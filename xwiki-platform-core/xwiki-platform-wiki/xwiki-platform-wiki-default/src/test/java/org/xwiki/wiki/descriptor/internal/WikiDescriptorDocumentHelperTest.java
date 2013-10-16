@@ -29,8 +29,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper;
-import org.xwiki.wiki.manager.WikiManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -54,7 +54,7 @@ public class WikiDescriptorDocumentHelperTest
     public org.xwiki.test.mockito.MockitoComponentMockingRule<DefaultWikiDescriptorDocumentHelper> mocker =
             new MockitoComponentMockingRule(DefaultWikiDescriptorDocumentHelper.class);
 
-    private WikiManager wikiManager;
+    private WikiDescriptorManager wikiDescriptorManager;
 
     private Provider<XWikiContext> xcontextProvider;
 
@@ -69,7 +69,7 @@ public class WikiDescriptorDocumentHelperTest
     @Before
     public void setUp() throws Exception
     {
-        wikiManager = mocker.getInstance(WikiManager.class);
+        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
         queryManager = mocker.getInstance(QueryManager.class);
         documentReferenceResolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "current");
@@ -77,7 +77,7 @@ public class WikiDescriptorDocumentHelperTest
         when(xcontextProvider.get()).thenReturn(context);
         xwiki = mock(XWiki.class);
         when(context.getWiki()).thenReturn(xwiki);
-        when(wikiManager.getMainWikiId()).thenReturn("xwiki");
+        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
     }
 
     @Test

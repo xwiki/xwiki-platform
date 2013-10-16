@@ -35,7 +35,8 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.wiki.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -59,6 +60,9 @@ public class WikiManagerScriptService implements ScriptService
 
     @Inject
     private WikiManager wikiManager;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -145,7 +149,7 @@ public class WikiManagerScriptService implements ScriptService
         WikiDescriptor descriptor = null;
 
         try {
-            descriptor = wikiManager.getByAlias(wikiAlias);
+            descriptor = wikiDescriptorManager.getByAlias(wikiAlias);
         } catch (WikiManagerException e) {
             error(e.getMessage(), e);
         }
@@ -164,7 +168,7 @@ public class WikiManagerScriptService implements ScriptService
         WikiDescriptor descriptor = null;
 
         try {
-            descriptor = wikiManager.getById(wikiId);
+            descriptor = wikiDescriptorManager.getById(wikiId);
         } catch (WikiManagerException e) {
             error(e.getMessage(), e);
         }
@@ -181,7 +185,7 @@ public class WikiManagerScriptService implements ScriptService
     {
         Collection<WikiDescriptor> wikis;
         try {
-            wikis = wikiManager.getAll();
+            wikis = wikiDescriptorManager.getAll();
         } catch (WikiManagerException e) {
             error(e.getMessage(), e);
             wikis = new ArrayList<WikiDescriptor>();
@@ -198,7 +202,7 @@ public class WikiManagerScriptService implements ScriptService
     public boolean exists(String wikiId)
     {
         try {
-            return wikiManager.exists(wikiId);
+            return wikiDescriptorManager.exists(wikiId);
         } catch (WikiManagerException e) {
             error(e.getMessage(), e);
             return false;
@@ -228,7 +232,7 @@ public class WikiManagerScriptService implements ScriptService
     {
         WikiDescriptor descriptor = null;
         try {
-            descriptor = wikiManager.getMainWikiDescriptor();
+            descriptor = wikiDescriptorManager.getMainWikiDescriptor();
         } catch (WikiManagerException e) {
             error(e.getMessage(), e);
         }
@@ -240,7 +244,7 @@ public class WikiManagerScriptService implements ScriptService
      */
     public String getMainWikiId()
     {
-        return wikiManager.getMainWikiId();
+        return wikiDescriptorManager.getMainWikiId();
     }
 
     /**

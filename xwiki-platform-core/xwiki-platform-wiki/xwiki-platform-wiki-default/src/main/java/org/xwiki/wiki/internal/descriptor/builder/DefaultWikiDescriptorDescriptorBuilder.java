@@ -29,9 +29,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.document.XWikiServerClassDocumentInitializer;
-import org.xwiki.wiki.manager.WikiManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -65,11 +65,8 @@ public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBui
     @Inject
     private EntityReferenceSerializer<String> referenceSerializer;
 
-    /**
-     * Wiki Manager.
-     */
     @Inject
-    private WikiManager wikiManager;
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public DefaultWikiDescriptor buildDescriptorObject(List<BaseObject> serverClassObjects, XWikiDocument document)
@@ -130,7 +127,7 @@ public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBui
         try {
             // Create the descriptor document
             DocumentReference wikiDescriptorReference =
-                    new DocumentReference(wikiManager.getMainWikiId(), XWiki.SYSTEM_SPACE, String.format("%s%s",
+                    new DocumentReference(wikiDescriptorManager.getMainWikiId(), XWiki.SYSTEM_SPACE, String.format("%s%s",
                             VALID_PAGE_PREFIX, StringUtils.capitalize(descriptor.getId())));
             wikiDescriptorDocument = xwiki.getDocument(wikiDescriptorReference, context);
 
@@ -144,7 +141,7 @@ public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBui
 
             // Create the aliases
             List<String> aliases = descriptor.getAliases();
-            DocumentReference serverClass = new DocumentReference(wikiManager.getMainWikiId(),
+            DocumentReference serverClass = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
                     DefaultWikiDescriptor.SERVER_CLASS.getParent().getName(),
                     DefaultWikiDescriptor.SERVER_CLASS.getName());
             for (int i = 1; i < aliases.size(); ++i) {

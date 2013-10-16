@@ -19,11 +19,9 @@
  */
 package org.xwiki.wiki.manager;
 
-import java.util.Collection;
-
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
-import org.xwiki.wiki.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 
 /**
  * Component to create and manage wikis.
@@ -46,14 +44,6 @@ public interface WikiManager
     WikiDescriptor create(String wikiId, String wikiAlias) throws WikiManagerException;
 
     /**
-     * Delete a wiki.
-     *
-     * @param wikiId Id of the wiki to delete.
-     * @throws WikiManagerException if problems occur
-     */
-    void delete(String wikiId) throws WikiManagerException;
-
-    /**
      * Copy a wiki.
      *
      * @param fromWikiId If of the wiki to copy
@@ -68,39 +58,12 @@ public interface WikiManager
             boolean copyRecycleBin) throws WikiManagerException;
 
     /**
-     * Get a wiki from one of its alias.
+     * Delete a wiki.
      *
-     * @param wikiAlias Alias of the wiki to retrieve
-     * @return The corresponding wiki descriptor of that alias.
+     * @param wikiId Id of the wiki to delete.
      * @throws WikiManagerException if problems occur
      */
-    WikiDescriptor getByAlias(String wikiAlias) throws WikiManagerException;
-
-    /**
-     * Get a wiki from its Id.
-     *
-     * @param wikiId Id of the wiki to retrieve.
-     * @return The corresponding wiki descriptor of that Id
-     * @throws WikiManagerException if problems occur
-     */
-    WikiDescriptor getById(String wikiId) throws WikiManagerException;
-
-    /**
-     * Get the list of all wikis (except the main one).
-     *
-     * @return the lit of every wiki created on the farm (except the main one).
-     * @throws WikiManagerException if problems occur
-     */
-    Collection<WikiDescriptor> getAll() throws WikiManagerException;
-
-    /**
-     * Check if a wiki corresponding to an Id exists.
-     *
-     * @param wikiId The id of the wiki to test.
-     * @return true if a wiki with that Id exists.
-     * @throws WikiManagerException if problems occur
-     */
-    boolean exists(String wikiId) throws WikiManagerException;
+    void delete(String wikiId) throws WikiManagerException;
 
     /**
      * Check if the wikiId is valid and available (the name is not already taken for technical reasons).
@@ -110,15 +73,4 @@ public interface WikiManager
      * @throws WikiManagerException if problems occur
      */
     boolean idAvailable(String wikiId) throws WikiManagerException;
-
-    /**
-     * @return the descriptor of the main wiki
-     * @throws WikiManagerException if problems occur
-     */
-    WikiDescriptor getMainWikiDescriptor() throws WikiManagerException;
-
-    /**
-     * @return the Id of the main wiki
-     */
-    String getMainWikiId();
 }

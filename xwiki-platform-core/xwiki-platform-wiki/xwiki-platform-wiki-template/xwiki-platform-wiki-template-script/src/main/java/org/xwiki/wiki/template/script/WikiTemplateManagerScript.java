@@ -32,7 +32,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.wiki.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.template.WikiTemplateManager;
 import org.xwiki.wiki.template.WikiTemplateManagerException;
 

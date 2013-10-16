@@ -31,10 +31,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
-import org.xwiki.wiki.WikiDescriptor;
-import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
-import org.xwiki.wiki.internal.manager.DefaultWikiManager;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.template.WikiTemplateManager;
@@ -57,6 +56,8 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     @Inject
     @Named("default")
     private WikiManager wikiManager;
+
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
     private QueryManager queryManager;
@@ -84,7 +85,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
             if (documentNames != null && !documentNames.isEmpty()) {
                 for (String documentName : documentNames) {
                     String id = documentName.substring("XWiki.XWikiServer".length()).toLowerCase();
-                    result.add(wikiManager.getById(id));
+                    result.add(wikiDescriptorManager.getById(id));
                 }
             }
         } catch (Exception e) {

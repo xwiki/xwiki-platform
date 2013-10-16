@@ -26,7 +26,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.wiki.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.internal.manager.DefaultWikiDescriptorCache;
 

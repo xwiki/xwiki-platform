@@ -21,7 +21,7 @@ package org.xwiki.wiki.internal.descriptor;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.wiki.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.document.XWikiServerClassDocumentInitializer;
 
 /**

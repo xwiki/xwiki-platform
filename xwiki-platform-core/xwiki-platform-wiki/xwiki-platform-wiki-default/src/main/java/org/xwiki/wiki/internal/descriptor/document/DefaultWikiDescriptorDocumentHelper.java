@@ -34,7 +34,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.wiki.manager.WikiManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWiki;
@@ -55,10 +55,10 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    private WikiManager wikiManager;
+    private QueryManager queryManager;
 
     @Inject
-    private QueryManager queryManager;
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
     @Named("current")
@@ -67,7 +67,7 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
     @Override
     public DocumentReference getDocumentReferenceFromId(String wikiId)
     {
-        return new DocumentReference(wikiManager.getMainWikiId(),
+        return new DocumentReference(wikiDescriptorManager.getMainWikiId(),
                 XWiki.SYSTEM_SPACE, String.format("XWikiServer%s", StringUtils.capitalize(wikiId)));
     }
 
@@ -87,7 +87,7 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
                     "where doc.object(XWiki.XWikiServerClass).server = :wikiAlias and doc.name like 'XWikiServer%'",
                     Query.XWQL);
             query.bindValue("wikiAlias", wikiAlias);
-            query.setWiki(wikiManager.getMainWikiId());
+            query.setWiki(wikiDescriptorManager.getMainWikiId());
             List<String> documentNames = query.execute();
 
             // Resolve the document name into a references
@@ -124,7 +124,7 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
             Query query = this.queryManager.createQuery(
                     "from doc.object(XWiki.XWikiServerClass) as descriptor where doc.name like 'XWikiServer%'",
                     Query.XWQL);
-            query.setWiki(wikiManager.getMainWikiId());
+            query.setWiki(wikiDescriptorManager.getMainWikiId());
             List<String> documentNames = query.execute();
 
             if (documentNames != null && !documentNames.isEmpty()) {

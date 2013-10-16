@@ -22,7 +22,7 @@ package org.xwiki.wiki.template;
 import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.wiki.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 
 /**
  * Component in charge of managing wiki templates and creating new wiki from these templates.

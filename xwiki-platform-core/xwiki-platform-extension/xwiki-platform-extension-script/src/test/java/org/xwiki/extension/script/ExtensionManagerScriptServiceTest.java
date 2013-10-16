@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -222,5 +223,13 @@ public class ExtensionManagerScriptServiceTest
                 Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(false);
 
         uninstall("installedonnamespace", "namespace");
+    }
+
+    @Test
+    public void testGet()
+    {
+        Assert.assertNotNull(this.scriptService.get(CoreExtensionScriptService.ID));
+        Assert.assertNotNull(this.scriptService.get(LocalExtensionScriptService.ID));
+        Assert.assertNotNull(this.scriptService.get(InstalledExtensionScriptService.ID));
     }
 }

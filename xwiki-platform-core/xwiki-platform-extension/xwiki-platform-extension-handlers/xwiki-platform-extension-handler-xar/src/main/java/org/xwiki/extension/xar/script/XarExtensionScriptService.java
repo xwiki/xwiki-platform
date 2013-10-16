@@ -29,33 +29,26 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.InstallRequest;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.script.AbstractExtensionScriptService;
 import org.xwiki.extension.script.ExtensionManagerScriptService;
 import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobManager;
-import org.xwiki.script.service.ScriptService;
 
 /**
  * Various XAR oriented APIs for scripts.
  * 
  * @version $Id$
+ * @since 5.3M1
  */
 @Component
-@Named("xarextension")
+@Named("extension.xar")
 @Singleton
-public class XarExtensionScriptService implements ScriptService
+public class XarExtensionScriptService extends AbstractExtensionScriptService
 {
-    /**
-     * The key under which the last encountered error is stored in the current execution context.
-     */
-    public static final String EXTENSIONERROR_KEY = "scriptservice.xarextension.error";
-
     /**
      * Needed for checking programming rights.
      */
@@ -63,63 +56,10 @@ public class XarExtensionScriptService implements ScriptService
     private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * Provides access to the current context.
-     */
-    @Inject
-    private Execution execution;
-
-    /**
-     * Provide safe wrapper for objects.
-     */
-    @Inject
-    @SuppressWarnings("rawtypes")
-    private ScriptSafeProvider scriptProvider;
-
-    /**
      * Handles and provides status feedback on extension operations (installation, upgrade, removal).
      */
     @Inject
     private JobManager jobManager;
-
-    /**
-     * Used to manipulate the installed xar extensions.
-     */
-    @Inject
-    private InstalledExtensionRepository xarRepository;
-
-    /**
-     * @param <T> the type of the object
-     * @param unsafe the unsafe object
-     * @return the safe version of the passed object
-     */
-    @SuppressWarnings("unchecked")
-    private <T> T safe(T unsafe)
-    {
-        return (T) this.scriptProvider.get(unsafe);
-    }
-
-    // Error management
-
-    /**
-     * Get the error generated while performing the previously called action.
-     * 
-     * @return an eventual exception or {@code null} if no exception was thrown
-     */
-    public Exception getLastError()
-    {
-        return (Exception) this.execution.getContext().getProperty(EXTENSIONERROR_KEY);
-    }
-
-    /**
-     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
-     * 
-     * @param e the exception to store, can be {@code null} to clear the previously stored exception
-     * @see #getLastError()
-     */
-    private void setError(Exception e)
-    {
-        this.execution.getContext().setProperty(EXTENSIONERROR_KEY, e);
-    }
 
     /**
      * Make sure the provided XAR extension properly is registered in the installed extensions index.

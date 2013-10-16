@@ -32,7 +32,6 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.Extension;
@@ -41,7 +40,6 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
@@ -49,11 +47,8 @@ import org.xwiki.extension.job.internal.InstallPlanJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.job.internal.UninstallPlanJob;
 import org.xwiki.extension.job.internal.UpgradePlanJob;
-import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.version.Version;
 import org.xwiki.extension.version.VersionConstraint;
@@ -66,6 +61,7 @@ import org.xwiki.job.JobException;
 import org.xwiki.job.JobManager;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.script.service.ScriptServiceManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -80,19 +76,19 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  */
 @Component
-@Named("extension")
+@Named(ExtensionManagerScriptService.ROLEHINT)
 @Singleton
-public class ExtensionManagerScriptService implements ScriptService
+public class ExtensionManagerScriptService extends AbstractExtensionScriptService
 {
     /**
-     * The key under which the last encountered error is stored in the current execution context.
+     * The role hint of this component.
      */
-    public static final String EXTENSIONERROR_KEY = "scriptservice.extension.error";
+    public static final String ROLEHINT = "extension";
 
     /**
      * The prefix put behind all job ids.
      */
-    public static final String EXTENSION_JOBID_PREFIX = "extension";
+    public static final String EXTENSION_JOBID_PREFIX = ROLEHINT;
 
     /**
      * The prefix put behind all job ids which are actual actions.
@@ -129,24 +125,6 @@ public class ExtensionManagerScriptService implements ScriptService
     private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * The repository containing installed extensions.
-     */
-    @Inject
-    private InstalledExtensionRepository installedExtensionRepository;
-
-    /**
-     * The repository containing local extensions.
-     */
-    @Inject
-    private LocalExtensionRepository localExtensionRepository;
-
-    /**
-     * The repository with core modules provided by the platform.
-     */
-    @Inject
-    private CoreExtensionRepository coreExtensionRepository;
-
-    /**
      * Repository manager, needed for cross-repository operations.
      */
     @Inject
@@ -158,40 +136,36 @@ public class ExtensionManagerScriptService implements ScriptService
     @Inject
     private JobManager jobManager;
 
-    /**
-     * Provides access to the current context.
-     */
-    @Inject
-    private Execution execution;
-
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    @SuppressWarnings("rawtypes")
-    private ScriptSafeProvider scriptProvider;
+    private ScriptServiceManager scriptServiceManager;
 
     /**
-     * @param <T> the type of the object
-     * @param unsafe the unsafe object
-     * @return the safe version of the passed object
+     * @param <S> the type of the {@link ScriptService}
+     * @param serviceName the name of the sub {@link ScriptService}
+     * @return the {@link ScriptService} or null of none could be found
      */
-    @SuppressWarnings("unchecked")
-    private <T> T safe(T unsafe)
+    public <S extends ScriptService> S get(String serviceName)
     {
-        return (T) this.scriptProvider.get(unsafe);
+        return (S) this.scriptServiceManager.get(ExtensionManagerScriptService.ROLEHINT + '.' + serviceName);
     }
 
     // Repositories
 
     /**
-     * @return all the repositories except core and local repositories
+     * @return all the remote repositories
      */
     public Collection<ExtensionRepository> getRepositories()
     {
         return safe(this.repositoryManager.getRepositories());
     }
 
+    /**
+     * @param repositoryId the identifier of the remote repository
+     * @return the repository
+     */
     public ExtensionRepository getRepository(String repositoryId)
     {
         return safe(this.extensionManager.getRepository(repositoryId));
@@ -283,112 +257,6 @@ public class ExtensionManagerScriptService implements ScriptService
         }
 
         return versions;
-    }
-
-    /**
-     * Get a list of all currently installed extensions. This doesn't include core extensions, only custom extensions
-     * installed by the administrators.
-     * 
-     * @return a list of read-only handlers corresponding to the installed extensions, an empty list if nothing is
-     *         installed
-     */
-    public Collection<InstalledExtension> getInstalledExtensions()
-    {
-        return safe(this.installedExtensionRepository.getInstalledExtensions());
-    }
-
-    /**
-     * Return all the extensions available for the provide namespace. This also include root extension since namespaces
-     * inherit from root.
-     * <p>
-     * This doesn't include core extensions, only extension installed through the API.
-     * 
-     * @param namespace the target namespace for which to retrieve the list of installed extensions
-     * @return a list of read-only handlers corresponding to the installed extensions, an empty list if nothing is
-     *         installed in the target namespace
-     */
-    public Collection<InstalledExtension> getInstalledExtensions(String namespace)
-    {
-        return safe(this.installedExtensionRepository.getInstalledExtensions(namespace));
-    }
-
-    /**
-     * Get the extension handler corresponding to the given installed extension ID or feature (virtual ID) provided by
-     * the extension and namespace.
-     * <p>
-     * The returned handler can be used to get more information about the extension, such as the authors, an extension
-     * description, its license...
-     * 
-     * @param feature the extension id or provided feature (virtual extension) of the extension to resolve
-     * @param namespace the optional namespace where the extension should be installed
-     * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
-     *         installed in the target namespace
-     */
-    public InstalledExtension getInstalledExtension(String feature, String namespace)
-    {
-        return safe(this.installedExtensionRepository.getInstalledExtension(feature, namespace));
-    }
-
-    /**
-     * Get a list of core extensions provided by the current version of the platform.
-     * 
-     * @return a list of read-only handlers corresponding to the core extensions
-     */
-    public Collection<CoreExtension> getCoreExtensions()
-    {
-        return safe(this.coreExtensionRepository.getCoreExtensions());
-    }
-
-    /**
-     * Get the extension handler corresponding to the given core extension ID. The returned handler can be used to get
-     * more information about the extension, such as the authors, an extension description, its license...
-     * 
-     * @param feature the extension id or provided feature (virtual extension) of the extension to resolve
-     * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
-     *         provided by the platform
-     */
-    public CoreExtension getCoreExtension(String feature)
-    {
-        return safe(this.coreExtensionRepository.getCoreExtension(feature));
-    }
-
-    /**
-     * Get a list of cached extensions from the local extension repository. This doesn't include core extensions, only
-     * custom extensions fetched or installed.
-     * 
-     * @return a list of read-only handlers corresponding to the local extensions, an empty list if nothing is available
-     *         in the local repository
-     */
-    public Collection<LocalExtension> getLocalExtensions()
-    {
-        return safe(this.localExtensionRepository.getLocalExtensions());
-    }
-
-    /**
-     * Get all the installed extensions that depend on the specified extension. The results are grouped by namespace, so
-     * the same extension can appear multiple times, once for each namespace where it is installed.
-     * 
-     * @param feature the extension id or provided feature (virtual extension) of the extension to resolve
-     * @param version the specific version to check
-     * @return a map namespace -&gt; list of dependent extensions, or {@code null} if any error occurs while computing
-     *         the result, in which case {@link #getLastError()} contains the failure reason
-     */
-    public Map<String, Collection<InstalledExtension>> getBackwardDependencies(String feature, String version)
-    {
-        setError(null);
-
-        Map<String, Collection<InstalledExtension>> extensions;
-
-        try {
-            extensions =
-                safe(this.installedExtensionRepository.getBackwardDependencies(new ExtensionId(feature, version)));
-        } catch (Exception e) {
-            setError(e);
-
-            extensions = null;
-        }
-
-        return extensions;
     }
 
     // Actions
@@ -699,6 +567,12 @@ public class ExtensionManagerScriptService implements ScriptService
         return job;
     }
 
+    /**
+     * Create the default request used when asking for the upgrade plan on a namespace.
+     * 
+     * @param namespace the namespace to upgrade
+     * @return the request to pass t the job
+     */
     public InstallRequest createUpgradePlanRequest(String namespace)
     {
         InstallRequest installRequest = new InstallRequest();
@@ -845,29 +719,6 @@ public class ExtensionManagerScriptService implements ScriptService
         return jobStatus;
     }
 
-    // Error management
-
-    /**
-     * Get the error generated while performing the previously called action.
-     * 
-     * @return an eventual exception or {@code null} if no exception was thrown
-     */
-    public Exception getLastError()
-    {
-        return (Exception) this.execution.getContext().getProperty(EXTENSIONERROR_KEY);
-    }
-
-    /**
-     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
-     * 
-     * @param e the exception to store, can be {@code null} to clear the previously stored exception
-     * @see #getLastError()
-     */
-    private void setError(Exception e)
-    {
-        this.execution.getContext().setProperty(EXTENSIONERROR_KEY, e);
-    }
-
     // Version management
 
     /**
@@ -931,5 +782,118 @@ public class ExtensionManagerScriptService implements ScriptService
         }
 
         return null;
+    }
+
+    // Deprecated (generally moved to dedicated script services)
+
+    /**
+     * Get a list of all currently installed extensions. This doesn't include core extensions, only custom extensions
+     * installed by the administrators.
+     * 
+     * @return a list of read-only handlers corresponding to the installed extensions, an empty list if nothing is
+     *         installed
+     * @deprecated since 5.3M1, use {@link InstalledExtensionScriptService#getInstalledExtensions()} instead
+     */
+    @Deprecated
+    public Collection<InstalledExtension> getInstalledExtensions()
+    {
+        return this.<InstalledExtensionScriptService> get(InstalledExtensionScriptService.ID).getInstalledExtensions();
+    }
+
+    /**
+     * Return all the extensions available for the provide namespace. This also include root extension since namespaces
+     * inherit from root.
+     * <p>
+     * This doesn't include core extensions, only extension installed through the API.
+     * 
+     * @param namespace the target namespace for which to retrieve the list of installed extensions
+     * @return a list of read-only handlers corresponding to the installed extensions, an empty list if nothing is
+     *         installed in the target namespace
+     * @deprecated since 5.3M1, use {@link InstalledExtensionScriptService#getInstalledExtensions(String)} instead
+     */
+    @Deprecated
+    public Collection<InstalledExtension> getInstalledExtensions(String namespace)
+    {
+        return this.<InstalledExtensionScriptService> get(InstalledExtensionScriptService.ID).getInstalledExtensions(
+            namespace);
+    }
+
+    /**
+     * Get the extension handler corresponding to the given installed extension ID or feature (virtual ID) provided by
+     * the extension and namespace.
+     * <p>
+     * The returned handler can be used to get more information about the extension, such as the authors, an extension
+     * description, its license...
+     * 
+     * @param feature the extension id or provided feature (virtual extension) of the extension to resolve
+     * @param namespace the optional namespace where the extension should be installed
+     * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
+     *         installed in the target namespace
+     * @deprecated since 5.3M1, use {@link InstalledExtensionScriptService#getInstalledExtension(String, String)}
+     *             instead
+     */
+    @Deprecated
+    public InstalledExtension getInstalledExtension(String feature, String namespace)
+    {
+        return this.<InstalledExtensionScriptService> get(InstalledExtensionScriptService.ID).getInstalledExtension(
+            feature, namespace);
+    }
+
+    /**
+     * Get all the installed extensions that depend on the specified extension. The results are grouped by namespace, so
+     * the same extension can appear multiple times, once for each namespace where it is installed.
+     * 
+     * @param feature the extension id or provided feature (virtual extension) of the extension to resolve
+     * @param version the specific version to check
+     * @return a map namespace -&gt; list of dependent extensions, or {@code null} if any error occurs while computing
+     *         the result, in which case {@link #getLastError()} contains the failure reason
+     * @deprecated since 5.3M1, use {@link InstalledExtensionScriptService#getBackwardDependencies(String)} instead
+     */
+    @Deprecated
+    public Map<String, Collection<InstalledExtension>> getBackwardDependencies(String feature, String version)
+    {
+        return this.<InstalledExtensionScriptService> get(InstalledExtensionScriptService.ID).getBackwardDependencies(
+            feature);
+    }
+
+    /**
+     * Get a list of core extensions provided by the current version of the platform.
+     * 
+     * @return a list of read-only handlers corresponding to the core extensions
+     * @deprecated since 5.3M1, use {@link CoreExtensionScriptService#getCoreExtensions()} instead
+     */
+    @Deprecated
+    public Collection<CoreExtension> getCoreExtensions()
+    {
+        return this.<CoreExtensionScriptService> get(CoreExtensionScriptService.ID).getCoreExtensions();
+    }
+
+    /**
+     * Get the extension handler corresponding to the given core extension ID. The returned handler can be used to get
+     * more information about the extension, such as the authors, an extension description, its license...
+     * 
+     * @param feature the extension id or provided feature (virtual extension) of the extension to resolve
+     * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension isn't
+     *         provided by the platform
+     * @deprecated since 5.3M1, use {@link CoreExtensionScriptService#getCoreExtension(String)} instead
+     */
+    @Deprecated
+    public CoreExtension getCoreExtension(String feature)
+    {
+        return this.<CoreExtensionScriptService> get(CoreExtensionScriptService.ID).getCoreExtension(feature);
+    }
+
+    /**
+     * Get a list of cached extensions from the local extension repository. This doesn't include core extensions, only
+     * custom extensions fetched or installed.
+     * 
+     * @return a list of read-only handlers corresponding to the local extensions, an empty list if nothing is available
+     *         in the local repository
+     * @deprecated since 5.3M1, use {@link LocalExtensionScriptService#getLocalExtensions()}
+     */
+    @Deprecated
+    public Collection<LocalExtension> getLocalExtensions()
+    {
+        return this.<LocalExtensionScriptService> get(LocalExtensionScriptService.ID).getLocalExtensions();
     }
 }

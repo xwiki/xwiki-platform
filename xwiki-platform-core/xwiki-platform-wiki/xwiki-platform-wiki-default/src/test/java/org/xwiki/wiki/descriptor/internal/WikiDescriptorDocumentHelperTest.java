@@ -29,7 +29,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.wiki.descriptor.internal.document.DefaultWikiDescriptorDocumentHelper;
+import org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper;
 import org.xwiki.wiki.manager.WikiManager;
 
 import com.xpn.xwiki.XWiki;
@@ -43,7 +43,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link org.xwiki.wiki.descriptor.internal.document.DefaultWikiDescriptorDocumentHelper}.
+ * Unit tests for {@link org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper}.
  *
  * @version $Id$
  * @since 5.3M1

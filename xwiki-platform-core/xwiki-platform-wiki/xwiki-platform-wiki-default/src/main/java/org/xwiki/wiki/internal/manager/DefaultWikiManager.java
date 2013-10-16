@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.descriptor.internal.manager;
+package org.xwiki.wiki.internal.manager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,10 +34,10 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.wiki.WikiDescriptor;
-import org.xwiki.wiki.descriptor.internal.DefaultWikiDescriptor;
-import org.xwiki.wiki.descriptor.internal.builder.WikiDescriptorBuilder;
-import org.xwiki.wiki.descriptor.internal.builder.WikiDescriptorBuilderException;
-import org.xwiki.wiki.descriptor.internal.document.DefaultWikiDescriptorDocumentHelper;
+import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
+import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder;
+import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilderException;
+import org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 

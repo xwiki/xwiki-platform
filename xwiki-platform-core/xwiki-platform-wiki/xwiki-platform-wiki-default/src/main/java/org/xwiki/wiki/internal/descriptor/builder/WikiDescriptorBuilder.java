@@ -17,12 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.descriptor.internal.builder;
+package org.xwiki.wiki.internal.descriptor.builder;
 
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.wiki.descriptor.internal.DefaultWikiDescriptor;
+import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;

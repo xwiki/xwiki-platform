@@ -27,7 +27,8 @@ import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.WikiDescriptor;
-import org.xwiki.wiki.descriptor.internal.manager.DefaultWikiDescriptorCache;
+import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
+import org.xwiki.wiki.internal.manager.DefaultWikiDescriptorCache;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -35,7 +36,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link org.xwiki.wiki.descriptor.internal.manager.DefaultWikiDescriptorCache}.
+ * Unit tests for {@link org.xwiki.wiki.internal.manager.DefaultWikiDescriptorCache}.
  *
  * @version $Id$
  * @since 5.3M1

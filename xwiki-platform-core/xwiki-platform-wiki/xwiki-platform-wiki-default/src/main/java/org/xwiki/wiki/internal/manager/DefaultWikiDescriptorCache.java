@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.descriptor.internal.manager;
+package org.xwiki.wiki.internal.manager;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -29,7 +29,7 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.wiki.descriptor.internal.DefaultWikiDescriptor;
+import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 
 /**
  * Default implementation of {@link WikiDescriptorCache}.

@@ -37,10 +37,11 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.WikiDescriptor;
-import org.xwiki.wiki.descriptor.internal.builder.WikiDescriptorBuilder;
-import org.xwiki.wiki.descriptor.internal.document.DefaultWikiDescriptorDocumentHelper;
-import org.xwiki.wiki.descriptor.internal.manager.DefaultWikiManager;
-import org.xwiki.wiki.descriptor.internal.manager.WikiDescriptorCache;
+import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
+import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder;
+import org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper;
+import org.xwiki.wiki.internal.manager.DefaultWikiManager;
+import org.xwiki.wiki.internal.manager.WikiDescriptorCache;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
@@ -61,7 +62,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link org.xwiki.wiki.descriptor.internal.manager.DefaultWikiManager}.
+ * Unit tests for {@link org.xwiki.wiki.internal.manager.DefaultWikiManager}.
  *
  * @version $Id$
  * @since 5.3M1

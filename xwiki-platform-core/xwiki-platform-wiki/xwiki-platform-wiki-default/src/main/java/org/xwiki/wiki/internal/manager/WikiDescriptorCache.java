@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.descriptor.internal.manager;
+package org.xwiki.wiki.internal.manager;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.wiki.descriptor.internal.DefaultWikiDescriptor;
+import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 
 /**
  * Component that handle caching for wiki descriptors.

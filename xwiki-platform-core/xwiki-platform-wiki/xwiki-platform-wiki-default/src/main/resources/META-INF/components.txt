@@ -1,4 +1,4 @@
-org.xwiki.wiki.descriptor.internal.builder.DefaultWikiDescriptorDescriptorBuilder
-org.xwiki.wiki.descriptor.internal.manager.DefaultWikiManager
+org.xwiki.wiki.internal.descriptor.builderWikiDescriptorDescriptorBuilder
+org.xwiki.wiki.internal.manager.DefaultWikiManager
 org.xwiki.wiki.descriptor.internal.WikiDescriptorListener
-org.xwiki.wiki.descriptor.internal.XWikiServerClassDocumentInitializer
+org.xwiki.wiki.internal.descriptor.document.XWikiServerClassDocumentInitializer

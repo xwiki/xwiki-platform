@@ -17,11 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.descriptor.internal;
+package org.xwiki.wiki.internal.descriptor;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.wiki.WikiDescriptor;
+import org.xwiki.wiki.internal.descriptor.document.XWikiServerClassDocumentInitializer;
 
 /**
  * Default implementation of the {@link WikiDescriptor}.

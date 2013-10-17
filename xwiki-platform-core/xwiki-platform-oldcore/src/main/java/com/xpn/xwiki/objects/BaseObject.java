@@ -434,5 +434,9 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
         super.setOwnerDocument(ownerDocument);
+
+        if (this.ownerDocument != null) {
+            setDocumentReference(this.ownerDocument.getDocumentReference());
+        }
     }
 }

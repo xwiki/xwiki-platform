@@ -311,10 +311,6 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
         this.ownerDocument = ownerDocument;
-
-        if (this.ownerDocument != null) {
-            setDocumentReference(this.ownerDocument.getDocumentReference());
-        }
     }
 
     /**

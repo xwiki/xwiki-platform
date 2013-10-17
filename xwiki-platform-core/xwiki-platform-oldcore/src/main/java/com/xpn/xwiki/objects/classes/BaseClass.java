@@ -1358,6 +1358,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     {
         super.setOwnerDocument(ownerDocument);
 
+        if (this.ownerDocument != null) {
+            setDocumentReference(this.ownerDocument.getDocumentReference());
+        }
+
         if (ownerDocument != null && isDirty) {
             ownerDocument.setContentDirty(true);
         }

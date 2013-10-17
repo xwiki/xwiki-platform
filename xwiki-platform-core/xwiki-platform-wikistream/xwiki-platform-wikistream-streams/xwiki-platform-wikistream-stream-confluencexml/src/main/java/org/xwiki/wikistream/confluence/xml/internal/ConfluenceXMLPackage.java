@@ -109,6 +109,40 @@ public class ConfluenceXMLPackage
 
     public static final String KEY_ATTACHMENT_DTO = "imageDetailsDTO";
 
+    public static final String KEY_GROUP_NAME = "name";
+
+    public static final String KEY_GROUP_ACTIVE = "active";
+
+    public static final String KEY_GROUP_LOCAL = "local";
+
+    public static final String KEY_GROUP_CREATION_DATE = "createdDate";
+
+    public static final String KEY_GROUP_REVISION_DATE = "updatedDate";
+
+    public static final String KEY_GROUP_DESCRIPTION = "description";
+
+    public static final String KEY_GROUP_DIRECTORY = "directory";
+
+    public static final String KEY_USER_NAME = "name";
+
+    public static final String KEY_USER_ACTIVE = "active";
+
+    public static final String KEY_USER_CREATION_DATE = "createdDate";
+
+    public static final String KEY_USER_REVISION_DATE = "updatedDate";
+
+    public static final String KEY_USER_FIRSTNAME = "firstName";
+
+    public static final String KEY_USER_LASTNAME = "lastName";
+
+    public static final String KEY_USER_DISPLAYNAME = "displayName";
+
+    public static final String KEY_USER_EMAIL = "emailAddress";
+
+    public static final String KEY_USER_DIRECTORY = "directory";
+
+    public static final String KEY_USER_PASSWORD = "credential";
+
     /**
      * 2012-03-07 17:16:48.158
      */
@@ -239,6 +273,10 @@ public class ConfluenceXMLPackage
             if (type.equals("Page")) {
                 readPageObject(xmlReader);
             } else if (type.equals("Space")) {
+                readSpaceObject(xmlReader);
+            } else if (type.equals("InternalUser")) {
+                readSpaceObject(xmlReader);
+            } else if (type.equals("InternalGroup")) {
                 readSpaceObject(xmlReader);
             } else if (type.equals("BodyContent")) {
                 readBodyContentObject(xmlReader);
@@ -376,6 +414,28 @@ public class ConfluenceXMLPackage
         }
     }
 
+    private void readUserObject(XMLStreamReader xmlReader) throws IOException, NumberFormatException,
+        XMLStreamException, ConfigurationException, WikiStreamException
+    {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
+
+        int pageId = readObjectProperties(xmlReader, properties);
+
+        // Save page
+        saveUserProperties(properties, pageId);
+    }
+
+    private void readGroupObject(XMLStreamReader xmlReader) throws IOException, NumberFormatException,
+        XMLStreamException, ConfigurationException, WikiStreamException
+    {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
+
+        int pageId = readObjectProperties(xmlReader, properties);
+
+        // Save page
+        saveGroupProperties(properties, pageId);
+    }
+
     private Object readProperty(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException
     {
         String propertyClass = xmlReader.getAttributeValue(null, "class");
@@ -437,14 +497,48 @@ public class ConfluenceXMLPackage
         return new File(this.tree, "pages");
     }
 
+    private File getUsersFolder()
+    {
+        return new File(this.tree, "users");
+    }
+
+    private File getGroupsFolder()
+    {
+        return new File(this.tree, "groups");
+    }
+
     private File getPageFolder(int pageId)
     {
         return new File(getPagesFolder(), String.valueOf(pageId));
     }
 
+    private File getUserFolder(int userId)
+    {
+        return new File(getUsersFolder(), String.valueOf(userId));
+    }
+
+    private File getGroupFolder(int groupId)
+    {
+        return new File(getGroupsFolder(), String.valueOf(groupId));
+    }
+
     private File getPagePropertiesFile(int pageId)
     {
         File folder = getPageFolder(pageId);
+
+        return new File(folder, "properties.properties");
+    }
+
+    private File getUserPropertiesFile(int userId)
+    {
+        File folder = getUserFolder(userId);
+
+        return new File(folder, "properties.properties");
+    }
+
+    private File getGroupPropertiesFile(int groupId)
+    {
+        File folder = getGroupFolder(groupId);
 
         return new File(folder, "properties.properties");
     }
@@ -513,6 +607,20 @@ public class ConfluenceXMLPackage
         return new PropertiesConfiguration(file);
     }
 
+    public PropertiesConfiguration getUserProperties(int userId) throws ConfigurationException
+    {
+        File file = getUserPropertiesFile(userId);
+
+        return new PropertiesConfiguration(file);
+    }
+
+    public PropertiesConfiguration getGroupProperties(int groupId) throws ConfigurationException
+    {
+        File file = getGroupPropertiesFile(groupId);
+
+        return new PropertiesConfiguration(file);
+    }
+
     public PropertiesConfiguration getAttachmentProperties(int pageId, int attachmentId) throws ConfigurationException
     {
         File file = getAttachmentPropertiesFile(pageId, attachmentId);
@@ -539,6 +647,26 @@ public class ConfluenceXMLPackage
         ConfigurationException
     {
         PropertiesConfiguration fileProperties = getPageProperties(pageId);
+
+        fileProperties.copy(properties);
+
+        fileProperties.save();
+    }
+
+    private void saveUserProperties(PropertiesConfiguration properties, int userId) throws IOException,
+        ConfigurationException
+    {
+        PropertiesConfiguration fileProperties = getUserProperties(userId);
+
+        fileProperties.copy(properties);
+
+        fileProperties.save();
+    }
+
+    private void saveGroupProperties(PropertiesConfiguration properties, int groupId) throws IOException,
+        ConfigurationException
+    {
+        PropertiesConfiguration fileProperties = getGroupProperties(groupId);
 
         fileProperties.copy(properties);
 

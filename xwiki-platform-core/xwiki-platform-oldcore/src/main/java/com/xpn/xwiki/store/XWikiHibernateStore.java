@@ -824,7 +824,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             String cxml = doc.getXClassXML();
             if (cxml != null) {
                 bclass.fromXML(cxml);
-                bclass.setDocumentReference(doc.getDocumentReference());
                 doc.setXClass(bclass);
                 bclass.setDirty(false);
             }

@@ -87,11 +87,6 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     private boolean isDirty = true;
 
     /**
-     * The owner document, if this object was obtained from a document.
-     */
-    private transient XWikiDocument ownerDocument;
-
-    /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
@@ -1361,7 +1356,12 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      */
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        this.ownerDocument = ownerDocument;
+        super.setOwnerDocument(ownerDocument);
+
+        if (this.ownerDocument != null) {
+            setDocumentReference(this.ownerDocument.getDocumentReference());
+        }
+
         if (ownerDocument != null && isDirty) {
             ownerDocument.setContentDirty(true);
         }

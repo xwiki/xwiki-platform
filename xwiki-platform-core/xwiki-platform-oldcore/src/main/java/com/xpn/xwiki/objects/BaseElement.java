@@ -27,6 +27,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.merge.MergeUtils;
@@ -50,8 +51,16 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     /**
      * Reference to the document in which this element is defined (for elements where this make sense, for example for
      * an XClass or a XObject).
+     * @since 5.3M1
+     * 
      */
-    private DocumentReference documentReference;
+    protected DocumentReference documentReference;
+
+    /**
+     * The owner document, if this element was obtained from a document.
+     * @since 5.3M1
+     */
+    protected transient XWikiDocument ownerDocument;
 
     /**
      * Free form name (for elements which don't point to a reference, for example for instances of {@link BaseProperty}
@@ -127,21 +136,10 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         this.referenceCache = null;
     }
 
-    /**
-     * Note that this method is used by Hibernate for loading an element. {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ElementInterface#setName(java.lang.String)
-     */
     @Override
     public void setName(String name)
     {
-        // If a reference is already set, then you cannot set a name
-        if (this.documentReference != null) {
-            throw new IllegalStateException("BaseElement#setName could not be called when a reference has been set.");
-        }
-
         this.name = name;
-        this.referenceCache = null;
     }
 
     public String getPrettyName()
@@ -262,6 +260,8 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         try {
             element = (BaseElement) super.clone();
 
+            element.setOwnerDocument(getOwnerDocument());
+
             // Make sure we clone either the reference or the name depending on which one is used.
             if (this.documentReference != null) {
                 element.setDocumentReference(getDocumentReference());
@@ -300,5 +300,25 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         }
 
         return modified;
+    }
+
+    /**
+     * Set the owner document of this element.
+     * 
+     * @param ownerDocument The owner document.
+     * @since 5.3M1
+     */
+    public void setOwnerDocument(XWikiDocument ownerDocument)
+    {
+        this.ownerDocument = ownerDocument;
+    }
+
+    /**
+     * @return the owner document of this element.
+     * @since 5.3M1
+     */
+    public XWikiDocument getOwnerDocument()
+    {
+        return this.ownerDocument;
     }
 }

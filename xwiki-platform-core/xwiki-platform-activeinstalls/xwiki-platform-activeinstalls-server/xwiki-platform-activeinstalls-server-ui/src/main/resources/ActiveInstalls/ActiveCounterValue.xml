@@ -44,7 +44,7 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #set ($now = $xwiki.jodatime.dateTime)
-#set ($threshold = $now.plusDays(-30))
+#set ($threshold = $now.plusDays(-2))
 #set ($formatted = $xwiki.jodatime.getISODateTimeFormatter().print($threshold))
 $services.activeinstalls.getInstallCount("date:[$formatted TO *]")
 {{/velocity}}</content>

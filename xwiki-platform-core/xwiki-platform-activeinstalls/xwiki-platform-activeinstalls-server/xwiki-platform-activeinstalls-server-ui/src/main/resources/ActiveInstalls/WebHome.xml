@@ -42,9 +42,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>Total number of XWiki installations{{footnote}}Total number of XWiki installations that have sent us a ping and for XWiki versions &gt;= 5.2-milestone-2.{{/footnote}}:
+  <content>Total number of XWiki installations{{footnote}}Total number of XWiki installations that have ever sent us a ping (since this feature was introduced, i.e. in XWiki 5.2-milestone-2).{{/footnote}}:
 
-(% id="totalCounter" class="flip-counter" %)(((
+    (% id="totalCounter" class="flip-counter" %)(((
 )))
 
 
@@ -55,7 +55,7 @@
 
 
 
-Active XWiki installations{{footnote}}Total number of XWiki installations that have sent us a ping in the past 30 days.{{/footnote}}:
+Active XWiki installations{{footnote}}Total number of XWiki installations that have sent us a ping in the past 2 days (since this feature was introduced, i.e. in XWiki 5.2-milestone-2).{{/footnote}}:
 
 (% id="activeCounter" class="flip-counter" %)(((
 )))

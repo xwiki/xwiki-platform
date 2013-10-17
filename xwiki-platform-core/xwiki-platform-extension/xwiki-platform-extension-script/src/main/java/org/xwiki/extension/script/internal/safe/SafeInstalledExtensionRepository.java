@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.xwiki.context.Execution;
+import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
@@ -31,6 +32,8 @@ import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.repository.result.IterableResult;
+import org.xwiki.extension.repository.search.SearchException;
 
 /**
  * Provide a public script access to a local extension repository.
@@ -162,5 +165,12 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
     public InstalledExtension resolve(ExtensionId extensionId)
     {
         return (InstalledExtension) super.resolve(extensionId);
+    }
+
+    @Override
+    public IterableResult<Extension> searchInstalledExtensions(String pattern, String namespace, int offset, int nb)
+        throws SearchException
+    {
+        return safe(getWrapped().searchInstalledExtensions(pattern, namespace, offset, nb));
     }
 }

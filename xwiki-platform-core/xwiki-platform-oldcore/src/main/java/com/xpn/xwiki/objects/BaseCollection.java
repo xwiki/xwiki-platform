@@ -50,6 +50,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
@@ -493,6 +494,10 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     public void addField(String name, PropertyInterface element)
     {
         this.fields.put(name, element);
+
+        if (element instanceof BaseElement) {
+            ((BaseElement) element).setOwnerDocument(getOwnerDocument());
+        }
     }
 
     public void removeField(String name)
@@ -753,16 +758,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     }
 
     @Override
-    public void setName(String name)
-    {
-        super.setName(name);
-
-        // We force to refresh the XClass reference so that next time it's retrieved again it'll be resolved against
-        // the new document reference.
-        this.xClassReferenceCache = null;
-    }
-
-    @Override
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)
     {
@@ -864,5 +859,23 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         }
 
         return modified;
+    }
+
+    /**
+     * Set the owner document of this base object.
+     * 
+     * @param ownerDocument The owner document.
+     * @since 5.3M1
+     */
+    public void setOwnerDocument(XWikiDocument ownerDocument)
+    {
+        super.setOwnerDocument(ownerDocument);
+
+        for (String propertyName : getPropertyList()) {
+            PropertyInterface property = getField(propertyName);
+            if (property instanceof BaseElement) {
+                ((BaseElement) property).setOwnerDocument(ownerDocument);
+            }
+        }
     }
 }

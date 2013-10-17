@@ -136,10 +136,21 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         this.referenceCache = null;
     }
 
+    /**
+     * Note that this method is used by Hibernate for loading an element. {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.ElementInterface#setName(java.lang.String)
+     */
     @Override
     public void setName(String name)
     {
+        // If a reference is already set, then you cannot set a name
+        if (this.documentReference != null) {
+            throw new IllegalStateException("BaseElement#setName could not be called when a reference has been set.");
+        }
+
         this.name = name;
+        this.referenceCache = null;
     }
 
     public String getPrettyName()

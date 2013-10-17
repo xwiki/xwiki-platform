@@ -602,4 +602,12 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is:
 # activeinstalls.pingURL=http://extensions.xwiki.org/activeinstalls
 
+#-------------------------------------------------------------------------------------
+# Activity Stream
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.3M1]
+#-# A list of full qualified class names or events that the activity stream should ignore
+activitystream.ignoredEvents=org.xwiki.bridge.event.WikiCreatingEvent,com.xpn.xwiki.internal.event.XARImportingEvent
+
 $!xwikiPropertiesAdditionalProperties

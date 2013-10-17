@@ -39,6 +39,7 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
@@ -64,6 +65,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityEventPriority;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStream;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
+import com.xpn.xwiki.plugin.activitystream.api.IgnoredEvents;
 import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.web.Utils;
@@ -840,9 +842,17 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
+        // Do not record some ignored events
+        ObservationContext observationContext = Utils.getComponent(ObservationContext.class);
+        IgnoredEvents ignoredEvents = Utils.getComponent(IgnoredEvents.class);
+        if (observationContext.isIn(ignoredEvents)) {
+            return;
+        }
+
         XWikiDocument currentDoc = (XWikiDocument) source;
         XWikiDocument originalDoc = currentDoc.getOriginalDocument();
         XWikiContext context = (XWikiContext) data;
+
         String wiki = context.getDatabase();
         String msgPrefix = "activitystream.event.";
         String streamName = getStreamName(currentDoc.getSpace(), context);

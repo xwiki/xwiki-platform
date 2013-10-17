@@ -811,6 +811,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 doc.setContentUpdateDate(new Date(doc.getContentUpdateDate().getTime()));
             } catch (ObjectNotFoundException e) { // No document
                 doc.setNew(true);
+
+                // Make sure to always return a document with an original version, even for one that does not exist.
+                // Allow writing more generic code.
+                doc.setOriginalDocument(new XWikiDocument(doc.getDocumentReference()));
+
                 return doc;
             }
 

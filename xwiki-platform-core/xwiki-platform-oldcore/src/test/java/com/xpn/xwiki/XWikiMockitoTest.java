@@ -215,7 +215,10 @@ public class XWikiMockitoTest
         AttachmentRecycleBinStore attachmentRecycleBinStore = mock(AttachmentRecycleBinStore.class);
         xwiki.setAttachmentRecycleBinStore(attachmentRecycleBinStore);
 
+        DocumentReference reference = document.getDocumentReference();
         when(context.getMessageTool()).thenReturn(mock(XWikiMessageTool.class));
+        when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context))).thenReturn(
+            new XWikiDocument(reference));
 
         xwiki.rollback(document, revision, context);
 

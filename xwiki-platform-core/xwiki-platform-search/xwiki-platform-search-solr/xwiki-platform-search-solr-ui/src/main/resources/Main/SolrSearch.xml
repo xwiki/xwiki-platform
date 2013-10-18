@@ -1328,7 +1328,11 @@ a.search-result-highlightAll:after {
   ## Add the facets.
   #foreach ($parameter in $request.parameterMap.entrySet())
     #if ($parameter.key.startsWith('f_'))
-      #set ($discard = $filters.put($parameter.key.substring(2), "#escapeFilterValue($parameter.value)"))
+      #set ($escapedValues = [])
+      #foreach ($value in $parameter.value)
+        #set ($discard = $escapedValues.add("#escapeFilterValue($value)"))
+      #end
+      #set ($discard = $filters.put($parameter.key.substring(2), $escapedValues))
     #end
   #end
   ##

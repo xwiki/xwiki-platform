@@ -1551,7 +1551,7 @@ AAAAAElFTkSuQmCC
       <name>platform.search.suggestSourceDocumentName</name>
     </property>
     <property>
-      <query>(title:__INPUT__* OR name:__INPUT__*) AND type:DOCUMENT</query>
+      <query>type:DOCUMENT AND (title:(__INPUT__*) OR name:(__INPUT__*) OR name_exact:(__INPUT__*))</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -1699,7 +1699,7 @@ AAAAAElFTkSuQmCC
       <name>platform.search.suggestSourceDocumentContent</name>
     </property>
     <property>
-      <query>(doccontent:__INPUT__* OR doccontentraw:__INPUT__*) AND type:DOCUMENT</query>
+      <query>type:DOCUMENT AND (doccontent:(__INPUT__*) OR doccontentraw:(__INPUT__*))</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -1847,7 +1847,7 @@ AAAAAElFTkSuQmCC
       <name>platform.search.suggestSourceAttachmentName</name>
     </property>
     <property>
-      <query>filename:__INPUT__* AND type:ATTACHMENT</query>
+      <query>type:ATTACHMENT AND filename:(__INPUT__*)</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -1995,7 +1995,7 @@ AAAAAElFTkSuQmCC
       <name>platform.search.suggestSourceAttachmentContent</name>
     </property>
     <property>
-      <query>attcontent:__INPUT__* AND type:ATTACHMENT</query>
+      <query>type:ATTACHMENT AND attcontent:(__INPUT__*)</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -2143,7 +2143,7 @@ AAAAAElFTkSuQmCC
       <name>platform.search.suggestSourceBlogPost</name>
     </property>
     <property>
-      <query>objcontent:__INPUT__* AND type:OBJECT AND class:Blog.BlogPostClass</query>
+      <query>type:OBJECT AND class:Blog.BlogPostClass AND objcontent:(__INPUT__*)</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -2291,7 +2291,7 @@ AAAAAElFTkSuQmCC
       <name>platform.search.suggestSourceUsers</name>
     </property>
     <property>
-      <query>objcontent:__INPUT__* AND type:OBJECT AND class:XWiki.XWikiUsers</query>
+      <query>type:OBJECT AND class:XWiki.XWikiUsers AND objcontent:(__INPUT__*)</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>

@@ -165,8 +165,8 @@
       <artifactId>servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>struts</groupId>
-      <artifactId>struts</artifactId>
+      <groupId>org.apache.struts</groupId>
+      <artifactId>struts-core</artifactId>
     </dependency>
 
     <!-- Rendering -->

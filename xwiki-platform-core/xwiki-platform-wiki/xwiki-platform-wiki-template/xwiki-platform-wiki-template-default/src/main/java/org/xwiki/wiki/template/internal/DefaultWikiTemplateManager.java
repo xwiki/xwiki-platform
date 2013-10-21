@@ -29,7 +29,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -38,14 +37,13 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.wiki.properties.WikiPropertyGroupException;
+import org.xwiki.wiki.properties.WikiPropertyGroupProvider;
 import org.xwiki.wiki.template.WikiTemplateManager;
 import org.xwiki.wiki.template.WikiTemplateManagerException;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
 
 @Component
 @Singleton
@@ -72,6 +70,10 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
 
     @Inject
     private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
+
+    @Inject
+    @Named("template")
+    private WikiPropertyGroupProvider templateWikiPropertyGroupProvider;
 
     @Override
     public Collection<WikiDescriptor> getTemplates() throws WikiTemplateManagerException
@@ -103,33 +105,37 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     public void setTemplate(String wikiId, boolean value) throws WikiTemplateManagerException
     {
         try {
-            XWikiContext context = xcontextProvider.get();
-
-            XWikiDocument wikiDocument = wikiDescriptorDocumentHelper.getDocumentFromWikiId(wikiId);
-            BaseObject obj = wikiDocument.getXObject(getWikiDescriptorClassReference());
-            obj.set(XWikiServerClassDocumentInitializer.FIELD_ISWIKITEMPLATE, "1", context);
-            context.getWiki().saveDocument(wikiDocument, "Set template: " + value, context);
+            // Get the descriptor
+            WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
+            // Get the property group
+            TemplateWikiPropertyGroup group = (TemplateWikiPropertyGroup) descriptor.getPropertyGroup(
+                    TemplateWikiPropertyGroupProvider.GROUP_NAME);
+            // Set the value
+            group.setTemplate(value);
+            // Save the descriptor
+            templateWikiPropertyGroupProvider.save(group, wikiId);
+        } catch (WikiPropertyGroupException e) {
+            throw new WikiTemplateManagerException(String.format("Failed to save the property group [%s]",
+                    TemplateWikiPropertyGroupProvider.GROUP_NAME), e);
         } catch (WikiManagerException e) {
-            throw new WikiTemplateManagerException(e.getMessage(), e);
-        } catch (XWikiException e) {
-            throw new WikiTemplateManagerException(e.getMessage(), e);
+            throw new WikiTemplateManagerException(String.format("Failed to get the descriptor for [%s].", wikiId), e);
         }
     }
 
     @Override
     public boolean isTemplate(String wikiId) throws WikiTemplateManagerException
     {
-        boolean isTemplate = false;
         try {
-            XWikiDocument wikiDocument = wikiDescriptorDocumentHelper.getDocumentFromWikiId(wikiId);
-            BaseObject obj = wikiDocument.getXObject(getWikiDescriptorClassReference());
-            isTemplate = obj.getIntValue(XWikiServerClassDocumentInitializer.FIELD_ISWIKITEMPLATE, 0) != 0;
-
+            // Get the descriptor
+            WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
+            // Get the property group
+            TemplateWikiPropertyGroup group = (TemplateWikiPropertyGroup) descriptor.getPropertyGroup(
+                    TemplateWikiPropertyGroupProvider.GROUP_NAME);
+            // Return the value
+            return group.isTemplate();
         } catch (WikiManagerException e) {
-            throw new WikiTemplateManagerException(e.getMessage(), e);
+            throw new WikiTemplateManagerException(String.format("Failed to get the descriptor for [%s].", wikiId), e);
         }
-
-        return isTemplate;
     }
 
     @Override
@@ -151,11 +157,5 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
         } catch (XWikiException e) {
             throw new WikiTemplateManagerException(e.getMessage(), e);
         }
-    }
-
-    private DocumentReference getWikiDescriptorClassReference()
-    {
-        return new DocumentReference(xcontextProvider.get().getMainXWiki(), XWiki.SYSTEM_SPACE,
-                XWikiServerClassDocumentInitializer.DOCUMENT_NAME);
     }
 }

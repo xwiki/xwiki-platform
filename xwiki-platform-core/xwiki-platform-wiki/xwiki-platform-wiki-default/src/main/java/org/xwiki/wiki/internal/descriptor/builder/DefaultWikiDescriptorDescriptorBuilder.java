@@ -68,6 +68,9 @@ public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBui
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @Inject
+    private WikiPropertyGroupLoader wikiPropertyGroupLoader;
+
     @Override
     public DefaultWikiDescriptor buildDescriptorObject(List<BaseObject> serverClassObjects, XWikiDocument document)
     {
@@ -81,6 +84,9 @@ public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBui
                 descriptor.addAlias(descriptorAlias);
             }
         }
+
+        // load the property groups
+        wikiPropertyGroupLoader.loadForDescriptor(descriptor);
 
         return descriptor;
     }
@@ -127,8 +133,8 @@ public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBui
         try {
             // Create the descriptor document
             DocumentReference wikiDescriptorReference =
-                    new DocumentReference(wikiDescriptorManager.getMainWikiId(), XWiki.SYSTEM_SPACE, String.format("%s%s",
-                            VALID_PAGE_PREFIX, StringUtils.capitalize(descriptor.getId())));
+                    new DocumentReference(wikiDescriptorManager.getMainWikiId(), XWiki.SYSTEM_SPACE,
+                            String.format("%s%s", VALID_PAGE_PREFIX, StringUtils.capitalize(descriptor.getId())));
             wikiDescriptorDocument = xwiki.getDocument(wikiDescriptorReference, context);
 
             // Create the server class object

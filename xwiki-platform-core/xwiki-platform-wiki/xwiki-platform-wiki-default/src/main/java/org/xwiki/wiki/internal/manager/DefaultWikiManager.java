@@ -34,6 +34,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder;
 import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilderException;
+import org.xwiki.wiki.internal.descriptor.builder.WikiPropertyGroupLoader;
 import org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -74,6 +75,9 @@ public class DefaultWikiManager implements WikiManager
     @Inject
     private WikiDescriptorBuilder wikiDescriptorBuilder;
 
+    @Inject
+    private WikiPropertyGroupLoader wikiPropertyGroupLoader;
+
     private WikiDescriptor createDescriptor(String wikiId, String wikiAlias) throws WikiManagerException
     {
         XWikiContext context = xcontextProvider.get();
@@ -89,6 +93,8 @@ public class DefaultWikiManager implements WikiManager
             xwiki.getStore().saveXWikiDoc(descriptorDocument, context);
             // Add the document to the descriptor
             descriptor.setDocumentReference(descriptorDocument.getDocumentReference());
+            // Load the property groups
+            wikiPropertyGroupLoader.loadForDescriptor(descriptor);
         } catch (WikiDescriptorBuilderException e) {
             throw new WikiManagerException("Failed to build the descriptor document.", e);
         } catch (XWikiException e) {

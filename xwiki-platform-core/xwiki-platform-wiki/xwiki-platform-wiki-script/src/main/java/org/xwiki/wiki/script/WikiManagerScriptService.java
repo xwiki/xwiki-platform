@@ -123,16 +123,20 @@ public class WikiManagerScriptService implements ScriptService
         WikiReference wikiReference = new WikiReference(wikiId);
 
         try {
+            // Get the wiki owner
+            WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
+            String owner = descriptor.getOwnerId();
             // Check right access
-            authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(), wikiReference);
-            authorizationManager.checkAccess(Right.CREATE_WIKI, context.getUserReference(), wikiReference);
-
+            if (!context.getUserReference().toString().equals(owner)) {
+                authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(), wikiReference);
+            }
             // Delete the wiki
             wikiManager.delete(wikiId);
         } catch (WikiManagerException e) {
             return false;
         } catch (AccessDeniedException e) {
             error("You don't have the right to delete the wiki", e);
+            return false;
         }
 
         return true;

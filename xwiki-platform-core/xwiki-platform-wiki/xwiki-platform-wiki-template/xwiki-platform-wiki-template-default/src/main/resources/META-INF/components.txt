@@ -1,0 +1,3 @@
+org.xwiki.wiki.template.internal.DefaultWikiTemplateManager
+org.xwiki.wiki.template.internal.TemplateWikiPropertyGroupProvider
+org.xwiki.wiki.template.internal.XWikiServerClassDocumentInitializer

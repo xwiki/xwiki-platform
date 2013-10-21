@@ -17,21 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.provisioning;
+package org.xwiki.wiki.template.internal;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.job.Job;
+import org.xwiki.wiki.properties.WikiPropertyGroup;
 
-/**
- * Component that prepares new wikis.
- */
-@Role
-public interface WikiProvisioner extends Job
+public class TemplateWikiPropertyGroup extends WikiPropertyGroup
 {
+    public static final String IS_TEMPLATE_PROPERTY = "isTemplate";
+
     /**
-     * @param wikiId Id thr wiki to prepare
-     * @param parameter parameter dependent of the implementation
-     * @throws WikiProvisionerException if problems occur
+     * Constructor.
+     *
+     * @param id Unique identifier of the group
      */
-    void execute(String wikiId, Object parameter) throws WikiProvisionerException;
+    public TemplateWikiPropertyGroup(String id)
+    {
+        super(id);
+    }
+
+    public boolean isTemplate()
+    {
+        return (Boolean) this.get(IS_TEMPLATE_PROPERTY);
+    }
+
+    public void setTemplate(boolean template)
+    {
+        this.set(IS_TEMPLATE_PROPERTY, template);
+    }
+
 }

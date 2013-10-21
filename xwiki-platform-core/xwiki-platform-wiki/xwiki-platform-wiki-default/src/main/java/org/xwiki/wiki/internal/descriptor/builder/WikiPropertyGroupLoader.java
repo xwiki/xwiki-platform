@@ -17,34 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.properties;
+package org.xwiki.wiki.internal.descriptor.builder;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 
 /**
- * Provider that manager WikiDescriptor Properties Groups.
- *
- * @version $Id$
- * @since 5.3M1
+ * Component to load all property groups for a given descriptor.
  */
 @Role
-public interface WikiPropertiesGroupProvider
+public interface WikiPropertyGroupLoader
 {
     /**
-     * Get the WikiDescriptor Property Group corresponding to a wiki.
-     *
-     * @param wikiId Id of the wiki
-     * @return the group corresponding to the wiki
-     * @throws WikiPropertyGroupException if problem occurs
+     * Load all property groups for the given descriptor.
+     * @param descriptor descriptor to initialize
      */
-    WikiPropertyGroup get(String wikiId) throws WikiPropertyGroupException;
-
-    /**
-     * Save the WikiDescriptor Property Group corresponding to a wiki in the persistent storage.
-     *
-     * @param group group to save
-     * @param wikiId uniquement identifier of the wiki concerned by this group
-     * @throws WikiPropertyGroupException if problem occurs
-     */
-    void save(WikiPropertyGroup group, String wikiId) throws WikiPropertyGroupException;
+    void loadForDescriptor(WikiDescriptor descriptor);
 }

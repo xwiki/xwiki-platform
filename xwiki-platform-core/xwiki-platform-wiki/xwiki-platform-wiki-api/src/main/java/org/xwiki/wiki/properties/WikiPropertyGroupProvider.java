@@ -17,21 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.provisioning;
+package org.xwiki.wiki.properties;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.job.Job;
 
 /**
- * Component that prepares new wikis.
+ * Provider that manager WikiDescriptor Properties Groups.
+ *
+ * @version $Id$
+ * @since 5.3M1
  */
 @Role
-public interface WikiProvisioner extends Job
+public interface WikiPropertyGroupProvider
 {
     /**
-     * @param wikiId Id thr wiki to prepare
-     * @param parameter parameter dependent of the implementation
-     * @throws WikiProvisionerException if problems occur
+     * Get the WikiDescriptor Property Group corresponding to a wiki.
+     *
+     * @param wikiId Id of the wiki
+     * @return the group corresponding to the wiki
+     * @throws WikiPropertyGroupException if problem occurs
      */
-    void execute(String wikiId, Object parameter) throws WikiProvisionerException;
+    WikiPropertyGroup get(String wikiId) throws WikiPropertyGroupException;
+
+    /**
+     * Save the WikiDescriptor Property Group corresponding to a wiki in the persistent storage.
+     *
+     * @param group group to save
+     * @param wikiId uniquement identifier of the wiki concerned by this group
+     * @throws WikiPropertyGroupException if problem occurs
+     */
+    void save(WikiPropertyGroup group, String wikiId) throws WikiPropertyGroupException;
 }

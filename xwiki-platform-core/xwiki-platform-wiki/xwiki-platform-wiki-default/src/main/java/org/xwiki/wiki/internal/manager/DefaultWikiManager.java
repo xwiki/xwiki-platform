@@ -34,10 +34,11 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder;
 import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilderException;
-import org.xwiki.wiki.internal.descriptor.builder.WikiPropertyGroupLoader;
+import org.xwiki.wiki.internal.descriptor.properties.WikiPropertyGroupManager;
 import org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.wiki.properties.WikiPropertyGroupException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -76,7 +77,7 @@ public class DefaultWikiManager implements WikiManager
     private WikiDescriptorBuilder wikiDescriptorBuilder;
 
     @Inject
-    private WikiPropertyGroupLoader wikiPropertyGroupLoader;
+    private WikiPropertyGroupManager wikiPropertyGroupManager;
 
     private WikiDescriptor createDescriptor(String wikiId, String wikiAlias) throws WikiManagerException
     {
@@ -88,17 +89,15 @@ public class DefaultWikiManager implements WikiManager
 
         try {
             // Build the document
-            XWikiDocument descriptorDocument = wikiDescriptorBuilder.buildDescriptorDocument(descriptor);
-            // Save the document
-            xwiki.getStore().saveXWikiDoc(descriptorDocument, context);
+            XWikiDocument descriptorDocument = wikiDescriptorBuilder.save(descriptor);
             // Add the document to the descriptor
             descriptor.setDocumentReference(descriptorDocument.getDocumentReference());
             // Load the property groups
-            wikiPropertyGroupLoader.loadForDescriptor(descriptor);
+            wikiPropertyGroupManager.loadForDescriptor(descriptor);
         } catch (WikiDescriptorBuilderException e) {
             throw new WikiManagerException("Failed to build the descriptor document.", e);
-        } catch (XWikiException e) {
-            throw new WikiManagerException("Failed to save the descriptor document.", e);
+        } catch (WikiPropertyGroupException e) {
+            throw new WikiManagerException("Failed to load the descriptor property groups.", e);
         }
 
         return descriptor;

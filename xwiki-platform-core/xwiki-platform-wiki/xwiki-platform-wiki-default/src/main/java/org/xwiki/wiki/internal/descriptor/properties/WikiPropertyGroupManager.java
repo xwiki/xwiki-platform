@@ -17,20 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.internal.descriptor.builder;
+package org.xwiki.wiki.internal.descriptor.properties;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.properties.WikiPropertyGroupException;
 
 /**
  * Component to load all property groups for a given descriptor.
  */
 @Role
-public interface WikiPropertyGroupLoader
+public interface WikiPropertyGroupManager
 {
     /**
      * Load all property groups for the given descriptor.
      * @param descriptor descriptor to initialize
      */
-    void loadForDescriptor(WikiDescriptor descriptor);
+    void loadForDescriptor(WikiDescriptor descriptor) throws WikiPropertyGroupException;
+
+    /**
+     * Save all property groups for the given descriptor
+     */
+    void saveForDescriptor(WikiDescriptor descriptor) throws WikiPropertyGroupException;
 }

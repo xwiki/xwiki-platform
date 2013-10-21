@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.internal.descriptor.builder;
+package org.xwiki.wiki.internal.descriptor.properties;
 
 import java.util.Map;
 
@@ -27,17 +27,18 @@ import javax.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.properties.WikiPropertyGroup;
 import org.xwiki.wiki.properties.WikiPropertyGroupException;
 import org.xwiki.wiki.properties.WikiPropertyGroupProvider;
 
 /**
- * Default implementation for WikiPropertyGroupLoader.
+ * Default implementation for WikiPropertyGroupManager.
  * @since 5.3M2
  * @version $Id :$
  */
 @Component
 @Singleton
-public class DefaultWikiPropertyGroupLoader implements WikiPropertyGroupLoader
+public class DefaultWikiPropertyGroupManager implements WikiPropertyGroupManager
 {
     @Inject
     private Map<String, WikiPropertyGroupProvider> propertyGroupProviders;
@@ -46,7 +47,7 @@ public class DefaultWikiPropertyGroupLoader implements WikiPropertyGroupLoader
     private Logger logger;
 
     @Override
-    public void loadForDescriptor(WikiDescriptor descriptor)
+    public void loadForDescriptor(WikiDescriptor descriptor) throws WikiPropertyGroupException
     {
         String wikiId = descriptor.getId();
         for(String propertyGroupName : propertyGroupProviders.keySet()) {
@@ -56,6 +57,17 @@ public class DefaultWikiPropertyGroupLoader implements WikiPropertyGroupLoader
             } catch (WikiPropertyGroupException e) {
                 logger.warn(String.format("Unable to load property groups [%s].", propertyGroupName), e);
             }
+        }
+    }
+
+    @Override
+    public void saveForDescriptor(WikiDescriptor descriptor) throws WikiPropertyGroupException
+    {
+        String wikiId = descriptor.getId();
+        for(String propertyGroupName : propertyGroupProviders.keySet()) {
+            WikiPropertyGroup group = descriptor.getPropertyGroup(propertyGroupName);
+            WikiPropertyGroupProvider provider = propertyGroupProviders.get(propertyGroupName);
+            provider.save(group, wikiId);
         }
     }
 }

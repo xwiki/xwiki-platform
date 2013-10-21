@@ -170,7 +170,7 @@ public class DefaultWikiManagerTest
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1");
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "XWikiServerWikiid1");
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
-        when(wikiDescriptorBuilder.buildDescriptorDocument(eq(descriptor))).thenReturn(descriptorDocument);
+        when(wikiDescriptorBuilder.save(eq(descriptor))).thenReturn(descriptorDocument);
         when(descriptorDocument.getDocumentReference()).thenReturn(documentReference);
 
         // Create
@@ -254,7 +254,7 @@ public class DefaultWikiManagerTest
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1");
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "XWikiServerWikiid1");
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
-        when(wikiDescriptorBuilder.buildDescriptorDocument(eq(descriptor))).thenReturn(descriptorDocument);
+        when(wikiDescriptorBuilder.save(eq(descriptor))).thenReturn(descriptorDocument);
         when(descriptorDocument.getDocumentReference()).thenReturn(documentReference);
 
         // Create

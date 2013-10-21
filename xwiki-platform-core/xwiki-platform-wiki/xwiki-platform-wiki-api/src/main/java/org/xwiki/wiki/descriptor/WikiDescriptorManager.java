@@ -80,4 +80,11 @@ public interface WikiDescriptorManager
      * @throws WikiManagerException if problems occur
      */
     boolean exists(String wikiId) throws WikiManagerException;
+
+    /**
+     * Save the given descriptor and all its property groups.
+     * @param descriptor descriptor to save
+     * @throws WikiManagerException if problem occurs
+     */
+    void saveDescriptor(WikiDescriptor descriptor) throws WikiManagerException;
 }

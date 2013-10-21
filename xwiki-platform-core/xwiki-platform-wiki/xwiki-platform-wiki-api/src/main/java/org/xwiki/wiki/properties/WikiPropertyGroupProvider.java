@@ -22,7 +22,7 @@ package org.xwiki.wiki.properties;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Provider that manager WikiDescriptor Properties Groups.
+ * Provider that manage WikiDescriptor Properties Groups.
  *
  * @version $Id$
  * @since 5.3M1
@@ -43,7 +43,7 @@ public interface WikiPropertyGroupProvider
      * Save the WikiDescriptor Property Group corresponding to a wiki in the persistent storage.
      *
      * @param group group to save
-     * @param wikiId uniquement identifier of the wiki concerned by this group
+     * @param wikiId identifier of the wiki concerned by this group
      * @throws WikiPropertyGroupException if problem occurs
      */
     void save(WikiPropertyGroup group, String wikiId) throws WikiPropertyGroupException;

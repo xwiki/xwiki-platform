@@ -22,6 +22,7 @@ package org.xwiki.wiki.internal.descriptor.builder;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -49,5 +50,5 @@ public interface WikiDescriptorBuilder
      * @return the document that hold the descriptor
      * @throws WikiDescriptorBuilderException if problems occur
      */
-    XWikiDocument buildDescriptorDocument(DefaultWikiDescriptor descriptor) throws WikiDescriptorBuilderException;
+    XWikiDocument save(WikiDescriptor descriptor) throws WikiDescriptorBuilderException;
 }

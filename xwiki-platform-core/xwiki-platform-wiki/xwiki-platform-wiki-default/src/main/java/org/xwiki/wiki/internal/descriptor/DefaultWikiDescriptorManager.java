@@ -31,7 +31,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder;
+import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilderException;
 import org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper;
+import org.xwiki.wiki.internal.descriptor.properties.WikiPropertyGroupManager;
 import org.xwiki.wiki.internal.manager.WikiDescriptorCache;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -58,6 +60,9 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
 
     @Inject
     private WikiDescriptorBuilder wikiDescriptorBuilder;
+
+    @Inject
+    private WikiPropertyGroupManager wikiPropertyGroupManager;
 
     @Override
     public Collection<WikiDescriptor> getAll() throws WikiManagerException
@@ -103,8 +108,6 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
             if (document != null) {
                 // Build the descriptor
                 descriptor = buildDescriptorFromDocument(document);
-                // Add the descriptor to the cache
-                cache.add((DefaultWikiDescriptor) descriptor);
             }
         }
 
@@ -122,8 +125,6 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
             if (!document.isNew()) {
                 // Build the descriptor
                 descriptor = buildDescriptorFromDocument(document);
-                // Add the descriptor to the cache
-                cache.add((DefaultWikiDescriptor) descriptor);
             }
         }
 
@@ -133,6 +134,17 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
     @Override
     public boolean exists(String wikiId) throws WikiManagerException {
         return getById(wikiId) != null;
+    }
+
+    @Override
+    public void saveDescriptor(WikiDescriptor descriptor) throws WikiManagerException
+    {
+        try {
+            wikiDescriptorBuilder.save(descriptor);
+        } catch (WikiDescriptorBuilderException e) {
+            throw new WikiManagerException(String.format("Unable to save wiki descriptor for [%s].",
+                    descriptor.getId()), e);
+        }
     }
 
     @Override
@@ -153,7 +165,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
                 document.getXObjects(DefaultWikiDescriptor.SERVER_CLASS), document);
         // Add to the cache
         if (descriptor != null) {
-            //cache.add(descriptor);
+            cache.add(descriptor);
         }
         return descriptor;
     }

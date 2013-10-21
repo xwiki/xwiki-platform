@@ -89,8 +89,6 @@ public class DefaultWikiManager implements WikiManager
             xwiki.getStore().saveXWikiDoc(descriptorDocument, context);
             // Add the document to the descriptor
             descriptor.setDocumentReference(descriptorDocument.getDocumentReference());
-            // Add the descriptor to the cache
-            //cache.add(descriptor);
         } catch (WikiDescriptorBuilderException e) {
             throw new WikiManagerException("Failed to build the descriptor document.", e);
         } catch (XWikiException e) {
@@ -177,9 +175,6 @@ public class DefaultWikiManager implements WikiManager
         } catch (XWikiException e) {
             throw new WikiManagerException("can't delete descriptor document");
         }
-
-        // Remove the descriptor from the caches
-        //cache.remove(descriptor);
 
         // Send an event
         observationManager.notify(new WikiDeletedEvent(wikiId), wikiId);

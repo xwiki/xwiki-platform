@@ -1,5 +1,4 @@
 org.xwiki.ircbot.internal.PircBotXIRCBot
-org.xwiki.ircbot.internal.wiki.WikiIRCBotScriptService
 org.xwiki.ircbot.internal.wiki.DefaultWikiIRCBotManager
 org.xwiki.ircbot.internal.wiki.DefaultWikiIRCBotListenerManager
 org.xwiki.ircbot.internal.wiki.DefaultWikiIRCBotListenerFactory
@@ -12,3 +11,4 @@ org.xwiki.ircbot.internal.DefaultDocumentModifiedEventListenerConfiguration
 org.xwiki.ircbot.internal.BrokenLinkEventListener
 org.xwiki.ircbot.internal.DefaultBrokenLinkEventListenerConfiguration
 org.xwiki.ircbot.internal.BrokenLinksBotListener
+org.xwiki.ircbot.wiki.script.WikiIRCBotScriptService

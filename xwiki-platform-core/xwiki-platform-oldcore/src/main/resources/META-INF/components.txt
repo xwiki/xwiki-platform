@@ -14,7 +14,7 @@ com.xpn.xwiki.internal.event.AttachmentEventGeneratorListener
 com.xpn.xwiki.internal.event.CommentEventGeneratorListener
 com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener
 com.xpn.xwiki.internal.event.XObjectEventGeneratorListener
-com.xpn.xwiki.internal.display.scripting.DisplayScriptService
+com.xpn.xwiki.script.display.DisplayScriptService
 com.xpn.xwiki.internal.display.XWiki10DocumentContentDisplayer
 com.xpn.xwiki.internal.localization.XWikiLocalizationContext
 com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer
@@ -51,7 +51,7 @@ com.xpn.xwiki.internal.template.DefaultPrivilegedTemplateRenderer
 com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
 com.xpn.xwiki.internal.query.CurrentLanguageQueryFilter
-com.xpn.xwiki.internal.sheet.scripting.SheetScriptService
+com.xpn.xwiki.script.sheet.SheetScriptService
 com.xpn.xwiki.internal.sheet.ClassSheetBinder
 com.xpn.xwiki.internal.sheet.DocumentSheetBinder
 com.xpn.xwiki.internal.sheet.DefaultModelBridge

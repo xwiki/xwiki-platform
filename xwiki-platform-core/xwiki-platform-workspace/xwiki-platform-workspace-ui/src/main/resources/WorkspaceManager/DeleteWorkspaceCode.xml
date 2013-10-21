@@ -63,7 +63,7 @@
         #set ($backUrl = $xwiki.getURL($browseDocumentReference))
         #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
         {{box}}
-          $services.localization.render('platform.workspace.deleteWorkspaceConfirmation', [$workspaceName, $workspaceUrl])
+          $services.localization.render('platform.workspace.deleteWorkspaceConfirmation', ['[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"])
           ((({{html}}
             &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.workspace.deleteWorkspaceYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.workspace.deleteWorkspaceNo')&lt;/a&gt;&lt;/span&gt;
           {{/html}})))
@@ -73,7 +73,7 @@
         #if ($WorkspaceManager.lastException)
           #printException($WorkspaceManager.lastException)
         #else
-          {{success}}$services.localization.render('platform.workspace.deleteWorkspaceSuccess', [$currentUser, $workspaceName]){{/success}}
+          {{success}}$services.localization.render('platform.workspace.deleteWorkspaceSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $workspaceName]){{/success}}
         #end
       #end
     #end

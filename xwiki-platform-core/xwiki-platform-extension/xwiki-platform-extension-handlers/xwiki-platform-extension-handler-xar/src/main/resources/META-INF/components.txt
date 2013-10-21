@@ -7,4 +7,5 @@ org.xwiki.extension.xar.internal.job.RepairXarJob
 org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository
 org.xwiki.extension.xar.internal.script.ConflictQuestionScriptSafeProvider
 org.xwiki.extension.xar.internal.script.DocumentScriptSafeProvider
-org.xwiki.extension.xar.internal.script.XarExtensionScriptService
+org.xwiki.extension.xar.script.DeprecatedXarExtensionScriptService
+org.xwiki.extension.xar.script.XarExtensionScriptService

@@ -175,7 +175,7 @@
 #end
 
 #macro (displayProgressBar $extension)
-  #if (!$jobStatus)
+  #if (!$jobStatus || !$jobStatus.request.extensions.contains($extension.id))
     #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
     #set ($jobState = $jobStatus.state)
   #end
@@ -213,7 +213,7 @@
 #end
 
 #macro (displayExtensionDetails_menu $extension)
-#if (!$jobStatus)
+#if (!$jobStatus || !$jobStatus.request.extensions.contains($extension.id))
   #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
   #set ($jobState = $jobStatus.state)
 #end
@@ -439,7 +439,7 @@ $namespace##
 #end
 
 #macro (displayExtensionDetails_progress $extension)
-  #if (!$jobStatus)
+  #if (!$jobStatus || !$jobStatus.request.extensions.contains($extension.id))
     #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
     #set ($jobState = $jobStatus.state)
   #end
@@ -932,9 +932,9 @@ Caused by: #printThrowable($throwable.cause true)
   #end
 #end
 
-#macro (determineExtensionStatus $extension $extensionStatus $extensionStatusMessage $versionConstraint)
+#macro (determineExtensionStatus $extension $_extensionStatus $_extensionStatusMessage $versionConstraint)
   #set ($currentVersion = $NULL)
-  #if (!$jobStatus)
+  #if (!$jobStatus || !$jobStatus.request.extensions.contains($extension.id))
     #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
     #set ($jobState = $jobStatus.state)
   #end
@@ -970,10 +970,10 @@ Caused by: #printThrowable($throwable.cause true)
   #if ($status != 'remote' && $status != 'loading')
     #set ($message = $services.localization.render("extensions.info.status.${status}", [$currentVersion.id.version.value]))
   #end
-  #set ($extensionStatus = $NULL)
-  #setVariable ("$extensionStatus" $status)
-  #set ($extensionStatusMessage = $NULL)
-  #setVariable ("$extensionStatusMessage" $message)
+  #set ($_extensionStatus = $NULL)
+  #setVariable ("$_extensionStatus" $status)
+  #set ($_extensionStatusMessage = $NULL)
+  #setVariable ("$_extensionStatusMessage" $message)
 #end
 
 #macro (determineVersionCompatibility $alice $bob $versionConstraint $options)
@@ -1168,20 +1168,20 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 <a href="$escapetool.xml($xwiki.getURL($wikiHomeDocumentReference))">$escapetool.xml($wikiPrettyName)</a>##
 #end
 
-#macro (isShowingExtensionDetails $extension $showDetails)
+#macro (isShowingExtensionDetails $extension $_showDetails)
   ## Show the extension details if this extension has been explicitely requested.
   #set ($return = "$!request.hideExtensionDetails" != 'true' && $request.extensionId == $extension.id.id
     && $request.extensionVersion == $extension.id.version.value)
   #if (!$return)
-    #if (!$jobStatus)
+    #if (!$jobStatus || !$jobStatus.request.extensions.contains($extension.id))
       #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
       #set ($jobState = $jobStatus.state)
     #end
     ## Always show the extension details if the extension has a job waiting.
     #set ($return = $jobState == 'WAITING')
   #end
-  #set ($showDetails = $NULL)
-  #setVariable("$showDetails" $return)
+  #set ($_showDetails = $NULL)
+  #setVariable("$_showDetails" $return)
 #end
 
 #macro (displayExtensionUpdaterPlan $plan)
@@ -1261,7 +1261,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #end
 #end
 
-#macro (getExtensionUpdaterPlan $plan)
+#macro (getExtensionUpdaterPlan $_plan)
   ## By default we return the upgrade plan for the current wiki.
   #set ($namespace = $extensionNamespace)
   #if ($xcontext.isMainWiki() && $services.distribution.jobStatus.upgradeMode == 'ALLINONE')
@@ -1269,11 +1269,11 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #set ($namespace = $NULL)
   #end
   #set ($return = $extensionManager.getExtensionPlanJobStatus($null, $namespace))
-  #set ($plan = $NULL)
-  #setVariable("$plan" $return)
+  #set ($_plan = $NULL)
+  #setVariable("$_plan" $return)
 #end
 
-#macro(computeExtensionUpdaterPlan $plan)
+#macro(computeExtensionUpdaterPlan $_plan)
   #if ($xcontext.isMainWiki() && $services.distribution.jobStatus.upgradeMode == 'ALLINONE')
     ## Create the upgrade plan for the entire farm.
     #set ($upgradePlanJob = $extensionManager.createUpgradePlan())
@@ -1293,12 +1293,12 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
       #printThrowable($lastError)
     </div>
   #else
-    #set ($plan = $NULL)
-    #setVariable ("$plan" $upgradePlanJob.status)
+    #set ($_plan = $NULL)
+    #setVariable ("$_plan" $upgradePlanJob.status)
   #end
 #end
 
-#macro (isExtensionUpdaterPlanOutdated $plan $outdated)
+#macro (isExtensionUpdaterPlanOutdated $plan $_outdated)
   ## Return true (outdated) if the plan is null.
   #set ($return = "$!plan" == '' && $plan != '')
   #if (!$return && $plan.state == 'FINISHED')
@@ -1308,8 +1308,8 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     ## The plan becomes outdated after one day.
     #set ($return = $duration.standardDays > 0)
   #end
-  #set ($outdated = $NULL)
-  #setVariable("$outdated" $return)
+  #set ($_outdated = $NULL)
+  #setVariable("$_outdated" $return)
 #end
 
 #macro (extensionUpdater)

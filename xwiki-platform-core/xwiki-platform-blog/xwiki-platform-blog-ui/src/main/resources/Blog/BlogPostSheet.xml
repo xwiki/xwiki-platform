@@ -50,7 +50,18 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   : $doc.display('extract', 'edit', $entryObj)
   ; {{translation key='xe.blog.sheet.category'/}}
   : (((#displayCategoryManagementTree('' 'selectable') (% class="clearfloats" %)((())))))
-  #isPublished($entryObj $isPublished)
+  #if ($doc.isNew())
+    ## We're creating a new blog post. We handle this case differently because #isPublished returns true when the
+    ## property is not set (object missing) and thus the new blog post will appear as published. See also the comment
+    ## from the else branch below.
+    #set ($isPublished = false)
+  #else
+    ## We're editing an existing blog post. We need to check the original document because the current one can have
+    ## unsaved changes, which happens for instance after returning from preview.
+    #set ($originalDocument = $xwiki.getDocument($doc.documentReference))
+    #getEntryObject($originalDocument $originalEntryObj)
+    #isPublished($originalEntryObj $isPublished)
+  #end
   #if($isPublished)
     #if($doc.creator == $xcontext.user)
       #publishMessageBox($services.localization.render('xe.blog.sheet.publicationdate', [${doc.display('publishDate', 'view', $entryObj)}]))

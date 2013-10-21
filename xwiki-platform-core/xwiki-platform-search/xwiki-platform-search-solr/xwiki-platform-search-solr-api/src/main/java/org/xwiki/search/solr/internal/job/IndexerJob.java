@@ -52,7 +52,6 @@ import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Provide progress information and store logging of an advanced indexing.
@@ -167,18 +166,16 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
 
         notifyPushLevelProgress((int) results.getNumFound());
 
+        XWikiContext xcontext = xcontextProvider.get();
+
         try {
             for (SolrDocument solrDocument : results) {
                 DocumentReference reference =
                     createDocumentReference((String) solrDocument.get(FieldUtils.WIKI),
                         (String) solrDocument.get(FieldUtils.SPACE), (String) solrDocument.get(FieldUtils.NAME),
                         (String) solrDocument.get(FieldUtils.DOCUMENT_LOCALE));
-                try {
-                    if (!exists(reference)) {
-                        this.indexer.delete(reference, true);
-                    }
-                } catch (QueryException e) {
-                    this.logger.error("Failed to check if document [{}] exists", e);
+                if (!xcontext.getWiki().exists(reference, xcontext)) {
+                    this.indexer.delete(reference, true);
                 }
 
                 notifyStepPropress();
@@ -186,26 +183,6 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
         } finally {
             notifyPopLevelProgress();
         }
-    }
-
-    /**
-     * Check if provided document exists (including Locale).
-     * 
-     * @param documentReference the document reference
-     * @return true of the document exists
-     * @throws QueryException when failing to execute exists request
-     */
-    // TODO: replace with XWiki#exists when locale support is added
-    private boolean exists(DocumentReference documentReference) throws QueryException
-    {
-        XWikiDocument document = new XWikiDocument(documentReference);
-        document.setLocale(documentReference.getLocale());
-
-        Query query = this.queryManager.createQuery("select doc.id from Document doc where doc.id=:id", Query.XWQL);
-        query.setWiki(documentReference.getWikiReference().getName());
-        query.bindValue("id", document.getId());
-
-        return !query.execute().isEmpty();
     }
 
     /**

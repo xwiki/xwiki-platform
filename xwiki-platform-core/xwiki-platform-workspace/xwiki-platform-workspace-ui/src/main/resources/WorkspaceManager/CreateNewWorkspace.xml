@@ -42,16 +42,16 @@
 #end
 #set ($WikiManager = $services.wikimanager)
 #if (!$WikiManager)
-  {{error}}$services.localization.render('workspacemanager.dependencies.wikimanager.missing'){{/error}}
+  {{error}}$services.localization.render('workspacemanager.dependencies.wikimanager.missing', ['[[', '&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Manager+Plugin]]']){{/error}}
 
 #end
 #if (!$services.applicationmanager)
-  {{error}}$services.localization.render('workspacemanager.dependencies.applicationmanager.missing'){{/error}}
+  {{error}}$services.localization.render('workspacemanager.dependencies.applicationmanager.missing', ['[[', '&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Application+Manager+Plugin]]']){{/error}}
 
 #end
 #set ($isInstallComplete = ($WorkspaceManager.getWorkspaceTemplates().size() &gt; 0))
 #if (!$isInstallComplete)
-  {{warning}}$services.localization.render('workspacemanager.template.install.notYetComplete', ['WorkspaceManager.Install']){{/warning}}
+  {{warning}}$services.localization.render('workspacemanager.template.install.notYetComplete', ['[[', 'WorkspaceManager.Install', '&gt;&gt;WorkspaceManager.Install]]']){{/warning}}
 
 #end
 ## If all dependancies are OK, we call the controller

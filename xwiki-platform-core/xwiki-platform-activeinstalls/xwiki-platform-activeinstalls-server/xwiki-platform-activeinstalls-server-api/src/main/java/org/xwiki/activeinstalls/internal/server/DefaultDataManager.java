@@ -19,6 +19,9 @@
  */
 package org.xwiki.activeinstalls.internal.server;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -28,6 +31,7 @@ import org.xwiki.component.annotation.Component;
 
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Count;
+import net.sf.json.JSONObject;
 
 /**
  * Get stored ping data from a remote Elastic Search instance.
@@ -45,13 +49,16 @@ public class DefaultDataManager implements DataManager
     @Override
     public long getInstallCount(String query) throws Exception
     {
-        String queryString = "{\n"
-            + "  \"query_string\" : {\n"
-            + "    \"query\" : \"" + query + "\"\n"
-            + "  }\n"
-            + "}";
+        Map queryMap = new HashMap();
+        queryMap.put("query", query);
 
-        return executeCount(queryString);
+        // This allows to write queries such as: -distributionVersion:*SNAPSHOT
+        queryMap.put("lowercase_expanded_terms", false);
+
+        Map jsonMap = new HashMap();
+        jsonMap.put("query_string", JSONObject.fromObject(queryMap));
+
+        return executeCount(JSONObject.fromObject(jsonMap).toString());
     }
 
     private long executeCount(String query) throws Exception

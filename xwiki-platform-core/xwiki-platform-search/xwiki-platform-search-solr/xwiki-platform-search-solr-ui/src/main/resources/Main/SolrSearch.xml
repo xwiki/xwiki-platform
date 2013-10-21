@@ -1314,7 +1314,7 @@ a.search-result-highlightAll:after {
     #set ($discard = $filters.put('wiki', [$wiki]))
   #end
   #if ($space != '' &amp;&amp; !$blacklistedSpaces.contains($space))
-    #set ($discard = $filters.put('space_exact', [$space]))
+    #set ($discard = $filters.put('space_exact', ["#escapeFilterValue($space)"]))
   #end
   #if ($type != '')
     #set ($discard = $filters.put('type', [$type]))
@@ -1328,7 +1328,11 @@ a.search-result-highlightAll:after {
   ## Add the facets.
   #foreach ($parameter in $request.parameterMap.entrySet())
     #if ($parameter.key.startsWith('f_'))
-      #set ($discard = $filters.put($parameter.key.substring(2), $parameter.value))
+      #set ($escapedValues = [])
+      #foreach ($value in $parameter.value)
+        #set ($discard = $escapedValues.add("#escapeFilterValue($value)"))
+      #end
+      #set ($discard = $filters.put($parameter.key.substring(2), $escapedValues))
     #end
   #end
   ##
@@ -1341,12 +1345,12 @@ a.search-result-highlightAll:after {
         #set ($queryFilter = "$queryFilter $filter.key:(")
         #set ($separator = '')
         #foreach ($value in $filter.value)
-          #set ($queryFilter = "$queryFilter$separator""$value""")
+          #set ($queryFilter = "$queryFilter$separator$value")
           #set ($separator = ' OR ')
         #end
         #set ($queryFilter = "$queryFilter)")
       #else
-        #set ($queryFilter = "$queryFilter $filter.key:""$filter.value.get(0)""")
+        #set ($queryFilter = "$queryFilter $filter.key:$filter.value.get(0)")
       #end
     #end
     #set ($discard = $query.bindValue('fq', $queryFilter))
@@ -1354,6 +1358,10 @@ a.search-result-highlightAll:after {
   ##
   ## Execute the query.
   #set ($searchResponse = $query.execute()[0])
+#end
+
+#macro (escapeFilterValue $value)
+"$stringtool.replaceEach($value, ['\', '"'], ['\\', '\"'])"##
 #end
 
 #macro (processRequestParameters)

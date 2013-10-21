@@ -64,7 +64,7 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
         }
     }
 
-    private boolean isWikiEnaled(String wiki)
+    private boolean isWikiEnabled(String wiki)
     {
         return this.properties.getEntities() == null || this.properties.getEntities().matches(new WikiReference(wiki));
     }
@@ -75,7 +75,7 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
             || this.properties.getEntities().matches(new SpaceReference(space, new WikiReference(wiki)));
     }
 
-    private boolean isDocumentEnaled(String wiki, String space, String document)
+    private boolean isDocumentEnabled(String wiki, String space, String document)
     {
         return this.properties.getEntities() == null
             || this.properties.getEntities().matches(new DocumentReference(wiki, space, document));
@@ -100,7 +100,7 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
         }
 
         for (String wikiName : this.instanceModel.getWikis()) {
-            if (isWikiEnaled(wikiName)) {
+            if (isWikiEnabled(wikiName)) {
                 writeWiki(wikiName, filter, proxyFilter);
             }
         }
@@ -147,7 +147,7 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
         }
 
         for (String documentName : this.instanceModel.getDocuments(wiki, space)) {
-            if (isDocumentEnaled(wiki, space, documentName)) {
+            if (isDocumentEnabled(wiki, space, documentName)) {
                 writeDocument(documentName, filter, proxyFilter);
             }
         }

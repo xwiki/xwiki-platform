@@ -20,7 +20,6 @@
 package com.xpn.xwiki.web;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -41,7 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * 
  * @version $Id$
  */
-public class PreviewAction extends XWikiAction
+public class PreviewAction extends EditAction
 {
     /**
      * Check if a certain action was selected by the user. This is needed in older skins, which don't make use of the
@@ -92,57 +91,22 @@ public class PreviewAction extends XWikiAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
-        XWikiRequest request = context.getRequest();
-        XWikiDocument doc = context.getDoc();
-        EditForm form = (EditForm) context.getForm();
-        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+        XWikiDocument editedDocument = prepareEditedDocument(context);
 
-        String language = form.getLanguage();
-
-        // Make sure it is not considered as new
-        XWikiDocument doc2 = doc.clone();
-        context.put("doc", doc2);
-
-        int sectionNumber = 0;
-        if (request.getParameter("section") != null && context.getWiki().hasSectionEdit(context)) {
-            sectionNumber = Integer.parseInt(request.getParameter("section"));
+        // The current user editing the document should be displayed as author and creator (if the edited document is
+        // new) when the edited document is previewed.
+        editedDocument.setAuthorReference(context.getUserReference());
+        if (editedDocument.isNew()) {
+            editedDocument.setCreatorReference(context.getUserReference());
         }
-        vcontext.put("sectionNumber", new Integer(sectionNumber));
 
-        if ((language == null) || (language.equals("")) || (language.equals("default"))
-            || (language.equals(doc.getDefaultLanguage()))) {
-            context.put("tdoc", doc2);
-            vcontext.put("doc", doc2.newDocument(context));
-            vcontext.put("tdoc", vcontext.get("doc"));
-            vcontext.put("cdoc", vcontext.get("doc"));
-            doc2.readFromTemplate(form.getTemplate(), context);
-            doc2.readFromForm(form, context);
-            doc2.setAuthorReference(context.getUserReference());
-            doc2.setContentAuthorReference(context.getUserReference());
-            if (doc2.isNew()) {
-                doc2.setCreatorReference(context.getUserReference());
-            }
-        } else {
-            // Need to save parent and defaultLanguage if they have changed
-            XWikiDocument tdoc = doc.getTranslatedDocument(language, context).clone();
-            tdoc.setLanguage(language);
-            tdoc.setTranslation(1);
-            context.put("tdoc", tdoc);
-            vcontext.put("tdoc", tdoc.newDocument(context));
-            vcontext.put("cdoc", vcontext.get("tdoc"));
-            tdoc.readFromTemplate(form.getTemplate(), context);
-            tdoc.readFromForm(form, context);
-            tdoc.setAuthorReference(context.getUserReference());
-            tdoc.setContentAuthorReference(context.getUserReference());
-            if (tdoc.isNew()) {
-                tdoc.setCreatorReference(context.getUserReference());
-            }
-        }
-        // reconfirm edit (captcha) when jcaptcha is not correct
-        if ((context.get("recheckcaptcha") != null) && ((Boolean) context.get("recheckcaptcha")).booleanValue()) {
-            return "captcha";
-        } else {
-            return "preview";
-        }
+        // Make sure the current user doesn't use the programming rights of the previous content author (by editing a
+        // document saved with programming rights, changing it and then previewing it). Also make sure the code
+        // requiring programming rights is executed in preview mode if the current user has programming rights.
+        editedDocument.setContentAuthorReference(context.getUserReference());
+
+        // Reconfirm edit (captcha) when jcaptcha is not correct.
+        Boolean reCheckCaptcha = (Boolean) context.get("recheckcaptcha");
+        return reCheckCaptcha != null && reCheckCaptcha ? "captcha" : "preview";
     }
 }

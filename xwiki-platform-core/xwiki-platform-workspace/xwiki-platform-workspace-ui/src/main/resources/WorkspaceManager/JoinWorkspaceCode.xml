@@ -61,12 +61,12 @@
     ##
     #set ($existingMemberObject = $workspaceGroupDocumentRestricted.getXObject($groupsClassReference, 'member', $currentUser))
     #if ("$!existingMemberObject" != '')
-      {{info}}$services.localization.render('platform.workspace.userAlreadyMemberOfWorkspace', [$currentUser, $workspaceName, $workspaceUrl]){{/info}}
+      {{info}}$services.localization.render('platform.workspace.userAlreadyMemberOfWorkspace', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"]){{/info}}
     #elseif ($currentUser == 'xwiki:XWiki.XWikiGuest')
       #set ($loginDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWiki', 'XWikiLogin'))
       #set ($loginDocument = $xwiki.getDocument($loginDocumentReference))
       #set ($loginUrl = $loginDocument.getExternalURL('login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
-      {{error}}$services.localization.render('platform.workspace.logInToContinue', [$loginUrl]){{/error}}
+      {{error}}$services.localization.render('platform.workspace.logInToContinue', ['[[', "&gt;&gt;$loginUrl]]"]){{/error}}
     #else
       ## The user is not already a member of the workspace.
       ##
@@ -116,16 +116,16 @@
           ## Display the proper success info.
           {{success}}
           #if ($request.acceptInvitation)
-            $services.localization.render('platform.workspace.invitationUserAcceptedSuccess', [$currentUser, $workspaceName, $workspaceUrl])
+            $services.localization.render('platform.workspace.invitationUserAcceptedSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"])
           #else
-            $services.localization.render('platform.workspace.invitationUserRejectedSuccess', [$currentUser, $workspaceName, $workspaceUrl])
+            $services.localization.render('platform.workspace.invitationUserRejectedSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"])
           #end
           {{/success}}
         #else
           ##
           ## User can decide if to accept or reject the invitation.
           {{html wiki='true'}}
-          $services.localization.render('platform.workspace.invitationViewTitle', [$workspaceName, $workspaceUrl])
+          $services.localization.render('platform.workspace.invitationViewTitle', ['[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"])
 
           &lt;form class='xform third' method='GET'&gt;
             &lt;dl&gt;
@@ -177,13 +177,13 @@
           #if ("$!{request.cancelJoinRequest}" != '1')
             ## Request already exists.
             ##
-            {{info}}$services.localization.render('platform.workspace.joinRequestPendingRequestExists', [$currentUser, $workspaceName, $workspaceUrl]){{/info}}
+            {{info}}$services.localization.render('platform.workspace.joinRequestPendingRequestExists', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"]){{/info}}
           #elseif ("$!confirm" != '1')
             ## User wants to cancel existing request.
             ##
             #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
             {{box}}
-              $services.localization.render('platform.workspace.joinRequestCancelConfirmation', [$workspaceName, $workspaceUrl])
+              $services.localization.render('platform.workspace.joinRequestCancelConfirmation', ['[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"])
               ((({{html}}
                 &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.workspace.joinRequestCancelYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.workspace.joinRequestCancelNo')&lt;/a&gt;&lt;/span&gt;
               {{/html}})))
@@ -193,13 +193,13 @@
             ##
             #set ($temp = $workspaceGroupDocumentRestricted.removeXObject($pendingRequest))
             #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, $services.localization.render('platform.workspace.joinRequestCancelSaveCommit', [$currentUser]), true, $xcontext.context))
-            {{success}}$services.localization.render('platform.workspace.joinRequestCancelSuccess', [$currentUser, $workspaceName, $workspaceUrl]){{/success}}
+            {{success}}$services.localization.render('platform.workspace.joinRequestCancelSuccess',  ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"]){{/success}}
           #end
         #elseif ("$!confirm" != '1')
           ## Join request.
           ##
           {{html wiki='true'}}
-            $services.localization.render('platform.workspace.joinRequestHint', [$workspaceName, $workspaceUrl])
+            $services.localization.render('platform.workspace.joinRequestHint', ['[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"])
 
             &lt;form class='xform third' method='GET'&gt;
               &lt;dl&gt;
@@ -234,7 +234,7 @@
           #set ($workspaceAdminGroupReference = $services.model.createDocumentReference($workspaceId, 'XWiki', 'XWikiAdminGroup'))
           #set ($notificationMessage = $services.localization.render('platform.workspace.joinRequestSaveNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, $workspaceName, $workspaceId]))
           #set ($temp = $services.messageStream.postMessageToGroup($notificationMessage, $workspaceAdminGroupReference))
-          {{success}}$services.localization.render('platform.workspace.joinRequestSuccess', [$currentUser, $workspaceName, $workspaceUrl]){{/success}}
+          {{success}}$services.localization.render('platform.workspace.joinRequestSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"]){{/success}}
         #end
       #else
         ## Open membership as default.
@@ -244,7 +244,7 @@
           ##
           #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
           {{box}}
-            $services.localization.render('platform.workspace.joinConfirmation', [$workspaceName, $workspaceUrl])
+            $services.localization.render('platform.workspace.joinConfirmation', ['[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"])
             ((({{html}}
               &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.workspace.joinYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.workspace.joinNo')&lt;/a&gt;&lt;/span&gt;
             {{/html}})))
@@ -255,7 +255,7 @@
           #set ($newMemberObject = $workspaceGroupDocumentRestricted.newXObject($groupsClassReference, $xcontext.context))
           #set ($temp = $newMemberObject.setStringValue('member', $currentUser))
           #set ($temp = $xwiki.getXWiki().saveDocument($workspaceGroupDocumentRestricted, $services.localization.render('platform.workspace.joinSaveComment', [$currentUser]), true, $xcontext.context))
-          {{success}}$services.localization.render('platform.workspace.joinSuccess', [$currentUser, $workspaceName, $workspaceUrl]){{/success}}
+          {{success}}$services.localization.render('platform.workspace.joinSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $workspaceName, "&gt;&gt;$workspaceUrl]]"]){{/success}}
         #end
       #end
     #end

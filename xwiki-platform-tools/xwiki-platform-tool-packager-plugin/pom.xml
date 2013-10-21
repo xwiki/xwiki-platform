@@ -55,7 +55,15 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-archiver</artifactId>
-      <version>2.3</version>
+      <version>2.4.3</version>
+      <exclusions>
+        <!-- We draw version 1.0-alpha-9-stable-1 but org.xwiki.commons:xwiki-commons-tool-xar-plugin draws
+             org.codehaus.plexus:plexus-container-default:1.5.5 -->
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- XWiki -->
     <dependency>
@@ -72,6 +80,14 @@
         <exclusion>
           <groupId>org.xwiki.commons</groupId>
           <artifactId>xwiki-commons-environment-servlet</artifactId>
+        </exclusion>
+        <!-- Exclude org.apache.maven:maven-model:3.1.0 which is drawn from
+             org.xwiki.commons:xwiki-commons-extension-api. Ideally we would upgrade to Maven 3.1.0 but this would
+             mean that Maven 3.0.x couldn't be used anymore to build XWiki so FTM we continue basing this plugin code
+             on Maven 3.0.x -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-model</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

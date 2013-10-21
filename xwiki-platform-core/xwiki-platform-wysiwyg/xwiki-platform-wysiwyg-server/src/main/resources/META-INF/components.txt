@@ -11,5 +11,5 @@ org.xwiki.wysiwyg.server.internal.plugin.macro.XWikiMacroDescriptorTranslator
 org.xwiki.wysiwyg.server.internal.plugin.importer.XWikiImportService
 org.xwiki.wysiwyg.server.internal.wiki.DefaultWikiService
 org.xwiki.wysiwyg.server.internal.wiki.DefaultLinkService
-org.xwiki.wysiwyg.server.internal.DefaultWysiwygEditorScriptService
 org.xwiki.wysiwyg.server.internal.DefaultWysiwygEditorConfiguration
+org.xwiki.wysiwyg.server.script.DefaultWysiwygEditorScriptService

@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.internal.safe.AbstractSafeObject;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
-import org.xwiki.extension.script.internal.ExtensionManagerScriptService;
+import org.xwiki.extension.script.ExtensionManagerScriptService;
 
 /**
  * Encapsulate {@link AbstractSafeObject} with tools to make easier to use the wrapped API with script language not

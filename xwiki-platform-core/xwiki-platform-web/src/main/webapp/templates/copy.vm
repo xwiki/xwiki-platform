@@ -48,7 +48,29 @@
     #if($sourcewiki != "" && $sourcespace != "" && $sourcepage != "" && $targetwiki != "" && $targetspace != "" && $targetpage != "" && $!{services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
       #set($sourceDocReference = $services.model.createDocumentReference($sourcewiki, $sourcespace, $sourcepage))
       #set($targetDocReference = $services.model.createDocumentReference($targetwiki, $targetspace, $targetpage))
-      #if($xwiki.copyDocument($sourceDocReference, $targetDocReference, $language, false, true))
+      ##-----------------------------------------------------------
+      ## If the target document already exists, warn the user
+      ##-----------------------------------------------------------
+      #if($xwiki.exists($targetDocReference) && $!{request.overwrite} != "true")
+        #warning($services.localization.render('core.copy.alreadyExists', [$services.model.serialize($targetDocReference, 'compactwiki')]))
+        <form action="" class="xform third">
+          ## CSRF prevention
+          <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+          <input type="hidden" name="xpage" value="copy" />
+          <input type="hidden" name="overwrite" value="true" />
+          <input type="hidden" name="sourceWikiName" value="$escapetool.xml($sourcewiki)" />
+          <input type="hidden" name="sourceSpaceName" value="$escapetool.xml($sourcespace)" />
+          <input type="hidden" name="sourcePageName" value="$escapetool.xml($sourcepage)" />
+          <input type="hidden" name="targetWikiName" value="$escapetool.xml($targetwiki)" />
+          <input type="hidden" name="targetSpaceName" value="$escapetool.xml($targetspace)" />
+          <input type="hidden" name="targetPageName" value="$escapetool.xml($targetpage)" />
+          <div class="buttons">
+            <span class="buttonwrapper"><input type="submit" value="$services.localization.render('core.copy.submit')" class="button"/></span>
+            <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL('view', 'xpage=copy')">$services.localization.render('core.copy.changeTarget')</a></span>
+            <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL()">$services.localization.render('core.copy.cancel')</a></span>
+          </div>
+        </form>
+      #elseif($xwiki.copyDocument($sourceDocReference, $targetDocReference, $language, false, true))
         #if($escapedLanguage)
           #set($fromurl = $xwiki.getURL($sourceDocReference, "view", "language=${escapedLanguage}"))
           #set($tourl = $xwiki.getURL($targetDocReference, "view", "language=${escapedLanguage}"))

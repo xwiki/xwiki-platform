@@ -58,11 +58,6 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      */
     private boolean isValueDirty = true;
 
-    /**
-     * The owner document, if this object was obtained from a document.
-     */
-    private transient XWikiDocument ownerDocument;
-
     @Override
     protected R createReference()
     {
@@ -345,7 +340,8 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
      */
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        this.ownerDocument = ownerDocument;
+        super.setOwnerDocument(ownerDocument);
+
         if (ownerDocument != null && isValueDirty) {
             ownerDocument.setMetaDataDirty(true);
         }

@@ -368,6 +368,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
 
             if (doc.isNew()) {
                 doc.setParent(DEFAULT_XWIKICLASS_PARENT);
+                doc.setHidden(true);
             }
 
             this.baseClass = doc.getXClass();

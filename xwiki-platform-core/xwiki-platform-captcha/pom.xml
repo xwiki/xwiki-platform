@@ -80,8 +80,8 @@
     </dependency>
     <!-- AbstractCaptchaAction extends org.apache.struts.action.Action -->
     <dependency>
-      <groupId>struts</groupId>
-      <artifactId>struts</artifactId>
+      <groupId>org.apache.struts</groupId>
+      <artifactId>struts-core</artifactId>
     </dependency>
   </dependencies>
   <build>

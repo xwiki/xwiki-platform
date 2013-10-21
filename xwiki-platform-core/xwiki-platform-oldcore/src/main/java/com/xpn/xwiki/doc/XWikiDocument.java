@@ -1975,7 +1975,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public void setXClass(BaseClass xwikiClass)
     {
-        xwikiClass.setDocumentReference(getDocumentReference());
         xwikiClass.setOwnerDocument(this);
 
         this.xClass = xwikiClass;
@@ -2062,7 +2061,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         DocumentReference absoluteClassReference = resolveClassReference(classReference);
         BaseObject object = BaseClass.newCustomClassInstance(absoluteClassReference, context);
-        object.setDocumentReference(getDocumentReference());
         object.setOwnerDocument(this);
         object.setXClassReference(classReference);
         List<BaseObject> objects = this.xObjects.get(absoluteClassReference);
@@ -2382,7 +2380,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public void addXObject(BaseObject object)
     {
-        object.setDocumentReference(getDocumentReference());
+        object.setOwnerDocument(this);
 
         List<BaseObject> vobj = this.xObjects.get(object.getXClassReference());
         if (vobj == null) {
@@ -2409,9 +2407,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void setXObject(DocumentReference classReference, int nb, BaseObject object)
     {
         if (object != null) {
-            object.setDocumentReference(getDocumentReference());
-            object.setNumber(nb);
             object.setOwnerDocument(this);
+            object.setNumber(nb);
         }
 
         List<BaseObject> objects = this.xObjects.get(classReference);
@@ -2437,9 +2434,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public void setXObject(int nb, BaseObject object)
     {
-        object.setDocumentReference(getDocumentReference());
-        object.setNumber(nb);
         object.setOwnerDocument(this);
+        object.setNumber(nb);
 
         List<BaseObject> objects = this.xObjects.get(object.getXClassReference());
         if (objects == null) {
@@ -3295,7 +3291,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                 .getDocumentReference()) + "_" + i), oldobject);
                     newobject.setNumber(oldobject.getNumber());
                     newobject.setGuid(oldobject.getGuid());
-                    newobject.setDocumentReference(getDocumentReference());
+                    newobject.setOwnerDocument(this);
                     newObjects.set(newobject.getNumber(), newobject);
                 }
             }
@@ -6279,7 +6275,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         newdoc.setOriginalDocument(null);
         newdoc.setContentDirty(true);
-        newdoc.getXClass().setDocumentReference(newDocumentReference);
+        newdoc.getXClass().setOwnerDocument(newdoc);
 
         XWikiDocumentArchive archive = getDocumentArchive();
         if (archive != null) {
@@ -6919,7 +6915,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), newPrefix), oldobject);
         newobject.setNumber(oldobject.getNumber());
         newobject.setGuid(oldobject.getGuid());
-        newobject.setDocumentReference(getDocumentReference());
         setXObject(nb, newobject);
 
         return newobject;

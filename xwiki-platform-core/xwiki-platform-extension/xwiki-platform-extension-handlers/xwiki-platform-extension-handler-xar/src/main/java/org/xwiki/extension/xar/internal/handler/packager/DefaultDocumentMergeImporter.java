@@ -134,6 +134,8 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
         MergeResult documentMergeResult =
             mergedDocument.merge(previousDocument, nextDocument, mergeConfiguration, xcontext);
 
+        documentMergeResult.getLog().log(this.logger);
+
         if (configuration.isInteractive() && !documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
             // Indicate future author to whoever is going to answer the question
             nextDocument.setCreatorReference(currentDocument.getCreatorReference());

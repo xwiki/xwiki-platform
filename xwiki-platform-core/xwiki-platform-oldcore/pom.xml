@@ -165,8 +165,8 @@
       <artifactId>servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>struts</groupId>
-      <artifactId>struts</artifactId>
+      <groupId>org.apache.struts</groupId>
+      <artifactId>struts-core</artifactId>
     </dependency>
 
     <!-- Rendering -->
@@ -197,7 +197,7 @@
     <dependency>
       <groupId>javassist</groupId>
       <artifactId>javassist</artifactId>
-      <version>3.9.0.GA</version>
+      <version>3.12.1.GA</version>
     </dependency>
     <dependency>
       <groupId>org.liquibase</groupId>
@@ -342,7 +342,6 @@
     <dependency>
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
-      <version>1.4.5</version>
     </dependency>
     <!-- Used by another tool, it should be removed some time -->
     <dependency>

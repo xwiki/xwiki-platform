@@ -63,8 +63,11 @@ public class Object extends Collection
     public java.lang.Object get(String name)
     {
         try {
-            XWikiDocument doc = getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(),
-                getXWikiContext());
+            XWikiDocument doc = getBaseObject().getOwnerDocument();
+            if (doc == null) {
+                doc = getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(), getXWikiContext());
+            }
+
             return doc.display(name, this.getBaseObject(), getXWikiContext());
         } catch (XWikiException e) {
             return null;
@@ -74,8 +77,12 @@ public class Object extends Collection
     public java.lang.Object display(String name, String mode)
     {
         try {
-            XWikiDocument doc = getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(),
-                getXWikiContext());
+            XWikiDocument doc = getBaseObject().getOwnerDocument();
+            if (doc == null) {
+                doc =
+                    getXWikiContext().getWiki().getDocument(getBaseObject().getDocumentReference(), getXWikiContext());
+            }
+
             return doc.display(name, mode, this.getBaseObject(), getXWikiContext());
         } catch (XWikiException e) {
             return null;

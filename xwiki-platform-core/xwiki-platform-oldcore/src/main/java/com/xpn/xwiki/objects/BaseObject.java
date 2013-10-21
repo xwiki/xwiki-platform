@@ -55,11 +55,6 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
     /**
-     * The owner document, if this object was obtained from a document.
-     */
-    private XWikiDocument ownerDocument;
-
-    /**
      * {@inheritDoc}
      * <p>
      * Note: This method is overridden to add the deprecation warning so that code using it can see it's deprecated.
@@ -415,7 +410,7 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         }
 
         if (prop != null) {
-            prop.setOwnerDocument(ownerDocument);
+            prop.setOwnerDocument(getOwnerDocument());
             safeput(fieldname, prop);
         }
     }
@@ -438,10 +433,10 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      */
     public void setOwnerDocument(XWikiDocument ownerDocument)
     {
-        this.ownerDocument = ownerDocument;
-        for (String propertyName : getPropertyList()) {
-            BaseProperty property = (BaseProperty) getField(propertyName);
-            property.setOwnerDocument(ownerDocument);
+        super.setOwnerDocument(ownerDocument);
+
+        if (this.ownerDocument != null) {
+            setDocumentReference(this.ownerDocument.getDocumentReference());
         }
     }
 }

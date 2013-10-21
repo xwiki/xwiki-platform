@@ -236,7 +236,11 @@ public class TextAreaClass extends StringClass
         Syntax syntax;
 
         try {
-            XWikiDocument doc = context.getWiki().getDocument(object.getDocumentReference(), context);
+            XWikiDocument doc = object.getOwnerDocument();
+            if (doc == null) {
+                doc = context.getWiki().getDocument(object.getDocumentReference(), context);
+            }
+
             syntax = doc.getSyntax();
         } catch (Exception e) {
             // Used to convert a Document Reference to string (compact form without the wiki part if it matches the

@@ -285,7 +285,13 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     protected String getDefaultURI(Document doc, Map<String, Object> params, XWikiContext context)
         throws XWikiException
     {
-        return doc.getExternalURL("view", "language=" + doc.getRealLanguage());
+        // We need to generate a stable URL so that RSS client reader get the same URL every time they get the RSS feed
+        // as otherwise they'll consider the entry as a new entry and display it and the user will see duplicates.
+        // In addition since most RSS readers will not handle cookies, calling doc.getExternalURL will generate a
+        // jsessionid parameters in the computed URL (as per the spec).
+        // Thus we need to remove it.
+        String url = doc.getExternalURL("view", "language=" + doc.getRealLanguage());
+        return url.replaceAll(";jsessionid=.*?(?=\\?|$)", "");
     }
 
     protected String getURI(Document doc, Map<String, Object> params, XWikiContext context) throws XWikiException

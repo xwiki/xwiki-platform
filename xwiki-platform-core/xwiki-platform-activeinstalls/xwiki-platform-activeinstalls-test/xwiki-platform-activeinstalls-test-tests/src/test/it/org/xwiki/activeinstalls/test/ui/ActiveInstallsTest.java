@@ -37,7 +37,7 @@ public class ActiveInstallsTest extends AbstractGuestTest
     public void verifyPingIsSent() throws Exception
     {
         // When XWiki was started by ElasticSearchRunner from AllTests, a page was checked to verify that the XWiki
-        // instance was up. This, in turn, triggered the send of an asynchrnous ping to the ES instance (started prior
+        // instance was up. This, in turn, triggered the send of an asynchronous ping to the ES instance (started prior
         // to the XWiki start in ElasticSearchRunner).
         //
         // Since the ping may take some time to be sent to our ES instance, we wait till we have 1 index in ES or
@@ -51,7 +51,7 @@ public class ActiveInstallsTest extends AbstractGuestTest
 
         // Navigate to the Active Installs Counter Value page to verify that the ping has been received
         ViewPage vp  = getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue");
-        assertEquals("1", vp.getContent());
+        assertEquals("0", vp.getContent());
 
         // Navigate to the Total Installs Counter Value page to verify that the ping has been received
         vp  = getUtil().gotoPage("ActiveInstalls", "TotalCounterValue");

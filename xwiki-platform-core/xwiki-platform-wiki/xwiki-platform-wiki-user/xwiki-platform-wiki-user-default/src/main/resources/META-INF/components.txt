@@ -1,0 +1,3 @@
+org.xwiki.wiki.user.internal.DefaultWikiUserManager
+org.xwiki.wiki.user.internal.WikiUserPropertyGroupProvider
+org.xwiki.wiki.user.internal.XWikiServerClassDocumentInitializer

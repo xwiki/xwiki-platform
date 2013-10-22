@@ -17,11 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.template.internal;
+package org.xwiki.wiki.template;
 
 import org.xwiki.wiki.properties.WikiPropertyGroup;
 
-public class TemplateWikiPropertyGroup extends WikiPropertyGroup
+public class WikiTemplatePropertyGroup extends WikiPropertyGroup
 {
     public static final String IS_TEMPLATE_PROPERTY = "isTemplate";
 
@@ -30,7 +30,7 @@ public class TemplateWikiPropertyGroup extends WikiPropertyGroup
      *
      * @param id Unique identifier of the group
      */
-    public TemplateWikiPropertyGroup(String id)
+    public WikiTemplatePropertyGroup(String id)
     {
         super(id);
     }

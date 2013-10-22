@@ -62,7 +62,7 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
     /**
      * Default list separators of XWiki.XWikiServerClass fields.
      */
-    public static final String DEFAULT_FIELDS = "|";
+    public static final String DEFAULT_FIELDS_SEPARATOR = "|";
 
     /**
      * Name of field <code>prettyname</code> for the XWiki class XWiki.XWikiServerClass.
@@ -122,8 +122,8 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
     /**
      * List of possible values for <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
      */
-    public static final String FIELDL_VISIBILITY = FIELDL_VISIBILITY_PUBLIC + DEFAULT_FIELDS
-        + FIELDL_VISIBILITY_PRIVATE + DEFAULT_FIELDS;
+    public static final String FIELDL_VISIBILITY = FIELDL_VISIBILITY_PUBLIC + DEFAULT_FIELDS_SEPARATOR
+        + FIELDL_VISIBILITY_PRIVATE + DEFAULT_FIELDS_SEPARATOR;
 
     /**
      * Pretty name of field <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
@@ -153,8 +153,8 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
     /**
      * List of possible values for <code>state</code> for the XWiki class XWiki.XWikiServerClass.
      */
-    public static final String FIELDL_STATE = FIELDL_STATE_ACTIVE + DEFAULT_FIELDS + FIELDL_STATE_INACTIVE
-        + DEFAULT_FIELDS + FIELDL_STATE_LOCKED;
+    public static final String FIELDL_STATE = FIELDL_STATE_ACTIVE + DEFAULT_FIELDS_SEPARATOR + FIELDL_STATE_INACTIVE
+        + DEFAULT_FIELDS_SEPARATOR + FIELDL_STATE_LOCKED;
 
     /**
      * Pretty name of field <code>state</code> for the XWiki class XWiki.XWikiServerClass.

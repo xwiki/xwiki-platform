@@ -22,6 +22,7 @@ package org.xwiki.wiki.user;
 import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Component that manage how users can participate on a wiki (local users, members, invitation, etc...).
@@ -31,6 +32,30 @@ import org.xwiki.component.annotation.Role;
 @Role
 public interface WikiUserManager
 {
+    /**
+     * @param wikiId Id of the wiki to test
+     * @return if local users are enabled on the specified wiki
+     */
+    boolean hasLocalUsersEnabled(String wikiId) throws WikiManagerException;
+
+    /**
+     * @param wikiId Id of the wiki to change
+     * @param enable enable or not the local users on the wiki
+     */
+    void enableLocalUsers(String wikiId, boolean enable) throws WikiManagerException;
+
+    /**
+     * @param wikiId if of the wiki to test
+     * @return the membership type of the specified wiki
+     */
+    MembershipType getMembershipType(String wikiId) throws WikiManagerException;
+
+    /**
+     * @param wikiId Id of the wiki to change
+     * @param type the membershyp type to set
+     */
+    void setMembershypType(String wikiId, MembershipType type) throws WikiManagerException;
+
     /**
      * @param wikiId id of the wiki
      * @return the list of all the local users

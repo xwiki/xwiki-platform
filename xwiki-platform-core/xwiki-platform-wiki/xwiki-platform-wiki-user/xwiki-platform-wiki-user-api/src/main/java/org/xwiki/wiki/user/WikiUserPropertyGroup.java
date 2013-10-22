@@ -23,7 +23,7 @@ import org.xwiki.wiki.properties.WikiPropertyGroup;
 
 public class WikiUserPropertyGroup extends WikiPropertyGroup
 {
-    public static final String ENABLE_LOCAL_USER_PROPERTY = "enableLocalUser";
+    public static final String ENABLE_LOCAL_USERS_PROPERTY = "enableLocalUsers";
 
     public static final String MEMBERSHIP_TYPE_PROPERTY = "membershipType";
 
@@ -37,14 +37,14 @@ public class WikiUserPropertyGroup extends WikiPropertyGroup
         super(id);
     }
 
-    public void enableLocalUser(boolean enable)
+    public void enableLocalUsers(boolean enable)
     {
-        this.set(ENABLE_LOCAL_USER_PROPERTY, enable);
+        this.set(ENABLE_LOCAL_USERS_PROPERTY, enable);
     }
 
     public boolean hasLocalUsersEnabled()
     {
-        return ((Boolean) this.get(ENABLE_LOCAL_USER_PROPERTY)).booleanValue();
+        return ((Boolean) this.get(ENABLE_LOCAL_USERS_PROPERTY)).booleanValue();
     }
 
     public void setMembershypType(MembershipType type)

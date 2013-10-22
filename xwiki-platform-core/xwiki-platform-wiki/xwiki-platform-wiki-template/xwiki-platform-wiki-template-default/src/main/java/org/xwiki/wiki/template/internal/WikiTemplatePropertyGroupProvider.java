@@ -31,6 +31,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.properties.WikiPropertyGroup;
 import org.xwiki.wiki.properties.WikiPropertyGroupException;
 import org.xwiki.wiki.properties.WikiPropertyGroupProvider;
+import org.xwiki.wiki.template.WikiTemplatePropertyGroup;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -39,9 +40,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component
-@Named(TemplateWikiPropertyGroupProvider.GROUP_NAME)
+@Named(WikiTemplatePropertyGroupProvider.GROUP_NAME)
 @Singleton
-public class TemplateWikiPropertyGroupProvider implements WikiPropertyGroupProvider
+public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvider
 {
     public static final String GROUP_NAME = "template";
 
@@ -60,7 +61,7 @@ public class TemplateWikiPropertyGroupProvider implements WikiPropertyGroupProvi
         XWikiContext context = xcontextProvider.get();
         XWiki xwiki = context.getWiki();
 
-        TemplateWikiPropertyGroup group = new TemplateWikiPropertyGroup(GROUP_NAME);
+        WikiTemplatePropertyGroup group = new WikiTemplatePropertyGroup(GROUP_NAME);
 
         try {
             XWikiDocument descriptorDocument = wikiDescriptorDocumentHelper.getDocumentFromWikiId(wikiId);
@@ -80,7 +81,7 @@ public class TemplateWikiPropertyGroupProvider implements WikiPropertyGroupProvi
         XWikiContext context = xcontextProvider.get();
         XWiki xwiki = context.getWiki();
 
-        TemplateWikiPropertyGroup templateGroup = (TemplateWikiPropertyGroup) group;
+        WikiTemplatePropertyGroup templateGroup = (WikiTemplatePropertyGroup) group;
 
         try {
             XWikiDocument descriptorDocument = wikiDescriptorDocumentHelper.getDocumentFromWikiId(wikiId);

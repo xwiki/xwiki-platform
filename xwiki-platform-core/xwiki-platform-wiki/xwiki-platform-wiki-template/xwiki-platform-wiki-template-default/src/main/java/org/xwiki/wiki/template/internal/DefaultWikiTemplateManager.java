@@ -39,6 +39,7 @@ import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.properties.WikiPropertyGroupException;
 import org.xwiki.wiki.properties.WikiPropertyGroupProvider;
+import org.xwiki.wiki.template.WikiTemplatePropertyGroup;
 import org.xwiki.wiki.template.WikiTemplateManager;
 import org.xwiki.wiki.template.WikiTemplateManagerException;
 
@@ -108,15 +109,15 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
             // Get the descriptor
             WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
             // Get the property group
-            TemplateWikiPropertyGroup group = (TemplateWikiPropertyGroup) descriptor.getPropertyGroup(
-                    TemplateWikiPropertyGroupProvider.GROUP_NAME);
+            WikiTemplatePropertyGroup group = (WikiTemplatePropertyGroup) descriptor.getPropertyGroup(
+                    WikiTemplatePropertyGroupProvider.GROUP_NAME);
             // Set the value
             group.setTemplate(value);
-            // Save the descriptor
+            // Save the property groups
             templateWikiPropertyGroupProvider.save(group, wikiId);
         } catch (WikiPropertyGroupException e) {
             throw new WikiTemplateManagerException(String.format("Failed to save the property group [%s]",
-                    TemplateWikiPropertyGroupProvider.GROUP_NAME), e);
+                    WikiTemplatePropertyGroupProvider.GROUP_NAME), e);
         } catch (WikiManagerException e) {
             throw new WikiTemplateManagerException(String.format("Failed to get the descriptor for [%s].", wikiId), e);
         }
@@ -129,8 +130,8 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
             // Get the descriptor
             WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
             // Get the property group
-            TemplateWikiPropertyGroup group = (TemplateWikiPropertyGroup) descriptor.getPropertyGroup(
-                    TemplateWikiPropertyGroupProvider.GROUP_NAME);
+            WikiTemplatePropertyGroup group = (WikiTemplatePropertyGroup) descriptor.getPropertyGroup(
+                    WikiTemplatePropertyGroupProvider.GROUP_NAME);
             // Return the value
             return group.isTemplate();
         } catch (WikiManagerException e) {

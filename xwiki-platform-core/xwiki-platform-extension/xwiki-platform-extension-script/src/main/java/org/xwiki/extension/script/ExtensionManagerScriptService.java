@@ -220,7 +220,9 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param extensionDependency the extension dependency to resolve
      * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension couldn't
      *         be resolved, in which case {@link #getLastError()} contains the failure reason
+     * @deprecated since 5.3M1, use {@link #resolve(ExtensionDependency, String)} instead
      */
+    @Deprecated
     public Extension resolve(ExtensionDependency extensionDependency)
     {
         setError(null);
@@ -229,6 +231,40 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
         try {
             extension = safe(this.extensionManager.resolveExtension(extensionDependency));
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return extension;
+    }
+
+    /**
+     * Search the provided extension as a dependency of another extension among all repositories including core and
+     * local repositories.
+     * <p>
+     * The search is done in the following order:
+     * <ul>
+     * <li>Is it a core extension ?</li>
+     * <li>Is it a local extension ?</li>
+     * <li>Is this feature installed in current namespace or parent ?</li>
+     * <li>Is it a remote extension in one of the configured remote repositories ?</li>
+     * </ul>
+     * The first one found is returned.
+     * 
+     * @param extensionDependency the extension dependency to resolve
+     * @param namespace the namespace where to search for the dependency
+     * @return the read-only handler corresponding to the requested extension, or {@code null} if the extension couldn't
+     *         be resolved, in which case {@link #getLastError()} contains the failure reason
+     * @since 5.3M1
+     */
+    public Extension resolve(ExtensionDependency extensionDependency, String namespace)
+    {
+        setError(null);
+
+        Extension extension = null;
+
+        try {
+            extension = safe(this.extensionManager.resolveExtension(extensionDependency, namespace));
         } catch (Exception e) {
             setError(e);
         }

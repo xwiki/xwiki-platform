@@ -70,6 +70,12 @@
           <artifactId>stax-api</artifactId>
           <groupId>javax.xml.stream</groupId>
         </exclusion>
+        <!-- We use Servlet API 2.4 at the moment but org.restlet.ext.jaxrs requires version 2.5 so we need to exclude
+             it. Luckily it seems to work fine with 2.4. -->
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>

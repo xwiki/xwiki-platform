@@ -30,6 +30,11 @@ import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.user.MembershipType;
 import org.xwiki.wiki.user.WikiUserManager;
 
+/**
+ * Script service to manage how the user are supported in a wiki.
+ * @since 5.3M2
+ * @version $Id$
+ */
 @Component
 @Named("wiki.user")
 @Singleton

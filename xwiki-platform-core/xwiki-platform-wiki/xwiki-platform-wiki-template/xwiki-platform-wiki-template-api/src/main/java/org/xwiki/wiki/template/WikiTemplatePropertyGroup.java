@@ -21,8 +21,14 @@ package org.xwiki.wiki.template;
 
 import org.xwiki.wiki.properties.WikiPropertyGroup;
 
+/**
+ * Property groups attached to wiki descriptors that store values about the wiki template feature.
+ */
 public class WikiTemplatePropertyGroup extends WikiPropertyGroup
 {
+    /**
+     * Name if the "is template" property.
+     */
     public static final String IS_TEMPLATE_PROPERTY = "isTemplate";
 
     /**
@@ -35,11 +41,19 @@ public class WikiTemplatePropertyGroup extends WikiPropertyGroup
         super(id);
     }
 
+    /**
+     * Helper to know if the wiki that hold this property group is a template or not.
+     * @return whether or not the wiki is a template
+     */
     public boolean isTemplate()
     {
         return (Boolean) this.get(IS_TEMPLATE_PROPERTY);
     }
 
+    /**
+     * Helper to set if the wiki that hold this property group is a template or not
+     * @param template whether or not the wiki should be a template
+     */
     public void setTemplate(boolean template)
     {
         this.set(IS_TEMPLATE_PROPERTY, template);

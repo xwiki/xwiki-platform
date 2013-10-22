@@ -48,7 +48,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @since 5.3M1
  */
 @Component
-@Named("wikidescriptor")
+@Named("wikidescriptor2")
 @Singleton
 public class WikiDescriptorListener implements EventListener
 {
@@ -67,7 +67,7 @@ public class WikiDescriptorListener implements EventListener
     @Override
     public String getName()
     {
-        return "wikidescriptor";
+        return "wikidescriptor2";
     }
 
     @Override

@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -71,7 +72,10 @@ public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBui
     private EntityReferenceSerializer<String> referenceSerializer;
 
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    private DocumentReferenceResolver<String> referenceResolver;
+
+    @Inject
+    private Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
 
     @Inject
     private WikiPropertyGroupManager wikiPropertyGroupManager;
@@ -91,13 +95,21 @@ public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBui
                 String descriptorAlias = extractWikiAlias(serverClassObjects.get(i));
                 descriptor.addAlias(descriptorAlias);
             }
-        }
 
-        // load the property groups
-        try {
-            wikiPropertyGroupManager.loadForDescriptor(descriptor);
-        } catch (WikiPropertyGroupException e) {
-            // log
+            // load properties
+            BaseObject object = serverClassObjects.get(0);
+            descriptor.setDocumentReference(referenceResolver.resolve(
+                    object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE)));
+            //descriptor.setHidden(object.getIntValue(XWikiServerClassDocumentInitializer.FI));
+            descriptor.setPrettyName(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME));
+            descriptor.setOwnerId(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER));
+
+            // load the property groups
+            try {
+                wikiPropertyGroupManager.loadForDescriptor(descriptor);
+            } catch (WikiPropertyGroupException e) {
+                // log
+            }
         }
 
         return descriptor;
@@ -138,6 +150,7 @@ public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBui
     @Override
     public XWikiDocument save(WikiDescriptor descriptor) throws WikiDescriptorBuilderException
     {
+        WikiDescriptorManager wikiDescriptorManager = wikiDescriptorManagerProvider.get();
         XWikiContext context = xcontextProvider.get();
         XWiki xwiki = context.getWiki();
         XWikiDocument descriptorDoc = null;

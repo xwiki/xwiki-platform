@@ -23,21 +23,35 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
  * Update the XWiki.XWikiServerClass document with all required information.
  *
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Component
-@Named("XWiki.XWikiServerClassTemplate")
+@Named("XWiki.XWikiServerTemplateClass")
 @Singleton
-public class XWikiServerClassDocumentInitializer extends
-        org.xwiki.wiki.internal.descriptor.document.XWikiServerClassDocumentInitializer
+public class XWikiServerTemplateClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
+    /**
+     * The name of the mandatory document.
+     */
+    public static final String DOCUMENT_NAME = "XWikiServerTemplateClass";
+
+    /**
+     * Reference to the server class.
+     */
+    public static final EntityReference SERVER_CLASS =  new EntityReference(DOCUMENT_NAME, EntityType.DOCUMENT,
+            new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
+
     /**
      * Name of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
      */
@@ -51,12 +65,19 @@ public class XWikiServerClassDocumentInitializer extends
     /**
      * Display type of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
      */
-    public static final String FIELDDT_ISWIKITEMPLATE = FIELDDT_SECURE;
+    public static final String FIELDDT_ISWIKITEMPLATE = "checkbox";
 
     /**
      * Default value of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final Boolean DEFAULT_ISWIKITEMPLATE = Boolean.FALSE;
+
+    public XWikiServerTemplateClassDocumentInitializer()
+    {
+        // Since we can`t get the main wiki here, this is just to be able to use the Abstract class.
+        // getDocumentReference() returns the actual main wiki document reference.
+        super(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
+    }
 
     @Override
     public boolean updateDocument(XWikiDocument document)

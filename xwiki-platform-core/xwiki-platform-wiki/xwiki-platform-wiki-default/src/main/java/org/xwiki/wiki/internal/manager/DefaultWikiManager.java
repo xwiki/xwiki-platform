@@ -34,8 +34,8 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder;
 import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilderException;
+import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.internal.descriptor.properties.WikiPropertyGroupManager;
-import org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.properties.WikiPropertyGroupException;
@@ -59,7 +59,7 @@ public class DefaultWikiManager implements WikiManager
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    private DefaultWikiDescriptorDocumentHelper descriptorDocumentHelper;
+    private WikiDescriptorDocumentHelper descriptorDocumentHelper;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;

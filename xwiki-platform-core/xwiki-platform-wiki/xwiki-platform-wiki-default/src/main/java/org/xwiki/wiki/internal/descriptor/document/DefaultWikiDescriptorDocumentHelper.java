@@ -45,7 +45,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Component to load and resolve wiki descriptor documents.
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Component
 @Singleton
@@ -58,7 +58,7 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
     private QueryManager queryManager;
 
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    private Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
 
     @Inject
     @Named("current")
@@ -67,6 +67,7 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
     @Override
     public DocumentReference getDocumentReferenceFromId(String wikiId)
     {
+        WikiDescriptorManager wikiDescriptorManager = wikiDescriptorManagerProvider.get();
         return new DocumentReference(wikiDescriptorManager.getMainWikiId(),
                 XWiki.SYSTEM_SPACE, String.format("XWikiServer%s", StringUtils.capitalize(wikiId)));
     }
@@ -80,6 +81,8 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
     @Override
     public DocumentReference findXWikiServerClassDocumentReference(String wikiAlias) throws WikiManagerException
     {
+        WikiDescriptorManager wikiDescriptorManager = wikiDescriptorManagerProvider.get();
+
         DocumentReference result = null;
 
         try {
@@ -118,11 +121,14 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
     @Override
     public List<XWikiDocument> getAllXWikiServerClassDocument() throws WikiManagerException
     {
+        WikiDescriptorManager wikiDescriptorManager = wikiDescriptorManagerProvider.get();
+
         List<XWikiDocument> result = new ArrayList<XWikiDocument>();
 
         try {
             Query query = this.queryManager.createQuery(
-                    "from doc.object(XWiki.XWikiServerClass) as descriptor where doc.name like 'XWikiServer%'",
+                    "from doc.object(XWiki.XWikiServerClass) as descriptor where doc.name like 'XWikiServer%' "
+                    + "and doc.fullName <> 'XWiki.XWikiServerClassTemplate'",
                     Query.XWQL);
             query.setWiki(wikiDescriptorManager.getMainWikiId());
             List<String> documentNames = query.execute();

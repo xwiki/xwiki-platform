@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
+import org.xwiki.wiki.internal.descriptor.document.XWikiServerClassDocumentInitializer;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.properties.WikiPropertyGroup;
 import org.xwiki.wiki.properties.WikiPropertyGroupException;
@@ -55,6 +56,16 @@ public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvi
     @Inject
     private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
 
+    private void upgradeFromOldSubwiki(XWikiDocument descriptorDocument, WikiTemplatePropertyGroup group)
+    {
+        BaseObject object = descriptorDocument.getXObject(XWikiServerClassDocumentInitializer.SERVER_CLASS);
+        String oldPropertyName = "iswikitemplate";
+        if (object.getPropertyList().contains(oldPropertyName)) {
+            group.setTemplate(object.getIntValue(oldPropertyName, 0) != 0);
+            // We can delete the old property but I keep it for compatibility reason
+        }
+    }
+
     @Override
     public WikiPropertyGroup get(String wikiId) throws WikiPropertyGroupException
     {
@@ -65,8 +76,10 @@ public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvi
 
         try {
             XWikiDocument descriptorDocument = wikiDescriptorDocumentHelper.getDocumentFromWikiId(wikiId);
-            BaseObject object = descriptorDocument.getXObject(XWikiServerClassDocumentInitializer.SERVER_CLASS);
-            group.setTemplate(object.getIntValue(XWikiServerClassDocumentInitializer.FIELD_ISWIKITEMPLATE) != 0);
+            BaseObject object = descriptorDocument.getXObject(XWikiServerTemplateClassDocumentInitializer.SERVER_CLASS);
+            // if the property is empty, then we put the previous value that was setted by upgradeFromOldSubwiki
+            group.setTemplate(object.getIntValue(XWikiServerTemplateClassDocumentInitializer.FIELD_ISWIKITEMPLATE,
+                    group.isTemplate() ? 1 : 0) != 0);
         } catch (WikiManagerException e) {
             throw new WikiPropertyGroupException(String.format("Unable to load descriptor document for wiki %s.",
                     wikiId), e);
@@ -85,8 +98,8 @@ public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvi
 
         try {
             XWikiDocument descriptorDocument = wikiDescriptorDocumentHelper.getDocumentFromWikiId(wikiId);
-            BaseObject object = descriptorDocument.getXObject(XWikiServerClassDocumentInitializer.SERVER_CLASS);
-            object.setIntValue(XWikiServerClassDocumentInitializer.FIELD_ISWIKITEMPLATE,
+            BaseObject object = descriptorDocument.getXObject(XWikiServerTemplateClassDocumentInitializer.SERVER_CLASS);
+            object.setIntValue(XWikiServerTemplateClassDocumentInitializer.FIELD_ISWIKITEMPLATE,
                     templateGroup.isTemplate() ? 1 : 0);
             xwiki.saveDocument(descriptorDocument, String.format("Changed property group [%s].", GROUP_NAME), context);
         } catch (WikiManagerException e) {

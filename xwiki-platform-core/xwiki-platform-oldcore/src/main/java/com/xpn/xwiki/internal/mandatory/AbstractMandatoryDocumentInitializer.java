@@ -31,6 +31,8 @@ import org.xwiki.sheet.SheetBinder;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
@@ -122,5 +124,39 @@ public abstract class AbstractMandatoryDocumentInitializer implements MandatoryD
         }
 
         return needsUpdate;
+    }
+
+    /**
+     * Set the default value of a boolean field of a XWiki class.
+     *
+     * @param baseClass the XWiki class.
+     * @param fieldName the name of the field.
+     * @param value the default value.
+     * @return true if <code>baseClass</code> modified.
+     */
+    protected boolean updateBooleanClassDefaultValue(BaseClass baseClass, String fieldName, Boolean value)
+    {
+        boolean needsUpdate = false;
+
+        BooleanClass bc = (BooleanClass) baseClass.get(fieldName);
+
+        int old = bc.getDefaultValue();
+        int intvalue = intFromBoolean(value);
+
+        if (intvalue != old) {
+            bc.setDefaultValue(intvalue);
+            needsUpdate = true;
+        }
+
+        return needsUpdate;
+    }
+
+    /**
+     * @param value the {@link Boolean} value to convert.
+     * @return the converted <code>int</code> value.
+     */
+    protected int intFromBoolean(Boolean value)
+    {
+        return value == null ? -1 : (value.booleanValue() ? 1 : 0);
     }
 }

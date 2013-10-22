@@ -63,7 +63,7 @@ public class WikiDescriptor
     /**
      * Default page.
      */
-    private LocalDocumentReference mainPageReference;
+    private LocalDocumentReference mainPageReference = new LocalDocumentReference("Main", "WebHome");
 
     /**
      * The owner of the wiki.
@@ -158,6 +158,23 @@ public class WikiDescriptor
     }
 
     /**
+     * @return the Id of the owner of the wiki
+     */
+    public String getOwnerId()
+    {
+        return ownerId;
+    }
+
+    /**
+     * Set the Id of the owner of the wiki
+     * @param ownerId
+     */
+    public void setOwnerId(String ownerId)
+    {
+        this.ownerId = ownerId;
+    }
+
+    /**
      * @return a reference to that wiki
      */
     public WikiReference getReference()
@@ -174,11 +191,11 @@ public class WikiDescriptor
     }
 
     /**
-     * @return the Id of the owner of the wiki
+     * @return a reference to the main page of the wiki
      */
-    public String getOwnerId()
+    public void setMainPageReference(DocumentReference reference)
     {
-        return ownerId;
+        this.mainPageReference = new LocalDocumentReference(reference.getParent().getName(), reference.getName());
     }
 
     /**

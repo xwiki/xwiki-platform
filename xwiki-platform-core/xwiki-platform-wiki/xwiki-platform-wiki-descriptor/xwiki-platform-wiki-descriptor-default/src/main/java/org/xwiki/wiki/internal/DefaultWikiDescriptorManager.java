@@ -161,8 +161,8 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager, Init
 
         try {
             Query query = this.queryManager.createQuery(
-                "where doc.object(XWiki.XWikiServerClass).server = :wikiAlias and doc.name like 'XWikiServer%'",
-                Query.XWQL);
+                "from doc.object(XWiki.XWikiServerClass) obj where obj.server = :wikiAlias and "
+                        + "doc.name like 'XWikiServer%'", Query.XWQL);
             query.bindValue("wikiAlias", wikiAlias);
             query.setWiki(getXWikiContext().getMainXWiki());
             List<String> documentNames = query.execute();

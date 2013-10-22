@@ -23,14 +23,14 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Component to load and resolve wiki descriptor documents.
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Role
 public interface WikiDescriptorDocumentHelper

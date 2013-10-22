@@ -23,9 +23,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.wiki.user.MembershipType;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -34,11 +38,26 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @since 5.3M2
  */
 @Component
-@Named("XWiki.XWikiServerClassUser")
+@Named("XWiki.XWikiServerUserClass")
 @Singleton
-public class XWikiServerClassDocumentInitializer extends
-        org.xwiki.wiki.internal.descriptor.document.XWikiServerClassDocumentInitializer
+public class XWikiServerUserClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
+    /**
+     * The name of the mandatory document.
+     */
+    public static final String DOCUMENT_NAME = "XWikiServerUserClass";
+
+    /**
+     * Reference to the server class.
+     */
+    public static final EntityReference SERVER_CLASS =  new EntityReference(DOCUMENT_NAME, EntityType.DOCUMENT,
+            new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
+
+    /**
+     * Default list separators of XWiki.XWikiServerClass fields.
+     */
+    public static final String DEFAULT_FIELDS_SEPARATOR = "|";
+
     /**
      * Name of field <code>membershipType</code> for the XWiki class XWiki.XWikiServerClass.
      */
@@ -80,6 +99,11 @@ public class XWikiServerClassDocumentInitializer extends
      * Default value of field <code>enableLocalUsers</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final Boolean DEFAULT_ENABLELOCALUSERS = Boolean.FALSE;
+
+    public XWikiServerUserClassDocumentInitializer()
+    {
+        super(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
+    }
 
     @Override
     public boolean updateDocument(XWikiDocument document)

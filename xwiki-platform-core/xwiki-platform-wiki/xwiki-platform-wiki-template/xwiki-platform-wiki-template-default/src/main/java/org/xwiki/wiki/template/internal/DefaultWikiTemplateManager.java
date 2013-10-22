@@ -83,9 +83,8 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
 
         try {
             Query query = this.queryManager.createQuery(
-                    "from doc.object(XWiki.XWikiServerClass) as descriptor where doc.name like 'XWikiServer%' and " +
-                            "descriptor.iswikitemplate = 1",
-                    Query.XWQL);
+                    "from doc.object(XWiki.XWikiServerTemplateClass) as descriptor where doc.name like 'XWikiServer%' "
+                    + "and descriptor.iswikitemplate = 1", Query.XWQL);
             query.setWiki(xcontextProvider.get().getMainXWiki());
             List<String> documentNames = query.execute();
 

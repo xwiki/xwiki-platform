@@ -699,8 +699,13 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (displayExtensionDetails $extension)
-  #set ($backwardDependencies = $extensionManager.getBackwardDependencies($extension.id.id, $extension.id.version.value))
-  #if (!$backwardDependencies)
+  #set ($backwardDependencies = $services.extension.installed.getBackwardDependencies($extension.id.id))
+  #if ($backwardDependencies && ($xcontext.isMainWiki() || $backwardDependencies.containsKey($extensionNamespace)))
+    #if (!$xcontext.isMainWiki())
+      ## If not on the main wiki then display only the backward dependencies from the current namespace.
+      #set ($backwardDependencies = {$extensionNamespace: $backwardDependencies.get($extensionNamespace)})
+    #end
+  #else
     #set ($backwardDependencies = {})
   #end
   <div class="extension-body">

@@ -325,7 +325,13 @@ icon=icon:bullet_go</parameters>
       #end
     #end
     #if (!$extensions)
-      #set ($extensions = $repository.search("$!request.search", $paginationParams.firstItem, $paginationParams.itemsPerPage))
+      #if ($selectedRepositoryId == 'installed' &amp;&amp; !$xcontext.isMainWiki())
+        ## When searching for installed extensions we need to take the namespace into account.
+        #set ($extensions = $services.extension.installed.repository.searchInstalledExtensions("$!request.search",
+          $extensionNamespace, $paginationParams.firstItem, $paginationParams.itemsPerPage))
+      #else
+        #set ($extensions = $repository.search("$!request.search", $paginationParams.firstItem, $paginationParams.itemsPerPage))
+      #end
       #set ($totalHits = $extensions.totalHits)
     #end
     #if (!$extensions.iterator().hasNext())

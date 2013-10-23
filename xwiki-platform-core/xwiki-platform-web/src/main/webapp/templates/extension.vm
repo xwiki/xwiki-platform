@@ -366,7 +366,7 @@ $namespace##
     #set ($dependencyId = $dependencyOrExtension.id)
     #set ($dependencyVersion = $dependencyOrExtension.versionConstraint)
     #if ($resolveRemotely)
-      #set ($dependencyExtension = $extensionManager.resolve($dependencyOrExtension))
+      #set ($dependencyExtension = $extensionManager.resolve($dependencyOrExtension, $extensionNamespace))
     #else
       ## Search for the dependency only in the core and local repositories.
       ## TODO: Check also the remote extensions that have been partially cached locally (e.g. only their pom has been
@@ -574,7 +574,7 @@ Caused by: #printThrowable($throwable.cause true)
     #elseif ($argument.id && ($argument.version || $argument.versionConstraint))
       #if ($resolveRemotely)
         ## Assume the argument is an extension dependency.
-        #set ($_extension = $extensionManager.resolve($argument))
+        #set ($_extension = $extensionManager.resolve($argument, $extensionNamespace))
         #if (!$_extension)
           ## Assume the argument is an extension id.
           #set ($_extension = $extensionManager.resolve($argument.id, $argument.version.value))
@@ -790,7 +790,14 @@ Caused by: #printThrowable($throwable.cause true)
     ## Display the extension.
     ## Create a dependency in order to support version constraints (e.g. a version range).
     #set ($dependency = $extensionManager.createExtensionDependency($request.extensionId, $request.extensionVersion))
-    #set ($extension = $extensionManager.resolve($dependency))
+    #if ($dependency.versionConstraint.version && $dependency.versionConstraint.ranges.isEmpty())
+      ## A precise version was specified so we resolve the requested extension.
+      #set ($extension = $extensionManager.resolve($request.extensionId, $request.extensionVersion))
+    #else
+      ## A version range was specified so we resolve the requested extension dependency. Note that the result might not
+      ## be exactly the requested extension but some extension that provides / features the requested extension.
+      #set ($extension = $extensionManager.resolve($dependency, $extensionNamespace))
+    #end
     #if ($extension)
       #displayExtension($extension)
     #else

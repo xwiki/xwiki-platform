@@ -304,15 +304,15 @@ icon=icon:bullet_go</parameters>
       #if ("$!request.search" == '')
         ## Fetch extensions from known repositories.
         #if ($selectedRepositoryId == 'core')
-          #set($extensions = $extensionManager.getCoreExtensions())
+          #set($extensions = $services.extension.core.getCoreExtensions())
         #elseif ($selectedRepositoryId == 'installed')
           #if ($xcontext.isMainWiki())
-            #set($extensions = $extensionManager.getInstalledExtensions())
+            #set($extensions = $services.extension.installed.getInstalledExtensions())
           #else
-            #set($extensions = $extensionManager.getInstalledExtensions($extensionNamespace))
+            #set($extensions = $services.extension.installed.getInstalledExtensions($extensionNamespace))
           #end
         #elseif ($selectedRepositoryId == 'local')
-          #set($extensions = $extensionManager.getLocalExtensions())
+          #set($extensions = $services.extension.local.getLocalExtensions())
         #end
         #if ($extensions)
           #set ($totalHits = $extensions.size())

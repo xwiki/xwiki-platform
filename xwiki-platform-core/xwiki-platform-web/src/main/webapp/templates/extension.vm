@@ -149,7 +149,7 @@
   #elseif ($extensionStatus.startsWith('remote-installed'))
     ## An extension that can be either upgraded or downgraded.
     ## Compare this version with the version that is currently installed to determine which button to display.
-    #set ($installedExtension = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
+    #set ($installedExtension = $services.extension.installed.getInstalledExtension($extension.id.id, $extensionNamespace))
     #if ($extension.id.version.compareTo($installedExtension.id.version) > 0)
       #extensionActionButtons($installedExtension 'upgrade')
     #else
@@ -960,9 +960,9 @@ Caused by: #printThrowable($throwable.cause true)
     #else
       ## An extension, either local or remote, that might be available to install.
       ## Check if a different version of this extension is installed or is a core dependency.
-      #set ($currentVersion = $extensionManager.getCoreExtension($extension.id.id))
+      #set ($currentVersion = $services.extension.core.getCoreExtension($extension.id.id))
       #if (!$currentVersion)
-        #set ($currentVersion = $extensionManager.getInstalledExtension($extension.id.id, $extensionNamespace))
+        #set ($currentVersion = $services.extension.installed.getInstalledExtension($extension.id.id, $extensionNamespace))
       #end
       #if ($currentVersion)
         #set ($repoId = $currentVersion.repository.descriptor.id)
@@ -1024,7 +1024,7 @@ $status##
     #set ($targetVersion = $_jobStatus.request.extensions.get(0).version)
     #if (!$targetVersion)
       ## Some jobs don't require the extension version. Let's determine the currently available version.
-      #set ($targetVersion = $extensionManager.getInstalledExtension($extensionId, $extensionNamespace).id.version)
+      #set ($targetVersion = $services.extension.installed.getInstalledExtension($extensionId, $extensionNamespace).id.version)
     #end
     #if ($targetVersion && $extensionVersion != $targetVersion.value)
       #set ($_jobStatus = $NULL)
@@ -1037,7 +1037,7 @@ $status##
     #set ($targetVersion = $_plan.request.extensions.get(0).version)
     #if (!$targetVersion)
       ## Some jobs don't require the extension version. Let's determine the currently available version.
-      #set ($targetVersion = $extensionManager.getInstalledExtension($extensionId, $extensionNamespace).id.version)
+      #set ($targetVersion = $services.extension.installed.getInstalledExtension($extensionId, $extensionNamespace).id.version)
     #end
     #if ($targetVersion && $extensionVersion != $targetVersion.value)
       #set ($_plan = $NULL)
@@ -1210,7 +1210,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #foreach ($firstLevelNode in $plan.tree)
       #set ($planAction = $firstLevelNode.action)
       #set ($status = $NULL)
-      #set ($installedVersion = $extensionManager.getInstalledExtension($planAction.extension.id.id, $planAction.namespace))
+      #set ($installedVersion = $services.extension.installed.getInstalledExtension($planAction.extension.id.id, $planAction.namespace))
       #if (!$installedVersion.isValid($planAction.namespace))
         #set ($status = $invalid)
       ## Check if the latest version has been installed after the upgrade plan was created.

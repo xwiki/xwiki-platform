@@ -25,14 +25,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>xwiki-platform-wiki-user-ui</artifactId>
+    <artifactId>xwiki-platform-wiki-ui</artifactId>
     <groupId>org.xwiki.platform</groupId>
     <version>5.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wiki-user-ui-wiki</artifactId>
+  <artifactId>xwiki-platform-wiki-ui-wiki</artifactId>
   <packaging>xar</packaging>
-  <name>XWiki Platform - Wiki - User - UI</name>
-  <description>XWiki application that manages wiki users.</description>
+  <name>XWiki Platform - Wiki - UI</name>
+  <description>XWiki application that manages wiki.</description>
   <properties>
     <xwiki.extension.features>
       <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->

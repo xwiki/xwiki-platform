@@ -87,9 +87,10 @@ public class WikiManagerScriptService implements ScriptService
      *
      * @param wikiId unique identifier of the new wiki
      * @param wikiAlias default alias of the new wiki
+     * @param ownerId Id of the user that will own the wiki
      * @return the wiki descriptor of the new wiki, or null if problems occur
      */
-    public WikiDescriptor createWiki(String wikiId, String wikiAlias)
+    public WikiDescriptor createWiki(String wikiId, String wikiAlias, String ownerId)
     {
         WikiDescriptor descriptor = null;
 
@@ -102,6 +103,9 @@ public class WikiManagerScriptService implements ScriptService
 
             // Create the wiki
             descriptor = wikiManager.create(wikiId, wikiAlias);
+            // Set the owner
+            descriptor.setOwnerId(ownerId);
+            wikiDescriptorManager.saveDescriptor(descriptor);
         } catch (WikiManagerException e) {
             error(e.getMessage(), e);
         } catch (AccessDeniedException e) {
@@ -249,6 +253,36 @@ public class WikiManagerScriptService implements ScriptService
     public String getMainWikiId()
     {
         return wikiDescriptorManager.getMainWikiId();
+    }
+
+    /**
+     * Save the specified descriptor (if you have the right).
+     *
+     * @param descriptor descriptor to save
+     * @return true if it succeed
+     */
+    public boolean saveDescriptor(WikiDescriptor descriptor)
+    {
+        XWikiContext context = xcontextProvider.get();
+
+        try {
+            // Get the wiki owner
+            WikiDescriptor oldDescriptor = wikiDescriptorManager.getById(descriptor.getId());
+            String owner = oldDescriptor.getOwnerId();
+            // Check right access
+            WikiReference wikiReference = new WikiReference(oldDescriptor.getId());
+            if (!context.getUserReference().toString().equals(owner)) {
+                authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(), wikiReference);
+            }
+            wikiDescriptorManager.saveDescriptor(descriptor);
+            return true;
+        } catch (WikiManagerException e) {
+            error(e.getMessage(), e);
+            return false;
+        } catch (AccessDeniedException e) {
+            error(e.getMessage(), e);
+            return false;
+        }
     }
 
     /**

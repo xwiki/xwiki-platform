@@ -57,6 +57,7 @@ public class DefaultWikiUserManager implements WikiUserManager
     public void enableLocalUsers(String wikiId, boolean enable) throws WikiManagerException
     {
         getPropertyGroup(wikiId).enableLocalUsers(enable);
+        wikiDescriptorManager.saveDescriptor(wikiDescriptorManager.getById(wikiId));
     }
 
     @Override
@@ -66,9 +67,13 @@ public class DefaultWikiUserManager implements WikiUserManager
     }
 
     @Override
-    public void setMembershypType(String wikiId, MembershipType type) throws WikiManagerException
+    public void setMembershipType(String wikiId, MembershipType type) throws WikiManagerException
     {
-        getPropertyGroup(wikiId).setMembershypType(type);
+        WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
+        WikiUserPropertyGroup group =
+                (WikiUserPropertyGroup) descriptor.getPropertyGroup(WikiUserPropertyGroupProvider.GROUP_NAME);
+        group.setMembershypType(type);
+        wikiDescriptorManager.saveDescriptor(descriptor);
     }
 
     @Override

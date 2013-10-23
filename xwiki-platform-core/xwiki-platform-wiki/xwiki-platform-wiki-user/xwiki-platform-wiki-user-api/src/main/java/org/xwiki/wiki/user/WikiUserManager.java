@@ -39,6 +39,7 @@ public interface WikiUserManager
     boolean hasLocalUsersEnabled(String wikiId) throws WikiManagerException;
 
     /**
+     * Enable or disbale the local users and save the descriptor.
      * @param wikiId Id of the wiki to change
      * @param enable enable or not the local users on the wiki
      */
@@ -51,10 +52,11 @@ public interface WikiUserManager
     MembershipType getMembershipType(String wikiId) throws WikiManagerException;
 
     /**
+     * Set the membership type of the wiki and save the descriptor.
      * @param wikiId Id of the wiki to change
      * @param type the membershyp type to set
      */
-    void setMembershypType(String wikiId, MembershipType type) throws WikiManagerException;
+    void setMembershipType(String wikiId, MembershipType type) throws WikiManagerException;
 
     /**
      * @param wikiId id of the wiki

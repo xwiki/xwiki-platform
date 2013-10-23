@@ -26,15 +26,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-wiki-user</artifactId>
+    <artifactId>xwiki-platform-wiki</artifactId>
     <version>5.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wiki-user-ui</artifactId>
-  <name>XWiki Platform - Wiki - User - UI - Parent POM</name>
+  <artifactId>xwiki-platform-wiki-ui</artifactId>
+  <name>XWiki Platform - Wiki - UI - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Wiki - User - UI- Parent POM</description>
+  <description>XWiki Platform - Wiki - UI- Parent POM</description>
   <modules>
-    <module>xwiki-platform-wiki-user-ui-mainwiki</module>
-    <module>xwiki-platform-wiki-user-ui-wiki</module>
+    <module>xwiki-platform-wiki-ui-mainwiki</module>
+    <module>xwiki-platform-wiki-ui-wiki</module>
   </modules>
 </project>

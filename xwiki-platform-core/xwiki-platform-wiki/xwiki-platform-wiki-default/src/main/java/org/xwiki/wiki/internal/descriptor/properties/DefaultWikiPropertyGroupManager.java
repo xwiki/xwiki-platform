@@ -67,8 +67,10 @@ public class DefaultWikiPropertyGroupManager implements WikiPropertyGroupManager
         String wikiId = descriptor.getId();
         for(String propertyGroupName : propertyGroupProviders.keySet()) {
             WikiPropertyGroup group = descriptor.getPropertyGroup(propertyGroupName);
-            WikiPropertyGroupProvider provider = propertyGroupProviders.get(propertyGroupName);
-            provider.save(group, wikiId);
+            if (group != null) {
+                WikiPropertyGroupProvider provider = propertyGroupProviders.get(propertyGroupName);
+                provider.save(group, wikiId);
+            }
         }
     }
 }

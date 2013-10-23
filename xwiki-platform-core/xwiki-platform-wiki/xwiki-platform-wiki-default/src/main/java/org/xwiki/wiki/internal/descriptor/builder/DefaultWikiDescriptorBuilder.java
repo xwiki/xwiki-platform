@@ -103,6 +103,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             //descriptor.setHidden(object.getIntValue(XWikiServerClassDocumentInitializer.FI));
             descriptor.setPrettyName(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME));
             descriptor.setOwnerId(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER));
+            descriptor.setDescription(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION));
 
             // load the property groups
             try {
@@ -167,6 +168,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
                     descriptor.getMainPageReference()), context);
             obj.set(XWikiServerClassDocumentInitializer.FIELD_OWNER, descriptor.getOwnerId(), context);
             obj.set(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME, descriptor.getPrettyName(), context);
+            obj.set(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION, descriptor.getDescription(), context);
 
             // Create the aliases
             List<String> aliases = descriptor.getAliases();

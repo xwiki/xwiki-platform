@@ -36,7 +36,7 @@ import org.xwiki.wiki.user.WikiUserManager;
  * @version $Id$
  */
 @Component
-@Named("wiki.user")
+@Named("wikiuser")
 @Singleton
 public class WikiUserManagerScriptService implements ScriptService
 {
@@ -109,11 +109,11 @@ public class WikiUserManagerScriptService implements ScriptService
      * @param type the membership type to set
      * @return true if it succeed
      */
-    public boolean setMembershypType(String wikiId, String type)
+    public boolean setMembershipType(String wikiId, String type)
     {
         boolean success = true;
         try {
-            wikiUserManager.setMembershypType(wikiId, MembershipType.valueOf(type.toUpperCase()));
+            wikiUserManager.setMembershipType(wikiId, MembershipType.valueOf(type.toUpperCase()));
         } catch (WikiManagerException e) {
             success = false;
         }

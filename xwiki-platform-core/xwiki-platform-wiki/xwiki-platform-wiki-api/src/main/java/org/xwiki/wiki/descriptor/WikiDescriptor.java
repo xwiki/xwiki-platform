@@ -77,6 +77,11 @@ public class WikiDescriptor
     private boolean isHidden;
 
     /**
+     * Description.
+     */
+    private String description;
+
+    /**
      * Properties groups that new modules can use to store their own value in the wiki descriptor.
      */
     private Map<String, WikiPropertyGroup> propertyGroups;
@@ -216,6 +221,22 @@ public class WikiDescriptor
     public void setHidden(boolean hidden)
     {
         this.isHidden = hidden;
+    }
+
+    /**
+     * @return the wiki description
+     */
+    public String getDescription()
+    {
+        return description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     /**

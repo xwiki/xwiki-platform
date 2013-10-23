@@ -81,9 +81,6 @@ public class DefaultWikiManager implements WikiManager
 
     private WikiDescriptor createDescriptor(String wikiId, String wikiAlias) throws WikiManagerException
     {
-        XWikiContext context = xcontextProvider.get();
-        XWiki xwiki = context.getWiki();
-
         // Create the descriptor
         DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor(wikiId, wikiAlias);
 

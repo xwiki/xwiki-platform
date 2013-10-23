@@ -37,6 +37,5 @@
     <module>xwiki-platform-wiki-user-api</module>
     <module>xwiki-platform-wiki-user-default</module>
     <module>xwiki-platform-wiki-user-script</module>
-    <module>xwiki-platform-wiki-user-ui</module>
   </modules>
 </project>

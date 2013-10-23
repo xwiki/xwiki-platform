@@ -133,7 +133,9 @@
   ## able for instance to recompute the install plan.
   #if ($extensionStatus.startsWith('installed'))
     ## This extension can be uninstalled.
-    #extensionActionButtons($extension 'uninstall' true)
+    ## The given extension object could be an instance of LocalExtension so make sure we use an InstalledExtension instance.
+    #set ($installedExtension = $services.extension.installed.getInstalledExtension($extension.id.id, $extensionNamespace))
+    #extensionActionButtons($installedExtension 'uninstall' true)
   #elseif ($extensionStatus == 'remote')
     ## Installable extension.
     #if ($xcontext.action == 'distribution' && $showRepairXARButton)

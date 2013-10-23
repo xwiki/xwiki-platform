@@ -78,7 +78,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     private Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
 
     @Inject
-    private WikiPropertyGroupManager wikiPropertyGroupManager;
+    private Provider<WikiPropertyGroupManager> wikiPropertyGroupManagerProvider;
 
     @Inject
     private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
@@ -106,6 +106,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
 
             // load the property groups
             try {
+                WikiPropertyGroupManager wikiPropertyGroupManager = wikiPropertyGroupManagerProvider.get();
                 wikiPropertyGroupManager.loadForDescriptor(descriptor);
             } catch (WikiPropertyGroupException e) {
                 // log
@@ -183,6 +184,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             xwiki.saveDocument(descriptorDoc, context);
 
             // Save the property groups
+            WikiPropertyGroupManager wikiPropertyGroupManager = wikiPropertyGroupManagerProvider.get();
             wikiPropertyGroupManager.saveForDescriptor(descriptor);
 
         } catch (WikiManagerException e) {

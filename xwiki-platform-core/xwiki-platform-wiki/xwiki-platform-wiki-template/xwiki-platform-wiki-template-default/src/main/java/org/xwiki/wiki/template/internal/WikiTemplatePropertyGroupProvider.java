@@ -76,10 +76,15 @@ public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvi
 
         try {
             XWikiDocument descriptorDocument = wikiDescriptorDocumentHelper.getDocumentFromWikiId(wikiId);
+            // Upgrade from old subwiki
+            upgradeFromOldSubwiki(descriptorDocument, group);
+            // Get the object
             BaseObject object = descriptorDocument.getXObject(XWikiServerTemplateClassDocumentInitializer.SERVER_CLASS);
-            // if the property is empty, then we put the previous value that was setted by upgradeFromOldSubwiki
-            group.setTemplate(object.getIntValue(XWikiServerTemplateClassDocumentInitializer.FIELD_ISWIKITEMPLATE,
-                    group.isTemplate() ? 1 : 0) != 0);
+            if (object != null) {
+                // if the property is empty, then we put the previous value that was setted by upgradeFromOldSubwiki
+                group.setTemplate(object.getIntValue(XWikiServerTemplateClassDocumentInitializer.FIELD_ISWIKITEMPLATE,
+                        group.isTemplate() ? 1 : 0) != 0);
+            }
         } catch (WikiManagerException e) {
             throw new WikiPropertyGroupException(String.format("Unable to load descriptor document for wiki %s.",
                     wikiId), e);
@@ -98,7 +103,8 @@ public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvi
 
         try {
             XWikiDocument descriptorDocument = wikiDescriptorDocumentHelper.getDocumentFromWikiId(wikiId);
-            BaseObject object = descriptorDocument.getXObject(XWikiServerTemplateClassDocumentInitializer.SERVER_CLASS);
+            BaseObject object = descriptorDocument.getXObject(XWikiServerTemplateClassDocumentInitializer.SERVER_CLASS,
+                    true, context);
             object.setIntValue(XWikiServerTemplateClassDocumentInitializer.FIELD_ISWIKITEMPLATE,
                     templateGroup.isTemplate() ? 1 : 0);
             xwiki.saveDocument(descriptorDocument, String.format("Changed property group [%s].", GROUP_NAME), context);

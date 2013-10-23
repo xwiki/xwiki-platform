@@ -39,6 +39,7 @@ public class WikiTemplatePropertyGroup extends WikiPropertyGroup
     public WikiTemplatePropertyGroup(String id)
     {
         super(id);
+        setTemplate(false); // Default value
     }
 
     /**

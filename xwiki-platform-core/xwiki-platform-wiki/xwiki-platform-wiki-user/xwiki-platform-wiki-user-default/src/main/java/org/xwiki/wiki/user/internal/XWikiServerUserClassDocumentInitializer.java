@@ -36,6 +36,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * Update the XWiki.XWikiServerClass document with all required information.
  *
  * @since 5.3M2
+ * @version $Id$
  */
 @Component
 @Named("XWiki.XWikiServerUserClass")

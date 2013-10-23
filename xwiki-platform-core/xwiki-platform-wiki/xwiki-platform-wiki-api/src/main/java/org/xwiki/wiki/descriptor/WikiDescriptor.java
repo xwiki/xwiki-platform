@@ -20,6 +20,7 @@
 package org.xwiki.wiki.descriptor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -90,6 +91,7 @@ public class WikiDescriptor
     {
         this.id = id;
         this.aliases = new ArrayList<String>();
+        this.propertyGroups = new HashMap<String, WikiPropertyGroup>();
         setDefaultAlias(defaultAlias);
     }
 

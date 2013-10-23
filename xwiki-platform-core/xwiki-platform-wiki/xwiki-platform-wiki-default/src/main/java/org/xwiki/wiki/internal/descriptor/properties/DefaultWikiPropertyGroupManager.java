@@ -33,6 +33,7 @@ import org.xwiki.wiki.properties.WikiPropertyGroupProvider;
 
 /**
  * Default implementation for WikiPropertyGroupManager.
+ *
  * @since 5.3M2
  * @version $Id :$
  */

@@ -42,7 +42,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 @Component
-@Named(WikiUserPropertyGroupProvider.GROUP_NAME)
+@Named("user")
 @Singleton
 public class WikiUserPropertyGroupProvider implements WikiPropertyGroupProvider
 {
@@ -69,15 +69,16 @@ public class WikiUserPropertyGroupProvider implements WikiPropertyGroupProvider
                 "WorkspaceManager", "WorkspaceClass");
         BaseObject oldObject = descriptorDocument.getXObject(oldClassDocument);
 
+        // --
         // The wiki is not a workspace
+        // --
         if (oldObject == null) {
             return false;
         }
 
+        // --
         // The wiki is a workspace
-        XWikiContext context = xcontextProvider.get();
-        XWiki xwiki = context.getWiki();
-
+        // --
         // No local users
         group.enableLocalUsers(false);
 
@@ -105,31 +106,30 @@ public class WikiUserPropertyGroupProvider implements WikiPropertyGroupProvider
     @Override
     public WikiPropertyGroup get(String wikiId) throws WikiPropertyGroupException
     {
-        XWikiContext context = xcontextProvider.get();
-        XWiki xwiki = context.getWiki();
-
         WikiUserPropertyGroup group = new WikiUserPropertyGroup(GROUP_NAME);
 
         try {
             // Get the document & the object
             XWikiDocument descriptorDocument = wikiDescriptorDocumentHelper.getDocumentFromWikiId(wikiId);
             if (!upgradeOldWorkspace(descriptorDocument, group)) {
-                // If it is not a workspace, then read the values
+                // If it is not a workspace, then read the values of the object
                 BaseObject object = descriptorDocument.getXObject(XWikiServerUserClassDocumentInitializer.SERVER_CLASS);
-                // Get the enable local users value (default value: 1, for compatibility reason with old subwikis).
-                group.enableLocalUsers(
-                        object.getIntValue(XWikiServerUserClassDocumentInitializer.FIELD_ENABLELOCALUSERS, 1) != 0);
-                // Get the membershipType value
-                String membershipTypeValue = object.getStringValue(
-                        XWikiServerUserClassDocumentInitializer.FIELD_MEMBERSHIPTYPE);
-                MembershipType membershipType;
-                try {
-                    membershipType = MembershipType.valueOf(membershipTypeValue.toUpperCase());
-                } catch (Exception e) {
-                    // Default value
-                    membershipType = MembershipType.INVITE;
+                if (object != null) {
+                    // Get the enable local users value (default value: 1, for compatibility reason with old subwikis).
+                    group.enableLocalUsers(
+                            object.getIntValue(XWikiServerUserClassDocumentInitializer.FIELD_ENABLELOCALUSERS, 1) != 0);
+                    // Get the membershipType value
+                    String membershipTypeValue = object.getStringValue(
+                            XWikiServerUserClassDocumentInitializer.FIELD_MEMBERSHIPTYPE);
+                    MembershipType membershipType;
+                    try {
+                        membershipType = MembershipType.valueOf(membershipTypeValue.toUpperCase());
+                    } catch (Exception e) {
+                        // Default value
+                        membershipType = MembershipType.INVITE;
+                    }
+                    group.setMembershypType(membershipType);
                 }
-                group.setMembershypType(membershipType);
             }
         } catch (WikiManagerException e) {
             throw new WikiPropertyGroupException(String.format("Unable to load descriptor document for wiki %s.",
@@ -161,7 +161,8 @@ public class WikiUserPropertyGroupProvider implements WikiPropertyGroupProvider
         XWiki xwiki = context.getWiki();
 
         // Fill the object
-        BaseObject object = descriptorDocument.getXObject(XWikiServerUserClassDocumentInitializer.SERVER_CLASS);
+        BaseObject object = descriptorDocument.getXObject(XWikiServerUserClassDocumentInitializer.SERVER_CLASS, true,
+                context);
         object.setIntValue(XWikiServerUserClassDocumentInitializer.FIELD_ENABLELOCALUSERS,
                 userGroup.hasLocalUsersEnabled() ? 1 : 0);
         object.setStringValue(XWikiServerUserClassDocumentInitializer.FIELD_MEMBERSHIPTYPE,

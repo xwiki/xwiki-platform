@@ -44,6 +44,9 @@ public class WikiUserPropertyGroup extends WikiPropertyGroup
     public WikiUserPropertyGroup(String id)
     {
         super(id);
+        // Default values
+        enableLocalUsers(false);
+        setMembershypType(MembershipType.INVITE);
     }
 
     /**

@@ -565,8 +565,13 @@ Caused by: #printThrowable($throwable.cause true)
 #macro (printLogMessage $log $resolveRemotely)
   #set ($message = '')
   #set ($messageElements = $log.messageElements)
-  #foreach ($argument in $log.argumentArray)
-    #set ($message = "$message$escapetool.xml($messageElements.get($mathtool.sub($velocityCount, 1)))")
+  #foreach ($messageElement in $messageElements)
+    #if ($velocityCount == $messageElements.size())
+      ## Skip the last message element because we always have more message elements than arguments.
+      #break
+    #end
+    #set ($argument = $log.argumentArray.get($foreach.index))
+    #set ($message = "$message$escapetool.xml($messageElement)")
     ## Assume the argument is an entity reference.
     #set ($reference = $services.model.serialize($argument))
     #if ($reference)
@@ -606,10 +611,14 @@ Caused by: #printThrowable($throwable.cause true)
       #set ($message = "$message$escapetool.xml($stringtool.join($argument, '/'))")
     #elseif ($argument.startsWith('wiki:'))
       #set ($message = "$message#wikiHomePageLink($argument)")
+    #elseif ($argument.previous && $argument.next)
+      ## Assume the argument is a diff Delta.
+      #set ($message = "$message@@ -$mathtool.add($argument.previous.index, 1),$argument.previous.size() +$mathtool.add($argument.next.index, 1),$argument.next.size() @@")
     #else
       #set ($message = "$message$escapetool.xml($argument)")
     #end
   #end
+  ## Add the last message element.
   $message$!escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))##
 #end
 

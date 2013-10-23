@@ -1,3 +1,0 @@
-org.xwiki.wiki.internal.DefaultWikiDescriptorBuilder
-org.xwiki.wiki.internal.DefaultWikiDescriptorManager
-org.xwiki.wiki.internal.WikiDescriptorListener

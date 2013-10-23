@@ -52,7 +52,7 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 @Component
 @Singleton
-public class DefaultWikiDescriptorDescriptorBuilder implements WikiDescriptorBuilder
+public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
 {
     /**
      * Page prefix for all descriptors.

@@ -45,10 +45,10 @@ import com.xpn.xwiki.objects.BaseObject;
  * Used to refresh the Wiki Descriptor Cache.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Component
-@Named("wikidescriptor2")
+@Named("wikidescriptor")
 @Singleton
 public class WikiDescriptorListener implements EventListener
 {
@@ -67,7 +67,7 @@ public class WikiDescriptorListener implements EventListener
     @Override
     public String getName()
     {
-        return "wikidescriptor2";
+        return "wikidescriptor";
     }
 
     @Override

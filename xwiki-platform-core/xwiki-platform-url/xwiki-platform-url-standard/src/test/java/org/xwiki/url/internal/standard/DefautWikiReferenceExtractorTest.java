@@ -30,11 +30,12 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.url.internal.ExtendedURL;
-import org.xwiki.wiki.WikiDescriptor;
-import org.xwiki.wiki.WikiDescriptorManager;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultWikiReferenceExtractor}.
@@ -69,8 +70,8 @@ public class DefautWikiReferenceExtractorTest
         setUpConfiguration(false, WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
 
         WikiDescriptorManager wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getByWikiAlias("wiki.server.com")).thenReturn(null);
-        when(wikiDescriptorManager.getByWikiId("wiki")).thenReturn(new WikiDescriptor("dummy", "dummy"));
+        when(wikiDescriptorManager.getByAlias("wiki.server.com")).thenReturn(null);
+        when(wikiDescriptorManager.getById("wiki")).thenReturn(new WikiDescriptor("dummy", "dummy"));
 
         testAndAssert("http://wiki.server.com/xwiki/bin/view/Main/WebHome", "wiki", false);
     }
@@ -102,7 +103,7 @@ public class DefautWikiReferenceExtractorTest
         setUpConfiguration(false, WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
 
         WikiDescriptorManager wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getByWikiAlias("wiki.server.com")).thenReturn(new WikiDescriptor("wikiid", "wiki"));
+        when(wikiDescriptorManager.getByAlias("wiki.server.com")).thenReturn(new WikiDescriptor("wikiid", "wiki"));
 
         testAndAssert("http://wiki.server.com/xwiki/bin/view/Main/WebHome", "wikiid", false);
     }
@@ -120,7 +121,7 @@ public class DefautWikiReferenceExtractorTest
         setUpConfiguration(true, WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
 
         WikiDescriptorManager wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getByWikiAlias("someWiki")).thenReturn(new WikiDescriptor("wikiid", "someWiki"));
+        when(wikiDescriptorManager.getByAlias("someWiki")).thenReturn(new WikiDescriptor("wikiid", "someWiki"));
 
         testAndAssert("http://localhost/xwiki/wiki/someWiki/view/Main/WebHome", "wikiid", true);
     }
@@ -138,7 +139,7 @@ public class DefautWikiReferenceExtractorTest
         setUpConfiguration(true, WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
 
         WikiDescriptorManager wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getByWikiAlias("someWiki")).thenReturn(new WikiDescriptor("", "someWiki"));
+        when(wikiDescriptorManager.getByAlias("someWiki")).thenReturn(new WikiDescriptor("", "someWiki"));
 
         testAndAssert("http://localhost/xwiki/wiki/someWiki/view/Main/WebHome", "xwiki", true);
     }
@@ -148,8 +149,8 @@ public class DefautWikiReferenceExtractorTest
         setUpConfiguration(true, WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
 
         WikiDescriptorManager wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getByWikiAlias("someWiki")).thenReturn(null);
-        when(wikiDescriptorManager.getByWikiId("someWiki")).thenReturn(new WikiDescriptor("dummy", "dummy"));
+        when(wikiDescriptorManager.getByAlias("someWiki")).thenReturn(null);
+        when(wikiDescriptorManager.getById("someWiki")).thenReturn(new WikiDescriptor("dummy", "dummy"));
 
         testAndAssert("http://localhost/xwiki/wiki/someWiki/view/Main/WebHome", "somewiki", true);
     }

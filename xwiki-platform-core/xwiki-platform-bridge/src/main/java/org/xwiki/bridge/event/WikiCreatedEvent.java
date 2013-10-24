@@ -19,7 +19,7 @@
  */
 package org.xwiki.bridge.event;
 
-import org.xwiki.observation.event.EndEvent;
+import org.xwiki.observation.event.EndFoldEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
@@ -28,7 +28,7 @@ import org.xwiki.observation.event.filter.EventFilter;
  * @version $Id$
  * @since 3.0M1
  */
-public class WikiCreatedEvent extends AbstractWikiEvent implements EndEvent
+public class WikiCreatedEvent extends AbstractWikiEvent implements EndFoldEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class

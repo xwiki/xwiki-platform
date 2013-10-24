@@ -509,7 +509,8 @@ public class WatchListStore implements EventListener
             return false;
         }
 
-        List<String> watchedElements = getWatchedElements(user, type, context);
+        // Copy the list of watched elements because it could be unmodifiable.
+        List<String> watchedElements = new ArrayList<String>(getWatchedElements(user, type, context));
 
         // Escape the element to watch in case it contains the WIKI_SPACE_SEP separator
         String escapedElementToWatch = elementToWatch.replaceAll(WATCHLIST_ELEMENT_SEP, "\\\\" + WATCHLIST_ELEMENT_SEP);

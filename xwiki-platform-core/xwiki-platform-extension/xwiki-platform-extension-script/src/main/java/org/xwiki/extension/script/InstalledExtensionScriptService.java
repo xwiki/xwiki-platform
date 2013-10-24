@@ -120,16 +120,7 @@ public class InstalledExtensionScriptService extends AbstractExtensionScriptServ
         Map<String, Collection<InstalledExtension>> extensions;
 
         if (installedExtension != null) {
-            setError(null);
-
-            try {
-                extensions =
-                    safe(this.installedExtensionRepository.getBackwardDependencies(installedExtension.getId()));
-            } catch (Exception e) {
-                setError(e);
-
-                extensions = null;
-            }
+            extensions = getBackwardDependencies(installedExtension.getId());
         } else {
             extensions = null;
         }

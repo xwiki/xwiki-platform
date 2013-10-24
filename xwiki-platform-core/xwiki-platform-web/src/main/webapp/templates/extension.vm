@@ -709,19 +709,40 @@ Caused by: #printThrowable($throwable.cause true)
   #end
 #end
 
-#macro (displayExtensionDetails $extension)
-  #set ($backwardDependencies = $services.extension.installed.getBackwardDependencies($extension.id.id))
-  #if ($backwardDependencies && ($xcontext.isMainWiki() || $backwardDependencies.containsKey($extensionNamespace)))
-    #if (!$xcontext.isMainWiki())
-      ## If not on the main wiki then display only the backward dependencies from the current namespace.
-      #set ($backwardDependencies = {$extensionNamespace: $backwardDependencies.get($extensionNamespace)})
+#macro (getBackwardDependencies $extension $return)
+  #set ($installedExtension = $services.extension.installed.getInstalledExtension($extension.id.id, $extensionNamespace))
+  #if ($installedExtension.isInstalled($NULL))
+    ## The extension is installed in the root namespace so it can have backward dependencies on multiple namespaces.
+    #set ($backwardDependencies = $services.extension.installed.getBackwardDependencies($installedExtension.id))
+    #if ($backwardDependencies && ($xcontext.isMainWiki() || $backwardDependencies.containsKey($extensionNamespace)))
+      #if (!$xcontext.isMainWiki())
+        ## If we're not on the main wiki then display only the backward dependencies from the current namespace.
+        #set ($backwardDependencies = {$extensionNamespace: $backwardDependencies.get($extensionNamespace)})
+      #end
+    #else
+      #set ($backwardDependencies = {})
+    #end
+  #elseif ($installedExtension)
+    ## The extension is installed on the current namespace.
+    #set ($backwardDependencies = $services.extension.installed.getBackwardDependencies($installedExtension.id.id,
+      $extensionNamespace))
+    #if ($backwardDependencies && $backwardDependencies.size() > 0)
+      #set ($backwardDependencies = {$extensionNamespace: $backwardDependencies})
+    #else
+      #set ($backwardDependencies = {})
     #end
   #else
     #set ($backwardDependencies = {})
   #end
+  #set ($return = $NULL)
+  #setVariable("$return" $backwardDependencies)
+#end
+
+#macro (displayExtensionDetails $extension)
   <div class="extension-body">
     #set ($extensionIdHashCode = "$extensionNamespace/$extension.id.id/$extension.id.version.value")
     #set ($extensionIdHashCode = $extensionIdHashCode.hashCode())
+    #getBackwardDependencies($extension $backwardDependencies)
     #displayExtensionDetails_menu($extension)
 
     #displayExtensionDetails_description($extension)

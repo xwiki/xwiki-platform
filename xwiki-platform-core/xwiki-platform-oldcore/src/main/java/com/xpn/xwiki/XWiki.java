@@ -1249,30 +1249,31 @@ public class XWiki implements EventListener
         saveDocument(doc, comment, false, context);
     }
 
-    public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit, XWikiContext context)
+    public void saveDocument(XWikiDocument document, String comment, boolean isMinorEdit, XWikiContext context)
         throws XWikiException
     {
-        String server = null, database = null;
-        try {
-            server = doc.getDocumentReference().getWikiReference().getName();
+        String currentWiki = context.getDatabase();
 
-            if (server != null) {
-                database = context.getDatabase();
-                context.setDatabase(server);
-            }
+        try {
+            // Switch to document wiki
+            context.setDatabase(document.getDocumentReference().getWikiReference().getName());
 
             // Setting comment & minor edit before saving
-            doc.setComment(StringUtils.defaultString(comment));
-            doc.setMinorEdit(isMinorEdit);
+            document.setComment(StringUtils.defaultString(comment));
+            document.setMinorEdit(isMinorEdit);
 
             // We need to save the original document since saveXWikiDoc() will reset it and we
             // need that original document for the notification below.
-            XWikiDocument originalDocument = doc.getOriginalDocument();
-            // Always use an originalDocument, to provide a consistent behavior. The cases where
-            // originalDocument is null are rare (specifically when the XWikiDocument object is
-            // manually constructed, and not obtained using the API).
+            XWikiDocument originalDocument = document.getOriginalDocument();
+
+            // Make sure to always have an original document for listeners that need to compare with it.
+            // The only case where we have a null original document is supposedly when the document
+            // instance has been crafted and passed #saveDocument without using #getDocument
+            // (which is not a good practice)
             if (originalDocument == null) {
-                originalDocument = new XWikiDocument(doc.getDocumentReference());
+                originalDocument =
+                    getDocument(new DocumentReference(document.getDocumentReference(), document.getLocale()), context);
+                document.setOriginalDocument(originalDocument);
             }
 
             ObservationManager om = Utils.getComponent((Type) ObservationManager.class);
@@ -1284,15 +1285,15 @@ public class XWiki implements EventListener
 
             if (om != null) {
                 if (originalDocument.isNew()) {
-                    om.notify(new DocumentCreatingEvent(doc.getDocumentReference()), doc, context);
+                    om.notify(new DocumentCreatingEvent(document.getDocumentReference()), document, context);
                 } else {
-                    om.notify(new DocumentUpdatingEvent(doc.getDocumentReference()), doc, context);
+                    om.notify(new DocumentUpdatingEvent(document.getDocumentReference()), document, context);
                 }
             }
 
             // Put attachments to remove in recycle bin
             if (hasAttachmentRecycleBin(context)) {
-                for (XWikiAttachmentToRemove attachment : doc.getAttachmentsToRemove()) {
+                for (XWikiAttachmentToRemove attachment : document.getAttachmentsToRemove()) {
                     if (attachment.isToRecycleBin()) {
                         getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(), context.getUser(),
                             new Date(), context, true);
@@ -1301,14 +1302,14 @@ public class XWiki implements EventListener
             }
 
             // Actually save the document.
-            getStore().saveXWikiDoc(doc, context);
+            getStore().saveXWikiDoc(document, context);
 
             // Since the store#saveXWikiDoc resets originalDocument, we need to temporarily put it
             // back to send notifications.
-            XWikiDocument newOriginal = doc.getOriginalDocument();
+            XWikiDocument newOriginal = document.getOriginalDocument();
 
             try {
-                doc.setOriginalDocument(originalDocument);
+                document.setOriginalDocument(originalDocument);
 
                 // Notify listeners about the document having been created or updated
 
@@ -1321,21 +1322,19 @@ public class XWiki implements EventListener
 
                 if (om != null) {
                     if (originalDocument.isNew()) {
-                        om.notify(new DocumentCreatedEvent(doc.getDocumentReference()), doc, context);
+                        om.notify(new DocumentCreatedEvent(document.getDocumentReference()), document, context);
                     } else {
-                        om.notify(new DocumentUpdatedEvent(doc.getDocumentReference()), doc, context);
+                        om.notify(new DocumentUpdatedEvent(document.getDocumentReference()), document, context);
                     }
                 }
             } catch (Exception ex) {
                 LOGGER.error("Failed to send document save notification for document ["
-                    + this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference()) + "]", ex);
+                    + this.defaultEntityReferenceSerializer.serialize(document.getDocumentReference()) + "]", ex);
             } finally {
-                doc.setOriginalDocument(newOriginal);
+                document.setOriginalDocument(newOriginal);
             }
         } finally {
-            if ((server != null) && (database != null)) {
-                context.setDatabase(database);
-            }
+            context.setDatabase(currentWiki);
         }
     }
 
@@ -1350,15 +1349,13 @@ public class XWiki implements EventListener
 
     public XWikiDocument getDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        String database = context.getDatabase();
+        String currentWiki = context.getDatabase();
         try {
-            if (doc.getDocumentReference().getWikiReference().getName() != null) {
-                context.setDatabase(doc.getDocumentReference().getWikiReference().getName());
-            }
+            context.setDatabase(doc.getDocumentReference().getWikiReference().getName());
 
             return getStore().loadXWikiDoc(doc, context);
         } finally {
-            context.setDatabase(database);
+            context.setDatabase(currentWiki);
         }
     }
 
@@ -1402,6 +1399,7 @@ public class XWiki implements EventListener
         doc.setLocale(reference.getLocale());
 
         doc.setContentDirty(true);
+
         return getDocument(doc, context);
     }
 

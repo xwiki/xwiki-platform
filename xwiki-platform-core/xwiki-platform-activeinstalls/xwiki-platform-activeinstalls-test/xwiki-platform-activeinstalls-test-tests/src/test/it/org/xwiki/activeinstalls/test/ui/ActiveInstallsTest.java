@@ -51,7 +51,7 @@ public class ActiveInstallsTest extends AbstractGuestTest
 
         // Navigate to the Active Installs Counter Value page to verify that the ping has been received
         ViewPage vp  = getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue");
-        assertEquals("1", vp.getContent());
+        assertEquals("0", vp.getContent());
 
         // Navigate to the Total Installs Counter Value page to verify that the ping has been received
         vp  = getUtil().gotoPage("ActiveInstalls", "TotalCounterValue");

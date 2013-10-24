@@ -173,7 +173,7 @@ public class XWikiServletRequest implements XWikiRequest
     {
         StringBuffer requestURL = this.request.getRequestURL();
         if ((requestURL == null) && (this.request instanceof MultipartRequestWrapper)) {
-            requestURL = ((MultipartRequestWrapper) this.request).getRequest().getRequestURL();
+            requestURL = ((HttpServletRequest) ((MultipartRequestWrapper) this.request).getRequest()).getRequestURL();
         }
         return requestURL;
     }

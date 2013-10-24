@@ -38,7 +38,7 @@
       #set ($searchSuggestConfigObject = $searchSuggestConfigDocument.newObject('XWiki.SearchSuggestSourceClass'))
       #set ($discard = $searchSuggestConfigObject.set('name', 'platform.workspace.searchSuggestSourceWorkspaces'))
       #set ($discard = $searchSuggestConfigObject.set('engine', 'solr'))
-      #set ($discard = $searchSuggestConfigObject.set('query', 'class:XWiki.XWikiServerClass AND propertyname:wikiprettyname AND propertyvalue__:__INPUT__*'))
+      #set ($discard = $searchSuggestConfigObject.set('query', 'class:XWiki.XWikiServerClass AND propertyname:wikiprettyname AND propertyvalue__:(__INPUT__*)'))
       #set ($discard = $searchSuggestConfigObject.set('resultsNumber', '3'))
       #set ($searchSuggestServiceReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'WorkspacesSuggestSolrService'))
       #set ($discard = $searchSuggestConfigObject.set('url', "$searchSuggestServiceReference"))

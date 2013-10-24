@@ -19,8 +19,7 @@
  */
 package org.xwiki.bridge.event;
 
-import org.xwiki.observation.event.BeginEvent;
-import org.xwiki.observation.event.HiddenEvent;
+import org.xwiki.observation.event.BeginFoldEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
@@ -29,7 +28,7 @@ import org.xwiki.observation.event.filter.EventFilter;
  * @version $Id$
  * @since 3.2M1
  */
-public class WikiCreatingEvent extends AbstractWikiEvent implements BeginEvent, HiddenEvent
+public class WikiCreatingEvent extends AbstractWikiEvent implements BeginFoldEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class

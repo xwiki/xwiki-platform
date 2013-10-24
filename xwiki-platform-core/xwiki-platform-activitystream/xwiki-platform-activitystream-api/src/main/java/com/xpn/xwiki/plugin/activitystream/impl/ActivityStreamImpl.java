@@ -41,9 +41,8 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.BeginEvent;
+import org.xwiki.observation.event.BeginFoldEvent;
 import org.xwiki.observation.event.Event;
-import org.xwiki.observation.event.TransientEvent;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -840,12 +839,12 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         return LISTENER_NAME;
     }
 
-    private static BeginEvent IGNORED_EVENTS = new BeginEvent()
+    private static BeginFoldEvent IGNORED_EVENTS = new BeginFoldEvent()
     {
         @Override
         public boolean matches(Object otherEvent)
         {
-            return otherEvent instanceof TransientEvent;
+            return otherEvent instanceof BeginFoldEvent;
         }
     };
 
@@ -854,7 +853,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     {
         // Do not record some ignored events
         ObservationContext observationContext = Utils.getComponent(ObservationContext.class);
-        if (event instanceof TransientEvent || observationContext.isIn(IGNORED_EVENTS)) {
+        if (observationContext.isIn(IGNORED_EVENTS)) {
             return;
         }
 

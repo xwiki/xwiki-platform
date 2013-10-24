@@ -225,7 +225,7 @@ public class DefaultWikiManagerTest
     @Test
     public void copyWhenWikiAlreadyExists() throws Exception
     {
-        // The wiki already exist
+        // The wiki already exists
         when(defaultWikiDescriptorManager.exists("existingid")).thenReturn(true);
         boolean exceptionCaught = false;
         try {

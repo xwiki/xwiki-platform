@@ -73,6 +73,11 @@ public interface WikiDescriptorManager
     String getMainWikiId();
 
     /**
+     * @return the Id of the current wiki
+     */
+    String getCurrentWikiId();
+
+    /**
      * Check if a wiki corresponding to an Id exists.
      *
      * @param wikiId The id of the wiki to test.

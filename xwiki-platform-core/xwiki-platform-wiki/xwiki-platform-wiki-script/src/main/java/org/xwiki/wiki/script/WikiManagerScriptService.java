@@ -30,6 +30,8 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
@@ -75,6 +77,9 @@ public class WikiManagerScriptService implements ScriptService
 
     @Inject
     private AuthorizationManager authorizationManager;
+
+    @Inject
+    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     /**
      * Logging tool.
@@ -123,27 +128,57 @@ public class WikiManagerScriptService implements ScriptService
      */
     public boolean deleteWiki(String wikiId)
     {
+        // Test right
         XWikiContext context = xcontextProvider.get();
-        WikiReference wikiReference = new WikiReference(wikiId);
+        if (!canDeleteWiki(context.getUser(), wikiId)) {
+            error("You don't have the right to delete the wiki",
+                    new Exception("You don't have the right to delete the wiki"));
+            return false;
+        }
+        // Delete the wiki
+        try {
+            wikiManager.delete(wikiId);
+        } catch (WikiManagerException e) {
+            error(String.format("Failed to delete wiki [%s]", wikiId), e);
+            return false;
+        }
+        // Return success
+        return true;
+    }
 
+    /**
+     * Test if a given user can delete a given wiki.
+     *
+     * @param userId the id of the user to test
+     * @param wikiId the id of the wiki
+     * @return whether or not the user can delete the specified wiki
+     */
+    public boolean canDeleteWiki(String userId, String wikiId)
+    {
         try {
             // Get the wiki owner
             WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
-            String owner = descriptor.getOwnerId();
-            // Check right access
-            if (!context.getUserReference().toString().equals(owner)) {
-                authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(), wikiReference);
+            if (descriptor == null) {
+                error(String.format("Error while getting the descriptor of wiki [%s]", wikiId),
+                        new Exception(String.format("Error while getting the descriptor of wiki [%s]", wikiId)));
+                return false;
             }
-            // Delete the wiki
-            wikiManager.delete(wikiId);
+            String owner = descriptor.getOwnerId();
+            // If the user is the owner
+            if (userId.equals(owner)) {
+                return true;
+            }
+            // If the user is an admin
+            DocumentReference userReference = documentReferenceResolver.resolve(userId);
+            WikiReference wikiReference = new WikiReference(wikiId);
+            if (authorizationManager.hasAccess(Right.ADMIN, userReference, wikiReference)) {
+                return true;
+            }
         } catch (WikiManagerException e) {
-            return false;
-        } catch (AccessDeniedException e) {
-            error("You don't have the right to delete the wiki", e);
-            return false;
+            error(String.format("Error while getting the descriptor of wiki [%s]", wikiId), e);
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -256,6 +291,14 @@ public class WikiManagerScriptService implements ScriptService
     }
 
     /**
+     * @return the id of the current wiki
+     */
+    public String getCurrentWikiId()
+    {
+        return wikiDescriptorManager.getCurrentWikiId();
+    }
+
+    /**
      * Save the specified descriptor (if you have the right).
      *
      * @param descriptor descriptor to save
@@ -304,5 +347,13 @@ public class WikiManagerScriptService implements ScriptService
 
         /* Store exception in context. */
         this.execution.getContext().setProperty(CONTEXT_LASTEXCEPTION, e);
+    }
+
+    /**
+     * @return the last exception, or null if there is not
+     */
+    public Exception getLastException()
+    {
+        return (Exception) this.execution.getContext().getProperty(CONTEXT_LASTEXCEPTION);
     }
 }

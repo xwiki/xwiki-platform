@@ -42,14 +42,20 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-user-api</artifactId>
+      <!-- needed until the UI has removed every relation to the default implementation -->
+      <artifactId>xwiki-platform-wiki-user-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <!-- needed until the UI has removed every relation to the default implementation -->
-      <artifactId>xwiki-platform-wiki-user-default</artifactId>
+      <artifactId>xwiki-platform-wiki-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-user-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

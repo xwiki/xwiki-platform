@@ -38,7 +38,6 @@ import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.internal.descriptor.properties.WikiPropertyGroupManager;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
-import org.xwiki.wiki.properties.WikiPropertyGroupException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -82,19 +81,15 @@ public class DefaultWikiManager implements WikiManager
     private WikiDescriptor createDescriptor(String wikiId, String wikiAlias) throws WikiManagerException
     {
         // Create the descriptor
-        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor(wikiId, wikiAlias);
+        WikiDescriptor descriptor = new DefaultWikiDescriptor(wikiId, wikiAlias);
 
         try {
             // Build the document
-            XWikiDocument descriptorDocument = wikiDescriptorBuilder.save(descriptor);
-            // Add the document to the descriptor
-            descriptor.setDocumentReference(descriptorDocument.getDocumentReference());
-            // Load the property groups
-            wikiPropertyGroupManager.loadForDescriptor(descriptor);
+            wikiDescriptorBuilder.save(descriptor);
+            // Reload the descriptor from the cache because it should have been seen by the DescriptorListener.
+            descriptor = wikiDescriptorManager.getById(wikiId);
         } catch (WikiDescriptorBuilderException e) {
             throw new WikiManagerException("Failed to build the descriptor document.", e);
-        } catch (WikiPropertyGroupException e) {
-            throw new WikiManagerException("Failed to load the descriptor property groups.", e);
         }
 
         return descriptor;

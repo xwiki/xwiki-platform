@@ -19,7 +19,6 @@
  */
 package org.xwiki.wiki.internal.descriptor;
 
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.document.XWikiServerClassDocumentInitializer;
@@ -37,11 +36,6 @@ public class DefaultWikiDescriptor extends WikiDescriptor
     public static final EntityReference SERVER_CLASS = XWikiServerClassDocumentInitializer.SERVER_CLASS;
 
     /**
-     * Reference of the document that store the descriptor of the wiki.
-     */
-    private DocumentReference documentReference;
-
-    /**
      * Constructor.
      * @param wikiId ID of the wiki
      * @param wikiAlias Alias of the wiki
@@ -49,34 +43,6 @@ public class DefaultWikiDescriptor extends WikiDescriptor
     public DefaultWikiDescriptor(String wikiId, String wikiAlias)
     {
         super(wikiId, wikiAlias);
-    }
-
-    /**
-     * Constructor.
-     * @param wikiId ID of the wiki
-     * @param wikiAlias Alias of the wiki
-     * @param documentReference Reference of the document that store the descriptor in the wiki
-     */
-    public DefaultWikiDescriptor(String wikiId, String wikiAlias, DocumentReference documentReference)
-    {
-        super(wikiId, wikiAlias);
-        this.documentReference = documentReference;
-    }
-
-    /**
-     * @param documentReference the new descriptor reference
-     */
-    public void setDocumentReference(DocumentReference documentReference)
-    {
-        this.documentReference = documentReference;
-    }
-
-    /**
-     * @return the descriptor reference
-     */
-    public DocumentReference getDocumentReference()
-    {
-        return documentReference;
     }
 
 }

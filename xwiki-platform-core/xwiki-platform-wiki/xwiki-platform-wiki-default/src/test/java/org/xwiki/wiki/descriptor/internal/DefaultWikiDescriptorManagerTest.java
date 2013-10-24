@@ -159,7 +159,7 @@ public class DefaultWikiDescriptorManagerTest
         when(document.getXObjects(any(EntityReference.class))).thenReturn(baseObjects);
 
         // Get a Wiki from the Wiki Descriptor Builder
-        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid", "wikialias", reference);
+        DefaultWikiDescriptor descriptor = new DefaultWikiDescriptor("wikiid", "wikialias");
         when(wikiDescriptorBuilder.buildDescriptorObject(anyListOf(BaseObject.class), any(XWikiDocument.class))).
                 thenReturn(descriptor);
 
@@ -188,9 +188,6 @@ public class DefaultWikiDescriptorManagerTest
     @Test
     public void getAll() throws Exception
     {
-        DocumentReference reference1 = new DocumentReference("xwiki", "space1", "page1");
-        DocumentReference reference2 = new DocumentReference("xwiki", "space2", "page2");
-
         // Get the XWikiDocuments for the Document References
         XWikiDocument document1 = mock(XWikiDocument.class);
         XWikiDocument document2 = mock(XWikiDocument.class);
@@ -204,8 +201,8 @@ public class DefaultWikiDescriptorManagerTest
         when(document2.getXObjects(any(EntityReference.class))).thenReturn(baseObjects);
 
         // Get a Wiki from the Wiki Descriptor Builder
-        DefaultWikiDescriptor descriptor1 = new DefaultWikiDescriptor("wikiid1", "wikialias1", reference1);
-        DefaultWikiDescriptor descriptor2 = new DefaultWikiDescriptor("wikiid2", "wikialias2", reference2);
+        DefaultWikiDescriptor descriptor1 = new DefaultWikiDescriptor("wikiid1", "wikialias1");
+        DefaultWikiDescriptor descriptor2 = new DefaultWikiDescriptor("wikiid2", "wikialias2");
         when(wikiDescriptorBuilder.buildDescriptorObject(anyListOf(BaseObject.class), any(XWikiDocument.class))).
                 thenReturn(descriptor1, descriptor2);
 

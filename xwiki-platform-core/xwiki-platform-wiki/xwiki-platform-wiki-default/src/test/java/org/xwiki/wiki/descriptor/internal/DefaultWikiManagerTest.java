@@ -43,7 +43,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -185,8 +184,6 @@ public class DefaultWikiManagerTest
         verify(xwiki).updateDatabase(eq("wikiid1"), eq(true), eq(true), any(XWikiContext.class));
         // Verify that the descriptor document has been saved
         verify(store).saveXWikiDoc(eq(descriptorDocument), any(XWikiContext.class));
-        // Verify that the descriptor has the good document reference
-        assertEquals(documentReference, ((DefaultWikiDescriptor) newWikiDescriptor).getDocumentReference());
     }
 
     @Test
@@ -268,8 +265,6 @@ public class DefaultWikiManagerTest
         verify(xwiki).copyWiki(eq("wikiid"), eq("wikiid1"), any(String.class), any(XWikiContext.class));
         // Verify that the descriptor document has been saved
         verify(store).saveXWikiDoc(eq(descriptorDocument), any(XWikiContext.class));
-        // Verify that the descriptor has the good document reference
-        assertEquals(documentReference, ((DefaultWikiDescriptor) newWikiDescriptor).getDocumentReference());
         // Verify that the descriptor has been added to the caches
         //verify(cache).add(eq((DefaultWikiDescriptor) newWikiDescriptor));
     }

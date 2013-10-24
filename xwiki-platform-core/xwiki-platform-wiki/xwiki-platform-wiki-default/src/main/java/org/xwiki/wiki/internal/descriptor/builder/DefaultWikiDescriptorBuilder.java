@@ -98,7 +98,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
 
             // load properties
             BaseObject object = serverClassObjects.get(0);
-            descriptor.setDocumentReference(referenceResolver.resolve(
+            descriptor.setMainPageReference(referenceResolver.resolve(
                     object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE)));
             //descriptor.setHidden(object.getIntValue(XWikiServerClassDocumentInitializer.FI));
             descriptor.setPrettyName(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME));
@@ -127,7 +127,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             // If the page name doesn't start with "XWikiServer" then consider we have an invalid Wiki
             String wikiId = extractWikiId(document);
             if (wikiId != null) {
-                descriptor = new DefaultWikiDescriptor(wikiId, serverProperty, document.getDocumentReference());
+                descriptor = new DefaultWikiDescriptor(wikiId, serverProperty);
             }
         }
 

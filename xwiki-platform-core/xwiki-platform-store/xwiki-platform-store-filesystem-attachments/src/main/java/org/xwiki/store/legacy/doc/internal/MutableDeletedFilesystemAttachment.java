@@ -21,13 +21,12 @@ package org.xwiki.store.legacy.doc.internal;
 
 import java.util.Date;
 
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.XWikiContext;
-import org.xwiki.model.reference.DocumentReference;
+import com.xpn.xwiki.doc.XWikiAttachment;
 
 /**
  * A mutable version of a DeletedFilesystemAttachment, passed around and populated while loading.
- *
+ * 
  * @version $Id$
  * @since 3.0M3
  */
@@ -52,8 +51,6 @@ public class MutableDeletedFilesystemAttachment extends DeletedFilesystemAttachm
         out.setFilename(this.getFilename());
         out.setDate(this.getDate());
         out.setDeleter(this.getDeleter());
-        // It is safe to pass null for the context since
-        // DeletedFilesystemAttachment.setAttachment does not use it.
         out.setAttachment(this.getAttachment(), null);
         return out;
     }
@@ -74,12 +71,6 @@ public class MutableDeletedFilesystemAttachment extends DeletedFilesystemAttachm
     public void setDocName(String docName)
     {
         super.setDocName(docName);
-    }
-
-    @Override
-    public void setDocumentReference(final DocumentReference docReference)
-    {
-        super.setDocumentReference(docReference);
     }
 
     @Override

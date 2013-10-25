@@ -58,7 +58,7 @@
       <scope>WIKI</scope>
     </property>
   </object>
-<content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
+  <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
 
 core.menu.type.wiki=Wiki
 core.menu.watchlist.add.wiki=Watch Wiki

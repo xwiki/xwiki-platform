@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.3-milestone-1</version>
   </parent>
   <artifactId>xwiki-platform-wiki-descriptor</artifactId>
   <name>XWiki Platform - Wiki - Wiki Descriptors - Parent POM</name>

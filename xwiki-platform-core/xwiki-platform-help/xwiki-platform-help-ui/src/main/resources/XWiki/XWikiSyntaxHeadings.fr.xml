@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxHeadings</name>
+  <language>fr</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382885828000</creationDate>
+  <date>1382885828000</date>
+  <contentUpdateDate>1382885828000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxHeadings</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Titres ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Headings ===
+
+|=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
+|Titres standard|(((
+1 niveau 1
+1.1 niveau 2
+1.1.1 niveau 3
+1.1.1.1 niveau 4
+1.1.1.1.1 niveau 5
+1.1.1.1.1.1 niveau 6
+)))|(((
+{{html}}
+&lt;!-- Note: replace this with wiki syntax when http://jira.xwiki.org/jira/browse/XWIKI-4358 is implemented --&gt;
+&lt;h1 id="Hlevel1"&gt;&lt;span&gt;niveau 1&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&lt;h2 id="Hlevel2"&gt;&lt;span&gt;niveau 2&lt;/span&gt;&lt;/h2&gt;&lt;h3 id="Hlevel3"&gt;&lt;span&gt;niveau 3&lt;/span&gt;&lt;/h3&gt;&lt;h4 id="Hlevel4"&gt;&lt;span&gt;niveau 4&lt;/span&gt;&lt;/h4&gt;&lt;h5 id="Hlevel5"&gt;&lt;span&gt;niveau 5&lt;/span&gt;&lt;/h5&gt;&lt;h6 id="Hlevel6"&gt;&lt;span&gt;niveau 6&lt;/span&gt;&lt;/h6&gt;
+{{/html}}
+)))
+|Titres paramétrés|&lt;h1&gt;&lt;span style="color:blue"&gt;
+titre&lt;/span&gt;&lt;/h1&gt;|(((
+{{html}}
+&lt;h1 id="Hheading" style="color:blue"&gt;&lt;span&gt;titre&lt;/span&gt;&lt;/h1&gt;
+{{/html}}
+)))
+|Titres en syntaxe wiki|1.1.1 Titre en *gras*|(((
+=== Titre en **gras** ===
+)))
+
+
+=== 2.0 Headings ===
+
+|=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
+|Titres standard|(((
+{{{= niveau 1 = 
+== niveau 2 ==
+=== niveau 3 ===
+==== niveau 4 ====
+===== niveau 5 =====
+====== niveau 6 ======}}}
+)))|(((
+{{html}}
+&lt;!-- Note: replace this with wiki syntax when http://jira.xwiki.org/jira/browse/XWIKI-4358 is implemented --&gt;
+&lt;h1 id="Hlevel1"&gt;&lt;span&gt;niveau 1&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&lt;h2 id="Hlevel2"&gt;&lt;span&gt;niveau 2&lt;/span&gt;&lt;/h2&gt;&lt;h3 id="Hlevel3"&gt;&lt;span&gt;niveau 3&lt;/span&gt;&lt;/h3&gt;&lt;h4 id="Hlevel4"&gt;&lt;span&gt;niveau 4&lt;/span&gt;&lt;/h4&gt;&lt;h5 id="Hlevel5"&gt;&lt;span&gt;niveau 5&lt;/span&gt;&lt;/h5&gt;&lt;h6 id="Hlevel6"&gt;&lt;span&gt;niveau 6&lt;/span&gt;&lt;/h6&gt;
+{{/html}}
+)))
+|Titres paramétrés|{{{(% style="color:blue" %)}}}
+~= titre =|(((
+{{html}}
+&lt;h1 id="Hheading" style="color:blue"&gt;&lt;span&gt;titre&lt;/span&gt;&lt;/h1&gt;
+{{/html}}
+)))
+|Titres en syntaxe wiki|{{{=== Titre en **gras** ===}}}|(((
+=== Titre en **gras** ===
+)))</content>
+</xwikidoc>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxTextFormatting</name>
+  <language>fr</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382885880000</creationDate>
+  <date>1382885880000</date>
+  <contentUpdateDate>1382885880000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxTextFormatting</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Formatage du texte ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Text Formatting ===
+
+|=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
+|Gras|{{{*gras*}}}|**gras**
+|Souligné|{{{__souligné___}}}|__souligné__
+|Italique|{{{~~italique~~}}}|//italique//
+|Barré|{{{--barré--}}}|--barré--
+|Espacement fixe|&lt;tt&gt;espacement fixe&lt;/tt&gt;|##espacement fixe##
+|Puissance|utilisation de la &lt;sup&gt;puissance&lt;/sup&gt;|utilisation de la ^^puissance^^
+|Indice|utilisation de l'&lt;sub&gt;indice&lt;/sub&gt;|utilisation de l',,indice,,
+
+=== 2.0 Text Formatting ===
+
+{{info}}
+Nouveau en syntaxe XWiki  {{velocity}}$crtSyntaxVer{{/velocity}} sur la syntaxe XWiki 1.0:
+* Les espaces sont autorisés, juste après les symboles de syntaxe.
+* L'utilisation des symboles doubles au cas où il y avait seulement un symbole en syntaxe XWiki 1.0, de sorte qu'il soit moins probable que l'utilisateur s'en serve dans le texte de manière erronée.
+* La possibilité d'avoir plusieurs lignes.
+{{/info}}
+
+|=Fonctionnalité|=Syntaxe XWiki  {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
+|Gras|{{{**gras**}}}|**gras**
+|Souligné|{{{__souligné__}}}|__souligné__
+|Italique|{{{//italique//}}}|//italique//
+|Barré|{{{--barré--}}}|--barré--
+|Espacement fixe|{{{##espacement fixe##}}}|##espacement fixe##
+|Puissance|{{{utilisation de la ^^puissance^^}}}|utilisation de la ^^puissance^^
+|Indice|{{{utilisation de l',,indice,,}}}|utilisation de l',,indice,,</content>
+</xwikidoc>

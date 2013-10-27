@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxNewLineLineBreaks</name>
+  <language>fr</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382886238000</creationDate>
+  <date>1382886238000</date>
+  <contentUpdateDate>1382886238000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxNewLineLineBreaks</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Nouvelle ligne/Sauts de ligne ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 New Line Line Breaks ===
+
+Une nouvelle ligne est un retour chariot. Un saut de ligne est une nouvelle ligne forcée qui peut apparaître n'importe où dans le texte.
+
+{{info}}
+En syntaxe XWiki 2.0, les nouvelles lignes sont ignorées, ce qui n'est pas le cas de la syntaxe XWiki 1.0 et Creole.
+{{/info}}
+
+|=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
+|Saut de ligne|{{{Ligne\\Nouvelle ligne}}}|Ligne
+Nouvelle ligne
+|Nouvelle ligne|Ligne
+Nouvelle ligne|Ligne Nouvelle ligne
+
+=== 2.0 New Line Line Breaks ===
+
+Une nouvelle ligne est un retour chariot. Un saut de ligne est une nouvelle ligne forcée qui peut apparaître n'importe où dans le texte.
+
+{{info}}
+En syntaxe XWiki 2.0, les nouvelles lignes sont ignorées, ce qui n'est pas le cas de la syntaxe XWiki 1.0 et Creole.
+{{/info}}
+
+|=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
+|Saut de ligne|{{{Ligne\\Nouvelle ligne}}}|Ligne
+Nouvelle ligne
+|Nouvelle ligne|Ligne
+Nouvelle ligne|Ligne
+Nouvelle ligne</content>
+</xwikidoc>

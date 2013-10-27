@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxHorizontalLine</name>
+  <language>fr</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382886084000</creationDate>
+  <date>1382886084000</date>
+  <contentUpdateDate>1382886084000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxHorizontalLine</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== La ligne horizontale ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Horizontal Line ===
+
+|=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
+|Ligne horizontale simple|{{{----}}}|(((
+----
+)))
+|Ligne horizontale paramétrée|&lt;hr style="color:blue"/&gt;|(((
+(% style="color: blue;" %)
+----
+)))
+
+=== 2.0 Horizontal Line ===
+
+|=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
+|Ligne horizontale simple|{{{----}}}|(((
+----
+)))
+|Ligne horizontale paramétrée|(((
+{{{(% style="color:blue" %)
+----}}}
+)))|(((
+(% style="color: blue;" %)
+----
+)))</content>
+</xwikidoc>

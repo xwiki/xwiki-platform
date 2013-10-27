@@ -30,7 +30,7 @@
 === 1.0 Links ===
 
 (% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
+|=(% style="width:20%" %)Fonctionnalité|=Syntaxe XWiki 1.0|=(% style="width:20%" %)Résultat
 |Lien vers une page de l'espace courant|{{{[WebHome]}}}|[[WebHome]]
 |Lien avec étiquette|{{{[étiquette&gt;WebHome]}}}|[[étiquette&gt;&gt;WebHome]]
 |Lien vers une page avec l'espace spécifié|{{{[Main.WebHome]}}}|[[Main.WebHome]]
@@ -82,7 +82,7 @@ La syntaxe complète d'un lien est ##(alias[|&amp;gt;])+(link)(@interWikiAlias)+
 === 2.0 Links ===
 
 (% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Fonctionnalité|=Syntaxe XWiki 2.0|=Résultat
+|=(% style="width:20%" %)Fonctionnalité|=Syntaxe XWiki 2.0|=(% style="width:20%" %)Résultat
 |Lien vers une page de l'espace courant|{{{[[WebHome]]}}}|[[WebHome]]
 |Lien avec étiquette|{{{[[étiquette&gt;&gt;WebHome]]}}}|[[étiquette&gt;&gt;WebHome]]
 |Lien vers une page avec l'espace spécifié|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]
@@ -120,7 +120,7 @@ La syntaxe complète\ d'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
 === 2.1 Links ===
 
 (% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Fonctionnalité|=Syntaxe XWiki 2.1|=Résultat
+|=(% style="width:20%" %)Fonctionnalité|=Syntaxe XWiki 2.1|=(% style="width:20%" %)Résultat
 |Lien vers une page de l'espace courant|{{{[[WebHome]]}}}|[[WebHome]]
 |Lien avec étiquette|{{{[[étiquette&gt;&gt;WebHome]]}}}|[[étiquette&gt;&gt;WebHome]]
 |Lien vers une page avec l'espace spécifié|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]

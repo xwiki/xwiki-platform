@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxQuotations</name>
+  <language>it</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382899393000</creationDate>
+  <date>1382899393000</date>
+  <contentUpdateDate>1382899393000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxQuotations</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Advanced =
+
+== Citazioni ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Quotations ===
+
+Permette di citare, quotare, del testo.
+
+|=Caratteristica|=Sintassi XWiki 1.0|=Risultato
+|Citazione semplice|(((
+&lt;blockquote&gt;&lt;p&gt;Giovanni ha detto questo&lt;/p&gt;&lt;/blockquote&gt;
+Io ho detto va bene
+)))|(((
+&gt; Giovanni ha detto questo
+Io ho detto va bene
+)))
+|Citazioni nidificate|(((
+&lt;blockquote&gt;&lt;p&gt;Giovanni ha detto questo&lt;/p&gt;
+&lt;blockquote&gt;&lt;p&gt;Maria ha risposto questo&lt;/p&gt;&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+Io ho detto va bene 
+)))|(((
+&gt; Giovanni ha detto questo
+&gt;&gt; Maria ha risposto questo
+Io ho detto va bene
+)))
+
+=== 2.0 Quotations ===
+
+Permette di citare, quotare, del testo.
+
+|=Caratteristica|=Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Risultato
+|Citazione semplice|((({{{
+&gt; Giovanni ha detto questo
+Io ho detto va bene
+}}})))|(((
+&gt; Giovanni ha detto questo
+Io ho detto va bene
+)))
+|Citazioni nidificate|((({{{
+&gt; Giovanni ha detto questo
+&gt;&gt; Maria ha risposto questo
+Io ho detto va bene
+}}})))|(((
+&gt; Giovanni ha detto questo
+&gt;&gt; Maria ha risposto questo
+Io ho detto va bene
+)))</content>
+</xwikidoc>

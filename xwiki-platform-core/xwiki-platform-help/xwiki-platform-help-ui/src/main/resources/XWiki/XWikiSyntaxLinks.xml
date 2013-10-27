@@ -136,7 +136,7 @@ yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
 === 1.0 Links ===
 
 (% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Feature|=XWiki Syntax 1.0|=Result
+|=(% style="width:20%" %)Feature|=XWiki Syntax 1.0|=(% style="width:20%" %)Result
 |Link to a page in the current Space|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
 |Link with a label|{{{[label&gt;WebHome]}}}|[[label&gt;&gt;WebHome]]
 |Link with XWiki Syntax in the label|{{{&lt;a href="$xwiki.getURL("WebHome")"&gt;&lt;strong&gt;bold label&lt;/strong&gt;&lt;/a&gt;}}}|[[**bold label**&gt;&gt;WebHome]]
@@ -188,7 +188,7 @@ The full format of a link is **##[label {&gt; or |}] (resource) [@interWikiAlias
 === 2.0 Links ===
 
 (% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Feature|=XWiki Syntax 2.0|=Result
+|=(% style="width:20%" %)Feature|=XWiki Syntax 2.0|=(% style="width:20%" %)Result
 |Link to a page in the current Space|{{{[[WebHome]]}}}|[[WebHome]]
 |Link with a label|(((
 {{{[[label&gt;&gt;WebHome]]}}}
@@ -242,7 +242,7 @@ The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [|
 === 2.1 Links ===
 
 (% style="overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Feature|=XWiki Syntax 2.1|=Result
+|=(% style="width:20%" %)Feature|=XWiki Syntax 2.1|=(% style="width:20%" %)Result
 |Link to a page in the current Space|{{{[[WebHome]]}}}|[[WebHome]]
 |Link with a label|(((
 {{{[[label&gt;&gt;WebHome]]}}}

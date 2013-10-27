@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxVerbatim</name>
+  <language>it</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382899328000</creationDate>
+  <date>1382899328000</date>
+  <contentUpdateDate>1382899328000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxVerbatim</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Avanzato =
+
+== Verbatim ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Verbatim ===
+
+{{velocity}}$subHeading Contenuto testuale, //verbatim// cioè //parola per parola// $subHeading{{/velocity}}
+
+Consente di inserire del contenuto che non sarà formattato (in altre parole non viene considerata la sintassi XWiki).
+
+{{info}}
+Con la Sintassi XWiki 1.0 la [[Pre macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Pre+Macro+%28Radeox%29]] preserva solo la sintassi XWiki e le macro Radeox. Per cui gli snippets HTML e gli script Groovy/Velocity sono comunque eseguiti.
+{{/info}}
+
+|=Caratteristica|=Sintassi XWiki 1.0|=Risultati
+|Verbatim in una riga|{{{Testo verbatim {pre}*[not rendered]*{/pre} contenuto}}}|Testo verbatim {{{*[not rendered]*}}}contenuto
+|Verbatim in un blocco|((({{{
+{pre}
+contenuto
+*verbatim*
+su più righe
+{/pre}
+}}}
+{{info}}È anche possibile usare la [[Code macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Code+Macro+%28Radeox%29]] ma essa visualizza per default il contenuto in una casella.{{/info}}
+)))|((({{{
+contenuto
+*verbatim*
+su più righe
+}}})))
+
+=== 2.0 Verbatim ===
+
+{{velocity}}$subHeading Contenuto testuale, //verbatim// cioè //parola per parola// $subHeading{{/velocity}}
+
+Consente di inserire del contenuto che non sarà formattato (in altre parole non viene considerata la sintassi XWiki).
+
+|=Caratteristica|=Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Risultati
+|Verbatim in una riga|{{{Testo verbatim {{{**[[not rendered]]**}}} contenuto}}}|Testo verbatim {{{**[[not rendered]]**}}}contenuto
+|Verbatim in un blocco|((({{{
+{{{
+contenuto
+**verbatim**
+su più righe
+}}}
+}}})))|((({{{
+contenuto
+**verbatim**
+su più righe
+}}})))
+</content>
+</xwikidoc>

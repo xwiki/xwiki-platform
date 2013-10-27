@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxGroups</name>
+  <language>it</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382899460000</creationDate>
+  <date>1382899460000</date>
+  <contentUpdateDate>1382899460000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxGroups</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Gruppi ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 2.0 Groups ===
+
+Si possono usare i Gruppi per inserire direttamete un altro documento nel documento corrente. Questo permette per esempio di inserire elementi complessi in una voce di un elenco o all'interno di una cella di una tabella. I Gruppi sono delimitati dai seguenti elementi sintattici:##{{{(((...)))}}}##. Un Gruppo può contenere un altro Gruppo senza limiti di nidificazione.
+
+|=Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Risultato
+|((({{{
+|=Titolo 1|=Titolo 2|=Titolo 3
+|Cella Uno|(((
+= Documento incluso =
+
+Alcuni paragrafi inclusi.
+
+* voce elenco uno
+* voce elenco due
+** sotto elemento 1
+** sotto elemento 2
+))) | Cella Tre
+
+Paragrafo successivo nel documento di livello superiore
+}}})))|(((
+|=Titolo 1|=Titolo 2|=Titolo 3
+|Cella Uno|(((
+{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Documento incluso&lt;/span&gt;&lt;/h1&gt;{{/html}}
+
+Alcuni paragrafi inclusi.
+
+* voce elenco uno
+* voce elenco due
+** sotto elemento 1
+** sotto elemento 2
+))) | Cella Tre
+
+Paragrafo successivo nel documento di livello superiore
+)))</content>
+</xwikidoc>

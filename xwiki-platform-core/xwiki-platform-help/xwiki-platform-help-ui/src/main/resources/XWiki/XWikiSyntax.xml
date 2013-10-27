@@ -292,7 +292,7 @@ tbody&gt;tr&gt;td&gt;tt {
 #set($catCount = -1)
 #set($catName = "")
 #set($catChildren = [])
-#set($results = $services.query.xwql('from doc.object(XWiki.XWikiSyntaxClass) as syntax order by syntax.category, syntax.section').execute())
+#set($results = $services.query.xwql('from doc.object(XWiki.XWikiSyntaxClass) as syntax order by syntax.category, syntax.section').addFilter('currentlanguage').execute())
 
 #if($results.empty)
   No syntax sections found!
@@ -300,18 +300,21 @@ tbody&gt;tr&gt;td&gt;tt {
   #foreach ($item in $results)
     #set($sectionDoc = $xwiki.getDocument($item))
     #set($obj = $sectionDoc.getObject("XWiki.XWikiSyntaxClass"))
-    #set($sectionList = $sectionDoc.getSections())
+    #set($sectionOrigList = $sectionDoc.getSections())
+    #set($sectionList = $sectionDoc.getTranslatedDocument().getSections())
 
     ## Get catName for first category
     #if($catCount == -1)
       #set($catCount = $catCount + 1)
+      #set($catId = $sectionOrigList.get(0).getSectionTitle())
       #set($catName = $sectionList.get(0).getSectionTitle())
 
     ## Put previous category into map, get new catName and reset children map
     #elseif($catCount &lt; $obj.getProperty("category").value)
-      #set($cat = { 'id' : $catName.toLowerCase(), 'name' : $catName, 'children' : $catChildren })
+      #set($cat = { 'id' : $catId.toLowerCase(), 'name' : $catName, 'children' : $catChildren })
       $syntaxMenu.add($cat)
       #set($catCount = $catCount + 1)
+      #set($catId = $sectionOrigList.get(0).getSectionTitle())
       #set($catName = $sectionList.get(0).getSectionTitle())
       #set($catChildren = [])
     #end
@@ -321,7 +324,7 @@ tbody&gt;tr&gt;td&gt;tt {
     $catChildren.add($child)
   #end
 #end
-#set($cat = { 'id' : $catName.toLowerCase(), 'name' : $catName, 'children' : $catChildren })
+#set($cat = { 'id' : $catId.toLowerCase(), 'name' : $catName, 'children' : $catChildren })
 $syntaxMenu.add($cat)
 
 

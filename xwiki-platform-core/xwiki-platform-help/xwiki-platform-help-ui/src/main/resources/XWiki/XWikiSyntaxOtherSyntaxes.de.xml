@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxOtherSyntaxes</name>
+  <language>de</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382866597000</creationDate>
+  <date>1382866597000</date>
+  <contentUpdateDate>1382866597000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Other Wiki Syntaxes</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Allgemeines =
+
+== Weitere Syntaxen ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Other Syntaxes ===
+
+Die folgenden weiteren Syntaxen sind in XWiki Enterprise 1.6 und später implementiert:
+* [[JSPWiki&gt;&gt;http://www.jspwiki.org/wiki/TextFormattingRules]]
+* [[MediaWiki&gt;&gt;http://en.wikipedia.org/wiki/Help:Editing]]
+* [[Confluence&gt;&gt;http://confluence.atlassian.com/display/CONF20/Confluence+Notation+Guide+Overview]]
+* [[TWiki&gt;&gt;http://twiki.org/cgi-bin/view/TWiki/WikiSyntax]]
+* [[Creole 1.0&gt;&gt;http://www.wikicreole.org/wiki/Creole1.0]]
+* [[XHTML 1.0&gt;&gt;http://www.w3.org/TR/xhtml1/]]
+
+{{warning}}Die Implementation einiger dieser Syntaxen ist noch nicht vollständig fertig. Beispielsweise funktioniert die Unterstützung für Links noch nicht perfekt. Wir müssen zu dem definieren, ob wir die originalen Syntaxen erweitern wollen um XWiki-spezifische Funktionen, wie die Möglichkeit zu einem anderen Unterwiki zu verlinken, zu unterstützen.{{/warning}}</content>
+</xwikidoc>

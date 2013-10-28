@@ -1,4 +1,5 @@
 org.xwiki.model.internal.reference.PathStringEntityReferenceSerializer
+org.xwiki.model.internal.reference.PathStringDocumentReferenceResolver
 org.xwiki.store.legacy.store.internal.FilesystemAttachmentStore
 org.xwiki.store.legacy.store.internal.FilesystemAttachmentVersioningStore
 org.xwiki.store.legacy.store.internal.FilesystemAttachmentRecycleBinStore

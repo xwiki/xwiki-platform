@@ -28,6 +28,7 @@ admin.repository=Repositório da extensão
 extension.repository.authors=Autores
 extension.repository.doc.creationDate=Criado em
 extension.repository.doc.date=Última modificação
+extension.repository.emptyvalue=0
 extension.repository.name=Nome
 extension.repository.summary=Resumo
 extension.repository.type=Tipo

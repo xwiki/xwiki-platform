@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
@@ -119,17 +120,60 @@ public class InstalledExtensionScriptService extends AbstractExtensionScriptServ
         Map<String, Collection<InstalledExtension>> extensions;
 
         if (installedExtension != null) {
-            setError(null);
-
-            try {
-                extensions =
-                    safe(this.installedExtensionRepository.getBackwardDependencies(installedExtension.getId()));
-            } catch (Exception e) {
-                setError(e);
-
-                extensions = null;
-            }
+            extensions = getBackwardDependencies(installedExtension.getId());
         } else {
+            extensions = null;
+        }
+
+        return extensions;
+    }
+
+    /**
+     * Get all backward dependencies by namespace for the provided installed extension.
+     * 
+     * @param extensionId the extension identifier
+     * @return the extension backward dependencies in all namespaces, or {@code null} if any error occurs while
+     *         computing the result, in which case {@link #getLastError()} contains the failure reason
+     */
+    public Map<String, Collection<InstalledExtension>> getBackwardDependencies(ExtensionId extensionId)
+    {
+        Map<String, Collection<InstalledExtension>> extensions;
+
+        setError(null);
+
+        try {
+            return safe(this.installedExtensionRepository.getBackwardDependencies(extensionId));
+        } catch (Exception e) {
+            setError(e);
+
+            extensions = null;
+        }
+
+        return extensions;
+    }
+
+    /**
+     * Get provided installed extension backward dependencies in the provided namespace.
+     * <p>
+     * Only look at the backward dependencies in the provided namespace. To get all the dependencies of a root extension
+     * (namespace=null) across namespaces use {@link #getBackwardDependencies(ExtensionId)} instead.
+     * 
+     * @param feature the extension unique identifier
+     * @param namespace the namespace where to search for backward dependencies
+     * @return the backward dependencies, an empty collection of none could be found, or {@code null} if any error
+     *         occurs while computing the result, in which case {@link #getLastError()} contains the failure reason
+     */
+    public Collection<InstalledExtension> getBackwardDependencies(String feature, String namespace)
+    {
+        Collection<InstalledExtension> extensions;
+
+        setError(null);
+
+        try {
+            return safe(this.installedExtensionRepository.getBackwardDependencies(feature, namespace));
+        } catch (Exception e) {
+            setError(e);
+
             extensions = null;
         }
 

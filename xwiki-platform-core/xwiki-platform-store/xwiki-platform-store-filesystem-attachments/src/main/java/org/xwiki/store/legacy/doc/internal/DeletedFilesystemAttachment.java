@@ -21,8 +21,6 @@ package org.xwiki.store.legacy.doc.internal;
 
 import java.util.Date;
 
-import org.xwiki.model.reference.DocumentReference;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
@@ -39,11 +37,6 @@ import com.xpn.xwiki.doc.XWikiAttachmentContent;
  */
 public class DeletedFilesystemAttachment extends DeletedAttachment
 {
-    /**
-     * The reference to the document which this attachment belongs to.
-     */
-    private DocumentReference docReference;
-
     /**
      * The attachment which was deleted.
      */
@@ -62,16 +55,12 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
      * @param attachment Deleted attachment.
      * @param deleter User which deleted the attachment.
      * @param deleteDate Date of delete action.
+     * @throws XWikiException is never thrown, we just have to declare it in order to call the super constructor
      */
     public DeletedFilesystemAttachment(final XWikiAttachment attachment, final String deleter, final Date deleteDate)
+        throws XWikiException
     {
-        this.setDocId(attachment.getDocId());
-        this.setDocName(attachment.getDoc().getFullName());
-        this.setFilename(attachment.getFilename());
-        this.setDeleter(deleter);
-        this.attachment = attachment;
-        this.setDate(deleteDate);
-        this.docReference = attachment.getDoc().getDocumentReference();
+        super(attachment, deleter, deleteDate, null);
     }
 
     @Override
@@ -85,7 +74,9 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
     }
 
     /**
-     * {@inheritDoc} context is unused and may safely be null.
+     * {@inheritDoc}
+     * <p>
+     * The XWiki context is unused and may safely be null.
      * 
      * @see com.xpn.xwiki.doc.DeletedAttachment#setAttachment(XWikiAttachment, XWikiContext)
      */
@@ -118,24 +109,6 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
         return this.attachment;
     }
 
-    /**
-     * @return the DocumentReference to the document which this attachment is attached to.
-     */
-    public DocumentReference getDocumentReference()
-    {
-        return this.docReference;
-    }
-
-    /**
-     * Set the document reference for the document which this attachment is attached to.
-     * 
-     * @param docReference the reference to the document.
-     */
-    protected void setDocumentReference(final DocumentReference docReference)
-    {
-        this.docReference = docReference;
-    }
-
     @Override
     public XWikiAttachment restoreAttachment(final XWikiAttachment attachment, final XWikiContext context)
         throws XWikiException
@@ -158,7 +131,7 @@ public class DeletedFilesystemAttachment extends DeletedAttachment
             result = (XWikiAttachment) this.attachment.clone();
         }
 
-        result.setDoc(context.getWiki().getDocument(this.getDocumentReference(), context));
+        result.setDoc(context.getWiki().getDocument(this.attachment.getReference().getDocumentReference(), context));
         return result;
     }
 

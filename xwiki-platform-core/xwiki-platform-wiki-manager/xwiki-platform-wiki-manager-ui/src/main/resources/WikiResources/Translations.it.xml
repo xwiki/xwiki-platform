@@ -85,6 +85,7 @@ wikimanager.listwikirank=Ordine
 wikimanager.listwikistate=Stato
 wikimanager.listwikitemplate=Modello di wiki
 wikimanager.notinvirtualmode=Il wiki non è in modalità virtuale. Ciò vuol dire che si può accedere solo al wiki principale. Assicurarsi di avere &lt;tt&gt;xwiki.virtual\=1&lt;/tt&gt; nel file &lt;tt&gt;xwiki.cfg&lt;/tt&gt; . 
+wikimanager.panels.applicationsPanelEntryLabel=Gestione del Wiki
 wikimanager.pluginnotenabled=Il plugin Wiki Manager non è abilitato. Questa pagina non funzionerà correttamente. Assicurarsi che il &lt;tt&gt;com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin&lt;/tt&gt; sia elencato tra i parametri di &lt;tt&gt;xwiki.plugins&lt;/tt&gt; del file &lt;tt&gt;xwiki.cfg&lt;/tt&gt; . 
 wikimanager.prop.alias.description=Descrizione
 wikimanager.prop.alias.homepage=Home page

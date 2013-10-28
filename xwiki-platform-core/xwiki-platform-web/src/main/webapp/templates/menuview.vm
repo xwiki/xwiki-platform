@@ -4,13 +4,13 @@
 <div class="componentcontainer">
 <strong id="xwikimenutitle" class="hidden">$services.localization.render('core.menu.main.title')</strong>
 <div class="rightmenu">
-#set ($isWorkspaceAPIAvailable = ("!$services.workspace" != ''))
+#set ($isWikiAPIAvailable = ("!$services.wiki" != ''))
 #set ($mainWikiHomeDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Main', 'WebHome'))
-#set ($workspaceManagerMainDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'WebHome'))
-#set ($isWorkspaceUIAvailable = $xwiki.exists($workspaceManagerMainDocumentReference))
-#set ($isWorkspace = $isWorkspaceAPIAvailable && $services.workspace.isWorkspace($xcontext.database))
+#set ($WikiManagerMainDocReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'WebHome'))
+#set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
+#set ($isWorkspace = $isWikiAPIAvailable && $services.workspace.isWorkspace($xcontext.database))
 #set ($isMainWikiUser = ($xcontext.mainWikiName == "$!{xcontext.userReference.wikiReference.name}"))
-#set ($hasSeveralWorkspaces = $isWorkspaceAPIAvailable && "$!services.workspace.getWorkspaces()" != '' && $services.workspace.getWorkspaces().size() > 1)
+#set ($hasSeveralWikis = $isWikiAPIAvailable && "$!services.wiki.getAll()" != '' && $services.wiki.getAll().size() > 1)
 #set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
 ##
 ## User
@@ -41,7 +41,7 @@
     #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=watchlist') $services.localization.render('core.menu.watchlist.management') 'tmWatchlistManager', '')
     #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=network') $services.localization.render('core.menu.network') 'tmUserNetwork', '')
   #end
-  #if ($isWorkspaceUIAvailable && $isMainWikiUser)
+  #if ($isWikiUIAvailable && $isMainWikiUser)
     #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=workspaces') $services.localization.render('workspacemanager.menu.user.workspaces') 'tmUserWorkspaces', '')
   #end
   #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=dashboard') $services.localization.render('core.menu.userDashboard') 'tmUserDashboard', '')
@@ -54,18 +54,18 @@
 ## Create
 ##
 ## $displayCreateWiki is determined by:
-## - the workspaces app is installed
+## - the wiki app is installed
 ## - and the user has the right to create a wiki
-## - and the workspaces application has been installed. We check this by checking if there's at least one template since the installation process will create a template
+## - and the wiki application has been installed.
 ## (in the future the last condition will be removed since we will use the Distribution Wizard for wiki creation)
-#set ($displayCreateWiki = $isWorkspaceAPIAvailable && $isWorkspaceUIAvailable && $hasCreateWiki && "$!services.workspace.getWorkspaceTemplates()" != '' && $services.workspace.getWorkspaceTemplates().size() > 0)
+#set ($displayCreateWiki = $isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki)
 #set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $hasComment || $displayCreateWiki)
 #if ($displayCreateSubmenu)
   #xwikitopmenuentrystart('' $services.localization.render('core.menu.create') 'tmCreate' 'hasIcon')
   #set ($hasPreviousMenuSection = false)
   #if ($displayCreateWiki)
-    #set ($createWorkspaceDocumentReference = $services.model.createDocumentReference('xwiki', 'WorkspaceManager', 'CreateNewWorkspace'))
-    #submenuitem("$xwiki.getURL($createWorkspaceDocumentReference)" $services.localization.render('core.menu.create.wiki') 'tmCreateWiki', '')
+    #set ($createWikiDocReference = $services.model.createDocumentReference('xwiki', 'WikiManager', 'CreateWiki'))
+    #submenuitem("$xwiki.getURL($createWikiDocReference)" $services.localization.render('core.menu.create.wiki') 'tmCreateWiki', '')
     #set ($hasPreviousMenuSection = true)
   #end
   #if ($hasCreateSpace)
@@ -129,7 +129,7 @@
 ## - Workspace Manager App is installed
 ## - There is at least 2 (sub)wikis (workspace-template which is hidden + a real wiki)
 ## - The current wiki is the main wiki OR the current wiki is a workspace
-#set ($displayHomeMenu = $isWorkspaceUIAvailable && $hasSeveralWorkspaces && ($xcontext.isMainWiki() || $isWorkspace))
+#set ($displayHomeMenu = $isWikiUIAvailable && $hasSeveralWikis && ($xcontext.isMainWiki() || $isWorkspace))
 #if ($displayHomeMenu)
   #xwikitopmenuentrystart($xwiki.getURL($mainWikiHomeDocumentReference) $services.localization.render('core.menu.type.home') 'tmMainWiki' 'hasIcon')
   #set ($hasPreviousMenuSection = false)
@@ -165,7 +165,7 @@
   #if ($hasPreviousMenuSection)
     #submenuseparator()
   #end  
-  #submenuitem("$xwiki.getURL($workspaceManagerMainDocumentReference)" $services.localization.render('workspacemanager.menu.workspace.index') 'tmWorkspaceIndex' '')
+  #submenuitem("$xwiki.getURL($WikiManagerMainDocReference)" $services.localization.render('workspacemanager.menu.workspace.index') 'tmWorkspaceIndex' '')
   #set($homeDocumentIndexRef = $services.model.createDocumentReference($xcontext.mainWikiName, 'Main', 'AllDocs'))
   #if ($xwiki.exists($homeDocumentIndexRef))
     #submenuitem($xwiki.getURL($homeDocumentIndexRef) $services.localization.render('core.menu.wiki.documentindex') 'tmWikiDocumentIndex' '')
@@ -179,7 +179,7 @@
 ##
 ## Wiki
 ##
-#set ($canDeleteWorkspace = $isWorkspaceAPIAvailable && $isWorkspaceUIAvailable && $services.workspace.canDeleteWorkspace($xcontext.user, $xcontext.database))
+#set ($canDeleteWorkspace = $isWikiAPIAvailable && $isWikiUIAvailable && $services.workspace.canDeleteWorkspace($xcontext.user, $xcontext.database))
 #set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin || $xwiki.exists('Main.AllDocs') || $canDeleteWorkspace)
 #set ($wikiEntryId = 'tmWiki')
 #set ($wikiEntryText = $services.localization.render('core.menu.type.wiki'))
@@ -193,7 +193,7 @@
 ## - there is only 1 wiki
 ## - OR Workspace manager is not installed
 ## - OR the wiki is not the home
-#if(!$hasSeveralWorkspaces || !$isWorkspaceUIAvailable || !$xcontext.isMainWiki())
+#if(!$hasSeveralWikis || !$isWikiUIAvailable || !$xcontext.isMainWiki())
   #if($displayHomeMenu)
     #xwikitopmenuseparator()
   #end

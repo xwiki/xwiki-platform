@@ -19,6 +19,8 @@
  */
 package org.xwiki.wiki.user;
 
+import java.util.Date;
+
 /**
  * Represents the invitation or the request to join a wiki.
  * @since 5.3M2
@@ -26,7 +28,10 @@ package org.xwiki.wiki.user;
  */
 public class MemberCandidacy
 {
-    private enum CandidateType
+    /**
+     * Type of the candidacy.
+     */
+    public enum CandidateType
     {
         /**
          * An admin has invited the user to join the wiki.
@@ -38,7 +43,26 @@ public class MemberCandidacy
         REQUEST
     }
 
-    private String id;
+    /**
+     * Status of the candidacy.
+     */
+    public enum Status
+    {
+        /**
+         * The candidacy is waiting to be reviewed.
+         */
+        PENDING,
+        /**
+         * The candidacy has been accepted.
+         */
+        ACCEPTED,
+        /**
+         * The candidacy has been rejected.
+         */
+        REJECTED
+    }
+
+    private int id;
 
     private String wikiId;
 
@@ -54,10 +78,49 @@ public class MemberCandidacy
 
     private CandidateType type;
 
+    private Status status;
+
+    private Date dateOfCreation;
+
+    private Date dateOfClosure;
+
+    /**
+     * Constructor.
+     */
+    public MemberCandidacy()
+    {
+        this.status = Status.PENDING;
+        this.dateOfCreation = new Date();
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param wikiId Id of the wiki to join
+     * @param userId Id of the user who ask to join or the user to invite
+     * @param type type of candidacy
+     */
+    public MemberCandidacy(String wikiId, String userId, CandidateType type)
+    {
+        this.wikiId = wikiId;
+        this.userId = userId;
+        this.type = type;
+        this.status = Status.PENDING;
+        this.dateOfCreation = new Date();
+    }
+
+    /**
+     * @param id Id to set
+     */
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
     /**
      * @return the id of the candidacy
      */
-    public String getId()
+    public int getId()
     {
         return id;
     }
@@ -164,6 +227,14 @@ public class MemberCandidacy
     }
 
     /**
+     * @param type the type of candidacy
+     */
+    public void setType(CandidateType type)
+    {
+        this.type = type;
+    }
+
+    /**
      * @return the type of candidacy
      */
     public CandidateType getType()
@@ -171,4 +242,51 @@ public class MemberCandidacy
         return type;
     }
 
+    /**
+     * @return the status of the request
+     */
+    public Status getStatus()
+    {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(Status status)
+    {
+        this.status = status;
+    }
+
+    /**
+     * @return the date of the creation of this candidacy
+     */
+    public Date getDateOfCreation()
+    {
+        return dateOfCreation;
+    }
+
+    /**
+     * @param dateOfCreation the date of the creation of this candidacy
+     */
+    public void setDateOfCreation(Date dateOfCreation)
+    {
+        this.dateOfCreation = dateOfCreation;
+    }
+
+    /**
+     * @return the date this candidacy has been closed.
+     */
+    public Date getDateOfClosure()
+    {
+        return dateOfClosure;
+    }
+
+    /**
+     * @param dateOfClosure the date this candidacy has been closed.
+     */
+    public void setDateOfClosure(Date dateOfClosure)
+    {
+        this.dateOfClosure = dateOfClosure;
+    }
 }

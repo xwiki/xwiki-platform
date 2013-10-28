@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>XWiki</web>
-  <name>BrowseWikisLiveTableResultsMacros</name>
+  <web>WikiManagerCode</web>
+  <name>WikisLiveTableResultsMacros</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>WorkspaceManager.WebHome</parent>
+  <parent>WikiManager.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
@@ -51,9 +51,9 @@
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
     ## Some constants which are usefull while processing each item.
     #set ($currentUser = "${xcontext.mainWikiName}:${xcontext.user}")
-    #set ($deleteWikiDocumentReference = $services.model.createDocumentReference('', 'XWiki', 'DeleteWikiCode'))
-    #set ($joinWikiDocumentReference = $services.model.createDocumentReference('', 'WorkspaceManager', 'JoinWorkspaceCode'))
-    #set ($leaveWikiDocumentReference = $services.model.createDocumentReference('', 'WorkspaceManager', 'LeaveWorkspaceCode'))
+    #set ($deleteWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'DeleteWiki'))
+    #set ($joinWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'JoinWorkspace'))
+    #set ($leaveWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'LeaveWorkspace'))
     #set ($wikiId = $docName.toLowerCase().replaceAll("xwiki.xwikiserver", ""))
     #set ($wiki = $services.wiki.getById($wikiId))
     ## Init membership actions as denied.

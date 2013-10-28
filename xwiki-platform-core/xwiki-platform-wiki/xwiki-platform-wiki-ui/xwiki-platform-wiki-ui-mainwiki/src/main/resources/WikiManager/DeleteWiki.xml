@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>XWiki</web>
+  <web>WikiManagerCode</web>
   <name>DeleteWikiCode</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>WorkspaceManager.WebHome</parent>
+  <parent>WikiManager.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
@@ -15,7 +15,7 @@
   <date>1304960266000</date>
   <contentUpdateDate>1304960266000</contentUpdateDate>
   <version>1.1</version>
-  <title>#if("$!{request.workspaceName}" == '')$services.localization.render('workspacemanager.title.delete.empty')#{else}$services.localization.render('workspacemanager.title.delete', [$request.workspaceName])#end</title>
+  <title>#if("$!{request.wikiId}" == '')$services.localization.render('workspacemanager.title.delete.empty')#{else}$services.localization.render('workspacemanager.title.delete', [$request.wikiId])#end</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -57,7 +57,7 @@
       {{error}}The user #if($xcontext.user != 'XWiki.XWikiGuest')[[$currentUser]]#{else}$xcontext.user#end is not allowed to delete the wiki [[$wikiId&gt;&gt;$wikiMainPage]].{{/error}}
     #else
       #if ("$!confirm" != 1)
-        #set ($browseDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'XWiki', 'BrowseWikis'))
+        #set ($browseDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'WebHome'))
         #set ($backUrl = $xwiki.getURL($browseDocumentReference))
         #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
         {{box}}

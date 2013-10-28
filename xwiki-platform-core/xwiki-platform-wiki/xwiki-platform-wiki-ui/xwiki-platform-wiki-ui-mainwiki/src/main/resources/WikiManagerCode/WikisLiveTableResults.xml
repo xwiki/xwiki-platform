@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>XWiki</web>
-  <name>BrowseWikisLiveTableResults</name>
+  <web>WikiManagerCode</web>
+  <name>WikisLiveTableResults</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.WebHome</parent>
+  <parent>WikiManager.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
@@ -23,7 +23,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="XWiki.BrowseWikisLiveTableResultsMacros" /}}
+  <content>{{include document="WikiManagerCode.WikisLiveTableResultsMacros" /}}
 
 {{velocity wiki="false"}}
 #set($from =  "")

@@ -93,6 +93,34 @@ public interface WikiUserManager
     void removeMember(String userId, String wikiId) throws WikiUserManagerException;
 
     /**
+     * Get all the invitations to join a wiki.
+     *
+     * @param wikiId id of the wiki to join
+     * @return a list of invitations to join this wiki
+     * @throws WikiUserManagerException if problems occur
+     */
+    Collection<MemberCandidacy> getAllInvitations(String wikiId) throws WikiUserManagerException;
+
+    /**
+     * Get all the join requests for a wiki.
+     *
+     * @param wikiId id of the wiki to join
+     * @return a list of join request for this wiki
+     * @throws WikiUserManagerException if problems occur
+     */
+    Collection<MemberCandidacy> getAllRequests(String wikiId) throws WikiUserManagerException;
+
+    /**
+     * Get the specified member candidacy.
+     *
+     * @param wikiId Od of the request concerned by the candidacy
+     * @param candidacyId Id of the candidacy to get
+     * @return the candidacy
+     * @throws WikiUserManagerException if problems occur
+     */
+    MemberCandidacy getCandidacy(String wikiId, int candidacyId) throws WikiUserManagerException;
+
+    /**
      * Perform a request to join a wiki.
      * @param userId UserID of the requester
      * @param wikiId Id of the wiki to join

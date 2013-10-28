@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>XWiki</web>
-  <name>CreateNewWorkspace</name>
+  <web>WikiManager</web>
+  <name>CreateWiki</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>WorkspaceManager.WebHome</parent>
+  <parent>WikiManager.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
@@ -95,7 +95,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.CreateNewWorkspace</name>
+    <name>WikiManager.CreateNewWiki</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>15ff9185-1a9c-44a2-9cf0-13329d0b3a03</guid>
@@ -334,7 +334,7 @@
       #set ($MSG_ERROR_WIKINAMEEMPTY = "$services.localization.render('workspacemanager.wikiname.error.empty')")
       #set ($MSG_ERROR_WIKIPRETTYNAMEEMPTY = "$services.localization.render('workspacemanager.wikiprettyname.error.empty')")
       #set ($MSG_INFO_WIKINAMEVALID = "$services.localization.render('workspacemanager.wikiname.info.valid')")
-      #set ($ISWIKINAMEAVAILABLE = $xwiki.getDocument("WorkspaceManager.IsWikiOrDatabaseOrWorkspaceAvailableService").URL)
+      #set ($ISWIKINAMEAVAILABLE = $xwiki.getURL($services.model.createDocumentReference("", "WikiManagerCode", "IsWikiOrDatabaseOrAvailableService")))
       /**
        * Init the event handlers
        */
@@ -508,8 +508,8 @@
         &lt;div class="half"&gt;
           ### MEMBERSHIP TYPE
           &lt;div&gt;
-            #set ($workspaceClass = $xwiki.getDocument('XWiki.XWikiServerUserClass').getxWikiClass())
-            #set ($membershipTypeProperty = $workspaceClass.get('membershipType'))
+            #set ($wikiUserClass = $xwiki.getDocument('WikiManagerCode.WikiUserClass').getxWikiClass())
+            #set ($membershipTypeProperty = $wikiUserClass.get('membershipType'))
             #set ($membershipTypeValues = '')
             #set ($membershipTypeValues = $membershipTypeProperty.getListValues())
             #set ($membershipTypeDetailsMap = $membershipTypeProperty.getMapValues())

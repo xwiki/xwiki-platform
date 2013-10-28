@@ -19,19 +19,32 @@
  */
 package org.xwiki.wiki.user.script;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.wiki.user.MemberCandidacy;
 import org.xwiki.wiki.user.MembershipType;
 import org.xwiki.wiki.user.WikiUserManager;
+import org.xwiki.wiki.user.WikiUserManagerException;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Script service to manage how the user are supported in a wiki.
+ * 
  * @since 5.3M2
  * @version $Id$
  */
@@ -45,6 +58,12 @@ public class WikiUserManagerScriptService implements ScriptService
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private AuthorizationManager authorizationManager;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * @return whether or not the current wiki has local users enabled
@@ -118,5 +137,309 @@ public class WikiUserManagerScriptService implements ScriptService
             success = false;
         }
         return success;
+    }
+
+    /**
+     * @param wikiId if the the wiki
+     * @return the list of all the members (global users) or null if something failed.
+     */
+    public Collection<String> getMembers(String wikiId)
+    {
+        try {
+            return wikiUserManager.getMembers(wikiId);
+        } catch (WikiUserManagerException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Add a user as a member.
+     *
+     * @param userId UserID to add
+     * @param wikiId Id of the wiki
+     * @return true if it succeed
+     */
+    public boolean addMember(String userId, String wikiId)
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+        try {
+            // Check the right
+            authorizationManager.checkAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId));
+            // Add the member
+            wikiUserManager.addMember(userId, wikiId);
+        } catch (AccessDeniedException e) {
+            // TODO
+            return false;
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Remove a member.
+     *
+     * @param userId UserID to remove
+     * @param wikiId Id the the wiki
+     * @return true if it succeed
+     */
+    public boolean removeMember(String userId, String wikiId)
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+        try {
+            // Check the right
+            authorizationManager.checkAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId));
+            // Add the member
+            wikiUserManager.removeMember(userId, wikiId);
+        } catch (AccessDeniedException e) {
+            // TODO
+            return false;
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean canSeeCandidacy(MemberCandidacy candidacy)
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+
+        // If the user is concerned by the candidacy
+        if (candidacy.getUserId().equals(xcontext.getUser())) {
+            // Hide the admin private comment
+            candidacy.setAdminPrivateComment(null);
+            return true;
+        }
+
+        // Check if the user is an admin
+        return authorizationManager.hasAccess(Right.ADMIN, xcontext.getUserReference(),
+                new WikiReference(candidacy.getWikiId()));
+    }
+
+    /**
+     * Get the specified candidacy.
+     *
+     * @param wikiId Id of the wiki concerned by the candidacy
+     * @param candidacyId id of the candidacy
+     * @return the candidacy or null if problems occur
+     */
+    public MemberCandidacy getCandidacy(String wikiId, int candidacyId)
+    {
+
+        // Get the candidacy
+        MemberCandidacy candidacy = null;
+        try {
+            candidacy = wikiUserManager.getCandidacy(wikiId, candidacyId);
+            // Check the rights
+            if (!canSeeCandidacy(candidacy)) {
+                // TODO;
+                candidacy = null;
+            }
+        } catch (WikiUserManagerException e) {
+            //TODO
+        }
+
+        return candidacy;
+    }
+
+    /**
+     * Filter from a list of candidacies those that the current user has the right to see.
+     * @param candidacies list to filter
+     * @return the filtered list
+     */
+    private Collection<MemberCandidacy> filterAuthorizedCandidacies(Collection<MemberCandidacy> candidacies)
+    {
+        Collection<MemberCandidacy> authorizedCandidacies = new ArrayList<MemberCandidacy>();
+
+        for (MemberCandidacy candidacy : candidacies) {
+            if (canSeeCandidacy(candidacy)) {
+                candidacies.add(candidacy);
+            }
+        }
+
+        return authorizedCandidacies;
+    }
+
+    /**
+     * Get all the invitations to join a wiki.
+     *
+     * @param wikiId id of the wiki to join
+     * @return a list of invitations to join this wiki or null if some problems occur
+     */
+    public Collection<MemberCandidacy> getAllInvitations(String wikiId)
+    {
+        try {
+            Collection<MemberCandidacy> candidacies = wikiUserManager.getAllInvitations(wikiId);
+            return filterAuthorizedCandidacies(candidacies);
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return null;
+        }
+    }
+
+    /**
+     * Get all the join requests for a wiki that the current user has the right to see.
+     *
+     * @param wikiId id of the wiki to join
+     * @return a list of join request for this wiki or null if some problems occur
+     */
+    public Collection<MemberCandidacy> getAllRequests(String wikiId)
+    {
+        try {
+            Collection<MemberCandidacy> candidacies = wikiUserManager.getAllRequests(wikiId);
+            return filterAuthorizedCandidacies(candidacies);
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return null;
+        }
+    }
+
+    /**
+     * Perform a request to join a wiki.
+     *
+     * @param userId UserID of the requester
+     * @param wikiId Id of the wiki to join
+     * @param message Message that motivates the request
+     * @return the generated candidacy
+     */
+    public MemberCandidacy askToJoin(String userId, String wikiId, String message)
+    {
+        try {
+            return wikiUserManager.askToJoin(userId, wikiId, message);
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return null;
+        }
+    }
+
+    /**
+     * Accept the request to join the wiki.
+     *
+     * @param request request to accept
+     * @param message message about the acceptance
+     * @param privateComment private comment that only the administrator can see
+     * @return true if it succeed
+     */
+    public boolean acceptRequest(MemberCandidacy request, String message, String privateComment)
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+        if (!xcontext.getUser().equals(request.getUserId())) {
+            return false;
+        }
+        try {
+            wikiUserManager.acceptRequest(request, message, privateComment);
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Refuse the request to join the wiki.
+     *
+     * @param request request to refuse
+     * @param message message about the refusal
+     * @param privateComment private comment that only the administrator can see
+     * @return true if it succeed
+     */
+    public boolean refuseRequest(MemberCandidacy request, String message, String privateComment)
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+        if (!xcontext.getUser().equals(request.getUserId())) {
+            return false;
+        }
+        try {
+            wikiUserManager.refuseRequest(request, message, privateComment);
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Invite a global user to a wiki.
+     *
+     * @param userId Id of the user to add
+     * @param wikiId Id of the wiki to join
+     * @param message MemberCandidacy message
+     * @return The generated invitation or null if problems occur
+     */
+    public MemberCandidacy invite(String userId, String wikiId, String message)
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+
+        // Check right
+        if (!authorizationManager.hasAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId))) {
+            // TODO
+            return null;
+        }
+
+        // Invite
+        try {
+            return wikiUserManager.invite(userId, wikiId, message);
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return null;
+        }
+    }
+
+    /**
+     * Accept the invitation to join a wiki.
+     *
+     * @param invitation invitation to accept
+     * @param message message that goes along the acceptance
+     * @return true if it succeed
+     */
+    public boolean acceptInvitation(MemberCandidacy invitation, String message)
+    {
+        // Check right
+        if (!canSeeCandidacy(invitation)) {
+            // TODO
+            return false;
+        }
+
+        // Accept invitation
+        try {
+            wikiUserManager.acceptInvitation(invitation, message);
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Refuse the invitation to join a wiki.
+     *
+     * @param invitation invitation to refuse
+     * @param message message that goes along the refusal
+     * @return true if it succeed
+     */
+    public boolean refuseInvitation(MemberCandidacy invitation, String message)
+    {
+        // Check right
+        if (!canSeeCandidacy(invitation)) {
+            // TODO
+            return false;
+        }
+
+        // Accept invitation
+        try {
+            wikiUserManager.refuseInvitation(invitation, message);
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return false;
+        }
+
+        return true;
     }
 }

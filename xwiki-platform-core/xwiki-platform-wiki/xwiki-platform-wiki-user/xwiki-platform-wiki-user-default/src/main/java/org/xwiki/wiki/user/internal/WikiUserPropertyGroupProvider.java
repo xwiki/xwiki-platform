@@ -124,14 +124,14 @@ public class WikiUserPropertyGroupProvider implements WikiPropertyGroupProvider
             XWikiDocument descriptorDocument = wikiDescriptorDocumentHelper.getDocumentFromWikiId(wikiId);
             if (!upgradeOldWorkspace(descriptorDocument, group)) {
                 // If it is not a workspace, then read the values of the object
-                BaseObject object = descriptorDocument.getXObject(XWikiServerUserClassDocumentInitializer.SERVER_CLASS);
+                BaseObject object = descriptorDocument.getXObject(WikiUserClassDocumentInitializer.SERVER_CLASS);
                 if (object != null) {
                     // Get the enable local users value (default value: 1, for compatibility reason with old subwikis).
                     group.enableLocalUsers(
-                            object.getIntValue(XWikiServerUserClassDocumentInitializer.FIELD_ENABLELOCALUSERS, 1) != 0);
+                            object.getIntValue(WikiUserClassDocumentInitializer.FIELD_ENABLELOCALUSERS, 1) != 0);
                     // Get the membershipType value
                     String membershipTypeValue = object.getStringValue(
-                            XWikiServerUserClassDocumentInitializer.FIELD_MEMBERSHIPTYPE);
+                            WikiUserClassDocumentInitializer.FIELD_MEMBERSHIPTYPE);
                     MembershipType membershipType;
                     try {
                         membershipType = MembershipType.valueOf(membershipTypeValue.toUpperCase());
@@ -170,11 +170,11 @@ public class WikiUserPropertyGroupProvider implements WikiPropertyGroupProvider
         XWiki xwiki = context.getWiki();
 
         // Fill the object
-        BaseObject object = descriptorDocument.getXObject(XWikiServerUserClassDocumentInitializer.SERVER_CLASS, true,
+        BaseObject object = descriptorDocument.getXObject(WikiUserClassDocumentInitializer.SERVER_CLASS, true,
                 context);
-        object.setIntValue(XWikiServerUserClassDocumentInitializer.FIELD_ENABLELOCALUSERS,
+        object.setIntValue(WikiUserClassDocumentInitializer.FIELD_ENABLELOCALUSERS,
                 userGroup.hasLocalUsersEnabled() ? 1 : 0);
-        object.setStringValue(XWikiServerUserClassDocumentInitializer.FIELD_MEMBERSHIPTYPE,
+        object.setStringValue(WikiUserClassDocumentInitializer.FIELD_MEMBERSHIPTYPE,
                 userGroup.getMembershipType().name().toLowerCase());
 
         // Save the document

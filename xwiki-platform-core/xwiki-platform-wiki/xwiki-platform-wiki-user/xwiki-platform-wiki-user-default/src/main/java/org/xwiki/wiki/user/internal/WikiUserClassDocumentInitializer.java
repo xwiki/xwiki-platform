@@ -27,7 +27,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.wiki.user.MembershipType;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -39,20 +38,25 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @version $Id$
  */
 @Component
-@Named("XWiki.XWikiServerUserClass")
+@Named("WikiManagerCode.WikiUserClass")
 @Singleton
-public class XWikiServerUserClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class WikiUserClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
     /**
      * The name of the mandatory document.
      */
-    public static final String DOCUMENT_NAME = "XWikiServerUserClass";
+    public static final String DOCUMENT_NAME = "WikiUserClass";
+
+    /**
+     * The space of the mandatory document.
+     */
+    public static final String DOCUMENT_SPACE = "WikiManagerCode";
 
     /**
      * Reference to the server class.
      */
     public static final EntityReference SERVER_CLASS =  new EntityReference(DOCUMENT_NAME, EntityType.DOCUMENT,
-            new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
+            new EntityReference(DOCUMENT_SPACE, EntityType.SPACE));
 
     /**
      * Default list separators of XWiki.XWikiServerClass fields.
@@ -104,9 +108,9 @@ public class XWikiServerUserClassDocumentInitializer extends AbstractMandatoryDo
     /**
      * Constructor.
      */
-    public XWikiServerUserClassDocumentInitializer()
+    public WikiUserClassDocumentInitializer()
     {
-        super(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
+        super(DOCUMENT_SPACE, DOCUMENT_NAME);
     }
 
     @Override
@@ -122,6 +126,12 @@ public class XWikiServerUserClassDocumentInitializer extends AbstractMandatoryDo
         needsUpdate |= baseClass.addBooleanField(FIELD_ENABLELOCALUSERS, FIELDPN_ENABLELOCALUSERS,
                 FIELDDT_ENABLELOCALUSERS);
         needsUpdate |= updateBooleanClassDefaultValue(baseClass, FIELD_ENABLELOCALUSERS, DEFAULT_ENABLELOCALUSERS);
+
+        // Check if the document is hidden
+        if (!document.isHidden()) {
+            document.setHidden(true);
+            needsUpdate = true;
+        }
 
         return needsUpdate;
     }

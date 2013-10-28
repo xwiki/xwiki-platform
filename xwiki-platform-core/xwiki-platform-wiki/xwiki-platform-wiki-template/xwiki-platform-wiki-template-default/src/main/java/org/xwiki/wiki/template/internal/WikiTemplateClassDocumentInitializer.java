@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -38,20 +37,25 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @version $Id$
  */
 @Component
-@Named("XWiki.XWikiServerTemplateClass")
+@Named("WikiManagerCode.WikiTemplateClass")
 @Singleton
-public class XWikiServerTemplateClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
+public class WikiTemplateClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {
     /**
      * The name of the mandatory document.
      */
-    public static final String DOCUMENT_NAME = "XWikiServerTemplateClass";
+    public static final String DOCUMENT_NAME = "WikiTemplateClass";
+
+    /**
+     * The space of the mandatory document.
+     */
+    public static final String DOCUMENT_SPACE = "WikiManagerCode";
 
     /**
      * Reference to the server class.
      */
     public static final EntityReference SERVER_CLASS =  new EntityReference(DOCUMENT_NAME, EntityType.DOCUMENT,
-            new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
+            new EntityReference(DOCUMENT_SPACE, EntityType.SPACE));
 
     /**
      * Name of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
@@ -76,11 +80,11 @@ public class XWikiServerTemplateClassDocumentInitializer extends AbstractMandato
     /**
      * Constructor.
      */
-    public XWikiServerTemplateClassDocumentInitializer()
+    public WikiTemplateClassDocumentInitializer()
     {
         // Since we can`t get the main wiki here, this is just to be able to use the Abstract class.
         // getDocumentReference() returns the actual main wiki document reference.
-        super(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);
+        super(DOCUMENT_SPACE, DOCUMENT_NAME);
     }
 
     @Override
@@ -93,6 +97,12 @@ public class XWikiServerTemplateClassDocumentInitializer extends AbstractMandato
 
         needsUpdate |= baseClass.addBooleanField(FIELD_ISWIKITEMPLATE, FIELDPN_ISWIKITEMPLATE, FIELDDT_ISWIKITEMPLATE);
         needsUpdate |= updateBooleanClassDefaultValue(baseClass, FIELD_ISWIKITEMPLATE, DEFAULT_ISWIKITEMPLATE);
+
+        // Check if the document is hidden
+        if (!document.isHidden()) {
+            document.setHidden(true);
+            needsUpdate = true;
+        }
 
         return needsUpdate;
     }

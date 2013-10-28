@@ -22,10 +22,28 @@ package org.xwiki.wiki.internal.manager;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.wiki.manager.WikiManagerException;
 
+/**
+ * Helper to perform the copy of a wiki..
+ * @since 5.3M2
+ * @version $Id :$
+ */
 @Role
 public interface WikiCopier
 {
+    /**
+     * Copy all documents from a wiki to an other.
+     * @param fromWikiId Id of the wiki where the documents are located
+     * @param toWikiId Id of the wiki that will hold the duplicated documents
+     * @param withHistory whether or not the history of the documents should be cloned
+     * @throws WikiManagerException if problems occur
+     */
     void copyDocuments(String fromWikiId, String toWikiId, boolean withHistory) throws WikiManagerException;
 
+    /**
+     * Copy all deleted documents form a wiki to an other.
+     * @param fromWikiId Id of the wiki where the documents are located
+     * @param toWikiId Id of the wiki that will hold the duplicated documents
+     * @throws WikiManagerException if problems occur
+     */
     void copyDeletedDocuments(String fromWikiId, String toWikiId) throws WikiManagerException;
 }

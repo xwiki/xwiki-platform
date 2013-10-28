@@ -40,11 +40,20 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * Implementation of {@link WikiPropertyGroupProvider} for the property groups concerning the templates.
+ *
+ * @since 5.3M2
+ * @version $Id$
+ */
 @Component
 @Named(WikiTemplatePropertyGroupProvider.GROUP_NAME)
 @Singleton
 public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvider
 {
+    /**
+     * Name of the property group.
+     */
     public static final String GROUP_NAME = "template";
 
     @Inject
@@ -55,6 +64,8 @@ public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvi
 
     @Inject
     private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
+
+    private String errorMessageNoDescriptorDocument = "Unable to load descriptor document for wiki %s.";
 
     private void upgradeFromOldSubwiki(XWikiDocument descriptorDocument, WikiTemplatePropertyGroup group)
     {
@@ -86,8 +97,7 @@ public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvi
                         group.isTemplate() ? 1 : 0) != 0);
             }
         } catch (WikiManagerException e) {
-            throw new WikiPropertyGroupException(String.format("Unable to load descriptor document for wiki %s.",
-                    wikiId), e);
+            throw new WikiPropertyGroupException(String.format(errorMessageNoDescriptorDocument, wikiId), e);
         }
 
         return group;
@@ -109,8 +119,7 @@ public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvi
                     templateGroup.isTemplate() ? 1 : 0);
             xwiki.saveDocument(descriptorDocument, String.format("Changed property group [%s].", GROUP_NAME), context);
         } catch (WikiManagerException e) {
-            throw new WikiPropertyGroupException(String.format("Unable to load descriptor document for wiki %s.",
-                    wikiId), e);
+            throw new WikiPropertyGroupException(String.format(errorMessageNoDescriptorDocument, wikiId), e);
         } catch (XWikiException e) {
             throw new WikiPropertyGroupException("Unable to save descriptor document.", e);
         }

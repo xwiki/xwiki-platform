@@ -37,6 +37,7 @@ import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
  * Utility classe used to fill a newly created wiki.
  *
  * @since 5.3M1
+ * @version $Id$
  */
 public class WikiCopy
 {
@@ -59,7 +60,7 @@ public class WikiCopy
      *             </ul>
      */
     public void copyWiki(String sourceWiki, String targetWiki, String comment, XWikiContext context)
-            throws XWikiException
+        throws XWikiException
     {
         XWiki xwiki = context.getWiki();
 
@@ -117,7 +118,8 @@ public class WikiCopy
 
         // Get applications manger
         ApplicationManagerPluginApi appmanager =
-                (ApplicationManagerPluginApi) context.getWiki().getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME, context);
+                (ApplicationManagerPluginApi) context.getWiki().getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME,
+                        context);
 
         if (appmanager == null) {
             return null;

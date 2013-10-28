@@ -46,6 +46,12 @@ import org.xwiki.wiki.template.WikiTemplateManagerException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
+/**
+ * Default implementation for {@link WikiTemplateManager}.
+ *
+ * @version $Id$
+ * @since 5.3M2
+ */
 @Component
 @Singleton
 public class DefaultWikiTemplateManager implements WikiTemplateManager
@@ -75,6 +81,8 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     @Inject
     @Named("template")
     private WikiPropertyGroupProvider templateWikiPropertyGroupProvider;
+
+    private String errorMessageNoDescriptor = "Failed to get the descriptor for [%s].";
 
     @Override
     public Collection<WikiDescriptor> getTemplates() throws WikiTemplateManagerException
@@ -118,7 +126,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
             throw new WikiTemplateManagerException(String.format("Failed to save the property group [%s]",
                     WikiTemplatePropertyGroupProvider.GROUP_NAME), e);
         } catch (WikiManagerException e) {
-            throw new WikiTemplateManagerException(String.format("Failed to get the descriptor for [%s].", wikiId), e);
+            throw new WikiTemplateManagerException(String.format(errorMessageNoDescriptor, wikiId), e);
         }
     }
 
@@ -134,7 +142,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
             // Return the value
             return group.isTemplate();
         } catch (WikiManagerException e) {
-            throw new WikiTemplateManagerException(String.format("Failed to get the descriptor for [%s].", wikiId), e);
+            throw new WikiTemplateManagerException(String.format(errorMessageNoDescriptor, wikiId), e);
         }
     }
 

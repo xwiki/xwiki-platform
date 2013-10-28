@@ -77,8 +77,6 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
                 DefaultWikiDescriptor descriptor = buildDescriptorFromDocument(document);
                 // Add it to the result list
                 result.add(descriptor);
-                // Add it to the cache
-                cache.add(descriptor);
             }
         } catch (Exception e) {
             throw new WikiManagerException("Failed to locate XWiki.XWikiServerClass documents", e);

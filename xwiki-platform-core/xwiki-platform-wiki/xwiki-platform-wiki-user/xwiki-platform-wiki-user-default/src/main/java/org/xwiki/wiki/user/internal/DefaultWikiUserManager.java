@@ -34,6 +34,12 @@ import org.xwiki.wiki.user.WikiUserManager;
 import org.xwiki.wiki.user.WikiUserManagerException;
 import org.xwiki.wiki.user.WikiUserPropertyGroup;
 
+/**
+ * Default implementation for {@link WikiUserManager}.
+ *
+ * @since 5.3M2
+ * @version $Id$
+ */
 @Component
 @Singleton
 public class DefaultWikiUserManager implements WikiUserManager
@@ -104,7 +110,7 @@ public class DefaultWikiUserManager implements WikiUserManager
 
     @Override
     public MemberCandidacy askToJoin(String userId, String wikiId, String message)
-            throws WikiUserManagerException
+        throws WikiUserManagerException
     {
         // TODO: Implement this method. This is not urgent because the UI currently does all the job.
         return null;
@@ -112,21 +118,21 @@ public class DefaultWikiUserManager implements WikiUserManager
 
     @Override
     public void acceptRequest(MemberCandidacy request, String message, String privateComment)
-            throws WikiUserManagerException
+        throws WikiUserManagerException
     {
         // TODO: Implement this method. This is not urgent because the UI currently does all the job.
     }
 
     @Override
     public void refuseRequest(MemberCandidacy request, String message, String privateComment)
-            throws WikiUserManagerException
+        throws WikiUserManagerException
     {
         // TODO: Implement this method. This is not urgent because the UI currently does all the job.
     }
 
     @Override
     public MemberCandidacy invite(String userId, String wikiId, String message)
-            throws WikiUserManagerException
+        throws WikiUserManagerException
     {
         // TODO: Implement this method. This is not urgent because the UI currently does all the job.
         return null;

@@ -35,6 +35,7 @@ public interface WikiUserManager
     /**
      * @param wikiId Id of the wiki to test
      * @return if local users are enabled on the specified wiki
+     * @throws WikiManagerException if problems occur
      */
     boolean hasLocalUsersEnabled(String wikiId) throws WikiManagerException;
 
@@ -42,12 +43,14 @@ public interface WikiUserManager
      * Enable or disbale the local users and save the descriptor.
      * @param wikiId Id of the wiki to change
      * @param enable enable or not the local users on the wiki
+     * @throws WikiManagerException if problems occur
      */
     void enableLocalUsers(String wikiId, boolean enable) throws WikiManagerException;
 
     /**
      * @param wikiId if of the wiki to test
      * @return the membership type of the specified wiki
+     * @throws WikiManagerException if problems occur
      */
     MembershipType getMembershipType(String wikiId) throws WikiManagerException;
 
@@ -55,6 +58,7 @@ public interface WikiUserManager
      * Set the membership type of the wiki and save the descriptor.
      * @param wikiId Id of the wiki to change
      * @param type the membershyp type to set
+     * @throws WikiManagerException if problems occur
      */
     void setMembershipType(String wikiId, MembershipType type) throws WikiManagerException;
 
@@ -106,7 +110,7 @@ public interface WikiUserManager
      * @throws WikiUserManagerException if problem occurs
      */
     void acceptRequest(MemberCandidacy request, String message, String privateComment)
-            throws WikiUserManagerException;
+        throws WikiUserManagerException;
 
     /**
      * Refuse the request to join the wiki.
@@ -116,7 +120,7 @@ public interface WikiUserManager
      * @throws WikiUserManagerException if problem occurs
      */
     void refuseRequest(MemberCandidacy request, String message, String privateComment)
-            throws WikiUserManagerException;
+        throws WikiUserManagerException;
 
     /**
      * Invite a global user to a wiki.

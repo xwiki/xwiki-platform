@@ -173,8 +173,7 @@ public class WikiDescriptor
     }
 
     /**
-     * Set the Id of the owner of the wiki
-     * @param ownerId
+     * @param ownerId the Id of the owner of the wiki
      */
     public void setOwnerId(String ownerId)
     {
@@ -198,7 +197,7 @@ public class WikiDescriptor
     }
 
     /**
-     * @return a reference to the main page of the wiki
+     * @param reference Reference to the main page of the wiki
      */
     public void setMainPageReference(DocumentReference reference)
     {

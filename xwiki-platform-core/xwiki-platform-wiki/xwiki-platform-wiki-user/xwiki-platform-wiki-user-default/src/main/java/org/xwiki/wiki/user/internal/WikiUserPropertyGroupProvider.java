@@ -41,11 +41,20 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+/**
+ * Provider to load and save the wiki property groups concerning the users.
+ *
+ * @since 5.3M2
+ * @version $Id$
+ */
 @Component
 @Named("user")
 @Singleton
 public class WikiUserPropertyGroupProvider implements WikiPropertyGroupProvider
 {
+    /**
+     * Name of the property group.
+     */
     public static final String GROUP_NAME = "user";
 
     @Inject
@@ -57,12 +66,14 @@ public class WikiUserPropertyGroupProvider implements WikiPropertyGroupProvider
     @Inject
     private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
 
+    private String errorMessageNoDescriptorDoc = "Unable to load descriptor document for wiki %s.";
+
     /**
      * Perform the upgrade from version prior to 5.3M2.
      * @return if the wiki was an old workspace
      */
     private boolean upgradeOldWorkspace(XWikiDocument descriptorDocument, WikiUserPropertyGroup group)
-            throws WikiPropertyGroupException
+        throws WikiPropertyGroupException
     {
         // Try to get the old workspace object
         DocumentReference oldClassDocument = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
@@ -132,8 +143,7 @@ public class WikiUserPropertyGroupProvider implements WikiPropertyGroupProvider
                 }
             }
         } catch (WikiManagerException e) {
-            throw new WikiPropertyGroupException(String.format("Unable to load descriptor document for wiki %s.",
-                    wikiId), e);
+            throw new WikiPropertyGroupException(String.format(errorMessageNoDescriptorDoc, wikiId), e);
         }
 
         return group;
@@ -148,13 +158,12 @@ public class WikiUserPropertyGroupProvider implements WikiPropertyGroupProvider
             XWikiDocument descriptorDocument = wikiDescriptorDocumentHelper.getDocumentFromWikiId(wikiId);
             save(userGroup, descriptorDocument);
         } catch (WikiManagerException e) {
-            throw new WikiPropertyGroupException(String.format("Unable to load descriptor document for wiki %s.",
-                    wikiId), e);
+            throw new WikiPropertyGroupException(String.format(errorMessageNoDescriptorDoc, wikiId), e);
         }
     }
 
     private void save(WikiUserPropertyGroup userGroup, XWikiDocument descriptorDocument)
-            throws WikiPropertyGroupException
+        throws WikiPropertyGroupException
     {
         // Get the XWiki Object
         XWikiContext context = xcontextProvider.get();

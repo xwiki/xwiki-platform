@@ -47,6 +47,11 @@ import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectD
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 
+/**
+ * Default implementation for {@link WikiCopier}.
+ * @version $Id$
+ * @since 5.3M2
+ */
 @Component
 public class DefaultWikiCopier implements WikiCopier
 {

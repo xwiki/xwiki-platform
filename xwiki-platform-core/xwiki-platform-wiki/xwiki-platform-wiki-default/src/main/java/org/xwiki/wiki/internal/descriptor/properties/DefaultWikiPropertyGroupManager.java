@@ -51,7 +51,7 @@ public class DefaultWikiPropertyGroupManager implements WikiPropertyGroupManager
     public void loadForDescriptor(WikiDescriptor descriptor) throws WikiPropertyGroupException
     {
         String wikiId = descriptor.getId();
-        for(String propertyGroupName : propertyGroupProviders.keySet()) {
+        for (String propertyGroupName : propertyGroupProviders.keySet()) {
             WikiPropertyGroupProvider provider = propertyGroupProviders.get(propertyGroupName);
             try {
                 descriptor.addPropertyGroup(provider.get(wikiId));
@@ -65,7 +65,7 @@ public class DefaultWikiPropertyGroupManager implements WikiPropertyGroupManager
     public void saveForDescriptor(WikiDescriptor descriptor) throws WikiPropertyGroupException
     {
         String wikiId = descriptor.getId();
-        for(String propertyGroupName : propertyGroupProviders.keySet()) {
+        for (String propertyGroupName : propertyGroupProviders.keySet()) {
             WikiPropertyGroup group = descriptor.getPropertyGroup(propertyGroupName);
             if (group != null) {
                 WikiPropertyGroupProvider provider = propertyGroupProviders.get(propertyGroupName);

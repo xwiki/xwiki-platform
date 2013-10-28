@@ -27,6 +27,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 /**
  * Component in charge of managing wiki templates and creating new wiki from these templates.
  *
+ * @version $Id$
  * @since 5.3M1
  */
 @Role
@@ -66,5 +67,5 @@ public interface WikiTemplateManager
      * @throws WikiTemplateManagerException if problems occur
      */
     WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias, WikiDescriptor templateDescriptor)
-            throws WikiTemplateManagerException;
+        throws WikiTemplateManagerException;
 }

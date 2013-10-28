@@ -24,6 +24,8 @@ import org.xwiki.job.Job;
 
 /**
  * Component that prepares new wikis.
+ * @since 5.3M2
+ * @version $Id :$
  */
 @Role
 public interface WikiProvisioner extends Job

@@ -35,7 +35,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder;
-import org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper;
+import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.internal.manager.DefaultWikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -58,13 +58,13 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 5.3M1
  */
-public class DefaultWikiManagerTest
+public class    DefaultWikiManagerTest
 {
     @Rule
     public MockitoComponentMockingRule<DefaultWikiManager> mocker =
             new MockitoComponentMockingRule(DefaultWikiManager.class);
 
-    private WikiDescriptorManager defaultWikiDescriptorManager;
+    private WikiDescriptorManager wikiDescriptorManager;
 
     private Provider<XWikiContext> xcontextProvider;
 
@@ -76,7 +76,7 @@ public class DefaultWikiManagerTest
 
     private WikiDescriptorBuilder wikiDescriptorBuilder;
 
-    private DefaultWikiDescriptorDocumentHelper descriptorDocumentHelper;
+    private WikiDescriptorDocumentHelper descriptorDocumentHelper;
 
     private XWikiContext xcontext;
 
@@ -86,20 +86,20 @@ public class DefaultWikiManagerTest
     public void setUp() throws Exception
     {
         // Injection
-        defaultWikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
+        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
         localizationManager = mocker.getInstance(ContextualLocalizationManager.class);
         observationManager = mocker.getInstance(ObservationManager.class);
         //logger = mocker.getInstance(Logger.class);
         wikiDescriptorBuilder = mocker.getInstance(WikiDescriptorBuilder.class);
-        descriptorDocumentHelper = mocker.getInstance(DefaultWikiDescriptorDocumentHelper.class);
+        descriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
 
         // Frequent uses
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
         xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
-        when(defaultWikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
+        when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
     }
 
     @Test
@@ -109,15 +109,15 @@ public class DefaultWikiManagerTest
         when(xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden,wikiid3,toto");
 
         // When the wiki already exists
-        when(defaultWikiDescriptorManager.exists("wikiid1")).thenReturn(true);
+        when(wikiDescriptorManager.exists("wikiid1")).thenReturn(true);
         assertFalse(this.mocker.getComponentUnderTest().idAvailable("wikiid1"));
 
         // When the wiki does not already exists
-        when(defaultWikiDescriptorManager.exists("wikiid2")).thenReturn(false);
+        when(wikiDescriptorManager.exists("wikiid2")).thenReturn(false);
         assertTrue(this.mocker.getComponentUnderTest().idAvailable("wikiid2"));
 
         // When the wiki does not already exists but the id is forbidden
-        when(defaultWikiDescriptorManager.exists("wikiid3")).thenReturn(false);
+        when(wikiDescriptorManager.exists("wikiid3")).thenReturn(false);
         assertFalse(this.mocker.getComponentUnderTest().idAvailable("wikiid3"));
     }
 
@@ -125,7 +125,7 @@ public class DefaultWikiManagerTest
     public void createWhenWikiExists() throws Exception
     {
         // When the wiki already exists
-        when(defaultWikiDescriptorManager.exists("wikiid1")).thenReturn(true);
+        when(wikiDescriptorManager.exists("wikiid1")).thenReturn(true);
 
         boolean exceptionCaught = false;
         try {
@@ -140,7 +140,7 @@ public class DefaultWikiManagerTest
     public void createWhenWikiIdIsForbidden() throws Exception
     {
         // The wiki does not already exist
-        when(defaultWikiDescriptorManager.exists("wikiid1")).thenReturn(false);
+        when(wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
 
         // Forbidden list
         when(xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden,wikiid1");
@@ -158,7 +158,7 @@ public class DefaultWikiManagerTest
     public void createWhenWikiIdIsValid() throws Exception
     {
         // The wiki does not already exist
-        when(defaultWikiDescriptorManager.exists("wikiid1")).thenReturn(false);
+        when(wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
 
         // The wiki id is valid
         when(xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden");
@@ -171,6 +171,7 @@ public class DefaultWikiManagerTest
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
         when(wikiDescriptorBuilder.save(eq(descriptor))).thenReturn(descriptorDocument);
         when(descriptorDocument.getDocumentReference()).thenReturn(documentReference);
+        when(wikiDescriptorManager.getById("wikiid1")).thenReturn(descriptor);
 
         // Create
         WikiDescriptor newWikiDescriptor = this.mocker.getComponentUnderTest().create("wikiid1", "wikialias1");
@@ -183,7 +184,7 @@ public class DefaultWikiManagerTest
         // Verify that the wiki has been updated
         verify(xwiki).updateDatabase(eq("wikiid1"), eq(true), eq(true), any(XWikiContext.class));
         // Verify that the descriptor document has been saved
-        verify(store).saveXWikiDoc(eq(descriptorDocument), any(XWikiContext.class));
+        verify(wikiDescriptorBuilder).save(eq(descriptor));
     }
 
     @Test
@@ -226,7 +227,7 @@ public class DefaultWikiManagerTest
     public void copyWhenWikiAlreadyExists() throws Exception
     {
         // The wiki already exists
-        when(defaultWikiDescriptorManager.exists("existingid")).thenReturn(true);
+        when(wikiDescriptorManager.exists("existingid")).thenReturn(true);
         boolean exceptionCaught = false;
         try {
             this.mocker.getComponentUnderTest().copy("wikiid", "existingid", "newwikialias", true, true);
@@ -240,7 +241,7 @@ public class DefaultWikiManagerTest
     public void copyWhenWikiAvailable() throws Exception
     {
         // The wiki does not already exist
-        when(defaultWikiDescriptorManager.exists("wikiid1")).thenReturn(false);
+        when(wikiDescriptorManager.exists("wikiid1")).thenReturn(false);
 
         // The new id is valid
         when(xwiki.Param("xwiki.virtual.reserved_wikis")).thenReturn("forbidden");
@@ -253,20 +254,18 @@ public class DefaultWikiManagerTest
         XWikiDocument descriptorDocument = mock(XWikiDocument.class);
         when(wikiDescriptorBuilder.save(eq(descriptor))).thenReturn(descriptorDocument);
         when(descriptorDocument.getDocumentReference()).thenReturn(documentReference);
+        WikiDescriptor createdWikiDescriptor = new DefaultWikiDescriptor("wikiid1", "wikialias1");
+        when(wikiDescriptorManager.getById("wikiid1")).thenReturn(createdWikiDescriptor);
 
         // Create
         WikiDescriptor newWikiDescriptor = this.mocker.getComponentUnderTest().copy("wikiid", "wikiid1",
                 "wikialias1", true, true);
         assertNotNull(newWikiDescriptor);
 
-        // Verify that the wiki descriptor is an instance of DefaultWikiDescriptor
-        assertTrue(newWikiDescriptor instanceof DefaultWikiDescriptor);
         // Verify that the wiki has been copied
         verify(xwiki).copyWiki(eq("wikiid"), eq("wikiid1"), any(String.class), any(XWikiContext.class));
-        // Verify that the descriptor document has been saved
-        verify(store).saveXWikiDoc(eq(descriptorDocument), any(XWikiContext.class));
-        // Verify that the descriptor has been added to the caches
-        //verify(cache).add(eq((DefaultWikiDescriptor) newWikiDescriptor));
+        // Verify that the descriptor has been saved
+        verify(wikiDescriptorBuilder).save(eq(createdWikiDescriptor));
     }
 }
 

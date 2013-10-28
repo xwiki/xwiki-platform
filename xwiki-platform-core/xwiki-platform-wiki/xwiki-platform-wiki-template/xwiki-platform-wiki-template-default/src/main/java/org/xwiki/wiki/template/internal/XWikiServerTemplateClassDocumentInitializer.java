@@ -35,6 +35,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * Update the XWiki.XWikiServerClass document with all required information.
  *
  * @since 5.3M2
+ * @version $Id$
  */
 @Component
 @Named("XWiki.XWikiServerTemplateClass")
@@ -72,6 +73,9 @@ public class XWikiServerTemplateClassDocumentInitializer extends AbstractMandato
      */
     public static final Boolean DEFAULT_ISWIKITEMPLATE = Boolean.FALSE;
 
+    /**
+     * Constructor.
+     */
     public XWikiServerTemplateClassDocumentInitializer()
     {
         // Since we can`t get the main wiki here, this is just to be able to use the Abstract class.

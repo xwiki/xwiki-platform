@@ -131,8 +131,8 @@ public class WikiManagerScriptService implements ScriptService
         // Test right
         XWikiContext context = xcontextProvider.get();
         if (!canDeleteWiki(context.getUser(), wikiId)) {
-            error("You don't have the right to delete the wiki",
-                    new Exception("You don't have the right to delete the wiki"));
+            String errorMessage = "You don't have the right to delete the wiki";
+            error(errorMessage, new Exception(errorMessage));
             return false;
         }
         // Delete the wiki
@@ -155,12 +155,12 @@ public class WikiManagerScriptService implements ScriptService
      */
     public boolean canDeleteWiki(String userId, String wikiId)
     {
+        String errorMessage = String.format("Error while getting the descriptor of wiki [%s]", wikiId);
         try {
             // Get the wiki owner
             WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
             if (descriptor == null) {
-                error(String.format("Error while getting the descriptor of wiki [%s]", wikiId),
-                        new Exception(String.format("Error while getting the descriptor of wiki [%s]", wikiId)));
+                error(errorMessage, new Exception(errorMessage));
                 return false;
             }
             String owner = descriptor.getOwnerId();
@@ -175,7 +175,7 @@ public class WikiManagerScriptService implements ScriptService
                 return true;
             }
         } catch (WikiManagerException e) {
-            error(String.format("Error while getting the descriptor of wiki [%s]", wikiId), e);
+            error(errorMessage, e);
         }
 
         return false;

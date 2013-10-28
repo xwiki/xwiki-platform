@@ -28,15 +28,15 @@ package org.xwiki.wiki.user;
 public enum MembershipType
 {
     /**
-     * Any user can join
+     * Any user can join.
      */
     OPEN,
     /**
-     * Any user can request to join but an admin must accept
+     * Any user can request to join but an admin must accept.
      */
     REQUEST,
     /**
-     * Only an admin can invite a user
+     * Only an admin can invite a user.
      */
     INVITE
 }

@@ -24,7 +24,10 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.properties.WikiPropertyGroupException;
 
 /**
- * Component to load all property groups for a given descriptor.
+ * Component to load and save all property groups for a given descriptor.
+ *
+ * @since 5.3M2
+ * @version $Id$
  */
 @Role
 public interface WikiPropertyGroupManager
@@ -32,11 +35,14 @@ public interface WikiPropertyGroupManager
     /**
      * Load all property groups for the given descriptor.
      * @param descriptor descriptor to initialize
+     * @throws WikiPropertyGroupException if problems occur
      */
     void loadForDescriptor(WikiDescriptor descriptor) throws WikiPropertyGroupException;
 
     /**
-     * Save all property groups for the given descriptor
+     * Save all property groups for the given descriptor.
+     * @param descriptor descriptor to save
+     * @throws WikiPropertyGroupException if problems occur
      */
     void saveForDescriptor(WikiDescriptor descriptor) throws WikiPropertyGroupException;
 }

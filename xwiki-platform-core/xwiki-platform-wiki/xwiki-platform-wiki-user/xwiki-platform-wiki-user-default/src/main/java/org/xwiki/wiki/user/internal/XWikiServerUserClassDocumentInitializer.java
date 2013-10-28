@@ -72,9 +72,9 @@ public class XWikiServerUserClassDocumentInitializer extends AbstractMandatoryDo
     /**
      * List of possible values for <code>membershipType</code> for the XWiki class XWiki.XWikiServerClass.
      */
-    public static final String FIELDL_MEMBERSHIPTYPE = MembershipType.OPEN.name().toLowerCase() +
-            DEFAULT_FIELDS_SEPARATOR + MembershipType.REQUEST.name().toLowerCase() + DEFAULT_FIELDS_SEPARATOR +
-            MembershipType.INVITE.name().toLowerCase();
+    public static final String FIELDL_MEMBERSHIPTYPE = MembershipType.OPEN.name().toLowerCase()
+            + DEFAULT_FIELDS_SEPARATOR + MembershipType.REQUEST.name().toLowerCase() + DEFAULT_FIELDS_SEPARATOR
+            + MembershipType.INVITE.name().toLowerCase();
 
     /**
      * Display type of field <code>membershipType</code> for the XWiki class XWiki.XWikiServerClass.
@@ -101,6 +101,9 @@ public class XWikiServerUserClassDocumentInitializer extends AbstractMandatoryDo
      */
     public static final Boolean DEFAULT_ENABLELOCALUSERS = Boolean.FALSE;
 
+    /**
+     * Constructor.
+     */
     public XWikiServerUserClassDocumentInitializer()
     {
         super(XWiki.SYSTEM_SPACE, DOCUMENT_NAME);

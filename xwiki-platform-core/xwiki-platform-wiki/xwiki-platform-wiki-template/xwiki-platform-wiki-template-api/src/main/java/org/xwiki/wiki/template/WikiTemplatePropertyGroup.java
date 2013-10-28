@@ -23,6 +23,8 @@ import org.xwiki.wiki.properties.WikiPropertyGroup;
 
 /**
  * Property groups attached to wiki descriptors that store values about the wiki template feature.
+ *
+ * @version $Id $
  */
 public class WikiTemplatePropertyGroup extends WikiPropertyGroup
 {
@@ -39,7 +41,8 @@ public class WikiTemplatePropertyGroup extends WikiPropertyGroup
     public WikiTemplatePropertyGroup(String id)
     {
         super(id);
-        setTemplate(false); // Default value
+        // Default value
+        setTemplate(false);
     }
 
     /**
@@ -52,7 +55,7 @@ public class WikiTemplatePropertyGroup extends WikiPropertyGroup
     }
 
     /**
-     * Helper to set if the wiki that hold this property group is a template or not
+     * Helper to set if the wiki that hold this property group is a template or not.
      * @param template whether or not the wiki should be a template
      */
     public void setTemplate(boolean template)

@@ -27,7 +27,9 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -38,11 +40,22 @@ import org.xwiki.wiki.template.WikiTemplateManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 
+/**
+ * Script service to manage the wiki templates.
+ *
+ * @since 5.3M2
+ * @version $Id$
+ */
 @Component
 @Named("wiki.template")
 @Singleton
 public class WikiTemplateManagerScript implements ScriptService
 {
+    /**
+     * Field name of the last API exception inserted in context.
+     */
+    public static final String CONTEXT_LASTEXCEPTION = "lastexception";
+
     @Inject
     private WikiTemplateManager wikiTemplateManager;
 
@@ -54,6 +67,18 @@ public class WikiTemplateManagerScript implements ScriptService
      */
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    /**
+     * Execution context.
+     */
+    @Inject
+    private Execution execution;
+
+    /**
+     * Logging tool.
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * Get the list of all wiki templates.
@@ -116,7 +141,37 @@ public class WikiTemplateManagerScript implements ScriptService
                 descriptor = wikiTemplateManager.createWikiFromTemplate(newWikiId, newWikiAlias, templateDescriptor);
             }
         } catch (WikiTemplateManagerException e) {
+            error("Failed to create the wiki from the template.", e);
         }
         return descriptor;
+    }
+
+    /**
+     * Log exception and store it in the context.
+     *
+     * @param errorMessage error message
+     * @param e the caught exception
+     * @see #CONTEXT_LASTEXCEPTION
+     */
+    private void error(String errorMessage, Exception e)
+    {
+        String errorMessageToLog = errorMessage;
+        if (errorMessageToLog == null) {
+            errorMessageToLog = e.getMessage();
+        }
+
+        /* Log exception. */
+        logger.error(errorMessageToLog, e);
+
+        /* Store exception in context. */
+        this.execution.getContext().setProperty(CONTEXT_LASTEXCEPTION, e);
+    }
+
+    /**
+     * @return the last exception, or null if there is not
+     */
+    public Exception getLastException()
+    {
+        return (Exception) this.execution.getContext().getProperty(CONTEXT_LASTEXCEPTION);
     }
 }

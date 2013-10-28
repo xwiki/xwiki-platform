@@ -23,6 +23,9 @@ import org.xwiki.wiki.properties.WikiPropertyGroup;
 
 /**
  * Property groups attached to wiki descriptors to store properties about the user management in a wiki.
+ *
+ * @since 5.3M2
+ * @version $Id$
  */
 public class WikiUserPropertyGroup extends WikiPropertyGroup
 {

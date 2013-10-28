@@ -36,7 +36,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder;
-import org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper;
+import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.internal.manager.WikiDescriptorCache;
 
 import com.xpn.xwiki.XWikiContext;
@@ -69,7 +69,7 @@ public class DefaultWikiDescriptorManagerTest
 
     private WikiDescriptorCache cache;
 
-    private DefaultWikiDescriptorDocumentHelper descriptorDocumentHelper;
+    private WikiDescriptorDocumentHelper descriptorDocumentHelper;
 
     private WikiDescriptorBuilder wikiDescriptorBuilder;
 
@@ -84,7 +84,7 @@ public class DefaultWikiDescriptorManagerTest
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
         wikiDescriptorBuilder = mocker.getInstance(WikiDescriptorBuilder.class);
         cache = this.mocker.getInstance(WikiDescriptorCache.class);
-        descriptorDocumentHelper = mocker.getInstance(DefaultWikiDescriptorDocumentHelper.class);
+        descriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
 
         // Frequent uses
         xcontext = mock(XWikiContext.class);

@@ -225,9 +225,9 @@ platform.workspace.requiredField=Required
 platform.workspace.profileJoinedWorkspacesLabel=Joined wikis
 platform.workspace.profileShowActivity=show activity
 platform.workspace.newWorkspaceTemplateLabel=Template
-WorkspaceManager.WorkspaceClass_membershipType_open=Open for any user to join
-WorkspaceManager.WorkspaceClass_membershipType_request=Any user can request to join but an admin must accept
-WorkspaceManager.WorkspaceClass_membershipType_invite=Only an admin can invite a user
+WikiManagerCode.WikiUserClass_membershipType_open=Open for any user to join
+WikiManagerCode.WikiUserClass_membershipType_request=Any user can request to join but an admin must accept
+WikiManagerCode.WikiUserClass_membershipType_invite=Only an admin can invite a user
 platform.workspace.searchSuggestSourceWorkspaces=Wikis
 
 # PROPERTIES
@@ -287,6 +287,13 @@ platform.workspace.createNewWorkspaceLabel=Create a new Wiki
 workspacemanager.menu.create=Wiki
 workspacemanager.menu.mainwiki.admin=Administer Main Wiki
 workspacemanager.menu.workspace.mainWiki=Main Wiki
+
+#######################################
+## until 5.3
+#######################################
+WorkspaceManager.WorkspaceClass_membershipType_open=Open for any user to join
+WorkspaceManager.WorkspaceClass_membershipType_request=Any user can request to join but an admin must accept
+WorkspaceManager.WorkspaceClass_membershipType_invite=Only an admin can invite a user
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

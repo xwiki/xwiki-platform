@@ -146,6 +146,9 @@ public class DefaultWikiUserManager implements WikiUserManager
     }
 
     private void saveGroupDocument(XWikiDocument document, String message) throws WikiUserManagerException {
+        // The document should be hidden
+        document.setHidden(true);
+
         // Save the document
         XWikiContext xcontext = xcontextProvider.get();
         XWiki xwiki = xcontext.getWiki();
@@ -163,10 +166,13 @@ public class DefaultWikiUserManager implements WikiUserManager
 
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
         DocumentReference classReference = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
-        for (BaseObject object : groupDoc.getXObjects(classReference)) {
-            String member = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
-            if (!member.isEmpty() && !members.contains(member)) {
-                members.add(member);
+        List<BaseObject> memberObjects = groupDoc.getXObjects(classReference);
+        if (memberObjects != null) {
+            for (BaseObject object : memberObjects) {
+                String member = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
+                if (!member.isEmpty() && !members.contains(member)) {
+                    members.add(member);
+                }
             }
         }
 
@@ -197,7 +203,37 @@ public class DefaultWikiUserManager implements WikiUserManager
         }
 
         // Save the document
-        saveGroupDocument(groupDoc, String.format("Add [%] to the group.", userId));
+        saveGroupDocument(groupDoc, String.format("Add [%s] to the group.", userId));
+    }
+
+    @Override
+    public void addMembers(Collection<String> userIds, String wikiId) throws WikiUserManagerException
+    {
+        Collection<String> members = getMembers(wikiId);
+
+        XWikiContext xcontext = xcontextProvider.get();
+        DocumentReference classReference =
+                new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
+
+        // Get the group document
+        XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
+
+        // Add members
+        try {
+            for (String userId : userIds) {
+                if (!members.contains(userId)) {
+                    // Add a member object
+                    int objectNumber = groupDoc.createXObject(classReference, xcontext);
+                    BaseObject object = groupDoc.getXObject(classReference, objectNumber);
+                    object.set(GROUP_CLASS_MEMBER_FIELD, userId, xcontext);
+                }
+            }
+        } catch (XWikiException e) {
+            throw new WikiUserManagerException("Fail to add members to the group", e);
+        }
+
+        // Save the document
+        saveGroupDocument(groupDoc, "Add members to the group.");
     }
 
     @Override
@@ -206,30 +242,68 @@ public class DefaultWikiUserManager implements WikiUserManager
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
 
-        // Get the member objects to remove
+        // Get the member objects
         DocumentReference classReference = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
-        List<BaseObject> objectsToRemove = new ArrayList<BaseObject>();
-        for (BaseObject object : groupDoc.getXObjects(classReference)) {
-            String member = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
-            if (userId.equals(member)) {
-                objectsToRemove.add(object);
+        List<BaseObject> objects = groupDoc.getXObjects(classReference);
+        if (objects != null) {
+
+            // Get the member objects to remove
+            List<BaseObject> objectsToRemove = new ArrayList<BaseObject>();
+            for (BaseObject object : objects) {
+                String member = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
+                if (userId.equals(member)) {
+                    objectsToRemove.add(object);
+                }
             }
-        }
 
-        // Remove them
-        for (BaseObject object : objectsToRemove) {
-            groupDoc.removeXObject(object);
-        }
+            // Remove them
+            for (BaseObject object : objectsToRemove) {
+                groupDoc.removeXObject(object);
+            }
 
-        // Save the document
-        saveGroupDocument(groupDoc, String.format("Remove [%] from the group.", userId));
+            // Save the document
+            saveGroupDocument(groupDoc, String.format("Remove [%s] from the group.", userId));
+        }
     }
 
-    private MemberCandidacy readCandidacyFromObject(BaseObject object)
+    @Override
+    public void removeMembers(Collection<String> userIds, String wikiId) throws WikiUserManagerException
+    {
+        // Get the group document
+        XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
+
+        // Get the member objects
+        DocumentReference classReference = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
+        List<BaseObject> objects = groupDoc.getXObjects(classReference);
+        if (objects != null) {
+
+            // Get the member objects to remove
+            List<BaseObject> objectsToRemove = new ArrayList<BaseObject>();
+            for (String userId: userIds) {
+                for (BaseObject object : objects) {
+                    String member = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
+                    if (userId.equals(member)) {
+                        objectsToRemove.add(object);
+                    }
+                }
+            }
+
+            // Remove them
+            for (BaseObject object : objectsToRemove) {
+                groupDoc.removeXObject(object);
+            }
+
+            // Save the document
+            saveGroupDocument(groupDoc, "Remove some users from the group.");
+        }
+    }
+
+    private MemberCandidacy readCandidacyFromObject(BaseObject object, String wikiId)
     {
         MemberCandidacy candidacy = new MemberCandidacy();
 
         candidacy.setId(object.getNumber());
+        candidacy.setWikiId(wikiId);
         candidacy.setUserId(object.getStringValue(CANDIDACY_CLASS_USER_FIELD));
         candidacy.setUserComment(object.getLargeStringValue(CANDIDACY_CLASS_USER_COMMENT_FIELD));
         candidacy.setAdminId(object.getStringValue(CANDIDACY_CLASS_ADMIN_FIELD));
@@ -238,7 +312,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         candidacy.setStatus(
                 MemberCandidacy.Status.valueOf(object.getStringValue(CANDIDACY_CLASS_STATUS_FIELD).toUpperCase()));
         candidacy.setType(
-                MemberCandidacy.CandidateType.valueOf(object.getStringValue(CANDIDACY_CLASS_STATUS_FIELD).toUpperCase())
+                MemberCandidacy.CandidateType.valueOf(object.getStringValue(CANDIDACY_CLASS_TYPE_FIELD).toUpperCase())
         );
         candidacy.setDateOfCreation(object.getDateValue(CANDIDACY_CLASS_DATE_OF_CREATION_FIELD));
         candidacy.setDateOfCreation(object.getDateValue(CANDIDACY_CLASS_DATE_OF_CLOSURE_FIELD));
@@ -257,9 +331,12 @@ public class DefaultWikiUserManager implements WikiUserManager
         String typeString = type.name().toLowerCase();
         DocumentReference candidateClassReference = new DocumentReference(wikiId, CANDIDACY_CLASS_SPACE,
                 CANDIDACY_CLASS_NAME);
-        for (BaseObject object : groupDoc.getXObjects(candidateClassReference)) {
-            if (object.getStringValue(CANDIDACY_CLASS_TYPE_FIELD).equals(typeString)) {
-                candidacies.add(readCandidacyFromObject(object));
+        List<BaseObject> candidacyObjects = groupDoc.getXObjects(candidateClassReference);
+        if (candidacyObjects != null) {
+            for (BaseObject object : candidacyObjects) {
+                if (object.getStringValue(CANDIDACY_CLASS_TYPE_FIELD).equals(typeString)) {
+                    candidacies.add(readCandidacyFromObject(object, wikiId));
+                }
             }
         }
 
@@ -288,7 +365,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         DocumentReference candidateClassReference = new DocumentReference(wikiId, CANDIDACY_CLASS_SPACE,
                 CANDIDACY_CLASS_NAME);
         BaseObject object = groupDoc.getXObject(candidateClassReference, candidacyId);
-        return readCandidacyFromObject(object);
+        return readCandidacyFromObject(object, wikiId);
     }
 
     @Override
@@ -319,9 +396,38 @@ public class DefaultWikiUserManager implements WikiUserManager
         }
 
         // Save the document
-        saveGroupDocument(groupDoc, String.format("[%] asks to join the wiki.", userId));
+        saveGroupDocument(groupDoc, String.format("[%s] asks to join the wiki.", userId));
 
         return candidacy;
+    }
+
+    @Override
+    public void join(String userId, String wikiId) throws WikiUserManagerException
+    {
+        // Get the descriptor of the wiki
+        WikiDescriptor wikiDescriptor = null;
+        try {
+            wikiDescriptor = wikiDescriptorManager.getById(wikiId);
+        } catch (WikiManagerException e) {
+            throw new WikiUserManagerException(String.format("Failed to get the descriptor of the wiki [%s].", wikiId));
+        }
+
+        // Check if the user has the right to join the wiki
+        WikiUserPropertyGroup group
+            = (WikiUserPropertyGroup) wikiDescriptor.getPropertyGroup(WikiUserPropertyGroupProvider.GROUP_NAME);
+        if (!group.getMembershipType().equals(MembershipType.OPEN)) {
+            throw new WikiUserManagerException(String.format("The user [%s] is not authorized to join the wiki [%s].",
+                    userId, wikiId));
+        }
+
+        // Join the wiki
+        addMember(userId, wikiId);
+    }
+
+    @Override
+    public void leave(String userId, String wikiId) throws WikiUserManagerException
+    {
+        removeMember(userId, wikiId);
     }
 
     @Override
@@ -390,7 +496,25 @@ public class DefaultWikiUserManager implements WikiUserManager
         object.setStringValue(CANDIDACY_CLASS_STATUS_FIELD, request.getStatus().name().toLowerCase());
 
         // Save the document
-        saveGroupDocument(groupDoc, String.format("Reject join request from user [%]", request.getUserId()));
+        saveGroupDocument(groupDoc, String.format("Reject join request from user [%s]", request.getUserId()));
+    }
+
+    @Override
+    public void cancelRequest(MemberCandidacy request) throws WikiUserManagerException
+    {
+        // Get the group document
+        XWikiDocument groupDoc = getMembersGroupDocument(request.getWikiId());
+
+        // Get the candidacy object
+        DocumentReference candidateClassReference = new DocumentReference(request.getWikiId(), CANDIDACY_CLASS_SPACE,
+                CANDIDACY_CLASS_NAME);
+        BaseObject object = groupDoc.getXObject(candidateClassReference, request.getId());
+
+        // Remove the candidacy, if any
+        if (object != null) {
+            groupDoc.removeXObject(object);
+            saveGroupDocument(groupDoc, String.format("User [%s] has cancel her join request.", request.getUserId()));
+        }
     }
 
     @Override
@@ -425,7 +549,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         }
 
         // Save the document
-        saveGroupDocument(groupDoc, String.format("[%] is invited to join the wiki.", userId));
+        saveGroupDocument(groupDoc, String.format("[%s] is invited to join the wiki.", userId));
 
         return candidacy;
     }
@@ -458,7 +582,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         object.setStringValue(CANDIDACY_CLASS_STATUS_FIELD, invitation.getStatus().name().toLowerCase());
 
         // Save the document
-        saveGroupDocument(groupDoc, String.format("User [%] has accepted to join the wiki. ", invitation.getUserId()));
+        saveGroupDocument(groupDoc, String.format("User [%s] has accepted to join the wiki. ", invitation.getUserId()));
     }
 
     @Override
@@ -486,7 +610,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         object.setStringValue(CANDIDACY_CLASS_STATUS_FIELD, invitation.getStatus().name().toLowerCase());
 
         // Save the document
-        saveGroupDocument(groupDoc, String.format("User [%] has rejected the invitation to join the wiki.",
+        saveGroupDocument(groupDoc, String.format("User [%s] has rejected the invitation to join the wiki.",
                 invitation.getUserId()));
     }
 }

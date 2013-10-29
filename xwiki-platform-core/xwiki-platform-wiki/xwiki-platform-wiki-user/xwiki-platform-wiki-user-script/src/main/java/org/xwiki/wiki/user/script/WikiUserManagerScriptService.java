@@ -28,6 +28,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
@@ -44,7 +46,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * Script service to manage how the user are supported in a wiki.
- * 
+ *
  * @since 5.3M2
  * @version $Id$
  */
@@ -65,12 +67,15 @@ public class WikiUserManagerScriptService implements ScriptService
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
+    @Inject
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
     /**
      * @return whether or not the current wiki has local users enabled
      */
     public Boolean hasLocalUsersEnabled()
     {
-        return hasLocalUsersEnabled(wikiDescriptorManager.getMainWikiId());
+        return hasLocalUsersEnabled(wikiDescriptorManager.getCurrentWikiId());
     }
 
     /**
@@ -179,6 +184,32 @@ public class WikiUserManagerScriptService implements ScriptService
     }
 
     /**
+     * Add a list of users as a members.
+     *
+     * @param userIds List of userID to add
+     * @param wikiId Id of the wiki
+     * @return true if it succeed
+     */
+    public boolean addMembers(Collection<String> userIds, String wikiId)
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+        try {
+            // Check the right
+            authorizationManager.checkAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId));
+            // Add the member
+            wikiUserManager.addMembers(userIds, wikiId);
+        } catch (AccessDeniedException e) {
+            // TODO
+            return false;
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Remove a member.
      *
      * @param userId UserID to remove
@@ -209,7 +240,8 @@ public class WikiUserManagerScriptService implements ScriptService
         XWikiContext xcontext = xcontextProvider.get();
 
         // If the user is concerned by the candidacy
-        if (candidacy.getUserId().equals(xcontext.getUser())) {
+        DocumentReference userReference = documentReferenceResolver.resolve(candidacy.getUserId());
+        if (userReference.equals(xcontext.getUserReference())) {
             // Hide the admin private comment
             candidacy.setAdminPrivateComment(null);
             return true;
@@ -229,7 +261,6 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public MemberCandidacy getCandidacy(String wikiId, int candidacyId)
     {
-
         // Get the candidacy
         MemberCandidacy candidacy = null;
         try {
@@ -257,7 +288,7 @@ public class WikiUserManagerScriptService implements ScriptService
 
         for (MemberCandidacy candidacy : candidacies) {
             if (canSeeCandidacy(candidacy)) {
-                candidacies.add(candidacy);
+                authorizedCandidacies.add(candidacy);
             }
         }
 
@@ -299,6 +330,60 @@ public class WikiUserManagerScriptService implements ScriptService
     }
 
     /**
+     * Join a wiki.
+     *
+     * @param userId userId to add to the wiki
+     * @param wikiId id of the wiki
+     * @return true if it succeed
+     */
+    public boolean join(String userId, String wikiId)
+    {
+        // Check if the current user is userId
+        XWikiContext xcontext = xcontextProvider.get();
+        DocumentReference userReference = documentReferenceResolver.resolve(userId);
+        if (!xcontext.getUserReference().equals(userReference)) {
+            //TODO
+            return false;
+        }
+
+        try {
+            wikiUserManager.join(userId, wikiId);
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Leave a wiki.
+     *
+     * @param userId userId to remove from the wiki
+     * @param wikiId id of the wiki
+     * @return true if it succeed
+     */
+    public boolean leave(String userId, String wikiId)
+    {
+        // Check if the current user is userId
+        XWikiContext xcontext = xcontextProvider.get();
+        DocumentReference userReference = documentReferenceResolver.resolve(userId);
+        if (!xcontext.getUserReference().equals(userReference)) {
+            //TODO
+            return false;
+        }
+
+        // Leave the wiki
+        try {
+            wikiUserManager.leave(userId, wikiId);
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Perform a request to join a wiki.
      *
      * @param userId UserID of the requester
@@ -326,8 +411,11 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public boolean acceptRequest(MemberCandidacy request, String message, String privateComment)
     {
+        // Check if the current user is userId
         XWikiContext xcontext = xcontextProvider.get();
-        if (!xcontext.getUser().equals(request.getUserId())) {
+        DocumentReference userReference = documentReferenceResolver.resolve(request.getUserId());
+        if (!xcontext.getUserReference().equals(userReference)) {
+            //TODO
             return false;
         }
         try {
@@ -350,12 +438,38 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public boolean refuseRequest(MemberCandidacy request, String message, String privateComment)
     {
+        // Check if the current user is userId
         XWikiContext xcontext = xcontextProvider.get();
-        if (!xcontext.getUser().equals(request.getUserId())) {
+        DocumentReference userReference = documentReferenceResolver.resolve(request.getUserId());
+        if (!xcontext.getUserReference().equals(userReference)) {
             return false;
         }
         try {
             wikiUserManager.refuseRequest(request, message, privateComment);
+        } catch (WikiUserManagerException e) {
+            // TODO
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Cancel a join request.
+     *
+     * @param request Join request to cancel
+     * @return true if it succeed
+     */
+    public boolean cancelRequest(MemberCandidacy request)
+    {
+        // Check if the current user is userId
+        XWikiContext xcontext = xcontextProvider.get();
+        DocumentReference userReference = documentReferenceResolver.resolve(request.getUserId());
+        if (!xcontext.getUserReference().equals(userReference)) {
+            return false;
+        }
+        try {
+            wikiUserManager.cancelRequest(request);
         } catch (WikiUserManagerException e) {
             // TODO
             return false;

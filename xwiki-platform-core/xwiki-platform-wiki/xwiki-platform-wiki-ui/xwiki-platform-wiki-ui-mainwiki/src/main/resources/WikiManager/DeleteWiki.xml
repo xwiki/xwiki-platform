@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>WikiManagerCode</web>
-  <name>DeleteWikiCode</name>
+  <web>WikiManager</web>
+  <name>DeleteWiki</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>

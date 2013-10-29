@@ -25,33 +25,31 @@
   <hidden>true</hidden>
   <content>Updates the wiki document of a workspace by using values from the request.
 
-The 'workspaceId' parameter is used to identify the wiki document and the request values update the objects of classes [[XWiki.XWikiServerClass]] and [[WorkspaceManager.WorkspaceClass]], objects which are already stored in the wiki document.
+The 'wikiId' parameter is used to identify the wiki document and the request values update the objects of classes [[XWiki.XWikiServerClass]] and [[WikiManagerCode.WikiUserClass]], objects which are already stored in the wiki document.
 
-The 'xredirect' parameter is also accepted, currently used in the administration section of a workspace.
+The 'xredirect' parameter is also accepted, currently used in the administration section of a wiki.
 
 {{velocity}}
-#set ($workspaceId = $request.workspaceId)
-#set ($WorkspaceManager = $services.workspace)
+#set ($wikiId = $request.wikiId)
 ##
 ## TODO: use a dependency check macro.
 ##
-#if ("$!workspaceId" == '')
-  {{error}}{{translation key="platform.workspace.oneParameterNotSpecified" parameters="workspaceId"/}}{{/error}}
+#if ("$!wikiId" == '')
+  {{error}}{{translation key="platform.workspace.oneParameterNotSpecified" parameters="wikiId"/}}{{/error}}
 #else
-  #set ($workspace = $WorkspaceManager.getWorkspace($workspaceId))
-  #if (!$workspace)
-    #if (!$WorkspaceManager.lastException)
-      {{error}}{{translation key="workspacemanager.error.workspacedoesnotexist" parameters="$workspaceId"/}}{{/error}}
-    #elseif("$!{WorkspaceManager.lastException.message}" != '')
-      {{error}}$services.localization.render('platform.workspace.exceptionWithMessage', [$WorkspaceManager.lastException.message]){{/error}}
+  #set ($wiki = $services.wiki.getById($wikiId))
+  #if (!$wiki)
+    #if (!$services.wiki.lastException)
+      {{error}}{{translation key="workspacemanager.error.workspacedoesnotexist" parameters="$wikiId"/}}{{/error}}
+    #elseif("$!{services.wiki.lastException.message}" != '')
+      {{error}}$services.localization.render('platform.workspace.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
     #else
-      {{error}}$WorkspaceManager.lastException.class{{/error}}
+      {{error}}$services.wiki.lastException.class{{/error}}
     #end
   #else
     #set ($wikiDocument = $workspace.wikiDocument)
     #set ($temp = $wikiDocument.updateObjectFromRequest("${xcontext.mainWikiName}:XWiki.XWikiServerClass"))
     #set ($temp = $wikiDocument.updateObjectFromRequest("${xcontext.mainWikiName}:WorkspaceManager.WorkspaceClass"))
-    #set ($temp = $WorkspaceManager.editWorkspace($workspaceId, $wikiDocument.firstWikiAlias))
   #end
   #if($request.xredirect)
     $response.sendRedirect($request.xredirect)

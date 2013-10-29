@@ -48,12 +48,13 @@
   #if(!$viewable)
     #set($discard = $row.put('doc_fullName', "${xcontext.database}:${item}"))
   #else
+    #set($itemDoc = $xwiki.getDocument($docName))
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
     ## Some constants which are usefull while processing each item.
-    #set ($currentUser = "${xcontext.mainWikiName}:${xcontext.user}")
+    #set ($currentUser = "${services.wiki.mainWikiId}:${xcontext.user}")
     #set ($deleteWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'DeleteWiki'))
-    #set ($joinWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'JoinWorkspace'))
-    #set ($leaveWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'LeaveWorkspace'))
+    #set ($joinWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'JoinWiki'))
+    #set ($leaveWikiDocumentReference = $services.model.createDocumentReference('', 'WikiManager', 'LeaveWiki'))
     #set ($wikiId = $docName.toLowerCase().replaceAll("xwiki.xwikiserver", ""))
     #set ($wiki = $services.wiki.getById($wikiId))
     ## Init membership actions as denied.
@@ -63,59 +64,53 @@
     #set ($itemHasViewInvitation = false)
     #set ($itemHasLeave = false)
     ## Determine if current user is already a member.
-    #*#set ($itemGroupDocument = $workspace.groupDocument)
-    #set ($itemGroupsClass = "${itemWikiId}:XWiki.XWikiGroups")
-    #set ($currentUserGroupObject = $itemGroupDocument.getObject($itemGroupsClass, 'member', $currentUser))
-    #set ($currentUserIsMember = !("$!currentUserGroupObject" == ''))
+    #set ($wikiMembers = $services.wikiuser.getMembers($wikiId))
+    #set ($currentUserIsMember = ($wikiMembers &amp;&amp; $wikiMembers.contains($currentUser)) || $currentUser == $wiki.ownerId)
     ## Determine available membership action and action URL.
     #if ($currentUserIsMember)
       ## Don't allow the owner to leave the workspace.
-      #if ($itemDoc.owner != $currentUser)
+      #if ($wiki.ownerId != $currentUser)
         #set ($itemHasLeave = true)
-        #set ($leaveUrl = $xwiki.getURL($leaveWorkspaceDocumentReference, 'view', "workspaceId=${itemWikiId}&amp;workspaceName=${wiki.prettyName}"))
+        #set ($leaveUrl = $xwiki.getURL($leaveWikiDocumentReference, 'view', "wikiId=${wikiId}"))
       #end
     #else
       ##
-      ## Determine if, regardless of membership type, an existing invitation exists for the current user.
-      #set ($candidateMembers = $itemGroupDocument.getObjects('XWiki.WorkspaceCandidateMemberClass', 'userName', $currentUser))
+      ## Determine if, regardless of membership type, an existing invitation exists for the 
+      #set ($invitations = $services.wikiuser.getAllInvitations($wikiId))
       #set ($existingInvitation = false)
-      #foreach ($candidateMember in $candidateMembers)
-        ## Use getProperty because it's an api Object.
-        #if ("$!{candidateMember.getProperty('type').getValue()}" == 'invitation' &amp;&amp;
-             "$!{candidateMember.getProperty('status').getValue()}" == 'pending')
-          ## Remember the existing invitation.
-          #set ($existingInvitation = $candidateMember)
+      #if ($invitations &amp;&amp; !$invitations.isEmpty())
+        #foreach($invitation in $invitations)
+          #if ($invitation.userId == $currentUser &amp;&amp; $invitation.status == 'PENDING')
+            #set ($existingInvitation = $invitation)
+          #end
         #end
       #end
-      #set ($itemMembershipType = $itemDoc.getObject('WorkspaceManager.WorkspaceClass').getProperty('membershipType').getValue())
+      #set ($itemMembershipType = $wiki.getPropertyGroup('user').membershipType)
       #if ($existingInvitation)
         #set ($itemHasViewInvitation = true)
-        #set ($viewInvitationUrl = $xwiki.getURL($joinWorkspaceDocumentReference, 'view', "workspaceId=${itemWikiId}"))
-      #elseif ($itemMembershipType == 'open')
+        #set ($viewInvitationUrl = $xwiki.getURL($joinWikiDocumentReference, 'view', "wikiId=${wikiId}"))
+      #elseif ($itemMembershipType == 'OPEN')
         #set ($itemHasJoin = true)
-        #set ($joinUrl = $xwiki.getURL($joinWorkspaceDocumentReference, 'view', "workspaceId=${itemWikiId}"))
-      #elseif ($itemMembershipType == 'request')
+        #set ($joinUrl = $xwiki.getURL($joinWikiDocumentReference, 'view', "wikiId=${wikiId}"))
+      #elseif ($itemMembershipType == 'REQUEST')
         ## Determine if a request was already sent.
         #set ($pendingRequest = false)
-        #set ($existingRequests = $itemGroupDocument.getObjects('XWiki.WorkspaceCandidateMemberClass', 'userName', $currentUser))
+        #set ($existingRequests = $services.wikiuser.getAllRequests($wikiId))
         #foreach ($existingRequest in $existingRequests)
-          ## Use getProperty because it's an api Object.
-          #if ("$!{existingRequest.getProperty('type').getValue()}" == 'request' &amp;&amp;
-            "$!{existingRequest.getProperty('status').getValue()}" == 'pending')
+          #if ($existingRequest.userId == $currentUser &amp;&amp; $existingRequest.status == 'PENDING')
             #set ($pendingRequest = true)
           #end
         #end
         #if ($pendingRequest)
           #set ($itemHasCancelJoinRequest = true)
-          #set ($cancelJoinRequestUrl = $xwiki.getURL($joinWorkspaceDocumentReference, 'view', "workspaceId=${itemWikiId}&amp;cancelJoinRequest=1"))
+          #set ($cancelJoinRequestUrl = $xwiki.getURL($joinWikiDocumentReference, 'view', "wikiId=${wikiId}&amp;cancelJoinRequest=1"))
         #else
           #set ($itemHasRequestJoin = true)
-          #set ($requestJoinUrl = $xwiki.getURL($joinWorkspaceDocumentReference, 'view', "workspaceId=${itemWikiId}&amp;requestJoin=1"))
+          #set ($requestJoinUrl = $xwiki.getURL($joinWikiDocumentReference, 'view', "wikiId=${wikiId}&amp;requestJoin=1"))
         #end
       #end
-    #end*#
+    #end
     #################################################
-    #set($itemDoc = $xwiki.getDocument($docName))
     ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
     ## result is a translation.
     #if ("$!docLanguage" != "" &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)

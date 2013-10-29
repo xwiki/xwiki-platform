@@ -26,6 +26,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Component that manage how users can participate on a wiki (local users, members, invitation, etc...).
+ *
  * @since 5.3M2
  * @version $Id$
  */
@@ -41,6 +42,7 @@ public interface WikiUserManager
 
     /**
      * Enable or disbale the local users and save the descriptor.
+     *
      * @param wikiId Id of the wiki to change
      * @param enable enable or not the local users on the wiki
      * @throws WikiManagerException if problems occur
@@ -56,6 +58,7 @@ public interface WikiUserManager
 
     /**
      * Set the membership type of the wiki and save the descriptor.
+     *
      * @param wikiId Id of the wiki to change
      * @param type the membershyp type to set
      * @throws WikiManagerException if problems occur
@@ -78,6 +81,7 @@ public interface WikiUserManager
 
     /**
      * Add a user as a member.
+     *
      * @param userId UserID to add
      * @param wikiId Id of the wiki
      * @throws WikiUserManagerException if problems occur
@@ -85,12 +89,31 @@ public interface WikiUserManager
     void addMember(String userId, String wikiId) throws WikiUserManagerException;
 
     /**
+     * Add a list of users as a member.
+     *
+     * @param userIds List of userID to add
+     * @param wikiId Id of the wiki
+     * @throws WikiUserManagerException if problems occur
+     */
+    void addMembers(Collection<String> userIds, String wikiId) throws WikiUserManagerException;
+
+    /**
      * Remove a member.
+     *
      * @param userId UserID to remove
      * @param wikiId Id the the wiki
      * @throws WikiUserManagerException if problems occur
      */
     void removeMember(String userId, String wikiId) throws WikiUserManagerException;
+
+    /**
+     * Remove a list of members.
+     *
+     * @param userIds List of UserID to remove
+     * @param wikiId Id the the wiki
+     * @throws WikiUserManagerException if problems occur
+     */
+    void removeMembers(Collection<String> userIds, String wikiId) throws WikiUserManagerException;
 
     /**
      * Get all the invitations to join a wiki.
@@ -122,6 +145,7 @@ public interface WikiUserManager
 
     /**
      * Perform a request to join a wiki.
+     *
      * @param userId UserID of the requester
      * @param wikiId Id of the wiki to join
      * @param message Message that motivates the request
@@ -131,27 +155,56 @@ public interface WikiUserManager
     MemberCandidacy askToJoin(String userId, String wikiId, String message) throws WikiUserManagerException;
 
     /**
+     * Join a wiki.
+     *
+     * @param userId userId to add to the wiki
+     * @param wikiId id of the wiki
+     * @throws WikiUserManagerException if problems occur
+     */
+    void join(String userId, String wikiId) throws WikiUserManagerException;
+
+    /**
+     * Leave a wiki.
+     *
+     * @param userId userId to remove from the wiki
+     * @param wikiId id of the wiki
+     * @throws WikiUserManagerException if problems occur
+     */
+    void leave(String userId, String wikiId) throws WikiUserManagerException;
+
+    /**
      * Accept the request to join the wiki.
+     *
      * @param request request to accept
      * @param message message about the acceptance
      * @param privateComment private comment that only the administrator can see
-     * @throws WikiUserManagerException if problem occurs
+     * @throws WikiUserManagerException if problems occur
      */
     void acceptRequest(MemberCandidacy request, String message, String privateComment)
         throws WikiUserManagerException;
 
     /**
      * Refuse the request to join the wiki.
+     *
      * @param request request to refuse
      * @param message message about the refusal
      * @param privateComment private comment that only the administrator can see
-     * @throws WikiUserManagerException if problem occurs
+     * @throws WikiUserManagerException if problems occur
      */
     void refuseRequest(MemberCandidacy request, String message, String privateComment)
         throws WikiUserManagerException;
 
     /**
+     * Cancel a join request.
+     *
+     * @param request Join request to cancel
+     * @throws WikiUserManagerException if problems occur
+     */
+    void cancelRequest(MemberCandidacy request) throws WikiUserManagerException;
+
+    /**
      * Invite a global user to a wiki.
+     *
      * @param userId Id of the user to add
      * @param wikiId Id of the wiki to join
      * @param message MemberCandidacy message
@@ -162,6 +215,7 @@ public interface WikiUserManager
 
     /**
      * Accept the invitation to join a wiki.
+     *
      * @param invitation invitation to accept
      * @param message message that goes along the acceptance
      * @throws WikiUserManagerException if problems occur
@@ -170,6 +224,7 @@ public interface WikiUserManager
 
     /**
      * Refuse the invitation to join a wiki.
+     *
      * @param invitation invitation to refuse
      * @param message message that goes along the refusal
      * @throws WikiUserManagerException if problems occur

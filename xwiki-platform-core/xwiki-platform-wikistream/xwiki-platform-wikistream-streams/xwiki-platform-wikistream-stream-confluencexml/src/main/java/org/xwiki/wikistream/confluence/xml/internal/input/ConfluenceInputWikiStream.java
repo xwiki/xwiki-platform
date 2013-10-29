@@ -41,6 +41,8 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.confluence.xml.internal.ConfluenceFilter;
 import org.xwiki.wikistream.confluence.xml.internal.ConfluenceXMLPackage;
+import org.xwiki.wikistream.filter.user.GroupFilter;
+import org.xwiki.wikistream.filter.user.UserFilter;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 import org.xwiki.wikistream.model.filter.WikiAttachmentFilter;
 import org.xwiki.wikistream.model.filter.WikiDocumentFilter;
@@ -75,7 +77,141 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
             throw new WikiStreamException("Failed to read package", e);
         }
 
-        // Generate events
+        // Generate users events
+        for (int userInt : this.confluencePackage.getUsers()) {
+            PropertiesConfiguration userProperties;
+            try {
+                userProperties = this.confluencePackage.getUserProperties(userInt);
+            } catch (ConfigurationException e) {
+                throw new WikiStreamException("Failed to get user properties", e);
+            }
+
+            String userId = userProperties.getString(ConfluenceXMLPackage.KEY_USER_NAME, String.valueOf(userInt));
+            if (this.properties.isConvertToXWiki() && userId.equals("admin")) {
+                userId = "Admin";
+            }
+
+            FilterEventParameters userParameters = new FilterEventParameters();
+
+            userParameters.put(UserFilter.PARAMETER_FIRSTNAME,
+                userProperties.getString(ConfluenceXMLPackage.KEY_USER_FIRSTNAME));
+            userParameters.put(UserFilter.PARAMETER_LASTNAME,
+                userProperties.getString(ConfluenceXMLPackage.KEY_USER_LASTNAME));
+            userParameters.put(UserFilter.PARAMETER_EMAIL,
+                userProperties.getString(ConfluenceXMLPackage.KEY_USER_EMAIL));
+            userParameters.put(UserFilter.PARAMETER_ACTIVE,
+                userProperties.getBoolean(ConfluenceXMLPackage.KEY_USER_ACTIVE));
+
+            try {
+                userParameters.put(UserFilter.PARAMETER_REVISION_DATE,
+                    this.confluencePackage.getDate(userProperties, ConfluenceXMLPackage.KEY_USER_REVISION_DATE));
+                userParameters.put(UserFilter.PARAMETER_CREATION_DATE,
+                    this.confluencePackage.getDate(userProperties, ConfluenceXMLPackage.KEY_USER_CREATION_DATE));
+            } catch (ParseException e) {
+                if (this.properties.isVerbose()) {
+                    this.logger.error("Failed to parse date", e);
+                }
+            }
+
+            // TODO: no idea how to import/convert the password, probably salted with the Confluence instance id
+
+            // > User
+            proxyFilter.beginUser(userId, userParameters);
+
+            // < User
+            proxyFilter.endUser(userId, userParameters);
+        }
+
+        // Generate users events
+        for (int groupInt : this.confluencePackage.getGroups()) {
+            PropertiesConfiguration groupProperties;
+            try {
+                groupProperties = this.confluencePackage.getGroupProperties(groupInt);
+            } catch (ConfigurationException e) {
+                throw new WikiStreamException("Failed to get group properties", e);
+            }
+
+            String groupId = groupProperties.getString(ConfluenceXMLPackage.KEY_GROUP_NAME, String.valueOf(groupInt));
+            if (this.properties.isConvertToXWiki()) {
+                if (groupId.equals("confluence-administrators")) {
+                    groupId = "XWikiAdminGroup";
+                } else if (groupId.equals("confluence-users")) {
+                    groupId = "XWikiAllGroup";
+                }
+            }
+
+            FilterEventParameters groupParameters = new FilterEventParameters();
+
+            try {
+                groupParameters.put(GroupFilter.PARAMETER_REVISION_DATE,
+                    this.confluencePackage.getDate(groupProperties, ConfluenceXMLPackage.KEY_GROUP_REVISION_DATE));
+                groupParameters.put(GroupFilter.PARAMETER_CREATION_DATE,
+                    this.confluencePackage.getDate(groupProperties, ConfluenceXMLPackage.KEY_GROUP_CREATION_DATE));
+            } catch (ParseException e) {
+                if (this.properties.isVerbose()) {
+                    this.logger.error("Failed to parse date", e);
+                }
+            }
+
+            // > Group
+            proxyFilter.beginGroup(groupId, groupParameters);
+
+            // Members users
+            if (groupProperties.containsKey(ConfluenceXMLPackage.KEY_GROUP_MEMBERUSERS)) {
+                List<Integer> users =
+                    this.confluencePackage.getIntegertList(groupProperties, ConfluenceXMLPackage.KEY_GROUP_MEMBERUSERS);
+                for (Integer memberInt : users) {
+                    FilterEventParameters memberParameters = new FilterEventParameters();
+
+                    try {
+                        String memberId =
+                            this.confluencePackage.getUserProperties(memberInt).getString(
+                                ConfluenceXMLPackage.KEY_USER_NAME, String.valueOf(memberInt));
+
+                        if (this.properties.isConvertToXWiki() && memberId.equals("admin")) {
+                            memberId = "Admin";
+                        }
+
+                        proxyFilter.onGroupMemberGroup(memberId, memberParameters);
+                    } catch (ConfigurationException e) {
+                        this.logger.error("Failed to get user properties", e);
+                    }
+                }
+            }
+
+            // Members groups
+            if (groupProperties.containsKey(ConfluenceXMLPackage.KEY_GROUP_MEMBERGROUPS)) {
+                List<Integer> groups =
+                    this.confluencePackage
+                        .getIntegertList(groupProperties, ConfluenceXMLPackage.KEY_GROUP_MEMBERGROUPS);
+                for (Integer memberInt : groups) {
+                    FilterEventParameters memberParameters = new FilterEventParameters();
+
+                    try {
+                        String memberId =
+                            this.confluencePackage.getGroupProperties(memberInt).getString(
+                                ConfluenceXMLPackage.KEY_GROUP_NAME, String.valueOf(memberInt));
+
+                        if (this.properties.isConvertToXWiki()) {
+                            if (memberId.equals("confluence-administrators")) {
+                                memberId = "XWikiAdminGroup";
+                            } else if (memberId.equals("confluence-users")) {
+                                memberId = "XWikiAllGroup";
+                            }
+                        }
+
+                        proxyFilter.onGroupMemberGroup(memberId, memberParameters);
+                    } catch (ConfigurationException e) {
+                        this.logger.error("Failed to get group properties", e);
+                    }
+                }
+            }
+
+            // < Group
+            proxyFilter.endGroup(groupId, groupParameters);
+        }
+
+        // Generate documents events
         for (Map.Entry<Integer, Set<Integer>> entry : this.confluencePackage.getPages().entrySet()) {
             int spaceId = entry.getKey();
 
@@ -122,7 +258,12 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
             throw new WikiStreamException("Failed to get page properties", e);
         }
 
-        String documentName = pageProperties.getString(ConfluenceXMLPackage.KEY_PAGE_TITLE);
+        String documentName;
+        if (pageProperties.containsKey(ConfluenceXMLPackage.KEY_PAGE_HOMEPAGE)) {
+            documentName = this.properties.getSpacePageName();
+        } else {
+            documentName = pageProperties.getString(ConfluenceXMLPackage.KEY_PAGE_TITLE);
+        }
 
         FilterEventParameters documentParameters = new FilterEventParameters();
         if (this.properties.getDefaultLocale() != null) {
@@ -150,9 +291,12 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
         proxyFilter.beginWikiDocumentLocale(locale, documentLocaleParameters);
 
         // Revisions
-        List<Integer> revisions = (List) pageProperties.getList(ConfluenceXMLPackage.KEY_PAGE_REVISIONS);
-        for (Integer revisionId : revisions) {
-            readPageRevision(revisionId, filter, proxyFilter);
+        if (pageProperties.containsKey(ConfluenceXMLPackage.KEY_PAGE_REVISIONS)) {
+            List<Integer> revisions =
+                this.confluencePackage.getIntegertList(pageProperties, ConfluenceXMLPackage.KEY_PAGE_REVISIONS);
+            for (Integer revisionId : revisions) {
+                readPageRevision(revisionId, filter, proxyFilter);
+            }
         }
 
         // Current version
@@ -212,6 +356,8 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
         // Content
         String confluenceBody = pageProperties.getString(ConfluenceXMLPackage.KEY_PAGE_BODY);
         int bodyType = pageProperties.getInt(ConfluenceXMLPackage.KEY_PAGE_BODY_TYPE);
+
+        // TODO: convert body
 
         // > WikiDocumentRevision
         proxyFilter.beginWikiDocumentRevision(revision, documentRevisionParameters);

@@ -27,9 +27,11 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,6 +60,8 @@ public class ConfluenceXMLPackage
     public static final String KEY_SPACE_NAME = "name";
 
     public static final String KEY_SPACE_DESCRIPTION = "description";
+
+    public static final String KEY_PAGE_HOMEPAGE = "homepage";
 
     public static final String KEY_PAGE_PARENT = "parent";
 
@@ -121,7 +125,9 @@ public class ConfluenceXMLPackage
 
     public static final String KEY_GROUP_DESCRIPTION = "description";
 
-    public static final String KEY_GROUP_DIRECTORY = "directory";
+    public static final String KEY_GROUP_MEMBERUSERS = "memberusers";
+
+    public static final String KEY_GROUP_MEMBERGROUPS = "membergroups";
 
     public static final String KEY_USER_NAME = "name";
 
@@ -138,8 +144,6 @@ public class ConfluenceXMLPackage
     public static final String KEY_USER_DISPLAYNAME = "displayName";
 
     public static final String KEY_USER_EMAIL = "emailAddress";
-
-    public static final String KEY_USER_DIRECTORY = "directory";
 
     public static final String KEY_USER_PASSWORD = "credential";
 
@@ -209,24 +213,57 @@ public class ConfluenceXMLPackage
         return str != null ? DATE_FORMAT.parse(str) : null;
     }
 
+    public List<Integer> getIntegertList(PropertiesConfiguration properties, String key)
+    {
+        return getIntegertList(properties, key, null);
+    }
+
+    public List<Integer> getIntegertList(PropertiesConfiguration properties, String key, List<Integer> def)
+    {
+        List<Object> list = properties.getList(key, null);
+
+        if (list == null) {
+            return def;
+        }
+
+        if (list.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        if (list.get(0) instanceof Integer) {
+            return (List) list;
+        }
+
+        List<Integer> integerList = new ArrayList<Integer>(list.size());
+        for (Object element : list) {
+            integerList.add(Integer.valueOf(element.toString()));
+        }
+
+        return integerList;
+    }
+
     public EntityReference getReferenceFromId(PropertiesConfiguration currentProperties, String key)
         throws ConfigurationException
     {
-        int pageId = currentProperties.getInt(key);
+        if (currentProperties.containsKey(key)) {
+            int pageId = currentProperties.getInt(key);
 
-        PropertiesConfiguration pageProperties = getPageProperties(pageId);
+            PropertiesConfiguration pageProperties = getPageProperties(pageId);
 
-        int spaceId = pageProperties.getInt(KEY_PAGE_SPACE);
-        int currentSpaceId = currentProperties.getInt(KEY_PAGE_SPACE);
+            int spaceId = pageProperties.getInt(KEY_PAGE_SPACE);
+            int currentSpaceId = currentProperties.getInt(KEY_PAGE_SPACE);
 
-        EntityReference spaceReference;
-        if (spaceId != currentSpaceId) {
-            spaceReference = new EntityReference(getSpaceName(currentSpaceId), EntityType.SPACE);
-        } else {
-            spaceReference = null;
+            EntityReference spaceReference;
+            if (spaceId != currentSpaceId) {
+                spaceReference = new EntityReference(getSpaceName(currentSpaceId), EntityType.SPACE);
+            } else {
+                spaceReference = null;
+            }
+
+            return new EntityReference(pageProperties.getString(KEY_PAGE_TITLE), EntityType.DOCUMENT, spaceReference);
         }
 
-        return new EntityReference(pageProperties.getString(KEY_PAGE_TITLE), EntityType.DOCUMENT, spaceReference);
+        return null;
     }
 
     public String getSpaceName(int spaceId) throws ConfigurationException
@@ -275,9 +312,11 @@ public class ConfluenceXMLPackage
             } else if (type.equals("Space")) {
                 readSpaceObject(xmlReader);
             } else if (type.equals("InternalUser")) {
-                readSpaceObject(xmlReader);
+                readUserObject(xmlReader);
             } else if (type.equals("InternalGroup")) {
-                readSpaceObject(xmlReader);
+                readGroupObject(xmlReader);
+            } else if (type.equals("HibernateMembership")) {
+                readMembershipObject(xmlReader);
             } else if (type.equals("BodyContent")) {
                 readBodyContentObject(xmlReader);
             } else if (type.equals("SpaceDescription")) {
@@ -362,6 +401,8 @@ public class ConfluenceXMLPackage
 
         int descriptionId = readObjectProperties(xmlReader, properties);
 
+        properties.setProperty(KEY_PAGE_HOMEPAGE, true);
+
         // Save page
         savePageProperties(properties, descriptionId);
     }
@@ -373,10 +414,12 @@ public class ConfluenceXMLPackage
 
         int permissionId = readObjectProperties(xmlReader, properties);
 
-        int spaceId = properties.getInt("space");
+        if (properties.containsKey("space")) {
+            int spaceId = properties.getInt("space");
 
-        // Save attachment
-        saveSpacePermissionsProperties(properties, spaceId, permissionId);
+            // Save attachment
+            saveSpacePermissionsProperties(properties, spaceId, permissionId);
+        }
     }
 
     private void readBodyContentObject(XMLStreamReader xmlReader) throws XMLStreamException, ConfigurationException,
@@ -386,9 +429,11 @@ public class ConfluenceXMLPackage
 
         readObjectProperties(xmlReader, properties);
 
-        int pageId = properties.getInt("content");
+        if (properties.containsKey("content")) {
+            int pageId = properties.getInt("content");
 
-        savePageProperties(properties, pageId);
+            savePageProperties(properties, pageId);
+        }
     }
 
     private void readPageObject(XMLStreamReader xmlReader) throws IOException, NumberFormatException,
@@ -436,6 +481,42 @@ public class ConfluenceXMLPackage
         saveGroupProperties(properties, pageId);
     }
 
+    private void readMembershipObject(XMLStreamReader xmlReader) throws ConfigurationException, XMLStreamException,
+        WikiStreamException, IOException
+    {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
+
+        readObjectProperties(xmlReader, properties);
+
+        Integer parentGroup = properties.getInteger("parentGroup", null);
+
+        if (parentGroup != null) {
+            PropertiesConfiguration groupProperties = getGroupProperties(parentGroup);
+
+            Integer userMember = properties.getInteger("userMember", null);
+
+            if (userMember != null) {
+                List<Integer> users =
+                    new ArrayList<Integer>(getIntegertList(groupProperties, KEY_GROUP_MEMBERUSERS,
+                        Collections.<Integer> emptyList()));
+                users.add(userMember);
+                groupProperties.setProperty(KEY_GROUP_MEMBERUSERS, users);
+            }
+
+            Integer groupMember = properties.getInteger("groupMember", null);
+
+            if (groupMember != null) {
+                List<Integer> groups =
+                    new ArrayList<Integer>(getIntegertList(groupProperties, KEY_GROUP_MEMBERGROUPS,
+                        Collections.<Integer> emptyList()));
+                groups.add(groupMember);
+                groupProperties.setProperty(KEY_GROUP_MEMBERGROUPS, groups);
+            }
+
+            saveGroupProperties(groupProperties, parentGroup);
+        }
+    }
+
     private Object readProperty(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException
     {
         String propertyClass = xmlReader.getAttributeValue(null, "class");
@@ -444,9 +525,13 @@ public class ConfluenceXMLPackage
             return xmlReader.getElementText();
         } else if (propertyClass.equals("java.util.List") || propertyClass.equals("java.util.Collection")) {
             return readListProperty(xmlReader);
+        } else if (propertyClass.equals("java.util.Set")) {
+            return readSetProperty(xmlReader);
         } else if (propertyClass.equals("Page") || propertyClass.equals("Space") || propertyClass.equals("BodyContent")
             || propertyClass.equals("Attachment") || propertyClass.equals("SpaceDescription")
-            || propertyClass.equals("Labelling") || propertyClass.equals("SpacePermission")) {
+            || propertyClass.equals("Labelling") || propertyClass.equals("SpacePermission")
+            || propertyClass.equals("InternalGroup") || propertyClass.equals("InternalUser")
+            || propertyClass.equals("Comment")) {
             return readIdProperty(xmlReader);
         } else {
             StAXUtils.skipElement(xmlReader);
@@ -455,7 +540,7 @@ public class ConfluenceXMLPackage
         return null;
     }
 
-    private Object readIdProperty(XMLStreamReader xmlReader) throws WikiStreamException, XMLStreamException
+    private Integer readIdProperty(XMLStreamReader xmlReader) throws WikiStreamException, XMLStreamException
     {
         xmlReader.nextTag();
 
@@ -471,7 +556,7 @@ public class ConfluenceXMLPackage
         return value;
     }
 
-    private Object readListProperty(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException
+    private List<Object> readListProperty(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException
     {
         List<Object> list = new ArrayList<Object>();
 
@@ -480,6 +565,17 @@ public class ConfluenceXMLPackage
         }
 
         return list;
+    }
+
+    private Set<Object> readSetProperty(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException
+    {
+        Set<Object> set = new LinkedHashSet<Object>();
+
+        for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
+            set.add(readProperty(xmlReader));
+        }
+
+        return set;
     }
 
     private File getSpacesFolder()
@@ -547,13 +643,18 @@ public class ConfluenceXMLPackage
     {
         File folder = getAttachmentsFolder(pageId);
 
-        String[] attachmentFolders = folder.list();
+        List<Integer> attachments;
+        if (folder.exists()) {
+            String[] attachmentFolders = folder.list();
 
-        List<Integer> attachments = new ArrayList<Integer>(attachmentFolders.length);
-        for (String attachmentIdString : attachmentFolders) {
-            if (NumberUtils.isNumber(attachmentIdString)) {
-                attachments.add(Integer.valueOf(attachmentIdString));
+            attachments = new ArrayList<Integer>(attachmentFolders.length);
+            for (String attachmentIdString : attachmentFolders) {
+                if (NumberUtils.isNumber(attachmentIdString)) {
+                    attachments.add(Integer.valueOf(attachmentIdString));
+                }
             }
+        } else {
+            attachments = Collections.emptyList();
         }
 
         return attachments;
@@ -612,6 +713,38 @@ public class ConfluenceXMLPackage
         File file = getUserPropertiesFile(userId);
 
         return new PropertiesConfiguration(file);
+    }
+
+    public List<Integer> getUsers()
+    {
+        File folder = getUsersFolder();
+
+        String[] userFolders = folder.list();
+
+        List<Integer> users = new ArrayList<Integer>(userFolders.length);
+        for (String userIdString : userFolders) {
+            if (NumberUtils.isNumber(userIdString)) {
+                users.add(Integer.valueOf(userIdString));
+            }
+        }
+
+        return users;
+    }
+
+    public List<Integer> getGroups()
+    {
+        File folder = getGroupsFolder();
+
+        String[] groupFolders = folder.list();
+
+        List<Integer> groups = new ArrayList<Integer>(groupFolders.length);
+        for (String groupIdString : groupFolders) {
+            if (NumberUtils.isNumber(groupIdString)) {
+                groups.add(Integer.valueOf(groupIdString));
+            }
+        }
+
+        return groups;
     }
 
     public PropertiesConfiguration getGroupProperties(int groupId) throws ConfigurationException

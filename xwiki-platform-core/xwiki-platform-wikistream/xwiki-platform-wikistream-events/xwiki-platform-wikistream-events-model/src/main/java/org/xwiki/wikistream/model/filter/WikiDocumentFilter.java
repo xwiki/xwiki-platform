@@ -39,11 +39,6 @@ public interface WikiDocumentFilter
     // Properties
 
     /**
-     * @type String
-     */
-    String PARAMETER_NAME = "name";
-
-    /**
      * @type Syntax
      */
     String PARAMETER_SYNTAX = "syntax";

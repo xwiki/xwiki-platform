@@ -24,22 +24,21 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wikistream.instance.internal.InstanceUtils;
-import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
 
 /**
  * @version $Id$
- * @since 5.2
+ * @since 5.3M2
  */
 @Component
-@Named(DocumentOutputInstanceWikiStreamFactory.ROLEHINT)
+@Named(UserOutputInstanceWikiStreamFactory.ROLEHINT)
 @Singleton
-public class DocumentOutputInstanceWikiStreamFactory extends
-    AbstractBeanOutputInstanceWikiStreamFactory<DocumentOutputProperties, XWikiDocumentFilter>
+public class UserOutputInstanceWikiStreamFactory extends
+    AbstractBeanOutputInstanceWikiStreamFactory<UserOutputProperties, UserInstanceOutputFilter>
 {
     /**
      * The id of this {@link org.xwiki.wikistream.instance.output.OutputInstanceWikiStreamFactory}.
      */
-    public static final String ID = "document";
+    public static final String ID = "users";
 
     /**
      * Tje role hint of this {@link org.xwiki.wikistream.output.OutputWikiStreamFactory}.
@@ -49,7 +48,7 @@ public class DocumentOutputInstanceWikiStreamFactory extends
     /**
      * The default constructor.
      */
-    public DocumentOutputInstanceWikiStreamFactory()
+    public UserOutputInstanceWikiStreamFactory()
     {
         super(ID);
     }

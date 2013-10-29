@@ -37,6 +37,10 @@ public class ConfluenceInputProperties extends DefaultWikiStreamProperties
 
     private Locale defaultLocale;
 
+    private boolean convertToXWiki = true;
+
+    private String spacePageName = "WebHome";
+
     @PropertyName("The source")
     @PropertyDescription("The source to load the wiki from")
     @PropertyMandatory
@@ -58,5 +62,25 @@ public class ConfluenceInputProperties extends DefaultWikiStreamProperties
     public void setDefaultLocale(Locale defaultLocale)
     {
         this.defaultLocale = defaultLocale;
+    }
+
+    public boolean isConvertToXWiki()
+    {
+        return this.convertToXWiki;
+    }
+
+    public void setConvertToXWiki(boolean convertToXWiki)
+    {
+        this.convertToXWiki = convertToXWiki;
+    }
+
+    public String getSpacePageName()
+    {
+        return this.spacePageName;
+    }
+
+    public void setSpacePageName(String spacePageName)
+    {
+        this.spacePageName = spacePageName;
     }
 }

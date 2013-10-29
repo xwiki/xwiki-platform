@@ -19,6 +19,8 @@
  */
 package org.xwiki.wikistream.confluence.xml.internal;
 
+import org.xwiki.wikistream.filter.user.GroupFilter;
+import org.xwiki.wikistream.filter.user.UserFilter;
 import org.xwiki.wikistream.model.filter.FarmFilter;
 import org.xwiki.wikistream.model.filter.WikiAttachmentFilter;
 import org.xwiki.wikistream.model.filter.WikiClassFilter;
@@ -36,7 +38,8 @@ import org.xwiki.wikistream.model.filter.WikiSpaceFilter;
  * @since 5.3M1
  */
 public interface ConfluenceFilter extends FarmFilter, WikiFilter, WikiSpaceFilter, WikiDocumentFilter,
-    WikiAttachmentFilter, WikiClassFilter, WikiClassPropertyFilter, WikiObjectFilter, WikiObjectPropertyFilter
+    WikiAttachmentFilter, WikiClassFilter, WikiClassPropertyFilter, WikiObjectFilter, WikiObjectPropertyFilter,
+    UserFilter, GroupFilter
 {
 
 }

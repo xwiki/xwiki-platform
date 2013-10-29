@@ -366,7 +366,9 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
         }
 
         if (this.properties.isPreserveVersion()) {
-            attachment.setVersion(getString(WikiAttachmentFilter.PARAMETER_REVISION, parameters, null));
+            if (parameters.containsKey(WikiAttachmentFilter.PARAMETER_REVISION)) {
+                attachment.setVersion(getString(WikiAttachmentFilter.PARAMETER_REVISION, parameters, null));
+            }
             attachment.setAuthor(getString(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR, parameters, ""));
             attachment.setComment(getString(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, parameters, null));
             attachment.setDate(getDate(WikiAttachmentFilter.PARAMETER_REVISION_DATE, parameters, null));

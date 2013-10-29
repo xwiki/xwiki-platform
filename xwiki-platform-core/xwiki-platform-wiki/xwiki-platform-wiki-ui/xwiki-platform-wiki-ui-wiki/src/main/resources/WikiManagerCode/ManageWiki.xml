@@ -92,7 +92,8 @@
       &lt;span class="buttonwrapper"&gt;
         &lt;input class="button" type="submit" name='save' value="$services.localization.render('admin.save')"/&gt;
       &lt;/span&gt;
-      &lt;input type='hidden' name='workspaceId' value="$workspaceId"/&gt;
+      &lt;input type='hidden' name='wikiId' value="$wikiId"/&gt;
+      &lt;input type='hidden' name='wikiDescriptorDocument' value="$wikiDocument.fullName" /&gt;
     {{/html}}
 
     ## Again, because of the URL in the xredirect field, we need to have it in a html macro with wiki='false' (default).

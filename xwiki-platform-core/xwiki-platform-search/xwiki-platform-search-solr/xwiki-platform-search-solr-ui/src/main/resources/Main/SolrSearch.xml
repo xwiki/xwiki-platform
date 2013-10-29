@@ -535,7 +535,7 @@ a.sort-item.active, a.sort-item.active:hover {
  */
 
 .search-results-left {
-  margin: 0.5em 16em 0.5em 0;
+  margin: 0.5em 20em 0.5em 0;
   padding: 0.5em 0.5em 0.5em 0;
 }
 
@@ -643,8 +643,8 @@ a.search-result-highlightAll:after {
 
 .search-facets {
   float: right;
-  max-width: 15.5em;
-  width: 15.5em;
+  max-width: 19.5em;
+  width: 19.5em;
   border-radius: 4px;
 }
 
@@ -736,7 +736,7 @@ a.search-result-highlightAll:after {
   display: block;
 }
 
-.search-facet-body ul {
+.search-facet-body ul, .search-facet-body ul.users {
   color: $theme.textSecondaryColor;
   list-style: none;
   display: block;
@@ -744,29 +744,21 @@ a.search-result-highlightAll:after {
   margin: 0;
 }
 
-.search-facet-body li {
-  clear: both;
+.search-facet-body li:hover {
+  background-color: $theme.highlightColor;
 }
 
 .search-facet-body input[type="checkbox"] {
   float: left;
-  margin-left: 0;
-}
-
-.search-facet-body a.selected {
-  font-weight: bolder;
+  margin: .2em 0;
 }
 
 .search-facet-body .itemName {
-  float: left;
+  display: block;
   overflow: hidden;
-  position: relative;
+  padding: .1em .2em;
   text-overflow: ellipsis;
-  width: 75%;
-}
-
-.search-facet-body .itemName.empty {
-  color: $theme.textSecondaryColor;
+  white-space: nowrap;
 }
 
 .search-facet-body .itemName {
@@ -775,18 +767,38 @@ a.search-result-highlightAll:after {
   text-decoration: none;
 }
 
-.search-facet-body .itemName:hover {
-  color: $theme.linkColor;
-  text-decoration: underline;
+.search-facet-body .itemName.empty {
+  color: $theme.textSecondaryColor;
+}
+
+/* In case the JavaScript is disabled. */
+.search-facet-body .itemName.selected {
+  font-weight: bolder;
 }
 
 .search-facet-body .itemCount {
   float: right;
+  padding: .1em 0;
 }
 
-.search-facet-body .itemName, .search-facet-body .itemCount {
-  padding: 0.2em 0;
+/**
+ * User Facet
+ */
+
+.users .itemName .user {
+  display: block;
+  margin: 0;
 }
+
+.users .itemName .user-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/**
+ * Miscellaneous
+ */
 
 .debug  {
   float: right;
@@ -953,7 +965,7 @@ a.search-result-highlightAll:after {
   &lt;/select&gt;
 #end
 
-#macro(spaceSelector)
+#macro (spaceSelector)
   #set ($spaces = [])
   #set ($wikiNames = $xwiki.wikiNames)
   #if ($wiki == $xcontext.database || ($wiki == '' &amp;&amp; $wikiNames.size() == 1))
@@ -1032,18 +1044,35 @@ a.search-result-highlightAll:after {
       #end
       &lt;div class="search-facet-header"&gt;$escapetool.xml($facetPrettyName)&lt;/div&gt; 
       &lt;div class="search-facet-body"&gt;
-        &lt;ul&gt;
-          #foreach ($facetValue in $facetValues)
-            &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
-          #end
-        &lt;/ul&gt;
+        #displaySearchFacetValues($facetValues)
       &lt;/div&gt;
       {{/html}}
     )))
   #end
 #end
 
-#macro(displaySearchFacetValue $facetValue)
+#set ($customSearchFacetValuesDisplayer = {
+  'author': 'user',
+  'creator': 'user'
+})
+
+#macro (displaySearchFacetValues $facetValues)
+  #set ($displayer = $customSearchFacetValuesDisplayer.get($facetField.name))
+  #if (!$displayer)
+    #set ($displayer = 'default')
+  #end
+  #evaluate("${escapetool.h}displaySearchFacetValues_${displayer}(${escapetool.d}facetValues)")
+#end
+
+#macro (displaySearchFacetValues_default $facetValues)
+  &lt;ul&gt;
+    #foreach ($facetValue in $facetValues)
+      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+    #end
+  &lt;/ul&gt;
+#end
+
+#macro (displaySearchFacetValue $facetValue)
   #set ($selectedValues = [])
   #if ($facetRequestValues)
     #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
@@ -1054,7 +1083,8 @@ a.search-result-highlightAll:after {
   #end
   ## Reset the pagination because the number of results can change when a facet is applied.
   #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
-  &lt;a href="$url"#if ($selected) class="selected"#end&gt;
+  &lt;div class="itemCount"&gt;$facetValue.count&lt;/div&gt;
+  &lt;a href="$url" class="itemName#if ($selected) selected#end#if ($facetValue.name == '') empty#end"&gt;
     #if ($facetValue.name == '')
       #set ($facetPrettyValueKey = "solr.field.${facetField.name}.emptyValue")
       #if (!$services.localization.get($facetPrettyValueKey))
@@ -1064,9 +1094,50 @@ a.search-result-highlightAll:after {
     #else
       #set ($facetPrettyValue = $facetValue.name)
     #end
-    &lt;span class="itemName#if ($facetValue.name == '') empty#end"&gt;$escapetool.xml($facetPrettyValue)&lt;/span&gt;
-    &lt;span class="itemCount"&gt;$facetValue.count&lt;/span&gt;
+    #set ($displayer = $customSearchFacetValueDisplayer.get($facetField.name))
+    #if (!$displayer)
+      #set ($displayer = 'default')
+    #end
+    #evaluate("${escapetool.h}displaySearchFacetValue_${displayer}(${escapetool.d}facetPrettyValue)")
   &lt;/a&gt;
+  &lt;div class="clearfloats"&gt;&lt;/div&gt;
+#end
+
+#set ($customSearchFacetValueDisplayer = {
+  'author': 'user',
+  'creator': 'user'
+})
+
+#macro (displaySearchFacetValue_default $facetPrettyValue)
+  $escapetool.xml($facetPrettyValue)
+#end
+
+#macro (displaySearchFacetValues_user $facetValues)
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
+  &lt;ul class="users"&gt;
+    #foreach ($facetValue in $facetValues)
+      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+    #end
+  &lt;/ul&gt;
+#end
+
+#macro (displaySearchFacetValue_user $user)
+  #set ($userReference = $services.model.resolveDocument($user))
+  #set ($userName = $escapetool.xml($xwiki.getUserName($user, false)))
+  &lt;span class="user"&gt;
+    &lt;span class="user-avatar-wrapper"&gt;
+      #getUserAvatarURL($userReference $avatarURL 30)
+      &lt;img src="$escapetool.xml($avatarURL.url)" class="icon" alt="$userName" /&gt;
+    &lt;/span&gt;
+    &lt;span class="user-name"&gt;$userName&lt;/span&gt;
+    &lt;span&gt;
+      &lt;span class="user-alias"&gt;$escapetool.xml($userReference.name)&lt;/span&gt;
+      ## Display the wiki only for local users.
+      #if ($userReference.wikiReference.name != $xcontext.getMainWikiName())
+        &lt;span class="user-wiki"&gt;$escapetool.xml($userReference.wikiReference.name)&lt;/span&gt;
+      #end
+    &lt;/span&gt;
+  &lt;/span&gt;
 #end
 
 #macro (displaySearchResultsSort)

@@ -4,13 +4,13 @@
 <div class="componentcontainer">
 <strong id="xwikimenutitle" class="hidden">$services.localization.render('core.menu.main.title')</strong>
 <div class="rightmenu">
-#set ($isWikiAPIAvailable = ("!$services.wiki" != ''))
+#set ($isWikiAPIAvailable = ("!$services.wiki" != '') && ("!$services.wikiuser" != ''))
 #set ($mainWikiHomeDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Main', 'WebHome'))
 #set ($WikiManagerMainDocReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'WebHome'))
 #set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
-#set ($isWorkspace = $isWikiAPIAvailable && $services.workspace.isWorkspace($xcontext.database))
+#set ($cantHaveLocalUsers = $isWikiAPIAvailable && !$xcontext.isMainWiki() && !$services.wikiuser.hasLocalUsersEnabled())
 #set ($isMainWikiUser = ($xcontext.mainWikiName == "$!{xcontext.userReference.wikiReference.name}"))
-#set ($hasSeveralWikis = $isWikiAPIAvailable && "$!services.wiki.getAll()" != '' && $services.wiki.getAll().size() > 1)
+#set ($hasSeveralWikis = $isWikiAPIAvailable && "$!services.wiki.getAll()" != '' && !$services.wiki.getAll().isEmpty())
 #set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
 ##
 ## User
@@ -127,9 +127,9 @@
 ##
 ## This menu is displayed if:
 ## - Workspace Manager App is installed
-## - There is at least 2 (sub)wikis (workspace-template which is hidden + a real wiki)
-## - The current wiki is the main wiki OR the current wiki is a workspace
-#set ($displayHomeMenu = $isWikiUIAvailable && $hasSeveralWikis && ($xcontext.isMainWiki() || $isWorkspace))
+## - There is at least 1 (sub)wiki
+## - The current wiki is the main wiki OR the current wiki has no support for local users
+#set ($displayHomeMenu = $isWikiUIAvailable && $hasSeveralWikis && ($xcontext.isMainWiki() || $cantHaveLocalUsers))
 #if ($displayHomeMenu)
   #xwikitopmenuentrystart($xwiki.getURL($mainWikiHomeDocumentReference) $services.localization.render('core.menu.type.home') 'tmMainWiki' 'hasIcon')
   #set ($hasPreviousMenuSection = false)

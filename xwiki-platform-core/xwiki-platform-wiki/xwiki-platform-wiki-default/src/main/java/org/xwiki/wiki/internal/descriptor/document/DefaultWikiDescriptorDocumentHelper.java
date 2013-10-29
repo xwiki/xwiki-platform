@@ -135,8 +135,11 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
 
             if (documentNames != null && !documentNames.isEmpty()) {
                 for (String documentName : documentNames) {
-                    // Resolve the document names into references and for each one extract the Wiki
-                    result.add(getDocument(documentReferenceResolver.resolve(documentName)));
+                    // Resolve the document names into references
+                    DocumentReference docRef = documentReferenceResolver.resolve(documentName);
+                    docRef = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
+                            docRef.getLastSpaceReference().getName(), docRef.getName());
+                    result.add(getDocument(docRef));
                 }
             }
         } catch (Exception e) {

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>WikiManagerCode</web>
+  <name>ManageWiki</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.XWikiPreferences</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1303899640000</creationDate>
+  <date>1308327581000</date>
+  <contentUpdateDate>1308327581000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('platform.workspace.manageWorkspaceTitle')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#if ("$!currentDoc" == '')
+  #set ($currentDoc = $doc.prefixedFullName)
+#end
+#set ($wikiId = $services.wiki.currentWikiId)
+##
+## TODO: use a dependency check macro.
+##
+#set ($wiki = $services.wiki.getById($wikiId))
+#if (!$wiki)
+  #if (!$services.wiki.lastException)
+    {{error}}{{translation key="services.wiki.error.workspacedoesnotexist" parameters="$wikiId"/}}{{/error}}
+  #elseif("$!{$services.wiki.lastException.message}" != '')
+    {{error}}$services.localization.render('platform.workspace.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
+  #else
+    {{error}}$services.wiki.lastException.class{{/error}}
+  #end
+#else
+  #set ($updateWikiDocumentReference = $services.model.createDocumentReference(${services.wiki.mainWikiId}, 'WikiManager', 'UpdateWiki'))
+  ## Get the wiki descriptor page
+  #set ($xwql = "FROM doc.object(XWiki.XWikiServerClass) obj WHERE obj.server = :server")
+  #set ($results = $services.query.xwql($xwql).setWiki($services.wiki.mainWikiId).bindValue('server', $wiki.defaultAlias).execute())
+  #if (!$results || $results.isEmpty())
+  
+    {{error}}Failed to get the wiki descriptor document.{{/error}}
+    
+  #else
+    #set ($wikiDocument = $xwiki.getDocument("${services.wiki.mainWikiId}:${results.get(0)}"))
+    {{html clean='false'}}
+    &lt;form class='xform half' action="$xwiki.getURL($updateWikiDocumentReference)" method='POST'&gt;
+    {{/html}}
+
+    ## Use a second html macro because wiki='true' in the first causes the action URL to be interpreted as wiki syntax and it's rendered as an &lt;a&gt; tag. We need an $escapetool.wiki(...) method to escape wiki syntax.
+    {{html clean='false' wiki='true'}}
+      &lt;dl&gt;
+        &lt;dt&gt;
+          &lt;label for='XWiki.XWikiServerClass_0_wikiprettyname'&gt;{{translation key="workspacemanager.prop.wikiprettyname.label"/}}&lt;/label&gt;
+          &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.wikiprettyname.hint"/}}&lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;((($wikiDocument.display('wikiprettyname', 'edit'))))&lt;/dd&gt;
+
+        &lt;dt&gt;
+          &lt;label for='XWiki.XWikiServerClass_0_description'&gt;{{translation key="workspacemanager.prop.description.label"/}}&lt;/label&gt;
+          &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.description.hint"/}}&lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;((($wikiDocument.display('description', 'edit'))))&lt;/dd&gt;
+
+        &lt;dt&gt;
+          &lt;label for='XWiki.XWikiServerClass_0_owner'&gt;{{translation key="workspacemanager.prop.owner.label"/}}&lt;/label&gt;
+          &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.owner.hint"/}}&lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          ## The workspace owner has to be a global user. Currently the "List of Users" XClass property type doesn't have
+          ## a meta property to force global or local users so we have to customize the display to add this restriction.
+          #userPicker_import(false)
+          &lt;input type="text" id="XWiki.XWikiServerClass_0_owner" name="XWiki.XWikiServerClass_0_owner"
+            value="$!escapetool.xml($wikiDocument.getObject('XWiki.XWikiServerClass').getProperty('owner').value)" class="suggestUsers global" /&gt;
+        &lt;/dd&gt;
+
+        &lt;dt&gt;
+          &lt;label for='WikiManagerCode.WikiUserClass_0_membershipType'&gt;{{translation key="workspacemanager.prop.membershipType.label"/}}&lt;/label&gt;
+          &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.membershipType.hint"/}}&lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;((($wikiDocument.display('membershipType', 'edit'))))&lt;/dd&gt;
+      &lt;/dl&gt;
+      &lt;br/&gt;
+      &lt;span class="buttonwrapper"&gt;
+        &lt;input class="button" type="submit" name='save' value="$services.localization.render('admin.save')"/&gt;
+      &lt;/span&gt;
+      &lt;input type='hidden' name='workspaceId' value="$workspaceId"/&gt;
+    {{/html}}
+
+    ## Again, because of the URL in the xredirect field, we need to have it in a html macro with wiki='false' (default).
+    {{html clean='false'}}
+      #set ($currentDocument = $xwiki.getDocument($currentDoc))
+      &lt;input type='hidden' name='xredirect' value="$currentDocument.getExternalURL($xcontext.action, ${request.queryString})" /&gt;
+    &lt;/form&gt;
+    {{/html}}
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

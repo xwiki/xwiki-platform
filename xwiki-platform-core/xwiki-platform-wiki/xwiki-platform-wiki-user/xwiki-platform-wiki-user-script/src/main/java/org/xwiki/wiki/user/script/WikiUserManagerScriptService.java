@@ -158,6 +158,23 @@ public class WikiUserManagerScriptService implements ScriptService
     }
 
     /**
+     * To know if a user is a member of a wiki.
+     *
+     * @param userId Id of the user
+     * @param wikiId Id of the wiki
+     * @return if the user is a member of the specified wiki or null if some problems occur
+     */
+    public Boolean isMember(String userId, String wikiId)
+    {
+        try {
+            return wikiUserManager.isMember(userId, wikiId);
+        } catch (WikiUserManagerException e) {
+            // Todo
+            return null;
+        }
+    }
+
+    /**
      * Add a user as a member.
      *
      * @param userId UserID to add

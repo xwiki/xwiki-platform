@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -59,9 +60,9 @@ public class DefaultWikiUserManager implements WikiUserManager
 
     private static final String GROUP_CLASS_MEMBER_FIELD = "member";
 
-    private static final String CANDIDACY_CLASS_NAME = "WorkspaceCandidateMemberClass";
+    private static final String CANDIDACY_CLASS_NAME = "WikiCandidateMemberClass";
 
-    private static final String CANDIDACY_CLASS_SPACE = "XWiki";
+    private static final String CANDIDACY_CLASS_SPACE = "WikiManagerCode";
 
     private static final String CANDIDACY_CLASS_TYPE_FIELD = "type";
 
@@ -83,6 +84,9 @@ public class DefaultWikiUserManager implements WikiUserManager
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private EntityReferenceSerializer<String> documentReferenceSerializer;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -177,6 +181,12 @@ public class DefaultWikiUserManager implements WikiUserManager
         }
 
         return members;
+    }
+
+    @Override
+    public boolean isMember(String userId, String wikiId) throws WikiUserManagerException
+    {
+        return getMembers(wikiId).contains(userId);
     }
 
     @Override
@@ -320,11 +330,66 @@ public class DefaultWikiUserManager implements WikiUserManager
         return candidacy;
     }
 
+    private synchronized void upgradeCandidaciesFromOldWorkspaceApplication(XWikiDocument groupDoc, String wikiId)
+        throws WikiUserManagerException
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+        DocumentReference oldCandidateClassReference = new DocumentReference(wikiId, "XWiki",
+                "WorkspaceCandidateMemberClass");
+
+        // Get the old objects
+        List<BaseObject> candidacyObjects = groupDoc.getXObjects(oldCandidateClassReference);
+        if (candidacyObjects != null) {
+            DocumentReference newCandidateClassReference = new DocumentReference(wikiId, CANDIDACY_CLASS_SPACE,
+                    CANDIDACY_CLASS_NAME);
+            try {
+                for (BaseObject oldObject : candidacyObjects) {
+                    // Transform the candidacy to the new class
+                    int objectNumber = groupDoc.createXObject(newCandidateClassReference, xcontext);
+                    BaseObject newObject = groupDoc.getXObject(newCandidateClassReference, objectNumber);
+                    newObject.setStringValue(CANDIDACY_CLASS_TYPE_FIELD,
+                            oldObject.getStringValue(CANDIDACY_CLASS_TYPE_FIELD));
+                    newObject.setStringValue(CANDIDACY_CLASS_STATUS_FIELD,
+                            oldObject.getStringValue(CANDIDACY_CLASS_STATUS_FIELD));
+                    newObject.setStringValue(CANDIDACY_CLASS_USER_FIELD,
+                            oldObject.getStringValue(CANDIDACY_CLASS_USER_FIELD));
+                    newObject.setLargeStringValue(CANDIDACY_CLASS_USER_COMMENT_FIELD,
+                            oldObject.getLargeStringValue(CANDIDACY_CLASS_USER_COMMENT_FIELD));
+                    newObject.setStringValue(CANDIDACY_CLASS_ADMIN_FIELD,
+                            oldObject.getStringValue(CANDIDACY_CLASS_ADMIN_FIELD));
+                    newObject.setLargeStringValue(CANDIDACY_CLASS_ADMIN_COMMENT_FIELD,
+                            oldObject.getLargeStringValue(CANDIDACY_CLASS_ADMIN_COMMENT_FIELD));
+                    newObject.setLargeStringValue(CANDIDACY_CLASS_ADMIN_PRIVATE_COMMENT_FIELD,
+                            oldObject.getLargeStringValue(CANDIDACY_CLASS_ADMIN_PRIVATE_COMMENT_FIELD));
+                    newObject.setDateValue(CANDIDACY_CLASS_DATE_OF_CREATION_FIELD,
+                            oldObject.getDateValue(CANDIDACY_CLASS_DATE_OF_CREATION_FIELD));
+                    newObject.setDateValue(CANDIDACY_CLASS_DATE_OF_CLOSURE_FIELD,
+                            oldObject.getDateValue(CANDIDACY_CLASS_DATE_OF_CLOSURE_FIELD));
+
+                    // Remove the old object
+                    groupDoc.removeXObject(oldObject);
+                }
+
+                // Save
+                saveGroupDocument(groupDoc, "Upgrade candidacies from the old Workspace Application to the new "
+                        + "Wiki Manager Application.");
+
+            } catch (XWikiException e) {
+                throw new WikiUserManagerException("Unable to upgrade candidacies from the old Workspace Application to"
+                        + "the new Wiki Manager Application.");
+            }
+        }
+
+    }
+
     private Collection<MemberCandidacy> getAllMemberCandidacies(String wikiId, MemberCandidacy.CandidateType type)
         throws WikiUserManagerException
     {
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
+
+        // Upgrade candidacies
+        upgradeCandidaciesFromOldWorkspaceApplication(groupDoc, wikiId);
 
         // Collect all the candidacy of the good type
         Collection<MemberCandidacy> candidacies = new ArrayList<MemberCandidacy>();
@@ -441,7 +506,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiContext xcontext = xcontextProvider.get();
 
         // Set the values
-        request.setAdminId(xcontext.getUser());
+        request.setAdminId(documentReferenceSerializer.serialize(xcontext.getUserReference()));
         request.setAdminComment(message);
         request.setAdminPrivateComment(privateComment);
         request.setStatus(MemberCandidacy.Status.ACCEPTED);
@@ -474,7 +539,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiContext xcontext = xcontextProvider.get();
 
         // Set the values
-        request.setAdminId(xcontext.getUser());
+        request.setAdminId(documentReferenceSerializer.serialize(xcontext.getUserReference()));
         request.setAdminComment(message);
         request.setAdminPrivateComment(privateComment);
         request.setStatus(MemberCandidacy.Status.REJECTED);
@@ -526,7 +591,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         // Create the candidacy
         MemberCandidacy candidacy = new MemberCandidacy(wikiId, userId, MemberCandidacy.CandidateType.INVITATION);
         candidacy.setUserComment(message);
-        candidacy.setAdminId(xcontext.getUser());
+        candidacy.setAdminId(documentReferenceSerializer.serialize(xcontext.getUserReference()));
 
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);

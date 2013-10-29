@@ -90,26 +90,25 @@ public class XWikiServletResponseStub implements XWikiResponse
     @Override
     public String encodeRedirectURL(String arg0)
     {
-        return null;
+        return arg0;
     }
 
     @Override
     public String encodeRedirectUrl(String arg0)
     {
-        return null;
+        return arg0;
     }
 
     @Override
     public String encodeURL(String arg0)
     {
-        // TODO Auto-generated method stub
-        return null;
+        return arg0;
     }
 
     @Override
     public String encodeUrl(String arg0)
     {
-        return null;
+        return arg0;
     }
 
     @Override

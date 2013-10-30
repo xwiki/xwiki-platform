@@ -159,11 +159,11 @@ public interface WikiDocumentFilter
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
-    void beginWikiDocumentRevision(@Name("version") String version,
+    void beginWikiDocumentRevision(@Name("revision") String revision,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
-    void endWikiDocumentRevision(@Name("version") String version,
+    void endWikiDocumentRevision(@Name("revision") String revision,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 }

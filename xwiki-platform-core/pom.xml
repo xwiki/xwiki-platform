@@ -376,6 +376,8 @@
             <!-- XWikiURL (now Resource) should only be in the Execution Context and not in the Request -->
             <exclude>org/xwiki/container/servlet/ServletRequest</exclude>
             <exclude>org/xwiki/container/portlet/PortletRequest</exclude>
+            <!-- Lots of refactoring in WikiStream -->
+            <exclude>org/xwiki/wikistream/**</exclude>
           </excludes>
         </configuration>
       </plugin>

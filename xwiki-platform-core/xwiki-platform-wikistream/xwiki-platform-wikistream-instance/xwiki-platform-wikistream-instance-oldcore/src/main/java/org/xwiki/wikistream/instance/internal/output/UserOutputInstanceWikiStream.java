@@ -39,11 +39,10 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.properties.ConverterManager;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.user.UserFilter;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
@@ -64,13 +63,14 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 public class UserOutputInstanceWikiStream extends AbstractBeanOutputWikiStream<UserOutputProperties> implements
     UserInstanceOutputFilter
 {
-    @Inject
-    @Named("current")
-    private DocumentReferenceResolver<EntityReference> entityResolver;
+    private static final EntityReference DEFAULT_SPACE = new EntityReference("XWiki", EntityType.SPACE);
 
     @Inject
     @Named("relative")
     private EntityReferenceResolver<String> relativeResolver;
+
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -126,31 +126,9 @@ public class UserOutputInstanceWikiStream extends AbstractBeanOutputWikiStream<U
         return get(boolean.class, key, parameters, def);
     }
 
-    private int getInt(String key, FilterEventParameters parameters, int def)
-    {
-        return get(int.class, key, parameters, def);
-    }
-
-    private Syntax getSyntax(String key, FilterEventParameters parameters, Syntax def)
-    {
-        return get(Syntax.class, key, parameters, def);
-    }
-
-    private EntityReference getEntityReference(String key, FilterEventParameters parameters, EntityReference def)
-    {
-        Object reference = get(Object.class, key, parameters, def);
-
-        if (reference instanceof EntityReference) {
-            return (EntityReference) reference;
-        }
-
-        return reference != null ? this.relativeResolver.resolve(reference.toString(), EntityType.DOCUMENT, parameters)
-            : def;
-    }
-
     private DocumentReference getUserDocumentReference(String id)
     {
-        return new DocumentReference(this.currentWiki, "XWiki", id);
+        return new DocumentReference(this.currentWiki, DEFAULT_SPACE.getName(), id);
     }
 
     private XWikiDocument getUserDocument(String id) throws XWikiException
@@ -162,7 +140,7 @@ public class UserOutputInstanceWikiStream extends AbstractBeanOutputWikiStream<U
 
     private DocumentReference getGroupDocumentReference(String id)
     {
-        return new DocumentReference(this.currentWiki, "XWiki", id);
+        return new DocumentReference(this.currentWiki, DEFAULT_SPACE.getName(), id);
     }
 
     private XWikiDocument getGroupDocument(String id) throws XWikiException
@@ -245,17 +223,25 @@ public class UserOutputInstanceWikiStream extends AbstractBeanOutputWikiStream<U
         // Update user properties
         userClass.fromValueMap(map, userObject);
 
-        // Dates
-        if (userDocument.isNew() && this.properties.isPreserveVersion()) {
-            if (parameters.containsKey(UserFilter.PARAMETER_CREATION_DATE)) {
-                userDocument.setCreationDate(getDate(UserFilter.PARAMETER_CREATION_DATE, parameters, new Date()));
-            }
-            if (parameters.containsKey(UserFilter.PARAMETER_REVISION_DATE)) {
-                userDocument.setDate(getDate(UserFilter.PARAMETER_CREATION_DATE, parameters, new Date()));
-                userDocument.setContentUpdateDate(getDate(UserFilter.PARAMETER_CREATION_DATE, parameters, new Date()));
+        if (userDocument.isNew()) {
+            // Authors
+            userDocument.setCreatorReference(userDocument.getDocumentReference());
+            userDocument.setAuthorReference(userDocument.getDocumentReference());
+            userDocument.setContentAuthorReference(userDocument.getDocumentReference());
+
+            // Dates
+            if (this.properties.isPreserveVersion()) {
+                if (parameters.containsKey(UserFilter.PARAMETER_CREATION_DATE)) {
+                    userDocument.setCreationDate(getDate(UserFilter.PARAMETER_CREATION_DATE, parameters, new Date()));
+                }
+                if (parameters.containsKey(UserFilter.PARAMETER_REVISION_DATE)) {
+                    userDocument.setDate(getDate(UserFilter.PARAMETER_REVISION_DATE, parameters, new Date()));
+                    userDocument.setContentUpdateDate(getDate(UserFilter.PARAMETER_REVISION_DATE, parameters,
+                        new Date()));
+                }
             }
 
-            // Set false to force the date we want
+            // Set false to force the date and authors we want
             userDocument.setMetaDataDirty(false);
         }
 
@@ -287,6 +273,19 @@ public class UserOutputInstanceWikiStream extends AbstractBeanOutputWikiStream<U
         this.members = new ArrayList<String>();
     }
 
+    private void addMember(String member, XWikiDocument groupDocument, BaseClass groupClass, XWikiContext xcontext)
+        throws WikiStreamException
+    {
+        BaseObject memberObject;
+        try {
+            memberObject = groupDocument.newXObject(groupClass.getReference(), xcontext);
+        } catch (XWikiException e) {
+            throw new WikiStreamException("Failed to add a group member object", e);
+        }
+
+        memberObject.setStringValue("member", member);
+    }
+
     @Override
     public void endGroup(String name, FilterEventParameters parameters) throws WikiStreamException
     {
@@ -306,15 +305,13 @@ public class UserOutputInstanceWikiStream extends AbstractBeanOutputWikiStream<U
             throw new WikiStreamException("Failed to get group class", e);
         }
 
-        for (String member : this.members) {
-            BaseObject memberObject;
-            try {
-                memberObject = groupDocument.newXObject(groupClass.getReference(), xcontext);
-            } catch (XWikiException e) {
-                throw new WikiStreamException("Failed to add a group member object", e);
+        if (this.members.isEmpty()) {
+            // Put an empty member so that the document is "marked" as group
+            addMember("", groupDocument, groupClass, xcontext);
+        } else {
+            for (String member : this.members) {
+                addMember(member, groupDocument, groupClass, xcontext);
             }
-
-            memberObject.setStringValue("member", member);
         }
 
         // Save
@@ -328,15 +325,22 @@ public class UserOutputInstanceWikiStream extends AbstractBeanOutputWikiStream<U
         this.members = null;
     }
 
+    private void addMember(String name)
+    {
+        EntityReference memberReference = this.relativeResolver.resolve(name, EntityType.DOCUMENT, DEFAULT_SPACE);
+
+        this.members.add(this.serializer.serialize(memberReference));
+    }
+
     @Override
     public void onGroupMemberUser(String name, FilterEventParameters parameters) throws WikiStreamException
     {
-        this.members.add(name);
+        addMember(name);
     }
 
     @Override
     public void onGroupMemberGroup(String name, FilterEventParameters parameters) throws WikiStreamException
     {
-        this.members.add(name);
+        addMember(this.properties.getGroupPrefix() + name + this.properties.getGroupSuffix());
     }
 }

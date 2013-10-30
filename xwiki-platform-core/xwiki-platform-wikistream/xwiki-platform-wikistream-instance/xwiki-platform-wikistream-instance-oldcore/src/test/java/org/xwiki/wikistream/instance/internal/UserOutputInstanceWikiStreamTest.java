@@ -19,6 +19,8 @@
  */
 package org.xwiki.wikistream.instance.internal;
 
+import java.text.ParseException;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -26,13 +28,17 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.internal.output.UserOutputInstanceWikiStream;
+import org.xwiki.wikistream.instance.internal.output.UserOutputProperties;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -43,6 +49,10 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @AllComponents
 public class UserOutputInstanceWikiStreamTest extends AbstractOutputInstanceWikiStreamTest
 {
+    LocalDocumentReference USER_CLASS = new LocalDocumentReference("XWiki", "XWikiUsers");
+
+    LocalDocumentReference GROUP_CLASS = new LocalDocumentReference("XWiki", "XWikiGroups");
+
     @Override
     public void before() throws ComponentLookupException, XWikiException
     {
@@ -58,7 +68,7 @@ public class UserOutputInstanceWikiStreamTest extends AbstractOutputInstanceWiki
 
                     XWikiDocument userDocument =
                         oldcore.getMockXWiki().getDocument(
-                            new DocumentReference(xcontext.getDatabase(), "XWiki", "XWikiUsers"), xcontext);
+                            new DocumentReference(USER_CLASS, new WikiReference(xcontext.getDatabase())), xcontext);
 
                     final BaseClass userClass = userDocument.getXClass();
 
@@ -89,7 +99,7 @@ public class UserOutputInstanceWikiStreamTest extends AbstractOutputInstanceWiki
 
                     XWikiDocument groupDocument =
                         oldcore.getMockXWiki().getDocument(
-                            new DocumentReference(xcontext.getDatabase(), "XWiki", "XWikiGroups"), xcontext);
+                            new DocumentReference(GROUP_CLASS, new WikiReference(xcontext.getDatabase())), xcontext);
 
                     final BaseClass groupClass = groupDocument.getXClass();
 
@@ -107,14 +117,95 @@ public class UserOutputInstanceWikiStreamTest extends AbstractOutputInstanceWiki
     // Tests
 
     @Test
-    public void testUsersAndGroups() throws WikiStreamException, XWikiException
+    public void testImportUsersAndGroupsPreserveVersion() throws WikiStreamException, XWikiException, ParseException
     {
-        importFromXML("user1", null);
+        UserOutputProperties outputProperties = new UserOutputProperties();
+
+        outputProperties.setPreserveVersion(true);
+
+        importFromXML("user1", outputProperties);
+
+        // XWiki.user1
 
         XWikiDocument userDocument =
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "user1"),
                 this.oldcore.getXWikiContext());
 
         Assert.assertFalse(userDocument.isNew());
+
+        Assert.assertEquals(new DocumentReference("wiki1", "XWiki", "user1"), userDocument.getCreatorReference());
+        Assert.assertEquals(toDate("2000-01-10 00:00:00.0 UTC"), userDocument.getCreationDate());
+        Assert.assertEquals(new DocumentReference("wiki1", "XWiki", "user1"), userDocument.getAuthorReference());
+        Assert.assertEquals(toDate("2000-01-11 00:00:00.0 UTC"), userDocument.getDate());
+        Assert.assertEquals(toDate("2000-01-11 00:00:00.0 UTC"), userDocument.getContentUpdateDate());
+        Assert.assertEquals(new DocumentReference("wiki1", "XWiki", "user1"), userDocument.getContentAuthorReference());
+        Assert.assertEquals(false, userDocument.isMinorEdit());
+        Assert.assertEquals("Import", userDocument.getComment());
+
+        BaseObject userObject = userDocument.getXObject(USER_CLASS);
+        Assert.assertEquals(0, userObject.getNumber());
+        Assert.assertEquals("user1 first name", userObject.getStringValue("first_name"));
+        Assert.assertEquals("user1 last name", userObject.getStringValue("last_name"));
+        Assert.assertEquals("user1@email.ext", userObject.getStringValue("email"));
+        Assert.assertEquals(1, userObject.getIntValue("active"));
+
+        // XWiki.user2
+
+        userDocument =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "user2"),
+                this.oldcore.getXWikiContext());
+
+        Assert.assertFalse(userDocument.isNew());
+
+        Assert.assertEquals(new DocumentReference("wiki1", "XWiki", "user2"), userDocument.getCreatorReference());
+        Assert.assertEquals(toDate("2000-01-20 00:00:00.0 UTC"), userDocument.getCreationDate());
+        Assert.assertEquals(new DocumentReference("wiki1", "XWiki", "user2"), userDocument.getAuthorReference());
+        Assert.assertEquals(toDate("2000-01-21 00:00:00.0 UTC"), userDocument.getDate());
+        Assert.assertEquals(toDate("2000-01-21 00:00:00.0 UTC"), userDocument.getContentUpdateDate());
+        Assert.assertEquals(new DocumentReference("wiki1", "XWiki", "user2"), userDocument.getContentAuthorReference());
+        Assert.assertEquals(false, userDocument.isMinorEdit());
+        Assert.assertEquals("Import", userDocument.getComment());
+
+        userObject = userDocument.getXObject(USER_CLASS);
+        Assert.assertEquals(0, userObject.getNumber());
+        Assert.assertEquals("user2 first name", userObject.getStringValue("first_name"));
+        Assert.assertEquals("user2 last name", userObject.getStringValue("last_name"));
+        Assert.assertEquals("user2@email.ext", userObject.getStringValue("email"));
+        Assert.assertEquals(0, userObject.getIntValue("active"));
+
+        // XWiki.group1
+
+        XWikiDocument groupDocument =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "group1"),
+                this.oldcore.getXWikiContext());
+
+        Assert.assertFalse(groupDocument.isNew());
+
+        BaseObject groupMemberObject0 = groupDocument.getXObject(GROUP_CLASS, 0);
+        Assert.assertEquals("XWiki.user1", groupMemberObject0.getStringValue("member"));
+        BaseObject groupMemberObject1 = groupDocument.getXObject(GROUP_CLASS, 1);
+        Assert.assertEquals("XWiki.user2", groupMemberObject1.getStringValue("member"));
+        
+        // XWiki.group2
+        
+        groupDocument =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "group2"),
+                this.oldcore.getXWikiContext());
+
+        Assert.assertFalse(groupDocument.isNew());
+
+        groupMemberObject0 = groupDocument.getXObject(GROUP_CLASS, 0);
+        Assert.assertEquals("XWiki.group1", groupMemberObject0.getStringValue("member"));
+
+        // XWiki.emptygroup
+
+        groupDocument =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "emptygroup"),
+                this.oldcore.getXWikiContext());
+
+        Assert.assertFalse(groupDocument.isNew());
+
+        groupMemberObject0 = groupDocument.getXObject(GROUP_CLASS, 0);
+        Assert.assertEquals("", groupMemberObject0.getStringValue("member"));
     }
 }

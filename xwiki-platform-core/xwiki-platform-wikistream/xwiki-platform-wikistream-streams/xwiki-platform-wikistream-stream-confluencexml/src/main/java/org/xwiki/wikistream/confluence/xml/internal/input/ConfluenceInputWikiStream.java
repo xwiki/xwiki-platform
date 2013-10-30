@@ -22,6 +22,7 @@ package org.xwiki.wikistream.confluence.xml.internal.input;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Locale;
@@ -38,6 +39,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.confluence.xml.internal.ConfluenceFilter;
 import org.xwiki.wikistream.confluence.xml.internal.ConfluenceXMLPackage;
@@ -58,6 +60,14 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
 {
     @Inject
     private Logger logger;
+
+    @Inject
+    @Named("confluence/1.0")
+    private StreamParser confluenceWIKIParser;
+
+    @Inject
+    @Named("confluence+xhtml/1.0")
+    private StreamParser confluenceXHTMLParser;
 
     private ConfluenceXMLPackage confluencePackage;
 
@@ -357,7 +367,27 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
         String confluenceBody = pageProperties.getString(ConfluenceXMLPackage.KEY_PAGE_BODY);
         int bodyType = pageProperties.getInt(ConfluenceXMLPackage.KEY_PAGE_BODY_TYPE);
 
-        // TODO: convert body
+        switch (bodyType) {
+            case 0:
+                try {
+                    this.confluenceWIKIParser.parse(new StringReader(confluenceBody), proxyFilter);
+                } catch (org.xwiki.rendering.parser.ParseException e) {
+                    throw new WikiStreamException(String.format("Failed parser content [{}]", confluenceBody));
+                }
+                break;
+            case 2:
+                try {
+                    this.confluenceXHTMLParser.parse(new StringReader(confluenceBody), proxyFilter);
+                } catch (org.xwiki.rendering.parser.ParseException e) {
+                    throw new WikiStreamException(String.format("Failed parser content [{}]", confluenceBody));
+                }
+                break;
+            default:
+                if (this.properties.isVerbose()) {
+                    this.logger.error("Usupported body type [{}]", bodyType);
+                }
+                break;
+        }
 
         // > WikiDocumentRevision
         proxyFilter.beginWikiDocumentRevision(revision, documentRevisionParameters);

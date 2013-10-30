@@ -40,5 +40,6 @@
     <module>xwiki-platform-wikistream-events-model</module>
     <module>xwiki-platform-wikistream-events-xwiki</module>
     <module>xwiki-platform-wikistream-events-extension</module>
+    <module>xwiki-platform-wikistream-events-user</module>
   </modules>
 </project>

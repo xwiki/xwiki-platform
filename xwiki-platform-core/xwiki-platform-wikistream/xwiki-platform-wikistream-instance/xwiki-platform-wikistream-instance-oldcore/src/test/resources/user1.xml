@@ -20,10 +20,18 @@
           <string>active</string>
           <boolean>true</boolean>
         </entry>
+        <entry>
+          <string>creation_date</string>
+          <date>2000-01-10 00:00:00.0 UTC</date>
+        </entry>
+        <entry>
+          <string>revision_date</string>
+          <date>2000-01-11 00:00:00.0 UTC</date>
+        </entry>
       </parameters>
     </p>
   </user>
-  <user name="user2id">
+  <user name="user2">
     <p>
       <parameters>
         <entry>
@@ -42,6 +50,14 @@
           <string>active</string>
           <boolean>false</boolean>
         </entry>
+        <entry>
+          <string>creation_date</string>
+          <date>2000-01-20 00:00:00.0 UTC</date>
+        </entry>
+        <entry>
+          <string>revision_date</string>
+          <date>2000-01-21 00:00:00.0 UTC</date>
+        </entry>
       </parameters>
     </p>
   </user>
@@ -52,5 +68,5 @@
   <group name="group2">
     <groupMemberGroup name="group1" />
   </group>
-  <group name="group3" />
+  <group name="emptygroup" />
 </wiki>

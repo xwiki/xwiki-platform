@@ -20,9 +20,14 @@
 package org.xwiki.wikistream.instance.internal;
 
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.mockito.Mockito;
@@ -59,6 +64,8 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
 @AllComponents
 public class AbstractOutputInstanceWikiStreamTest
 {
+    private static final SimpleDateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S z", Locale.ENGLISH);
+
     protected MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
 
     @Rule
@@ -113,8 +120,10 @@ public class AbstractOutputInstanceWikiStreamTest
                 public Object answer(InvocationOnMock invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
+                    String comment = (String) invocation.getArguments()[1];
                     boolean minorEdit = (Boolean) invocation.getArguments()[2];
 
+                    document.setComment(StringUtils.defaultString(comment));
                     document.setMinorEdit(minorEdit);
                     document.incrementVersion();
                     document.setNew(false);
@@ -212,5 +221,10 @@ public class AbstractOutputInstanceWikiStreamTest
         InputWikiStream inputWikiStream = this.inputWikiStreamFactory.createInputWikiStream(properties);
 
         inputWikiStream.read(outputWikiStream.getFilter());
+    }
+
+    protected Date toDate(String date) throws ParseException
+    {
+        return DATE_PARSER.parse(date);
     }
 }

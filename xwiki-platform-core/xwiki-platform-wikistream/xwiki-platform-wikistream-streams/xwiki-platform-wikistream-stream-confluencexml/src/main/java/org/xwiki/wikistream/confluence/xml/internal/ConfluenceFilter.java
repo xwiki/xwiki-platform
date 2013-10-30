@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.confluence.xml.internal;
 
+import org.xwiki.rendering.listener.Listener;
 import org.xwiki.wikistream.filter.user.GroupFilter;
 import org.xwiki.wikistream.filter.user.UserFilter;
 import org.xwiki.wikistream.model.filter.FarmFilter;
@@ -39,7 +40,7 @@ import org.xwiki.wikistream.model.filter.WikiSpaceFilter;
  */
 public interface ConfluenceFilter extends FarmFilter, WikiFilter, WikiSpaceFilter, WikiDocumentFilter,
     WikiAttachmentFilter, WikiClassFilter, WikiClassPropertyFilter, WikiObjectFilter, WikiObjectPropertyFilter,
-    UserFilter, GroupFilter
+    UserFilter, GroupFilter, Listener
 {
 
 }

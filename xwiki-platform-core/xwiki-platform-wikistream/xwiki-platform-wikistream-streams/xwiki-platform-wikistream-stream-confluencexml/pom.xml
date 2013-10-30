@@ -40,6 +40,10 @@
       <artifactId>commons-compress</artifactId>
     </dependency>
     <dependency>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wikistream-xml</artifactId>
       <version>${project.version}</version>

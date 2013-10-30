@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.instance.internal;
 
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -52,7 +53,7 @@ public class DocumentOutputInstanceWikiStreamTest extends AbstractOutputInstance
     // Tests
 
     @Test
-    public void testDocumentFull() throws WikiStreamException, XWikiException
+    public void testImportDocumentsPreserveVersion() throws WikiStreamException, XWikiException, ParseException
     {
         DocumentOutputProperties outputProperties = new DocumentOutputProperties();
 
@@ -76,14 +77,14 @@ public class DocumentOutputInstanceWikiStreamTest extends AbstractOutputInstance
         Assert.assertEquals(true, document.isHidden());
         Assert.assertEquals("content", document.getContent());
 
-        //Assert.assertEquals(new DocumentReference("wiki", "XWiki", "creator"), document.getCreatorReference());
-        //Assert.assertEquals(Locale.ROOT, document.getCreationDate());
-        //Assert.assertEquals(Locale.ROOT, document.getAuthorReference());
-        //Assert.assertEquals(Locale.ROOT, document.getDate());
-        //Assert.assertEquals(Locale.ROOT, document.getContentUpdateDate());
-        //Assert.assertEquals(new DocumentReference("wiki", "space", "contentAuthor"), document.getContentAuthorReference());
-        //Assert.assertEquals(Locale.ROOT, document.isMinorEdit());
-        //Assert.assertEquals(Locale.ROOT, document.getComment());
+        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "creator"), document.getCreatorReference());
+        Assert.assertEquals(toDate("2000-01-01 00:00:00.0 UTC"), document.getCreationDate());
+        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
+        Assert.assertEquals(toDate("2000-01-02 00:00:00.0 UTC"), document.getDate());
+        Assert.assertEquals(toDate("2000-01-03 00:00:00.0 UTC"), document.getContentUpdateDate());
+        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"), document.getContentAuthorReference());
+        Assert.assertEquals(false, document.isMinorEdit());
+        Assert.assertEquals("comment", document.getComment());
 
         // Attachment
 
@@ -94,10 +95,10 @@ public class DocumentOutputInstanceWikiStreamTest extends AbstractOutputInstance
         Assert.assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
             attachment.getContent(this.oldcore.getXWikiContext())));
 
-        //Assert.assertEquals(Locale.ROOT, attachment.getAuthor());
-        //Assert.assertEquals(Locale.ROOT, attachment.getDate());
-        //Assert.assertEquals(Locale.ROOT, attachment.getVersion());
-        //Assert.assertEquals(Locale.ROOT, attachment.getComment());
+        Assert.assertEquals("XWiki.attachmentAuthor", attachment.getAuthor());
+        Assert.assertEquals(toDate("2000-01-05 00:00:00.0 UTC"), attachment.getDate());
+        Assert.assertEquals("1.1", attachment.getVersion());
+        Assert.assertEquals("attachment comment", attachment.getComment());
 
         // XClass
 

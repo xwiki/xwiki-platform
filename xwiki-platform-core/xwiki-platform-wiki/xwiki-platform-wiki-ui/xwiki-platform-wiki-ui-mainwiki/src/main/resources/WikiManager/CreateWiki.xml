@@ -25,6 +25,234 @@
   <hidden>true</hidden>
   <object>
     <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass></customClass>
+      <customMapping></customMapping>
+      <defaultViewSheet></defaultViewSheet>
+      <defaultEditSheet></defaultEditSheet>
+      <defaultWeb></defaultWeb>
+      <nameField></nameField>
+      <validationScript></validationScript>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator></separator>
+        <separators>,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator></separator>
+        <separators>,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>WikiManager.CreateWiki</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>64f76087-6318-4e80-aae7-85ccd298eb7f</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>(function(){
+
+  var domainnamesetted = false;
+  var lastwikiname;
+
+  ## Error messages
+  #set ($MSG_ERROR_WIKIALREADYEXISTS = "$services.localization.render('workspacemanager.wikiname.error.wikialreadyexists')")
+  #set ($MSG_ERROR_DATABASEALREADYEXISTS = "$services.localization.render('workspacemanager.wikiname.error.databasealreadyexists')")
+  #set ($MSG_ERROR_WIKINAMEALREADYUSED = "$services.localization.render('workspacemanager.wikiname.error.alreadyused')")
+  #set ($MSG_ERROR_WIKINAMEEMPTY = "$services.localization.render('workspacemanager.wikiname.error.empty')")
+  #set ($MSG_ERROR_WIKIPRETTYNAMEEMPTY = "$services.localization.render('workspacemanager.wikiprettyname.error.empty')")
+  #set ($MSG_INFO_WIKINAMEVALID = "$services.localization.render('workspacemanager.wikiname.info.valid')")
+  #set ($ISWIKINAMEAVAILABLE = $xwiki.getURL($services.model.createDocumentReference("", "WikiManagerCode", "IsWikiOrDatabaseOrAvailableService")))
+
+  /**
+   * Init the event handlers
+   */
+  function init() {
+    var prettyName = $('prettyname');
+    prettyName.observe('change', prettyNameChanged);
+    prettyName.observe('keyup', prettyNameChanged);
+    var wikiName   = $('wikiname');
+    wikiName.observe('change', wikiNameChanged);
+    wikiName.observe('keyup', wikiNameChanged);
+    if(prettyName.value.blank() || wikiName.value.blank()){
+      $('wizard-next').disabled = true;
+    } 
+  }
+  
+  /**
+   * Pretty name changed
+   */
+  function prettyNameChanged(event){
+    var prettyName = $('prettyname');
+    if(prettyName.value.blank()){
+      $('wikiprettynamevalidation').innerHTML = "$MSG_ERROR_WIKIPRETTYNAMEEMPTY";
+      prettyName.addClassName('xErrorField');          
+    }else{
+      $('wikiprettynamevalidation').innerHTML = '';
+      prettyName.removeClassName('xErrorField');
+      // If the user has manually changed the wikiname, we don't generate it automaticaly anymore
+      if(!domainnamesetted){
+        var wikiName = $('wikiname');
+        wikiName.value = prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
+        validateWikiName();
+      }
+    }
+  }
+  /**
+   * Wiki name changed
+   */
+  function wikiNameChanged(event){
+    domainnamesetted = true;
+    validateWikiName();
+  }
+  /**
+   * Validate the wiki name
+   */
+  function validateWikiName(){
+    var wikiNameElement = $('wikiname');
+    var wikiname = wikiNameElement.value; 
+    var filteredWikiName = filterWikiName(wikiname);
+    if (wikiname != filteredWikiName) {
+      wikiNameElement.value = filteredWikiName;
+      wikiname = filteredWikiName;
+    }
+    if (lastwikiname == wikiname){
+      return;
+    }
+    lastwikiname = wikiname;
+    if (wikiname &amp;&amp; !wikiname.blank()) {
+      var surl = "$ISWIKINAMEAVAILABLE" + "?xpage=plain&amp;outputSyntax=plain&amp;ajax=1&amp;wikiname=" + escape(wikiname);
+      surl += "&amp;form_token=$!{services.csrf.getToken()}";
+      new Ajax.Request(surl, {
+        method: 'get',
+        onSuccess: function(transport) {
+          if (transport.responseText == "true") {
+            $('wikinamevalidation').innerHTML = "";
+            wikiNameElement.removeClassName('xErrorField');
+              if (!$('prettyname').value.blank()) {
+                $('wizard-next').disabled = false;
+              }
+          }
+          else if (transport.responseText == "database"){
+            $('wikinamevalidation').innerHTML = "$MSG_ERROR_DATABASEALREADYEXISTS";
+            wikiNameElement.addClassName('xErrorField');
+            $('wizard-next').disabled = true;
+          }
+          else if (transport.responseText == "wiki"){
+            $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKIALREADYEXISTS";
+            wikiNameElement.addClassName('xErrorField');
+            $('wizard-next').disabled = true;
+          }
+          else{
+            $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEALREADYUSED";
+            wikiNameElement.addClassName('xErrorField');
+            $('wizard-next').disabled = true;
+          }
+        }
+      });
+    }
+    else{
+      $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEEMPTY";
+      $('wizard-next').disabled = true;
+    }
+  }
+  /**
+   * Filter wiki name
+   */
+  function filterWikiName(wikiName){
+    var result = noaccent(wikiName);
+
+    // The server-side code strips '_' chars from the database name.
+    result = result.replace(/[_]/g, "");
+
+    // Classic requirement for an identifier is to start with a letter.
+    while (result.length &gt; 0 &amp;&amp; !isNaN(result.charAt(0))) {
+      result = result.substring(1);
+    }
+
+    // Out of all databases, Oracle seems to be the least permissive, limiting schema names to 30 chars.
+    if (result.length &gt; 30) {
+      result = result.substring(0, 30);
+    }
+
+    // Keep IDs lowercased.
+    result = result.toLowerCase();
+
+    return result;
+  }
+
+  /**
+   * Call Init
+   */
+  (XWiki &amp;&amp; XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
+
+})();</code>
+    </property>
+    <property>
+      <name>JS</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass></customClass>
       <customMapping></customMapping>
@@ -104,7 +332,7 @@
     </property>
     <property>
       <code>#contentmenu, #hierarchy, #document-info, #xdocFooter{
-        display: none;
+  display: none;
         }
       </code>
     </property>

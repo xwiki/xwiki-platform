@@ -113,7 +113,6 @@ workspacemanager.install.translations=The translations page has been automatical
 workspacemanager.error.workspacedoesnotexist=Wiki [{0}] does not exist
 workspacemanager.wikiname.error.databasealreadyexists=A database with this identifier already exists
 workspacemanager.wikiname.error.wikialreadyexists=A wiki with this identifier already exists
-workspacemanager.wikiname.error.workspacealreadyexists=A wiki with this identifier already exists
 workspacemanager.wikiname.error.empty=Identifier can't be empty
 workspacemanager.wikiname.error.alreadyused=This identifier is already used
 platform.workspace.templateNotInstalledInstallNow=Wiki template is not yet installed. Install the wiki template now?
@@ -294,6 +293,7 @@ workspacemanager.menu.workspace.mainWiki=Main Wiki
 WorkspaceManager.WorkspaceClass_membershipType_open=Open for any user to join
 WorkspaceManager.WorkspaceClass_membershipType_request=Any user can request to join but an admin must accept
 WorkspaceManager.WorkspaceClass_membershipType_invite=Only an admin can invite a user
+workspacemanager.wikiname.error.workspacealreadyexists=A wiki with this identifier already exists
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

@@ -565,20 +565,20 @@ public class DefaultWikiUserManager implements WikiUserManager
     }
 
     @Override
-    public void cancelRequest(MemberCandidacy request) throws WikiUserManagerException
+    public void cancelCandidacy(MemberCandidacy candidacy) throws WikiUserManagerException
     {
         // Get the group document
-        XWikiDocument groupDoc = getMembersGroupDocument(request.getWikiId());
+        XWikiDocument groupDoc = getMembersGroupDocument(candidacy.getWikiId());
 
         // Get the candidacy object
-        DocumentReference candidateClassReference = new DocumentReference(request.getWikiId(), CANDIDACY_CLASS_SPACE,
+        DocumentReference candidateClassReference = new DocumentReference(candidacy.getWikiId(), CANDIDACY_CLASS_SPACE,
                 CANDIDACY_CLASS_NAME);
-        BaseObject object = groupDoc.getXObject(candidateClassReference, request.getId());
+        BaseObject object = groupDoc.getXObject(candidateClassReference, candidacy.getId());
 
         // Remove the candidacy, if any
         if (object != null) {
             groupDoc.removeXObject(object);
-            saveGroupDocument(groupDoc, String.format("User [%s] has cancel her join request.", request.getUserId()));
+            saveGroupDocument(groupDoc, String.format("Candidacy [%d] is canceled.", candidacy.getId()));
         }
     }
 

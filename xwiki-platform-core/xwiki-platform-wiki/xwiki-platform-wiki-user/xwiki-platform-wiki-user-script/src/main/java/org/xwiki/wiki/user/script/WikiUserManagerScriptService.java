@@ -28,13 +28,13 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.user.MemberCandidacy;
@@ -53,6 +53,7 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Named("wikiuser")
 @Singleton
+@Unstable
 public class WikiUserManagerScriptService implements ScriptService
 {
     @Inject
@@ -68,7 +69,7 @@ public class WikiUserManagerScriptService implements ScriptService
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * @return whether or not the current wiki has local users enabled
@@ -112,7 +113,7 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public MembershipType getMembershipType()
     {
-        return getMembershipType(wikiDescriptorManager.getMainWikiId());
+        return getMembershipType(wikiDescriptorManager.getCurrentWikiId());
     }
 
     /**
@@ -257,8 +258,8 @@ public class WikiUserManagerScriptService implements ScriptService
         XWikiContext xcontext = xcontextProvider.get();
 
         // If the user is concerned by the candidacy
-        DocumentReference userReference = documentReferenceResolver.resolve(candidacy.getUserId());
-        if (userReference.equals(xcontext.getUserReference())) {
+        String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
+        if (candidacy.getUserId().equals(currentUser)) {
             // Hide the admin private comment
             candidacy.setAdminPrivateComment(null);
             return true;
@@ -357,8 +358,8 @@ public class WikiUserManagerScriptService implements ScriptService
     {
         // Check if the current user is userId
         XWikiContext xcontext = xcontextProvider.get();
-        DocumentReference userReference = documentReferenceResolver.resolve(userId);
-        if (!xcontext.getUserReference().equals(userReference)) {
+        String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
+        if (!userId.equals(currentUser)) {
             //TODO
             return false;
         }
@@ -383,8 +384,8 @@ public class WikiUserManagerScriptService implements ScriptService
     {
         // Check if the current user is userId
         XWikiContext xcontext = xcontextProvider.get();
-        DocumentReference userReference = documentReferenceResolver.resolve(userId);
-        if (!xcontext.getUserReference().equals(userReference)) {
+        String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
+        if (!userId.equals(currentUser)) {
             //TODO
             return false;
         }
@@ -430,9 +431,9 @@ public class WikiUserManagerScriptService implements ScriptService
     {
         // Check if the current user is userId
         XWikiContext xcontext = xcontextProvider.get();
-        DocumentReference userReference = documentReferenceResolver.resolve(request.getUserId());
-        if (!xcontext.getUserReference().equals(userReference)) {
-            //TODO
+        String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
+        if (!authorizationManager.hasAccess(Right.ADMIN, xcontext.getUserReference(),
+                new WikiReference(request.getWikiId()))) {
             return false;
         }
         try {
@@ -455,10 +456,10 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public boolean refuseRequest(MemberCandidacy request, String message, String privateComment)
     {
-        // Check if the current user is userId
+        // Check if the current user is admin
         XWikiContext xcontext = xcontextProvider.get();
-        DocumentReference userReference = documentReferenceResolver.resolve(request.getUserId());
-        if (!xcontext.getUserReference().equals(userReference)) {
+        if (!authorizationManager.hasAccess(Right.ADMIN, xcontext.getUserReference(),
+                new WikiReference(request.getWikiId()))) {
             return false;
         }
         try {
@@ -472,21 +473,24 @@ public class WikiUserManagerScriptService implements ScriptService
     }
 
     /**
-     * Cancel a join request.
+     * Cancel a candidacy.
      *
-     * @param request Join request to cancel
+     * @param candidacy Candidacy to cancel
      * @return true if it succeed
      */
-    public boolean cancelRequest(MemberCandidacy request)
+    public boolean cancelCandidacy(MemberCandidacy candidacy)
     {
         // Check if the current user is userId
         XWikiContext xcontext = xcontextProvider.get();
-        DocumentReference userReference = documentReferenceResolver.resolve(request.getUserId());
-        if (!xcontext.getUserReference().equals(userReference)) {
-            return false;
+        String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
+        if (!candidacy.getUserId().equals(currentUser)) {
+            if (!authorizationManager.hasAccess(Right.ADMIN, xcontext.getUserReference(),
+                    new WikiReference(candidacy.getWikiId()))) {
+                return false;
+            }
         }
         try {
-            wikiUserManager.cancelRequest(request);
+            wikiUserManager.cancelCandidacy(candidacy);
         } catch (WikiUserManagerException e) {
             // TODO
             return false;

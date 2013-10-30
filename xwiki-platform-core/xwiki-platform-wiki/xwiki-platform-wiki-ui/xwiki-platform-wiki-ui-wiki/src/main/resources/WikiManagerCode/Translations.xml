@@ -96,6 +96,8 @@ platform.workspace.inviteSuccess={0} invited successfully.
 platform.workspace.invitationCancelSaveComment=Cancelled invitation {0} ({1})
 platform.workspace.invitationCancelNotification=Your invitation has been cancelled and is no longer valid.
 platform.workspace.invitationCancelSuccess=Invitation cancelled successfully.
+platform.wikimanager.invitationCancelFailure=Error, you can not cancel this invitation.
+platform.wikimanager.candidateReviewFailure=Error, you can not cancel this invitation.
 
 # Duplicated from WorkspaceManager.Translations. To be removed when the 2 are merged.
 workspacemanager.error.workspacedoesnotexist=Wiki [{0}] does not exist

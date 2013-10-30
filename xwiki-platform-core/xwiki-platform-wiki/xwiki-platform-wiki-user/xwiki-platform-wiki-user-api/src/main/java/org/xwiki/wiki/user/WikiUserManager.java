@@ -22,6 +22,7 @@ package org.xwiki.wiki.user;
 import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
@@ -31,6 +32,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
  * @version $Id$
  */
 @Role
+@Unstable
 public interface WikiUserManager
 {
     /**
@@ -205,14 +207,6 @@ public interface WikiUserManager
         throws WikiUserManagerException;
 
     /**
-     * Cancel a join request.
-     *
-     * @param request Join request to cancel
-     * @throws WikiUserManagerException if problems occur
-     */
-    void cancelRequest(MemberCandidacy request) throws WikiUserManagerException;
-
-    /**
      * Invite a global user to a wiki.
      *
      * @param userId Id of the user to add
@@ -241,4 +235,11 @@ public interface WikiUserManager
      */
     void refuseInvitation(MemberCandidacy invitation, String message) throws WikiUserManagerException;
 
+    /**
+     * Cancel a candidacy.
+     *
+     * @param candidacy Candidacy to cancel
+     * @throws WikiUserManagerException if problems occur
+     */
+    void cancelCandidacy(MemberCandidacy candidacy) throws WikiUserManagerException;
 }

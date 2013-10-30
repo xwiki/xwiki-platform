@@ -19,6 +19,7 @@
  */
 package org.xwiki.wiki.user;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.properties.WikiPropertyGroup;
 
 /**
@@ -27,6 +28,7 @@ import org.xwiki.wiki.properties.WikiPropertyGroup;
  * @since 5.3M2
  * @version $Id$
  */
+@Unstable
 public class WikiUserPropertyGroup extends WikiPropertyGroup
 {
     /**

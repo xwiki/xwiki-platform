@@ -21,11 +21,14 @@ package org.xwiki.wiki.user;
 
 import java.util.Date;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Represents the invitation or the request to join a wiki.
  * @since 5.3M2
  * @version $Id$
  */
+@Unstable
 public class MemberCandidacy
 {
     /**

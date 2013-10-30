@@ -109,7 +109,7 @@
           ##
           ## User can decide if to accept or reject the invitation.
           {{html wiki='true'}}
-          $services.localization.render('platform.workspace.invitationViewTitle', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]"])
+          $services.localization.render('platform.workspace.invitationViewTitle', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
 
           &lt;form class='xform third' method='GET'&gt;
             &lt;dl&gt;
@@ -171,7 +171,7 @@
           #else
             ## User confirms the cancel of existing request.
             ##
-            #set ($result = $services.wikiuser.cancelRequest($pendingRequest))
+            #set ($result = $services.wikiuser.cancelCandidacy($pendingRequest))
             #if ($result)
               {{success}}$services.localization.render('platform.workspace.joinRequestCancelSuccess',  ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
             #else

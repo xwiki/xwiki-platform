@@ -291,55 +291,56 @@
 {{/velocity}}
 
 {{velocity}}
-#set ($candidateClass = 'WorkspaceCandidateMemberClass')
+#macro (printException $exception)
+  #if($exception.message)
+    {{error}}$services.localization.render('platform.workspace.exceptionWithMessage', [$exception.message]){{/error}}
+  #else
+    {{error}}$exception.class{{/error}}
+  #end
+#end
+#set ($candidateClass = 'WikiManagerCode.WikiCandidateMemberClass')
 #set ($xwikiGroupsClass = 'XWiki.XWikiGroups')
 #set ($messageStream = $services.messageStream)
-#set ($wikiDescriptor = $services.workspace.getWorkspace($xcontext.database).wikiDescriptor)
-#set ($workspacePrettyName = $wikiDescriptor.wikiPrettyName)
-#if ("$!workspacePrettyName" == '')
-  #set ($workspacePrettyName = $xcontext.database)
+#set ($wiki = $services.wiki.getById($services.wiki.currentWikiId))
+#set ($wikiPrettyName = $wiki.prettyName)
+#if ("$!wikiPrettyName" == '')
+  #set ($wikiPrettyName = $wiki.id)
 #end
-#set ($workspaceUrl = $wikiDescriptor.homePageUrl)
+#set ($wikiMainPage = $wiki.mainPageReference)
 ##
 #if ($hasAdmin &amp;&amp; ($request.acceptUser || $request.rejectUser))
   ## Handle a candidate members's request.
   ##
   #set ($candidateNumber = $mathtool.toInteger("$!{request.candidateNumber}"))
-  #set ($candidateMember = $groupDoc.getObject($candidateClass, $candidateNumber))
-  #if ($candidateMember &amp;&amp; $candidateMember.getProperty('status').getValue() == 'pending')
-    ## Common values.
-    #set ($temp = $candidateMember.set('reviewer', "$xcontext.user"))
-    #set ($temp = $candidateMember.set('resolutionDate', $datetool.date))
-    #set ($temp = $candidateMember.set('reviewerComment', "$!{request.reviewerComment}"))
-    #set ($temp = $candidateMember.set('reviewerPrivateComment', "$!{request.reviewerPrivateComment}"))
-    ## Specific values.
+  #set ($candidacy = $services.wikiuser.getCandidacy($wiki.id, $candidateNumber))
+  #if ($candidacy &amp;&amp; $$candidacy.status == 'PENDING')
     #if ($request.acceptUser)
-      #set ($temp = $candidateMember.set('status', 'accepted'))
-      ## Add user to group, if not already added, and notify user.
-      #set ($existingUserObject = $groupDoc.getObject($xwikiGroupsClass, 'member', $candidateMember.userName))
-      #if (!$existingUserObject)
-        #set ($newUserObject = $groupDoc.newObject($xwikiGroupsClass))
-        #set ($temp = $newUserObject.set('member', $candidateMember.userName))
+      #set ($success = $services.wikiuser.acceptRequest($candidacy, $request.reviewerComment, $request.reviewerPrivateComment))
+      #if ($success)
+        #set ($notificationMessage = $services.localization.render('platform.workspace.joinRequestAcceptedNotification', [$wikiPrettyName]))
       #end
-      #set ($notificationMessage = $services.localization.render('platform.workspace.joinRequestAcceptedNotification', [$workspacePrettyName]))
     #elseif ($request.rejectUser)
-      #set ($temp = $candidateMember.set('status', 'rejected'))
-      #set ($notificationMessage = $services.localization.render('platform.workspace.joinRequestRejectedNotification', [$workspacePrettyName]))
+      #set ($success = $services.wikiuser.refuseRequest($candidacy, $request.reviewerComment, $request.reviewerPrivateComment))
+      #if ($success)
+        #set ($notificationMessage = $services.localization.render('platform.workspace.joinRequestRejectedNotification', [$wikiPrettyName]))
+      #end
     #end
-    ## Save changes.
-    #set ($temp = $groupDoc.save($services.localization.render('platform.workspace.candidateHandledSaveComment', [$candidateNumber, $candidateMember.userName]), true))
     ## Notify the user.
     #if ("$!{request.reviewerComment}" != '')
       ## FIXME: replace newline with ${escapetool.newline} when upgrading velocity-tools to 2.0 (in xwiki3.1+?)
       #set ($notificationMessage = "${notificationMessage}
 $services.localization.render('platform.workspace.candidateHandledComment') ${request.reviewerComment}")
     #end
-    #set ($userDocumentReference = $services.model.resolveDocument($candidateMember.userName))
+    #set ($userDocumentReference = $services.model.resolveDocument($candidacy.userId))
     #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
-    #if ($request.acceptUser)
-      {{info}}{{translation key="platform.workspace.candidateAcceptedSuccess"/}}{{/info}}
+    #if ($success)
+      #if ($request.acceptUser)
+        {{info}}{{translation key="platform.workspace.candidateAcceptedSuccess"/}}{{/info}}
+      #else
+        {{info}}{{translation key="platform.workspace.candidateRejectedSuccess"/}}{{/info}}
+      #end
     #else
-      {{info}}{{translation key="platform.workspace.candidateRejectedSuccess"/}}{{/info}}
+        {{error}}{{translation key="platform.wikimanager.candidateReviewFailure"/}}{{/error}}
     #end
   #end
 #elseif($hasAdmin &amp;&amp; $request.inviteUser)
@@ -353,8 +354,9 @@ $services.localization.render('platform.workspace.candidateHandledComment') ${re
   ##
   ## Remove users that are already members.
   #set ($alreadyMembers = [])
+  #set ($members = $services.wikiuser.getMembers($wiki.id))
   #foreach ($name in $names)
-    #if ($groupDoc.getObject($xwikiGroupsClass, 'member', $name))
+    #if ($members.contains($name))
       #set ($discard = $alreadyMembers.add($name))
       {{error}}$services.localization.render('platform.workspace.inviteUserAlreadyMember', [$xwiki.getUserName($name, false)]){{/error}}
     #end
@@ -364,12 +366,10 @@ $services.localization.render('platform.workspace.candidateHandledComment') ${re
   ## Remove users that have already been invited.
   #set ($alreadyInvited = [])
   #foreach ($name in $names)
-    #foreach ($candidateMember in $groupDoc.getObjects($candidateClass, 'userName', $name))
-      #if ($candidateMember.getProperty('status').getValue() == 'pending')
+    #foreach ($candidateMember in $services.wikiuser.getAllInvitations($wiki.id))
+      #if ($candidateMember.status == 'PENDING')
         #set ($errorMessageKey = 'platform.workspace.inviteUserAlreadyInvited')
-        #if ($candidateMember.getProperty('type').getValue() == 'request')
-          #set ($errorMessageKey = 'platform.workspace.inviteRequestAlreadyExists')
-        #end
+        #set ($errorMessageKey = 'platform.workspace.inviteRequestAlreadyExists')
         {{error}}$services.localization.render($errorMessageKey, [$xwiki.getUserName($name, false)]){{/error}}
         #set ($discard = $alreadyInvited.add($name))
         #break
@@ -379,18 +379,9 @@ $services.localization.render('platform.workspace.candidateHandledComment') ${re
   #set ($discard = $names.removeAll($alreadyInvited))
   ##
   #foreach ($userName in $names)
-    #set ($newInvitationObject = $groupDoc.newObject($candidateClass))
-    #set ($temp = $newInvitationObject.set('status', 'pending'))
-    #set ($temp = $newInvitationObject.set('type', 'invitation'))
-    #set ($temp = $newInvitationObject.set('reviewer', "$xcontext.user"))
-    #set ($temp = $newInvitationObject.set('resolutionDate', $datetool.date))
-    #set ($temp = $newInvitationObject.set('reviewerComment', "$!message"))
-    #set ($temp = $newInvitationObject.set('userName', $userName))
-    ##set ($temp = $newInvitationObject.set('reviewerPrivateComment', "$!{request.reviewerPrivateComment}"))
-    ## Save the invitation.
-    #set ($temp = $groupDoc.save($services.localization.render('platform.workspace.inviteSaveComment', [$userName]), true))
+    #set ($temp = $services.wikiuser.invite($userName, $wiki.id, $message))
     ## Notify the user.
-    #set ($notificationMessage = $services.localization.render('platform.workspace.inviteNotification', [$workspacePrettyName]))
+    #set ($notificationMessage = $services.localization.render('platform.workspace.inviteNotification', [$wikiPrettyName]))
     #if ("$!message" != '')
       ## FIXME: remplace newline with ${escapetool.newline} when upgrading velocity-tools to 2.0 (in xwiki3.1+?)
       #set ($notificationMessage = "$notificationMessage
@@ -404,17 +395,19 @@ $services.localization.render('platform.workspace.candidateHandledComment') $mes
   ##
   ## Handle cancelling an invitation.
   #set ($candidateNumber = $mathtool.toInteger("$!{request.candidateNumber}"))
-  #set ($candidateMember = $groupDoc.getObject($candidateClass, $candidateNumber))
-  #if ($candidateMember &amp;&amp; $candidateMember.getProperty('status').getValue() == 'pending')
+  #set ($candidateMember = $services.wikiuser.getCandidacy($wiki.id, $candidateNumber))
+  #if ($candidateMember &amp;&amp; $candidateMember.status == 'PENDING')
     ## Remove the invitation
-    #set ($temp = $groupDoc.removeObject($candidateMember))
-    ## Save changes.
-    #set ($temp = $groupDoc.save($services.localization.render('platform.workspace.invitationCancelSaveComment', [$candidateNumber, $candidateMember.userName]), true))
-    ## Notify the user.
-    #set ($notificationMessage = $services.localization.render('platform.workspace.invitationCancelNotification'))
-    #set ($userDocumentReference = $services.model.resolveDocument($candidateMember.userName))
-    #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
-    {{info}}{{translation key="platform.workspace.invitationCancelSuccess"/}}{{/info}}
+    #set ($success = $services.wikiuser.cancelCandidacy($candidateMember))
+    #if($success)
+      ## Notify the user.
+      #set ($notificationMessage = $services.localization.render('platform.workspace.invitationCancelNotification'))
+      #set ($userDocumentReference = $services.model.resolveDocument($candidateMember.userId))
+      #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
+      {{info}}{{translation key="platform.workspace.invitationCancelSuccess"/}}{{/info}}
+    #else
+      {{error}}{{translation key="platform.wikimanager.invitationCancelFailure"/}}{{/error}}
+    #end
   #end
 #end
 
@@ -423,8 +416,8 @@ $services.localization.render('platform.workspace.candidateHandledComment') $mes
 #if($hasEditGroupRight)
 {{html}}
 #userPicker_import()
-#set ($discard = $xwiki.ssx.use('XWiki.WorkspaceUsers'))
-#set ($discard = $xwiki.jsx.use('XWiki.WorkspaceUsers'))
+#set ($discard = $xwiki.ssx.use('WikiManagerCode.WikiUsers'))
+#set ($discard = $xwiki.jsx.use('WikiManagerCode.WikiUsers'))
 &lt;form id='inviteUserForm' class='xform half'&gt;
   &lt;h2&gt;$services.localization.render('workspacemanager.member.add')&lt;/h2&gt;
   &lt;dl&gt;
@@ -455,7 +448,7 @@ $services.localization.render('platform.workspace.candidateHandledComment') $mes
   &lt;div class="hidden"&gt;
     &lt;input type="hidden" name="form_token" value="$!services.csrf.getToken()" /&gt;
     &lt;input type='hidden' name='editor' value='globaladmin'/&gt;
-    &lt;input type='hidden' name='section' value='XWiki.WorkspaceUsers'/&gt;
+    &lt;input type='hidden' name='section' value='Users'/&gt;
   &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}
@@ -557,7 +550,7 @@ $services.localization.render('platform.workspace.candidateHandledComment') $mes
       &lt;/div&gt;
       &lt;input type='hidden' name='candidateNumber' value='$candidateMember.number'/&gt;
       &lt;input type='hidden' name='editor' value='globaladmin'/&gt;
-      &lt;input type='hidden' name='section' value='XWiki.WorkspaceUsers'/&gt;
+      &lt;input type='hidden' name='section' value='Users'/&gt;
     &lt;/form&gt;
   &lt;/div&gt;
   &lt;div class='clearfloats'&gt;&lt;/div&gt;

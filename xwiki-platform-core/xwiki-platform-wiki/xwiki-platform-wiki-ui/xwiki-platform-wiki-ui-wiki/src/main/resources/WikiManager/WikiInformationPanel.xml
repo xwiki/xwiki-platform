@@ -212,10 +212,10 @@
 {{/velocity}}</content>
     </property>
     <property>
-      <description>Provides information about the current workspace.</description>
+      <description>Provides information about the current wiki.</description>
     </property>
     <property>
-      <name>Workspace Information</name>
+      <name>Wiki Information</name>
     </property>
     <property>
       <type>view</type>

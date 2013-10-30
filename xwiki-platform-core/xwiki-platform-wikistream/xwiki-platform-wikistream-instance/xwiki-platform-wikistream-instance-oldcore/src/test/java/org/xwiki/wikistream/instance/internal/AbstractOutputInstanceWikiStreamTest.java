@@ -36,7 +36,6 @@ import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.BeanInputWikiStreamFactory;
 import org.xwiki.wikistream.input.InputWikiStream;
@@ -66,10 +65,8 @@ public class AbstractOutputInstanceWikiStreamTest
 {
     private static final SimpleDateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S z", Locale.ENGLISH);
 
-    protected MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
-
     @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule(this.mocker);
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
     protected BeanInputWikiStreamFactory<WikiXMLInputProperties> inputWikiStreamFactory;
 
@@ -84,9 +81,10 @@ public class AbstractOutputInstanceWikiStreamTest
     public void before() throws ComponentLookupException, XWikiException
     {
         this.inputWikiStreamFactory =
-            this.mocker.getInstance(InputWikiStreamFactory.class, WikiStreamType.WIKI_XML.serialize());
+            this.oldcore.getMocker().getInstance(InputWikiStreamFactory.class, WikiStreamType.WIKI_XML.serialize());
         this.outputWikiStreamFactory =
-            this.mocker.getInstance(OutputWikiStreamFactory.class, WikiStreamType.XWIKI_INSTANCE.serialize());
+            this.oldcore.getMocker().getInstance(OutputWikiStreamFactory.class,
+                WikiStreamType.XWIKI_INSTANCE.serialize());
 
         Mockito.when(
             this.oldcore.getMockXWiki().getDocument(Mockito.any(DocumentReference.class),

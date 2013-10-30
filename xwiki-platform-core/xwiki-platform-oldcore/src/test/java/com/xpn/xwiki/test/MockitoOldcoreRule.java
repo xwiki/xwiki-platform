@@ -64,6 +64,11 @@ public class MockitoOldcoreRule implements MethodRule
 
     private XWikiRightService mockRightService;
 
+    public MockitoOldcoreRule()
+    {
+        this(new MockitoComponentManagerRule());
+    }
+
     public MockitoOldcoreRule(MockitoComponentManagerRule componentManager)
     {
         this(componentManager, componentManager);
@@ -73,6 +78,11 @@ public class MockitoOldcoreRule implements MethodRule
     {
         this.componentManager = componentManager;
         this.parent = parent;
+    }
+
+    public MockitoComponentManagerRule getMocker()
+    {
+        return this.componentManager;
     }
 
     public Statement apply(final Statement base, final FrameworkMethod method, final Object target)

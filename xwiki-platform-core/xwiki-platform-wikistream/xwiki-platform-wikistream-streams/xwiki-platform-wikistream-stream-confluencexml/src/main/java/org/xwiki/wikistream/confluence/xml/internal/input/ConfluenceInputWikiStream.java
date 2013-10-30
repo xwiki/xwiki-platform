@@ -363,34 +363,30 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
         documentRevisionParameters.put(WikiDocumentFilter.PARAMETER_TITLE,
             pageProperties.getString(ConfluenceXMLPackage.KEY_PAGE_TITLE));
 
+        // > WikiDocumentRevision
+        proxyFilter.beginWikiDocumentRevision(revision, documentRevisionParameters);
+
         // Content
         String confluenceBody = pageProperties.getString(ConfluenceXMLPackage.KEY_PAGE_BODY);
         int bodyType = pageProperties.getInt(ConfluenceXMLPackage.KEY_PAGE_BODY_TYPE);
 
-        switch (bodyType) {
-            case 0:
-                try {
+        try {
+            switch (bodyType) {
+                case 0:
                     this.confluenceWIKIParser.parse(new StringReader(confluenceBody), proxyFilter);
-                } catch (org.xwiki.rendering.parser.ParseException e) {
-                    throw new WikiStreamException(String.format("Failed parser content [{}]", confluenceBody));
-                }
-                break;
-            case 2:
-                try {
+                    break;
+                case 2:
                     this.confluenceXHTMLParser.parse(new StringReader(confluenceBody), proxyFilter);
-                } catch (org.xwiki.rendering.parser.ParseException e) {
-                    throw new WikiStreamException(String.format("Failed parser content [{}]", confluenceBody));
-                }
-                break;
-            default:
-                if (this.properties.isVerbose()) {
-                    this.logger.error("Usupported body type [{}]", bodyType);
-                }
-                break;
+                    break;
+                default:
+                    if (this.properties.isVerbose()) {
+                        this.logger.error("Usupported body type [{}]", bodyType);
+                    }
+                    break;
+            }
+        } catch (org.xwiki.rendering.parser.ParseException e) {
+            throw new WikiStreamException(String.format("Failed parser content [%s]", confluenceBody), e);
         }
-
-        // > WikiDocumentRevision
-        proxyFilter.beginWikiDocumentRevision(revision, documentRevisionParameters);
 
         // Attachments
         for (int attachmentId : this.confluencePackage.getAttachments(pageId)) {

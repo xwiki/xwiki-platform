@@ -206,6 +206,15 @@ public class ConfluenceXMLPackage
         createTree();
     }
 
+    private PropertiesConfiguration newProperties()
+    {
+        PropertiesConfiguration properties = new PropertiesConfiguration();
+
+        properties.setDelimiterParsingDisabled(true);
+
+        return properties;
+    }
+
     public Date getDate(PropertiesConfiguration properties, String key) throws ParseException
     {
         String str = properties.getString(key);
@@ -366,7 +375,7 @@ public class ConfluenceXMLPackage
     private void readAttachmentObject(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException,
         ConfigurationException, IOException
     {
-        PropertiesConfiguration properties = new PropertiesConfiguration();
+        PropertiesConfiguration properties = newProperties();
 
         int attachmentId = readObjectProperties(xmlReader, properties);
 
@@ -379,7 +388,7 @@ public class ConfluenceXMLPackage
     private void readSpaceObject(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException,
         ConfigurationException, IOException
     {
-        PropertiesConfiguration properties = new PropertiesConfiguration();
+        PropertiesConfiguration properties = newProperties();
 
         int spaceId = readObjectProperties(xmlReader, properties);
 
@@ -397,7 +406,7 @@ public class ConfluenceXMLPackage
     private void readSpaceDescriptionObject(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException,
         ConfigurationException, IOException
     {
-        PropertiesConfiguration properties = new PropertiesConfiguration();
+        PropertiesConfiguration properties = newProperties();
 
         int descriptionId = readObjectProperties(xmlReader, properties);
 
@@ -410,7 +419,7 @@ public class ConfluenceXMLPackage
     private void readSpacePermissionObject(XMLStreamReader xmlReader) throws XMLStreamException,
         ConfigurationException, IOException, WikiStreamException
     {
-        PropertiesConfiguration properties = new PropertiesConfiguration();
+        PropertiesConfiguration properties = newProperties();
 
         int permissionId = readObjectProperties(xmlReader, properties);
 
@@ -425,7 +434,8 @@ public class ConfluenceXMLPackage
     private void readBodyContentObject(XMLStreamReader xmlReader) throws XMLStreamException, ConfigurationException,
         WikiStreamException, IOException
     {
-        PropertiesConfiguration properties = new PropertiesConfiguration();
+        PropertiesConfiguration properties = newProperties();
+        properties.setDelimiterParsingDisabled(true);
 
         readObjectProperties(xmlReader, properties);
 
@@ -439,7 +449,7 @@ public class ConfluenceXMLPackage
     private void readPageObject(XMLStreamReader xmlReader) throws IOException, NumberFormatException,
         XMLStreamException, ConfigurationException, WikiStreamException
     {
-        PropertiesConfiguration properties = new PropertiesConfiguration();
+        PropertiesConfiguration properties = newProperties();
 
         int pageId = readObjectProperties(xmlReader, properties);
 
@@ -462,7 +472,7 @@ public class ConfluenceXMLPackage
     private void readUserObject(XMLStreamReader xmlReader) throws IOException, NumberFormatException,
         XMLStreamException, ConfigurationException, WikiStreamException
     {
-        PropertiesConfiguration properties = new PropertiesConfiguration();
+        PropertiesConfiguration properties = newProperties();
 
         int pageId = readObjectProperties(xmlReader, properties);
 
@@ -473,7 +483,7 @@ public class ConfluenceXMLPackage
     private void readGroupObject(XMLStreamReader xmlReader) throws IOException, NumberFormatException,
         XMLStreamException, ConfigurationException, WikiStreamException
     {
-        PropertiesConfiguration properties = new PropertiesConfiguration();
+        PropertiesConfiguration properties = newProperties();
 
         int pageId = readObjectProperties(xmlReader, properties);
 
@@ -484,7 +494,7 @@ public class ConfluenceXMLPackage
     private void readMembershipObject(XMLStreamReader xmlReader) throws ConfigurationException, XMLStreamException,
         WikiStreamException, IOException
     {
-        PropertiesConfiguration properties = new PropertiesConfiguration();
+        PropertiesConfiguration properties = newProperties();
 
         readObjectProperties(xmlReader, properties);
 

@@ -263,7 +263,7 @@ public class PackageMojo extends AbstractMojo
 
         // Step 8: Extract SmartClient library from smartGWT to be used by the XWiki Explorer Tree.
         getLog().info("Extracting SmartClient ...");
-        String smartGWTVersion = this.project.getProperties().getProperty("smartgwt.version");
+        String smartGWTVersion = getDependencyManagementVersion(getTopLevelPOMProject(), "com.smartgwt", "smartgwt");
         Artifact smartGWTArtifact = resolveArtifact("com.smartgwt", "smartgwt", smartGWTVersion, "jar");
         File smartGWTOutputDirectory = new File(project.getBuild().getDirectory(), "smartgwt");
         unzip(smartGWTArtifact.getFile(), smartGWTOutputDirectory);

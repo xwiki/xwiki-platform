@@ -1137,6 +1137,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * @return the {@link DocumentReference} of the document also containing the document {@link Locale}
+     * @since 5.3M2
+     */
+    public DocumentReference getDocumentReferenceWithLocale()
+    {
+        return new DocumentReference(this.documentReference, getLocale());
+    }
+
+    /**
      * @return the document's space + page name (eg "space.page")
      * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
      */

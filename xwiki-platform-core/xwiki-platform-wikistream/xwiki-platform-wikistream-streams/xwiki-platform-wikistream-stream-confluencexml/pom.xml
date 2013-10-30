@@ -63,6 +63,16 @@
       <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-confluencexhtml</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-syntax-confluence</artifactId>
+      <version>${rendering.version}</version>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>

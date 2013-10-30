@@ -31,12 +31,11 @@ The 'xredirect' parameter is also accepted, currently used in the administration
 
 {{velocity}}
 #set ($wikiId = $request.wikiId)
-#set ($wikiDescriptorDocument = $request.wikiDescriptorDocument)
 ##
 ## TODO: use a dependency check macro.
 ##
-#if ("$!wikiId" == '' || "$!wikiDescriptorDocument" == '')
-  {{error}}$services.localization.render('platform.workspace.twoParametersNotSpecified', ["wikiId", "wikiDescriptorDocument"]){{/error}}
+#if ("$!wikiId" == '')
+  {{error}}$services.localization.render('platform.workspace.oneParameterNotSpecified', ["wikiId"]){{/error}}
 #else
   #set ($wiki = $services.wiki.getById($wikiId))
   #if (!$wiki)
@@ -48,10 +47,11 @@ The 'xredirect' parameter is also accepted, currently used in the administration
       {{error}}$services.wiki.lastException.class{{/error}}
     #end
   #else
-    #set ($wikiDocument = $xwiki.getDocument($wikiDescriptorDocument))
-    #set ($temp = $wikiDocument.updateObjectFromRequest("${services.wiki.mainWikiId}:XWiki.XWikiServerClass"))
-    #set ($temp = $wikiDocument.updateObjectFromRequest("${services.wiki.mainWikiId}:WikiManagerCode.WikiUserClass"))
-    #set ($temp = $wikiDocument.save())
+    #set ($temp = $wiki.setPrettyName($request.get('XWiki.XWikiServerClass_0_wikiprettyname')))
+    #set ($temp = $wiki.setDescription($request.get('XWiki.XWikiServerClass_0_description')))
+    #set ($temp = $wiki.setOwnerId($request.get('XWiki.XWikiServerClass_0_owner')))
+    #set ($temp = $services.wiki.saveDescriptor($wiki))
+    #set ($temp = $services.wikiuser.setMembershipType($wiki.id, $request.get('WikiManagerCode.WikiUserClass_0_membershipType')))
   #end
   #if($request.xredirect)
     $response.sendRedirect($request.xredirect)

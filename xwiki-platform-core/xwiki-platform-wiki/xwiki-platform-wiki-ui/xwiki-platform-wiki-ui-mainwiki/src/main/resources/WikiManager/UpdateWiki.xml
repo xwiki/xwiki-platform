@@ -48,8 +48,14 @@ The 'xredirect' parameter is also accepted, currently used in the administration
     #end
   #else
     #set ($temp = $wiki.setPrettyName($request.get('XWiki.XWikiServerClass_0_wikiprettyname')))
-    #set ($temp = $wiki.setDescription($request.get('XWiki.XWikiServerClass_0_description')))
-    #set ($temp = $wiki.setOwnerId($request.get('XWiki.XWikiServerClass_0_owner')))
+    #set ($temp = $wiki.setDescription($request.get('XWiki.XWikiServerClass_0_description'))
+    #set ($newOwner = $request.get('XWiki.XWikiServerClass_0_owner'))
+    #if (!$newOwner.startsWith("${services.wiki.mainWikiId}:")
+      #set ($newOwner = "${services.wiki.mainWikiId}:${newOwner}")
+    #end
+    #if ($xwiki.exists($newOwner))
+      #set ($temp = $wiki.setOwnerId($newOwner))
+    #end
     #set ($temp = $services.wiki.saveDescriptor($wiki))
     #set ($temp = $services.wikiuser.setMembershipType($wiki.id, $request.get('WikiManagerCode.WikiUserClass_0_membershipType')))
   #end

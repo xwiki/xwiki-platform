@@ -652,10 +652,17 @@ a.search-result-highlightAll:after {
 .search-facets-actions,
 .search-facet {
   background-color: $theme.backgroundSecondaryColor;
-  padding: 0.5em 1em;
   border-bottom: 1px solid $theme.borderColor;
   border-top: 1px solid $theme.pageContentBackgroundColor;
   position: relative;
+}
+
+.search-facets-header,
+.search-facets-actions {
+  padding: 0.5em 1em;
+}
+.search-facet {
+  padding: 0.5em .8em;
 }
 
 .search-facets-header {
@@ -688,10 +695,11 @@ a.search-result-highlightAll:after {
 }
 
 .search-facet-header {
-  cursor: pointer;
   background: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-left.png')") no-repeat scroll 100% 50% transparent;
   color: $theme.titleColor;
+  cursor: pointer;
   line-height: 1.4em;
+  margin: 0 .2em;
   text-transform: capitalize;
 }
 
@@ -726,6 +734,10 @@ a.search-result-highlightAll:after {
 
 .search-facet-body ul {
   font-size: .9em;
+}
+
+.search-facet-body li {
+  padding: .1em .2em;
 }
 
 .search-facet.expanded .search-facet-header {

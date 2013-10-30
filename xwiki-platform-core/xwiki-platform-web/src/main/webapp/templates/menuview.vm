@@ -24,12 +24,7 @@
   #end
 #end
 #if ($isGuest && $xwiki.hasAccessLevel('register', 'XWiki.XWikiPreferences'))
-  #if($isWikiAPIAvailable && !$xcontext.isMainWiki() && !$services.wikiuser.hasLocalUsersEnabled())
-    #set ($refRegister = $services.model.createDocumentReference($services.wiki.mainWikiId, 'XWiki', 'Register'))
-    #set ($regurl = $xwiki.getURL($refRegister, 'register'))
-  #else
-    #set ($regurl = $xwiki.getURL('XWiki.Register', 'register'))
-  #end
+  #set ($regurl = $xwiki.getURL('XWiki.Register', 'register'))
   #xwikitopmenuentry($!regurl $!services.localization.render('core.register') 'tmRegister')
 #end
 ##

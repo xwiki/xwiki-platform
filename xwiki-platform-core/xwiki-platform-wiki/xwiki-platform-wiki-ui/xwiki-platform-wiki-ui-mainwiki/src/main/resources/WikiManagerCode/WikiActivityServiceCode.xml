@@ -24,22 +24,22 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($parameterName = 'workspaceName')
-#set ($workspaceNames = $request.getParameterValues($parameterName))
-#if ("$!workspaceNames" == '' || $workspaceNames.size() == 0)
+#set ($parameterName = 'wikiName')
+#set ($wikiNames = $request.getParameterValues($parameterName))
+#if ("$!wikiNames" == '' || $wikiNames.size() == 0)
   {{translation key="platform.workspace.activityHint"/}}
 
   {{error}}{{translation key="platform.workspace.oneParameterNotSpecified" parameters="$parameterName"/}} {{translation key="platform.workspace.parameterAcceptsMultipleValues"/}}{{/error}}
 #else
-  #set ($wikiNames = '')
-  #foreach ($workspaceName in $workspaceNames)
-    #if ("$!workspaceName" != '')
-      #set ($wikiNames = "$workspaceName, $wikiNames")
+  #set ($wikiNamesList = '')
+  #foreach ($wikiName in $wikiNames)
+    #if ("$!wikiName" != '')
+      #set ($wikiNamesList = "$wikiName, $wikiNamesList")
     #end
   #end
-  #set ($wikiNames = $wikiNames.replaceAll(',\s$',''))
-  = #if ($workspaceNames.size() == 1)$services.localization.render('platform.workspace.activityTitle', [$wikiNames])#{else}$services.localization.render('platform.workspace.activityMultipleTitle', [$wikiNames])#end =
-  {{activity wikis="$wikiNames"}}
+  #set ($wikiNamesList = $wikiNamesList.replaceAll(',\s$',''))
+  = #if ($wikiNames.size() == 1)$services.localization.render('platform.workspace.activityTitle', [$wikiNamesList])#{else}$services.localization.render('platform.workspace.activityMultipleTitle', [$wikiNamesList])#end =
+  {{activity wikis="$wikiNamesList"}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

@@ -10,7 +10,6 @@
 #set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
 #set ($cantHaveLocalUsers = $isWikiAPIAvailable && !$xcontext.isMainWiki() && !$services.wikiuser.hasLocalUsersEnabled())
 #set ($isMainWikiUser = ($xcontext.mainWikiName == "$!{xcontext.userReference.wikiReference.name}"))
-#set ($hasSeveralWikis = $isWikiAPIAvailable && "$!services.wiki.getAll()" != '' && !$services.wiki.getAll().isEmpty())
 #set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
 ##
 ## User
@@ -42,7 +41,7 @@
     #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=network') $services.localization.render('core.menu.network') 'tmUserNetwork', '')
   #end
   #if ($isWikiUIAvailable && $isMainWikiUser)
-    #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=workspaces') $services.localization.render('workspacemanager.menu.user.workspaces') 'tmUserWorkspaces', '')
+    #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=wikis') $services.localization.render('workspacemanager.menu.user.workspaces') 'tmUserWorkspaces', '')
   #end
   #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=dashboard') $services.localization.render('core.menu.userDashboard') 'tmUserDashboard', '')
   #xwikitopmenuentryend()
@@ -127,9 +126,8 @@
 ##
 ## This menu is displayed if:
 ## - Workspace Manager App is installed
-## - There is at least 1 (sub)wiki
 ## - The current wiki is the main wiki OR the current wiki has no support for local users
-#set ($displayHomeMenu = $isWikiUIAvailable && $hasSeveralWikis && ($xcontext.isMainWiki() || $cantHaveLocalUsers))
+#set ($displayHomeMenu = $isWikiUIAvailable && ($xcontext.isMainWiki() || $cantHaveLocalUsers))
 #if ($displayHomeMenu)
   #xwikitopmenuentrystart($xwiki.getURL($mainWikiHomeDocumentReference) $services.localization.render('core.menu.type.home') 'tmMainWiki' 'hasIcon')
   #set ($hasPreviousMenuSection = false)
@@ -190,10 +188,9 @@
 #end
 #set ($wikiEntryText = "${wikiEntryText}__SEPARATOR__${wikiName}")
 ## The wiki menu is available if:
-## - there is only 1 wiki
-## - OR Workspace manager is not installed
+## - OR WikiManager is not installed
 ## - OR the wiki is not the home
-#if(!$hasSeveralWikis || !$isWikiUIAvailable || !$xcontext.isMainWiki())
+#if(!$isWikiUIAvailable || !$xcontext.isMainWiki())
   #if($displayHomeMenu)
     #xwikitopmenuseparator()
   #end

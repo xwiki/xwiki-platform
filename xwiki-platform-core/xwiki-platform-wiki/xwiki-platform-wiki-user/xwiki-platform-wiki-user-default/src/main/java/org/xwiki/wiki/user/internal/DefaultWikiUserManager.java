@@ -168,6 +168,16 @@ public class DefaultWikiUserManager implements WikiUserManager
     {
         List<String> members = new ArrayList<String>();
 
+        try {
+            // Get the descriptor
+            WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
+            // Add the wiki owner
+            members.add(descriptor.getOwnerId());
+        } catch (WikiManagerException e) {
+            throw new WikiUserManagerException(String.format("Failed to get the descriptor for [%s]", wikiId), e);
+        }
+
+        // Get the other members from the wiki AllGroup
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
         DocumentReference classReference = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
         List<BaseObject> memberObjects = groupDoc.getXObjects(classReference);
@@ -189,6 +199,19 @@ public class DefaultWikiUserManager implements WikiUserManager
         return getMembers(wikiId).contains(userId);
     }
 
+    private void addMemberObject(XWikiDocument groupDoc, String userId, DocumentReference classReference)
+        throws WikiUserManagerException
+    {
+        try {
+            XWikiContext xcontext = xcontextProvider.get();
+            int objectNumber = groupDoc.createXObject(classReference, xcontext);
+            BaseObject object = groupDoc.getXObject(classReference, objectNumber);
+            object.set(GROUP_CLASS_MEMBER_FIELD, userId, xcontext);
+        } catch (XWikiException e) {
+            throw new WikiUserManagerException("Fail to add a member to the group", e);
+        }
+    }
+
     @Override
     public void addMember(String userId, String wikiId) throws WikiUserManagerException
     {
@@ -202,15 +225,16 @@ public class DefaultWikiUserManager implements WikiUserManager
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
 
         // Add a member object
-        XWikiContext xcontext = xcontextProvider.get();
         DocumentReference classReference = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
-        try {
-            int objectNumber = groupDoc.createXObject(classReference, xcontext);
-            BaseObject object = groupDoc.getXObject(classReference, objectNumber);
-            object.set(GROUP_CLASS_MEMBER_FIELD, userId, xcontext);
-        } catch (XWikiException e) {
-            throw new WikiUserManagerException("Fail to add a member to the group", e);
+
+        // If the group does not contain any user yet, add an empty member (cf: XWIKI-6275).
+        List<BaseObject> memberObjects = groupDoc.getXObjects(classReference);
+        if (memberObjects == null || memberObjects.isEmpty()) {
+            addMemberObject(groupDoc, "", classReference);
         }
+
+        // Add the user
+        addMemberObject(groupDoc, userId, classReference);
 
         // Save the document
         saveGroupDocument(groupDoc, String.format("Add [%s] to the group.", userId));
@@ -221,25 +245,24 @@ public class DefaultWikiUserManager implements WikiUserManager
     {
         Collection<String> members = getMembers(wikiId);
 
-        XWikiContext xcontext = xcontextProvider.get();
         DocumentReference classReference =
                 new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
 
         // Get the group document
         XWikiDocument groupDoc = getMembersGroupDocument(wikiId);
 
+        // If the group does not contain any user yet, add an empty member (cf: XWIKI-6275).
+        List<BaseObject> memberObjects = groupDoc.getXObjects(classReference);
+        if (memberObjects == null || memberObjects.isEmpty()) {
+            addMemberObject(groupDoc, "", classReference);
+        }
+
         // Add members
-        try {
-            for (String userId : userIds) {
-                if (!members.contains(userId)) {
-                    // Add a member object
-                    int objectNumber = groupDoc.createXObject(classReference, xcontext);
-                    BaseObject object = groupDoc.getXObject(classReference, objectNumber);
-                    object.set(GROUP_CLASS_MEMBER_FIELD, userId, xcontext);
-                }
+        for (String userId : userIds) {
+            if (!members.contains(userId)) {
+                // Add a member object
+                addMemberObject(groupDoc, userId, classReference);
             }
-        } catch (XWikiException e) {
-            throw new WikiUserManagerException("Fail to add members to the group", e);
         }
 
         // Save the document

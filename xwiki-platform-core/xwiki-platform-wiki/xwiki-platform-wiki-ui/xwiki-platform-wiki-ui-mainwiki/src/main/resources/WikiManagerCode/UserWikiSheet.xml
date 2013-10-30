@@ -2,7 +2,7 @@
 
 <xwikidoc>
   <web>WikiManagerCode</web>
-  <name>UserWorkspaceSheet</name>
+  <name>UserWikiSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -95,10 +95,10 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManagerCode.UserWorkspaceSheet</name>
+    <name>WikiManagerCode.UserWikiSheet</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
-    <guid>2884b3fe-6198-45a2-8cc8-1f2a0c240fbd</guid>
+    <guid>80a56ef7-cc1d-4206-a749-9066de3e32df</guid>
     <property>
       <cache>forbid</cache>
     </property>
@@ -106,33 +106,33 @@
       <code>var XWiki = (function (XWiki) {
 // Start XWiki augmentation.
 
-XWiki.UserWorkspaceTab = Class.create({
+XWiki.UserWikiTab = Class.create({
   initialize : function () {
     this.addListeners();
   },
 
   addListeners : function() {
-    var elements = $('workspaces') ? $('workspaces').childElements() : [];
+    var elements = $('wikis') ? $('wikis').childElements() : [];
     for (var i = 0; i &lt; elements.length; ++i) {
-      elements[i].down('.workspaceActivity a').observe('click', this.onWorkspaceClicked);
+      elements[i].down('.wikiActivity a').observe('click', this.onWikiClicked);
     }
   },
 
-  onWorkspaceClicked : function (event) {
+  onWikiClicked : function (event) {
     var element = Event.element(event);
-    var workspaceId = element.up('li').id;
-    new Ajax.Request("$xwiki.getURL('WorkspaceManager.WorkspaceActivityServiceCode')", {
+    var wikiId = element.up('li').id;
+    new Ajax.Request("$xwiki.getURL('WikiManagerCode.WikiActivityServiceCode')", {
       parameters: {
         'xpage' : 'plain',
-        'workspaceName' : workspaceId
+        'wikiName' : wikiId
       },
 
       onCreate : function() {
-        $('workspaceActivityColumn').innerHTML = '&lt;span class="loading"&gt;Loading...&lt;/span&gt;';
+        $('wikiActivityColumn').innerHTML = '&lt;span class="loading"&gt;Loading...&lt;/span&gt;';
       }.bind(this),
 
       onSuccess : function(response) {
-        $('workspaceActivityColumn').innerHTML = response.responseText;
+        $('wikiActivityColumn').innerHTML = response.responseText;
       }.bind(this),
 
       onFailure: function(response) {
@@ -140,7 +140,7 @@ XWiki.UserWorkspaceTab = Class.create({
         if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
           failureReason = 'Server not responding';
         }
-        $('workspaceActivityColumn').innerHTML = '&lt;span&gt;Failed to load activity stream. Reason:&lt;/span&gt;&lt;br/&gt;&lt;span&gt;' + failureReason + '&lt;/span&gt;';
+        $('wikiActivityColumn').innerHTML = '&lt;span&gt;Failed to load activity stream. Reason:&lt;/span&gt;&lt;br/&gt;&lt;span&gt;' + failureReason + '&lt;/span&gt;';
       }.bind(this),
 
       on0: function (response) {
@@ -154,7 +154,7 @@ XWiki.UserWorkspaceTab = Class.create({
 });
 
 var init = function() {
-  new XWiki.UserWorkspaceTab();
+  new XWiki.UserWikiTab();
 };
 (XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
 
@@ -244,47 +244,47 @@ return XWiki;
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManagerCode.UserWorkspaceSheet</name>
+    <name>WikiManagerCode.UserWikiSheet</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
-    <guid>244c71a0-ceeb-4e24-85f6-961c0e13770c</guid>
+    <guid>a20d3a8b-f13e-4d73-8dc4-3e6fb45ddc5f</guid>
     <property>
       <cache>long</cache>
     </property>
     <property>
       <code>#template("colorThemeInit.vm")
 
-#workspaceActivityColumn {
+#wikiActivityColumn {
   margin: 5px 10px 10px;
   padding: 5px 10px 10px;
 }
 
-#workspaceActivity .loading {
+#wikiActivity .loading {
   padding-left: 20px;
   background-position: 0 0;
 }
 
-.workspaceActivity {
+.wikiActivity {
   float: right;
   font-size: 0.8em;
 }
 
-#workspaces li:hover {
+#wikis li:hover {
   background-color: $theme.highlightColor;
 }
 
-#workspaces li {
+#wikis li {
   padding: 2px 20px 2px 2px;
 }
 
-#workspaces {
+#wikis {
   list-style-type: none;
   margin: 0;
   padding: 0;
 }</code>
     </property>
     <property>
-      <name>woskpaces</name>
+      <name>wikis</name>
     </property>
     <property>
       <parse>1</parse>
@@ -305,7 +305,7 @@ return XWiki;
   #set($temp = $doc.use($obj))
   #set ($currentUser = $xcontext.user)
   #if (!$currentUser.startsWith("${xcontext.mainWikiName}:"))
-    #set ($currentUser = "${xcontext.mainWikiName}:${currentUser}")
+    #set ($currentUser = "${services.wiki.mainWikiId}:${currentUser}")
   #end
   #set($documentUser = $doc.prefixedFullName)
   #set($isMyProfile = ($currentUser == $documentUser))
@@ -314,33 +314,28 @@ return XWiki;
     &lt;div class='profile-section highlighted-profile-section'&gt;
       &lt;h1&gt;$services.localization.render('platform.workspace.profileJoinedWorkspacesLabel')&lt;/h1&gt;
       #set ($joinedWikis = [])
-      #set (wikis = $services.wiki.getAll())
-      #foreach (wiki in $wikis)
-        #set ($groupClassReference = $services.model.createDocumentReference($wiki.id, 'XWiki', 'XWikiGroups'))
-        #set ($groupMembers = $workspace.groupDocument.getObjects($services.model.serialize($groupClassReference)))
-        #foreach ($groupMember in $groupMembers)
-          #if ($groupMember.get('member') == $documentUser)
-            #set($temp = $joinedWikis.add($wiki))
-            #break
-          #end
+      #set ($wikis = $services.wiki.getAll())
+      #foreach ($wiki in $wikis)
+        #if($services.wikiuser.isMember($currentUser, $wiki.id))
+          #set($temp = $joinedWikis.add($wiki))
         #end
       #end
       #if ($joinedWikis.size() == 0)
         &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.workspace.profileNotMemberOfAnyWorkspace')#{else}$services.localization.render('platform.workspace.profileUserNotMemberOfAnyWorkspace')#end&lt;/span&gt;
       #else
-        &lt;ul id='workspaces'&gt;
+        &lt;ul id='wikis'&gt;
         #foreach ($wiki in $joinedWikis)
           &lt;li id='$wiki.id'&gt;
-            &lt;span class='workspaceHomepage'&gt;&lt;a href='$xwiki.getURL($wiki.mainPageReference)'&gt;$wiki.prettyName&lt;/a&gt;&lt;/span&gt;
-            &lt;span class='workspaceActivity'&gt;&lt;a href='javascript:void(0)'&gt;$services.localization.render('platform.workspace.profileShowActivity') &amp;#187;&lt;/a&gt;&lt;/span&gt;
+            &lt;span class='wikiHomepage'&gt;&lt;a href='$xwiki.getURL($wiki.mainPageReference)'&gt;$wiki.prettyName&lt;/a&gt;&lt;/span&gt;
+            &lt;span class='wikiActivity'&gt;&lt;a href='javascript:void(0)'&gt;$services.localization.render('platform.workspace.profileShowActivity') &amp;#187;&lt;/a&gt;&lt;/span&gt;
           &lt;/li&gt;
         #end
         &lt;/ul&gt;
       #end
     &lt;/div&gt;
   &lt;/div&gt;
-  &lt;div id='workspaceActivity' class='half column'&gt;
-    &lt;div id='workspaceActivityColumn'&gt;
+  &lt;div id='wikiActivity' class='half column'&gt;
+    &lt;div id='wikiActivityColumn'&gt;
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;

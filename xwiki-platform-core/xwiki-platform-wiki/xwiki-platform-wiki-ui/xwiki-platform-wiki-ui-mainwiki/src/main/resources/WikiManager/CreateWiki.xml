@@ -677,7 +677,6 @@
     ## Save the members
     #set ($members = [])
     #getRequestList($members 'members')
-    #set ($discard = $members.add($request.ownerId))
     ## Remove empty strings from the list of members (the user picker submits by default an empty string).
     #set ($discard = $members.removeAll(['']))
     #if ("$!members" != '' &amp;&amp; $members.size() &gt; 0)
@@ -690,18 +689,6 @@
       ## Add the members
       #set($discard = $services.wikiuser.addMembers($members, $wikiDescriptor.id))
     #end
-    ## Save the admin
-    #set ($wikiAdminGroupReference = $services.model.createDocumentReference($wikiDescriptor.id, "XWiki", "XWikiAdminGroup"))
-    #set ($wikiAdminGroupDocument = $xwiki.getDocument($wikiAdminGroupReference))
-    #set ($discard = $wikiAdminGroupDocument.setHidden(true)) 
-    #set ($owner = $request.ownerId)
-    #set($memberObject = $wikiAdminGroupDocument.newObject($groupsClassName))
-    #if (!$owner.startsWith("${services.wiki.mainWikiId}:"))
-      #set ($owner = "${services.wiki.mainWikiId}:${member}")
-    #end
-    #set ($discard = $memberObject.set('member', $owner))
-    ## Save the group document to preserve the member additions.
-    #set ($discard = $wikiAdminGroupDocument.save($services.localization.render('platform.workspace.createInitialMembersSaveComment'), true))
     ## Set the pretty name
     #set ($discard = $wikiDescriptor.setPrettyName($request.wikiprettyname))
     #set ($discard = $wikiDescriptor.setDescription($request.description))

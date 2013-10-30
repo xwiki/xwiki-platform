@@ -165,7 +165,7 @@
     <className>XWiki.ConfigurableClass</className>
     <guid>e1627a9f-98c6-4f7e-b3b8-d181da8d37d8</guid>
     <property>
-      <codeToExecute/>
+      <codeToExecute>{{include reference="WikiManagerCode.AdminWikisSheet" /}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>

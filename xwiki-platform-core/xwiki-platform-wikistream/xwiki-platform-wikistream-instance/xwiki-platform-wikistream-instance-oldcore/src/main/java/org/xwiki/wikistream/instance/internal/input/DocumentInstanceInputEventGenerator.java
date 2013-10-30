@@ -32,10 +32,10 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.filter.WikiDocumentFilter;
 import org.xwiki.wikistream.instance.input.AbstractInstanceInputEventGenerator;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
+import org.xwiki.wikistream.model.filter.WikiDocumentFilter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

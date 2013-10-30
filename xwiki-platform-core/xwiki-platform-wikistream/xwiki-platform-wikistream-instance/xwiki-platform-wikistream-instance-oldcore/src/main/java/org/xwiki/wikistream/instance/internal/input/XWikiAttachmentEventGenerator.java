@@ -31,10 +31,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.filter.WikiAttachmentFilter;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiAttachmentFilter;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.XWikiAttachmentFilter;
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiAttachmentFilter;
+import org.xwiki.wikistream.model.filter.WikiAttachmentFilter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

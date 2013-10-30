@@ -30,6 +30,9 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wikistream.WikiStreamException;
@@ -50,6 +53,8 @@ import org.xwiki.wikistream.xml.internal.input.XMLInputWikiStreamUtils;
  */
 public class DocumentLocaleReader extends AbstractReader
 {
+    private EntityReferenceResolver<String> relativeResolver;
+
     private String currentSpace;
 
     private FilterEventParameters currentSpaceParameters = FilterEventParameters.EMPTY;
@@ -78,9 +83,11 @@ public class DocumentLocaleReader extends AbstractReader
 
     private Queue<WikiAttachment> currentAttachments = new LinkedList<WikiAttachment>();
 
-    public DocumentLocaleReader(SyntaxFactory syntaxFactory)
+    public DocumentLocaleReader(SyntaxFactory syntaxFactory, EntityReferenceResolver<String> relativeResolver)
     {
         super(syntaxFactory);
+
+        this.relativeResolver = relativeResolver;
     }
 
     public String getCurrentSpace()
@@ -249,9 +256,13 @@ public class DocumentLocaleReader extends AbstractReader
                             parameter = XARDocumentModel.DOCUMENTREVISION_PARAMETERS.get(elementName);
 
                             if (parameter != null) {
-                                // TODO: convert into proper values
-                                this.currentDocumentRevisionParameters.put(parameter.name,
-                                    convert(parameter.type, value));
+                                Object objectValue;
+                                if (parameter.type == EntityReference.class) {
+                                    objectValue = this.relativeResolver.resolve(value, EntityType.DOCUMENT);
+                                } else {
+                                    objectValue = convert(parameter.type, value);
+                                }
+                                this.currentDocumentRevisionParameters.put(parameter.name, objectValue);
 
                                 sendBeginWikiDocumentRevision(proxyFilter, false);
                             } else {

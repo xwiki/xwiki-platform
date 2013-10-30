@@ -22,7 +22,7 @@ package org.xwiki.wikistream.xar.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.wikistream.filter.WikiClassFilter;
+import org.xwiki.wikistream.model.filter.WikiClassFilter;
 import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
 
 /**

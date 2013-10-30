@@ -36,22 +36,26 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.filter.FilterDescriptorManager;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.properties.ConverterManager;
+import org.xwiki.rendering.listener.WrappingListener;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.filter.WikiAttachmentFilter;
-import org.xwiki.wikistream.filter.WikiClassFilter;
-import org.xwiki.wikistream.filter.WikiDocumentFilter;
-import org.xwiki.wikistream.filter.WikiObjectFilter;
-import org.xwiki.wikistream.instance.internal.InstanceUtils;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiAttachmentFilter;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiAttachmentFilter;
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
+import org.xwiki.wikistream.model.filter.WikiAttachmentFilter;
+import org.xwiki.wikistream.model.filter.WikiClassFilter;
+import org.xwiki.wikistream.model.filter.WikiDocumentFilter;
+import org.xwiki.wikistream.model.filter.WikiObjectFilter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -77,8 +81,15 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
     XWikiDocumentFilter
 {
     @Inject
+    private FilterDescriptorManager filterManager;
+
+    @Inject
     @Named("current")
     private DocumentReferenceResolver<EntityReference> entityResolver;
+
+    @Inject
+    @Named("relative")
+    private EntityReferenceResolver<String> relativeResolver;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -89,6 +100,10 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
+
+    private WrappingListener contentListener = new WrappingListener();
+
+    private DefaultWikiPrinter currentWikiPrinter;
 
     private EntityReference currentEntityReference;
 
@@ -104,8 +119,6 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
 
     private XWikiDocument currentDocument;
 
-    private BaseClass currentDocumentClass;
-
     private BaseClass currentXClass;
 
     private PropertyClass currentClassProperty;
@@ -115,6 +128,12 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
     private BaseObject currentXObject;
 
     private BaseClass currentXObjectClass;
+
+    @Override
+    protected Object createFilter() throws WikiStreamException
+    {
+        return this.filterManager.createCompositeFilter(this, this.contentListener);
+    }
 
     @Override
     public void close() throws IOException
@@ -166,6 +185,18 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
         return get(Syntax.class, key, parameters, def);
     }
 
+    private EntityReference getEntityReference(String key, FilterEventParameters parameters, EntityReference def)
+    {
+        Object reference = get(Object.class, key, parameters, def);
+
+        if (reference instanceof EntityReference) {
+            return (EntityReference) reference;
+        }
+
+        return reference != null ? this.relativeResolver.resolve(reference.toString(), EntityType.DOCUMENT, parameters)
+            : def;
+    }
+
     // Events
 
     @Override
@@ -213,14 +244,17 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
     {
         this.currentLocale = locale;
 
-        getDate(WikiDocumentFilter.PARAMETER_CREATION_DATE, parameters, null);
-        getString(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, parameters, null);
+        this.currentCreationDate = getDate(WikiDocumentFilter.PARAMETER_CREATION_DATE, parameters, null);
+        this.currentCreationAuthor = getString(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, parameters, null);
     }
 
     @Override
     public void endWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws WikiStreamException
     {
         this.currentLocale = null;
+
+        this.currentCreationDate = null;
+        this.currentCreationAuthor = null;
     }
 
     @Override
@@ -234,9 +268,9 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
 
         this.currentDocument.setDefaultLocale(this.currentDefaultLocale);
         this.currentDocument.setLocale(this.currentLocale);
-        this.currentDocument.setVersion(version);
 
-        this.currentDocument.setParent(getString(WikiDocumentFilter.PARAMETER_PARENT, parameters, null));
+        this.currentDocument.setParentReference(getEntityReference(WikiDocumentFilter.PARAMETER_PARENT, parameters,
+            null));
         this.currentDocument.setCustomClass(getString(WikiDocumentFilter.PARAMETER_CUSTOMCLASS, parameters, null));
         this.currentDocument.setTitle(getString(WikiDocumentFilter.PARAMETER_TITLE, parameters, null));
         this.currentDocument.setDefaultTemplate(getString(WikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE, parameters,
@@ -246,74 +280,95 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
         // TODO: get default syntax
         this.currentDocument.setSyntax(getSyntax(WikiDocumentFilter.PARAMETER_SYNTAX, parameters, null));
         this.currentDocument.setHidden(getBoolean(WikiDocumentFilter.PARAMETER_HIDDEN, parameters, false));
-        this.currentDocument.setContent(getString(WikiDocumentFilter.PARAMETER_CONTENT, parameters, null));
 
-        if (this.properties.isPreserveVersion()) {
-            this.currentDocument.setCreationDate(this.currentCreationDate);
-            this.currentDocument.setCreator(this.currentCreationAuthor);
+        // Content
 
-            this.currentDocument
-                .setMinorEdit(getBoolean(WikiDocumentFilter.PARAMETER_REVISION_MINOR, parameters, false));
-            this.currentDocument.setDate(getDate(WikiDocumentFilter.PARAMETER_REVISION_DATE, parameters, null));
-            this.currentDocument.setAuthor(getString(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
-            this.currentDocument.setComment(getString(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, parameters, ""));
+        if (parameters.containsKey(WikiDocumentFilter.PARAMETER_CONTENT)) {
+            this.currentDocument.setContent(getString(WikiDocumentFilter.PARAMETER_CONTENT, parameters, null));
+        } else {
+            ComponentManager componentManager = this.componentManagerProvider.get();
 
-            this.currentDocument.setContentAuthor(getString(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters,
-                null));
-            this.currentDocument.setContentUpdateDate(getDate(WikiDocumentFilter.PARAMETER_CONTENT_DATE, parameters,
-                null));
-
-            String revisions = getString(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS, parameters, null);
-            if (revisions != null) {
-                try {
-                    this.currentDocument.setDocumentArchive(revisions);
-                } catch (XWikiException e) {
-                    throw new WikiStreamException("Faile to set attachment archive", e);
-                }
+            PrintRendererFactory rendererFactory;
+            try {
+                rendererFactory =
+                    componentManager.getInstance(PrintRendererFactory.class, this.currentDocument.getSyntax()
+                        .toIdString());
+            } catch (ComponentLookupException e) {
+                throw new WikiStreamException(String.format("Failed to find PrintRendererFactory for syntax [%s]",
+                    this.currentDocument.getSyntax()), e);
             }
+
+            this.currentWikiPrinter = new DefaultWikiPrinter();
+            this.contentListener.setWrappedListener(rendererFactory.createRenderer(this.currentWikiPrinter));
         }
     }
 
     @Override
     public void endWikiDocumentRevision(String version, FilterEventParameters parameters) throws WikiStreamException
     {
-        // Save document
+        // Set content
+        if (this.currentWikiPrinter != null) {
+            this.currentDocument.setContent(this.currentWikiPrinter.getBuffer().toString());
+
+            this.contentListener.setWrappedListener(null);
+            this.currentWikiPrinter = null;
+        }
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
         try {
             XWikiDocument document =
-                xcontext.getWiki().getDocument(this.currentDocument.getDocumentReference(), xcontext);
+                xcontext.getWiki().getDocument(this.currentDocument.getDocumentReferenceWithLocale(), xcontext);
 
             if (document.isNew()) {
                 document = this.currentDocument;
             } else {
-                if (!document.getLocale().equals(this.currentDocument.getLocale())) {
-                    XWikiDocument localeDocument = document.getTranslatedDocument(this.currentLocale, xcontext);
+                document.apply(this.currentDocument);
+            }
 
-                    if (localeDocument == document) {
-                        document = this.currentDocument;
-                    } else {
-                        document = localeDocument;
+            // Default author
+
+            if (this.properties.isAuthorSet()) {
+                if (document.isNew()) {
+                    document.setCreatorReference(this.properties.getAuthor());
+                }
+                document.setAuthorReference(this.properties.getAuthor());
+                document.setContentAuthorReference(this.properties.getAuthor());
+            }
+
+            // Versions and save document
+
+            if (this.properties.isPreserveVersion()) {
+                if (document.isNew()) {
+                    document.setCreationDate(this.currentCreationDate);
+                    document.setCreator(this.currentCreationAuthor);
+
+                    String revisions = getString(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS, parameters, null);
+                    if (revisions != null) {
+                        try {
+                            document.setDocumentArchive(revisions);
+                        } catch (XWikiException e) {
+                            throw new WikiStreamException("Failed to set attachment archive", e);
+                        }
                     }
                 }
-            }
 
-            if (document != this.currentDocument) {
-                document.apply(this.currentDocument);
-                if (this.properties.isPreserveVersion()) {
-                    document.setVersion(this.currentVersion);
-                    document.setMetaDataDirty(false);
-                }
+                document.setMinorEdit(getBoolean(WikiDocumentFilter.PARAMETER_REVISION_MINOR, parameters, false));
+                document.setDate(getDate(WikiDocumentFilter.PARAMETER_REVISION_DATE, parameters, new Date()));
+                document.setAuthor(getString(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
+                document.setComment(getString(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, parameters, ""));
+
+                document.setContentAuthor(getString(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters, null));
+                document.setContentUpdateDate(getDate(WikiDocumentFilter.PARAMETER_CONTENT_DATE, parameters, new Date()));
+
+                document.setVersion(version);
+
+                document.setMetaDataDirty(false);
+
+                xcontext.getWiki().saveDocument(document, document.getComment(), document.isMinorEdit(), xcontext);
             } else {
-                if (!this.properties.isPreserveVersion()) {
-                    this.currentDocument.setRCSVersion(null);
-                } else {
-                    document.setMetaDataDirty(false);
-                }
+                xcontext.getWiki().saveDocument(document, this.properties.getSaveComment(), xcontext);
             }
-
-            saveDocument(document);
         } catch (Exception e) {
             throw new WikiStreamException("Failed to save document", e);
         }
@@ -322,18 +377,6 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
 
         this.currentVersion = null;
         this.currentDocument = null;
-    }
-
-    private void saveDocument(XWikiDocument document) throws XWikiException
-    {
-        XWikiContext xcontext = this.xcontextProvider.get();
-
-        if (this.properties.isAuthorSet()) {
-            document.setAuthorReference(this.properties.getAuthor());
-            document.setContentAuthorReference(this.properties.getAuthor());
-        }
-
-        xcontext.getWiki().saveDocument(document, this.properties.getSaveComment(), xcontext);
     }
 
     @Override
@@ -345,11 +388,17 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
         try {
             attachment.setContent(content);
         } catch (IOException e) {
-            throw new WikiStreamException("Faile to set attachment content", e);
+            throw new WikiStreamException("Failed to set attachment content", e);
+        }
+
+        if (this.properties.isAuthorSet()) {
+            // TODO
         }
 
         if (this.properties.isPreserveVersion()) {
-            attachment.setVersion(getString(WikiAttachmentFilter.PARAMETER_REVISION, parameters, null));
+            if (parameters.containsKey(WikiAttachmentFilter.PARAMETER_REVISION)) {
+                attachment.setVersion(getString(WikiAttachmentFilter.PARAMETER_REVISION, parameters, null));
+            }
             attachment.setAuthor(getString(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR, parameters, ""));
             attachment.setComment(getString(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, parameters, null));
             attachment.setDate(getDate(WikiAttachmentFilter.PARAMETER_REVISION_DATE, parameters, null));
@@ -359,13 +408,9 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
                 try {
                     attachment.setArchive(revisions);
                 } catch (XWikiException e) {
-                    throw new WikiStreamException("Faile to set attachment archive", e);
+                    throw new WikiStreamException("Failed to set attachment archive", e);
                 }
             }
-        }
-
-        if (this.properties.isAuthorSet()) {
-            // TODO: set author
         }
 
         this.currentDocument.getAttachmentList().add(attachment);
@@ -380,7 +425,6 @@ public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStre
             this.currentXObjectClass = this.currentXClass;
         } else {
             this.currentXClass = this.currentDocument.getXClass();
-            this.currentDocumentClass = this.currentXClass;
         }
 
         this.currentXClass.setCustomClass(getString(WikiClassFilter.PARAMETER_CUSTOMCLASS, parameters, null));

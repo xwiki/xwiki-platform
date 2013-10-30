@@ -23,8 +23,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.wikistream.instance.internal.DocumentInstanceFilter;
 import org.xwiki.wikistream.instance.internal.InstanceUtils;
-import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
 
 /**
  * @version $Id$
@@ -34,12 +34,12 @@ import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
 @Named(DocumentOutputInstanceWikiStreamFactory.ROLEHINT)
 @Singleton
 public class DocumentOutputInstanceWikiStreamFactory extends
-    AbstractBeanOutputInstanceWikiStreamFactory<DocumentOutputProperties, XWikiDocumentFilter>
+    AbstractBeanOutputInstanceWikiStreamFactory<DocumentOutputProperties, DocumentInstanceFilter>
 {
     /**
      * The id of this {@link org.xwiki.wikistream.instance.output.OutputInstanceWikiStreamFactory}.
      */
-    public static final String ID = "documents";
+    public static final String ID = "document";
 
     /**
      * Tje role hint of this {@link org.xwiki.wikistream.output.OutputWikiStreamFactory}.

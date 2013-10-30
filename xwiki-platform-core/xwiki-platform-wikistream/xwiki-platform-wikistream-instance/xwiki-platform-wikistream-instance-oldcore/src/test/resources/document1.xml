@@ -23,7 +23,7 @@
           </entry>
         </parameters>
       </p>
-      <wikiDocumentRevision version="1.1">
+      <wikiDocumentRevision revision="1.1">
         <p>
           <parameters>
             <entry>
@@ -100,19 +100,19 @@
             <parameters>
               <entry>
                 <string>revision_author</string>
-                <string>XWiki.author</string>
+                <string>XWiki.attachmentAuthor</string>
               </entry>
               <entry>
                 <string>revision_date</string>
                 <date>2000-01-05 00:00:00.0 UTC</date>
               </entry>
               <entry>
-                <string>revision_version</string>
+                <string>revision</string>
                 <string>1.1</string>
               </entry>
               <entry>
                 <string>revision_comment</string>
-                <string>comment</string>
+                <string>attachment comment</string>
               </entry>
             </parameters>
           </p>

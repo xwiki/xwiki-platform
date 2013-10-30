@@ -54,5 +54,5 @@ public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOuputP
     }
 
     protected abstract Object createListener(Result result, P parameters) throws XMLStreamException,
-        FactoryConfigurationError;
+        FactoryConfigurationError, WikiStreamException;
 }

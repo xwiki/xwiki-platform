@@ -19,7 +19,7 @@
  */
 package org.xwiki.wikistream.internal;
 
-import org.xwiki.wikistream.WikiStream;
+import org.xwiki.wikistream.WikiStreamFactory;
 import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 import org.xwiki.wikistream.type.WikiStreamType;
 
@@ -28,7 +28,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * @version $Id$
  * @since 5.2M2
  */
-public abstract class AbstractWikiStream implements WikiStream
+public abstract class AbstractWikiStream implements WikiStreamFactory
 {
     protected final WikiStreamType type;
 

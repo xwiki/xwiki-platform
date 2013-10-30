@@ -25,11 +25,11 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARUtils;
 
 /**
- * A generic xml output wikistream implementation. This class can be used as a test bench to validate various
- * XMLInputStream wiki parsers.
+ * Generate events from XAR WikiStream package.
  * 
  * @version $Id$
  * @since 5.2M2
@@ -37,13 +37,13 @@ import org.xwiki.wikistream.xar.internal.XARUtils;
 @Component
 @Named(XARUtils.ROLEHINT)
 @Singleton
-public class XARInputWikiStreamFactory extends AbstractBeanInputWikiStreamFactory<XARInputProperties>
+public class XARInputWikiStreamFactory extends AbstractBeanInputWikiStreamFactory<XARInputProperties, XARFilter>
 {
     public XARInputWikiStreamFactory()
     {
         super(WikiStreamType.XWIKI_XAR);
 
-        setName("Wiki XML output stream");
+        setName("XAR input stream");
         setDescription("Generates wiki events from XAR package.");
     }
 }

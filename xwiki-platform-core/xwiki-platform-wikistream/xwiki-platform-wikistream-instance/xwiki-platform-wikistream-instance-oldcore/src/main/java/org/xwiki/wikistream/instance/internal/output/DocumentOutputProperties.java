@@ -21,6 +21,7 @@ package org.xwiki.wikistream.instance.internal.output;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * @version $Id$
@@ -37,6 +38,8 @@ public class DocumentOutputProperties extends InstanceOutputProperties
     private boolean authorSet = false;
 
     private boolean preserveVersion = false;
+
+    private Syntax defaultSyntax;
 
     public EntityReference getDefaultReference()
     {
@@ -82,5 +85,15 @@ public class DocumentOutputProperties extends InstanceOutputProperties
     public void setPreserveVersion(boolean preserveVersion)
     {
         this.preserveVersion = preserveVersion;
+    }
+
+    public Syntax getDefaultSyntax()
+    {
+        return this.defaultSyntax;
+    }
+
+    public void setDefaultSyntax(Syntax defaultSyntax)
+    {
+        this.defaultSyntax = defaultSyntax;
     }
 }

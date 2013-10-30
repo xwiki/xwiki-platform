@@ -19,6 +19,9 @@
  */
 package org.xwiki.wikistream.wikixml.internal.input;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -26,6 +29,7 @@ import javax.xml.transform.Result;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.xml.parser.XMLParserFactory;
+import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xml.internal.input.AbstractXMLBeanInputWikiStreamFactory;
 
@@ -39,7 +43,8 @@ import org.xwiki.wikistream.xml.internal.input.AbstractXMLBeanInputWikiStreamFac
 @Component
 @Named("wiki+xml")
 @Singleton
-public class WikiXMLInputWikiStreamFactory extends AbstractXMLBeanInputWikiStreamFactory<WikiXMLInputProperties>
+public class WikiXMLInputWikiStreamFactory extends
+    AbstractXMLBeanInputWikiStreamFactory<WikiXMLInputProperties, Object>
 {
     @Inject
     private XMLParserFactory parserFactory;
@@ -50,6 +55,12 @@ public class WikiXMLInputWikiStreamFactory extends AbstractXMLBeanInputWikiStrea
 
         setName("Generic XML output stream");
         setDescription("Generates wiki events from generic XML file.");
+    }
+
+    @Override
+    public Collection<Class< ? >> getFilterInterfaces() throws WikiStreamException
+    {
+        return Collections.emptyList();
     }
 
     @Override

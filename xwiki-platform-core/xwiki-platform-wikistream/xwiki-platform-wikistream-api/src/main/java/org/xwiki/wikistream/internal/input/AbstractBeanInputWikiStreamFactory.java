@@ -19,6 +19,10 @@
  */
 package org.xwiki.wikistream.internal.input;
 
+import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -26,7 +30,9 @@ import javax.inject.Inject;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.BeanInputWikiStreamFactory;
 import org.xwiki.wikistream.input.InputWikiStream;
@@ -38,15 +44,35 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * @version $Id$
  * @since 5.2M2
  */
-public abstract class AbstractBeanInputWikiStreamFactory<P> extends AbstractBeanWikiStreamFactory<P> implements
+public abstract class AbstractBeanInputWikiStreamFactory<P, F> extends AbstractBeanWikiStreamFactory<P> implements
     BeanInputWikiStreamFactory<P>, Initializable
 {
     @Inject
     private ComponentManager componentManager;
 
+    private List<Class< ? >> filerInterfaces;
+
     public AbstractBeanInputWikiStreamFactory(WikiStreamType type)
     {
         super(type);
+    }
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        super.initialize();
+
+        // Get bean properties type
+        ParameterizedType genericType =
+            (ParameterizedType) ReflectionUtils.resolveType(AbstractBeanInputWikiStreamFactory.class, getClass());
+        this.filerInterfaces =
+            Arrays.<Class< ? >> asList(ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[1]));
+    }
+
+    @Override
+    public Collection<Class< ? >> getFilterInterfaces() throws WikiStreamException
+    {
+        return this.filerInterfaces;
     }
 
     @Override

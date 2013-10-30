@@ -19,11 +19,12 @@
  */
 package org.xwiki.wikistream.xml.internal;
 
+import org.xwiki.wikistream.DefaultWikiStreamProperties;
+
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
-public class XMLProperties
+public class XMLProperties extends DefaultWikiStreamProperties
 {
 }

@@ -23,17 +23,16 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
-import org.xwiki.wikistream.WikiStream;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.WikiStreamFactory;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
 @Role
 @Unstable
-public interface InputWikiStreamFactory extends WikiStream
+public interface InputWikiStreamFactory extends WikiStreamFactory
 {
     InputWikiStream createInputWikiStream(Map<String, Object> properties) throws WikiStreamException;
 }

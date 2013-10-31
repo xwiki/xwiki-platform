@@ -19,13 +19,16 @@
  */
 package org.xwiki.wiki.template;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.properties.WikiPropertyGroup;
 
 /**
  * Property groups attached to wiki descriptors that store values about the wiki template feature.
  *
  * @version $Id $
+ * @since 5.3M2
  */
+@Unstable
 public class WikiTemplatePropertyGroup extends WikiPropertyGroup
 {
     /**

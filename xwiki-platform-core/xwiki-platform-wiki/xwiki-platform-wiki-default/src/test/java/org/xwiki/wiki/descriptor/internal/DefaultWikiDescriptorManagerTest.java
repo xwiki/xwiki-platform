@@ -57,7 +57,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptorManager}.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 public class DefaultWikiDescriptorManagerTest
 {

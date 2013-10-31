@@ -48,7 +48,7 @@ import com.xpn.xwiki.objects.BaseObject;
 /**
  * Default implementation for {@link org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder}.
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Component
 @Singleton

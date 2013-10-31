@@ -22,15 +22,17 @@ package org.xwiki.wiki.template;
 import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 
 /**
  * Component in charge of managing wiki templates and creating new wiki from these templates.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Role
+@Unstable
 public interface WikiTemplateManager
 {
     /**

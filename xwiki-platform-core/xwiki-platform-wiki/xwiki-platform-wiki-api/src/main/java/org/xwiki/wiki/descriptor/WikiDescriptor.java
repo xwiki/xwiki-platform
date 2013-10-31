@@ -36,7 +36,7 @@ import org.xwiki.wiki.properties.WikiPropertyGroup;
  * This class is a descriptor for wiki.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Unstable
 public class WikiDescriptor

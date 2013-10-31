@@ -27,7 +27,7 @@ import java.util.Map;
  * attached to the WikiDescriptor. Each module is responsible for the persistent storage of its properties.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 public class WikiPropertyGroup
 {

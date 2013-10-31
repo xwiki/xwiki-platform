@@ -42,7 +42,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Default implementation for {@link WikiDescriptorManager}.
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Component
 @Singleton

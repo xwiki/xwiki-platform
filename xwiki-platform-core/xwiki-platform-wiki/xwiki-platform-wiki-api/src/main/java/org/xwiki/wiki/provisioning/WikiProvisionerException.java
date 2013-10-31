@@ -23,7 +23,7 @@ package org.xwiki.wiki.provisioning;
  * Encapsulate any exception related to Wiki Provisioner.
  *
  * @version $Id$
- * @since 5.1M1
+ * @since 5.3M2
  */
 public class WikiProvisionerException extends Exception
 {

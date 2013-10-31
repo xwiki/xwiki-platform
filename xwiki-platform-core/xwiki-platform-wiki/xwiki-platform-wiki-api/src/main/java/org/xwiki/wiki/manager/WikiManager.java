@@ -27,7 +27,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
  * Component to create and manage wikis.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Role
 @Unstable

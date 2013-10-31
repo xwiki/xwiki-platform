@@ -36,7 +36,7 @@ import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
 /**
  * Utility classe used to fill a newly created wiki.
  *
- * @since 5.3M1
+ * @since 5.3M2
  * @version $Id$
  */
 public class WikiCopy

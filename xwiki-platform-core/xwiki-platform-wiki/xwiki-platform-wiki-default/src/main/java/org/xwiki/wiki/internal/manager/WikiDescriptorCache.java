@@ -25,7 +25,7 @@ import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 /**
  * Component that handle caching for wiki descriptors.
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Role
 public interface WikiDescriptorCache

@@ -34,7 +34,7 @@ import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 /**
  * Default implementation of {@link WikiDescriptorCache}.
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Component
 @Singleton

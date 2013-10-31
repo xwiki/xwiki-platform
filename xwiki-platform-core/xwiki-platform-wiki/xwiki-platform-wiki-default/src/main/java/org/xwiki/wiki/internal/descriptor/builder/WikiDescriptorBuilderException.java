@@ -23,7 +23,7 @@ package org.xwiki.wiki.internal.descriptor.builder;
  * Encapsulate any exception related to WikiDescriptor Builder.
  *
  * @version $Id$
- * @since 5.1M1
+ * @since 5.1M2
  */
 public class WikiDescriptorBuilderException extends Exception
 {

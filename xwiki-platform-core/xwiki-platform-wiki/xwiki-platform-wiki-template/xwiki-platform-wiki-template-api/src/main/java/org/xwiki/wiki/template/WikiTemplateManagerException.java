@@ -23,7 +23,7 @@ package org.xwiki.wiki.template;
  * Encapsulate any exception related to Wiki Template Manager.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 public class WikiTemplateManagerException extends Exception
 {

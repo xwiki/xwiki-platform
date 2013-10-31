@@ -56,9 +56,9 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link org.xwiki.wiki.internal.manager.DefaultWikiManager}.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
-public class    DefaultWikiManagerTest
+public class DefaultWikiManagerTest
 {
     @Rule
     public MockitoComponentMockingRule<DefaultWikiManager> mocker =

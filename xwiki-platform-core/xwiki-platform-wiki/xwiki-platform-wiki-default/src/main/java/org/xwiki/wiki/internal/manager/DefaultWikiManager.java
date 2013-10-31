@@ -48,7 +48,7 @@ import com.xpn.xwiki.util.Util;
 /**
  * Default implementation for {@link WikiManager}.
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Component
 @Singleton

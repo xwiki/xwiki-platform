@@ -23,7 +23,7 @@ package org.xwiki.wiki.properties;
  * Encapsulate any exception related to WikiDescriptor Properties Groups.
  *
  * @version $Id$
- * @since 5.1M1
+ * @since 5.1M2
  */
 public class WikiPropertyGroupException extends Exception
 {

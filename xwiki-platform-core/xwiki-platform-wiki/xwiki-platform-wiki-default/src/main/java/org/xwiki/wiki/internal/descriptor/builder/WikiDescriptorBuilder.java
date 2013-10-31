@@ -31,7 +31,7 @@ import com.xpn.xwiki.objects.BaseObject;
 /**
  * Component that create WikiDescriptor object from wiki document and vice versa.
  * @version $Id $
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Role
 public interface WikiDescriptorBuilder

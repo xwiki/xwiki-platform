@@ -29,7 +29,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
  * Component to list and get wiki descriptors.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Role
 @Unstable

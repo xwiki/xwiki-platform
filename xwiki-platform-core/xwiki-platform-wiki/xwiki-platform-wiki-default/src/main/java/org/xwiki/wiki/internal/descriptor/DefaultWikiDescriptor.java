@@ -26,7 +26,7 @@ import org.xwiki.wiki.internal.descriptor.document.XWikiServerClassDocumentIniti
 /**
  * Default implementation of the {@link WikiDescriptor}.
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 public class DefaultWikiDescriptor extends WikiDescriptor
 {

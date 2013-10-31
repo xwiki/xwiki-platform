@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Role;
  * Provider that manage WikiDescriptor Properties Groups.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Role
 public interface WikiPropertyGroupProvider

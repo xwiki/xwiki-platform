@@ -36,7 +36,7 @@ import org.xwiki.wikistream.model.filter.WikiSpaceFilter;
  * All events supported by Confluence module.
  * 
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 public interface ConfluenceFilter extends FarmFilter, WikiFilter, WikiSpaceFilter, WikiDocumentFilter,
     WikiAttachmentFilter, WikiClassFilter, WikiClassPropertyFilter, WikiObjectFilter, WikiObjectPropertyFilter,

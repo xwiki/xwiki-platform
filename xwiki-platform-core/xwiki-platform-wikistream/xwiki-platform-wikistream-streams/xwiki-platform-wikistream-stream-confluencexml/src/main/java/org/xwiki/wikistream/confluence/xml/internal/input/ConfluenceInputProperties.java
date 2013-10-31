@@ -29,7 +29,7 @@ import org.xwiki.wikistream.input.InputSource;
 
 /**
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 public class ConfluenceInputProperties extends DefaultWikiStreamProperties
 {

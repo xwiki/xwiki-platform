@@ -23,7 +23,7 @@ package org.xwiki.wikistream;
  * Properties common to most streams.
  * 
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 public interface WikiStreamProperties
 {

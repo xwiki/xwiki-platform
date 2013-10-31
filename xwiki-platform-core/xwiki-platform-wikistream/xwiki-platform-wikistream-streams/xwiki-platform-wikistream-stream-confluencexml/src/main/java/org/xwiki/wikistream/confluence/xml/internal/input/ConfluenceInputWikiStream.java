@@ -51,7 +51,7 @@ import org.xwiki.wikistream.model.filter.WikiDocumentFilter;
 
 /**
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Component
 @Named(ConfluenceInputWikiStreamFactory.ROLEHINT)

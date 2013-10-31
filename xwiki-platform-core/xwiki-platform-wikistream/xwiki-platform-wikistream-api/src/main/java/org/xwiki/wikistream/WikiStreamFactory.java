@@ -30,7 +30,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * describes a wiki stream with list of bean class parameters.
  * 
  * @version $Id$
- * @since 5.3M1
+ * @since 5.3M2
  */
 @Unstable
 public interface WikiStreamFactory

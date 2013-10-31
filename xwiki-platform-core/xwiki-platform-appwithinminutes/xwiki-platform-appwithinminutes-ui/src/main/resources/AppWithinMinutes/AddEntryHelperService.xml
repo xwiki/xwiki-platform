@@ -25,7 +25,7 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 ####################################################
-## Add Entry Helper Service
+##    AppWithinMinutes: Add Entry Helper Service
 ##
 ## This service takes a parameter 'entryName' and say:
 ## - if this entry already exist
@@ -34,22 +34,27 @@
 ## The other parameter is 'entrySpace', that set the
 ##   space where the entry should be added
 ####################################################
+#if($xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
+  #set($discard = $response.setContentType('application/json'))
+#end
 #set($entryName = $request.entryName)
 #set($entrySpace = $request.entrySpace)
+#set($map = {})
 #if("$!entryName" != '' &amp;&amp; "$!entrySpace" != '')
   #set($entryReference = $services.model.createDocumentReference('', $entrySpace, $entryName))
   #if(!$xwiki.exists($entryReference))
-    create
+    #set($discard = $map.put('action', 'create'))
   #else
     #set($entryFullName = $entryReference.toString())
     #if($xwiki.hasAccessLevel('edit', $xcontext.user, $entryFullName))
-      edit
+      #set($discard = $map.put('action', 'edit'))
     #elseif($xwiki.hasAccessLevel('view', $xcontext.user, $entryFullName))
-      view
+      #set($discard = $map.put('action', 'view'))
     #else
-      forbid
+      #set($discard = $map.put('action', 'forbid'))
     #end
   #end
 #end
+$jsontool.serialize($map)
 {{/velocity}}</content>
 </xwikidoc>

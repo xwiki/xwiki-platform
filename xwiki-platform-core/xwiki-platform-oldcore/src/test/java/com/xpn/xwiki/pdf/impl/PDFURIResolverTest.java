@@ -65,7 +65,10 @@ public class PDFURIResolverTest
         XWikiAttachment attachment = mock(XWikiAttachment.class);
 
         XWikiContext context = mock(XWikiContext.class);
-        when(context.get("pdfExportImageURLMap")).thenReturn(Collections.singletonMap("href", attachmentReference));
+        // Add an encoded space character to test that the URL is not decoded. The input URL (to be resolved) is
+        // expected to be encoded because the URL factory creates encoded URLs.
+        String url = "encoded+url";
+        when(context.get("pdfExportImageURLMap")).thenReturn(Collections.singletonMap(url, attachmentReference));
         when(context.getWiki()).thenReturn(xwiki);
         when(xwiki.getDocument(attachmentReference.extractReference(EntityType.DOCUMENT), context)).thenReturn(
             document);
@@ -73,7 +76,7 @@ public class PDFURIResolverTest
         when(attachment.getContentInputStream(context)).thenReturn(new ByteArrayInputStream("content".getBytes()));
 
         PDFURIResolver resolver = new PDFURIResolver(context);
-        Source source = resolver.resolve("href", "base");
+        Source source = resolver.resolve(url, "base");
         Assert.assertEquals(StreamSource.class, source.getClass());
         Assert.assertEquals("content", IOUtils.readLines(((StreamSource) source).getInputStream()).get(0));
     }

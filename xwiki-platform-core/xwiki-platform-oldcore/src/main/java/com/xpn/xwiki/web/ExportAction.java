@@ -254,7 +254,7 @@ public class ExportAction extends XWikiAction
             }
         }
 
-        if (context.getWiki().ParamAsLong("xwiki.action.export.xar.usewikistream", 0) == 1) {
+        if (context.getWiki().ParamAsLong("xwiki.action.export.xar.usewikistream", 1) == 1) {
             // Create input wiki stream
             InstanceInputProperties inputProperties = new InstanceInputProperties();
 

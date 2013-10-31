@@ -20,6 +20,7 @@
 package org.xwiki.wikistream.internal.input;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputWikiStream;
 
 /**
@@ -30,5 +31,5 @@ import org.xwiki.wikistream.input.InputWikiStream;
 @Role
 public interface BeanInputWikiStream<P> extends InputWikiStream
 {
-    void setProperties(P properties);
+    void setProperties(P properties) throws WikiStreamException;
 }

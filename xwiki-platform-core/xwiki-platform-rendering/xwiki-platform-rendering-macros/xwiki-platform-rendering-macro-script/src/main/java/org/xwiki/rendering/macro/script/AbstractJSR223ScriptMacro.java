@@ -215,7 +215,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
             context.getCurrentMacroBlock().getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE),
                 Axes.ANCESTOR_OR_SELF);
         if (metaDataBlock != null) {
-            scriptContext.setAttribute("javax.script.filename", metaDataBlock.getMetaData()
+            scriptContext.setAttribute(ScriptEngine.FILENAME, metaDataBlock.getMetaData()
                 .getMetaData(MetaData.SOURCE), ScriptContext.ENGINE_SCOPE);
         }
 

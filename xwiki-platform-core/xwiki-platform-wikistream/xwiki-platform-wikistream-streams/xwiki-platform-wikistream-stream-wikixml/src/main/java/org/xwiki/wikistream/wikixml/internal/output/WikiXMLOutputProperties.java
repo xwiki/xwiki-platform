@@ -17,39 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.internal.output;
+package org.xwiki.wikistream.wikixml.internal.output;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.wikistream.instance.internal.InstanceUtils;
+import org.xwiki.wikistream.xml.internal.output.XMLOuputProperties;
 
 /**
+ * 
  * @version $Id$
  * @since 5.3M2
  */
-@Component
-@Named(UserOutputInstanceWikiStreamFactory.ROLEHINT)
-@Singleton
-public class UserOutputInstanceWikiStreamFactory extends
-    AbstractBeanOutputInstanceWikiStreamFactory<UserOutputProperties, UserInstanceOutputFilter>
+public class WikiXMLOutputProperties extends XMLOuputProperties
 {
-    /**
-     * The id of this {@link org.xwiki.wikistream.instance.output.OutputInstanceWikiStreamFactory}.
-     */
-    public static final String ID = "users";
 
-    /**
-     * Tje role hint of this {@link org.xwiki.wikistream.output.OutputWikiStreamFactory}.
-     */
-    public static final String ROLEHINT = InstanceUtils.ROLEHINT + '+' + ID;
-
-    /**
-     * The default constructor.
-     */
-    public UserOutputInstanceWikiStreamFactory()
-    {
-        super(ID);
-    }
 }

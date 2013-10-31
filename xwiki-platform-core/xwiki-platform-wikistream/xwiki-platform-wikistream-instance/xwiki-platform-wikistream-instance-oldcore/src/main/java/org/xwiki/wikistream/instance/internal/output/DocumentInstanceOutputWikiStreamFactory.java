@@ -31,10 +31,10 @@ import org.xwiki.wikistream.instance.internal.InstanceUtils;
  * @since 5.2
  */
 @Component
-@Named(DocumentOutputInstanceWikiStreamFactory.ROLEHINT)
+@Named(DocumentInstanceOutputWikiStreamFactory.ROLEHINT)
 @Singleton
-public class DocumentOutputInstanceWikiStreamFactory extends
-    AbstractBeanOutputInstanceWikiStreamFactory<DocumentOutputProperties, DocumentInstanceFilter>
+public class DocumentInstanceOutputWikiStreamFactory extends
+    AbstractBeanOutputInstanceWikiStreamFactory<DocumentInstanceOutputProperties, DocumentInstanceFilter>
 {
     /**
      * The id of this {@link org.xwiki.wikistream.instance.output.OutputInstanceWikiStreamFactory}.
@@ -49,7 +49,7 @@ public class DocumentOutputInstanceWikiStreamFactory extends
     /**
      * The default constructor.
      */
-    public DocumentOutputInstanceWikiStreamFactory()
+    public DocumentInstanceOutputWikiStreamFactory()
     {
         super(ID);
     }

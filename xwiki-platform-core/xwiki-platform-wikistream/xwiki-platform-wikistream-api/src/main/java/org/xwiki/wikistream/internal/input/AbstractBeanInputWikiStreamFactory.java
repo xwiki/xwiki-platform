@@ -88,7 +88,7 @@ public abstract class AbstractBeanInputWikiStreamFactory<P, F> extends AbstractB
         try {
             inputWikiStream =
                 this.componentManager.getInstance(new DefaultParameterizedType(null, BeanInputWikiStream.class,
-                    properties.getClass()), getType().serialize());
+                    getPropertiesBeanClass()), getType().serialize());
         } catch (ComponentLookupException e) {
             throw new WikiStreamException(String.format("Failed to get instance of [%s] for type [%s]",
                 BeanInputWikiStream.class, getType()), e);

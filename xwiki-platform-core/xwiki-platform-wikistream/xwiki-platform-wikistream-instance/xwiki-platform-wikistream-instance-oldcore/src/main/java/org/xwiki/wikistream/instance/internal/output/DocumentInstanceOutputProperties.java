@@ -20,13 +20,17 @@
 package org.xwiki.wikistream.instance.internal.output;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * @version $Id$
  * @since 5.3M2
  */
-public class UserOutputProperties extends InstanceOutputProperties
+public class DocumentInstanceOutputProperties extends InstanceOutputProperties
 {
+    private EntityReference defaultReference = null;
+
     private String saveComment = "Import";
 
     private DocumentReference author = null;
@@ -35,9 +39,17 @@ public class UserOutputProperties extends InstanceOutputProperties
 
     private boolean preserveVersion = false;
 
-    private String groupPrefix = "";
+    private Syntax defaultSyntax;
 
-    private String groupSuffix = "";
+    public EntityReference getDefaultReference()
+    {
+        return this.defaultReference;
+    }
+
+    public void setDefaultReference(EntityReference defaultReference)
+    {
+        this.defaultReference = defaultReference;
+    }
 
     public String getSaveComment()
     {
@@ -75,23 +87,13 @@ public class UserOutputProperties extends InstanceOutputProperties
         this.preserveVersion = preserveVersion;
     }
 
-    public String getGroupPrefix()
+    public Syntax getDefaultSyntax()
     {
-        return this.groupPrefix;
+        return this.defaultSyntax;
     }
 
-    public void setGroupPrefix(String groupPrefix)
+    public void setDefaultSyntax(Syntax defaultSyntax)
     {
-        this.groupPrefix = groupPrefix;
-    }
-
-    public String getGroupSuffix()
-    {
-        return this.groupSuffix;
-    }
-
-    public void setGroupSuffix(String groupSuffix)
-    {
-        this.groupSuffix = groupSuffix;
+        this.defaultSyntax = defaultSyntax;
     }
 }

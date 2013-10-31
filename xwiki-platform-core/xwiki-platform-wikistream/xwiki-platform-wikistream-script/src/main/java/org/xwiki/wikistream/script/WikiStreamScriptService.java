@@ -84,6 +84,6 @@ public class WikiStreamScriptService implements ScriptService
         OutputWikiStreamFactory factory =
             this.componentManager.getInstance(OutputWikiStreamFactory.class, outputType.serialize());
 
-        return factory.creaOutputWikiStream(outputProperties);
+        return factory.createOutputWikiStream(outputProperties);
     }
 }

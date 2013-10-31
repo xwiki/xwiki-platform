@@ -17,16 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.wikixml.internal.output;
-
-import org.xwiki.wikistream.xml.internal.output.XMLOuputProperties;
+package org.xwiki.wikistream.instance.internal.input;
 
 /**
  * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3M2
  */
-public class WikiXMLOuputProperties extends XMLOuputProperties
+public class DocumentInstanceInputProperties extends InstanceInputProperties
 {
 
 }

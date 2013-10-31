@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.internal;
+package org.xwiki.wikistream.instance.internal.output;
 
 import java.text.ParseException;
 
@@ -32,8 +32,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.instance.internal.output.UserOutputInstanceWikiStream;
-import org.xwiki.wikistream.instance.internal.output.UserOutputProperties;
+import org.xwiki.wikistream.instance.internal.AbstractInstanceWikiStreamTest;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -42,19 +41,19 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Validate {@link UserOutputInstanceWikiStream}.
+ * Validate {@link UserInstanceOutputWikiStream}.
  * 
  * @version $Id$
  */
 @AllComponents
-public class UserOutputInstanceWikiStreamTest extends AbstractOutputInstanceWikiStreamTest
+public class UserInstanceOutputWikiStreamTest extends AbstractInstanceWikiStreamTest
 {
     LocalDocumentReference USER_CLASS = new LocalDocumentReference("XWiki", "XWikiUsers");
 
     LocalDocumentReference GROUP_CLASS = new LocalDocumentReference("XWiki", "XWikiGroups");
 
     @Override
-    public void before() throws ComponentLookupException, XWikiException
+    public void before() throws Exception
     {
         super.before();
 
@@ -119,7 +118,7 @@ public class UserOutputInstanceWikiStreamTest extends AbstractOutputInstanceWiki
     @Test
     public void testImportUsersAndGroupsPreserveVersion() throws WikiStreamException, XWikiException, ParseException
     {
-        UserOutputProperties outputProperties = new UserOutputProperties();
+        UserInstanceOutputProperties outputProperties = new UserInstanceOutputProperties();
 
         outputProperties.setPreserveVersion(true);
 

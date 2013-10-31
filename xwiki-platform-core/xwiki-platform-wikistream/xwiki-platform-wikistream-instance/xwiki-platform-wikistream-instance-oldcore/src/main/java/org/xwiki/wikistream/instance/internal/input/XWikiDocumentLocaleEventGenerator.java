@@ -163,7 +163,8 @@ public class XWikiDocumentLocaleEventGenerator extends
         if (properties.isWithWikiClass()) {
             BaseClass xclass = document.getXClass();
             if (!xclass.getFieldList().isEmpty()) {
-                ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, documentFilter, properties);
+                ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, documentFilter,
+                    (BaseClassInputProperties) properties);
             }
         }
 
@@ -173,7 +174,7 @@ public class XWikiDocumentLocaleEventGenerator extends
                 for (BaseObject xobject : xobjects) {
                     if (xobject != null) {
                         ((BaseObjectEventGenerator) this.objectEventGenerator).write(xobject, filter, documentFilter,
-                            properties);
+                            (BaseObjectInputProperties) properties);
                     }
                 }
             }

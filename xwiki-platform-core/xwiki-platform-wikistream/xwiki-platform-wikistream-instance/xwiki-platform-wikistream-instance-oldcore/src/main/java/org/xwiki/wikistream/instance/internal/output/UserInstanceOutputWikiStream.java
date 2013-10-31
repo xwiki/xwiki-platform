@@ -58,9 +58,9 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @since 5.3M2
  */
 @Component
-@Named(UserOutputInstanceWikiStreamFactory.ROLEHINT)
+@Named(UserInstanceOutputWikiStreamFactory.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class UserOutputInstanceWikiStream extends AbstractBeanOutputWikiStream<UserOutputProperties> implements
+public class UserInstanceOutputWikiStream extends AbstractBeanOutputWikiStream<UserInstanceOutputProperties> implements
     UserInstanceOutputFilter
 {
     private static final EntityReference DEFAULT_SPACE = new EntityReference("XWiki", EntityType.SPACE);

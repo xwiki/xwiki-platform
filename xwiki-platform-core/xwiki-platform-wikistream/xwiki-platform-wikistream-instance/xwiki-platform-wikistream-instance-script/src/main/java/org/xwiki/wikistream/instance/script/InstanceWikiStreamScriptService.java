@@ -84,7 +84,7 @@ public class InstanceWikiStreamScriptService implements ScriptService
         OutputWikiStreamFactory outputWikiStreamFactory =
             this.componentManagerProvider.get().getInstance(OutputWikiStreamFactory.class, outputStream.serialize());
 
-        OutputWikiStream outputWikiStream = outputWikiStreamFactory.creaOutputWikiStream(outputProperties);
+        OutputWikiStream outputWikiStream = outputWikiStreamFactory.createOutputWikiStream(outputProperties);
 
         // Export
         inputWikiStream.read(outputWikiStream.getFilter());

@@ -20,11 +20,10 @@
 package org.xwiki.wikistream.instance.internal.input;
 
 /**
- * 
  * @version $Id$
  * @since 5.2
  */
-public class XWikiAttachmentInputProperties
+public class XWikiAttachmentInputProperties extends DocumentInstanceInputProperties
 {
     private boolean withWikiAttachmentContent = true;
 

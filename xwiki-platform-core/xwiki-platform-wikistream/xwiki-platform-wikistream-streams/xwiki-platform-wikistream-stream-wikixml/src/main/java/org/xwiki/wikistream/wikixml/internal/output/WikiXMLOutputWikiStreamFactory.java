@@ -53,7 +53,7 @@ import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamF
 @Named("wiki+xml")
 @Singleton
 public class WikiXMLOutputWikiStreamFactory extends
-    AbstractXMLBeanOutputWikiStreamFactory<WikiXMLOuputProperties, Object>
+    AbstractXMLBeanOutputWikiStreamFactory<WikiXMLOutputProperties, Object>
 {
     @Inject
     private XMLSerializerFactory serializerFactory;
@@ -89,7 +89,7 @@ public class WikiXMLOutputWikiStreamFactory extends
     }
 
     @Override
-    protected Object createListener(Result result, WikiXMLOuputProperties properties) throws XMLStreamException,
+    protected Object createListener(Result result, WikiXMLOutputProperties properties) throws XMLStreamException,
         FactoryConfigurationError, WikiStreamException
     {
 

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.internal;
+package org.xwiki.wikistream.instance.internal.output;
 
 import java.text.ParseException;
 import java.util.Arrays;
@@ -32,8 +32,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.instance.internal.output.DocumentOutputInstanceWikiStream;
-import org.xwiki.wikistream.instance.internal.output.DocumentOutputProperties;
+import org.xwiki.wikistream.instance.internal.AbstractInstanceWikiStreamTest;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -43,19 +42,19 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 
 /**
- * Validate {@link DocumentOutputInstanceWikiStream}.
+ * Validate {@link DocumentInstanceOutputWikiStream}.
  * 
  * @version $Id$
  */
 @AllComponents
-public class DocumentOutputInstanceWikiStreamTest extends AbstractOutputInstanceWikiStreamTest
+public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiStreamTest
 {
     // Tests
 
     @Test
     public void testImportDocumentsPreserveVersion() throws WikiStreamException, XWikiException, ParseException
     {
-        DocumentOutputProperties outputProperties = new DocumentOutputProperties();
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
         outputProperties.setPreserveVersion(true);
 

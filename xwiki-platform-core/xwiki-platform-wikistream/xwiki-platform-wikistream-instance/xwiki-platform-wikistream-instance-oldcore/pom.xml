@@ -98,10 +98,10 @@
               org/xwiki/wikistream/instance/internal/input/XWikiAttachmentInputProperties.java,
               org/xwiki/wikistream/instance/internal/input/XWikiDocumentInputProperties.java,
               org/xwiki/wikistream/instance/internal/input/XWikiDocumentLocaleEventGenerator.java,
-              org/xwiki/wikistream/instance/internal/output/DocumentOutputInstanceWikiStream.java,
-              org/xwiki/wikistream/instance/internal/output/DocumentOutputProperties.java,
-              org/xwiki/wikistream/instance/internal/output/UserOutputInstanceWikiStream.java,
-              org/xwiki/wikistream/instance/internal/output/UserOutputProperties.java
+              org/xwiki/wikistream/instance/internal/output/DocumentInstanceOutputWikiStream.java,
+              org/xwiki/wikistream/instance/internal/output/DocumentInstanceOutputProperties.java,
+              org/xwiki/wikistream/instance/internal/output/UserInstanceOutputProperties.java,
+              org/xwiki/wikistream/instance/internal/output/UserInstanceOutputWikiStream.java
           </excludes>
         </configuration>
       </plugin>

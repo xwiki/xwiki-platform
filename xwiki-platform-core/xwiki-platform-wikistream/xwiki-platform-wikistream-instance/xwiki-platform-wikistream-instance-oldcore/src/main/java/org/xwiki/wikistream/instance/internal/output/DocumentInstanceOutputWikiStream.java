@@ -75,9 +75,9 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
  * @since 5.2
  */
 @Component
-@Named(DocumentOutputInstanceWikiStreamFactory.ROLEHINT)
+@Named(DocumentInstanceOutputWikiStreamFactory.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DocumentOutputInstanceWikiStream extends AbstractBeanOutputWikiStream<DocumentOutputProperties> implements
+public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStream<DocumentInstanceOutputProperties> implements
     XWikiDocumentFilter
 {
     @Inject

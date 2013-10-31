@@ -305,7 +305,7 @@ public class ExportAction extends XWikiAction
             OutputWikiStreamFactory outputWikiStreamFactory =
                 Utils.getComponent(OutputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR.serialize());
 
-            OutputWikiStream outputWikiStream = outputWikiStreamFactory.creaOutputWikiStream(outputProperties);
+            OutputWikiStream outputWikiStream = outputWikiStreamFactory.createOutputWikiStream(outputProperties);
 
             // Export
             response.setContentType("application/zip");

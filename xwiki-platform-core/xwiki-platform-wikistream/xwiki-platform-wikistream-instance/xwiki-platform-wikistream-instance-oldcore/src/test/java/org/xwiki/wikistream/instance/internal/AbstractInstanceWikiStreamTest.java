@@ -33,7 +33,6 @@ import org.junit.Rule;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.wikistream.WikiStreamException;
@@ -49,7 +48,6 @@ import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.wikixml.internal.input.WikiXMLInputProperties;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -61,26 +59,25 @@ import com.xpn.xwiki.test.MockitoOldcoreRule;
  * @version $Id$
  */
 @AllComponents
-public class AbstractOutputInstanceWikiStreamTest
+public class AbstractInstanceWikiStreamTest
 {
     private static final SimpleDateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S z", Locale.ENGLISH);
 
     @Rule
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
-    protected BeanInputWikiStreamFactory<WikiXMLInputProperties> inputWikiStreamFactory;
+    protected BeanInputWikiStreamFactory<WikiXMLInputProperties> xmlInputWikiStreamFactory;
 
     protected BeanOutputWikiStreamFactory<InstanceOutputProperties> outputWikiStreamFactory;
 
-    protected Map<DocumentReference, Map<String, XWikiDocument>> documents =
-        new HashMap<DocumentReference, Map<String, XWikiDocument>>();
+    protected Map<DocumentReference, XWikiDocument> documents = new HashMap<DocumentReference, XWikiDocument>();
 
     protected Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
 
     @Before
-    public void before() throws ComponentLookupException, XWikiException
+    public void before() throws Exception
     {
-        this.inputWikiStreamFactory =
+        this.xmlInputWikiStreamFactory =
             this.oldcore.getMocker().getInstance(InputWikiStreamFactory.class, WikiStreamType.WIKI_XML.serialize());
         this.outputWikiStreamFactory =
             this.oldcore.getMocker().getInstance(OutputWikiStreamFactory.class,
@@ -95,14 +92,11 @@ public class AbstractOutputInstanceWikiStreamTest
             {
                 DocumentReference target = (DocumentReference) invocation.getArguments()[0];
 
-                Map<String, XWikiDocument> documentLanguages = documents.get(target);
-
-                if (documentLanguages == null) {
-                    documentLanguages = new HashMap<String, XWikiDocument>();
-                    documents.put(target, documentLanguages);
+                if (target.getLocale() == null) {
+                    target = new DocumentReference(target, Locale.ROOT);
                 }
 
-                XWikiDocument document = documentLanguages.get("");
+                XWikiDocument document = documents.get(target);
 
                 if (document == null) {
                     document = new XWikiDocument(target);
@@ -126,25 +120,18 @@ public class AbstractOutputInstanceWikiStreamTest
                     document.incrementVersion();
                     document.setNew(false);
 
-                    Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
+                    XWikiDocument previousDocument = documents.get(document.getDocumentReferenceWithLocale());
 
-                    XWikiDocument previousDocument;
-                    if (documentLanguages == null) {
-                        documentLanguages = new HashMap<String, XWikiDocument>();
-                        documents.put(document.getDocumentReference(), documentLanguages);
-                        previousDocument = null;
-                    } else {
-                        previousDocument = documentLanguages.get(document.getLanguage());
-                    }
-
-                    for (XWikiAttachment attachment : document.getAttachmentList()) {
-                        if (!attachment.isContentDirty()) {
-                            attachment.setAttachment_content(previousDocument.getAttachment(attachment.getFilename())
-                                .getAttachment_content());
+                    if (previousDocument != document) {
+                        for (XWikiAttachment attachment : document.getAttachmentList()) {
+                            if (!attachment.isContentDirty()) {
+                                attachment.setAttachment_content(previousDocument.getAttachment(
+                                    attachment.getFilename()).getAttachment_content());
+                            }
                         }
                     }
 
-                    documentLanguages.put(document.getLanguage(), document.clone());
+                    documents.put(document.getDocumentReferenceWithLocale(), document.clone());
 
                     return null;
                 }
@@ -172,11 +159,7 @@ public class AbstractOutputInstanceWikiStreamTest
             {
                 XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
 
-                Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
-
-                if (documentLanguages != null) {
-                    documentLanguages.remove(document.getLanguage());
-                }
+                documents.remove(document.getDocumentReferenceWithLocale());
 
                 return null;
             }
@@ -209,14 +192,14 @@ public class AbstractOutputInstanceWikiStreamTest
             instanceProperties = new InstanceOutputProperties();
         }
 
-        OutputWikiStream outputWikiStream = this.outputWikiStreamFactory.creaOutputWikiStream(instanceProperties);
+        OutputWikiStream outputWikiStream = this.outputWikiStreamFactory.createOutputWikiStream(instanceProperties);
 
         URL url = getClass().getResource("/" + resource + ".xml");
 
         WikiXMLInputProperties properties = new WikiXMLInputProperties();
         properties.setSource(new DefaultURLInputSource(url));
 
-        InputWikiStream inputWikiStream = this.inputWikiStreamFactory.createInputWikiStream(properties);
+        InputWikiStream inputWikiStream = this.xmlInputWikiStreamFactory.createInputWikiStream(properties);
 
         inputWikiStream.read(outputWikiStream.getFilter());
     }

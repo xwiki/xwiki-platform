@@ -109,7 +109,7 @@ public class WikiStreamTest
 
         InputWikiStream inputWikiStream = inputFactory.createInputWikiStream(this.configuration.inputConfiguration);
         OutputWikiStream outputWikiStream =
-            outputFactory.creaOutputWikiStream(this.configuration.expectConfiguration.output);
+            outputFactory.createOutputWikiStream(this.configuration.expectConfiguration.output);
 
         try {
             // Convert

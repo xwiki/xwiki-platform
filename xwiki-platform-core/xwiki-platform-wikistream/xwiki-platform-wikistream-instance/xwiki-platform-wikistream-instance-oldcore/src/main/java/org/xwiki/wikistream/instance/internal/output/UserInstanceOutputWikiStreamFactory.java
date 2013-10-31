@@ -17,28 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.output;
+package org.xwiki.wikistream.instance.internal.output;
 
-import java.util.Map;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
-import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.WikiStreamFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.wikistream.instance.internal.InstanceUtils;
 
 /**
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3M2
  */
-@Role
-@Unstable
-public interface OutputWikiStreamFactory extends WikiStreamFactory
+@Component
+@Named(UserInstanceOutputWikiStreamFactory.ROLEHINT)
+@Singleton
+public class UserInstanceOutputWikiStreamFactory extends
+    AbstractBeanOutputInstanceWikiStreamFactory<UserInstanceOutputProperties, UserInstanceOutputFilter>
 {
     /**
-     * @param properties the properties to control {@link OutputWikiStream} behavior
-     * @return a new {@link OutputWikiStream}
-     * @throws WikiStreamException when failing to create a {@link OutputWikiStream}
-     * @since 5.3M2
+     * The id of this {@link org.xwiki.wikistream.instance.output.OutputInstanceWikiStreamFactory}.
      */
-    OutputWikiStream createOutputWikiStream(Map<String, Object> properties) throws WikiStreamException;
+    public static final String ID = "users";
+
+    /**
+     * Tje role hint of this {@link org.xwiki.wikistream.output.OutputWikiStreamFactory}.
+     */
+    public static final String ROLEHINT = InstanceUtils.ROLEHINT + '+' + ID;
+
+    /**
+     * The default constructor.
+     */
+    public UserInstanceOutputWikiStreamFactory()
+    {
+        super(ID);
+    }
 }

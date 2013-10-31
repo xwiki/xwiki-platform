@@ -29,5 +29,11 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface BeanOutputWikiStreamFactory<P> extends OutputWikiStreamFactory
 {
-    OutputWikiStream creaOutputWikiStream(P properties) throws WikiStreamException;
+    /**
+     * @param properties the properties to control {@link OutputWikiStream} behavior
+     * @return a new {@link OutputWikiStream}
+     * @throws WikiStreamException when failing to create a {@link OutputWikiStream}
+     * @since 5.3M2
+     */
+    OutputWikiStream createOutputWikiStream(P properties) throws WikiStreamException;
 }

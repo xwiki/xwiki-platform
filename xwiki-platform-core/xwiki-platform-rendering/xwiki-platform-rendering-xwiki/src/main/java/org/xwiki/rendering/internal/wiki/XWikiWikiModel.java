@@ -157,29 +157,23 @@ public class XWikiWikiModel implements WikiModel
         }
 
         // Handle attachment references
-        String url = getLinkURL(imageReference);
-        if (!this.xwikiRenderingConfiguration.isImageDimensionsIncludedInImageURL()) {
-            return url;
+        if (this.xwikiRenderingConfiguration.isImageDimensionsIncludedInImageURL()) {
+            String extraQueryString = StringUtils.removeStart(getImageURLQueryString(parameters), "&");
+            if (!extraQueryString.isEmpty()) {
+                // Handle scaled image attachments.
+                String queryString = imageReference.getParameter(AttachmentResourceReference.QUERY_STRING);
+                if (StringUtils.isEmpty(queryString)) {
+                    queryString = extraQueryString;
+                } else {
+                    queryString += '&' + extraQueryString;
+                }
+                ResourceReference scaledImageReference = imageReference.clone();
+                scaledImageReference.setParameter(AttachmentResourceReference.QUERY_STRING, queryString);
+                return getLinkURL(scaledImageReference);
+            }
         }
 
-        StringBuilder queryString = getImageURLQueryString(parameters);
-        if (queryString.length() == 0) {
-            return url;
-        }
-
-        // Determine the insertion point.
-        int insertionPoint = url.lastIndexOf('#');
-        if (insertionPoint < 0) {
-            // No fragment identifier.
-            insertionPoint = url.length();
-        }
-        if (url.lastIndexOf('?', insertionPoint) < 0) {
-            // No query string.
-            queryString.setCharAt(0, '?');
-        }
-
-        // Insert the query string.
-        return new StringBuilder(url).insert(insertionPoint, queryString).toString();
+        return getLinkURL(imageReference);
     }
 
     @Override
@@ -337,10 +331,10 @@ public class XWikiWikiModel implements WikiModel
      * @param imageParameters image parameters, including width and height then they are specified
      * @return the query string to be added to an image URL in order to resize the image on the server side
      */
-    private StringBuilder getImageURLQueryString(Map<String, String> imageParameters)
+    private String getImageURLQueryString(Map<String, String> imageParameters)
     {
-        String width = StringUtils.chomp(getImageDimension(WIDTH, imageParameters), PIXELS);
-        String height = StringUtils.chomp(getImageDimension(HEIGHT, imageParameters), PIXELS);
+        String width = StringUtils.removeEnd(getImageDimension(WIDTH, imageParameters), PIXELS);
+        String height = StringUtils.removeEnd(getImageDimension(HEIGHT, imageParameters), PIXELS);
         boolean useHeight = StringUtils.isNotEmpty(height) && StringUtils.isNumeric(height);
         StringBuilder queryString = new StringBuilder();
         if (StringUtils.isEmpty(width) || !StringUtils.isNumeric(width)) {
@@ -371,6 +365,6 @@ public class XWikiWikiModel implements WikiModel
                 queryString.append('&').append(HEIGHT).append('=').append(height);
             }
         }
-        return queryString;
-    }    
+        return queryString.toString();
+    }
 }

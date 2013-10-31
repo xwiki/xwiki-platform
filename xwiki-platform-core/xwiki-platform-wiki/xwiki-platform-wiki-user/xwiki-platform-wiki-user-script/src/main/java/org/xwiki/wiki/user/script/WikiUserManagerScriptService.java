@@ -431,7 +431,6 @@ public class WikiUserManagerScriptService implements ScriptService
     {
         // Check if the current user is userId
         XWikiContext xcontext = xcontextProvider.get();
-        String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
         if (!authorizationManager.hasAccess(Right.ADMIN, xcontext.getUserReference(),
                 new WikiReference(request.getWikiId()))) {
             return false;

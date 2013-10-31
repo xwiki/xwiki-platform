@@ -551,7 +551,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         object.setStringValue(CANDIDACY_CLASS_STATUS_FIELD, request.getStatus().name().toLowerCase());
 
         // Save the document
-        saveGroupDocument(groupDoc, String.format("Accept join request from user [%]", request.getUserId()));
+        saveGroupDocument(groupDoc, String.format("Accept join request from user [%s]", request.getUserId()));
     }
 
     @Override

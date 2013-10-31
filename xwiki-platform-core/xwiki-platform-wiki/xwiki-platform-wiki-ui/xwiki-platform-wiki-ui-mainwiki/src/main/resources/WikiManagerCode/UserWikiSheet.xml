@@ -304,7 +304,7 @@ return XWiki;
   #set($temp = $xwiki.jsx.use('WikiManagerCode.UserWikiSheet'))
   #set($temp = $doc.use($obj))
   #set ($currentUser = $xcontext.user)
-  #if (!$currentUser.startsWith("${xcontext.mainWikiName}:"))
+  #if (!$currentUser.startsWith("${services.wiki.mainWikiId}:"))
     #set ($currentUser = "${services.wiki.mainWikiId}:${currentUser}")
   #end
   #set($documentUser = $doc.prefixedFullName)

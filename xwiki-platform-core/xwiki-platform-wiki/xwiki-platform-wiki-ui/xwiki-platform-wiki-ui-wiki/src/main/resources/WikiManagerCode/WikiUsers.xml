@@ -480,6 +480,7 @@ $services.localization.render('platform.workspace.candidateHandledComment') $mes
 &lt;div id='candidates' class='xform'&gt;
 &lt;h2&gt;$services.localization.render('platform.workspace.candidatesLabel')&lt;/h2&gt;
 &lt;div class='xHint'&gt;$services.localization.render('platform.workspace.candidatesHint')&lt;/div&gt;
+#set ($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
 #set ($candidateMembers = $groupDoc.getObjects($candidateClass))
 #foreach ($candidateMember in $candidateMembers)
   #set ($userFullName = $candidateMember.userName)

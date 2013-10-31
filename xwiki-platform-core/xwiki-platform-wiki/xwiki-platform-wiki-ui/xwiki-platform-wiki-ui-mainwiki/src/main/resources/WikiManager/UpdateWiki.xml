@@ -48,9 +48,9 @@ The 'xredirect' parameter is also accepted, currently used in the administration
     #end
   #else
     #set ($temp = $wiki.setPrettyName($request.get('XWiki.XWikiServerClass_0_wikiprettyname')))
-    #set ($temp = $wiki.setDescription($request.get('XWiki.XWikiServerClass_0_description'))
+    #set ($temp = $wiki.setDescription($request.get('XWiki.XWikiServerClass_0_description')))
     #set ($newOwner = $request.get('XWiki.XWikiServerClass_0_owner'))
-    #if (!$newOwner.startsWith("${services.wiki.mainWikiId}:")
+    #if (!$newOwner.startsWith("${services.wiki.mainWikiId}:"))
       #set ($newOwner = "${services.wiki.mainWikiId}:${newOwner}")
     #end
     #if ($xwiki.exists($newOwner))

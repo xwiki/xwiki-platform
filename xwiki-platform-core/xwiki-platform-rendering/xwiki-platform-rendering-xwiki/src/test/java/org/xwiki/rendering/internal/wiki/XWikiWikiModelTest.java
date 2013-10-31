@@ -24,9 +24,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-
 import org.jmock.Expectations;
+import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.SkinAccessBridge;
@@ -99,13 +98,11 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
     @Test
     public void testGetImageURLWhenBothWidthAndHeightAttributesAreSpecified() throws Exception
     {
-        setUpCommonExpectations("attachmentURL", true);
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("width", "100px");
         parameters.put("height", "50");
 
-        AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
-        Assert.assertEquals("attachmentURL?width=100&height=50", getMockedComponent().getImageURL(reference, parameters));
+        testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true, "width=100&height=50");
     }
 
     /**
@@ -117,13 +114,11 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
     @Test
     public void testGetImageURLWhenIncludingImageDimensionsIsForbidden() throws Exception
     {
-        setUpCommonExpectations("attachmentURL", false);
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("width", "101px");
         parameters.put("height", "55px");
 
-        AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
-        Assert.assertEquals("attachmentURL", getMockedComponent().getImageURL(reference, parameters));
+        testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, false, null);
     }
 
     /**
@@ -134,13 +129,11 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
     @Test
     public void testGetImageURLWhenBothWidthAndHeightCSSPropertiesAreSpecified() throws Exception
     {
-        setUpCommonExpectations("attachmentURL", true);
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("style", "border: 1px; height: 30px; margin-top: 2em; width: 70px");
 
         AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
-        Assert.assertEquals("attachmentURL?width=70&height=30",
-            getMockedComponent().getImageURL(reference, parameters));
+        testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true, "width=70&height=30");
     }
 
     /**
@@ -151,13 +144,11 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
     @Test
     public void testGetImageURLWhenOnlyWidthAttributeIsSpecified() throws Exception
     {
-        setUpCommonExpectations("attachmentURL", true);
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("width", "150");
         parameters.put("height", "30%");
 
-        AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
-        Assert.assertEquals("attachmentURL?width=150", getMockedComponent().getImageURL(reference, parameters));
+        testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true, "width=150");
     }
 
     /**
@@ -168,12 +159,11 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
     @Test
     public void testGetImageURLWhenOnlyHeightCSSPropertyIsSpecified() throws Exception
     {
-        setUpCommonExpectations("attachmentURL", true);
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("style", "width: 5cm; height: 80px");
 
         AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
-        Assert.assertEquals("attachmentURL?height=80", getMockedComponent().getImageURL(reference, parameters));
+        testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true, "height=80");
     }
 
     /**
@@ -185,7 +175,6 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
     @Test
     public void testGetImageURLWhenBothWidthAndHeightAreUnspecifiedAndImageSizeIsLimited() throws Exception
     {
-        setUpCommonExpectations("attachmentURL", true);
         final XWikiRenderingConfiguration configuration =
             getComponentManager().getInstance((Type) XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
@@ -200,8 +189,8 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
         Map<String, String> parameters = Collections.emptyMap();
 
         AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
-        Assert.assertEquals("attachmentURL?width=200&height=170&keepAspectRatio=true",
-            getMockedComponent().getImageURL(reference, parameters));
+        testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true,
+            "width=200&height=170&keepAspectRatio=true");
     }
 
     /**
@@ -213,7 +202,6 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
     @Test
     public void testGetImageURLWhenBothWidthAndHeightAreUnspecifiedAndOnlyImageWidthIsLimited() throws Exception
     {
-        setUpCommonExpectations("attachmentURL", true);
         final XWikiRenderingConfiguration configuration =
             getComponentManager().getInstance((Type) XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
@@ -230,7 +218,7 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
         parameters.put("style", "height:10em");
 
         AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
-        Assert.assertEquals("attachmentURL?width=25", getMockedComponent().getImageURL(reference, parameters));
+        testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true, "width=25");
     }
 
     /**
@@ -242,7 +230,6 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
     @Test
     public void testGetImageURLWhenBothWidthAndHeightAreUnspecifiedAndImageSizeIsNotLimited() throws Exception
     {
-        setUpCommonExpectations("attachmentURL", true);
         final XWikiRenderingConfiguration configuration =
             getComponentManager().getInstance((Type) XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
@@ -257,24 +244,7 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("style", "bad CSS declaration");
 
-        AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
-        Assert.assertEquals("attachmentURL", getMockedComponent().getImageURL(reference, parameters));
-    }
-
-    /**
-     * Tests that the proper image URL is generated when the attachment URL has a fragment identifier.
-     * 
-     * @throws Exception if an exception occurs while running the test
-     */
-    @Test
-    public void testGetImageURLWhenAttachmentURLHasFragmentIdentifier() throws Exception
-    {
-        setUpCommonExpectations("test#fragment", true);
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("width", "23");
-
-        AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
-        Assert.assertEquals("test?width=23#fragment", getMockedComponent().getImageURL(reference, parameters));
+        testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true, null);
     }
 
     /**
@@ -284,15 +254,14 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
      * @throws Exception if an exception occurs while running the test
      */
     @Test
-    public void testGetImageURLWhenAttachmentURLHasQueryStringAndFragmentIdentifier() throws Exception
+    public void testGetImageURLWhenImageReferenceHasQueryString() throws Exception
     {
-        setUpCommonExpectations("test?param=value#fragment", true);
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("height", "17");
 
         AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
-        Assert.assertEquals("test?param=value&height=17#fragment",
-           getMockedComponent().getImageURL(reference, parameters));
+        reference.setParameter(AttachmentResourceReference.QUERY_STRING, "param=value");
+        testImageURL(reference, parameters, true, "param=value&height=17");
     }
 
     /**
@@ -303,7 +272,6 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
     @Test
     public void testGetImageURLWhenBothStyleAndDimensionParametersAreSpecified() throws Exception
     {
-        setUpCommonExpectations("attachmentURL", true);
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("height", "46");
         parameters.put("width", "101px");
@@ -311,8 +279,7 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
 
         // Note that the style parameter take precedence over the dimension parameters and the width is actually 20% but
         // we can't use it for resizing the image on the server side so it's omitted from the query string.
-        AttachmentResourceReference reference = new AttachmentResourceReference("attachmentReference");
-        Assert.assertEquals("attachmentURL?height=75", getMockedComponent().getImageURL(reference, parameters));
+        testImageURL(new AttachmentResourceReference("attachmentReference"), parameters, true, "height=75");
     }
 
     @Test
@@ -380,27 +347,29 @@ public class XWikiWikiModelTest extends AbstractMockingComponentTestCase<WikiMod
         Assert.assertEquals("viewurl", getMockedComponent().getDocumentViewURL(reference));
     }
 
-    private void setUpCommonExpectations(final String expectedAttachmentURL,
-        final boolean expectedIsImageDimensionsIncludedInImageURL) throws Exception
+    private void testImageURL(final ResourceReference imageReference, Map<String, String> parameters,
+        final boolean expectedIsImageDimensionsIncludedInImageURL, final String expectedQueryString) throws Exception
     {
         final DocumentAccessBridge documentAccessBridge =
             getComponentManager().getInstance((Type) DocumentAccessBridge.class);
         final AttachmentReferenceResolver<String> attachmentResolver =
             getComponentManager().getInstance(AttachmentReferenceResolver.TYPE_STRING, "current");
         final AttachmentReference attachmentReference =
-            new AttachmentReference("filename", new DocumentReference("wiki", "space", "page"));
+            new AttachmentReference("image", new DocumentReference("wiki", "space", "page"));
         final XWikiRenderingConfiguration configuration =
             getComponentManager().getInstance((Type) XWikiRenderingConfiguration.class);
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(attachmentResolver).resolve("attachmentReference", new Object[] {});
-                will(returnValue(attachmentReference));
-                oneOf(documentAccessBridge).getAttachmentURL(attachmentReference, null, false);
-                will(returnValue(expectedAttachmentURL));
                 oneOf(configuration).isImageDimensionsIncludedInImageURL();
                 will(returnValue(expectedIsImageDimensionsIncludedInImageURL));
+                oneOf(attachmentResolver).resolve(imageReference.getReference(), new Object[] {});
+                will(returnValue(attachmentReference));
+                oneOf(documentAccessBridge).getAttachmentURL(attachmentReference, expectedQueryString, false);
+                will(returnValue("?" + expectedQueryString));
             }
         });
+
+        Assert.assertEquals("?" + expectedQueryString, getMockedComponent().getImageURL(imageReference, parameters));
     }
 }

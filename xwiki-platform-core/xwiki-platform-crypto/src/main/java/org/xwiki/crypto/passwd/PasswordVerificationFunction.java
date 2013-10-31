@@ -24,7 +24,7 @@ import java.io.IOException;
 
 
 /**
- * Password verification function differes from key derivation function in that password verification function
+ * Password verification function differs from key derivation function in that password verification function
  * stores the hashed password given it. While this is quite wrong for encryption, it is exactly what is needed
  * for verifying a password. Implementations are expected to wrap a key derivation function and store it's output.
  *

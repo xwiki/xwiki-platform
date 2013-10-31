@@ -37,7 +37,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.Block.Axes;
+import org.xwiki.rendering.block.match.MetadataBlockMatcher;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -205,6 +209,15 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         ScriptContext scriptContext = getScriptContext();
 
         StringWriter stringWriter = new StringWriter();
+
+        // Set standard javax.script.filename property
+        MetaDataBlock metaDataBlock =
+            context.getCurrentMacroBlock().getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE),
+                Axes.ANCESTOR_OR_SELF);
+        if (metaDataBlock != null) {
+            scriptContext.setAttribute("javax.script.filename", metaDataBlock.getMetaData()
+                .getMetaData(MetaData.SOURCE), ScriptContext.ENGINE_SCOPE);
+        }
 
         // set writer in script context
         scriptContext.setWriter(stringWriter);

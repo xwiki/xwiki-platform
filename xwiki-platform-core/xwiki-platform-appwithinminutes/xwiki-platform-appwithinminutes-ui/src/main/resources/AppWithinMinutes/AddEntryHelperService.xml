@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>AppWithinMinutes</web>
+  <name>AddEntryHelperService</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AppWithinMinutes.LiveTableClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1321361413000</creationDate>
+  <date>1321380065000</date>
+  <contentUpdateDate>1321380065000</contentUpdateDate>
+  <version>1.1</version>
+  <title></title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+####################################################
+## Add Entry Helper Service
+##
+## This service takes a parameter 'entryName' and say:
+## - if this entry already exist
+## - if the current user has the edit right on it
+## - if the current user has the view right on it.
+## The other parameter is 'entrySpace', that set the
+##   space where the entry should be added
+####################################################
+#set($entryName = $request.entryName)
+#set($entrySpace = $request.entrySpace)
+#if("$!entryName" != '' &amp;&amp; "$!entrySpace" != '')
+  #set($entryReference = $services.model.createDocumentReference('', $entrySpace, $entryName))
+  #if(!$xwiki.exists($entryReference))
+    create
+  #else
+    #set($entryFullName = $entryReference.toString())
+    #if($xwiki.hasAccessLevel('edit', $xcontext.user, $entryFullName))
+      edit
+    #elseif($xwiki.hasAccessLevel('view', $xcontext.user, $entryFullName))
+      view
+    #else
+      forbid
+    #end
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

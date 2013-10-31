@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>AppWithinMinutes</web>
+  <name>AddEntrySuggestService</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>AppWithinMinutes.LiveTableClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1321361413000</creationDate>
+  <date>1321380065000</date>
+  <contentUpdateDate>1321380065000</contentUpdateDate>
+  <version>1.1</version>
+  <title></title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+####################################################
+##   AppWithinMinutes: Add Entry Suggest Service
+##
+## This service generate the suggest list of pages 
+##  from a certain space.
+####################################################
+#set($input = $request.get("input").toLowerCase())
+#set($spacename = $request.get("spacename"))
+$response.setContentType("text/xml") ## generate a xml file
+## select pages
+#if("$!input" == "")
+  #set($xwql = "WHERE doc.space=:space AND doc.name&lt;&gt;'WebHome' AND doc.name&lt;&gt;'WebPreferences' ORDER BY doc.date DESC")
+  #set($query = $services.query.xwql($xwql).bindValue('space', $spacename))
+#else
+  #set($xwql = "WHERE doc.space=:space AND doc.name&lt;&gt;'WebHome' AND doc.name&lt;&gt;'WebPreferences' AND lower(doc.name) LIKE :input ORDER BY doc.date DESC")
+  #set($query = $services.query.xwql($xwql).bindValue('space', $spacename).bindValue('input', "%${input}%"))
+#end
+#set($searchresults = $query.setLimit(30).execute())
+&lt;results space="$escapetool.xml($spacename)"&gt;
+#foreach($result in $searchresults)
+  #set($resultDoc = $xwiki.getDocument($result))
+  #set($resultDocName = $resultDoc.name)
+  #set($resultDocURL = $resultDoc.getURL())
+  &lt;rs id="1" info="$resultDocURL"&gt;$escapetool.xml($resultDocName)&lt;/rs&gt;
+#end
+&lt;/results&gt;
+{{/velocity}}</content>
+</xwikidoc>

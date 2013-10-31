@@ -1116,12 +1116,21 @@ a.search-result-highlightAll:after {
 #end
 
 #set ($customSearchFacetValueDisplayer = {
+  'wiki': 'wiki',
   'author': 'user',
   'creator': 'user'
 })
 
 #macro (displaySearchFacetValue_default $facetPrettyValue)
   $escapetool.xml($facetPrettyValue)
+#end
+
+#macro (displaySearchFacetValue_wiki $wikiName)
+  #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wikiName).wikiPrettyName)
+  #if ("$!wikiPrettyName.trim()" == '')
+    #set ($wikiPrettyName = $wikiName)
+  #end
+  $escapetool.xml($wikiPrettyName)
 #end
 
 #macro (displaySearchFacetValues_user $facetValues)

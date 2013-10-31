@@ -187,6 +187,7 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
   _onInputChange : function() {
     // We are going to look if the entry already exists and if we have the edit right on it
     if (this.input.value != '') {
+      this.action = 'edit';
       // this URL will let us know if the page already exists or not
       #set($helperReference = $services.model.createDocumentReference('', 'AppWithinMinutes', 'AddEntryHelperService'))
       var url = '$escapetool.javascript($xwiki.getURL($helperReference, 'get', 'outputSyntax=plain'))';
@@ -196,12 +197,10 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
         onSuccess: function(transport) {
           var result = transport.responseText;
           if (result == 'create') {
-            this.action = 'edit';
             this.errorMessage.addClassName('hidden');
             this.addButton.writeAttribute('src', '$xwiki.getSkinFile('icons/silk/add.png')');
             this.addButton.writeAttribute('alt', '$escapetool.javascript($services.localization.render('platform.appwithinminutes.appHomePageAddEntryLabel'))'.escapeHTML());
           } else if (result == 'edit') {
-            this.action = 'edit';
             this.errorMessage.update('$escapetool.javascript($services.localization.render('platform.appwithinminutes.appHomePageAddEntryAlreadyExistsEdit'))'.escapeHTML());
             this.errorMessage.removeClassName('hidden');
             this.addButton.writeAttribute('src', '$xwiki.getSkinFile('icons/silk/page_white_edit.png')');
@@ -213,7 +212,6 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
             this.addButton.writeAttribute('src', '$xwiki.getSkinFile('icons/silk/eye.png')');
             this.addButton.writeAttribute('alt', '$escapetool.javascript($services.localization.render('platform.appwithinminutes.appHomePageSeeEntryLabel'))'.escapeHTML());
           } else if(result == 'forbid') {
-            this.action = 'edit';
             this.errorMessage.update('$escapetool.javascript($services.localization.render('platform.appwithinminutes.appHomePageAddEntryAlreadyExistsLock'))'.escapeHTML());
             this.errorMessage.removeClassName('hidden');
             this.addButton.writeAttribute('src', '$xwiki.getSkinFile('icons/silk/lock.png')');

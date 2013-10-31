@@ -1177,8 +1177,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Don't allow setting a null reference for now, ie. don't do anything to preserve backward compatibility
         // with previous behavior (i.e. {@link #setFullName}.
         if (reference != null) {
-            if (!reference.equals(getDocumentReference())) {
-                this.documentReference = reference;
+            // Retro compatibility, make sure <code>this.documentReference</code> does not contain the Locale (for now)
+            DocumentReference referenceWithoutLocale =
+                reference.getLocale() != null ? new DocumentReference(reference, null) : reference;
+
+            if (!referenceWithoutLocale.equals(getDocumentReference())) {
+                this.documentReference = referenceWithoutLocale;
                 setMetaDataDirty(true);
 
                 // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.

@@ -134,11 +134,14 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
     this.urlTemplate = trigger.up().next('input[type=hidden]').value;
 
     this.input = new Element('input', {type: 'text'});
-    this.addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.png')', alt: '$escapetool.javascript($services.localization.render('platform.appwithinminutes.appHomePageAddEntryLabel'))'});
+    this.addButton = new Element('input', {type: 'image', src: '$xwiki.getSkinFile('icons/silk/add.png')', alt: '$escapetool.javascript($services.localization.render('platform.appwithinminutes.appHomePageAddEntryLabel'))'});    
+    this.errorMessage = new Element('p', {class: 'hidden box warningmessage'});
+    this.errorMessage.update('$escapetool.javascript($services.localization.render('platform.appwithinminutes.appHomePageAddEntryAlreadyExists'))');
 
     var container = new Element('div', {id: 'entryNamePopup'});
     container.insert(this.input);
     container.insert(this.addButton);
+    container.insert(this.errorMessage);
 
     $super(container, {
       show: {method: this.showDialog, keys: []},
@@ -150,17 +153,45 @@ XWiki.EntryNamePopup = Class.create(XWiki.widgets.ModalPopup, {
   },
   createDialog : function($super, event) {
     this.addButton.observe('click', this._onAdd.bind(this));
+    this.input.observe('change', this._onInputChange.bind(this));
+    this.input.observe('keyup', this._onInputChange.bind(this));    
     $super(event);
   },
   showDialog : function($super, event) {
     $super(event);
     this.input.clear().focus();
+    if (!this.errorMessage.hasClassName('hidden')) {
+      this.errorMessage.addClassName('hidden');
+    }
   },
   _onAdd : function() {
     if (this.input.value != '') {
       window.self.location = this.urlTemplate.replace('__entryName__', encodeURIComponent(this.input.value));
     } else {
       this.input.focus();
+    }
+  },
+  _onInputChange : function() {
+    // We are going to look if the entry already exists or no
+    if (this.input.value != '') {
+      // this URL will let us know if the page already exists or not      
+      var restURL = XWiki.contextPath + '/rest/wikis/' + XWiki.currentWiki + '/spaces/' + XWiki.currentSpace + '/pages/' + encodeURIComponent(this.input.value);
+      var self = this;
+      new Ajax.Request(restURL, {
+        method:'get',
+        onSuccess: function(transport) {
+          // if the URL succeed, then the entry already exists!
+          if (self.errorMessage.hasClassName('hidden')) {
+            self.errorMessage.removeClassName('hidden');
+          }
+        },
+        on404: function() {
+          // IF we have a 404 error, then the entry does not exists, it's ok          
+          if (!self.errorMessage.hasClassName('hidden')) {
+            self.errorMessage.addClassName('hidden');
+          }
+        }
+      });
     }
   }
 });

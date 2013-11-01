@@ -53,8 +53,7 @@ public class DefaultUserDocumentUtils implements UserDocumentUtils
     @Override
     public String getCurrentUser()
     {
-        String localName = this.bridge.getCurrentUser();
-        DocumentReference dr = this.resolver.resolve(localName);
+        DocumentReference dr = this.bridge.getCurrentUserReference();
         return this.serializer.serialize(dr);
     }
 

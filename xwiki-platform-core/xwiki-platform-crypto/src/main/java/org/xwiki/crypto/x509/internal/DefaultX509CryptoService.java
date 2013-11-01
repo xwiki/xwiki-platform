@@ -20,12 +20,14 @@
 package org.xwiki.crypto.x509.internal;
 
 import java.security.GeneralSecurityException;
+import java.security.Provider;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.crypto.internal.UserDocumentUtils;
 import org.xwiki.crypto.passwd.PasswordCryptoService;
 import org.xwiki.crypto.x509.X509CryptoService;
@@ -40,7 +42,7 @@ import org.xwiki.crypto.x509.XWikiX509KeyPair;
  */
 @Component
 @Singleton
-public class DefaultX509CryptoService implements X509CryptoService
+public class DefaultX509CryptoService implements X509CryptoService, Initializable
 {
     /** Used for dealing with non cryptographic stuff like getting user document names and URLs. */
     @Inject
@@ -50,11 +52,23 @@ public class DefaultX509CryptoService implements X509CryptoService
     @Inject
     private PasswordCryptoService passwordCryptoService;
 
+    /** Java Cryptography Infrastructure provider. */
+    @Inject
+    private javax.inject.Provider<Provider> jcaProvider;
+
     /** Handles the generation of keys. */
     private final X509KeyService keyService = new X509KeyService();
 
     /** For signing and verifying signatures on text. */
     private final X509SignatureService signatureService = new X509SignatureService();
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        Provider provider = jcaProvider.get();
+        keyService.setProvider(provider);
+        signatureService.setProvider(provider);
+    }
 
     @Override
     public XWikiX509Certificate[] certsFromSpkac(final String spkacSerialization, final int daysOfValidity)

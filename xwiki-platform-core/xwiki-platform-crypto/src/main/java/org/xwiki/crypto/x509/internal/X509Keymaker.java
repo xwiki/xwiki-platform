@@ -22,27 +22,28 @@ package org.xwiki.crypto.x509.internal;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
+import java.security.Provider;
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Date;
-import java.util.Vector;
 
-import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.misc.MiscObjectIdentifiers;
 import org.bouncycastle.asn1.misc.NetscapeCertType;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.X500NameBuilder;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.X509Extensions;
-import org.bouncycastle.asn1.x509.X509Name;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.asn1.x509.X509Extension;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.JDKKeyPairGenerator;
-import org.bouncycastle.x509.X509V3CertificateGenerator;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
-
 
 /**
  * Keymaker allows you to create keypairs and X509Certificates.
@@ -52,11 +53,8 @@ import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
  */
 public class X509Keymaker
 {
-    /** The name used for the heading underwhich all of the generated CA certificates will show in the browser. */
+    /** The name used for the heading under which all of the generated CA certificates will show in the browser. */
     private static final String CA_ORGANIZATION_NAME = "Fake authorities for trusting client certificates";
-
-    /** A certificate generator. Use of this must be synchronized. */
-    private final X509V3CertificateGenerator certGenerator = new X509V3CertificateGenerator();
 
     /** A key pair generator. Use of this must be synchronized. */
     private final JDKKeyPairGenerator.RSA keyPairGen = new JDKKeyPairGenerator.RSA();
@@ -68,7 +66,7 @@ public class X509Keymaker
     private final long aDay = 24 * anHour;
 
     /** Signature algorithm to use. */
-    private final String certSignatureAlgorithm = "SHA1WithRSAEncryption";
+    private final String certSignatureAlgorithm = "SHA1WithRSA";
 
     /** If this is set then it will be used to sign all client keys. */
     private KeyPair authorityKeyPair;
@@ -76,15 +74,30 @@ public class X509Keymaker
     /** If this is set then it will be returned by the script service with all client certificates. */
     private X509Certificate authorityCertificate;
 
-    /** Make sure the BouncyCastle provider is added to java security providers. */
+    /** The JCA provider to use. */
+    private Provider provider;
+
+    /**
+     * @return the JCA provider in use.
+     */
+    public Provider getProvider()
     {
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
+        return provider;
+    }
+
+    /**
+     * Set the JCA provider to use.
+     * @param provider a JCA provider
+     * @return this object for easy call chaining.
+     */
+    public X509Keymaker setProvider(Provider provider)
+    {
+        this.provider = provider;
+        return this;
     }
 
     /** @return a newly generated RSA KeyPair. */
-    public KeyPair newKeyPair()
+    public synchronized KeyPair newKeyPair()
     {
         return this.keyPairGen.generateKeyPair();
     }
@@ -165,7 +178,7 @@ public class X509Keymaker
      * @return a new X509 certificate.
      * @throws GeneralSecurityException if something goes wrong.
      */
-    public synchronized X509Certificate makeClientCertificate(final PublicKey forCert,
+    public X509Certificate makeClientCertificate(final PublicKey forCert,
                                                               final KeyPair toSignWith,
                                                               final int daysOfValidity,
                                                               final boolean nonRepudiable,
@@ -173,50 +186,51 @@ public class X509Keymaker
                                                               final String userName)
         throws GeneralSecurityException
     {
+        // the UID (same for issuer since this certificate confers no authority)
+        final X500Name dName = new X500Name("UID=" + userName);
+
+        JcaX509v3CertificateBuilder certBldr = this.prepareGenericCertificate(forCert, daysOfValidity, dName, dName);
+
+        // Not a CA
+        certBldr.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(false));
+
+        // Client cert
+        certBldr.addExtension(MiscObjectIdentifiers.netscapeCertType,
+                              false,
+                              new NetscapeCertType(NetscapeCertType.sslClient | NetscapeCertType.smime));
+
+        // Key Usage extension.
+        int keyUsage =   KeyUsage.digitalSignature
+                       | KeyUsage.keyEncipherment
+                       | KeyUsage.dataEncipherment
+                       | KeyUsage.keyAgreement;
+        if (nonRepudiable) {
+            keyUsage |= KeyUsage.nonRepudiation;
+        }
+        certBldr.addExtension(X509Extension.keyUsage, true, new KeyUsage(keyUsage));
+
+        // Set the authority key identifier to be the CA key which we are using.
+        certBldr.addExtension(X509Extension.authorityKeyIdentifier,
+                                   false,
+                                   new AuthorityKeyIdentifierStructure(toSignWith.getPublic()));
+
+        // FOAFSSL compatibility.
+        final GeneralNames subjectAltNames =
+            new GeneralNames(new GeneralName(GeneralName.uniformResourceIdentifier, webId));
+        certBldr.addExtension(X509Extension.subjectAlternativeName, true, subjectAltNames);
+
         try {
-            // the UID (same for issuer since this certificate confers no authority)
-            final X509Name dName = new X509Name("UID=" + userName);
+            ContentSigner signer = new JcaContentSignerBuilder(this.certSignatureAlgorithm)
+                .setProvider(provider).build(toSignWith.getPrivate());
 
-            this.prepareGenericCertificate(forCert, daysOfValidity, dName, dName);
-
-            // Not a CA
-            certGenerator.addExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(false));
-
-            // Client cert
-            certGenerator.addExtension(MiscObjectIdentifiers.netscapeCertType,
-                                       false,
-                                       new NetscapeCertType(NetscapeCertType.sslClient | NetscapeCertType.smime));
-
-            // Key Usage extension.
-            int keyUsage =   KeyUsage.digitalSignature
-                           | KeyUsage.keyEncipherment
-                           | KeyUsage.dataEncipherment
-                           | KeyUsage.keyAgreement;
-            if (nonRepudiable) {
-                keyUsage |= KeyUsage.nonRepudiation;
-            }
-            certGenerator.addExtension(X509Extensions.KeyUsage, true, new KeyUsage(keyUsage));
-
-            // Set the authority key identifier to be the CA key which we are using.
-            certGenerator.addExtension(X509Extensions.AuthorityKeyIdentifier,
-                                       false,
-                                       new AuthorityKeyIdentifierStructure(toSignWith.getPublic()));
-
-            // FOAFSSL compatibility.
-            final GeneralNames subjectAltNames =
-                new GeneralNames(new GeneralName(GeneralName.uniformResourceIdentifier, webId));
-            certGenerator.addExtension(X509Extensions.SubjectAlternativeName, true, subjectAltNames);
-
-            return this.generate(toSignWith);
-
-        } finally {
-            // Clean up after ourselves so that it is more difficult to try to extract private keys from the heap.
-            this.certGenerator.reset();
+            return new JcaX509CertificateConverter().setProvider(provider).getCertificate(certBldr.build(signer));
+        } catch (Exception e) {
+            throw new GeneralSecurityException(e);
         }
     }
 
     /**
-     * Create a new self signed X509 certificate authority certificate.
+     * Create a new self signed X509 certificate authority certificate that is unable to sign other CA.
      *
      * @param keyPair the public key will appear in the certificate and the private key will be used to sign it.
      * @param daysOfValidity number of days the cert should be valid for.
@@ -225,43 +239,37 @@ public class X509Keymaker
      * @return a new X509 certificate authority.
      * @throws GeneralSecurityException if something goes wrong.
      */
-    public synchronized X509Certificate makeCertificateAuthority(final KeyPair keyPair,
+    public X509Certificate makeCertificateAuthority(final KeyPair keyPair,
                                                                  final int daysOfValidity,
                                                                  final String commonName)
         throws GeneralSecurityException
     {
+        final X500Name dName = new X500NameBuilder(BCStyle.INSTANCE)
+                                    .addRDN(BCStyle.O, CA_ORGANIZATION_NAME)
+                                    .addRDN(BCStyle.CN, commonName)
+                                    .build();
+
+        JcaX509v3CertificateBuilder certBldr =
+            this.prepareGenericCertificate(keyPair.getPublic(), daysOfValidity, dName, dName);
+
+        // This authority is a CA but can't sign other CA's.
+        certBldr.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(0));
+
+        // Allow certificate signing only.
+        certBldr.addExtension(X509Extension.keyUsage, true, new KeyUsage(KeyUsage.keyCertSign));
+
+        // Adds the subject key identifier extension. Self singed so uses it's own key.
+        certBldr.addExtension(X509Extension.subjectKeyIdentifier,
+                                   false,
+                                   new SubjectKeyIdentifierStructure(keyPair.getPublic()));
+
         try {
-            final X509Name name = new X509Name(
-                new Vector<DERObjectIdentifier>() {
-                    {
-                        this.add(X509Name.O);
-                        this.add(X509Name.CN);
-                    }
-                },
-                new Vector<String>() {
-                    {
-                        this.add(X509Keymaker.CA_ORGANIZATION_NAME);
-                        this.add(commonName);
-                    }
-                });
+            ContentSigner signer = new JcaContentSignerBuilder(this.certSignatureAlgorithm)
+                .setProvider(provider).build(keyPair.getPrivate());
 
-            this.prepareGenericCertificate(keyPair.getPublic(), daysOfValidity, name, name);
-
-            // This authority can't sign other CA's.
-            certGenerator.addExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(0));
-
-            // Allow certificate signing only.
-            certGenerator.addExtension(X509Extensions.KeyUsage, true, new KeyUsage(KeyUsage.keyCertSign));
-
-            // Adds the subject key identifier extension. Self singed so uses it's own key.
-            certGenerator.addExtension(X509Extensions.SubjectKeyIdentifier,
-                                       false,
-                                       new SubjectKeyIdentifierStructure(keyPair.getPublic()));
-
-            return this.generate(keyPair);
-        } finally {
-            // Clean up after ourselves so that it is more difficult to try to extract private keys from the heap.
-            this.certGenerator.reset();
+            return new JcaX509CertificateConverter().setProvider(provider).getCertificate(certBldr.build(signer));
+        } catch (Exception e) {
+            throw new GeneralSecurityException(e);
         }
     }
 
@@ -273,46 +281,18 @@ public class X509Keymaker
      * @param subjectDN subject name
      * @param issuerDN issuer name
      */
-    private synchronized void prepareGenericCertificate(final PublicKey forCert,
-                                                        final int daysOfValidity,
-                                                        final X509Name subjectDN,
-                                                        final X509Name issuerDN)
+    private JcaX509v3CertificateBuilder prepareGenericCertificate(final PublicKey forCert,
+                                                               final int daysOfValidity,
+                                                               final X500Name subjectDN,
+                                                               final X500Name issuerDN)
     {
-        // We reset and use a "shared" cert generator which is why this method is synchronized.
-        this.certGenerator.reset();
-
-        // Set up the validity dates.
-        this.certGenerator.setNotBefore(new Date(System.currentTimeMillis() - this.anHour));
-        this.certGenerator.setNotAfter(new Date(System.currentTimeMillis() + (this.aDay * daysOfValidity)));
-
-        // Set a serial number to the current time.
-        this.certGenerator.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()).abs());
-
-        // Set public key and algorithm.
-        this.certGenerator.setPublicKey(forCert);
-        this.certGenerator.setSignatureAlgorithm(this.certSignatureAlgorithm);
-
-        // set subject and issuer names
-        this.certGenerator.setSubjectDN(subjectDN);
-        this.certGenerator.setIssuerDN(issuerDN);
-    }
-
-    /**
-     * Makes the current certificate in the cert generator.
-     *
-     * @param toSignWith the private key in this pair will be used to sign the certificate.
-     * @return a new X509 certificate.
-     * @throws GeneralSecurityException if something goes wrong.
-     */
-    private synchronized X509Certificate generate(final KeyPair toSignWith)
-        throws GeneralSecurityException
-    {
-        // Creates and sign this certificate.
-        final X509Certificate cert = this.certGenerator.generate(toSignWith.getPrivate());
-
-        // Checks that this certificate has indeed been correctly signed.
-        cert.verify(toSignWith.getPublic());
-
-        return cert;
+        return new JcaX509v3CertificateBuilder(
+            issuerDN,
+            BigInteger.valueOf(System.currentTimeMillis()).abs(),
+            new Date(System.currentTimeMillis() - this.anHour),
+            new Date(System.currentTimeMillis() + (this.aDay * daysOfValidity)),
+            subjectDN,
+            forCert
+        );
     }
 }

@@ -24,9 +24,9 @@ import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.security.InvalidParameterException;
 import java.security.KeyPair;
+import java.security.Provider;
 import java.security.cert.X509Certificate;
 
-import org.bouncycastle.jce.netscape.NetscapeCertRequest;
 import org.xwiki.crypto.internal.Convert;
 import org.xwiki.crypto.passwd.PasswordCryptoService;
 import org.xwiki.crypto.x509.XWikiX509Certificate;
@@ -43,6 +43,29 @@ public class X509KeyService
     /** Used for the actual key making, also holds any secrets. */
     private final X509Keymaker keymaker = new X509Keymaker();
 
+    /**  The JCA provider to use. */
+    private Provider provider;
+
+    /**
+     * @return the JCA provider in use.
+     */
+    public Provider getProvider()
+    {
+        return provider;
+    }
+
+    /**
+     * Set the JCA provider to use.
+     * @param provider a JCA provider
+     * @return this object for easy call chaining.
+     */
+    public X509KeyService setProvider(Provider provider)
+    {
+        this.provider = provider;
+        this.keymaker.setProvider(provider);
+        return this;
+    }
+
     /**
      * @param spkacSerialization a <a href="http://en.wikipedia.org/wiki/Spkac">SPKAC</a> Certificate Signing Request
      * @param daysOfValidity number of days before the certificate should become invalid.
@@ -50,7 +73,7 @@ public class X509KeyService
      * @param userName the String serialization of the user's page name.
      * @return 2 certificates, one a client cert and the other an authority cert which signed the client cert.
      * @throws GeneralSecurityException on errors
-     * @see org.xwiki.crypto.CryptoService#certsFromSpkac(String, int)
+     * @see org.xwiki.crypto.x509.X509CryptoService#certsFromSpkac(String, int)
      */
     public XWikiX509Certificate[] certsFromSpkac(final String spkacSerialization,
                                                  final int daysOfValidity,
@@ -64,18 +87,19 @@ public class X509KeyService
             throw new InvalidParameterException("SPKAC parameter is null");
         }
 
-        NetscapeCertRequest certRequest = null;
+        SpkacRequest spkacRequest;
         try {
-            certRequest = new NetscapeCertRequest(Convert.fromBase64String(spkacSerialization));
+            spkacRequest = new SpkacRequest(Convert.fromBase64String(spkacSerialization));
         } catch (Exception e) {
             throw new GeneralSecurityException("Failed to parse certificate request", e);
         }
 
-        X509Certificate[] certs = this.keymaker.makeClientAndAuthorityCertificates(certRequest.getPublicKey(),
-                                                                                   daysOfValidity,
-                                                                                   true,
-                                                                                   webID,
-                                                                                   userName);
+        X509Certificate[] certs = this.keymaker.makeClientAndAuthorityCertificates(
+            spkacRequest.getPublicKey(provider),
+            daysOfValidity,
+            true,
+            webID,
+            userName);
         return new XWikiX509Certificate[] {
             new XWikiX509Certificate(certs[0]),
             new XWikiX509Certificate(certs[1])
@@ -93,7 +117,7 @@ public class X509KeyService
      *                              serialized without allowing the private key to be read from the database.
      * @return a certificate and matching private key in an XWikiX509KeyPair object.
      * @throws GeneralSecurityException on errors
-     * @see org.xwiki.crypto.CryptoService#newCertAndPrivateKey(int)
+     * @see org.xwiki.crypto.x509.X509CryptoService#newCertAndPrivateKey(int, String)
      */
     public XWikiX509KeyPair newCertAndPrivateKey(final int daysOfValidity,
                                                  final String webID,

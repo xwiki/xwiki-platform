@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxVerbatim</name>
+  <language>lv</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382899296000</creationDate>
+  <date>1382899296000</date>
+  <contentUpdateDate>1382899296000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxVerbatim</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Paplašināts =
+
+== Precīza teksta kopija ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Verbatim ===
+
+Precīza teksta kopijas iezīme ļauj attēlot tekstu tieši tādu, kāds tas ir ievadīts (citiem vārdiem sakot, šim tekstam netiek izpildīta viki sintakse).
+
+{{info}}
+XWiki 1.0 sintaksē [[//pre// makross&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/PreMacro]] novērš tikai viki un //Radeox// makrosu izpildi, tomēr HTML kods un Groovy vai Velocity skripti tiek izpildīti.
+{{/info}}
+
+|=Piemērs|=XWiki 1.0 sintakse|=Rezultāts
+|Precīzi attēlots teksts rindā|{{{Teksts, kam {pre}*[netiek izpildīta]*{/pre} sintakse}}}|Teksts, kam {{{*[netiek izpildīta]*}}} sintakse
+|Precīzi attēlots teksts rāmī|(((
+{{{
+{pre}
+Daudzu rindu
+*precīzi*
+attēlots teksts
+{/pre}
+}}}
+
+{{info}}Precīczu teksta kpoju var attēlot, arī izmantojot [[//code// makrosu&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/CodeMacro]], bet tas uzreiz pēc noklusējuma tekstu attēlo rāmī.{{/info}}
+)))|(((
+{{{
+Daudzu rindu
+*precīzi*
+attēlots teksts
+}}}
+)))
+
+=== 2.0 Verbatim ===
+
+Precīza teksta kopijas iezīme ļauj attēlot tekstu tieši tādu, kāds tas ir ievadīts (citiem vārdiem sakot, šim tekstam netiek izpildīta viki sintakse).
+
+|=Piemērs|=XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintakse|=Rezultāts
+|Precīzi attēlots teksts rindā|{{{Teksts, kam {{{*[netiek izpildīta]*}}} sintakse}}}|Teksts, kam {{{*[netiek izpildīta]*}}} sintakse
+|Precīzi attēlots teksts rāmī|(((
+{{{
+{{{
+Daudzu rindu
+*precīzi*
+attēlots teksts
+}}}
+}}}
+)))|(((
+{{{
+Daudzu rindu
+*precīzi*
+attēlots teksts
+}}}
+)))</content>
+</xwikidoc>

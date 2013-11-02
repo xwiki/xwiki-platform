@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxScripts</name>
+  <language>lv</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382899756000</creationDate>
+  <date>1382899756000</date>
+  <contentUpdateDate>1382899756000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxScripts</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Programming =
+
+== Skripti ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Scripts ===
+
+{{info}}XWiki 1.0 sintaksē Velocity skriptus varēja izsaukt jebkurā viki dokumenta vietā. Tā rezultātā gadījās, ka lietotāji negribot ievadīja tekstu, kas tika izpildīts kā Velocity skripts. Tas arī palēnināja lapu parādīšanu pat tajos gadījumos, ja lapā nebija Velocity skriptu, un radīja arī citas tehniskas problēmas. Tieši tas pats attiecas arī uz Groovy skriptiem.{{/info}}
+
+|=Piemērs|=XWiki 1.0 sintakse
+|Velocity skripts|(((
+{{{
+#set ($mainigais = "vērtība")
+}}}
+)))|
+|Groovy skripts|(((
+{{{
+&lt;%
+def mainigais = "vērtība"
+%&gt;
+}}}
+)))|
+
+=== 2.0 Scripts ===
+
+{{info}}XWiki 1.0 sintaksē Velocity skriptus varēja izsaukt jebkurā viki dokumenta vietā. Tā rezultātā gadījās, ka lietotāji negribot ievadīja tekstu, kas tika izpildīts kā Velocity skripts. Tas arī palēnināja lapu parādīšanu pat tajos gadījumos, ja lapā nebija Velocity skriptu, un radīja arī citas tehniskas problēmas. Tāpēc XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintaksē Velocity skripti ir jāiekļauj, izmantojot tieši norādītu ##velocity## makrosu. Tieši tas pats attiecas arī uz Groovy skriptiem.{{/info}}
+
+|=Piemērs|=XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintakse
+|Velocity skripts|(((
+{{{
+{{velocity}}
+#set ($mainigais = "vērtība")
+{{/velocity}}
+}}}
+)))
+|Groovy skripts|(((
+{{{
+{{groovy}}
+def mainigais = "vērtība"
+{{/groovy}}
+}}}
+)))</content>
+</xwikidoc>

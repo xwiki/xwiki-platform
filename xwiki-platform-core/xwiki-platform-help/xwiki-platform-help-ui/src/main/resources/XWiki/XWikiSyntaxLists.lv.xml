@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxLists</name>
+  <language>lv</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382898200000</creationDate>
+  <date>1382898200000</date>
+  <contentUpdateDate>1382898200000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxLists</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Saraksti ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Lists ===
+
+|=Piemērs|=XWiki 1.0 sintakse|=Rezultāts
+|Aizzīmēts saraksts|(((
+{{{
+* punkts 1
+** punkts 2
+*** punkts 3
+* punkts 4
+}}}
+)))|(((
+* punkts 1
+** punkts 2
+*** punkts 3
+* punkts 4
+)))
+|Numurēts saraksts|(((
+{{{
+1. punkts 1
+11. punkts 2
+111. punkts 3
+1. punkts 4
+}}}
+)))|(((
+1. punkts 1
+11. punkts 2
+111. punkts 3
+1. punkts 4
+)))
+|Jaukti saraksti|(((
+{{{
+1. punkts 1
+1*. punkts 2
+1*. punkts 3
+1. punkts 4
+}}}
+)))|(((
+1. punkts 1
+1*. punkts 2
+1*. punkts 3
+1. punkts 4
+)))
+|Saraksts ar kvadrātiem|(((
+{{{
+- punkts 1
+- punkts 2
+}}}
+)))|(((
+(% style="list-style-type: square" %)
+* punkts 1
+* punkts 2
+)))
+|Saraksts ar aplīšiem|(((
+{{{
+&lt;ul style="list-style-type: disc"&gt;
+&lt;li&gt;punkts 1&lt;/li&gt;
+&lt;li&gt;punkts 2&lt;/li&gt;
+&lt;/ul&gt;}}}
+)))|(((
+(% style="list-style-type: disc" %)
+* punkts 1
+* punkts 2
+)))
+|Saraksts ar mazajiem burtiem|(((
+{{{
+a. punkts 1
+a. punkts 2
+}}}
+)))|(((
+(% style="list-style-type: lower-alpha" %)
+* punkts 1
+* punkts 2
+)))
+|Saraksts ar lielajiem burtiem|(((
+{{{
+A. punkts 1
+A. punkts 2
+}}}
+)))|(((
+(% style="list-style-type: upper-alpha" %)
+* punkts 1
+* punkts 2
+)))
+|Saraksts ar maziem romiešu cipariem|(((
+{{{
+i. punkts 1
+i. punkts 2
+}}}
+)))|(((
+(% style="list-style-type: lower-roman" %)
+* punkts 1
+* punkts 2
+)))
+|Saraksts ar lieliem romiešu cipariem|(((
+{{{
+I. punkts 1
+I. punkts 2
+}}}
+)))|(((
+(% style="list-style-type: upper-roman" %)
+* punkts 1
+* punkts 2
+)))
+|Saraksts ar maziem grieķu burtiem|(((
+{{{
+g. punkts 1
+g. punkts 2
+}}}
+)))|(((
+(% style="list-style-type: lower-greek" %)
+* punkts 1
+* punkts 2
+)))
+
+
+=== 2.0 Lists ===
+
+|=Piemērs|=XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintakse|=Rezultāts
+|Aizzīmēts saraksts|(((
+{{{
+* punkts 1
+** punkts 2
+*** punkts 3
+* punkts 4
+}}}
+)))|(((
+* punkts 1
+** punkts 2
+*** punkts 3
+* punkts 4
+)))
+|Numurēts saraksts|(((
+{{{
+1. punkts 1
+11. punkts 2
+111. punkts 3
+1. punkts 4
+}}}
+)))|(((
+1. punkts 1
+11. punkts 2
+111. punkts 3
+1. punkts 4
+)))
+|Jaukti saraksti|(((
+{{{
+1. punkts 1
+1*. punkts 2
+1*. punkts 3
+1. punkts 4
+}}}
+)))|(((
+1. punkts 1
+1*. punkts 2
+1*. punkts 3
+1. punkts 4
+)))
+|Saraksts ar kvadrātiem|(((
+{{{
+(% style="list-style-type: square" %)
+* punkts 1
+* punkts 2
+}}}
+)))|(((
+(% style="list-style-type: square" %)
+* punkts 1
+* punkts 2
+)))
+|Saraksts ar aplīšiem|(((
+{{{
+(% style="list-style-type: disc" %)
+* punkts 1
+* punkts 2
+}}}
+)))|(((
+(% style="list-style-type: disc" %)
+* punkts 1
+* punkts 2
+)))
+|Saraksts ar mazajiem burtiem|(((
+{{{
+(% style="list-style-type: lower-alpha" %)
+* punkts 1
+* punkts 2
+}}}
+)))|(((
+(% style="list-style-type: lower-alpha" %)
+* punkts 1
+* punkts 2
+)))
+|Saraksts ar lielajiem burtiem|(((
+{{{
+(% style="list-style-type: upper-alpha" %)
+* punkts 1
+* punkts 2
+}}}
+)))|(((
+(% style="list-style-type: upper-alpha" %)
+* punkts 1
+* punkts 2
+)))
+|Saraksts ar maziem romiešu cipariem|(((
+{{{
+(% style="list-style-type: lower-roman" %)
+* punkts 1
+* punkts 2
+}}}
+)))|(((
+(% style="list-style-type: lower-roman" %)
+* punkts 1
+* punkts 2
+)))
+|Saraksts ar lieliem romiešu cipariem|(((
+{{{
+(% style="list-style-type: upper-roman" %)
+* punkts 1
+* punkts 2
+}}}
+)))|(((
+(% style="list-style-type: upper-roman" %)
+* punkts 1
+* punkts 2
+)))
+|Saraksts ar maziem grieķu burtiem|(((
+{{{
+(% style="list-style-type: lower-greek" %)
+* punkts 1
+* punkts 2
+}}}
+)))|(((
+(% style="list-style-type: lower-greek" %)
+* punkts 1
+* punkts 2
+)))</content>
+</xwikidoc>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxParameters</name>
+  <language>sv</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382899600000</creationDate>
+  <date>1382899600000</date>
+  <contentUpdateDate>1382899600000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxParameters</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Advanced =
+
+== Parameters ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Parameters ===
+
+ I XWiki syntax 1.0 finns det ingen syntax för att ange parametrar utan XHTML-koden måste matas in direkt såsom illustreras nedan.
+
+|=XWiki syntax 1.0|=Genererad XHTML
+|((({{{
+&lt;h1 class="minKlass" style="minStil" id="mittId"&gt;rubrik&lt;/h1&gt;
+}}})))|((({{{
+&lt;h1 class="myClass" style="minStil" id="mittId"&gt;rubrik&lt;/h1&gt;
+}}})))
+
+=== 2.0 Parameters ===
+
+Med XWiki syntax  {{velocity}}$crtSyntaxVer{{/velocity}} är det möjligt att ange parametrar till syntaktiska element och textblock.  Detta används exempelvis för att ändra stil på elementen.  Det går att ange nyckel/värde-par så att XHTML-renderaren infogar motsvarande attribut i den underliggande XHTML-representationen av syntaxelementen. 
+
+|=XWiki syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Genererad XHTML
+|((({{{
+(% class="minKlass" style="minStil" id="mittId" %)
+= rubrik =
+}}})))|((({{{
+&lt;h1 class="myClass" style="minStil" id="mittId"&gt;rubrik&lt;/h1&gt;
+}}})))</content>
+</xwikidoc>

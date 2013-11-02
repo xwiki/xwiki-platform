@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxTextFormatting</name>
+  <language>lv</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382898050000</creationDate>
+  <date>1382898050000</date>
+  <contentUpdateDate>1382898050000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxTextFormatting</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Teksta noformējums ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Text Formatting ===
+
+|=Piemērs|=XWiki 1.0 sintakse|=Rezultāts
+|Treknraksts|{{{*treknraksts*}}}|**treknraksts**
+|Pasvītrojums|{{{__pasvītrojums___}}}|__pasvītrojums__
+|Slīpraksts|{{{~~slīpraksts~~}}}|~~slīpraksts~~
+|Nosvītrojums|{{{--nosvītrojums--}}}--nosvītrojums--
+|Vienādplatuma|{{{vienādplatuma}}}|##vienādplatuma##
+|Augšraksts|{{{teksts un &lt;sup&gt;augšraksts&lt;/sup&gt;}}}|teksts un  ^^augšraksts^^
+|Apakšraksts|{{{teksts un  &lt;sub&gt;apakšraksts&lt;/sub&gt;}}}|teksts un  ,,apakšraksts,,
+
+=== 2.0 Text Formatting ===
+
+{{info}}
+XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintakses izmaiņas attiecībā pret XWiki 1.0 sintaksi:
+* Pēc noformējuma simboliem ir atļauti tukšumi (piemēram, XWiki 1.0 sintaksē, šis teksts nebija * treknrakstā *).
+* Noformējumam tiek izmantoti dubulti simboli, līdz ar to ir samazināta iespēja, ka tie tiek izmantoti kļūdaini.
+* Iespēja turpināt sākto noformējumu vairākās rindās, kas nebija iespējams 1.0 sintaksē.
+{{/info}}
+
+|=Piemērs|=XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintakse|=Rezultāts
+|Treknraksts|{{{**treknraksts**}}}|**treknraksts**
+|Pasvītrojums|{{{__pasvītrojums__}}}|__pasvītrojums__
+|Slīpraksts|{{{//slīpraksts//}}}|~~slīpraksts~~
+|Nosvītrojums|{{{--nosvītrojums--}}}|--nosvītrojums--
+|Vienādplatuma|{{{##vienādplatuma##}}}|##vienādplatuma##
+|Augšraksts|{{{teksts un ^^augšraksts^^}}}|teksts un  ^^augšraksts^^
+|Apakšraksts|{{{teksts un  ,,apakšraksts,,}}}|teksts un  ,,apakšraksts,,</content>
+</xwikidoc>

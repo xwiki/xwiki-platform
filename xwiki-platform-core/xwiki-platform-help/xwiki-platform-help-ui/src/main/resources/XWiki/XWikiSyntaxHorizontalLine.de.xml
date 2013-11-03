@@ -44,7 +44,7 @@
 
 {{info}}Es müssen vier oder mehr Striche sein.{{/info}}
 
-{{info}}Es ist zu beachten, dass dies anders als bei Creole ist, wo es genau vier Striche gefordert sind.{{/info}}
+{{info}}Es ist zu beachten, dass dies anders als bei Creole ist, wo genau vier Striche gefordert sind.{{/info}}
 
 |=Funktion|=XWiki Syntax 2.0|=Ergebnis
 |Einfache horizontale Linie|{{{----}}}|(((----)))

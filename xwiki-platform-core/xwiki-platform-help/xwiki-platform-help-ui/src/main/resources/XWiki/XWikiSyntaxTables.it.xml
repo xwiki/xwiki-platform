@@ -32,12 +32,12 @@
 È possibile creare facilmente del testo in forma tabellare.
 
 |=Caratteristica|=Sintassi XWiki 1.0|=Risultato
-|Tabella Standard|{{{(((
+|Tabella Standard|((({{{
 {table}
 Titolo 1 | Titolo 2
 Parola 1 | Parola 2
 {table}
-)))}}}|(((
+}}})))|(((
 |=Titolo 1|=Titolo 2
 |Parola 1|Parola 2
 )))
@@ -95,7 +95,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 
 È possibile creare facilmente del testo in forma tabellare. Con la Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sono supportati anche parametri per la tabella, le righe o le celle.
 
-|=Caratteristica|==Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Risultato
+|=Caratteristica|=Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Risultato
 |Tabella Standard|((({{{
 |=Titolo 1|=Titolo 2
 |Parola 1|Parola 2}}}

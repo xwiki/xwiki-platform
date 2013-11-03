@@ -54,7 +54,7 @@ java kods
 Arī XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintaksē var iekļaut divu veidu makrosus:
 
 * //Velocity// makrosus (izsauc ar komandu ###makrosa_nosaukums(parametrs1 … parametrsN)##)
-* //XWiki// macros (called using the ##{{{{{makrosa_nosaukums parametrs1="vērtība1" … parametrsN="vērtībaN"}}}}}##)
+* //XWiki// makrosus (izsauc ar komandu ##{{{{{makrosa_nosaukums parametrs1="vērtība1" … parametrsN="vērtībaN"}}}}}##)
 
 |=Piemērs|=XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintakse|=Rezultāts
 |XWiki makross|(((
@@ -71,5 +71,5 @@ System.out.println("Hello World!");
 
 {{info}}XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintaksē nevar izmantot Radeox makrosus, tāpēc tie ir pārrakstīti kā XWiki makrosi.{{/info}}
 
-{{info}}Sākot ar Xwiki 2.0 versiju, lai parāditu ziņojuma rāmi,  ieteicams izmantot [[message makrosu&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/MessageMacro]].{{/info}}</content>
+{{info}}Sākot ar XWiki 2.0 versiju, lai parāditu ziņojuma rāmi,  ieteicams izmantot [[message makrosu&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/MessageMacro]].{{/info}}</content>
 </xwikidoc>

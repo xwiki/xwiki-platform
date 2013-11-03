@@ -66,7 +66,7 @@ Det fullständiga formatet för bilder är antingen **##image~: (referens)##** e
 *** **##bildnamn##**: En obligatorisk sträng som anger namnet på bildbilagan.  (Notera att XWiki ibland ändrar filnamnet på filer som laddas upp som bilaga.)
 * **##parametrar##**: En utelämnings bar lista separerad av blankstegstecken med parametrar till bilden.  Exempel: ##width="800" height="600" alt="img.png" title="Min fina bild"##
 ** **HTML-attribut**:  Alla attribut definierade i HTML-standarden för taggen ##&lt;img&gt;## kan användas.
-*** **##style##**: CSS-stilinformation som skall appliceras på bilden. Exempel: ##style="float:right;height:50"## (bilden till höger, höjd 50 pixlar), ##style="style="display:block;margin-left:auto;margin-right:auto;width:80%"## (bilden centrerad, bredd 80% av blockbredden), ##style="vertical-align:bottom"## (texten ställs i linje med bildens nederkant)
+*** **##style##**: CSS-stilinformation som skall appliceras på bilden. Exempel: ##style="float:right;height:50"## (bilden till höger, höjd 50 pixlar), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (bilden centrerad, bredd 80% av blockbredden), ##style="vertical-align:bottom"## (texten ställs i linje med bildens nederkant)
 *** **##height##**: Parameter som anger höjden på bilden vid visning.  Värdet kan anges antingen i pixlar (exempel: ##height="80"##) eller relativt höjden på bildens omgivande block (exempel: ##height="40%"##).
 *** **##width##**: Parameter som anger bredden på bilden vid visning.  Värdet kan anges antingen i pixlar (exempel: ##height="80"##) eller relativt bredden på bildens omgivande block (exempel: ##height="40%"##). 
 *** **##title##**: Parameter som anger texten som blir synlig då muspekaren hålls över bilden. Exempel: ##title="Min fina bild"##
@@ -104,7 +104,7 @@ Det fullständiga formatet för bilder är antingen **##image~: (referens)##** e
 *** **##ikonnamn##**: En obligatorisk sträng som anger namnet på ikonen. Exempel: ##accept##
 * **##parametrar##**: En utelämnings bar lista separerad av blankstegstecken med parametrar till bilden.  Exempel: ##width="800" height="600" alt="img.png" title="Min fina bild"##
 ** **HTML-attribut**:  Alla attribut definierade i HTML-standarden för taggen ##&lt;img&gt;## kan användas.
-*** **##style##**: CSS-stilinformation som skall appliceras på bilden. Exempel: ##style="float:right;height:50"## (bilden till höger, höjd 50 pixlar), ##style="style="display:block;margin-left:auto;margin-right:auto;width:80%"## (bilden centrerad, bredd 80% av blockbredden), ##style="vertical-align:bottom"## (texten ställs i linje med bildens nederkant)
+*** **##style##**: CSS-stilinformation som skall appliceras på bilden. Exempel: ##style="float:right;height:50"## (bilden till höger, höjd 50 pixlar), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (bilden centrerad, bredd 80% av blockbredden), ##style="vertical-align:bottom"## (texten ställs i linje med bildens nederkant)
 *** **##height##**: Parameter som anger höjden på bilden vid visning.  Värdet kan anges antingen i pixlar (exempel: ##height="80"##) eller relativt höjden på bildens omgivande block (exempel: ##height="40%"##).
 *** **##width##**: Parameter som anger bredden på bilden vid visning.  Värdet kan anges antingen i pixlar (exempel: ##height="80"##) eller relativt bredden på bildens omgivande block (exempel: ##height="40%"##). 
 *** **##title##**: Parameter som anger texten som blir synlig då muspekaren hålls över bilden. Exempel: ##title="Min fina bild"##

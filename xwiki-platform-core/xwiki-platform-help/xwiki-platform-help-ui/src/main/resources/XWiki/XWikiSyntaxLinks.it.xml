@@ -73,12 +73,12 @@ Il formato completo di un link è **##[etichetta {&gt; o |}] (risorsa) [@interWi
 *** **un URI** nella forma **##protocollo:percorso##** (esempi: ##http:~/~/xwiki.org##, ##mailto~:john@smith.com##), o
 *** **una pagina wiki ** riferimento nella forma **##~[~[NomeWiki:] spazio.] (pagina)##**. Esempi: ##WebHome##, ##Main.WebHome##, ##mywiki:Main.WebHome##
 **** **##NomeWiki##**: Stringa opzionale che contiene il nome di un subwiki (animal) di una 'farm' di wiki. Il link punterà ad una pagina all'interno di quel subwiki. Esempio: ##miowiki##
-**** **##spazio##: Nome opzionale dello Spazio del wiki. Se non si specifica uno spazio viene usato lo spazio corrente. Esempio: ##Main##
+**** **##spazio##**: Nome opzionale dello Spazio del wiki. Se non si specifica uno spazio viene usato lo spazio corrente. Esempio: ##Main##
 **** **##pagina##**: Stringa obbligatoria che contiene il nome della pagina del wiki da collegare. Esempio: ##WebHome##
-** **##Stringaquery##: Stringa opzionale di query per specificare dei parametri che saranno usati nel rendering dell'URL. Esempio: ##mydata1=5&amp;mydata2=Hello##
-** **##ancora##: Nome opzionale di un'ancora che punta ad un'altra ancora definita nel link in oggetto. Notare che in XWiki le ancore sono create automaticamente per i titoli. Esempio: ##HTableOfContents##
-* **##interWikiAlias##: Un alias opzionale [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] come definito nella InterWiki Map (vedere la  [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]).Questo vale solo per i nomi delle pagine wiki. Esempio: ##wikipedia##
-* **##obbiettivo##: Stringa opzionale che corrisponde all'atttributo HTML ##target## per un elemento link HTML ##A## . Questo elemento viene usato quando si fa il render del link. Di default apre il link nella pagina corrente. Esempi: ##_self##, ##_blank##
+** **##Stringaquery##**: Stringa opzionale di query per specificare dei parametri che saranno usati nel rendering dell'URL. Esempio: ##mydata1=5&amp;mydata2=Hello##
+** **##ancora##**: Nome opzionale di un'ancora che punta ad un'altra ancora definita nel link in oggetto. Notare che in XWiki le ancore sono create automaticamente per i titoli. Esempio: ##HTableOfContents##
+* **##interWikiAlias##**: Un alias opzionale [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] come definito nella InterWiki Map (vedere la  [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]).Questo vale solo per i nomi delle pagine wiki. Esempio: ##wikipedia##
+* **##obbiettivo##**: Stringa opzionale che corrisponde all'atttributo HTML ##target## per un elemento link HTML ##A## . Questo elemento viene usato quando si fa il render del link. Di default apre il link nella pagina corrente. Esempi: ##_self##, ##_blank##
 
 === 2.0 Links ===
 
@@ -119,7 +119,7 @@ Le parti tra ##( )## sono richieste, le parti tra ##[ ]## sono opzionali.
 
 Il formato completo di un link è **##[etichetta&gt;&gt;] (risorsa) [@interWikiAlias] [||parametri]##**
 
-* **##etichetta##: Stringa opzionale che sarà mostrata all'utente dopo il render del link. L'etichetta può contenere della sintassi XWiki. Se non viene specificata un'etichetta sarà generata un'etichetta predefinita. Il modello di generazione può essere cambiato, vedere la [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Esempio: ##My Page##
+* **##etichetta##**: Stringa opzionale che sarà mostrata all'utente dopo il render del link. L'etichetta può contenere della sintassi XWiki. Se non viene specificata un'etichetta sarà generata un'etichetta predefinita. Il modello di generazione può essere cambiato, vedere la [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]. Esempio: ##My Page##
 * **##risorsa##**: Il riferimento completo al link con la sintassi seguente: **##(riferimento) [?Stringaquery] [#ancora]##**
 ** **##riferimento##**: Il riferimento al collegamento in una delle forme seguenti:
 *** **URL**: qualsiasi URL nella forma **##protocollo:~/~/percorso##**. Esempi: ##http:~/~/xwiki.org##, ##https:~/~/svn.xwiki.org/##
@@ -137,7 +137,7 @@ Il formato completo di un link è **##[etichetta&gt;&gt;] (risorsa) [@interWikiA
 ** **##Stringaquery##**: Stringa opzionale di query per specificare parametri che saranno usati nel rendering dell'URL. Esempio: ##mydata1=5&amp;mydata2=Hello##
 ** **##anchra##**: Nome di un'ancora opzionale che punta ad un'ancora definita nel link cui si fa riferimento. Notare che in XWiki le ancore sono create automaticamente per i titoli. Esempio: ##HTableOfContents##
 * **##interWikiAlias##**: Alias opzionale [[Inter Wiki&gt;&gt;http://en.wikipedia.org/wiki/InterWiki]] come definito nella InterWiki Map (vedere la [[Admin Guide&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/AdminGuide/]]). Questo vale solo per i nomi delle pagine wiki. Esempio: ##wikipedia##
-* **##parametri##: elenco opzionale di parametri che si possono passare al link. Esempio: ##rel="~_~_blank"## (apri in una nuova finestra)
+* **##parametri##**: elenco opzionale di parametri che si possono passare al link. Esempio: ##rel="~_~_blank"## (apri in una nuova finestra)
 
 
 === 2.1 Links ===

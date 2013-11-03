@@ -29,17 +29,17 @@
 {{comment}}please do not translate the sub headlines{{/comment}}
 === 1.0 Verbatim ===
 
-Erlaubt es Inhalte einzugeben die nicht formatiert werden (in anderen Worten wird die XWiki Syntax nicht beachtet).
+Erlaubt es Inhalte einzugeben, die nicht formatiert werden (in anderen Worten wird die XWiki Syntax nicht beachtet).
 
 {{info}}
-In XWiki Syntax 1.0 schützt das [[Pre Makro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Pre+Macro+%28Radeox%29]] nur XWiki Syntax und Radeox Makros. HTML Code und Groovy/Velocity Skripte, hingegen, werden weiterhin ausgeführt.
+In XWiki Syntax 1.0 schützt das [[Pre Makro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Pre+Macro+%28Radeox%29]] nur XWiki Syntax und Radeox Makros. HTML Code und Groovy/Velocity Skripte hingegen werden weiterhin ausgeführt.
 {{/info}}
 
 |=Funktion|=XWiki Syntax 1.0|=Ergebnis
 |Wortgetreu in Zeile|{{{Etwas wortgetreuer {pre}*[nicht gerenderter]*{/pre} Inhalt}}}|Etwas wortgetreuer {{{*[nicht gerenderter]*}}} Inhalt
 |Wortgetreuer Block|((({{{
 {pre}
-vielzeiliger
+mehrzeiliger
 *wortgetreuer*
 Inhalt
 {/pre}
@@ -53,7 +53,7 @@ Inhalt
 
 === 2.0 Verbatim ===
 
-Erlaubt es Inhalte einzugeben die nicht formatiert werden (in anderen Worten wird die XWiki Syntax nicht beachtet).
+Erlaubt es Inhalte einzugeben, die nicht formatiert werden (in anderen Worten wird die XWiki Syntax nicht beachtet).
 
 |=Funktion|=XWiki Syntax 2.0|=Ergebnis
 |Wortgetreu in Zeile|{{{Etwas wortgetreuer {{{**[[nicht gerenderter]]**}}} Inhalt}}}|Etwas wortgetreuer {{{**[[nicht gerenderter]]**}}} Inhalt

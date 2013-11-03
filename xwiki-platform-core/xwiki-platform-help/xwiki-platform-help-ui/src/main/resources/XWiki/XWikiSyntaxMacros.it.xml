@@ -53,7 +53,7 @@ Anche nella Sintassi XWiki 2.0 ci sono due tipi di macro:
 * Macro Velocity (chiamate usando la sintassi ###macroname(param1 ... paramN)## all'interno della Macro Velocity)
 * Macro XWiki (chiamate usando la sintassi ##{{{{{macroname param1="value1" ... paramN="valueN"}}}}}## )
 
-|=Caratteristica|=Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|=Caratteristica|=Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Risultato
 |Macro XWiki|(((
 {{{{{code language="java"}}
 System.out.println("Hello World!");

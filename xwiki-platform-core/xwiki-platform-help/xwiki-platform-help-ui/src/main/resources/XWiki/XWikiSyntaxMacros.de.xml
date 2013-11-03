@@ -42,26 +42,19 @@ Java Inhalt
 {code}
 }}})))
 
-{{info}}Für die vollständige Liste der verfügbaren Makros ist das [[Erweiterungswiki&gt;&gt;http://extensions.xwiki.org/]] zu besuchen.{{/info}}
+{{info}}Eine vollständige Liste der verfügbaren Makros ist im [[Erweiterungswiki&gt;&gt;http://extensions.xwiki.org/]] zu finden.{{/info}}
 
 === 2.0 Macros ===
 
-Es gibt ebenfalls zwei Arten von Makros in XWiki Syntax  {{velocity}}$crtSyntaxVer{{/velocity}}:
+In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} gibt es genau eine Art von Makros, welche mittels der Syntax ##{{{{{macroname param1="value1" ... paramN="valueN"}}}}}## angegeben werden, zum Beispiel für das ##~{~{code~}~}## Makro:
 
-* Velocity Makros (aufgerufen mittels der ###macroname(param1 ... paramN)## Syntax im Velocity Makro)
-* XWiki Makros (aufgerufen mittels der ##{{{{{macroname param1="value1" ... paramN="valueN"}}}}}## Syntax)
+|=Funktion|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Ausgabe
+|Makro|(((
+{{{{{code language="java"}}
+System.out.println("Hello World!");
+{{/code}
+}}}
+)))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
 
-|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}
-|Velocity Makro|((({{{#info("Ein Text")}}})))|((({{{
-{{info}}
-Ein Text
-{{/info}}
-}}})))
-|XWiki Makro|((({{{
-{{code language="java"}}
-Java Inhalt
-{{/code}}
-}}})))
-
-{{info}}Für die vollständige Liste der verfügbaren Makros ist das [[Erweiterungswiki&gt;&gt;http://extensions.xwiki.org/]] zu besuchen.{{/info}}</content>
+{{info}}Eine vollständige Liste der verfügbaren Makros ist im [[Erweiterungswiki&gt;&gt;http://extensions.xwiki.org/]] zu finden.{{/info}}</content>
 </xwikidoc>

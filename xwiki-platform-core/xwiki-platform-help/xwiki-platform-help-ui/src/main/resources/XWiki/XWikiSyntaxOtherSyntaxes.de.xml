@@ -37,5 +37,5 @@ Die folgenden weiteren Syntaxen sind in XWiki Enterprise 1.6 und später impleme
 * [[Creole 1.0&gt;&gt;http://www.wikicreole.org/wiki/Creole1.0]]
 * [[XHTML 1.0&gt;&gt;http://www.w3.org/TR/xhtml1/]]
 
-{{warning}}Die Implementation einiger dieser Syntaxen ist noch nicht vollständig fertig. Beispielsweise funktioniert die Unterstützung für Links noch nicht perfekt. Wir müssen zu dem definieren, ob wir die originalen Syntaxen erweitern wollen um XWiki-spezifische Funktionen, wie die Möglichkeit zu einem anderen Unterwiki zu verlinken, zu unterstützen.{{/warning}}</content>
+{{warning}}Die Implementierung einiger dieser Syntaxen ist noch nicht vollständig fertig. Beispielsweise funktioniert die Unterstützung für Links noch nicht perfekt. Wir müssen zudem definieren, ob wir die originalen Syntaxen erweitern wollen um XWiki-spezifische Funktionen, wie die Möglichkeit zu einem anderen Unterwiki zu verlinken, zu unterstützen.{{/warning}}</content>
 </xwikidoc>

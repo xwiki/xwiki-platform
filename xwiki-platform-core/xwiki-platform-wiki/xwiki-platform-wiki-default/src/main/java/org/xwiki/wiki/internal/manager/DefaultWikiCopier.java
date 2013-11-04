@@ -28,9 +28,13 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.event.status.PopLevelProgressEvent;
+import org.xwiki.job.event.status.PushLevelProgressEvent;
+import org.xwiki.job.event.status.StepProgressEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -64,6 +68,9 @@ public class DefaultWikiCopier implements WikiCopier
     @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
+    @Inject
+    private ObservationManager observationManager;
+
     @Override
     public void copyDocuments(String fromWikiId, String toWikiId, boolean withHistory) throws WikiManagerException
     {
@@ -74,6 +81,9 @@ public class DefaultWikiCopier implements WikiCopier
             Query query = queryManager.createQuery("select doc.fullName from Document as doc", Query.XWQL);
             query.setWiki(fromWikiId);
             List<String> documentFullnames = query.execute();
+
+            observationManager.notify(new PushLevelProgressEvent(documentFullnames.size()), this);
+
             WikiReference fromWikiReference = new WikiReference(fromWikiId);
             for (String documentFullName : documentFullnames) {
                 DocumentReference origDocReference = documentReferenceResolver.resolve(documentFullName,
@@ -81,8 +91,12 @@ public class DefaultWikiCopier implements WikiCopier
                 DocumentReference newDocReference = new DocumentReference(toWikiId,
                         origDocReference.getLastSpaceReference().getName(), origDocReference.getName());
                 xwiki.copyDocument(origDocReference, newDocReference, !withHistory, context);
+
+                observationManager.notify(new StepProgressEvent(), this);
             }
             handleAppDescriptors(fromWikiId, toWikiId);
+
+            observationManager.notify(new PopLevelProgressEvent(), this);
         } catch (QueryException e) {
             throw new WikiManagerException("Unable to get the source wiki documents.", e);
         } catch (XWikiException e) {

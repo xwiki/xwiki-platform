@@ -19,15 +19,45 @@
  */
 package org.xwiki.wiki.provisioning;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.job.Job;
+import org.xwiki.job.AbstractRequest;
 
 /**
- * Component that prepares new wikis.
+ * Base class for {@link org.xwiki.job.Request} implementations used by wiki provisioners.
+ *
  * @since 5.3M2
- * @version $Id :$
+ * @version $Id$
  */
-@Role
-public interface WikiProvisioner extends Job
+public class WikiProvisionerRequest extends AbstractRequest
 {
+    /**
+     * Name of the property that stores the od of the wiki to provision.
+     */
+    public static final String PROPERTY_WIKI_ID = "wikiprovisioner.wikiId";
+
+    /**
+     * Constructor.
+     * @param wikiId id of the wiki to provision
+     */
+    public WikiProvisionerRequest(String wikiId)
+    {
+        super();
+        setWikiId(wikiId);
+    }
+
+    /**
+     * @param wikiId if of the wiki to provision
+     */
+    public void setWikiId(String wikiId)
+    {
+        setProperty(PROPERTY_WIKI_ID, wikiId);
+    }
+
+    /**
+     * @return the id of the wiki to provision
+     */
+    public String getWikiId()
+    {
+        return getProperty(PROPERTY_WIKI_ID);
+    }
+
 }

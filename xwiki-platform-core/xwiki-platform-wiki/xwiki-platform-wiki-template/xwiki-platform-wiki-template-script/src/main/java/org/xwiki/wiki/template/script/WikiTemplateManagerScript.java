@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -47,7 +48,7 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  */
 @Component
-@Named("wiki.template")
+@Named("wikitemplate")
 @Singleton
 public class WikiTemplateManagerScript implements ScriptService
 {
@@ -126,11 +127,11 @@ public class WikiTemplateManagerScript implements ScriptService
      *
      * @param newWikiId ID of the wiki to create
      * @param newWikiAlias Default alias of the wiki to create
-     * @param templateDescriptor Descriptor of the template to use
+     * @param templateId Id of the template to use
      * @return The descriptor of the new wiki or null if problems occur
      */
     public WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias,
-            WikiDescriptor templateDescriptor)
+            String templateId)
     {
         WikiDescriptor descriptor = null;
         try {
@@ -138,7 +139,7 @@ public class WikiTemplateManagerScript implements ScriptService
             if (authorizationManager.hasAccess(Right.CREATE_WIKI, context.getUserReference(),
                     new WikiReference(context.getMainXWiki())))
             {
-                descriptor = wikiTemplateManager.createWikiFromTemplate(newWikiId, newWikiAlias, templateDescriptor);
+                descriptor = wikiTemplateManager.createWikiFromTemplate(newWikiId, newWikiAlias, templateId);
             }
         } catch (WikiTemplateManagerException e) {
             error("Failed to create the wiki from the template.", e);
@@ -173,5 +174,20 @@ public class WikiTemplateManagerScript implements ScriptService
     public Exception getLastException()
     {
         return (Exception) this.execution.getContext().getProperty(CONTEXT_LASTEXCEPTION);
+    }
+
+    /**
+     * Get the status of the wiki creation job.
+     *
+     * @param wikiId id of the constructing wiki
+     * @return the status of the job
+     */
+    public JobStatus getWikiCreationStatus(String wikiId)
+    {
+        try {
+            return wikiTemplateManager.getWikiCreationStatus(wikiId);
+        } catch (WikiTemplateManagerException e) {
+            return null;
+        }
     }
 }

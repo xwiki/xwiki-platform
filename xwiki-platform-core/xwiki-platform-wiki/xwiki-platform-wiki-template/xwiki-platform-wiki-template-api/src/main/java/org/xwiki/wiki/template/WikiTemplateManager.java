@@ -22,6 +22,7 @@ package org.xwiki.wiki.template;
 import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 
@@ -64,10 +65,19 @@ public interface WikiTemplateManager
      *
      * @param newWikiId ID of the wiki to create
      * @param newWikiAlias Default alias of the wiki to create
-     * @param templateDescriptor Descriptor of the template to use
+     * @param templateId Id of the template to use
      * @return The descriptor of the new wiki
      * @throws WikiTemplateManagerException if problems occur
      */
-    WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias, WikiDescriptor templateDescriptor)
+    WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId)
         throws WikiTemplateManagerException;
+
+    /**
+     * Get the status of the wiki creation job.
+     *
+     * @param wikiId id of the constructing wiki
+     * @return the status of the job
+     * @throws WikiTemplateManagerException if problem occurs
+     */
+    JobStatus getWikiCreationStatus(String wikiId) throws WikiTemplateManagerException;
 }

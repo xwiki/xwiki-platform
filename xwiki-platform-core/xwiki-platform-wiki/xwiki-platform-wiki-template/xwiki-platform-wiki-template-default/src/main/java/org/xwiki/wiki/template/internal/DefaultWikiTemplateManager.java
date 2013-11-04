@@ -29,6 +29,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -39,12 +40,11 @@ import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.properties.WikiPropertyGroupException;
 import org.xwiki.wiki.properties.WikiPropertyGroupProvider;
-import org.xwiki.wiki.template.WikiTemplatePropertyGroup;
 import org.xwiki.wiki.template.WikiTemplateManager;
 import org.xwiki.wiki.template.WikiTemplateManagerException;
+import org.xwiki.wiki.template.WikiTemplatePropertyGroup;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 
 /**
  * Default implementation for {@link WikiTemplateManager}.
@@ -66,6 +66,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     @Named("default")
     private WikiManager wikiManager;
 
+    @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
@@ -77,6 +78,9 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
 
     @Inject
     private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
+
+    @Inject
+    private TemplateWikiProvisionerExecutor templateWikiProvisionerExecutor;
 
     @Inject
     @Named("template")
@@ -91,7 +95,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
 
         try {
             Query query = this.queryManager.createQuery(
-                    "from doc.object(XWiki.XWikiServerTemplateClass) as descriptor where doc.name like 'XWikiServer%' "
+                    "from doc.object(WikiManager.WikiTemplateClass) as descriptor where doc.name like 'XWikiServer%' "
                     + "and descriptor.iswikitemplate = 1", Query.XWQL);
             query.setWiki(xcontextProvider.get().getMainXWiki());
             List<String> documentNames = query.execute();
@@ -148,22 +152,25 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
 
     @Override
     public WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias,
-            WikiDescriptor templateDescriptor) throws WikiTemplateManagerException
+            String templateId) throws WikiTemplateManagerException
     {
         try {
             // First, create the new wiki
             WikiDescriptor descriptor = wikiManager.create(newWikiId, newWikiAlias);
 
-            // Then copy the wiki
-            WikiCopy wikiCopy = new WikiCopy();
-            wikiCopy.copyWiki(templateDescriptor.getId(), newWikiId, "", xcontextProvider.get());
+            // Then, create a template provisioner job
+            templateWikiProvisionerExecutor.createAndExecuteJob(newWikiId, templateId);
 
             // Finally, return the descriptor
             return descriptor;
         } catch (WikiManagerException e) {
             throw new WikiTemplateManagerException(e.getMessage(), e);
-        } catch (XWikiException e) {
-            throw new WikiTemplateManagerException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public JobStatus getWikiCreationStatus(String wikiId) throws WikiTemplateManagerException
+    {
+        return templateWikiProvisionerExecutor.getJobStatus(wikiId);
     }
 }

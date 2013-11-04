@@ -41,7 +41,7 @@ public class XARInputWikiStreamFactory extends AbstractBeanInputWikiStreamFactor
 {
     public XARInputWikiStreamFactory()
     {
-        super(WikiStreamType.XWIKI_XAR);
+        super(WikiStreamType.XWIKI_XAR_10);
 
         setName("XAR input stream");
         setDescription("Generates wiki events from XAR package.");

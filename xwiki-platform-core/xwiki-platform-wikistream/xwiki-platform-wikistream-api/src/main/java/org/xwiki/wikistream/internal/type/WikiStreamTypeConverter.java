@@ -17,33 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xar.internal.output;
+package org.xwiki.wikistream.internal.type;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.lang.reflect.Type;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
+import org.xwiki.properties.converter.AbstractConverter;
 import org.xwiki.wikistream.type.WikiStreamType;
-import org.xwiki.wikistream.xar.internal.XARFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils;
 
 /**
- * Generate XAR package from WikiStream events.
+ * Convert a WikiStream type from a {@link String} to a {@link WikiStreamType} object and the other way around.
  * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3M2
  */
-@Component
-@Named(XARUtils.ROLEHINT)
-@Singleton
-public class XAROutputWikiStreamFactory extends AbstractBeanOutputWikiStreamFactory<XAROutputProperties, XARFilter>
+public class WikiStreamTypeConverter extends AbstractConverter<WikiStreamType>
 {
-    public XAROutputWikiStreamFactory()
+    @Override
+    protected WikiStreamType convertToType(Type targetType, Object value)
     {
-        super(WikiStreamType.XWIKI_XAR_10);
+        return value == null ? null : WikiStreamType.unserialize(value.toString());
+    }
 
-        setName("XAR output stream");
-        setDescription("Write XAR package from wiki events.");
+    @Override
+    protected String convertToString(WikiStreamType value)
+    {
+        return value == null ? null : value.serialize();
     }
 }

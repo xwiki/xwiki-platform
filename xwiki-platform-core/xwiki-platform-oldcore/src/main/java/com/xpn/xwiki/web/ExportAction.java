@@ -303,7 +303,7 @@ public class ExportAction extends XWikiAction
             outputProperties.put("preserveVersion", backup);
 
             OutputWikiStreamFactory outputWikiStreamFactory =
-                Utils.getComponent(OutputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR.serialize());
+                Utils.getComponent(OutputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_10.serialize());
 
             OutputWikiStream outputWikiStream = outputWikiStreamFactory.createOutputWikiStream(outputProperties);
 

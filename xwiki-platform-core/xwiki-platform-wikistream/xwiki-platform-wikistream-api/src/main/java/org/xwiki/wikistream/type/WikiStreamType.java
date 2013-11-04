@@ -44,8 +44,10 @@ public class WikiStreamType
 
     /**
      * The XAR format.
+     * 
+     * @since 5.3M2
      */
-    public static final WikiStreamType XWIKI_XAR = new WikiStreamType(WikiType.XWIKI, "xar", "1.0");
+    public static final WikiStreamType XWIKI_XAR_10 = new WikiStreamType(WikiType.XWIKI, "xar", "1.0");
 
     /**
      * The database stream based on oldcore APIs.

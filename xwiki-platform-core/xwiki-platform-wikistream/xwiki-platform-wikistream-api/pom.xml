@@ -42,6 +42,11 @@
       <artifactId>xwiki-commons-filter-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-job</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
 
     <!-- Testing dependencies -->
     <dependency>

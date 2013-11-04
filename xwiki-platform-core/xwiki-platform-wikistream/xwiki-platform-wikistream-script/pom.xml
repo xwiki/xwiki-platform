@@ -47,6 +47,11 @@
       <artifactId>xwiki-commons-script</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Mostly used for right testing -->
     <dependency>

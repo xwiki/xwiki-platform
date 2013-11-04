@@ -1394,7 +1394,8 @@ public class XWiki implements EventListener
      */
     public XWikiDocument getDocument(DocumentReference reference, XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc = new XWikiDocument(reference);
+        XWikiDocument doc =
+            new XWikiDocument(reference.getLocale() != null ? new DocumentReference(reference, null) : reference);
         // TODO: remove that when XWikiDocument merge reference and locale
         doc.setLocale(reference.getLocale());
 

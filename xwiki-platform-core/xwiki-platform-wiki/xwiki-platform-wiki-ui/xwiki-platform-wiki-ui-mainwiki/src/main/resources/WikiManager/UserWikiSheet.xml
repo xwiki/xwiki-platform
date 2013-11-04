@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>WikiManagerCode</web>
+  <web>WikiManager</web>
   <name>UserWikiSheet</name>
   <language/>
   <defaultLanguage/>
@@ -95,7 +95,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManagerCode.UserWikiSheet</name>
+    <name>WikiManager.UserWikiSheet</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>80a56ef7-cc1d-4206-a749-9066de3e32df</guid>
@@ -121,7 +121,7 @@ XWiki.UserWikiTab = Class.create({
   onWikiClicked : function (event) {
     var element = Event.element(event);
     var wikiId = element.up('li').id;
-    new Ajax.Request("$xwiki.getURL('WikiManagerCode.WikiActivityServiceCode')", {
+    new Ajax.Request("$xwiki.getURL('WikiManager.WikiActivityServiceCode')", {
       parameters: {
         'xpage' : 'plain',
         'wikiName' : wikiId
@@ -244,7 +244,7 @@ return XWiki;
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManagerCode.UserWikiSheet</name>
+    <name>WikiManager.UserWikiSheet</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>a20d3a8b-f13e-4d73-8dc4-3e6fb45ddc5f</guid>
@@ -300,8 +300,8 @@ return XWiki;
 
 {{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}
 #else
-  #set($temp = $xwiki.ssx.use('WikiManagerCode.UserWikiSheet'))
-  #set($temp = $xwiki.jsx.use('WikiManagerCode.UserWikiSheet'))
+  #set($temp = $xwiki.ssx.use('WikiManager.UserWikiSheet'))
+  #set($temp = $xwiki.jsx.use('WikiManager.UserWikiSheet'))
   #set($temp = $doc.use($obj))
   #set ($currentUser = $xcontext.user)
   #if (!$currentUser.startsWith("${services.wiki.mainWikiId}:"))

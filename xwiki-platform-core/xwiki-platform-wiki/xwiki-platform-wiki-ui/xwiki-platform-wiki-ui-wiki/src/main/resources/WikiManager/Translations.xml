@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>WikiManagerCode</web>
+  <web>WikiManager</web>
   <name>Translations</name>
   <language/>
   <defaultLanguage/>
@@ -50,7 +50,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <name>WikiManagerCode.Translations</name>
+    <name>WikiManager.Translations</name>
     <number>0</number>
     <className>XWiki.TranslationDocumentClass</className>
     <guid>55b808f6-2711-4616-add3-e7343c67c956</guid>

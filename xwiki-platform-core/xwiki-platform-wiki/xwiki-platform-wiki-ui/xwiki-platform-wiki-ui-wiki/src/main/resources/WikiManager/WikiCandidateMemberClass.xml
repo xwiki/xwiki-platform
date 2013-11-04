@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>WikiManagerCode</web>
+  <web>WikiManager</web>
   <name>WikiCandidateMemberClass</name>
   <language/>
   <defaultLanguage/>
@@ -24,7 +24,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <class>
-    <name>WikiManagerCode.WikiCandidateMemberClass</name>
+    <name>WikiManager.WikiCandidateMemberClass</name>
     <customClass/>
     <customMapping/>
     <defaultViewSheet/>

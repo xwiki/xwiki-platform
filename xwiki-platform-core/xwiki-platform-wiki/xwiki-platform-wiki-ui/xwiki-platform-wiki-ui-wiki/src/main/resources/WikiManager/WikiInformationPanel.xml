@@ -149,7 +149,7 @@
       #end 
       #set ($membershipType = $wiki.getPropertyGroup('user').membershipType)
       #set ($joinPageReference = $services.model.createDocumentReference(${services.wiki.mainWikiId}, 'WikiManager', 'JoinWiki'))
-      #set ($joinText = $services.localization.render("WikiManagerCode.WikiCandidateMemberClass_membershipType_${membershipType.name().toLowerCase()}"))
+      #set ($joinText = $services.localization.render("WikiManager.WikiCandidateMemberClass_membershipType_${membershipType.name().toLowerCase()}"))
       #set ($actionLabel = false)
       #set ($actionUrl = $xwiki.getURL($joinPageReference, 'view', "wikiId=${currentWiki}"))
       #if ($existingInvitationOrRequest)

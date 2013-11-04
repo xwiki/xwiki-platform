@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>WikiManagerCode</web>
+  <web>WikiManager</web>
   <name>WikisLiveTableResults</name>
   <language/>
   <defaultLanguage/>
@@ -23,7 +23,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="WikiManagerCode.WikisLiveTableResultsMacros" /}}
+  <content>{{include document="WikiManager.WikisLiveTableResultsMacros" /}}
 
 {{velocity wiki="false"}}
 #set($from =  "")

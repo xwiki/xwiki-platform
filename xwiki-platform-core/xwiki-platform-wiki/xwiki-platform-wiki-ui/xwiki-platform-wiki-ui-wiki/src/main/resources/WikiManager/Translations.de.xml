@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>XWiki</web>
-  <name>WorkspaceTranslations</name>
+  <web>WikiManager</web>
+  <name>Translations</name>
   <language>de</language>
   <defaultLanguage/>
   <translation>1</translation>

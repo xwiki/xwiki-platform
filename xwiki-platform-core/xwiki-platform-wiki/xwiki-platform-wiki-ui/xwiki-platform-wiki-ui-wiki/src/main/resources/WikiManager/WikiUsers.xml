@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>WikiManagerCode</web>
+  <web>WikiManager</web>
   <name>WikiUsers</name>
   <language/>
   <defaultLanguage/>
@@ -95,7 +95,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManagerCode.WikiUsers</name>
+    <name>WikiManager.WikiUsers</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>97a34330-a9ab-4bab-8295-73bb1a6ed2a9</guid>
@@ -218,7 +218,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManagerCode.WikiUsers</name>
+    <name>WikiManager.WikiUsers</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>22d44dd4-dd1f-41ff-ad2f-00cf192b2346</guid>
@@ -298,7 +298,7 @@
     {{error}}$exception.class{{/error}}
   #end
 #end
-#set ($candidateClass = 'WikiManagerCode.WikiCandidateMemberClass')
+#set ($candidateClass = 'WikiManager.WikiCandidateMemberClass')
 #set ($xwikiGroupsClass = 'XWiki.XWikiGroups')
 #set ($messageStream = $services.messageStream)
 #set ($wiki = $services.wiki.getById($services.wiki.currentWikiId))
@@ -416,8 +416,8 @@ $services.localization.render('platform.workspace.candidateHandledComment') $mes
 #if($hasEditGroupRight)
 {{html}}
 #userPicker_import()
-#set ($discard = $xwiki.ssx.use('WikiManagerCode.WikiUsers'))
-#set ($discard = $xwiki.jsx.use('WikiManagerCode.WikiUsers'))
+#set ($discard = $xwiki.ssx.use('WikiManager.WikiUsers'))
+#set ($discard = $xwiki.jsx.use('WikiManager.WikiUsers'))
 &lt;form id='inviteUserForm' class='xform half'&gt;
   &lt;h2&gt;$services.localization.render('workspacemanager.member.add')&lt;/h2&gt;
   &lt;dl&gt;

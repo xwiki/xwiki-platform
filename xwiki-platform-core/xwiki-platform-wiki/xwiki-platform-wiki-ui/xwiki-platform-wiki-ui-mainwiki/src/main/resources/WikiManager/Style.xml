@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>WikiManagerCode</web>
+  <web>WikiManager</web>
   <name>Style</name>
   <language/>
   <defaultLanguage/>
@@ -95,7 +95,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManagerCode.Style</name>
+    <name>WikiManager.Style</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>bc7e4dd6-328e-41d1-bb65-6f6407b3093e</guid>

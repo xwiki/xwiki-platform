@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>WikiManagerCode</web>
+  <web>WikiManager</web>
   <name>LegacyWorkspacesMacro</name>
   <language/>
   <defaultLanguage/>
@@ -133,7 +133,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibility>
     </class>
-    <name>WikiManagerCode.LegacyWorkspacesMacro</name>
+    <name>WikiManager.LegacyWorkspacesMacro</name>
     <number>0</number>
     <className>XWiki.WikiMacroClass</className>
     <guid>24ec5979-2510-4e3c-a0d5-a42ef43b0b05</guid>

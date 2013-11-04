@@ -230,7 +230,7 @@
         &lt;/dd&gt;
 
         &lt;dt&gt;
-          &lt;label for='WikiManagerCode.WikiUserClass_0_membershipType'&gt;{{translation key="workspacemanager.prop.membershipType.label"/}}&lt;/label&gt;
+          &lt;label for='WikiManager.WikiUserClass_0_membershipType'&gt;{{translation key="workspacemanager.prop.membershipType.label"/}}&lt;/label&gt;
           &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.membershipType.hint"/}}&lt;/span&gt;
         &lt;/dt&gt;
         &lt;dd&gt;((($wikiDocument.display('membershipType', 'edit'))))&lt;/dd&gt;

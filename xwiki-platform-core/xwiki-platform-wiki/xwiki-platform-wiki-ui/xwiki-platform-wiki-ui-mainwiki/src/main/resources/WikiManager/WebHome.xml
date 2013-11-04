@@ -140,12 +140,12 @@
     'wikiprettyname' : { 'type' : 'text', 'link' : 'field' },
     'description' : { 'type' : 'text' , 'size' : 50, 'html' : 'true' },
     'owner' : { 'type' : 'text', 'size' : 10, 'html' : 'true' },
-    'membershipType' : { 'type' : 'text', 'class' : 'WikiManagerCode.WikiUserClass'}
+    'membershipType' : { 'type' : 'text', 'class' : 'WikiManager.WikiUserClass'}
 })
 #set($options = {
    'className' : 'XWiki.XWikiServerClass',
    'rowCount' : 10,
-   'resultPage' : 'WikiManagerCode.WikisLiveTableResults',
+   'resultPage' : 'WikiManager.WikisLiveTableResults',
    'translationPrefix' : 'workspacemanager.browse.'
 })
 #if(!$isGuest)

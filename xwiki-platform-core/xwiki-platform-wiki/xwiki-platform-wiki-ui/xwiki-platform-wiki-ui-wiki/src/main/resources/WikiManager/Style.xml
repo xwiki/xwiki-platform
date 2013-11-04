@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>WikiManagerCode</web>
+  <web>WikiManager</web>
   <name>Style</name>
   <language/>
   <defaultLanguage/>
@@ -95,7 +95,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManagerCode.Style</name>
+    <name>WikiManager.Style</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>2544a614-d451-48d8-bc82-59b14f521b9e</guid>
@@ -103,7 +103,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>#set ($wikiManagerStyleDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManagerCode', 'Style'))
+      <code>#set ($wikiManagerStyleDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'Style'))
 #if ($xwiki.exists($wikiManagerStyleDocumentReference))
 @import "$xwiki.getURL($wikiManagerStyleDocumentReference, 'ssx', '')";
 #end</code>

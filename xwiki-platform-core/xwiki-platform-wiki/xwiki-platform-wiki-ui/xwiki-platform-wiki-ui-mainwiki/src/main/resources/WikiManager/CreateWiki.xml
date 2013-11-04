@@ -115,7 +115,7 @@
   #set ($MSG_ERROR_WIKINAMEEMPTY = "$services.localization.render('workspacemanager.wikiname.error.empty')")
   #set ($MSG_ERROR_WIKIPRETTYNAMEEMPTY = "$services.localization.render('workspacemanager.wikiprettyname.error.empty')")
   #set ($MSG_INFO_WIKINAMEVALID = "$services.localization.render('workspacemanager.wikiname.info.valid')")
-  #set ($ISWIKINAMEAVAILABLE = $xwiki.getURL($services.model.createDocumentReference("", "WikiManagerCode", "IsWikiOrDatabaseOrAvailableService")))
+  #set ($ISWIKINAMEAVAILABLE = $xwiki.getURL($services.model.createDocumentReference("", "WikiManager", "IsWikiOrDatabaseOrAvailableService")))
 
   /**
    * Init the event handlers
@@ -597,7 +597,7 @@
         &lt;div class="half"&gt;
           ### MEMBERSHIP TYPE
           &lt;div&gt;
-            #set ($wikiUserClassDocument = $xwiki.getDocument('WikiManagerCode.WikiUserClass'))
+            #set ($wikiUserClassDocument = $xwiki.getDocument('WikiManager.WikiUserClass'))
             #set ($wikiUserClass = $wikiUserClassDocument.getxWikiClass())
             #set ($membershipTypeProperty = $wikiUserClass.get('membershipType'))
             #set ($membershipTypeValues = '')

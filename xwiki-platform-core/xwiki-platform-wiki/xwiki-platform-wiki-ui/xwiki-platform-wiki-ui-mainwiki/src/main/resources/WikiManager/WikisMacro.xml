@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>WikiManagerCode</web>
+  <web>WikiManager</web>
   <name>WikisMacro</name>
   <language/>
   <defaultLanguage/>
@@ -95,7 +95,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManagerCode.WikisMacro</name>
+    <name>WikiManager.WikisMacro</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>2a19c5bd-10f9-4185-b6a8-af1b86abfa91</guid>
@@ -267,7 +267,7 @@ ul.xlist li.xitem div.xshowonhover img {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibility>
     </class>
-    <name>WikiManagerCode.WikisMacro</name>
+    <name>WikiManager.WikisMacro</name>
     <number>0</number>
     <className>XWiki.WikiMacroClass</className>
     <guid>24ec5979-2510-4e3c-a0d5-a42ef43b0b05</guid>
@@ -276,7 +276,7 @@ ul.xlist li.xitem div.xshowonhover img {
 ##
 ## List all the wikis.
 ##
-#set($discard = $xwiki.ssx.use('WikiManagerCode.WikisMacros'))
+#set($discard = $xwiki.ssx.use('WikiManager.WikisMacros'))
 ##
 #set ($wikis = $services.wiki.getAll())
 ##set ($discard = $workspaces.removeAll($WorkspaceManager.getWorkspaceTemplates()))

@@ -142,7 +142,7 @@
 {{/html}}
 
 #else
-  {{include reference="WikiManagerCode.WikiUsers" /}}
+  {{include reference="WikiManager.WikiUsers" /}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

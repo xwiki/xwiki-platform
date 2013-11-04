@@ -25,7 +25,7 @@
   <hidden>true</hidden>
   <content>Updates the wiki document of a wiki by using values from the request.
 
-The 'wikiId' parameter is used to identify the wiki document and the request values update the objects of classes [[XWiki.XWikiServerClass]] and [[WikiManagerCode.WikiUserClass]], objects which are already stored in the wiki document.
+The 'wikiId' parameter is used to identify the wiki document and the request values update the objects of classes [[XWiki.XWikiServerClass]] and [[wikiHomepage.WikiUserClass]], objects which are already stored in the wiki document.
 
 The 'xredirect' parameter is also accepted, currently used in the administration section of a wiki.
 
@@ -57,7 +57,7 @@ The 'xredirect' parameter is also accepted, currently used in the administration
       #set ($temp = $wiki.setOwnerId($newOwner))
     #end
     #set ($temp = $services.wiki.saveDescriptor($wiki))
-    #set ($temp = $services.wikiuser.setMembershipType($wiki.id, $request.get('WikiManagerCode.WikiUserClass_0_membershipType')))
+    #set ($temp = $services.wikiuser.setMembershipType($wiki.id, $request.get('wikiHomepage.WikiUserClass_0_membershipType')))
   #end
   #if($request.xredirect)
     $response.sendRedirect($request.xredirect)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>WikiManagerCode</web>
+  <web>WikiManager</web>
   <name>Translations</name>
   <language/>
   <defaultLanguage/>
@@ -50,7 +50,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <name>WikiManagerCode.Translations</name>
+    <name>WikiManager.Translations</name>
     <number>0</number>
     <className>XWiki.TranslationDocumentClass</className>
     <guid>31bb7dd5-7ccc-43e8-bed3-bd1a16eb355e</guid>
@@ -224,9 +224,9 @@ platform.workspace.requiredField=Required
 platform.workspace.profileJoinedWorkspacesLabel=Joined wikis
 platform.workspace.profileShowActivity=show activity
 platform.workspace.newWorkspaceTemplateLabel=Template
-WikiManagerCode.WikiUserClass_membershipType_open=Open for any user to join
-WikiManagerCode.WikiUserClass_membershipType_request=Any user can request to join but an admin must accept
-WikiManagerCode.WikiUserClass_membershipType_invite=Only an admin can invite a user
+WikiManager.WikiUserClass_membershipType_open=Open for any user to join
+WikiManager.WikiUserClass_membershipType_request=Any user can request to join but an admin must accept
+WikiManager.WikiUserClass_membershipType_invite=Only an admin can invite a user
 platform.workspace.searchSuggestSourceWorkspaces=Wikis
 
 # PROPERTIES

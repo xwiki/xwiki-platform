@@ -21,7 +21,7 @@
 -->
 
 <xwikidoc>
-  <web>WikiManagerCode</web>
+  <web>WikiManager</web>
   <name>AdminWikisSheet</name>
   <language/>
   <defaultLanguage/>
@@ -160,12 +160,12 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </propertiesToShow>
     </class>
-    <name>WikiManagerCode.AdminWikisSheet</name>
+    <name>WikiManager.AdminWikisSheet</name>
     <number>0</number>
     <className>XWiki.ConfigurableClass</className>
     <guid>e1627a9f-98c6-4f7e-b3b8-d181da8d37d8</guid>
     <property>
-      <codeToExecute>{{include reference="WikiManagerCode.AdminWikisSheet" /}}</codeToExecute>
+      <codeToExecute>{{include reference="WikiManager.AdminWikisSheet" /}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>

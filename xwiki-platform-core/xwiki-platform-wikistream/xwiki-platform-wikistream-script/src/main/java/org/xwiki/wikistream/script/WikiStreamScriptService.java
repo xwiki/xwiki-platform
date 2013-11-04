@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -37,6 +38,8 @@ import org.xwiki.wikistream.input.InputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStream;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Expose various WikiStream related APIs to scripts.
@@ -58,6 +61,9 @@ public class WikiStreamScriptService implements ScriptService
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     public ScriptService get(String id)
     {
         return this.scriptServiceManager.get(ROLEHINT + '.' + id);
@@ -66,12 +72,23 @@ public class WikiStreamScriptService implements ScriptService
     public void convert(WikiStreamType inputType, Map<String, Object> inputProperties, WikiStreamType outputType,
         Map<String, Object> outputProperties) throws WikiStreamException, ComponentLookupException
     {
-        createInputWikiStream(inputType, inputProperties).read(createOutputWikiStream(outputType, outputProperties));
+        // TODO: introduce advanced right checking system
+        XWikiContext xcontext = this.xcontextProvider.get();
+        if (xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
+            createInputWikiStream(inputType, inputProperties)
+                .read(createOutputWikiStream(outputType, outputProperties));
+        }
     }
 
     public InputWikiStream createInputWikiStream(WikiStreamType inputType, Map<String, Object> inputProperties)
         throws ComponentLookupException, WikiStreamException
     {
+        // TODO: introduce advanced right checking system
+        XWikiContext xcontext = this.xcontextProvider.get();
+        if (!xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
+            return null;
+        }
+
         InputWikiStreamFactory factory =
             this.componentManager.getInstance(InputWikiStreamFactory.class, inputType.serialize());
 
@@ -81,6 +98,12 @@ public class WikiStreamScriptService implements ScriptService
     public OutputWikiStream createOutputWikiStream(WikiStreamType outputType, Map<String, Object> outputProperties)
         throws ComponentLookupException, WikiStreamException
     {
+        // TODO: introduce advanced right checking system
+        XWikiContext xcontext = this.xcontextProvider.get();
+        if (!xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
+            return null;
+        }
+
         OutputWikiStreamFactory factory =
             this.componentManager.getInstance(OutputWikiStreamFactory.class, outputType.serialize());
 

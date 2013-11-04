@@ -34,11 +34,11 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
 
-import org.junit.Assert;
 import org.apache.velocity.VelocityContext;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.junit.Assert;
 import org.xwiki.context.Execution;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.EntityType;
@@ -57,7 +57,6 @@ import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
@@ -1491,26 +1490,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.document.setContent("good {{include reference=\"One.Two\"/}}");
         assertEquals(Arrays.asList("One.Two"), this.document.getIncludedPages(getContext()));
-    }
-
-    /**
-     * XWIKI-8024: XWikiDocument#setAsContextDoc doesn't set the 'cdoc' in the Velocity context
-     */
-    public void testSetAsContextDoc() throws Exception
-    {
-        VelocityContext velocityContext = new VelocityContext();
-        this.mockVelocityManager.stubs().method("getVelocityContext").will(returnValue(velocityContext));
-
-        assertNotSame(this.document, getContext().getDoc());
-        this.document.setAsContextDoc(getContext());
-        assertSame(this.document, getContext().getDoc());
-
-        Assert.assertEquals(this.document.getDocumentReference(),
-            ((Document) velocityContext.get("doc")).getDocumentReference());
-        Assert.assertEquals(this.document.getDocumentReference(),
-            ((Document) velocityContext.get("tdoc")).getDocumentReference());
-        Assert.assertEquals(this.document.getDocumentReference(),
-            ((Document) velocityContext.get("cdoc")).getDocumentReference());
     }
 
     /**

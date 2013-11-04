@@ -7826,8 +7826,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         try {
             context.setDoc(this);
-            com.xpn.xwiki.api.Document apidoc = newDocument(context);
-            com.xpn.xwiki.api.Document tdoc = apidoc.getTranslatedDocument();
+
+            XWikiDocument defaultTranslation, translatedDocument;
+            if (this.getTranslation() == 0) {
+                defaultTranslation = this;
+                translatedDocument = this.getTranslatedDocument(context);
+            } else {
+                defaultTranslation = context.getWiki().getDocument(this.getDocumentReference(), context);
+                translatedDocument = this;
+            }
+
+            com.xpn.xwiki.api.Document apidoc = defaultTranslation.newDocument(context);
+            com.xpn.xwiki.api.Document tdoc = translatedDocument.newDocument(context);
 
             VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();

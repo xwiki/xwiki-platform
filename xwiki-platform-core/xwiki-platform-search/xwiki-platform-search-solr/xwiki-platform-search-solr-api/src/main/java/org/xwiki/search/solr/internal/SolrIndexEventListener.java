@@ -107,7 +107,8 @@ public class SolrIndexEventListener implements EventListener
             if (event instanceof DocumentUpdatedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
 
-                this.solrIndexer.get().index(document.getDocumentReference(), false);
+                this.solrIndexer.get().index(
+                    new DocumentReference(document.getDocumentReference(), document.getLocale()), false);
             } else if (event instanceof DocumentCreatedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
 

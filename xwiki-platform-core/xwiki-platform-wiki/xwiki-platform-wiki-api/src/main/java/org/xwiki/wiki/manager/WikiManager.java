@@ -58,6 +58,16 @@ public interface WikiManager
             boolean copyRecycleBin) throws WikiManagerException;
 
     /**
+     * Rename a wiki.
+     *
+     * @param wikiId If of the wiki to rename
+     * @param newWikiId new Id of the wiki
+     * @return the descriptor of the renamed wiki
+     * @throws WikiManagerException if problems occur
+     */
+    WikiDescriptor rename(String wikiId, String newWikiId) throws WikiManagerException;
+
+    /**
      * Delete a wiki.
      *
      * @param wikiId Id of the wiki to delete.

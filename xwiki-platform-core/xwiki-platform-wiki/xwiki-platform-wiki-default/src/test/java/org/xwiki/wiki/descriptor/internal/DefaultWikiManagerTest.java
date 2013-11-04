@@ -37,6 +37,7 @@ import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder;
 import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.internal.manager.DefaultWikiManager;
+import org.xwiki.wiki.internal.manager.WikiCopier;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
@@ -82,6 +83,8 @@ public class DefaultWikiManagerTest
 
     private com.xpn.xwiki.XWiki xwiki;
 
+    private WikiCopier wikiCopier;
+
     @Before
     public void setUp() throws Exception
     {
@@ -93,6 +96,7 @@ public class DefaultWikiManagerTest
         //logger = mocker.getInstance(Logger.class);
         wikiDescriptorBuilder = mocker.getInstance(WikiDescriptorBuilder.class);
         descriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
+        wikiCopier = mocker.getInstance(WikiCopier.class);
 
         // Frequent uses
         xcontext = mock(XWikiContext.class);
@@ -263,7 +267,9 @@ public class DefaultWikiManagerTest
         assertNotNull(newWikiDescriptor);
 
         // Verify that the wiki has been copied
-        verify(xwiki).copyWiki(eq("wikiid"), eq("wikiid1"), any(String.class), any(XWikiContext.class));
+        verify(wikiCopier).copyDocuments(eq("wikiid"), eq("wikiid1"), eq(true));
+        // Verify that deleted documents has been copied too
+        verify(wikiCopier).copyDeletedDocuments(eq("wikiid"), eq("wikiid1"));
         // Verify that the descriptor has been saved
         verify(wikiDescriptorBuilder).save(eq(createdWikiDescriptor));
     }

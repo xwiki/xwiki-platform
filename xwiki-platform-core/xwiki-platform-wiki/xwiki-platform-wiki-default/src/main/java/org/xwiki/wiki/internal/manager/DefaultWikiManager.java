@@ -78,6 +78,9 @@ public class DefaultWikiManager implements WikiManager
     @Inject
     private WikiPropertyGroupManager wikiPropertyGroupManager;
 
+    @Inject
+    private WikiCopier wikiCopier;
+
     private WikiDescriptor createDescriptor(String wikiId, String wikiAlias) throws WikiManagerException
     {
         // Create the descriptor
@@ -129,22 +132,18 @@ public class DefaultWikiManager implements WikiManager
     public WikiDescriptor copy(String fromWikiId, String newWikiId, String newWikiAlias, boolean copyHistory,
             boolean copyRecycleBin) throws WikiManagerException
     {
-        // Verify that the newId is valid
-        if (!idAvailable(newWikiId)) {
-            throw new WikiManagerException(String.format("Id [%s] is not avalaible.", newWikiId));
+        WikiDescriptor newWiki = create(newWikiId, newWikiAlias);
+        wikiCopier.copyDocuments(fromWikiId, newWikiId, copyHistory);
+        if (copyRecycleBin) {
+            wikiCopier.copyDeletedDocuments(fromWikiId, newWikiId);
         }
+        return newWiki;
+    }
 
-        XWikiContext context = xcontextProvider.get();
-        XWiki xwiki = context.getWiki();
-
-        // Copy all the wiki
-        try {
-            xwiki.copyWiki(fromWikiId, newWikiId, null, context);
-        } catch (XWikiException e) {
-            throw new WikiManagerException("Failed to copy the wiki.", e);
-        }
-
-        return createDescriptor(newWikiId, newWikiAlias);
+    @Override
+    public WikiDescriptor rename(String wikiId, String newWikiId) throws WikiManagerException
+    {
+        throw new WikiManagerException("This method is not implemented yet");
     }
 
     @Override

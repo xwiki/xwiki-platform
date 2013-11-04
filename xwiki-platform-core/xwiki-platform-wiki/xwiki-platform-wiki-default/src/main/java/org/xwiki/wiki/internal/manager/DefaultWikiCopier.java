@@ -45,7 +45,6 @@ import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPluginApi;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
-import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 
 /**
  * Default implementation for {@link WikiCopier}.
@@ -95,25 +94,7 @@ public class DefaultWikiCopier implements WikiCopier
     @Override
     public void copyDeletedDocuments(String fromWikiId, String toWikiId) throws WikiManagerException
     {
-        XWikiContext context = xcontextProvider.get();
-        XWiki xwiki = context.getWiki();
-        XWikiRecycleBinStoreInterface recycleBinStore = xwiki.getRecycleBinStore();
-
-        // Note: I don't like this implementation,
-        // but we don't have a clean API for this.
-        // technical debt.
-        try {
-            Query query = queryManager.createQuery("select ddoc.id from XWikiDeletedDocument as ddoc", Query.XWQL);
-            query.setWiki(fromWikiId);
-            List<String> deletedDocumentIds = query.execute();
-            for (String deletedDocumentId : deletedDocumentIds) {
-//
-//                recycleBinStore.
-//                recycleBinStore.saveToRecycleBin();
-            }
-        } catch (QueryException e) {
-            throw new WikiManagerException("Unable to get the deleted documents.", e);
-        }
+        throw new WikiManagerException("This method is not implemented yet");
     }
 
     /**

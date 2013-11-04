@@ -59,7 +59,7 @@ import com.xpn.xwiki.XWikiContext;
 @Named(WikiStreamScriptService.ROLEHINT)
 @Singleton
 @Unstable
-public class WikiStreamScriptService extends AbstractExtensionScriptService
+public class WikiStreamScriptService extends AbstractWikiStreamScriptService
 {
     public static final String ROLEHINT = "wikistream";
 
@@ -67,7 +67,8 @@ public class WikiStreamScriptService extends AbstractExtensionScriptService
     private ScriptServiceManager scriptServiceManager;
 
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -95,13 +96,13 @@ public class WikiStreamScriptService extends AbstractExtensionScriptService
             // TODO: introduce advanced right checking system instead
             XWikiContext xcontext = this.xcontextProvider.get();
             if (xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
-                WikiStreamConverterJobRequest request =
-                    new WikiStreamConverterJobRequest(inputType, inputProperties, outputType, outputProperties);
-
-                job = this.jobManager.addJob(WikiStreamConverterJob.JOBTYPE, request);
-            } else {
                 throw new AuthorizationException("WikiStream conversion require programming right");
             }
+
+            WikiStreamConverterJobRequest request =
+                new WikiStreamConverterJobRequest(inputType, inputProperties, outputType, outputProperties);
+
+            job = this.jobManager.addJob(WikiStreamConverterJob.JOBTYPE, request);
         } catch (Exception e) {
             setError(e);
         }
@@ -118,7 +119,7 @@ public class WikiStreamScriptService extends AbstractExtensionScriptService
 
         try {
             List<ComponentDescriptor<WikiStreamFactory>> descriptors =
-                this.componentManager.<WikiStreamFactory> getComponentDescriptorList(factoryType);
+                this.componentManagerProvider.get().<WikiStreamFactory> getComponentDescriptorList(factoryType);
             Collection<WikiStreamType> types = new ArrayList<WikiStreamType>(descriptors.size());
             for (ComponentDescriptor<WikiStreamFactory> descriptor : descriptors) {
                 types.add(WikiStreamType.unserialize(descriptor.getRoleHint()));
@@ -154,8 +155,8 @@ public class WikiStreamScriptService extends AbstractExtensionScriptService
         resetError();
 
         try {
-            return this.componentManager.<WikiStreamFactory> getInstance(factoryType, inputType.serialize())
-                .getDescriptor();
+            return this.componentManagerProvider.get()
+                .<WikiStreamFactory> getInstance(factoryType, inputType.serialize()).getDescriptor();
         } catch (Exception e) {
             setError(e);
         }
@@ -193,7 +194,7 @@ public class WikiStreamScriptService extends AbstractExtensionScriptService
                 throw new AuthorizationException("Using WikiStream module require programming right");
             }
 
-            return this.componentManager.getInstance(factoryType, inputType.serialize());
+            return this.componentManagerProvider.get().getInstance(factoryType, inputType.serialize());
         } catch (Exception e) {
             setError(e);
         }

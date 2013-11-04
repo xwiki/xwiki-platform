@@ -31,7 +31,7 @@ import org.xwiki.script.service.ScriptService;
  * @version $Id$
  * @since 5.3M1
  */
-public abstract class AbstractExtensionScriptService implements ScriptService
+public abstract class AbstractWikiStreamScriptService implements ScriptService
 {
     /**
      * The key under which the last encountered error is stored in the current execution context.

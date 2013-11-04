@@ -42,6 +42,8 @@ import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.script.WikiStreamScriptService;
 import org.xwiki.wikistream.type.WikiStreamType;
 
+import com.xpn.xwiki.XWikiContext;
+
 /**
  * Expose various WikiStream <tt>instance</tt> input/output streams related APIs to scripts.
  * 
@@ -64,6 +66,9 @@ public class InstanceWikiStreamScriptService implements ScriptService
     @Named(InstanceInputWikiStreamFactory.ROLEHINT)
     private InputWikiStreamFactory inputInstanceFactory;
 
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     public EntityReferenceSet newEntityReferenceSet()
     {
         return new EntityReferenceSet();
@@ -77,16 +82,21 @@ public class InstanceWikiStreamScriptService implements ScriptService
     public void export(WikiStreamType outputStream, InstanceInputProperties inputProperties,
         Map<String, Object> outputProperties) throws WikiStreamException, ComponentLookupException
     {
-        // Create input wiki stream
-        InputWikiStream inputWikiStream = this.inputInstanceFactory.createInputWikiStream(inputProperties);
+        // TODO: introduce advanced right checking system
+        XWikiContext xcontext = this.xcontextProvider.get();
+        if (xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
+            // Create input wiki stream
+            InputWikiStream inputWikiStream = this.inputInstanceFactory.createInputWikiStream(inputProperties);
 
-        // Create output wiki stream
-        OutputWikiStreamFactory outputWikiStreamFactory =
-            this.componentManagerProvider.get().getInstance(OutputWikiStreamFactory.class, outputStream.serialize());
+            // Create output wiki stream
+            OutputWikiStreamFactory outputWikiStreamFactory =
+                this.componentManagerProvider.get()
+                    .getInstance(OutputWikiStreamFactory.class, outputStream.serialize());
 
-        OutputWikiStream outputWikiStream = outputWikiStreamFactory.creaOutputWikiStream(outputProperties);
+            OutputWikiStream outputWikiStream = outputWikiStreamFactory.creaOutputWikiStream(outputProperties);
 
-        // Export
-        inputWikiStream.read(outputWikiStream.getFilter());
+            // Export
+            inputWikiStream.read(outputWikiStream.getFilter());
+        }
     }
 }

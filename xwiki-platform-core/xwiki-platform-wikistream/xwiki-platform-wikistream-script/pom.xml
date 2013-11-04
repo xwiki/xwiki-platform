@@ -48,6 +48,13 @@
       <version>${commons.version}</version>
     </dependency>
 
+    <!-- Mostly used for right testing -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

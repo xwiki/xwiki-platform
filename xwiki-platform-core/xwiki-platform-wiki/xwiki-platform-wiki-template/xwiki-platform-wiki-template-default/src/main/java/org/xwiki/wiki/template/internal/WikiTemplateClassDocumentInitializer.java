@@ -49,7 +49,7 @@ public class WikiTemplateClassDocumentInitializer extends AbstractMandatoryDocum
     /**
      * The space of the mandatory document.
      */
-    public static final String DOCUMENT_SPACE = "WikiManagerCode";
+    public static final String DOCUMENT_SPACE = "WikiManager";
 
     /**
      * Reference to the server class.

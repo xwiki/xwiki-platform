@@ -1064,6 +1064,7 @@ a.search-result-highlightAll:after {
 #end
 
 #set ($customSearchFacetValuesDisplayer = {
+  'locale': 'locale',
   'author': 'user',
   'creator': 'user'
 })
@@ -1117,6 +1118,7 @@ a.search-result-highlightAll:after {
 
 #set ($customSearchFacetValueDisplayer = {
   'wiki': 'wiki',
+  'locale': 'locale',
   'author': 'user',
   'creator': 'user'
 })
@@ -1131,6 +1133,20 @@ a.search-result-highlightAll:after {
     #set ($wikiPrettyName = $wikiName)
   #end
   $escapetool.xml($wikiPrettyName)
+#end
+
+#macro (displaySearchFacetValues_locale $facetValues)
+  #set ($currentLocale = $services.localization.currentLocale)
+  #displaySearchFacetValues_default($facetValues)
+#end
+
+#macro (displaySearchFacetValue_locale $facetPrettyValue)
+  #if ($facetValue.name == $facetPrettyValue)
+    #set ($locale = $services.localization.toLocale($facetValue.name))
+    $escapetool.xml($locale.getDisplayName($currentLocale))
+  #else
+    $escapetool.xml($facetPrettyValue)
+  #end
 #end
 
 #macro (displaySearchFacetValues_user $facetValues)

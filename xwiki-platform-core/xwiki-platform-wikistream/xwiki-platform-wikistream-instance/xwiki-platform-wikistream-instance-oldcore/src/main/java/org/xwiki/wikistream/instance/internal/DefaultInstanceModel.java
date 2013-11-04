@@ -19,6 +19,8 @@
  */
 package org.xwiki.wikistream.instance.internal;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -54,7 +56,9 @@ public class DefaultInstanceModel implements InstanceModel
         XWikiContext xcontext = this.xcontextProvider.get();
 
         try {
-            return xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
+            List<String> wikis = new ArrayList<String>(xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext));
+            Collections.sort(wikis);
+            return wikis;
         } catch (XWikiException e) {
             throw new WikiStreamException("Failed to get the list of wikis", e);
         }
@@ -75,8 +79,10 @@ public class DefaultInstanceModel implements InstanceModel
     {
         try {
             Query query =
-                this.queryManager.createQuery("select distinct doc.name from Document doc where doc.space = :space",
-                    Query.XWQL);
+                this.queryManager
+                    .createQuery(
+                        "select distinct doc.name from Document doc where doc.space = :space order by doc.name asc",
+                        Query.XWQL);
             query.bindValue("space", space);
             query.setWiki(wiki);
 

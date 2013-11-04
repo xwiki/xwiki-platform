@@ -243,6 +243,7 @@ public class UserInstanceOutputWikiStream extends AbstractBeanOutputWikiStream<U
 
             // Set false to force the date and authors we want
             userDocument.setMetaDataDirty(false);
+            userDocument.setContentDirty(false);
         }
 
         // Save

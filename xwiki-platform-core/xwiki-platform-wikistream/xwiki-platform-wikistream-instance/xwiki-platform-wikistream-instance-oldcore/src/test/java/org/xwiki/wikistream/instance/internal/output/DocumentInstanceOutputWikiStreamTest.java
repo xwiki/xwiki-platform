@@ -82,8 +82,9 @@ public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiSt
         Assert.assertEquals(toDate("2000-01-02 00:00:00.0 UTC"), document.getDate());
         Assert.assertEquals(toDate("2000-01-03 00:00:00.0 UTC"), document.getContentUpdateDate());
         Assert.assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"), document.getContentAuthorReference());
-        Assert.assertEquals(false, document.isMinorEdit());
+        Assert.assertEquals(true, document.isMinorEdit());
         Assert.assertEquals("comment", document.getComment());
+        Assert.assertEquals("1.42", document.getVersion());
 
         // Attachment
 
@@ -136,11 +137,11 @@ public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiSt
 
         // Object 2
 
-        List<BaseObject> otherObjects = objects.get(new DocumentReference("wiki", "space", "otherclass"));
+        List<BaseObject> otherObjects = objects.get(new DocumentReference("wiki", "otherspace", "otherclass"));
         Assert.assertEquals(1, otherObjects.size());
         BaseObject otherObject = otherObjects.get(0);
         Assert.assertEquals(0, otherObject.getNumber());
-        Assert.assertEquals(new DocumentReference("wiki", "space", "otherclass"), otherObject.getXClassReference());
+        Assert.assertEquals(new DocumentReference("wiki", "otherspace", "otherclass"), otherObject.getXClassReference());
         Assert.assertEquals("8eaeac52-e2f2-47b2-87e1-bc6909597b39", otherObject.getGuid());
     }
 }

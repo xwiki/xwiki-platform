@@ -76,6 +76,11 @@ public class BaseObjectEventGenerator extends
 
         objectFilter.beginWikiObject(xobject.getReference().getName(), objectParameters);
 
+        // Object class
+
+        BaseClass xclass = xobject.getXClass(xcontext);
+        ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, objectFilter, properties);
+
         // Properties
 
         // Iterate over values/properties sorted by field name so that the values are
@@ -90,11 +95,6 @@ public class BaseObjectEventGenerator extends
                     properties);
             }
         }
-
-        // Object class
-
-        BaseClass xclass = xobject.getXClass(xcontext);
-        ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, objectFilter, properties);
 
         // < WikiObject
 

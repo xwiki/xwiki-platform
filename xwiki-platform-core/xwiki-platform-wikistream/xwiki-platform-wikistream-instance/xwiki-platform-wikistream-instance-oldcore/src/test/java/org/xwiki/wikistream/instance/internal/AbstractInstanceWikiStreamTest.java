@@ -22,8 +22,10 @@ package org.xwiki.wikistream.instance.internal;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -34,6 +36,8 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.BeanInputWikiStreamFactory;
@@ -63,6 +67,10 @@ public class AbstractInstanceWikiStreamTest
 {
     private static final SimpleDateFormat DATE_PARSER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S z", Locale.ENGLISH);
 
+    protected static final LocalDocumentReference USER_CLASS = new LocalDocumentReference("XWiki", "XWikiUsers");
+
+    protected static final LocalDocumentReference GROUP_CLASS = new LocalDocumentReference("XWiki", "XWikiGroups");
+
     @Rule
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
@@ -72,8 +80,6 @@ public class AbstractInstanceWikiStreamTest
 
     protected Map<DocumentReference, XWikiDocument> documents = new HashMap<DocumentReference, XWikiDocument>();
 
-    protected Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
-
     @Before
     public void before() throws Exception
     {
@@ -82,6 +88,10 @@ public class AbstractInstanceWikiStreamTest
         this.outputWikiStreamFactory =
             this.oldcore.getMocker().getInstance(OutputWikiStreamFactory.class,
                 WikiStreamType.XWIKI_INSTANCE.serialize());
+
+        this.oldcore.getXWikiContext().setDatabase("wiki");
+
+        // XWiki
 
         Mockito.when(
             this.oldcore.getMockXWiki().getDocument(Mockito.any(DocumentReference.class),
@@ -117,8 +127,20 @@ public class AbstractInstanceWikiStreamTest
 
                     document.setComment(StringUtils.defaultString(comment));
                     document.setMinorEdit(minorEdit);
-                    document.incrementVersion();
+
+                    if (document.isContentDirty() || document.isMetaDataDirty()) {
+                        document.setDate(new Date());
+                        if (document.isContentDirty()) {
+                            document.setContentUpdateDate(new Date());
+                            document.setContentAuthorReference(document.getAuthorReference());
+                        }
+                        document.incrementVersion();
+
+                        document.setContentDirty(false);
+                        document.setMetaDataDirty(false);
+                    }
                     document.setNew(false);
+                    document.setStore(oldcore.getMockStore());
 
                     XWikiDocument previousDocument = documents.get(document.getDocumentReferenceWithLocale());
 
@@ -173,25 +195,106 @@ public class AbstractInstanceWikiStreamTest
                 @Override
                 public BaseClass answer(InvocationOnMock invocation) throws Throwable
                 {
-                    DocumentReference documentReference = (DocumentReference) invocation.getArguments()[0];
-
-                    return classes.get(documentReference.getName());
+                    return oldcore
+                        .getMockXWiki()
+                        .getDocument((DocumentReference) invocation.getArguments()[0],
+                            (XWikiContext) invocation.getArguments()[1]).getXClass();
                 }
             });
-
         Mockito.when(this.oldcore.getMockXWiki().hasAttachmentRecycleBin(Mockito.any(XWikiContext.class))).thenReturn(
             true);
 
-        this.oldcore.getXWikiContext().setDatabase("wiki");
+        // XWikiStoreInterface
+
+        Mockito.when(
+            this.oldcore.getMockStore().getTranslationList(Mockito.any(XWikiDocument.class),
+                Mockito.any(XWikiContext.class))).then(new Answer<List<String>>()
+        {
+            @Override
+            public List<String> answer(InvocationOnMock invocation) throws Throwable
+            {
+                XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
+
+                List<String> translations = new ArrayList<String>();
+
+                for (XWikiDocument storedDocument : documents.values()) {
+                    Locale storedLocale = storedDocument.getLocale();
+                    if (!storedLocale.equals(Locale.ROOT)
+                        && storedDocument.getDocumentReference().equals(document.getDocumentReference())) {
+                        translations.add(storedLocale.toString());
+                    }
+                }
+
+                return translations;
+            }
+        });
+
+        // Users
+
+        Mockito.when(this.oldcore.getMockXWiki().getUserClass(Mockito.any(XWikiContext.class))).then(
+            new Answer<BaseClass>()
+            {
+                @Override
+                public BaseClass answer(InvocationOnMock invocation) throws Throwable
+                {
+                    XWikiContext xcontext = (XWikiContext) invocation.getArguments()[0];
+
+                    XWikiDocument userDocument =
+                        oldcore.getMockXWiki().getDocument(
+                            new DocumentReference(USER_CLASS, new WikiReference(xcontext.getDatabase())), xcontext);
+
+                    final BaseClass userClass = userDocument.getXClass();
+
+                    if (userDocument.isNew()) {
+                        userClass.addTextField("first_name", "First Name", 30);
+                        userClass.addTextField("last_name", "Last Name", 30);
+                        userClass.addEmailField("email", "e-Mail", 30);
+                        userClass.addPasswordField("password", "Password", 10);
+                        userClass.addBooleanField("active", "Active", "active");
+                        userClass.addTextAreaField("comment", "Comment", 40, 5);
+                        userClass.addTextField("avatar", "Avatar", 30);
+                        userClass.addTextField("phone", "Phone", 30);
+                        userClass.addTextAreaField("address", "Address", 40, 3);
+
+                        oldcore.getMockXWiki().saveDocument(userDocument, xcontext);
+                    }
+
+                    return userClass;
+                }
+            });
+        Mockito.when(this.oldcore.getMockXWiki().getGroupClass(Mockito.any(XWikiContext.class))).then(
+            new Answer<BaseClass>()
+            {
+                @Override
+                public BaseClass answer(InvocationOnMock invocation) throws Throwable
+                {
+                    XWikiContext xcontext = (XWikiContext) invocation.getArguments()[0];
+
+                    XWikiDocument groupDocument =
+                        oldcore.getMockXWiki().getDocument(
+                            new DocumentReference(GROUP_CLASS, new WikiReference(xcontext.getDatabase())), xcontext);
+
+                    final BaseClass groupClass = groupDocument.getXClass();
+
+                    if (groupDocument.isNew()) {
+                        groupClass.addTextField("member", "Member", 30);
+
+                        oldcore.getMockXWiki().saveDocument(groupDocument, xcontext);
+                    }
+
+                    return groupClass;
+                }
+            });
+    }
+
+    protected void importFromXML(String resource) throws WikiStreamException
+    {
+        importFromXML(resource, new InstanceOutputProperties());
     }
 
     protected void importFromXML(String resource, InstanceOutputProperties instanceProperties)
         throws WikiStreamException
     {
-        if (instanceProperties == null) {
-            instanceProperties = new InstanceOutputProperties();
-        }
-
         OutputWikiStream outputWikiStream = this.outputWikiStreamFactory.createOutputWikiStream(instanceProperties);
 
         URL url = getClass().getResource("/" + resource + ".xml");

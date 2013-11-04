@@ -22,6 +22,7 @@ package org.xwiki.wikistream.instance.internal.input;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -82,13 +83,15 @@ public class AbstractInstanceInputWikiStreamTest extends AbstractInstanceWikiStr
             @Override
             public List<String> answer(InvocationOnMock invocation) throws Throwable
             {
-                Set<String> spaces = new HashSet<String>();
+                Set<String> wikis = new HashSet<String>();
 
                 for (DocumentReference reference : documents.keySet()) {
-                    spaces.add(reference.getWikiReference().getName());
+                    wikis.add(reference.getWikiReference().getName());
                 }
 
-                return new ArrayList<String>(spaces);
+                List<String> list = new ArrayList<String>(wikis);
+                Collections.sort(list);
+                return list;
             }
         });
 
@@ -108,7 +111,9 @@ public class AbstractInstanceInputWikiStreamTest extends AbstractInstanceWikiStr
                     }
                 }
 
-                return new ArrayList<String>(spaces);
+                List<String> list = new ArrayList<String>(spaces);
+                Collections.sort(list);
+                return list;
             }
         });
 
@@ -122,16 +127,18 @@ public class AbstractInstanceInputWikiStreamTest extends AbstractInstanceWikiStr
                     String wiki = (String) invocation.getArguments()[0];
                     String space = (String) invocation.getArguments()[1];
 
-                    Set<String> spaces = new HashSet<String>();
+                    Set<String> docs = new HashSet<String>();
 
                     for (DocumentReference reference : documents.keySet()) {
                         if (reference.getWikiReference().getName().equals(wiki)
                             && reference.getLastSpaceReference().getName().equals(space)) {
-                            spaces.add(reference.getLastSpaceReference().getName());
+                            docs.add(reference.getName());
                         }
                     }
 
-                    return new ArrayList<String>(spaces);
+                    List<String> list = new ArrayList<String>(docs);
+                    Collections.sort(list);
+                    return list;
                 }
             });
     }
@@ -168,9 +175,9 @@ public class AbstractInstanceInputWikiStreamTest extends AbstractInstanceWikiStr
     }
 
     protected void assertXML(String resource, InstanceOutputProperties outputProperties,
-        InstanceInputProperties inutProperties) throws WikiStreamException, IOException
+        InstanceInputProperties inputProperties) throws WikiStreamException, IOException
     {
         importFromXML(resource, outputProperties);
-        assertXML(resource, inutProperties);
+        assertXML(resource, inputProperties);
     }
 }

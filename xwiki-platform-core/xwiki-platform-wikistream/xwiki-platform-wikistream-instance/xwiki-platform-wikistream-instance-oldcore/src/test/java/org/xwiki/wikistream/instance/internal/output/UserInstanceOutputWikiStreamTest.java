@@ -23,22 +23,14 @@ import java.text.ParseException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.internal.AbstractInstanceWikiStreamTest;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
  * Validate {@link UserInstanceOutputWikiStream}.
@@ -48,71 +40,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @AllComponents
 public class UserInstanceOutputWikiStreamTest extends AbstractInstanceWikiStreamTest
 {
-    LocalDocumentReference USER_CLASS = new LocalDocumentReference("XWiki", "XWikiUsers");
-
-    LocalDocumentReference GROUP_CLASS = new LocalDocumentReference("XWiki", "XWikiGroups");
-
-    @Override
-    public void before() throws Exception
-    {
-        super.before();
-
-        Mockito.when(this.oldcore.getMockXWiki().getUserClass(Mockito.any(XWikiContext.class))).then(
-            new Answer<BaseClass>()
-            {
-                @Override
-                public BaseClass answer(InvocationOnMock invocation) throws Throwable
-                {
-                    XWikiContext xcontext = (XWikiContext) invocation.getArguments()[0];
-
-                    XWikiDocument userDocument =
-                        oldcore.getMockXWiki().getDocument(
-                            new DocumentReference(USER_CLASS, new WikiReference(xcontext.getDatabase())), xcontext);
-
-                    final BaseClass userClass = userDocument.getXClass();
-
-                    if (userDocument.isNew()) {
-                        userClass.addTextField("first_name", "First Name", 30);
-                        userClass.addTextField("last_name", "Last Name", 30);
-                        userClass.addEmailField("email", "e-Mail", 30);
-                        userClass.addPasswordField("password", "Password", 10);
-                        userClass.addBooleanField("active", "Active", "active");
-                        userClass.addTextAreaField("comment", "Comment", 40, 5);
-                        userClass.addTextField("avatar", "Avatar", 30);
-                        userClass.addTextField("phone", "Phone", 30);
-                        userClass.addTextAreaField("address", "Address", 40, 3);
-
-                        oldcore.getMockXWiki().saveDocument(userDocument, xcontext);
-                    }
-
-                    return userClass;
-                }
-            });
-        Mockito.when(this.oldcore.getMockXWiki().getGroupClass(Mockito.any(XWikiContext.class))).then(
-            new Answer<BaseClass>()
-            {
-                @Override
-                public BaseClass answer(InvocationOnMock invocation) throws Throwable
-                {
-                    XWikiContext xcontext = (XWikiContext) invocation.getArguments()[0];
-
-                    XWikiDocument groupDocument =
-                        oldcore.getMockXWiki().getDocument(
-                            new DocumentReference(GROUP_CLASS, new WikiReference(xcontext.getDatabase())), xcontext);
-
-                    final BaseClass groupClass = groupDocument.getXClass();
-
-                    if (groupDocument.isNew()) {
-                        groupClass.addTextField("member", "Member", 30);
-
-                        oldcore.getMockXWiki().saveDocument(groupDocument, xcontext);
-                    }
-
-                    return groupClass;
-                }
-            });
-    }
-
     // Tests
 
     @Test
@@ -184,9 +111,9 @@ public class UserInstanceOutputWikiStreamTest extends AbstractInstanceWikiStream
         Assert.assertEquals("XWiki.user1", groupMemberObject0.getStringValue("member"));
         BaseObject groupMemberObject1 = groupDocument.getXObject(GROUP_CLASS, 1);
         Assert.assertEquals("XWiki.user2", groupMemberObject1.getStringValue("member"));
-        
+
         // XWiki.group2
-        
+
         groupDocument =
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "XWiki", "group2"),
                 this.oldcore.getXWikiContext());

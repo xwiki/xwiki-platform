@@ -63,7 +63,6 @@
               org/xwiki/wikistream/instance/input/AbstractEntityEventGenerator.java,
               org/xwiki/wikistream/instance/input/AbstractInstanceInputEventGenerator.java,
               org/xwiki/wikistream/instance/input/EntityEventGenerator.java,
-              org/xwiki/wikistream/instance/input/InstanceInputEventGenerator.java,
               org/xwiki/wikistream/instance/internal/InstanceModel.java,
               org/xwiki/wikistream/instance/internal/InstanceUtils.java,
               org/xwiki/wikistream/instance/internal/input/AbstractBeanEntityEventGenerator.java,

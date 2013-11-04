@@ -33,7 +33,7 @@
   <name>XWiki Platform - Wiki Stream - Instance - Oldcore</name>
   <description>Extract oldcore related data from the current XWiki instance</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.70</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.input.AbstractInstanceInputEventGenerator;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
@@ -53,6 +54,25 @@ public class DocumentInstanceInputEventGenerator extends AbstractInstanceInputEv
     private Provider<XWikiContext> xcontextProvider;
 
     @Override
+    public void setWikiDocumentParameters(String name, FilterEventParameters documentParameters) throws WikiStreamException
+    {
+        DocumentReference reference = new DocumentReference(name, new SpaceReference(this.currentReference));
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        XWikiDocument defaultDocument;
+        try {
+            defaultDocument = xcontext.getWiki().getDocument(reference, xcontext);
+        } catch (XWikiException e) {
+            throw new WikiStreamException("Failed to get document [" + reference + "]", e);
+        }
+
+        if (!defaultDocument.getDefaultLocale().equals(Locale.ROOT)) {
+            documentParameters.put(WikiDocumentFilter.PARAMETER_LOCALE, defaultDocument.getDefaultLocale());
+        }
+    }
+
+    @Override
     public void beginWikiDocument(String name, FilterEventParameters parameters) throws WikiStreamException
     {
         super.beginWikiDocument(name, parameters);
@@ -67,14 +87,6 @@ public class DocumentInstanceInputEventGenerator extends AbstractInstanceInputEv
         } catch (XWikiException e) {
             throw new WikiStreamException("Failed to get document [" + reference + "]", e);
         }
-
-        // > WikiDocument
-
-        FilterEventParameters documentParameters = new FilterEventParameters();
-
-        documentParameters.put(WikiDocumentFilter.PARAMETER_LOCALE, defaultDocument.getDefaultLocale());
-
-        this.proxyFilter.beginWikiDocument(name, documentParameters);
 
         // Default document locale
         this.documentLocaleParser.write(defaultDocument, this.filter, this.properties);
@@ -96,9 +108,5 @@ public class DocumentInstanceInputEventGenerator extends AbstractInstanceInputEv
                     e);
             }
         }
-
-        // < WikiDocument
-
-        this.proxyFilter.endWikiDocument(defaultDocument.getDocumentReference().getName(), documentParameters);
     }
 }

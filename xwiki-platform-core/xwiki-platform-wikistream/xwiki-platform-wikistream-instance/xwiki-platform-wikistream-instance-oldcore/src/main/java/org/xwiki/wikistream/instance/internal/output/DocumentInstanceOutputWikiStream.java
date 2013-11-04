@@ -77,8 +77,8 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 @Component
 @Named(DocumentInstanceOutputWikiStreamFactory.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStream<DocumentInstanceOutputProperties> implements
-    XWikiDocumentFilter
+public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStream<DocumentInstanceOutputProperties>
+    implements XWikiDocumentFilter
 {
     @Inject
     private FilterDescriptorManager filterManager;
@@ -288,18 +288,21 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
         } else {
             ComponentManager componentManager = this.componentManagerProvider.get();
 
-            PrintRendererFactory rendererFactory;
-            try {
-                rendererFactory =
-                    componentManager.getInstance(PrintRendererFactory.class, this.currentDocument.getSyntax()
-                        .toIdString());
-            } catch (ComponentLookupException e) {
-                throw new WikiStreamException(String.format("Failed to find PrintRendererFactory for syntax [%s]",
-                    this.currentDocument.getSyntax()), e);
-            }
+            if (componentManager
+                .hasComponent(PrintRendererFactory.class, this.currentDocument.getSyntax().toIdString())) {
+                PrintRendererFactory rendererFactory;
+                try {
+                    rendererFactory =
+                        componentManager.getInstance(PrintRendererFactory.class, this.currentDocument.getSyntax()
+                            .toIdString());
+                } catch (ComponentLookupException e) {
+                    throw new WikiStreamException(String.format("Failed to find PrintRendererFactory for syntax [%s]",
+                        this.currentDocument.getSyntax()), e);
+                }
 
-            this.currentWikiPrinter = new DefaultWikiPrinter();
-            this.contentListener.setWrappedListener(rendererFactory.createRenderer(this.currentWikiPrinter));
+                this.currentWikiPrinter = new DefaultWikiPrinter();
+                this.contentListener.setWrappedListener(rendererFactory.createRenderer(this.currentWikiPrinter));
+            }
         }
     }
 
@@ -359,11 +362,13 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
                 document.setComment(getString(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, parameters, ""));
 
                 document.setContentAuthor(getString(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters, null));
-                document.setContentUpdateDate(getDate(WikiDocumentFilter.PARAMETER_CONTENT_DATE, parameters, new Date()));
+                document
+                    .setContentUpdateDate(getDate(WikiDocumentFilter.PARAMETER_CONTENT_DATE, parameters, new Date()));
 
                 document.setVersion(version);
 
                 document.setMetaDataDirty(false);
+                document.setContentDirty(false);
 
                 xcontext.getWiki().saveDocument(document, document.getComment(), document.isMinorEdit(), xcontext);
             } else {
@@ -411,6 +416,8 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
                     throw new WikiStreamException("Failed to set attachment archive", e);
                 }
             }
+
+            attachment.setMetaDataDirty(false);
         }
 
         this.currentDocument.getAttachmentList().add(attachment);

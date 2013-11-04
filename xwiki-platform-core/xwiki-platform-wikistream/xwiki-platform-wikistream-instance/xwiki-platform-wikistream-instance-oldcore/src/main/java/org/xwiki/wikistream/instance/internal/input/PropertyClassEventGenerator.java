@@ -52,7 +52,7 @@ public class PropertyClassEventGenerator extends
         if (xclassProperty.getClass().getSimpleName().equals(classType + "Class")) {
             // Keep exporting the full Java class name for old/default property types to avoid breaking the XAR format
             // (to allow XClasses created with the current version of XWiki to be imported in an older version).
-            classType = getClass().getName();
+            classType = xclassProperty.getClass().getName();
         }
 
         propertyFilter.beginWikiClassProperty(xclassProperty.getName(), classType, propertyParameters);

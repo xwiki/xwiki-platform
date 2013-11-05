@@ -268,9 +268,10 @@ admin.wikis.templatemissing=To enable the creation of wikis, you need to {0}crea
 ## Create new wiki wizard
 platform.workspace.wizard.step1=Step 1 — Choose a name
 platform.workspace.wizard.step2=Step 2 — Choose members
-platform.wikimanager.wizard.stepFilling=The wiki is creating
-platform.wikimanager.wizard.stepFillingWait=Please wait during the system is filling the wiki.
+platform.wikimanager.wizard.stepFilling=The system is creating the wiki.
+platform.wikimanager.wizard.stepFillingWait=Please wait while the system is filling the wiki.
 platform.wikimanager.wizard.stepFillingComplete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
+platform.wikimanager.wizard.stepFillingFinalize=Finalize
 platform.workspace.wizard.step1.shortname=Name
 platform.workspace.wizard.step2.shortname=Members
 platform.wikimanager.setAsTemplateLabel=This wiki will be a template

@@ -657,7 +657,6 @@ return XWiki;
 #########################
 ## PLUGINS DEPENDANCIES
 #########################
-#set ($services.wiki = $services.wiki)
 #if (!$services.wiki)
   {{error}}{{translation key="workspacemanager.pluginnotenabled"/}}{{/error}}
 

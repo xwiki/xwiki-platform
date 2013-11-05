@@ -99,10 +99,16 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public boolean enableLocalUsers(String wikiId, boolean enable)
     {
+        XWikiContext xcontext = xcontextProvider.get();
         boolean success = true;
         try {
+            // Check the right
+            authorizationManager.checkAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId));
+            // Do the job
             wikiUserManager.enableLocalUsers(wikiId, enable);
         } catch (WikiManagerException e) {
+            success = false;
+        } catch (AccessDeniedException e) {
             success = false;
         }
         return success;
@@ -136,10 +142,16 @@ public class WikiUserManagerScriptService implements ScriptService
      */
     public boolean setMembershipType(String wikiId, String type)
     {
+        XWikiContext xcontext = xcontextProvider.get();
         boolean success = true;
         try {
+            // Check the right
+            authorizationManager.checkAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId));
+            // Do the job
             wikiUserManager.setMembershipType(wikiId, MembershipType.valueOf(type.toUpperCase()));
         } catch (WikiManagerException e) {
+            success = false;
+        } catch (AccessDeniedException e) {
             success = false;
         }
         return success;

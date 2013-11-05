@@ -276,6 +276,9 @@ platform.workspace.wizard.step1.shortname=Name
 platform.workspace.wizard.step2.shortname=Members
 platform.wikimanager.setAsTemplateLabel=This wiki will be a template
 platform.wikimanager.notemplate=No template (default)
+platform.wikimanager.usersIsolationLabel=Users Isolation
+platform.wikimanager.usersIsolationHint=By default all the users will be global, shared between wikis and not isolated locally
+platform.wikimanager.usersIsolationCheckbox=Allow creating local users
 
 ###############################################################################
 ## Deprecated

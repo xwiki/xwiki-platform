@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -34,6 +35,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.wiki.properties.WikiPropertyGroupException;
+import org.xwiki.wiki.properties.WikiPropertyGroupProvider;
 import org.xwiki.wiki.user.MemberCandidacy;
 import org.xwiki.wiki.user.MembershipType;
 import org.xwiki.wiki.user.WikiUserManager;
@@ -86,6 +89,10 @@ public class DefaultWikiUserManager implements WikiUserManager
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
+    @Named("user")
+    private WikiPropertyGroupProvider wikiUserPropertyGroupProvider;
+
+    @Inject
     private EntityReferenceSerializer<String> documentReferenceSerializer;
 
     @Inject
@@ -97,6 +104,15 @@ public class DefaultWikiUserManager implements WikiUserManager
         return (WikiUserPropertyGroup) descriptor.getPropertyGroup(WikiUserPropertyGroupProvider.GROUP_NAME);
     }
 
+    private void savePropertyGroup(WikiUserPropertyGroup group, String wikiId) throws WikiManagerException
+    {
+        try {
+            wikiUserPropertyGroupProvider.save(group, wikiId);
+        } catch (WikiPropertyGroupException e) {
+            throw new WikiManagerException("Failed to save the user property group.", e);
+        }
+    }
+
     @Override
     public boolean hasLocalUsersEnabled(String wikiId) throws WikiManagerException
     {
@@ -106,8 +122,11 @@ public class DefaultWikiUserManager implements WikiUserManager
     @Override
     public void enableLocalUsers(String wikiId, boolean enable) throws WikiManagerException
     {
-        getPropertyGroup(wikiId).enableLocalUsers(enable);
-        wikiDescriptorManager.saveDescriptor(wikiDescriptorManager.getById(wikiId));
+        WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
+        WikiUserPropertyGroup group =
+                (WikiUserPropertyGroup) descriptor.getPropertyGroup(WikiUserPropertyGroupProvider.GROUP_NAME);
+        group.enableLocalUsers(enable);
+        savePropertyGroup(group, wikiId);
     }
 
     @Override
@@ -123,7 +142,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         WikiUserPropertyGroup group =
                 (WikiUserPropertyGroup) descriptor.getPropertyGroup(WikiUserPropertyGroupProvider.GROUP_NAME);
         group.setMembershypType(type);
-        wikiDescriptorManager.saveDescriptor(descriptor);
+        savePropertyGroup(group, wikiId);
     }
 
     @Override

@@ -22,6 +22,7 @@ package org.xwiki.crypto.x509.internal;
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -39,7 +40,6 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.jce.provider.JDKKeyPairGenerator;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
@@ -57,7 +57,7 @@ public class X509Keymaker
     private static final String CA_ORGANIZATION_NAME = "Fake authorities for trusting client certificates";
 
     /** A key pair generator. Use of this must be synchronized. */
-    private final JDKKeyPairGenerator.RSA keyPairGen = new JDKKeyPairGenerator.RSA();
+    private KeyPairGenerator generator;
 
     /** Milliseconds in an hour. */
     private final long anHour = 60 * 60 * 1000L;
@@ -93,13 +93,19 @@ public class X509Keymaker
     public X509Keymaker setProvider(Provider provider)
     {
         this.provider = provider;
+        try {
+            this.generator = KeyPairGenerator.getInstance("RSA", provider);
+        } catch (Exception e) {
+            // Should not happen
+            throw new RuntimeException(e);
+        }
         return this;
     }
 
     /** @return a newly generated RSA KeyPair. */
     public synchronized KeyPair newKeyPair()
     {
-        return this.keyPairGen.generateKeyPair();
+        return generator.generateKeyPair();
     }
 
     /**
@@ -191,35 +197,35 @@ public class X509Keymaker
 
         JcaX509v3CertificateBuilder certBldr = this.prepareGenericCertificate(forCert, daysOfValidity, dName, dName);
 
-        // Not a CA
-        certBldr.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(false));
-
-        // Client cert
-        certBldr.addExtension(MiscObjectIdentifiers.netscapeCertType,
-                              false,
-                              new NetscapeCertType(NetscapeCertType.sslClient | NetscapeCertType.smime));
-
-        // Key Usage extension.
-        int keyUsage =   KeyUsage.digitalSignature
-                       | KeyUsage.keyEncipherment
-                       | KeyUsage.dataEncipherment
-                       | KeyUsage.keyAgreement;
-        if (nonRepudiable) {
-            keyUsage |= KeyUsage.nonRepudiation;
-        }
-        certBldr.addExtension(X509Extension.keyUsage, true, new KeyUsage(keyUsage));
-
-        // Set the authority key identifier to be the CA key which we are using.
-        certBldr.addExtension(X509Extension.authorityKeyIdentifier,
-                                   false,
-                                   new AuthorityKeyIdentifierStructure(toSignWith.getPublic()));
-
-        // FOAFSSL compatibility.
-        final GeneralNames subjectAltNames =
-            new GeneralNames(new GeneralName(GeneralName.uniformResourceIdentifier, webId));
-        certBldr.addExtension(X509Extension.subjectAlternativeName, true, subjectAltNames);
-
         try {
+            // Not a CA
+            certBldr.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(false));
+
+            // Client cert
+            certBldr.addExtension(MiscObjectIdentifiers.netscapeCertType,
+                                  false,
+                                  new NetscapeCertType(NetscapeCertType.sslClient | NetscapeCertType.smime));
+
+            // Key Usage extension.
+            int keyUsage =   KeyUsage.digitalSignature
+                           | KeyUsage.keyEncipherment
+                           | KeyUsage.dataEncipherment
+                           | KeyUsage.keyAgreement;
+            if (nonRepudiable) {
+                keyUsage |= KeyUsage.nonRepudiation;
+            }
+            certBldr.addExtension(X509Extension.keyUsage, true, new KeyUsage(keyUsage));
+
+            // Set the authority key identifier to be the CA key which we are using.
+            certBldr.addExtension(X509Extension.authorityKeyIdentifier,
+                                       false,
+                                       new AuthorityKeyIdentifierStructure(toSignWith.getPublic()));
+
+            // FOAFSSL compatibility.
+            final GeneralNames subjectAltNames =
+                new GeneralNames(new GeneralName(GeneralName.uniformResourceIdentifier, webId));
+            certBldr.addExtension(X509Extension.subjectAlternativeName, true, subjectAltNames);
+
             ContentSigner signer = new JcaContentSignerBuilder(this.certSignatureAlgorithm)
                 .setProvider(provider).build(toSignWith.getPrivate());
 
@@ -252,18 +258,18 @@ public class X509Keymaker
         JcaX509v3CertificateBuilder certBldr =
             this.prepareGenericCertificate(keyPair.getPublic(), daysOfValidity, dName, dName);
 
-        // This authority is a CA but can't sign other CA's.
-        certBldr.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(0));
-
-        // Allow certificate signing only.
-        certBldr.addExtension(X509Extension.keyUsage, true, new KeyUsage(KeyUsage.keyCertSign));
-
-        // Adds the subject key identifier extension. Self singed so uses it's own key.
-        certBldr.addExtension(X509Extension.subjectKeyIdentifier,
-                                   false,
-                                   new SubjectKeyIdentifierStructure(keyPair.getPublic()));
-
         try {
+            // This authority is a CA but can't sign other CA's.
+            certBldr.addExtension(X509Extension.basicConstraints, true, new BasicConstraints(0));
+
+            // Allow certificate signing only.
+            certBldr.addExtension(X509Extension.keyUsage, true, new KeyUsage(KeyUsage.keyCertSign));
+
+            // Adds the subject key identifier extension. Self singed so uses it's own key.
+            certBldr.addExtension(X509Extension.subjectKeyIdentifier,
+                                       false,
+                                       new SubjectKeyIdentifierStructure(keyPair.getPublic()));
+
             ContentSigner signer = new JcaContentSignerBuilder(this.certSignatureAlgorithm)
                 .setProvider(provider).build(keyPair.getPrivate());
 

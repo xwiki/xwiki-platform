@@ -150,7 +150,7 @@ public class X509SignatureService
                         return null;
                     }
 
-                    return new XWikiX509Certificate(
+                    result = new XWikiX509Certificate(
                         new JcaX509CertificateConverter().setProvider(provider).getCertificate(certificate), null);
                 }
             }

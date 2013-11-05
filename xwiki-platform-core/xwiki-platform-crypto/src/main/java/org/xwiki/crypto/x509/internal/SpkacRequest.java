@@ -85,7 +85,7 @@ public class SpkacRequest
      * @throws NoSuchAlgorithmException if the public key  algorithm is invalid.
      * @throws InvalidKeyException if the public key is invalid.
      * @throws SignatureException if an error occur while signing the request for signature verification.
-     * @throws IOException
+     * @throws IOException on IO error
      */
     public boolean verify(String challenge, Provider provider)
         throws InvalidKeySpecException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, IOException
@@ -111,7 +111,7 @@ public class SpkacRequest
      * @return a public key.
      * @throws NoSuchAlgorithmException if the public key  algorithm is invalid.
      * @throws InvalidKeySpecException if the public key specification is invalid.
-     * @throws IOException
+     * @throws IOException on IO error
      */
     public PublicKey getPublicKey(Provider provider)
         throws NoSuchAlgorithmException, InvalidKeySpecException, IOException

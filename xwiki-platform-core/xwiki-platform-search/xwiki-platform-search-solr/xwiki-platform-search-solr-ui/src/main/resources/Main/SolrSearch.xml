@@ -230,7 +230,7 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
       // Add a check box before each facet value. We do this from JavaScript because the behaviour of a check box inside
       // a link is not consistent across different browsers (some follow the link when the check box is clicked, others
       // don't) and having the check box outside the facet value link requires JavaScript to synchronize them.
-      this.container.select('.search-facet-body a').each(function(facetValueAnchor) {
+      this.container.select('.search-facet-body a.itemName').each(function(facetValueAnchor) {
         var checkBox = new Element('input', {type: 'checkbox'});
         checkBox.checked = facetValueAnchor.hasClassName('selected');
         checkBox.observe('click', facetValueAnchor.click.bind(facetValueAnchor));
@@ -765,7 +765,8 @@ a.search-result-highlightAll:after {
   margin: .2em 0;
 }
 
-.search-facet-body .itemName {
+.search-facet-body .itemName,
+.search-facet-body .more {
   display: block;
   overflow: hidden;
   padding: .1em .2em;
@@ -773,13 +774,15 @@ a.search-result-highlightAll:after {
   white-space: nowrap;
 }
 
-.search-facet-body .itemName {
+.search-facet-body .itemName,
+.search-facet-body .more {
   /* Remove link styling */
   color: $theme.textColor;
   text-decoration: none;
 }
 
-.search-facet-body .itemName.empty {
+.search-facet-body .itemName.empty,
+.search-facet-body .more {
   color: $theme.textSecondaryColor;
 }
 
@@ -1079,10 +1082,27 @@ a.search-result-highlightAll:after {
 
 #macro (displaySearchFacetValues_default $facetValues)
   &lt;ul&gt;
-    #foreach ($facetValue in $facetValues)
-      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
-    #end
+    #displaySearchFacetValuesLimited($facetValues)
   &lt;/ul&gt;
+#end
+
+#macro (displaySearchFacetValuesLimited $facetValues)
+  #set ($limitRequestParameter = "l_$facetField.name")
+  #set ($limit = $mathtool.toInteger($request.getParameter($limitRequestParameter)))
+  #if ("$!limit" == '')
+    #set ($limit = 5)
+  #end
+  #set ($limit = $mathtool.max($mathtool.min($limit, $facetValues.size()), 0))
+  #foreach ($facetValue in $facetValues)
+    #if ($foreach.index &lt; $limit)
+      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+    #else
+      #extendQueryString($url {$limitRequestParameter: [$mathtool.add($limit, 5)]})
+      &lt;li&gt;&lt;a href="$url" class="more"&gt;&amp;hellip; $escapetool.xml($services.localization.render(
+        'solr.facets.moreValues', [$mathtool.sub($facetValues.size(), $limit)]))&lt;/a&gt;&lt;/li&gt;
+      #break
+    #end
+  #end
 #end
 
 #macro (displaySearchFacetValue $facetValue)
@@ -1152,9 +1172,7 @@ a.search-result-highlightAll:after {
 #macro (displaySearchFacetValues_user $facetValues)
   #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
   &lt;ul class="users"&gt;
-    #foreach ($facetValue in $facetValues)
-      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
-    #end
+    #displaySearchFacetValuesLimited($facetValues)
   &lt;/ul&gt;
 #end
 

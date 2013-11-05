@@ -123,6 +123,7 @@ solr.facets.resetAll=Reset all
 solr.facets.expandAll=Expand all
 solr.facets.collapseAll=Collapse all
 solr.facets.emptyValue=Empty Value
+solr.facets.moreValues={0} more
 
 solr.field.locale=Language
 solr.field.locale.emptyValue=No Language

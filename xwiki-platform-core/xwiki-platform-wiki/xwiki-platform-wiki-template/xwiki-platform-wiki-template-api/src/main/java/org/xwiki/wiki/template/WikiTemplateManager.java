@@ -66,10 +66,11 @@ public interface WikiTemplateManager
      * @param newWikiId ID of the wiki to create
      * @param newWikiAlias Default alias of the wiki to create
      * @param templateId Id of the template to use
+     * @param ownerId Id of the wiki owner
      * @return The descriptor of the new wiki
      * @throws WikiTemplateManagerException if problems occur
      */
-    WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId)
+    WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId, String ownerId)
         throws WikiTemplateManagerException;
 
     /**

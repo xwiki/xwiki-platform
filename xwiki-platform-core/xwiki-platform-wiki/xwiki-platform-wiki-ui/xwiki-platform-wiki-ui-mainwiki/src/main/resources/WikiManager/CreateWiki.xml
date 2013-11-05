@@ -253,6 +253,152 @@
   </object>
   <object>
     <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass></customClass>
+      <customMapping></customMapping>
+      <defaultViewSheet></defaultViewSheet>
+      <defaultEditSheet></defaultEditSheet>
+      <defaultWeb></defaultWeb>
+      <nameField></nameField>
+      <validationScript></validationScript>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator></separator>
+        <separators>,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator></separator>
+        <separators>,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>WikiManager.CreateWiki</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>e5f64c56-d46d-4814-905e-c1f91c13dce0</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>var XWiki = (function (XWiki) {
+// Start XWiki augmentation.
+/**
+ * Enhances the behaviour of an extension.
+ */
+XWiki.TemplateProvisionner = Class.create({
+  initialize : function () {
+    this._callRefresh.bind(this).delay(1);
+  },
+  _callRefresh : function () {
+    // Document URL
+    var document = new XWiki.Document('WikiTemplateProvisionerService', 'WikiManager');
+    var url = document.getURL('get', 'outputSyntax=plain');
+    new Ajax.Request(url, {
+      method: 'get',
+      parameters : {'wikiId': $('wikiId').value},
+      onSuccess : function(response) {
+        var result = response.responseText.evalJSON(true);
+        this._refresh(result);
+      }.bind(this)
+   });
+  },
+  _refresh : function (status) {    
+    if (status.status == 'FINISHED') {
+      $('ui-progress').addClassName('hidden');
+      $('successMessage').removeClassName('hidden');
+      $('finalize').removeClassName('hidden');
+    }
+    else {
+      var progress = status.progress;
+      if (progress != 'null') {
+        if (progress &lt; 0)
+          progress = 0;
+        else if (progress &gt; 1)
+          progress = 1;
+        $('template-progress-bar').setStyle({width: (progress*100)+'%'});
+      }
+      this._callRefresh.bind(this).delay(1);
+   }
+  }
+});
+
+var init = function(event) {
+  if ($('wikiId')) {
+    new XWiki.TemplateProvisionner();
+  }
+  return true;
+};
+// When the document is loaded, trigger the Extension Manager form enhancements.
+(XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
+
+// End XWiki augmentation.
+return XWiki;
+}(XWiki || {}));
+      </code>
+    </property>
+    <property>
+      <name>Progress Bar JS</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+  <object>
+    <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass></customClass>
       <customMapping></customMapping>
@@ -323,7 +469,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManager.CreateNewWiki</name>
+    <name>WikiManager.CreateWiki</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>15ff9185-1a9c-44a2-9cf0-13329d0b3a03</guid>
@@ -333,7 +479,12 @@
     <property>
       <code>#contentmenu, #hierarchy, #document-info, #xdocFooter{
   display: none;
-        }
+}
+
+#label_set_as_template, #set_as_template{
+  display: inline;
+  text-transform: none;
+}
       </code>
     </property>
     <property>
@@ -346,7 +497,151 @@
       <use>currentPage</use>
     </property>
   </object>
-  <content>{{velocity}}
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass></customClass>
+      <customMapping></customMapping>
+      <defaultViewSheet></defaultViewSheet>
+      <defaultEditSheet></defaultEditSheet>
+      <defaultWeb></defaultWeb>
+      <nameField></nameField>
+      <validationScript></validationScript>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator></separator>
+        <separators>,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator></separator>
+        <separators>,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>WikiManager.CreateWiki</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>97f67f7f-0623-40c1-94a2-ddf78393f066</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#template('colorThemeInit.vm')
+
+.ui-progress {
+  margin-top: .5em;
+}
+
+.ui-progress-bar {
+  background-image:-moz-repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.2) 5px, transparent 5px, transparent 10px);
+  background-repeat: repeat;
+  background-color: $theme.notificationSuccessColor !important;
+  background-position: left;
+  -moz-animation-duration: 0.2s;
+  -moz-animation-iteration-count: infinite;
+  -moz-animation-name: progress-animation;
+  -moz-animation-timing-function: linear;
+}
+
+@-moz-keyframes progress-animation {
+  0% {background-position: -14.142px 0;}
+  100% {background-position: 0px 0;}
+}
+
+.ui-progress-background {
+  background-color: transparent;
+  border-radius: 8px 8px 8px 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3) inset, 0 1px 0 0 $theme.pageContentBackgroundColor;
+  height: 8px;
+}
+
+.ui-progress-bar {
+  background-color: $theme.backgroundSecondaryColor;
+  border-radius: 8px 8px 8px 8px;
+  height: 8px;
+}
+
+.ui-progress-bar.green {
+  box-shadow:
+    inset 0 2px 9px  rgba(255,255,255,0.3),
+    inset 0 -2px 6px rgba(0,0,0,0.4);
+
+  background-image:
+     -webkit-gradient(linear, 0 0, 100% 100%,
+        color-stop(.25, rgba(255, 255, 255, .2)),
+        color-stop(.25, transparent), color-stop(.5, transparent),
+        color-stop(.5, rgba(255, 255, 255, .2)),
+        color-stop(.75, rgba(255, 255, 255, .2)),
+        color-stop(.75, transparent), to(transparent)
+     );
+
+  -webkit-background-size: 50px 50px;
+  -moz-background-size: 50px 50px;
+}
+      </code>
+    </property>
+    <property>
+      <name>Progress Bar stylesheet</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
+<content>{{velocity}}
 #######################################################
 ##         Create a new (sub)wiki - WIZARD
 ##
@@ -383,6 +678,8 @@
     #stepMembers()
   #elseif($request.step == 'create')
     #create()
+  #elseif($request.step == 'finalize')
+    #setMembers()
   #else
     ## Default step
     #stepType()
@@ -401,10 +698,12 @@
 
   &lt;div class="wizard-header"&gt;
     &lt;h1&gt;&lt;span&gt;$title&lt;/span&gt;&lt;/h1&gt;
-    &lt;ul class="steps"&gt;
-      #wizardHeaderStep($services.localization.render('platform.workspace.wizard.step1.shortname'), 1, $currentStepNumber)
-      #wizardHeaderStep($services.localization.render('platform.workspace.wizard.step2.shortname'), 2, $currentStepNumber)
-    &lt;/ul&gt;
+    #if($currentStepNumber)
+      &lt;ul class="steps"&gt;
+        #wizardHeaderStep($services.localization.render('platform.workspace.wizard.step1.shortname'), 1, $currentStepNumber)
+        #wizardHeaderStep($services.localization.render('platform.workspace.wizard.step2.shortname'), 2, $currentStepNumber)
+      &lt;/ul&gt;
+    #end
     &lt;div class="clearfloats"&gt;&lt;/div&gt;
   &lt;/div&gt;
     
@@ -414,7 +713,7 @@
 ##
 ## Display the wizard footer
 ##################################
-#macro(wizardFooter $prev $next $create)
+#macro(wizardFooter $prev $next $create $finalize)
   &lt;div class="clearfloats"&gt;&lt;/div&gt;
   &lt;div class="wizard-footer buttons"&gt;
     #if($prev!='')
@@ -430,6 +729,11 @@
     #if($create!='')
       &lt;span class="buttonwrapper"&gt;
         &lt;button value="$create" title="Create" name="step" id="wizard-next" class="button"&gt;Create&lt;/button&gt;
+      &lt;/span&gt;
+    #end
+    #if($finalize != '')
+      &lt;span class="buttonwrapper"&gt;
+        &lt;button value="finalize" title="Finalize" name="step" id="finalize" class="button hidden"&gt;$finalize&lt;/button&gt;
       &lt;/span&gt;
     #end
   &lt;/div&gt;
@@ -456,16 +760,7 @@
         ### SECOND STEP VALUES
         &lt;input type="hidden" name="ownerId" value="$!escapetool.xml($request.getParameter('ownerId'))" /&gt;
         &lt;input type="hidden" name="membershipType" value="$!escapetool.xml($request.getParameter('membershipType'))" /&gt;
-        #set ($members = [])
-        #getRequestList($members 'members')
-        #set($membersValue = '')
-        #foreach($m in $members)
-          #if($velocityCount &gt; 1)
-            #set($$membersValue = "${membersValue},")
-          #end
-          #set($$membersValue = "${membersValue}${m}")
-        #end
-        &lt;input type="hidden" name="members" value="$!escapetool.xml($membersValue)" /&gt;
+        #addMembersAsHiddenInput()
         ### WIZARD FIRST HALF ###
         &lt;div class="half"&gt;
           ### PRETTY NAME ###
@@ -494,40 +789,6 @@
               &lt;/dd&gt;
             &lt;/dl&gt;
           &lt;/div&gt;
-          ### TEMPLATE ###
-          &lt;div&gt;
-            #set ($templates = $services.workspace.getWorkspaceTemplates())
-            #if ($templates.size() &gt; 1)
-              &lt;dt&gt;
-                &lt;label for="template"&gt;$services.localization.render('platform.workspace.newWorkspaceTemplateLabel')&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('platform.workspace.newWorkspaceTemplateHint')&lt;/span&gt;
-              &lt;/dt&gt;
-              &lt;dd&gt;
-                &lt;select name="template" id="template"&gt;
-                  #foreach ($template in $templates)
-                    #set ($wikiDescriptor = $template.wikiDescriptor)
-                    #set ($name = $wikiDescriptor.wikiName)
-                    #if ($stringtool.isNotBlank("$!wikiDescriptor.wikiPrettyName"))
-                      #set($name = "${wikiDescriptor.wikiPrettyName} (${name})")
-                    #end
-                    #set($selected = '')
-                    #if(($request.template == $wikiDescriptor.wikiName) || ($request.template == '' &amp;&amp; $wikiDescriptor.wikiName == 'workspacetemplate'))
-                      #set($selected = 'selected="selected"')
-                    #end
-                    &lt;option value="${wikiDescriptor.wikiName}" $selected&gt;$name&lt;/option&gt;
-                  #end
-                &lt;/select&gt;
-              &lt;/dd&gt;
-            #elseif ($templates.size() == 1)
-              &lt;div&gt;
-                &lt;input id="template" name="template" type="hidden" value="$templates[0].wikiDescriptor.wikiName" #if(!$isInstallComplete)disabled="disabled"#{end} /&gt;
-              &lt;/div&gt;
-            #end
-          &lt;/div&gt;
-        ### END OF WIZARD FIRST HALF
-        &lt;/div&gt;
-        ### WIZARD SECOND HALF
-        &lt;div class="half"&gt;
           ### DESCRIPTION ###
           &lt;div&gt;
             &lt;dl&gt;
@@ -539,6 +800,46 @@
                 &lt;textarea id="description" name="description" rows="7" cols="45"&gt;$!request.getParameter('description')&lt;/textarea&gt;
               &lt;/dd&gt;
             &lt;/dl&gt;
+          &lt;/div&gt;
+        ### END OF WIZARD FIRST HALF
+        &lt;/div&gt;
+        ### WIZARD SECOND HALF
+        &lt;div class="half"&gt;
+          ### TEMPLATE ###
+          #set ($templates = $services.wikitemplate.getTemplates())
+          &lt;div&gt;
+            &lt;dt&gt;
+              &lt;label for="template"&gt;$services.localization.render('platform.workspace.newWorkspaceTemplateLabel')&lt;/label&gt;
+              #if ($templates.size() &gt; 0)
+                &lt;span class="xHint"&gt;$services.localization.render('platform.workspace.newWorkspaceTemplateHint')&lt;/span&gt;
+              #end
+            &lt;/dt&gt;
+            &lt;dd&gt;
+              #if ($templates.size() &gt; 0)
+                &lt;select name="template" id="template"&gt;
+                  &lt;option value="xwikinotemplate"&gt;$services.localization.render('platform.wikimanager.notemplate')&lt;/option&gt;
+                  #foreach ($template in $templates)
+                    #set ($name = $template.id)
+                    #if ($stringtool.isNotBlank("$!template.prettyName"))
+                      #set($name = "${template.prettyName} (${name})")
+                    #end
+                    #set($selected = '')
+                    #if($request.template == $template.id)
+                      #set($selected = 'selected="selected"')
+                    #end
+                    &lt;option value="${template.id}" $selected&gt;$name&lt;/option&gt;
+                  #end
+                &lt;/select&gt;
+              #end
+            &lt;/dd&gt;
+            &lt;p class="xformInline"&gt;
+              #set ($isTemplate = '')
+              #if ($request.set_as_template == '1')
+                #set ($isTemplate = 'checked="checked"')
+              #end
+              &lt;input type="checkbox" name="set_as_template" id="set_as_template" $isTemplate/&gt;
+              &lt;label for="set_as_template" id="label_set_as_template"&gt;$services.localization.render('platform.wikimanager.setAsTemplateLabel')&lt;/label&gt;
+            &lt;/p&gt;
           &lt;/div&gt;
         ### END OF WIZARD SECOND HALF
         &lt;/div&gt;
@@ -558,7 +859,7 @@
 #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
 
   {{html}}
-    &lt;form class="xform" method="post" action="$doc.getURL()"&gt;      
+    &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
       #wizardHeader($services.localization.render('platform.workspace.wizard.step2'), 2)
       ### WIZARD BODY ###  
       &lt;div class="wizard-body"&gt;
@@ -566,7 +867,8 @@
         &lt;input type="hidden" name="wikiprettyname" value="$!escapetool.xml($request.getParameter('wikiprettyname'))" /&gt;
         &lt;input type="hidden" name="wikiname" value="$!escapetool.xml($request.wikiname)" /&gt;
         &lt;input type="hidden" name="description" value="$!escapetool.xml($request.getParameter('description'))" /&gt;
-        &lt;input type="hidden" name="template" value="$!escapetool.xml($request.template)" /&gt;        
+        &lt;input type="hidden" name="template" value="$!escapetool.xml($request.template)" /&gt;
+        &lt;input type="hidden" name="set_as_template" value="$!escapetool.xml($request.set_as_template)" /&gt;
         #userPicker_import(true)
         ### WIZARD FIRST HALF ###
         &lt;div class="half"&gt;
@@ -667,37 +969,121 @@
 ## The final step that eventually create the wiki
 ##################################
 #macro(create)
-  #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $request.wikiname, $request.ownerId))
+  #set($fromTemplate = false)
+  #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
+    ## check if the wiki is already in creation
+    #if(!$services.wikitemplate.getWikiCreationStatus($request.wikiname))
+      #set($wikiDescriptor = $services.wikitemplate.createWikiFromTemplate($request.wikiname, $request.wikiname, $request.template, $request.ownerId))
+    #else
+      #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
+    #end
+    #set($fromTemplate = true)
+  #else 
+    #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $request.wikiname, $request.ownerId))
+  #end
   #if (!$wikiDescriptor)
 
     {{error}}$services.localization.render('workspacemanager.errorcreatewiki', [$request.wikiname, $services.wiki.lastException]){{/error}}
 
-  #else
-    #set ($groupsClassName = "${wikiDescriptor.id}:XWiki.XWikiGroups")    
-    ## Save the members
-    #set ($members = [])
-    #getRequestList($members 'members')
-    ## Remove empty strings from the list of members (the user picker submits by default an empty string).
-    #set ($discard = $members.removeAll(['']))
-    #if ("$!members" != '' &amp;&amp; $members.size() &gt; 0)
-      ## Enforce global users
-      #foreach ($member in $members)
-        #if (!$member.startsWith("${services.wiki.mainWikiId}:"))
-          #set ($member = "${services.wiki.mainWikiId}:${member}")
-        #end
-      #end
-      ## Add the members
-      #set($discard = $services.wikiuser.addMembers($members, $wikiDescriptor.id))
-    #end
+  #else    
     ## Set the pretty name
     #set ($discard = $wikiDescriptor.setPrettyName($request.wikiprettyname))
     #set ($discard = $wikiDescriptor.setDescription($request.description))
     #set ($discard = $services.wiki.saveDescriptor($wikiDescriptor))
     ## Set the membership type
     #set ($discard = $services.wikiuser.setMembershipType($wikiDescriptor.id, $request.membershipType))
-    ## Redirect to the new workspace's homepage.
-    #set ($discard = $response.sendRedirect($xwiki.getURL($wikiDescriptor.getMainPageReference())))
+    ## Set the template value
+    #if("$!request.set_as_template" != '')
+      #set ($discard = $services.wikitemplate.setTemplate($wikiDescriptor.id, true))
+    #end
+    #if($fromTemplate)
+      #templateFilling($wikiDescriptor)
+    #else
+      #setMembers($wikiDescriptor)
+    #end
   #end
+#end
+##################################
+##        SET MEMBERS
+##
+## This macro set the members of the wiki
+##################################
+#macro(setMembers $wikiDescriptor)
+  #if(!$wikiDescriptor)
+    #set($wikiDescriptor = $services.wiki.getById($request.wikiId))
+  #end
+  #set ($groupsClassName = "${wikiDescriptor.id}:XWiki.XWikiGroups")    
+  ## Save the members
+  #set ($members = [])
+  #getRequestList($members 'members')
+  ## Remove empty strings from the list of members (the user picker submits by default an empty string).
+  #set ($discard = $members.removeAll(['']))
+  #if ("$!members" != '' &amp;&amp; $members.size() &gt; 0)
+    ## Enforce global users
+    #foreach ($member in $members)
+      #if (!$member.startsWith("${services.wiki.mainWikiId}:"))
+        #set ($member = "${services.wiki.mainWikiId}:${member}")
+      #end
+    #end
+    ## Add the members
+    #set($discard = $services.wikiuser.addMembers($members, $wikiDescriptor.id))
+  #end
+  ## Redirect to the new wiki's homepage.
+  #set ($discard = $response.sendRedirect($xwiki.getURL($wikiDescriptor.mainPageReference)))
+#end
+##################################
+##  ADD MEMBERS AS HIDDEN INPUT
+##################################
+#macro(addMembersAsHiddenInput)
+  ### MEMBERS VALUES
+  #set ($members = [])
+  #getRequestList($members 'members')
+  #set($membersValue = '')
+  #foreach($m in $members)
+    #if($m != '')
+      #if($velocityCount &gt; 1)
+        #set($membersValue = "${membersValue},")
+      #end
+      #set($membersValue = "${membersValue}${m}")
+    #end
+  #end
+  &lt;input type="hidden" name="members" value="$!escapetool.xml($membersValue)" /&gt;
+#end
+##################################
+##       TEMPLATE FILLING
+##
+## This step display a progess bar during
+## the wiki provisionning
+##################################
+#macro(templateFilling $wikiDescriptor)
+  #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
+
+  {{html}}
+    &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
+    #addMembersAsHiddenInput()
+    &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($wikiDescriptor.id)" /&gt;
+    #wizardHeader($services.localization.render('platform.wikimanager.wizard.stepFilling'))
+    &lt;div class="wizard-body"&gt;
+      &lt;div class="ui-progress" id="ui-progress"&gt;
+        $services.localization.render('platform.wikimanager.wizard.stepFillingWait')
+        &lt;div class="ui-progress-background"&gt;
+          #set ($percent = $services.wikitemplate.getWikiCreationStatus($wikiDescriptor.id).progress.offset)
+          ## There is no progress information if the job was scheduled but hasn't started yet.
+          #if (!$percent)
+            #set ($percent = 0)
+          #end
+          #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
+          &lt;div class="ui-progress-bar green" style="width:${percent}%" id="template-progress-bar"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p class="successmessage box hidden" id="successMessage"&gt;
+      $services.localization.render('platform.wikimanager.wizard.stepFillingComplete')
+      &lt;/p&gt;
+    &lt;/div&gt;
+    #wizardFooter('', '', '', $services.localization.render('platform.wikimanager.wizard.stepFillingFinalize'))
+    &lt;/form&gt;
+  {{/html}}
+
 #end
 {{/velocity}}</content>
 </xwikidoc>

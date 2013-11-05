@@ -151,18 +151,22 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     }
 
     @Override
-    public WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias,
-            String templateId) throws WikiTemplateManagerException
+    public WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId,
+        String ownerId) throws WikiTemplateManagerException
     {
         try {
             // First, create the new wiki
             WikiDescriptor descriptor = wikiManager.create(newWikiId, newWikiAlias);
 
+            // Set the owner
+            descriptor.setOwnerId(ownerId);
+            wikiDescriptorManager.saveDescriptor(descriptor);
+
             // Then, create a template provisioner job
             templateWikiProvisionerExecutor.createAndExecuteJob(newWikiId, templateId);
 
             // Finally, return the descriptor
-            return descriptor;
+            return wikiDescriptorManager.getById(newWikiId);
         } catch (WikiManagerException e) {
             throw new WikiTemplateManagerException(e.getMessage(), e);
         }

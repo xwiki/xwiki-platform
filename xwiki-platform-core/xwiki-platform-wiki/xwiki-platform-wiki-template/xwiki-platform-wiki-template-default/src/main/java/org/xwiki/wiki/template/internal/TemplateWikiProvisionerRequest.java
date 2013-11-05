@@ -42,6 +42,7 @@ public class TemplateWikiProvisionerRequest extends WikiProvisionerRequest
     public TemplateWikiProvisionerRequest(String wikiId, String templateId)
     {
         super(wikiId);
+        setTemplateId(templateId);
     }
 
     /**

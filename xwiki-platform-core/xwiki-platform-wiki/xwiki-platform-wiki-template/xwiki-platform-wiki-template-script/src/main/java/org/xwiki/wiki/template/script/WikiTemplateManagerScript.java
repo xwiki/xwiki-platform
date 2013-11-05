@@ -33,9 +33,12 @@ import org.xwiki.context.Execution;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.template.WikiTemplateManager;
 import org.xwiki.wiki.template.WikiTemplateManagerException;
 
@@ -59,6 +62,9 @@ public class WikiTemplateManagerScript implements ScriptService
 
     @Inject
     private WikiTemplateManager wikiTemplateManager;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
     private AuthorizationManager authorizationManager;
@@ -105,9 +111,28 @@ public class WikiTemplateManagerScript implements ScriptService
     public boolean setTemplate(String wikiId, boolean value)
     {
         try {
+            XWikiContext context = xcontextProvider.get();
+            // Get the descriptor
+            WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
+            // Get the wiki owner
+            String owner = descriptor.getOwnerId();
+            // Check right access
+            WikiReference wikiReference = new WikiReference(descriptor.getId());
+            if (!context.getUserReference().toString().equals(owner)) {
+                authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(), wikiReference);
+            }
+            // Do the job
             wikiTemplateManager.setTemplate(wikiId, value);
+            // Return success
             return true;
         } catch (WikiTemplateManagerException e) {
+            //TODO log
+            return false;
+        } catch (AccessDeniedException e) {
+            //TODO log
+            return false;
+        } catch (WikiManagerException e) {
+            //TODO log
             return false;
         }
     }
@@ -128,10 +153,11 @@ public class WikiTemplateManagerScript implements ScriptService
      * @param newWikiId ID of the wiki to create
      * @param newWikiAlias Default alias of the wiki to create
      * @param templateId Id of the template to use
+     * @param ownerId Id of the wiki owner
      * @return The descriptor of the new wiki or null if problems occur
      */
     public WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias,
-            String templateId)
+            String templateId, String ownerId)
     {
         WikiDescriptor descriptor = null;
         try {
@@ -139,7 +165,7 @@ public class WikiTemplateManagerScript implements ScriptService
             if (authorizationManager.hasAccess(Right.CREATE_WIKI, context.getUserReference(),
                     new WikiReference(context.getMainXWiki())))
             {
-                descriptor = wikiTemplateManager.createWikiFromTemplate(newWikiId, newWikiAlias, templateId);
+                descriptor = wikiTemplateManager.createWikiFromTemplate(newWikiId, newWikiAlias, templateId, ownerId);
             }
         } catch (WikiTemplateManagerException e) {
             error("Failed to create the wiki from the template.", e);

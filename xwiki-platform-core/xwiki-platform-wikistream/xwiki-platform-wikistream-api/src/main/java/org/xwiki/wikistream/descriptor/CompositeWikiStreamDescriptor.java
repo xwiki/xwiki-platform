@@ -19,50 +19,40 @@
  */
 package org.xwiki.wikistream.descriptor;
 
-import org.xwiki.properties.BeanDescriptor;
-import org.xwiki.properties.PropertyDescriptor;
 import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3M2
  */
 @Unstable
-public class DefaultWikiStreamBeanDescriptor extends AbstractWikiStreamDescriptor implements WikiStreamBeanDescriptor
+public class CompositeWikiStreamDescriptor extends AbstractWikiStreamDescriptor
 {
     /**
-     * The description of the properties bean.
+     * The sub descriptors.
      */
-    private BeanDescriptor propertiesBeanDescriptor;
+    private WikiStreamDescriptor[] descriptors;
 
     /**
-     * @param name
-     * @param description
-     * @param parametersBeanDescriptor
+     * @param name human readable name of wiki stream input source type.
+     * @param description the description of the wiki stream
+     * @param descriptors the sub descriptors
      */
-    public DefaultWikiStreamBeanDescriptor(String name, String description, BeanDescriptor parametersBeanDescriptor)
+    public CompositeWikiStreamDescriptor(String name, String description, WikiStreamDescriptor... descriptors)
     {
         super(name, description);
 
-        this.propertiesBeanDescriptor = parametersBeanDescriptor;
+        this.descriptors = descriptors;
 
         extractParameters();
     }
 
     protected void extractParameters()
     {
-        for (PropertyDescriptor propertyDescriptor : this.propertiesBeanDescriptor.getProperties()) {
-            DefaultWikiStreamBeanParameterDescriptor< ? > desc =
-                new DefaultWikiStreamBeanParameterDescriptor<Object>(propertyDescriptor);
-            this.parameterDescriptorMap.put(desc.getId().toLowerCase(), desc);
+        for (WikiStreamDescriptor descriptor : this.descriptors) {
+            for (WikiStreamPropertyDescriptor< ? > propertyDescriptor : descriptor.getProperties()) {
+                this.parameterDescriptorMap.put(propertyDescriptor.getId().toLowerCase(), propertyDescriptor);
+            }
         }
-    }
-
-    // WikiStreamBeanDescriptor
-
-    @Override
-    public Class< ? > getBeanClass()
-    {
-        return this.propertiesBeanDescriptor.getBeanClass();
     }
 }

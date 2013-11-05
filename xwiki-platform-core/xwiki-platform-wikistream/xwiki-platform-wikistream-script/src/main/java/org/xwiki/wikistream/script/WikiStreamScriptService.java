@@ -22,6 +22,7 @@ package org.xwiki.wikistream.script;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -120,10 +121,15 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
         try {
             List<ComponentDescriptor<WikiStreamFactory>> descriptors =
                 this.componentManagerProvider.get().<WikiStreamFactory> getComponentDescriptorList(factoryType);
-            Collection<WikiStreamType> types = new ArrayList<WikiStreamType>(descriptors.size());
+
+            List<WikiStreamType> types = new ArrayList<WikiStreamType>(descriptors.size());
             for (ComponentDescriptor<WikiStreamFactory> descriptor : descriptors) {
                 types.add(WikiStreamType.unserialize(descriptor.getRoleHint()));
             }
+
+            Collections.sort(types);
+
+            return types;
         } catch (Exception e) {
             setError(e);
         }
@@ -175,7 +181,7 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
     /**
      * @since 5.3M2
      */
-    public WikiStreamDescriptor getOuputWikiStreamDescriptor(WikiStreamType inputType)
+    public WikiStreamDescriptor getOutputWikiStreamDescriptor(WikiStreamType inputType)
     {
         return getWikiStreamDescriptor(OutputWikiStreamFactory.class, inputType);
     }

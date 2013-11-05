@@ -53,12 +53,17 @@ public abstract class AbstractBeanEntityEventGenerator<E, F, P> extends Abstract
         throws WikiStreamException
     {
         P propertiesBean;
-        try {
-            propertiesBean = this.propertiesType.newInstance();
 
-            this.beanManager.populate(propertiesBean, properties);
-        } catch (Exception e) {
-            throw new WikiStreamException("Failed to convert properties to Java bean", e);
+        if (this.propertiesType.isInstance(properties)) {
+            propertiesBean = (P) properties;
+        } else {
+            try {
+                propertiesBean = this.propertiesType.newInstance();
+
+                this.beanManager.populate(propertiesBean, properties);
+            } catch (Exception e) {
+                throw new WikiStreamException("Failed to convert properties to Java bean", e);
+            }
         }
 
         write(entity, filter, internalFilter, propertiesBean);

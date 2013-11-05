@@ -123,6 +123,7 @@ solr.facets.resetAll=Reset all
 solr.facets.expandAll=Expand all
 solr.facets.collapseAll=Collapse all
 solr.facets.emptyValue=Empty Value
+solr.facets.moreValues={0} more
 
 solr.field.locale=Language
 solr.field.locale.emptyValue=No Language
@@ -134,6 +135,7 @@ solr.field.name_exact=Page
 solr.field.title=Title
 solr.field.author_display=Author
 solr.field.creator_display=Creator
+solr.field.date=Last Modification Date
 solr.field.creationdate=Creation Date
 solr.field.doccontent=Rendered Document Content
 solr.field.doccontentraw=Raw Document Content

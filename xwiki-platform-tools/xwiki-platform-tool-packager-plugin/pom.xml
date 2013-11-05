@@ -227,7 +227,6 @@
     <dependency>
       <groupId>com.smartgwt</groupId>
       <artifactId>smartgwt</artifactId>
-      <version>${smartgwt.version}</version>
       <scope>runtime</scope>
     </dependency>
     <!-- We need to pick a URL implementation @ runtime -->

@@ -1,2 +1,5 @@
 org.xwiki.wikistream.internal.input.InputSourceConverter
+org.xwiki.wikistream.internal.job.WikiStreamConverterJob
+org.xwiki.wikistream.internal.job.WikiStreamJobManager
 org.xwiki.wikistream.internal.output.OutputTargetConverter
+org.xwiki.wikistream.internal.type.WikiStreamTypeConverter

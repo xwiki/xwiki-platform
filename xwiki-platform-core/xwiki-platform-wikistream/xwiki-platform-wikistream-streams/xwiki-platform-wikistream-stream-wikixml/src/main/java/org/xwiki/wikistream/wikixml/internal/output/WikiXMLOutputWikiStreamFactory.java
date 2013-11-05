@@ -19,16 +19,26 @@
  */
 package org.xwiki.wikistream.wikixml.internal.output;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.xml.serializer.XMLSerializerFactory;
-import org.xwiki.wikistream.internal.utils.AllFilter;
+import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.input.InputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamFactory;
 
@@ -43,10 +53,13 @@ import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamF
 @Named("wiki+xml")
 @Singleton
 public class WikiXMLOutputWikiStreamFactory extends
-    AbstractXMLBeanOutputWikiStreamFactory<WikiXMLOuputProperties, Object>
+    AbstractXMLBeanOutputWikiStreamFactory<WikiXMLOutputProperties, Object>
 {
     @Inject
     private XMLSerializerFactory serializerFactory;
+
+    @Inject
+    private Provider<ComponentManager> contextComponentManager;
 
     public WikiXMLOutputWikiStreamFactory()
     {
@@ -57,9 +70,30 @@ public class WikiXMLOutputWikiStreamFactory extends
     }
 
     @Override
-    protected Object createListener(Result result, WikiXMLOuputProperties properties) throws XMLStreamException,
-        FactoryConfigurationError
+    public Collection<Class< ? >> getFilterInterfaces() throws WikiStreamException
     {
-        return this.serializerFactory.createSerializer(AllFilter.class, result, null);
+        List<InputWikiStreamFactory> factorys;
+        try {
+            factorys = this.contextComponentManager.get().getInstanceList(InputWikiStreamFactory.class);
+        } catch (ComponentLookupException e) {
+            throw new WikiStreamException("Failed to lookup InputWikiStreamFactory components instances", e);
+        }
+
+        Set<Class< ? >> filters = new HashSet<Class< ? >>();
+
+        for (InputWikiStreamFactory factory : factorys) {
+            filters.addAll(factory.getFilterInterfaces());
+        }
+
+        return filters;
+    }
+
+    @Override
+    protected Object createListener(Result result, WikiXMLOutputProperties properties) throws XMLStreamException,
+        FactoryConfigurationError, WikiStreamException
+    {
+
+        return this.serializerFactory.createSerializer(getFilterInterfaces().toArray(ArrayUtils.EMPTY_CLASS_ARRAY),
+            result, null);
     }
 }

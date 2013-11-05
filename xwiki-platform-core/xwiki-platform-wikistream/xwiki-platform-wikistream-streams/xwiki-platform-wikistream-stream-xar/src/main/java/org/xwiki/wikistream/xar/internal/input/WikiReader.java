@@ -32,6 +32,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputSource;
@@ -45,18 +46,15 @@ import org.xwiki.wikistream.xar.internal.XARModel;
  */
 public class WikiReader
 {
-    private SyntaxFactory syntaxFactory;
-
     private String extensionId;
 
     private String version;
 
     private DocumentLocaleReader documentReader;
 
-    public WikiReader(SyntaxFactory syntaxFactory)
+    public WikiReader(SyntaxFactory syntaxFactory, EntityReferenceResolver<String> relativeResolver)
     {
-        this.syntaxFactory = syntaxFactory;
-        this.documentReader = new DocumentLocaleReader(this.syntaxFactory);
+        this.documentReader = new DocumentLocaleReader(syntaxFactory, relativeResolver);
     }
 
     public String getExtensionId()

@@ -69,7 +69,7 @@ public class InstanceOutputWikiStream extends AbstractBeanOutputWikiStream<Insta
         Object[] filters = new Object[factories.size()];
         int i = 0;
         for (OutputInstanceWikiStreamFactory factory : factories) {
-            filters[i++] = factory.creaOutputWikiStream(properties).getFilter();
+            filters[i++] = factory.createOutputWikiStream(properties).getFilter();
         }
 
         this.filter = this.filterManager.createCompositeFilter(filters);

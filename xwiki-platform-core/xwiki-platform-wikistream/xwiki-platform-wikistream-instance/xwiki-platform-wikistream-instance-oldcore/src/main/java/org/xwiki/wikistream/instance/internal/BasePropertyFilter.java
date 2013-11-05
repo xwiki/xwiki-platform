@@ -19,7 +19,7 @@
  */
 package org.xwiki.wikistream.instance.internal;
 
-import org.xwiki.wikistream.filter.WikiObjectPropertyFilter;
+import org.xwiki.wikistream.model.filter.WikiObjectPropertyFilter;
 
 /**
  * @version $Id$

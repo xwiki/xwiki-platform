@@ -1137,6 +1137,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * @return the {@link DocumentReference} of the document also containing the document {@link Locale}
+     * @since 5.3M2
+     */
+    public DocumentReference getDocumentReferenceWithLocale()
+    {
+        return new DocumentReference(this.documentReference, getLocale());
+    }
+
+    /**
      * @return the document's space + page name (eg "space.page")
      * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
      */
@@ -1168,8 +1177,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Don't allow setting a null reference for now, ie. don't do anything to preserve backward compatibility
         // with previous behavior (i.e. {@link #setFullName}.
         if (reference != null) {
-            if (!reference.equals(getDocumentReference())) {
-                this.documentReference = reference;
+            // Retro compatibility, make sure <code>this.documentReference</code> does not contain the Locale (for now)
+            DocumentReference referenceWithoutLocale =
+                reference.getLocale() != null ? new DocumentReference(reference, null) : reference;
+
+            if (!referenceWithoutLocale.equals(getDocumentReference())) {
+                this.documentReference = referenceWithoutLocale;
                 setMetaDataDirty(true);
 
                 // Clean the absolute parent reference cache to rebuild it next time getParentReference is called.
@@ -7813,8 +7826,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         try {
             context.setDoc(this);
-            com.xpn.xwiki.api.Document apidoc = newDocument(context);
-            com.xpn.xwiki.api.Document tdoc = apidoc.getTranslatedDocument();
+
+            XWikiDocument defaultTranslation, translatedDocument;
+            if (this.getTranslation() == 0) {
+                defaultTranslation = this;
+                translatedDocument = this.getTranslatedDocument(context);
+            } else {
+                defaultTranslation = context.getWiki().getDocument(this.getDocumentReference(), context);
+                translatedDocument = this;
+            }
+
+            com.xpn.xwiki.api.Document apidoc = defaultTranslation.newDocument(context);
+            com.xpn.xwiki.api.Document tdoc = translatedDocument.newDocument(context);
 
             VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
@@ -8191,11 +8214,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @return the relative parent reference, this method should stay private since this the relative saving of the
-     *         parent reference is an implementation detail and from the outside we should only see absolute references
+     * Return the reference of the parent document as it stored and passed to
+     * {@link #setParentReference(EntityReference)}.
+     * <p>
+     * You should use {@link #getParentReference()} reference if you want to complete parent reference.
+     * 
+     * @return the relative parent reference
      * @since 2.2.3
      */
-    protected EntityReference getRelativeParentReference()
+    public EntityReference getRelativeParentReference()
     {
         return this.parentReference;
     }

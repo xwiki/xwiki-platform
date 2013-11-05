@@ -207,15 +207,6 @@
         <artifactId>gwt-servlet</artifactId>
         <version>${gwt.version}</version>
       </dependency>
-      <dependency>
-        <!-- SmartGWT is used only for its tree widget. -->
-        <!-- If you remove or move this dependency don't forget to update the repository section at the bottom. -->
-        <groupId>com.smartgwt</groupId>
-        <artifactId>smartgwt</artifactId>
-        <version>${smartgwt.version}</version>
-        <!-- Only needed at build time -->
-        <scope>provided</scope>
-      </dependency>
       <!-- Used at least in Solr Search and in Infinispan Cache -->
       <dependency>
         <groupId>org.codehaus.woodstox</groupId>
@@ -376,6 +367,8 @@
             <!-- XWikiURL (now Resource) should only be in the Execution Context and not in the Request -->
             <exclude>org/xwiki/container/servlet/ServletRequest</exclude>
             <exclude>org/xwiki/container/portlet/PortletRequest</exclude>
+            <!-- Lots of refactoring in WikiStream -->
+            <exclude>org/xwiki/wikistream/**</exclude>
           </excludes>
         </configuration>
       </plugin>

@@ -21,10 +21,10 @@
 package org.xwiki.wikistream.instance.internal;
 
 import org.xwiki.filter.UnknownFilter;
-import org.xwiki.wikistream.filter.FarmFilter;
-import org.xwiki.wikistream.filter.WikiDocumentFilter;
-import org.xwiki.wikistream.filter.WikiFilter;
-import org.xwiki.wikistream.filter.WikiSpaceFilter;
+import org.xwiki.wikistream.model.filter.FarmFilter;
+import org.xwiki.wikistream.model.filter.WikiDocumentFilter;
+import org.xwiki.wikistream.model.filter.WikiFilter;
+import org.xwiki.wikistream.model.filter.WikiSpaceFilter;
 
 /**
  * @version $Id$

@@ -29,15 +29,16 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.filter.WikiDocumentFilter;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
+import org.xwiki.wikistream.model.filter.WikiDocumentFilter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -102,30 +103,48 @@ public class XWikiDocumentLocaleEventGenerator extends
 
         FilterEventParameters revisionParameters = new FilterEventParameters();
 
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_LOCALE, document.getLocale());
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_PARENT, document.getParent());
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_TITLE, document.getTitle());
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_CUSTOMCLASS, document.getCustomClass());
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE, document.getDefaultTemplate());
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT, document.getValidationScript());
+        if (document.getRelativeParentReference() != null) {
+            revisionParameters.put(WikiDocumentFilter.PARAMETER_PARENT, document.getRelativeParentReference());
+        }
+        if (!document.getTitle().isEmpty()) {
+            revisionParameters.put(WikiDocumentFilter.PARAMETER_TITLE, document.getTitle());
+        }
+        if (!document.getCustomClass().isEmpty()) {
+            revisionParameters.put(WikiDocumentFilter.PARAMETER_CUSTOMCLASS, document.getCustomClass());
+        }
+        if (!document.getDefaultTemplate().isEmpty()) {
+            revisionParameters.put(WikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE, document.getDefaultTemplate());
+        }
+        if (!document.getValidationScript().isEmpty()) {
+            revisionParameters.put(WikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT, document.getValidationScript());
+        }
         revisionParameters.put(WikiDocumentFilter.PARAMETER_SYNTAX, document.getSyntax());
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_HIDDEN, document.isHidden());
+        if (document.isHidden()) {
+            revisionParameters.put(WikiDocumentFilter.PARAMETER_HIDDEN, document.isHidden());
+        }
 
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, document.getAuthor());
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, document.getComment());
+        if (!document.getComment().isEmpty()) {
+            revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, document.getComment());
+        }
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_DATE, document.getDate());
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_MINOR, document.isMinorEdit());
+        if (document.isMinorEdit()) {
+            revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_MINOR, document.isMinorEdit());
+        }
 
         revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, document.getContentAuthor());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT_DATE, document.getContentUpdateDate());
-        revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT, document.getContent());
-        if (properties.isWithWikiDocumentContentHTML()) {
-            try {
-                revisionParameters
-                    .put(WikiDocumentFilter.PARAMETER_CONTENT_HTML, document.getRenderedContent(xcontext));
-            } catch (XWikiException e) {
-                this.logger.error("Failed to render content of document [{}] as HTML", document.getDocumentReference(),
-                    e);
+        if (StringUtils.isNotEmpty(document.getContent())) {
+            revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT, document.getContent());
+
+            if (properties.isWithWikiDocumentContentHTML()) {
+                try {
+                    revisionParameters
+                        .put(WikiDocumentFilter.PARAMETER_CONTENT_HTML, document.getRenderedContent(xcontext));
+                } catch (XWikiException e) {
+                    this.logger.error("Failed to render content of document [{}] as HTML", document.getDocumentReference(),
+                        e);
+                }
             }
         }
 
@@ -163,7 +182,8 @@ public class XWikiDocumentLocaleEventGenerator extends
         if (properties.isWithWikiClass()) {
             BaseClass xclass = document.getXClass();
             if (!xclass.getFieldList().isEmpty()) {
-                ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, documentFilter, properties);
+                ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, documentFilter,
+                    (BaseClassInputProperties) properties);
             }
         }
 
@@ -173,7 +193,7 @@ public class XWikiDocumentLocaleEventGenerator extends
                 for (BaseObject xobject : xobjects) {
                     if (xobject != null) {
                         ((BaseObjectEventGenerator) this.objectEventGenerator).write(xobject, filter, documentFilter,
-                            properties);
+                            (BaseObjectInputProperties) properties);
                     }
                 }
             }

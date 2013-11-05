@@ -29,6 +29,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputSource;
@@ -50,6 +51,10 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
 {
     @Inject
     private SyntaxFactory syntaxFactory;
+
+    @Inject
+    @Named("relative")
+    private EntityReferenceResolver<String> relativeResolver;
 
     @Override
     public void close() throws IOException
@@ -98,7 +103,7 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
 
     private void readXAR(Object filter, XARFilter proxyFilter) throws WikiStreamException
     {
-        WikiReader wikiReader = new WikiReader(this.syntaxFactory);
+        WikiReader wikiReader = new WikiReader(this.syntaxFactory, this.relativeResolver);
 
         try {
             wikiReader.read(filter, proxyFilter, this.properties);
@@ -109,7 +114,7 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
 
     protected void readDocument(Object filter, XARFilter proxyFilter) throws WikiStreamException
     {
-        DocumentLocaleReader documentReader = new DocumentLocaleReader(this.syntaxFactory);
+        DocumentLocaleReader documentReader = new DocumentLocaleReader(this.syntaxFactory, this.relativeResolver);
 
         try {
             documentReader.read(filter, proxyFilter, this.properties);

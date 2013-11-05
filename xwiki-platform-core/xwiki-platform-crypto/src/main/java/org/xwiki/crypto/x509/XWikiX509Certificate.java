@@ -62,7 +62,7 @@ public class XWikiX509Certificate extends AbstractX509CertificateWrapper
     /** Certificate fingerprint. */
     private final String fingerprint;
 
-    /** Certificate fingrprint of the issuer. */
+    /** Certificate fingerprint of the issuer. */
     private final String issuerFingerprint;
 
     /**
@@ -190,7 +190,7 @@ public class XWikiX509Certificate extends AbstractX509CertificateWrapper
      * @param pemEncoded a String containing an X509 certificate in PEM format
      * @throws GeneralSecurityException If there isn't a valid {@link XWikiX509Certificate#CERT_BEGIN} or
      *                                  {@link XWikiX509Certificate#CERT_END} tag, or if there is an exception parsing
-     *                                  the content inbetween.
+     *                                  the content in between.
      * @return an XWikiX509Certificate from the PEM input.
      * @see XWikiX509Certificate#toPEMString()
      */

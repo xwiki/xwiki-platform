@@ -71,6 +71,30 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
         this.filterType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[0]);
     }
 
+    @Override
+    public void setWikiFarmParameters(FilterEventParameters parameters) throws WikiStreamException
+    {
+        // To ovewrite
+    }
+
+    @Override
+    public void setWikiParameters(String name, FilterEventParameters parameters) throws WikiStreamException
+    {
+        // To ovewrite
+    }
+
+    @Override
+    public void setWikiSpaceParameters(String name, FilterEventParameters parameters) throws WikiStreamException
+    {
+        // To ovewrite
+    }
+
+    @Override
+    public void setWikiDocumentParameters(String name, FilterEventParameters parameters) throws WikiStreamException
+    {
+        // To ovewrite
+    }
+
     public void setProperties(Map<String, Object> properties)
     {
         this.properties = properties;

@@ -20,6 +20,7 @@
 package org.xwiki.crypto.x509.internal;
 
 import java.security.GeneralSecurityException;
+import java.security.Provider;
 import java.security.cert.CertStore;
 import java.security.cert.Certificate;
 import java.security.cert.CollectionCertStoreParameters;
@@ -52,11 +53,30 @@ public class X509SignatureService
     /** Digest Object ID. TODO should the digest used be configurable? */
     private static final String DIGEST_OID = CMSSignedGenerator.DIGEST_SHA1;
 
-    /** Bouncy Castle provider name. */
-    private static final String PROVIDER = "BC";
-
     /** Type of the certificate store to use for PKCS7 encoding/decoding. */
     private static final String CERT_STORE_TYPE = "Collection";
+
+    /** The JCA provider to use. */
+    private Provider provider;
+
+    /**
+     * @return the JCA provider in use.
+     */
+    public Provider getProvider()
+    {
+        return provider;
+    }
+
+    /**
+     * Set the JCA provider to use.
+     * @param provider a JCA provider
+     * @return this object for easy call chaining.
+     */
+    public X509SignatureService setProvider(Provider provider)
+    {
+        this.provider = provider;
+        return this;
+    }
 
     /**
      * Produce a pkcs#7 signature for the given text.
@@ -83,7 +103,7 @@ public class X509SignatureService
             gen.addCertificatesAndCRLs(store);
             gen.addSigner(toSignWith.getPrivateKey(password), certificate, DIGEST_OID);
             byte[] data = textToSign.getBytes();
-            CMSSignedData cmsData = gen.generate(new CMSProcessableByteArray(data), false, PROVIDER);
+            CMSSignedData cmsData = gen.generate(new CMSProcessableByteArray(data), false, provider);
 
             return Convert.toBase64String(cmsData.getEncoded());
         } catch (GeneralSecurityException exception) {
@@ -107,7 +127,7 @@ public class X509SignatureService
             byte[] data = signedText.getBytes();
             byte[] signature = Convert.fromBase64String(base64Signature);
             CMSSignedData cmsData = new CMSSignedData(new CMSProcessableByteArray(data), signature);
-            CertStore certStore = cmsData.getCertificatesAndCRLs(CERT_STORE_TYPE, PROVIDER);
+            CertStore certStore = cmsData.getCertificatesAndCRLs(CERT_STORE_TYPE, provider);
             SignerInformationStore signers = cmsData.getSignerInfos();
 
             int numSigners = signers.getSigners().size();
@@ -123,7 +143,7 @@ public class X509SignatureService
                 Collection< ? extends Certificate> certs = certStore.getCertificates(signer.getSID());
                 for (Iterator<? extends Certificate> cit = certs.iterator(); cit.hasNext();) {
                     Certificate certificate = cit.next();
-                    if (!signer.verify(certificate.getPublicKey(), PROVIDER)) {
+                    if (!signer.verify(certificate.getPublicKey(), provider)) {
                         return null;
                     }
                     if (certificate instanceof X509Certificate) {

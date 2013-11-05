@@ -50,12 +50,13 @@ public abstract class AbstractBeanInputWikiStream<P, F> implements BeanInputWiki
     }
 
     public AbstractBeanInputWikiStream(FilterDescriptorManager filterDescriptorManager, P properties)
+        throws WikiStreamException
     {
         this.filterDescriptorManager = filterDescriptorManager;
         setProperties(properties);
     }
 
-    public void setProperties(P properties)
+    public void setProperties(P properties) throws WikiStreamException
     {
         this.properties = properties;
     }

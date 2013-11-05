@@ -1,3 +1,4 @@
+org.xwiki.crypto.internal.BouncyCastleJcaProvider
 org.xwiki.crypto.internal.DefaultUserDocumentUtils
 org.xwiki.crypto.script.CryptoScriptService
 org.xwiki.crypto.passwd.internal.DefaultPasswordCryptoService

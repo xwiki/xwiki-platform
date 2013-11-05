@@ -44,7 +44,7 @@ public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOuputP
     }
 
     @Override
-    public OutputWikiStream creaOutputWikiStream(P properties) throws WikiStreamException
+    public OutputWikiStream createOutputWikiStream(P properties) throws WikiStreamException
     {
         try {
             return new DefaultXMLOutputWikiStream<P, F>(this, properties);
@@ -54,5 +54,5 @@ public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOuputP
     }
 
     protected abstract Object createListener(Result result, P parameters) throws XMLStreamException,
-        FactoryConfigurationError;
+        FactoryConfigurationError, WikiStreamException;
 }

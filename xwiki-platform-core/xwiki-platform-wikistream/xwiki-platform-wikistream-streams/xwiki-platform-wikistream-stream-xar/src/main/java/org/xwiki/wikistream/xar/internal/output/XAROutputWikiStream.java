@@ -34,13 +34,16 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.filter.WikiClassFilter;
-import org.xwiki.wikistream.filter.WikiObjectFilter;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiAttachmentFilter;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
+import org.xwiki.wikistream.model.filter.WikiClassFilter;
+import org.xwiki.wikistream.model.filter.WikiObjectFilter;
 import org.xwiki.wikistream.xar.internal.XARAttachmentModel;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
 import org.xwiki.wikistream.xar.internal.XARClassPropertyModel;
@@ -50,8 +53,6 @@ import org.xwiki.wikistream.xar.internal.XARObjectModel;
 import org.xwiki.wikistream.xar.internal.XARObjectPropertyModel;
 import org.xwiki.wikistream.xar.internal.XARUtils;
 import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiAttachmentFilter;
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
 
 /**
  * @version $Id$
@@ -65,6 +66,9 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     @Inject
     @Named("local")
     private EntityReferenceSerializer<String> localSerializer;
+
+    @Inject
+    private EntityReferenceSerializer<String> defaultSerializer;
 
     private XARWikiWriter wikiWriter;
 
@@ -106,6 +110,11 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     public String toString(byte[] bytes)
     {
         return Base64.encodeBase64String(bytes);
+    }
+
+    public String toString(EntityReference reference)
+    {
+        return this.defaultSerializer.serialize(reference);
     }
 
     // events
@@ -195,8 +204,10 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.writer.writeElement(XARDocumentModel.ELEMENT_CREATION_DATE,
             toString((Date) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CREATION_DATE)));
 
-        this.writer.writeElement(XARDocumentModel.ELEMENT_REVISIONS,
-            (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS));
+        if (this.properties.isPreserveVersion()) {
+            this.writer.writeElement(XARDocumentModel.ELEMENT_REVISIONS,
+                (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS));
+        }
     }
 
     @Override
@@ -220,7 +231,7 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.currentDocumentVersion = version;
 
         this.writer.writeElement(XARDocumentModel.ELEMENT_PARENT,
-            (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_PARENT));
+            toString((EntityReference) parameters.get(XWikiWikiDocumentFilter.PARAMETER_PARENT)));
         this.writer.writeElement(XARDocumentModel.ELEMENT_REVISION_AUTHOR,
             (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR));
         this.writer.writeElement(XARDocumentModel.ELEMENT_CUSTOMCLASS,
@@ -265,8 +276,10 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.writer.writeStartElement(XARAttachmentModel.ELEMENT_ATTACHMENT);
 
         this.writer.writeElement(XARAttachmentModel.ELEMENT_NAME, name);
-        this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISIONS,
-            (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
+        if (this.properties.isPreserveVersion()) {
+            this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISIONS,
+                (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
+        }
 
         this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_AUTHOR,
             (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));

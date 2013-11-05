@@ -254,9 +254,12 @@ public class ExportAction extends XWikiAction
             }
         }
 
-        if (context.getWiki().ParamAsLong("xwiki.action.export.xar.usewikistream", 0) == 1) {
+        if (context.getWiki().ParamAsLong("xwiki.action.export.xar.usewikistream", 1) == 1) {
             // Create input wiki stream
             InstanceInputProperties inputProperties = new InstanceInputProperties();
+
+            inputProperties.set("withWikiDocumentRevisions", backup);
+            inputProperties.set("withWikiAttachmentRevisions", backup);
 
             EntityReferenceSet entities = new EntityReferenceSet();
 
@@ -303,9 +306,9 @@ public class ExportAction extends XWikiAction
             outputProperties.put("preserveVersion", backup);
 
             OutputWikiStreamFactory outputWikiStreamFactory =
-                Utils.getComponent(OutputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR.serialize());
+                Utils.getComponent(OutputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_10.serialize());
 
-            OutputWikiStream outputWikiStream = outputWikiStreamFactory.creaOutputWikiStream(outputProperties);
+            OutputWikiStream outputWikiStream = outputWikiStreamFactory.createOutputWikiStream(outputProperties);
 
             // Export
             response.setContentType("application/zip");

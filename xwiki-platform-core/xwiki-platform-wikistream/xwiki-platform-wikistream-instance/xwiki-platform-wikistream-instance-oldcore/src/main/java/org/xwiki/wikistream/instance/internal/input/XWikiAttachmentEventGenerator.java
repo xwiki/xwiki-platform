@@ -31,10 +31,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.filter.WikiAttachmentFilter;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiAttachmentFilter;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.XWikiAttachmentFilter;
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiAttachmentFilter;
+import org.xwiki.wikistream.model.filter.WikiAttachmentFilter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -68,7 +68,9 @@ public class XWikiAttachmentEventGenerator extends
 
         FilterEventParameters attachmentParameters = new FilterEventParameters();
 
-        attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR, attachment.getAuthor());
+        if (attachment.getAuthor() != null) {
+            attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR, attachment.getAuthor());
+        }
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, attachment.getComment());
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, attachment.getDate());
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION, attachment.getVersion());

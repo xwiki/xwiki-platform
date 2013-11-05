@@ -24,10 +24,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -52,15 +55,25 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
     private InstanceModel instanceModel;
 
     @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManager;
+
     private List<InstanceInputEventGenerator> eventGenerators;
 
     @Override
-    public void setProperties(InstanceInputProperties properties)
+    public void setProperties(InstanceInputProperties properties) throws WikiStreamException
     {
         super.setProperties(properties);
 
-        for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.setProperties(this.properties);
+        try {
+            this.eventGenerators = this.componentManager.get().getInstanceList(InstanceInputEventGenerator.class);
+        } catch (ComponentLookupException e) {
+            throw new WikiStreamException(
+                "Failed to get regsitered instance of OutputInstanceWikiStreamFactory components", e);
+        }
+
+        for (InstanceInputEventGenerator eventGenerator : this.eventGenerators) {
+            eventGenerator.setProperties(this.properties);
         }
     }
 
@@ -86,11 +99,15 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
     {
         // Nothing do close
     }
-    
+
     @Override
     protected void read(Object filter, InstanceFilter proxyFilter) throws WikiStreamException
     {
-        FilterEventParameters parameters = FilterEventParameters.EMPTY;
+        FilterEventParameters parameters = new FilterEventParameters();
+
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.setWikiFarmParameters(parameters);
+        }
 
         proxyFilter.beginFarm(parameters);
 
@@ -114,7 +131,11 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
 
     private void writeWiki(String wiki, Object filter, InstanceFilter proxyFilter) throws WikiStreamException
     {
-        FilterEventParameters parameters = FilterEventParameters.EMPTY;
+        FilterEventParameters parameters = new FilterEventParameters();
+
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.setWikiParameters(wiki, parameters);
+        }
 
         proxyFilter.beginWiki(wiki, parameters);
 
@@ -138,7 +159,11 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
     private void writeSpace(String wiki, String space, Object filter, InstanceFilter proxyFilter)
         throws WikiStreamException
     {
-        FilterEventParameters parameters = FilterEventParameters.EMPTY;
+        FilterEventParameters parameters = new FilterEventParameters();
+
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.setWikiSpaceParameters(space, parameters);
+        }
 
         proxyFilter.beginWikiSpace(space, parameters);
 
@@ -159,10 +184,13 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
         proxyFilter.endWikiSpace(space, parameters);
     }
 
-    private void writeDocument(String document, Object filter, InstanceFilter proxyFilter)
-        throws WikiStreamException
+    private void writeDocument(String document, Object filter, InstanceFilter proxyFilter) throws WikiStreamException
     {
-        FilterEventParameters parameters = FilterEventParameters.EMPTY;
+        FilterEventParameters parameters = new FilterEventParameters();
+
+        for (InstanceInputEventGenerator generator : this.eventGenerators) {
+            generator.setWikiDocumentParameters(document, parameters);
+        }
 
         proxyFilter.beginWikiDocument(document, parameters);
 

@@ -67,7 +67,7 @@ public class PBKDF2KeyDerivationFunction extends AbstractKeyDerivationFunction
 
     /**
      * Default Constructor.
-     * Uses SHA-1 digest for compatabulity with PKCS#5
+     * Uses SHA-1 digest for compatibility with PKCS#5
      */
     public PBKDF2KeyDerivationFunction()
     {

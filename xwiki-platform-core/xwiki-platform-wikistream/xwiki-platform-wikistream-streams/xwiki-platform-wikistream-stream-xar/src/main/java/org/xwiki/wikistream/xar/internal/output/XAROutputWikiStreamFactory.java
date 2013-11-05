@@ -29,8 +29,7 @@ import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARUtils;
 
 /**
- * A generic xml output wikistream implementation. This class can be used as a test bench to validate various
- * XMLInputStream wiki parsers.
+ * Generate XAR package from WikiStream events.
  * 
  * @version $Id$
  * @since 5.2M2
@@ -42,7 +41,7 @@ public class XAROutputWikiStreamFactory extends AbstractBeanOutputWikiStreamFact
 {
     public XAROutputWikiStreamFactory()
     {
-        super(WikiStreamType.XWIKI_XAR);
+        super(WikiStreamType.XWIKI_XAR_10);
 
         setName("XAR output stream");
         setDescription("Write XAR package from wiki events.");

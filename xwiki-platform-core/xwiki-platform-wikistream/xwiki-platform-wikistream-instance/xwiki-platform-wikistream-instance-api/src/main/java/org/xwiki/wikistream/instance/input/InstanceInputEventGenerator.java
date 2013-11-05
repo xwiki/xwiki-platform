@@ -22,7 +22,9 @@ package org.xwiki.wikistream.instance.input;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.internal.InstanceFilter;
 
 /**
@@ -33,7 +35,52 @@ import org.xwiki.wikistream.instance.internal.InstanceFilter;
 @Role
 public interface InstanceInputEventGenerator extends InstanceFilter
 {
+    /**
+     * Set custom parameter related to the farm.
+     * 
+     * @param parameters the parameters to set
+     * @throws WikiStreamException when failing to set parameters
+     * @since 5.3M2
+     */
+    void setWikiFarmParameters(FilterEventParameters parameters) throws WikiStreamException;
+
+    /**
+     * Set custom parameter related to the wiki.
+     * 
+     * @param name the name of wiki
+     * @param parameters the parameters to set
+     * @throws WikiStreamException when failing to set parameters
+     * @since 5.3M2
+     */
+    void setWikiParameters(String name, FilterEventParameters parameters) throws WikiStreamException;
+
+    /**
+     * Set custom parameter related to the space.
+     * 
+     * @param name the name of space
+     * @param parameters the parameters to set
+     * @throws WikiStreamException when failing to set parameters
+     * @since 5.3M2
+     */
+    void setWikiSpaceParameters(String name, FilterEventParameters parameters) throws WikiStreamException;
+
+    /**
+     * Set custom parameter related to the document.
+     * 
+     * @param name the name of document
+     * @param parameters the parameters to set
+     * @throws WikiStreamException when failing to set parameters
+     * @since 5.3M2
+     */
+    void setWikiDocumentParameters(String name, FilterEventParameters parameters) throws WikiStreamException;
+
+    /**
+     * @param filter the filter to send events to
+     */
     void setFilter(Object filter);
 
+    /**
+     * @param properties the event generator properties
+     */
     void setProperties(Map<String, Object> properties);
 }

@@ -73,7 +73,8 @@
       <!-- SmartGWT is used only for its tree widget. -->
       <groupId>com.smartgwt</groupId>
       <artifactId>smartgwt</artifactId>
-      <!-- Scope is provided, see in parent POMs -->
+      <!-- Only needed at build time -->
+      <scope>provided</scope>
     </dependency>
     <!-- Needed to be in the WAR -->
     <dependency>

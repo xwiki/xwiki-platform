@@ -19,7 +19,7 @@
  */
 package org.xwiki.wikistream.instance.internal;
 
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiAttachmentFilter;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiAttachmentFilter;
 
 /**
  * 

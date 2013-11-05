@@ -33,19 +33,31 @@ import org.xwiki.stability.Unstable;
 public class WikiStreamType
 {
     /**
+     * Data format identifier for XML.
+     */
+    public static final String DATA_XML = "xml";
+
+    /**
      * Generic WIKI XML Syntax.
      */
-    public static final WikiStreamType WIKI_XML = new WikiStreamType(WikiType.WIKI, "xml");
+    public static final WikiStreamType WIKI_XML = new WikiStreamType(WikiType.WIKI, DATA_XML);
 
     /**
      * The XAR format.
+     * 
+     * @since 5.3M2
      */
-    public static final WikiStreamType XWIKI_XAR = new WikiStreamType(WikiType.XWIKI, "xar", "1.0");
+    public static final WikiStreamType XWIKI_XAR_10 = new WikiStreamType(WikiType.XWIKI, "xar", "1.0");
 
     /**
      * The database stream based on oldcore APIs.
      */
     public static final WikiStreamType XWIKI_INSTANCE = new WikiStreamType(WikiType.XWIKI, "instance");
+
+    /**
+     * The Confluence XML format.
+     */
+    public static final WikiStreamType CONFLUENCE_XML = new WikiStreamType(WikiType.CONFLUENCE, DATA_XML);
 
     /**
      * Wiki type.

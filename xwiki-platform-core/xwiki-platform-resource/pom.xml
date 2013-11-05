@@ -32,7 +32,7 @@
   <artifactId>xwiki-platform-resource</artifactId>
   <name>XWiki Platform - Resource API</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Resource API</description>
+  <description>An abstraction of a XWiki URI (Entity, Template, Skin, etc)</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Resource API</xwiki.extension.name>

@@ -76,13 +76,13 @@ public abstract class AbstractBeanOutputWikiStreamFactory<P, F> extends Abstract
     }
 
     @Override
-    public OutputWikiStream creaOutputWikiStream(Map<String, Object> properties) throws WikiStreamException
+    public OutputWikiStream createOutputWikiStream(Map<String, Object> properties) throws WikiStreamException
     {
-        return creaOutputWikiStream(createPropertiesBean(properties));
+        return createOutputWikiStream(createPropertiesBean(properties));
     }
 
     @Override
-    public OutputWikiStream creaOutputWikiStream(P properties) throws WikiStreamException
+    public OutputWikiStream createOutputWikiStream(P properties) throws WikiStreamException
     {
         BeanOutputWikiStream<P> inputWikiStream;
         try {

@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.Role;
  * A key derivation function.
  * Each function must produce the same hash from the same password repeatable but there is no guarantee that a new
  * function of the same class will produce the same hash from the password. In order to make a password able to be
- * validated, you must call getSerialized() and initialize the next function with that output.
+ * validated, you must call {{@link #serialize()}} and initialize the next function with that output.
  * Each time a password is to be hashed, it should be done so with a new instance.
  *
  * @since 2.5M1

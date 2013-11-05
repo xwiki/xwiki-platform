@@ -1068,7 +1068,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
         // TODO: rename "url" to "link" for consistency ?
         if (metadata.containsKey("url")) {
-            feed.setLink(String.valueOf(metadata.get("url")));
+            feed.setLink(removeJSessionIdFromURL(String.valueOf(metadata.get("url"))));
         } else {
             feed.setLink("http://" + context.getRequest().getServerName());
         }
@@ -1136,5 +1136,20 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         WikiPrinter printer = new DefaultWikiPrinter();
         this.syntaxConverter.convert(new StringReader(originalString), Syntax.HTML_4_01, Syntax.PLAIN_1_0, printer);
         return printer.toString();
+    }
+
+    /**
+     * We need to generate a stable URL so that RSS client reader get the same URL every time they get the RSS
+     * feed as otherwise they'll consider the entry as a new entry and display it and the user will see
+     * duplicates.
+     * In addition since most RSS readers will not handle cookies, calling doc.getExternalURL will generate a
+     * jsessionid parameters in the computed URL (as per the spec).
+     * Thus we need to remove it.
+     *
+     * @return the URL without the jsessionid part
+     */
+    static String removeJSessionIdFromURL(String url)
+    {
+        return url.replaceAll(";jsessionid=.*?(?=\\?|$)", "");
     }
 }

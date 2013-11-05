@@ -31,6 +31,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
@@ -106,6 +107,25 @@ public class LocalizationScriptService implements ScriptService
     public Locale getCurrentLocale()
     {
         return this.localizationContext.getCurrentLocale();
+    }
+
+    /**
+     * Converts the given string to a locale. E.g. the string "pt_BR" is converted to a locale with the language set to
+     * Portuguese and the country set to Brazil.
+     * 
+     * @param str the String to convert to Locale
+     * @return the corresponding locale, or {@link Locale#ROOT} if the given string is {@code null} or empty; if the
+     *         given string doesn't represent a locale (e.g. invalid format) then {@code null} is returned
+     * @since 5.3M2
+     * @see org.apache.commons.lang3.LocaleUtils#toLocale(String)
+     */
+    public Locale toLocale(String str)
+    {
+        try {
+            return LocaleUtils.toLocale(str);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     // Helpers

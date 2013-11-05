@@ -30,9 +30,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.filter.WikiObjectFilter;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.BaseObjectFilter;
+import org.xwiki.wikistream.model.filter.WikiObjectFilter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseObject;
@@ -76,6 +76,11 @@ public class BaseObjectEventGenerator extends
 
         objectFilter.beginWikiObject(xobject.getReference().getName(), objectParameters);
 
+        // Object class
+
+        BaseClass xclass = xobject.getXClass(xcontext);
+        ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, objectFilter, properties);
+
         // Properties
 
         // Iterate over values/properties sorted by field name so that the values are
@@ -90,11 +95,6 @@ public class BaseObjectEventGenerator extends
                     properties);
             }
         }
-
-        // Object class
-
-        BaseClass xclass = xobject.getXClass(xcontext);
-        ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, objectFilter, properties);
 
         // < WikiObject
 

@@ -19,15 +19,15 @@
  */
 package org.xwiki.wikistream.xar.internal;
 
-import org.xwiki.wikistream.filter.WikiClassFilter;
-import org.xwiki.wikistream.filter.WikiClassPropertyFilter;
-import org.xwiki.wikistream.filter.FarmFilter;
-import org.xwiki.wikistream.filter.WikiFilter;
-import org.xwiki.wikistream.filter.WikiObjectFilter;
-import org.xwiki.wikistream.filter.WikiObjectPropertyFilter;
-import org.xwiki.wikistream.filter.WikiSpaceFilter;
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiAttachmentFilter;
-import org.xwiki.wikistream.xwiki.filter.XWikiWikiDocumentFilter;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiAttachmentFilter;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
+import org.xwiki.wikistream.model.filter.FarmFilter;
+import org.xwiki.wikistream.model.filter.WikiClassFilter;
+import org.xwiki.wikistream.model.filter.WikiClassPropertyFilter;
+import org.xwiki.wikistream.model.filter.WikiFilter;
+import org.xwiki.wikistream.model.filter.WikiObjectFilter;
+import org.xwiki.wikistream.model.filter.WikiObjectPropertyFilter;
+import org.xwiki.wikistream.model.filter.WikiSpaceFilter;
 
 /**
  * All events supported by XAR module.

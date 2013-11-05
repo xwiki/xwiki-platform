@@ -62,6 +62,8 @@
       <!-- SmartGWT is used only for its tree widget. -->
       <groupId>com.smartgwt</groupId>
       <artifactId>smartgwt</artifactId>
+      <!-- Only needed at build time -->
+      <scope>provided</scope>
     </dependency>
     <!-- XWiki dependencies -->
     <dependency>

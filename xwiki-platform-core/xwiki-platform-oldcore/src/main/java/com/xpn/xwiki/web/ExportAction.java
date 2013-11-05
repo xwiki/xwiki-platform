@@ -258,6 +258,9 @@ public class ExportAction extends XWikiAction
             // Create input wiki stream
             InstanceInputProperties inputProperties = new InstanceInputProperties();
 
+            inputProperties.set("withWikiDocumentRevisions", backup);
+            inputProperties.set("withWikiAttachmentRevisions", backup);
+
             EntityReferenceSet entities = new EntityReferenceSet();
 
             if (all) {

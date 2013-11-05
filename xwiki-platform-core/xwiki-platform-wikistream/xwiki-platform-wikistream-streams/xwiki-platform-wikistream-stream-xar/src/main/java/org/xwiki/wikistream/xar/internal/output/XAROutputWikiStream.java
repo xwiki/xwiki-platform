@@ -204,8 +204,10 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.writer.writeElement(XARDocumentModel.ELEMENT_CREATION_DATE,
             toString((Date) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CREATION_DATE)));
 
-        this.writer.writeElement(XARDocumentModel.ELEMENT_REVISIONS,
-            (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS));
+        if (this.properties.isPreserveVersion()) {
+            this.writer.writeElement(XARDocumentModel.ELEMENT_REVISIONS,
+                (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS));
+        }
     }
 
     @Override
@@ -274,8 +276,10 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.writer.writeStartElement(XARAttachmentModel.ELEMENT_ATTACHMENT);
 
         this.writer.writeElement(XARAttachmentModel.ELEMENT_NAME, name);
-        this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISIONS,
-            (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
+        if (this.properties.isPreserveVersion()) {
+            this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISIONS,
+                (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
+        }
 
         this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_AUTHOR,
             (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));

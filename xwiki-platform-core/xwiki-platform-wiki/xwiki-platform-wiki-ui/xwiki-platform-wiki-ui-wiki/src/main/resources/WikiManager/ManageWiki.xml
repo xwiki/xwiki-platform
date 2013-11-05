@@ -222,7 +222,7 @@
           &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.owner.hint"/}}&lt;/span&gt;
         &lt;/dt&gt;
         &lt;dd&gt;
-          ## The workspace owner has to be a global user. Currently the "List of Users" XClass property type doesn't have
+          ## The wiki owner has to be a global user. Currently the "List of Users" XClass property type doesn't have
           ## a meta property to force global or local users so we have to customize the display to add this restriction.
           #userPicker_import(false)
           &lt;input type="text" id="XWiki.XWikiServerClass_0_owner" name="XWiki.XWikiServerClass_0_owner"
@@ -234,6 +234,11 @@
           &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.membershipType.hint"/}}&lt;/span&gt;
         &lt;/dt&gt;
         &lt;dd&gt;((($wikiDocument.display('membershipType', 'edit'))))&lt;/dd&gt;
+        
+        &lt;dt&gt;
+          &lt;label for='WikiManager.WikiTemplateClass_0_iswikitemplate'&gt;{{translation key="platform.workspace.newWorkspaceTemplateLabel"/}}&lt;/label&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;((($wikiDocument.display('iswikitemplate', 'edit') {{translation key="platform.wikimanager.setAsTemplateLabel"/}} )))&lt;/dd&gt;
       &lt;/dl&gt;
       &lt;br/&gt;
       &lt;span class="buttonwrapper"&gt;

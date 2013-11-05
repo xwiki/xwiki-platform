@@ -140,7 +140,7 @@
     'wikiprettyname' : { 'type' : 'text', 'link' : 'field' },
     'description' : { 'type' : 'text' , 'size' : 50, 'html' : 'true' },
     'owner' : { 'type' : 'text', 'size' : 10, 'html' : 'true' },
-    'membershipType' : { 'type' : 'text', 'class' : 'WikiManager.WikiUserClass'}
+    'membershipType' : { 'type' : 'list', 'class' : 'WikiManager.WikiUserClass'}
 })
 #set($options = {
    'className' : 'XWiki.XWikiServerClass',
@@ -150,7 +150,7 @@
 })
 #if(!$isGuest)
   #set($discard = $columns.add('_actions'))
-  #set($discard = $columnsProperties.put('_actions', { 'actions' : ['join', 'requestJoin', 'cancelJoinRequest', 'viewInvitation', 'leave', 'delete'] }))
+  #set($discard = $columnsProperties.put('_actions', { 'actions' : ['join', 'requestJoin', 'cancelJoinRequest', 'viewInvitation', 'leave', 'edit', 'delete'] }))
 #end
 #livetable('wikis', $columns, $columnsProperties, $options)
 {{/velocity}}</content>

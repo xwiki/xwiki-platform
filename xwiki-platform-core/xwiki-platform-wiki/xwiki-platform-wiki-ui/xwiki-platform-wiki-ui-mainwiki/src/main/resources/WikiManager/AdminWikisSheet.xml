@@ -190,6 +190,29 @@
     </property>
   </object>
   <content>{{velocity}}
+= {{translation key="admin.wikis.template" /}}=
+## Load the User Picker style for the wiki owner column.
+#set($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
+#set($columns = ['wikiprettyname', 'description', 'owner', 'membershipType'])
+#set($columnsProperties = {
+    'wikiprettyname' : { 'type' : 'text', 'link' : 'field' },
+    'description' : { 'type' : 'text' , 'size' : 50, 'html' : 'true' },
+    'owner' : { 'type' : 'text', 'size' : 10, 'html' : 'true' },
+    'membershipType' : { 'type' : 'list', 'class' : 'WikiManager.WikiUserClass'}
+})
+#set($options = {
+   'className' : 'XWiki.XWikiServerClass',
+   'rowCount' : 10,
+   'resultPage' : 'WikiManager.WikisLiveTableResults',
+   'translationPrefix' : 'workspacemanager.browse.',
+   'extraParams': 'onlyTemplates=1'
+})
+#if(!$isGuest)
+  #set($discard = $columns.add('_actions'))
+  #set($discard = $columnsProperties.put('_actions', { 'actions' : ['edit', 'delete'] }))
+#end
+#livetable('wikis', $columns, $columnsProperties, $options)
+
 ### Sheet used to generically display the XWikiPreferences object fields in the administration sheets.
 ## clean="false" due to bug #XWIKI-4122 - the &lt;legend&gt; element is dropped.
 {{html clean="false"}}

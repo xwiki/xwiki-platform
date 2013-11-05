@@ -58,22 +58,22 @@ public class WikiTemplateClassDocumentInitializer extends AbstractMandatoryDocum
             new EntityReference(DOCUMENT_SPACE, EntityType.SPACE));
 
     /**
-     * Name of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
+     * Name of field <code>iswikitemplate</code> for the XWiki class WikiManagerCode.WikiTemplateClass.
      */
     public static final String FIELD_ISWIKITEMPLATE = "iswikitemplate";
 
     /**
-     * Pretty name of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
+     * Pretty name of field <code>iswikitemplate</code> for the XWiki class WikiManagerCode.WikiTemplateClass.
      */
     public static final String FIELDPN_ISWIKITEMPLATE = "Template";
 
     /**
-     * Display type of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
+     * Display type of field <code>iswikitemplate</code> for the XWiki class WikiManagerCode.WikiTemplateClass.
      */
     public static final String FIELDDT_ISWIKITEMPLATE = "checkbox";
 
     /**
-     * Default value of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
+     * Default value of field <code>iswikitemplate</code> for the XWiki class WikiManagerCode.WikiTemplateClass.
      */
     public static final Boolean DEFAULT_ISWIKITEMPLATE = Boolean.FALSE;
 

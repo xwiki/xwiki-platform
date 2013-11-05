@@ -28,8 +28,6 @@
 {{velocity wiki="false"}}
 #set($from =  "")
 #set($extra = "")
-##set($from = "")
-##set($extra = "")
 #set($params = [])
 #if("$!request.space" != '')
   #set($extra = "${extra} and doc.space = ?")
@@ -38,6 +36,21 @@
 #if("$!request.orphaned" == '1')
   #set($extra = "${extra} and doc.parent='' and doc.name&lt;&gt;'WebHome'")
 #end
-#gridresultwithfilter("$!request.classname" $request.collist.split(",") "${from}" "${extra}" $params)
+#if("$!request.onlyTemplates" == '1')
+  #set($from = "${from}, BaseObject objTemplate, IntegerProperty propTemplate")
+  #set($extra = "${extra} AND doc.fullName = objTemplate.name AND objTemplate.className='WikiManager.WikiTemplateClass' AND objTemplate.id = propTemplate.id AND propTemplate.name='iswikitemplate' AND propTemplate.value='1'")
+#end
+#if("$!request.membershipType" != '')
+  #set($from = "${from}, BaseObject objWikiUser, StringProperty propMembershipType")
+  #set($extra = "${extra} AND doc.fullName = objWikiUser.name AND objWikiUser.className='WikiManager.WikiUserClass' AND objWikiUser.id = propMembershipType.id AND propMembershipType.name='membershipType' AND propMembershipType.value=?")
+  #set($discard = $params.add($request.membershipType))
+#end
+#set($columns = [])
+#foreach($c in $request.collist.split(","))
+  #if($c != 'membershipType')
+    #set($discard = $columns.add($c))
+  #end
+#end
+#gridresultwithfilter("$!request.classname" $columns "${from}" "${extra}" $params)
 {{/velocity}}</content>
 </xwikidoc>

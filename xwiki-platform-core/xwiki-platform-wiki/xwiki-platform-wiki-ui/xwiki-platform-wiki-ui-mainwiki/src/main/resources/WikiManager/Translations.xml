@@ -227,6 +227,9 @@ platform.workspace.newWorkspaceTemplateLabel=Template
 WikiManager.WikiUserClass_membershipType_open=Open for any user to join
 WikiManager.WikiUserClass_membershipType_request=Any user can request to join but an admin must accept
 WikiManager.WikiUserClass_membershipType_invite=Only an admin can invite a user
+WikiManager.WikiUserClass_userScope_local_only=Only local users are available in the wiki
+WikiManager.WikiUserClass_userScope_global_only=Only global users are available in the wiki
+WikiManager.WikiUserClass_userScope_local_and_global=Both global and local users are available in the wiki
 platform.workspace.searchSuggestSourceWorkspaces=Wikis
 
 # PROPERTIES
@@ -276,9 +279,8 @@ platform.workspace.wizard.step1.shortname=Name
 platform.workspace.wizard.step2.shortname=Members
 platform.wikimanager.setAsTemplateLabel=This wiki will be a template
 platform.wikimanager.notemplate=No template (default)
-platform.wikimanager.usersIsolationLabel=Users Isolation
-platform.wikimanager.usersIsolationHint=By default all the users will be global, shared between wikis and not isolated locally
-platform.wikimanager.usersIsolationCheckbox=Allow creating local users
+platform.wikimanager.userScopeLabel=User Scope
+platform.wikimanager.userScopeHint=Select what kind of users can access to the wiki
 
 ###############################################################################
 ## Deprecated

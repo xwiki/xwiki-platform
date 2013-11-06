@@ -8,7 +8,7 @@
 #set ($mainWikiHomeDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Main', 'WebHome'))
 #set ($WikiManagerMainDocReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'WebHome'))
 #set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
-#set ($cantHaveLocalUsers = $isWikiAPIAvailable && !$xcontext.isMainWiki() && !$services.wikiuser.hasLocalUsersEnabled())
+#set ($cantHaveLocalUsers = $isWikiAPIAvailable && !$xcontext.isMainWiki() && $services.wikiuser.getUserScope()=='LOCAL_ONLY')
 #set ($isMainWikiUser = ($xcontext.mainWikiName == "$!{xcontext.userReference.wikiReference.name}"))
 #set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
 ##

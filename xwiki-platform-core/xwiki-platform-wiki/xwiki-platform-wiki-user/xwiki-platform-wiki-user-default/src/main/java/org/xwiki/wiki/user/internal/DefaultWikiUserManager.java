@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -35,13 +34,12 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
-import org.xwiki.wiki.properties.WikiPropertyGroupException;
-import org.xwiki.wiki.properties.WikiPropertyGroupProvider;
 import org.xwiki.wiki.user.MemberCandidacy;
 import org.xwiki.wiki.user.MembershipType;
+import org.xwiki.wiki.user.UserScope;
+import org.xwiki.wiki.user.WikiUserConfiguration;
 import org.xwiki.wiki.user.WikiUserManager;
 import org.xwiki.wiki.user.WikiUserManagerException;
-import org.xwiki.wiki.user.WikiUserPropertyGroup;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -89,8 +87,7 @@ public class DefaultWikiUserManager implements WikiUserManager
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
-    @Named("user")
-    private WikiPropertyGroupProvider wikiUserPropertyGroupProvider;
+    private WikiUserConfigurationHelper wikiUserConfigurationHelper;
 
     @Inject
     private EntityReferenceSerializer<String> documentReferenceSerializer;
@@ -98,57 +95,38 @@ public class DefaultWikiUserManager implements WikiUserManager
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
-    private WikiUserPropertyGroup getPropertyGroup(String wikiId) throws WikiManagerException
+    @Override
+    public UserScope getUserScope(String wikiId) throws WikiUserManagerException
     {
-        WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
-        return (WikiUserPropertyGroup) descriptor.getPropertyGroup(WikiUserPropertyGroupProvider.GROUP_NAME);
-    }
-
-    private void savePropertyGroup(WikiUserPropertyGroup group, String wikiId) throws WikiManagerException
-    {
-        try {
-            wikiUserPropertyGroupProvider.save(group, wikiId);
-        } catch (WikiPropertyGroupException e) {
-            throw new WikiManagerException("Failed to save the user property group.", e);
-        }
+        return wikiUserConfigurationHelper.getConfiguration(wikiId).getUserScope();
     }
 
     @Override
-    public boolean hasLocalUsersEnabled(String wikiId) throws WikiManagerException
+    public void setUserScope(String wikiId, UserScope scope) throws WikiUserManagerException
     {
-        return getPropertyGroup(wikiId).hasLocalUsersEnabled();
+        WikiUserConfiguration configuration = wikiUserConfigurationHelper.getConfiguration(wikiId);
+        configuration.setUserScope(scope);
+        wikiUserConfigurationHelper.saveConfiguration(configuration, wikiId);
     }
 
     @Override
-    public void enableLocalUsers(String wikiId, boolean enable) throws WikiManagerException
+    public MembershipType getMembershipType(String wikiId) throws WikiUserManagerException
     {
-        WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
-        WikiUserPropertyGroup group =
-                (WikiUserPropertyGroup) descriptor.getPropertyGroup(WikiUserPropertyGroupProvider.GROUP_NAME);
-        group.enableLocalUsers(enable);
-        savePropertyGroup(group, wikiId);
+        return wikiUserConfigurationHelper.getConfiguration(wikiId).getMembershipType();
     }
 
     @Override
-    public MembershipType getMembershipType(String wikiId) throws WikiManagerException
+    public void setMembershipType(String wikiId, MembershipType type) throws WikiUserManagerException
     {
-        return getPropertyGroup(wikiId).getMembershipType();
-    }
-
-    @Override
-    public void setMembershipType(String wikiId, MembershipType type) throws WikiManagerException
-    {
-        WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
-        WikiUserPropertyGroup group =
-                (WikiUserPropertyGroup) descriptor.getPropertyGroup(WikiUserPropertyGroupProvider.GROUP_NAME);
-        group.setMembershypType(type);
-        savePropertyGroup(group, wikiId);
+        WikiUserConfiguration configuration = wikiUserConfigurationHelper.getConfiguration(wikiId);
+        configuration.setMembershypType(type);
+        wikiUserConfigurationHelper.saveConfiguration(configuration, wikiId);
     }
 
     @Override
     public Collection<String> getLocalUsers(String wikiId) throws WikiUserManagerException
     {
-        // TODO: Implement this method. This is not urgent because the UI currently does all the job.
+        // TODO: Implement this method. This is not urgent because no one needs it yet.
         return null;
     }
 
@@ -520,9 +498,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         }
 
         // Check if the user has the right to join the wiki
-        WikiUserPropertyGroup group
-            = (WikiUserPropertyGroup) wikiDescriptor.getPropertyGroup(WikiUserPropertyGroupProvider.GROUP_NAME);
-        if (!group.getMembershipType().equals(MembershipType.OPEN)) {
+        if (!wikiUserConfigurationHelper.getConfiguration(wikiId).getMembershipType().equals(MembershipType.OPEN)) {
             throw new WikiUserManagerException(String.format("The user [%s] is not authorized to join the wiki [%s].",
                     userId, wikiId));
         }

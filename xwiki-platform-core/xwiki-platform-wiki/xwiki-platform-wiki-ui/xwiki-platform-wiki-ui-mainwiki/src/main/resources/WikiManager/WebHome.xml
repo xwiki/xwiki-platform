@@ -140,7 +140,7 @@
     'wikiprettyname' : { 'type' : 'text', 'link' : 'field' },
     'description' : { 'type' : 'text' , 'size' : 50, 'html' : 'true' },
     'owner' : { 'type' : 'text', 'size' : 10, 'html' : 'true' },
-    'membershipType' : { 'type' : 'list', 'class' : 'WikiManager.WikiUserClass'}
+    'membershipType' : { 'sortable': false, 'filterable': false}
 })
 #set($options = {
    'className' : 'XWiki.XWikiServerClass',

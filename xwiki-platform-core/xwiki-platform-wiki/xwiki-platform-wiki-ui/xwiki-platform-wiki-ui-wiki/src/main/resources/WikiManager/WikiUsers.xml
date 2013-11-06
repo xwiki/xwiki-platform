@@ -411,6 +411,32 @@ $services.localization.render('platform.workspace.candidateHandledComment') $mes
   #end
 #end
 
+### MEMBERSHIP TYPE ###
+== Users configuration ==
+#set($userConfRef = $services.model.createDocumentReference('', 'WikiManager', 'WikiUserConfiguration'))
+#set($userConfDoc = $xwiki.getDocument($userConfRef))
+{{html clean="false" wiki="true"}}
+  &lt;form&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.membershipType.hint"/}}&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;((($userConfDoc.display('membershipType', 'edit'))))&lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;span class='xHint'&gt;{{translation key="platform.wikimanager.userScopeHint"/}}&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;((($userConfDoc.display('userScope', 'edit'))))&lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;p class="buttons"&gt;
+      &lt;span class='buttonwrapper'&gt;
+        &lt;input type="submit" class="button" value="save" onclick="alert('not implemented yet'); return false;"/&gt;
+      &lt;/span&gt;
+    &lt;/p&gt;
+  &lt;/form&gt;
+{{/html}}
+
 ##
 ## In the original sheet, this was displayed only in edit mode. 
 #if($hasEditGroupRight)

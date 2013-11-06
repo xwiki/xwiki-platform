@@ -759,7 +759,7 @@ return XWiki;
         ### SECOND STEP VALUES
         &lt;input type="hidden" name="ownerId" value="$!escapetool.xml($request.getParameter('ownerId'))" /&gt;
         &lt;input type="hidden" name="membershipType" value="$!escapetool.xml($request.getParameter('membershipType'))" /&gt;
-        &lt;input type="hidden" name="usersIsolation" value="$!escapetool.xml($request.usersIsolation)" /&gt;
+        &lt;input type="hidden" name="userScope" value="$!escapetool.xml($request.userScope)" /&gt;
         #addMembersAsHiddenInput()
         ### WIZARD FIRST HALF ###
         &lt;div class="half"&gt;
@@ -893,21 +893,34 @@ return XWiki;
               &lt;input id="owner" name="ownerId" type="hidden" value="${xcontext.mainWikiName}:${xcontext.user}"/&gt;
             #end
           &lt;/div&gt;
-          ### USERS ISOLATION ###
+          ### USERS SCOPE ###
           &lt;div&gt;
             &lt;dl&gt;
               &lt;dt&gt;
-                &lt;label for="usersIsolation"&gt;$services.localization.render('platform.wikimanager.usersIsolationLabel')&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('platform.wikimanager.usersIsolationHint')&lt;/span&gt;
+                &lt;label for="userScope"&gt;$services.localization.render('platform.wikimanager.userScopeLabel')&lt;/label&gt;
+                &lt;span class="xHint"&gt;$services.localization.render('platform.wikimanager.userScopeHint')&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
-                #set($value = $escapetool.xml($request.getParameter('usersIsolation')))
-                #set($isLocalUsersEnabled = '')
-                #if("$!request.usersIsolation" != '')
-                  #set($isLocalUsersEnabled = 'checked="checked"')
+                #set($value = $escapetool.xml($request.getParameter('userScope')))
+                #set ($wikiUserClassDocument = $xwiki.getDocument('WikiManager.WikiUserClass'))
+                #set ($wikiUserClass = $wikiUserClassDocument.getxWikiClass())
+                #set ($userScopeProperty = $wikiUserClass.get('userScope'))
+                #set ($userScopePropertyValues = '')
+                #set ($userScopePropertyValues = $userScopeProperty.getListValues())
+                #set ($userScopeDetailsMap = $userScopeProperty.getMapValues())
+                #foreach ($userScopeValue in $userScopePropertyValues)
+                  #set ($userScopeValueId = "userScope_${foreach.index}")
+                  &lt;div&gt;
+                  &lt;label for="$userScopeValueId"&gt;
+                  #set($checked = '')
+                  #if($request.getParameter('userScope') == $userScopeValue || ("$!request.getParameter('userScope')"=='' &amp;&amp; $foreach.index==0))
+                    #set($checked = 'checked="checked"')
+                  #end
+                  &lt;input type="radio" id="$userScopeValueId" name="userScope" value="$userScopeValue" $checked/&gt;
+                  $services.localization.render("${wikiUserClassDocument.fullName}_${userScopeProperty.name}_${userScopeDetailsMap.get($userScopeValue).getValue()}")
+                  &lt;/label&gt;
+                  &lt;/div&gt;
                 #end
-                &lt;input type="checkbox" id="usersIsolation" name="usersIsolation" $isLocalUsersEnabled/&gt;
-                $services.localization.render("platform.wikimanager.usersIsolationCheckbox")
               &lt;/dd&gt;
             &lt;/dl&gt;
           &lt;/div&gt;
@@ -917,8 +930,6 @@ return XWiki;
         &lt;div class="half"&gt;
           ### MEMBERSHIP TYPE
           &lt;div&gt;
-            #set ($wikiUserClassDocument = $xwiki.getDocument('WikiManager.WikiUserClass'))
-            #set ($wikiUserClass = $wikiUserClassDocument.getxWikiClass())
             #set ($membershipTypeProperty = $wikiUserClass.get('membershipType'))
             #set ($membershipTypeValues = '')
             #set ($membershipTypeValues = $membershipTypeProperty.getListValues())
@@ -1010,9 +1021,7 @@ return XWiki;
     #set ($discard = $services.wiki.saveDescriptor($wikiDescriptor))
     ## Set the membership type and the local users
     #set ($discard = $services.wikiuser.setMembershipType($wikiDescriptor.id, $request.membershipType))
-    #if("$!request.usersIsolation" != '')
-      #set ($discard = $services.wikiuser.enableLocalUsers($wikiDescriptor.id, true))
-    #end
+    #set ($discard = $services.wikiuser.setUserScope($wikiDescriptor.id, $request.userScope))
     ## Set the template value
     #if("$!request.set_as_template" != '')
       #set ($discard = $services.wikitemplate.setTemplate($wikiDescriptor.id, true))

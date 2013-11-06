@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
-import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Component that manage how users can participate on a wiki (local users, members, invitation, etc...).
@@ -37,35 +36,35 @@ public interface WikiUserManager
 {
     /**
      * @param wikiId Id of the wiki to test
-     * @return if local users are enabled on the specified wiki
-     * @throws WikiManagerException if problems occur
+     * @return the user scope of the wiki
+     * @throws WikiUserManagerException if problems occur
      */
-    boolean hasLocalUsersEnabled(String wikiId) throws WikiManagerException;
+    UserScope getUserScope(String wikiId) throws WikiUserManagerException;
 
     /**
-     * Enable or disbale the local users and save the descriptor.
+     * Set the user scope of the wiki.
      *
      * @param wikiId Id of the wiki to change
-     * @param enable enable or not the local users on the wiki
-     * @throws WikiManagerException if problems occur
+     * @param scope the scope to set
+     * @throws WikiUserManagerException if problems occur
      */
-    void enableLocalUsers(String wikiId, boolean enable) throws WikiManagerException;
+    void setUserScope(String wikiId, UserScope scope) throws WikiUserManagerException;
 
     /**
      * @param wikiId if of the wiki to test
      * @return the membership type of the specified wiki
-     * @throws WikiManagerException if problems occur
+     * @throws WikiUserManagerException if problems occur
      */
-    MembershipType getMembershipType(String wikiId) throws WikiManagerException;
+    MembershipType getMembershipType(String wikiId) throws WikiUserManagerException;
 
     /**
-     * Set the membership type of the wiki and save the descriptor.
+     * Set the membership type of the wiki and save the configuration.
      *
      * @param wikiId Id of the wiki to change
      * @param type the membershyp type to set
-     * @throws WikiManagerException if problems occur
+     * @throws WikiUserManagerException if problems occur
      */
-    void setMembershipType(String wikiId, MembershipType type) throws WikiManagerException;
+    void setMembershipType(String wikiId, MembershipType type) throws WikiUserManagerException;
 
     /**
      * @param wikiId id of the wiki

@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.wiki.user.MembershipType;
+import org.xwiki.wiki.user.UserScope;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
@@ -55,55 +56,57 @@ public class WikiUserClassDocumentInitializer extends AbstractMandatoryDocumentI
     /**
      * Reference to the server class.
      */
-    public static final EntityReference SERVER_CLASS =  new EntityReference(DOCUMENT_NAME, EntityType.DOCUMENT,
+    public static final EntityReference CONFIGURATION_CLASS = new EntityReference(DOCUMENT_NAME, EntityType.DOCUMENT,
             new EntityReference(DOCUMENT_SPACE, EntityType.SPACE));
 
     /**
-     * Default list separators of XWiki.XWikiServerClass fields.
+     * Default list separators of WikiManager.XWikiServerClass fields.
      */
     public static final String DEFAULT_FIELDS_SEPARATOR = "|";
 
     /**
-     * Name of field <code>membershipType</code> for the XWiki class XWiki.XWikiServerClass.
+     * Name of field <code>membershipType</code> for the XWiki class WikiManager.WikiUserClass.
      */
     public static final String FIELD_MEMBERSHIPTYPE = "membershipType";
 
     /**
-     * Pretty name of field <code>membershipType</code> for the XWiki class XWiki.XWikiServerClass.
+     * Pretty name of field <code>membershipType</code> for the XWiki class WikiManager.WikiUserClass.
      */
     public static final String FIELDPN_MEMBERSHIPTYPE = "Membership Type";
 
     /**
-     * List of possible values for <code>membershipType</code> for the XWiki class XWiki.XWikiServerClass.
+     * List of possible values for <code>membershipType</code> for the XWiki class WikiManager.WikiUserClass.
      */
     public static final String FIELDL_MEMBERSHIPTYPE = MembershipType.OPEN.name().toLowerCase()
             + DEFAULT_FIELDS_SEPARATOR + MembershipType.REQUEST.name().toLowerCase() + DEFAULT_FIELDS_SEPARATOR
             + MembershipType.INVITE.name().toLowerCase();
 
     /**
-     * Display type of field <code>membershipType</code> for the XWiki class XWiki.XWikiServerClass.
+     * Display type of field <code>membershipType</code> for the XWiki class WikiManager.WikiUserClass.
      */
     public static final String FIELDDT_MEMBERSHIPTYPE = "radio";
 
     /**
-     * Name of field <code>enableLocalUsers</code> for the XWiki class XWiki.XWikiServerClass.
+     * Name of field <code>userScope</code> for the XWiki class WikiManager.WikiUserClass.
      */
-    public static final String FIELD_ENABLELOCALUSERS = "enableLocalUsers";
+    public static final String FIELD_USERSCOPE = "userScope";
 
     /**
-     * Pretty name of field <code>enableLocalUsers</code> for the XWiki class XWiki.XWikiServerClass.
+     * Pretty name of field <code>userScope</code> for the XWiki class WikiManager.WikiUserClass.
      */
-    public static final String FIELDPN_ENABLELOCALUSERS = "Enable local users";
+    public static final String FIELDPN_USERSCOPE = "User scope";
 
     /**
-     * Display type of field <code>enableLocalUsers</code> for the XWiki class XWiki.XWikiServerClass.
+     * Display type of field <code>userScope</code> for the XWiki class WikiManager.WikiUserClass.
      */
-    public static final String FIELDDT_ENABLELOCALUSERS = "checkbox";
+    public static final String FIELDDT_USERSCOPE = FIELDDT_MEMBERSHIPTYPE;
 
     /**
-     * Default value of field <code>enableLocalUsers</code> for the XWiki class XWiki.XWikiServerClass.
+     * List of possible values for <code>userScope</code> for the XWiki class WikiManager.WikiUserClass.
      */
-    public static final Boolean DEFAULT_ENABLELOCALUSERS = Boolean.FALSE;
+    public static final String FIELDL_USERSCOPE = UserScope.LOCAL_ONLY.name().toLowerCase()
+            + DEFAULT_FIELDS_SEPARATOR + UserScope.GLOBAL_ONLY.name().toLowerCase() + DEFAULT_FIELDS_SEPARATOR
+            + UserScope.LOCAL_AND_GLOBAL.name().toLowerCase();
 
     /**
      * Constructor.
@@ -123,9 +126,8 @@ public class WikiUserClassDocumentInitializer extends AbstractMandatoryDocumentI
 
         needsUpdate |= baseClass.addStaticListField(FIELD_MEMBERSHIPTYPE, FIELDPN_MEMBERSHIPTYPE,
                 MembershipType.values().length, false, FIELDL_MEMBERSHIPTYPE, FIELDDT_MEMBERSHIPTYPE);
-        needsUpdate |= baseClass.addBooleanField(FIELD_ENABLELOCALUSERS, FIELDPN_ENABLELOCALUSERS,
-                FIELDDT_ENABLELOCALUSERS);
-        needsUpdate |= updateBooleanClassDefaultValue(baseClass, FIELD_ENABLELOCALUSERS, DEFAULT_ENABLELOCALUSERS);
+        needsUpdate |= baseClass.addStaticListField(FIELD_USERSCOPE, FIELDPN_USERSCOPE,
+                UserScope.values().length, false, FIELDL_USERSCOPE, FIELDDT_USERSCOPE);
 
         // Check if the document is hidden
         if (!document.isHidden()) {

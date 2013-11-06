@@ -138,13 +138,12 @@
     #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $xcontext.user, $fullname)))
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
     #set($discard = $row.put('doc_hasdelete', $services.wiki.canDeleteWiki($currentUser, $wikiId)))
-    #set($editReference = $services.model.createDocumentReference($wiki.id, 'XWiki', 'XWikiPreferences'))
-    #set($discard = $row.put('doc_edit_url', $xwiki.getURL($editReference, 'admin', 'editor=globaladmin&amp;section=Wiki')))
     #################################################
     #set($discard = $row.put('doc_copy_url', $itemDoc.getURL('view', 'xpage=copy')))
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
     #set($deleteUrl = $xwiki.getURL($deleteWikiDocumentReference, 'view', "wikiId=${wikiId}"))
     #set($discard = $row.put('doc_delete_url', $deleteUrl))
+    #set($discard = $row.put('doc_edit_url', $itemDoc.getURL('edit', 'editor=object')))
     #################################################
     #set($discard = $row.put('doc_rename_url', $itemDoc.getURL('view', 'xpage=rename&amp;step=1')))
     #set($discard = $row.put('doc_rights_url', $itemDoc.getURL('edit', 'editor=rights')))
@@ -158,7 +157,9 @@
       #gridresult_buildColumnJSON($colname $row)
     #end
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
-    #set($objWikiUser = $itemDoc.getObject('WikiManager.WikiUserClass'))
+    #set($docConfUserRef = $services.model.createDocumentReference($wiki.id, 'WikiManager', 'WikiUserConfiguration'))
+    #set($docConfUser = $xwiki.getDocument($docConfUserRef))
+    #set($objWikiUser = $docConfUser.getObject('WikiManager.WikiUserClass'))
     #set($discard = $row.put('membershipType', $objWikiUser.membershipType))
     #set($discard = $row.put('doc_hasjoin', $itemHasJoin))
     #set($discard = $row.put('doc_hasrequestJoin', $itemHasRequestJoin))

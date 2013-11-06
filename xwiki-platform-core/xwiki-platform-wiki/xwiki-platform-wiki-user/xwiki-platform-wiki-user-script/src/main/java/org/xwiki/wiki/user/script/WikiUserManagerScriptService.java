@@ -36,9 +36,9 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.user.MemberCandidacy;
 import org.xwiki.wiki.user.MembershipType;
+import org.xwiki.wiki.user.UserScope;
 import org.xwiki.wiki.user.WikiUserManager;
 import org.xwiki.wiki.user.WikiUserManagerException;
 
@@ -72,32 +72,32 @@ public class WikiUserManagerScriptService implements ScriptService
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
-     * @return whether or not the current wiki has local users enabled
+     * @return the user scope
      */
-    public Boolean hasLocalUsersEnabled()
+    public UserScope getUserScope()
     {
-        return hasLocalUsersEnabled(wikiDescriptorManager.getCurrentWikiId());
+        return getUserScope(wikiDescriptorManager.getCurrentWikiId());
     }
 
     /**
      * @param wikiId Id of the wiki to test
-     * @return whether or not the specified wiki has local users enabled
+     * @return the user scope
      */
-    public Boolean hasLocalUsersEnabled(String wikiId)
+    public UserScope getUserScope(String wikiId)
     {
         try {
-            return wikiUserManager.hasLocalUsersEnabled(wikiId);
-        } catch (WikiManagerException e) {
+            return wikiUserManager.getUserScope(wikiId);
+        } catch (WikiUserManagerException e) {
             return null;
         }
     }
 
     /**
      * @param wikiId Id of the wiki to change
-     * @param enable enable/disable the local users support for the specified wiki
+     * @param scope scope to set
      * @return true if it succeed
      */
-    public boolean enableLocalUsers(String wikiId, boolean enable)
+    public boolean setUserScope(String wikiId, String scope)
     {
         XWikiContext xcontext = xcontextProvider.get();
         boolean success = true;
@@ -105,8 +105,8 @@ public class WikiUserManagerScriptService implements ScriptService
             // Check the right
             authorizationManager.checkAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId));
             // Do the job
-            wikiUserManager.enableLocalUsers(wikiId, enable);
-        } catch (WikiManagerException e) {
+            wikiUserManager.setUserScope(wikiId, UserScope.valueOf(scope.toUpperCase()));
+        } catch (WikiUserManagerException e) {
             success = false;
         } catch (AccessDeniedException e) {
             success = false;
@@ -130,7 +130,7 @@ public class WikiUserManagerScriptService implements ScriptService
     {
         try {
             return wikiUserManager.getMembershipType(wikiId);
-        } catch (WikiManagerException e) {
+        } catch (WikiUserManagerException e) {
             return null;
         }
     }
@@ -149,7 +149,7 @@ public class WikiUserManagerScriptService implements ScriptService
             authorizationManager.checkAccess(Right.ADMIN, xcontext.getUserReference(), new WikiReference(wikiId));
             // Do the job
             wikiUserManager.setMembershipType(wikiId, MembershipType.valueOf(type.toUpperCase()));
-        } catch (WikiManagerException e) {
+        } catch (WikiUserManagerException e) {
             success = false;
         } catch (AccessDeniedException e) {
             success = false;

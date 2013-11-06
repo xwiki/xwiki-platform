@@ -57,8 +57,6 @@ The 'xredirect' parameter is also accepted, currently used in the administration
       #set ($temp = $wiki.setOwnerId($newOwner))
     #end
     #set ($temp = $services.wiki.saveDescriptor($wiki))
-    #set ($temp = $services.wikiuser.setMembershipType($wiki.id, $request.get('WikiManager.WikiUserClass_0_membershipType')))
-    #set ($temp = $services.wikitemplate.setTemplate($wiki.id, $request.get('WikiManager.WikiTemplateClass_0_iswikitemplate')))
   #end
   #if($request.xredirect)
     $response.sendRedirect($request.xredirect)

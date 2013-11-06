@@ -991,13 +991,13 @@ return XWiki;
   #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
     ## check if the wiki is already in creation
     #if(!$services.wikitemplate.getWikiCreationStatus($request.wikiname))
-      #set($wikiDescriptor = $services.wikitemplate.createWikiFromTemplate($request.wikiname, $request.wikiname, $request.template, $request.ownerId))
+      #set($wikiDescriptor = $services.wikitemplate.createWikiFromTemplate($request.wikiname, $request.wikiname, $request.template, $request.ownerId, true))
     #else
       #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
     #end
     #set($fromTemplate = true)
   #else 
-    #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $request.wikiname, $request.ownerId))
+    #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $request.wikiname, $request.ownerId, true))
   #end
   #if (!$wikiDescriptor)
 

@@ -152,11 +152,11 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
 
     @Override
     public WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId,
-        String ownerId) throws WikiTemplateManagerException
+        String ownerId, boolean failOnExist) throws WikiTemplateManagerException
     {
         try {
             // First, create the new wiki
-            WikiDescriptor descriptor = wikiManager.create(newWikiId, newWikiAlias);
+            WikiDescriptor descriptor = wikiManager.create(newWikiId, newWikiAlias, failOnExist);
 
             // Set the owner
             descriptor.setOwnerId(ownerId);

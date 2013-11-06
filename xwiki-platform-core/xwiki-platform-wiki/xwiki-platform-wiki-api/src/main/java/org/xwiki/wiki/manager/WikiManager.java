@@ -38,10 +38,11 @@ public interface WikiManager
      *
      * @param wikiId Id of the new wiki
      * @param wikiAlias Default alias of the new wiki
+     * @param failOnExist throw an exception if the wikiId already exists
      * @return the descriptor of the created wiki
      * @throws WikiManagerException if problems occur
      */
-    WikiDescriptor create(String wikiId, String wikiAlias) throws WikiManagerException;
+    WikiDescriptor create(String wikiId, String wikiAlias, boolean failOnExist) throws WikiManagerException;
 
     /**
      * Copy a wiki.
@@ -51,11 +52,12 @@ public interface WikiManager
      * @param newWikiAlias Default alias of the new wiki
      * @param copyHistory decide if you want to copy the pages' history
      * @param copyRecycleBin decide if you want to copy the recycle bin content
+     * @param failOnExist throw an exception if the wikiId already exists
      * @return the descriptor of the created wiki
      * @throws WikiManagerException if problems occur
      */
     WikiDescriptor copy(String fromWikiId, String newWikiId, String newWikiAlias, boolean copyHistory,
-            boolean copyRecycleBin) throws WikiManagerException;
+            boolean copyRecycleBin, boolean failOnExist) throws WikiManagerException;
 
     /**
      * Rename a wiki.

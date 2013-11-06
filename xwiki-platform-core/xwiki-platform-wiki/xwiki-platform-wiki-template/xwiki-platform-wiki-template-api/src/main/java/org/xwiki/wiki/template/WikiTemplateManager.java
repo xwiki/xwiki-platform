@@ -67,11 +67,12 @@ public interface WikiTemplateManager
      * @param newWikiAlias Default alias of the wiki to create
      * @param templateId Id of the template to use
      * @param ownerId Id of the wiki owner
+     * @param failOnExist fail if the wiki id is not available
      * @return The descriptor of the new wiki
      * @throws WikiTemplateManagerException if problems occur
      */
-    WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId, String ownerId)
-        throws WikiTemplateManagerException;
+    WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId, String ownerId,
+        boolean failOnExist) throws WikiTemplateManagerException;
 
     /**
      * Get the status of the wiki creation job.

@@ -93,9 +93,10 @@ public class WikiManagerScriptService implements ScriptService
      * @param wikiId unique identifier of the new wiki
      * @param wikiAlias default alias of the new wiki
      * @param ownerId Id of the user that will own the wiki
+     * @param failOnExist Fail the operation if the wiki id already exists
      * @return the wiki descriptor of the new wiki, or null if problems occur
      */
-    public WikiDescriptor createWiki(String wikiId, String wikiAlias, String ownerId)
+    public WikiDescriptor createWiki(String wikiId, String wikiAlias, String ownerId, boolean failOnExist)
     {
         WikiDescriptor descriptor = null;
 
@@ -103,18 +104,21 @@ public class WikiManagerScriptService implements ScriptService
 
         try {
             // Check right access
-            authorizationManager.checkAccess(Right.CREATE_WIKI, context.getUserReference(),
-                    new WikiReference(context.getMainXWiki()));
+            WikiReference mainWikiReference = new WikiReference(getMainWikiId());
+            authorizationManager.checkAccess(Right.CREATE_WIKI, context.getUserReference(), mainWikiReference);
+            if (!failOnExist) {
+                authorizationManager.checkAccess(Right.PROGRAM, context.getUserReference(), mainWikiReference);
+            }
 
             // Create the wiki
-            descriptor = wikiManager.create(wikiId, wikiAlias);
+            descriptor = wikiManager.create(wikiId, wikiAlias, failOnExist);
             // Set the owner
             descriptor.setOwnerId(ownerId);
             wikiDescriptorManager.saveDescriptor(descriptor);
         } catch (WikiManagerException e) {
             error(e.getMessage(), e);
         } catch (AccessDeniedException e) {
-            error("You don't have the right to create wiki", e);
+            error("You don't have the right to create wiki or to set failOnExist to false.", e);
         }
 
         return descriptor;

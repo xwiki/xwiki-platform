@@ -24,18 +24,16 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.bridge.event.WikiCopiedEvent;
+import org.xwiki.bridge.event.WikiCreateFailedEvent;
+import org.xwiki.bridge.event.WikiCreatedEvent;
+import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
-import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder;
-import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilderException;
-import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
-import org.xwiki.wiki.internal.descriptor.properties.WikiPropertyGroupManager;
 import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -58,13 +56,7 @@ public class DefaultWikiManager implements WikiManager
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    private WikiDescriptorDocumentHelper descriptorDocumentHelper;
-
-    @Inject
     private WikiDescriptorManager wikiDescriptorManager;
-
-    @Inject
-    private ContextualLocalizationManager localizationManager;
 
     @Inject
     private ObservationManager observationManager;
@@ -73,70 +65,56 @@ public class DefaultWikiManager implements WikiManager
     private Logger logger;
 
     @Inject
-    private WikiDescriptorBuilder wikiDescriptorBuilder;
-
-    @Inject
-    private WikiPropertyGroupManager wikiPropertyGroupManager;
+    private WikiCreator wikiCreator;
 
     @Inject
     private WikiCopier wikiCopier;
 
-    private WikiDescriptor createDescriptor(String wikiId, String wikiAlias) throws WikiManagerException
+    @Inject
+    private WikiDeleter wikiDeleter;
+
+    @Override
+    public WikiDescriptor create(String wikiId, String wikiAlias, boolean failOnExist) throws WikiManagerException
     {
-        // Create the descriptor
-        WikiDescriptor descriptor = new DefaultWikiDescriptor(wikiId, wikiAlias);
+        // Check that the wiki Id is available
+        if (failOnExist && !idAvailable(wikiId)) {
+            throw new WikiManagerException("wiki id is not valid");
+        }
+
+        XWikiContext context = xcontextProvider.get();
+        WikiDescriptor descriptor;
 
         try {
-            // Build the document
-            wikiDescriptorBuilder.save(descriptor);
-            // Reload the descriptor from the cache because it should have been seen by the DescriptorListener.
-            descriptor = wikiDescriptorManager.getById(wikiId);
-        } catch (WikiDescriptorBuilderException e) {
-            throw new WikiManagerException("Failed to build the descriptor document.", e);
+            // Send the begin event
+            observationManager.notify(new WikiCreatingEvent(wikiId), wikiId, context);
+
+            // Create the wiki
+            descriptor = wikiCreator.create(wikiId, wikiAlias);
+
+            // Send the end event
+            observationManager.notify(new WikiCreatedEvent(wikiId), wikiId, context);
+
+        } catch (WikiManagerException e) {
+            // Send the failed event
+            observationManager.notify(new WikiCreateFailedEvent(wikiId), wikiId, context);
+
+            // Throw the exception
+            throw e;
         }
 
         return descriptor;
     }
 
     @Override
-    public WikiDescriptor create(String wikiId, String wikiAlias) throws WikiManagerException
-    {
-        // Check that the wiki Id is available
-        if (!idAvailable(wikiId)) {
-            throw new WikiManagerException("wiki id is not valid");
-        }
-
-        XWikiContext context = xcontextProvider.get();
-        XWiki xwiki = context.getWiki();
-
-        // Create database/schema
-        try {
-            xwiki.getStore().createWiki(wikiId, context);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databasecreation"));
-        }
-
-        // Init database/schema
-        try {
-            xwiki.updateDatabase(wikiId, true, true, context);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databaseupdate"));
-        }
-
-        return createDescriptor(wikiId, wikiAlias);
-    }
-
-    @Override
     public WikiDescriptor copy(String fromWikiId, String newWikiId, String newWikiAlias, boolean copyHistory,
-            boolean copyRecycleBin) throws WikiManagerException
+            boolean copyRecycleBin, boolean failOnExist) throws WikiManagerException
     {
-        WikiDescriptor newWiki = create(newWikiId, newWikiAlias);
+        WikiDescriptor newWiki = create(newWikiId, newWikiAlias, failOnExist);
         wikiCopier.copyDocuments(fromWikiId, newWikiId, copyHistory);
         if (copyRecycleBin) {
             wikiCopier.copyDeletedDocuments(fromWikiId, newWikiId);
         }
+        observationManager.notify(new WikiCopiedEvent(fromWikiId, newWikiId), fromWikiId, xcontextProvider.get());
         return newWiki;
     }
 
@@ -149,28 +127,8 @@ public class DefaultWikiManager implements WikiManager
     @Override
     public void delete(String wikiId) throws WikiManagerException
     {
-        XWikiContext context = xcontextProvider.get();
-        XWiki xwiki = context.getWiki();
-
-        // Check if we try to delete the main wiki
-        if (wikiId.equals(wikiDescriptorManager.getMainWikiId())) {
-            throw new WikiManagerException("can't delete main wiki");
-        }
-
-        // Delete the database
-        try {
-            xwiki.getStore().deleteWiki(wikiId, context);
-        } catch (XWikiException e) {
-            throw new WikiManagerException("can't delete database");
-        }
-
-        // Delete the descriptor document
-        try {
-            XWikiDocument descriptorDocument = descriptorDocumentHelper.getDocumentFromWikiId(wikiId);
-            xwiki.deleteDocument(descriptorDocument, context);
-        } catch (XWikiException e) {
-            throw new WikiManagerException("can't delete descriptor document");
-        }
+        // Delete the wiki
+        wikiDeleter.delete(wikiId);
 
         // Send an event
         observationManager.notify(new WikiDeletedEvent(wikiId), wikiId);
@@ -178,9 +136,17 @@ public class DefaultWikiManager implements WikiManager
 
     @Override
     public boolean idAvailable(String wikiId) throws WikiManagerException {
-        //TODO: look if the id is valid and free (the database does not already exists, for example)
+        // Get the store
+        XWikiContext xcontext = xcontextProvider.get();
+        XWiki xwiki = xcontext.getWiki();
+        // Get the forbidden list
         String wikiForbiddenList = xcontextProvider.get().getWiki().Param("xwiki.virtual.reserved_wikis");
-        return !wikiDescriptorManager.exists(wikiId) && !Util.contains(wikiId, wikiForbiddenList, ", ");
+        try {
+            return !wikiDescriptorManager.exists(wikiId) && !Util.contains(wikiId, wikiForbiddenList, ", ")
+                    && xwiki.getStore().isWikiNameAvailable(wikiId, xcontext);
+        } catch (XWikiException e) {
+            throw new WikiManagerException("Fail to look at the databases.");
+        }
     }
 
     private XWikiDocument getDocument(DocumentReference reference) throws WikiManagerException

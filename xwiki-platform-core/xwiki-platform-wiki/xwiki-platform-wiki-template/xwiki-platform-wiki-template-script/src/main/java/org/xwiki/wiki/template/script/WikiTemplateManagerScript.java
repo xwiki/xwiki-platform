@@ -154,10 +154,11 @@ public class WikiTemplateManagerScript implements ScriptService
      * @param newWikiAlias Default alias of the wiki to create
      * @param templateId Id of the template to use
      * @param ownerId Id of the wiki owner
+     * @param failOnExist fail the creation of the wiki id if not available
      * @return The descriptor of the new wiki or null if problems occur
      */
     public WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias,
-            String templateId, String ownerId)
+            String templateId, String ownerId, boolean failOnExist)
     {
         WikiDescriptor descriptor = null;
         try {
@@ -165,7 +166,8 @@ public class WikiTemplateManagerScript implements ScriptService
             if (authorizationManager.hasAccess(Right.CREATE_WIKI, context.getUserReference(),
                     new WikiReference(context.getMainXWiki())))
             {
-                descriptor = wikiTemplateManager.createWikiFromTemplate(newWikiId, newWikiAlias, templateId, ownerId);
+                descriptor = wikiTemplateManager.createWikiFromTemplate(newWikiId, newWikiAlias, templateId, ownerId,
+                        failOnExist);
             }
         } catch (WikiTemplateManagerException e) {
             error("Failed to create the wiki from the template.", e);

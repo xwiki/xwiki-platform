@@ -125,6 +125,17 @@ solr.facets.collapseAll=Collapse all
 solr.facets.emptyValue=Empty Value
 solr.facets.moreValues={0} more
 
+solr.facet.date.today=Today
+solr.facet.date.last7Days=Last 7 days
+solr.facet.date.last30Days=Last 30 days
+solr.facet.date.customInterval=Custom interval
+solr.facet.date.start=Start date
+solr.facet.date.end=End date
+solr.facet.date.between=From {0} to {1}
+solr.facet.date.after=After {0}
+solr.facet.date.before=Before {0}
+solr.facet.date.any=Any date
+
 solr.field.locale=Language
 solr.field.locale.emptyValue=No Language
 solr.field.wiki=Wiki

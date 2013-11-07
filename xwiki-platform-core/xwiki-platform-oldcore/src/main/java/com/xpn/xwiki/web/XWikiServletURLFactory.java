@@ -597,10 +597,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     private static URL normalizeURL(URL url, XWikiContext context) throws MalformedURLException
     {
-        // For robust session tracking, all URLs emitted by a servlet should be encoded. Otherwise, URL rewriting
-        // cannot be used with browsers which do not support cookies.
-        String encodedURLAsString = context.getResponse().encodeURL(url.toExternalForm());
-        return new URL(encodedURLAsString);
+        return normalizeURL(url.toExternalForm(), context);
     }
 
     private static URL normalizeURL(String url, XWikiContext context) throws MalformedURLException

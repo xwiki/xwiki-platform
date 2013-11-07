@@ -283,6 +283,19 @@ tbody&gt;tr&gt;td&gt;tt {
   #set ($crtSyntaxVer = 2.1) ## Default to Syntax 2.1
 #end
 
+#set ($extraParamList = []) 
+#if ($request.language)
+  #set ($discard = $extraParamList.add("language=$escapetool.url($request.language)"))
+#end
+#if ($request.xpage)
+  #set ($discard = $extraParamList.add("xpage=$escapetool.url($request.xpage)"))
+#end
+#if ($extraParamList.isEmpty())
+  #set ($extraParams = '')
+#else
+  #set ($extraParams = '&amp;'+$stringtool.join($extraParamList,'&amp;'))
+#end
+
 ##
 ## Syntax menu map
 ##
@@ -364,13 +377,7 @@ $syntaxMenu.add($cat)
 ##
 #foreach ($category in $syntaxMenu)
   ## "Standard" URLs and icons for categories
-  #set ($category.url = "?syntax=$escapetool.url(${crtSyntaxVer})&amp;category=${mathtool.sub($velocityCount, 1)}")
-  #if ($request.language)
-    #set ($category.url = "$category.url&amp;language=$escapetool.url($request.language)")
-  #end
-  #if ($request.xpage)
-    #set ($category.url = "$category.url&amp;xpage=$escapetool.url($request.xpage)")
-  #end
+  #set ($category.url = "?syntax=$escapetool.url(${crtSyntaxVer})&amp;category=${mathtool.sub($velocityCount, 1)}${extraParams}")  
   #set ($category.cssClass = "${category.id}Icon")
   #if ("$!{crtCategoryId}" != '' &amp;&amp; $velocityCount == $mathtool.add($crtCategoryId, 1))
     #set ($crtCategory = $category)
@@ -383,13 +390,7 @@ $syntaxMenu.add($cat)
         #set ($crtSection = $section)
         #set ($crtCategory = $category)
       #end
-      #set ($section.url = "?syntax=$escapetool.url(${crtSyntaxVer})&amp;section=$escapetool.url(${section.id})")
-      #if ($request.language)
-        #set ($section.url = "$section.url&amp;language=$escapetool.url($request.language)")
-      #end
-      #if ($request.xpage)
-        #set ($section.url = "$section.url&amp;xpage=$escapetool.url($request.xpage)")
-      #end
+      #set ($section.url = "?syntax=$escapetool.url(${crtSyntaxVer})&amp;section=$escapetool.url(${section.id})${extraParams}")
     #end
   #end
 #end
@@ -460,19 +461,10 @@ $syntaxMenu.add($cat)
   #elseif ($crtSectionId != '')
     #set ($crtSelection = "section=$escapetool.url($!{crtSectionId})")
   #end
-  #if ($request.language)
-    #if ($crtSelection != "")
-      #set ($crtSelection = "${crtSelection}&amp;amp;language=$escapetool.url($request.language)")
-    #else
-      #set ($crtSelection = "language=$escapetool.url($request.language)")
-    #end
-  #end
-  #if ($request.xpage)
-    #if ($crtSelection != "")
-      #set ($crtSelection = "${crtSelection}&amp;amp;xpage=$escapetool.url($request.xpage)")
-    #else
-      #set ($crtSelection = "xpage=$escapetool.url($request.xpage)")
-    #end
+  #if ($crtSelection != "")
+    #set ($crtSelection = "${crtSelection}${extraParams}")
+  #else
+    #set ($crtSelection = "$extraParams")
   #end
 {{html}}
   &lt;form id="change-context" class="xformInline" action=""&gt;
@@ -486,11 +478,11 @@ $syntaxMenu.add($cat)
       #end
       &lt;select id="goto-select" name="target" title="$escapetool.xml($services.localization.render("help.changesyntax"))"&gt;
         &lt;optgroup label="$services.localization.render('help.choose_syntax')"&gt;
-          #set ($query = "syntax=1.0&amp;amp;${crtSelection}")
+          #set ($query = "syntax=1.0&amp;${crtSelection}")
           &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==1.0)selected="selected"#end&gt;XWiki Syntax 1.0&lt;/option&gt;
-          #set ($query = "syntax=2.0&amp;amp;${crtSelection}")
+          #set ($query = "syntax=2.0&amp;${crtSelection}")
           &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==2.0)selected="selected"#end&gt;XWiki Syntax 2.0&lt;/option&gt;
-          #set ($query = "syntax=2.1&amp;amp;${crtSelection}")
+          #set ($query = "syntax=2.1&amp;${crtSelection}")
           &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==2.1)selected="selected"#end&gt;XWiki Syntax 2.1&lt;/option&gt;
         &lt;/optgroup&gt;
       &lt;/select&gt;
@@ -518,10 +510,7 @@ $xwiki.get('ssx').use($doc.getFullName())##
 #set ($syntaxTitle = $services.localization.render("help.syntaxtitle", ["${crtSyntaxVer}"]))
 #syntaxSwitch()
 (((
-#set ($query = "syntax=$escapetool.url(${crtSyntaxVer})")
-#if ($request.xpage)
-  #set ($query = "$query&amp;xpage=$escapetool.url(${request.xpage})")
-#end
+#set ($query = "syntax=$escapetool.url(${crtSyntaxVer})${extraParams}")
 #if ($crtCategory){{html}}&lt;a href="${doc.getURL('view', ${query})}"&gt;$syntaxTitle&lt;/a&gt;{{/html}}#{else}(% class="current" %)$syntaxTitle#{end}#if ($crtCategory) (% class="separator" %)» #if ($crtSection){{html}}&lt;a href="${crtCategory.url}"&gt;${crtCategory.name}&lt;/a&gt;{{/html}}#{else}(% class="current" %)${crtCategory.name}#{end}#if ($crtSection) (% class="separator" %)» (% class="current" %)${crtSection.name}#end#end
 )))
 == $syntaxTitle: $sectionName ==

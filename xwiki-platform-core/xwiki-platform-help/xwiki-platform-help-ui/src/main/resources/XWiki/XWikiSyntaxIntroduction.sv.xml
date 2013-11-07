@@ -35,7 +35,7 @@ Med början på XWiki enterprise version 1.7 och senare har en ny wikisyntax, ka
 ** Tvetydigheter fanns exempelvis då en rad inleddes med en asterisk.  Var det då fetstil eller en punktlista?  Detta var nödvändigt att lösa för att möjliggöra en deterministisk WYSIWYG-editor.
 * För att närma sig [[Creole 1.0 syntaxen&gt;&gt;http://www.wikicreole.org/]] vilken håller på att bli standard för wikisyntax.  Sammanslutningen bakom Creole har dessutom noggrant analyserat alla existerande wikisyntaxer innan de valt symboler.  Symbolvalen är därför väldigt bra.
 
-Utöver syntaxändringarna har vi också bytt ut den underliggande renderingsmotorn (vilken tidigare var Radeox) till förmån för vår egen motor som bygger på [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] och [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (och möjligen andra i framtiden).  Detta låter oss tillhandahålla andra syntaxer i wikin: [[MediaWiki, Confluence, JSPWiki, Creole, TWiki m.fl.&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes&amp;language=sv"]]
+Utöver syntaxändringarna har vi också bytt ut den underliggande renderingsmotorn (vilken tidigare var Radeox) till förmån för vår egen motor som bygger på [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] och [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (och möjligen andra i framtiden).  Detta låter oss tillhandahålla andra syntaxer i wikin: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki m.fl.&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}
 
 
 === 2.0 Introduction ===
@@ -45,7 +45,7 @@ Med början på XWiki enterprise version 1.7 och senare har en ny wikisyntax, ka
 ** Tvetydigheter fanns exempelvis då en rad inleddes med en asterisk.  Var det då fetstil eller en punktlista?  Detta var nödvändigt att lösa för att möjliggöra en deterministisk WYSIWYG-editor.
 * För att närma sig [[Creole 1.0 syntaxen&gt;&gt;http://www.wikicreole.org/]] vilken håller på att bli standard för wikisyntax.  Sammanslutningen bakom Creole har dessutom noggrant analyserat alla existerande wikisyntaxer innan de valt symboler.  Symbolvalen är därför väldigt bra.
 
-Utöver syntaxändringarna har vi också bytt ut den underliggande renderingsmotorn (vilken tidigare var Radeox) till förmån för vår egen motor som bygger på [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] och [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (och möjligen andra i framtiden).  Detta låter oss tillhandahålla andra syntaxer i wikin: [[MediaWiki, Confluence, JSPWiki, Creole, TWiki m.fl.&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes&amp;language=sv"]]
+Utöver syntaxändringarna har vi också bytt ut den underliggande renderingsmotorn (vilken tidigare var Radeox) till förmån för vår egen motor som bygger på [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] och [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (och möjligen andra i framtiden).  Detta låter oss tillhandahålla andra syntaxer i wikin: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki m.fl.&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}
 
 
 === 2.1 Introduction ===
@@ -56,5 +56,5 @@ Sedan introduktionen av XWiki syntax 2.0 har några begränsningar upptäckts.  
 
 {{info}}Eftersom XWiki syntax 2.1 bygger på XWiki syntax 2.0 gäller all syntax från XWiki syntax 2.0 om inte annat anges i specifikationen för 2.1.{{/info}}
 
-Utöver syntaxändringarna har vi också bytt ut den underliggande renderingsmotorn (vilken tidigare var Radeox) till förmån för vår egen motor som bygger på [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] och [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (och möjligen andra i framtiden).  Detta låter oss tillhandahålla andra syntaxer i wikin: [[MediaWiki, Confluence, JSPWiki, Creole, TWiki m.fl.&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes&amp;language=sv"]]</content>
+Utöver syntaxändringarna har vi också bytt ut den underliggande renderingsmotorn (vilken tidigare var Radeox) till förmån för vår egen motor som bygger på [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] och [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (och möjligen andra i framtiden).  Detta låter oss tillhandahålla andra syntaxer i wikin: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki m.fl.&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}</content>
 </xwikidoc>

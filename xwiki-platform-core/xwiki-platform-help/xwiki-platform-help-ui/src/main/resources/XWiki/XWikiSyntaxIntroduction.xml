@@ -111,7 +111,7 @@
 
 The XWiki Syntax 1.0 was the first attempt to implement a Wiki-style Syntax in XWiki. It has some limitations and some formatting can only be achieved by inserting raw HTML. We recommend using the newer syntaxes; XWiki Syntax 1.0 is only supported for backwards compatibility.
 
-In addition to the XWiki-specific syntaxes we've also changed our underlying rendering engine in XWiki Enterprise version 1.7 (was Radeox previously) in favor of our own engine which is superset wrapper around [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] and [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (and possibly others in the future). This has allowed us to provide other syntaxes in the wiki: [[MediaWiki, Confluence, JSPWiki, Creole, TWiki and more&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes&amp;language=default"]].
+In addition to the XWiki-specific syntaxes we've also changed our underlying rendering engine in XWiki Enterprise version 1.7 (was Radeox previously) in favor of our own engine which is superset wrapper around [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] and [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (and possibly others in the future). This has allowed us to provide other syntaxes in the wiki: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki and more&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
 
 === 2.0 Introduction ===
 
@@ -121,7 +121,7 @@ Starting with XWiki Enterprise version 1.7 we've introduced a new wiki syntax. W
 ** Ambiguities. For example there was an ambiguity between a bold item starting a line and a bulletted list. Resolving the ambiguities was required in order to rewrite the WYSIWYG editor so that it could be deterministic.
 * Be closer to the [[Creole 1.0 syntax&gt;&gt;http://www.wikicreole.org/]] which is becoming a standard for wiki syntax. In addition the Creole community has taken the time to analyze all the existing wiki syntaxes before deciding on symbols. The choices made are thus very good.
 
-In addition to these XWiki-specific syntaxes we've also changed our underlying rendering engine (was Radeox previously) in favor of our own engine which is superset wrapper around [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] and [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (and possibly others in the future). This has allowed us to provide other syntaxes in the wiki: [[MediaWiki, Confluence, JSPWiki, Creole, TWiki and more&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes&amp;language=default"]].
+In addition to these XWiki-specific syntaxes we've also changed our underlying rendering engine (was Radeox previously) in favor of our own engine which is superset wrapper around [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] and [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (and possibly others in the future). This has allowed us to provide other syntaxes in the wiki: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki and more&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
 
 === 2.1 Introduction ===
 
@@ -131,6 +131,6 @@ Since the introduction of XWiki Syntax 2.0 a few shortcomings of this syntax hav
 
 {{info}}Since XWiki Syntax 2.1 is based on XWiki Syntax 2.0 all syntax from XWiki Syntax 2.0 is valid unless the 2.1 specifications suggest differently.{{/info}}
 
-In addition to these XWiki-specific syntaxes we've also changed our underlying rendering engine in XWiki Enterprise version 1.7 (was Radeox previously) in favor of our own engine which is superset wrapper around [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] and [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (and possibly others in the future).  This has allowed us to provide other syntaxes in the wiki: [[MediaWiki, Confluence, JSPWiki, Creole, TWiki and more&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes&amp;language=default"]].
+In addition to these XWiki-specific syntaxes we've also changed our underlying rendering engine in XWiki Enterprise version 1.7 (was Radeox previously) in favor of our own engine which is superset wrapper around [[Wikimodel&gt;&gt;http://code.google.com/p/wikimodel/]] and [[Doxia&gt;&gt;http://maven.apache.org/doxia/]] (and possibly others in the future).  This has allowed us to provide other syntaxes in the wiki: {{velocity}}[[MediaWiki, Confluence, JSPWiki, Creole, TWiki and more&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
 </content>
 </xwikidoc>

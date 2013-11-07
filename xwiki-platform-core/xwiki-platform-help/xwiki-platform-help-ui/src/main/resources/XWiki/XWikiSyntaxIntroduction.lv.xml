@@ -31,7 +31,7 @@
 
 Sākot ar XWiki Enterprise versiju 1.7 ir ieviesta jauna viki sintakse. Līdz ar to, vecā viki sintakse tiek saukta par //XWiki 1.0 sintaksi//, bet jaunā par //XWiki 2.0 sintaksi//.
 
-Papildus šīm divām XWiki sintaksēm mēs bijušā //Radeox// dzinēja vietā esam ieviesuši īpašu sintakses apstrādes infrastruktūru, kas apstrādā  [[//Wikimodel//&gt;&gt;http://code.google.com/p/wikimodel/]], [[//Doxia//&gt;&gt;http://maven.apache.org/doxia/]] un nākotnē iespējams arī citus modeļus. Tas mums ļauj izmantot arī citas viki sintakses kā [[//MediaWiki, Confluence, JSPWiki, Creole, TWiki// un citas&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes&amp;language=lv"]].
+Papildus šīm divām XWiki sintaksēm mēs bijušā //Radeox// dzinēja vietā esam ieviesuši īpašu sintakses apstrādes infrastruktūru, kas apstrādā  [[//Wikimodel//&gt;&gt;http://code.google.com/p/wikimodel/]], [[//Doxia//&gt;&gt;http://maven.apache.org/doxia/]] un nākotnē iespējams arī citus modeļus. Tas mums ļauj izmantot arī citas viki sintakses kā {{velocity}}[[//MediaWiki, Confluence, JSPWiki, Creole, TWiki// un citas&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
 
 === 2.0 Introduction ===
 
@@ -42,7 +42,7 @@ Sākot ar XWiki Enterprise versiju 1.7 ir ieviesta jauna viki sintakse. Līdz ar
 ** Nenoteiktība. Atkal kā piemēru var minēt zvaigznītes, kas apzīmē gan treknrakstu, gan aizzīmētu sarakstu. Nenoteiktības bija nepieciešams novērst, lai varētu izstrādāt noformējuma redaktoru, kas darbojas stingri determinēti.
 * Nepieciešamība tuvināties [[//Creole// 1.0 sintaksei&gt;&gt;http://www.wikicreole.org/]], kas iedibinās par standarta viki sistēmu sintaksi. //Creole// izstrādes komūna ir veikusi visu vadošo viki sistēmu sintaksi analīzi un salīdzināšanu, izvēloties ērtākos un izplatītākos apzīmējumus. Mūsu 1.0 versijā ieviestā sintakse ne visur bija tāda.
 
-Papildus šīm divām XWiki sintaksēm mēs bijušā //Radeox// dzinēja vietā esam ieviesuši īpašu sintakses apstrādes infrastruktūru, kas apstrādā  [[//Wikimodel//&gt;&gt;http://code.google.com/p/wikimodel/]], [[//Doxia//&gt;&gt;http://maven.apache.org/doxia/]] un nākotnē iespējams arī citus modeļus. Tas mums ļauj izmantot arī citas viki sintakses kā [[//MediaWiki, Confluence, JSPWiki, Creole, TWiki// un citas&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes&amp;language=lv"]].
+Papildus šīm divām XWiki sintaksēm mēs bijušā //Radeox// dzinēja vietā esam ieviesuši īpašu sintakses apstrādes infrastruktūru, kas apstrādā  [[//Wikimodel//&gt;&gt;http://code.google.com/p/wikimodel/]], [[//Doxia//&gt;&gt;http://maven.apache.org/doxia/]] un nākotnē iespējams arī citus modeļus. Tas mums ļauj izmantot arī citas viki sintakses kā {{velocity}}[[//MediaWiki, Confluence, JSPWiki, Creole, TWiki// un citas&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
 
 === 2.1 Introduction ===
 
@@ -53,5 +53,5 @@ Sākot ar XWiki Enterprise versiju 1.7 ir ieviesta jauna viki sintakse. Līdz ar
 ** Nenoteiktība. Atkal kā piemēru var minēt zvaigznītes, kas apzīmē gan treknrakstu, gan aizzīmētu sarakstu. Nenoteiktības bija nepieciešams novērst, lai varētu izstrādāt noformējuma redaktoru, kas darbojas stingri determinēti.
 * Nepieciešamība tuvināties [[//Creole// 1.0 sintaksei&gt;&gt;http://www.wikicreole.org/]], kas iedibinās par standarta viki sistēmu sintaksi. //Creole// izstrādes komūna ir veikusi visu vadošo viki sistēmu sintaksi analīzi un salīdzināšanu, izvēloties ērtākos un izplatītākos apzīmējumus. Mūsu 1.0 versijā ieviestā sintakse ne visur bija tāda.
 
-Papildus šīm divām XWiki sintaksēm mēs bijušā //Radeox// dzinēja vietā esam ieviesuši īpašu sintakses apstrādes infrastruktūru, kas apstrādā  [[//Wikimodel//&gt;&gt;http://code.google.com/p/wikimodel/]], [[//Doxia//&gt;&gt;http://maven.apache.org/doxia/]] un nākotnē iespējams arī citus modeļus. Tas mums ļauj izmantot arī citas viki sintakses kā [[//MediaWiki, Confluence, JSPWiki, Creole, TWiki// un citas&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes&amp;language=lv"]].</content>
+Papildus šīm divām XWiki sintaksēm mēs bijušā //Radeox// dzinēja vietā esam ieviesuši īpašu sintakses apstrādes infrastruktūru, kas apstrādā  [[//Wikimodel//&gt;&gt;http://code.google.com/p/wikimodel/]], [[//Doxia//&gt;&gt;http://maven.apache.org/doxia/]] un nākotnē iespējams arī citus modeļus. Tas mums ļauj izmantot arī citas viki sintakses kā {{velocity}}[[//MediaWiki, Confluence, JSPWiki, Creole, TWiki// un citas&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.</content>
 </xwikidoc>

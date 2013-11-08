@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.template.internal;
+package org.xwiki.wiki.internal.provisioning;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,22 +36,25 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobStatus;
-import org.xwiki.wiki.template.WikiTemplateManagerException;
+import org.xwiki.wiki.provisioning.WikiProvisioningJob;
+import org.xwiki.wiki.provisioning.WikiProvisioningJobException;
+import org.xwiki.wiki.provisioning.WikiProvisioningJobExecutor;
+import org.xwiki.wiki.provisioning.WikiProvisioningJobRequest;
 
 /**
- * Default implementation for {@link TemplateWikiProvisionerExecutor}.
+ * Default implementation for {@link org.xwiki.wiki.provisioning.WikiProvisioningJobExecutor}.
  *
  * @since 5.3M2
  * @version $Id$
  */
 @Component
 @Singleton
-public class DefaultTemplateWikiProvisionerExecutor implements TemplateWikiProvisionerExecutor, Initializable
+public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobExecutor, Initializable
 {
     /**
-     * Map of all the jobs.
+     * List of all the jobs.
      */
-    private Map<String, TemplateWikiProvisioner> provisionners;
+    private List<WikiProvisioningJob> jobs;
 
     /**
      * Job Executor.
@@ -68,40 +71,49 @@ public class DefaultTemplateWikiProvisionerExecutor implements TemplateWikiProvi
     @Override
     public void initialize() throws InitializationException
     {
-        this.provisionners = new HashMap<String, TemplateWikiProvisioner>();
+        this.jobs = new ArrayList<WikiProvisioningJob>();
 
-        // Setup provisionners job thread
+        // Setup jobs thread
         BasicThreadFactory factory =
-                new BasicThreadFactory.Builder().namingPattern("XWiki Template provisioner thread").daemon(true)
+                new BasicThreadFactory.Builder().namingPattern("XWiki Template provisioning thread").daemon(true)
                         .priority(Thread.MIN_PRIORITY).build();
         this.jobExecutor = Executors.newCachedThreadPool(factory);
     }
 
     @Override
-    public void createAndExecuteJob(String wikiId, String templateId) throws WikiTemplateManagerException
+    public int createAndExecuteJob(String wikiId, String provisionerRole, Object parameter) throws
+            WikiProvisioningJobException
     {
         try {
+            int jobId = -1;
             // Create the job
-            TemplateWikiProvisioner job = componentManager.getInstance(Job.class, TemplateWikiProvisioner.JOBTYPE);
+            WikiProvisioningJob job = componentManager.getInstance(Job.class, provisionerRole);
             // Initialize it
-            job.initialize(new TemplateWikiProvisionerRequest(wikiId, templateId));
+            job.initialize(new WikiProvisioningJobRequest(wikiId, parameter));
             // Put it to the list of jobs
-            provisionners.put(wikiId, job);
+            synchronized (jobs) {
+                jobId = jobs.size();
+                jobs.add(job);
+            }
             // Pass it to the executor
             jobExecutor.execute(new ExecutionContextRunnable(job, this.componentManager));
+            // Return the job id
+            return jobId;
         } catch (ComponentLookupException e) {
-            throw new WikiTemplateManagerException("Failed to lookup template provisioner job component", e);
+            throw new WikiProvisioningJobException(
+                    String.format("Failed to lookup provisioning job component for role [%s]", provisionerRole), e);
         }
     }
 
     @Override
-    public JobStatus getJobStatus(String wikiId) throws WikiTemplateManagerException
+    public JobStatus getJobStatus(int jobId) throws WikiProvisioningJobException
     {
-        TemplateWikiProvisioner provisionner = provisionners.get(wikiId);
-        if (provisionner == null) {
-            throw new WikiTemplateManagerException(String.format("There is no provisioner for the wiki [%s].",
-                    wikiId));
+        try {
+            WikiProvisioningJob job = jobs.get(jobId);
+            return job.getStatus();
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new WikiProvisioningJobException(
+                    String.format("There is no job corresponding to the jobId [%d].", jobId), e);
         }
-        return provisionner.getStatus();
     }
 }

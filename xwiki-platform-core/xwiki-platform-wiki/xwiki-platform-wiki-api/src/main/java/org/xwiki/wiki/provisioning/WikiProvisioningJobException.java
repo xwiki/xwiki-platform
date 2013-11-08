@@ -20,12 +20,12 @@
 package org.xwiki.wiki.provisioning;
 
 /**
- * Encapsulate any exception related to Wiki Provisioner.
+ * Encapsulate any exception related to Wiki Provisioning Jobs.
  *
  * @version $Id$
  * @since 5.3M2
  */
-public class WikiProvisionerException extends Exception
+public class WikiProvisioningJobException extends Exception
 {
     /**
      * Class ID for serialization.
@@ -37,7 +37,7 @@ public class WikiProvisionerException extends Exception
      *
      * @param message The detailed message. This can later be retrieved by the Throwable.getMessage() method.
      */
-    public WikiProvisionerException(String message)
+    public WikiProvisioningJobException(String message)
     {
         super(message);
     }
@@ -49,7 +49,7 @@ public class WikiProvisionerException extends Exception
      * @param throwable the cause. This can be retrieved later by the Throwable.getCause() method. (A null value is
      * permitted, and indicates that the cause is nonexistent or unknown)
      */
-    public WikiProvisionerException(String message, Throwable throwable)
+    public WikiProvisioningJobException(String message, Throwable throwable)
     {
         super(message, throwable);
     }

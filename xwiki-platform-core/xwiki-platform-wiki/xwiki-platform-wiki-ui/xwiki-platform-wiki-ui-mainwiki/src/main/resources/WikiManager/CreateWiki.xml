@@ -336,17 +336,17 @@
 /**
  * Enhances the behaviour of an extension.
  */
-XWiki.TemplateProvisionner = Class.create({
+XWiki.ProvisioningBar = Class.create({
   initialize : function () {
     this._callRefresh.bind(this).delay(1);
   },
   _callRefresh : function () {
     // Document URL
-    var document = new XWiki.Document('WikiTemplateProvisionerService', 'WikiManager');
+    var document = new XWiki.Document('WikiTemplateProvisioningService', 'WikiManager');
     var url = document.getURL('get', 'outputSyntax=plain');
     new Ajax.Request(url, {
       method: 'get',
-      parameters : {'wikiId': $('wikiId').value},
+      parameters : {'jobId': $('jobId').value},
       onSuccess : function(response) {
         var result = response.responseText.evalJSON(true);
         this._refresh(result);
@@ -374,8 +374,8 @@ XWiki.TemplateProvisionner = Class.create({
 });
 
 var init = function(event) {
-  if ($('wikiId')) {
-    new XWiki.TemplateProvisionner();
+  if ($('jobId')) {
+    new XWiki.ProvisioningBar();
   }
   return true;
 };
@@ -1002,10 +1002,9 @@ return XWiki;
   #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
     ## check if the wiki is already in creation
     #if(!$services.wikitemplate.getWikiCreationStatus($request.wikiname))
-      #set($wikiDescriptor = $services.wikitemplate.createWikiFromTemplate($request.wikiname, $request.wikiname, $request.template, $request.ownerId, true))
-    #else
-      #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
+      #set($wikiJobId = $services.wikitemplate.createWikiFromTemplate($request.wikiname, $request.wikiname, $request.template, $request.ownerId, true))
     #end
+    #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
     #set($fromTemplate = true)
   #else 
     #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $request.wikiname, $request.ownerId, true))
@@ -1019,9 +1018,6 @@ return XWiki;
     #set ($discard = $wikiDescriptor.setPrettyName($request.wikiprettyname))
     #set ($discard = $wikiDescriptor.setDescription($request.description))
     #set ($discard = $services.wiki.saveDescriptor($wikiDescriptor))
-    ## Set the membership type and the local users
-    #set ($discard = $services.wikiuser.setMembershipType($wikiDescriptor.id, $request.membershipType))
-    #set ($discard = $services.wikiuser.setUserScope($wikiDescriptor.id, $request.userScope))
     ## Set the template value
     #if("$!request.set_as_template" != '')
       #set ($discard = $services.wikitemplate.setTemplate($wikiDescriptor.id, true))
@@ -1042,6 +1038,9 @@ return XWiki;
   #if(!$wikiDescriptor)
     #set($wikiDescriptor = $services.wiki.getById($request.wikiId))
   #end
+  ## Set the membership type and the local users
+  #set ($discard = $services.wikiuser.setMembershipType($wikiDescriptor.id, $request.membershipType))
+  #set ($discard = $services.wikiuser.setUserScope($wikiDescriptor.id, $request.userScope))
   #set ($groupsClassName = "${wikiDescriptor.id}:XWiki.XWikiGroups")    
   ## Save the members
   #set ($members = [])
@@ -1091,13 +1090,15 @@ return XWiki;
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
     #addMembersAsHiddenInput()
-    &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($wikiDescriptor.id)" /&gt;
+    &lt;input type="hidden" name="membershipType" value="$!escapetool.xml($request.getParameter('membershipType'))" /&gt;
+    &lt;input type="hidden" name="userScope" value="$!escapetool.xml($request.userScope)" /&gt;
+    &lt;input type="hidden" name="jobId" id="jobId" value="$!escapetool.xml($wikiJobId)" /&gt;
     #wizardHeader($services.localization.render('platform.wikimanager.wizard.stepFilling'))
     &lt;div class="wizard-body"&gt;
       &lt;div class="ui-progress" id="ui-progress"&gt;
         $services.localization.render('platform.wikimanager.wizard.stepFillingWait')
         &lt;div class="ui-progress-background"&gt;
-          #set ($percent = $services.wikitemplate.getWikiCreationStatus($wikiDescriptor.id).progress.offset)
+          #set ($percent = $services.wikitemplate.getWikiProvisioningJobStatus($wikiJobId).progress.offset)
           ## There is no progress information if the job was scheduled but hasn't started yet.
           #if (!$percent)
             #set ($percent = 0)

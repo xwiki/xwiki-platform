@@ -40,6 +40,8 @@ import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.properties.WikiPropertyGroupException;
 import org.xwiki.wiki.properties.WikiPropertyGroupProvider;
+import org.xwiki.wiki.provisioning.WikiProvisioningJobException;
+import org.xwiki.wiki.provisioning.WikiProvisioningJobExecutor;
 import org.xwiki.wiki.template.WikiTemplateManager;
 import org.xwiki.wiki.template.WikiTemplateManagerException;
 import org.xwiki.wiki.template.WikiTemplatePropertyGroup;
@@ -80,7 +82,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
 
     @Inject
-    private TemplateWikiProvisionerExecutor templateWikiProvisionerExecutor;
+    private WikiProvisioningJobExecutor wikiProvisionerExecutor;
 
     @Inject
     @Named("template")
@@ -151,7 +153,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     }
 
     @Override
-    public WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId,
+    public int createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId,
         String ownerId, boolean failOnExist) throws WikiTemplateManagerException
     {
         try {
@@ -162,19 +164,24 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
             descriptor.setOwnerId(ownerId);
             wikiDescriptorManager.saveDescriptor(descriptor);
 
-            // Then, create a template provisioner job
-            templateWikiProvisionerExecutor.createAndExecuteJob(newWikiId, templateId);
+            // finally, create a template provisioner job
+            return wikiProvisionerExecutor.createAndExecuteJob(newWikiId,
+                    TemplateWikiProvisioningJob.JOBTYPE, templateId);
 
-            // Finally, return the descriptor
-            return wikiDescriptorManager.getById(newWikiId);
         } catch (WikiManagerException e) {
+            throw new WikiTemplateManagerException(e.getMessage(), e);
+        } catch (WikiProvisioningJobException e) {
             throw new WikiTemplateManagerException(e.getMessage(), e);
         }
     }
 
     @Override
-    public JobStatus getWikiCreationStatus(String wikiId) throws WikiTemplateManagerException
+    public JobStatus getWikiProvisioningJobStatus(int jobId) throws WikiTemplateManagerException
     {
-        return templateWikiProvisionerExecutor.getJobStatus(wikiId);
+        try {
+            return wikiProvisionerExecutor.getJobStatus(jobId);
+        } catch (WikiProvisioningJobException e) {
+            throw new WikiTemplateManagerException(e.getMessage(), e);
+        }
     }
 }

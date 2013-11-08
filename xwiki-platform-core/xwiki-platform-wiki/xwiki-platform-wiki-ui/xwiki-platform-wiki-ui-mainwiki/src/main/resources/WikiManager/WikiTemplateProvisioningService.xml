@@ -2,7 +2,7 @@
 
 <xwikidoc>
   <web>WikiManager</web>
-  <name>WikiTemplateProvisionerService</name>
+  <name>WikiTemplateProvisioningService</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -26,8 +26,8 @@
   <content>{{velocity}}
 #if($xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
   #set($discard = $response.setContentType('application/json'))
-  #set($wikiId = $request.wikiId)
-  #set($status = $services.wikitemplate.getWikiCreationStatus($wikiId))
+  #set($jobId = $request.jobId)
+  #set($status = $services.wikitemplate.getWikiProvisioningJobStatus($jobId))
   #set($map = {'wikiId':$wikiId, 'progress':$status.progress.offset, 'status':$status.state})
   $jsontool.serialize($map)
 #end

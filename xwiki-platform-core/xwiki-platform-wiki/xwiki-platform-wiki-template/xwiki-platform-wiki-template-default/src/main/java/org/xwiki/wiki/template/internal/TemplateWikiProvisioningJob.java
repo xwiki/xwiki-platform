@@ -21,15 +21,20 @@ package org.xwiki.wiki.template.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
+import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.job.internal.DefaultJobStatus;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.wiki.internal.manager.WikiCopier;
-import org.xwiki.wiki.provisioning.WikiProvisioner;
-import org.xwiki.wiki.provisioning.WikiProvisionerRequest;
+import org.xwiki.wiki.provisioning.WikiProvisioningJob;
+import org.xwiki.wiki.provisioning.WikiProvisioningJobRequest;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Component that createAndExecuteJob a wiki with the content of a template wiki.
@@ -39,23 +44,37 @@ import org.xwiki.wiki.provisioning.WikiProvisionerRequest;
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-@Named(TemplateWikiProvisioner.JOBTYPE)
-public class TemplateWikiProvisioner extends AbstractJob<TemplateWikiProvisionerRequest,
-        DefaultJobStatus<WikiProvisionerRequest>> implements WikiProvisioner
+@Named(TemplateWikiProvisioningJob.JOBTYPE)
+public class TemplateWikiProvisioningJob extends AbstractJob<WikiProvisioningJobRequest,
+        DefaultJobStatus<WikiProvisioningJobRequest>> implements WikiProvisioningJob
 {
     /**
      * The id of the job.
      */
-    public static final String JOBTYPE = "wikiprovisioner.template";
+    public static final String JOBTYPE = "wikiprovisioning.template";
 
     @Inject
     private WikiCopier wikiCopier;
 
+    @Inject
+    private ObservationManager observationManager;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     @Override
     protected void runInternal() throws Exception
     {
-        TemplateWikiProvisionerRequest request = getRequest();
-        wikiCopier.copyDocuments(request.getTemplateId(), request.getWikiId(), false);
+        WikiProvisioningJobRequest request = getRequest();
+        if (!(request.getProvisioningJobParameter() instanceof String)) {
+            throw new Exception("The provisioning parameter is not a valid String.");
+        }
+
+        String wikiId = request.getWikiId();
+        String templateId = (String) request.getProvisioningJobParameter();
+
+        wikiCopier.copyDocuments(templateId, wikiId, false);
+        observationManager.notify(new WikiCopiedEvent(templateId, wikiId), templateId, xcontextProvider.get());
     }
 
     @Override

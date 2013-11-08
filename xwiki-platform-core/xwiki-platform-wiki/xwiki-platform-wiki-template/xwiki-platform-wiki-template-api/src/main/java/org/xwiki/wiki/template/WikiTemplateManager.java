@@ -68,18 +68,18 @@ public interface WikiTemplateManager
      * @param templateId Id of the template to use
      * @param ownerId Id of the wiki owner
      * @param failOnExist fail if the wiki id is not available
-     * @return The descriptor of the new wiki
+     * @return the id of the job that provision the new wiki with the template content
      * @throws WikiTemplateManagerException if problems occur
      */
-    WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId, String ownerId,
+    int createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId, String ownerId,
         boolean failOnExist) throws WikiTemplateManagerException;
 
     /**
-     * Get the status of the wiki creation job.
+     * Get the status of the wiki provisioning job.
      *
-     * @param wikiId id of the constructing wiki
+     * @param jobId id of wiki provisioning job
      * @return the status of the job
      * @throws WikiTemplateManagerException if problem occurs
      */
-    JobStatus getWikiCreationStatus(String wikiId) throws WikiTemplateManagerException;
+    JobStatus getWikiProvisioningJobStatus(int jobId) throws WikiTemplateManagerException;
 }

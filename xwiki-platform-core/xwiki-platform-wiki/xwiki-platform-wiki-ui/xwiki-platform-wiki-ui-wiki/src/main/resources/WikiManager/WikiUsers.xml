@@ -412,11 +412,13 @@ $services.localization.render('platform.workspace.candidateHandledComment') $mes
 #end
 
 ### MEMBERSHIP TYPE ###
-== Users configuration ==
 #set($userConfRef = $services.model.createDocumentReference('', 'WikiManager', 'WikiUserConfiguration'))
 #set($userConfDoc = $xwiki.getDocument($userConfRef))
+#set($updateWikiUserReference = $services.model.createDocumentReference('', 'WikiManager', 'UpdateWikiUser'))
+#set($redirectURL = $doc.getExternalURL($xcontext.action, $request.queryString))
 {{html clean="false" wiki="true"}}
-  &lt;form&gt;
+  &lt;form id='setUserConfigurationForm' class='xform half' action="$xwiki.getURL($updateWikiUserReference)" method='POST'&gt;
+    &lt;h2&gt;$services.localization.render('platform.wikimanager.userconfiguration.title')&lt;/h2&gt;
     &lt;dl&gt;
       &lt;dt&gt;
         &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.membershipType.hint"/}}&lt;/span&gt;
@@ -431,11 +433,18 @@ $services.localization.render('platform.workspace.candidateHandledComment') $mes
     &lt;/dl&gt;
     &lt;p class="buttons"&gt;
       &lt;span class='buttonwrapper'&gt;
-        &lt;input type="submit" class="button" value="save" onclick="alert('not implemented yet'); return false;"/&gt;
+        &lt;input type="submit" class="button" value="save"/&gt;
       &lt;/span&gt;
     &lt;/p&gt;
+{{/html}}
+#set($redirectURL = $doc.getExternalURL($xcontext.action, $request.queryString))
+{{html clean="false"}}
+    &lt;div class="hidden"&gt;
+      &lt;input type='hidden' name='xredirect' value="$redirectURL" /&gt;
+    &lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
+
 
 ##
 ## In the original sheet, this was displayed only in edit mode. 

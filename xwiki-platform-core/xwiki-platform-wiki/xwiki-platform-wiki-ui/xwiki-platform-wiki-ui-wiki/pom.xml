@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-platform-wiki-ui-wiki</artifactId>
   <packaging>xar</packaging>
-  <name>XWiki Platform - Wiki - UI</name>
+  <name>XWiki Platform - Wiki - UI - Wiki</name>
   <description>XWiki application that manages wiki.</description>
   <properties>
     <xwiki.extension.features>

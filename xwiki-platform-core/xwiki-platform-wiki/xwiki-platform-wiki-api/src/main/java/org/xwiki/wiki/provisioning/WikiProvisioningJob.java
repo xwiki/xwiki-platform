@@ -17,38 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.template.internal;
+package org.xwiki.wiki.provisioning;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.job.event.status.JobStatus;
-import org.xwiki.stability.Unstable;
-import org.xwiki.wiki.template.WikiTemplateManagerException;
+import org.xwiki.job.Job;
 
 /**
- * Executor that manage job that provision wikis.
- *
- * @since 5.3M3
- * @version $Id$
+ * Component that prepares new wikis.
+ * @since 5.3M2
+ * @version $Id :$
  */
 @Role
-@Unstable
-public interface TemplateWikiProvisionerExecutor
+public interface WikiProvisioningJob extends Job
 {
-    /**
-     * Create a job and execute it.
-     *
-     * @param wikiId id of the wiki to provision
-     * @param templateId id of the template to use
-     * @throws WikiTemplateManagerException if problems occur
-     */
-    void createAndExecuteJob(String wikiId, String templateId) throws WikiTemplateManagerException;
-
-    /**
-     * Get the status of a job.
-     *
-     * @param wikiId Id od the wiki concerned by the job
-     * @return the job status
-     * @throws WikiTemplateManagerException if problems occur
-     */
-    JobStatus getJobStatus(String wikiId) throws WikiTemplateManagerException;
 }

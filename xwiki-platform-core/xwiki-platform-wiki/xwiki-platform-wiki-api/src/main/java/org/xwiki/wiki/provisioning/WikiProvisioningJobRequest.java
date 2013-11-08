@@ -20,6 +20,7 @@
 package org.xwiki.wiki.provisioning;
 
 import org.xwiki.job.AbstractRequest;
+import org.xwiki.stability.Unstable;
 
 /**
  * Base class for {@link org.xwiki.job.Request} implementations used by wiki provisioners.
@@ -27,21 +28,29 @@ import org.xwiki.job.AbstractRequest;
  * @since 5.3M2
  * @version $Id$
  */
-public class WikiProvisionerRequest extends AbstractRequest
+@Unstable
+public class WikiProvisioningJobRequest extends AbstractRequest
 {
     /**
-     * Name of the property that stores the od of the wiki to provision.
+     * Name of the property that stores the id of the wiki to provision.
      */
-    public static final String PROPERTY_WIKI_ID = "wikiprovisioner.wikiId";
+    public static final String PROPERTY_WIKI_ID = "wikiprovisioning.wikiId";
+
+    /**
+     * Name of the property that stores the property used by the provisioning job.
+     */
+    public static final String PROPERTY_PROVISIONING_JOB_PARAMETER = "wikiprovisioning.parameter";
 
     /**
      * Constructor.
      * @param wikiId id of the wiki to provision
+     * @param parameter the parameter to be used by the provisioning job
      */
-    public WikiProvisionerRequest(String wikiId)
+    public WikiProvisioningJobRequest(String wikiId, Object parameter)
     {
         super();
         setWikiId(wikiId);
+        setProvisioningJobParameter(parameter);
     }
 
     /**
@@ -58,6 +67,22 @@ public class WikiProvisionerRequest extends AbstractRequest
     public String getWikiId()
     {
         return getProperty(PROPERTY_WIKI_ID);
+    }
+
+    /**
+     * @param parameter the parameter to be used by the provisioning job
+     */
+    public void setProvisioningJobParameter(Object parameter)
+    {
+        setProperty(PROPERTY_PROVISIONING_JOB_PARAMETER, parameter);
+    }
+
+    /**
+     * @return the parameter to be used by the provisioning job
+     */
+    public Object getProvisioningJobParameter()
+    {
+        return getProperty(PROPERTY_PROVISIONING_JOB_PARAMETER);
     }
 
 }

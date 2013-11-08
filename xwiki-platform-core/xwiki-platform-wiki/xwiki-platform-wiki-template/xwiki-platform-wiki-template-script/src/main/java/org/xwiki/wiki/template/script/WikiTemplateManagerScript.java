@@ -155,24 +155,25 @@ public class WikiTemplateManagerScript implements ScriptService
      * @param templateId Id of the template to use
      * @param ownerId Id of the wiki owner
      * @param failOnExist fail the creation of the wiki id if not available
-     * @return The descriptor of the new wiki or null if problems occur
+     * @return the id of the job that provision the new wiki with the template content, null if the user does not have
+     * the right to create a wiki
      */
-    public WikiDescriptor createWikiFromTemplate(String newWikiId, String newWikiAlias,
+    public Integer createWikiFromTemplate(String newWikiId, String newWikiAlias,
             String templateId, String ownerId, boolean failOnExist)
     {
-        WikiDescriptor descriptor = null;
+        Integer jobId = null;
         try {
             XWikiContext context = xcontextProvider.get();
             if (authorizationManager.hasAccess(Right.CREATE_WIKI, context.getUserReference(),
                     new WikiReference(context.getMainXWiki())))
             {
-                descriptor = wikiTemplateManager.createWikiFromTemplate(newWikiId, newWikiAlias, templateId, ownerId,
+                jobId = wikiTemplateManager.createWikiFromTemplate(newWikiId, newWikiAlias, templateId, ownerId,
                         failOnExist);
             }
         } catch (WikiTemplateManagerException e) {
             error("Failed to create the wiki from the template.", e);
         }
-        return descriptor;
+        return jobId;
     }
 
     /**
@@ -207,13 +208,13 @@ public class WikiTemplateManagerScript implements ScriptService
     /**
      * Get the status of the wiki creation job.
      *
-     * @param wikiId id of the constructing wiki
+     * @param jobId id of the provisioning job.
      * @return the status of the job
      */
-    public JobStatus getWikiCreationStatus(String wikiId)
+    public JobStatus getWikiProvisioningJobStatus(int jobId)
     {
         try {
-            return wikiTemplateManager.getWikiCreationStatus(wikiId);
+            return wikiTemplateManager.getWikiProvisioningJobStatus(jobId);
         } catch (WikiTemplateManagerException e) {
             return null;
         }

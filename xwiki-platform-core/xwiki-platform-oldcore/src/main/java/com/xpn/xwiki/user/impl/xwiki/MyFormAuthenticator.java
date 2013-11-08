@@ -142,10 +142,13 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             // 2) if the authenticated user for this session does not have the same name as
             //    the user stored in the cookie, authenticate
             // 3) if xwiki.authentication.always is set to 1 in xwiki.cfg file, authenticate
-            // If cookies are turned off, don't do anything at this level.
-            if (request.isRequestedSessionIdFromCookie() && (principal == null ||
-                !StringUtils.endsWith(principal.getName(), "XWiki." + username)
-                || context.getWiki().ParamAsLong("xwiki.authentication.always", 0) == 1))
+
+            // Note: In order to support working without cookies enabled we would need to test if cookies are enabled
+            //       by calling for example request.isRequestedSessionIdFromCookie(). However doing this breaks first
+            //       time multiwiki access in domain based for example (see http://jira.xwiki.org/browse/XWIKI-9622).
+            //       Thus at the moment we don't support working fully without cookies (something to be fixed for later)
+            if (principal == null || !StringUtils.endsWith(principal.getName(), "XWiki." + username)
+                || context.getWiki().ParamAsLong("xwiki.authentication.always", 0) == 1)
             {
                 principal = authenticate(username, password, context);
 

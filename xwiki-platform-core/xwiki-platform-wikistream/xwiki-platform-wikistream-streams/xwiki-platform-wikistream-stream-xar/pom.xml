@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wikistream-streams</artifactId>
-    <version>5.2.1-SNAPSHOT</version>
+    <version>5.2.1</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-stream-xar</artifactId>
   <name>XWiki Platform - Wiki Stream - XAR</name>

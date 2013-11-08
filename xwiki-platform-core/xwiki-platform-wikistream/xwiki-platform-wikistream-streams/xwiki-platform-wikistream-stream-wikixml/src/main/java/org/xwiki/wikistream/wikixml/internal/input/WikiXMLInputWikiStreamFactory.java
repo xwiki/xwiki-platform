@@ -25,7 +25,7 @@ import java.util.Collections;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.transform.Result;
+import javax.xml.stream.XMLEventWriter;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.xml.parser.XMLParserFactory;
@@ -64,8 +64,8 @@ public class WikiXMLInputWikiStreamFactory extends
     }
 
     @Override
-    protected Result createParser(Object filter, WikiXMLInputProperties parameters)
+    protected XMLEventWriter createXMLEventWriter(Object filter, WikiXMLInputProperties parameters)
     {
-        return this.parserFactory.createResult(filter, null);
+        return this.parserFactory.createXMLEventWriter(filter, null);
     }
 }

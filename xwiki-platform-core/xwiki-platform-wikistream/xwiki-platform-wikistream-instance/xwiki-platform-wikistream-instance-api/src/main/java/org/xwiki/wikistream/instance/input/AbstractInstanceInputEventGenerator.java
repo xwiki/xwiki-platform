@@ -20,12 +20,16 @@
 package org.xwiki.wikistream.instance.input;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Stack;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.util.ReflectionUtils;
@@ -36,6 +40,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 
 /**
  * @param <F>
@@ -48,7 +53,7 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     @Inject
     private FilterDescriptorManager filterDescriptorManager;
 
-    private Class<F> filterType;
+    private List<Class< ? >> filerInterfaces;
 
     protected Map<String, Object> properties;
 
@@ -62,13 +67,33 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
 
     protected EntityReference currentReference;
 
+    protected WikiStreamDescriptor descriptor;
+
     @Override
     public void initialize() throws InitializationException
     {
         // Get the type of the internal filter
         ParameterizedType genericType =
             (ParameterizedType) ReflectionUtils.resolveType(AbstractInstanceInputEventGenerator.class, getClass());
-        this.filterType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[0]);
+        this.filerInterfaces =
+            Arrays.<Class< ? >> asList(ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[0]));
+    }
+
+    @Override
+    public WikiStreamDescriptor getDescriptor()
+    {
+        return this.descriptor;
+    }
+
+    protected void setDescriptor(WikiStreamDescriptor descriptor)
+    {
+        this.descriptor = descriptor;
+    }
+
+    @Override
+    public Collection<Class< ? >> getFilterInterfaces() throws WikiStreamException
+    {
+        return this.filerInterfaces;
     }
 
     @Override
@@ -104,7 +129,9 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     public void setFilter(Object filter)
     {
         this.filter = filter;
-        this.proxyFilter = this.filterDescriptorManager.createFilterProxy(filter, this.filterType);
+        this.proxyFilter =
+            this.filterDescriptorManager.createFilterProxy(filter,
+                this.filerInterfaces.toArray(ArrayUtils.EMPTY_CLASS_ARRAY));
     }
 
     @Override

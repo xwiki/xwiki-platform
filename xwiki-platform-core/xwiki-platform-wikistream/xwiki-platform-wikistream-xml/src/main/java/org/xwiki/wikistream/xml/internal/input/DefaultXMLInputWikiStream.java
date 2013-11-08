@@ -19,7 +19,7 @@
  */
 package org.xwiki.wikistream.xml.internal.input;
 
-import javax.xml.transform.Result;
+import javax.xml.stream.XMLEventWriter;
 
 /**
  * @param <P>
@@ -38,8 +38,8 @@ public class DefaultXMLInputWikiStream<P extends XMLInputProperties, F> extends 
     }
 
     @Override
-    protected Result createParser(Object listener, P parameters)
+    protected XMLEventWriter createXMLEventWriter(Object listener, P parameters)
     {
-        return this.factory.createParser(listener, parameters);
+        return this.factory.createXMLEventWriter(listener, parameters);
     }
 }

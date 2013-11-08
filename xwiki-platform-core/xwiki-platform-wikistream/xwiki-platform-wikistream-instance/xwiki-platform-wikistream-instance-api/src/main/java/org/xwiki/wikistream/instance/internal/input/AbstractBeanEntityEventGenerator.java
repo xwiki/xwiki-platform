@@ -28,12 +28,17 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.descriptor.DefaultWikiStreamBeanDescriptor;
 import org.xwiki.wikistream.instance.input.AbstractEntityEventGenerator;
 
 public abstract class AbstractBeanEntityEventGenerator<E, F, P> extends AbstractEntityEventGenerator<E, F>
 {
     @Inject
     private BeanManager beanManager;
+
+    private String name;
+
+    private String description;
 
     private Class<P> propertiesType;
 
@@ -46,6 +51,46 @@ public abstract class AbstractBeanEntityEventGenerator<E, F, P> extends Abstract
         ParameterizedType genericType =
             (ParameterizedType) ReflectionUtils.resolveType(AbstractBeanEntityEventGenerator.class, getClass());
         this.propertiesType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[2]);
+
+        // Initialize WikiStream Descriptor.
+        DefaultWikiStreamBeanDescriptor descriptor =
+            new DefaultWikiStreamBeanDescriptor(getName(), getDescription(),
+                this.beanManager.getBeanDescriptor(!this.propertiesType.isInterface() ? this.propertiesType
+                    : Object.class));
+
+        setDescriptor(descriptor);
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName()
+    {
+        return this.name;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription()
+    {
+        return this.description;
     }
 
     @Override

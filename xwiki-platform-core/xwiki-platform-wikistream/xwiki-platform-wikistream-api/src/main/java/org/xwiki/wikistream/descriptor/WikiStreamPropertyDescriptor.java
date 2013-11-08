@@ -50,7 +50,7 @@ public interface WikiStreamPropertyDescriptor<T>
     /**
      * @return the type of the property.
      */
-    Type getPropertyType();
+    Type getType();
 
     /**
      * @return the default value of the property.

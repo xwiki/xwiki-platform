@@ -67,6 +67,30 @@ public class InstanceOutputWikiStreamFactory extends
     }
 
     @Override
+    public void initialize() throws InitializationException
+    {
+        super.initialize();
+
+        List<OutputInstanceWikiStreamFactory> factories;
+        try {
+            factories = this.componentManagerProvider.get().getInstanceList(OutputInstanceWikiStreamFactory.class);
+        } catch (ComponentLookupException e) {
+            throw new InitializationException(
+                "Failed to get registered instance of OutputInstanceWikiStreamFactory components", e);
+        }
+
+        WikiStreamDescriptor[] descriptors = new WikiStreamDescriptor[factories.size() + 1];
+
+        descriptors[0] = this.descriptor;
+        for (int i = 0; i < factories.size(); ++i) {
+            descriptors[i + 1] = factories.get(i).getDescriptor();
+        }
+
+        setDescriptor(new CompositeWikiStreamDescriptor(this.descriptor.getName(), this.descriptor.getDescription(),
+            descriptors));
+    }
+
+    @Override
     public Collection<Class< ? >> getFilterInterfaces() throws WikiStreamException
     {
         List<OutputInstanceWikiStreamFactory> factories;
@@ -83,29 +107,5 @@ public class InstanceOutputWikiStreamFactory extends
         }
 
         return filters;
-    }
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        super.initialize();
-
-        List<OutputInstanceWikiStreamFactory> factories;
-        try {
-            factories = this.componentManagerProvider.get().getInstanceList(OutputInstanceWikiStreamFactory.class);
-        } catch (ComponentLookupException e) {
-            throw new InitializationException(
-                "Failed to get regsitered instance of OutputInstanceWikiStreamFactory components", e);
-        }
-
-        WikiStreamDescriptor[] descriptors = new WikiStreamDescriptor[factories.size() + 1];
-
-        descriptors[0] = this.descriptor;
-        for (int i = 0; i < factories.size(); ++i) {
-            descriptors[i + 1] = factories.get(i).getDescriptor();
-        }
-
-        setDescriptor(new CompositeWikiStreamDescriptor(this.descriptor.getName(), this.descriptor.getDescription(),
-            descriptors));
     }
 }

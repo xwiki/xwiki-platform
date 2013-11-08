@@ -32,7 +32,9 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.properties.BeanManager;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 import org.xwiki.wikistream.instance.input.AbstractInstanceInputEventGenerator;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
@@ -47,6 +49,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DocumentInstanceInputEventGenerator extends AbstractInstanceInputEventGenerator<XWikiDocumentFilter>
 {
+    /**
+     * The {@link BeanManager} component.
+     */
+    @Inject
+    protected BeanManager beanManager;
+
     @Inject
     private EntityEventGenerator<XWikiDocument> documentLocaleParser;
 
@@ -54,7 +62,14 @@ public class DocumentInstanceInputEventGenerator extends AbstractInstanceInputEv
     private Provider<XWikiContext> xcontextProvider;
 
     @Override
-    public void setWikiDocumentParameters(String name, FilterEventParameters documentParameters) throws WikiStreamException
+    public WikiStreamDescriptor getDescriptor()
+    {
+        return this.documentLocaleParser.getDescriptor();
+    }
+    
+    @Override
+    public void setWikiDocumentParameters(String name, FilterEventParameters documentParameters)
+        throws WikiStreamException
     {
         DocumentReference reference = new DocumentReference(name, new SpaceReference(this.currentReference));
 

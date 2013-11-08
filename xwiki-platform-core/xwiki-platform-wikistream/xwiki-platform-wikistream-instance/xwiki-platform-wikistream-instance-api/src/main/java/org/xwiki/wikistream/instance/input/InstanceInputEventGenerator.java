@@ -19,12 +19,14 @@
  */
 package org.xwiki.wikistream.instance.input;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 import org.xwiki.wikistream.instance.internal.InstanceFilter;
 
 /**
@@ -83,4 +85,15 @@ public interface InstanceInputEventGenerator extends InstanceFilter
      * @param properties the event generator properties
      */
     void setProperties(Map<String, Object> properties);
+
+    /**
+     * @return The WikiStreamDescriptor describes a WikiStream and has the list of bean class parameters or properties.
+     */
+    WikiStreamDescriptor getDescriptor();
+
+    /**
+     * @return the filters supported by this stream factory
+     * @throws WikiStreamException when failing to get filters interfaces
+     */
+    Collection<Class< ? >> getFilterInterfaces() throws WikiStreamException;
 }

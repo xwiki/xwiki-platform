@@ -24,9 +24,9 @@ import java.util.Map;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 
 /**
- * 
  * @param <E>
  * @param <P>
  * @version $Id$
@@ -37,4 +37,9 @@ import org.xwiki.wikistream.WikiStreamException;
 public interface EntityEventGenerator<E>
 {
     void write(E entity, Object filter, Map<String, Object> properties) throws WikiStreamException;
+
+    /**
+     * @return The WikiStreamDescriptor describes a WikiStream and has the list of bean class parameters or properties.
+     */
+    WikiStreamDescriptor getDescriptor();
 }

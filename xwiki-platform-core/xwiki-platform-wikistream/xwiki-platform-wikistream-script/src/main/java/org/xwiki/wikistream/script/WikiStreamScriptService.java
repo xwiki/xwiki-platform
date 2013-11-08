@@ -83,6 +83,15 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
         return this.scriptServiceManager.get(ROLEHINT + '.' + id);
     }
 
+    // TODO: introduce advanced right checking system instead
+    private void checkProgrammingRights() throws AuthorizationException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        if (!xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
+            throw new AuthorizationException("WikiStream conversion require programming right");
+        }
+    }
+
     /**
      * @since 5.3M2
      */
@@ -94,16 +103,32 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
         Job job = null;
 
         try {
-            // TODO: introduce advanced right checking system instead
-            XWikiContext xcontext = this.xcontextProvider.get();
-            if (xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
-                throw new AuthorizationException("WikiStream conversion require programming right");
-            }
+            checkProgrammingRights();
 
             WikiStreamConverterJobRequest request =
                 new WikiStreamConverterJobRequest(inputType, inputProperties, outputType, outputProperties);
 
             job = this.jobManager.addJob(WikiStreamConverterJob.JOBTYPE, request);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return job;
+    }
+
+    /**
+     * @since 5.3M2
+     */
+    public Job getCurrentJob()
+    {
+        resetError();
+
+        Job job = null;
+
+        try {
+            checkProgrammingRights();
+
+            return this.jobManager.getCurrentJob();
         } catch (Exception e) {
             setError(e);
         }
@@ -194,11 +219,7 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
         resetError();
 
         try {
-            // TODO: introduce advanced right checking system instead
-            XWikiContext xcontext = this.xcontextProvider.get();
-            if (xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
-                throw new AuthorizationException("Using WikiStream module require programming right");
-            }
+            checkProgrammingRights();
 
             return this.componentManagerProvider.get().getInstance(factoryType, inputType.serialize());
         } catch (Exception e) {

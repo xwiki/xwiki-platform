@@ -1428,6 +1428,27 @@ a.search-result-highlightAll:after {
   )))
   #set ($discard = $paginationParameters.put('position', 'bottom'))
   {{html}}#pagination($paginationParameters){{/html}}
+
+  #displayRSSLink()
+#end
+
+#macro (displayRSSLink)
+  {{html}}
+  #set ($parameters = {})
+  ## We keep most of the current request parameters so that the RSS feed matches the current search query and filters.
+  #set ($discard = $parameters.putAll($request.getParameterMap()))
+  ## The feed will provide the most recent results that match the search query and filters.
+  #set ($discard = $parameters.put('sort', 'date'))
+  #set ($discard = $parameters.put('sortOrder', 'desc'))
+  ## Reset the pagination so that only the top results are included.
+  #set ($discard = $parameters.remove('firstIndex'))
+  ## Add the parameters required to output the RSS feed instead of the search UI.
+  #set ($discard = $parameters.put('outputSyntax', 'plain'))
+  #set ($discard = $parameters.put('media', 'rss'))
+  &lt;a href="$doc.getURL('get', $escapetool.url($parameters))" class="hasIcon iconRSS"&gt;
+    $services.localization.render('search.rss', ["[$escapetool.xml($text)]"])
+  &lt;/a&gt;
+  {{/html}}
 #end
 
 #macro (displaySearchResult $searchResult)
@@ -1758,10 +1779,52 @@ $value##
     "$escapetool.url($request.facet)=$escapetool.url($interval)"))
   $response.sendRedirect($xredirect)
 #end
+
+#macro (outputRSSFeed)
+  ##
+  ## Get the search results.
+  ##
+  #processRequestParameters()
+  #getSearchResults()
+  #set ($list = [])
+  #set ($results = $searchResponse.results)
+  #foreach ($searchResult in $results)
+    #set ($searchResultDocumentReference = $services.model.createDocumentReference(
+      $searchResult.wiki, $searchResult.space, $searchResult.name))
+    #set ($discard = $list.add("$searchResultDocumentReference"))
+  #end
+  ##
+  ## Compute the feed URI.
+  ##
+  #set ($parameters = {})
+  #set ($discard = $parameters.putAll($request.getParameterMap()))
+  #set ($discard = $parameters.remove('outputSyntax'))
+  #set ($discard = $parameters.remove('media'))
+  #set ($feedURI = $doc.getExternalURL('view', $escapetool.url($parameters)))
+  ##
+  ## Configure the feed.
+  ##
+  #set ($feed = $xwiki.feed.getDocumentFeed($list, {}))
+  #set ($discard = $feed.setLink($feedURI))
+  #set ($discard = $feed.setUri($feedURI))
+  #set ($discard = $feed.setAuthor('XWiki'))
+  #set ($title = $services.localization.render('search.rss', ["[$text]"]))
+  #set ($discard = $feed.setTitle($title))
+  #set ($discard = $feed.setDescription($title))
+  #set ($discard = $feed.setLanguage($xcontext.language))
+  #set ($discard = $feed.setCopyright($xwiki.getXWikiPreference('copyright')))
+  ##
+  ## Output the feed.
+  ##
+  #set ($discard = $response.setContentType('application/rss+xml'))
+  $xwiki.feed.getFeedOutput($feed, 'rss_2.0')
+#end
 {{/velocity}}
 
 {{velocity}}
-#if ($xcontext.action == 'get' &amp;&amp; "$!request.facet" != '' &amp;&amp; ($request.startDate || $request.endDate))
+#if ($request.media == 'rss')
+  #outputRSSFeed()
+#elseif ($xcontext.action == 'get' &amp;&amp; "$!request.facet" != '' &amp;&amp; ($request.startDate || $request.endDate))
   #handleCustomDateInterval()
 #else
   #displaySearchUI()

@@ -78,7 +78,7 @@ public class WikiStreamConverterJobRequest extends AbstractRequest implements Wi
 
         List<String> jobId = new ArrayList<String>();
         jobId.add(JOBID_PREFIX);
-        jobId.add("convert");
+        jobId.add("converter");
         jobId.add(inputType.serialize());
         jobId.add(outputType.serialize());
         setId(jobId);

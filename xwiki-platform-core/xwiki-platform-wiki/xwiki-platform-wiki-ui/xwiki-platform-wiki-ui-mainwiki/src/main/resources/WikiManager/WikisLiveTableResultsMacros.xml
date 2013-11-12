@@ -143,7 +143,7 @@
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
     #set($deleteUrl = $xwiki.getURL($deleteWikiDocumentReference, 'view', "wikiId=${wikiId}"))
     #set($discard = $row.put('doc_delete_url', $deleteUrl))
-    #set($discard = $row.put('doc_edit_url', $itemDoc.getURL('edit', 'editor=object')))
+    #set($discard = $row.put('doc_edit_url', $itemDoc.getURL('view')))
     #################################################
     #set($discard = $row.put('doc_rename_url', $itemDoc.getURL('view', 'xpage=rename&amp;step=1')))
     #set($discard = $row.put('doc_rights_url', $itemDoc.getURL('edit', 'editor=rights')))

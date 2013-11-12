@@ -29,7 +29,6 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.job.internal.DefaultJobStatus;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.wiki.internal.manager.WikiCopier;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobRequest;
@@ -55,9 +54,6 @@ public class TemplateWikiProvisioningJob extends AbstractJob<WikiProvisioningJob
 
     @Inject
     private WikiCopier wikiCopier;
-
-    @Inject
-    private ObservationManager observationManager;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;

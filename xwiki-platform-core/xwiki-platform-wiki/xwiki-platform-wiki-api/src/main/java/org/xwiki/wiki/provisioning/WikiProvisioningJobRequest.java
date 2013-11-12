@@ -19,6 +19,8 @@
  */
 package org.xwiki.wiki.provisioning;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.stability.Unstable;
 
@@ -83,6 +85,30 @@ public class WikiProvisioningJobRequest extends AbstractRequest
     public Object getProvisioningJobParameter()
     {
         return getProperty(PROPERTY_PROVISIONING_JOB_PARAMETER);
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof WikiProvisioningJobRequest)) {
+            return false;
+        }
+
+        WikiProvisioningJobRequest r = (WikiProvisioningJobRequest) o;
+        return new EqualsBuilder().append(r.getWikiId(), getWikiId()).append(
+                r.getProvisioningJobParameter(), getProvisioningJobParameter()).isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+        builder.append(getWikiId()).append(getProvisioningJobParameter());
+        return builder.hashCode();
     }
 
 }

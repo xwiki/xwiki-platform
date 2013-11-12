@@ -24,8 +24,8 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 {{html clean="false" wiki="true"}}
-#set ($WikiManager = $services.wikimanager)
-#set ($Exception = $WikiManager.DefaultException)
+#set ($WikiManager = $services.wiki)
+#set ($Exception = $WikiManager.lastException)
 ##
 #set ($action = $request.getParameter("action"))
 #set ($domain = $request.getParameter("domain"))
@@ -35,20 +35,21 @@
 #if ($doc.fullName == "XWiki.XWikiServerClassSheet" || $doc.fullName == "XWiki.XWikiServerClassTemplate")
   = Document "$doc.name" =
 #else
-  #set ($wiki = $WikiManager.getWikiFromDocumentName($doc.fullName))
+  #set ($wikiId = $doc.name.replaceAll('XWikiServer', '').toLowerCase())
+  #set ($wiki = $WikiManager.getById($wikiId))
   ##
   #if ($action &amp;&amp; ($action == "create") &amp;&amp; $domain &amp;&amp; ($domain.trim().length() &gt; 0))
     #if (!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
 
       {{error}}{{translation key="notallowed"/}}{{/error}}
-    #elseif (!$wiki.containsWikiAlias($domain))
-      #set ($alias = $wiki.newObject("XWiki.XWikiServerClass"))
+    #elseif (!$wiki.aliases.contains($domain))
+      #set ($alias = $doc.newObject("XWiki.XWikiServerClass"))
       $alias.set("server", $domain)
       $alias.set("homepage", "Main.WebHome")
-      $wiki.save()
+      $doc.save()
     #else
 
-      {{error}}{{translation key="wikimanager.erroraliasalreadynotexists" parameters="$domain"/}}{{/error}}
+      {{error}}{{translation key="platform.wikimanager.wikisheet.erroraliasalreadynotexists" parameters="$domain"/}}{{/error}}
     #end
   #end
   ##
@@ -56,80 +57,81 @@
     #if (!${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
 
       {{error}}{{translation key="notallowed"/}}{{/error}}
-    #elseif ($wiki.containsWikiAlias($domain))
-      #set ($alias = $wiki.getWikiAlias($domain))
-      #set ($removed = $wiki.removeObject($alias.objectApi))
-      $wiki.save()
+    #elseif ($wiki.aliases.contains($domain))
+      #set ($alias = $doc.getObject('XWiki.XWikiServerClass', 'server', $domain))
+      #set ($removed = $doc.removeObject($alias))
+      $doc.save()
     #else
-      {{error}}{{translation key="wikimanager.erroraliasdoesnotexists" parameters="$domain"/}}{{/error}}
+      {{error}}{{translation key="platform.wikimanager.wikisheet.erroraliasdoesnotexists" parameters="$domain"/}}{{/error}}
     #end
   #end
   ##
   #############################################################################
   ##
-  #set ($wikiAliasList = $wiki.wikiAliasList)
+  #set ($wikiAliasList = $doc.getObjects('XWiki.XWikiServerClass'))
   ##
   #if ($wikiAliasList.size() &gt; 0)
-    = Wiki "$wiki.wikiName" =
+    = Wiki "$wiki.id" =
 
     ##
     #set ($firstalias = $wikiAliasList.get(0))
     #if ($xcontext.action == "view")
-      == {{translation key="wikimanager.title.wikisettings"/}} ==
+      == {{translation key="platform.wikimanager.wikisheet.title.wikisettings"/}} ==
 
     #else
       &lt;fieldset&gt;
-        &lt;legend&gt;{{translation key="wikimanager.title.wikisettings"/}}&lt;/legend&gt;
+        &lt;legend&gt;{{translation key="platform.wikimanager.wikisheet.title.wikisettings"/}}&lt;/legend&gt;
     #end
     ##
       &lt;dl&gt;
-        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.wikiprettyname"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.wikiprettyname"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
-              $doc.display("wikiprettyname", $firstalias.objectApi)&lt;br/&gt;
-              {{translation key="wikimanager.doc.createwiki.desc.wikiprettyname"/}}
+              $doc.display("wikiprettyname", $firstalias)&lt;br/&gt;
+              {{translation key="platform.wikimanager.wikisheet.desc.wikiprettyname"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.owner"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.owner"/}}:&lt;/dt&gt;
           &lt;dd&gt;
-            $doc.display("owner", $firstalias.objectApi)
+            $doc.display("owner", $firstalias)
             &lt;p&gt;
-              {{translation key="wikimanager.doc.createwiki.desc.owner"/}}
+              {{translation key="platform.wikimanager.wikisheet.desc.owner"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.secure"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.secure"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
-              $doc.display("secure", $firstalias.objectApi)&lt;br/&gt;
-              {{translation key="wikimanager.doc.createwiki.desc.secure"/}}
+              $doc.display("secure", $firstalias)&lt;br/&gt;
+              {{translation key="platform.wikimanager.wikisheet.desc.secure"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.iswikitemplate"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.iswikitemplate"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
-              $doc.display("iswikitemplate", $firstalias.objectApi)&lt;br/&gt;
-              {{translation key="wikimanager.doc.createwiki.desc.iswikitemplate"/}}
+              #set($objTemplate = $doc.getObject('WikiManager.WikiTemplateClass'))
+              $objTemplate.get("iswikitemplate")&lt;br/&gt;
+              {{translation key="platform.wikimanager.wikisheet.desc.iswikitemplate"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.server"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.server"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
-              $doc.display("server", $firstalias.objectApi)&lt;br/&gt;
-              {{translation key="wikimanager.doc.createwiki.desc.server"/}}
+              $doc.display("server", $firstalias)&lt;br/&gt;
+              {{translation key="platform.wikimanager.wikisheet.desc.server"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.description"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.description"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
-              $doc.display("description", $firstalias.objectApi)&lt;br/&gt;
-              {{translation key="wikimanager.doc.createwiki.desc.description"/}}
+              $doc.display("description", $firstalias)&lt;br/&gt;
+              {{translation key="platform.wikimanager.wikisheet.desc.description"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;{{translation key="wikimanager.prop.wiki.homepage"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.homepage"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
-              $doc.display("homepage", $firstalias.objectApi)&lt;br/&gt;
-              {{translation key="wikimanager.doc.createwiki.desc.homepage"/}}
+              $doc.display("homepage", $firstalias)&lt;br/&gt;
+              {{translation key="platform.wikimanager.wikisheet.desc.homepage"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
       &lt;/dl&gt;
@@ -138,7 +140,7 @@
     #end
     ##
     #if ($xcontext.action == "view")
-      == {{translation key="wikimanager.title.createnewalias"/}} ==
+      == {{translation key="platform.wikimanager.wikisheet.title.createnewalias"/}} ==
 
       ##
       &lt;form method="get" action=""&gt;
@@ -146,7 +148,7 @@
           &lt;legend&gt;Create new alias&lt;/legend&gt;
           &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
           &lt;input type="hidden" name="action" value="create"/&gt;
-          &lt;label for="inputdomain"&gt;{{translation key="wikimanager.prop.alias.server"/}}&lt;/label&gt;: &lt;input id="inputdomain" type="text" name="domain" class="wikialiasinput"/&gt;
+          &lt;label for="inputdomain"&gt;{{translation key="platform.wikimanager.wikisheet.server"/}}&lt;/label&gt;: &lt;input id="inputdomain" type="text" name="domain" class="wikialiasinput"/&gt;
           &lt;input type="submit" class="button" value="$services.localization.render('create')"/&gt;
           &lt;/fieldset&gt;
       &lt;/form&gt;
@@ -154,7 +156,7 @@
     ##
     #if ($wikiAliasList.size() &gt; 1)
       #if ($xcontext.action == "view")
-        == {{translation key="wikimanager.title.viewaliases"/}} ==
+        == {{translation key="platform.wikimanager.wikisheet.title.viewaliases"/}} ==
 
       #end
       ##
@@ -163,22 +165,22 @@
           &lt;form method="get" action="$doc.getURL("view")"&gt;
         #end
             &lt;fieldset&gt;
-              &lt;legend&gt;$doc.display("server", $wikiAlias.objectApi)&lt;/legend&gt;
+              &lt;legend&gt;$doc.display("server", $wikiAlias)&lt;/legend&gt;
               ##
               &lt;br /&gt;
               &lt;dl&gt;
-                &lt;dt&gt;{{translation key="wikimanager.prop.alias.description"/}}:&lt;/dt&gt;
+                &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.description"/}}:&lt;/dt&gt;
                   &lt;dd&gt;
                     &lt;p&gt;
-                      $doc.display("description", $wikiAlias.objectApi)&lt;br/&gt;
-                      {{translation key="wikimanager.doc.createwiki.desc.description"/}}
+                      $doc.display("description", $wikiAlias)&lt;br/&gt;
+                      {{translation key="platform.wikimanager.wikisheet.desc.description"/}}
                     &lt;/p&gt;
                   &lt;/dd&gt;
-                &lt;dt&gt;{{translation key="wikimanager.prop.alias.homepage"/}}:&lt;/dt&gt;
+                &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.homepage"/}}:&lt;/dt&gt;
                   &lt;dd&gt;
                     &lt;p&gt;
-                      $doc.display("homepage", $wikiAlias.objectApi)&lt;br/&gt;
-                      {{translation key="wikimanager.doc.createwiki.desc.homepage"/}}
+                      $doc.display("homepage", $wikiAlias)&lt;br/&gt;
+                      {{translation key="platform.wikimanager.wikisheet.desc.homepage"/}}
                     &lt;/p&gt;
                   &lt;/dd&gt;
               &lt;/dl&gt;

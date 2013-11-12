@@ -37,12 +37,12 @@ public interface WikiProvisioningJobExecutor
      * Create a job and execute it.
      *
      * @param wikiId id of the wiki to provision
-     * @param provisionerRole name of the WikiProvisioningJob component to use
+     * @param provisioningJobName name of the WikiProvisioningJob component to use
      * @param parameter parameter used by the wiki provisioning job, depending of its implementation.
      * @return the job ID.
      * @throws WikiProvisioningJobException if problems occur
      */
-    int createAndExecuteJob(String wikiId, String provisionerRole, Object parameter) throws
+    int createAndExecuteJob(String wikiId, String provisioningJobName, Object parameter) throws
             WikiProvisioningJobException;
 
     /**

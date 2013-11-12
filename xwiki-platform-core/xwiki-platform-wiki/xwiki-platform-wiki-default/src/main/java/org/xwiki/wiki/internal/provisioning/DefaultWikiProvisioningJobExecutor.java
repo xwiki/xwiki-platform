@@ -34,7 +34,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
-import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobException;
@@ -75,19 +74,19 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
 
         // Setup jobs thread
         BasicThreadFactory factory =
-                new BasicThreadFactory.Builder().namingPattern("XWiki Template provisioning thread").daemon(true)
+                new BasicThreadFactory.Builder().namingPattern("XWiki provisioning thread").daemon(true)
                         .priority(Thread.MIN_PRIORITY).build();
         this.jobExecutor = Executors.newCachedThreadPool(factory);
     }
 
     @Override
-    public int createAndExecuteJob(String wikiId, String provisionerRole, Object parameter) throws
+    public int createAndExecuteJob(String wikiId, String provisioningJobName, Object parameter) throws
             WikiProvisioningJobException
     {
         try {
             int jobId = -1;
             // Create the job
-            WikiProvisioningJob job = componentManager.getInstance(Job.class, provisionerRole);
+            WikiProvisioningJob job = componentManager.getInstance(WikiProvisioningJob.class, provisioningJobName);
             // Initialize it
             job.initialize(new WikiProvisioningJobRequest(wikiId, parameter));
             // Put it to the list of jobs
@@ -101,7 +100,7 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
             return jobId;
         } catch (ComponentLookupException e) {
             throw new WikiProvisioningJobException(
-                    String.format("Failed to lookup provisioning job component for role [%s]", provisionerRole), e);
+                    String.format("Failed to lookup provisioning job component for role [%s]", provisioningJobName), e);
         }
     }
 

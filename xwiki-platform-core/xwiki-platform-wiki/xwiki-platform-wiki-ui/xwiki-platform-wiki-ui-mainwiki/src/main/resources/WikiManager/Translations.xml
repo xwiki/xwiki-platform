@@ -271,16 +271,44 @@ admin.wikis.templatemissing=To enable the creation of wikis, you need to {0}crea
 ## Create new wiki wizard
 platform.workspace.wizard.step1=Step 1 — Choose a name
 platform.workspace.wizard.step2=Step 2 — Choose members
-platform.wikimanager.wizard.stepFilling=The system is creating the wiki.
-platform.wikimanager.wizard.stepFillingWait=Please wait while the system is filling the wiki.
-platform.wikimanager.wizard.stepFillingComplete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-platform.wikimanager.wizard.stepFillingFinalize=Finalize
+platform.wikimanager.wizard.stepProvisioning=The system is provisioning the wiki.
+platform.wikimanager.wizard.stepProvisioningWait=Please wait while the system is provisioning the wiki.
+platform.wikimanager.wizard.stepProvisioningComplete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
+platform.wikimanager.wizard.stepProvisioningFinalize=Finalize
 platform.workspace.wizard.step1.shortname=Name
 platform.workspace.wizard.step2.shortname=Members
 platform.wikimanager.setAsTemplateLabel=This wiki will be a template
 platform.wikimanager.notemplate=No template (default)
 platform.wikimanager.userScopeLabel=User Scope
 platform.wikimanager.userScopeHint=Select what kind of users can access to the wiki
+
+## XWikiServerClassSheet
+platform.wikimanager.wikisheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
+platform.wikimanager.wikisheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exists.
+platform.wikimanager.wikisheet.title.wikisettings=Wiki properties
+platform.wikimanager.wikisheet.title.createnewalias=Create new alias
+platform.wikimanager.wikisheet.title.viewaliases=View aliases
+platform.wikimanager.wikisheet.desc.wikiprettyname=The display name of the wiki.
+platform.wikimanager.wikisheet.desc.owner=A global user who will have all the rights on this wiki.
+platform.wikimanager.wikisheet.desc.secure=If enabled, all this wiki's generated externals URLs will starting with ~~https~~.
+platform.wikimanager.wikisheet.desc.iswikitemplate=Indicate if this wiki can be use as template when creating a new wiki.
+platform.wikimanager.wikisheet.desc.server=The alias used to access the wiki.
+platform.wikimanager.wikisheet.desc.description=A brief wiki description.
+platform.wikimanager.wikisheet.desc.homepage=The home page of the wiki.
+platform.wikimanager.wikisheet.wikiname=Wiki identifier
+platform.wikimanager.wikisheet.wikiprettyname=Pretty name
+platform.wikimanager.wikisheet.wikiprettyname=Pretty name
+platform.wikimanager.wikisheet.owner=Owner
+platform.wikimanager.wikisheet.secure=Secure (SSL)
+platform.wikimanager.wikisheet.visibility=Visibility
+platform.wikimanager.wikisheet.language=Language
+platform.wikimanager.wikisheet.description=Description
+platform.wikimanager.wikisheet.server=Alias
+platform.wikimanager.wikisheet.homepage=Home page
+platform.wikimanager.wikisheet.iswikitemplate=Wiki template
+platform.wikimanager.wikisheet.server=Alias
+platform.wikimanager.wikisheet.homepage=Home page
+
 
 ###############################################################################
 ## Deprecated

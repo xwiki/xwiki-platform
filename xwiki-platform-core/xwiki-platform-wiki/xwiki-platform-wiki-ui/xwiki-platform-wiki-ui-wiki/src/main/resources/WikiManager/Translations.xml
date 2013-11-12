@@ -140,7 +140,7 @@ XWiki.WorkspaceCandidateMemberClass_status_accepted=Accepted
 XWiki.WorkspaceCandidateMemberClass_status_rejected=Rejected
 XWiki.WorkspaceCandidateMemberClass_type_request=Request
 XWiki.WorkspaceCandidateMemberClass_type_invitation=Invitation
-platform.wikimanager.userconfiguration.title
+platform.wikimanager.userconfiguration.title=Configuration
 
 # HINTS
 workspacemanager.prop.wikiprettyname.hint=The display name of the wiki.

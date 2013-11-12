@@ -90,20 +90,22 @@ public class X509KeyService
         SpkacRequest spkacRequest;
         try {
             spkacRequest = new SpkacRequest(Convert.fromBase64String(spkacSerialization));
+
+            X509Certificate[] certs = this.keymaker.makeClientAndAuthorityCertificates(
+                spkacRequest.getPublicKey(provider),
+                daysOfValidity,
+                true,
+                webID,
+                userName);
+
+            return new XWikiX509Certificate[] {
+                new XWikiX509Certificate(certs[0]),
+                new XWikiX509Certificate(certs[1])
+            };
         } catch (Exception e) {
             throw new GeneralSecurityException("Failed to parse certificate request", e);
         }
 
-        X509Certificate[] certs = this.keymaker.makeClientAndAuthorityCertificates(
-            spkacRequest.getPublicKey(provider),
-            daysOfValidity,
-            true,
-            webID,
-            userName);
-        return new XWikiX509Certificate[] {
-            new XWikiX509Certificate(certs[0]),
-            new XWikiX509Certificate(certs[1])
-        };
     }
 
     /**

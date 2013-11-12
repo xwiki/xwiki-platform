@@ -19,6 +19,11 @@
  */
 package org.xwiki.wikistream.internal.job;
 
+import javax.inject.Named;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.job.internal.DefaultJobStatus;
 import org.xwiki.wikistream.input.InputWikiStream;
@@ -33,6 +38,9 @@ import org.xwiki.wikistream.output.OutputWikiStreamFactory;
  * @version $Id$
  * @since 5.3M2
  */
+@Component
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+@Named(WikiStreamConverterJob.JOBTYPE)
 public class WikiStreamConverterJob extends
     AbstractJob<WikiStreamConverterJobRequest, DefaultJobStatus<WikiStreamConverterJobRequest>>
 {

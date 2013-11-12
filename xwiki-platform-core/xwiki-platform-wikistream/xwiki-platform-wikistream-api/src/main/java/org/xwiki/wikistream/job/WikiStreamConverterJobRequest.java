@@ -19,6 +19,8 @@
  */
 package org.xwiki.wikistream.job;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.job.AbstractRequest;
@@ -33,7 +35,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * @since 5.3M2
  */
 @Unstable
-public class WikiStreamConverterJobRequest extends AbstractRequest
+public class WikiStreamConverterJobRequest extends AbstractRequest implements WikiStreamJobRequest
 {
     /**
      * Serialization identifier.
@@ -73,6 +75,13 @@ public class WikiStreamConverterJobRequest extends AbstractRequest
         this.inputProperties = inputProperties;
         this.outputType = outputType;
         this.outputProperties = outputProperties;
+
+        List<String> jobId = new ArrayList<String>();
+        jobId.add(JOBID_PREFIX);
+        jobId.add("converter");
+        jobId.add(inputType.serialize());
+        jobId.add(outputType.serialize());
+        setId(jobId);
     }
 
     /**

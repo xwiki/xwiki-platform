@@ -1270,31 +1270,38 @@ ${Msz}Mb##
   #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
   #if("$!options.pageSizeBounds" != '') #set($pageSizeBounds = $options.pageSizeBounds) #end
   #set($classname = "$!options.className")
-  #set($extraparams = "$!options.extraParams")
   ##
   ## Columns informations
   ##
-  #set($collist2 = '')
-  #set($classparams = '')
+  #set ($dataColumns = [])
+  #set ($classParams = {})
   #foreach($colname in $collist)
     #if("$!selectedColumn" == '' && !$colname.startsWith('_'))
       #set($selectedColumn = $colname)
     #end
     #if($colname != '_actions')
-      #set($collist2 = "${collist2},${colname}")
+      #set ($discard = $dataColumns.add($colname))
       #set($propClassName = "$!{colprops.get($colname).get('class')}")
       #if($propClassName != '')
-        #set($classparams = "${classparams}&${colname}_class=${propClassName}")
+        #set ($discard = $classParams.put("${colname}_class", $propClassName))
       #end
     #end
   #end
-  #set($collist2 = $collist2.substring(1))
   #if("$!options.url" != '')
     #set($dataurl = $options.url)
-  #elseif("$!options.resultPage" != '')
-    #set($dataurl = $xwiki.getURL($options.resultPage, 'get', "outputSyntax=plain&transprefix=${transprefix}&classname=$!{classname}&collist=${collist2}&$!{extraparams}${classparams}") )
   #else
-    #set($dataurl = $xwiki.getURL('XWiki.LiveTableResults', 'get', "outputSyntax=plain&transprefix=${transprefix}&classname=$!{classname}&collist=${collist2}$!{extraparams}${classparams}"))
+    #set ($parameters = {
+      'outputSyntax': 'plain',
+      'transprefix': $transprefix,
+      'classname': $classname,
+      'collist': $stringtool.join($dataColumns, ',')
+    })
+    #set ($discard = $parameters.putAll($classParams))
+    #set ($resultPage = $options.resultPage)
+    #if ("$!resultPage" == '')
+      #set ($resultPage = 'XWiki.LiveTableResults')
+    #end
+    #set ($dataurl = $xwiki.getURL($resultPage, 'get', "$escapetool.url($parameters)&$!options.extraParams"))
   #end
   ##
   ## HTML Table

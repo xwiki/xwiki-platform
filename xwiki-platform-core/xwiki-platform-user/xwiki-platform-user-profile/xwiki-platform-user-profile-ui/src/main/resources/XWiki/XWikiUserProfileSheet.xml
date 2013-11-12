@@ -238,13 +238,7 @@
           &lt;dt class='label'&gt;
             &lt;label #if($inEditMode)for="${xwikiUsersClassName}_${obj.number}_${sectionProperty}"#{end}&gt;$doc.displayPrettyName("${sectionProperty}")&lt;/label&gt;
           &lt;/dt&gt;
-          &lt;dd #if("$!vCardProperty" != '' &amp;&amp; !$inEditMode)class="$vCardProperty"#{end}&gt;
-            #if ($inEditMode)
-              $doc.display($sectionProperty, 'edit')
-            #else
-              $!escapetool.xml($doc.getValue($sectionProperty))
-            #end
-          &lt;/dd&gt;
+          &lt;dd #if("$!vCardProperty" != '' &amp;&amp; !$inEditMode)class="$vCardProperty"#{end}&gt;$doc.display($sectionProperty)&lt;/dd&gt;
           #end
         #end
         &lt;/dl&gt;

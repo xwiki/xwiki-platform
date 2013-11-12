@@ -40,5 +40,6 @@
     <module>xwiki-platform-wikistream-test</module>
     <module>xwiki-platform-wikistream-streams</module>
     <module>xwiki-platform-wikistream-instance</module>
+    <module>xwiki-platform-wikistream-ui</module>
   </modules>
 </project>

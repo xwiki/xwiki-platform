@@ -22,13 +22,13 @@ package org.xwiki.crypto.x509.internal;
 import java.security.GeneralSecurityException;
 import java.security.Provider;
 import java.security.cert.CertStore;
-import java.security.cert.Certificate;
 import java.security.cert.CollectionCertStoreParameters;
-import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.CMSSignedData;
@@ -36,13 +36,15 @@ import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.cms.CMSSignedGenerator;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
+import org.bouncycastle.util.Store;
 import org.xwiki.crypto.internal.Convert;
 import org.xwiki.crypto.x509.XWikiX509Certificate;
 import org.xwiki.crypto.x509.XWikiX509KeyPair;
 
 
 /**
- * Implementation of {@link XWikiSignature} that uses PKCS7 encoding. Signatures are stored as a
+ * Implementation of signature that uses PKCS7 encoding. Signatures are stored as a
  * PKCS#7 signed data objects with embedded signer certificate and detached content.
  * 
  * @version $Id$
@@ -127,7 +129,7 @@ public class X509SignatureService
             byte[] data = signedText.getBytes();
             byte[] signature = Convert.fromBase64String(base64Signature);
             CMSSignedData cmsData = new CMSSignedData(new CMSProcessableByteArray(data), signature);
-            CertStore certStore = cmsData.getCertificatesAndCRLs(CERT_STORE_TYPE, provider);
+            Store certStore = cmsData.getCertificates();
             SignerInformationStore signers = cmsData.getSignerInfos();
 
             int numSigners = signers.getSigners().size();
@@ -140,15 +142,16 @@ public class X509SignatureService
                     throw new GeneralSecurityException("Only one certificate is supported");
                 }
                 SignerInformation signer = (SignerInformation) it.next();
-                Collection< ? extends Certificate> certs = certStore.getCertificates(signer.getSID());
-                for (Iterator<? extends Certificate> cit = certs.iterator(); cit.hasNext();) {
-                    Certificate certificate = cit.next();
-                    if (!signer.verify(certificate.getPublicKey(), provider)) {
+                Collection<X509CertificateHolder> certs = certStore.getMatches(signer.getSID());
+                for (Iterator<X509CertificateHolder> cit = certs.iterator(); cit.hasNext();) {
+                    X509CertificateHolder certificate = cit.next();
+                    if (!signer.verify(
+                        new JcaSimpleSignerInfoVerifierBuilder().setProvider(provider).build(certificate))) {
                         return null;
                     }
-                    if (certificate instanceof X509Certificate) {
-                        result = new XWikiX509Certificate((X509Certificate) certificate, null);
-                    }
+
+                    result = new XWikiX509Certificate(
+                        new JcaX509CertificateConverter().setProvider(provider).getCertificate(certificate), null);
                 }
             }
             return result;

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,10 +36,11 @@ import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
 import org.xwiki.wikistream.instance.internal.input.InstanceInputProperties;
 import org.xwiki.wikistream.internal.output.DefaultOutputStreamOutputTarget;
+import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStream;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
-import org.xwiki.wikistream.utils.WikiStreamConstants;
+import org.xwiki.wikistream.xar.internal.output.XAROutputProperties;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -283,32 +285,32 @@ public class ExportAction extends XWikiAction
             InputWikiStream inputWikiStream = inputWikiStreamFactory.createInputWikiStream(inputProperties);
 
             // Create output wiki stream
-            Map<String, Object> outputProperties = new HashMap<String, Object>();
+            XAROutputProperties xarProperties = new XAROutputProperties();
 
             XWikiResponse response = context.getResponse();
 
-            outputProperties.put(WikiStreamConstants.PROPERTY_TARGET,
+            xarProperties.setTarget(
                 new DefaultOutputStreamOutputTarget(response.getOutputStream()));
-            outputProperties.put("name", name);
+            xarProperties.setName(name);
             if (description != null) {
-                outputProperties.put("description", description);
+                xarProperties.setDescription(description);
             }
             if (licence != null) {
-                outputProperties.put("license", licence);
+                xarProperties.setLicense(licence);
             }
             if (author != null) {
-                outputProperties.put("author", author);
+                xarProperties.setAuthor(author);
             }
             if (version != null) {
-                outputProperties.put("version", version);
+                xarProperties.setVersion(version);
             }
-            outputProperties.put("backupPack", backup);
-            outputProperties.put("preserveVersion", backup);
+            xarProperties.setBackupPack(backup);
+            xarProperties.setPreserveVersion(backup);
 
-            OutputWikiStreamFactory outputWikiStreamFactory =
-                Utils.getComponent(OutputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_10.serialize());
+            BeanOutputWikiStreamFactory<XAROutputProperties> xarWikiStreamFactory =
+                Utils.getComponent((Type) OutputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_10.serialize());
 
-            OutputWikiStream outputWikiStream = outputWikiStreamFactory.createOutputWikiStream(outputProperties);
+            OutputWikiStream outputWikiStream = xarWikiStreamFactory.createOutputWikiStream(xarProperties);
 
             // Export
             response.setContentType("application/zip");

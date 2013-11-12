@@ -30,6 +30,7 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.filter.FilterDescriptorManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 
 /**
  * @param <E>
@@ -46,6 +47,8 @@ public abstract class AbstractEntityEventGenerator<E, F> implements EntityEventG
 
     protected Class<F> filterType;
 
+    protected WikiStreamDescriptor descriptor;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -53,6 +56,17 @@ public abstract class AbstractEntityEventGenerator<E, F> implements EntityEventG
         ParameterizedType genericType =
             (ParameterizedType) ReflectionUtils.resolveType(AbstractEntityEventGenerator.class, getClass());
         this.filterType = ReflectionUtils.getTypeClass(genericType.getActualTypeArguments()[1]);
+    }
+
+    @Override
+    public WikiStreamDescriptor getDescriptor()
+    {
+        return this.descriptor;
+    }
+
+    protected void setDescriptor(WikiStreamDescriptor descriptor)
+    {
+        this.descriptor = descriptor;
     }
 
     @Override

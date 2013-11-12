@@ -24,8 +24,8 @@ import java.io.IOException;
 import javanet.staxutils.XMLStreamUtils;
 
 import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.transform.Result;
 
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputSource;
@@ -66,13 +66,13 @@ public abstract class AbstractXMLInputWikiStream<P extends XMLInputProperties> i
                 throw new WikiStreamException("Unknown source type [" + source.getClass() + "]");
             }
 
-            XMLStreamUtils.copy(xmlEventReader, createParser(listener, this.parameters));
+            XMLStreamUtils.copy(xmlEventReader, createXMLEventWriter(listener, this.parameters));
         } catch (Exception e) {
             throw new WikiStreamException("Faild to parse XML source", e);
         }
     }
 
-    protected abstract Result createParser(Object listener, P parameters);
+    protected abstract XMLEventWriter createXMLEventWriter(Object listener, P parameters);
 
     @Override
     public void close() throws IOException

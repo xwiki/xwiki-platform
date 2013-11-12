@@ -17,29 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal.input;
+package org.xwiki.wikistream.job;
 
-import javax.xml.stream.XMLEventWriter;
+import org.xwiki.job.Request;
 
 /**
- * @param <P>
+ * WikiStream job request.
+ * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3M2
  */
-public class DefaultXMLInputWikiStream<P extends XMLInputProperties, F> extends AbstractXMLInputWikiStream<P>
+public interface WikiStreamJobRequest extends Request
 {
-    private final AbstractXMLBeanInputWikiStreamFactory<P, F> factory;
-
-    public DefaultXMLInputWikiStream(AbstractXMLBeanInputWikiStreamFactory<P, F> factory, P parameters)
-    {
-        super(parameters);
-
-        this.factory = factory;
-    }
-
-    @Override
-    protected XMLEventWriter createXMLEventWriter(Object listener, P parameters)
-    {
-        return this.factory.createXMLEventWriter(listener, parameters);
-    }
+    /**
+     * The prefix used for all WikiStream jobs identifiers.
+     */
+    String JOBID_PREFIX = "wikistream";
 }

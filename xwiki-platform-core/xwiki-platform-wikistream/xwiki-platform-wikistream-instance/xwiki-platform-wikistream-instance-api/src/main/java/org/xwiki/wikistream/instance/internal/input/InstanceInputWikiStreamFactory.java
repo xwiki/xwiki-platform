@@ -32,10 +32,13 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.descriptor.CompositeWikiStreamDescriptor;
+import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
+import org.xwiki.wikistream.instance.input.InstanceInputEventGenerator;
 import org.xwiki.wikistream.instance.internal.InstanceFilter;
 import org.xwiki.wikistream.instance.internal.InstanceUtils;
-import org.xwiki.wikistream.instance.output.OutputInstanceWikiStreamFactory;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
@@ -67,19 +70,43 @@ public class InstanceInputWikiStreamFactory extends
     }
 
     @Override
+    public void initialize() throws InitializationException
+    {
+        super.initialize();
+
+        List<InstanceInputEventGenerator> eventGenerators;
+        try {
+            eventGenerators = this.componentManagerProvider.get().getInstanceList(InstanceInputEventGenerator.class);
+        } catch (ComponentLookupException e) {
+            throw new InitializationException(
+                "Failed to get registered instance of InstanceInputEventGenerator components", e);
+        }
+
+        WikiStreamDescriptor[] descriptors = new WikiStreamDescriptor[eventGenerators.size() + 1];
+
+        descriptors[0] = this.descriptor;
+        for (int i = 0; i < eventGenerators.size(); ++i) {
+            descriptors[i + 1] = eventGenerators.get(i).getDescriptor();
+        }
+
+        setDescriptor(new CompositeWikiStreamDescriptor(this.descriptor.getName(), this.descriptor.getDescription(),
+            descriptors));
+    }
+
+    @Override
     public Collection<Class< ? >> getFilterInterfaces() throws WikiStreamException
     {
-        List<OutputInstanceWikiStreamFactory> factories;
+        List<InstanceInputEventGenerator> eventGenerators;
         try {
-            factories = this.componentManagerProvider.get().getInstanceList(OutputInstanceWikiStreamFactory.class);
+            eventGenerators = this.componentManagerProvider.get().getInstanceList(InstanceInputEventGenerator.class);
         } catch (ComponentLookupException e) {
             throw new WikiStreamException(
-                "Failed to get regsitered instance of OutputInstanceWikiStreamFactory components", e);
+                "Failed to get registered instance of InstanceInputEventGenerator components", e);
         }
 
         Set<Class< ? >> filters = new HashSet<Class< ? >>();
-        for (OutputInstanceWikiStreamFactory factory : factories) {
-            filters.addAll(factory.getFilterInterfaces());
+        for (InstanceInputEventGenerator generator : eventGenerators) {
+            filters.addAll(generator.getFilterInterfaces());
         }
 
         return filters;

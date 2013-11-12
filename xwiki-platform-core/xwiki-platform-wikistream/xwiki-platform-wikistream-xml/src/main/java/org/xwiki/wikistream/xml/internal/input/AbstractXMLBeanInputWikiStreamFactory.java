@@ -19,7 +19,7 @@
  */
 package org.xwiki.wikistream.xml.internal.input;
 
-import javax.xml.transform.Result;
+import javax.xml.stream.XMLEventWriter;
 
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputWikiStream;
@@ -45,5 +45,5 @@ public abstract class AbstractXMLBeanInputWikiStreamFactory<P extends XMLInputPr
         return new DefaultXMLInputWikiStream<P, F>(this, properties);
     }
 
-    protected abstract Result createParser(Object filter, P parameters);
+    protected abstract XMLEventWriter createXMLEventWriter(Object filter, P parameters);
 }

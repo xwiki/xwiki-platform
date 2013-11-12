@@ -20,6 +20,7 @@
 package org.xwiki.wikistream.type;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.stability.Unstable;
 
@@ -30,7 +31,7 @@ import org.xwiki.stability.Unstable;
  * @since 5.2M2
  */
 @Unstable
-public class WikiStreamType
+public class WikiStreamType implements Comparable<WikiStreamType>
 {
     /**
      * Data format identifier for XML.
@@ -216,5 +217,17 @@ public class WikiStreamType
         }
 
         return result;
+    }
+
+    @Override
+    public int compareTo(WikiStreamType o)
+    {
+        CompareToBuilder builder = new CompareToBuilder();
+
+        builder.append(getType().toString(), o.getType().toString());
+        builder.append(getDataFormat(), o.getDataFormat());
+        builder.append(getVersion(), o.getVersion());
+
+        return builder.toComparison();
     }
 }

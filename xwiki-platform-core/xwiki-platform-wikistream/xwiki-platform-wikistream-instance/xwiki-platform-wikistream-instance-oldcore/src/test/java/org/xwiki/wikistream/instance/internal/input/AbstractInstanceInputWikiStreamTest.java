@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.mockito.Mockito;
@@ -158,7 +159,9 @@ public class AbstractInstanceInputWikiStreamTest extends AbstractInstanceWikiStr
 
         URL url = getClass().getResource("/" + resource + ".xml");
 
-        String expected = IOUtils.toString(url);
+        String expected = IOUtils.toString(url, "UTF-8");
+
+        expected = StringUtils.removeStart(expected, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n");
 
         InputWikiStream inputWikiStream = this.inputWikiStreamFactory.createInputWikiStream(instanceProperties);
 

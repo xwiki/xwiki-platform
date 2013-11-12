@@ -65,7 +65,7 @@ public class DefaultWikiStreamBeanParameterDescriptor<T> implements WikiStreamPr
     }
 
     @Override
-    public Type getPropertyType()
+    public Type getType()
     {
         return this.propertyDescriptor.getPropertyType();
     }

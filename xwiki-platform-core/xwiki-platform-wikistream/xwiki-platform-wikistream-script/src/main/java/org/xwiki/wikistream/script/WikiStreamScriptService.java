@@ -22,6 +22,7 @@ package org.xwiki.wikistream.script;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -82,6 +83,15 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
         return this.scriptServiceManager.get(ROLEHINT + '.' + id);
     }
 
+    // TODO: introduce advanced right checking system instead
+    private void checkProgrammingRights() throws AuthorizationException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        if (!xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
+            throw new AuthorizationException("WikiStream conversion require programming right");
+        }
+    }
+
     /**
      * @since 5.3M2
      */
@@ -93,16 +103,32 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
         Job job = null;
 
         try {
-            // TODO: introduce advanced right checking system instead
-            XWikiContext xcontext = this.xcontextProvider.get();
-            if (xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
-                throw new AuthorizationException("WikiStream conversion require programming right");
-            }
+            checkProgrammingRights();
 
             WikiStreamConverterJobRequest request =
                 new WikiStreamConverterJobRequest(inputType, inputProperties, outputType, outputProperties);
 
             job = this.jobManager.addJob(WikiStreamConverterJob.JOBTYPE, request);
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return job;
+    }
+
+    /**
+     * @since 5.3M2
+     */
+    public Job getCurrentJob()
+    {
+        resetError();
+
+        Job job = null;
+
+        try {
+            checkProgrammingRights();
+
+            return this.jobManager.getCurrentJob();
         } catch (Exception e) {
             setError(e);
         }
@@ -120,10 +146,15 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
         try {
             List<ComponentDescriptor<WikiStreamFactory>> descriptors =
                 this.componentManagerProvider.get().<WikiStreamFactory> getComponentDescriptorList(factoryType);
-            Collection<WikiStreamType> types = new ArrayList<WikiStreamType>(descriptors.size());
+
+            List<WikiStreamType> types = new ArrayList<WikiStreamType>(descriptors.size());
             for (ComponentDescriptor<WikiStreamFactory> descriptor : descriptors) {
                 types.add(WikiStreamType.unserialize(descriptor.getRoleHint()));
             }
+
+            Collections.sort(types);
+
+            return types;
         } catch (Exception e) {
             setError(e);
         }
@@ -175,7 +206,7 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
     /**
      * @since 5.3M2
      */
-    public WikiStreamDescriptor getOuputWikiStreamDescriptor(WikiStreamType inputType)
+    public WikiStreamDescriptor getOutputWikiStreamDescriptor(WikiStreamType inputType)
     {
         return getWikiStreamDescriptor(OutputWikiStreamFactory.class, inputType);
     }
@@ -188,11 +219,7 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
         resetError();
 
         try {
-            // TODO: introduce advanced right checking system instead
-            XWikiContext xcontext = this.xcontextProvider.get();
-            if (xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
-                throw new AuthorizationException("Using WikiStream module require programming right");
-            }
+            checkProgrammingRights();
 
             return this.componentManagerProvider.get().getInstance(factoryType, inputType.serialize());
         } catch (Exception e) {

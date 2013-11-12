@@ -45,16 +45,11 @@
     <!-- The core cryptography engine, used everywhere -->
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk16</artifactId>
+      <artifactId>bcprov-jdk15on</artifactId>
     </dependency>
-    <!-- 
-      Used for generation and verification of PKCS#7 signatures.
-      PKCS#7 must be used because it's compatible with mozilla
-      crypto.signText() javascript function.
-    -->
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcmail-jdk16</artifactId>
+      <artifactId>bcpkix-jdk15on</artifactId>
     </dependency>
     <!-- Used exclusively by UserDocumentUtils -->
     <dependency>

@@ -269,6 +269,25 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
     }
   });
 
+  var CustomDateIntervalBehavior = Class.create({
+    initialize: function(container) {
+      this.container = container;
+      container.down('a.itemName').observe('click', this._onToggle.bindAsEventListener(this));
+    },
+
+    _onToggle: function(event) {
+      var link = event.element();
+      var startDate = this.container.down('input.datetime');
+      var endDate = startDate.next('input.datetime');
+      link.href = XWiki.currentDocument.getURL('get', Object.toQueryString({
+        facet: startDate.name,
+        startDate: startDate.value,
+        endDate: endDate.value,
+        xredirect: link.readAttribute('href')
+      }));
+    }
+  });
+
   var SearchResultBehavior = Class.create({
     initialize: function(container) {
       this.container = container;
@@ -298,6 +317,10 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
 
     var searchFacets = $('body').down('.search-facets');
     searchFacets &amp;&amp; new SearchFacetsBehavior(searchFacets);
+
+    $('body').select('.customDateInterval').each(function(customDateInterval) {
+      new CustomDateIntervalBehavior(customDateInterval);
+    });
 
     $('body').select('.search-result').each(function(searchResult) {
       new SearchResultBehavior(searchResult);
@@ -797,6 +820,13 @@ a.search-result-highlightAll:after {
 }
 
 /**
+ * Date Facet
+ */
+.search-facet-body li.customDateInterval input {
+  margin-bottom: .3em;
+}
+
+/**
  * User Facet
  */
 
@@ -839,6 +869,8 @@ a.search-result-highlightAll:after {
     </property>
   </object>
   <content>{{velocity output='false'}}
+#set ($rangePattern = $regextool.compile('^\[(.+) TO (.+)\]$'))
+
 #macro (displaySearchForm)
   {{html}}
   &lt;form class="search-form" action=""&gt;
@@ -1069,7 +1101,9 @@ a.search-result-highlightAll:after {
 #set ($customSearchFacetValuesDisplayer = {
   'locale': 'locale',
   'author': 'user',
-  'creator': 'user'
+  'creator': 'user',
+  'date': 'date',
+  'creationdate': 'date'
 })
 
 #macro (displaySearchFacetValues $facetValues)
@@ -1140,7 +1174,9 @@ a.search-result-highlightAll:after {
   'wiki': 'wiki',
   'locale': 'locale',
   'author': 'user',
-  'creator': 'user'
+  'creator': 'user',
+  'date': 'date',
+  'creationdate': 'date'
 })
 
 #macro (displaySearchFacetValue_default $facetPrettyValue)
@@ -1195,6 +1231,150 @@ a.search-result-highlightAll:after {
   &lt;/span&gt;
 #end
 
+#macro (displaySearchFacetValues_date $facetValues)
+  ##
+  ## Build the list of date intervals.
+  ##
+  ## 1. Predefined date intervals.
+  #set ($now = $xwiki.jodatime.dateTime)
+  #set ($intervals = [
+    {
+      'label': $services.localization.render('solr.facet.date.today'),
+      'start': $now.withTimeAtStartOfDay(),
+      'end'  : $now,
+      'name' : '[NOW/DAY TO NOW]',
+      'count': 0
+    }, {
+      'label': $services.localization.render('solr.facet.date.last7Days'),
+      'start': $now.minusDays(7),
+      'end'  : $now,
+      'name' : '[NOW-7DAYS TO NOW]',
+      'count': 0
+    }, {
+      'label': $services.localization.render('solr.facet.date.last30Days'),
+      'start': $now.minusDays(30),
+      'end'  : $now,
+      'name' : '[NOW-30DAYS TO NOW]',
+      'count': 0
+    }
+  ])
+  ## 2. Date intervals specified on the request.
+  #set ($iso8601Formatter = $xwiki.jodatime.getDateTimeFormatterForPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
+  #if ($facetRequestValues)
+    #set ($selectedIntervals = [])
+    #foreach ($selectedValue in $facetRequestValues)
+      ## Determine if the value/range is custom.
+      #set ($custom = true)
+      #foreach ($interval in $intervals)
+        #if ($interval.name == $selectedValue)
+          #set ($discard = $selectedIntervals.add($interval))
+          #set ($custom = false)
+          #break
+        #end
+      #end
+      #if ($custom)
+        #set ($rangeMatcher = $rangePattern.matcher($selectedValue))
+        #if ($rangeMatcher.matches())
+          #set ($range = [$rangeMatcher.group(1), $rangeMatcher.group(2)])
+          #foreach ($point in $range)
+            #if ($point == '*')
+              #set ($point = $NULL)
+            #else
+              #set ($point = $iso8601Formatter.parseDateTime($point))
+            #end
+            #set ($discard = $range.set($foreach.index, $point))
+          #end
+          #set ($discard = $selectedIntervals.add({
+            'start': $range.get(0),
+            'end'  : $range.get(1),
+            'name' : $selectedValue,
+            'count': 0
+          }))
+        #end
+      #end
+    #end
+    #set ($intervals = $selectedIntervals)
+  #end
+  ##
+  ## Count matches for each date interval.
+  ##
+  #foreach ($facetValue in $facetValues)
+    #set ($dateValue = $iso8601Formatter.parseDateTime($facetValue.name))
+    #foreach ($interval in $intervals)
+      #if ((!$interval.start || $dateValue.isAfter($interval.start))
+          &amp;&amp; (!$interval.end || $dateValue.isBefore($interval.end)))
+        #set ($discard = $interval.put('count', $mathtool.add($interval.count, $facetValue.count)))
+      #end
+    #end
+  #end
+  ## Filter the unselected date intervals that don't have matches.
+  #if (!$facetRequestValues)
+    #set ($intervalsWithMatches = [])
+    #foreach ($interval in $intervals)
+      #if ($interval.count &gt; 0)
+        #set ($discard = $intervalsWithMatches.add($interval))
+      #end
+    #end
+    #set ($intervals = $intervalsWithMatches)
+  #end
+  ##
+  ## Display date intervals.
+  ##
+  &lt;ul&gt;
+    #foreach ($facetValue in $intervals)
+      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+    #end
+    #if (!$facetRequestValues)
+      ## Allow users to specify a custom interval.
+      &lt;li class="customDateInterval"&gt;
+        #displaySearchFacetValue_customDateInterval()
+      &lt;/li&gt;
+    #end
+  &lt;/ul&gt;
+#end
+
+#macro (displaySearchFacetValue_customDateInterval)
+  ## Reset the pagination because the number of results can change when a facet is applied.
+  #extendQueryString($url {$facetRequestParameter: ['[* TO *]'], 'firstIndex': []})
+  &lt;a href="$url" class="itemName"&gt;
+    $escapetool.xml($services.localization.render('solr.facet.date.customInterval'))
+  &lt;/a&gt;
+  ## A simple date picker widget.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js', true))
+  ## Used to parse and serialize the selected date using the specified date format.
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js', true))
+  ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
+  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
+  &lt;input type="text" name="$escapetool.xml($facetRequestParameter)" class="datetime withTip"
+    value="$escapetool.xml($services.localization.render('solr.facet.date.start'))"
+    title="$escapetool.xml($dateFormat)" /&gt;
+  &lt;input type="text" name="$escapetool.xml($facetRequestParameter)" class="datetime withTip"
+    value="$escapetool.xml($services.localization.render('solr.facet.date.end'))"
+    title="$escapetool.xml($dateFormat)" /&gt;
+  &lt;div class="clearfloats"&gt;&lt;/div&gt;
+#end
+
+#macro (displaySearchFacetValue_date $facetPrettyValue)
+  #if ($facetValue.label)
+    $escapetool.xml($facetValue.label)
+  #elseif ($facetValue.start &amp;&amp; $facetValue.end)
+    $services.localization.render('solr.facet.date.between',
+      ["$xwiki.formatDate($facetValue.start.toDate())&lt;br/&gt;",
+      $xwiki.formatDate($facetValue.end.toDate())])
+  #elseif ($facetValue.start)
+    $escapetool.xml($services.localization.render('solr.facet.date.after',
+      [$xwiki.formatDate($facetValue.start.toDate())]))
+  #elseif ($facetValue.end)
+    $escapetool.xml($services.localization.render('solr.facet.date.before',
+      [$xwiki.formatDate($facetValue.end.toDate())]))
+  #else
+    $escapetool.xml($services.localization.render('solr.facet.date.any'))
+  #end
+#end
+
 #macro (displaySearchResultsSort)
   #set ($defaultSortOrder = {
     'score': 'desc',
@@ -1227,12 +1407,7 @@ a.search-result-highlightAll:after {
   #set ($parameters = {})
   #set ($discard = $parameters.putAll($request.getParameterMap()))
   #set ($discard = $parameters.putAll($extraParameters))
-  #set ($queryString = '')
-  #foreach($parameter in $parameters.entrySet())
-    #foreach ($value in $parameter.value)
-      #set ($queryString = "$queryString&amp;$escapetool.url($parameter.key)=$escapetool.url($value)")
-    #end
-  #end
+  #set ($queryString = $escapetool.url($parameters))
   #set ($url = $NULL)
   #setVariable("$url" $doc.getURL('view', $queryString))
 #end
@@ -1253,6 +1428,27 @@ a.search-result-highlightAll:after {
   )))
   #set ($discard = $paginationParameters.put('position', 'bottom'))
   {{html}}#pagination($paginationParameters){{/html}}
+
+  #displayRSSLink()
+#end
+
+#macro (displayRSSLink)
+  {{html}}
+  #set ($parameters = {})
+  ## We keep most of the current request parameters so that the RSS feed matches the current search query and filters.
+  #set ($discard = $parameters.putAll($request.getParameterMap()))
+  ## The feed will provide the most recent results that match the search query and filters.
+  #set ($discard = $parameters.put('sort', 'date'))
+  #set ($discard = $parameters.put('sortOrder', 'desc'))
+  ## Reset the pagination so that only the top results are included.
+  #set ($discard = $parameters.remove('firstIndex'))
+  ## Add the parameters required to output the RSS feed instead of the search UI.
+  #set ($discard = $parameters.put('outputSyntax', 'plain'))
+  #set ($discard = $parameters.put('media', 'rss'))
+  &lt;a href="$doc.getURL('get', $escapetool.url($parameters))" class="hasIcon iconRSS"&gt;
+    $services.localization.render('search.rss', ["[$escapetool.xml($text)]"])
+  &lt;/a&gt;
+  {{/html}}
 #end
 
 #macro (displaySearchResult $searchResult)
@@ -1487,7 +1683,12 @@ a.search-result-highlightAll:after {
 #end
 
 #macro (escapeFilterValue $value)
+## Check if the given value is a range.
+#if ($rangePattern.matcher($value).matches())##
+$value##
+#else##
 "$stringtool.replaceEach($value, ['\', '"'], ['\\', '\"'])"##
+#end##
 #end
 
 #macro (processRequestParameters)
@@ -1532,28 +1733,101 @@ a.search-result-highlightAll:after {
     #set ($wiki = $xcontext.database)
   #end
 #end
+
+#macro (displaySearchUI)
+  #set ($discard = $xwiki.ssx.use('Main.SolrSearch'))
+  #set ($discard = $xwiki.jsx.use('Main.SolrSearch'))
+  ## Disable the document extra data: comments, attachments, history...
+  #set ($docextras = [])
+  #processRequestParameters()
+  (% class="search-form-container" %)(((
+    #displaySearchForm()
+    #displaySearchDebugInfo()
+  )))
+  #if ($text != '')
+    #getSearchResults()
+    (% class="search-results-container" %)(((
+      #displaySearchFacets($searchResponse)
+      (% class="search-results-left" %)(((
+        #displaySearchResultsSort()
+
+        #displaySearchResults()
+      )))
+    )))
+  #end
+#end
+
+#macro (convertDateFormat $dateString $inputFormat $outputFormat $return)
+  #set ($date = $datetool.toDate($inputFormat, $dateString))
+  #if ($date)
+    #set ($date = $datetool.format($outputFormat, $date))
+  #else
+    #set ($date = '*')
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $date)
+#end
+
+#macro (handleCustomDateInterval)
+  #set ($configuredDateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
+  #set ($iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+  #convertDateFormat($request.startDate $configuredDateFormat $iso8601DateFormat $startDate)
+  #convertDateFormat($request.endDate $configuredDateFormat $iso8601DateFormat $endDate)
+  #set ($interval = "[$startDate TO $endDate]")
+  #set ($xredirect = $request.xredirect.replaceFirst(
+    "\b$regextool.quote($escapetool.url($request.facet))=[^&amp;$escapetool.d]*",
+    "$escapetool.url($request.facet)=$escapetool.url($interval)"))
+  $response.sendRedirect($xredirect)
+#end
+
+#macro (outputRSSFeed)
+  ##
+  ## Get the search results.
+  ##
+  #processRequestParameters()
+  #getSearchResults()
+  #set ($list = [])
+  #set ($results = $searchResponse.results)
+  #foreach ($searchResult in $results)
+    #set ($searchResultDocumentReference = $services.model.createDocumentReference(
+      $searchResult.wiki, $searchResult.space, $searchResult.name))
+    #set ($discard = $list.add("$searchResultDocumentReference"))
+  #end
+  ##
+  ## Compute the feed URI.
+  ##
+  #set ($parameters = {})
+  #set ($discard = $parameters.putAll($request.getParameterMap()))
+  #set ($discard = $parameters.remove('outputSyntax'))
+  #set ($discard = $parameters.remove('media'))
+  #set ($feedURI = $doc.getExternalURL('view', $escapetool.url($parameters)))
+  ##
+  ## Configure the feed.
+  ##
+  #set ($feed = $xwiki.feed.getDocumentFeed($list, {}))
+  #set ($discard = $feed.setLink($feedURI))
+  #set ($discard = $feed.setUri($feedURI))
+  #set ($discard = $feed.setAuthor('XWiki'))
+  #set ($title = $services.localization.render('search.rss', ["[$text]"]))
+  #set ($discard = $feed.setTitle($title))
+  #set ($discard = $feed.setDescription($title))
+  #set ($discard = $feed.setLanguage($xcontext.language))
+  #set ($discard = $feed.setCopyright($xwiki.getXWikiPreference('copyright')))
+  ##
+  ## Output the feed.
+  ##
+  #set ($discard = $response.setContentType('application/rss+xml'))
+  $xwiki.feed.getFeedOutput($feed, 'rss_2.0')
+#end
 {{/velocity}}
 
 {{velocity}}
-#set ($discard = $xwiki.ssx.use('Main.SolrSearch'))
-#set ($discard = $xwiki.jsx.use('Main.SolrSearch'))
-## Disable the document extra data: comments, attachments, history...
-#set ($docextras = [])
-#processRequestParameters()
-(% class="search-form-container" %)(((
-  #displaySearchForm()
-  #displaySearchDebugInfo()
-)))
-#if ($text != '')
-  #getSearchResults()
-  (% class="search-results-container" %)(((
-    #displaySearchFacets($searchResponse)
-    (% class="search-results-left" %)(((
-      #displaySearchResultsSort()
-
-      #displaySearchResults()
-    )))
-  )))
+#if ($request.media == 'rss')
+  #outputRSSFeed()
+#elseif ($xcontext.action == 'get' &amp;&amp; "$!request.facet" != '' &amp;&amp; ($request.startDate || $request.endDate))
+  #handleCustomDateInterval()
+#else
+  #displaySearchUI()
 #end
 {{/velocity}}</content>
 </xwikidoc>

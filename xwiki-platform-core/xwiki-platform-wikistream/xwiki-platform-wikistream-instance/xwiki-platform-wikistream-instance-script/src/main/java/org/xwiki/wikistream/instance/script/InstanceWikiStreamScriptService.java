@@ -30,20 +30,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.job.Job;
 import org.xwiki.model.reference.EntityReferenceSet;
-import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
-import org.xwiki.wikistream.input.InputWikiStream;
-import org.xwiki.wikistream.input.InputWikiStreamFactory;
-import org.xwiki.wikistream.instance.internal.InstanceUtils;
 import org.xwiki.wikistream.instance.internal.input.InstanceInputProperties;
-import org.xwiki.wikistream.output.OutputWikiStream;
-import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.script.AbstractWikiStreamScriptService;
 import org.xwiki.wikistream.script.WikiStreamScriptService;
 import org.xwiki.wikistream.type.WikiStreamType;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Expose various WikiStream <tt>instance</tt> input/output streams related APIs to scripts.
@@ -64,15 +57,8 @@ public class InstanceWikiStreamScriptService extends AbstractWikiStreamScriptSer
     private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
-    @Named(InstanceUtils.ROLEHINT)
-    private InputWikiStreamFactory inputInstanceFactory;
-
-    @Inject
-    @Named(InstanceUtils.ROLEHINT)
-    private OutputWikiStreamFactory outputInstanceFactory;
-
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    @Named("wikistream")
+    private ScriptService wikistreamScriptService;
 
     public EntityReferenceSet newEntityReferenceSet()
     {
@@ -89,7 +75,8 @@ public class InstanceWikiStreamScriptService extends AbstractWikiStreamScriptSer
      */
     public WikiStreamDescriptor getInputWikiStreamDescriptor()
     {
-        return this.inputInstanceFactory.getDescriptor();
+        return ((WikiStreamScriptService) this.wikistreamScriptService)
+            .getInputWikiStreamDescriptor(WikiStreamType.XWIKI_INSTANCE);
     }
 
     /**
@@ -97,7 +84,8 @@ public class InstanceWikiStreamScriptService extends AbstractWikiStreamScriptSer
      */
     public WikiStreamDescriptor getOuputWikiStreamDescriptor()
     {
-        return this.outputInstanceFactory.getDescriptor();
+        return ((WikiStreamScriptService) this.wikistreamScriptService)
+            .getOutputWikiStreamDescriptor(WikiStreamType.XWIKI_INSTANCE);
     }
 
     /**
@@ -106,33 +94,8 @@ public class InstanceWikiStreamScriptService extends AbstractWikiStreamScriptSer
     public Job startImport(WikiStreamType inputType, Map<String, Object> inputProperties,
         InstanceInputProperties instanceProperties)
     {
-        resetError();
-
-        Job job = null;
-
-        try {
-            // TODO: introduce advanced right checking system instead
-            XWikiContext xcontext = this.xcontextProvider.get();
-            if (xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
-                throw new AuthorizationException("WikiStream conversion require programming right");
-            }
-
-            // Create instance wiki stream
-            OutputWikiStream outputWikiStream = this.outputInstanceFactory.createOutputWikiStream(instanceProperties);
-
-            // Create input wiki stream
-            InputWikiStreamFactory inputWikiStreamFactory =
-                this.componentManagerProvider.get().getInstance(InputWikiStreamFactory.class, inputType.serialize());
-
-            InputWikiStream inputWikiStream = inputWikiStreamFactory.createInputWikiStream(inputProperties);
-
-            // Start import
-            inputWikiStream.read(outputWikiStream.getFilter());
-        } catch (Exception e) {
-            setError(e);
-        }
-
-        return job;
+        return ((WikiStreamScriptService) this.wikistreamScriptService).startConvert(inputType, inputProperties,
+            WikiStreamType.XWIKI_INSTANCE, instanceProperties);
     }
 
     /**
@@ -141,32 +104,7 @@ public class InstanceWikiStreamScriptService extends AbstractWikiStreamScriptSer
     public Job startExport(WikiStreamType outputType, Map<String, Object> outputProperties,
         InstanceInputProperties instanceProperties)
     {
-        resetError();
-
-        Job job = null;
-
-        try {
-            // TODO: introduce advanced right checking system instead
-            XWikiContext xcontext = this.xcontextProvider.get();
-            if (xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
-                throw new AuthorizationException("WikiStream conversion require programming right");
-            }
-
-            // Create instance wiki stream
-            InputWikiStream inputWikiStream = this.inputInstanceFactory.createInputWikiStream(instanceProperties);
-
-            // Create input wiki stream
-            OutputWikiStreamFactory outputWikiStreamFactory =
-                this.componentManagerProvider.get().getInstance(OutputWikiStreamFactory.class, outputType.serialize());
-
-            OutputWikiStream outputWikiStream = outputWikiStreamFactory.createOutputWikiStream(outputProperties);
-
-            // Start export
-            inputWikiStream.read(outputWikiStream.getFilter());
-        } catch (Exception e) {
-            setError(e);
-        }
-
-        return job;
+        return ((WikiStreamScriptService) this.wikistreamScriptService).startConvert(WikiStreamType.XWIKI_INSTANCE,
+            instanceProperties, outputType, outputProperties);
     }
 }

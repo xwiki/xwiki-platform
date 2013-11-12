@@ -28,7 +28,7 @@
 #set ($translationsName = "$stringtool.removeEnd($className, 'Class')Translations")
 {{{##
 {{velocity output="false"}}
-${escapetool.d}services.localization.use('document', '$translationsName')
+${escapetool.d}services.localization.use('document', '$translationsName.replace("'", "''")')
 {{/velocity}}
 
 {{include document="XWiki.LiveTableResults" /}}##

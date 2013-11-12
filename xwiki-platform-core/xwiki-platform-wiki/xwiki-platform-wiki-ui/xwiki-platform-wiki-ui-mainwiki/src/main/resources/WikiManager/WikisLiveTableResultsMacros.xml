@@ -64,7 +64,7 @@
     #set ($itemHasViewInvitation = false)
     #set ($itemHasLeave = false)
     ## Determine if current user is already a member.
-    #set ($wikiMembers = $services.wikiuser.getMembers($wikiId))
+    #set ($wikiMembers = $services.wiki.user.getMembers($wikiId))
     #set ($currentUserIsMember = ($wikiMembers &amp;&amp; $wikiMembers.contains($currentUser)) || $currentUser == $wiki.ownerId)
     ## Determine available membership action and action URL.
     #if ($currentUserIsMember)
@@ -76,7 +76,7 @@
     #else
       ##
       ## Determine if, regardless of membership type, an existing invitation exists for the 
-      #set ($invitations = $services.wikiuser.getAllInvitations($wikiId))
+      #set ($invitations = $services.wiki.user.getAllInvitations($wikiId))
       #set ($existingInvitation = false)
       #if ($invitations &amp;&amp; !$invitations.isEmpty())
         #foreach($invitation in $invitations)
@@ -95,7 +95,7 @@
       #elseif ($itemMembershipType == 'REQUEST')
         ## Determine if a request was already sent.
         #set ($pendingRequest = false)
-        #set ($existingRequests = $services.wikiuser.getAllRequests($wikiId))
+        #set ($existingRequests = $services.wiki.user.getAllRequests($wikiId))
         #foreach ($existingRequest in $existingRequests)
           #if ($existingRequest.userId == $currentUser &amp;&amp; $existingRequest.status == 'PENDING')
             #set ($pendingRequest = true)

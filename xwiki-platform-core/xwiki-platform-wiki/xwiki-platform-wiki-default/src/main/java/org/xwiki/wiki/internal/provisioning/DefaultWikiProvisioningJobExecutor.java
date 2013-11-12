@@ -20,7 +20,9 @@
 package org.xwiki.wiki.internal.provisioning;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -34,7 +36,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
-import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.job.Job;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobException;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobExecutor;
@@ -53,7 +55,7 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
     /**
      * List of all the jobs.
      */
-    private List<WikiProvisioningJob> jobs;
+    private Map<List<String>, WikiProvisioningJob> jobs;
 
     /**
      * Job Executor.
@@ -70,7 +72,7 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
     @Override
     public void initialize() throws InitializationException
     {
-        this.jobs = new ArrayList<WikiProvisioningJob>();
+        this.jobs = new HashMap<List<String>, WikiProvisioningJob>();
 
         // Setup jobs thread
         BasicThreadFactory factory =
@@ -80,24 +82,26 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
     }
 
     @Override
-    public int createAndExecuteJob(String wikiId, String provisioningJobName, Object parameter) throws
+    public WikiProvisioningJob createAndExecuteJob(String wikiId, String provisioningJobName, Object parameter) throws
             WikiProvisioningJobException
     {
         try {
-            int jobId = -1;
             // Create the job
-            WikiProvisioningJob job = componentManager.getInstance(WikiProvisioningJob.class, provisioningJobName);
+            WikiProvisioningJob job = componentManager.getInstance(Job.class, provisioningJobName);
+            // Id of the new job
+            List<String> jobId = new ArrayList<String>();
+            jobId.add("wiki");
+            jobId.add("provisioning");
+            jobId.add(provisioningJobName);
+            jobId.add(wikiId);
             // Initialize it
-            job.initialize(new WikiProvisioningJobRequest(wikiId, parameter));
-            // Put it to the list of jobs
-            synchronized (jobs) {
-                jobId = jobs.size();
-                jobs.add(job);
-            }
+            job.initialize(new WikiProvisioningJobRequest(jobId, wikiId, parameter));
+            // Add it to the list of jobs
+            jobs.put(jobId, job);
             // Pass it to the executor
             jobExecutor.execute(new ExecutionContextRunnable(job, this.componentManager));
-            // Return the job id
-            return jobId;
+            // Return the job
+            return job;
         } catch (ComponentLookupException e) {
             throw new WikiProvisioningJobException(
                     String.format("Failed to lookup provisioning job component for role [%s]", provisioningJobName), e);
@@ -105,11 +109,11 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
     }
 
     @Override
-    public JobStatus getJobStatus(int jobId) throws WikiProvisioningJobException
+    public WikiProvisioningJob getJob(List<String> jobId) throws WikiProvisioningJobException
     {
         try {
             WikiProvisioningJob job = jobs.get(jobId);
-            return job.getStatus();
+            return job;
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new WikiProvisioningJobException(
                     String.format("There is no job corresponding to the jobId [%d].", jobId), e);

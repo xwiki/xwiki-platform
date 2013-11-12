@@ -19,15 +19,13 @@
  */
 package org.xwiki.wiki.provisioning;
 
-import org.xwiki.component.annotation.Role;
 import org.xwiki.job.Job;
 
 /**
- * Component that prepares new wikis.
+ * Component that provision wikis.
  * @since 5.3M2
  * @version $Id :$
  */
-@Role
 public interface WikiProvisioningJob extends Job
 {
 }

@@ -19,6 +19,8 @@
  */
 package org.xwiki.wiki.provisioning;
 
+import java.util.List;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.job.AbstractRequest;
@@ -45,12 +47,14 @@ public class WikiProvisioningJobRequest extends AbstractRequest
 
     /**
      * Constructor.
+     * @param id id of the job request
      * @param wikiId id of the wiki to provision
      * @param parameter the parameter to be used by the provisioning job
      */
-    public WikiProvisioningJobRequest(String wikiId, Object parameter)
+    public WikiProvisioningJobRequest(List<String> id, String wikiId, Object parameter)
     {
         super();
+        setId(id);
         setWikiId(wikiId);
         setProvisioningJobParameter(parameter);
     }
@@ -99,7 +103,7 @@ public class WikiProvisioningJobRequest extends AbstractRequest
         }
 
         WikiProvisioningJobRequest r = (WikiProvisioningJobRequest) o;
-        return new EqualsBuilder().append(r.getWikiId(), getWikiId()).append(
+        return new EqualsBuilder().append(r.getId(), getId()).append(r.getWikiId(), getWikiId()).append(
                 r.getProvisioningJobParameter(), getProvisioningJobParameter()).isEquals();
     }
 
@@ -107,6 +111,7 @@ public class WikiProvisioningJobRequest extends AbstractRequest
     public int hashCode()
     {
         HashCodeBuilder builder = new HashCodeBuilder();
+        builder.append(getId());
         builder.append(getWikiId()).append(getProvisioningJobParameter());
         return builder.hashCode();
     }

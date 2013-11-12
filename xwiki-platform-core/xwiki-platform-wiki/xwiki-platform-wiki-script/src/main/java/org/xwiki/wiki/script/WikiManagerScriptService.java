@@ -34,6 +34,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -51,10 +52,15 @@ import com.xpn.xwiki.XWikiContext;
  * @since 5.3M2
  */
 @Component
-@Named("wiki")
+@Named(WikiManagerScriptService.ROLEHINT)
 @Singleton
 public class WikiManagerScriptService implements ScriptService
 {
+    /**
+     * Hint of the component.
+     */
+    public static final String ROLEHINT = "wiki";
+
     /**
      * Field name of the last API exception inserted in context.
      */
@@ -81,11 +87,28 @@ public class WikiManagerScriptService implements ScriptService
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
+    @Inject
+    private ScriptServiceManager scriptServiceManager;
+
     /**
      * Logging tool.
      */
     @Inject
     private Logger logger;
+
+    /**
+     * Get a sub script service related to wiki.
+     * (Note that we're voluntarily using an API name of "get" to make it extra easy to access Script Services from
+     * Velocity (since in Velocity writing <code>$services.wiki.name</code> is equivalent to writing
+     * <code>$services.wiki.get("name")</code>). It also makes it a short and easy API name for other scripting
+     * languages.
+     * @param serviceName id of the script service
+     * @return the service asked or null if none could be found
+     */
+    public ScriptService get(String serviceName)
+    {
+        return scriptServiceManager.get(ROLEHINT + '.' + serviceName);
+    }
 
     /**
      * Create a new wiki.
@@ -103,9 +126,12 @@ public class WikiManagerScriptService implements ScriptService
         XWikiContext context = xcontextProvider.get();
 
         try {
+            // Check if the current script has the programing rights
+            authorizationManager.checkAccess(Right.PROGRAM, context.getDoc().getAuthorReference(),
+                    context.getDoc().getDocumentReference());
             // Check right access
             WikiReference mainWikiReference = new WikiReference(getMainWikiId());
-            authorizationManager.checkAccess(Right.CREATE_WIKI, context.getUserReference(), mainWikiReference);
+            authorizationManager.checkAccess(Right.PROGRAM, context.getDoc().getAuthorReference(), mainWikiReference);
             if (!failOnExist) {
                 authorizationManager.checkAccess(Right.PROGRAM, context.getUserReference(), mainWikiReference);
             }
@@ -161,6 +187,11 @@ public class WikiManagerScriptService implements ScriptService
     {
         String errorMessage = String.format("Error while getting the descriptor of wiki [%s]", wikiId);
         try {
+            // Check if the current script has the programing rights
+            XWikiContext context = xcontextProvider.get();
+            authorizationManager.checkAccess(Right.PROGRAM, context.getDoc().getAuthorReference(),
+                    context.getDoc().getDocumentReference());
+
             // Get the wiki owner
             WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
             if (descriptor == null) {
@@ -179,6 +210,8 @@ public class WikiManagerScriptService implements ScriptService
                 return true;
             }
         } catch (WikiManagerException e) {
+            error(errorMessage, e);
+        } catch (AccessDeniedException e) {
             error(errorMessage, e);
         }
 
@@ -313,6 +346,9 @@ public class WikiManagerScriptService implements ScriptService
         XWikiContext context = xcontextProvider.get();
 
         try {
+            // Check if the current script has the programing rights
+            authorizationManager.checkAccess(Right.PROGRAM, context.getDoc().getAuthorReference(),
+                    context.getDoc().getDocumentReference());
             // Get the wiki owner
             WikiDescriptor oldDescriptor = wikiDescriptorManager.getById(descriptor.getId());
             String owner = oldDescriptor.getOwnerId();

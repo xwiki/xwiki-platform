@@ -119,7 +119,7 @@ public class DefaultWikiUserManager implements WikiUserManager
     public void setMembershipType(String wikiId, MembershipType type) throws WikiUserManagerException
     {
         WikiUserConfiguration configuration = wikiUserConfigurationHelper.getConfiguration(wikiId);
-        configuration.setMembershypType(type);
+        configuration.setMembershipType(type);
         wikiUserConfigurationHelper.saveConfiguration(configuration, wikiId);
     }
 

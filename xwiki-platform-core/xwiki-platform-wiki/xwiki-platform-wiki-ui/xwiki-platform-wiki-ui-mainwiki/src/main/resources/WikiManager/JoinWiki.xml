@@ -55,7 +55,7 @@
     #end
     #set ($currentUser = "${services.wiki.mainWikiId}:${xcontext.user}")
     ##
-    #set ($members = $services.wikiuser.getMembers($wikiId))
+    #set ($members = $services.wiki.user.getMembers($wikiId))
     #if ($members &amp;&amp; $members.contains($currentUser))
       {{info}}$services.localization.render('platform.workspace.userAlreadyMemberOfWorkspace', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/info}}
     #elseif ($currentUser == 'xwiki:XWiki.XWikiGuest')
@@ -72,7 +72,7 @@
       #set ($membershipType = $wiki.getPropertyGroup('user').membershipType)
       ##
       ## Determine if, regardless of membership type, an existing invitation exists for the current user.
-      #set ($invitations = $services.wikiuser.getAllInvitations($wikiId))
+      #set ($invitations = $services.wiki.user.getAllInvitations($wikiId))
       #set ($existingInvitation = false)
       #if ($invitations &amp;&amp; !$invitations.isEmpty())
         #foreach($invitation in $invitations)
@@ -90,9 +90,9 @@
           #set ($notificationMessage = $services.localization.render('platform.workspace.invitationUserAcceptedNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, ${wikiName}, $wikiId]))
           ## Accept
           #if ($request.acceptInvitation)
-            #set ($discard = $services.wikiuser.acceptInvitation($existingInvitation, $request.userComment))
+            #set ($discard = $services.wiki.user.acceptInvitation($existingInvitation, $request.userComment))
           #else
-            #set ($discard = $services.wikiuser.refuseInvitation($existingInvitation, $request.userComment))
+            #set ($discard = $services.wiki.user.refuseInvitation($existingInvitation, $request.userComment))
           #end          
           ## Send message to wiki admins. (XWikiAdminGroup)
           #set ($wikiAdminGroupReference = $services.model.createDocumentReference($wikiId, 'XWiki', 'XWikiAdminGroup'))
@@ -147,7 +147,7 @@
         ## Determine if a pending request already exists.
         ##
         #set ($pendingRequest = false)
-        #set ($existingRequests = $services.wikiuser.getAllRequests($wikiId))
+        #set ($existingRequests = $services.wiki.user.getAllRequests($wikiId))
         #foreach ($existingRequest in $existingRequests)
           #if ($existingRequest.userId == $currentUser &amp;&amp; $existingRequest.status == 'PENDING')
             #set ($pendingRequest = $existingRequest)
@@ -171,11 +171,11 @@
           #else
             ## User confirms the cancel of existing request.
             ##
-            #set ($result = $services.wikiuser.cancelCandidacy($pendingRequest))
+            #set ($result = $services.wiki.user.cancelCandidacy($pendingRequest))
             #if ($result)
               {{success}}$services.localization.render('platform.workspace.joinRequestCancelSuccess',  ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
             #else
-              #printException($services.wikiuser.lastException.message)
+              #printException($services.wiki.user.lastException.message)
             #end
           #end
         #elseif ("$!confirm" != '1')
@@ -205,7 +205,7 @@
         #else
           ## User confirmed the join request.
           ##
-          #set ($request = $services.wikiuser.askToJoin($currentUser, $wikiId, $request.userComment))
+          #set ($request = $services.wiki.user.askToJoin($currentUser, $wikiId, $request.userComment))
           #if ($request)
             ## Send message to wiki admins. (XWikiAdminGroup)
             #set ($wikiAdminGroupReference = $services.model.createDocumentReference($wikiId, 'XWiki', 'XWikiAdminGroup'))
@@ -213,7 +213,7 @@
             #set ($discard = $services.messageStream.postMessageToGroup($notificationMessage, $wikiAdminGroupReference))
             {{success}}$services.localization.render('platform.workspace.joinRequestSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
           #else
-            #printException($services.wikiuser.lastException.message)
+            #printException($services.wiki.user.lastException.message)
           #end
         #end
       #else
@@ -232,11 +232,11 @@
         #else
           ## User confirmed to join the wiki.
           ##
-          #set ($result = $services.wikiuser.join($currentUser, $wikiId))
+          #set ($result = $services.wiki.user.join($currentUser, $wikiId))
           #if ($result)
             {{success}}$services.localization.render('platform.workspace.joinSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
           #else
-            #printException($services.wikiuser.lastException.message)
+            #printException($services.wiki.user.lastException.message)
           #end
         #end
       #end

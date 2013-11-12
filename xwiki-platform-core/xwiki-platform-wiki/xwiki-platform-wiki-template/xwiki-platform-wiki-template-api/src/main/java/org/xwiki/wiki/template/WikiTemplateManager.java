@@ -20,11 +20,12 @@
 package org.xwiki.wiki.template;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 
 /**
  * Component in charge of managing wiki templates and creating new wiki from these templates.
@@ -68,18 +69,18 @@ public interface WikiTemplateManager
      * @param templateId Id of the template to use
      * @param ownerId Id of the wiki owner
      * @param failOnExist fail if the wiki id is not available
-     * @return the id of the job that provision the new wiki with the template content
+     * @return the job that provisions the new wiki with the template content
      * @throws WikiTemplateManagerException if problems occur
      */
-    int createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId, String ownerId,
+    WikiProvisioningJob createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId, String ownerId,
         boolean failOnExist) throws WikiTemplateManagerException;
 
     /**
-     * Get the status of the wiki provisioning job.
+     * Get the wiki provisioning job.
      *
      * @param jobId id of wiki provisioning job
-     * @return the status of the job
+     * @return the job
      * @throws WikiTemplateManagerException if problem occurs
      */
-    JobStatus getWikiProvisioningJobStatus(int jobId) throws WikiTemplateManagerException;
+    WikiProvisioningJob getWikiProvisioningJob(List<String> jobId) throws WikiTemplateManagerException;
 }

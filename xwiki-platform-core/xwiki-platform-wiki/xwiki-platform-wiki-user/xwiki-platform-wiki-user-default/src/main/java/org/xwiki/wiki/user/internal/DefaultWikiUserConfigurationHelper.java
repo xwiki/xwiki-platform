@@ -109,7 +109,7 @@ public class DefaultWikiUserConfigurationHelper implements WikiUserConfiguration
                 // Default value
                 membershipType = MembershipType.INVITE;
             }
-            configuration.setMembershypType(membershipType);
+            configuration.setMembershipType(membershipType);
         }
 
         return configuration;

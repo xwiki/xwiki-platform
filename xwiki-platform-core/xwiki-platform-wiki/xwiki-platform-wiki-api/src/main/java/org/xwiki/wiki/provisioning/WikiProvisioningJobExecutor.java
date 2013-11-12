@@ -19,8 +19,9 @@
  */
 package org.xwiki.wiki.provisioning;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
-import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -39,18 +40,18 @@ public interface WikiProvisioningJobExecutor
      * @param wikiId id of the wiki to provision
      * @param provisioningJobName name of the WikiProvisioningJob component to use
      * @param parameter parameter used by the wiki provisioning job, depending of its implementation.
-     * @return the job ID.
+     * @return the created job.
      * @throws WikiProvisioningJobException if problems occur
      */
-    int createAndExecuteJob(String wikiId, String provisioningJobName, Object parameter) throws
+    WikiProvisioningJob createAndExecuteJob(String wikiId, String provisioningJobName, Object parameter) throws
             WikiProvisioningJobException;
 
     /**
-     * Get the status of a job.
+     * Get a wiki provisioning job.
      *
      * @param jobId Id of the job
      * @return the job status
      * @throws WikiProvisioningJobException if problems occur
      */
-    JobStatus getJobStatus(int jobId) throws WikiProvisioningJobException;
+    WikiProvisioningJob getJob(List<String> jobId) throws WikiProvisioningJobException;
 }

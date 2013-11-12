@@ -48,7 +48,7 @@
     #set ($currentUser = "${xcontext.mainWikiName}:${xcontext.user}")
     #set ($wikiMainPage = $wiki.mainPageReference)
     ##
-    #set ($members = $services.wikiuser.getMembers($wikiId))
+    #set ($members = $services.wiki.user.getMembers($wikiId))
     #if (!$members || !$members.contains($currentUser))
       {{error}}$services.localization.render('platform.workspace.userNotMemberOfWorkspace', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/error}}
     #elseif ($wiki.ownerId == $currentUser)
@@ -65,11 +65,11 @@
           {{/html}})))
         {{/box}}
       #else
-        #set ($result = $services.wikiuser.leave($currentUser, $wikiId))
+        #set ($result = $services.wiki.user.leave($currentUser, $wikiId))
         #if ($result)
           {{success}}$services.localization.render('platform.workspace.leaveSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
         #else
-          #printException($services.wikiuser.lastException.message)
+          #printException($services.wiki.user.lastException.message)
         #end
       #end
     #end

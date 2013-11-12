@@ -15,7 +15,7 @@
   <date>1307191413000</date>
   <contentUpdateDate>1307191413000</contentUpdateDate>
   <version>1.1</version>
-  <title></title>
+  <title/>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -26,8 +26,9 @@
   <content>{{velocity}}
 #if($xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
   #set($discard = $response.setContentType('application/json'))
-  #set($jobId = $request.jobId)
-  #set($status = $services.wikitemplate.getWikiProvisioningJobStatus($jobId))
+  #set($wikiId = $request.wikiId)
+  #set($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $wikiId])
+  #set($status = $services.wiki.template.getWikiProvisioningJobStatus($jobId))
   #set($map = {'wikiId':$wikiId, 'progress':$status.progress.offset, 'status':$status.state})
   $jsontool.serialize($map)
 #end

@@ -29,7 +29,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -40,6 +39,7 @@ import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.properties.WikiPropertyGroupException;
 import org.xwiki.wiki.properties.WikiPropertyGroupProvider;
+import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobException;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobExecutor;
 import org.xwiki.wiki.template.WikiTemplateManager;
@@ -153,7 +153,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     }
 
     @Override
-    public int createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId,
+    public WikiProvisioningJob createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId,
         String ownerId, boolean failOnExist) throws WikiTemplateManagerException
     {
         try {
@@ -176,10 +176,10 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     }
 
     @Override
-    public JobStatus getWikiProvisioningJobStatus(int jobId) throws WikiTemplateManagerException
+    public WikiProvisioningJob getWikiProvisioningJob(List<String> jobId) throws WikiTemplateManagerException
     {
         try {
-            return wikiProvisionerExecutor.getJobStatus(jobId);
+            return wikiProvisionerExecutor.getJob(jobId);
         } catch (WikiProvisioningJobException e) {
             throw new WikiTemplateManagerException(e.getMessage(), e);
         }

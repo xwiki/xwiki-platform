@@ -19,11 +19,14 @@
  */
 package org.xwiki.wiki.descriptor.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.job.Job;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.internal.provisioning.DefaultWikiProvisioningJobExecutor;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
@@ -33,7 +36,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.wiki.internal.provisioning.DefaultWikiProvisioningJobExecutor}.
@@ -52,22 +54,27 @@ public class DefaultWikiProvisioningJobExecutorTest
     {
         // Mocks
         WikiProvisioningJob provisioningJob = mock(WikiProvisioningJob.class);
-        mocker.registerComponent(WikiProvisioningJob.class, "test", provisioningJob);
+        mocker.registerComponent(Job.class, "wikiprovisioning.test", provisioningJob);
         ExecutionContextManager executionContextManager = mock(ExecutionContextManager.class);
         mocker.registerComponent(ExecutionContextManager.class, executionContextManager);
         Execution execution = mock(Execution.class);
         mocker.registerComponent(Execution.class, execution);
 
         // Execute
-        int jobId = mocker.getComponentUnderTest().createAndExecuteJob("wikiid", "test", "templateid");
+        WikiProvisioningJob job = mocker.getComponentUnderTest().createAndExecuteJob("wikiid", "wikiprovisioning.test",
+                "templateid");
 
         // Verify
-        verify(provisioningJob).initialize(eq(new WikiProvisioningJobRequest("wikiid", "templateid")));
+        // Id of the job.
+        List<String> jobId = new ArrayList<String>();
+        jobId.add("wiki");
+        jobId.add("provisioning");
+        jobId.add("wikiprovisioning.test");
+        jobId.add("wikiid");
+        verify(provisioningJob).initialize(eq(new WikiProvisioningJobRequest(jobId, "wikiid", "templateid")));
         Thread.sleep(100);
         verify(provisioningJob).run();
 
-        JobStatus status = mock(JobStatus.class);
-        when(provisioningJob.getStatus()).thenReturn(status);
-        assertEquals(mocker.getComponentUnderTest().getJobStatus(jobId), status);
+        assertEquals(mocker.getComponentUnderTest().getJob(jobId), job);
     }
 }

@@ -26,13 +26,13 @@
   <object>
     <class>
       <name>XWiki.JavaScriptExtension</name>
-      <customClass></customClass>
-      <customMapping></customMapping>
-      <defaultViewSheet></defaultViewSheet>
-      <defaultEditSheet></defaultEditSheet>
-      <defaultWeb></defaultWeb>
-      <nameField></nameField>
-      <validationScript></validationScript>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
       <cache>
         <cache>0</cache>
         <disabled>0</disabled>
@@ -42,7 +42,7 @@
         <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator></separator>
+        <separator/>
         <separators>,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
@@ -87,7 +87,7 @@
         <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator></separator>
+        <separator/>
         <separators>,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
@@ -254,13 +254,13 @@
   <object>
     <class>
       <name>XWiki.JavaScriptExtension</name>
-      <customClass></customClass>
-      <customMapping></customMapping>
-      <defaultViewSheet></defaultViewSheet>
-      <defaultEditSheet></defaultEditSheet>
-      <defaultWeb></defaultWeb>
-      <nameField></nameField>
-      <validationScript></validationScript>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
       <cache>
         <cache>0</cache>
         <disabled>0</disabled>
@@ -270,7 +270,7 @@
         <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator></separator>
+        <separator/>
         <separators>,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
@@ -315,7 +315,7 @@
         <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator></separator>
+        <separator/>
         <separators>,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
@@ -346,7 +346,7 @@ XWiki.ProvisioningBar = Class.create({
     var url = document.getURL('get', 'outputSyntax=plain');
     new Ajax.Request(url, {
       method: 'get',
-      parameters : {'jobId': $('jobId').value},
+      parameters : {'wikiId': $('wikiId').value},
       onSuccess : function(response) {
         var result = response.responseText.evalJSON(true);
         this._refresh(result);
@@ -374,7 +374,7 @@ XWiki.ProvisioningBar = Class.create({
 });
 
 var init = function(event) {
-  if ($('jobId')) {
+  if ($('wikiId')) {
     new XWiki.ProvisioningBar();
   }
   return true;
@@ -400,13 +400,13 @@ return XWiki;
   <object>
     <class>
       <name>XWiki.StyleSheetExtension</name>
-      <customClass></customClass>
-      <customMapping></customMapping>
-      <defaultViewSheet></defaultViewSheet>
-      <defaultEditSheet></defaultEditSheet>
-      <defaultWeb></defaultWeb>
-      <nameField></nameField>
-      <validationScript></validationScript>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
       <cache>
         <cache>0</cache>
         <disabled>0</disabled>
@@ -416,7 +416,7 @@ return XWiki;
         <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator></separator>
+        <separator/>
         <separators>,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
@@ -461,7 +461,7 @@ return XWiki;
         <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator></separator>
+        <separator/>
         <separators>,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
@@ -500,13 +500,13 @@ return XWiki;
   <object>
     <class>
       <name>XWiki.StyleSheetExtension</name>
-      <customClass></customClass>
-      <customMapping></customMapping>
-      <defaultViewSheet></defaultViewSheet>
-      <defaultEditSheet></defaultEditSheet>
-      <defaultWeb></defaultWeb>
-      <nameField></nameField>
-      <validationScript></validationScript>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
       <cache>
         <cache>0</cache>
         <disabled>0</disabled>
@@ -516,7 +516,7 @@ return XWiki;
         <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator></separator>
+        <separator/>
         <separators>,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
@@ -561,7 +561,7 @@ return XWiki;
         <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
-        <separator></separator>
+        <separator/>
         <separators>,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
@@ -641,7 +641,7 @@ return XWiki;
       <use>currentPage</use>
     </property>
   </object>
-<content>{{velocity}}
+  <content>{{velocity}}
 #######################################################
 ##         Create a new (sub)wiki - WIZARD
 ##
@@ -806,7 +806,7 @@ return XWiki;
         ### WIZARD SECOND HALF
         &lt;div class="half"&gt;
           ### TEMPLATE ###
-          #set ($templates = $services.wikitemplate.getTemplates())
+          #set ($templates = $services.wiki.template.getTemplates())
           &lt;div&gt;
             &lt;dt&gt;
               &lt;label for="template"&gt;$services.localization.render('platform.workspace.newWorkspaceTemplateLabel')&lt;/label&gt;
@@ -1001,8 +1001,8 @@ return XWiki;
   #set($fromTemplate = false)
   #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
     ## check if the wiki is already in creation
-    #if(!$services.wikitemplate.getWikiCreationStatus($request.wikiname))
-      #set($wikiJobId = $services.wikitemplate.createWikiFromTemplate($request.wikiname, $request.wikiname, $request.template, $request.ownerId, true))
+    #if(!$services.wiki.template.getWikiCreationStatus($request.wikiname))
+      #set($discard = $services.wiki.template.createWikiFromTemplate($request.wikiname, $request.wikiname, $request.template, $request.ownerId, true))
     #end
     #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
     #set($fromTemplate = true)
@@ -1020,7 +1020,7 @@ return XWiki;
     #set ($discard = $services.wiki.saveDescriptor($wikiDescriptor))
     ## Set the template value
     #if("$!request.set_as_template" != '')
-      #set ($discard = $services.wikitemplate.setTemplate($wikiDescriptor.id, true))
+      #set ($discard = $services.wiki.template.setTemplate($wikiDescriptor.id, true))
     #end
     #if($fromTemplate)
       #templateProvisioning($wikiDescriptor)
@@ -1039,8 +1039,8 @@ return XWiki;
     #set($wikiDescriptor = $services.wiki.getById($request.wikiId))
   #end
   ## Set the membership type and the local users
-  #set ($discard = $services.wikiuser.setMembershipType($wikiDescriptor.id, $request.membershipType))
-  #set ($discard = $services.wikiuser.setUserScope($wikiDescriptor.id, $request.userScope))
+  #set ($discard = $services.wiki.user.setMembershipType($wikiDescriptor.id, $request.membershipType))
+  #set ($discard = $services.wiki.user.setUserScope($wikiDescriptor.id, $request.userScope))
   #set ($groupsClassName = "${wikiDescriptor.id}:XWiki.XWikiGroups")    
   ## Save the members
   #set ($members = [])
@@ -1055,7 +1055,7 @@ return XWiki;
       #end
     #end
     ## Add the members
-    #set($discard = $services.wikiuser.addMembers($members, $wikiDescriptor.id))
+    #set($discard = $services.wiki.user.addMembers($members, $wikiDescriptor.id))
   #end
   ## Redirect to the new wiki's homepage.
   #set ($discard = $response.sendRedirect($xwiki.getURL($wikiDescriptor.mainPageReference)))
@@ -1092,14 +1092,14 @@ return XWiki;
     #addMembersAsHiddenInput()
     &lt;input type="hidden" name="membershipType" value="$!escapetool.xml($request.getParameter('membershipType'))" /&gt;
     &lt;input type="hidden" name="userScope" value="$!escapetool.xml($request.userScope)" /&gt;
-    &lt;input type="hidden" name="jobId" id="jobId" value="$!escapetool.xml($wikiJobId)" /&gt;
     &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($wikiDescriptor.id)" /&gt;
     #wizardHeader($services.localization.render('platform.wikimanager.wizard.stepProvisioning'))
     &lt;div class="wizard-body"&gt;
       &lt;div class="ui-progress" id="ui-progress"&gt;
         $services.localization.render('platform.wikimanager.wizard.stepProvisioningWait')
         &lt;div class="ui-progress-background"&gt;
-          #set ($percent = $services.wikitemplate.getWikiProvisioningJobStatus($wikiJobId).progress.offset)
+          #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $wikiDescriptor.id])
+          #set ($percent = $services.wiki.template.getWikiProvisioningJobStatus($jobId).progress.offset)
           ## There is no progress information if the job was scheduled but hasn't started yet.
           #if (!$percent)
             #set ($percent = 0)

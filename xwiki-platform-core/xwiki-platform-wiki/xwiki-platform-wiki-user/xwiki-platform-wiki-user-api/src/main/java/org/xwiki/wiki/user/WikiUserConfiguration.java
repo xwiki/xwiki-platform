@@ -41,7 +41,7 @@ public class WikiUserConfiguration
     {
         // Default values
         setUserScope(UserScope.GLOBAL_ONLY);
-        setMembershypType(MembershipType.INVITE);
+        setMembershipType(MembershipType.INVITE);
     }
 
     /**
@@ -63,7 +63,7 @@ public class WikiUserConfiguration
     /**
      * @param type membership type to set
      */
-    public void setMembershypType(MembershipType type)
+    public void setMembershipType(MembershipType type)
     {
         this.membershipType = type;
     }

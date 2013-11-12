@@ -129,10 +129,10 @@
     {{translation key="platform.workspace.joinNeedToLogIn"/}}
   #else
     #set ($hasOwner = ($wiki.ownerId.equals($currentUser)))
-    #set ($currentUserIsMember = $services.wikiuser.isMember($currentUser, $currentWiki))
+    #set ($currentUserIsMember = $services.wiki.user.isMember($currentUser, $currentWiki))
     #if (!$currentUserIsMember)
       ## Determine if, regardless of membership type, an existing invitation or join request exists for the current user.
-      #set ($invitations = $services.wikiuser.getAllInvitations($currentWiki))
+      #set ($invitations = $services.wiki.user.getAllInvitations($currentWiki))
       #set ($existingInvitationOrRequest = false)
       #if ($invitations &amp;&amp; !$invitations.isEmpty())
         #foreach($invitation in $invitations)
@@ -141,7 +141,7 @@
           #end
         #end
       #end      
-      #set ($existingRequests = $services.wikiuser.getAllRequests($currentWiki))
+      #set ($existingRequests = $services.wiki.user.getAllRequests($currentWiki))
       #foreach ($existingRequest in $existingRequests)
         #if ($existingRequest.userId == $currentUser &amp;&amp; $existingRequest.status == 'PENDING')
           #set ($existingInvitationOrRequest = $existingRequest)
@@ -184,7 +184,7 @@
   #end
   ----
   **{{translation key="platform.workspace.panelInformationMembersLabel"/}}**
-  #set ($members = $services.wikiuser.getMembers($currentWiki))
+  #set ($members = $services.wiki.user.getMembers($currentWiki))
   #set ($totalNrOfUsers = $members.size())
   #set ($MAX_USERS = 12)
   #set ($nrOfUsersToGet = $MAX_USERS)

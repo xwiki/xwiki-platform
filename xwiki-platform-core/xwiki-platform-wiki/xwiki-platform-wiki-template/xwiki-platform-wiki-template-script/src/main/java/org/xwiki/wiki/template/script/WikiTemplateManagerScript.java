@@ -21,6 +21,7 @@ package org.xwiki.wiki.template.script;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -51,7 +52,7 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  */
 @Component
-@Named("wikitemplate")
+@Named("wiki.template")
 @Singleton
 public class WikiTemplateManagerScript implements ScriptService
 {
@@ -112,6 +113,9 @@ public class WikiTemplateManagerScript implements ScriptService
     {
         try {
             XWikiContext context = xcontextProvider.get();
+            // Check if the current script has the programing rights
+            authorizationManager.checkAccess(Right.PROGRAM, context.getDoc().getAuthorReference(),
+                    context.getDoc().getDocumentReference());
             // Get the descriptor
             WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
             // Get the wiki owner
@@ -155,25 +159,30 @@ public class WikiTemplateManagerScript implements ScriptService
      * @param templateId Id of the template to use
      * @param ownerId Id of the wiki owner
      * @param failOnExist fail the creation of the wiki id if not available
-     * @return the id of the job that provision the new wiki with the template content, null if the user does not have
-     * the right to create a wiki
+     * @return true if it succeed
      */
-    public Integer createWikiFromTemplate(String newWikiId, String newWikiAlias,
+    public boolean createWikiFromTemplate(String newWikiId, String newWikiAlias,
             String templateId, String ownerId, boolean failOnExist)
     {
-        Integer jobId = null;
         try {
             XWikiContext context = xcontextProvider.get();
-            if (authorizationManager.hasAccess(Right.CREATE_WIKI, context.getUserReference(),
-                    new WikiReference(context.getMainXWiki())))
-            {
-                jobId = wikiTemplateManager.createWikiFromTemplate(newWikiId, newWikiAlias, templateId, ownerId,
+            // Check if the current script has the programing rights
+            authorizationManager.checkAccess(Right.PROGRAM, context.getDoc().getAuthorReference(),
+                    context.getDoc().getDocumentReference());
+            // Check if the user has the right
+            authorizationManager.checkAccess(Right.CREATE_WIKI, context.getUserReference(),
+                    new WikiReference(context.getMainXWiki()));
+
+            // Do the job
+            wikiTemplateManager.createWikiFromTemplate(newWikiId, newWikiAlias, templateId, ownerId,
                         failOnExist);
-            }
+            return true;
         } catch (WikiTemplateManagerException e) {
             error("Failed to create the wiki from the template.", e);
+        } catch (AccessDeniedException e) {
+            error("Error, you or this script does not have the right to create a wiki from a template.", e);
         }
-        return jobId;
+        return false;
     }
 
     /**
@@ -211,10 +220,10 @@ public class WikiTemplateManagerScript implements ScriptService
      * @param jobId id of the provisioning job.
      * @return the status of the job
      */
-    public JobStatus getWikiProvisioningJobStatus(int jobId)
+    public JobStatus getWikiProvisioningJobStatus(List<String> jobId)
     {
         try {
-            return wikiTemplateManager.getWikiProvisioningJobStatus(jobId);
+            return wikiTemplateManager.getWikiProvisioningJob(jobId).getStatus();
         } catch (WikiTemplateManagerException e) {
             return null;
         }

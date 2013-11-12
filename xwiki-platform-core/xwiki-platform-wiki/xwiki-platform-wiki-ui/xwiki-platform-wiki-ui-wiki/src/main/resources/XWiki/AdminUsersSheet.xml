@@ -43,7 +43,7 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if($services.wikiuser.hasLocalUsersEnabled())
+#if($services.wiki.user.hasLocalUsersEnabled())
 ### Globally administrate the users in a wiki.
 #set($formname = "update")
 #set($saveaction = "save")

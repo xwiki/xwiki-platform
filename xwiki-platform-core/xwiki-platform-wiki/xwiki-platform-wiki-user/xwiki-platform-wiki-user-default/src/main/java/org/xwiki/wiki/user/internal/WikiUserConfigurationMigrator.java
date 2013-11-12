@@ -19,16 +19,13 @@
  */
 package org.xwiki.wiki.user.internal;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.user.MembershipType;
@@ -41,9 +38,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.store.migration.DataMigration;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
+import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
  * Migrator to convert all workspaces (WorkspaceManager.WorkspaceClass) to new WikiUserConfiguration objects.
@@ -52,8 +49,12 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  */
 @Component
 @Named("R530000WikiUserConfigurationMigrator")
-public class WikiUserConfigurationMigrator implements DataMigration
+public class WikiUserConfigurationMigrator extends AbstractHibernateDataMigration
 {
+    private static final String WORKSPACE_CLASS_SPACE = "WorkspaceManager";
+
+    private static final String WORKSPACE_CLASS_PAGE = "WorkspaceClass";
+
     @Inject
     private QueryManager queryManager;
 
@@ -65,12 +66,6 @@ public class WikiUserConfigurationMigrator implements DataMigration
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
-
-    @Override
-    public String getName()
-    {
-        return "Workspaces to new wiki API migrator (JIRA XWIKI-9516)";
-    }
 
     @Override
     public String getDescription()
@@ -85,12 +80,46 @@ public class WikiUserConfigurationMigrator implements DataMigration
         return new XWikiDBVersion(53000);
     }
 
-    private void migrateFromOldWorkspace(XWikiDocument document) throws DataMigrationException
+    @Override
+    public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
+        // We migrate only subwikis
+        if (wikiDescriptorManager.getCurrentWikiId().equals(wikiDescriptorManager.getMainWikiId())) {
+            return false;
+        }
+
+        // If the WorkspaceClass does not exists, nothing to do
+        XWikiContext xcontext = getXWikiContext();
+        DocumentReference oldClassDocument = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
+                WORKSPACE_CLASS_SPACE, WORKSPACE_CLASS_PAGE);
+        if (!xcontext.getWiki().exists(oldClassDocument, xcontext)) {
+            return false;
+        }
+
+        // Else, return true
+        return true;
+    }
+
+    @Override
+    protected void hibernateMigrate() throws DataMigrationException, XWikiException
+    {
+        // Context, XWiki
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+
+        // Current wiki
+        String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
+
+        // Get the old wiki descriptor
+        DocumentReference oldWikiDescriptorReference = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
+                XWiki.SYSTEM_SPACE, String.format("XWikiServer%s", StringUtils.capitalize(currentWikiId)));
+        XWikiDocument oldWikiDescriptor = xwiki.getDocument(oldWikiDescriptorReference, context);
+
         // Try to get the old workspace object
         DocumentReference oldClassDocument = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
-                "WorkspaceManager", "WorkspaceClass");
-        BaseObject oldObject = document.getXObject(oldClassDocument);
+                WORKSPACE_CLASS_SPACE, WORKSPACE_CLASS_PAGE);
+
+        BaseObject oldObject = oldWikiDescriptor.getXObject(oldClassDocument);
 
         // --
         // The wiki is not a workspace
@@ -115,52 +144,26 @@ public class WikiUserConfigurationMigrator implements DataMigration
             // Default value
             membershipType = MembershipType.INVITE;
         }
-        configuration.setMembershypType(membershipType);
+        configuration.setMembershipType(membershipType);
 
-        // Wiki Id
-        String wikiId = document.getDocumentReference().getName().replaceAll("XWikiServer", "").toLowerCase();
         // Save the new configuration
         try {
-            wikiUserConfigurationHelper.saveConfiguration(configuration, wikiId);
+            wikiUserConfigurationHelper.saveConfiguration(configuration, currentWikiId);
         } catch (WikiUserManagerException e) {
             throw new DataMigrationException(String.format(
-                    "Fail to save the new wiki user configuration page for wiki [%s].", wikiId), e);
+                    "Failed to save the new wiki user configuration page for wiki [%s].", currentWikiId), e);
         }
 
         // Delete the old object
-        document.removeXObject(oldObject);
+        oldWikiDescriptor.removeXObject(oldObject);
 
         // Save the document
-        XWikiContext context = xcontextProvider.get();
-        XWiki xwiki = context.getWiki();
         try {
-            xwiki.saveDocument(document, "Remove the old WorkspaceManager.WorkspaceClass object.", context);
+            xwiki.saveDocument(oldWikiDescriptor, "Remove the old WorkspaceManager.WorkspaceClass object.", context);
         } catch (XWikiException e) {
             throw new DataMigrationException(String.format(
-                    "Fail to save the document [%s] to remove the WorkspaceManager.WorkspaceClass object.",
-                    document.getDocumentReference().toString()), e);
+                    "Failed to save the document [%s] to remove the WorkspaceManager.WorkspaceClass object.",
+                    oldWikiDescriptor.getDocumentReference().toString()), e);
         }
-    }
-
-    @Override
-    public void migrate() throws DataMigrationException
-    {
-        String xwql = "SELECT XWikiDocument doc FROM doc.object(WorkspaceManager.WorkspaceClass) "
-                + "obj WHERE doc.space = :space";
-        try {
-            Query query = queryManager.createQuery(xwql, Query.XWQL).bindValue("space", XWiki.SYSTEM_SPACE);
-            List<XWikiDocument> documents = query.execute();
-            for (XWikiDocument document: documents) {
-                migrateFromOldWorkspace(document);
-            }
-        } catch (QueryException e) {
-            throw new DataMigrationException("Fail get yhe list of all the workspace objects.", e);
-        }
-    }
-
-    @Override
-    public boolean shouldExecute(XWikiDBVersion startupVersion)
-    {
-        return true;
     }
 }

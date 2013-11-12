@@ -330,7 +330,7 @@
   #if ($isGuest)
     {{translation key="platform.workspace.joinNeedToLogIn"/}}
   #else
-    #set ($members = $services.wikiuser.getMembers($currentWiki))
+    #set ($members = $services.wiki.user.getMembers($currentWiki))
     #set ($hasJoin = $members &amp;&amp; !$members.contains($currentUser))
     #if ($hasJoin)
       #set ($joinPageReference = $services.model.createDocumentReference(${services.wiki.mainWikiId}, 'WikiManager', 'JoinWiki'))

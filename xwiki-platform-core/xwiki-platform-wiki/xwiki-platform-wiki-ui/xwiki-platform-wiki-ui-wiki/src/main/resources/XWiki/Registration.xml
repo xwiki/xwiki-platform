@@ -253,7 +253,7 @@
   </object>
   <content>{{velocity}}
 ## Check if the wiki has local user enabled
-#if($services.wikiuser.hasLocalUsersEnabled())
+#if($services.wiki.user.hasLocalUsersEnabled())
 ## These are defined in other places around XWiki, changing them here will result in undefined behavior.
 #set($redirectParam = 'xredirect')
 #set($userSpace = 'XWiki.')

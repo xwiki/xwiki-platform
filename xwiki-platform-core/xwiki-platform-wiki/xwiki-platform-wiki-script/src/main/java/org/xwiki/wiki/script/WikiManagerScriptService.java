@@ -131,7 +131,7 @@ public class WikiManagerScriptService implements ScriptService
                     context.getDoc().getDocumentReference());
             // Check right access
             WikiReference mainWikiReference = new WikiReference(getMainWikiId());
-            authorizationManager.checkAccess(Right.PROGRAM, context.getDoc().getAuthorReference(), mainWikiReference);
+            authorizationManager.checkAccess(Right.CREATE_WIKI, context.getUserReference(), mainWikiReference);
             if (!failOnExist) {
                 authorizationManager.checkAccess(Right.PROGRAM, context.getUserReference(), mainWikiReference);
             }

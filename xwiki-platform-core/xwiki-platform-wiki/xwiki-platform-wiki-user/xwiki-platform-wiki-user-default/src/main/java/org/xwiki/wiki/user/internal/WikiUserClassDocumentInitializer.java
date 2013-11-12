@@ -104,8 +104,8 @@ public class WikiUserClassDocumentInitializer extends AbstractMandatoryDocumentI
     /**
      * List of possible values for <code>userScope</code> for the XWiki class WikiManager.WikiUserClass.
      */
-    public static final String FIELDL_USERSCOPE = UserScope.LOCAL_ONLY.name().toLowerCase()
-            + DEFAULT_FIELDS_SEPARATOR + UserScope.GLOBAL_ONLY.name().toLowerCase() + DEFAULT_FIELDS_SEPARATOR
+    public static final String FIELDL_USERSCOPE = UserScope.GLOBAL_ONLY.name().toLowerCase()
+            + DEFAULT_FIELDS_SEPARATOR + UserScope.LOCAL_ONLY.name().toLowerCase() + DEFAULT_FIELDS_SEPARATOR
             + UserScope.LOCAL_AND_GLOBAL.name().toLowerCase();
 
     /**

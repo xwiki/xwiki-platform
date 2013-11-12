@@ -53,7 +53,6 @@ public class WikiProvisioningJobRequest extends AbstractRequest
      */
     public WikiProvisioningJobRequest(List<String> id, String wikiId, Object parameter)
     {
-        super();
         setId(id);
         setWikiId(wikiId);
         setProvisioningJobParameter(parameter);

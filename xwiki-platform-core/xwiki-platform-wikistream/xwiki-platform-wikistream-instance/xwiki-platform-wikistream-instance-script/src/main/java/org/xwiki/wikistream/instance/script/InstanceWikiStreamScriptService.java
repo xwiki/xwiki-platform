@@ -82,7 +82,7 @@ public class InstanceWikiStreamScriptService extends AbstractWikiStreamScriptSer
     /**
      * @since 5.3M2
      */
-    public WikiStreamDescriptor getOuputWikiStreamDescriptor()
+    public WikiStreamDescriptor getOutputWikiStreamDescriptor()
     {
         return ((WikiStreamScriptService) this.wikistreamScriptService)
             .getOutputWikiStreamDescriptor(WikiStreamType.XWIKI_INSTANCE);

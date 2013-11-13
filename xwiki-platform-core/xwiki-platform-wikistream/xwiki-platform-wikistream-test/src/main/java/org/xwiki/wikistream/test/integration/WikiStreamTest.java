@@ -139,7 +139,7 @@ public class WikiStreamTest
             byte[] expectButes = IOUtils.toByteArray(((InputStreamInputSource) expect).getInputStream());
         } else {
             // No idea how to compare that
-            Assert.fail("Ouput target type [" + actual.getClass() + "] is not supported");
+            Assert.fail("Output target type [" + actual.getClass() + "] is not supported");
         }
     }
 

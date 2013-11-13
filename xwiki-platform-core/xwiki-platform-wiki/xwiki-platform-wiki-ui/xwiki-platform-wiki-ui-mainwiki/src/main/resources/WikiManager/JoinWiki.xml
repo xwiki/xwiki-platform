@@ -69,7 +69,7 @@
       #set ($browseDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'WebHome'))
       #set ($backUrl = $xwiki.getURL($browseDocumentReference))
       ##
-      #set ($membershipType = $wiki.getPropertyGroup('user').membershipType)
+      #set ($membershipType = $services.wiki.user.getMembershipType($wiki.id))
       ##
       ## Determine if, regardless of membership type, an existing invitation exists for the current user.
       #set ($invitations = $services.wiki.user.getAllInvitations($wikiId))

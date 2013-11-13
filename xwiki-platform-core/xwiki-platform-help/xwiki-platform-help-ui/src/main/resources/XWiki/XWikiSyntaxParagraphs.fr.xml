@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxParagraphs</name>
+  <language>fr</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382885771000</creationDate>
+  <date>1382885771000</date>
+  <contentUpdateDate>1382885771000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxParagraphs</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Éditer =
+
+== Paragraphes ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Paragraphs ===
+
+Les paragraphes sont des éléments de texte séparés par 2 ou plusieurs nouvelles lignes.
+
+{{info}}
+En syntaxe XWiki 2.0, on tient compte des lignes nouvelles, ce qui n'est pas le cas des syntaxes XWiki 1.0 et Creole.
+{{/info}}
+
+|=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
+|Paragraphe simple|Ceci est un paragraphe simple|Ceci est un paragraphe
+|Paragraphe sur plusieurs lignes |Paragraphe sur{{{\\}}}
+plusieurs lignes|Paragraphe sur
+plusieurs lignes
+|Deux paragraphes|Le premier paragraphe
+\\Le deuxième paragraphe|Le premier paragraphe
+\\Le deuxième paragraphe
+|Paragraphe paramétré|&lt;p style="text-align:center;
+color:blue"&gt;
+Paragraphe centré et bleu&lt;/p&gt;|(% style="text-align: center; color: blue;" %)
+Paragraphe centré et bleu
+
+=== 2.0 Paragraphs ===
+
+Les paragraphes sont des éléments de texte séparés par 2 ou plusieurs nouvelles lignes.
+
+{{info}}
+En syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}, on tient compte des lignes nouvelles, ce qui n'est pas le cas des syntaxes XWiki 1.0 et Creole.
+{{/info}}
+
+|=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
+|Paragraphe simple|Ceci est un paragraphe|Ceci est un paragraphe
+|Paragraphe sur plusieurs lignes |Paragraphe sur
+plusieurs lignes|Paragraphe sur
+plusieurs lignes
+|Deux paragraphes|Le premier paragraphe
+\\Le deuxième paragraphe|Le premier paragraphe
+\\Le deuxième paragraphe
+|Paragraphe paramétré|{{{(% style="text-align:center;
+color:blue" %)}}}
+Paragraphe centré et bleu|(% style="text-align: center; color: blue;" %)
+Paragraphe centré et bleu</content>
+</xwikidoc>

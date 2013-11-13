@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxGroups</name>
+  <language>lv</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382899429000</creationDate>
+  <date>1382899429000</date>
+  <contentUpdateDate>1382899429000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxGroups</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Grupas ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 2.0 Groups ===
+
+Grupas var izmantot, lai ievietotu citu dokumentu iekļautu tekošajā dokumentā. Piemēram, grupas ļauj iekļaut sarežģītus teksta elementus tabulas šūnā vai aizzīmēta saraksta ierakstā. Grupas atdala ar sekojošiem atdalītājiem: ##{{{(((...)))}}}##. Vienā grupā var ievietot citu grupu un grupu iekļaušanas dziļums nav limitēts.
+
+|=XWiki 2.0 sintakse|=Rezultāts
+|(((
+{{{
+|=1. Virsraksts|=2. Virsraksts|=3. Virsraksts
+|1. šūna|(((
+= Iegults dokuments
+
+Iegulta teksta rindkopa.
+
+* saraksta 1. punkts
+* saraksta 2. punkts
+** saraksta 1. apakšpunkts
+** saraksta 2. apakšpunkts
+))) | 3. šūna
+
+Nākošā rindkopa augšējā līmeņa dokumentā
+}}}
+)))|(((
+|=1. Virsraksts|=2. Virsraksts|=3. Virsraksts
+|1. šūna|(((
+{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Iegults dokuments&lt;/span&gt;&lt;/h1&gt;{{/html}}
+
+Iegulta teksta rindkopa.
+
+* saraksta 1. punkts
+* saraksta 2. punkts
+** saraksta 1. apakšpunkts
+** saraksta 2. apakšpunkts
+
+)))| 3. šūna
+
+Nākošā rindkopa augšējā līmeņa dokumentā
+)))</content>
+</xwikidoc>

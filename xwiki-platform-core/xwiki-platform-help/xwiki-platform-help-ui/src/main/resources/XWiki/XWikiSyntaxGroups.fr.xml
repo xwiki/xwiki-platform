@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxGroups</name>
+  <language>fr</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382893194000</creationDate>
+  <date>1382893195000</date>
+  <contentUpdateDate>1382893194000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxGroups</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Groupes ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 2.0 Groups ===
+
+Les groupes peuvent être utilisés pour insérer un autre document  directement dans le document courant. Cela permet par exemple d'insérer des éléments complexes à l'intérieur d'un élément d'une liste ou dans une cellule de tableau. Les groupes sont délimités par les éléments syntaxiques suivants:##{{{(((...)))}}}##. Un groupe peut contenir un autre groupe et il n'y a pas de limite d'imbrication.
+
+|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
+|(((
+{{{|=Titre 1|=Titre 2|=Titre 3
+|Cellule 1|(((
+= Document ancré
+
+Un paragraphe ancré.
+
+* élément de liste 1
+* élément de liste 2
+  ** sous-élément 1
+  ** sous-élément 2
+))) | Cellule 3
+
+Le paragraphe suivant dans le document de haut niveau}}}
+)))|(((
+|=Titre 1|=Titre 2|=Titre 3
+|Cellule 1|(((
+{{html}}
+&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Document ancré&lt;/span&gt;&lt;/h1&gt;
+{{/html}}
+
+Un paragraphe ancré.
+
+* élément de liste 1
+* élément de liste 2
+** sous-élément 1
+** sous-élément 2
+)))| Cellule 3
+
+Le paragraphe suivant dans le document de haut niveau
+)))</content>
+</xwikidoc>

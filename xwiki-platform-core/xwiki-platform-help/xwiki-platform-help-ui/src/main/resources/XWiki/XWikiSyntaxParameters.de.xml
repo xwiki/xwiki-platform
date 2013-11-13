@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxParameters</name>
+  <language>de</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382877868000</creationDate>
+  <date>1382877868000</date>
+  <contentUpdateDate>1382877868000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxParameters</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Fortgeschritten =
+
+== Parameter ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Parameters ===
+
+In XWiki Syntax 1.0 gibt es keine Syntax für das Übergeben von Parametern und die einzige Möglichkeit, dies zu tun war es direkt XHTML in den Inhalt zu schreiben, wie in der nachstehenden Tabelle gezeigt.
+
+|=XWiki Syntax 1.0|=Generated XHTML
+|((({{{
+&lt;h1 class="meineKlasse" style="meinStil" id="meineID"&gt;Überschrift&lt;/h1&gt;
+}}})))|((({{{
+&lt;h1 class="meineKlasse" style="meinStil" id="meineID"&gt;Überschrift&lt;/h1&gt;
+}}})))
+
+=== 2.0 Parameters ===
+
+Mit der XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} ist es möglich Parameter an die verschiedenen Syntaxelemente und auch an Textblöcke weiterzugeben. Dies wird beispielsweise benutzt um diese zu gestalten. Sie können jegliche Parameterschlüssel/Wertepaare verwenden, die Sie möchten. Der XHTML Renderer wird diese Parameter als XHTML Attribute an die zugrundeliegende XHTML Representation der verschiedenen Syntaxelemente weitergeben. 
+
+|=(% style="width="60%" %)XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Generiertes XHTML
+|((({{{
+(% class="meineKlasse" style="meinStil" id="meineID" %)
+= Überschrift =
+}}})))|((({{{
+&lt;h1 class="meineKlasse" style="meinStil" id="meineID"&gt;Überschrift&lt;/h1&gt;
+}}})))</content>
+</xwikidoc>

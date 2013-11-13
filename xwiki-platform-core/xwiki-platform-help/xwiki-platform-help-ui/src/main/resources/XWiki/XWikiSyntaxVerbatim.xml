@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxVerbatim</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301498008000</date>
+  <contentUpdateDate>1301498008000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxVerbatim</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.XWikiSyntaxClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <category>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>category</name>
+        <number>1</number>
+        <numberType>integer</numberType>
+        <prettyName>Category ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </category>
+      <maxSyntaxVersion>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>maxSyntaxVersion</name>
+        <number>4</number>
+        <numberType>float</numberType>
+        <prettyName>Maximum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </maxSyntaxVersion>
+      <minSyntaxVersion>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>minSyntaxVersion</name>
+        <number>3</number>
+        <numberType>float</numberType>
+        <prettyName>Minimum Syntax Version</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </minSyntaxVersion>
+      <section>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>section</name>
+        <number>2</number>
+        <numberType>integer</numberType>
+        <prettyName>Section ID</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </section>
+    </class>
+    <name>XWiki.XWikiSyntaxVerbatim</name>
+    <number>0</number>
+    <className>XWiki.XWikiSyntaxClass</className>
+    <guid>1808887e-f225-4ccf-9693-e9500f5b3b78</guid>
+    <property>
+      <category>2</category>
+    </property>
+    <property>
+      <maxSyntaxVersion>2.0</maxSyntaxVersion>
+    </property>
+    <property>
+      <minSyntaxVersion>1.0</minSyntaxVersion>
+    </property>
+    <property>
+      <section>0</section>
+    </property>
+  </object>
+  <content>= Advanced =
+
+== Verbatim ==
+
+=== 1.0 Verbatim ===
+
+Allow to enter content that will not be formatted (in other words the XWiki Syntax will not be taken into account).
+
+{{info}}In XWiki Syntax 1.0 the [[Pre macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Pre+Macro+%28Radeox%29]] only preserves XWiki Syntax and Radeox macros. However HTML snippets and Groovy/Velocity scripts are still executed.{{/info}}
+
+|=Feature|=XWiki Syntax 1.0|=Result
+|Verbatim inline|{{{Some verbatim {pre}*[not rendered]*{/pre} content}}}|Some verbatim {{{*[not rendered]*}}} content
+|Verbatim block|((({{{
+{pre}
+multi line
+*verbatim*
+content
+{/pre}
+}}}
+{{info}}It's also possible to use the [[Code macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Code+Macro+%28Radeox%29]] but it displays its content in a box by default.{{/info}}
+)))|((({{{
+multi line
+*verbatim*
+content
+}}})))
+
+=== 2.0 Verbatim ===
+
+Allow to enter content that will not be formatted (in other words the XWiki Syntax will not be taken into account).
+
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|Verbatim inline|{{{Some verbatim {{{**[[not rendered]]**}}} content}}}|Some verbatim {{{**[[not rendered]]**}}} content
+|Verbatim block|((({{{
+{{{
+multi line
+**verbatim**
+content
+}}}
+}}})))|((({{{
+multi line
+**verbatim**
+content
+}}})))</content>
+</xwikidoc>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxNewLineLineBreaks</name>
+  <language>it</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382898364000</creationDate>
+  <date>1382898364000</date>
+  <contentUpdateDate>1382898364000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxNewLineLineBreaks</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+==  Nuova riga/Interruzioni di riga ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 New Line Line Breaks ===
+
+Una nuova riga è un ritorno a capo. Un'interruzione di riga è una nuova riga forzata che può comparire in un punto qualsiasi del testo.
+
+{{info}}
+Con la Sintassi XWiki 2.0 le nuove righe vengono rispettate, cosa che non accade con la Sintassi XWiki 1.0 e con la Sintassi di Creole.
+{{/info}}
+
+|=Caratteristica|=Sintassi XWiki 1.0|=Risultato
+|Interruzione riga|{{{Riga\\Nuova riga}}}|Riga\\Nuova riga
+|Nuova riga|Riga\\Nuova riga|Riga Nuova riga
+
+=== 2.0 New Line Line Breaks ===
+
+Una nuova riga è un ritorno a capo. Un'interruzione di riga è una nuova riga forzata che può comparire in un punto qualsiasi del testo.
+
+{{info}}
+Con la Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}} le nuove righe vengono rispettate, cosa che non accade con la Sintassi XWiki 1.0 e con la Sintassi di Creole.
+{{/info}}
+
+|=Caratteristica|=Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Risultato
+|Interruzione riga|{{{Riga\\Nuova riga}}}|Riga\\Nuova riga
+|Nuova riga|Riga\\Nuova riga|Riga\\Nuova riga</content>
+</xwikidoc>

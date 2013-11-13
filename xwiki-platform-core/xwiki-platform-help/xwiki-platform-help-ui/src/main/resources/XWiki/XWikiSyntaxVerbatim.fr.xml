@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxVerbatim</name>
+  <language>fr</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382893096000</creationDate>
+  <date>1382893096000</date>
+  <contentUpdateDate>1382893096000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxVerbatim</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Avancé =
+
+== Verbatim ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Verbatim ===
+
+Vous permet d'avoir un contenu qui ne sera pas formaté . En d'autres termes, la syntaxe wiki ne sera pas prise en compte.
+
+{{info}}
+En syntaxe XWiki 1.0 la [[macro Pre&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/PreMacro]] préserve seulement la syntaxe wiki et les macros Radeox. Cependant, les fragments HTML et les scripts Groovy/Velocity sont toujours exécutés. 
+{{/info}}
+
+|=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
+|Verbatim en-ligne|{{{Du contenu verbatim {pre}*[non rendu]*{/pre}}}}|Du contenu verbatim {{{*[non rendu]*}}}
+|Le bloc Verbatim|(((
+{{{
+{pre}
+Du contenu
+*verbatim*
+sur plusieurs lignes
+{/pre}
+}}}
+{{info}}Il est aussi possible d'utiliser la [[macro Code&gt;&gt;http://code.xwiki.org/xwiki/bin/view/Macros/CodeMacro]] mais celle-ci affiche son contenu dans une boîte par défaut..{{/info}}
+)))|(((
+{{{Du contenu
+*verbatim*
+sur plusieurs lignes}}}
+)))
+
+=== 2.0 Verbatim ===
+
+Vous permet d'avoir un contenu qui ne sera pas formaté . En d'autres termes, la syntaxe wiki ne sera pas prise en compte.
+|=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
+|Verbatim en-ligne|{{{Du contenu verbatim 
+{{{**[[non rendu]]**}}}}}}|Du contenu verbatim {{{**[[non rendu]]**}}}
+|Le bloc Verbatim|(((
+{{{{{{
+Du contenu
+**verbatim**
+sur plusieurs lignes
+}}}}}}
+)))|(((
+{{{Du contenu 
+**verbatim**
+sur plusieurs lignes}}}
+)))</content>
+</xwikidoc>

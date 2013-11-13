@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxScripts</name>
+  <language>it</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382899785000</creationDate>
+  <date>1382899785000</date>
+  <contentUpdateDate>1382899785000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxScripts</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Programming =
+
+== Scripts ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Scripts ===
+
+{{info}}Con la Sintassi XWiki 1.0 era possibile inserire gli script Velocity ovunque direttamente nella pagina. Questo comportava dei problemi quando per esempio l'utente inseriva del contenuto Velocity involontariamente. Era anche uno spreco di risorse per le pagine che non richiedevano un contenuto Velocity. C'erano molti altri limiti tecnici. Lo stesso avviene per gli script Groovy.{{/info}}
+
+|=Caratteristica|=Sintassi XWiki 1.0
+|Script Velocity|((({{{
+#set ($var = "qualsiasi")
+}}})))
+|Script Groovy|((({{{
+&lt;%
+def var = "qualsiasi"
+%&gt;
+}}})))
+
+=== 2.0 Scripts ===
+
+{{info}}Con la Sintassi XWiki 1.0 era possibile inserire gli script Velocity ovunque direttamente nella pagina. Questo comportava dei problemi quando per esempio l'utente inseriva del contenuto Velocity involontariamente. Era anche uno spreco di risorse per le pagine che non richiedevano un contenuto Velocity. C'erano molti altri limiti tecnici. Perciò nella Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}} gli script Velocity devono essere inseriti usando la macro ##velocity## . Lo stesso avviene per gli script Groovy.{{/info}}
+
+|=Caratteristica|=Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}
+|Script Velocity|((({{{
+{{velocity}}
+#set ($var = "qualsiasi")
+{{/velocity}}
+}}})))
+|Script Groovy|((({{{
+{{groovy}}
+def var = "qualsiasi"
+{{/groovy}}
+}}})))</content>
+</xwikidoc>

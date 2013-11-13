@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxScripts</name>
+  <language>fr</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382893423000</creationDate>
+  <date>1382893423000</date>
+  <contentUpdateDate>1382893423000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxScripts</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Programming =
+
+== Scripts ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Scripts ===
+
+{{info}}
+En syntaxe XWiki 1.0, il était possible d'inclure des scripts Velocity directement dans la page. Cela a créé quelques problèmes, par exemple, les cas où l'utilisateur avait inclus involontairement du contenu Velocity. Cela affectait aussi la performance des pages qui ne nécessitaient pas de contenu Velocity. Il y avait eu d'autres limitations techniques. Ainsi, en syntaxe XWiki 2.0, les scripts Velocity doivent être inclus en utilisant la macro ##velocity##. En va de même pour l'inclusion des scripts Groovy.
+{{/info}}
+
+|=Feature|=Syntaxe XWiki 1.0
+|Script Velocity|((({{{
+#set ($var = "quelquechose")
+}}})))
+|Script Groovy|((({{{
+&lt;%
+def var = "quelquechose"
+%&gt;
+}}})))
+
+=== 2.0 Scripts ===
+
+{{info}}
+En syntaxe XWiki 1.0, il était possible d'inclure des scripts Velocity directement dans la page. Cela a créé quelques problèmes, par exemple, les cas où l'utilisateur avait inclus involontairement du contenu Velocity. Cela affectait aussi la performance des pages qui ne nécessitaient pas de contenu Velocity. Il y avait eu d'autres limitations techniques. Ainsi, en syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}, les scripts Velocity doivent être inclus en utilisant la macro ##velocity##. En va de même pour l'inclusion des scripts Groovy.
+{{/info}}
+
+|=Feature|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}
+|Script Velocity|((({{{
+{{velocity}}
+#set ($var = "quelquechose")
+{{/velocity}}
+}}})))
+|Script Groovy|((({{{
+{{groovy}}
+def var = "quelquechose"
+{{/groovy}}
+}}})))</content>
+</xwikidoc>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxGroups</name>
+  <language>de</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382878639000</creationDate>
+  <date>1382878639000</date>
+  <contentUpdateDate>1382878639000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxGroups</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Fortgeschritten =
+
+== Gruppen ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 2.0 Groups ===
+Gruppen können benutzt werden um ein Dokument "inline" direkt in ein anderes Dokument einzufügen. Dies ermöglicht es beispielsweise komplexe Elemente in einem Listenelement oder in einer Tabellenzelle einzufügen. Gruppen sind durch die folgenden Syntaxelemente begrenzt: ##{{{(((...)))}}}##. Eine Gruppe kann eine andere Gruppe beinhalten und es gibt keine Grenzen bei der Verschachtelung.
+
+|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Ergebnis
+|((({{{
+|=Kopfzeile 1|=Kopfzeile 2|=Kopfzeile 3
+|Zelle Eins|(((
+= Eingebundenes Dokument =
+
+Ein eingebetteter Absatz.
+
+* Listenelement eins
+* Listenelement zwei
+  ** Unterelement 1
+  ** Unterelement 2
+))) | Zelle Drei
+
+Nächster Absatz im Dokument der obersten Ebene
+}}})))|(((
+|=Kopfzeile 1|=Kopfzeile 2|=Kopfzeile 3
+|Zelle Eins|(((
+{{html}}&lt;h1 id="HEmbeddeddocument"&gt;&lt;span&gt;Eingebettetes Dokument&lt;/span&gt;&lt;/h1&gt;{{/html}}
+
+Ein eingebetteter Absatz.
+
+* Listenelement eins
+* Listenelement zwei
+  ** Unterelement 1
+  ** Unterelement 2
+))) | Zelle Drei
+
+Nächster Absatz im Dokument der obersten Ebene
+)))</content>
+</xwikidoc>

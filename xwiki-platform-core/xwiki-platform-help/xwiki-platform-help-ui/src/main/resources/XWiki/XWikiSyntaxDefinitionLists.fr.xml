@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxDefinitionLists</name>
+  <language>fr</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382886193000</creationDate>
+  <date>1382886193000</date>
+  <contentUpdateDate>1382886193000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxDefinitionLists</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Listes de définitions ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Definition Lists ===
+
+|=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
+|Définition standard|(((
+{{{&lt;dl&gt;
+  &lt;dt&gt;terme&lt;/dt&gt;
+  &lt;dd&gt;définition&lt;/dd&gt;
+&lt;/dl&gt;}}}
+)))|(((
+; terme
+: définition
+)))
+|Définitions imbriquées|(((
+{{{&lt;dl&gt;
+  &lt;dt&gt;terme1&lt;/dt&gt;
+  &lt;dd&gt;définition1
+    &lt;dl&gt;
+      &lt;dt&gt;terme2&lt;/dt&gt;
+      &lt;dd&gt;définition2&lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/dd&gt;
+&lt;/dl&gt;}}}
+)))|(((
+; terme1
+: définition1
+:; terme2
+:: définition2
+)))
+|Définition paramétrée|(((
+{{{&lt;dl style="color:blue"&gt;
+  &lt;dt&gt;terme&lt;/dt&gt;
+  &lt;dd&gt;définition&lt;/dd&gt;
+&lt;/dl&gt;}}}
+)))|(((
+(% style="color: blue;" %)
+; terme
+: définition
+)))
+
+=== 2.0 Definition Lists ===
+|=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
+|Définition standard|(((
+{{{; terme
+: définition}}}
+)))|(((
+; terme
+: définition
+)))
+|Définitions imbriquées|(((
+{{{; terme1
+: définition1
+:; terme2
+:: définition2}}}
+)))|(((
+; terme1
+: définition1
+:; terme2
+:: définition2
+)))
+|Définition paramétrée|(((
+{{{(% style="color:blue" %)
+; terme
+: définition}}}
+)))|(((
+(% style="color: blue;" %)
+; terme
+: définition
+)))</content>
+</xwikidoc>

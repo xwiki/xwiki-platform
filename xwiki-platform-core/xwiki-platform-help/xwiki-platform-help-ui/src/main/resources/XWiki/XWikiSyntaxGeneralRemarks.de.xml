@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxGeneralRemarks</name>
+  <language>de</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1382866277000</creationDate>
+  <date>1382866277000</date>
+  <contentUpdateDate>1382866277000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxGeneralRemarks</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Allgemeines =
+
+== Bemerkungen ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 2.0 General Remarks ===
+
+XWiki Syntax 2.0 korrigiert einige Fehler oder mehrdeutige Syntax, die vom Nutzer eingegeben wird, wie in den Beispielen in der Tabelle unterhalb gezeigt.
+
+|=Beschreibung|=Beispiel für ungültige oder mehrdeutige Syntax|=Korrigierte Syntax 2.0
+|Nicht geschlossener Textstil|{{{**fett}}}|{{{**fett**}}}
+|Zwei unabhängige Elemente sind nicht durch 2 neue Zeilen getrennt|{{{| Tabellenzelle}}}\\{{{* Listenelement}}}|{{{| Tabellenzelle}}}\\\\{{{* Listenelement}}}
+|Zwei unabhängige Elemente sind nicht durch 2 neue Zeilen getrennt|{{{Absatz}}}\\{{{----}}}\\{{{Absatz}}}|{{{Absatz}}}\\\\{{{----}}}\\\\{{{Absatz}}}
+|Ignorierte neue Zeilen am Anfang von Dokument|&lt;neue Zeile am Anfang des Dokuments&gt;\\Absatz|Absatz
+|Nicht geschlossene Überschriftensyntax|{{{=== Überschrift}}}|{{{=== Überschrift ===}}}</content>
+</xwikidoc>

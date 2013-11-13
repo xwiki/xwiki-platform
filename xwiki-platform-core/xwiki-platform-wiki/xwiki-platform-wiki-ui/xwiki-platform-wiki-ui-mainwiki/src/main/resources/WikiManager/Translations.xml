@@ -89,8 +89,13 @@
 #     old.key.name=Some translation
 ###############################################################################
 
+## Menus
+platform.wiki.menu.wikiindex=Wiki Index
+platform.wiki.menu.deletewiki=Delete
+platform.wiki.menu.userwikis=Wikis
+
 ## Dependencies
-platform.wiki.dependencies.wiki.missing=The Workspaces Manager java component is not installed. This page will not work properly. Make sure that the "Workspace API" extension is installed (using the Extension Manager) or that the file 'xwiki-platform-workspace-api-&lt;version&gt;.jar' is present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+platform.wiki.dependencies.wiki.missing=The Wiki java component is not installed. This page will not work properly. Make sure that the "Wiki API" extension is installed (using the Extension Manager) or that the file 'xwiki-platform-wiki-api-&lt;version&gt;.jar' is present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
 platform.wiki.dependencies.template.missing=
 platform.wiki.dependencies.user.missing=
 platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
@@ -113,8 +118,8 @@ platform.wiki.error.exceptionWithMessage=Exception: {0}
 platform.wiki.form.requiredField=Required
 
 ## Users
-platform.wiki.users.userAlreadyMemberOfWorkspace=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
-platform.wiki.users.userNotMemberOfWorkspace=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
+platform.wiki.users.userAlreadyMemberOfWiki=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
+platform.wiki.users.userNotMemberOfWiki=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
 platform.wiki.users.logInToContinue=In order to continue, you need to {0}log in{1} first.
 platform.wiki.users.invitation.userAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
 platform.wiki.users.invitation.userAcceptedSuccess=The user {0}{1}{2} successfully accepted the invitation and joined the wiki {3}{4}{5}.
@@ -156,8 +161,8 @@ platform.wiki.users.join.request.cancel.label=Back
 
 ## User profile
 platform.wiki.users.profile.joinedwikis.label=Joined wikis
-platform.wiki.users.profile.joinedwikis.notMemberOfAnyWorkspace=You are not a member of any wiki yet.
-platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWorkspace=The user is not a member of any wiki yet.
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=You are not a member of any wiki yet.
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=The user is not a member of any wiki yet.
 platform.wiki.users.profile.activity.title=Activity of wiki {0}
 platform.wiki.users.profile.activity.hint=Generates an activity stream for the given wiki(s).
 platform.wiki.users.profile.activity.multipletitle=Activity of wikis {0}
@@ -188,12 +193,12 @@ platform.wiki.browse._actions.leave=Leave
 platform.wiki.browse._actions.delete=Delete
 
 ## Classes
-WikiManager.WikiUserClass_membershipType_open=WikiManager.WikiUserClass_membershipType_open
-WikiManager.WikiUserClass_membershipType_request=WikiManager.WikiUserClass_membershipType_request
-WikiManager.WikiUserClass_membershipType_invite=WikiManager.WikiUserClass_membershipType_invite
-WikiManager.WikiUserClass_userScope_local_only=WikiManager.WikiUserClass_userScope_local_only
-WikiManager.WikiUserClass_userScope_global_only=WikiManager.WikiUserClass_userScope_global_only
-WikiManager.WikiUserClass_userScope_local_and_global=WikiManager.WikiUserClass_userScope_local_and_global
+WikiManager.WikiUserClass_membershipType_open=Open for any user to join
+WikiManager.WikiUserClass_membershipType_request=Any user can request to join but an admin must accept
+WikiManager.WikiUserClass_membershipType_invite=Only an admin can invite a user
+WikiManager.WikiUserClass_userScope_local_only=Only local users are available in the wiki
+WikiManager.WikiUserClass_userScope_global_only=Only global users are available in the wiki
+WikiManager.WikiUserClass_userScope_local_and_global=Both global and local users are available in the wiki
 platform.wiki.prop.wikiname=Wiki Identifier
 platform.wiki.prop.wikiprettyname=Pretty Name
 platform.wiki.prop.description=Description
@@ -209,13 +214,13 @@ platform.wiki.create.wizard.desc.description=A brief description of the wiki and
 platform.wiki.create.wizard.desc.owner=A user who will have all the rights on the wiki.
 platform.wiki.create.wizard.desc.members=The users who can participate in the wiki.
 platform.wiki.create.wizard.step.nameAndType=Step 1 — Choose a name
-platform.wiki.create.wizard.step.nameAndType.shortName=
+platform.wiki.create.wizard.step.nameAndType.shortname=Name
 platform.wiki.create.wizard.step.users=Step 2 — Choose members
-platform.wiki.create.wizard.step.users.shortName=
+platform.wiki.create.wizard.step.users.shortname=Users
 platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
-platform.wiki.create.wizard.step.provisioning.wait=
-platform.wiki.create.wizard.step.provisioning.complete=
-platform.wiki.create.wizard.step.provisioning.finalize=
+platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
+platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
+platform.wiki.create.wizard.step.provisioning.finalize=Finalize
 platform.wiki.create.wizard.setAsTemplate.label=This wiki will be a template
 platform.wiki.create.wizard.template.noTemplate=No template (default)
 platform.wiki.create.wizard.userScope.label=User Scope

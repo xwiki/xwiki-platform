@@ -41,7 +41,7 @@
     #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=network') $services.localization.render('core.menu.network') 'tmUserNetwork', '')
   #end
   #if ($isWikiUIAvailable && $isMainWikiUser)
-    #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=wikis') $services.localization.render('workspacemanager.menu.user.workspaces') 'tmUserWorkspaces', '')
+    #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=wikis') $services.localization.render('platform.wiki.menu.userwikis') 'tmUserWikis', '')
   #end
   #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=dashboard') $services.localization.render('core.menu.userDashboard') 'tmUserDashboard', '')
   #xwikitopmenuentryend()
@@ -125,7 +125,7 @@
 ## Home Menu
 ##
 ## This menu is displayed if:
-## - Workspace Manager App is installed
+## - Wiki UI is available
 ## - The current wiki is the main wiki OR the current wiki has no support for local users
 #set ($displayHomeMenu = $isWikiUIAvailable && ($xcontext.isMainWiki() || $cantHaveLocalUsers))
 #if ($displayHomeMenu)
@@ -163,7 +163,7 @@
   #if ($hasPreviousMenuSection)
     #submenuseparator()
   #end  
-  #submenuitem("$xwiki.getURL($WikiManagerMainDocReference)" $services.localization.render('workspacemanager.menu.workspace.index') 'tmWorkspaceIndex' '')
+  #submenuitem("$xwiki.getURL($WikiManagerMainDocReference)" $services.localization.render('platform.wiki.menu.wikiindex') 'tmWikiIndex' '')
   #set($homeDocumentIndexRef = $services.model.createDocumentReference($xcontext.mainWikiName, 'Main', 'AllDocs'))
   #if ($xwiki.exists($homeDocumentIndexRef))
     #submenuitem($xwiki.getURL($homeDocumentIndexRef) $services.localization.render('core.menu.wiki.documentindex') 'tmWikiDocumentIndex' '')
@@ -177,8 +177,8 @@
 ##
 ## Wiki
 ##
-#set ($canDeleteWorkspace = $isWikiAPIAvailable && $isWikiUIAvailable && $services.workspace.canDeleteWorkspace($xcontext.user, $xcontext.database))
-#set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin || $xwiki.exists('Main.AllDocs') || $canDeleteWorkspace)
+#set ($canDeleteWiki = $isWikiAPIAvailable && $isWikiUIAvailable && $services.wiki.mainWikiId != $services.wiki.currentWikiId && $services.wiki.canDeleteWiki($xcontext.user, $services.wiki.currentWikiId))
+#set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin || $xwiki.exists('Main.AllDocs') || $canDeleteWiki)
 #set ($wikiEntryId = 'tmWiki')
 #set ($wikiEntryText = $services.localization.render('core.menu.type.wiki'))
 #set ($wikiName = $!{services.wikimanager.getWikiDocument($xcontext.getDatabase()).getWikiPrettyName()})
@@ -229,13 +229,13 @@
       #submenuitem("$xwiki.getURL('Main.AllDocs')" $services.localization.render('core.menu.wiki.documentindex') 'tmWikiDocumentIndex' '')
       #set ($hasPreviousMenuSection = true)
     #end
-    #if ($canDeleteWorkspace)
+    #if ($canDeleteWiki)
       #if ($hasPreviousMenuSection)
         #submenuseparator()
       #end
-      #set ($deleteWorkspacePageReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WorkspaceManager', 'DeleteWorkspaceCode'))
-      #set ($deleteUrl = $xwiki.getURL($deleteWorkspacePageReference, 'view', "workspaceId=${xcontext.database}&workspaceName=$wikiName"))
-      #submenuitem($deleteUrl $services.localization.render('workspacemanager.menu.workspace.delete') 'tmDeleteWorkspace' '')
+      #set ($deleteWikiPageReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'DeleteWiki'))
+      #set ($deleteUrl = $xwiki.getURL($deleteWikiPageReference, 'view', "wikiId=${services.wiki.currentWikiId}"))
+      #submenuitem($deleteUrl $services.localization.render('platform.wiki.menu.deletewiki') 'tmDeleteWiki' '')
       #set ($hasPreviousMenuSection = true)
     #end
     #xwikitopmenuentryend()

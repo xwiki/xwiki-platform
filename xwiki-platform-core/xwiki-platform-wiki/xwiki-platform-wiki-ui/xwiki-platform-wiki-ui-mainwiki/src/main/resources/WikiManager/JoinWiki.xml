@@ -57,7 +57,7 @@
     ##
     #set ($members = $services.wiki.user.getMembers($wikiId))
     #if ($members &amp;&amp; $members.contains($currentUser))
-      {{info}}$services.localization.render('platform.wiki.users.userAlreadyMemberOfWorkspace', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/info}}
+      {{info}}$services.localization.render('platform.wiki.users.userAlreadyMemberOfWiki', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/info}}
     #elseif ($currentUser == 'xwiki:XWiki.XWikiGuest')
       #set ($loginDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'XWiki', 'XWikiLogin'))
       #set ($loginDocument = $xwiki.getDocument($loginDocumentReference))
@@ -138,7 +138,7 @@
           {{/html}}
         #end
       ##
-      ## The user is not invited to join. Continue based on the current membership type of the workspace.
+      ## The user is not invited to join. Continue based on the current membership type of the wiki.
       #elseif ($membershipType == 'INVITE')
         ##
         ## User does not have an invitation.

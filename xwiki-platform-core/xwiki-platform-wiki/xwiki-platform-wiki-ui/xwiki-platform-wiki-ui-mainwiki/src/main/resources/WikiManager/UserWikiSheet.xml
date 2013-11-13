@@ -321,7 +321,7 @@ return XWiki;
         #end
       #end
       #if ($joinedWikis.size() == 0)
-        &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.wiki.users.profile.joinedwikis.notMemberOfAnyWorkspace')#{else}$services.localization.render('platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWorkspace')#end&lt;/span&gt;
+        &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki')#{else}$services.localization.render('platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki')#end&lt;/span&gt;
       #else
         &lt;ul id='wikis'&gt;
         #foreach ($wiki in $joinedWikis)

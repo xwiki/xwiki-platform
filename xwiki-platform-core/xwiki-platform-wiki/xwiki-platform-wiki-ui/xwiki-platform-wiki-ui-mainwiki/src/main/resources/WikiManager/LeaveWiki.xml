@@ -50,7 +50,7 @@
     ##
     #set ($members = $services.wiki.user.getMembers($wikiId))
     #if (!$members || !$members.contains($currentUser))
-      {{error}}$services.localization.render('platform.wiki.users.userNotMemberOfWorkspace', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/error}}
+      {{error}}$services.localization.render('platform.wiki.users.userNotMemberOfWiki', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/error}}
     #elseif ($wiki.ownerId == $currentUser)
       {{error}}$services.localization.render('platform.wiki.users.leave.error.userIsOwner', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/error}}
     #else

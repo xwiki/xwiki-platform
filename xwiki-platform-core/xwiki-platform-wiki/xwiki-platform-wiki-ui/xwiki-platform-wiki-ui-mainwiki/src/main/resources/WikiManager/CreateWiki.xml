@@ -1096,7 +1096,7 @@ return XWiki;
     #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.provisioning'))
     &lt;div class="wizard-body"&gt;
       &lt;div class="ui-progress" id="ui-progress"&gt;
-        $services.localization.render('platform.wiki.create.wizard.step.provisioningWait')
+        $services.localization.render('platform.wiki.create.wizard.step.provisioning.wait')
         &lt;div class="ui-progress-background"&gt;
           #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $wikiDescriptor.id])
           #set ($percent = $services.wiki.template.getWikiProvisioningJobStatus($jobId).progress.offset)
@@ -1109,10 +1109,10 @@ return XWiki;
         &lt;/div&gt;
       &lt;/div&gt;
       &lt;p class="successmessage box hidden" id="successMessage"&gt;
-      $services.localization.render('platform.wiki.create.wizard.step.provisioningComplete')
+      $services.localization.render('platform.wiki.create.wizard.step.provisioning.complete')
       &lt;/p&gt;
     &lt;/div&gt;
-    #wizardFooter('', '', '', $services.localization.render('platform.wiki.create.wizard.step.provisioningFinalize'))
+    #wizardFooter('', '', '', $services.localization.render('platform.wiki.create.wizard.step.provisioning.finalize'))
     &lt;/form&gt;
   {{/html}}
 

@@ -103,10 +103,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>.actionmenu #tmXWiki {
-  background-image: url("$xwiki.getSkinFile('icons/xwiki/logo-xs.png')");
-}
-
+      <code>
 .actionmenu #tmMainWiki {
   background-image: url("$xwiki.getSkinFile('icons/silk/house.png')");
 }
@@ -115,26 +112,27 @@
   background-image: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
 }
 
-.actionmenu #tmWorkspaceIndex {
+.actionmenu #tmWikiIndex {
   background-image: url("$xwiki.getSkinFile('icons/silk/text_list_bullets.png')");
 }
 
 .actionmenu #tmMainWikiDocumentIndex {
   background-image: url("$xwiki.getSkinFile('icons/silk/book_open.png')");
 }
+
 .actionmenu #tmMainUserIndex {
   background-image: url("$xwiki.getSkinFile('icons/silk/group.png')");
 }
 
-.actionmenu #tmWorkspace {
-  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
+.actionmenu #tmWiki {
+  background-image: url("$xwiki.getSkinFile('icons/silk/world.png')");
 }
 
-.actionmenu #tmDeleteWorkspace {
+.actionmenu #tmDeleteWiki {
   background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
 }
 
-.actionmenu #tmUserWorkspaces {
+.actionmenu #tmUserWikis {
   background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
 }</code>
     </property>

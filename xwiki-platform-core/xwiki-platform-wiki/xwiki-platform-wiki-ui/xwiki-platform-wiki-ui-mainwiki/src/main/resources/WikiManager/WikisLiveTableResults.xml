@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>WikiManager</web>
+  <name>WikisLiveTableResults</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>WikiManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1293832800000</creationDate>
+  <date>1293832800000</date>
+  <contentUpdateDate>1293832800000</contentUpdateDate>
+  <version>1.1</version>
+  <title>$services.localization.render('platform.livetable.results')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>{{include document="WikiManager.WikisLiveTableResultsMacros" /}}
+
+{{velocity wiki="false"}}
+#set($from =  "")
+#set($extra = "")
+#set($params = [])
+#if("$!request.space" != '')
+  #set($extra = "${extra} and doc.space = ?")
+  #set($discard = $params.add("$request.space"))
+#end
+#if("$!request.orphaned" == '1')
+  #set($extra = "${extra} and doc.parent='' and doc.name&lt;&gt;'WebHome'")
+#end
+#if("$!request.onlyTemplates" == '1')
+  #set($from = "${from}, BaseObject objTemplate, IntegerProperty propTemplate")
+  #set($extra = "${extra} AND doc.fullName = objTemplate.name AND objTemplate.className='WikiManager.WikiTemplateClass' AND objTemplate.id = propTemplate.id AND propTemplate.name='iswikitemplate' AND propTemplate.value='1'")
+#end
+#set($columns = [])
+#foreach($c in $request.collist.split(","))
+  #if($c != 'membershipType')
+    #set($discard = $columns.add($c))
+  #end
+#end
+#gridresultwithfilter("$!request.classname" $columns "${from}" "${extra}" $params)
+{{/velocity}}</content>
+</xwikidoc>

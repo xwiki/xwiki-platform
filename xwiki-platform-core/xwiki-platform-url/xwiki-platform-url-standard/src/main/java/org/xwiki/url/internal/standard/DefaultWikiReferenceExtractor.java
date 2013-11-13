@@ -32,9 +32,9 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.url.internal.ExtendedURL;
-import org.xwiki.wiki.WikiDescriptor;
-import org.xwiki.wiki.WikiDescriptorException;
-import org.xwiki.wiki.WikiDescriptorManager;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Handles both path-based and domain-based multiwiki configurations when extracting the wiki reference from the passed
@@ -110,7 +110,7 @@ public class DefaultWikiReferenceExtractor implements WikiReferenceExtractor
         WikiDescriptor wikiDescriptor = getWikiDescriptorByAlias(alias);
         if (wikiDescriptor != null) {
             // Get the wiki id from the wiki descriptor
-            wikiId = wikiDescriptor.getWikiId();
+            wikiId = wikiDescriptor.getId();
         } else {
             wikiId = normalizeWikiIdForNonExistentWikiDescriptor(alias);
         }
@@ -126,7 +126,7 @@ public class DefaultWikiReferenceExtractor implements WikiReferenceExtractor
         WikiDescriptor wikiDescriptor = getWikiDescriptorByAlias(alias);
         if (wikiDescriptor != null) {
             // Get the wiki id from the wiki descriptor
-            wikiId = wikiDescriptor.getWikiId();
+            wikiId = wikiDescriptor.getId();
         } else {
             // Fallback: No definition found based on the full domain name, consider the alias as a
             // domain name and try to use the first part of the domain name as the wiki name.
@@ -147,7 +147,8 @@ public class DefaultWikiReferenceExtractor implements WikiReferenceExtractor
 
             // Create a virtual descriptor and save it so that next call will resolve to it directly without needing
             // to query the entity store.
-            this.wikiDescriptorManager.set(new WikiDescriptor(wikiId, alias));
+            // this.wikiDescriptorCache.add(new WikiDescriptor(wikiId, alias));
+            // TODO: uncomment theses lines, find a solution
         }
 
         return wikiId;
@@ -175,8 +176,8 @@ public class DefaultWikiReferenceExtractor implements WikiReferenceExtractor
     private WikiDescriptor getWikiDescriptorByAlias(String alias)
     {
         try {
-            return this.wikiDescriptorManager.getByWikiAlias(alias);
-        } catch (WikiDescriptorException e) {
+            return this.wikiDescriptorManager.getByAlias(alias);
+        } catch (WikiManagerException e) {
             throw new RuntimeException(String.format("Failed to located wiki descriptor for alias [%s]", alias), e);
         }
     }
@@ -184,8 +185,8 @@ public class DefaultWikiReferenceExtractor implements WikiReferenceExtractor
     private WikiDescriptor getWikiDescriptorById(String wikiId)
     {
         try {
-            return this.wikiDescriptorManager.getByWikiId(wikiId);
-        } catch (WikiDescriptorException e) {
+            return this.wikiDescriptorManager.getById(wikiId);
+        } catch (WikiManagerException e) {
             throw new RuntimeException(String.format("Failed to located wiki descriptor for wiki [%s]", wikiId), e);
         }
     }

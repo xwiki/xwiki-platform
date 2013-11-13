@@ -1,0 +1,12 @@
+org.xwiki.wiki.internal.descriptor.builder.DefaultWikiDescriptorBuilder
+org.xwiki.wiki.internal.descriptor.properties.DefaultWikiPropertyGroupManager
+org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper
+org.xwiki.wiki.internal.descriptor.document.XWikiServerClassDocumentInitializer
+org.xwiki.wiki.internal.descriptor.listener.WikiDescriptorListener
+org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptorManager
+org.xwiki.wiki.internal.manager.DefaultWikiDescriptorCache
+org.xwiki.wiki.internal.manager.DefaultWikiManager
+org.xwiki.wiki.internal.manager.DefaultWikiCopier
+org.xwiki.wiki.internal.manager.DefaultWikiCreator
+org.xwiki.wiki.internal.manager.DefaultWikiDeleter
+org.xwiki.wiki.internal.provisioning.DefaultWikiProvisioningJobExecutor

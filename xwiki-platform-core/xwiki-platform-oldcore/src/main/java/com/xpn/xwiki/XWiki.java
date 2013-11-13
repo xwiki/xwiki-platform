@@ -125,9 +125,9 @@ import org.xwiki.resource.Resource;
 import org.xwiki.resource.ResourceFactory;
 import org.xwiki.resource.ResourceManager;
 import org.xwiki.stability.Unstable;
-import org.xwiki.wiki.WikiDescriptor;
-import org.xwiki.wiki.WikiDescriptorException;
-import org.xwiki.wiki.WikiDescriptorManager;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.api.Api;
@@ -506,8 +506,8 @@ public class XWiki implements EventListener
         WikiDescriptorManager wikiDescriptorManager = Utils.getComponent(WikiDescriptorManager.class);
         WikiDescriptor descriptor;
         try {
-            descriptor = wikiDescriptorManager.getByWikiId(wikiId);
-        } catch (WikiDescriptorException e) {
+            descriptor = wikiDescriptorManager.getById(wikiId);
+        } catch (WikiManagerException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_STORE_MISC,
                 String.format("Failed find wiki descriptor for wiki id [%s]", wikiId), e);
         }
@@ -913,9 +913,9 @@ public class XWiki implements EventListener
         WikiDescriptorManager descriptorManager = Utils.getComponent(WikiDescriptorManager.class);
         try {
             for (WikiDescriptor descriptor : descriptorManager.getAll()) {
-                databaseNames.add(descriptor.getWikiId());
+                databaseNames.add(descriptor.getId());
             }
-        } catch (WikiDescriptorException e) {
+        } catch (WikiManagerException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to get the list of wikis", e);
         }

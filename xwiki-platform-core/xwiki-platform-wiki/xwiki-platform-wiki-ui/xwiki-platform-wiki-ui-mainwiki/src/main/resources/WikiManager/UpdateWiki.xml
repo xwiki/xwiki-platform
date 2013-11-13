@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>WikiManager</web>
+  <name>UpdateWiki</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>WikiManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1302123147000</creationDate>
+  <date>1308327207000</date>
+  <contentUpdateDate>1308327207000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>Updates the wiki document of a wiki by using values from the request.
+
+The 'wikiId' parameter is used to identify the wiki document and the request values update the objects of classes [[XWiki.XWikiServerClass]], [[WikiManager.WikiUserClass]] and [[WikiManager.WikiTemplateClass]] objects which are already stored in the wiki document.
+
+The 'xredirect' parameter is also accepted, currently used in the administration section of a wiki.
+
+{{velocity}}
+#set ($wikiId = $request.wikiId)
+##
+## TODO: use a dependency check macro.
+##
+#if ("$!wikiId" == '')
+  {{error}}$services.localization.render('platform.wiki.error.oneParameterNotSpecified', ["wikiId"]){{/error}}
+#else
+  #set ($wiki = $services.wiki.getById($wikiId))
+  #if (!$wiki)
+    #if (!$services.wiki.lastException)
+      {{error}}{{translation key="platform.wiki.error.wikidoesnotexist" parameters="$wikiId"/}}{{/error}}
+    #elseif("$!{services.wiki.lastException.message}" != '')
+      {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
+    #else
+      {{error}}$services.wiki.lastException.class{{/error}}
+    #end
+  #else
+    #set ($temp = $wiki.setPrettyName($request.get('XWiki.XWikiServerClass_0_wikiprettyname')))
+    #set ($temp = $wiki.setDescription($request.get('XWiki.XWikiServerClass_0_description')))
+    #set ($newOwner = $request.get('XWiki.XWikiServerClass_0_owner'))
+    #if (!$newOwner.startsWith("${services.wiki.mainWikiId}:"))
+      #set ($newOwner = "${services.wiki.mainWikiId}:${newOwner}")
+    #end
+    #if ($xwiki.exists($newOwner))
+      #set ($temp = $wiki.setOwnerId($newOwner))
+    #end
+    #set ($temp = $services.wiki.saveDescriptor($wiki))
+  #end
+  #if($request.xredirect)
+    $response.sendRedirect($request.xredirect)
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

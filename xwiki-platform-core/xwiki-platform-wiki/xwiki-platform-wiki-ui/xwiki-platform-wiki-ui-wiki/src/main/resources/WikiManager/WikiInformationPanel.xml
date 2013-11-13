@@ -147,7 +147,7 @@
           #set ($existingInvitationOrRequest = $existingRequest)
         #end
       #end 
-      #set ($membershipType = $wiki.getPropertyGroup('user').membershipType)
+      #set ($membershipType = $services.wiki.user.getMembershipType($wiki.id))
       #set ($joinPageReference = $services.model.createDocumentReference(${services.wiki.mainWikiId}, 'WikiManager', 'JoinWiki'))
       #set ($joinText = $services.localization.render("WikiManager.WikiCandidateMemberClass_membershipType_${membershipType.name().toLowerCase()}"))
       #set ($actionLabel = false)

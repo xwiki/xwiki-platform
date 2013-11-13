@@ -15,7 +15,7 @@
   <date>1308816032000</date>
   <contentUpdateDate>1308816032000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render('workspacemanager.createworkspace')</title>
+  <title>$services.localization.render('platform.wiki.create.title')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -109,11 +109,11 @@
   var lastwikiname;
 
   ## Error messages
-  #set ($MSG_ERROR_WIKIALREADYEXISTS = "$services.localization.render('workspacemanager.wikiname.error.wikialreadyexists')")
-  #set ($MSG_ERROR_DATABASEALREADYEXISTS = "$services.localization.render('workspacemanager.wikiname.error.databasealreadyexists')")
-  #set ($MSG_ERROR_WIKINAMEALREADYUSED = "$services.localization.render('workspacemanager.wikiname.error.alreadyused')")
-  #set ($MSG_ERROR_WIKINAMEEMPTY = "$services.localization.render('workspacemanager.wikiname.error.empty')")
-  #set ($MSG_ERROR_WIKIPRETTYNAMEEMPTY = "$services.localization.render('workspacemanager.wikiprettyname.error.empty')")
+  #set ($MSG_ERROR_WIKIALREADYEXISTS = "$services.localization.render('platform.wiki.create.error.wikiname.wikialreadyexists')")
+  #set ($MSG_ERROR_DATABASEALREADYEXISTS = "$services.localization.render('platform.wiki.create.error.wikiname.databasealreadyexists')")
+  #set ($MSG_ERROR_WIKINAMEALREADYUSED = "$services.localization.render('platform.wiki.create.error.wikiname.wikialreadyexists')")
+  #set ($MSG_ERROR_WIKINAMEEMPTY = "$services.localization.render('platform.wiki.create.error.wikiname.empty')")
+  #set ($MSG_ERROR_WIKIPRETTYNAMEEMPTY = "$services.localization.render('platform.wiki.create.prettyname.empty')")
   #set ($MSG_INFO_WIKINAMEVALID = "$services.localization.render('workspacemanager.wikiname.info.valid')")
   #set ($ISWIKINAMEAVAILABLE = $xwiki.getURL($services.model.createDocumentReference("", "WikiManager", "IsWikiOrDatabaseOrAvailableService")))
 
@@ -658,11 +658,11 @@ return XWiki;
 ## PLUGINS DEPENDANCIES
 #########################
 #if (!$services.wiki)
-  {{error}}{{translation key="workspacemanager.pluginnotenabled"/}}{{/error}}
+  {{error}}{{translation key="platform.wiki.dependencies.wiki.missing"/}}{{/error}}
 
 #end
 #if (!$services.applicationmanager)
-  {{error}}$services.localization.render('workspacemanager.dependencies.applicationmanager.missing', ['[[', '&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Application+Manager+Plugin]]']){{/error}}
+  {{error}}$services.localization.render('platform.wiki.dependencies.applicationmanager.missing', ['[[', '&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Application+Manager+Plugin]]']){{/error}}
 
 #end
 ## If all dependancies are OK, we call the controller
@@ -699,8 +699,8 @@ return XWiki;
     &lt;h1&gt;&lt;span&gt;$title&lt;/span&gt;&lt;/h1&gt;
     #if($currentStepNumber)
       &lt;ul class="steps"&gt;
-        #wizardHeaderStep($services.localization.render('platform.workspace.wizard.step1.shortname'), 1, $currentStepNumber)
-        #wizardHeaderStep($services.localization.render('platform.workspace.wizard.step2.shortname'), 2, $currentStepNumber)
+        #wizardHeaderStep($services.localization.render('platform.wiki.create.wizard.step.nameAndType.shortname'), 1, $currentStepNumber)
+        #wizardHeaderStep($services.localization.render('platform.wiki.create.wizard.step.users.shortname'), 2, $currentStepNumber)
       &lt;/ul&gt;
     #end
     &lt;div class="clearfloats"&gt;&lt;/div&gt;
@@ -742,7 +742,7 @@ return XWiki;
 ##
 ## Add a required message
 ##################################
-#macro(required)&lt;span class='xRequired'&gt;($services.localization.render('platform.workspace.requiredField'))&lt;/span&gt;#end
+#macro(required)&lt;span class='xRequired'&gt;($services.localization.render('platform.wiki.form.requiredField'))&lt;/span&gt;#end
 ##################################
 ##          STEP TYPE
 ##
@@ -753,7 +753,7 @@ return XWiki;
 
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
-      #wizardHeader($services.localization.render('platform.workspace.wizard.step1'), 1)
+      #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.nameAndType'), 1)
       ### WIZARD BODY ###
       &lt;div class="wizard-body"&gt;
         ### SECOND STEP VALUES
@@ -767,8 +767,8 @@ return XWiki;
           &lt;div&gt;
             &lt;dl&gt;
               &lt;dt&gt;
-                &lt;label for="prettyname"&gt;$services.localization.render('workspacemanager.prop.wiki.wikiprettyname')#required()&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('workspacemanager.doc.createwiki.desc.wikiprettyname')&lt;/span&gt;
+                &lt;label for="prettyname"&gt;$services.localization.render('platform.wiki.prop.wikiprettyname')#required()&lt;/label&gt;
+                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikiprettyname')&lt;/span&gt;
                 &lt;span id="wikiprettynamevalidation" class="xErrorMsg"&gt;&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
@@ -780,8 +780,8 @@ return XWiki;
           &lt;div&gt;
             &lt;dl&gt;
               &lt;dt&gt;
-                &lt;label for="wikiname"&gt;$services.localization.render('workspacemanager.prop.wiki.wikiname')#required()&lt;/label&gt;
-                &lt;span class='xHint'&gt;$services.localization.render('workspacemanager.doc.createwiki.wikiname')&lt;/span&gt;
+                &lt;label for="wikiname"&gt;$services.localization.render('platform.wiki.prop.wikiname')#required()&lt;/label&gt;
+                &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikiname')&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
                 &lt;input size="40" id="wikiname" name="wikiname" type="text"  value="$!escapetool.xml($request.wikiname)"/&gt;
@@ -793,8 +793,8 @@ return XWiki;
           &lt;div&gt;
             &lt;dl&gt;
               &lt;dt&gt;
-                &lt;label for="description"&gt;$services.localization.render('workspacemanager.prop.wiki.description')&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('workspacemanager.doc.createwiki.desc.description')&lt;/span&gt;
+                &lt;label for="description"&gt;$services.localization.render('platform.wiki.prop.description')&lt;/label&gt;
+                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.description')&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
                 &lt;textarea id="description" name="description" rows="7" cols="45"&gt;$!request.getParameter('description')&lt;/textarea&gt;
@@ -809,15 +809,15 @@ return XWiki;
           #set ($templates = $services.wiki.template.getTemplates())
           &lt;div&gt;
             &lt;dt&gt;
-              &lt;label for="template"&gt;$services.localization.render('platform.workspace.newWorkspaceTemplateLabel')&lt;/label&gt;
+              &lt;label for="template"&gt;$services.localization.render('platform.wiki.create.wizard.template.label')&lt;/label&gt;
               #if ($templates.size() &gt; 0)
-                &lt;span class="xHint"&gt;$services.localization.render('platform.workspace.newWorkspaceTemplateHint')&lt;/span&gt;
+                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.newTemplateHint')&lt;/span&gt;
               #end
             &lt;/dt&gt;
             &lt;dd&gt;
               #if ($templates.size() &gt; 0)
                 &lt;select name="template" id="template"&gt;
-                  &lt;option value="xwikinotemplate"&gt;$services.localization.render('platform.wikimanager.notemplate')&lt;/option&gt;
+                  &lt;option value="xwikinotemplate"&gt;$services.localization.render('platform.wiki.create.wizard.template.noTemplate')&lt;/option&gt;
                   #foreach ($template in $templates)
                     #set ($name = $template.id)
                     #if ($stringtool.isNotBlank("$!template.prettyName"))
@@ -838,7 +838,7 @@ return XWiki;
                 #set ($isTemplate = 'checked="checked"')
               #end
               &lt;input type="checkbox" name="set_as_template" id="set_as_template" $isTemplate/&gt;
-              &lt;label for="set_as_template" id="label_set_as_template"&gt;$services.localization.render('platform.wikimanager.setAsTemplateLabel')&lt;/label&gt;
+              &lt;label for="set_as_template" id="label_set_as_template"&gt;$services.localization.render('platform.wiki.create.wizard.setAsTemplate.label')&lt;/label&gt;
             &lt;/p&gt;
           &lt;/div&gt;
         ### END OF WIZARD SECOND HALF
@@ -860,7 +860,7 @@ return XWiki;
 
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
-      #wizardHeader($services.localization.render('platform.workspace.wizard.step2'), 2)
+      #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.users'), 2)
       ### WIZARD BODY ###  
       &lt;div class="wizard-body"&gt;
         ### FIRST STEP VALUES
@@ -878,8 +878,8 @@ return XWiki;
             #if ($hasAdmin)
               &lt;dl&gt;
                 &lt;dt&gt;
-                  &lt;label for="owner"&gt;$services.localization.render('workspacemanager.prop.wiki.owner') &lt;span class="xRequired"&gt;($services.localization.render('platform.workspace.requiredField'))&lt;/span&gt;&lt;/label&gt;
-                  &lt;span class="xHint"&gt;$services.localization.render('workspacemanager.doc.createwiki.desc.owner')&lt;/span&gt;
+                  &lt;label for="owner"&gt;$services.localization.render('platform.wiki.prop.owner') &lt;span class="xRequired"&gt;($services.localization.render('platform.wiki.form.requiredField'))&lt;/span&gt;&lt;/label&gt;
+                  &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.owner')&lt;/span&gt;
                 &lt;/dt&gt;
                 &lt;dd&gt;
                   #set($value = $escapetool.xml($request.getParameter('ownerId')))
@@ -897,8 +897,8 @@ return XWiki;
           &lt;div&gt;
             &lt;dl&gt;
               &lt;dt&gt;
-                &lt;label for="userScope"&gt;$services.localization.render('platform.wikimanager.userScopeLabel')&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('platform.wikimanager.userScopeHint')&lt;/span&gt;
+                &lt;label for="userScope"&gt;$services.localization.render('platform.wiki.create.wizard.userScope.label')&lt;/label&gt;
+                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.userScope.hint')&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
                 #set($value = $escapetool.xml($request.getParameter('userScope')))
@@ -936,8 +936,8 @@ return XWiki;
             #set ($membershipTypeDetailsMap = $membershipTypeProperty.getMapValues())
             &lt;dl&gt;
               &lt;dt&gt;
-                &lt;label&gt;$services.localization.render('workspacemanager.prop.workspace.membershipType.label')&lt;/label&gt;
-                &lt;span class='xHint'&gt;$services.localization.render('workspacemanager.prop.workspace.membershipType.hint')&lt;/span&gt;
+                &lt;label&gt;$services.localization.render('platform.wiki.prop.membershipType.label')&lt;/label&gt;
+                &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.prop.membershipType.hint')&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
               #foreach ($membershipTypeValue in $membershipTypeValues)
@@ -960,8 +960,8 @@ return XWiki;
           &lt;div&gt;
             &lt;dl&gt;
               &lt;dt&gt;
-                &lt;label for="members"&gt;$services.localization.render('workspacemanager.members')&lt;/label&gt;
-                &lt;span class="xHint"&gt;$services.localization.render('workspacemanager.doc.createwiki.members')&lt;/span&gt;
+                &lt;label for="members"&gt;$services.localization.render('platform.wiki.create.members')&lt;/label&gt;
+                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.members')&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
                 &lt;input type="text" id="members" name="members" value="$!escapetool.xml($request.members)" class="suggestUsers multipleSelection"/&gt;
@@ -1011,7 +1011,7 @@ return XWiki;
   #end
   #if (!$wikiDescriptor)
 
-    {{error}}$services.localization.render('workspacemanager.errorcreatewiki', [$request.wikiname, $services.wiki.lastException]){{/error}}
+    {{error}}$services.localization.render('platform.wiki.create.error', [$request.wikiname, $services.wiki.lastException]){{/error}}
 
   #else    
     ## Set the pretty name
@@ -1093,10 +1093,10 @@ return XWiki;
     &lt;input type="hidden" name="membershipType" value="$!escapetool.xml($request.getParameter('membershipType'))" /&gt;
     &lt;input type="hidden" name="userScope" value="$!escapetool.xml($request.userScope)" /&gt;
     &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($wikiDescriptor.id)" /&gt;
-    #wizardHeader($services.localization.render('platform.wikimanager.wizard.stepProvisioning'))
+    #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.provisioning'))
     &lt;div class="wizard-body"&gt;
       &lt;div class="ui-progress" id="ui-progress"&gt;
-        $services.localization.render('platform.wikimanager.wizard.stepProvisioningWait')
+        $services.localization.render('platform.wiki.create.wizard.step.provisioningWait')
         &lt;div class="ui-progress-background"&gt;
           #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $wikiDescriptor.id])
           #set ($percent = $services.wiki.template.getWikiProvisioningJobStatus($jobId).progress.offset)
@@ -1109,10 +1109,10 @@ return XWiki;
         &lt;/div&gt;
       &lt;/div&gt;
       &lt;p class="successmessage box hidden" id="successMessage"&gt;
-      $services.localization.render('platform.wikimanager.wizard.stepProvisioningComplete')
+      $services.localization.render('platform.wiki.create.wizard.step.provisioningComplete')
       &lt;/p&gt;
     &lt;/div&gt;
-    #wizardFooter('', '', '', $services.localization.render('platform.wikimanager.wizard.stepProvisioningFinalize'))
+    #wizardFooter('', '', '', $services.localization.render('platform.wiki.create.wizard.step.provisioningFinalize'))
     &lt;/form&gt;
   {{/html}}
 

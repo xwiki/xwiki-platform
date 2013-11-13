@@ -15,7 +15,7 @@
   <date>1293832800000</date>
   <contentUpdateDate>1293832800000</contentUpdateDate>
   <version>1.1</version>
-  <title>#if("$!{request.wikiId}" == '')$services.localization.render('workspacemanager.title.leave.empty')#{else}$services.localization.render('workspacemanager.title.leave', [$request.wikiId])#end</title>
+  <title>#if("$!{request.wikiId}" == '')$services.localization.render('platform.wiki.users.leave.title.empty')#{else}$services.localization.render('platform.wiki.users.leave.title', [$request.wikiId])#end</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -28,7 +28,7 @@
 #set ($confirm = $request.confirm)
 ##
 #if ("$!wikiId" == '')
-  {{error}}{{translation key="platform.workspace.oneParameterNotSpecified" parameters="wikiId"/}}{{/error}}
+  {{error}}{{translation key="platform.wiki.error.oneParameterNotSpecified" parameters="wikiId"/}}{{/error}}
 #else
   ## FIXME: add plugin dependency checks.
   ##
@@ -36,9 +36,9 @@
   ##
   #if ("$!wiki" == '')
     #if ("$!{$services.wiki.lastException}" != '')
-      {{error}}$services.localization.render('platform.workspace.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
+      {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
     #else
-      {{error}}{{translation key="workspacemanager.error.workspacedoesnotexist" parameters="$wikiId"/}}{{/error}}
+      {{error}}{{translation key="platform.wiki.error.wikidoesnotexist" parameters="$wikiId"/}}{{/error}}
     #end
   #else
     #set ($wikiName = $wiki.prettyName)
@@ -50,24 +50,24 @@
     ##
     #set ($members = $services.wiki.user.getMembers($wikiId))
     #if (!$members || !$members.contains($currentUser))
-      {{error}}$services.localization.render('platform.workspace.userNotMemberOfWorkspace', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/error}}
+      {{error}}$services.localization.render('platform.wiki.users.userNotMemberOfWorkspace', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/error}}
     #elseif ($wiki.ownerId == $currentUser)
-      {{error}}$services.localization.render('platform.workspace.leaveErrorUserIsOwner', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/error}}
+      {{error}}$services.localization.render('platform.wiki.users.leave.error.userIsOwner', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/error}}
     #else
       #if ("$!confirm" != 1)
         #set ($browseDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'WebHome'))
         #set ($backUrl = $xwiki.getURL($browseDocumentReference))
         #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
         {{box}}
-          $services.localization.render('platform.workspace.leaveConfirmation', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+          $services.localization.render('platform.wiki.users.leave.confirmation', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
           ((({{html}}
-            &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.workspace.leaveYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.workspace.leaveNo')&lt;/a&gt;&lt;/span&gt;
+            &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.wiki.users.leave.confirmation.yes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.users.leave.confirmation.no')&lt;/a&gt;&lt;/span&gt;
           {{/html}})))
         {{/box}}
       #else
         #set ($result = $services.wiki.user.leave($currentUser, $wikiId))
         #if ($result)
-          {{success}}$services.localization.render('platform.workspace.leaveSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
+          {{success}}$services.localization.render('platform.wiki.users.leave.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
         #else
           #printException($services.wiki.user.lastException.message)
         #end

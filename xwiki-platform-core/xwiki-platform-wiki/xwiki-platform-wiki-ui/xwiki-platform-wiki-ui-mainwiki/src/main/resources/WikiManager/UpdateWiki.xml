@@ -35,14 +35,14 @@ The 'xredirect' parameter is also accepted, currently used in the administration
 ## TODO: use a dependency check macro.
 ##
 #if ("$!wikiId" == '')
-  {{error}}$services.localization.render('platform.workspace.oneParameterNotSpecified', ["wikiId"]){{/error}}
+  {{error}}$services.localization.render('platform.wiki.error.oneParameterNotSpecified', ["wikiId"]){{/error}}
 #else
   #set ($wiki = $services.wiki.getById($wikiId))
   #if (!$wiki)
     #if (!$services.wiki.lastException)
-      {{error}}{{translation key="workspacemanager.error.workspacedoesnotexist" parameters="$wikiId"/}}{{/error}}
+      {{error}}{{translation key="platform.wiki.error.wikidoesnotexist" parameters="$wikiId"/}}{{/error}}
     #elseif("$!{services.wiki.lastException.message}" != '')
-      {{error}}$services.localization.render('platform.workspace.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
+      {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
     #else
       {{error}}$services.wiki.lastException.class{{/error}}
     #end

@@ -15,7 +15,7 @@
   <date>1307191413000</date>
   <contentUpdateDate>1307191413000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render('workspacemanager.title.join')</title>
+  <title>$services.localization.render('platform.wiki.users.join.title')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -26,7 +26,7 @@
   <content>{{velocity}}
 #macro (printException $exception)
   #if($exception.message)
-    {{error}}$services.localization.render('platform.workspace.exceptionWithMessage', [$exception.message]){{/error}}
+    {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$exception.message]){{/error}}
   #else
     {{error}}$exception.class{{/error}}
   #end
@@ -35,7 +35,7 @@
 #set ($confirm = $request.confirm)
 ##
 #if ("$!wikiId" == '')
-  {{error}}{{translation key="platform.workspace.oneParameterNotSpecified" parameters="wikiId"/}}{{/error}}
+  {{error}}{{translation key="platform.wiki.error.oneParameterNotSpecified" parameters="wikiId"/}}{{/error}}
 #else
   ## FIXME: add plugin dependency checks.
   ##
@@ -44,9 +44,9 @@
   ##
   #if ("$!wikiId" == '')
     #if ("$!{services.wiki.lastException}" != '')
-      {{error}}$services.localization.render('platform.workspace.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
+      {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
     #else
-      {{error}}{{translation key="workspacemanager.error.workspacedoesnotexist" parameters="$wikiId"/}}{{/error}}
+      {{error}}{{translation key="platform.wiki.error.wikidoesnotexist" parameters="$wikiId"/}}{{/error}}
     #end
   #else
     #set ($wikiName = $wiki.prettyName)
@@ -57,12 +57,12 @@
     ##
     #set ($members = $services.wiki.user.getMembers($wikiId))
     #if ($members &amp;&amp; $members.contains($currentUser))
-      {{info}}$services.localization.render('platform.workspace.userAlreadyMemberOfWorkspace', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/info}}
+      {{info}}$services.localization.render('platform.wiki.users.userAlreadyMemberOfWorkspace', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/info}}
     #elseif ($currentUser == 'xwiki:XWiki.XWikiGuest')
       #set ($loginDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'XWiki', 'XWikiLogin'))
       #set ($loginDocument = $xwiki.getDocument($loginDocumentReference))
       #set ($loginUrl = $loginDocument.getExternalURL('login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
-      {{error}}$services.localization.render('platform.workspace.logInToContinue', ['[[', "&gt;&gt;$loginUrl]]"]){{/error}}
+      {{error}}$services.localization.render('platform.wiki.users.logInToContinue', ['[[', "&gt;&gt;$loginUrl]]"]){{/error}}
     #else
       ## The user is not already a member of the wiki
       ##
@@ -87,7 +87,7 @@
         #if ($request.acceptInvitation || $request.rejectInvitation)
           ##
           ## The user decided whether to accept or to reject the invitation.
-          #set ($notificationMessage = $services.localization.render('platform.workspace.invitationUserAcceptedNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, ${wikiName}, $wikiId]))
+          #set ($notificationMessage = $services.localization.render('platform.wiki.users.invitation.userAcceptedNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, ${wikiName}, $wikiId]))
           ## Accept
           #if ($request.acceptInvitation)
             #set ($discard = $services.wiki.user.acceptInvitation($existingInvitation, $request.userComment))
@@ -100,37 +100,37 @@
           ## Display the proper success info.
           {{success}}
           #if ($request.acceptInvitation)
-            $services.localization.render('platform.workspace.invitationUserAcceptedSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+            $services.localization.render('platform.wiki.users.invitation.userAcceptedSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
           #else
-            $services.localization.render('platform.workspace.invitationUserRejectedSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+            $services.localization.render('platform.wiki.users.invitation.userRejectedSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
           #end
           {{/success}}
         #else
           ##
           ## User can decide if to accept or reject the invitation.
           {{html wiki='true'}}
-          $services.localization.render('platform.workspace.invitationViewTitle', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+          $services.localization.render('platform.wiki.users.invitation.title', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
 
           &lt;form class='xform third' method='GET'&gt;
             &lt;dl&gt;
             #if ("$!existingInvitation.get('reviewerComment').getValue()" != '')
               &lt;dt&gt;
-                &lt;label&gt;{{translation key="platform.workspace.invitationMessageLabel"/}}&lt;/label&gt;
+                &lt;label&gt;{{translation key="platform.wiki.users.invitation.message.label"/}}&lt;/label&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
                 $existingInvitation.get('reviewerComment').getValue()
               &lt;/dd&gt;
             #end  
               &lt;dt&gt;
-                &lt;label for='userComment'&gt;{{translation key="platform.workspace.invitationReplyLabel"/}}&lt;/label&gt;
-                &lt;span class='xHint'&gt;{{translation key="platform.workspace.invitationReplyHint"/}}&lt;/span&gt;
+                &lt;label for='userComment'&gt;{{translation key="platform.wiki.users.invitation.reply.title"/}}&lt;/label&gt;
+                &lt;span class='xHint'&gt;{{translation key="platform.wiki.users.invitation.reply.hint"/}}&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;&lt;textarea name='userComment' rows='7' cols='45'&gt;&lt;/textarea&gt;&lt;/dd&gt;
               &lt;span class='buttonwrapper'&gt;
                 &lt;br/&gt;
-                &lt;input type='submit' name='acceptInvitation' value="$services.localization.render('platform.workspace.invitationAcceptLabel')" class='button'/&gt;
-                &lt;input type='submit' name='rejectInvitation' value="$services.localization.render('platform.workspace.invitationRejectLabel')" class='button'/&gt;
-                &lt;a href="$backUrl" class='button secondary'&gt;{{translation key="platform.workspace.invitationPostponeLabel"/}}&lt;/a&gt;
+                &lt;input type='submit' name='acceptInvitation' value="$services.localization.render('platform.wiki.users.invitation.accept.label')" class='button'/&gt;
+                &lt;input type='submit' name='rejectInvitation' value="$services.localization.render('platform.wiki.users.invitation.reject.label')" class='button'/&gt;
+                &lt;a href="$backUrl" class='button secondary'&gt;{{translation key="platform.wiki.users.invitation.postpone.label"/}}&lt;/a&gt;
               &lt;/span&gt;
               &lt;input type='hidden' name='wikiId' value="$!wikiId"/&gt;
             &lt;/dl&gt;
@@ -142,7 +142,7 @@
       #elseif ($membershipType == 'INVITE')
         ##
         ## User does not have an invitation.
-        {{error}}{{translation key="platform.workspace.joinErrorNeedInvitation"/}}{{/error}}
+        {{error}}{{translation key="platform.wiki.users.join.error.needInvitation"/}}{{/error}}
       #elseif ($membershipType == 'REQUEST')
         ## Determine if a pending request already exists.
         ##
@@ -157,15 +157,15 @@
           #if ("$!{request.cancelJoinRequest}" != '1')
             ## Request already exists.
             ##
-            {{info}}$services.localization.render('platform.workspace.joinRequestPendingRequestExists', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/info}}
+            {{info}}$services.localization.render('platform.wiki.users.join.request.pendingRequestExists', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/info}}
           #elseif ("$!confirm" != '1')
             ## User wants to cancel existing request.
             ##
             #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
             {{box}}
-              $services.localization.render('platform.workspace.joinRequestCancelConfirmation', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+              $services.localization.render('platform.wiki.users.join.request.cancelConfirmation', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
               ((({{html}}
-                &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.workspace.joinRequestCancelYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.workspace.joinRequestCancelNo')&lt;/a&gt;&lt;/span&gt;
+                &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.wiki.users.join.request.cancelYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.users.join.request.cancelNo')&lt;/a&gt;&lt;/span&gt;
               {{/html}})))
             {{/box}}
           #else
@@ -173,7 +173,7 @@
             ##
             #set ($result = $services.wiki.user.cancelCandidacy($pendingRequest))
             #if ($result)
-              {{success}}$services.localization.render('platform.workspace.joinRequestCancelSuccess',  ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
+              {{success}}$services.localization.render('platform.wiki.users.join.request.cancelSuccess',  ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
             #else
               #printException($services.wiki.user.lastException.message)
             #end
@@ -182,19 +182,19 @@
           ## Join request.
           ##
           {{html wiki='true'}}
-            $services.localization.render('platform.workspace.joinRequestHint', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+            $services.localization.render('platform.wiki.users.join.request.hint', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
 
             &lt;form class='xform third' method='GET'&gt;
               &lt;dl&gt;
                 &lt;dt&gt;
-                  &lt;label for='userComment'&gt;{{translation key="platform.workspace.joinRequestMessageLabel"/}}&lt;/label&gt;
-                  &lt;span class='xHint'&gt;{{translation key="platform.workspace.joinRequestMessageHint"/}}&lt;/span&gt;
+                  &lt;label for='userComment'&gt;{{translation key="platform.wiki.users.join.request.message.label"/}}&lt;/label&gt;
+                  &lt;span class='xHint'&gt;{{translation key="platform.wiki.users.join.request.message.hint"/}}&lt;/span&gt;
                 &lt;/dt&gt;
                 &lt;dd&gt;&lt;textarea name='userComment' rows='7' cols='45'&gt;&lt;/textarea&gt;&lt;/dd&gt;
                 &lt;span class='buttonwrapper'&gt;
                   &lt;br/&gt;
-                  &lt;input type='submit' name='submit' value="$services.localization.render('platform.workspace.joinRequestSendLabel')" class='button'/&gt;
-                  &lt;a href="$backUrl" class='button secondary'&gt;{{translation key="platform.workspace.joinRequestCancelLabel"/}}&lt;/a&gt;
+                  &lt;input type='submit' name='submit' value="$services.localization.render('platform.wiki.users.join.request.send.label')" class='button'/&gt;
+                  &lt;a href="$backUrl" class='button secondary'&gt;{{translation key="platform.wiki.users.join.request.cancel.label"/}}&lt;/a&gt;
                 &lt;/span&gt;
                 &lt;input type='hidden' name='wikiId' value="$!wikiId"/&gt;
                 &lt;input type='hidden' name='requestJoin' value="$!request.requestJoin"/&gt;
@@ -209,9 +209,9 @@
           #if ($request)
             ## Send message to wiki admins. (XWikiAdminGroup)
             #set ($wikiAdminGroupReference = $services.model.createDocumentReference($wikiId, 'XWiki', 'XWikiAdminGroup'))
-            #set ($notificationMessage = $services.localization.render('platform.workspace.joinRequestSaveNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, $wikiName, $wikiId]))
+            #set ($notificationMessage = $services.localization.render('platform.wiki.users.join.request.saveNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, $wikiName, $wikiId]))
             #set ($discard = $services.messageStream.postMessageToGroup($notificationMessage, $wikiAdminGroupReference))
-            {{success}}$services.localization.render('platform.workspace.joinRequestSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
+            {{success}}$services.localization.render('platform.wiki.users.join.request.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
           #else
             #printException($services.wiki.user.lastException.message)
           #end
@@ -224,9 +224,9 @@
           ##
           #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
           {{box}}
-            $services.localization.render('platform.workspace.joinConfirmation', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+            $services.localization.render('platform.wiki.users.join.confirmation', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
             ((({{html}}
-              &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.workspace.joinYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.workspace.joinNo')&lt;/a&gt;&lt;/span&gt;
+              &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.wiki.users.join.yes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.users.join.no')&lt;/a&gt;&lt;/span&gt;
             {{/html}})))
           {{/box}}
         #else
@@ -234,7 +234,7 @@
           ##
           #set ($result = $services.wiki.user.join($currentUser, $wikiId))
           #if ($result)
-            {{success}}$services.localization.render('platform.workspace.joinSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
+            {{success}}$services.localization.render('platform.wiki.users.join.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
           #else
             #printException($services.wiki.user.lastException.message)
           #end

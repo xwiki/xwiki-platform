@@ -27,9 +27,9 @@
 #set ($parameterName = 'wikiName')
 #set ($wikiNames = $request.getParameterValues($parameterName))
 #if ("$!wikiNames" == '' || $wikiNames.size() == 0)
-  {{translation key="platform.workspace.activityHint"/}}
+  {{translation key="platform.wiki.users.profile.activity.hint"/}}
 
-  {{error}}{{translation key="platform.workspace.oneParameterNotSpecified" parameters="$parameterName"/}} {{translation key="platform.workspace.parameterAcceptsMultipleValues"/}}{{/error}}
+  {{error}}{{translation key="platform.wiki.error.oneParameterNotSpecified" parameters="$parameterName"/}} {{translation key="platform.wiki.error.parameterAcceptsMultipleValues"/}}{{/error}}
 #else
   #set ($wikiNamesList = '')
   #foreach ($wikiName in $wikiNames)
@@ -38,7 +38,7 @@
     #end
   #end
   #set ($wikiNamesList = $wikiNamesList.replaceAll(',\s$',''))
-  = #if ($wikiNames.size() == 1)$services.localization.render('platform.workspace.activityTitle', [$wikiNamesList])#{else}$services.localization.render('platform.workspace.activityMultipleTitle', [$wikiNamesList])#end =
+  = #if ($wikiNames.size() == 1)$services.localization.render('platform.wiki.users.profile.activity.title', [$wikiNamesList])#{else}$services.localization.render('platform.wiki.users.profile.activity.multipletitle', [$wikiNamesList])#end =
   {{activity wikis="$wikiNamesList"}}
 #end
 {{/velocity}}</content>

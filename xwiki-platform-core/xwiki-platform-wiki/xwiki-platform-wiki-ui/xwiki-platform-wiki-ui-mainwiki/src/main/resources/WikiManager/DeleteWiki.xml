@@ -15,7 +15,7 @@
   <date>1304960266000</date>
   <contentUpdateDate>1304960266000</contentUpdateDate>
   <version>1.1</version>
-  <title>#if("$!{request.wikiId}" == '')$services.localization.render('workspacemanager.title.delete.empty')#{else}$services.localization.render('workspacemanager.title.delete', [$request.wikiId])#end</title>
+  <title>#if("$!{request.wikiId}" == '')$services.localization.render('platform.wiki.users.delete.title.empty')#{else}$services.localization.render('platform.wiki.users.delete.title', [$request.wikiId])#end</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -26,7 +26,7 @@
   <content>{{velocity}}
 #macro (printException $exception)
   #if($exception.message)
-    {{error}}$services.localization.render('platform.workspace.exceptionWithMessage', [$exception.message]){{/error}}
+    {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$exception.message]){{/error}}
   #else
     {{error}}$exception.class{{/error}}
   #end
@@ -36,7 +36,7 @@
 #set ($confirm = $request.confirm)
 ##
 #if ("$!wikiId" == '')
-  {{error}}{{translation key="platform.workspace.oneParameterNotSpecified" parameters="wikiId"/}}{{/error}}
+  {{error}}{{translation key="platform.wiki.error.oneParameterNotSpecified" parameters="wikiId"/}}{{/error}}
 #else
   ## FIXME: add plugin dependency checks.
   ##
@@ -45,7 +45,7 @@
   ##
   #if (!$wiki)
     #if (!$services.wiki.lastException)
-      {{error}}{{translation key="workspacemanager.error.workspacedoesnotexist" parameters="$wikiId"/}}{{/error}}
+      {{error}}{{translation key="platform.wiki.error.wikidoesnotexist" parameters="$wikiId"/}}{{/error}}
     #else
       #printException($services.wiki.lastException)
     #end
@@ -61,9 +61,9 @@
         #set ($backUrl = $xwiki.getURL($browseDocumentReference))
         #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
         {{box}}
-          $services.localization.render('platform.workspace.deleteWorkspaceConfirmation', ['[[', $wikiId, "&gt;&gt;$wikiMainPage]]"])
+          $services.localization.render('platform.wiki.delete.confirmation', ['[[', $wikiId, "&gt;&gt;$wikiMainPage]]"])
           ((({{html}}
-            &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.workspace.deleteWorkspaceYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.workspace.deleteWorkspaceNo')&lt;/a&gt;&lt;/span&gt;
+            &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.wiki.delete.confirmation.yes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.delete.confirmation.no')&lt;/a&gt;&lt;/span&gt;
           {{/html}})))
         {{/box}}
       #else
@@ -71,7 +71,7 @@
         #if ($services.wiki.lastException)
           #printException($services.wiki.lastException)
         #else
-          {{success}}$services.localization.render('platform.workspace.deleteWorkspaceSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiId]){{/success}}
+          {{success}}$services.localization.render('platform.wiki.delete.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiId]){{/success}}
         #end
       #end
     #end

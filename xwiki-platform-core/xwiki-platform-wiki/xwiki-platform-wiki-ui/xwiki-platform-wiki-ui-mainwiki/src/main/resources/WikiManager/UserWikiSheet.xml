@@ -312,7 +312,7 @@ return XWiki;
   {{html clean='false'}}
   &lt;div class='half column'&gt;
     &lt;div class='profile-section highlighted-profile-section'&gt;
-      &lt;h1&gt;$services.localization.render('platform.workspace.profileJoinedWorkspacesLabel')&lt;/h1&gt;
+      &lt;h1&gt;$services.localization.render('platform.wiki.users.profile.joinedwikis.label')&lt;/h1&gt;
       #set ($joinedWikis = [])
       #set ($wikis = $services.wiki.getAll())
       #foreach ($wiki in $wikis)
@@ -321,13 +321,13 @@ return XWiki;
         #end
       #end
       #if ($joinedWikis.size() == 0)
-        &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.workspace.profileNotMemberOfAnyWorkspace')#{else}$services.localization.render('platform.workspace.profileUserNotMemberOfAnyWorkspace')#end&lt;/span&gt;
+        &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.wiki.users.profile.joinedwikis.notMemberOfAnyWorkspace')#{else}$services.localization.render('platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWorkspace')#end&lt;/span&gt;
       #else
         &lt;ul id='wikis'&gt;
         #foreach ($wiki in $joinedWikis)
           &lt;li id='$wiki.id'&gt;
             &lt;span class='wikiHomepage'&gt;&lt;a href='$xwiki.getURL($wiki.mainPageReference)'&gt;$wiki.prettyName&lt;/a&gt;&lt;/span&gt;
-            &lt;span class='wikiActivity'&gt;&lt;a href='javascript:void(0)'&gt;$services.localization.render('platform.workspace.profileShowActivity') &amp;#187;&lt;/a&gt;&lt;/span&gt;
+            &lt;span class='wikiActivity'&gt;&lt;a href='javascript:void(0)'&gt;$services.localization.render('platform.wiki.users.profile.activity.show') &amp;#187;&lt;/a&gt;&lt;/span&gt;
           &lt;/li&gt;
         #end
         &lt;/ul&gt;

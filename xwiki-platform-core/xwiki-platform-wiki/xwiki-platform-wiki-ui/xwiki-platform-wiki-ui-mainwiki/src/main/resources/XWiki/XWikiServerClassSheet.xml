@@ -49,7 +49,7 @@
       $doc.save()
     #else
 
-      {{error}}{{translation key="platform.wikimanager.wikisheet.erroraliasalreadynotexists" parameters="$domain"/}}{{/error}}
+      {{error}}{{translation key="platform.wiki.sheet.erroraliasalreadynotexists" parameters="$domain"/}}{{/error}}
     #end
   #end
   ##
@@ -62,7 +62,7 @@
       #set ($removed = $doc.removeObject($alias))
       $doc.save()
     #else
-      {{error}}{{translation key="platform.wikimanager.wikisheet.erroraliasdoesnotexists" parameters="$domain"/}}{{/error}}
+      {{error}}{{translation key="platform.wiki.sheet.erroraliasdoesnotexists" parameters="$domain"/}}{{/error}}
     #end
   #end
   ##
@@ -76,62 +76,62 @@
     ##
     #set ($firstalias = $wikiAliasList.get(0))
     #if ($xcontext.action == "view")
-      == {{translation key="platform.wikimanager.wikisheet.title.wikisettings"/}} ==
+      == {{translation key="platform.wiki.sheet.title.settings"/}} ==
 
     #else
       &lt;fieldset&gt;
-        &lt;legend&gt;{{translation key="platform.wikimanager.wikisheet.title.wikisettings"/}}&lt;/legend&gt;
+        &lt;legend&gt;{{translation key="platform.wiki.sheet.title.settings"/}}&lt;/legend&gt;
     #end
     ##
       &lt;dl&gt;
-        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.wikiprettyname"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wiki.sheet.prop.wikiprettyname"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
               $doc.display("wikiprettyname", $firstalias)&lt;br/&gt;
-              {{translation key="platform.wikimanager.wikisheet.desc.wikiprettyname"/}}
+              {{translation key="platform.wiki.sheet.desc.wikiprettyname"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.owner"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wiki.sheet.prop.owner"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             $doc.display("owner", $firstalias)
             &lt;p&gt;
-              {{translation key="platform.wikimanager.wikisheet.desc.owner"/}}
+              {{translation key="platform.wiki.sheet.desc.owner"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.secure"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wiki.sheet.prop.secure"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
               $doc.display("secure", $firstalias)&lt;br/&gt;
-              {{translation key="platform.wikimanager.wikisheet.desc.secure"/}}
+              {{translation key="platform.wiki.sheet.desc.secure"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.iswikitemplate"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wiki.sheet.prop.iswikitemplate"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
               #set($objTemplate = $doc.getObject('WikiManager.WikiTemplateClass'))
               $objTemplate.get("iswikitemplate")&lt;br/&gt;
-              {{translation key="platform.wikimanager.wikisheet.desc.iswikitemplate"/}}
+              {{translation key="platform.wiki.sheet.desc.iswikitemplate"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.server"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wiki.sheet.prop.server"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
               $doc.display("server", $firstalias)&lt;br/&gt;
-              {{translation key="platform.wikimanager.wikisheet.desc.server"/}}
+              {{translation key="platform.wiki.sheet.desc.server"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.description"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wiki.sheet.prop.description"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
               $doc.display("description", $firstalias)&lt;br/&gt;
-              {{translation key="platform.wikimanager.wikisheet.desc.description"/}}
+              {{translation key="platform.wiki.sheet.desc.description"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
-        &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.homepage"/}}:&lt;/dt&gt;
+        &lt;dt&gt;{{translation key="platform.wiki.sheet.prop.homepage"/}}:&lt;/dt&gt;
           &lt;dd&gt;
             &lt;p&gt;
               $doc.display("homepage", $firstalias)&lt;br/&gt;
-              {{translation key="platform.wikimanager.wikisheet.desc.homepage"/}}
+              {{translation key="platform.wiki.sheet.desc.homepage"/}}
             &lt;/p&gt;
           &lt;/dd&gt;
       &lt;/dl&gt;
@@ -140,7 +140,7 @@
     #end
     ##
     #if ($xcontext.action == "view")
-      == {{translation key="platform.wikimanager.wikisheet.title.createnewalias"/}} ==
+      == {{translation key="platform.wiki.sheet.title.createnewalias"/}} ==
 
       ##
       &lt;form method="get" action=""&gt;
@@ -148,7 +148,7 @@
           &lt;legend&gt;Create new alias&lt;/legend&gt;
           &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
           &lt;input type="hidden" name="action" value="create"/&gt;
-          &lt;label for="inputdomain"&gt;{{translation key="platform.wikimanager.wikisheet.server"/}}&lt;/label&gt;: &lt;input id="inputdomain" type="text" name="domain" class="wikialiasinput"/&gt;
+          &lt;label for="inputdomain"&gt;{{translation key="platform.wiki.sheet.prop.server"/}}&lt;/label&gt;: &lt;input id="inputdomain" type="text" name="domain" class="wikialiasinput"/&gt;
           &lt;input type="submit" class="button" value="$services.localization.render('create')"/&gt;
           &lt;/fieldset&gt;
       &lt;/form&gt;
@@ -156,7 +156,7 @@
     ##
     #if ($wikiAliasList.size() &gt; 1)
       #if ($xcontext.action == "view")
-        == {{translation key="platform.wikimanager.wikisheet.title.viewaliases"/}} ==
+        == {{translation key="platform.wiki.sheet.title.viewaliases"/}} ==
 
       #end
       ##
@@ -169,18 +169,18 @@
               ##
               &lt;br /&gt;
               &lt;dl&gt;
-                &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.description"/}}:&lt;/dt&gt;
+                &lt;dt&gt;{{translation key="platform.wiki.sheet.prop.description"/}}:&lt;/dt&gt;
                   &lt;dd&gt;
                     &lt;p&gt;
                       $doc.display("description", $wikiAlias)&lt;br/&gt;
-                      {{translation key="platform.wikimanager.wikisheet.desc.description"/}}
+                      {{translation key="platform.wiki.sheet.desc.description"/}}
                     &lt;/p&gt;
                   &lt;/dd&gt;
-                &lt;dt&gt;{{translation key="platform.wikimanager.wikisheet.homepage"/}}:&lt;/dt&gt;
+                &lt;dt&gt;{{translation key="platform.wiki.sheet.prop.homepage"/}}:&lt;/dt&gt;
                   &lt;dd&gt;
                     &lt;p&gt;
                       $doc.display("homepage", $wikiAlias)&lt;br/&gt;
-                      {{translation key="platform.wikimanager.wikisheet.desc.homepage"/}}
+                      {{translation key="platform.wiki.sheet.desc.homepage"/}}
                     &lt;/p&gt;
                   &lt;/dd&gt;
               &lt;/dl&gt;

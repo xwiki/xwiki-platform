@@ -89,225 +89,164 @@
 #     old.key.name=Some translation
 ###############################################################################
 
-# MESSAGES
-workspacemanager.pluginnotenabled=The Workspaces Manager java component is not installed. This page will not work properly. Make sure that the "Workspace API" extension is installed (using the Extension Manager) or that the file 'xwiki-platform-workspace-api-&lt;version&gt;.jar' is present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-workspacemanager.template.install.success=Wiki template has been successfully installed.
-workspacemanager.template.install.error=Error installing wiki template. {0}
-workspacemanager.template.install.error.missingattachment=Error installing the wiki template. The file "{0}" is not attached to the document {1}{2}{3}. Please re-import the {1}{2}{3} document from the Workspaces Application XAR.
-workspacemanager.template.install.error.missingtemplateattachment=Error installing the wiki template. The file "{0}" is not attached to the document {1}{2}{3}. Please attach a base template that will be used for all newly created wikis. You can download the most recent "*.xar" file from {4}here{5} and rename it to "{0}" before attaching it.
-workspacemanager.template.install.notYetComplete=The installation process is not yet complete.\n\
-\n\
-In order to finish the installation process, please log in as Admin and go to the page {0}{1}{2}.
-workspacemanager.translations.install.success=Workspace translations have been successfully installed.
-platform.workspace.translationsInstallSaveComment=Automatically registered Workspace translations.
-workspacemanager.searchSuggestions.install.success=Workspace search suggestions have been successfully installed.
-platform.workspace.searchSuggestionsInstallSaveComment=Automatically registered workspace search suggestions.
-workspacemanager.install.notallowed=Admin rights are required to complete the Workspace Manager installation. Please login as Admin to complete the installation.
-workspacemanager.dependencies.wikimanager.missing=The {0}Wiki Manager Plugin{1} is not installed. Please install it and try again.
-workspacemanager.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
-workspacemanager.wikiprettyname.error.empty=Pretty name must not be empty
-workspacemanager.successcreatewiki=Your wiki \"{0}\" has been created. You can access it at the following address: {1}
-workspacemanager.errorcreatewiki=Wiki \"{0}\" creation failed: {1}.
-workspacemanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS=This wiki \"{0}\" already exist. Please choose another name.
-workspacemanager.install.translations=The translations page has been automatically registered in XWiki's preferences.
-workspacemanager.error.workspacedoesnotexist=Wiki [{0}] does not exist
-workspacemanager.wikiname.error.databasealreadyexists=A database with this identifier already exists
-workspacemanager.wikiname.error.wikialreadyexists=A wiki with this identifier already exists
-workspacemanager.wikiname.error.empty=Identifier can't be empty
-workspacemanager.wikiname.error.alreadyused=This identifier is already used
-platform.workspace.templateNotInstalledInstallNow=Wiki template is not yet installed. Install the wiki template now?
-platform.workspace.templateMigrateSuccess=The existing default wiki template has been successfully migrated to the new format.
-platform.workspace.templateInstallConfirm=Install
-platform.workspace.templateFeaturesInstallErrorNeedTemplateFirst=Wiki template features can not be installed without the wiki base template being installed first.
-platform.workspace.templateFeaturesInstallTranslationsAndPanelSaveComment=Automatically registered wiki translations and panel
-platform.workspace.templateFeaturesInstallRemoveAdminSaveComment=Automatically removed local admin.
-platform.workspace.templateFeaturesInstallSetViewRightsSaveComment=Automatically set default rights for global users to allow view.
-platform.workspace.templateFeaturesInstallSetPanelViewRightsGuestsSaveComment=Automatically set default rights to panels for guests to allow view.
-platform.workspace.templateFeaturesInstallSetPanelViewRightsGlobalUsersSaveComment=Automatically set default rights to panels for global users to allow view.
-platform.workspace.templateFeaturesInstallSetThemesViewRightsGuestsSaveComment=Automatically set default rights to color themes for guests to allow view.
-platform.workspace.templateFeaturesInstallSetThemesViewRightsGlobalUsersSaveComment=Automatically set default rights to color themes for global users to allow view.
-platform.workspace.templateFeaturesInstallSetSkinViewRightsGuestsSaveComment=Automatically set default rights to skin for guests to allow view.
-platform.workspace.templateFeaturesInstallSetSkinViewRightsGlobalUsersSaveComment=Automatically set default rights to skin for global users to allow view.
-platform.workspace.templateFeaturesInstallFixMacrosSaveComment=Fixed macro registration.
-platform.workspace.templateFeaturesInstallFixConfigurableClassSaveComment=Fixed Configurable Class registration issues.
-platform.workspace.templateFeaturesInstallFixSSXSaveComment=Fixed SSX registration issues.
-platform.workspace.templateFeaturesInstallFixJSXSaveComment=Fixed JSX registration issues.
-platform.workspace.templateFeaturesInstallFixRequiredRightClassSaveComment=Fixed RequiredRightClass requests.
-platform.workspace.templateFeaturesInstallSuccess=Wiki template features successfully installed.
-platform.workspace.oneParameterNotSpecified=The ''{0}'' parameter was not specified.
-platform.workspace.twoParametersNotSpecified=The ''{0}'' and ''{1}'' parameters were not specified.
-platform.workspace.parameterAcceptsMultipleValues=Multiple values accepted.
-platform.workspace.exceptionWithMessage=Exception: {0}
-platform.workspace.userAlreadyMemberOfWorkspace=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
-platform.workspace.userNotMemberOfWorkspace=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
-platform.workspace.logInToContinue=In order to continue, you need to {0}log in{1} first.
-platform.workspace.invitationUserAcceptedSaveComment=The user {0} accepted the invitation.
-platform.workspace.invitationUserAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
-platform.workspace.invitationUserAcceptedSuccess=The user {0}{1}{2} successfully accepted the invitation and joined the wiki {3}{4}{5}.
-platform.workspace.invitationUserRejectedSaveComment=The user {0} rejected the invitation.
-platform.workspace.invitationUserRejectedNotification=The user ''{0}'' ({1}) has rejected the invitation to join the wiki ''{2}'' ({3}).
-platform.workspace.invitationUserRejectedSuccess=The user {0}{1}{2} successfully rejected the invitation to join the wiki {3}{4}{5}.
-platform.workspace.joinErrorNeedInvitation=This wiki is invite only. In order to join it, you need to receive an invitation from one of its admins.
-platform.workspace.joinRequestPendingRequestExists=The user {0}{1}{2} already has a pending request to join the wiki {3}{4}{5}. Please wait for a wiki admin to review it.
-platform.workspace.joinRequestCancelConfirmation=Are you sure you want cancel the request to join the wiki {0}{1}{2}?
-platform.workspace.joinRequestCancelYes=Yes
-platform.workspace.joinRequestCancelNo=No
-platform.workspace.joinRequestCancelSaveCommit=The user {0} cancelled his join request.
-platform.workspace.joinRequestCancelSuccess=The user {0}{1}{2} successfully cancelled the request to join the wiki {3}{4}{5}.
-platform.workspace.joinRequestSaveComment=The user {0} requested to join the wiki.
-platform.workspace.joinRequestSaveNotification=The user ''{0}'' ({1}) has requested to join the wiki ''{2}'' ({3}).
-platform.workspace.joinRequestSuccess=The user {0}{1}{2} successfully sent the request to join wiki {3}{4}{5}.
-platform.workspace.joinConfirmation=Are you sure you want to join the wiki {0}{1}{2}?
-platform.workspace.joinYes=Yes
-platform.workspace.joinNo=No
-platform.workspace.joinSaveComment=The user {0} joined the wiki.
-platform.workspace.joinSuccess=The user {0}{1}{2} successfully joined wiki {3}{4}{5}.
-platform.workspace.macroNoWorkspaces=There are currently no wiki created (except the main one).
-platform.workspace.createInitialMembersSaveComment=Added initial wiki members
-platform.workspace.profileNotMemberOfAnyWorkspace=You are not a member of any wiki yet.
-platform.workspace.profileUserNotMemberOfAnyWorkspace=The user is not a member of any wiki yet.
-platform.workspace.deleteWorkspaceConfirmation=Are you sure you want to delete the wiki {0}{1}{2}?
-platform.workspace.deleteWorkspaceYes=Yes
-platform.workspace.deleteWorkspaceNo=No
-platform.workspace.deleteWorkspaceSuccess=The user {0}{1}{2} successfully deleted the wiki ''{3}''.
-platform.workspace.leaveErrorUserIsOwner=The user {0}{1}{2} is the owner of the wiki {3}{4}{5}. The owner of a wiki may not leave it unless the wiki is deleted or the owner is changed.
-platform.workspace.leaveConfirmation=Are you sure you want to leave wiki {0}{1}{2}?
-platform.workspace.leaveYes=Yes
-platform.workspace.leaveNo=No
-platform.workspace.leaveSaveComment=User {0} left wiki.
-platform.workspace.leaveSuccess=The user {0}{1}{2} successfully left wiki {3}{4}{5}.
+## Dependencies
+platform.wiki.dependencies.wiki.missing=The Workspaces Manager java component is not installed. This page will not work properly. Make sure that the "Workspace API" extension is installed (using the Extension Manager) or that the file 'xwiki-platform-workspace-api-&lt;version&gt;.jar' is present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+platform.wiki.dependencies.template.missing=
+platform.wiki.dependencies.user.missing=
+platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
 
-# LABELS
-workspacemanager.createworkspace=Create a new wiki
-workspacemanager.members=MEMBERS
-workspacemanager.title.createwiki.wikiname=Wiki identifier
-workspacemanager.title.createwiki.desc=Wiki description
-workspacemanager.title.createwiki.members=Initial wiki members
-workspacemanager.title.join=Join Wiki
-workspacemanager.title.leave=Leave Wiki "{0}"
-workspacemanager.title.leave.empty=Leave Wiki
-workspacemanager.title.delete=Delete Wiki "{0}"
-workspacemanager.title.delete.empty=Delete Wiki
-workspacemanager.browse=Browse Wikis
-workspacemanager.browse.emptyvalue=N/A
-workspacemanager.browse.wikiprettyname=Name
-workspacemanager.browse.description=Description
-workspacemanager.browse.owner=Owner
-workspacemanager.browse.membershipType=Membership Type
-workspacemanager.browse._actions=Actions
-workspacemanager.browse._actions.join=Join
-workspacemanager.browse._actions.requestJoin=Request Join
-workspacemanager.browse._actions.viewInvitation=View Invitation
-workspacemanager.browse._actions.cancelJoinRequest=Cancel Request
-workspacemanager.browse._actions.leave=Leave
-workspacemanager.browse._actions.delete=Delete
-workspacemanager.menu.workspace.index=Wiki Index
-workspacemanager.menu.workspace.delete=Delete
-workspacemanager.menu.user.workspaces=Wikis
-workspacemanager.profile.category.workspaces=Wikis
-platform.workspace.templateWikiTitle=Wiki Template
-platform.workspace.invitationViewTitle=You have been invited to join the wiki {0}{1}{2}.
-platform.workspace.invitationMessageLabel=Invitation message
-platform.workspace.invitationReplyLabel=Reply
-platform.workspace.invitationAcceptLabel=Accept
-platform.workspace.invitationRejectLabel=Reject
-platform.workspace.invitationPostponeLabel=Later
-platform.workspace.joinRequestMessageLabel=Message
-platform.workspace.joinRequestSendLabel=Send Request
-platform.workspace.joinRequestCancelLabel=Back
-platform.workspace.searchSuggestExampleLabel=Examples:
-platform.workspace.activityTitle=Activity of wiki {0}
-platform.workspace.activityMultipleTitle=Activity of wikis {0}
-# Macro translation keys need to respect the convention
-rendering.macro.workspaces.name=Workspaces
-platform.workspace.requiredField=Required
-platform.workspace.profileJoinedWorkspacesLabel=Joined wikis
-platform.workspace.profileShowActivity=show activity
-platform.workspace.newWorkspaceTemplateLabel=Template
-WikiManager.WikiUserClass_membershipType_open=Open for any user to join
-WikiManager.WikiUserClass_membershipType_request=Any user can request to join but an admin must accept
-WikiManager.WikiUserClass_membershipType_invite=Only an admin can invite a user
-WikiManager.WikiUserClass_userScope_local_only=Only local users are available in the wiki
-WikiManager.WikiUserClass_userScope_global_only=Only global users are available in the wiki
-WikiManager.WikiUserClass_userScope_local_and_global=Both global and local users are available in the wiki
-platform.workspace.searchSuggestSourceWorkspaces=Wikis
+## Create
+platform.wiki.create.title=Create a new wiki
+platform.wiki.create.members=MEMBERS
+platform.wiki.create.prettyname.empty=Pretty name must not be empty
+platform.wiki.create.error=Wiki \"{0}\" creation failed: {1}.
+platform.wiki.create.error.wikiname.databasealreadyexists=A database with this identifier already exists
+platform.wiki.create.error.wikiname.wikialreadyexists=This identifier is already used
+platform.wiki.create.error.wikiname.wikialreadyexists=This identifier is already used
+platform.wiki.create.error.wikiname.empty=Identifier can't be empty
 
-# PROPERTIES
-workspacemanager.prop.wiki.wikiname=Wiki Identifier
-workspacemanager.prop.wiki.wikiprettyname=Pretty Name
-workspacemanager.prop.wiki.description=Description
-workspacemanager.prop.wiki.server=Alias
-workspacemanager.prop.wiki.owner=Owner
-workspacemanager.prop.workspace.membershipType.label=Membership Type
+## Common errors and messages
+platform.wiki.error.wikidoesnotexist=Wiki [{0}] does not exist
+platform.wiki.error.oneParameterNotSpecified=The ''{0}'' parameter was not specified.
+platform.wiki.error.parameterAcceptsMultipleValues=Multiple values accepted.
+platform.wiki.error.exceptionWithMessage=Exception: {0}
+platform.wiki.form.requiredField=Required
 
-# DOCUMENTATION
-workspacemanager.doc.createwiki.wikiname=The unique identifier of the new wiki.
-workspacemanager.doc.createwiki.desc.wikiprettyname=The display name of the wiki.
-platform.workspace.newWorkspaceTemplateHint=Template to use for this new wiki (all documents will be cloned).
-workspacemanager.doc.createwiki.desc.description=A brief description of the wiki and its purpose.
-workspacemanager.doc.createwiki.desc.owner=A user who will have all the rights on the wiki.
-workspacemanager.doc.createwiki.members=The users who can participate in the wiki.
-workspacemanager.prop.workspace.membershipType.hint=The way users can join this wiki.
-platform.workspace.invitationReplyHint=A reply message to send, viewable by the wiki admin, in which you can motivate your decision.
-platform.workspace.joinRequestHint=To join the wiki {0}{1}{2}, you must first issue a join request. After this, a wiki admin will review your request and consider accepting or rejecting it.
-platform.workspace.joinRequestMessageHint=A message to send, viewable by the wiki admin, in which you can motivate this join request.
-platform.workspace.searchSuggestHint=This service allows to retrieve search results for the suggest UI component.
-platform.workspace.activityHint=Generates an activity stream for the given wiki(s).
-rendering.macro.workspaces.description=List all wikis
+## Users
+platform.wiki.users.userAlreadyMemberOfWorkspace=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
+platform.wiki.users.userNotMemberOfWorkspace=The user {0}{1}{2} is not a member of the wiki {3}{4}{5}.
+platform.wiki.users.logInToContinue=In order to continue, you need to {0}log in{1} first.
+platform.wiki.users.invitation.userAcceptedNotification=The user ''{0}'' ({1}) has accepted the invitation to join the wiki ''{2}'' ({3}).
+platform.wiki.users.invitation.userAcceptedSuccess=The user {0}{1}{2} successfully accepted the invitation and joined the wiki {3}{4}{5}.
+platform.wiki.users.invitation.userRejectedSuccess=The user {0}{1}{2} successfully rejected the invitation to join the wiki {3}{4}{5}.
+platform.wiki.users.join.error.needInvitation=This wiki is invite only. In order to join it, you need to receive an invitation from one of its admins.
+platform.wiki.users.join.request.pendingRequestExists=The user {0}{1}{2} already has a pending request to join the wiki {3}{4}{5}. Please wait for a wiki admin to review it.
+platform.wiki.users.join.request.cancelConfirmation=Are you sure you want cancel the request to join the wiki {0}{1}{2}?
+platform.wiki.users.join.request.cancelYes=Yes
+platform.wiki.users.join.request.cancelNo=No
+platform.wiki.users.join.request.cancelSuccess=The user {0}{1}{2} successfully cancelled the request to join the wiki {3}{4}{5}.
+platform.wiki.users.join.request.saveNotification=The user ''{0}'' ({1}) has requested to join the wiki ''{2}'' ({3}).
+platform.wiki.users.join.request.success=The user {0}{1}{2} successfully sent the request to join wiki {3}{4}{5}.
+platform.wiki.users.join.confirmation=Are you sure you want to join the wiki {0}{1}{2}?
+platform.wiki.users.join.yes=Yes
+platform.wiki.users.join.no=No
+platform.wiki.users.join.success=The user {0}{1}{2} successfully joined wiki {3}{4}{5}.
+platform.wiki.users.leave.error.userIsOwner=The user {0}{1}{2} is the owner of the wiki {3}{4}{5}. The owner of a wiki may not leave it unless the wiki is deleted or the owner is changed.
+platform.wiki.users.leave.confirmation=Are you sure you want to leave wiki {0}{1}{2}?
+platform.wiki.users.leave.confirmation.yes=Yes
+platform.wiki.users.leave.confirmation.no=No
+platform.wiki.users.leave.success=The user {0}{1}{2} successfully left wiki {3}{4}{5}.
+platform.wiki.users.join.title=Join Wiki
+platform.wiki.users.leave.title=Leave Wiki "{0}"
+platform.wiki.users.leave.empty=
+platform.wiki.users.delete.title=Delete Wiki "{0}"
+platform.wiki.users.delete.empty=
+platform.wiki.users.invitation.reply.hint=A reply message to send, viewable by the wiki admin, in which you can motivate your decision.
+platform.wiki.users.join.request.hint=To join the wiki {0}{1}{2}, you must first issue a join request. After this, a wiki admin will review your request and consider accepting or rejecting it.
+platform.wiki.users.join.request.message.hint=A message to send, viewable by the wiki admin, in which you can motivate this join request.
+platform.wiki.users.invitation.title=You have been invited to join the wiki {0}{1}{2}.
+platform.wiki.users.invitation.message.label=Invitation message
+platform.wiki.users.invitation.reply.title=Reply
+platform.wiki.users.invitation.accept.label=Accept
+platform.wiki.users.invitation.reject.label=Reject
+platform.wiki.users.invitation.postpone.label=Later
+platform.wiki.users.join.request.message.label=Message
+platform.wiki.users.join.request.send.label=Send Request
+platform.wiki.users.join.request.cancel.label=Back
 
-## Group sheet. To be removed once it gets into platform.
-xe.admin.groups.comment=About
-xe.admin.groups.tags=Tags
-xe.admin.groups._actions.follow=Follow
-xe.admin.groups._actions.unfollow=Unfollow
+## User profile
+platform.wiki.users.profile.joinedwikis.label=Joined wikis
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWorkspace=You are not a member of any wiki yet.
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWorkspace=The user is not a member of any wiki yet.
+platform.wiki.users.profile.activity.title=Activity of wiki {0}
+platform.wiki.users.profile.activity.hint=Generates an activity stream for the given wiki(s).
+platform.wiki.users.profile.activity.multipletitle=Activity of wikis {0}
+platform.wiki.users.profile.activity.show=show activity
+
+## Wiki Deletion
+platform.wiki.delete.confirmation=Are you sure you want to delete the wiki {0}{1}{2}?
+platform.wiki.delete.confirmation.yes=Yes
+platform.wiki.delete.confirmation.no=No
+platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''{3}''.
+
+## Wiki macro
+platform.wiki.macro.noWikis=There are currently no wiki created (except the main one).
+
+## Browse
+platform.wiki.browse=Browse Wikis
+platform.wiki.browse.emptyvalue=N/A
+platform.wiki.browse.wikiprettyname=Name
+platform.wiki.browse.description=Description
+platform.wiki.browse.owner=Owner
+platform.wiki.browse.membershipType=Membership Type
+platform.wiki.browse._actions=Actions
+platform.wiki.browse._actions.join=Join
+platform.wiki.browse._actions.requestJoin=Request Join
+platform.wiki.browse._actions.viewInvitation=View Invitation
+platform.wiki.browse._actions.cancelJoinRequest=Cancel Request
+platform.wiki.browse._actions.leave=Leave
+platform.wiki.browse._actions.delete=Delete
+
+## Classes
+WikiManager.WikiUserClass_membershipType_open=WikiManager.WikiUserClass_membershipType_open
+WikiManager.WikiUserClass_membershipType_request=WikiManager.WikiUserClass_membershipType_request
+WikiManager.WikiUserClass_membershipType_invite=WikiManager.WikiUserClass_membershipType_invite
+WikiManager.WikiUserClass_userScope_local_only=WikiManager.WikiUserClass_userScope_local_only
+WikiManager.WikiUserClass_userScope_global_only=WikiManager.WikiUserClass_userScope_global_only
+WikiManager.WikiUserClass_userScope_local_and_global=WikiManager.WikiUserClass_userScope_local_and_global
+platform.wiki.prop.wikiname=Wiki Identifier
+platform.wiki.prop.wikiprettyname=Pretty Name
+platform.wiki.prop.description=Description
+platform.wiki.prop.owner=Owner
+platform.wiki.prop.membershipType.label=Membership Type
+platform.wiki.prop.membershipType.hint=The way users can join this wiki.
+
+## Wizard
+platform.wiki.create.wizard.desc.wikiname=The unique identifier of the new wiki.
+platform.wiki.create.wizard.desc.wikiprettyname=The display name of the wiki.
+platform.wiki.create.wizard.desc.newTemplateHint=Template to use for this new wiki (all documents will be cloned).
+platform.wiki.create.wizard.desc.description=A brief description of the wiki and its purpose.
+platform.wiki.create.wizard.desc.owner=A user who will have all the rights on the wiki.
+platform.wiki.create.wizard.desc.members=The users who can participate in the wiki.
+platform.wiki.create.wizard.step.nameAndType=Step 1 — Choose a name
+platform.wiki.create.wizard.step.nameAndType.shortName=
+platform.wiki.create.wizard.step.users=Step 2 — Choose members
+platform.wiki.create.wizard.step.users.shortName=
+platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
+platform.wiki.create.wizard.step.provisioning.wait=
+platform.wiki.create.wizard.step.provisioning.complete=
+platform.wiki.create.wizard.step.provisioning.finalize=
+platform.wiki.create.wizard.setAsTemplate.label=This wiki will be a template
+platform.wiki.create.wizard.template.noTemplate=No template (default)
+platform.wiki.create.wizard.userScope.label=User Scope
+platform.wiki.create.wizard.userScope.hint=Select what kind of users can access to the wiki
+platform.wiki.create.wizard.template.label=Template
 
 ## Admin
 admin.wikis=Wikis
-admin.wikis.description=Settings related to wikis creation.
 admin.wikis.template=Wiki Template
 admin.wikis.rights=Wiki Creation Right
-admin.wikis.templatemissing=To enable the creation of wikis, you need to {0}create a template first{1}.
 
-## Create new wiki wizard
-platform.workspace.wizard.step1=Step 1 — Choose a name
-platform.workspace.wizard.step2=Step 2 — Choose members
-platform.wikimanager.wizard.stepProvisioning=The system is provisioning the wiki.
-platform.wikimanager.wizard.stepProvisioningWait=Please wait while the system is provisioning the wiki.
-platform.wikimanager.wizard.stepProvisioningComplete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-platform.wikimanager.wizard.stepProvisioningFinalize=Finalize
-platform.workspace.wizard.step1.shortname=Name
-platform.workspace.wizard.step2.shortname=Members
-platform.wikimanager.setAsTemplateLabel=This wiki will be a template
-platform.wikimanager.notemplate=No template (default)
-platform.wikimanager.userScopeLabel=User Scope
-platform.wikimanager.userScopeHint=Select what kind of users can access to the wiki
-
-## XWikiServerClassSheet
-platform.wikimanager.wikisheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
-platform.wikimanager.wikisheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exists.
-platform.wikimanager.wikisheet.title.wikisettings=Wiki properties
-platform.wikimanager.wikisheet.title.createnewalias=Create new alias
-platform.wikimanager.wikisheet.title.viewaliases=View aliases
-platform.wikimanager.wikisheet.desc.wikiprettyname=The display name of the wiki.
-platform.wikimanager.wikisheet.desc.owner=A global user who will have all the rights on this wiki.
-platform.wikimanager.wikisheet.desc.secure=If enabled, all this wiki's generated externals URLs will starting with ~~https~~.
-platform.wikimanager.wikisheet.desc.iswikitemplate=Indicate if this wiki can be use as template when creating a new wiki.
-platform.wikimanager.wikisheet.desc.server=The alias used to access the wiki.
-platform.wikimanager.wikisheet.desc.description=A brief wiki description.
-platform.wikimanager.wikisheet.desc.homepage=The home page of the wiki.
-platform.wikimanager.wikisheet.wikiname=Wiki identifier
-platform.wikimanager.wikisheet.wikiprettyname=Pretty name
-platform.wikimanager.wikisheet.wikiprettyname=Pretty name
-platform.wikimanager.wikisheet.owner=Owner
-platform.wikimanager.wikisheet.secure=Secure (SSL)
-platform.wikimanager.wikisheet.visibility=Visibility
-platform.wikimanager.wikisheet.language=Language
-platform.wikimanager.wikisheet.description=Description
-platform.wikimanager.wikisheet.server=Alias
-platform.wikimanager.wikisheet.homepage=Home page
-platform.wikimanager.wikisheet.iswikitemplate=Wiki template
-platform.wikimanager.wikisheet.server=Alias
-platform.wikimanager.wikisheet.homepage=Home page
+## XWikiServer Sheet
+platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
+platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exists.
+platform.wiki.sheet.title.settings=Wiki properties
+platform.wiki.sheet.title.createnewalias=Create new alias
+platform.wiki.sheet.title.viewaliases=View aliases
+platform.wiki.sheet.desc.wikiprettyname=The display name of the wiki.
+platform.wiki.sheet.desc.owner=A global user who will have all the rights on this wiki.
+platform.wiki.sheet.desc.secure=If enabled, all this wiki's generated externals URLs will starting with ~~https~~.
+platform.wiki.sheet.desc.iswikitemplate=Indicate if this wiki can be use as template when creating a new wiki.
+platform.wiki.sheet.desc.server=The alias used to access the wiki.
+platform.wiki.sheet.desc.description=A brief wiki description.
+platform.wiki.sheet.desc.homepage=The home page of the wiki.
+platform.wiki.sheet.prop.wikiprettyname=Pretty name
+platform.wiki.sheet.prop.owner=Owner
+platform.wiki.sheet.prop.secure=Secure (SSL)
+platform.wiki.sheet.prop.description=Description
+platform.wiki.sheet.prop.server=Alias
+platform.wiki.sheet.prop.homepage=Home page
+platform.wiki.sheet.prop.iswikitemplate=Wiki template
 
 
 ###############################################################################
@@ -317,22 +256,6 @@ platform.wikimanager.wikisheet.homepage=Home page
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
-
-#######################################
-## until 5.2
-#######################################
-platform.workspace.createNewWorkspaceLabel=Create a new Wiki
-workspacemanager.menu.create=Wiki
-workspacemanager.menu.mainwiki.admin=Administer Main Wiki
-workspacemanager.menu.workspace.mainWiki=Main Wiki
-
-#######################################
-## until 5.3
-#######################################
-WorkspaceManager.WorkspaceClass_membershipType_open=Open for any user to join
-WorkspaceManager.WorkspaceClass_membershipType_request=Any user can request to join but an admin must accept
-WorkspaceManager.WorkspaceClass_membershipType_invite=Only an admin can invite a user
-workspacemanager.wikiname.error.workspacealreadyexists=A wiki with this identifier already exists
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

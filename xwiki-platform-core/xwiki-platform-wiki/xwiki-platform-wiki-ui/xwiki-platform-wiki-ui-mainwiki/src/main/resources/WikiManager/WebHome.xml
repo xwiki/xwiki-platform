@@ -15,7 +15,7 @@
   <date>1307113397000</date>
   <contentUpdateDate>1307113397000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render('workspacemanager.browse')</title>
+  <title>$services.localization.render('platform.wiki.browse')</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -146,7 +146,7 @@
    'className' : 'XWiki.XWikiServerClass',
    'rowCount' : 10,
    'resultPage' : 'WikiManager.WikisLiveTableResults',
-   'translationPrefix' : 'workspacemanager.browse.'
+   'translationPrefix' : 'platform.wiki.browse.'
 })
 #if(!$isGuest)
   #set($discard = $columns.add('_actions'))

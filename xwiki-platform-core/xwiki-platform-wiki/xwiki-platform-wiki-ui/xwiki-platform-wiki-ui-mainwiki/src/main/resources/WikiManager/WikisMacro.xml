@@ -282,7 +282,7 @@ ul.xlist li.xitem div.xshowonhover img {
 ##set ($discard = $workspaces.removeAll($WorkspaceManager.getWorkspaceTemplates()))
 ##
 #if (!$wikis || $wikis.size() == 0 )
-{{translation key="platform.workspace.macroNoWorkspaces"/}}
+{{translation key="platform.wiki.macro.noWikis"/}}
 
 #end
 {{html wiki='true'}}
@@ -305,7 +305,7 @@ ul.xlist li.xitem div.xshowonhover img {
     &lt;li id='spWorkspaceCreateItem' class='xitem workspace'&gt;
       &lt;div class='xitemcontainer'&gt;
         #set ($createWikiDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'CreateWiki'))
-        &lt;div id='spWorkspaceCreateLabel' class='spWorkspaceName'&gt;&lt;a href="$xwiki.getURL($createWikiDocumentReference)"&gt;{{translation key="workspacemanager.createworkspace"/}}&lt;/a&gt;&lt;/div&gt;
+        &lt;div id='spWorkspaceCreateLabel' class='spWorkspaceName'&gt;&lt;a href="$xwiki.getURL($createWikiDocumentReference)"&gt;{{translation key="platform.wiki.create.title"/}}&lt;/a&gt;&lt;/div&gt;
         &lt;div class='spacer'&gt;&amp;nbsp;&lt;/div&gt;
       &lt;/div&gt;
     &lt;/li&gt;

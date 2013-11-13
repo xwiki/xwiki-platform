@@ -204,7 +204,7 @@
    'className' : 'XWiki.XWikiServerClass',
    'rowCount' : 10,
    'resultPage' : 'WikiManager.WikisLiveTableResults',
-   'translationPrefix' : 'workspacemanager.browse.',
+   'translationPrefix' : 'platform.wiki.browse.',
    'extraParams': 'onlyTemplates=1'
 })
 #if(!$isGuest)

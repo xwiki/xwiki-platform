@@ -251,11 +251,13 @@ public class XWikiAttachmentArchive implements Cloneable
             final Archive rcsArchive = getRCSArchive();
 
             if (rcsArchive == null) {
-                return null;
+                // No archive means there is no history and only the current version.
+                return this.attachment.getVersion().equals(rev) ? this.attachment : null;
             }
 
             final Version version = rcsArchive.getRevisionVersion(rev);
             if (version == null) {
+                // The requested revision doesn't exist.
                 return null;
             }
             final Object[] lines = rcsArchive.getRevision(version);

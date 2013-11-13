@@ -85,7 +85,7 @@
           #end
         #end
       #end
-      #set ($itemMembershipType = $wiki.getPropertyGroup('user').membershipType)
+      #set ($itemMembershipType = $services.wiki.user.getMembershipType($wiki.id))
       #if ($existingInvitation)
         #set ($itemHasViewInvitation = true)
         #set ($viewInvitationUrl = $xwiki.getURL($joinWikiDocumentReference, 'view', "wikiId=${wikiId}"))

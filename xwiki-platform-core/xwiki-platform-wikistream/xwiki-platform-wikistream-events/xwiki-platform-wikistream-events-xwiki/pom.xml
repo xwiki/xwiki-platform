@@ -26,7 +26,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-wikistream-streams</artifactId>
+    <artifactId>xwiki-platform-wikistream-events</artifactId>
     <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-events-xwiki</artifactId>

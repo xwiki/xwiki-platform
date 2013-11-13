@@ -307,7 +307,7 @@
   #if ("$!displayName" == '')
     #set($displayName = $currentWiki)
   #end
-  $services.localization.render('platform.workspace.gadgetWelcomeToWorkspace', ['**', $displayName, '**'])
+  $services.localization.render('platform.wiki.currentwiki.welcome', ['**', $displayName, '**'])
   #set ($wikiDescriptrion = $wiki.description)
   #if ("$!wikiDescriptrion" != '')
 
@@ -319,27 +319,27 @@
   #if (!$isGuest)
     #if ($hasOwner)
 
-      {{translation key="platform.workspace.currentUserIsOwner"/}}
+      {{translation key="platform.wiki.currentwiki.currentUserIsOwner"/}}
     #elseif ($hasAdmin)
 
-      {{translation key="platform.workspace.currentUserIsAdministrator"/}}
+      {{translation key="platform.wiki.currentwiki.currentUserIsAdmin"/}}
     #end
   #end
 
   ## Join/Leave
   #if ($isGuest)
-    {{translation key="platform.workspace.joinNeedToLogIn"/}}
+    {{translation key="platform.wiki.currentwiki.joinNeedToLogin"/}}
   #else
     #set ($members = $services.wiki.user.getMembers($currentWiki))
     #set ($hasJoin = $members &amp;&amp; !$members.contains($currentUser))
     #if ($hasJoin)
       #set ($joinPageReference = $services.model.createDocumentReference(${services.wiki.mainWikiId}, 'WikiManager', 'JoinWiki'))
       #set ($joinUrl = $xwiki.getURL($joinPageReference, 'view', "wikiId=${currentWiki}"))
-      {{translation key="platform.workspace.currentUserNotMember"/}} $services.localization.render('platform.workspace.currentUserCanJoin', ['[[', "&gt;&gt;path:$joinUrl]]"])
+      {{translation key="platform.wiki.currentwiki.currentUserNotMember"/}} $services.localization.render('platform.wiki.currentwiki.currentuserCanJoin', ['[[', "&gt;&gt;path:$joinUrl]]"])
     #elseif (!$hasOwner)
       #set ($leavePageReference = $services.model.createDocumentReference(${services.wiki.mainWikiId}, 'WikiManager', 'LeaveWiki'))
       #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "wikiId=${currentWiki}"))
-      {{translation key="platform.workspace.currentUserIsMember"/}} $services.localization.render('platform.workspace.currentUserCanLeave', ['[[', "&gt;&gt;path:$leaveUrl]]"])
+      {{translation key="platform.wiki.currentwiki.currentUserIsMember"/}} $services.localization.render('platform.wiki.currentwiki.currentUserCanLeave', ['[[', "&gt;&gt;path:$leaveUrl]]"])
     #end
   #end
 #end
@@ -349,7 +349,7 @@
       <position>1,1</position>
     </property>
     <property>
-      <title>$services.localization.render('platform.workspace.gadgetWorkspaceInformationLabel')</title>
+      <title>$services.localization.render('platform.wiki.currentwiki.gadget.wikiInformation.label')</title>
     </property>
   </object>
   <object>
@@ -435,14 +435,14 @@
   #end
 #end
 
-$services.localization.render('platform.workspace.gadgetTopActiveUsersAllMembers', ['[[', '&gt;&gt;Main.UserDirectory]]'])
+$services.localization.render('platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers', ['[[', '&gt;&gt;Main.UserDirectory]]'])
 {{/velocity}}</content>
     </property>
     <property>
       <position>1,2</position>
     </property>
     <property>
-      <title>$services.localization.render('platform.workspace.gadgetTopActiveUsersLabel')</title>
+      <title>$services.localization.render('platform.wiki.currentwiki.gadget.topActiveUsers.label')</title>
     </property>
   </object>
   <content>{{dashboard/}}</content>

@@ -15,7 +15,7 @@
   <date>1308327581000</date>
   <contentUpdateDate>1308327581000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render('platform.workspace.manageWorkspaceTitle')</title>
+  <title>$services.localization.render('platform.wiki.currentwiki.managewikis.title')</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -183,7 +183,7 @@
   #if (!$services.wiki.lastException)
     {{error}}{{translation key="services.wiki.error.workspacedoesnotexist" parameters="$wikiId"/}}{{/error}}
   #elseif("$!{$services.wiki.lastException.message}" != '')
-    {{error}}$services.localization.render('platform.workspace.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
+    {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
   #else
     {{error}}$services.wiki.lastException.class{{/error}}
   #end
@@ -206,20 +206,20 @@
     {{html clean='false' wiki='true'}}
       &lt;dl&gt;
         &lt;dt&gt;
-          &lt;label for='XWiki.XWikiServerClass_0_wikiprettyname'&gt;{{translation key="workspacemanager.prop.wikiprettyname.label"/}}&lt;/label&gt;
-          &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.wikiprettyname.hint"/}}&lt;/span&gt;
+          &lt;label for='XWiki.XWikiServerClass_0_wikiprettyname'&gt;{{translation key="platform.wiki.currentwiki.prop.wikiprettyname.label"/}}&lt;/label&gt;
+          &lt;span class='xHint'&gt;{{translation key="platform.wiki.currentwiki.prop.wikiprettyname.hint"/}}&lt;/span&gt;
         &lt;/dt&gt;
         &lt;dd&gt;((($wikiDocument.display('wikiprettyname', 'edit'))))&lt;/dd&gt;
 
         &lt;dt&gt;
-          &lt;label for='XWiki.XWikiServerClass_0_description'&gt;{{translation key="workspacemanager.prop.description.label"/}}&lt;/label&gt;
-          &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.description.hint"/}}&lt;/span&gt;
+          &lt;label for='XWiki.XWikiServerClass_0_description'&gt;{{translation key="platform.wiki.currentwiki.prop.description.label"/}}&lt;/label&gt;
+          &lt;span class='xHint'&gt;{{translation key="platform.wiki.currentwiki.prop.description.hint"/}}&lt;/span&gt;
         &lt;/dt&gt;
         &lt;dd&gt;((($wikiDocument.display('description', 'edit'))))&lt;/dd&gt;
 
         &lt;dt&gt;
-          &lt;label for='XWiki.XWikiServerClass_0_owner'&gt;{{translation key="workspacemanager.prop.owner.label"/}}&lt;/label&gt;
-          &lt;span class='xHint'&gt;{{translation key="workspacemanager.prop.owner.hint"/}}&lt;/span&gt;
+          &lt;label for='XWiki.XWikiServerClass_0_owner'&gt;{{translation key="platform.wiki.currentwiki.prop.owner.label"/}}&lt;/label&gt;
+          &lt;span class='xHint'&gt;{{translation key="platform.wiki.currentwiki.prop.owner.hint"/}}&lt;/span&gt;
         &lt;/dt&gt;
         &lt;dd&gt;
           ## The wiki owner has to be a global user. Currently the "List of Users" XClass property type doesn't have

@@ -106,7 +106,7 @@
     </property>
     <property>
       <content>{{velocity}}
-#panelheader($services.localization.render('workspacemanager.panel.title'))
+#panelheader($services.localization.render('platform.wiki.panel.title'))
 #set ($currentWiki = $services.wiki.currentWikiId)
 #set ($currentUser = $services.model.serialize($xcontext.userReference, 'default'))
 ##
@@ -116,17 +116,17 @@
 #if (!$wiki)
   {{error}}{{translation key="platform.workspace.wikiNotWorkspace"/}}{{/error}}
 #else
-  **{{translation key="platform.workspace.panelInformationNameLabel"/}}**
+  **{{translation key="platform.wiki.currentwiki.panel.information.name.label"/}}**
   $wiki.prettyName
   #set ($wikiDescription = $wiki.description)
   #if ("$!wikiDescription" != '')
-    **{{translation key="platform.workspace.panelInformationDescriptionLabel"/}}**
+    **{{translation key="platform.wiki.currentwiki.panel.information.description.label"/}}**
     $wikiDescription
   #end
   ----
   ## Join/Leave
   #if ($isGuest)
-    {{translation key="platform.workspace.joinNeedToLogIn"/}}
+    {{translation key="platform.wiki.currentwiki.joinNeedToLogin"/}}
   #else
     #set ($hasOwner = ($wiki.ownerId.equals($currentUser)))
     #set ($currentUserIsMember = $services.wiki.user.isMember($currentUser, $currentWiki))
@@ -154,18 +154,18 @@
       #set ($actionUrl = $xwiki.getURL($joinPageReference, 'view', "wikiId=${currentWiki}"))
       #if ($existingInvitationOrRequest)
         #if ($existingInvitationOrRequest.type == 'INVITATION')
-          #set ($joinText = $services.localization.render('platform.workspace.invitationPendingForCurrentWorkspace'))
-          #set ($actionLabel = $services.localization.render('platform.workspace.invitationActionViewLabel'))
+          #set ($joinText = $services.localization.render('platform.wiki.currentwiki.invitationPendingForCurrentWorkspace'))
+          #set ($actionLabel = $services.localization.render('platform.wiki.currentwiki.invitation.view.label'))
         #else
-          #set ($joinText = $services.localization.render('platform.workspace.joinRequestPendingForCurrentWorkspace'))
-          #set ($actionLabel = $services.localization.render('platform.workspace.joinRequestActionCancelLabel'))
+          #set ($joinText = $services.localization.render('platform.wiki.currentwiki.joinRequestPendingForCurrentWorkspace'))
+          #set ($actionLabel = $services.localization.render('platform.wiki.currentwiki.joinrequest.cancel.label'))
           #set ($actionUrl = $xwiki.getURL($joinPageReference, 'view', "wikiId=${currentWiki}&amp;cancelJoinRequest=1"))
         #end
       #else
         #if ($membershipType == 'request')
-          #set ($actionLabel = $services.localization.render('platform.workspace.joinRequestActionRequestLabel'))
+          #set ($actionLabel = $services.localization.render('platform.wiki.currentwiki.joinreques.request.label'))
         #elseif ($membershipType == 'open')
-          #set ($actionLabel = $services.localization.render('platform.workspace.joinActionJoinLabel'))
+          #set ($actionLabel = $services.localization.render('platform.wiki.currentwiki.join.label'))
         #end
       #end
       ## Display
@@ -174,16 +174,16 @@
         (% class='buttonwrapper' %)[[$actionLabel&gt;&gt;path:$actionUrl||class='button']](%%)
       #end
     #elseif (!$hasOwner)
-      {{translation key="platform.workspace.currentUserIsMember"/}}
+      {{translation key="platform.wiki.currentwiki.currentUserIsMember"/}}
       #set ($leavePageReference = $services.model.createDocumentReference(${services.wiki.mainWikiId}, 'WikiManager', 'LeaveWiki'))
       #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "wikiId=${currentWiki}"))
-      (% class='buttonwrapper' %)[[{{translation key="platform.workspace.leaveWorkspace"/}}&gt;&gt;path:$leaveUrl||class='button']](%%)
+      (% class='buttonwrapper' %)[[{{translation key="platform.wiki.currentwiki.leave.label"/}}&gt;&gt;path:$leaveUrl||class='button']](%%)
     #else
-      {{translation key="platform.workspace.currentUserIsOwner"/}}
+      {{translation key="platform.wiki.currentwiki.currentUserIsOwner"/}}
     #end
   #end
   ----
-  **{{translation key="platform.workspace.panelInformationMembersLabel"/}}**
+  **{{translation key="platform.wiki.currentwiki.panel.information.members.label"/}}**
   #set ($members = $services.wiki.user.getMembers($currentWiki))
   #set ($totalNrOfUsers = $members.size())
   #set ($MAX_USERS = 12)

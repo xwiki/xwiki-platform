@@ -60,100 +60,95 @@
   </object>
   <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
 
+## MENU
 core.menu.type.wiki=Wiki
 core.menu.watchlist.add.wiki=Watch Wiki
 core.menu.watchlist.remove.wiki=Unwatch Wiki
 core.menu.admin.wiki=Administer wiki
 
-# WORKSPACE INFORMATION PANEL
-workspacemanager.panel.title=Wiki information
+# WIKI INFORMATION PANEL
+platform.wiki.panel.title=Wiki information
 
 # MESSAGES
-platform.workspace.wikiNotWorkspace=The current wiki is not a workspace.
-platform.workspace.gadgetWelcomeToWorkspace=Welcome to the {0}{1}{2} wiki.
-platform.workspace.currentUserIsOwner=You are the owner of this wiki.
-platform.workspace.currentUserIsAdministrator=You are an administrator of this wiki.
-platform.workspace.joinNeedToLogIn=To join this wiki you need to be logged in.
-platform.workspace.currentUserNotMember=You are not a member of this wiki.
-platform.workspace.currentUserCanJoin=If you like, you can {0}join this wiki{1}.
-platform.workspace.currentUserIsMember=You are a member of this wiki.
-platform.workspace.currentUserCanLeave=If you like, you can {0}leave this wiki{1}.
-platform.workspace.gadgetTopActiveUsersAllMembers=To see the full list of wiki members, you can use the {0}User Directory{1} page.
-platform.workspace.invitationPendingForCurrentWorkspace=You have been invited to join this wiki
-platform.workspace.joinRequestPendingForCurrentWorkspace=You have requested to join this wiki
-platform.workspace.joinRequestAcceptedNotification=Your request to join the wiki ''{0}'' has been accepted.
-platform.workspace.joinRequestRejectedNotification=Your request to join the wiki ''{0}'' has been rejected.
-platform.workspace.candidateHandledSaveComment=Handled candidate {0} ({1})
-platform.workspace.candidateHandledComment=Comment:
-platform.workspace.candidateAcceptedSuccess=Request accepted successfully.
-platform.workspace.candidateRejectedSuccess=Request rejected successfully.
-platform.workspace.inviteUserAlreadyMember={0} is already a member of the wiki.
-platform.workspace.inviteRequestAlreadyExists={0} already has a pending request. Please respond to that request instead.
-platform.workspace.inviteUserAlreadyInvited={0} already has a pending invitation.
-platform.workspace.inviteSaveComment=User ''{0}'' has been invited to join the wiki.
-platform.workspace.inviteNotification=You have been invited to join the wiki ''{0}''.
-platform.workspace.inviteSuccess={0} invited successfully.
-platform.workspace.invitationCancelSaveComment=Cancelled invitation {0} ({1})
-platform.workspace.invitationCancelNotification=Your invitation has been cancelled and is no longer valid.
-platform.workspace.invitationCancelSuccess=Invitation cancelled successfully.
-platform.wikimanager.invitationCancelFailure=Error, you can not cancel this invitation.
-platform.wikimanager.candidateReviewFailure=Error, you can not cancel this invitation.
-
-# Duplicated from WorkspaceManager.Translations. To be removed when the 2 are merged.
-workspacemanager.error.workspacedoesnotexist=Wiki [{0}] does not exist
-platform.workspace.exceptionWithMessage=Exception: {0}
-
+platform.wiki.currentwiki.welcome=Welcome to the {0}{1}{2} wiki.
+platform.wiki.currentwiki.currentUserIsOwner=You are the owner of this wiki.
+platform.wiki.currentwiki.currentUserIsAdmin=You are an administrator of this wiki.
+platform.wiki.currentwiki.joinNeedToLogin=To join this wiki you need to be logged in.
+platform.wiki.currentwiki.currentUserNotMember=You are not a member of this wiki.
+platform.wiki.currentwiki.currentuserCanJoin=If you like, you can {0}join this wiki{1}.
+platform.wiki.currentwiki.currentUserIsMember=You are a member of this wiki.
+platform.wiki.currentwiki.currentUserCanLeave=If you like, you can {0}leave this wiki{1}.
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=To see the full list of wiki members, you can use the {0}User Directory{1} page.
+platform.wiki.currentwiki.invitationPendingForCurrentWorkspace=You have been invited to join this wiki
+platform.wiki.currentwiki.joinRequestPendingForCurrentWorkspace=You have requested to join this wiki
+platform.wiki.currentwiki.joinRequestAcceptedNotification=Your request to join the wiki ''{0}'' has been accepted.
+platform.wiki.currentwiki.joinRequestRejectedNotification=Your request to join the wiki ''{0}'' has been rejected.
+platform.wiki.currentwiki.candidateHandledSaveComment=Handled candidate {0} ({1})
+platform.wiki.currentwiki.candidateHandledComment=Comment:
+platform.wiki.currentwiki.candidateAcceptedSuccess=Request accepted successfully.
+platform.wiki.currentwiki.candidateRejectedSuccess=Request rejected successfully.
+platform.wiki.currentwiki.inviteUserAlreadyMember={0} is already a member of the wiki.
+platform.wiki.currentwiki.inviteRequestAlreadyExists={0} already has a pending request. Please respond to that request instead.
+platform.wiki.currentwiki.inviteUserAlreadyInvited={0} already has a pending invitation.
+platform.wiki.currentwiki.inviteSaveComment=User ''{0}'' has been invited to join the wiki.
+platform.wiki.currentwiki.inviteNotification=You have been invited to join the wiki ''{0}''.
+platform.wiki.currentwiki.inviteSuccess={0} invited successfully.
+platform.wiki.currentwiki.invitationCancelSaveComment=Cancelled invitation {0} ({1})
+platform.wiki.currentwiki.invitationCancelNotification=Your invitation has been cancelled and is no longer valid.
+platform.wiki.currentwiki.invitationCancelSuccess=Invitation cancelled successfully.
+platform.wiki.currentwiki.invitationCancelFailure=Error, you can not cancel this invitation.
+platform.wiki.currentwiki.candidateReviewFailure=Error, you can not cancel this invitation.
 
 # LABELS
-workspacemanager.prop.wikiprettyname.label=Pretty Name
-workspacemanager.prop.description.label=Description
-workspacemanager.prop.owner.label=Owner
-workspacemanager.prop.membershipType.label=Membership Type
-workspacemanager.prop.secure.label=Secure (SSL)
-workspacemanager.member.add=Add or invite users to wiki
-platform.workspace.gadgetWorkspaceInformationLabel=Wiki Information
-platform.workspace.gadgetTopActiveUsersLabel=Top Active Members
-platform.workspace.panelInformationNameLabel=Name
-platform.workspace.panelInformationDescriptionLabel=Description
-platform.workspace.panelInformationMembersLabel=Members
-platform.workspace.invitationActionViewLabel=View Invitation
-platform.workspace.joinRequestActionCancelLabel=Cancel Request
-platform.workspace.joinRequestActionRequestLabel=Request Join
-platform.workspace.joinActionJoinLabel=Join
-platform.workspace.leaveWorkspace=Leave Wiki
-platform.workspace.inviteUserNameLabel=User name
-platform.workspace.inviteMessageLabel=Message
-platform.workspace.inviteInviteButtonLabel=Invite
-platform.workspace.candidatesLabel=Candidates
-platform.workspace.candidateStatusLabel=Status:
-platform.workspace.candidateTypeLabel=Type:
-platform.workspace.candidateReviewerLabel=Admin:
-platform.workspace.candidateReviewerMessageLabel=Admin's Message:
-platform.workspace.candidateReviewerPrivateComment=Private Comment:
-platform.workspace.candidateAcceptLabel=Accept
-platform.workspace.candidateRejectLabel=Reject
-platform.workspace.invitationCancelLabel=Cancel Invitation
-platform.workspace.workspaceUsersTitle=Wiki Users
-platform.workspace.manageWorkspaceTitle=Wiki
-XWiki.WorkspaceCandidateMemberClass_status_pending=Pending
-XWiki.WorkspaceCandidateMemberClass_status_accepted=Accepted
-XWiki.WorkspaceCandidateMemberClass_status_rejected=Rejected
-XWiki.WorkspaceCandidateMemberClass_type_request=Request
-XWiki.WorkspaceCandidateMemberClass_type_invitation=Invitation
-platform.wikimanager.userconfiguration.title=Configuration
+platform.wiki.currentwiki.prop.wikiprettyname.label=Pretty Name
+platform.wiki.currentwiki.prop.description.label=Description
+platform.wiki.currentwiki.prop.owner.label=Owner
+platform.wiki.currentwiki.prop.membershipType.label=Membership Type
+platform.wiki.currentwiki.prop.secure.label=Secure (SSL)
+platform.wiki.currentwiki.member.add=Add or invite users to wiki
+platform.wiki.currentwiki.gadget.wikiInformation.label=Wiki Information
+platform.wiki.currentwiki.gadget.topActiveUsers.label=Top Active Members
+platform.wiki.currentwiki.panel.information.name.label=Name
+platform.wiki.currentwiki.panel.information.description.label=Description
+platform.wiki.currentwiki.panel.information.members.label=Members
+platform.wiki.currentwiki.invitation.view.label=View Invitation
+platform.wiki.currentwiki.joinrequest.cancel.label=Cancel Request
+platform.wiki.currentwiki.joinreques.request.label=Request Join
+platform.wiki.currentwiki.join.label=Join
+platform.wiki.currentwiki.leave.label=Leave Wiki
+platform.wiki.currentwiki.invite.username.label=User name
+platform.wiki.currentwiki.invite.message.label=Message
+platform.wiki.currentwiki.invite.button.label=Invite
+platform.wiki.currentwiki.candidates.label=Candidates
+platform.wiki.currentwiki.candidates.status.label=Status:
+platform.wiki.currentwiki.candidates.type.label=Type:
+platform.wiki.currentwiki.candidates.reviewer.label=Admin:
+platform.wiki.currentwiki.candidates.reviewermessage.label=Admin's Message:
+platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Private Comment:
+platform.wiki.currentwiki.candidates.accept.label=Accept
+platform.wiki.currentwiki.candidates.reject.label=Reject
+platform.wiki.currentwiki.candidates.invitation.cancel.label=Cancel Invitation
+platform.wiki.currentwiki.wikiusers.title=Wiki Users
+platform.wiki.currentwiki.managewikis.title=Wiki
+WikiManager.WikiCandidateMemberClass_status_pending=Pending
+WikiManager.WikiCandidateMemberClass_status_accepted=Accepted
+WikiManager.WikiCandidateMemberClass_status_rejected=Rejected
+WikiManager.WikiCandidateMemberClass_type_request=Request
+WikiManager.WikiCandidateMemberClass_type_invitation=Invitation
 
 # HINTS
-workspacemanager.prop.wikiprettyname.hint=The display name of the wiki.
-workspacemanager.prop.description.hint=A brief description of the wiki and its purpose.
-workspacemanager.prop.owner.hint=A user who will have all the rights on the wiki.
-workspacemanager.prop.membershipType.hint=The way users can join this wiki.
-workspacemanager.prop.secure.hint=If enabled, all this wiki's generated externals URLs will starting with {0}https:~/~/{1}.
-platform.workspace.inviteUserNameHint=The name of the user to add to the wiki.
-platform.workspace.inviteMessageHint=The message to send to the user.
-platform.workspace.candidatesHint=Users which have requested or which have been invited to join the wiki.
+platform.wiki.currentwiki.prop.wikiprettyname.hint=The display name of the wiki.
+platform.wiki.currentwiki.prop.description.hint=A brief description of the wiki and its purpose.
+platform.wiki.currentwiki.prop.owner.hint=A user who will have all the rights on the wiki.
+platform.wiki.currentwiki.prop.membershipType.hint=The way users can join this wiki.
+platform.wiki.currentwiki.prop.secure.hint=If enabled, all this wiki's generated externals URLs will starting with {0}https:~/~/{1}.
+platform.wiki.currentwiki.invite.username.hint=The name of the user to add to the wiki.
+platform.wiki.currentwiki.invite.message.hint=The message to send to the user.
+platform.wiki.currentwiki.candidates.hint=Users which have requested or which have been invited to join the wiki.
 
-# DESCRIPTIONS
+# ADMIN
 admin.xwiki.manageworkspace.description=Manage settings such as wiki name, description, owner and membership type.
 admin.xwiki.workspaceusers.description=Manage wiki members: add, remove, invite, accept or reject wiki members.
+admin.xwiki.usersconfiguration.title=Configuration
 </content>
 </xwikidoc>

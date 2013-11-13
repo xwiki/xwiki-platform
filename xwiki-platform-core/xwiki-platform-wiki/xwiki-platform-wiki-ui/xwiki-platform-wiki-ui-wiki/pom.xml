@@ -36,7 +36,7 @@
   <properties>
     <xwiki.extension.features>
       <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-      org.xwiki.platform:xwiki-workspace-ui
+      org.xwiki.platform:xwiki-platform-workspace-template-features
     </xwiki.extension.features>
   </properties>
   <dependencies>

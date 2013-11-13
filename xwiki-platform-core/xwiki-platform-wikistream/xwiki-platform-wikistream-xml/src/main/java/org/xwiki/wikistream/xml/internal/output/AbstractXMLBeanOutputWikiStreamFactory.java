@@ -35,7 +35,7 @@ import org.xwiki.wikistream.type.WikiStreamType;
  * @version $Id$
  * @since 5.2M2
  */
-public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOuputProperties, F> extends
+public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOutputProperties, F> extends
     AbstractBeanOutputWikiStreamFactory<P, F>
 {
     public AbstractXMLBeanOutputWikiStreamFactory(WikiStreamType type)

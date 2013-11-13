@@ -28,7 +28,7 @@ import org.xwiki.wikistream.xml.internal.XMLProperties;
  * @version $Id$
  * @since 5.2M2
  */
-public class XMLOuputProperties extends XMLProperties
+public class XMLOutputProperties extends XMLProperties
 {
     private boolean format = true;
 

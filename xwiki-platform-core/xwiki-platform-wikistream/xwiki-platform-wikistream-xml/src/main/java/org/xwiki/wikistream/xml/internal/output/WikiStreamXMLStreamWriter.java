@@ -45,7 +45,7 @@ public class WikiStreamXMLStreamWriter
         this.printNullValue = printNullValue;
     }
 
-    public WikiStreamXMLStreamWriter(OutputStream outputStream, XMLOuputProperties properties, boolean printNullValue)
+    public WikiStreamXMLStreamWriter(OutputStream outputStream, XMLOutputProperties properties, boolean printNullValue)
         throws WikiStreamException
     {
         try {
@@ -64,7 +64,7 @@ public class WikiStreamXMLStreamWriter
         this.printNullValue = printNullValue;
     }
 
-    public WikiStreamXMLStreamWriter(XMLOuputProperties properties, boolean printNullValue) throws WikiStreamException
+    public WikiStreamXMLStreamWriter(XMLOutputProperties properties, boolean printNullValue) throws WikiStreamException
     {
         try {
             this.writer = XMLOutputWikiStreamUtils.createXMLStreamWriter(properties);

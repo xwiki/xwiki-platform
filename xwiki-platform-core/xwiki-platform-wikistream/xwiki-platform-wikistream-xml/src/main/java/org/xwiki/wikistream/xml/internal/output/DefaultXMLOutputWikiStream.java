@@ -31,7 +31,7 @@ import org.xwiki.wikistream.WikiStreamException;
  * @version $Id$
  * @since 5.2M2
  */
-public class DefaultXMLOutputWikiStream<P extends XMLOuputProperties, F> extends AbstractXMLOutputWikiStream<P>
+public class DefaultXMLOutputWikiStream<P extends XMLOutputProperties, F> extends AbstractXMLOutputWikiStream<P>
 {
     private final AbstractXMLBeanOutputWikiStreamFactory<P, F> factory;
 

@@ -20,14 +20,14 @@
 package org.xwiki.wikistream.xar.internal.output;
 
 import org.xwiki.wikistream.xar.internal.XARModel;
-import org.xwiki.wikistream.xml.internal.output.XMLOuputProperties;
+import org.xwiki.wikistream.xml.internal.output.XMLOutputProperties;
 
 /**
  * 
  * @version $Id$
  * @since 5.2M2
  */
-public class XAROutputProperties extends XMLOuputProperties
+public class XAROutputProperties extends XMLOutputProperties
 {
     private String name;
 

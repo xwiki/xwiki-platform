@@ -19,14 +19,14 @@
  */
 package org.xwiki.wikistream.wikixml.internal.output;
 
-import org.xwiki.wikistream.xml.internal.output.XMLOuputProperties;
+import org.xwiki.wikistream.xml.internal.output.XMLOutputProperties;
 
 /**
  * 
  * @version $Id$
  * @since 5.3M2
  */
-public class WikiXMLOutputProperties extends XMLOuputProperties
+public class WikiXMLOutputProperties extends XMLOutputProperties
 {
 
 }

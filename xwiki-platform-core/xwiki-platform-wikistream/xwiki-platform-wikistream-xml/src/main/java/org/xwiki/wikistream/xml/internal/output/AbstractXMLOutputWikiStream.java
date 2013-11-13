@@ -42,7 +42,7 @@ import org.xwiki.wikistream.xml.output.ResultOutputTarget;
  * @version $Id$
  * @since 5.2M2
  */
-public abstract class AbstractXMLOutputWikiStream<P extends XMLOuputProperties> implements OutputWikiStream
+public abstract class AbstractXMLOutputWikiStream<P extends XMLOutputProperties> implements OutputWikiStream
 {
     protected final P properties;
 

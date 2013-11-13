@@ -41,7 +41,7 @@ import org.xwiki.xml.stax.StAXUtils;
  */
 public final class XMLOutputWikiStreamUtils
 {
-    public static XMLStreamWriter createXMLStreamWriter(XMLOuputProperties properties) throws XMLStreamException,
+    public static XMLStreamWriter createXMLStreamWriter(XMLOutputProperties properties) throws XMLStreamException,
         IOException, WikiStreamException
     {
         XMLStreamWriter xmlStreamWriter;

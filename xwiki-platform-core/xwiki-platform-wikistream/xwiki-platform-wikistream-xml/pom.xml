@@ -77,7 +77,7 @@
               org/xwiki/wikistream/xml/internal/output/DefaultResultInputSource.java,
               org/xwiki/wikistream/xml/internal/output/DefaultXMLOutputWikiStream.java,
               org/xwiki/wikistream/xml/internal/output/WikiStreamXMLStreamWriter.java,
-              org/xwiki/wikistream/xml/internal/output/XMLOuputProperties.java,
+              org/xwiki/wikistream/xml/internal/output/XMLOutputProperties.java,
               org/xwiki/wikistream/xml/internal/output/XMLOutputWikiStreamUtils.java,
               org/xwiki/wikistream/xml/output/ResultOutputTarget.java
           </excludes>

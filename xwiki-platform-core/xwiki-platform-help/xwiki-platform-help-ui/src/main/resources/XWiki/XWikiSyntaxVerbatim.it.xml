@@ -6,7 +6,7 @@
   <language>it</language>
   <defaultLanguage/>
   <translation>1</translation>
-  <parent/>
+  <parent>XWiki.XWikiSyntax</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>

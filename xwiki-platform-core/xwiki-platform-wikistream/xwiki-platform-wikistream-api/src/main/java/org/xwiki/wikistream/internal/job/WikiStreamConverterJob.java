@@ -19,11 +19,14 @@
  */
 package org.xwiki.wikistream.internal.job;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.job.internal.DefaultJobStatus;
 import org.xwiki.wikistream.input.InputWikiStream;
@@ -49,6 +52,10 @@ public class WikiStreamConverterJob extends
      */
     public static final String JOBTYPE = "wikistream.converter";
 
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
+
     @Override
     public String getType()
     {
@@ -59,12 +66,14 @@ public class WikiStreamConverterJob extends
     protected void runInternal() throws Exception
     {
         InputWikiStreamFactory inputFactory =
-            this.componentManager.getInstance(InputWikiStreamFactory.class, getRequest().getInputType().serialize());
+            this.componentManagerProvider.get().getInstance(InputWikiStreamFactory.class,
+                getRequest().getInputType().serialize());
 
         InputWikiStream inputWikiStream = inputFactory.createInputWikiStream(getRequest().getInputProperties());
 
         OutputWikiStreamFactory outputFactory =
-            this.componentManager.getInstance(OutputWikiStreamFactory.class, getRequest().getOutputType().serialize());
+            this.componentManagerProvider.get().getInstance(OutputWikiStreamFactory.class,
+                getRequest().getOutputType().serialize());
 
         OutputWikiStream outputWikiStream = outputFactory.createOutputWikiStream(getRequest().getOutputProperties());
 

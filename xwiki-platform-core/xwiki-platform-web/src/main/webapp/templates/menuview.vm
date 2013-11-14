@@ -8,7 +8,6 @@
 #set ($mainWikiHomeDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Main', 'WebHome'))
 #set ($WikiManagerMainDocReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'WebHome'))
 #set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
-#set ($cantHaveLocalUsers = $isWikiAPIAvailable && !$xcontext.isMainWiki() && $services.wiki.user.getUserScope()=='GLOBAL_ONLY')
 #set ($isMainWikiUser = ($xcontext.mainWikiName == "$!{xcontext.userReference.wikiReference.name}"))
 #set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
 ##
@@ -126,8 +125,8 @@
 ##
 ## This menu is displayed if:
 ## - Wiki UI is available
-## - The current wiki is the main wiki OR the current wiki has no support for local users
-#set ($displayHomeMenu = $isWikiUIAvailable && ($xcontext.isMainWiki() || $cantHaveLocalUsers))
+## - The current wiki is the main wiki OR the current wiki has support for local users only
+#set ($displayHomeMenu = $isWikiUIAvailable && ($xcontext.isMainWiki() || ("$!services.wiki.user" != '' && $services.wiki.user.getUserScope()=='GLOBAL_ONLY')))
 #if ($displayHomeMenu)
   #xwikitopmenuentrystart($xwiki.getURL($mainWikiHomeDocumentReference) $services.localization.render('core.menu.type.home') 'tmMainWiki' 'hasIcon')
   #set ($hasPreviousMenuSection = false)

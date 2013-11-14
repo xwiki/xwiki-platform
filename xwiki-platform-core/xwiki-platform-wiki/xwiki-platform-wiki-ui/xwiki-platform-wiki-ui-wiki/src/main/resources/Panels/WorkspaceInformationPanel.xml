@@ -108,7 +108,9 @@
       <content>{{velocity}}
 #set($newPanelReference = $services.model.createDocumentReference('', 'WikiManager', 'WikiInformationPanel'))
 #set($newPanelDocument = $xwiki.getDocument($newPanelReference))
+{{html}}
 $newPanelDocument.display('content', 'view')
+{{/html}}
 {{/velocity}}</content>
     </property>
     <property>

@@ -42,11 +42,11 @@
   #set ($wiki = $services.wiki.getById($wikiId))
   #set ($wikiMainPage = $wiki.mainPageReference)
   ##
-  #if ("$!wikiId" == '')
+  #if ("$!wiki" == '')
     #if ("$!{services.wiki.lastException}" != '')
       {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
     #else
-      {{error}}{{translation key="platform.wiki.error.wikidoesnotexist" parameters="$wikiId"/}}{{/error}}
+      {{error}}$services.localization.render('platform.wiki.error.wikidoesnotexist', [$wikiId]){{/error}}
     #end
   #else
     #set ($wikiName = $wiki.prettyName)

@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>FAQCode</web>
   <name>FAQHomeSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>FAQCode.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1384415291000</creationDate>
+  <parent>FAQCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1360482998000</creationDate>
-  <date>1360494327000</date>
-  <contentUpdateDate>1360494327000</contentUpdateDate>
+  <date>1384417967000</date>
+  <contentUpdateDate>1384417967000</contentUpdateDate>
   <version>1.1</version>
   <title>$doc.title</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -51,7 +50,12 @@ t    $response.sendRedirect($xwiki.getURL($newFAQReference, 'inline', "$!{reques
     {{html}}
     &lt;form action="$xwiki.getURL('FAQCode.FAQSearch')"&gt;
       &lt;div&gt;
+      ## Both Lucene and SOLR searches obey the $request.space param
       &lt;input type="hidden" name="space" value="${faqSpace}" /&gt;
+      ## Lucene needs a $request.wikinames param while SOLR requires a $request.wiki one
+      &lt;input type="hidden" name="wiki" value="${xcontext.database}" /&gt;
+      &lt;input type="hidden" name="wikinames" value="${xcontext.database}" /&gt;
+      ## Both Lucene and SOLR searches obey the $request.text param
       &lt;input type="text" name="text" value="$services.localization.render('platform.faq.search.questionHint')" size="25" class="withTip" /&gt;
       &lt;span class="buttonwrapper"&gt;
         &lt;input class="button" type="submit" value="$services.localization.render('platform.faq.search.submit')" /&gt;
@@ -97,4 +101,5 @@ t    $response.sendRedirect($xwiki.getURL($newFAQReference, 'inline', "$!{reques
     This class sheet must be applied on a document containing an FAQCode.FAQHomeClass object
   #end
 {{/velocity}}</content>
+  <renderedcontent/>
 </xwikidoc>

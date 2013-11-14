@@ -952,10 +952,10 @@ $value##
   #processRequestParameters()
   (% class="search-form-container" %)(((
     #displaySearchForm()
-    #displaySearchDebugInfo()
   )))
   #if ($text != '')
     #getSearchResults()
+    #displaySearchDebugInfo()
     (% class="search-results-container" %)(((
       #displaySearchFacets($searchResponse)
       (% class="search-results-left" %)(((

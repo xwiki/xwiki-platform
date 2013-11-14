@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -28,6 +29,10 @@ import com.xpn.xwiki.util.Util;
 
 public class EditForm extends XWikiForm
 {
+    /**
+     * Internal standard for new line ending is <code>\n</code>.
+     */
+    private final static Pattern CONTENT_LINEENDING = Pattern.compile("\r\n|\r");
 
     // ---- Form fields -------------------------------------------------
     private String content;
@@ -66,7 +71,14 @@ public class EditForm extends XWikiForm
     public void readRequest()
     {
         XWikiRequest request = getRequest();
-        setContent(request.getParameter("content"));
+
+        String requestContent = request.getParameter("content");
+        if (requestContent != null) {
+            // Internal standard is \n for newlines
+            requestContent = CONTENT_LINEENDING.matcher(content).replaceAll("\n");
+            setContent(requestContent);
+        }
+
         setWeb(request.getParameter("web"));
         setName(request.getParameter("name"));
         setParent(request.getParameter("parent"));

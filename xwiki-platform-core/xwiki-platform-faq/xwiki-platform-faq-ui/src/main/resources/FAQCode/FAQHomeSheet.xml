@@ -48,7 +48,7 @@ t    $response.sendRedirect($xwiki.getURL($newFAQReference, 'inline', "$!{reques
     $services.localization.render('platform.faq.search.title')
     (((
     {{html}}
-    &lt;form action="$xwiki.getURL('FAQCode.FAQSearch')"&gt;
+    &lt;form action="$xwiki.getURL('FAQ.FAQSearch')"&gt;
       &lt;div&gt;
       ## Both Lucene and SOLR searches obey the $request.space param
       &lt;input type="hidden" name="space" value="${faqSpace}" /&gt;

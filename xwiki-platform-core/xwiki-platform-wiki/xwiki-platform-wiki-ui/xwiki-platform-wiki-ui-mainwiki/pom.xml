@@ -36,7 +36,8 @@
   <properties>
     <xwiki.extension.features>
       <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-      org.xwiki.platform:xwiki-workspace-ui
+      org.xwiki.platform:xwiki-platform-workspace-ui,
+      org.xwiki.platform:xwiki-platform-wiki-manager-ui
     </xwiki.extension.features>
   </properties>
   <dependencies>
@@ -44,6 +45,13 @@
       <groupId>org.xwiki.platform</groupId>
       <!-- needed until the UI has removed every relation to the default implementation -->
       <artifactId>xwiki-platform-wiki-user-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <!-- needed until the UI has removed every relation to the default implementation -->
+      <artifactId>xwiki-platform-wiki-template-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

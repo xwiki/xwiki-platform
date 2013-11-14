@@ -63,7 +63,7 @@ public class DefaultWikiUserManager implements WikiUserManager
 
     private static final String CANDIDACY_CLASS_NAME = "WikiCandidateMemberClass";
 
-    private static final String CANDIDACY_CLASS_SPACE = "WikiManagerCode";
+    private static final String CANDIDACY_CLASS_SPACE = "WikiManager";
 
     private static final String CANDIDACY_CLASS_TYPE_FIELD = "type";
 

@@ -630,7 +630,7 @@ public class PackageMojo extends AbstractMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-url-standard", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-wiki-descriptor-default", getXWikiPlatformVersion(), null, "jar"));
+            "xwiki-platform-wiki-default", getXWikiPlatformVersion(), null, "jar"));
 
         // Ensures all logging goes through SLF4J and Logback.
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.commons",

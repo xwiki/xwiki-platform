@@ -84,20 +84,7 @@ public class WikiUserConfigurationMigrator extends AbstractHibernateDataMigratio
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
         // We migrate only subwikis
-        if (wikiDescriptorManager.getCurrentWikiId().equals(wikiDescriptorManager.getMainWikiId())) {
-            return false;
-        }
-
-        // If the WorkspaceClass does not exists, nothing to do
-        XWikiContext xcontext = getXWikiContext();
-        DocumentReference oldClassDocument = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
-                WORKSPACE_CLASS_SPACE, WORKSPACE_CLASS_PAGE);
-        if (!xcontext.getWiki().exists(oldClassDocument, xcontext)) {
-            return false;
-        }
-
-        // Else, return true
-        return true;
+        return !wikiDescriptorManager.getCurrentWikiId().equals(wikiDescriptorManager.getMainWikiId());
     }
 
     @Override
@@ -118,21 +105,40 @@ public class WikiUserConfigurationMigrator extends AbstractHibernateDataMigratio
         // Try to get the old workspace object
         DocumentReference oldClassDocument = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
                 WORKSPACE_CLASS_SPACE, WORKSPACE_CLASS_PAGE);
-
         BaseObject oldObject = oldWikiDescriptor.getXObject(oldClassDocument);
 
-        // --
-        // The wiki is not a workspace
-        // --
-        if (oldObject == null) {
-            return;
+        // Upgrade depending of the type
+        if (oldObject != null) {
+            // It's a workspace
+            upgradeWorkspace(oldObject, currentWikiId, oldWikiDescriptor);
+        } else {
+            // It's a regular subwiki
+            upgradeRegularSubwiki(currentWikiId);
         }
+    }
 
-        // --
-        // The wiki is a workspace
-        // --
-        // No local users
+    private void upgradeRegularSubwiki(String currentWikiId) throws DataMigrationException, XWikiException
+    {
+        // Create the new configuration
         WikiUserConfiguration configuration = new WikiUserConfiguration();
+        configuration.setUserScope(UserScope.LOCAL_AND_GLOBAL);
+        configuration.setMembershipType(MembershipType.INVITE);
+
+        // Save the new configuration
+        saveConfiguration(configuration, currentWikiId);
+    }
+
+    private void upgradeWorkspace(BaseObject oldObject, String currentWikiId, XWikiDocument oldWikiDescriptor)
+        throws DataMigrationException, XWikiException
+    {
+        // Context, XWiki
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+
+        // Create the new configuration
+        WikiUserConfiguration configuration = new WikiUserConfiguration();
+
+        // No local users
         configuration.setUserScope(UserScope.GLOBAL_ONLY);
 
         // Get the membershipType value
@@ -147,12 +153,7 @@ public class WikiUserConfigurationMigrator extends AbstractHibernateDataMigratio
         configuration.setMembershipType(membershipType);
 
         // Save the new configuration
-        try {
-            wikiUserConfigurationHelper.saveConfiguration(configuration, currentWikiId);
-        } catch (WikiUserManagerException e) {
-            throw new DataMigrationException(String.format(
-                    "Failed to save the new wiki user configuration page for wiki [%s].", currentWikiId), e);
-        }
+        saveConfiguration(configuration, currentWikiId);
 
         // Delete the old object
         oldWikiDescriptor.removeXObject(oldObject);
@@ -164,6 +165,17 @@ public class WikiUserConfigurationMigrator extends AbstractHibernateDataMigratio
             throw new DataMigrationException(String.format(
                     "Failed to save the document [%s] to remove the WorkspaceManager.WorkspaceClass object.",
                     oldWikiDescriptor.getDocumentReference().toString()), e);
+        }
+    }
+
+    private void saveConfiguration(WikiUserConfiguration configuration, String currentWikiId)
+        throws DataMigrationException, XWikiException
+    {
+        try {
+            wikiUserConfigurationHelper.saveConfiguration(configuration, currentWikiId);
+        } catch (WikiUserManagerException e) {
+            throw new DataMigrationException(String.format(
+                    "Failed to save the new wiki user configuration page for wiki [%s].", currentWikiId), e);
         }
     }
 }

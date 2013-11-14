@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>XWikiSyntax</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1384447292000</creationDate>
+  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1383773267000</creationDate>
-  <date>1383774928000</date>
-  <contentUpdateDate>1383774928000</contentUpdateDate>
+  <date>1384452769000</date>
+  <contentUpdateDate>1384452769000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render("help.syntaxpage.title")</title>
   <defaultTemplate/>
@@ -21,250 +21,13 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
-  <object>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <name>XWiki.XWikiSyntax</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>62f48ea6-d577-48fc-83ac-2bed169a325d</guid>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>/* Administration application custom JavaScript */
-
-document.observe('xwiki:dom:loaded', function() {
-  if($('goto-select')) {
-    Event.observe($('goto-select'), 'change', function (event) {
-      var select = event.element();
-      var i = select.selectedIndex;
-      if (window.location != select.options[i].value) {
-        window.location = select.options[i].value;
-      }
-    });
-    $('goto-select').next().hide();
-  }
-});</code>
-    </property>
-    <property>
-      <name>Syntax Guide javascript</name>
-    </property>
-    <property>
-      <parse>0</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <name>XWiki.XWikiSyntax</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>054720d0-2038-49a9-afc7-c8b6d58012ec</guid>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>#document-title {
-  margin-bottom: 1em;
-}
-#change-context {
-  float: right;
-  padding-top: 0.5em;
-}
-#goto-select optgroup {
-  margin: 0.5ex;
-}
-
-#syntax-page-content {
-  margin-left: 15em;
-}
-#syntax-page-content table {
-  width: 99%;
-}
-#syntax-page-content&gt;h3 {
-  display: none;
-}
-#syntax-page-content&gt;h3.sectionheader {
-  display: block;
-}
-
-/*******************************************************/
-
-.syntax-menu .generalIcon {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_code.gif')");
-}
-
-.syntax-menu .editingIcon {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.gif')");
-}
-
-.syntax-menu .advancedIcon {
-  background-image: url("$xwiki.getSkinFile('icons/silk/wand.gif')");
-}
-
-.syntax-menu .programmingIcon {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_gear.gif')");
-}
-
-/* Firefox panics when it has an overflowing table but the content is pre-formatted. */
-tbody&gt;tr&gt;td&gt;tt {
-    white-space: normal !important;
-}</code>
-    </property>
-    <property>
-      <name>Syntax Guide Stylesheet</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>onDemand</use>
-    </property>
-  </object>
+  <hidden/>
   <content>{{velocity output="false"}}
+#set($SUPPORTED_SYNTAXES = {})
+#set($void = $SUPPORTED_SYNTAXES.put(1.0, 'XWiki Syntax 1.0'))
+#set($void = $SUPPORTED_SYNTAXES.put(2.0, 'XWiki Syntax 2.0'))
+#set($void = $SUPPORTED_SYNTAXES.put(2.1, 'XWiki Syntax 2.1'))
+
 #if ($request.xaction == 'switchContext')
   $response.sendRedirect($request.target)
   #stop
@@ -275,8 +38,8 @@ tbody&gt;tr&gt;td&gt;tt {
   #set ($crtCategoryId = $mathtool.toInteger($crtCategoryId))
 #end
 #set ($crtSectionId = "$!{request.section}")
-#set ($crtSyntaxVer = "$!{request.syntax}")
-#if ($crtSyntaxVer != '')
+#set ($crtSyntaxVer = $mathtool.toDouble($request.syntax))
+#if ($crtSyntaxVer &amp;&amp; $SUPPORTED_SYNTAXES.containsKey($crtSyntaxVer))
   #set ($crtSyntaxVer = $mathtool.toDouble($crtSyntaxVer))
 
 #else
@@ -479,11 +242,11 @@ $syntaxMenu.add($cat)
       &lt;select id="goto-select" name="target" title="$escapetool.xml($services.localization.render("help.changesyntax"))"&gt;
         &lt;optgroup label="$services.localization.render('help.choose_syntax')"&gt;
           #set ($query = "syntax=1.0&amp;${crtSelection}")
-          &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==1.0)selected="selected"#end&gt;XWiki Syntax 1.0&lt;/option&gt;
+          &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==1.0)selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get(1.0)&lt;/option&gt;
           #set ($query = "syntax=2.0&amp;${crtSelection}")
-          &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==2.0)selected="selected"#end&gt;XWiki Syntax 2.0&lt;/option&gt;
+          &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==2.0)selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get(2.0)&lt;/option&gt;
           #set ($query = "syntax=2.1&amp;${crtSelection}")
-          &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==2.1)selected="selected"#end&gt;XWiki Syntax 2.1&lt;/option&gt;
+          &lt;option value="$doc.getURL('view', $query)" #if($crtSyntaxVer==2.1)selected="selected"#end&gt;$SUPPORTED_SYNTAXES.get(2.1)&lt;/option&gt;
         &lt;/optgroup&gt;
       &lt;/select&gt;
       &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$escapetool.xml($services.localization.render('admin.switchContext'))" class="button" /&gt;&lt;/span&gt;
@@ -535,4 +298,246 @@ $xwiki.get('ssx').use($doc.getFullName())##
   #end
   ))) ## syntax-page-content
 {{/velocity}}</content>
+  <object>
+    <name>XWiki.XWikiSyntax</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>62f48ea6-d577-48fc-83ac-2bed169a325d</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/* Administration application custom JavaScript */
+
+document.observe('xwiki:dom:loaded', function() {
+  if($('goto-select')) {
+    Event.observe($('goto-select'), 'change', function (event) {
+      var select = event.element();
+      var i = select.selectedIndex;
+      if (window.location != select.options[i].value) {
+        window.location = select.options[i].value;
+      }
+    });
+    $('goto-select').next().hide();
+  }
+});</code>
+    </property>
+    <property>
+      <name>Syntax Guide javascript</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.XWikiSyntax</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>054720d0-2038-49a9-afc7-c8b6d58012ec</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#document-title {
+  margin-bottom: 1em;
+}
+#change-context {
+  float: right;
+  padding-top: 0.5em;
+}
+#goto-select optgroup {
+  margin: 0.5ex;
+}
+
+#syntax-page-content {
+  margin-left: 15em;
+}
+#syntax-page-content table {
+  width: 99%;
+}
+#syntax-page-content&gt;h3 {
+  display: none;
+}
+#syntax-page-content&gt;h3.sectionheader {
+  display: block;
+}
+
+/*******************************************************/
+
+.syntax-menu .generalIcon {
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_code.gif')");
+}
+
+.syntax-menu .editingIcon {
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.gif')");
+}
+
+.syntax-menu .advancedIcon {
+  background-image: url("$xwiki.getSkinFile('icons/silk/wand.gif')");
+}
+
+.syntax-menu .programmingIcon {
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_gear.gif')");
+}
+
+/* Firefox panics when it has an overflowing table but the content is pre-formatted. */
+tbody&gt;tr&gt;td&gt;tt {
+    white-space: normal !important;
+}</code>
+    </property>
+    <property>
+      <name>Syntax Guide Stylesheet</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
 </xwikidoc>

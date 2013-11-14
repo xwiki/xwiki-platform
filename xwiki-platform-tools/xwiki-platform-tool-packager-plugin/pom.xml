@@ -236,10 +236,10 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- We need pick a Wiki Descriptor implementation @ runtime -->
+    <!-- We need pick a Wiki implementation @ runtime -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-descriptor-default</artifactId>
+      <artifactId>xwiki-platform-wiki-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

@@ -808,30 +808,34 @@ return XWiki;
           ### TEMPLATE ###
           #set ($templates = $services.wiki.template.getTemplates())
           &lt;div&gt;
-            &lt;dt&gt;
-              &lt;label for="template"&gt;$services.localization.render('platform.wiki.create.wizard.template.label')&lt;/label&gt;
-              #if ($templates.size() &gt; 0)
-                &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.newTemplateHint')&lt;/span&gt;
-              #end
-            &lt;/dt&gt;
-            &lt;dd&gt;
-              #if ($templates.size() &gt; 0)
-                &lt;select name="template" id="template"&gt;
-                  &lt;option value="xwikinotemplate"&gt;$services.localization.render('platform.wiki.create.wizard.template.noTemplate')&lt;/option&gt;
-                  #foreach ($template in $templates)
-                    #set ($name = $template.id)
-                    #if ($stringtool.isNotBlank("$!template.prettyName"))
-                      #set($name = "${template.prettyName} (${name})")
+            &lt;dl&gt;
+              &lt;dt&gt;
+                #if ($templates.size() &gt; 0)
+                  &lt;label for="template"&gt;$services.localization.render('platform.wiki.create.wizard.template.label')&lt;/label&gt;
+                  &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.newTemplateHint')&lt;/span&gt;
+                #else
+                  &lt;label&gt;$services.localization.render('platform.wiki.create.wizard.template.label')&lt;/label&gt;
+                #end
+              &lt;/dt&gt;
+              &lt;dd&gt;
+                #if ($templates.size() &gt; 0)
+                  &lt;select name="template" id="template"&gt;
+                    &lt;option value="xwikinotemplate"&gt;$services.localization.render('platform.wiki.create.wizard.template.noTemplate')&lt;/option&gt;
+                    #foreach ($template in $templates)
+                      #set ($name = $template.id)
+                      #if ($stringtool.isNotBlank("$!template.prettyName"))
+                        #set($name = "${template.prettyName} (${name})")
+                      #end
+                      #set($selected = '')
+                      #if($request.template == $template.id)
+                        #set($selected = 'selected="selected"')
+                      #end
+                      &lt;option value="${template.id}" $selected&gt;$name&lt;/option&gt;
                     #end
-                    #set($selected = '')
-                    #if($request.template == $template.id)
-                      #set($selected = 'selected="selected"')
-                    #end
-                    &lt;option value="${template.id}" $selected&gt;$name&lt;/option&gt;
-                  #end
-                &lt;/select&gt;
-              #end
-            &lt;/dd&gt;
+                  &lt;/select&gt;
+                #end
+              &lt;/dd&gt;
+            &lt;/dl&gt;
             &lt;p class="xformInline"&gt;
               #set ($isTemplate = '')
               #if ($request.set_as_template == '1')

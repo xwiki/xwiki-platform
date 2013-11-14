@@ -26,7 +26,6 @@
   <content>{{include document="XWiki.SearchCode"/}}
 
 {{velocity}}
-#set($allwikinamelist = ["xwiki"])
 {{include document="$searchPage"/}}
 {{/velocity}}
 </content>

@@ -259,8 +259,10 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
             toString(parameters.get(XWikiWikiDocumentFilter.PARAMETER_HIDDEN)));
         this.writer.writeElement(XARDocumentModel.ELEMENT_CONTENT,
             (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CONTENT));
-        this.writer.writeElement(XARDocumentModel.ELEMENT_CONTENT_HTML,
-            (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CONTENT_HTML));
+        if (parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_CONTENT_HTML)) {
+            this.writer.writeElement(XARDocumentModel.ELEMENT_CONTENT_HTML,
+                (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CONTENT_HTML));
+        }
     }
 
     @Override

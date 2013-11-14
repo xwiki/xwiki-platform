@@ -166,6 +166,13 @@ public class WikiUserConfigurationMigrator extends AbstractHibernateDataMigratio
                     "Failed to save the document [%s] to remove the WorkspaceManager.WorkspaceClass object.",
                     oldWikiDescriptor.getDocumentReference().toString()), e);
         }
+
+        // The WorkspaceManager.Install script has removed some pages:
+        // - XWiki.AdminRegistrationSheet
+        // - XWiki.RegistrationConfig
+        // - XWiki.RegistrationHelp
+        // - XWiki.AdminUsersSheet
+        // We need to restore them
     }
 
     private void saveConfiguration(WikiUserConfiguration configuration, String currentWikiId)

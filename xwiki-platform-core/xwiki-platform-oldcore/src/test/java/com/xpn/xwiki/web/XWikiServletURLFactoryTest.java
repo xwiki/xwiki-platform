@@ -38,6 +38,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
+import junit.framework.Assert;
+
 public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
 {
     private static final String MAIN_WIKI_NAME = "xwiki";
@@ -455,5 +457,15 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
         assertEquals(new URL("http://mainwiki.mywiki.tld/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
         assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+    }
+
+    /**
+     * Verify that jsessionid is removed from URL.
+     */
+    public void testNormalizeURL() throws Exception
+    {
+        assertEquals(new URL("http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35?language=en"),
+            urlFactory.normalizeURL("http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35"
+                + ";jsessionid=0AF95AFB8997826B936C0397DF6A0C7F?language=en", getContext()));
     }
 }

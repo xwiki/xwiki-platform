@@ -617,7 +617,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * @return the normalized URL
      * @throws MalformedURLException if the passed URL is invalid
      */
-    private static URL normalizeURL(URL url, XWikiContext context) throws MalformedURLException
+    protected static URL normalizeURL(URL url, XWikiContext context) throws MalformedURLException
     {
         return normalizeURL(url.toExternalForm(), context);
     }
@@ -644,7 +644,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * @return the normalized URL
      * @throws MalformedURLException if the passed URL is invalid
      */
-    private static URL normalizeURL(String url, XWikiContext context) throws MalformedURLException
+    protected static URL normalizeURL(String url, XWikiContext context) throws MalformedURLException
     {
         // For robust session tracking, all URLs emitted by a servlet should be encoded. Otherwise, URL rewriting
         // cannot be used with browsers which do not support cookies.

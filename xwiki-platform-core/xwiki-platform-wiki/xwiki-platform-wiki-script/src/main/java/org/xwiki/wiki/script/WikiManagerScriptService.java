@@ -158,13 +158,22 @@ public class WikiManagerScriptService implements ScriptService
      */
     public boolean deleteWiki(String wikiId)
     {
-        // Test right
+        // Test if the script has the programming right
         XWikiContext context = xcontextProvider.get();
+        if (!authorizationManager.hasAccess(Right.PROGRAM,
+                context.getDoc().getAuthorReference(), context.getDoc().getDocumentReference())) {
+            String errorMessage = "This script does not have the right to delete a wiki.";
+            error(errorMessage, new Exception(errorMessage));
+            return false;
+        }
+
+        // Test right
         if (!canDeleteWiki(context.getUser(), wikiId)) {
             String errorMessage = "You don't have the right to delete the wiki";
             error(errorMessage, new Exception(errorMessage));
             return false;
         }
+
         // Delete the wiki
         try {
             wikiManager.delete(wikiId);

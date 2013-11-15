@@ -19,12 +19,18 @@
  */
 package org.xwiki.wiki.user.internal;
 
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -36,6 +42,7 @@ import org.xwiki.wiki.user.WikiUserManagerException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.migration.DataMigrationException;
@@ -60,6 +67,9 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public String getDescription()
@@ -146,7 +156,11 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
                     + "the new Wiki Application.");
         }
 
-        restoreDeletedDocuments(wikiId);
+        try {
+            restoreDeletedDocuments(wikiId);
+        } catch(XWikiException e) {
+            //TODO
+        }
     }
 
     /**
@@ -265,8 +279,157 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
      *
      * @param wikiId id of the wiki to upgrade
      */
-    private void restoreDeletedDocuments(String wikiId)
+    public void restoreDeletedDocuments(String wikiId) throws XWikiException
     {
-        // Not implemented yet
+        XWikiContext xcontext = getXWikiContext();
+        XWiki xwiki = xcontext.getWiki();
+
+        // Create the list of documents to restore
+        List<DocumentReference> documentsToRestore = new LinkedList<DocumentReference>();
+        documentsToRestore.add(new DocumentReference(wikiId, "XWiki", "AdminRegistrationSheet"));
+        documentsToRestore.add(new DocumentReference(wikiId, "XWiki", "RegistrationConfig"));
+        documentsToRestore.add(new DocumentReference(wikiId, "XWiki", "RegistrationHelp"));
+        documentsToRestore.add(new DocumentReference(wikiId, "XWiki", "AdminUsersSheet"));
+
+        // Remove from the list the document that already exists (so we don't need to restore them)
+        Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
+        while (itDocumentsToRestore.hasNext()) {
+            DocumentReference docRef = itDocumentsToRestore.next();
+            if (xwiki.exists(docRef, xcontext)) {
+                itDocumentsToRestore.remove();
+            }
+        }
+
+        // If the list is empty, there is nothing to do
+        if (documentsToRestore.isEmpty()) {
+            return;
+        }
+
+        // Try to restore from the workspace-template.xar
+        restoreDocumentsFromXar(documentsToRestore);
+
+        // If the list is empty, the job is done
+        if (documentsToRestore.isEmpty()) {
+            return;
+        }
+
+        // Try to copy these documents from the main wiki
+        restoreDocumentFromMainWiki(documentsToRestore);
+
+        // If the list is empty, the job is done
+        if (documentsToRestore.isEmpty()) {
+            return;
+        }
+
+        // Finally, just create empty documents, and DW will show a conflict during the upgrade
+        createEmptyDocuments(documentsToRestore);
+    }
+
+    private void restoreDocumentsFromXar(List<DocumentReference> documentsToRestore) throws XWikiException
+    {
+        XWikiContext xcontext = getXWikiContext();
+        XWiki xwiki = xcontext.getWiki();
+
+        // Get the workspace-template XAR in order to restore these pages.
+        DocumentReference installDocumentReference = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
+                WORKSPACE_CLASS_SPACE, "Install");
+        XWikiDocument installDocument = xwiki.getDocument(installDocumentReference, xcontext);
+        if(installDocument.isNew()) {
+            logger.warn("WorkspaceManager.Install does not exist");
+            return;
+        }
+        XWikiAttachment xeXar = installDocument.getAttachment("workspace-template.xar");
+        if (xeXar == null) {
+            logger.warn("WorkspaceManager.Install has no attachment named workspace-template.xar.");
+            return;
+        }
+
+        // Open the XAR and restore the pages
+        ZipArchiveInputStream zip = new ZipArchiveInputStream(xeXar.getContentInputStream(xcontext));
+        try {
+            ZipArchiveEntry zipEntry = zip.getNextZipEntry();
+            while (zipEntry != null) {
+                // Get the name of the file
+                String fileName = zipEntry.getName();
+
+                // Check if it matches with one of the document to restore
+                Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
+                while (itDocumentsToRestore.hasNext()) {
+                    DocumentReference docRef = itDocumentsToRestore.next();
+
+                    // Compute what should be the filename of the document to restore
+                    String fileNameToRestore = String.format("%s/%s.xml", docRef.getLastSpaceReference().getName(),
+                            docRef.getName());
+
+                    // If the file in the zip is the good one, then we use it to restore the document
+                    if (fileName.equals(fileNameToRestore)) {
+                        try {
+                            restoreDeletedDocument(docRef, zipEntry, zip);
+                            // We have restored this document
+                            itDocumentsToRestore.remove();
+                        } catch (XWikiException e) {
+                            logger.warn("Failed to get [%s] from workspace-template.xar.", docRef);
+                        }
+                    }
+                }
+                // Next iteration
+                zipEntry = zip.getNextZipEntry();
+            }
+        } catch (IOException e) {
+            logger.error("Error during the decompression of workspace-template.xar.");
+        }
+    }
+
+    private void restoreDeletedDocument(DocumentReference docToRestoreReference, ZipArchiveEntry zipEntry,
+        ZipArchiveInputStream zip) throws XWikiException
+    {
+        XWikiContext xcontext = getXWikiContext();
+        XWiki xwiki = xcontext.getWiki();
+
+        XWikiDocument docToRestore = xwiki.getDocument(docToRestoreReference, xcontext);
+        docToRestore.fromXML(zip);
+        xwiki.saveDocument(docToRestore, xcontext);
+    }
+
+    private void restoreDocumentFromMainWiki(List<DocumentReference> documentsToRestore)
+    {
+        XWikiContext xcontext = getXWikiContext();
+        XWiki xwiki = xcontext.getWiki();
+
+        Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
+        while (itDocumentsToRestore.hasNext()) {
+            DocumentReference docRef = itDocumentsToRestore.next();
+
+            // Get the corresponding doc in the main wiki
+            DocumentReference mainDocRef = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
+                    docRef.getLastSpaceReference().getName(), docRef.getName());
+
+            // If the document exists in the main wiki, copy it
+            if (xwiki.exists(mainDocRef, xcontext)) {
+                try {
+                    xwiki.copyDocument(mainDocRef, docRef, xcontext);
+                    itDocumentsToRestore.remove();
+                } catch (XWikiException e) {
+                    logger.error("Failed to copy [%s] to [%s]", mainDocRef, docRef);
+                }
+            }
+        }
+    }
+
+    private void createEmptyDocuments(List<DocumentReference> documentsToRestore)
+    {
+        XWikiContext xcontext = getXWikiContext();
+        XWiki xwiki = xcontext.getWiki();
+
+        Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
+        while (itDocumentsToRestore.hasNext()) {
+            DocumentReference docRef = itDocumentsToRestore.next();
+            try {
+                XWikiDocument document = xwiki.getDocument(docRef, xcontext);
+                xwiki.saveDocument(document, xcontext);
+            } catch (XWikiException e) {
+                logger.error("Failed to create an empty document [%s]", docRef);
+            }
+        }
     }
 }

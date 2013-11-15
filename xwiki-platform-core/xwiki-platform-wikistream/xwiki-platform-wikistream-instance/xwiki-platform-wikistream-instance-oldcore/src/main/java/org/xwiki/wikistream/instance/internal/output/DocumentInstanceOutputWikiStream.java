@@ -398,6 +398,8 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
     {
         XWikiAttachment attachment = new XWikiAttachment(this.currentDocument, name);
 
+        attachment.setAuthor("");
+
         try {
             attachment.setContent(content);
         } catch (IOException e) {

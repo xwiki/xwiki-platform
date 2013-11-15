@@ -71,7 +71,7 @@ public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvi
     {
         BaseObject object = descriptorDocument.getXObject(XWikiServerClassDocumentInitializer.SERVER_CLASS);
         String oldPropertyName = "iswikitemplate";
-        if (object.getPropertyList().contains(oldPropertyName)) {
+        if (object != null && object.getPropertyList().contains(oldPropertyName)) {
             group.setTemplate(object.getIntValue(oldPropertyName, 0) != 0);
             // We can delete the old property but I keep it for compatibility reason
         }

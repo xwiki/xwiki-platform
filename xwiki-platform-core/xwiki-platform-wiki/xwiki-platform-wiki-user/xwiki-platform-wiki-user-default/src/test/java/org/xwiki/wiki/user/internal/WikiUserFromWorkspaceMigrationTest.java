@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -36,7 +35,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -44,16 +42,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@AllComponents
 public class WikiUserFromWorkspaceMigrationTest
 {
     @Rule
     public MockitoComponentMockingRule<WikiUserFromWorkspaceMigration> mocker =
             new MockitoComponentMockingRule(WikiUserFromWorkspaceMigration.class, HibernateDataMigration.class,
                     "R530000WikiUserFromWorkspaceMigration");
-
-    @Rule
-    private MockitoOldcoreRule oldcore;
 
     private WikiDescriptorManager wikiDescriptorManager;
 
@@ -68,20 +62,17 @@ public class WikiUserFromWorkspaceMigrationTest
     @Before
     public void setUp() throws Exception
     {
-        oldcore = new MockitoOldcoreRule(this.mocker);
-        //Utils.setComponentManager(mocker);
-
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         wikiUserConfigurationHelper = mocker.getInstance(WikiUserConfigurationHelper.class);
         execution = mock(Execution.class);
         mocker.registerComponent(Execution.class, execution);
-        xcontext = oldcore.getXWikiContext();
-        xwiki = oldcore.getMockXWiki();
+        xcontext = mock(XWikiContext.class);
+        xwiki = mock(XWiki.class);
 
         ExecutionContext executionContext = mock(ExecutionContext.class);
         when(execution.getContext()).thenReturn(executionContext);
         when(executionContext.getProperty("xwikicontext")).thenReturn(xcontext);
-        //when(xcontext.getWiki()).thenReturn(oldcore.getMockXWiki());
+        when(xcontext.getWiki()).thenReturn(xwiki);
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
     }
 
@@ -96,14 +87,20 @@ public class WikiUserFromWorkspaceMigrationTest
         when(xeXar.getContentInputStream(any(XWikiContext.class))).thenReturn(
                 getClass().getResourceAsStream("/test-restore-documents.xar"));
 
-        XWikiDocument documentToRestore = mock(XWikiDocument.class);
-        //when(xwiki.getDocument(eq(new DocumentReference("wikiid1", "XWiki", "AdminRegistrationSheet")),
-        //                any(XWikiContext.class))).thenReturn(documentToRestore);
+        XWikiDocument documentToRestore1 = mock(XWikiDocument.class);
+        when(xwiki.getDocument(eq(new DocumentReference("wikiid1", "XWiki", "AdminRegistrationSheet")),
+                        any(XWikiContext.class))).thenReturn(documentToRestore1);
+        DocumentReference documentToRestore2 = new DocumentReference("mainWiki", "XWiki", "RegistrationConfig");
+        when(xwiki.getDocument(eq(documentToRestore2), any(XWikiContext.class))).thenReturn(mock(XWikiDocument.class));
+        when(xwiki.exists(documentToRestore2, xcontext)).thenReturn(true);
 
         this.mocker.getComponentUnderTest().restoreDeletedDocuments("wikiid1");
 
-        verify(documentToRestore).fromXML(any(InputStream.class));
-        //verify(xwiki).saveDocument(documentToRestore, xcontext);
+        verify(documentToRestore1).fromXML(any(InputStream.class));
+        verify(xwiki).saveDocument(documentToRestore1, xcontext);
+        verify(xwiki).copyDocument(eq(documentToRestore2),
+                eq(new DocumentReference("wikiid1", "XWiki", "RegistrationConfig")), any(XWikiContext.class));
+
     }
 
 

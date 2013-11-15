@@ -372,6 +372,7 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
                 // Next iteration
                 zipEntry = zip.getNextZipEntry();
             }
+            zip.close();
         } catch (IOException e) {
             logger.error("Error during the decompression of workspace-template.xar.");
         } catch (XWikiException e) {
@@ -398,7 +399,7 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
                     xwiki.copyDocument(mainDocRef, docRef, xcontext);
                     itDocumentsToRestore.remove();
                 } catch (XWikiException e) {
-                    logger.error("Failed to copy [%s] to [%s]", mainDocRef, docRef);
+                    logger.error("Failed to copy [%s] to [%s].", mainDocRef, docRef);
                 }
             }
         }

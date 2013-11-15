@@ -69,7 +69,7 @@ yellow"&gt;Titre 2&lt;/td&gt;
 $xwiki.jsfx.use
 
 ("js/xwiki/table/tablefilterNsort.js", true)
-&lt;table id="tableid"
+&lt;table id="table1id"
 
 class="grid sortable filterable doOddEven"&gt;
  &lt;tr class="sortHeader"&gt;
@@ -92,7 +92,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 {{/velocity}}
 
 {{html}}
-&lt;table id="tableid" class="grid sortable filterable doOddEven"&gt;
+&lt;table id="table1id" class="grid sortable filterable doOddEven"&gt;
   &lt;tr class="sortHeader"&gt;
     &lt;th&gt;Titre1&lt;/th&gt;
     &lt;th&gt;Titre2&lt;/th&gt;

@@ -62,7 +62,7 @@ Parola 1 | Parola 2
 |Tabella filtrabile ordinabile|((({{{
 $xwiki.ssfx.use("js/xwiki/table/table.css")
 $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
-&lt;table id="tableid" class="grid sortable filterable doOddEven"&gt;
+&lt;table id="table1id" class="grid sortable filterable doOddEven"&gt;
 &lt;tr class="sortHeader"&gt;
 &lt;th&gt;Titolo1&lt;/th&gt;
 &lt;th&gt;Titolo2&lt;/th&gt;
@@ -85,7 +85,7 @@ $xwiki.ssfx.use("js/xwiki/table/table.css")
 $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 {{/velocity}}
 
-(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="grid sortable filterable doOddEven" id="table1id" %)
 (% class="sortHeader" %)|=Titolo 1|=Titolo 2
 |Cella 11|Cella 12
 |Cella 21|Cella 22

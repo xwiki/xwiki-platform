@@ -62,7 +62,7 @@ Wort 1 | Wort 2
 |Filterbare, sortierbare Tabelle|((({{{
 $xwiki.ssfx.use("js/xwiki/table/table.css")
 $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
-&lt;table id="tableid" class="grid sortable filterable doOddEven"&gt;
+&lt;table id="table1id" class="grid sortable filterable doOddEven"&gt;
   &lt;tr class="sortHeader"&gt;
     &lt;th&gt;Titel 1&lt;/th&gt;
     &lt;th&gt;Titel 2&lt;/th&gt;
@@ -85,7 +85,7 @@ $xwiki.ssfx.use("js/xwiki/table/table.css")
 $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 {{/velocity}}
 
-(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="grid sortable filterable doOddEven" id="table1id" %)
 (% class="sortHeader" %)|=Titel 1|=Titel 2
 |Zelle 11|Zelle 12
 |Zelle 21|Zelle 22

@@ -11,9 +11,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1382885828000</creationDate>
-  <date>1382885828000</date>
-  <contentUpdateDate>1382885828000</contentUpdateDate>
+  <creationDate>1384507496000</creationDate>
+  <date>1384509551000</date>
+  <contentUpdateDate>1384509551000</contentUpdateDate>
   <version>1.1</version>
   <title>XWikiSyntaxHeadings</title>
   <defaultTemplate/>
@@ -38,16 +38,17 @@
 1.1.1.1.1 niveau 5
 1.1.1.1.1.1 niveau 6
 )))|(((
-{{html}}
-&lt;!-- Note: replace this with wiki syntax when http://jira.xwiki.org/jira/browse/XWIKI-4358 is implemented --&gt;
-&lt;h1 id="Hlevel1"&gt;&lt;span&gt;niveau 1&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&lt;h2 id="Hlevel2"&gt;&lt;span&gt;niveau 2&lt;/span&gt;&lt;/h2&gt;&lt;h3 id="Hlevel3"&gt;&lt;span&gt;niveau 3&lt;/span&gt;&lt;/h3&gt;&lt;h4 id="Hlevel4"&gt;&lt;span&gt;niveau 4&lt;/span&gt;&lt;/h4&gt;&lt;h5 id="Hlevel5"&gt;&lt;span&gt;niveau 5&lt;/span&gt;&lt;/h5&gt;&lt;h6 id="Hlevel6"&gt;&lt;span&gt;niveau 6&lt;/span&gt;&lt;/h6&gt;
-{{/html}}
+= niveau 1 = 
+== niveau 2 ==
+=== niveau 3 ===
+==== niveau 4 ====
+===== niveau 5 =====
+====== niveau 6 ======
 )))
 |Titres paramétrés|&lt;h1&gt;&lt;span style="color:blue"&gt;
 titre&lt;/span&gt;&lt;/h1&gt;|(((
-{{html}}
-&lt;h1 id="Hheading" style="color:blue"&gt;&lt;span&gt;titre&lt;/span&gt;&lt;/h1&gt;
-{{/html}}
+(% style="color:blue" %)
+= titre =
 )))
 |Titres en syntaxe wiki|1.1.1 Titre en *gras*|(((
 === Titre en **gras** ===
@@ -65,16 +66,17 @@ titre&lt;/span&gt;&lt;/h1&gt;|(((
 ===== niveau 5 =====
 ====== niveau 6 ======}}}
 )))|(((
-{{html}}
-&lt;!-- Note: replace this with wiki syntax when http://jira.xwiki.org/jira/browse/XWIKI-4358 is implemented --&gt;
-&lt;h1 id="Hlevel1"&gt;&lt;span&gt;niveau 1&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&lt;h2 id="Hlevel2"&gt;&lt;span&gt;niveau 2&lt;/span&gt;&lt;/h2&gt;&lt;h3 id="Hlevel3"&gt;&lt;span&gt;niveau 3&lt;/span&gt;&lt;/h3&gt;&lt;h4 id="Hlevel4"&gt;&lt;span&gt;niveau 4&lt;/span&gt;&lt;/h4&gt;&lt;h5 id="Hlevel5"&gt;&lt;span&gt;niveau 5&lt;/span&gt;&lt;/h5&gt;&lt;h6 id="Hlevel6"&gt;&lt;span&gt;niveau 6&lt;/span&gt;&lt;/h6&gt;
-{{/html}}
+= niveau 1 = 
+== niveau 2 ==
+=== niveau 3 ===
+==== niveau 4 ====
+===== niveau 5 =====
+====== niveau 6 ======
 )))
 |Titres paramétrés|{{{(% style="color:blue" %)}}}
 ~= titre =|(((
-{{html}}
-&lt;h1 id="Hheading" style="color:blue"&gt;&lt;span&gt;titre&lt;/span&gt;&lt;/h1&gt;
-{{/html}}
+(% style="color:blue" %)
+= titre =
 )))
 |Titres en syntaxe wiki|{{{=== Titre en **gras** ===}}}|(((
 === Titre en **gras** ===

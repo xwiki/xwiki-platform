@@ -277,8 +277,9 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
             null));
         this.currentDocument.setValidationScript(getString(WikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT, parameters,
             null));
-        // TODO: get default syntax
-        this.currentDocument.setSyntax(getSyntax(WikiDocumentFilter.PARAMETER_SYNTAX, parameters, null));
+        if (this.properties.getDefaultSyntax() != null) {
+            this.currentDocument.setSyntax(this.properties.getDefaultSyntax());
+        }
         this.currentDocument.setHidden(getBoolean(WikiDocumentFilter.PARAMETER_HIDDEN, parameters, false));
 
         // Content

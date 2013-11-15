@@ -642,6 +642,11 @@ public class PackageMojo extends AbstractMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.slf4j", "log4j-over-slf4j",
             getDependencyManagementVersion(pomProject, "org.slf4j", "log4j-over-slf4j"), null, "jar"));
 
+        // When writing functional tests there's is often the need to export pages as XAR. Thus, in order to make
+        // developer's life easy, we also include the wikistream module (used for XAR exports).
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-wikistream-instance-oldcore", getXWikiPlatformVersion(), null, "jar"));
+
         return mandatoryTopLevelArtifacts;
     }
 

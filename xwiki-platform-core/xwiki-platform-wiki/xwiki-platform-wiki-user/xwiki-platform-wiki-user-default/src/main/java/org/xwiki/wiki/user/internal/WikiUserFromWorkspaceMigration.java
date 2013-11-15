@@ -225,7 +225,7 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
         XWikiDocument candidaciesDocument = xwiki.getDocument(candidaciesDocumentReference, xcontext);
 
         // We need to get all the old candidacies
-        DocumentReference oldCandidateClassReference = new DocumentReference(wikiId, "XWiki",
+        DocumentReference oldCandidateClassReference = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE,
                 "WorkspaceCandidateMemberClass");
         List<BaseObject> candidacyObjects = candidaciesDocument.getXObjects(oldCandidateClassReference);
         if (candidacyObjects != null) {
@@ -282,10 +282,10 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
 
         // Create the list of documents to restore
         List<DocumentReference> documentsToRestore = new LinkedList<DocumentReference>();
-        documentsToRestore.add(new DocumentReference(wikiId, "XWiki", "AdminRegistrationSheet"));
-        documentsToRestore.add(new DocumentReference(wikiId, "XWiki", "RegistrationConfig"));
-        documentsToRestore.add(new DocumentReference(wikiId, "XWiki", "RegistrationHelp"));
-        documentsToRestore.add(new DocumentReference(wikiId, "XWiki", "AdminUsersSheet"));
+        documentsToRestore.add(new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, "AdminRegistrationSheet"));
+        documentsToRestore.add(new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, "RegistrationConfig"));
+        documentsToRestore.add(new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, "RegistrationHelp"));
+        documentsToRestore.add(new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, "AdminUsersSheet"));
 
         // Remove from the list the document that already exists (so we don't need to restore them)
         Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
@@ -328,7 +328,7 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
             DocumentReference installDocumentReference = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
                     WORKSPACE_CLASS_SPACE, "Install");
             XWikiDocument installDocument = xwiki.getDocument(installDocumentReference, xcontext);
-            if(installDocument.isNew()) {
+            if (installDocument.isNew()) {
                 logger.warn("WorkspaceManager.Install does not exist");
                 return;
             }

@@ -20,22 +20,22 @@
 package org.xwiki.git.script;
 
 import java.io.File;
-import java.io.PrintWriter;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gitective.core.CommitFinder;
 import org.gitective.core.filter.commit.CommitCountFilter;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.gitective.core.stat.UserCommitActivity;
+import org.junit.*;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.StandardEnvironment;
+import org.xwiki.git.GitHelper;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.ComponentManagerRule;
+import org.xwiki.test.annotation.AllComponents;
 
 /**
  * Unit tests for {@link org.xwiki.git.script.GitScriptService}.
@@ -43,11 +43,15 @@ import org.xwiki.test.jmock.AbstractComponentTestCase;
  * @version $Id$
  * @since 4.2M1
  */
-public class GitScriptServiceTest extends AbstractComponentTestCase
+@AllComponents
+public class GitScriptServiceTest
 {
     private static final String TEST_REPO_ORIG = "test-repo-orig";
 
     private static final String TEST_REPO_CLONED = "test-repo-cloned";
+
+    @Rule
+    public ComponentManagerRule componentManager = new ComponentManagerRule();
 
     private File testRepository;
 
@@ -55,24 +59,26 @@ public class GitScriptServiceTest extends AbstractComponentTestCase
     public void setupRepository() throws Exception
     {
         // Configure permanent directory to be the temporary directory
-        StandardEnvironment environment = getComponentManager().getInstance(Environment.class);
+        StandardEnvironment environment = this.componentManager.getInstance(Environment.class);
         environment.setPermanentDirectory(environment.getTemporaryDirectory());
+        GitHelper gitHelper = new GitHelper(environment);
 
         // Delete repositories
-        FileUtils.deleteDirectory(getRepositoryFile(TEST_REPO_ORIG));
-        FileUtils.deleteDirectory(getRepositoryFile(TEST_REPO_CLONED));
+        FileUtils.deleteDirectory(gitHelper.getRepositoryFile(TEST_REPO_ORIG));
+        FileUtils.deleteDirectory(gitHelper.getRepositoryFile(TEST_REPO_CLONED));
 
         // Create a Git repository for the test
-        this.testRepository = createGitTestRepository(TEST_REPO_ORIG);
+        this.testRepository = gitHelper.createGitTestRepository(TEST_REPO_ORIG);
 
         // Add a file so that we can test querying the test repository for more fun!
-        add(testRepository, "test.txt", "test content", "first commit");
+        gitHelper.add(testRepository, "test.txt", "test content", new PersonIdent("test author", "author@doe.com"),
+            new PersonIdent("test committer", "committer@doe.com"), "first commit");
     }
 
     @Test
-    public void pullRepository() throws Exception
+    public void getRepositoryAndFindAuthors() throws Exception
     {
-        GitScriptService service = (GitScriptService) getComponentManager().getInstance(ScriptService.class, "git");
+        GitScriptService service = this.componentManager.getInstance(ScriptService.class, "git");
         Repository repository = service.getRepository(this.testRepository.getAbsolutePath(), TEST_REPO_CLONED);
         Assert.assertEquals(true, new Git(repository).pull().call().isSuccessful());
 
@@ -82,48 +88,26 @@ public class GitScriptServiceTest extends AbstractComponentTestCase
         finder.find();
 
         Assert.assertEquals(1, count.getCount());
+
+        Set<PersonIdent> authors = service.findAuthors(repository);
+        Assert.assertEquals(1, authors.size());
+        Assert.assertEquals("test author", authors.iterator().next().getName());
     }
 
-    private File getRepositoryFile(String repoName) throws Exception
+    @Test
+    public void getCountCommits() throws Exception
     {
-        Environment environment = getComponentManager().getInstance(Environment.class);
-        return new File(environment.getPermanentDirectory(), "git/" + repoName);
-    }
+        GitScriptService service = this.componentManager.getInstance(ScriptService.class, "git");
+        Repository repository = service.getRepository(this.testRepository.getAbsolutePath(), TEST_REPO_CLONED);
+        Assert.assertEquals(true, new Git(repository).pull().call().isSuccessful());
 
-    private File createGitTestRepository(String repoName) throws Exception
-    {
-        File localDirectory = getRepositoryFile(repoName);
-        File gitDirectory = new File(localDirectory, ".git");
-        FileRepositoryBuilder builder = new FileRepositoryBuilder();
-        Repository repository = builder.setGitDir(gitDirectory)
-            .readEnvironment()
-            .findGitDir()
-            .build();
-        repository.create();
-        return repository.getDirectory();
-    }
-
-    private void add(File repo, String path, String content, String message) throws Exception
-    {
-   		File file = new File(repo.getParentFile(), path);
-   		if (!file.getParentFile().exists()) {
-            Assert.assertTrue(file.getParentFile().mkdirs());
-        }
-   		if (!file.exists()) {
-            Assert.assertTrue(file.createNewFile());
-        }
-   		PrintWriter writer = new PrintWriter(file);
-   		if (content == null)
-   			content = "";
-   		try {
-   			writer.print(content);
-   		} finally {
-   			writer.close();
-   		}
-   		Git git = Git.open(repo);
-   		git.add().addFilepattern(path).call();
-   		RevCommit commit = git.commit().setOnly(path).setMessage(message)
-   				.setAuthor("test author", "john@does.com").setCommitter("test committer", "john@does.com").call();
-        Assert.assertNotNull(commit);
+        UserCommitActivity[] commits = service.countAuthorCommits(1, repository);
+        // 1 author
+        Assert.assertEquals(1, commits.length);
+        // 1 commit
+        Assert.assertEquals(1, commits[0].getCount());
+        // Verify user name and emai
+        Assert.assertEquals("test author", commits[0].getName());
+        Assert.assertEquals("author@doe.com", commits[0].getEmail());
     }
 }

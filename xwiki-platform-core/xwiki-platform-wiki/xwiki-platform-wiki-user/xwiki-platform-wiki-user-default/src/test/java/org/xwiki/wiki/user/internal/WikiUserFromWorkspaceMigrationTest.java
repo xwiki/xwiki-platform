@@ -52,6 +52,7 @@ public class WikiUserFromWorkspaceMigrationTest
             new MockitoComponentMockingRule(WikiUserFromWorkspaceMigration.class, HibernateDataMigration.class,
                     "R530000WikiUserFromWorkspaceMigration");
 
+    @Rule
     private MockitoOldcoreRule oldcore;
 
     private WikiDescriptorManager wikiDescriptorManager;

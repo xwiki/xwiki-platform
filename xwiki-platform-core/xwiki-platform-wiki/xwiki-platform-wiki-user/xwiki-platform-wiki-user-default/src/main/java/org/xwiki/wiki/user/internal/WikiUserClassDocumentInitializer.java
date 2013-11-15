@@ -33,13 +33,13 @@ import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Update the XWiki.XWikiServerClass document with all required information.
+ * Update the WikiManagerCode.WikiUserClass document with all required information.
  *
  * @since 5.3M2
  * @version $Id$
  */
 @Component
-@Named("WikiManagerCode.WikiUserClass")
+@Named("WikiManager.WikiUserClass")
 @Singleton
 public class WikiUserClassDocumentInitializer extends AbstractMandatoryDocumentInitializer
 {

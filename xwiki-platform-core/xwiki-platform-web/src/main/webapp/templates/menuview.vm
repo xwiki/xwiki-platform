@@ -4,6 +4,7 @@
 <div class="componentcontainer">
 <strong id="xwikimenutitle" class="hidden">$services.localization.render('core.menu.main.title')</strong>
 <div class="rightmenu">
+#set ($discard = $xwiki.ssfx.use('uicomponents/wiki/wiki.css', true))
 #set ($isWikiAPIAvailable = ("!$services.wiki" != '') && ("!$services.wiki.user" != ''))
 #set ($mainWikiHomeDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Main', 'WebHome'))
 #set ($WikiManagerMainDocReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'WebHome'))

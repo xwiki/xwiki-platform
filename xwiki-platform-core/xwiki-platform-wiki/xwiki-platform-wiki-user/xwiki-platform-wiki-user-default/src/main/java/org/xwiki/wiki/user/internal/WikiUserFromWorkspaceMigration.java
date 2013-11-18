@@ -235,8 +235,7 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
 
             for (BaseObject oldObject : candidacyObjects) {
                 // Transform the candidacy to the new class
-                int objectNumber = candidaciesDocument.createXObject(newCandidateClassReference, xcontext);
-                BaseObject newObject = candidaciesDocument.getXObject(newCandidateClassReference, objectNumber);
+                BaseObject newObject = candidaciesDocument.newXObject(newCandidateClassReference, xcontext);
                 newObject.setStringValue(WikiCandidateMemberClassInitializer.FIELD_TYPE,
                         oldObject.getStringValue("type"));
                 newObject.setStringValue(WikiCandidateMemberClassInitializer.FIELD_STATUS,

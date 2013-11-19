@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
@@ -38,6 +39,7 @@ import org.dom4j.dom.DOMDocument;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Archive;
@@ -183,7 +185,7 @@ public class XWikiAttachment implements Cloneable
      */
     public int getContentSize(XWikiContext context) throws XWikiException
     {
-        if (this.attachment_content == null) {
+        if (this.attachment_content == null && context != null) {
             this.doc.loadAttachmentContent(this, context);
         }
 
@@ -551,7 +553,7 @@ public class XWikiAttachment implements Cloneable
     @Deprecated
     public byte[] getContent(XWikiContext context) throws XWikiException
     {
-        if (this.attachment_content == null) {
+        if (this.attachment_content == null && context != null) {
             this.doc.loadAttachmentContent(this, context);
         }
 
@@ -568,7 +570,7 @@ public class XWikiAttachment implements Cloneable
      */
     public InputStream getContentInputStream(XWikiContext context) throws XWikiException
     {
-        if (this.attachment_content == null) {
+        if (this.attachment_content == null && context != null) {
             this.doc.loadAttachmentContent(this, context);
         }
 
@@ -764,4 +766,31 @@ public class XWikiAttachment implements Cloneable
         return loadArchive(context).getRevision(this, rev, context);
     }
 
+    /**
+     * Apply the provided attachment so that the current one contains the same informations and indicate if it was
+     * necessary to modify it in any way.
+     * 
+     * @param attachment the attachment to apply
+     * @return true if the attachment has been modified
+     * @since 5.3M2
+     */
+    public boolean apply(XWikiAttachment attachment)
+    {
+        boolean modified = false;
+
+        if (getFilesize() != attachment.getFilesize()) {
+            setFilesize(attachment.getFilesize());
+        }
+
+        try {
+            if (!IOUtils.contentEquals(getContentInputStream(null), attachment.getContentInputStream(null))) {
+                setContent(attachment.getContentInputStream(null));
+                modified = true;
+            }
+        } catch (Exception e) {
+            Log.error("Failed to compare content of attachments", e);
+        }
+
+        return modified;
+    }
 }

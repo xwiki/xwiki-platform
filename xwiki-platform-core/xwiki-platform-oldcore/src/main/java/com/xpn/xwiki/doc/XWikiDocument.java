@@ -3572,6 +3572,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         setContentDirty(true);
     }
 
+    /**
+     * Load attachment content from database.
+     * 
+     * @param context the XWiki context
+     * @throws XWikiException when failing to load attachments
+     * @since 5.3M2
+     */
+    public void loadAttachmentsContent(XWikiContext context) throws XWikiException
+    {
+        for (XWikiAttachment attachment : getAttachmentList()) {
+            attachment.loadContent(context);
+        }
+    }
+
     public void loadAttachments(XWikiContext context) throws XWikiException
     {
         for (XWikiAttachment attachment : getAttachmentList()) {
@@ -5103,6 +5117,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return null;
+    }
+
+    /**
+     * Add passed attachment to the document.
+     * 
+     * @param attachment the attachment to add
+     * @since 5.3M2
+     */
+    public void addAttachment(XWikiAttachment attachment)
+    {
+        attachment.setDoc(this);
+        getAttachmentList().add(attachment);
     }
 
     /**
@@ -8437,13 +8463,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
      * this method is dealing with "real" data and should not change everything related to version management and
      * document identifier.
-     * <p>
-     * This method also does not take into account attachments because: <u>
-     * <li>removing attachments means directly modifying the database, there is no way to indicate attachment to remove
-     * later like with objects (this could be improved later)</li>
-     * <li>copying them all from one XWikiDocument to another could be very expensive for the memory if done all at once
-     * since it mean loading all the attachment content in memory. Better doing it one by one after before or after the
-     * call to this method.</li>
      * 
      * @param document the document to apply
      * @return false is nothing changed
@@ -8555,7 +8574,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 }
             }
         }
-        // Add new attachments or update existing objects
+        // Add new attachments or update existing attachments
+        for (XWikiAttachment attachment : document.getAttachmentList()) {
+            XWikiAttachment originalAttachment = getAttachment(attachment.getFilename());
+            if (originalAttachment == null) {
+                addAttachment(attachment);
+            } else {
+                originalAttachment.apply(attachment);
+            }
+        }
 
         return modified;
     }

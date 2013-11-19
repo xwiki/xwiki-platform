@@ -729,13 +729,18 @@ public class ConfluenceXMLPackage
     {
         File folder = getUsersFolder();
 
-        String[] userFolders = folder.list();
+        List<Integer> users;
+        if (folder.exists()) {
+            String[] userFolders = folder.list();
 
-        List<Integer> users = new ArrayList<Integer>(userFolders.length);
-        for (String userIdString : userFolders) {
-            if (NumberUtils.isNumber(userIdString)) {
-                users.add(Integer.valueOf(userIdString));
+            users = new ArrayList<Integer>(userFolders.length);
+            for (String userIdString : userFolders) {
+                if (NumberUtils.isNumber(userIdString)) {
+                    users.add(Integer.valueOf(userIdString));
+                }
             }
+        } else {
+            users = Collections.emptyList();
         }
 
         return users;
@@ -745,13 +750,18 @@ public class ConfluenceXMLPackage
     {
         File folder = getGroupsFolder();
 
-        String[] groupFolders = folder.list();
+        List<Integer> groups;
+        if (folder.exists()) {
+            String[] groupFolders = folder.list();
 
-        List<Integer> groups = new ArrayList<Integer>(groupFolders.length);
-        for (String groupIdString : groupFolders) {
-            if (NumberUtils.isNumber(groupIdString)) {
-                groups.add(Integer.valueOf(groupIdString));
+            groups = new ArrayList<Integer>(groupFolders.length);
+            for (String groupIdString : groupFolders) {
+                if (NumberUtils.isNumber(groupIdString)) {
+                    groups.add(Integer.valueOf(groupIdString));
+                }
             }
+        } else {
+            groups = Collections.emptyList();
         }
 
         return groups;

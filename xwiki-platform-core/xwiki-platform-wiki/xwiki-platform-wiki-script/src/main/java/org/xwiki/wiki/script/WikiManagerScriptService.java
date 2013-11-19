@@ -196,11 +196,6 @@ public class WikiManagerScriptService implements ScriptService
     {
         String errorMessage = String.format("Error while getting the descriptor of wiki [%s]", wikiId);
         try {
-            // Check if the current script has the programing rights
-            XWikiContext context = xcontextProvider.get();
-            authorizationManager.checkAccess(Right.PROGRAM, context.getDoc().getAuthorReference(),
-                    context.getDoc().getDocumentReference());
-
             // Get the wiki owner
             WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
             if (descriptor == null) {
@@ -219,8 +214,6 @@ public class WikiManagerScriptService implements ScriptService
                 return true;
             }
         } catch (WikiManagerException e) {
-            error(errorMessage, e);
-        } catch (AccessDeniedException e) {
             error(errorMessage, e);
         }
 

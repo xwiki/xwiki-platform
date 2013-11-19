@@ -90,7 +90,7 @@ public class DefaultWikiCopier implements WikiCopier
                         fromWikiReference);
                 DocumentReference newDocReference = new DocumentReference(toWikiId,
                         origDocReference.getLastSpaceReference().getName(), origDocReference.getName());
-                xwiki.copyDocument(origDocReference, newDocReference, !withHistory, context);
+                xwiki.copyDocument(origDocReference, newDocReference, null, !withHistory, true, context);
 
                 observationManager.notify(new StepProgressEvent(), this);
             }

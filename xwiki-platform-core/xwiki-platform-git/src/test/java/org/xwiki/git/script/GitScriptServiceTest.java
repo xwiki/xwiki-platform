@@ -68,7 +68,7 @@ public class GitScriptServiceTest
         FileUtils.deleteDirectory(gitHelper.getRepositoryFile(TEST_REPO_CLONED));
 
         // Create a Git repository for the test
-        this.testRepository = gitHelper.createGitTestRepository(TEST_REPO_ORIG);
+        this.testRepository = gitHelper.createGitTestRepository(TEST_REPO_ORIG).getDirectory();
 
         // Add a file so that we can test querying the test repository for more fun!
         gitHelper.add(testRepository, "test.txt", "test content", new PersonIdent("test author", "author@doe.com"),

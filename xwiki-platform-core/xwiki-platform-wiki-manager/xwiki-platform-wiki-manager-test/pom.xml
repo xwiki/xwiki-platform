@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki-manager</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.3-milestone-2</version>
   </parent>
   <artifactId>xwiki-platform-wiki-manager-test</artifactId>
   <name>XWiki Platform - Wiki Manager - Tests - Parent POM</name>

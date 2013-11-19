@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-user-profile-test</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.3-milestone-2</version>
   </parent>
   <artifactId>xwiki-platform-user-profile-test-pageobjects</artifactId>
   <name>XWiki Platform - User - Profile - Tests - Page Objects</name>

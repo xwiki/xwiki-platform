@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.3-milestone-2</version>
   </parent>
   <artifactId>xwiki-platform-localization-sources</artifactId>
   <name>XWiki Platform - Localization - Sources Parent POM</name>

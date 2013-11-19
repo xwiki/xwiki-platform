@@ -46,6 +46,11 @@ public class GitHelper
         return localDirectory;
     }
 
+    public boolean exists(String repoName) throws Exception
+    {
+        return getRepositoryFile(repoName).exists();
+    }
+
     public Repository createGitTestRepository(String repoName) throws Exception
     {
         File localDirectory = getRepositoryFile(repoName);

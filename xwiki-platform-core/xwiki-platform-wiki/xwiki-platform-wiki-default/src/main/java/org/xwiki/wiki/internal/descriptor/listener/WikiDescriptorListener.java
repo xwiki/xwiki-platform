@@ -36,6 +36,7 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.builder.WikiDescriptorBuilder;
+import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.internal.manager.WikiDescriptorCache;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -63,6 +64,9 @@ public class WikiDescriptorListener implements EventListener
 
     @Inject
     private WikiDescriptorCache cache;
+
+    @Inject
+    private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
 
     @Override
     public String getName()
@@ -104,8 +108,9 @@ public class WikiDescriptorListener implements EventListener
     {
         List<BaseObject> existingServerClassObjects = document.getXObjects(SERVER_CLASS);
         if (existingServerClassObjects != null && !existingServerClassObjects.isEmpty()) {
-            DefaultWikiDescriptor existingDescriptor =
-                    this.builder.buildDescriptorObject(existingServerClassObjects, document);
+            String wikiId =
+                    wikiDescriptorDocumentHelper.getWikiIdFromDocumentReference(document.getDocumentReference());
+            DefaultWikiDescriptor existingDescriptor = cache.getFromId(wikiId);
             if (existingDescriptor != null) {
                 cache.remove(existingDescriptor);
             }

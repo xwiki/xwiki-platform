@@ -39,6 +39,8 @@
       org.xwiki.platform:xwiki-platform-workspace-ui,
       org.xwiki.platform:xwiki-platform-wiki-manager-ui
     </xwiki.extension.features>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Wiki Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

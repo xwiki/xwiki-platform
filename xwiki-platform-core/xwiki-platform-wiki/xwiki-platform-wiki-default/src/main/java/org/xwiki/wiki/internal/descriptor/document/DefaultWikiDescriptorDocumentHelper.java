@@ -73,6 +73,14 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
     }
 
     @Override
+    public String getWikiIdFromDocumentReference(DocumentReference descriptorDocumentReference)
+    {
+        String docName = descriptorDocumentReference.getName();
+        String wikiId = docName.replaceAll("XWikiServer", "");
+        return wikiId.toLowerCase();
+    }
+
+    @Override
     public XWikiDocument getDocumentFromWikiId(String wikiId) throws WikiManagerException
     {
         return getDocument(getDocumentReferenceFromId(wikiId));

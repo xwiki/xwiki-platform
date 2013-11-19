@@ -586,7 +586,8 @@ public class PackageMojo extends AbstractMojo
         // because for example some XARs mayb depend on JARs and we need those JARs to be packaged!
         Set<Artifact> jarArtifacts = new HashSet<Artifact>();
         for (Artifact artifact : resolvedArtifacts) {
-            if (artifact.getType().equals("jar")) {
+            // Note: test-jar is used in functional tests from time to time and we need to package them too.
+            if (artifact.getType().equals("jar") || artifact.getType().equals("test-jar")) {
                 jarArtifacts.add(artifact);
             }
         }

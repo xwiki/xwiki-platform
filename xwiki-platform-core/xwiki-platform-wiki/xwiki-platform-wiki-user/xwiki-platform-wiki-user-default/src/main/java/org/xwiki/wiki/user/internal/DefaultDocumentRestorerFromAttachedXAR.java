@@ -56,7 +56,8 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
-    private ZipFile getZipFile(DocumentReference docReference, String attachmentName) throws XWikiException, IOException
+    private File getTemporaryZipFile(DocumentReference docReference, String attachmentName)
+        throws XWikiException, IOException
     {
         XWikiContext xcontext = xcontextProvider.get();
         XWiki xwiki = xcontext.getWiki();
@@ -88,8 +89,8 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
         }
         tempFileOuputStream.close();
 
-        // Return the zip file
-        return new ZipFile(tempFile);
+        // Return the temp file
+        return tempFile;
     }
 
     @Override
@@ -98,9 +99,10 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
     {
         XWikiContext xcontext = xcontextProvider.get();
         XWiki xwiki = xcontext.getWiki();
-
+        File tempZipFile = null;
         try {
-            ZipFile zipFile = getZipFile(docReference, attachmentName);
+            tempZipFile = getTemporaryZipFile(docReference, attachmentName);
+            ZipFile zipFile = new ZipFile(tempZipFile);
             // We look for each document to restore if there is a corresponding zipEntry.
             Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
             while (itDocumentsToRestore.hasNext()) {
@@ -124,6 +126,11 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
             zipFile.close();
         } catch (IOException e) {
             logger.error(String.format("Error during the decompression of %s.", attachmentName));
+        } finally {
+            // Delete the temporary zip file
+            if (tempZipFile != null) {
+                tempZipFile.delete();
+            }
         }
     }
 

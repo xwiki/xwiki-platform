@@ -19,7 +19,6 @@
  */
 package org.xwiki.wiki.user.internal;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,8 +26,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -42,7 +39,6 @@ import org.xwiki.wiki.user.WikiUserManagerException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.migration.DataMigrationException;
@@ -67,6 +63,9 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private DocumentRestorerFromAttachedXAR documentRestorerFromAttachedXAR;
 
     @Inject
     private Logger logger;
@@ -319,63 +318,13 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
 
     private void restoreDocumentsFromWorkspaceXar(List<DocumentReference> documentsToRestore)
     {
-        XWikiContext xcontext = getXWikiContext();
-        XWiki xwiki = xcontext.getWiki();
-
+        DocumentReference installDocumentReference = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
+                WORKSPACE_CLASS_SPACE, "Install");
         try {
-            // Get the workspace-template XAR in order to restore these pages.
-            DocumentReference installDocumentReference = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
-                    WORKSPACE_CLASS_SPACE, "Install");
-            XWikiDocument installDocument = xwiki.getDocument(installDocumentReference, xcontext);
-            if (installDocument.isNew()) {
-                logger.warn("WorkspaceManager.Install does not exist");
-                return;
-            }
-            XWikiAttachment xeXar = installDocument.getAttachment("workspace-template.xar");
-            if (xeXar == null) {
-                logger.warn("WorkspaceManager.Install has no attachment named workspace-template.xar.");
-                return;
-            }
-
-            // Open the XAR and restore the pages
-            ZipArchiveInputStream zip = new ZipArchiveInputStream(xeXar.getContentInputStream(xcontext));
-
-            ZipArchiveEntry zipEntry = zip.getNextZipEntry();
-            while (zipEntry != null) {
-                // Get the name of the file
-                String fileName = zipEntry.getName();
-
-                // Check if it matches with one of the document to restore
-                Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
-                while (itDocumentsToRestore.hasNext()) {
-                    DocumentReference docRef = itDocumentsToRestore.next();
-
-                    // Compute what should be the filename of the document to restore
-                    String fileNameToRestore = String.format("%s/%s.xml", docRef.getLastSpaceReference().getName(),
-                            docRef.getName());
-
-                    // If the file in the zip is the good one, then we use it to restore the document
-                    if (fileName.equals(fileNameToRestore)) {
-                        try {
-                            // Restore it
-                            XWikiDocument docToRestore = xwiki.getDocument(docRef, xcontext);
-                            docToRestore.fromXML(zip);
-                            xwiki.saveDocument(docToRestore, xcontext);
-                            // We have restored this document
-                            itDocumentsToRestore.remove();
-                        } catch (XWikiException e) {
-                            logger.warn("Failed to get [%s] from workspace-template.xar.", docRef);
-                        }
-                    }
-                }
-                // Next iteration
-                zipEntry = zip.getNextZipEntry();
-            }
-            zip.close();
-        } catch (IOException e) {
-            logger.error("Error during the decompression of workspace-template.xar.");
+            documentRestorerFromAttachedXAR.restoreDocumentFromAttachedXAR(installDocumentReference,
+                    "workspace-template.xar", documentsToRestore);
         } catch (XWikiException e) {
-            logger.error("Failed to get WorkspaceManager.Install or workspace-template.xar", e);
+            logger.error("Error while restoring documents from the Workspace XAR");
         }
     }
 

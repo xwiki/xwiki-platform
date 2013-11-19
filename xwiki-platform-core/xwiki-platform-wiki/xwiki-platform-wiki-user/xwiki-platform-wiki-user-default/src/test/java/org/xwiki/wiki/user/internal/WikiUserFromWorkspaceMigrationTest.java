@@ -19,7 +19,6 @@
  */
 package org.xwiki.wiki.user.internal;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +37,6 @@ import org.xwiki.wiki.user.WikiUserConfiguration;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.migration.hibernate.HibernateDataMigration;
@@ -61,6 +59,8 @@ public class WikiUserFromWorkspaceMigrationTest
 
     private WikiUserConfigurationHelper wikiUserConfigurationHelper;
 
+    private DocumentRestorerFromAttachedXAR documentRestorerFromAttachedXAR;
+
     private Execution execution;
 
     private XWikiContext xcontext;
@@ -72,6 +72,7 @@ public class WikiUserFromWorkspaceMigrationTest
     {
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         wikiUserConfigurationHelper = mocker.getInstance(WikiUserConfigurationHelper.class);
+        documentRestorerFromAttachedXAR = mocker.getInstance(DocumentRestorerFromAttachedXAR.class);
         execution = mock(Execution.class);
         mocker.registerComponent(Execution.class, execution);
         xcontext = mock(XWikiContext.class);
@@ -145,21 +146,11 @@ public class WikiUserFromWorkspaceMigrationTest
         when(oldCandidacy.getDateValue("date")).thenReturn(new Date(2000));
         when(oldCandidacy.getDateValue("resolutionDate")).thenReturn(new Date(8000));
 
-        // Mocks about the old document restoration from the XAR
-        XWikiDocument workspaceInstallDoc = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq(new DocumentReference("mainWiki", "WorkspaceManager", "Install")),
-                any(XWikiContext.class))).thenReturn(workspaceInstallDoc);
-        XWikiAttachment xeXar = mock(XWikiAttachment.class);
-        when(workspaceInstallDoc.getAttachment("workspace-template.xar")).thenReturn(xeXar);
-        when(xeXar.getContentInputStream(any(XWikiContext.class))).thenReturn(
-                getClass().getResourceAsStream("/test-restore-documents.xar"));
-        XWikiDocument documentToRestore1 = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq(new DocumentReference("workspace", "XWiki", "AdminRegistrationSheet")),
-                any(XWikiContext.class))).thenReturn(documentToRestore1);
-
         // Mocks about the old document to restore form the main wiki
         DocumentReference documentToRestore2 = new DocumentReference("mainWiki", "XWiki", "RegistrationConfig");
-        when(xwiki.getDocument(eq(documentToRestore2), any(XWikiContext.class))).thenReturn(mock(XWikiDocument.class));
+        XWikiDocument documentToRestore2FromMainWiki = mock(XWikiDocument.class);
+        when(xwiki.getDocument(eq(documentToRestore2), any(XWikiContext.class))).
+                thenReturn(documentToRestore2FromMainWiki);
         when(xwiki.exists(documentToRestore2, xcontext)).thenReturn(true);
 
         // Run
@@ -173,8 +164,8 @@ public class WikiUserFromWorkspaceMigrationTest
 
         // Verify the old workspace object has been removed and the descriptor saved
         verify(oldDescriptorDocument).removeXObject(oldObject);
-        verify(xwiki, times(1)).saveDocument(oldDescriptorDocument, "Remove the old WorkspaceManager.WorkspaceClass object.",
-                xcontext);
+        verify(xwiki, times(1)).saveDocument(oldDescriptorDocument, "Remove the old WorkspaceManager.WorkspaceClass" +
+                " object.", xcontext);
 
         // Verify the candidacy has been upgraded
         verify(newCandidacyObject).setStringValue(WikiCandidateMemberClassInitializer.FIELD_TYPE, "aa");
@@ -196,8 +187,8 @@ public class WikiUserFromWorkspaceMigrationTest
                 " to the new Wiki Application.", xcontext);
 
         // Verify the document to restore has been restored from the xar
-        verify(documentToRestore1).fromXML(any(InputStream.class));
-        verify(xwiki, times(1)).saveDocument(documentToRestore1, xcontext);
+        verify(documentRestorerFromAttachedXAR).restoreDocumentFromAttachedXAR(eq(new DocumentReference("mainWiki",
+                "WorkspaceManager", "Install")), eq("workspace-template.xar"), any(List.class));
 
         // Verify the document to restore has been restored from the main wiki
         verify(xwiki).copyDocument(eq(documentToRestore2),

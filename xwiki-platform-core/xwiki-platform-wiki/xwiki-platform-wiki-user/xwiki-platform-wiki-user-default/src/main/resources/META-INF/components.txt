@@ -2,3 +2,4 @@ org.xwiki.wiki.user.internal.DefaultWikiUserManager
 org.xwiki.wiki.user.internal.DefaultWikiUserConfigurationHelper
 org.xwiki.wiki.user.internal.WikiUserClassDocumentInitializer
 org.xwiki.wiki.user.internal.WikiUserFromWorkspaceMigration
+org.xwiki.wiki.user.internal.DefaultDocumentRestorerFromAttachedXAR

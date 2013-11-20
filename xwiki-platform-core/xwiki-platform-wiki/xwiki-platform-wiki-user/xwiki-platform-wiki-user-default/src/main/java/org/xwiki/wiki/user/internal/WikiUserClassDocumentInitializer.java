@@ -33,7 +33,7 @@ import com.xpn.xwiki.internal.mandatory.AbstractMandatoryDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Update the WikiManagerCode.WikiUserClass document with all required information.
+ * Update the WikiManager.WikiUserClass document with all required information.
  *
  * @since 5.3M2
  * @version $Id$

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-annotations</artifactId>
-    <version>5.2.1-SNAPSHOT</version>
+    <version>5.2.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-annotation-test-pageobjects</artifactId>
   <name>XWiki Platform - Annotations - Page Objects</name>

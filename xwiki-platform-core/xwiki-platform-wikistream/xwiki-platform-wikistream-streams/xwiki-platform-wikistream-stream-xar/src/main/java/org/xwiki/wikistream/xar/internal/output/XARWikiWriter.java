@@ -37,6 +37,7 @@ import org.xwiki.wikistream.output.FileOutputTarget;
 import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 import org.xwiki.wikistream.output.OutputTarget;
 import org.xwiki.wikistream.xar.internal.XARModel;
+import org.xwiki.wikistream.xar.output.XAROutputProperties;
 import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
 
 /**
@@ -166,12 +167,12 @@ public class XARWikiWriter
             writer.writeStartElement(XARModel.ELEMENT_PACKAGE);
 
             writer.writeStartElement(XARModel.ELEMENT_INFOS);
-            writer.writeElement(XARModel.ELEMENT_INFOS_NAME, this.xarProperties.getName());
-            writer.writeElement(XARModel.ELEMENT_INFOS_DESCRIPTION, this.xarProperties.getDescription());
-            writer.writeElement(XARModel.ELEMENT_INFOS_LICENSE, this.xarProperties.getLicense());
-            writer.writeElement(XARModel.ELEMENT_INFOS_AUTHOR, this.xarProperties.getAuthor());
-            writer.writeElement(XARModel.ELEMENT_INFOS_VERSION, this.xarProperties.getVersion());
-            writer.writeElement(XARModel.ELEMENT_INFOS_ISBACKUPPACK, this.xarProperties.isBackupPack() ? "1" : "0");
+            writer.writeElement(XARModel.ELEMENT_INFOS_NAME, this.xarProperties.getPackageName());
+            writer.writeElement(XARModel.ELEMENT_INFOS_DESCRIPTION, this.xarProperties.getPackageDescription());
+            writer.writeElement(XARModel.ELEMENT_INFOS_LICENSE, this.xarProperties.getPackageLicense());
+            writer.writeElement(XARModel.ELEMENT_INFOS_AUTHOR, this.xarProperties.getPackageAuthor());
+            writer.writeElement(XARModel.ELEMENT_INFOS_VERSION, this.xarProperties.getPackageVersion());
+            writer.writeElement(XARModel.ELEMENT_INFOS_ISBACKUPPACK, this.xarProperties.isPackageBackupPack() ? "1" : "0");
             writer.writeElement(XARModel.ELEMENT_INFOS_ISPRESERVEVERSION, this.xarProperties.isPreserveVersion() ? "1"
                 : "0");
             writer.writeEndElement();

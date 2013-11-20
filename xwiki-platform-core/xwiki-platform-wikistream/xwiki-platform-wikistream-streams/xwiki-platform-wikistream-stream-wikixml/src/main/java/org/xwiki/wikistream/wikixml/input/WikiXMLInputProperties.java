@@ -17,42 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal.input;
+package org.xwiki.wikistream.wikixml.input;
 
-import java.io.IOException;
-
-import javax.xml.transform.Source;
-
-import org.xwiki.wikistream.xml.input.source.SourceInputSource;
+import org.xwiki.wikistream.xml.input.XMLInputProperties;
 
 /**
+ * Generic XML parser properties.
+ * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3RC1
  */
-public class DefaultSourceInputSource implements SourceInputSource
+public class WikiXMLInputProperties extends XMLInputProperties
 {
-    private Source source;
 
-    public DefaultSourceInputSource(Source source)
-    {
-        this.source = source;
-    }
-
-    @Override
-    public boolean restartSupported()
-    {
-        return false;
-    }
-
-    @Override
-    public void close() throws IOException
-    {
-        // Source is not closable
-    }
-
-    @Override
-    public Source getSource()
-    {
-        return this.source;
-    }
 }

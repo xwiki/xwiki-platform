@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.confluence.xml.internal.input;
+package org.xwiki.wikistream.confluence.input;
 
 import java.util.Locale;
 
@@ -28,19 +28,36 @@ import org.xwiki.wikistream.DefaultWikiStreamProperties;
 import org.xwiki.wikistream.input.InputSource;
 
 /**
+ * Confluence XMLL input properties.
+ * 
  * @version $Id$
- * @since 5.3M2
+ * @since 5.3RC1
  */
 public class ConfluenceInputProperties extends DefaultWikiStreamProperties
 {
+    /**
+     * @see #getSource()
+     */
     private InputSource source;
 
+    /**
+     * @see #getDefaultLocale()
+     */
     private Locale defaultLocale;
 
+    /**
+     * @see #isConvertToXWiki()
+     */
     private boolean convertToXWiki = true;
 
+    /**
+     * @see #getSpacePageName()
+     */
     private String spacePageName = "WebHome";
 
+    /**
+     * @return The source to load the wiki from
+     */
     @PropertyName("The source")
     @PropertyDescription("The source to load the wiki from")
     @PropertyMandatory
@@ -49,36 +66,64 @@ public class ConfluenceInputProperties extends DefaultWikiStreamProperties
         return this.source;
     }
 
+    /**
+     * @param source The source to load the wiki from
+     */
     public void setSource(InputSource source)
     {
         this.source = source;
     }
 
+    /**
+     * @return The locale of the documents
+     */
+    @PropertyName("Default locale")
+    @PropertyDescription("The locale of the documents")
     public Locale getDefaultLocale()
     {
         return defaultLocale;
     }
 
+    /**
+     * @param defaultLocale The locale of the documents
+     */
     public void setDefaultLocale(Locale defaultLocale)
     {
         this.defaultLocale = defaultLocale;
     }
 
+    /**
+     * @return if true, convert various Confluence standards to XWiki standard (the name of the admin group, etc.)
+     */
+    @PropertyName("XWiki conversion")
+    @PropertyDescription("Convert various Confluence standards to XWiki standard (the name of the admin group, etc.)")
     public boolean isConvertToXWiki()
     {
         return this.convertToXWiki;
     }
 
+    /**
+     * @param convertToXWiki if true, convert various Confluence standards to XWiki standard (the name of the admin
+     *            group, etc.)
+     */
     public void setConvertToXWiki(boolean convertToXWiki)
     {
         this.convertToXWiki = convertToXWiki;
     }
 
+    /**
+     * @return The name to use for space home page
+     */
+    @PropertyName("Space home page")
+    @PropertyDescription("The name to use for space home page")
     public String getSpacePageName()
     {
         return this.spacePageName;
     }
 
+    /**
+     * @param spacePageName The name to use for space home page
+     */
     public void setSpacePageName(String spacePageName)
     {
         this.spacePageName = spacePageName;

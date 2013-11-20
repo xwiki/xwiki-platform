@@ -36,6 +36,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARAttachmentModel;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
 import org.xwiki.wikistream.xar.internal.XARDocumentModel;

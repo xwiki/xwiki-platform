@@ -32,10 +32,6 @@
   <artifactId>xwiki-platform-wikistream-streams</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - WikiStream - Streams</name>
-  <properties>
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
   <modules>
     <module>xwiki-platform-wikistream-stream-wikixml</module>
     <module>xwiki-platform-wikistream-stream-xar</module>

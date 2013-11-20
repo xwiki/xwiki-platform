@@ -49,7 +49,7 @@ import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStream;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
-import org.xwiki.wikistream.wikixml.internal.output.WikiXMLOutputProperties;
+import org.xwiki.wikistream.wikixml.output.WikiXMLOutputProperties;
 
 /**
  * Base class to validate an instance sub {@link InputInstanceWikiStream}.

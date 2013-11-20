@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
 
 /**
- * User related events.
+ * Group related events.
  * 
  * @version $Id$
  * @since 5.3M2
@@ -37,29 +37,49 @@ public interface GroupFilter
     // Properties
 
     /**
-     * @type String
+     * @type {@link java.util.Date}
      */
     String PARAMETER_CREATION_DATE = "creation_date";
 
     /**
-     * @type String
+     * @type {@link java.util.Date}
      */
     String PARAMETER_REVISION_DATE = "revision_date";
 
     // Events
 
+    /**
+     * @param name the name of the group
+     * @param parameters the parameters of the group
+     * @throws WikiStreamException when failing to send event
+     */
     void beginGroup(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param name the name of the user
+     * @param parameters the parameters of the user
+     * @throws WikiStreamException when failing to send event
+     */
     void onGroupMemberUser(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param name the name of the group
+     * @param parameters the parameters of the group
+     * @throws WikiStreamException when failing to send event
+     */
     void onGroupMemberGroup(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param name the name of the group
+     * @param parameters the parameters of the group
+     * @throws WikiStreamException when failing to send event
+     */
     void endGroup(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;

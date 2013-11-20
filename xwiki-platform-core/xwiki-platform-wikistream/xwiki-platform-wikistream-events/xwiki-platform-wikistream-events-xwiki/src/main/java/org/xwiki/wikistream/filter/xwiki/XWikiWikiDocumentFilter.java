@@ -32,7 +32,7 @@ import org.xwiki.wikistream.model.filter.WikiSpaceFilter;
 public interface XWikiWikiDocumentFilter extends WikiFilter, WikiSpaceFilter, WikiDocumentFilter
 {
     /**
-     * @type String
+     * @type {@link String}
      */
-    String PARAMETER_JRCSREVISIONS = "xwiki_document_jrcsrevisions";
+    String PARAMETER_JRCSREVISIONS = "xwiki_jrcsrevisions";
 }

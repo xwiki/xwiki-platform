@@ -25,6 +25,7 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.xml.output.XMLOutputProperties;
 
 /**
  * @param <P>

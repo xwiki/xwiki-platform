@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.wikistream.confluence.input.ConfluenceInputProperties;
 import org.xwiki.wikistream.confluence.xml.internal.ConfluenceFilter;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
@@ -40,8 +41,14 @@ import org.xwiki.wikistream.type.WikiStreamType;
 public class ConfluenceInputWikiStreamFactory extends
     AbstractBeanInputWikiStreamFactory<ConfluenceInputProperties, ConfluenceFilter>
 {
+    /**
+     * The role hint of that component.
+     */
     public static final String ROLEHINT = "confluence+xml";
 
+    /**
+     * The default constructor.
+     */
     public ConfluenceInputWikiStreamFactory()
     {
         super(WikiStreamType.CONFLUENCE_XML);

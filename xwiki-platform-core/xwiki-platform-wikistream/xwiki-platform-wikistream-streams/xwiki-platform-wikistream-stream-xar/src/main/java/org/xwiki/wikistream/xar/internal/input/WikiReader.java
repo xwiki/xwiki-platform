@@ -37,6 +37,7 @@ import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.input.InputStreamInputSource;
+import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARModel;
 

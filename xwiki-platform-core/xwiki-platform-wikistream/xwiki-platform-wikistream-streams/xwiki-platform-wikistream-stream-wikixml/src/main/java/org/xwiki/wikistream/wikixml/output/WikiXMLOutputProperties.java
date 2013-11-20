@@ -17,14 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal;
+package org.xwiki.wikistream.wikixml.output;
 
-import org.xwiki.wikistream.DefaultWikiStreamProperties;
+import org.xwiki.wikistream.xml.output.XMLOutputProperties;
 
 /**
+ * Generic XML serializer properties.
+ * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3RC1
  */
-public class XMLProperties extends DefaultWikiStreamProperties
+public class WikiXMLOutputProperties extends XMLOutputProperties
 {
+
 }

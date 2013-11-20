@@ -40,6 +40,7 @@ import org.xwiki.filter.xml.serializer.XMLSerializerFactory;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.wikixml.output.WikiXMLOutputProperties;
 import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamFactory;
 
 /**
@@ -61,6 +62,9 @@ public class WikiXMLOutputWikiStreamFactory extends
     @Inject
     private Provider<ComponentManager> contextComponentManager;
 
+    /**
+     * Default constructor.
+     */
     public WikiXMLOutputWikiStreamFactory()
     {
         super(WikiStreamType.WIKI_XML);

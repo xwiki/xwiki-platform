@@ -34,10 +34,20 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface WikiFilter
 {
+    /**
+     * @param name the name of the wiki
+     * @param parameters the properties of the wiki
+     * @throws WikiStreamException when failing to send event
+     */
     void beginWiki(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param name the name of the wiki
+     * @param parameters the properties of the wiki
+     * @throws WikiStreamException when failing to send event
+     */
     void endWiki(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;

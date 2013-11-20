@@ -25,6 +25,7 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.xml.input.XMLInputProperties;
 
 /**
  * @param <P>

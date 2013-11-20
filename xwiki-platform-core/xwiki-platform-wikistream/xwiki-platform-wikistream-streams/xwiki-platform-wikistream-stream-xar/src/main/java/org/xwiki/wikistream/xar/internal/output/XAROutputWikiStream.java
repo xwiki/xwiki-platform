@@ -52,6 +52,7 @@ import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARObjectModel;
 import org.xwiki.wikistream.xar.internal.XARObjectPropertyModel;
 import org.xwiki.wikistream.xar.internal.XARUtils;
+import org.xwiki.wikistream.xar.output.XAROutputProperties;
 import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
 
 /**
@@ -204,7 +205,8 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.writer.writeElement(XARDocumentModel.ELEMENT_CREATION_DATE,
             toString((Date) parameters.get(XWikiWikiDocumentFilter.PARAMETER_CREATION_DATE)));
 
-        if (this.properties.isPreserveVersion()) {
+        if (this.properties.isPreserveVersion()
+            && parameters.containsKey(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS)) {
             this.writer.writeElement(XARDocumentModel.ELEMENT_REVISIONS,
                 (String) parameters.get(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS));
         }

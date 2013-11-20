@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARObjectModel;

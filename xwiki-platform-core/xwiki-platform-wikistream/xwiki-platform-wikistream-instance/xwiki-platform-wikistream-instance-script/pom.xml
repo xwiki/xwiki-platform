@@ -30,7 +30,7 @@
     <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-instance-script</artifactId>
-  <name>XWiki Platform - Wiki Stream - Instance - Script</name>
+  <name>XWiki Platform - WikiStream - Instance - Script</name>
   <description>Expose script oriented API ro manipulate instance wiki stream</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>

@@ -30,7 +30,7 @@
     <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-instance-oldcore</artifactId>
-  <name>XWiki Platform - Wiki Stream - Instance - Oldcore</name>
+  <name>XWiki Platform - WikiStream - Instance - Oldcore</name>
   <description>Extract oldcore related data from the current XWiki instance</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.70</xwiki.jacoco.instructionRatio>

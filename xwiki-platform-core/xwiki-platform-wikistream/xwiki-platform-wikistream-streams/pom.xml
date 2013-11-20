@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-platform-wikistream-streams</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Wiki Stream - Streams</name>
+  <name>XWiki Platform - WikiStream - Streams</name>
   <properties>
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
     <xwiki.clirr.skip>true</xwiki.clirr.skip>

@@ -30,8 +30,8 @@
     <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-stream-confluencexml</artifactId>
-  <name>XWiki Platform - Wiki Stream - Confluence XML</name>
-  <description>XWiki Platform - Wiki Stream - Confluence XML</description>  <properties>
+  <name>XWiki Platform - WikiStream - Confluence XML</name>
+  <description>XWiki Platform - WikiStream - Confluence XML</description>  <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>

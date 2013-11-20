@@ -30,7 +30,7 @@
     <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-script</artifactId>
-  <name>XWiki Platform - Wiki Stream - Script</name>
+  <name>XWiki Platform - WikiStream - Script</name>
   <description>XWiki Platform - Wiki Stream - Script</description>
   <packaging>jar</packaging>
   <properties>

@@ -30,7 +30,7 @@
     <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-instance-api</artifactId>
-  <name>XWiki Platform - Wiki Stream - Instance - API</name>
+  <name>XWiki Platform - WikiStream - Instance - API</name>
   <description>Extract data from the current XWiki instance</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>

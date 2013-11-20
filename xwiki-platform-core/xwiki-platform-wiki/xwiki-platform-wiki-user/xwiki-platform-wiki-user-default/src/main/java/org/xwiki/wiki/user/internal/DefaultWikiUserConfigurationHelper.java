@@ -40,6 +40,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Default implementation of {@link WikiUserConfigurationHelper}.
  *
  * @version $Id$
+ * @since 5.3M2
  */
 @Component
 @Singleton

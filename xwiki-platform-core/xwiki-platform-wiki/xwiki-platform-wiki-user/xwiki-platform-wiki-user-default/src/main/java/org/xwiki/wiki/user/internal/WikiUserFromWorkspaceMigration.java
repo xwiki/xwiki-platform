@@ -49,6 +49,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * Migrator to convert all workspaces (WorkspaceManager.WorkspaceClass) to new WikiUserConfiguration objects.
  *
  * @version $Id$
+ * @since 5.3RC1
  */
 @Component
 @Named("R530000WikiUserFromWorkspaceMigration")
@@ -312,7 +313,7 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
 
         // If the list is empty, the job is done
         if (!documentsToRestore.isEmpty()) {
-            logger.error("Failed to restore some documents: [%s]", documentsToRestore);
+            logger.error("Failed to restore some documents: [{}]", documentsToRestore);
         }
     }
 
@@ -324,7 +325,7 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
             documentRestorerFromAttachedXAR.restoreDocumentFromAttachedXAR(installDocumentReference,
                     "workspace-template.xar", documentsToRestore);
         } catch (XWikiException e) {
-            logger.error("Error while restoring documents from the Workspace XAR");
+            logger.error("Error while restoring documents from the Workspace XAR", e);
         }
     }
 
@@ -347,7 +348,7 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
                     xwiki.copyDocument(mainDocRef, docRef, xcontext);
                     itDocumentsToRestore.remove();
                 } catch (XWikiException e) {
-                    logger.error("Failed to copy [%s] to [%s].", mainDocRef, docRef);
+                    logger.error("Failed to copy [{}] to [{}].", mainDocRef, docRef, e);
                 }
             }
         }

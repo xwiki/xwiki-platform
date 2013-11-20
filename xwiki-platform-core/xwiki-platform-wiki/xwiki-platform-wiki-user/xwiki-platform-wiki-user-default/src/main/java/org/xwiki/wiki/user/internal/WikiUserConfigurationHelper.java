@@ -28,6 +28,7 @@ import org.xwiki.wiki.user.WikiUserManagerException;
  * Component to load and save wiki user configuration in a wiki.
  *
  * @version $Id$
+ * @since 5.3M2
  */
 @Unstable
 @Role

@@ -31,7 +31,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 /**
  * Update the WikiManager.WikiCandidateMemberClass document with all required information.
  *
- * @since 5.3M2
+ * @since 5.3RC1
  * @version $Id$
  */
 @Component

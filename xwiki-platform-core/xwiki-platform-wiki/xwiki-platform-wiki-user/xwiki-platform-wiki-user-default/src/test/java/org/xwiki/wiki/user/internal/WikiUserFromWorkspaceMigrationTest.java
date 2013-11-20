@@ -48,6 +48,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for {@link WikiUserFromWorkspaceMigration}.
+ *
+ * @since 5.3RC1
+ */
 public class WikiUserFromWorkspaceMigrationTest
 {
     @Rule

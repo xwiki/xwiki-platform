@@ -46,6 +46,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Default implementation for {@link DocumentRestorerFromAttachedXAR}.
  *
  * @version $Id$
+ * @since 5.3RC1
  */
 @Component
 public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerFromAttachedXAR
@@ -125,7 +126,7 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
             }
             zipFile.close();
         } catch (IOException e) {
-            logger.error(String.format("Error during the decompression of %s.", attachmentName));
+            logger.error(String.format("Error during the decompression of [%s].", attachmentName), e);
         } finally {
             // Delete the temporary zip file
             if (tempZipFile != null) {

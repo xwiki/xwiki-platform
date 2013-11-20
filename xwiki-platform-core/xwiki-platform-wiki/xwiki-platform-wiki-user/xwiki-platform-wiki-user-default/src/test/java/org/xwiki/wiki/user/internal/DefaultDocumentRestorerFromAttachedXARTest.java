@@ -43,6 +43,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for {@link DefaultDocumentRestorerFromAttachedXAR}.
+ *
+ * @since 5.3RC1
+ */
 public class DefaultDocumentRestorerFromAttachedXARTest
 {
     @Rule

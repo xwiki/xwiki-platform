@@ -30,6 +30,7 @@ import com.xpn.xwiki.XWikiException;
  * Component to restore some document from a XAR attached to a wiki page.
  *
  * @version $Id$
+ * @since 5.3RC1
  */
 @Role
 public interface DocumentRestorerFromAttachedXAR

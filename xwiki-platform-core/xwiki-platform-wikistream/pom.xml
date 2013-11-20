@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-platform-wikistream</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Wiki Stream</name>
+  <name>XWiki Platform - WikiStream</name>
   <modules>
     <module>xwiki-platform-wikistream-api</module>
     <module>xwiki-platform-wikistream-xml</module>

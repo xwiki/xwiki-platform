@@ -271,15 +271,16 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
     private void saveDocument(XWikiDocument document, String comment, boolean setCreator,
         PackageConfiguration configuration) throws Exception
     {
-        XWikiContext context = this.xcontextProvider.get();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
-        XWikiDocument currentDocument = getDatabaseDocument(document, context);
+        XWikiDocument currentDocument = getDatabaseDocument(document, xcontext);
 
         DocumentReference userReference = configuration.getUserReference();
 
         if (!currentDocument.isNew()) {
             if (document != currentDocument) {
                 if (document.isNew()) {
+                    currentDocument.loadAttachmentsContent(xcontext);
                     currentDocument.apply(document);
                     if (setCreator) {
                         currentDocument.setCreatorReference(document.getCreatorReference());

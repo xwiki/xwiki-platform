@@ -27,6 +27,7 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStream;
 import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.xml.output.XMLOutputProperties;
 
 /**
  * A generic xml output wikistream implementation. This class can be used as a test bench to validate various

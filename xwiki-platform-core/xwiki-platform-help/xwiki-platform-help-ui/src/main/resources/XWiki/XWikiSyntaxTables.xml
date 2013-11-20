@@ -16,7 +16,6 @@
   <contentUpdateDate>1301497989000</contentUpdateDate>
   <version>1.1</version>
   <title>XWikiSyntaxTables</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -142,7 +141,7 @@ Word 1 | Word 2
 |Filterable Sortable table|((({{{
 $xwiki.ssfx.use("js/xwiki/table/table.css")
 $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
-&lt;table id="tableid" class="grid sortable filterable doOddEven"&gt;
+&lt;table id="table1id" class="grid sortable filterable doOddEven"&gt;
   &lt;tr class="sortHeader"&gt;
     &lt;th&gt;Title 1&lt;/th&gt;
     &lt;th&gt;Title 2&lt;/th&gt;
@@ -165,7 +164,7 @@ $xwiki.ssfx.use("js/xwiki/table/table.css")
 $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 {{/velocity}}
 
-(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="grid sortable filterable doOddEven" id="table1id" %)
 (% class="sortHeader" %)|=Title 1|=Title 2
 |Cell 11|Cell 12
 |Cell 21|Cell 22

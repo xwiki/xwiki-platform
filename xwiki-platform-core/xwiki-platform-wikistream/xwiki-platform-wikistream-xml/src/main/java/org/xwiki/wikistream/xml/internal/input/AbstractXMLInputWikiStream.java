@@ -32,6 +32,7 @@ import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.input.InputStreamInputSource;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.ReaderInputSource;
+import org.xwiki.wikistream.xml.input.XMLInputProperties;
 
 /**
  * @param <P>

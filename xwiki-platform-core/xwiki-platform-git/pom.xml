@@ -34,7 +34,7 @@
   <packaging>jar</packaging>
   <description>Script Service to make it easy to run Git commands in wiki pages</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.81</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -57,6 +57,11 @@
       <artifactId>gitective-core</artifactId>
       <version>0.9.9</version>
     </dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>2.2</version>
+    </dependency>
     <!-- Test Dependencies -->
     <dependency>
       <groupId>commons-io</groupId>
@@ -70,4 +75,25 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**//GitHelper.class</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

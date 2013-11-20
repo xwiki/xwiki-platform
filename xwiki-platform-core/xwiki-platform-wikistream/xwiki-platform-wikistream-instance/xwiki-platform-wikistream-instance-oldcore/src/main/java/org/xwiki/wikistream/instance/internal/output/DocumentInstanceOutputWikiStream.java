@@ -266,6 +266,8 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
             new XWikiDocument(this.entityResolver.resolve(this.currentEntityReference,
                 this.properties.getDefaultReference()));
 
+        this.currentDocument.setSyntax(getSyntax(WikiDocumentFilter.PARAMETER_SYNTAX, parameters, null));
+
         this.currentDocument.setDefaultLocale(this.currentDefaultLocale);
         this.currentDocument.setLocale(this.currentLocale);
 
@@ -277,8 +279,6 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
             null));
         this.currentDocument.setValidationScript(getString(WikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT, parameters,
             null));
-        // TODO: get default syntax
-        this.currentDocument.setSyntax(getSyntax(WikiDocumentFilter.PARAMETER_SYNTAX, parameters, null));
         this.currentDocument.setHidden(getBoolean(WikiDocumentFilter.PARAMETER_HIDDEN, parameters, false));
 
         // Content
@@ -286,6 +286,13 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
         if (parameters.containsKey(WikiDocumentFilter.PARAMETER_CONTENT)) {
             this.currentDocument.setContent(getString(WikiDocumentFilter.PARAMETER_CONTENT, parameters, null));
         } else {
+            if (this.properties.getDefaultSyntax() != null) {
+                this.currentDocument.setSyntax(this.properties.getDefaultSyntax());
+            } else {
+                // Make sure to set the default syntax if none were provided
+                this.currentDocument.setSyntax(this.currentDocument.getSyntax());
+            }
+
             ComponentManager componentManager = this.componentManagerProvider.get();
 
             if (componentManager
@@ -326,6 +333,7 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
             if (document.isNew()) {
                 document = this.currentDocument;
             } else {
+                document.loadAttachmentsContent(xcontext);
                 document.apply(this.currentDocument);
             }
 
@@ -389,6 +397,8 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
         throws WikiStreamException
     {
         XWikiAttachment attachment = new XWikiAttachment(this.currentDocument, name);
+
+        attachment.setAuthor("");
 
         try {
             attachment.setContent(content);

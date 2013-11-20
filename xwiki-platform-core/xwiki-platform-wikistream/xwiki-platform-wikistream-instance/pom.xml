@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-platform-wikistream-instance</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Wiki Stream - Instance</name>
+  <name>XWiki Platform - WikiStream - Instance</name>
   <modules>
     <module>xwiki-platform-wikistream-instance-api</module>
     <module>xwiki-platform-wikistream-instance-oldcore</module>

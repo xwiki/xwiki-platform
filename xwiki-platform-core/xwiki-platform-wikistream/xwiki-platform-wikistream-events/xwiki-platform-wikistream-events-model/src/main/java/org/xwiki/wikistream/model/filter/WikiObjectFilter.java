@@ -34,16 +34,35 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface WikiObjectFilter
 {
-    public static final String PARAMETER_NUMBER = "number";
+    /**
+     * @type {@link Integer}
+     */
+    String PARAMETER_NUMBER = "number";
 
-    public static final String PARAMETER_CLASS_REFERENCE = "class_reference";
+    /**
+     * @type {@link String}
+     */
+    String PARAMETER_CLASS_REFERENCE = "class_reference";
 
-    public static final String PARAMETER_GUID = "guid";
+    /**
+     * @type {@link String}
+     */
+    String PARAMETER_GUID = "guid";
 
+    /**
+     * @param name the name of the object
+     * @param parameters the properties of the object
+     * @throws WikiStreamException when failing to send event
+     */
     void beginWikiObject(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param name the name of the object
+     * @param parameters the properties of the object
+     * @throws WikiStreamException when failing to send event
+     */
     void endWikiObject(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;

@@ -17,42 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal;
+package org.xwiki.wikistream.xml;
 
-import java.io.IOException;
-
-import javax.xml.transform.Result;
-
-import org.xwiki.wikistream.xml.output.ResultOutputTarget;
+import org.xwiki.wikistream.DefaultWikiStreamProperties;
 
 /**
+ * Base Java bean for XML based modules.
+ * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3RC1
  */
-public class DefaultResultOutputTarget implements ResultOutputTarget
+public class XMLProperties extends DefaultWikiStreamProperties
 {
-    private Result result;
-
-    public DefaultResultOutputTarget(Result result)
-    {
-        this.result = result;
-    }
-
-    @Override
-    public boolean restartSupported()
-    {
-        return false;
-    }
-
-    @Override
-    public Result getResult()
-    {
-        return this.result;
-    }
-
-    @Override
-    public void close() throws IOException
-    {
-        // Result does not support close
-    }
 }

@@ -31,7 +31,6 @@ import org.junit.Assert;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
-import org.mockito.Mockito;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
@@ -358,19 +357,5 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         String description = source(doc, params).getDescription().getValue();
         int descriptionLength = getXMLContentLength(description);
         Assert.assertTrue(PARAMETERS_IGNORED, descriptionLength <= maxLength);
-    }
-
-    /**
-     * Unit test for <a href="http://jira.xwiki.org/browse/XWIKI-9576">XWIKI-9576</a>.
-     */
-    public void testRemoveJsessionId() throws Exception
-    {
-        Document doc = Mockito.mock(Document.class);
-        Mockito.when(doc.getRealLanguage()).thenReturn("en");
-        Mockito.when(doc.getExternalURL("view", "language=en")).thenReturn(
-            "http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35;jsessionid=0AF95AFB8997826B936C0397DF6A0C7F?"
-            + "language=en");
-        Assert.assertEquals("http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35?language=en",
-            this.source.getDefaultURI(doc, null, null));
     }
 }

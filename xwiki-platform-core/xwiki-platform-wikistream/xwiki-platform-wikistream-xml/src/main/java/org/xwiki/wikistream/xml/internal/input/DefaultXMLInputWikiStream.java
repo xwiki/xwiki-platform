@@ -21,6 +21,8 @@ package org.xwiki.wikistream.xml.internal.input;
 
 import javax.xml.stream.XMLEventWriter;
 
+import org.xwiki.wikistream.xml.input.XMLInputProperties;
+
 /**
  * @param <P>
  * @version $Id$

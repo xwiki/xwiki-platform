@@ -40,7 +40,7 @@ import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStream;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
-import org.xwiki.wikistream.xar.internal.output.XAROutputProperties;
+import org.xwiki.wikistream.xar.output.XAROutputProperties;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -291,20 +291,20 @@ public class ExportAction extends XWikiAction
 
             xarProperties.setTarget(
                 new DefaultOutputStreamOutputTarget(response.getOutputStream()));
-            xarProperties.setName(name);
+            xarProperties.setPackageName(name);
             if (description != null) {
-                xarProperties.setDescription(description);
+                xarProperties.setPackageDescription(description);
             }
             if (licence != null) {
-                xarProperties.setLicense(licence);
+                xarProperties.setPackageLicense(licence);
             }
             if (author != null) {
-                xarProperties.setAuthor(author);
+                xarProperties.setPackageAuthor(author);
             }
             if (version != null) {
-                xarProperties.setVersion(version);
+                xarProperties.setPackageVersion(version);
             }
-            xarProperties.setBackupPack(backup);
+            xarProperties.setPackageBackupPack(backup);
             xarProperties.setPreserveVersion(backup);
 
             BeanOutputWikiStreamFactory<XAROutputProperties> xarWikiStreamFactory =

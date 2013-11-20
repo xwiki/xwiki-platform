@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.xml.parser.XMLParserFactory;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.wikixml.input.WikiXMLInputProperties;
 import org.xwiki.wikistream.xml.internal.input.AbstractXMLBeanInputWikiStreamFactory;
 
 /**
@@ -49,6 +50,9 @@ public class WikiXMLInputWikiStreamFactory extends
     @Inject
     private XMLParserFactory parserFactory;
 
+    /**
+     * Default constructor.
+     */
     public WikiXMLInputWikiStreamFactory()
     {
         super(WikiStreamType.WIKI_XML);

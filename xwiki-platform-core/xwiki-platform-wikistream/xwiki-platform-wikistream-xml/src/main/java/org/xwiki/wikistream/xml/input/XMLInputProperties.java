@@ -17,53 +17,64 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal.output;
+package org.xwiki.wikistream.xml.input;
 
+import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
-import org.xwiki.wikistream.output.OutputTarget;
-import org.xwiki.wikistream.xml.internal.XMLProperties;
+import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.wikistream.input.InputSource;
+import org.xwiki.wikistream.xml.XMLProperties;
 
 /**
- * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3RC1
  */
-public class XMLOutputProperties extends XMLProperties
+public class XMLInputProperties extends XMLProperties
 {
-    private boolean format = true;
+    /**
+     * @see #getSource()
+     */
+    private InputSource source;
 
-    private String encoding = "UTF-8";
+    /**
+     * @see #getEncoding()
+     */
+    private String encoding;
 
-    private OutputTarget target;
-
-    public boolean isFormat()
+    /**
+     * @return The source to load the wiki from
+     */
+    @PropertyName("Source")
+    @PropertyDescription("The source to load the wiki from")
+    @PropertyMandatory
+    public InputSource getSource()
     {
-        return this.format;
+        return this.source;
     }
 
-    public void setFormat(boolean format)
+    /**
+     * @param source The source to load the wiki from
+     */
+    public void setSource(InputSource source)
     {
-        this.format = format;
+        this.source = source;
     }
 
+    /**
+     * @return The encoding to use to parse the content
+     */
+    @PropertyName("Encoding")
+    @PropertyDescription("The encoding to use to parse the content")
     public String getEncoding()
     {
         return this.encoding;
     }
 
+    /**
+     * @param encoding The encoding to use to parse the content
+     */
     public void setEncoding(String encoding)
     {
         this.encoding = encoding;
-    }
-
-    @PropertyMandatory
-    public OutputTarget getTarget()
-    {
-        return this.target;
-    }
-
-    public void setTarget(OutputTarget target)
-    {
-        this.target = target;
     }
 }

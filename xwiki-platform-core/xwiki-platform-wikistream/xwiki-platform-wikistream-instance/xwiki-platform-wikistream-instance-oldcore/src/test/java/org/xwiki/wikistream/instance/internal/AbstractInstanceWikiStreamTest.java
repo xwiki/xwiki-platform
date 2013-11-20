@@ -49,7 +49,7 @@ import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStream;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
-import org.xwiki.wikistream.wikixml.internal.input.WikiXMLInputProperties;
+import org.xwiki.wikistream.wikixml.input.WikiXMLInputProperties;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;

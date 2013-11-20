@@ -34,10 +34,20 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface WikiSpaceFilter
 {
+    /**
+     * @param name the space name
+     * @param parameters the properties of the space
+     * @throws WikiStreamException when failing to send event
+     */
     void beginWikiSpace(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param name the space name
+     * @param parameters the properties of the space
+     * @throws WikiStreamException when failing to send event
+     */
     void endWikiSpace(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;

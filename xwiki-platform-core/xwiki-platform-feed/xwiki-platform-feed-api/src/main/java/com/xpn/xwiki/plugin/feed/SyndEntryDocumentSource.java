@@ -285,7 +285,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     protected String getDefaultURI(Document doc, Map<String, Object> params, XWikiContext context)
         throws XWikiException
     {
-        return FeedPlugin.removeJSessionIdFromURL(doc.getExternalURL("view", "language=" + doc.getRealLanguage()));
+        return doc.getExternalURL("view", "language=" + doc.getRealLanguage());
     }
 
     protected String getURI(Document doc, Map<String, Object> params, XWikiContext context) throws XWikiException

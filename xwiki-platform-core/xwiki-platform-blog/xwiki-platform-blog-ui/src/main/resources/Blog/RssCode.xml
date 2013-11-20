@@ -11,11 +11,12 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1383146726000</creationDate>
-  <date>1383228977000</date>
-  <contentUpdateDate>1383228977000</contentUpdateDate>
+  <creationDate>1229906880000</creationDate>
+  <date>1229907556000</date>
+  <contentUpdateDate>1229907556000</contentUpdateDate>
   <version>1.1</version>
   <title>Macros for displaying Blog-related RSS feeds</title>
+  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -128,10 +129,10 @@
  * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
  *###
 #macro(printBlogRssChannelDescription $blogDoc $entries)
-  &lt;channel rdf:about="#normalize($blogDoc.getURL())"&gt;
+  &lt;channel rdf:about="$blogDoc.getURL()"&gt;
     #getBlogTitle($blogDoc $title)
     &lt;title&gt;$title&lt;/title&gt;
-    &lt;link&gt;#normalize($blogDoc.getExternalURL())&lt;/link&gt;
+    &lt;link&gt;$blogDoc.getExternalURL()&lt;/link&gt;
     ## TODO: Add a Description field in the blog class
     &lt;description&gt;Most recent blog posts in the $blogDoc.space space&lt;/description&gt;
     #getWikiLogo($logoUrl)
@@ -146,7 +147,7 @@
       ## This is just a list of blog entries, which are detailed below.
       #foreach ($entryDoc in $entries)
         #if($xwiki.hasAccessLevel('view', ${entryDoc.fullName}))
-        &lt;rdf:li rdf:resource="#normalize($entryDoc.getExternalURL('view', "language=${entryDoc.realLanguage}"))" /&gt;
+        &lt;rdf:li rdf:resource="$entryDoc.getExternalURL('view', "language=${entryDoc.realLanguage}")" /&gt;
         #end
       #end
       &lt;/rdf:Seq&gt;
@@ -163,9 +164,9 @@
  *###
 #macro(printGlobalBlogRssChannelDescription $entries)
   #set ($mainDoc = $xwiki.getDocument($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
-  &lt;channel rdf:about="#normalize($mainDoc.getExternalURL())"&gt;
+  &lt;channel rdf:about="$mainDoc.getExternalURL()"&gt;
     &lt;title&gt;$escapetool.xml($mainDoc.plainTitle)&lt;/title&gt;
-    &lt;link&gt;#normalize($mainDoc.getExternalURL())&lt;/link&gt;
+    &lt;link&gt;$mainDoc.getExternalURL()&lt;/link&gt;
     ## TODO: Add a Description field in the blog class
     &lt;description&gt;Most recent blog posts in the wiki&lt;/description&gt;
     #getWikiLogo($logoUrl)
@@ -177,7 +178,7 @@
       ## This is just a list of blog entries, which are detailed below.
       #foreach ($entryDoc in $entries)
         #if($xwiki.hasAccessLevel('view', ${entryDoc.fullName}))
-        &lt;rdf:li rdf:resource="#normalize($entryDoc.getExternalURL('view', "language=${entryDoc.realLanguage}"))" /&gt;
+        &lt;rdf:li rdf:resource="$entryDoc.getExternalURL('view', "language=${entryDoc.realLanguage}")" /&gt;
         #end
       #end
       &lt;/rdf:Seq&gt;
@@ -194,9 +195,9 @@
  * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
  *###
 #macro(printBlogCategoryRssChannelDescription $categoryDoc $entries)
-  &lt;channel rdf:about="#normalize($categoryDoc.getURL())"&gt;
+  &lt;channel rdf:about="$categoryDoc.getURL()"&gt;
     &lt;title&gt;$categoryDoc.display('name')&lt;/title&gt;
-    &lt;link&gt;#normalize($categoryDoc.getExternalURL())&lt;/link&gt;
+    &lt;link&gt;$categoryDoc.getExternalURL()&lt;/link&gt;
     ## TODO: Add a Description field in the blog class
     &lt;description&gt;Most recent blog posts in the $categoryDoc.display('name') category&lt;/description&gt;
     &lt;dc:rights&gt;$escapetool.xml($xwiki.spaceCopyright)&lt;/dc:rights&gt;
@@ -205,7 +206,7 @@
       ## This is just a list of blog entries, which are detailed below.
       #foreach ($entryDoc in $entries)
         #if($xwiki.hasAccessLevel('view', ${entryDoc.fullName}))
-        &lt;rdf:li rdf:resource="#normalize($entryDoc.getExternalURL('view', "language=${entryDoc.realLanguage}"))" /&gt;
+        &lt;rdf:li rdf:resource="$entryDoc.getExternalURL('view', "language=${entryDoc.realLanguage}")" /&gt;
         #end
       #end
       &lt;/rdf:Seq&gt;
@@ -225,7 +226,7 @@
   &lt;image rdf:about="$logoUrl"&gt;
     &lt;title&gt;Wiki Logo&lt;/title&gt;
     &lt;url&gt;$logoUrl&lt;/url&gt;
-    &lt;link&gt;#normalize($blogDoc.getExternalURL())&lt;/link&gt;
+    &lt;link&gt;$blogDoc.getExternalURL()&lt;/link&gt;
   &lt;/image&gt;
 #end
 ##
@@ -255,7 +256,7 @@
  * @param entryDoc The XDocument corresponding to the displayed blog entry.
  *###
 #macro(printBlogRssItem $entryDoc)
-  #set($entryUrl = "#normalize($entryDoc.getExternalURL('view', ""language=${entryDoc.realLanguage}""))")
+  #set($entryUrl = $entryDoc.getExternalURL('view', "language=${entryDoc.realLanguage}"))
   #getEntryObject($entryDoc $entryObj)
   #getEntryContent($entryDoc $entryObj true $entryContent)
   #if($!entryDoc.syntax.toIdString() == 'xwiki/1.0')
@@ -275,7 +276,7 @@
     &lt;dc:creator&gt;$escapetool.xml($xwiki.getUserName($entryDoc.creator, false))&lt;/dc:creator&gt;
     #if($entryDoc.creator != $entryDoc.author)
       &lt;dc:contributor&gt;
-        &lt;rdf:Description link="#normalize($xwiki.getURL($entryDoc.author))"&gt;
+        &lt;rdf:Description link="$xwiki.getURL($entryDoc.author)"&gt;
           &lt;rdf:value&gt;$escapetool.xml($xwiki.getUserName($entryDoc.author, false))&lt;/rdf:value&gt;
         &lt;/rdf:Description&gt;
       &lt;/dc:contributor&gt;
@@ -330,17 +331,5 @@ $escapetool.xml($entryDoc.display($fieldName, 'view', $entryObj))#end
   #set ($logoUrl = $NULL)
   #setVariable ("$logoUrl" "${request.scheme}://${request.serverName}${port}${path}")
 #end
-##
-##
-##
-## We need to generate a stable URL so that RSS client reader get the same URL every time they get the RSS
-## feed as otherwise they'll consider the entry as a new entry and display it and the user will see
-## duplicates.
-## In addition since most RSS readers will not handle cookies, calling doc.getExternalURL will generate a
-## jsessionid parameters in the computed URL (as per the spec).
-##  Thus we need to remove it.
-##
-#macro(normalize $url)
-$url.replaceAll(';jsessionid=.*?(?=\\\\?|$)', '')#end
 {{/velocity}}</content>
 </xwikidoc>

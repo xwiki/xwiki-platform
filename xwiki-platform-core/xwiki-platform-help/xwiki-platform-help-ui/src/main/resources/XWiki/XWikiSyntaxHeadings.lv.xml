@@ -11,9 +11,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1382897917000</creationDate>
-  <date>1382897917000</date>
-  <contentUpdateDate>1382897917000</contentUpdateDate>
+  <creationDate>1384507502000</creationDate>
+  <date>1384509826000</date>
+  <contentUpdateDate>1384509826000</contentUpdateDate>
   <version>1.1</version>
   <title>XWikiSyntaxHeadings</title>
   <defaultTemplate/>
@@ -38,15 +38,16 @@
 1.1.1.1.1 5. līmenis
 1.1.1.1.1.1 6. līmenis
 )))|(((
-{{html}}
-&lt;!-- Note: replace this with wiki syntax when http://jira.xwiki.org/jira/browse/XWIKI-4358 is implemented --&gt;
-&lt;h1 id="Hlevel1"&gt;&lt;span&gt;1. līmenis&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&lt;h2 id="Hlevel2"&gt;&lt;span&gt;2. līmenis&lt;/span&gt;&lt;/h2&gt;&lt;h3 id="Hlevel3"&gt;&lt;span&gt;3. līmenis&lt;/span&gt;&lt;/h3&gt;&lt;h4 id="Hlevel4"&gt;&lt;span&gt;4. līmenis&lt;/span&gt;&lt;/h4&gt;&lt;h5 id="Hlevel5"&gt;&lt;span&gt;5. līmenis&lt;/span&gt;&lt;/h5&gt;&lt;h6 id="Hlevel6"&gt;&lt;span&gt;6. līmenis&lt;/span&gt;&lt;/h6&gt;
-{{/html}}
+= 1. līmenis =
+== 2. līmenis ==
+=== 3. līmenis ===
+==== 4. līmenis ====
+===== 5. līmenis =====
+====== 6. līmenis ======
 )))
 |Virsraksts ar parametriem |&lt;h1&gt;&lt;span style="color:blue"&gt;virsraksts&lt;/span&gt;&lt;/h1&gt;|(((
-{{html}}
-&lt;h1 id="Hheader" style="color:blue"&gt;&lt;span&gt;virsraksts&lt;/span&gt;&lt;/h1&gt;
-{{/html}}
+(% style="color:blue" %)
+= virsraksts =
 )))
 |Virsraksts ar viki sintaksi|1.1.1 Virsraksts ar *treknrakstu*|(((
 === Virsraksts ar **treknrakstu** ===
@@ -66,16 +67,17 @@
 ====== 6. līmenis ======
 }}}
 )))|(((
-{{html}}
-&lt;!-- Note: replace this with wiki syntax when http://jira.xwiki.org/jira/browse/XWIKI-4358 is implemented --&gt;
-&lt;h1 id="Hlevel1"&gt;&lt;span&gt;1. līmenis&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&lt;h2 id="Hlevel2"&gt;&lt;span&gt;2. līmenis&lt;/span&gt;&lt;/h2&gt;&lt;h3 id="Hlevel3"&gt;&lt;span&gt;3. līmenis&lt;/span&gt;&lt;/h3&gt;&lt;h4 id="Hlevel4"&gt;&lt;span&gt;4. līmenis&lt;/span&gt;&lt;/h4&gt;&lt;h5 id="Hlevel5"&gt;&lt;span&gt;5. līmenis&lt;/span&gt;&lt;/h5&gt;&lt;h6 id="Hlevel6"&gt;&lt;span&gt;6. līmenis&lt;/span&gt;&lt;/h6&gt;
-{{/html}}
+= 1. līmenis =
+== 2. līmenis ==
+=== 3. līmenis ===
+==== 4. līmenis ====
+===== 5. līmenis =====
+====== 6. līmenis ======
 )))
 |Virsraksts ar parametriem |{{{(% style="color:blue" %)}}}
 ~= virsraksts =|(((
-{{html}}
-&lt;h1 id="Hheader" style="color:blue"&gt;&lt;span&gt;virsraksts&lt;/span&gt;&lt;/h1&gt;
-{{/html}}
+(% style="color:blue" %)
+= virsraksts =
 )))
 |Virsraksts ar viki sintaksi|{{{=== Virsraksts ar **treknrakstu** ===}}}|(((
 === Virsraksts ar **treknrakstu** ===

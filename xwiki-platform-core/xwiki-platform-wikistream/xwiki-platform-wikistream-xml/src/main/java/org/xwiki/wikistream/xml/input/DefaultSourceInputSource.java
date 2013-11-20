@@ -17,25 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal.output;
+package org.xwiki.wikistream.xml.input;
 
 import java.io.IOException;
 
-import javax.xml.transform.Result;
-
-import org.xwiki.wikistream.xml.output.ResultOutputTarget;
+import javax.xml.transform.Source;
 
 /**
+ * Default implementation of {@link SourceInputSource}.
+ * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3RC1
  */
-public class DefaultResultInputSource implements ResultOutputTarget
+public class DefaultSourceInputSource implements SourceInputSource
 {
-    private Result result;
+    /**
+     * @see #getSource()
+     */
+    private Source source;
 
-    public DefaultResultInputSource(Result result)
+    /**
+     * @param source the {@link Source}
+     */
+    public DefaultSourceInputSource(Source source)
     {
-        this.result = result;
+        this.source = source;
     }
 
     @Override
@@ -47,12 +53,12 @@ public class DefaultResultInputSource implements ResultOutputTarget
     @Override
     public void close() throws IOException
     {
-        // Result is not closable
+        // Source is not closable
     }
 
     @Override
-    public Result getResult()
+    public Source getSource()
     {
-        return this.result;
+        return this.source;
     }
 }

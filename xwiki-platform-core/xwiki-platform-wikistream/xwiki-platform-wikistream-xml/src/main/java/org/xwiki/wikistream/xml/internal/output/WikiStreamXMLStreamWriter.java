@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.xml.output.XMLOutputProperties;
 
 /**
  * @version $Id$

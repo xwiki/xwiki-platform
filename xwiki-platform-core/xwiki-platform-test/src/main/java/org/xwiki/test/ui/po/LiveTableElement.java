@@ -148,9 +148,9 @@ public class LiveTableElement extends BaseElement
      */
     public int getRowCount()
     {
-        WebElement liveTableBody = getDriver().findElement(By.id(livetableId + "-display"));
+        WebElement liveTableBody = getUtil().findElementWithoutWaiting(getDriver(), By.id(livetableId + "-display"));
         // We use XPath because we're interested only in the direct children.
-        return liveTableBody.findElements(By.xpath("tr")).size();
+        return getUtil().findElementsWithoutWaiting(getDriver(), liveTableBody, By.xpath("tr")).size();
     }
 
     /**

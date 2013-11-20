@@ -1365,40 +1365,5 @@ RK5CYII=
       <titleColor>#4D4D4D</titleColor>
     </property>
   </object>
-  <object>
-    <class>
-      <name>XWiki.TagClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <tags>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>input</displayType>
-        <multiSelect>1</multiSelect>
-        <name>tags</name>
-        <number>1</number>
-        <prettyName>Tags</prettyName>
-        <relationalStorage>1</relationalStorage>
-        <separator>|</separator>
-        <separators>|,</separators>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <values/>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </tags>
-    </class>
-    <name>ColorThemes.Dusk</name>
-    <number>0</number>
-    <className>XWiki.TagClass</className>
-    <guid>98bf78fc-2907-4b9e-934f-5227b4f26a99</guid>
-    <property>
-      <tags/>
-    </property>
-  </object>
   <content/>
 </xwikidoc>

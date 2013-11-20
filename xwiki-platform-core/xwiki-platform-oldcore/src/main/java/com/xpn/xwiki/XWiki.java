@@ -3488,18 +3488,6 @@ public class XWiki implements EventListener
         }
     }
 
-    /**
-     * @deprecated replaced by {@link #setUserDefaultGroup(String fullwikiname, XWikiContext context)}
-     * @param context
-     * @param fullwikiname
-     * @throws XWikiException
-     */
-    @Deprecated
-    public void SetUserDefaultGroup(XWikiContext context, String fullwikiname) throws XWikiException
-    {
-        setUserDefaultGroup(fullwikiname, context);
-    }
-
     public void protectUserPage(String userName, String userRights, XWikiDocument doc, XWikiContext context)
         throws XWikiException
     {
@@ -3513,21 +3501,6 @@ public class XWiki implements EventListener
         newuserrightsobject.setLargeStringValue("users", userName);
         newuserrightsobject.setStringValue("levels", userRights);
         newuserrightsobject.setIntValue("allow", 1);
-    }
-
-    /**
-     * @deprecated replaced by {@link #protectUserPage(String,String,XWikiDocument,XWikiContext)}
-     * @param context
-     * @param fullwikiname
-     * @param userRights
-     * @param doc
-     * @throws XWikiException
-     */
-    @Deprecated
-    public void ProtectUserPage(XWikiContext context, String fullwikiname, String userRights, XWikiDocument doc)
-        throws XWikiException
-    {
-        protectUserPage(fullwikiname, userRights, doc, context);
     }
 
     public User getUser(XWikiContext context)

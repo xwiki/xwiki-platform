@@ -3508,12 +3508,7 @@ public class XWiki implements EventListener
         EntityReference relativeRightClassReference =
             rightClassReference.removeParent(rightClassReference.getWikiReference());
 
-        // Add protection to the page
-        BaseObject newrightsobject = doc.newXObject(relativeRightClassReference, context);
-        newrightsobject.setLargeStringValue("groups", "XWiki.XWikiAdminGroup");
-        newrightsobject.setStringValue("levels", userRights);
-        newrightsobject.setIntValue("allow", 1);
-
+        // Allow users to edit their own profiles
         BaseObject newuserrightsobject = doc.newXObject(relativeRightClassReference, context);
         newuserrightsobject.setLargeStringValue("users", userName);
         newuserrightsobject.setStringValue("levels", userRights);

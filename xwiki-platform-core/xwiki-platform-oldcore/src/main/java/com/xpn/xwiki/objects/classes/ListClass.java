@@ -429,14 +429,11 @@ public abstract class ListClass extends PropertyClass
             selectlist = ((ListProperty) prop).getList();
             List<String> newlist = new ArrayList<String>();
             for (String value : selectlist) {
-                // We have to escape the XML special chars because the output of the display methods is assumed to be
-                // HTML and the list values should be handled as plain text not HTML.
-                newlist.add(XMLUtils.escape(getDisplayValue(value, name, map, context)));
+                newlist.add(getDisplayValue(value, name, map, context));
             }
             buffer.append(StringUtils.join(newlist, separator));
         } else {
-            // Escape the value because it has to be treated as plain text not HTML.
-            buffer.append(XMLUtils.escape(getDisplayValue(prop.getValue(), name, map, context)));
+            buffer.append(getDisplayValue(prop.getValue(), name, map, context));
         }
     }
 

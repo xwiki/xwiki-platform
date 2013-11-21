@@ -262,7 +262,8 @@
     #set ($hasPreviousMenuSection = true)
   #end
   #if ($hasSpaceAdmin && $isAdminAppInstalled)
-    #set ($adminspaceaction = $!xwiki.getURL("${doc.space}.WebPreferences", 'admin'))
+    #set ($spaceAdminDocRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebPreferences'))
+    #set ($adminspaceaction = $xwiki.getURL($spaceAdminDocRef, 'admin'))
     #submenuitem($adminspaceaction $services.localization.render('core.menu.admin.space', [$escapetool.xml($doc.space)]) 'tmAdminSpace')
     #set ($hasPreviousMenuSection = true)
   #end

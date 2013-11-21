@@ -23,6 +23,8 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output='false'}}
+#set ($defaultDateFormat = 'yyyy/MM/dd HH:mm')
+#set ($iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'")
 #set ($rangePattern = $regextool.compile('^\[(.+) TO (.+)\]$'))
 
 #macro (displaySearchForm)
@@ -391,6 +393,9 @@
   ##
   ## 1. Predefined date intervals.
   #set ($now = $xwiki.jodatime.dateTime)
+  ## Solr indexes the dates in UTC timezone.
+  #set ($utcTimezone = $xwiki.jodatime.getTimezone(0))
+  #set ($now = $now.toDateTime($utcTimezone))
   #set ($intervals = [
     {
       'label': $services.localization.render('solr.facet.date.today'),
@@ -413,7 +418,8 @@
     }
   ])
   ## 2. Date intervals specified on the request.
-  #set ($iso8601Formatter = $xwiki.jodatime.getDateTimeFormatterForPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
+  #set ($iso8601Formatter = $xwiki.jodatime.getDateTimeFormatterForPattern($iso8601DateFormat))
+  #set ($iso8601Formatter = $iso8601Formatter.withZone($utcTimezone))
   #if ($facetRequestValues)
     #set ($selectedIntervals = [])
     #foreach ($selectedValue in $facetRequestValues)
@@ -489,7 +495,11 @@
 
 #macro (displaySearchFacetValue_customDateInterval)
   ## Reset the pagination because the number of results can change when a facet is applied.
-  #extendQueryString($url {$facetRequestParameter: ['[* TO *]'], 'firstIndex': []})
+  #extendQueryString($url {
+    $facetRequestParameter: ['[* TO *]'],
+    'firstIndex': [],
+    'timezoneOffset': []
+  })
   &lt;a href="$url" class="itemName"&gt;
     $escapetool.xml($services.localization.render('solr.facet.date.customInterval'))
   &lt;/a&gt;
@@ -501,7 +511,7 @@
   ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
   #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
-  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
+  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
   &lt;input type="text" name="$escapetool.xml($facetRequestParameter)" class="datetime withTip"
     value="$escapetool.xml($services.localization.render('solr.facet.date.start'))"
     title="$escapetool.xml($dateFormat)" /&gt;
@@ -514,16 +524,27 @@
 #macro (displaySearchFacetValue_date $facetPrettyValue)
   #if ($facetValue.label)
     $escapetool.xml($facetValue.label)
-  #elseif ($facetValue.start &amp;&amp; $facetValue.end)
-    $services.localization.render('solr.facet.date.between',
-      ["$xwiki.formatDate($facetValue.start.toDate())&lt;br/&gt;",
-      $xwiki.formatDate($facetValue.end.toDate())])
-  #elseif ($facetValue.start)
-    $escapetool.xml($services.localization.render('solr.facet.date.after',
-      [$xwiki.formatDate($facetValue.start.toDate())]))
-  #elseif ($facetValue.end)
-    $escapetool.xml($services.localization.render('solr.facet.date.before',
-      [$xwiki.formatDate($facetValue.end.toDate())]))
+  #elseif ($facetValue.start || $facetValue.end)
+    ## Compute the client timezone.
+    #set ($timezoneOffsetInMinutes = $mathtool.toInteger($request.timezoneOffset))
+    #set ($offsetHours = $timezoneOffsetInMinutes / 60)
+    #set ($offsetMinutes = $mathtool.abs($timezoneOffsetInMinutes) % 60)
+    #set ($clientTimezone = $xwiki.jodatime.getTimezone($offsetHours, $offsetMinutes))
+    ## Obtain a date printer.
+    #set ($configuredDateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
+    #set ($datePrinter = $xwiki.jodatime.getDateTimeFormatterForPattern($configuredDateFormat))
+    #set ($datePrinter = $datePrinter.withLocale($services.localization.currentLocale).withZone($clientTimezone))
+    ## Display the custom interval.
+    #if (!$facetValue.start)
+      $escapetool.xml($services.localization.render('solr.facet.date.before',
+        [$datePrinter.print($facetValue.end)]))
+    #elseif (!$facetValue.end)
+      $escapetool.xml($services.localization.render('solr.facet.date.after',
+        [$datePrinter.print($facetValue.start)]))
+    #else
+      $services.localization.render('solr.facet.date.between',
+        ["$datePrinter.print($facetValue.start)&lt;br/&gt;", $datePrinter.print($facetValue.end)])
+    #end
   #else
     $escapetool.xml($services.localization.render('solr.facet.date.any'))
   #end
@@ -911,10 +932,11 @@ $value##
   #end
 #end
 
-#macro (convertDateFormat $dateString $inputFormat $outputFormat $return)
-  #set ($date = $datetool.toDate($inputFormat, $dateString))
+#macro (convertDateFormat $dateString $inputFormat $dateParser $datePrinter $return)
+  ## We don't use the given date parser directly because it can throw IllegalArgumentException.
+  #set ($date = $datetool.toDate($inputFormat, $dateString, $services.localization.currentLocale))
   #if ($date)
-    #set ($date = $datetool.format($outputFormat, $date))
+    #set ($date = $datePrinter.print($dateParser.parseDateTime($dateString)))
   #else
     #set ($date = '*')
   #end
@@ -923,14 +945,29 @@ $value##
 #end
 
 #macro (handleCustomDateInterval)
-  #set ($configuredDateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
-  #set ($iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-  #convertDateFormat($request.startDate $configuredDateFormat $iso8601DateFormat $startDate)
-  #convertDateFormat($request.endDate $configuredDateFormat $iso8601DateFormat $endDate)
+  ## Compute the client timezone.
+  #set ($timezoneOffsetInMinutes = $mathtool.toInteger($request.timezoneOffset))
+  #set ($offsetHours = $timezoneOffsetInMinutes / 60)
+  #set ($offsetMinutes = $mathtool.abs($timezoneOffsetInMinutes) % 60)
+  #set ($clientTimezone = $xwiki.jodatime.getTimezone($offsetHours, $offsetMinutes))
+  ## Obtain a date parser.
+  #set ($configuredDateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
+  #set ($dateParser = $xwiki.jodatime.getDateTimeFormatterForPattern($configuredDateFormat))
+  #set ($dateParser = $dateParser.withLocale($services.localization.currentLocale).withZone($clientTimezone))
+  ## Obtain a date printer (Solr indexes the dates in ISO8601 format with UTC timezone).
+  #set ($datePrinter = $xwiki.jodatime.getDateTimeFormatterForPattern($iso8601DateFormat))
+  #set ($utcTimezone = $xwiki.jodatime.getTimezone(0))
+  #set ($datePrinter = $datePrinter.withZone($utcTimezone))
+  ## Convert the given dates.
+  #convertDateFormat($request.startDate $configuredDateFormat $dateParser $datePrinter $startDate)
+  #convertDateFormat($request.endDate $configuredDateFormat $dateParser $datePrinter $endDate)
   #set ($interval = "[$startDate TO $endDate]")
   #set ($xredirect = $request.xredirect.replaceFirst(
     "\b$regextool.quote($escapetool.url($request.facet))=[^&amp;$escapetool.d]*",
-    "$escapetool.url($request.facet)=$escapetool.url($interval)"))
+    $escapetool.url({
+      $request.facet: $interval,
+      'timezoneOffset': $request.timezoneOffset
+    })))
   $response.sendRedirect($xredirect)
 #end
 
@@ -1187,10 +1224,14 @@ $value##
       var link = event.element();
       var startDate = this.container.down('input.datetime');
       var endDate = startDate.next('input.datetime');
+      // We change the sign because Date#getTimezoneOffset() returns (UTC - local time)
+      // and we need (local time - UTC) on the server.
+      var timezoneOffset = -new Date().getTimezoneOffset();
       link.href = XWiki.currentDocument.getURL('get', Object.toQueryString({
         facet: startDate.name,
         startDate: startDate.value,
         endDate: endDate.value,
+        timezoneOffset: timezoneOffset,
         xredirect: link.readAttribute('href')
       }));
     }

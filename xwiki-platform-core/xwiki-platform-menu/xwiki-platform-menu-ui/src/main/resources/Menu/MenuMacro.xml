@@ -529,7 +529,12 @@ $xwiki.getDocument('MenuTemplate').content
       <code>{{velocity}}
 #set ($id = $xcontext.macro.params.id)
 #set ($type = $xcontext.macro.params.type)
-#set ($discard = $xwiki.ssx.use("$xcontext.macro.doc.prefixedFullName"))
+#set ($colorTheme = $xwiki.getUserPreference('colorTheme'))
+#if ("$!colorTheme" != '')
+  ## Make sure we use an absolute reference (see XWIKI-9672)
+  #set ($colorTheme = $services.model.resolveDocument($colorTheme, $doc.documentReference))
+#end
+#set ($discard = $xwiki.ssx.use("$xcontext.macro.doc.prefixedFullName", {'colorTheme': $colorTheme}))
 #set ($discard = $xwiki.jsx.use("$xcontext.macro.doc.prefixedFullName"))
 (% #if ("$!id" != '') id="$id"#end class="menu menu-$!type" %)(((
   $xcontext.macro.content

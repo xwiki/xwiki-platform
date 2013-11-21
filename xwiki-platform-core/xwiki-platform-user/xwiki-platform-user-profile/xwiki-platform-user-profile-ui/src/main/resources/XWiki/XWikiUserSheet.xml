@@ -1,112 +1,155 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>XWikiUserSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.XWikiUsers</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1385047495000</creationDate>
+  <parent>Main.XWikiUsers</parent>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1106308018000</creationDate>
-  <date>1305818123000</date>
-  <contentUpdateDate>1305818123000</contentUpdateDate>
+  <date>1385071571000</date>
+  <contentUpdateDate>1385071571000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.core.profile.title', [$xwiki.getUserName($doc.fullName, false)])</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity}}
+#########################
+## CSS &amp; Javascripts
+#########################
+#set($discard = $xwiki.ssx.use("XWiki.XWikiUserSheet"))
+#set($discard = $xwiki.jsx.use("XWiki.XWikiUserSheet"))
+#########################
+## Setting categories
+#########################
+#set($categories = [])
+#set($discard = $categories.add({'id':'profile', 'sheet':'XWiki.XWikiUserProfileSheet'}))
+#set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
+#if($isMyProfile || $hasAdmin)
+  #set($discard = $categories.add({'id':'preferences', 'sheet':'XWiki.XWikiUserPreferencesSheet'}))
+#end
+## TODO: add APIs to be able to display users watchlists to admins
+#if($isMyProfile &amp;&amp; $hasWatch)  
+  #set($discard = $categories.add({'id':'watchlist', 'sheet':'XWiki.XWikiUserWatchListSheet'}))
+#end
+#if($isMyProfile)
+  #set($discard = $categories.add({'id':'network', 'sheet':'XWiki.XWikiUserNetworkSheet'}))
+#end
+#set($userWikiSheet = 'WikiManagerCode.UserWikiSheet')
+#if($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWikiSheet))  
+  #set($discard = $categories.add({
+    'id': 'wikis',
+    'name': $services.localization.render('workspacemanager.profile.category.workspaces'),
+    'sheet': $userWikiSheet
+  }))
+#end
+#if($isMyProfile &amp;&amp; $hasDashboard)
+  #set($discard = $categories.add({'id':'dashboard', 'sheet':'Dashboard.XWikiUserDashboardSheet'}))  
+#end
+#########################
+## Current category
+#########################
+#set($currentCategory = "$!request.category")
+#if($currentCategory == "")
+  #set($currentCategory = $listtool.get($categories, 0).get('id'))
+#end
+#########################
+## Creating vertical menu
+#########################
+#set($userMenu = [{
+  'id'       : 'settings',
+  'cssClass' : 'user-menu-title',
+  'children' : $categories
+  }
+])
+## Setting automaticaly url &amp; css fields of each category
+#foreach($category in $userMenu)
+  #foreach($subcategory in $category.get('children'))
+    #set($id = $subcategory.get('id')) 
+    #set($discard = $subcategory.put('url', "?category=${id}"))
+    #set($discard = $subcategory.put('cssClass', "user-menu-$id category-tab"))
+  #end
+#end
+#########################
+## Display the left menu
+#########################
+(% id="user-menu-col" %)
+(((
+  ############
+  ## Avatar
+  ############
+  (% id="avatar" %)
+  (((
+    #if($request.xpage == 'edituser')
+      {{html clean="false"}}
+        #resizedUserAvatar($doc.fullName 170)
+      {{/html}}
+    #else
+      {{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="120" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$services.localization.render('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,gif"/}}
+    #end
+  )))
+  ##########
+  ## Menu
+  ##########
+  (% id="user-vertical-menu" %)
+  (((
+    #verticalNavigation($userMenu, {'translationPrefix' : 'platform.core.profile.category.', 'crtItemId' : $currentCategory, 'cssClass' : 'profile-menu'})
+  )))
+)))
+#########################
+## Display the page content
+#########################
+(% id="user-page-content" %)
+(((
+  #foreach($category in $userMenu)
+    #foreach($subcategory in $category.get('children'))
+      #set($tabKey = $subcategory.get('id')) 
+      (% id="${tabKey}Pane" class="user-page-pane#if($tabKey != $currentCategory) hidden#end" %)
+      (((
+        #set($tabInclude = $subcategory.get('sheet'))
+        {{include reference="${tabInclude}" /}}
+      )))
+    #end
+  #end
+)))
+#########################
+## END
+#########################
+{{html clean="false"}}
+  #if($xcontext.action == 'edit' || $xcontext.action == 'inline')
+    &lt;input type='hidden' name='category' value="$!{currentCategory}" /&gt;
+  #end
+  &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
+  #if($request.get('xpage'))
+    &lt;script type="text/javascript"&gt;
+      document.fire('lightbox:userprofile:loaded');
+    &lt;/script&gt;
+  #end
+{{/html}}
+{{/velocity}}</content>
   <attachment>
     <filename>noavatar.png</filename>
-    <filesize>3076</filesize>
     <author>xwiki:XWiki.Admin</author>
-    <date>1263400909000</date>
+    <date>1263397309000</date>
     <version>1.1</version>
     <comment/>
-    <content>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
-</content>
+    <content>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</content>
+    <filesize>3076</filesize>
   </attachment>
   <object>
+    <name>XWiki.XWikiUserSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>4a317e5c-a75e-4dec-aad0-1f80ffde5124</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -178,10 +221,6 @@ aqJnTa4EE0Iwwsohli6MYFH6sl+ylT6JYKxQ5hlIH4f/BgD7inc8EZgGUgAAAABJRU5ErkJggg==
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.XWikiUserSheet</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>4a317e5c-a75e-4dec-aad0-1f80ffde5124</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -273,6 +312,10 @@ return XWiki;
     </property>
   </object>
   <object>
+    <name>XWiki.XWikiUserSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>30c9f7e7-0b53-468b-a254-645d035d9416</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -344,10 +387,6 @@ return XWiki;
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.XWikiUserSheet</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>30c9f7e7-0b53-468b-a254-645d035d9416</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -607,119 +646,4 @@ span#avatarUpload {
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{velocity}}
-#########################
-## CSS &amp; Javascripts
-#########################
-#set($discard = $xwiki.ssx.use("XWiki.XWikiUserSheet"))
-#set($discard = $xwiki.jsx.use("XWiki.XWikiUserSheet"))
-#########################
-## Setting categories
-#########################
-#set($categories = [])
-#set($discard = $categories.add({'id':'profile', 'sheet':'XWiki.XWikiUserProfileSheet'}))
-#set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
-#if($isMyProfile || $hasAdmin)
-  #set($discard = $categories.add({'id':'preferences', 'sheet':'XWiki.XWikiUserPreferencesSheet'}))
-#end
-## TODO: add APIs to be able to display users watchlists to admins
-#if($isMyProfile &amp;&amp; $hasWatch)  
-  #set($discard = $categories.add({'id':'watchlist', 'sheet':'XWiki.XWikiUserWatchListSheet'}))
-#end
-#if($isMyProfile)
-  #set($discard = $categories.add({'id':'network', 'sheet':'XWiki.XWikiUserNetworkSheet'}))
-#end
-#set($userWikiSheet = 'WikiManagerCode.UserWikiSheet')
-#if($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWikiSheet))  
-  #set($discard = $categories.add({
-    'id': 'wikis',
-    'name': $services.localization.render('workspacemanager.profile.category.workspaces'),
-    'sheet': $userWikiSheet
-  }))
-#end
-#if($isMyProfile &amp;&amp; $hasDashboard)
-  #set($discard = $categories.add({'id':'dashboard', 'sheet':'Dashboard.XWikiUserDashboardSheet'}))  
-#end
-#########################
-## Current category
-#########################
-#set($currentCategory = "$!request.category")
-#if($currentCategory == "")
-  #set($currentCategory = $listtool.get($categories, 0).get('id'))
-#end
-#########################
-## Creating vertical menu
-#########################
-#set($userMenu = [{
-  'id'       : 'settings',
-  'cssClass' : 'user-menu-title',
-  'children' : $categories
-  }
-])
-## Setting automaticaly url &amp; css fields of each category
-#foreach($category in $userMenu)
-  #foreach($subcategory in $category.get('children'))
-    #set($id = $subcategory.get('id')) 
-    #set($discard = $subcategory.put('url', "?category=${id}"))
-    #set($discard = $subcategory.put('cssClass', "user-menu-$id category-tab"))
-  #end
-#end
-#########################
-## Display the left menu
-#########################
-(% id="user-menu-col" %)
-(((
-  ############
-  ## Avatar
-  ############
-  (% id="avatar" %)
-  (((
-    #if($request.xpage == 'edituser')
-      {{html clean="false"}}
-        #resizedUserAvatar($doc.fullName 170)
-      {{/html}}
-    #else
-      {{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="120" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$services.localization.render('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,gif"/}}
-    #end
-  )))
-  ##########
-  ## Menu
-  ##########
-  (% id="user-vertical-menu" %)
-  (((
-    #verticalNavigation($userMenu, {'translationPrefix' : 'platform.core.profile.category.', 'crtItemId' : $currentCategory, 'cssClass' : 'profile-menu'})
-  )))
-)))
-#########################
-## Display the page content
-#########################
-(% id="user-page-content" %)
-(((
-  #foreach($category in $userMenu)
-    #foreach($subcategory in $category.get('children'))
-      #set($tabKey = $subcategory.get('id')) 
-      (% id="${tabKey}Pane" class="user-page-pane#if($tabKey != $currentCategory) hidden#end" %)
-      (((
-        #set($tabInclude = $subcategory.get('sheet'))
-        {{include reference="${tabInclude}" /}}
-      )))
-    #end
-  #end
-)))
-#########################
-## END
-#########################
-{{html clean="false"}}
-  #if($xcontext.action == 'edit' || $xcontext.action == 'inline')
-    &lt;input type='hidden' name='category' value="$!{currentCategory}" /&gt;
-  #end
-  &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-  #if($request.get('xpage'))
-    &lt;script type="text/javascript"&gt;
-      document.fire('lightbox:userprofile:loaded');
-    &lt;/script&gt;
-  #end
-{{/html}}
-{{/velocity}}</content>
 </xwikidoc>
-

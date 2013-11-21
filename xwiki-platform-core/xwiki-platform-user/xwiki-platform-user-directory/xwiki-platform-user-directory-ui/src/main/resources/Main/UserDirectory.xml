@@ -280,7 +280,11 @@ icon=icon:group</parameters>
   ## If no override is present, use the default data source.
   #set ($userDirectoryLivetableResultsReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'UserDirectoryLivetableResults'))
 #end
+## Note that we specify the class name even though we use a custom results page (which hard-codes it) because the class
+## name is needed by the live table filters, to have a proper drop down list for Static List fields for instance
+## (see XWIKI-9660).
 #set ($options = {
+   'className': $services.model.serialize($xwikiUsersClassReference, 'local'),
    'resultPage' : "$services.model.serialize($userDirectoryLivetableResultsReference)",
    'translationPrefix' : 'xe.userdirectory.',
    'tagCloud' : true,

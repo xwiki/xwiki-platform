@@ -19,10 +19,8 @@
  */
 package org.xwiki.wikistream.instance.output;
 
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.properties.annotation.PropertyDescription;
-import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -43,13 +41,6 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     private String saveComment = "Import";
 
     /**
-     * @see #getAuthor()
-     */
-    private DocumentReference author;
-
-    private boolean authorSet;
-
-    /**
      * @see #getDefaultSyntax()
      */
     private Syntax defaultSyntax;
@@ -57,17 +48,17 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     /**
      * @see #isPreviousDeleted()
      */
-    private boolean previousDeleted;
+    private boolean previousDeleted = true;
 
     /**
      * @see #isVersionPreserved()
      */
-    private boolean versionPreserved;
+    private boolean versionPreserved = true;
 
     /**
      * @see #isPreserveAuthor()
      */
-    private boolean authorPreserved;
+    private boolean authorPreserved = true;
 
     /**
      * @return The base reference to use to resolve reference from events
@@ -106,34 +97,6 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     }
 
     /**
-     * @return The author to set when saving a document
-     */
-    @PropertyName("Author")
-    @PropertyDescription("The author to set when saving a document")
-    public DocumentReference getAuthor()
-    {
-        return this.author;
-    }
-
-    /**
-     * @param author The author to set when saving a document
-     */
-    public void setAuthor(DocumentReference author)
-    {
-        this.author = author;
-        this.authorSet = true;
-    }
-
-    /**
-     * @return indicate of the author has been set
-     */
-    @PropertyHidden
-    public boolean isAuthorSet()
-    {
-        return this.authorSet;
-    }
-
-    /**
      * @return The default syntax if not is provided in events
      */
     @PropertyName("Default syntax")
@@ -152,17 +115,17 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     }
 
     /**
-     * @return Indicate of existing document should be deleted before importing the new one
+     * @return Indicate if existing document should be deleted before importing the new one
      */
     @PropertyName("Delete existing document")
-    @PropertyDescription("Indicate of existing document should be deleted before importing the new one")
+    @PropertyDescription("Indicate if existing document should be deleted before importing the new one")
     public boolean isPreviousDeleted()
     {
         return this.previousDeleted;
     }
 
     /**
-     * @param previousDeleted Indicate of existing document should be deleted before importing the new one
+     * @param previousDeleted Indicate if existing document should be deleted before importing the new one
      */
     public void setPreviousDeleted(boolean previousDeleted)
     {
@@ -170,7 +133,7 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     }
 
     /**
-     * @return Indicate of the versions coming from the events should be kept
+     * @return Indicate if the versions coming from the events should be kept
      */
     @PropertyName("Preserve version")
     @PropertyDescription("Indicate if the versions coming from the events should be kept")
@@ -180,7 +143,7 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     }
 
     /**
-     * @param versionPreserved Indicate of the versions coming from the events should be kept
+     * @param versionPreserved Indicate if the versions coming from the events should be kept
      */
     public void setVersionPreserved(boolean versionPreserved)
     {
@@ -188,19 +151,18 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
     }
 
     /**
-     * @return Indicate of the authors comming from the events should be kept. Not taken into account if
-     *         {@link #setAuthor(DocumentReference)} is used.
+     * @return Indicate if the authors coming from the events should be kept.
      */
     @PropertyName("Preserve author")
     @PropertyDescription(
-        "Indicate of the authors comming from the events should be kept. Not taken into account if AUTHOR is set")
+        "Indicate if the authors comming from the events should be kept. Not taken into account if AUTHOR is set")
     public boolean isAuthorPreserved()
     {
         return authorPreserved;
     }
 
     /**
-     * @param authorPreserved Indicate of the authors comming from the events should be kept. Not taken into account if
+     * @param authorPreserved Indicate if the authors coming from the events should be kept. Not taken into account if
      *            {@link #setAuthor(DocumentReference)} is used.
      */
     public void setAuthorPreserved(boolean authorPreserved)

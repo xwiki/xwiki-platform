@@ -434,17 +434,17 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
-    public Set< ? > getSetValue(String name)
+    public Set<?> getSetValue(String name)
     {
         ListProperty prop = (ListProperty) safeget(name);
         if (prop == null) {
             return new HashSet<Object>();
         } else {
-            return new HashSet<Object>((Collection< ? >) prop.getValue());
+            return new HashSet<Object>((Collection<?>) prop.getValue());
         }
     }
 
-    public void setSetValue(String name, Set< ? > value)
+    public void setSetValue(String name, Set<?> value)
     {
         ListProperty property = new ListProperty();
         property.setValue(value);

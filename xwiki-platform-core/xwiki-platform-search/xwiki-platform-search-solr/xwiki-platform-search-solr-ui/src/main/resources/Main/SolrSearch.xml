@@ -370,7 +370,8 @@
 
 #macro (displaySearchFacetValue_user $user)
   #set ($userReference = $services.model.resolveDocument($user))
-  #set ($userName = $escapetool.xml($xwiki.getUserName($user, false)))
+  ## The string returned by XWiki#getUserName() is XML encoded.
+  #set ($userName = $xwiki.getUserName($user, false))
   &lt;span class="user"&gt;
     &lt;span class="user-avatar-wrapper"&gt;
       #getUserAvatarURL($userReference $avatarURL 30)

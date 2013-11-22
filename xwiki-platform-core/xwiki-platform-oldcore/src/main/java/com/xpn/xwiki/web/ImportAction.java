@@ -124,7 +124,7 @@ public class ImportAction extends XWikiAction
 
         String all = request.get("all");
         if (!"1".equals(all)) {
-            if (context.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 1) == 1) {
+            if (context.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 0) == 1) {
                 XARInputProperties xarProperties = new XARInputProperties();
                 DocumentInstanceOutputProperties instanceProperties = new DocumentInstanceOutputProperties();
 

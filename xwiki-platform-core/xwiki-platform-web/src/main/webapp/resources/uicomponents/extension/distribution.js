@@ -66,7 +66,8 @@ XWiki.DefaultUIStep = Class.create({
     question.down('.button').observe('click', function(event) {
       event.stop();
       question.hide();
-      form.show().focusFirstElement();
+      // Make sure the form is enabled because the browser can cache the state of the form fields (see XWIKI-9717).
+      form.enable().show().focusFirstElement();
     }).activate();
     question.down('.button.secondary').observe('click', hidePreviousUiForm);
     // Hide the form.

@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.xml;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.DefaultWikiStreamProperties;
 
 /**
@@ -27,6 +28,7 @@ import org.xwiki.wikistream.DefaultWikiStreamProperties;
  * @version $Id$
  * @since 5.3RC1
  */
+@Unstable
 public class XMLProperties extends DefaultWikiStreamProperties
 {
 }

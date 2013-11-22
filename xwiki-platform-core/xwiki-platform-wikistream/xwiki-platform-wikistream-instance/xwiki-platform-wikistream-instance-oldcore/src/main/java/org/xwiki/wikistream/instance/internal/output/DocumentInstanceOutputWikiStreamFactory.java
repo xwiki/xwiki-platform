@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wikistream.instance.internal.DocumentInstanceFilter;
 import org.xwiki.wikistream.instance.internal.InstanceUtils;
+import org.xwiki.wikistream.instance.output.DocumentInstanceOutputProperties;
 
 /**
  * @version $Id$

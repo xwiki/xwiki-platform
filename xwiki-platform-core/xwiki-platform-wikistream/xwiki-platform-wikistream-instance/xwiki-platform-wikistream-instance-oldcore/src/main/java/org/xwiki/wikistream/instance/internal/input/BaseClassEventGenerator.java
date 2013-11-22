@@ -29,6 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.BaseClassFilter;
 import org.xwiki.wikistream.model.filter.WikiClassFilter;
@@ -43,16 +44,16 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 @Component
 @Singleton
 public class BaseClassEventGenerator extends
-    AbstractBeanEntityEventGenerator<BaseClass, BaseClassFilter, BaseClassInputProperties>
+    AbstractBeanEntityEventGenerator<BaseClass, BaseClassFilter, DocumentInstanceInputProperties>
 {
     public static final ParameterizedType ROLE = new DefaultParameterizedType(null, EntityEventGenerator.class,
-        BaseClass.class, BaseClassInputProperties.class);
+        BaseClass.class, DocumentInstanceInputProperties.class);
 
     @Inject
     private EntityEventGenerator<PropertyClass> propertyEventGenerator;
 
     @Override
-    public void write(BaseClass xclass, Object filter, BaseClassFilter xclassFilter, BaseClassInputProperties properties)
+    public void write(BaseClass xclass, Object filter, BaseClassFilter xclassFilter, DocumentInstanceInputProperties properties)
         throws WikiStreamException
     {
         // WikiClass

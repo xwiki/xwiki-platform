@@ -25,8 +25,9 @@ import java.text.ParseException;
 import org.junit.Test;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.instance.internal.output.DocumentInstanceOutputProperties;
+import org.xwiki.wikistream.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.wikistream.instance.internal.output.DocumentInstanceOutputWikiStream;
+import org.xwiki.wikistream.instance.output.DocumentInstanceOutputProperties;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -45,11 +46,10 @@ public class DocumentInstanceInputWikiStreamTest extends AbstractInstanceInputWi
         IOException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
-        outputProperties.setPreserveVersion(true);
+        outputProperties.setVersionPreserved(true);
 
-        XWikiDocumentInputProperties inputProperties = new XWikiDocumentInputProperties();
-        inputProperties.setWithWikiAttachmentRevisions(false);
-        inputProperties.setWithWikiDocumentRevisions(false);
+        DocumentInstanceInputProperties inputProperties = new DocumentInstanceInputProperties();
+        inputProperties.setWithRevisions(false);
 
         assertXML("document1", outputProperties, inputProperties);
     }

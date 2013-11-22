@@ -51,6 +51,7 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.xwiki.XWikiWikiAttachmentFilter;
 import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
+import org.xwiki.wikistream.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
 import org.xwiki.wikistream.model.filter.WikiAttachmentFilter;
 import org.xwiki.wikistream.model.filter.WikiClassFilter;
@@ -349,7 +350,7 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
 
             // Versions and save document
 
-            if (this.properties.isPreserveVersion()) {
+            if (this.properties.isVersionPreserved()) {
                 if (document.isNew()) {
                     document.setCreationDate(this.currentCreationDate);
                     document.setCreator(this.currentCreationAuthor);
@@ -410,7 +411,7 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
             // TODO
         }
 
-        if (this.properties.isPreserveVersion()) {
+        if (this.properties.isVersionPreserved()) {
             if (parameters.containsKey(WikiAttachmentFilter.PARAMETER_REVISION)) {
                 attachment.setVersion(getString(WikiAttachmentFilter.PARAMETER_REVISION, parameters, null));
             }

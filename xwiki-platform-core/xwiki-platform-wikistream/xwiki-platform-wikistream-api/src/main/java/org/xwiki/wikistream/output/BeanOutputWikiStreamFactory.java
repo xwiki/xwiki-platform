@@ -21,6 +21,7 @@ package org.xwiki.wikistream.output;
 
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.internal.output.BeanOutputWikiStream;
 
 /**
  * @version $Id$
@@ -35,5 +36,5 @@ public interface BeanOutputWikiStreamFactory<P> extends OutputWikiStreamFactory
      * @throws WikiStreamException when failing to create a {@link OutputWikiStream}
      * @since 5.3M2
      */
-    OutputWikiStream createOutputWikiStream(P properties) throws WikiStreamException;
+    BeanOutputWikiStream<P> createOutputWikiStream(P properties) throws WikiStreamException;
 }

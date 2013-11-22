@@ -26,16 +26,20 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-wikistream</artifactId>
+    <artifactId>xwiki-platform-wikistream-instance</artifactId>
     <version>5.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wikistream-instance</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - WikiStream - Instance</name>
-  <modules>
-    <module>xwiki-platform-wikistream-instance-api</module>
-    <module>xwiki-platform-wikistream-instance-document</module>
-    <module>xwiki-platform-wikistream-instance-oldcore</module>
-    <module>xwiki-platform-wikistream-instance-script</module>
-  </modules>
+  <artifactId>xwiki-platform-wikistream-instance-document</artifactId>
+  <name>XWiki Platform - WikiStream - Instance - Document</name>
+  <description>API for document instance module</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.0</xwiki.jacoco.instructionRatio>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wikistream-instance-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

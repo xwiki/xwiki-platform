@@ -22,23 +22,18 @@ package org.xwiki.wikistream.xar.internal.output;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
-import org.apache.commons.lang3.ObjectUtils;
-import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.output.FileOutputTarget;
 import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 import org.xwiki.wikistream.output.OutputTarget;
-import org.xwiki.wikistream.xar.internal.XARModel;
+import org.xwiki.wikistream.xar.internal.XARPackage;
 import org.xwiki.wikistream.xar.output.XAROutputProperties;
-import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
 
 /**
  * @version $Id$
@@ -46,24 +41,6 @@ import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
  */
 public class XARWikiWriter
 {
-    private static final LocalStringEntityReferenceSerializer TOSTRING_SERIALIZER =
-        new LocalStringEntityReferenceSerializer();
-
-    private static class Entry
-    {
-        public LocalDocumentReference reference;
-
-        public Locale locale = Locale.ROOT;
-
-        public int defaultAction = XARModel.ACTION_OVERWRITE;
-
-        public Entry(LocalDocumentReference reference, Locale locale)
-        {
-            this.reference = reference;
-            this.locale = locale;
-        }
-    }
-
     private final String name;
 
     private final Map<String, Object> wikiProperties;
@@ -72,7 +49,7 @@ public class XARWikiWriter
 
     private final ZipArchiveOutputStream zipStream;
 
-    private final List<Entry> entries = new LinkedList<Entry>();
+    private XARPackage xarPackage = new XARPackage();
 
     public XARWikiWriter(String name, Map<String, Object> wikiParameters, XAROutputProperties xarProperties)
         throws WikiStreamException
@@ -115,7 +92,7 @@ public class XARWikiWriter
         return this.wikiProperties;
     }
 
-    public OutputStream newEntry(LocalDocumentReference reference, Locale locale) throws WikiStreamException
+    public OutputStream newEntry(LocalDocumentReference reference) throws WikiStreamException
     {
         StringBuilder path = new StringBuilder();
 
@@ -126,9 +103,9 @@ public class XARWikiWriter
         path.append(reference.getName());
 
         // Add language
-        if (locale != null && !locale.equals(Locale.ROOT)) {
+        if (reference.getLocale() != null && !reference.getLocale().equals(Locale.ROOT)) {
             path.append('.');
-            path.append(locale);
+            path.append(reference.getLocale());
         }
 
         // Add extension
@@ -141,7 +118,7 @@ public class XARWikiWriter
             throw new WikiStreamException("Failed to add a new zip entry for [" + path + "]", e);
         }
 
-        this.entries.add(new Entry(reference, locale));
+        this.xarPackage.addEntry(reference);
 
         return this.zipStream;
     }
@@ -157,42 +134,7 @@ public class XARWikiWriter
 
     private void writePackage() throws WikiStreamException, IOException
     {
-        ZipArchiveEntry zipentry = new ZipArchiveEntry(XARModel.PATH_PACKAGE);
-        this.zipStream.putArchiveEntry(zipentry);
-
-        WikiStreamXMLStreamWriter writer = new WikiStreamXMLStreamWriter(this.zipStream, this.xarProperties, true);
-
-        try {
-            writer.writeStartDocument();
-            writer.writeStartElement(XARModel.ELEMENT_PACKAGE);
-
-            writer.writeStartElement(XARModel.ELEMENT_INFOS);
-            writer.writeElement(XARModel.ELEMENT_INFOS_NAME, this.xarProperties.getPackageName());
-            writer.writeElement(XARModel.ELEMENT_INFOS_DESCRIPTION, this.xarProperties.getPackageDescription());
-            writer.writeElement(XARModel.ELEMENT_INFOS_LICENSE, this.xarProperties.getPackageLicense());
-            writer.writeElement(XARModel.ELEMENT_INFOS_AUTHOR, this.xarProperties.getPackageAuthor());
-            writer.writeElement(XARModel.ELEMENT_INFOS_VERSION, this.xarProperties.getPackageVersion());
-            writer.writeElement(XARModel.ELEMENT_INFOS_ISBACKUPPACK, this.xarProperties.isPackageBackupPack() ? "1" : "0");
-            writer.writeElement(XARModel.ELEMENT_INFOS_ISPRESERVEVERSION, this.xarProperties.isPreserveVersion() ? "1"
-                : "0");
-            writer.writeEndElement();
-
-            writer.writeStartElement(XARModel.ELEMENT_FILES);
-            for (Entry entry : this.entries) {
-                writer.writeStartElement(XARModel.ELEMENT_FILES_FILES);
-                writer.writeAttribute(XARModel.ATTRIBUTE_DEFAULTACTION, String.valueOf(entry.defaultAction));
-                writer.writeAttribute(XARModel.ATTRIBUTE_LOCALE, ObjectUtils.toString(entry.locale, ""));
-                writer.writeCharacters(TOSTRING_SERIALIZER.serialize(entry.reference));
-                writer.writeEndElement();
-            }
-            writer.writeEndElement();
-            writer.writeEndDocument();
-
-            writer.flush();
-        } finally {
-            writer.close();
-            this.zipStream.closeArchiveEntry();
-        }
+        this.xarPackage.write(this.zipStream);
     }
 
     public void close() throws WikiStreamException

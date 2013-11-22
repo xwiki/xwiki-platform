@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.wikixml.input;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.xml.input.XMLInputProperties;
 
 /**
@@ -27,6 +28,7 @@ import org.xwiki.wikistream.xml.input.XMLInputProperties;
  * @version $Id$
  * @since 5.3RC1
  */
+@Unstable
 public class WikiXMLInputProperties extends XMLInputProperties
 {
 

@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.instance.internal;
 
+
 /**
  * 
  * @version $Id$

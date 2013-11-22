@@ -34,7 +34,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
-import org.xwiki.wikistream.instance.internal.input.InstanceInputProperties;
+import org.xwiki.wikistream.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.wikistream.internal.output.DefaultOutputStreamOutputTarget;
 import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStream;
@@ -258,7 +258,7 @@ public class ExportAction extends XWikiAction
 
         if (context.getWiki().ParamAsLong("xwiki.action.export.xar.usewikistream", 1) == 1) {
             // Create input wiki stream
-            InstanceInputProperties inputProperties = new InstanceInputProperties();
+            DocumentInstanceInputProperties inputProperties = new DocumentInstanceInputProperties();
 
             inputProperties.set("withWikiDocumentRevisions", backup);
             inputProperties.set("withWikiAttachmentRevisions", backup);
@@ -289,8 +289,7 @@ public class ExportAction extends XWikiAction
 
             XWikiResponse response = context.getResponse();
 
-            xarProperties.setTarget(
-                new DefaultOutputStreamOutputTarget(response.getOutputStream()));
+            xarProperties.setTarget(new DefaultOutputStreamOutputTarget(response.getOutputStream()));
             xarProperties.setPackageName(name);
             if (description != null) {
                 xarProperties.setPackageDescription(description);
@@ -308,7 +307,7 @@ public class ExportAction extends XWikiAction
             xarProperties.setPreserveVersion(backup);
 
             BeanOutputWikiStreamFactory<XAROutputProperties> xarWikiStreamFactory =
-                Utils.getComponent((Type) OutputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_10.serialize());
+                Utils.getComponent((Type) OutputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_11.serialize());
 
             OutputWikiStream outputWikiStream = xarWikiStreamFactory.createOutputWikiStream(xarProperties);
 

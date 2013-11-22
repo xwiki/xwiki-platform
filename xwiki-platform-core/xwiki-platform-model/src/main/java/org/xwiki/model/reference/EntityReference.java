@@ -20,6 +20,7 @@
 package org.xwiki.model.reference;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -287,7 +288,19 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     @SuppressWarnings("unchecked")
     protected final <T> T getParameter(String name)
     {
-        return (parameters == null) ? null : (T) parameters.get(name);
+        return (this.parameters == null) ? null : (T) this.parameters.get(name);
+    }
+
+    /**
+     * Get the parameters. This method is final so there is no way to override the map, and the private field in all
+     * other methods of this implementation (faster).
+     * 
+     * @return the value of the parameter
+     * @since 5.3RC1
+     */
+    final Map<String, Serializable> getParameters()
+    {
+        return this.parameters == null ? Collections.<String, Serializable> emptyMap() : this.parameters;
     }
 
     /**

@@ -22,8 +22,8 @@ package org.xwiki.wikistream.xml.internal.input;
 import javax.xml.stream.XMLEventWriter;
 
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
+import org.xwiki.wikistream.internal.input.BeanInputWikiStream;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xml.input.XMLInputProperties;
 
@@ -41,7 +41,7 @@ public abstract class AbstractXMLBeanInputWikiStreamFactory<P extends XMLInputPr
     }
 
     @Override
-    public InputWikiStream createInputWikiStream(P properties) throws WikiStreamException
+    public BeanInputWikiStream<P> createInputWikiStream(P properties) throws WikiStreamException
     {
         return new DefaultXMLInputWikiStream<P, F>(this, properties);
     }

@@ -46,9 +46,9 @@ public class WikiStreamType implements Comparable<WikiStreamType>
     /**
      * The XAR format.
      * 
-     * @since 5.3M2
+     * @since 5.3RC1
      */
-    public static final WikiStreamType XWIKI_XAR_10 = new WikiStreamType(WikiType.XWIKI, "xar", "1.0");
+    public static final WikiStreamType XWIKI_XAR_11 = new WikiStreamType(WikiType.XWIKI, "xar", "1.1");
 
     /**
      * The database stream based on oldcore APIs.

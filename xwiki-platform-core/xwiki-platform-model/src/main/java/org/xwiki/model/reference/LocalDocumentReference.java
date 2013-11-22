@@ -19,6 +19,8 @@
  */
 package org.xwiki.model.reference;
 
+import java.util.Locale;
+
 import org.xwiki.model.EntityType;
 
 /**
@@ -41,11 +43,56 @@ public class LocalDocumentReference extends EntityReference
     }
 
     /**
+     * Create a new Document reference in the current wiki.
+     * 
+     * @param spaceName the name of the space containing the document, must not be null
+     * @param pageName the name of the document, must not be null
+     * @param locale the new locale for this reference
+     * @since 5.3RC1
+     */
+    public LocalDocumentReference(String spaceName, String pageName, Locale locale)
+    {
+        super(pageName, EntityType.DOCUMENT, new EntityReference(spaceName, EntityType.SPACE));
+
+        setLocale(locale);
+    }
+
+    /**
      * @param documentReference the full document reference
      * @since 5.2M2
      */
     public LocalDocumentReference(DocumentReference documentReference)
     {
         super(documentReference, documentReference.getWikiReference(), null);
+    }
+
+    /**
+     * @param entityReference the reference
+     * @param locale the new locale for this reference, if null, locale is removed
+     * @since 5.3RC1
+     */
+    public LocalDocumentReference(EntityReference entityReference, Locale locale)
+    {
+        super(entityReference);
+
+        setLocale(locale);
+    }
+
+    /**
+     * @return the locale of this document reference
+     */
+    public Locale getLocale()
+    {
+        return (Locale) getParameter(DocumentReference.LOCALE);
+    }
+
+    /**
+     * Set the locale of this document reference.
+     * 
+     * @param locale the locale of this document reference
+     */
+    protected void setLocale(Locale locale)
+    {
+        setParameter(DocumentReference.LOCALE, locale);
     }
 }

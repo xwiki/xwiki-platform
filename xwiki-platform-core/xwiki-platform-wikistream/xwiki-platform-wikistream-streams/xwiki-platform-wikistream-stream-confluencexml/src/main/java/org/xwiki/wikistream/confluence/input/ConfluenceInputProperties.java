@@ -24,6 +24,7 @@ import java.util.Locale;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.DefaultWikiStreamProperties;
 import org.xwiki.wikistream.input.InputSource;
 
@@ -33,6 +34,7 @@ import org.xwiki.wikistream.input.InputSource;
  * @version $Id$
  * @since 5.3RC1
  */
+@Unstable
 public class ConfluenceInputProperties extends DefaultWikiStreamProperties
 {
     /**

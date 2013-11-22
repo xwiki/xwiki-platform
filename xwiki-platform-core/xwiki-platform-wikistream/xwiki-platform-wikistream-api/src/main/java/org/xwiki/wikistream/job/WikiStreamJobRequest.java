@@ -20,6 +20,7 @@
 package org.xwiki.wikistream.job;
 
 import org.xwiki.job.Request;
+import org.xwiki.stability.Unstable;
 
 /**
  * WikiStream job request.
@@ -27,6 +28,7 @@ import org.xwiki.job.Request;
  * @version $Id$
  * @since 5.3M2
  */
+@Unstable
 public interface WikiStreamJobRequest extends Request
 {
     /**

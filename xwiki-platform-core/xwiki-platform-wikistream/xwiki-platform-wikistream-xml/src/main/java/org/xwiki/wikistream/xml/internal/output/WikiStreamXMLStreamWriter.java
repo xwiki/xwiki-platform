@@ -46,14 +46,13 @@ public class WikiStreamXMLStreamWriter
         this.printNullValue = printNullValue;
     }
 
-    public WikiStreamXMLStreamWriter(OutputStream outputStream, XMLOutputProperties properties, boolean printNullValue)
+    public WikiStreamXMLStreamWriter(OutputStream outputStream, String encoding, boolean format, boolean printNullValue)
         throws WikiStreamException
     {
         try {
-            XMLStreamWriter streamWriter =
-                XMLOutputFactory.newInstance().createXMLStreamWriter(outputStream, properties.getEncoding());
+            XMLStreamWriter streamWriter = XMLOutputFactory.newInstance().createXMLStreamWriter(outputStream, encoding);
 
-            if (properties.isFormat()) {
+            if (format) {
                 this.writer = new IndentingXMLStreamWriter(streamWriter);
             } else {
                 this.writer = streamWriter;

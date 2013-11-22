@@ -21,6 +21,7 @@ package org.xwiki.wikistream.xar.output;
 
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.xml.output.XMLOutputProperties;
 
 /**
@@ -29,6 +30,7 @@ import org.xwiki.wikistream.xml.output.XMLOutputProperties;
  * @version $Id$
  * @since 5.3RC1
  */
+@Unstable
 public class XAROutputProperties extends XMLOutputProperties
 {
     /**

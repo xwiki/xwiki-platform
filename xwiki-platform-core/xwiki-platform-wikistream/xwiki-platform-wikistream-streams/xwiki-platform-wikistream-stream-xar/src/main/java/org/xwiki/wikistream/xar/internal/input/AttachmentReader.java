@@ -31,7 +31,7 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARAttachmentModel;
 import org.xwiki.wikistream.xar.internal.XARFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
+import org.xwiki.wikistream.xar.internal.XARUtils.EventParameter;
 
 /**
  * @version $Id$
@@ -64,7 +64,7 @@ public class AttachmentReader extends AbstractReader
 
             String value = xmlReader.getElementText();
 
-            Parameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
+            EventParameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
 
             if (parameter != null) {
                 wikiAttachment.parameters.put(parameter.name, convert(parameter.type, value));

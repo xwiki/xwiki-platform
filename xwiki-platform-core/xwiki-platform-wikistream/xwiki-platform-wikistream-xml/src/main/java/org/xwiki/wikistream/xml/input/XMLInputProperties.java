@@ -22,6 +22,7 @@ package org.xwiki.wikistream.xml.input;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.xml.XMLProperties;
 
@@ -29,6 +30,7 @@ import org.xwiki.wikistream.xml.XMLProperties;
  * @version $Id$
  * @since 5.3RC1
  */
+@Unstable
 public class XMLInputProperties extends XMLProperties
 {
     /**

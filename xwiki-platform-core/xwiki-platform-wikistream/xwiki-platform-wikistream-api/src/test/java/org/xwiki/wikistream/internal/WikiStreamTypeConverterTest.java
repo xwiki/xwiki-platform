@@ -42,8 +42,8 @@ public class WikiStreamTypeConverterTest
     public void convertToTypeObject() throws Exception
     {
         WikiStreamType type =
-            this.mocker.getComponentUnderTest().convert(WikiStreamType.class, WikiStreamType.XWIKI_XAR_10.serialize());
-        Assert.assertEquals(WikiStreamType.XWIKI_XAR_10, type);
+            this.mocker.getComponentUnderTest().convert(WikiStreamType.class, WikiStreamType.XWIKI_XAR_11.serialize());
+        Assert.assertEquals(WikiStreamType.XWIKI_XAR_11, type);
     }
 
     @Test
@@ -56,8 +56,8 @@ public class WikiStreamTypeConverterTest
     @Test
     public void convertToString() throws Exception
     {
-        String typeId = this.mocker.getComponentUnderTest().convert(String.class, WikiStreamType.XWIKI_XAR_10);
-        Assert.assertEquals(WikiStreamType.XWIKI_XAR_10.serialize(), typeId);
+        String typeId = this.mocker.getComponentUnderTest().convert(String.class, WikiStreamType.XWIKI_XAR_11);
+        Assert.assertEquals(WikiStreamType.XWIKI_XAR_11.serialize(), typeId);
     }
 
     @Test

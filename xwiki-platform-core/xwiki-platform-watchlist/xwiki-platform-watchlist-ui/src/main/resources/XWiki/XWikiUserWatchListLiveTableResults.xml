@@ -87,11 +87,9 @@
         "id"        : "$!listtool.get($element, 0)",
         "type"      : "$!listtool.get($element, 1)",
         #set($wikiName = $!listtool.get($element, 2))
-        #if($services.wikimanager)
-          #set($wikiPrettyName = $services.wikimanager.getWikiDocument($wikiName).getWikiPrettyName())
-          #if("$!wikiPrettyName.trim()" != '')
-            #set($wikiName = $wikiPrettyName)
-          #end
+        #set($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
+        #if("$!wikiPrettyName.trim()" != '')
+          #set($wikiName = $wikiPrettyName)
         #end
         "wikiName"  : "$wikiName",
         "wikiUrl"   : "$!listtool.get($element, 3)",

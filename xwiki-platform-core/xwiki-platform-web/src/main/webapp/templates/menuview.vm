@@ -180,8 +180,8 @@
 #set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin || $xwiki.exists('Main.AllDocs') || $canDeleteWiki)
 #set ($wikiEntryId = 'tmWiki')
 #set ($wikiEntryText = $services.localization.render('core.menu.type.wiki'))
-#set ($wikiName = $!{services.wikimanager.getWikiDocument($xcontext.getDatabase()).getWikiPrettyName()})
-## If no pretty name is available (no wikimanager service or pretty name is empty), use the wiki name.
+#set ($wikiName = $services.wiki.getById($xcontext.database).prettyName)
+## If no pretty name is available (no wiki script service or pretty name is empty), use the wiki name.
 #if ("$!wikiName.trim()" == '')
   #set ($wikiName = $xcontext.getDatabase())
 #end

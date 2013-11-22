@@ -1205,7 +1205,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #set ($wikiName = $stringtool.removeStart($namespace, 'wiki:'))
 #set ($wikiReference = $services.model.createDocumentReference($wikiName, '', '').wikiReference)
 #set ($wikiHomeDocumentReference = $services.model.resolveDocument('', 'default', $wikiReference))
-#set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wikiName).wikiPrettyName)
+#set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
 #if ("$!wikiPrettyName.trim()" == '')
 #set ($wikiPrettyName = $wikiName)
 #end

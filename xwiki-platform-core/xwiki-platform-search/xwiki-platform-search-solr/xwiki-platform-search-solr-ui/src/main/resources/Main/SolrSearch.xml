@@ -151,7 +151,7 @@
   #end
   #set ($wikis = [])
   #foreach ($wikiName in $wikiNames)
-    #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wikiName).wikiPrettyName)
+    #set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
     #if ("$!wikiPrettyName.trim()" == '')
       #set ($wikiPrettyName = $wikiName)
     #end
@@ -340,7 +340,7 @@
 #end
 
 #macro (displaySearchFacetValue_wiki $wikiName)
-  #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wikiName).wikiPrettyName)
+  #set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
   #if ("$!wikiPrettyName.trim()" == '')
     #set ($wikiPrettyName = $wikiName)
   #end
@@ -688,7 +688,7 @@
 #end
 
 #macro (displaySearchResultLocation $searchResult)
-  #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($searchResult.wiki).wikiPrettyName)
+  #set ($wikiPrettyName = $services.wiki.getById($searchResult.wiki).prettyName)
   #if ("$!wikiPrettyName.trim()" == '')
     #set ($wikiPrettyName = $searchResult.wiki)
   #end

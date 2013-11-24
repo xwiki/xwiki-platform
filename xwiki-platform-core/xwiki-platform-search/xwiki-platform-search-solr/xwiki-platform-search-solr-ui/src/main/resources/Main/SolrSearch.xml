@@ -358,6 +358,8 @@
     $escapetool.xml($locale.getDisplayName($currentLocale))
   #else
     $escapetool.xml($facetPrettyValue)
+    #set ($hint = $escapetool.xml($services.localization.render('solr.field.locale.emptyValue.hint')))
+    &lt;img src="$xwiki.getSkinFile('/icons/silk/information.png')" alt="$hint" title="$hint" class="icon" /&gt;
   #end
 #end
 

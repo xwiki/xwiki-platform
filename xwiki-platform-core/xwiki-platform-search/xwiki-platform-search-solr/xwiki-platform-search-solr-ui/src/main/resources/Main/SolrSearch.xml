@@ -80,8 +80,12 @@
           &lt;select id="searchFilterLanguage" name="lang"&gt;
             &lt;option value=""&gt;$services.localization.render('solr.filterBy.language.all')&lt;/option&gt;
             #getSupportedLanguages()
+            #set ($currentLocale = $services.localization.currentLocale)
             #foreach ($supportedLanguage in $supportedLanguages)
-              &lt;option value="$supportedLanguage" #if ($language == $supportedLanguage)selected="selected"#end&gt;$supportedLanguage&lt;/option&gt;
+              #set ($locale = $services.localization.toLocale($supportedLanguage))
+              &lt;option value="$supportedLanguage" #if ($language == $supportedLanguage)selected="selected"#end&gt;
+                $escapetool.xml($locale.getDisplayName($currentLocale))
+              &lt;/option&gt;
             #end
           &lt;/select&gt;
         &lt;/dd&gt;

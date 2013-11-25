@@ -253,6 +253,8 @@ platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.homepage=Home page
 platform.wiki.sheet.prop.iswikitemplate=Wiki template
 
+## Search Suggest
+platform.wiki.searchSuggestSourceWikis=Wikis
 
 ###############################################################################
 ## Deprecated

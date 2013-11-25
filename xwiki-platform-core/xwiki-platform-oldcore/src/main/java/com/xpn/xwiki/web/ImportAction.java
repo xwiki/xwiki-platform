@@ -30,6 +30,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.BeanInputWikiStreamFactory;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
@@ -47,6 +48,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XARImportedEvent;
+import com.xpn.xwiki.internal.event.XARImportingEvent;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.DocumentInfoAPI;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
@@ -194,7 +197,16 @@ public class ImportAction extends XWikiAction
                 BeanOutputWikiStream<InstanceOutputProperties> instanceWikiStream =
                     instanceWikiStreamFactory.createOutputWikiStream(instanceProperties);
 
-                xarWikiStream.read(instanceWikiStream);
+                // Notify all the listeners about import
+                ObservationManager observation = Utils.getComponent(ObservationManager.class);
+
+                observation.notify(new XARImportingEvent(), null, context);
+
+                try {
+                    xarWikiStream.read(instanceWikiStream);
+                } finally {
+                    observation.notify(new XARImportedEvent(), null, context);
+                }
             } else {
                 PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
                 importer.Import(packFile.getContentInputStream(context));

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -37,6 +38,7 @@ import org.xwiki.wikistream.input.InputWikiStreamFactory;
 import org.xwiki.wikistream.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.wikistream.instance.output.InstanceOutputProperties;
 import org.xwiki.wikistream.internal.input.BeanInputWikiStream;
+import org.xwiki.wikistream.internal.input.DefaultInputStreamInputSource;
 import org.xwiki.wikistream.internal.output.BeanOutputWikiStream;
 import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
@@ -205,9 +207,14 @@ public class ImportAction extends XWikiAction
 
                 observation.notify(new XARImportingEvent(), null, context);
 
+                InputStream source = packFile.getContentInputStream(context);
+                xarProperties.setSource(new DefaultInputStreamInputSource(source));
+
                 try {
                     xarWikiStream.read(instanceWikiStream);
                 } finally {
+                    source.close();
+
                     observation.notify(new XARImportedEvent(), null, context);
                 }
             } else {

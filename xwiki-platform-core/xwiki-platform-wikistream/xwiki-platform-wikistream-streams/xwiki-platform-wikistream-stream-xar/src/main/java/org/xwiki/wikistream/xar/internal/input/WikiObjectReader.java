@@ -29,11 +29,12 @@ import javax.xml.stream.XMLStreamReader;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARObjectModel;
 import org.xwiki.wikistream.xar.internal.XARObjectPropertyModel;
-import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
+import org.xwiki.wikistream.xar.internal.XARUtils.EventParameter;
 import org.xwiki.wikistream.xar.internal.input.ClassReader.WikiClass;
 
 /**
@@ -96,7 +97,7 @@ public class WikiObjectReader extends AbstractReader
             } else {
                 String value = xmlReader.getElementText();
 
-                Parameter parameter = XARObjectModel.OBJECT_PARAMETERS.get(elementName);
+                EventParameter parameter = XARObjectModel.OBJECT_PARAMETERS.get(elementName);
 
                 if (parameter != null) {
                     wikiObject.parameters.put(parameter.name, convert(parameter.type, value));

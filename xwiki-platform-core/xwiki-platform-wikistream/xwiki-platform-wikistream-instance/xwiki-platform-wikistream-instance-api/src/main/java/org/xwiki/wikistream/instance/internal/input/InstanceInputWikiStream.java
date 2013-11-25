@@ -37,6 +37,7 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.input.InstanceInputEventGenerator;
+import org.xwiki.wikistream.instance.input.InstanceInputProperties;
 import org.xwiki.wikistream.instance.internal.InstanceFilter;
 import org.xwiki.wikistream.instance.internal.InstanceModel;
 import org.xwiki.wikistream.instance.internal.InstanceUtils;

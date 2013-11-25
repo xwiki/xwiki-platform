@@ -22,8 +22,14 @@ package org.xwiki.wikistream.instance.internal;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.2
+ */
 @Role
 public interface InstanceModel
 {

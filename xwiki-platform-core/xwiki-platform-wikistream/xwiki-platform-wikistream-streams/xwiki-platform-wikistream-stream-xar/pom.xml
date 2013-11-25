@@ -30,8 +30,9 @@
     <version>5.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-stream-xar</artifactId>
-  <name>XWiki Platform - Wiki Stream - XAR</name>
-  <description>XWiki Platform - Wiki Stream - XAR</description>  <properties>
+  <name>XWiki Platform - WikiStream - XAR</name>
+  <description>XWiki Platform - WikiStream - XAR</description>
+  <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
@@ -73,4 +74,40 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+              org/xwiki/wikistream/xar/internal/XARAttachmentModel.java,
+              org/xwiki/wikistream/xar/internal/XARClassModel.java,
+              org/xwiki/wikistream/xar/internal/XARClassPropertyModel.java,
+              org/xwiki/wikistream/xar/internal/XARDocumentModel.java,
+              org/xwiki/wikistream/xar/internal/XARFilter.java,
+              org/xwiki/wikistream/xar/internal/XARModel.java,
+              org/xwiki/wikistream/xar/internal/XARObjectModel.java,
+              org/xwiki/wikistream/xar/internal/XARObjectPropertyModel.java,
+              org/xwiki/wikistream/xar/internal/XARPackage.java,
+              org/xwiki/wikistream/xar/internal/XARUtils.java,
+              org/xwiki/wikistream/xar/internal/input/AbstractReader.java,
+              org/xwiki/wikistream/xar/internal/input/AttachmentReader.java,
+              org/xwiki/wikistream/xar/internal/input/ClassPropertyReader.java,
+              org/xwiki/wikistream/xar/internal/input/ClassReader.java,
+              org/xwiki/wikistream/xar/internal/input/DocumentLocaleReader.java,
+              org/xwiki/wikistream/xar/internal/input/WikiObjectReader.java,
+              org/xwiki/wikistream/xar/internal/input/WikiReader.java,
+              org/xwiki/wikistream/xar/internal/input/XARInputWikiStream.java,
+              org/xwiki/wikistream/xar/internal/input/XARInputWikiStreamFactory.java,
+              org/xwiki/wikistream/xar/internal/output/XAROutputWikiStream.java,
+              org/xwiki/wikistream/xar/internal/output/XAROutputWikiStreamFactory.java,
+              org/xwiki/wikistream/xar/internal/output/XARWikiWriter.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

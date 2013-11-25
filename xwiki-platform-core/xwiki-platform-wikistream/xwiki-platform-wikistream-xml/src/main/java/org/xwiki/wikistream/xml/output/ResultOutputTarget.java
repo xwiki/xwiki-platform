@@ -25,6 +25,7 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.output.OutputTarget;
 
 /**
+ * {@link Result} based {@link OutputTarget}.
  * 
  * @version $Id$
  * @since 5.2M2
@@ -32,5 +33,8 @@ import org.xwiki.wikistream.output.OutputTarget;
 @Unstable
 public interface ResultOutputTarget extends OutputTarget
 {
+    /**
+     * @return the {@link Result}
+     */
     Result getResult();
 }

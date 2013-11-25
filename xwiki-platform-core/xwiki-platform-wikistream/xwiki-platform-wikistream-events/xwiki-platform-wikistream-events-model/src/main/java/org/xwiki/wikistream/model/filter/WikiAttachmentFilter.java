@@ -37,45 +37,52 @@ import org.xwiki.wikistream.WikiStreamException;
 public interface WikiAttachmentFilter
 {
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_NAME = "name";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_CONTENT_TYPE = "content_type";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_CREATION_AUTHOR = "creation_author";
 
     /**
-     * @type Date
+     * @type {@link java.util.Date}
      */
     String PARAMETER_CREATION_DATE = "creation_date";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_REVISION = "revision";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_REVISION_AUTHOR = "revision_author";
 
     /**
-     * @type Date
+     * @type {@link java.util.Date}
      */
     String PARAMETER_REVISION_DATE = "revision_date";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_REVISION_COMMENT = "revision_comment";
 
+    /**
+     * @param name the name of the attachment
+     * @param content the binary content of the attachment
+     * @param size the size of the attachment
+     * @param parameters the properties of the attachment
+     * @throws WikiStreamException when failing to send event
+     */
     void onWikiAttachment(@Name("name") String name, @Name("content") InputStream content, @Name("size") Long size,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;

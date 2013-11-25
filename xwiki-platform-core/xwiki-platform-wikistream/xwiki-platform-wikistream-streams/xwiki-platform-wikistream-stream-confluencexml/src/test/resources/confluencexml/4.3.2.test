@@ -190,7 +190,6 @@
                 <specialSymbol>.</specialSymbol>
               </paragraph>
               <paragraph>
-                <space></space>
                 <word>To</word>
                 <space></space>
                 <word>help</word>
@@ -277,9 +276,6 @@
                 <word>space</word>
                 <specialSymbol>.</specialSymbol>
               </paragraph>
-              <paragraph>
-                <space></space>
-              </paragraph>
             </group>
             <group name="{class=columnLayout twoColumns}">
               <group name="{class=cell large}">
@@ -301,9 +297,7 @@
                                 <space></space>
                                 <word>space</word>
                               </header>
-                              <paragraph>
-                                <space></space>
-                              </paragraph>
+                              <paragraph></paragraph>
                               <macro id="pagetreesearch"></macro>
                               <paragraph></paragraph>
                               <macro id="pagetree"></macro>
@@ -538,7 +532,6 @@
             </listItem>
           </list>
           <paragraph>
-            <space></space>
             <word>76</word>
             <space></space>
             <word>incomplete</word>
@@ -638,8 +631,7 @@
             <word>4</word>
             <space></space>
             <word>for</word>
-            <space></space>
-            <link freestanding="true">
+            <link>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -652,7 +644,7 @@
               </p>
             </link>
             <newLine></newLine>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -666,7 +658,7 @@
             </image>
           </paragraph>
           <paragraph>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -725,142 +717,34 @@
                 <table>
                   <tableRow>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h1</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h2</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h3</word>
                     </tableHeadCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>1</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>2</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>3</word>
                     </tableCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>4</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <group name="{}">
                         <paragraph>
                           <word>6</word>
@@ -914,7 +798,7 @@
                   <word>alignment</word>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -933,7 +817,7 @@
                   <word>page2</word>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -945,7 +829,6 @@
                       </reference>
                     </p>
                   </link>
-                  <space></space>
                   <specialSymbol>&lt;</specialSymbol>
                   <specialSymbol>=</specialSymbol>
                   <space></space>
@@ -1219,7 +1102,6 @@
             </listItem>
           </list>
           <paragraph>
-            <space></space>
             <word>76</word>
             <space></space>
             <word>incomplete</word>
@@ -1319,8 +1201,7 @@
             <word>4</word>
             <space></space>
             <word>for</word>
-            <space></space>
-            <link freestanding="true">
+            <link>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -1333,7 +1214,7 @@
               </p>
             </link>
             <newLine></newLine>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -1347,7 +1228,7 @@
             </image>
           </paragraph>
           <paragraph>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -1406,142 +1287,34 @@
                 <table>
                   <tableRow>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h1</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h2</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h3</word>
                     </tableHeadCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>1</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>2</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>3</word>
                     </tableCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>4</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <group name="{}">
                         <paragraph>
                           <word>6</word>
@@ -1595,7 +1368,7 @@
                   <word>alignment</word>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -1614,7 +1387,7 @@
                   <word>page2</word>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -1626,7 +1399,6 @@
                       </reference>
                     </p>
                   </link>
-                  <space></space>
                   <specialSymbol>&lt;</specialSymbol>
                   <specialSymbol>=</specialSymbol>
                   <space></space>
@@ -1661,7 +1433,7 @@
                 </paragraph>
                 <horizontalLine></horizontalLine>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -1673,7 +1445,6 @@
                       </reference>
                     </p>
                   </link>
-                  <space></space>
                   <specialSymbol>&lt;</specialSymbol>
                   <specialSymbol>=</specialSymbol>
                   <space></space>
@@ -2382,7 +2153,6 @@
             </listItem>
           </list>
           <paragraph>
-            <space></space>
             <word>76</word>
             <space></space>
             <word>incomplete</word>
@@ -2482,8 +2252,7 @@
             <word>4</word>
             <space></space>
             <word>for</word>
-            <space></space>
-            <link freestanding="true">
+            <link>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -2496,7 +2265,7 @@
               </p>
             </link>
             <newLine></newLine>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -2510,7 +2279,7 @@
             </image>
           </paragraph>
           <paragraph>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -2569,142 +2338,34 @@
                 <table>
                   <tableRow>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h1</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h2</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h3</word>
                     </tableHeadCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>1</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>2</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>3</word>
                     </tableCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>4</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <group name="{}">
                         <paragraph>
                           <word>6</word>
@@ -2758,7 +2419,7 @@
                   <word>alignment</word>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -2777,7 +2438,7 @@
                   <word>page2</word>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -2789,7 +2450,6 @@
                       </reference>
                     </p>
                   </link>
-                  <space></space>
                   <specialSymbol>&lt;</specialSymbol>
                   <specialSymbol>=</specialSymbol>
                   <space></space>
@@ -2824,7 +2484,7 @@
                 </paragraph>
                 <horizontalLine></horizontalLine>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -2836,7 +2496,6 @@
                       </reference>
                     </p>
                   </link>
-                  <space></space>
                   <specialSymbol>&lt;</specialSymbol>
                   <specialSymbol>=</specialSymbol>
                   <space></space>
@@ -3545,7 +3204,6 @@
             </listItem>
           </list>
           <paragraph>
-            <space></space>
             <word>76</word>
             <space></space>
             <word>complete</word>
@@ -3645,8 +3303,7 @@
             <word>4</word>
             <space></space>
             <word>for</word>
-            <space></space>
-            <link freestanding="true">
+            <link>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -3659,7 +3316,7 @@
               </p>
             </link>
             <newLine></newLine>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -3673,7 +3330,7 @@
             </image>
           </paragraph>
           <paragraph>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -3732,142 +3389,34 @@
                 <table>
                   <tableRow>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h1</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h2</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h3</word>
                     </tableHeadCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>1</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>2</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>3</word>
                     </tableCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>4</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <group name="{}">
                         <paragraph>
                           <word>6</word>
@@ -3921,7 +3470,7 @@
                   <word>alignment</word>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -3940,7 +3489,7 @@
                   <word>page2</word>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -3952,7 +3501,6 @@
                       </reference>
                     </p>
                   </link>
-                  <space></space>
                   <specialSymbol>&lt;</specialSymbol>
                   <specialSymbol>=</specialSymbol>
                   <space></space>
@@ -3987,7 +3535,7 @@
                 </paragraph>
                 <horizontalLine></horizontalLine>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -3999,7 +3547,6 @@
                       </reference>
                     </p>
                   </link>
-                  <space></space>
                   <specialSymbol>&lt;</specialSymbol>
                   <specialSymbol>=</specialSymbol>
                   <space></space>
@@ -4708,7 +4255,6 @@
             </listItem>
           </list>
           <paragraph>
-            <space></space>
             <word>76</word>
             <space></space>
             <word>complete</word>
@@ -4779,8 +4325,7 @@
             <word>4</word>
             <space></space>
             <word>for</word>
-            <space></space>
-            <link freestanding="true">
+            <link>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -4793,7 +4338,7 @@
               </p>
             </link>
             <newLine></newLine>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -4807,7 +4352,7 @@
             </image>
           </paragraph>
           <paragraph>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -4866,142 +4411,34 @@
                 <table>
                   <tableRow>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h1</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h2</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h3</word>
                     </tableHeadCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>1</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>2</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>3</word>
                     </tableCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>4</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <group name="{}">
                         <paragraph>
                           <word>6</word>
@@ -5055,7 +4492,7 @@
                   <word>alignment</word>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -5074,7 +4511,7 @@
                   <word>page2</word>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -5086,7 +4523,6 @@
                       </reference>
                     </p>
                   </link>
-                  <space></space>
                   <specialSymbol>&lt;</specialSymbol>
                   <specialSymbol>=</specialSymbol>
                   <space></space>
@@ -5121,7 +4557,7 @@
                 </paragraph>
                 <horizontalLine></horizontalLine>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -5133,7 +4569,6 @@
                       </reference>
                     </p>
                   </link>
-                  <space></space>
                   <specialSymbol>&lt;</specialSymbol>
                   <specialSymbol>=</specialSymbol>
                   <space></space>
@@ -5857,7 +5292,6 @@
             </listItem>
           </list>
           <paragraph>
-            <space></space>
             <word>76</word>
             <space></space>
             <word>complete</word>
@@ -5928,8 +5362,7 @@
             <word>4</word>
             <space></space>
             <word>for</word>
-            <space></space>
-            <link freestanding="true">
+            <link>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -5942,7 +5375,7 @@
               </p>
             </link>
             <newLine></newLine>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -5956,7 +5389,7 @@
             </image>
           </paragraph>
           <paragraph>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -6015,142 +5448,34 @@
                 <table>
                   <tableRow>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h1</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h2</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h3</word>
                     </tableHeadCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>1</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>2</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>3</word>
                     </tableCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>4</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <group name="{}">
                         <paragraph>
                           <word>6</word>
@@ -6204,7 +5529,7 @@
                   <word>alignment</word>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -6223,7 +5548,7 @@
                   <word>page2</word>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -6235,7 +5560,6 @@
                       </reference>
                     </p>
                   </link>
-                  <space></space>
                   <specialSymbol>&lt;</specialSymbol>
                   <specialSymbol>=</specialSymbol>
                   <space></space>
@@ -6270,7 +5594,7 @@
                 </paragraph>
                 <horizontalLine></horizontalLine>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -6282,7 +5606,6 @@
                       </reference>
                     </p>
                   </link>
-                  <space></space>
                   <specialSymbol>&lt;</specialSymbol>
                   <specialSymbol>=</specialSymbol>
                   <space></space>
@@ -7009,7 +6332,6 @@
             </listItem>
           </list>
           <paragraph>
-            <space></space>
             <word>76</word>
             <space></space>
             <word>complete</word>
@@ -7080,8 +6402,7 @@
             <word>4</word>
             <space></space>
             <word>for</word>
-            <space></space>
-            <link freestanding="true">
+            <link>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -7094,7 +6415,7 @@
               </p>
             </link>
             <newLine></newLine>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -7108,7 +6429,7 @@
             </image>
           </paragraph>
           <paragraph>
-            <image freestanding="true">
+            <image>
               <p>
                 <reference>
                   <isTyped>true</isTyped>
@@ -7167,142 +6488,34 @@
                 <table>
                   <tableRow>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h1</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h2</word>
                     </tableHeadCell>
                     <tableHeadCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>h3</word>
                     </tableHeadCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>1</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>2</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>3</word>
                     </tableCell>
                   </tableRow>
                   <tableRow>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>4</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <word>5</word>
                     </tableCell>
                     <tableCell>
-                      <p>
-                        <parameters>
-                          <entry>
-                            <string>rowspan</string>
-                            <string>1</string>
-                          </entry>
-                          <entry>
-                            <string>colspan</string>
-                            <string>1</string>
-                          </entry>
-                        </parameters>
-                      </p>
                       <group name="{}">
                         <paragraph>
                           <word>6</word>
@@ -7356,7 +6569,7 @@
                   <word>alignment</word>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -7387,7 +6600,7 @@
                   </link>
                 </paragraph>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -7433,7 +6646,7 @@
                 </paragraph>
                 <horizontalLine></horizontalLine>
                 <paragraph>
-                  <link freestanding="true">
+                  <link>
                     <p>
                       <reference>
                         <isTyped>true</isTyped>
@@ -7445,7 +6658,6 @@
                       </reference>
                     </p>
                   </link>
-                  <space></space>
                   <specialSymbol>&lt;</specialSymbol>
                   <specialSymbol>=</specialSymbol>
                   <space></space>
@@ -12329,7 +11541,6 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
                 <specialSymbol>.</specialSymbol>
               </paragraph>
               <paragraph>
-                <space></space>
                 <word>To</word>
                 <space></space>
                 <word>help</word>
@@ -12416,9 +11627,6 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
                 <word>space</word>
                 <specialSymbol>.</specialSymbol>
               </paragraph>
-              <paragraph>
-                <space></space>
-              </paragraph>
             </group>
             <group name="{class=columnLayout twoColumns}">
               <group name="{class=cell large}">
@@ -12440,9 +11648,7 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
                                 <space></space>
                                 <word>space</word>
                               </header>
-                              <paragraph>
-                                <space></space>
-                              </paragraph>
+                              <paragraph></paragraph>
                               <macro id="pagetreesearch"></macro>
                               <paragraph></paragraph>
                               <macro id="pagetree"></macro>
@@ -12811,7 +12017,6 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
                 <specialSymbol>.</specialSymbol>
               </paragraph>
               <paragraph>
-                <space></space>
                 <word>To</word>
                 <space></space>
                 <word>help</word>
@@ -12898,9 +12103,6 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
                 <word>space</word>
                 <specialSymbol>.</specialSymbol>
               </paragraph>
-              <paragraph>
-                <space></space>
-              </paragraph>
             </group>
             <group name="{class=columnLayout twoColumns}">
               <group name="{class=cell large}">
@@ -12922,9 +12124,7 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
                                 <space></space>
                                 <word>space</word>
                               </header>
-                              <paragraph>
-                                <space></space>
-                              </paragraph>
+                              <paragraph></paragraph>
                               <macro id="pagetreesearch"></macro>
                               <paragraph></paragraph>
                               <macro id="pagetree"></macro>

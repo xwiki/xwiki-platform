@@ -27,6 +27,7 @@ import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARUtils;
+import org.xwiki.wikistream.xar.output.XAROutputProperties;
 
 /**
  * Generate XAR package from WikiStream events.
@@ -41,7 +42,7 @@ public class XAROutputWikiStreamFactory extends AbstractBeanOutputWikiStreamFact
 {
     public XAROutputWikiStreamFactory()
     {
-        super(WikiStreamType.XWIKI_XAR_10);
+        super(WikiStreamType.XWIKI_XAR_11);
 
         setName("XAR output stream");
         setDescription("Write XAR package from wiki events.");

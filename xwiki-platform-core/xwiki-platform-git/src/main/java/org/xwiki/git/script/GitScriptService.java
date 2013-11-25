@@ -19,23 +19,41 @@
  */
 package org.xwiki.git.script;
 
-import java.io.File;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.slf4j.Logger;
+import org.gitective.core.stat.UserCommitActivity;
+import org.joda.time.DateTime;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.environment.Environment;
+import org.xwiki.git.GitManager;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
 /**
  * Various APIs to make it easy to perform Git commands from within scripts.
+ * <p/>
+ * Example usage from Velocity:
+ * <code><pre>
+ *   {{velocity}}
+ *   #set ($calendar = $datetool.calendar)
+ *   #set ($now = $datetool.date)
+ *   #set ($discard = $calendar.add(6, -10))
+ *   #set ($repository = $services.git.getRepository("https://github.com/xwiki/xwiki-commons.git",
+ *     "xwiki/xwiki-commons"))
+ *   #set ($data = $services.git.countAuthorCommits($calendar.getTime(), $repository))
+ *   #foreach ($authorCommits in $data)
+ *     * $authorCommits.email = $authorCommits.count
+ *   #end
+ *   {{/velocity}}
+ * </pre></code>
  *
  * @version $Id$
  * @since 4.2M1
@@ -46,18 +64,8 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class GitScriptService implements ScriptService
 {
-    /**
-     * Required to get access to the Environment's permanent directory, where the Script service will clone Git
-     * repositories.
-     */
     @Inject
-    private Environment environment;
-
-    /**
-     * The logger to log.
-     */
-    @Inject
-    private Logger logger;
+    private GitManager gitManager;
 
     /**
      * Clone a Git repository by storing it locally in the XWiki Permanent directory. If the repository is already
@@ -70,33 +78,47 @@ public class GitScriptService implements ScriptService
      */
     public Repository getRepository(String repositoryURI, String localDirectoryName)
     {
-        Repository repository;
+        return this.gitManager.getRepository(repositoryURI, localDirectoryName);
+    }
 
-        File localDirectory = new File(this.environment.getPermanentDirectory(), "git/" + localDirectoryName);
-        File gitDirectory = new File(localDirectory, ".git");
-        this.logger.debug("Local Git repository is at [{}]", gitDirectory);
-        FileRepositoryBuilder builder = new FileRepositoryBuilder();
+    /**
+     * Find all authors who have ever committed code in the passed repository.
+     *
+     * @param repositories the list of repositories in which to look for authors
+     * @return the list of authors who have ever contributed code in the passed repository
+     */
+    public Set<PersonIdent> findAuthors(Repository... repositories)
+    {
+        return this.gitManager.findAuthors(Arrays.asList(repositories));
+    }
 
-        try {
-            // Step 1: Initialize Git environment
-            repository = builder.setGitDir(gitDirectory)
-                .readEnvironment()
-                .findGitDir()
-                .build();
-            Git git = new Git(repository);
+    /**
+     * Count commits done by all authors in the passed repositories and since the passed date.
+     *
+     * @param sinceDays the number of days to look back in the past or look from the beginning if set to 0
+     * @param repositories the list of repositories in which to look for commits
+     * @return the author commit activity
+     */
+    public UserCommitActivity[] countAuthorCommits(int sinceDays, Repository... repositories)
+    {
+        return countAuthorCommits(sinceDays, Arrays.asList(repositories));
+    }
 
-            // Step 2: Verify if the directory exists and isn't empty.
-            if (!gitDirectory.exists()) {
-                // Step 2.1: Need to clone the remote repository since it doesn't exist
-                git.cloneRepository()
-                    .setDirectory(localDirectory)
-                    .setURI(repositoryURI)
-                    .call();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(String.format("Failed to execute Git command in [%s]", gitDirectory), e);
+    /**
+     * Count commits done by all authors in the passed repositories and since the passed date.
+     *
+     * @param sinceDays the number of days to look back in the past or look from the beginning if set to 0
+     * @param repositories the list of repositories in which to look for commits
+     * @return the author commit activity
+     */
+    public UserCommitActivity[] countAuthorCommits(int sinceDays, List<Repository> repositories)
+    {
+        Date date = null;
+        if (sinceDays > 0) {
+            // Compute today - since days
+            DateTime now = new DateTime();
+            date = now.minusDays(sinceDays).toDate();
         }
-
-        return repository;
+        return this.gitManager.countAuthorCommits(date, repositories);
     }
 }

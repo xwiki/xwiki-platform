@@ -31,7 +31,7 @@ import org.xwiki.wikistream.model.filter.WikiAttachmentFilter;
 public interface XWikiWikiAttachmentFilter extends WikiAttachmentFilter
 {
     /**
-     * @type String
+     * @type {@link String}
      */
-    String PARAMETER_JRCSREVISIONS = "xwiki_attachment_jrcsrevisions";
+    String PARAMETER_JRCSREVISIONS = "xwiki_jrcsrevisions";
 }

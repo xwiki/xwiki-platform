@@ -62,7 +62,7 @@ Ord 1 | Ord 2
 |Filtrerbar och sorterbar tabell|((({{{
 $xwiki.ssfx.use("js/xwiki/table/table.css")
 $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
-&lt;table id="tableid" class="grid sortable filterable doOddEven"&gt;
+&lt;table id="table1id" class="grid sortable filterable doOddEven"&gt;
   &lt;tr class="sortHeader"&gt;
     &lt;th&gt;Titel1&lt;/th&gt;
     &lt;th&gt;Titel2&lt;/th&gt;
@@ -85,7 +85,7 @@ $xwiki.ssfx.use("js/xwiki/table/table.css")
 $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 {{/velocity}}
 
-(% class="grid sortable filterable doOddEven" id="tableid" %)
+(% class="grid sortable filterable doOddEven" id="table1id" %)
 (% class="sortHeader" %)|=Titel 1|=Titel 2
 |Cell 11|Cell 12
 |Cell 21|Cell 22

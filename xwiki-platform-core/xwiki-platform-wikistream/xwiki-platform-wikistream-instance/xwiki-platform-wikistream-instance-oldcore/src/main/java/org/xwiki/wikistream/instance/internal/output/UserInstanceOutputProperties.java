@@ -20,6 +20,7 @@
 package org.xwiki.wikistream.instance.internal.output;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.wikistream.instance.output.InstanceOutputProperties;
 
 /**
  * @version $Id$

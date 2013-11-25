@@ -34,24 +34,53 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface WikiClassFilter
 {
-    public static final String PARAMETER_CUSTOMCLASS = "customclass";
+    /**
+     * @type {@link String}
+     */
+    String PARAMETER_CUSTOMCLASS = "customclass";
 
-    public static final String PARAMETER_CUSTOMMAPPING = "custommapping";
+    /**
+     * @type {@link String}
+     */
+    String PARAMETER_CUSTOMMAPPING = "custommapping";
 
-    public static final String PARAMETER_SHEET_DEFAULTVIEW = "sheet_defaultview";
+    /**
+     * @type {@link String}
+     */
+    String PARAMETER_SHEET_DEFAULTVIEW = "sheet_defaultview";
 
-    public static final String PARAMETER_SHEET_DEFAULTEDIT = "sheet_defaultedit";
+    /**
+     * @type {@link String}
+     */
+    String PARAMETER_SHEET_DEFAULTEDIT = "sheet_defaultedit";
 
-    public static final String PARAMETER_DEFAULTSPACE = "defaultspace";
+    /**
+     * @type {@link String}
+     */
+    String PARAMETER_DEFAULTSPACE = "defaultspace";
 
-    public static final String PARAMETER_NAMEFIELD = "namefield";
+    /**
+     * @type {@link String}
+     */
+    String PARAMETER_NAMEFIELD = "namefield";
 
-    public static final String PARAMETER_VALIDATIONSCRIPT = "validationscript";
+    /**
+     * @type {@link String}
+     */
+    String PARAMETER_VALIDATIONSCRIPT = "validationscript";
 
+    /**
+     * @param parameters the properties of the class
+     * @throws WikiStreamException when failing to send event
+     */
     void beginWikiClass(
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param parameters the properties of the class
+     * @throws WikiStreamException when failing to send event
+     */
     void endWikiClass(
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;

@@ -41,7 +41,7 @@ public class UserInstanceOutputWikiStreamFactory extends
     public static final String ID = "users";
 
     /**
-     * Tje role hint of this {@link org.xwiki.wikistream.output.OutputWikiStreamFactory}.
+     * The role hint of this {@link org.xwiki.wikistream.output.OutputWikiStreamFactory}.
      */
     public static final String ROLEHINT = InstanceUtils.ROLEHINT + '+' + ID;
 
@@ -51,5 +51,8 @@ public class UserInstanceOutputWikiStreamFactory extends
     public UserInstanceOutputWikiStreamFactory()
     {
         super(ID);
+
+        setName("XWiki users instance input stream");
+        setDescription("Specialized version of the XWiki instance input stream for users.");
     }
 }

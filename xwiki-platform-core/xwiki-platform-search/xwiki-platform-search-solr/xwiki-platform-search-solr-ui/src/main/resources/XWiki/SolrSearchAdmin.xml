@@ -394,7 +394,7 @@ search=Main.SolrSearch</parameters>
           &lt;select id="solrAdminWiki" name="wiki"&gt;
             &lt;option value=""&gt;$services.localization.render('solr.admin.indexing.wiki.select_farm')&lt;/option&gt;
             #foreach ($wiki in $allWikis)
-              #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wiki).wikiPrettyName)
+              #set ($wikiPrettyName = $services.wiki.getById($wiki).prettyName)
               #if ("$!wikiPrettyName.trim()" == '')
                 #set ($wikiPrettyName = $wiki)
               #end

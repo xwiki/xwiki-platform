@@ -41,6 +41,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.confluence.input.ConfluenceInputProperties;
 import org.xwiki.wikistream.confluence.xml.internal.ConfluenceFilter;
 import org.xwiki.wikistream.confluence.xml.internal.ConfluenceXMLPackage;
 import org.xwiki.wikistream.filter.user.GroupFilter;

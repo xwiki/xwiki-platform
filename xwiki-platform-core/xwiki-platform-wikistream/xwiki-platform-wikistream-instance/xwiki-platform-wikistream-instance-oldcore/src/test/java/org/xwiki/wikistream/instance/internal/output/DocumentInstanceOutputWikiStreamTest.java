@@ -33,6 +33,7 @@ import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.internal.AbstractInstanceWikiStreamTest;
+import org.xwiki.wikistream.instance.output.DocumentInstanceOutputProperties;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -56,7 +57,7 @@ public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiSt
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
-        outputProperties.setPreserveVersion(true);
+        outputProperties.setVersionPreserved(true);
 
         importFromXML("document1", outputProperties);
 

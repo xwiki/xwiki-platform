@@ -23,6 +23,10 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.output.OutputTarget;
 
+/**
+ * @version $Id$
+ * @since 5.2M2
+ */
 @Unstable
 public interface WikiStreamConstants
 {

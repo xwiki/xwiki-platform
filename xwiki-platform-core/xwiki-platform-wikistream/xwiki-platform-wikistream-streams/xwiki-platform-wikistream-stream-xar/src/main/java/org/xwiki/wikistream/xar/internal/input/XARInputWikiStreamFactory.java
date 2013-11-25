@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARUtils;
 
@@ -41,7 +42,7 @@ public class XARInputWikiStreamFactory extends AbstractBeanInputWikiStreamFactor
 {
     public XARInputWikiStreamFactory()
     {
-        super(WikiStreamType.XWIKI_XAR_10);
+        super(WikiStreamType.XWIKI_XAR_11);
 
         setName("XAR input stream");
         setDescription("Generates wiki events from XAR package.");

@@ -17,23 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.internal.output;
+package org.xwiki.wikistream.wikixml.input;
 
-import java.util.HashMap;
-
-import org.xwiki.properties.RawProperties;
 import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.xml.input.XMLInputProperties;
 
 /**
+ * Generic XML parser properties.
+ * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3RC1
  */
 @Unstable
-public class InstanceOutputProperties extends HashMap<String, Object> implements RawProperties
+public class WikiXMLInputProperties extends XMLInputProperties
 {
-    @Override
-    public void set(String propertyName, Object value)
-    {
-        put(propertyName, value);
-    }
+
 }

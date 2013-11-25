@@ -19,12 +19,15 @@
  */
 package org.xwiki.wikistream;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Properties common to most streams.
  * 
  * @version $Id$
  * @since 5.3M2
  */
+@Unstable
 public interface WikiStreamProperties
 {
     /**

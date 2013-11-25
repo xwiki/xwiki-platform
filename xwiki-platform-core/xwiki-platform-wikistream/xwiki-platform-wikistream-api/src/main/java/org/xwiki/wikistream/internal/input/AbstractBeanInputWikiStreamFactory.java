@@ -82,7 +82,7 @@ public abstract class AbstractBeanInputWikiStreamFactory<P, F> extends AbstractB
     }
 
     @Override
-    public InputWikiStream createInputWikiStream(P properties) throws WikiStreamException
+    public BeanInputWikiStream<P> createInputWikiStream(P properties) throws WikiStreamException
     {
         BeanInputWikiStream<P> inputWikiStream;
         try {

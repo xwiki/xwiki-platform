@@ -23,7 +23,7 @@
             <date>2000-01-01 00:00:00.0 UTC</date>
           </entry>
           <entry>
-            <string>xwiki_document_jrcsrevisions</string>
+            <string>xwiki_jrcsrevisions</string>
             <string>jrcsrevisions</string>
           </entry>
         </parameters>
@@ -107,7 +107,7 @@
             <content>AAECAwQFBgcICQ==</content>
             <parameters>
               <entry>
-                <string>xwiki_attachment_jrcsrevisions</string>
+                <string>xwiki_jrcsrevisions</string>
                 <string>jrcsrevisions</string>
               </entry>
               <entry>
@@ -119,7 +119,7 @@
                 <date>2000-01-05 00:00:00.0 UTC</date>
               </entry>
               <entry>
-                <string>revision_version</string>
+                <string>revision</string>
                 <string>1.1</string>
               </entry>
               <entry>

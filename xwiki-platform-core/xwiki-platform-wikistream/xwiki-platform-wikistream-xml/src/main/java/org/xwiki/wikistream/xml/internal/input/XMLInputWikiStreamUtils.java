@@ -30,7 +30,8 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.input.InputStreamInputSource;
 import org.xwiki.wikistream.input.ReaderInputSource;
-import org.xwiki.wikistream.xml.input.source.SourceInputSource;
+import org.xwiki.wikistream.xml.input.SourceInputSource;
+import org.xwiki.wikistream.xml.input.XMLInputProperties;
 import org.xwiki.xml.stax.StAXUtils;
 
 /**

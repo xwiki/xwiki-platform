@@ -17,31 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.confluence.xml.internal.input;
-
-import java.util.Locale;
+package org.xwiki.wikistream.xml.input;
 
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.properties.annotation.PropertyName;
-import org.xwiki.wikistream.DefaultWikiStreamProperties;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.input.InputSource;
+import org.xwiki.wikistream.xml.XMLProperties;
 
 /**
  * @version $Id$
- * @since 5.3M2
+ * @since 5.3RC1
  */
-public class ConfluenceInputProperties extends DefaultWikiStreamProperties
+@Unstable
+public class XMLInputProperties extends XMLProperties
 {
+    /**
+     * @see #getSource()
+     */
     private InputSource source;
 
-    private Locale defaultLocale;
+    /**
+     * @see #getEncoding()
+     */
+    private String encoding;
 
-    private boolean convertToXWiki = true;
-
-    private String spacePageName = "WebHome";
-
-    @PropertyName("The source")
+    /**
+     * @return The source to load the wiki from
+     */
+    @PropertyName("Source")
     @PropertyDescription("The source to load the wiki from")
     @PropertyMandatory
     public InputSource getSource()
@@ -49,38 +54,29 @@ public class ConfluenceInputProperties extends DefaultWikiStreamProperties
         return this.source;
     }
 
+    /**
+     * @param source The source to load the wiki from
+     */
     public void setSource(InputSource source)
     {
         this.source = source;
     }
 
-    public Locale getDefaultLocale()
+    /**
+     * @return The encoding to use to parse the content
+     */
+    @PropertyName("Encoding")
+    @PropertyDescription("The encoding to use to parse the content")
+    public String getEncoding()
     {
-        return defaultLocale;
+        return this.encoding;
     }
 
-    public void setDefaultLocale(Locale defaultLocale)
+    /**
+     * @param encoding The encoding to use to parse the content
+     */
+    public void setEncoding(String encoding)
     {
-        this.defaultLocale = defaultLocale;
-    }
-
-    public boolean isConvertToXWiki()
-    {
-        return this.convertToXWiki;
-    }
-
-    public void setConvertToXWiki(boolean convertToXWiki)
-    {
-        this.convertToXWiki = convertToXWiki;
-    }
-
-    public String getSpacePageName()
-    {
-        return this.spacePageName;
-    }
-
-    public void setSpacePageName(String spacePageName)
-    {
-        this.spacePageName = spacePageName;
+        this.encoding = encoding;
     }
 }

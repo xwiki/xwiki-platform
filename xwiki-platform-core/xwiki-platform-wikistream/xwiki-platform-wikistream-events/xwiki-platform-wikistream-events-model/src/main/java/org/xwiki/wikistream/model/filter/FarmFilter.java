@@ -34,10 +34,18 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface FarmFilter
 {
+    /**
+     * @param parameters the farm parameters
+     * @throws WikiStreamException when failing to send event
+     */
     void beginFarm(
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param parameters the farm parameters
+     * @throws WikiStreamException when failing to send event
+     */
     void endFarm(
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;

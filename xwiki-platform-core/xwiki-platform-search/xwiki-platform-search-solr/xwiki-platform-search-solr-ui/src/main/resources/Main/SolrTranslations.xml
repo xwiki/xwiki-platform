@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Main</web>
   <name>SolrTranslations</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.SolrSearch</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1385047506000</creationDate>
+  <parent>Main.SolrSearch</parent>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1369063635000</creationDate>
-  <date>1369655569000</date>
-  <contentUpdateDate>1369654393000</contentUpdateDate>
+  <date>1385298756000</date>
+  <contentUpdateDate>1385298756000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Translations</title>
   <defaultTemplate/>
@@ -22,41 +22,6 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <object>
-    <class>
-      <name>XWiki.TranslationDocumentClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <scope>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>1</number>
-        <prettyName>Scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
-    </class>
-    <name>Main.SolrTranslations</name>
-    <number>0</number>
-    <className>XWiki.TranslationDocumentClass</className>
-    <guid>54715b8e-2403-4d0f-9b46-26f2b0e9e339</guid>
-    <property>
-      <scope>WIKI</scope>
-    </property>
-  </object>
   <content>solr.admin.title=Solr Search Administration
 solr.admin.submit=Apply
 solr.admin.error.notallowed=You are not allowed to perform this action.
@@ -99,8 +64,8 @@ solr.filter.hint=Select predefined filters that will be applied on your query.
 solr.filter.toggle=Toggle the search filter
 solr.filterBy.wiki=Wiki
 solr.filterBy.wiki.all=All wikis
-solr.filterBy.type=Type
-solr.filterBy.type.all=All types
+solr.filterBy.type=Result type
+solr.filterBy.type.all=All result types
 solr.filterBy.type.document=Document
 solr.filterBy.type.attachment=Attachment
 solr.filterBy.type.object=Object
@@ -108,8 +73,8 @@ solr.filterBy.type.object_property=Object property
 solr.filterBy.language=Language
 solr.filterBy.language.all=All languages
 solr.filterBy.space=Space
-solr.filterBy.fileType=File type
-solr.filterBy.fileType.all=All file types
+solr.filterBy.fileType=Attachment media type
+solr.filterBy.fileType.all=All media types
 solr.filterBy.fileType.image=Image
 solr.filterBy.fileType.audio=Audio
 solr.filterBy.fileType.video=Video
@@ -138,6 +103,7 @@ solr.facet.date.any=Any date
 
 solr.field.locale=Language
 solr.field.locale.emptyValue=No Language
+solr.field.locale.emptyValue.hint=Some documents don't have a language set because they contain scripts (which are not written in a natural language) or they make up the user interface which is displayed in the current language (like this page).
 solr.field.wiki=Wiki
 solr.field.space=Space
 solr.field.space_exact=Space
@@ -156,4 +122,39 @@ solr.field.filename=Attachment Name
 solr.field.attcontent=Attachment Content
 solr.field.comment=Comments
 solr.field.objcontent=Objects</content>
+  <object>
+    <name>Main.SolrTranslations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>54715b8e-2403-4d0f-9b46-26f2b0e9e339</guid>
+    <class>
+      <name>XWiki.TranslationDocumentClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>1</number>
+        <prettyName>Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>GLOBAL|WIKI|USER|ON_DEMAND</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <scope>WIKI</scope>
+    </property>
+  </object>
 </xwikidoc>

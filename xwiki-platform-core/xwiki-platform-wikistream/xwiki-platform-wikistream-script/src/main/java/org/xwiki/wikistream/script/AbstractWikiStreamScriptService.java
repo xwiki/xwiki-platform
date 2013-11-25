@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Base class for all WikiStream related script services.
@@ -31,6 +32,7 @@ import org.xwiki.script.service.ScriptService;
  * @version $Id$
  * @since 5.3M1
  */
+@Unstable
 public abstract class AbstractWikiStreamScriptService implements ScriptService
 {
     /**

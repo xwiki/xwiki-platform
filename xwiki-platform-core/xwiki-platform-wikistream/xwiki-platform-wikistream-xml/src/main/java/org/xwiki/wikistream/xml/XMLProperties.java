@@ -17,43 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xml.internal.input;
+package org.xwiki.wikistream.xml;
 
-import org.xwiki.properties.annotation.PropertyDescription;
-import org.xwiki.properties.annotation.PropertyMandatory;
-import org.xwiki.properties.annotation.PropertyName;
-import org.xwiki.wikistream.input.InputSource;
+import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.DefaultWikiStreamProperties;
 
 /**
+ * Base Java bean for XML based modules.
+ * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3RC1
  */
-public class XMLInputProperties
+@Unstable
+public class XMLProperties extends DefaultWikiStreamProperties
 {
-    private InputSource source;
-
-    private String encoding;
-
-    @PropertyName("The source")
-    @PropertyDescription("The source to load the wiki from")
-    @PropertyMandatory
-    public InputSource getSource()
-    {
-        return this.source;
-    }
-
-    public void setSource(InputSource source)
-    {
-        this.source = source;
-    }
-
-    public String getEncoding()
-    {
-        return this.encoding;
-    }
-
-    public void setEncoding(String encoding)
-    {
-        this.encoding = encoding;
-    }
 }

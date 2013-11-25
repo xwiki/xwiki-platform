@@ -17,13 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model.internal.reference;
+package org.xwiki.model.reference;
+
+import java.util.Locale;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSet;
 
 /**
  * Validate {@link EntityReferenceSet}.
@@ -92,9 +92,11 @@ public class EntityReferenceSetTest
 
         Assert.assertTrue(set.matches(new EntityReference("space", EntityType.SPACE, new EntityReference("wiki",
             EntityType.WIKI))));
+        Assert.assertTrue(set.matches(new EntityReference("space", EntityType.SPACE)));
 
         Assert.assertFalse(set.matches(new EntityReference("notspace", EntityType.SPACE, new EntityReference("wiki",
             EntityType.WIKI))));
+        Assert.assertFalse(set.matches(new EntityReference("notspace", EntityType.SPACE)));
     }
 
     @Test
@@ -136,5 +138,67 @@ public class EntityReferenceSetTest
         Assert.assertFalse(set.matches(new EntityReference("otherwiki", EntityType.WIKI)));
 
         Assert.assertTrue(set.matches(new EntityReference("notwiki", EntityType.WIKI)));
+    }
+
+    @Test
+    public void testExcludeSpace()
+    {
+        EntityReferenceSet set = new EntityReferenceSet();
+
+        set.excludes(new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI)));
+
+        Assert.assertFalse(set.matches(new EntityReference("space", EntityType.SPACE, new EntityReference("wiki",
+            EntityType.WIKI))));
+
+        Assert.assertTrue(set.matches(new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertTrue(set.matches(new EntityReference("space", EntityType.SPACE, new EntityReference("otherwiki",
+            EntityType.WIKI))));
+        Assert.assertTrue(set.matches(new EntityReference("otherspace", EntityType.SPACE, new EntityReference("wiki",
+            EntityType.WIKI))));
+    }
+
+    @Test
+    public void testExcludePartial()
+    {
+        EntityReferenceSet set = new EntityReferenceSet();
+
+        set.excludes(new EntityReference("space", EntityType.SPACE));
+
+        Assert.assertFalse(set.matches(new EntityReference("space", EntityType.SPACE, new EntityReference("wiki",
+            EntityType.WIKI))));
+        Assert.assertFalse(set.matches(new EntityReference("space", EntityType.SPACE)));
+
+        Assert.assertTrue(set.matches(new EntityReference("notspace", EntityType.SPACE, new EntityReference("wiki",
+            EntityType.WIKI))));
+        Assert.assertTrue(set.matches(new EntityReference("notspace", EntityType.SPACE)));
+    }
+
+    @Test
+    public void testIncludeLocale()
+    {
+        EntityReferenceSet set = new EntityReferenceSet();
+
+        set.includes(new DocumentReference("wiki", "space", "document", Locale.ENGLISH));
+
+        Assert.assertTrue(set.matches(new DocumentReference("wiki", "space", "document")));
+        Assert.assertTrue(set.matches(new DocumentReference("wiki", "space", "document", Locale.ENGLISH)));
+
+        Assert.assertFalse(set.matches(new DocumentReference("wiki", "space", "document", Locale.FRENCH)));
+        Assert.assertFalse(set.matches(new DocumentReference("wiki", "space", "document", Locale.ROOT)));
+    }
+
+    @Test
+    public void testExcludeLocale()
+    {
+        EntityReferenceSet set = new EntityReferenceSet();
+
+        set.excludes(new DocumentReference("wiki", "space", "document", Locale.ENGLISH));
+
+        Assert.assertTrue(set.matches(new DocumentReference("wiki", "space", "document")));
+
+        Assert.assertFalse(set.matches(new DocumentReference("wiki", "space", "document", Locale.ENGLISH)));
+
+        Assert.assertTrue(set.matches(new DocumentReference("wiki", "space", "document", Locale.FRENCH)));
+        Assert.assertTrue(set.matches(new DocumentReference("wiki", "space", "document", Locale.ROOT)));
     }
 }

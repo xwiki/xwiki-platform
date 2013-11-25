@@ -34,6 +34,12 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface WikiObjectPropertyFilter
 {
+    /**
+     * @param name the name of the property
+     * @param value the value of the property
+     * @param parameters the properties of the property
+     * @throws WikiStreamException when failing to send event
+     */
     void onWikiObjectProperty(@Name("name") String name, @Name("value") String value,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Main</web>
   <name>UserDirectory</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1385047494000</creationDate>
+  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1364502215000</creationDate>
-  <date>1364569715000</date>
-  <contentUpdateDate>1364569684000</contentUpdateDate>
+  <date>1385065244000</date>
+  <contentUpdateDate>1385065244000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.userdirectory.title')</title>
   <defaultTemplate/>
@@ -22,93 +22,6 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <object>
-    <class>
-      <name>XWiki.UIExtensionClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <content>
-        <disabled>0</disabled>
-        <name>content</name>
-        <number>3</number>
-        <prettyName>Extension Content</prettyName>
-        <rows>10</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </content>
-      <extensionPointId>
-        <disabled>0</disabled>
-        <name>extensionPointId</name>
-        <number>1</number>
-        <prettyName>Extension Point ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </extensionPointId>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>2</number>
-        <prettyName>Extension ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parameters>
-        <disabled>0</disabled>
-        <name>parameters</name>
-        <number>4</number>
-        <prettyName>Extension Parameters</prettyName>
-        <rows>10</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </parameters>
-      <scope>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>5</number>
-        <prettyName>Extension Scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>wiki=Current Wiki|user=Current User|global=Global</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
-    </class>
-    <name>Main.UserDirectory</name>
-    <number>0</number>
-    <className>XWiki.UIExtensionClass</className>
-    <guid>391472d5-30e8-4351-ae7f-a4d72394a4ce</guid>
-    <property>
-      <content/>
-    </property>
-    <property>
-      <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>
-    </property>
-    <property>
-      <name>platform.panels.userDirectoryApplication</name>
-    </property>
-    <property>
-      <parameters>label=$services.localization.render('xe.panels.quicklinks.userdirectory')
-target=Main.UserDirectory
-icon=icon:group</parameters>
-    </property>
-    <property>
-      <scope>wiki</scope>
-    </property>
-  </object>
   <content>{{velocity}}
 #set ($xwikiUsersClassReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'XWikiUsers'))
 #set ($xwikiUsersClassName = $services.model.serialize($xwikiUsersClassReference))
@@ -280,7 +193,11 @@ icon=icon:group</parameters>
   ## If no override is present, use the default data source.
   #set ($userDirectoryLivetableResultsReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'UserDirectoryLivetableResults'))
 #end
+## Note that we specify the class name even though we use a custom results page (which hard-codes it) because the class
+## name is needed by the live table filters, to have a proper drop down list for Static List fields for instance
+## (see XWIKI-9660).
 #set ($options = {
+   'className': $services.model.serialize($xwikiUsersClassReference, 'local'),
    'resultPage' : "$services.model.serialize($userDirectoryLivetableResultsReference)",
    'translationPrefix' : 'xe.userdirectory.',
    'tagCloud' : true,
@@ -293,4 +210,91 @@ icon=icon:group</parameters>
   #set ($discard = $doc.removeObject($fakeUser))
 #end
 {{/velocity}}</content>
+  <object>
+    <name>Main.UserDirectory</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>391472d5-30e8-4351-ae7f-a4d72394a4ce</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <name>content</name>
+        <number>3</number>
+        <prettyName>Extension Content</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>1</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <disabled>0</disabled>
+        <name>parameters</name>
+        <number>4</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>5</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>
+    </property>
+    <property>
+      <name>platform.panels.userDirectoryApplication</name>
+    </property>
+    <property>
+      <parameters>label=$services.localization.render('xe.panels.quicklinks.userdirectory')
+target=Main.UserDirectory
+icon=icon:group</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
 </xwikidoc>

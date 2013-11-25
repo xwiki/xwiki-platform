@@ -85,12 +85,12 @@ public privileged aspect XWikiCompatibilityAspect
     public String XWiki.getURLEncoded(String content)
     {
         try {
-            return URLEncoder.encode(content, this.getEncoding());            
+            return URLEncoder.encode(content, this.getEncoding());
         } catch (UnsupportedEncodingException e) {
             return content;
         }
     }
-    
+
     /**
      * @return true for multi-wiki/false for mono-wiki
      * @deprecated replaced by {@link XWiki#isVirtualMode()} since 1.4M1.
@@ -920,5 +920,32 @@ public privileged aspect XWikiCompatibilityAspect
                 }
             }
         }
+    }
+
+    /**
+     * @deprecated replaced by {@link #setUserDefaultGroup(String fullwikiname, XWikiContext context)}
+     * @param context
+     * @param fullwikiname
+     * @throws XWikiException
+     */
+    @Deprecated
+    public void XWiki.SetUserDefaultGroup(XWikiContext context, String fullwikiname) throws XWikiException
+    {
+        this.setUserDefaultGroup(fullwikiname, context);
+    }
+
+    /**
+     * @deprecated replaced by {@link #protectUserPage(String,String,XWikiDocument,XWikiContext)}
+     * @param context
+     * @param fullwikiname
+     * @param userRights
+     * @param doc
+     * @throws XWikiException
+     */
+    @Deprecated
+    public void XWiki.ProtectUserPage(XWikiContext context, String fullwikiname, String userRights, XWikiDocument doc)
+        throws XWikiException
+    {
+        this.protectUserPage(fullwikiname, userRights, doc, context);
     }
 }

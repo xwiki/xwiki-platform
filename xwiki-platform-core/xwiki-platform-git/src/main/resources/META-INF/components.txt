@@ -1,1 +1,2 @@
+org.xwiki.git.internal.DefaultGitManager
 org.xwiki.git.script.GitScriptService

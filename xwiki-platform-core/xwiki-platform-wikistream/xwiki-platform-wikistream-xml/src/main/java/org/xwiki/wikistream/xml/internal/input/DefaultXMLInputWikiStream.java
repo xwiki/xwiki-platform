@@ -21,12 +21,17 @@ package org.xwiki.wikistream.xml.internal.input;
 
 import javax.xml.stream.XMLEventWriter;
 
+import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.internal.input.BeanInputWikiStream;
+import org.xwiki.wikistream.xml.input.XMLInputProperties;
+
 /**
  * @param <P>
  * @version $Id$
  * @since 5.2M2
  */
-public class DefaultXMLInputWikiStream<P extends XMLInputProperties, F> extends AbstractXMLInputWikiStream<P>
+public class DefaultXMLInputWikiStream<P extends XMLInputProperties, F> extends AbstractXMLInputWikiStream<P> implements
+    BeanInputWikiStream<P>
 {
     private final AbstractXMLBeanInputWikiStreamFactory<P, F> factory;
 
@@ -41,5 +46,11 @@ public class DefaultXMLInputWikiStream<P extends XMLInputProperties, F> extends 
     protected XMLEventWriter createXMLEventWriter(Object listener, P parameters)
     {
         return this.factory.createXMLEventWriter(listener, parameters);
+    }
+
+    @Override
+    public void setProperties(P properties) throws WikiStreamException
+    {
+        // Not used
     }
 }

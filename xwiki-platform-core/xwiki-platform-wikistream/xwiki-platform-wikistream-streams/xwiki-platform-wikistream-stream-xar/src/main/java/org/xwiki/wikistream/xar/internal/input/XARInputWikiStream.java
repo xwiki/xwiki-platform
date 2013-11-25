@@ -36,9 +36,10 @@ import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.input.InputStreamInputSource;
 import org.xwiki.wikistream.input.ReaderInputSource;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
+import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARUtils;
-import org.xwiki.wikistream.xml.input.source.SourceInputSource;
+import org.xwiki.wikistream.xml.input.SourceInputSource;
 
 /**
  * @version $Id$

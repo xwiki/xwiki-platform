@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.wikixml.output;
 
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.xml.output.XMLOutputProperties;
 
 /**
@@ -27,6 +28,7 @@ import org.xwiki.wikistream.xml.output.XMLOutputProperties;
  * @version $Id$
  * @since 5.3RC1
  */
+@Unstable
 public class WikiXMLOutputProperties extends XMLOutputProperties
 {
 

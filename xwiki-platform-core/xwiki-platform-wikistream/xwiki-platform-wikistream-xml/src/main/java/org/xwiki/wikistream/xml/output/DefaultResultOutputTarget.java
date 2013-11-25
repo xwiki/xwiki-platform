@@ -23,12 +23,15 @@ import java.io.IOException;
 
 import javax.xml.transform.Result;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Default implementation of {@link ResultOutputTarget}.
  * 
  * @version $Id$
  * @since 5.3RC1
  */
+@Unstable
 public class DefaultResultOutputTarget implements ResultOutputTarget
 {
     /**

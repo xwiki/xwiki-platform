@@ -42,7 +42,7 @@ public class XAROutputWikiStreamFactory extends AbstractBeanOutputWikiStreamFact
 {
     public XAROutputWikiStreamFactory()
     {
-        super(WikiStreamType.XWIKI_XAR_10);
+        super(WikiStreamType.XWIKI_XAR_11);
 
         setName("XAR output stream");
         setDescription("Write XAR package from wiki events.");

@@ -33,7 +33,7 @@ import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
-import org.xwiki.wikistream.instance.internal.input.InstanceInputProperties;
+import org.xwiki.wikistream.instance.input.InstanceInputProperties;
 import org.xwiki.wikistream.script.AbstractWikiStreamScriptService;
 import org.xwiki.wikistream.script.WikiStreamScriptService;
 import org.xwiki.wikistream.type.WikiStreamType;

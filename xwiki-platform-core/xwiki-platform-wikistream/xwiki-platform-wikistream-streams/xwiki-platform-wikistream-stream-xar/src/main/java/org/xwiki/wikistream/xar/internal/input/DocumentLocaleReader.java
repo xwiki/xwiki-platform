@@ -36,13 +36,14 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARAttachmentModel;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
 import org.xwiki.wikistream.xar.internal.XARDocumentModel;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARObjectModel;
-import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
+import org.xwiki.wikistream.xar.internal.XARUtils.EventParameter;
 import org.xwiki.wikistream.xar.internal.input.AttachmentReader.WikiAttachment;
 import org.xwiki.wikistream.xar.internal.input.ClassReader.WikiClass;
 import org.xwiki.wikistream.xar.internal.input.WikiObjectReader.WikiObject;
@@ -116,7 +117,8 @@ public class DocumentLocaleReader extends AbstractReader
         this.sentBeginWikiDocumentRevision = false;
     }
 
-    private void sendBeginWikiDocument(XARFilter proxyFilter, boolean force) throws WikiStreamException
+    private void sendBeginWikiDocument(XARFilter proxyFilter, boolean force, XARInputProperties properties)
+        throws WikiStreamException
     {
         if (!this.sentBeginWikiDocument
             && (force || (this.currentDocument != null && this.currentDocumentParameters.size() == XARDocumentModel.DOCUMENT_PARAMETERS
@@ -126,34 +128,41 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void sendEndWikiDocument(XARFilter proxyFilter) throws WikiStreamException
+    private void sendEndWikiDocument(XARFilter proxyFilter, XARInputProperties properties) throws WikiStreamException
     {
-        sendBeginWikiDocumentLocale(proxyFilter, true);
-        sendBeginWikiDocument(proxyFilter, true);
+        sendBeginWikiDocumentLocale(proxyFilter, true, properties);
+        sendBeginWikiDocument(proxyFilter, true, properties);
 
         proxyFilter.endWikiDocument(this.currentDocument, this.currentDocumentParameters);
     }
 
-    private void sendBeginWikiDocumentLocale(XARFilter proxyFilter, boolean force) throws WikiStreamException
+    private void sendBeginWikiDocumentLocale(XARFilter proxyFilter, boolean force, XARInputProperties properties)
+        throws WikiStreamException
     {
         if (this.sentBeginWikiDocument
             && !this.sentBeginWikiDocumentLocale
             && (force || (this.currentDocumentLocale != null && this.currentDocumentLocaleParameters.size() == XARDocumentModel.DOCUMENTLOCALE_PARAMETERS
                 .size()))) {
+            if (!properties.isWithHistory()) {
+                this.currentDocumentLocaleParameters.remove(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS);
+            }
+
             proxyFilter.beginWikiDocumentLocale(this.currentDocumentLocale, this.currentDocumentLocaleParameters);
             this.sentBeginWikiDocumentLocale = true;
         }
     }
 
-    private void sendEndWikiDocumentLocale(XARFilter proxyFilter) throws WikiStreamException
+    private void sendEndWikiDocumentLocale(XARFilter proxyFilter, XARInputProperties properties)
+        throws WikiStreamException
     {
-        sendBeginWikiDocumentRevision(proxyFilter, true);
-        sendBeginWikiDocumentLocale(proxyFilter, true);
+        sendBeginWikiDocumentRevision(proxyFilter, true, properties);
+        sendBeginWikiDocumentLocale(proxyFilter, true, properties);
 
         proxyFilter.endWikiDocumentLocale(this.currentDocumentLocale, this.currentDocumentLocaleParameters);
     }
 
-    private void sendBeginWikiDocumentRevision(XARFilter proxyFilter, boolean force) throws WikiStreamException
+    private void sendBeginWikiDocumentRevision(XARFilter proxyFilter, boolean force, XARInputProperties properties)
+        throws WikiStreamException
     {
         if (this.sentBeginWikiDocumentLocale
             && !this.sentBeginWikiDocumentRevision
@@ -164,9 +173,10 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void sendEndWikiDocumentRevision(XARFilter proxyFilter) throws WikiStreamException
+    private void sendEndWikiDocumentRevision(XARFilter proxyFilter, XARInputProperties properties)
+        throws WikiStreamException
     {
-        sendBeginWikiDocumentRevision(proxyFilter, true);
+        sendBeginWikiDocumentRevision(proxyFilter, true, properties);
 
         proxyFilter.endWikiDocumentRevision(this.currentDocumentRevision, this.currentDocumentRevisionParameters);
     }
@@ -232,27 +242,27 @@ public class DocumentLocaleReader extends AbstractReader
                     }
                 } else if (XARDocumentModel.ELEMENT_NAME.equals(elementName)) {
                     this.currentDocument = value;
-                    sendBeginWikiDocument(proxyFilter, false);
+                    sendBeginWikiDocument(proxyFilter, false, properties);
                 } else if (XARDocumentModel.ELEMENT_LOCALE.equals(elementName)) {
                     this.currentDocumentLocale = (Locale) convert(Locale.class, value);
-                    sendBeginWikiDocumentLocale(proxyFilter, false);
+                    sendBeginWikiDocumentLocale(proxyFilter, false, properties);
                 } else if (XARDocumentModel.ELEMENT_REVISION.equals(elementName)) {
                     this.currentDocumentRevision = value;
-                    sendBeginWikiDocumentRevision(proxyFilter, false);
+                    sendBeginWikiDocumentRevision(proxyFilter, false, properties);
                 } else {
-                    Parameter parameter = XARDocumentModel.DOCUMENT_PARAMETERS.get(elementName);
+                    EventParameter parameter = XARDocumentModel.DOCUMENT_PARAMETERS.get(elementName);
 
                     if (parameter != null) {
                         this.currentDocumentParameters.put(parameter.name, convert(parameter.type, value));
 
-                        sendBeginWikiDocument(proxyFilter, false);
+                        sendBeginWikiDocument(proxyFilter, false, properties);
                     } else {
                         parameter = XARDocumentModel.DOCUMENTLOCALE_PARAMETERS.get(elementName);
 
                         if (parameter != null) {
                             this.currentDocumentLocaleParameters.put(parameter.name, convert(parameter.type, value));
 
-                            sendBeginWikiDocumentLocale(proxyFilter, false);
+                            sendBeginWikiDocumentLocale(proxyFilter, false, properties);
                         } else {
                             parameter = XARDocumentModel.DOCUMENTREVISION_PARAMETERS.get(elementName);
 
@@ -265,7 +275,7 @@ public class DocumentLocaleReader extends AbstractReader
                                 }
                                 this.currentDocumentRevisionParameters.put(parameter.name, objectValue);
 
-                                sendBeginWikiDocumentRevision(proxyFilter, false);
+                                sendBeginWikiDocumentRevision(proxyFilter, false, properties);
                             } else {
                                 // Unknown property
                                 // TODO: log something ?
@@ -276,23 +286,23 @@ public class DocumentLocaleReader extends AbstractReader
             }
         }
 
-        sendBeginWikiDocument(proxyFilter, true);
-        sendBeginWikiDocumentLocale(proxyFilter, true);
-        sendBeginWikiDocumentRevision(proxyFilter, true);
+        sendBeginWikiDocument(proxyFilter, true, properties);
+        sendBeginWikiDocumentLocale(proxyFilter, true, properties);
+        sendBeginWikiDocumentRevision(proxyFilter, true, properties);
 
         sendWikiAttachments(proxyFilter);
         sendWikiClass(proxyFilter);
         sendWikiObjects(proxyFilter);
 
-        sendEndWikiDocumentRevision(proxyFilter);
-        sendEndWikiDocumentLocale(proxyFilter);
-        sendEndWikiDocument(proxyFilter);
+        sendEndWikiDocumentRevision(proxyFilter, properties);
+        sendEndWikiDocumentLocale(proxyFilter, properties);
+        sendEndWikiDocument(proxyFilter, properties);
     }
 
     private void readObject(XMLStreamReader xmlReader, Object filter, XARFilter proxyFilter,
         XARInputProperties properties) throws XMLStreamException, WikiStreamException, IOException, ParseException
     {
-        sendBeginWikiDocumentRevision(proxyFilter, false);
+        sendBeginWikiDocumentRevision(proxyFilter, false, properties);
 
         WikiObjectReader reader = new WikiObjectReader();
 
@@ -308,7 +318,7 @@ public class DocumentLocaleReader extends AbstractReader
     private void readClass(XMLStreamReader xmlReader, Object filter, XARFilter proxyFilter,
         XARInputProperties properties) throws XMLStreamException, WikiStreamException, IOException, ParseException
     {
-        sendBeginWikiDocumentRevision(proxyFilter, false);
+        sendBeginWikiDocumentRevision(proxyFilter, false, properties);
 
         ClassReader reader = new ClassReader();
 
@@ -322,7 +332,7 @@ public class DocumentLocaleReader extends AbstractReader
     private void readAttachment(XMLStreamReader xmlReader, Object filter, XARFilter proxyFilter,
         XARInputProperties properties) throws XMLStreamException, WikiStreamException, ParseException
     {
-        sendBeginWikiDocumentRevision(proxyFilter, false);
+        sendBeginWikiDocumentRevision(proxyFilter, false, properties);
 
         AttachmentReader reader = new AttachmentReader();
 

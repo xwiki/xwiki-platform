@@ -22,6 +22,7 @@ package org.xwiki.wikistream.xml.output;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.output.OutputTarget;
 import org.xwiki.wikistream.xml.XMLProperties;
 
@@ -31,6 +32,7 @@ import org.xwiki.wikistream.xml.XMLProperties;
  * @version $Id$
  * @since 5.3RC1
  */
+@Unstable
 public class XMLOutputProperties extends XMLProperties
 {
     /**

@@ -59,7 +59,9 @@ public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
     }
 
     /**
-     * Tests that the list values are XML-encoded and joined using the specified separator.
+     * Tests that the list values are joined using the specified separator without being XML-encoded.
+     * 
+     * @see "XWIKI-9680: Apostrophes in static list value are encoded on .display()"
      */
     public void testDisplayView()
     {
@@ -71,12 +73,11 @@ public class StaticListClassTest extends AbstractBridgedXWikiComponentTestCase
         object.addField(propertyName, listProperty);
 
         StaticListClass staticListClass = new StaticListClass();
-        staticListClass.setSeparator("*");
+        staticListClass.setSeparator(" * ");
         staticListClass.setValues(VALUES_WITH_HTML_SPECIAL_CHARS.get(0) + '|' + VALUES_WITH_HTML_SPECIAL_CHARS.get(1)
             + '=' + StringUtils.reverse(VALUES_WITH_HTML_SPECIAL_CHARS.get(1)) + '|'
             + VALUES_WITH_HTML_SPECIAL_CHARS.get(2));
-        assertEquals("a&#60;b&#62;c*3&#39;2&#34;1*x&#123;y&#38;z",
-            staticListClass.displayView(propertyName, "", object, null));
+        assertEquals("a<b>c * 3'2\"1 * x{y&z", staticListClass.displayView(propertyName, "", object, null));
     }
 
     /**

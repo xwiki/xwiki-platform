@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.wikistream.model.filter.WikiObjectFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
+import org.xwiki.wikistream.xar.internal.XARUtils.EventParameter;
 
 /**
  * @version $Id$
@@ -43,12 +43,12 @@ public class XARObjectModel
 
     // Utils
 
-    public static final Map<String, Parameter> OBJECT_PARAMETERS = new HashMap<String, Parameter>()
+    public static final Map<String, EventParameter> OBJECT_PARAMETERS = new HashMap<String, EventParameter>()
     {
         {
-            put(ELEMENT_CLASSNAME, new Parameter(WikiObjectFilter.PARAMETER_CLASS_REFERENCE));
-            put(ELEMENT_GUID, new Parameter(WikiObjectFilter.PARAMETER_GUID));
-            put(ELEMENT_NUMBER, new Parameter(WikiObjectFilter.PARAMETER_NUMBER, Integer.class));
+            put(ELEMENT_CLASSNAME, new EventParameter(WikiObjectFilter.PARAMETER_CLASS_REFERENCE));
+            put(ELEMENT_GUID, new EventParameter(WikiObjectFilter.PARAMETER_GUID));
+            put(ELEMENT_NUMBER, new EventParameter(WikiObjectFilter.PARAMETER_NUMBER, Integer.class));
         }
     };
 }

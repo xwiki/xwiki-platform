@@ -35,7 +35,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
@@ -47,7 +47,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * Script service to manager wikis.
- *
+ * 
  * @version $Id$
  * @since 5.3M2
  */
@@ -97,11 +97,11 @@ public class WikiManagerScriptService implements ScriptService
     private Logger logger;
 
     /**
-     * Get a sub script service related to wiki.
-     * (Note that we're voluntarily using an API name of "get" to make it extra easy to access Script Services from
-     * Velocity (since in Velocity writing <code>$services.wiki.name</code> is equivalent to writing
-     * <code>$services.wiki.get("name")</code>). It also makes it a short and easy API name for other scripting
-     * languages.
+     * Get a sub script service related to wiki. (Note that we're voluntarily using an API name of "get" to make it
+     * extra easy to access Script Services from Velocity (since in Velocity writing <code>$services.wiki.name</code> is
+     * equivalent to writing <code>$services.wiki.get("name")</code>). It also makes it a short and easy API name for
+     * other scripting languages.
+     * 
      * @param serviceName id of the script service
      * @return the service asked or null if none could be found
      */
@@ -110,9 +110,18 @@ public class WikiManagerScriptService implements ScriptService
         return scriptServiceManager.get(ROLEHINT + '.' + serviceName);
     }
 
+    // TODO: move to new API a soon as a proper helper is provided
+    private void checkProgrammingRights(String message) throws AuthorizationException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        if (!xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
+            throw new AuthorizationException(message);
+        }
+    }
+
     /**
      * Create a new wiki.
-     *
+     * 
      * @param wikiId unique identifier of the new wiki
      * @param wikiAlias default alias of the new wiki
      * @param ownerId Id of the user that will own the wiki
@@ -127,8 +136,8 @@ public class WikiManagerScriptService implements ScriptService
 
         try {
             // Check if the current script has the programing rights
-            authorizationManager.checkAccess(Right.PROGRAM, context.getDoc().getAuthorReference(),
-                    context.getDoc().getDocumentReference());
+            checkProgrammingRights("Creating a wiki require programming rights");
+
             // Check right access
             WikiReference mainWikiReference = new WikiReference(getMainWikiId());
             authorizationManager.checkAccess(Right.CREATE_WIKI, context.getUserReference(), mainWikiReference);
@@ -141,10 +150,8 @@ public class WikiManagerScriptService implements ScriptService
             // Set the owner
             descriptor.setOwnerId(ownerId);
             wikiDescriptorManager.saveDescriptor(descriptor);
-        } catch (WikiManagerException e) {
-            error(e.getMessage(), e);
-        } catch (AccessDeniedException e) {
-            error("You don't have the right to create wiki or to set failOnExist to false.", e);
+        } catch (Exception e) {
+            error(e);
         }
 
         return descriptor;
@@ -152,7 +159,7 @@ public class WikiManagerScriptService implements ScriptService
 
     /**
      * Delete the specified wiki.
-     *
+     * 
      * @param wikiId unique identifier of the wiki to delete
      * @return true if the wiki has been successfully deleted
      */
@@ -160,34 +167,31 @@ public class WikiManagerScriptService implements ScriptService
     {
         // Test if the script has the programming right
         XWikiContext context = xcontextProvider.get();
-        if (!authorizationManager.hasAccess(Right.PROGRAM,
-                context.getDoc().getAuthorReference(), context.getDoc().getDocumentReference())) {
-            String errorMessage = "This script does not have the right to delete a wiki.";
-            error(errorMessage, new Exception(errorMessage));
-            return false;
-        }
 
-        // Test right
-        if (!canDeleteWiki(context.getUser(), wikiId)) {
-            String errorMessage = "You don't have the right to delete the wiki";
-            error(errorMessage, new Exception(errorMessage));
-            return false;
-        }
-
-        // Delete the wiki
         try {
+            // Check if the current script has the programming rights
+            checkProgrammingRights("Deleting a wiki require programming rights");
+
+            // Test right
+            if (!canDeleteWiki(context.getUser(), wikiId)) {
+                throw new AuthorizationException("You don't have the right to delete the wiki");
+            }
+
+            // Delete the wiki
             wikiManager.delete(wikiId);
-        } catch (WikiManagerException e) {
+
+            // Return success
+            return true;
+        } catch (Exception e) {
             error(String.format("Failed to delete wiki [%s]", wikiId), e);
-            return false;
         }
-        // Return success
-        return true;
+
+        return false;
     }
 
     /**
      * Test if a given user can delete a given wiki.
-     *
+     * 
      * @param userId the id of the user to test
      * @param wikiId the id of the wiki
      * @return whether or not the user can delete the specified wiki
@@ -199,7 +203,7 @@ public class WikiManagerScriptService implements ScriptService
             // Get the wiki owner
             WikiDescriptor descriptor = wikiDescriptorManager.getById(wikiId);
             if (descriptor == null) {
-                error(errorMessage, new Exception(errorMessage));
+                error(new Exception(errorMessage));
                 return false;
             }
             String owner = descriptor.getOwnerId();
@@ -222,7 +226,7 @@ public class WikiManagerScriptService implements ScriptService
 
     /**
      * Get a wiki descriptor from one of its alias.
-     *
+     * 
      * @param wikiAlias alias to search
      * @return the wiki descriptor corresponding to the alias, or null if no descriptors match the alias
      */
@@ -233,7 +237,7 @@ public class WikiManagerScriptService implements ScriptService
         try {
             descriptor = wikiDescriptorManager.getByAlias(wikiAlias);
         } catch (WikiManagerException e) {
-            error(e.getMessage(), e);
+            error(e);
         }
 
         return descriptor;
@@ -241,7 +245,7 @@ public class WikiManagerScriptService implements ScriptService
 
     /**
      * Get a wiki descriptor from its unique identifier.
-     *
+     * 
      * @param wikiId unique identifier of the wiki to search
      * @return the wiki descriptor corresponding to the Id, or null if no descriptors match the id
      */
@@ -252,7 +256,7 @@ public class WikiManagerScriptService implements ScriptService
         try {
             descriptor = wikiDescriptorManager.getById(wikiId);
         } catch (WikiManagerException e) {
-            error(e.getMessage(), e);
+            error(e);
         }
 
         return descriptor;
@@ -260,7 +264,7 @@ public class WikiManagerScriptService implements ScriptService
 
     /**
      * Get all the wiki descriptors.
-     *
+     * 
      * @return the list of all wiki descriptors
      */
     public Collection<WikiDescriptor> getAll()
@@ -269,15 +273,16 @@ public class WikiManagerScriptService implements ScriptService
         try {
             wikis = wikiDescriptorManager.getAll();
         } catch (WikiManagerException e) {
-            error(e.getMessage(), e);
+            error(e);
             wikis = new ArrayList<WikiDescriptor>();
         }
+
         return wikis;
     }
 
     /**
      * Test if a wiki exists.
-     *
+     * 
      * @param wikiId unique identifier to test
      * @return true if a wiki with this Id exists on the system.
      */
@@ -286,14 +291,15 @@ public class WikiManagerScriptService implements ScriptService
         try {
             return wikiDescriptorManager.exists(wikiId);
         } catch (WikiManagerException e) {
-            error(e.getMessage(), e);
+            error(e);
+
             return false;
         }
     }
 
     /**
      * Check if the wikiId is valid and available (the name is not already taken for technical reasons).
-     *
+     * 
      * @param wikiId the Id to test
      * @return true if the Id is valid and available
      */
@@ -302,7 +308,8 @@ public class WikiManagerScriptService implements ScriptService
         try {
             return wikiManager.idAvailable(wikiId);
         } catch (WikiManagerException e) {
-            error(e.getMessage(), e);
+            error(e);
+
             return false;
         }
     }
@@ -316,8 +323,9 @@ public class WikiManagerScriptService implements ScriptService
         try {
             descriptor = wikiDescriptorManager.getMainWikiDescriptor();
         } catch (WikiManagerException e) {
-            error(e.getMessage(), e);
+            error(e);
         }
+
         return descriptor;
     }
 
@@ -339,7 +347,7 @@ public class WikiManagerScriptService implements ScriptService
 
     /**
      * Save the specified descriptor (if you have the right).
-     *
+     * 
      * @param descriptor descriptor to save
      * @return true if it succeed
      */
@@ -348,9 +356,9 @@ public class WikiManagerScriptService implements ScriptService
         XWikiContext context = xcontextProvider.get();
 
         try {
-            // Check if the current script has the programing rights
-            authorizationManager.checkAccess(Right.PROGRAM, context.getDoc().getAuthorReference(),
-                    context.getDoc().getDocumentReference());
+            // Check if the current script has the programming rights
+            checkProgrammingRights("Saving wiki descriptor require programming rights");
+
             // Get the wiki owner
             WikiDescriptor oldDescriptor = wikiDescriptorManager.getById(descriptor.getId());
             String owner = oldDescriptor.getOwnerId();
@@ -360,19 +368,30 @@ public class WikiManagerScriptService implements ScriptService
                 authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(), wikiReference);
             }
             wikiDescriptorManager.saveDescriptor(descriptor);
+
             return true;
-        } catch (WikiManagerException e) {
-            error(e.getMessage(), e);
-            return false;
-        } catch (AccessDeniedException e) {
-            error(e.getMessage(), e);
+        } catch (Exception e) {
+            error(e);
+
             return false;
         }
     }
 
     /**
      * Log exception and store it in the context.
-     *
+     * 
+     * @param errorMessage error message
+     * @param e the caught exception
+     * @see #CONTEXT_LASTEXCEPTION
+     */
+    private void error(Exception e)
+    {
+        error(null, e);
+    }
+
+    /**
+     * Log exception and store it in the context.
+     * 
      * @param errorMessage error message
      * @param e the caught exception
      * @see #CONTEXT_LASTEXCEPTION

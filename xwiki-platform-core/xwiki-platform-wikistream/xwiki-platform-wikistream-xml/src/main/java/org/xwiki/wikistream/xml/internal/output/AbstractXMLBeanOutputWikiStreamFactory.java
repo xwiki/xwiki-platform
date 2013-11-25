@@ -25,7 +25,7 @@ import javax.xml.transform.Result;
 
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
-import org.xwiki.wikistream.output.OutputWikiStream;
+import org.xwiki.wikistream.internal.output.BeanOutputWikiStream;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xml.output.XMLOutputProperties;
 
@@ -45,7 +45,7 @@ public abstract class AbstractXMLBeanOutputWikiStreamFactory<P extends XMLOutput
     }
 
     @Override
-    public OutputWikiStream createOutputWikiStream(P properties) throws WikiStreamException
+    public BeanOutputWikiStream<P> createOutputWikiStream(P properties) throws WikiStreamException
     {
         try {
             return new DefaultXMLOutputWikiStream<P, F>(this, properties);

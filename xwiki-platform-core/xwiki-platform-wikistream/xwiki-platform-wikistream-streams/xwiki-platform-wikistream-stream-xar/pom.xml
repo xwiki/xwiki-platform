@@ -91,6 +91,7 @@
               org/xwiki/wikistream/xar/internal/XARModel.java,
               org/xwiki/wikistream/xar/internal/XARObjectModel.java,
               org/xwiki/wikistream/xar/internal/XARObjectPropertyModel.java,
+              org/xwiki/wikistream/xar/internal/XARPackage.java,
               org/xwiki/wikistream/xar/internal/XARUtils.java,
               org/xwiki/wikistream/xar/internal/input/AbstractReader.java,
               org/xwiki/wikistream/xar/internal/input/AttachmentReader.java,

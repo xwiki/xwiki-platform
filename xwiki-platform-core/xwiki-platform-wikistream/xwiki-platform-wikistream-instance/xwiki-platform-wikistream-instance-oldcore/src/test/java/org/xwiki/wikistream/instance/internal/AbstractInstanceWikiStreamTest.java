@@ -43,7 +43,7 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.BeanInputWikiStreamFactory;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
-import org.xwiki.wikistream.instance.internal.output.InstanceOutputProperties;
+import org.xwiki.wikistream.instance.output.InstanceOutputProperties;
 import org.xwiki.wikistream.internal.input.DefaultURLInputSource;
 import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStream;

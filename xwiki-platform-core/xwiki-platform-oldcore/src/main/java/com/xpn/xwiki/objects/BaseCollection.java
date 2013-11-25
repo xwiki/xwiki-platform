@@ -129,6 +129,13 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         this.number = number;
     }
 
+    /**
+     * Marks a field as scheduled for removal when saving this entity. Should only be used internally, use
+     * {@link #removeField(String)} to actually remove a field.
+     *
+     * @param field the field to remove, must belong to this entity
+     * @see #removeField(String)
+     */
     public void addPropertyForRemoval(PropertyInterface field)
     {
         getFieldsToRemove().add(field);
@@ -427,17 +434,17 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
-    public Set< ? > getSetValue(String name)
+    public Set<?> getSetValue(String name)
     {
         ListProperty prop = (ListProperty) safeget(name);
         if (prop == null) {
             return new HashSet<Object>();
         } else {
-            return new HashSet<Object>((Collection< ? >) prop.getValue());
+            return new HashSet<Object>((Collection<?>) prop.getValue());
         }
     }
 
-    public void setSetValue(String name, Set< ? > value)
+    public void setSetValue(String name, Set<?> value)
     {
         ListProperty property = new ListProperty();
         property.setValue(value);

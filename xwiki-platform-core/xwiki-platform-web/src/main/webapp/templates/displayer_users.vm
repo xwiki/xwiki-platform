@@ -20,8 +20,9 @@
       <li class="user">
         <div class="user-avatar-wrapper">
           #getUserAvatarURL($userReference $avatarURL 30)
+          ## The string returned by XWiki#getUserName() is XML encoded.
           <img src="$escapetool.xml($avatarURL.url)" class="icon"
-            alt="$escapetool.xml($xwiki.getUserName($user, false))" />
+            alt="$xwiki.getUserName($user, false)" />
         </div>
         <div class="user-name">$xwiki.getUserName($user)</div>
         <div>

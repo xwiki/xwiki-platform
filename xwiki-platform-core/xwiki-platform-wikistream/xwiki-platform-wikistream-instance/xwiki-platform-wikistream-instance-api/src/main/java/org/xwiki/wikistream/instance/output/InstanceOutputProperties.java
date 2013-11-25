@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.instance.internal.output;
+package org.xwiki.wikistream.instance.output;
 
 import java.util.HashMap;
 
@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
- * @since 5.2M2
+ * @since 5.3RC1
  */
 @Unstable
 public class InstanceOutputProperties extends HashMap<String, Object> implements RawProperties

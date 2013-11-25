@@ -179,8 +179,9 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         if (this.writer == null) {
             if (this.wikiWriter != null) {
                 this.writer =
-                    new WikiStreamXMLStreamWriter(this.wikiWriter.newEntry(this.currentDocumentReference, locale),
-                        this.properties, true);
+                    new WikiStreamXMLStreamWriter(this.wikiWriter.newEntry(new LocalDocumentReference(
+                        this.currentDocumentReference, locale)), this.properties.getEncoding(),
+                        this.properties.isFormat(), true);
             } else {
                 this.writer = new WikiStreamXMLStreamWriter(this.properties, true);
             }

@@ -17,24 +17,51 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.event;
+package org.xwiki.bridge.event;
 
-import org.xwiki.observation.event.AbstractFilterableEvent;
 import org.xwiki.observation.event.BeginFoldEvent;
+import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * Event to notify of the starting import of a XAR package.
- * <p>
- * TODO: this event should take the name of the imported xar as a parameter, and listeners should be able to match on
- * it. For the moment, I cannot figure out how to get the name of the imported xar from the Package plugin.
- * 
+ * An event triggered just after a provisioning job is finished.
+ *
  * @version $Id$
+ * @since 5.3RC1
  */
-public class XARImportingEvent extends AbstractFilterableEvent implements BeginFoldEvent
+public class WikiProvisioningEvent extends AbstractWikiEvent implements BeginFoldEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
      * changes.
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Matches all {@link WikiProvisioningEvent} events.
+     */
+    public WikiProvisioningEvent()
+    {
+
+    }
+
+    /**
+     * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
+     * meaning that this event will match only events affecting the same wiki.
+     *
+     * @param wikiId the wiki identifier
+     */
+    public WikiProvisioningEvent(String wikiId)
+    {
+        super(wikiId);
+    }
+
+    /**
+     * Constructor using a custom {@link org.xwiki.observation.event.filter.EventFilter}.
+     *
+     * @param eventFilter the filter to use for matching events
+     */
+    public WikiProvisioningEvent(EventFilter eventFilter)
+    {
+        super(eventFilter);
+    }
 }

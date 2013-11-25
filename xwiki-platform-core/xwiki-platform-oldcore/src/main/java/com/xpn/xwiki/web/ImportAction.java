@@ -97,7 +97,7 @@ public class ImportAction extends XWikiAction
         response.setContentType(MediaType.APPLICATION_XML.toString());
         response.setCharacterEncoding(encoding);
 
-        if (xcontext.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 1) == 1) {
+        if (xcontext.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 0) == 1) {
             XARPackage xarPackage = new XARPackage();
             XARInputProperties properties = new XARInputProperties();
             properties.setReferencesOnly(true);

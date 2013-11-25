@@ -1,3 +1,4 @@
 org.xwiki.linkchecker.internal.LinkCheckerEventListener
 org.xwiki.linkchecker.internal.ContextLinkCheckerThreadInitializer
 org.xwiki.linkchecker.internal.ThreadLinkContextDataProvider
+900:org.xwiki.linkchecker.internal.XWikiLinkCheckerTransformationConfiguration

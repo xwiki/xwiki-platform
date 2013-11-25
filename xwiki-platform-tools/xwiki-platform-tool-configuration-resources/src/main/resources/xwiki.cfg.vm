@@ -662,6 +662,6 @@ xwiki.plugin.image.cache.capacity=30
 #-# Indicate if WikiStream should be used when importing a XAR in the import action.
 #-# This property will be removed as soon as WikiStream is old/stable enough.
 #-# By default WikiStream the old system is used, uncomment to use WikiStream.
-# xwiki.action.import.xar.usewikistream=1
+xwiki.action.import.xar.usewikistream=1
 
 $!xwikiCfgAdditionalProperties

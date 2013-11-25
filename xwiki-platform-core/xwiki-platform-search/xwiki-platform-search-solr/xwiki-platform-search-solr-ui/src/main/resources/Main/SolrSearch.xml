@@ -504,15 +504,6 @@
 #end
 
 #macro (displaySearchFacetValue_customDateInterval)
-  ## Reset the pagination because the number of results can change when a facet is applied.
-  #extendQueryString($url {
-    $facetRequestParameter: ['[* TO *]'],
-    'firstIndex': [],
-    'timezoneOffset': []
-  })
-  &lt;a href="$url" class="itemName"&gt;
-    $escapetool.xml($services.localization.render('solr.facet.date.customInterval'))
-  &lt;/a&gt;
   ## A simple date picker widget.
   #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js', true))
@@ -522,13 +513,47 @@
   #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
   #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
-  &lt;input type="text" name="$escapetool.xml($facetRequestParameter)" class="datetime withTip"
-    value="$escapetool.xml($services.localization.render('solr.facet.date.start'))"
-    title="$escapetool.xml($dateFormat)" /&gt;
-  &lt;input type="text" name="$escapetool.xml($facetRequestParameter)" class="datetime withTip"
-    value="$escapetool.xml($services.localization.render('solr.facet.date.end'))"
-    title="$escapetool.xml($dateFormat)" /&gt;
-  &lt;div class="clearfloats"&gt;&lt;/div&gt;
+  &lt;form action="$doc.getURL('get')"&gt;
+    &lt;div class="hidden"&gt;
+      ## Reset the pagination because the number of results can change when a facet is applied.
+      #extendQueryString($url {
+        $facetRequestParameter: ['[* TO *]'],
+        'firstIndex': [],
+        'timezoneOffset': []
+      })
+      &lt;input type="hidden" name="xredirect" value="$escapetool.xml($url)" /&gt;
+      &lt;input type="hidden" name="facet" value="$escapetool.xml($facetRequestParameter)" /&gt;
+    &lt;/div&gt;
+    &lt;div class="itemName"&gt;$escapetool.xml($services.localization.render('solr.facet.date.customInterval'))&lt;/div&gt;
+    &lt;dl&gt;
+      &lt;dt class="hidden"&gt;
+        &lt;label for="$escapetool.xml($facetRequestParameter)_startDate"&gt;
+          $escapetool.xml($services.localization.render('solr.facet.date.start'))
+        &lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;input type="text" id="$escapetool.xml($facetRequestParameter)_startDate" name="startDate"
+          value="$escapetool.xml($services.localization.render('solr.facet.date.start'))"
+          class="datetime withTip" title="$escapetool.xml($dateFormat)" /&gt;
+      &lt;/dd&gt;
+      &lt;dt class="hidden"&gt;
+        &lt;label for="$escapetool.xml($facetRequestParameter)_endDate"&gt;
+          $escapetool.xml($services.localization.render('solr.facet.date.end'))
+        &lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;input type="text" id="$escapetool.xml($facetRequestParameter)_endDate" name="endDate"
+          value="$escapetool.xml($services.localization.render('solr.facet.date.end'))"
+          class="datetime withTip" title="$escapetool.xml($dateFormat)" /&gt;
+      &lt;/dt&gt;
+    &lt;/dl&gt;
+    &lt;div&gt;
+      &lt;span class="buttonwrapper"&gt;
+        &lt;input type="submit" class="button" value="$escapetool.xml($services.localization.render(
+          'solr.facet.date.applyCustomInterval'))" /&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
 #end
 
 #macro (displaySearchFacetValue_date $facetPrettyValue)
@@ -1227,7 +1252,26 @@ $value##
   var CustomDateIntervalBehavior = Class.create({
     initialize: function(container) {
       this.container = container;
-      container.down('a.itemName').observe('click', this._onToggle.bindAsEventListener(this));
+      var form = this.container.down('form');
+
+      // Note that we change the sign because Date#getTimezoneOffset() returns (UTC - local time)
+      // and we need (local time - UTC) on the server.
+      var timezoneOffset = new Element('input', {
+        type: 'hidden',
+        name: 'timezoneOffset',
+        value: -new Date().getTimezoneOffset()
+      });
+      form.down('div.hidden').insert(timezoneOffset);
+
+      var checkbox = new Element('input', {type: 'checkbox'});
+      checkbox.observe('click', function() {
+        form.toggle();
+      });
+
+      var label = new Element('label', {'class': 'itemName'});
+      label.insert(checkbox);
+      label.insert(form.down('.itemName').remove().innerHTML);
+      form.hide().insert({before: label});
     },
 
     _onToggle: function(event) {
@@ -1781,8 +1825,15 @@ a.search-result-highlightAll:after {
 /**
  * Date Facet
  */
-.search-facet-body li.customDateInterval input {
+.search-facet-body .customDateInterval input {
   margin-bottom: .3em;
+}
+.search-facet-body .customDateInterval .itemName {
+  cursor: pointer;
+  padding-left: 0;
+}
+.search-facet-body .customDateInterval form {
+  margin-top: .5em;
 }
 
 /**

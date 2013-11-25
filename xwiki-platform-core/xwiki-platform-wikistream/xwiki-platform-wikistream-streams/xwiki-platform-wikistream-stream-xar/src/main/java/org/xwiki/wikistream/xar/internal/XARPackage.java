@@ -185,21 +185,21 @@ public class XARPackage implements WikiDocumentFilter, WikiSpaceFilter
         this.entries.add(new Entry(reference));
     }
 
-    public void write(ZipArchiveOutputStream zipStream) throws WikiStreamException, IOException
+    public void write(ZipArchiveOutputStream zipStream, String encoding) throws WikiStreamException, IOException
     {
         ZipArchiveEntry zipentry = new ZipArchiveEntry(XARModel.PATH_PACKAGE);
         zipStream.putArchiveEntry(zipentry);
 
         try {
-            write(zipStream);
+            write(zipStream, encoding);
         } finally {
             zipStream.closeArchiveEntry();
         }
     }
 
-    public void write(OutputStream stream) throws WikiStreamException, IOException
+    public void write(OutputStream stream, String encoding) throws WikiStreamException, IOException
     {
-        WikiStreamXMLStreamWriter writer = new WikiStreamXMLStreamWriter(stream, "UTF8", true, true);
+        WikiStreamXMLStreamWriter writer = new WikiStreamXMLStreamWriter(stream, encoding, true, true);
 
         try {
             writer.writeStartDocument();

@@ -65,6 +65,8 @@ public class ImportAction extends XWikiAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
+        String result = null;
+
         try {
             XWikiRequest request = context.getRequest();
             XWikiResponse response = context.getResponse();
@@ -84,14 +86,14 @@ public class ImportAction extends XWikiAction
             if ("getPackageInfos".equals(action)) {
                 getPackageInfos(doc.getAttachment(name), response, context);
             } else if ("import".equals(action)) {
-                importPackage(doc.getAttachment(name), request, context);
+                result = importPackage(doc.getAttachment(name), request, context);
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
                 "Exception while importing", e);
         }
 
-        return null;
+        return result;
     }
 
     private void getPackageInfos(XWikiAttachment packFile, XWikiResponse response, XWikiContext xcontext)

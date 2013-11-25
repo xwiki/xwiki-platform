@@ -90,6 +90,7 @@ public class ImportAction extends XWikiAction
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
                 "Exception while importing", e);
         }
+
         return null;
     }
 
@@ -109,7 +110,7 @@ public class ImportAction extends XWikiAction
                 Utils.getComponent((Type) InputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_11.serialize());
             inputWikiStreamFactory.createInputWikiStream(properties).read(xarPackage);
 
-            xarPackage.write(response.getOutputStream());
+            xarPackage.write(response.getOutputStream(), encoding);
         } else {
             PackageAPI importer = ((PackageAPI) xcontext.getWiki().getPluginApi("package", xcontext));
             importer.Import(packFile.getContentInputStream(xcontext));
@@ -123,10 +124,10 @@ public class ImportAction extends XWikiAction
     private String importPackage(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
         throws IOException, XWikiException, WikiStreamException
     {
-        String[] pages = request.getParameterValues("pages");
-
         String all = request.get("all");
         if (!"1".equals(all)) {
+            String[] pages = request.getParameterValues("pages");
+
             if (context.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 0) == 1) {
                 XARInputProperties xarProperties = new XARInputProperties();
                 DocumentInstanceOutputProperties instanceProperties = new DocumentInstanceOutputProperties();

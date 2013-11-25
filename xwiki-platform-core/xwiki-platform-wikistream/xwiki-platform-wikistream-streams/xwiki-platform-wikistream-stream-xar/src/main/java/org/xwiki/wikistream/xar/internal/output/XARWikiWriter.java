@@ -134,7 +134,7 @@ public class XARWikiWriter
 
     private void writePackage() throws WikiStreamException, IOException
     {
-        this.xarPackage.write(this.zipStream);
+        this.xarPackage.write(this.zipStream, xarProperties.getEncoding());
     }
 
     public void close() throws WikiStreamException

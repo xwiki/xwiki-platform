@@ -253,9 +253,6 @@ platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.homepage=Home page
 platform.wiki.sheet.prop.iswikitemplate=Wiki template
 
-## Search Suggest
-platform.wiki.searchSuggestSourceWikis=Wikis
-
 ###############################################################################
 ## Deprecated
 ## Note: each element should be removed when the last branch using it is no longer supported

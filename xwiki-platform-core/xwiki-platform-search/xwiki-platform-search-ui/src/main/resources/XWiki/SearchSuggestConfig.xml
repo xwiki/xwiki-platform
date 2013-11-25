@@ -2436,7 +2436,7 @@ AAAAAElFTkSuQmCC
       <icon>icon:chart_organisation</icon>
     </property>
     <property>
-      <name>platform.wiki.searchSuggestSourceWikis</name>
+      <name>platform.search.suggestSourceWikis</name>
     </property>
     <property>
       <query>class:XWiki.XWikiServerClass AND propertyname:wikiprettyname AND propertyvalue__:(__INPUT__*)</query>

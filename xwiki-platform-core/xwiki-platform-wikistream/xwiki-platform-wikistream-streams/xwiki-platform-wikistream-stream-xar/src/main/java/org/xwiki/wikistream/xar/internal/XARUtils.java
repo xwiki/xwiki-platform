@@ -50,5 +50,5 @@ public final class XARUtils
     /**
      * @since 5.2RC1
      */
-    public static final String ROLEHINT = "xwiki+xar/1.0";
+    public static final String ROLEHINT = "xwiki+xar/1.1";
 }

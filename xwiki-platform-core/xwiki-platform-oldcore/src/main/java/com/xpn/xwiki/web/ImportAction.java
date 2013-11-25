@@ -30,6 +30,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.BeanInputWikiStreamFactory;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
@@ -47,6 +48,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XARImportedEvent;
+import com.xpn.xwiki.internal.event.XARImportingEvent;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.DocumentInfoAPI;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
@@ -62,6 +65,8 @@ public class ImportAction extends XWikiAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
+        String result = null;
+
         try {
             XWikiRequest request = context.getRequest();
             XWikiResponse response = context.getResponse();
@@ -81,13 +86,14 @@ public class ImportAction extends XWikiAction
             if ("getPackageInfos".equals(action)) {
                 getPackageInfos(doc.getAttachment(name), response, context);
             } else if ("import".equals(action)) {
-                importPackage(doc.getAttachment(name), request, context);
+                result = importPackage(doc.getAttachment(name), request, context);
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
                 "Exception while importing", e);
         }
-        return null;
+
+        return result;
     }
 
     private void getPackageInfos(XWikiAttachment packFile, XWikiResponse response, XWikiContext xcontext)
@@ -97,7 +103,7 @@ public class ImportAction extends XWikiAction
         response.setContentType(MediaType.APPLICATION_XML.toString());
         response.setCharacterEncoding(encoding);
 
-        if (xcontext.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 1) == 1) {
+        if (xcontext.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 0) == 1) {
             XARPackage xarPackage = new XARPackage();
             XARInputProperties properties = new XARInputProperties();
             properties.setReferencesOnly(true);
@@ -106,7 +112,7 @@ public class ImportAction extends XWikiAction
                 Utils.getComponent((Type) InputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_11.serialize());
             inputWikiStreamFactory.createInputWikiStream(properties).read(xarPackage);
 
-            xarPackage.write(response.getOutputStream());
+            xarPackage.write(response.getOutputStream(), encoding);
         } else {
             PackageAPI importer = ((PackageAPI) xcontext.getWiki().getPluginApi("package", xcontext));
             importer.Import(packFile.getContentInputStream(xcontext));
@@ -120,10 +126,10 @@ public class ImportAction extends XWikiAction
     private String importPackage(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
         throws IOException, XWikiException, WikiStreamException
     {
-        String[] pages = request.getParameterValues("pages");
-
         String all = request.get("all");
         if (!"1".equals(all)) {
+            String[] pages = request.getParameterValues("pages");
+
             if (context.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 0) == 1) {
                 XARInputProperties xarProperties = new XARInputProperties();
                 DocumentInstanceOutputProperties instanceProperties = new DocumentInstanceOutputProperties();
@@ -194,7 +200,16 @@ public class ImportAction extends XWikiAction
                 BeanOutputWikiStream<InstanceOutputProperties> instanceWikiStream =
                     instanceWikiStreamFactory.createOutputWikiStream(instanceProperties);
 
-                xarWikiStream.read(instanceWikiStream);
+                // Notify all the listeners about import
+                ObservationManager observation = Utils.getComponent(ObservationManager.class);
+
+                observation.notify(new XARImportingEvent(), null, context);
+
+                try {
+                    xarWikiStream.read(instanceWikiStream);
+                } finally {
+                    observation.notify(new XARImportedEvent(), null, context);
+                }
             } else {
                 PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
                 importer.Import(packFile.getContentInputStream(context));

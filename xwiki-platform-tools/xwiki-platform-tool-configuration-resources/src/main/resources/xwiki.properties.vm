@@ -181,11 +181,19 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# rendering.transformation.icon.mappings = (off) = lightbulb_off
 #-# rendering.transformation.icon.mappings = (*) = star
 
+#-------------------------------------------------------------------------------------
+# LinkChecker Transformation
+#-------------------------------------------------------------------------------------
+
 #-# [Since 3.3M2]
-#-# LinkChecker Transformation Configuration
 #-# Defines the time (in ms) after which an external link should be checked again for validity.
 #-# the default configuration is:
 # rendering.transformation.linkchecker.timeout = 3600000
+
+#-# [Since 5.3RC1]
+#-# List of document references that are excluded from link checking, specified using regexes.
+#-# the default configuration is:
+# rendering.transformation.linkchecker.excludedReferencePatterns = .*:XWiki\.ExternalLinksJSON
 
 #-------------------------------------------------------------------------------------
 # Rendering Macros

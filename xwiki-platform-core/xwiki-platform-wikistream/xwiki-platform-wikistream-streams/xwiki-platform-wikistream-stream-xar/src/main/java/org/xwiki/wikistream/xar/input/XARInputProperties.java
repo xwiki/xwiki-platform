@@ -47,7 +47,7 @@ public class XARInputProperties extends XMLInputProperties
     /**
      * @see #isWithHistory()
      */
-    private boolean withHistory;
+    private boolean withHistory = true;
 
     /**
      * @return if true events should be generated only for the document references (skip anything else)

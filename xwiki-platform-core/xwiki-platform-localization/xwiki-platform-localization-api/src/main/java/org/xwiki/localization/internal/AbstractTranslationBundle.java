@@ -24,8 +24,8 @@ import java.util.Locale;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
-import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.Translation;
+import org.xwiki.localization.TranslationBundle;
 
 /**
  * Base class for {@link TranslationBundle} implementations. Defines the bundle priority as an <code>integer</code>.
@@ -121,8 +121,8 @@ public abstract class AbstractTranslationBundle implements TranslationBundle
     }
 
     /**
-     * Compares two {@link TranslationBundle}s according to their priority. If they have the same priority, use their class names
-     * as the comparison criterion.
+     * Compares two {@link TranslationBundle}s according to their priority. If they have the same priority, use their
+     * class names as the comparison criterion.
      * 
      * @param otherBundle The Bundle to compare to.
      * @return Zero if the two bundles are identical, a negative number if this Bundle takes precedence over the other,
@@ -136,7 +136,15 @@ public abstract class AbstractTranslationBundle implements TranslationBundle
             return getPriority() - otherBundle.getPriority();
         }
 
-        return getClass().getSimpleName().compareTo(otherBundle.getClass().getSimpleName());
+        int result;
+
+        if (getId() == null) {
+            result = otherBundle.getId() == null ? 0 : 1;
+        } else {
+            result = otherBundle.getId() == null ? -1 : getId().compareTo(otherBundle.getId());
+        }
+
+        return result;
     }
 
     @Override

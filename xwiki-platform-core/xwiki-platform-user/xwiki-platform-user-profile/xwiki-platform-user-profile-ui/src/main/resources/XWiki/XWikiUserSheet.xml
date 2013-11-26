@@ -44,11 +44,11 @@
 #if($isMyProfile)
   #set($discard = $categories.add({'id':'network', 'sheet':'XWiki.XWikiUserNetworkSheet'}))
 #end
-#set($userWikiSheet = 'WikiManagerCode.UserWikiSheet')
+#set($userWikiSheet = 'WikiManager.UserWikiSheet')
 #if($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWikiSheet))  
   #set($discard = $categories.add({
     'id': 'wikis',
-    'name': $services.localization.render('workspacemanager.profile.category.workspaces'),
+    'name': $services.localization.render('platform.wiki.menu.userwikis'),
     'sheet': $userWikiSheet
   }))
 #end

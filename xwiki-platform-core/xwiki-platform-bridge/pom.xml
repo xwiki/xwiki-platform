@@ -34,7 +34,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Temporary bridge between new components and the old core, until the old core is completely split into components</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.48</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.44</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

@@ -136,15 +136,13 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
 
         XWikiDocument document = context.getWiki().getDocument(this.documentReference, context);
 
-        if (locale != null && !locale.equals(Locale.ROOT)) {
-            XWikiDocument tdocument = document.getTranslatedDocument(locale, context);
+        if (locale != null && !locale.equals(Locale.ROOT) && !locale.equals(document.getDefaultLocale())) {
+            document = context.getWiki().getDocument(new DocumentReference(document.getDocumentReference(), locale), context);
 
-            if (tdocument == document) {
+            if (document.isNew()) {
                 // No document found for this locale
                 return null;
             }
-
-            document = tdocument;
         }
 
         String content = document.getContent();
@@ -210,7 +208,12 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         } else {
             XWikiDocument document = (XWikiDocument) arg1;
 
-            bundleCache.remove(document.getLocale() != null ? document.getLocale() : Locale.ROOT);
+            if (document.getLocale() != null) {
+                this.bundleCache.remove(document.getLocale());
+            } else {
+                this.bundleCache.remove(Locale.ROOT);
+                this.bundleCache.remove(document.getDefaultLocale());
+            }
         }
     }
 

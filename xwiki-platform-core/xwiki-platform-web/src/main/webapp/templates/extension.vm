@@ -578,8 +578,8 @@ Caused by: #printThrowable($throwable.cause true)
     ## We will display a link to that entity, so we need to extract the document from it.
     #set ($documentReference = $argument.extractReference("DOCUMENT"))
     #if ($documentReference)
-      #set ($serializedDocumentReference = $services.model.serialize($documentReference))
-      #set ($message = "$message<a href=""$xwiki.getURL($documentReference)"">$escapetool.xml($serializedDocumentReference)</a>")
+      #set ($serializedArgument = $services.model.serialize($argument))
+      #set ($message = "$message<a href=""$xwiki.getURL($documentReference)"">$escapetool.xml($serializedArgument)</a>")
     #elseif ($argument.id && ($argument.version || $argument.versionConstraint))
       #if ($resolveRemotely)
         ## Assume the argument is an extension dependency.

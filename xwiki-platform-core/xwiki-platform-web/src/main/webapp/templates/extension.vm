@@ -574,7 +574,8 @@ Caused by: #printThrowable($throwable.cause true)
     #end
     #set ($argument = $log.argumentArray.get($foreach.index))
     #set ($message = "$message$escapetool.xml($messageElement)")
-    ## Assume the argument is an entity reference, so we need to extract the document reference to make a link to it
+    ## This code prints a message from the log. The $argument is the entity that is concerned by the message.
+    ## We will display a link to that entity, so we need to extract the document from it.
     #set ($documentReference = $argument.extractReference("DOCUMENT"))
     #if ($documentReference)
       #set ($serializedDocumentReference = $services.model.serialize($documentReference))

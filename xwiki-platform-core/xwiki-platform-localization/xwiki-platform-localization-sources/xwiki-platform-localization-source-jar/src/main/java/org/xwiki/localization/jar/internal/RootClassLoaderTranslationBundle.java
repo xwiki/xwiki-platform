@@ -34,7 +34,6 @@ import javax.inject.Named;
 
 import org.apache.commons.collections.EnumerationUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.internal.AbstractCachedTranslationBundle;
 import org.xwiki.localization.internal.DefaultLocalizedTranslationBundle;
@@ -51,7 +50,7 @@ import org.xwiki.localization.message.TranslationMessageParser;
  */
 @Component
 @Named("rootclassloader")
-public class RootClassLoaderTranslationBundle extends AbstractCachedTranslationBundle implements TranslationBundle
+public class RootClassLoaderTranslationBundle extends AbstractCachedTranslationBundle
 {
     /**
      * The parser to use for each message.

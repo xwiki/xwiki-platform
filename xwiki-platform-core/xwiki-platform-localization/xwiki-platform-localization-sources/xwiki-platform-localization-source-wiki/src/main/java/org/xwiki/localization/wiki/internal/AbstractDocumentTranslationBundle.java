@@ -64,7 +64,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @since 4.3M2
  */
 public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTranslationBundle implements
-    TranslationBundle, DisposableCacheValue, Disposable, EventListener
+    DisposableCacheValue, Disposable, EventListener
 {
     /**
      * Make default wiki document based translation priority a bit higher than the default one.

@@ -33,6 +33,7 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wikistream.WikiStreamException;
@@ -136,7 +137,7 @@ public class DocumentLocaleReader extends AbstractReader
         proxyFilter.endWikiDocument(this.currentDocument, this.currentDocumentParameters);
     }
 
-    private void sendBeginWikiDocumentLocale(XARFilter proxyFilter, boolean force, XARInputProperties properties)
+    private boolean sendBeginWikiDocumentLocale(XARFilter proxyFilter, boolean force, XARInputProperties properties)
         throws WikiStreamException
     {
         if (this.sentBeginWikiDocument
@@ -149,7 +150,13 @@ public class DocumentLocaleReader extends AbstractReader
 
             proxyFilter.beginWikiDocumentLocale(this.currentDocumentLocale, this.currentDocumentLocaleParameters);
             this.sentBeginWikiDocumentLocale = true;
+
+            if (properties.isReferencesOnly()) {
+                return false;
+            }
         }
+
+        return true;
     }
 
     private void sendEndWikiDocumentLocale(XARFilter proxyFilter, XARInputProperties properties)
@@ -245,7 +252,12 @@ public class DocumentLocaleReader extends AbstractReader
                     sendBeginWikiDocument(proxyFilter, false, properties);
                 } else if (XARDocumentModel.ELEMENT_LOCALE.equals(elementName)) {
                     this.currentDocumentLocale = (Locale) convert(Locale.class, value);
-                    sendBeginWikiDocumentLocale(proxyFilter, false, properties);
+                    if (!sendBeginWikiDocumentLocale(proxyFilter, false, properties)) {
+                        sendEndWikiDocumentLocale(proxyFilter, properties);
+                        sendEndWikiDocument(proxyFilter, properties);
+
+                        return;
+                    }
                 } else if (XARDocumentModel.ELEMENT_REVISION.equals(elementName)) {
                     this.currentDocumentRevision = value;
                     sendBeginWikiDocumentRevision(proxyFilter, false, properties);
@@ -262,7 +274,12 @@ public class DocumentLocaleReader extends AbstractReader
                         if (parameter != null) {
                             this.currentDocumentLocaleParameters.put(parameter.name, convert(parameter.type, value));
 
-                            sendBeginWikiDocumentLocale(proxyFilter, false, properties);
+                            if (!sendBeginWikiDocumentLocale(proxyFilter, false, properties)) {
+                                sendEndWikiDocumentLocale(proxyFilter, properties);
+                                sendEndWikiDocument(proxyFilter, properties);
+
+                                return;
+                            }
                         } else {
                             parameter = XARDocumentModel.DOCUMENTREVISION_PARAMETERS.get(elementName);
 
@@ -287,14 +304,15 @@ public class DocumentLocaleReader extends AbstractReader
         }
 
         sendBeginWikiDocument(proxyFilter, true, properties);
-        sendBeginWikiDocumentLocale(proxyFilter, true, properties);
-        sendBeginWikiDocumentRevision(proxyFilter, true, properties);
+        if (sendBeginWikiDocumentLocale(proxyFilter, true, properties)) {
+            sendBeginWikiDocumentRevision(proxyFilter, true, properties);
 
-        sendWikiAttachments(proxyFilter);
-        sendWikiClass(proxyFilter);
-        sendWikiObjects(proxyFilter);
+            sendWikiAttachments(proxyFilter);
+            sendWikiClass(proxyFilter);
+            sendWikiObjects(proxyFilter);
 
-        sendEndWikiDocumentRevision(proxyFilter, properties);
+            sendEndWikiDocumentRevision(proxyFilter, properties);
+        }
         sendEndWikiDocumentLocale(proxyFilter, properties);
         sendEndWikiDocument(proxyFilter, properties);
     }

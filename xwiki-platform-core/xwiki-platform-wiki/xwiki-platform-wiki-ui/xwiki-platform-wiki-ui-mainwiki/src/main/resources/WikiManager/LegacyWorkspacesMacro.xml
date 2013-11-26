@@ -150,13 +150,13 @@
       <defaultCategory>Navigation</defaultCategory>
     </property>
     <property>
-      <description>List all workspaces</description>
+      <description>Deprecated macro that should not be used, here for compatibility reason. Please use the "wikis" macro instead.</description>
     </property>
     <property>
       <id>workspaces</id>
     </property>
     <property>
-      <name>Workspaces</name>
+      <name>Workspaces (Legacy)</name>
     </property>
     <property>
       <supportsInlineMode>0</supportsInlineMode>

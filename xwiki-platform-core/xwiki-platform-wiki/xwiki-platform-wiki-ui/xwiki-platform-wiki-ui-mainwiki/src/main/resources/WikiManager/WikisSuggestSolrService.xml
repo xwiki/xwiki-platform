@@ -23,18 +23,17 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($queryFilter = "$!request.query")
+#set ($queryStmt = "$!request.query")
 #set ($input = "$!request.input")
-#if ($queryFilter != '' &amp;&amp; $input != '')
-  #set ($queryFilter = $queryFilter.replaceAll('__INPUT__', $input))
+#if ($queryStmt != '' &amp;&amp; $input != '')
+  #set ($queryStmt = $queryStmt.replaceAll('__INPUT__', $input))
   #set ($limit = $mathtool.toInteger($request.nb))
   #if (!$limit)
     #set ($limit = 3)
   #end
   ## We look for documents having an object of type XWiki.XWikiServerClass.
-  #set ($query = $services.query.createQuery('{!join from=name_exact to=name_exact}class:XWiki.XWikiServerClass', 'solr'))
+  #set ($query = $services.query.createQuery($queryStmt, 'solr'))
   #set ($discard = $query.setLimit($limit))
-  #set ($discard = $query.bindValue('fq', $queryFilter))
   #set ($discard = $response.setContentType('text/xml'))
   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
   &lt;results&gt;
@@ -45,7 +44,7 @@
       #if ($wikiDescriptor)
         #set ($name = $wikiDescriptor.prettyName)
         #if ("$!name.trim()" == '')
-          #set ($name = $wikiReference.id)
+          #set ($name = $wikiDescriptor.id)
         #end
         #set ($wikiHomeDocRef = $wikiDescriptor.mainPageReference)
         #set ($url = $xwiki.getURL($wikiHomeDocRef))

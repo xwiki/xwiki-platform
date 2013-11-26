@@ -419,4 +419,30 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
 
         Assert.assertEquals("", this.tool.get("wiki.translation"));
     }
+
+    @Test
+    public void fallbackOnResource() throws XWikiException
+    {
+        Assert.assertEquals("Language", this.tool.get("language"));
+
+        this.defaultWikiTranslation.setDefaultLocale(Locale.FRENCH);
+
+        addWikiTranslation("language", "Overwritten language", Locale.ROOT);
+
+        // ROOT language has been overwritten
+        getContext().setLocale(Locale.ROOT);
+        Assert.assertEquals("Overwritten language", this.tool.get("language"));
+        
+        // The real locale of ROOT version in FRENCH so it's overwritten too
+        getContext().setLocale(Locale.FRENCH);
+        Assert.assertEquals("Overwritten language", this.tool.get("language"));
+
+        // GERMAN hasn't been overwritten
+        getContext().setLocale(Locale.GERMAN);
+        Assert.assertEquals("Sprache", this.tool.get("language"));
+
+        // There is no ENGLISH translation for this key so it fallback on ROOT
+        getContext().setLocale(Locale.ENGLISH);
+        Assert.assertEquals("Overwritten language", this.tool.get("language"));
+    }
 }

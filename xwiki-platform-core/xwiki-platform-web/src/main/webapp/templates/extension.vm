@@ -574,11 +574,11 @@ Caused by: #printThrowable($throwable.cause true)
     #end
     #set ($argument = $log.argumentArray.get($foreach.index))
     #set ($message = "$message$escapetool.xml($messageElement)")
-    ## Assume the argument is an entity reference.
-    #set ($reference = $argument.extractReference("DOCUMENT"))
-    #if ($reference)
-      #set ($reference = $services.model.serialize($reference))
-      #set ($message = "$message<a href=""$xwiki.getURL($reference)"">$escapetool.xml($reference)</a>")
+    ## Assume the argument is an entity reference, so we need to extract the document reference to make a link to it
+    #set ($documentReference = $argument.extractReference("DOCUMENT"))
+    #if ($documentReference)
+      #set ($serializedDocumentReference = $services.model.serialize($documentReference))
+      #set ($message = "$message<a href=""$xwiki.getURL($documentReference)"">$escapetool.xml($serializedDocumentReference)</a>")
     #elseif ($argument.id && ($argument.version || $argument.versionConstraint))
       #if ($resolveRemotely)
         ## Assume the argument is an extension dependency.

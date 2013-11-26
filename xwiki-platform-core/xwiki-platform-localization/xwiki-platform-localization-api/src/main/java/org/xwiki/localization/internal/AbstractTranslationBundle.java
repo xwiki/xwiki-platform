@@ -122,7 +122,7 @@ public abstract class AbstractTranslationBundle implements TranslationBundle
 
     /**
      * Compares two {@link TranslationBundle}s according to their priority. If they have the same priority, use their
-     * class names as the comparison criterion.
+     * id as the comparison criterion.
      * 
      * @param otherBundle The Bundle to compare to.
      * @return Zero if the two bundles are identical, a negative number if this Bundle takes precedence over the other,

@@ -182,6 +182,9 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
                 objAlias.set(XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, context);
             }
 
+            // Set the document as hidden
+            descriptorDoc.setHidden(true);
+
             // Save the document
             xwiki.saveDocument(descriptorDoc, context);
 

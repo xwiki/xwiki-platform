@@ -157,6 +157,9 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
         }
 
         restoreDeletedDocuments(wikiId);
+
+        // Finally, the migration is done, we can delete the old workspace object.
+        deleteOldWorkspaceObject(oldObject, oldWikiDescriptor);
     }
 
     /**
@@ -194,6 +197,14 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
 
         // Save the new configuration
         saveConfiguration(configuration, wikiId);
+    }
+
+    private void deleteOldWorkspaceObject(BaseObject oldObject, XWikiDocument oldWikiDescriptor)
+        throws DataMigrationException
+    {
+        // Context, XWiki
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
 
         // Delete the old object
         oldWikiDescriptor.removeXObject(oldObject);

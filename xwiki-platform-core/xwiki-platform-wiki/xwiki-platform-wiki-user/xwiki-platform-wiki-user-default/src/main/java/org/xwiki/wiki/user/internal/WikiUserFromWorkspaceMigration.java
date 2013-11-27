@@ -284,9 +284,8 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
      * - XWiki.AdminUsersSheet
      *
      * @param wikiId id of the wiki to upgrade
-     * @throws DataMigrationException if problem occurs
      */
-    private void restoreDeletedDocuments(String wikiId) throws DataMigrationException
+    private void restoreDeletedDocuments(String wikiId)
     {
         XWikiContext xcontext = getXWikiContext();
         XWiki xwiki = xcontext.getWiki();
@@ -333,7 +332,9 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
                 }
                 documentsToRestoreAsString += d;
             }
-            logger.error("Failed to restore some documents: [{}]", documentsToRestoreAsString);
+            logger.warn("Failed to restore some documents: [{}]. You should import manually "
+                    + "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your"
+                    + " wiki, to restore these documents.", documentsToRestoreAsString);
         }
     }
 

@@ -60,9 +60,6 @@ public class WikiUserFromWorkspaceMigrationTest
             new MockitoComponentMockingRule(WikiUserFromWorkspaceMigration.class, HibernateDataMigration.class,
                     "R530000WikiUserFromWorkspaceMigration");
 
-    //@Rule
-    //public LogRule logCapture = new LogRule();
-
     private WikiDescriptorManager wikiDescriptorManager;
 
     private WikiUserConfigurationHelper wikiUserConfigurationHelper;
@@ -161,6 +158,7 @@ public class WikiUserFromWorkspaceMigrationTest
                 thenReturn(documentToRestore2FromMainWiki);
         when(xwiki.exists(documentToRestore2, xcontext)).thenReturn(true);
 
+        // Run
         mocker.getComponentUnderTest().hibernateMigrate();
 
         // Verify the user configuration is accurate
@@ -201,10 +199,11 @@ public class WikiUserFromWorkspaceMigrationTest
         verify(xwiki).copyDocument(eq(documentToRestore2),
                 eq(new DocumentReference("workspace", "XWiki", "RegistrationConfig")), any(XWikiContext.class));
 
-        // Verify that the log contains a warning about the document that the migration failed to restore
-        /*assertTrue(logCapture.contains("Failed to restore some documents: " +
-                "[workspace:XWiki.AdminRegistrationSheet, workspace:XWiki.RegistrationHelp, " +
-                "workspace:XWiki.AdminUsersSheet]"));*/
+        // Verify that the log contains a warning about the documents that the migration failed to restore
+        verify(mocker.getMockedLogger()).warn("Failed to restore some documents: [{}]. You should import manually " +
+                "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your" +
+                " wiki, to restore these documents.", "workspace:XWiki.AdminRegistrationSheet, " +
+                "workspace:XWiki.RegistrationHelp, workspace:XWiki.AdminUsersSheet");
 
     }
 

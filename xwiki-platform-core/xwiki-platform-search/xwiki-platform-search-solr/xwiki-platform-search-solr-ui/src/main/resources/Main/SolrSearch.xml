@@ -1058,7 +1058,7 @@ $value##
 {{/velocity}}</content>
   <attachment>
     <filename>dark-grey-disclosure-arrow-down.png</filename>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1368007370000</date>
     <version>1.1</version>
     <comment/>
@@ -1067,7 +1067,7 @@ $value##
   </attachment>
   <attachment>
     <filename>dark-grey-disclosure-arrow-left.png</filename>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1368432948000</date>
     <version>1.1</version>
     <comment/>
@@ -1076,7 +1076,7 @@ $value##
   </attachment>
   <attachment>
     <filename>light-grey-disclosure-arrow-down.png</filename>
-    <author>XWiki.Admin</author>
+    <author>xwiki:XWiki.Admin</author>
     <date>1368007370000</date>
     <version>1.1</version>
     <comment/>

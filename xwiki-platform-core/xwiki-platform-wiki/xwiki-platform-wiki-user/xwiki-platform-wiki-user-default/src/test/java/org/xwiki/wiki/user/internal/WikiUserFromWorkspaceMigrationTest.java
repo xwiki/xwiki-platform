@@ -191,13 +191,20 @@ public class WikiUserFromWorkspaceMigrationTest
         verify(xwiki, times(1)).saveDocument(memberGroupDoc, "Upgrade candidacies from the old Workspace Application" +
                 " to the new Wiki Application.", xcontext);
 
-        // Verify the document to restore has been restored from the xar
+        // Verify we try to restore the documents from the xar
         verify(documentRestorerFromAttachedXAR).restoreDocumentFromAttachedXAR(eq(new DocumentReference("mainWiki",
                 "WorkspaceManager", "Install")), eq("workspace-template.xar"), any(List.class));
 
         // Verify the document to restore has been restored from the main wiki
         verify(xwiki).copyDocument(eq(documentToRestore2),
                 eq(new DocumentReference("workspace", "XWiki", "RegistrationConfig")), any(XWikiContext.class));
+
+        // Verify that the log contains a warning about the documents that the migration failed to restore
+        verify(mocker.getMockedLogger()).warn("Failed to restore some documents: [{}]. You should import manually " +
+                "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your" +
+                " wiki, to restore these documents.", "workspace:XWiki.AdminRegistrationSheet, " +
+                "workspace:XWiki.RegistrationHelp, workspace:XWiki.AdminUsersSheet");
+
     }
 
 }

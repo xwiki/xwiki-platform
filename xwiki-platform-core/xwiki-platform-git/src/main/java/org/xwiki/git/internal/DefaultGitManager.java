@@ -114,6 +114,10 @@ public class DefaultGitManager implements GitManager
     @Override
     public UserCommitActivity[] countAuthorCommits(Date since, List<Repository> repositories)
     {
+        if (repositories.isEmpty()) {
+            return new UserCommitActivity[0];
+        }
+
         CommitFinder finder = new CommitFinder(repositories);
         CommitCountFilter countFilter = new CommitCountFilter();
         AuthorHistogramFilter histogramFilter = new AuthorHistogramFilter();

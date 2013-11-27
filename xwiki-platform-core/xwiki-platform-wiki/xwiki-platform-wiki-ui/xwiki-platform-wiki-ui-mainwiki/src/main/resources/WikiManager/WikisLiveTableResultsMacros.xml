@@ -25,11 +25,9 @@
   <hidden>true</hidden>
   <content>{{include reference="XWiki.LiveTableResultsMacros" /}}
 {{velocity output="false"}}
-#**
-* Adds information about each live table row to the JSON returned by a live table data call.
-* NOTE: This macro uses Velocity variables defined by gridresultwithfilter_buildQuery.
-*
-* @param $map stores the JSON in memory so that it can be adjusted before serialization
+#*
+* We override the following macro from XWiki.LiveTableResultsMacros to disable the filter on hidden documents.
+* Ths should be removed when XWIKI-9739 will be fixed.
 *#
 #macro(gridresult_buildRowsJSON $map)
   #set($offset = $mathtool.toInteger($request.get('offset')))
@@ -56,13 +54,10 @@
   #end
   #set($discard = $map.put('rows', $rows))
 #end
-#**
- * Adds information about the specified live table row to the JSON returned by a live table data call.
- * NOTE: This macro uses Velocity variables available in gridresult_buildRowsJSON.
- *
- * @param $item the name of the document that feeds this live table row
- * @param $rows stores the JSON in memory so that it can be adjusted before serialization
- *#
+#*
+* We override the following macro from XWiki.LiveTableResultsMacros to add custom actions (join, leave, etc...)
+* and to display the membershipType.
+*#
 #macro(gridresult_buildRowJSON $item $rows)
   ## Handle both the case where the "language" filter is used and thus languages are returned too and the case where
   ## only the document name is returned. When more than the document name is returned the $item variable is a list.

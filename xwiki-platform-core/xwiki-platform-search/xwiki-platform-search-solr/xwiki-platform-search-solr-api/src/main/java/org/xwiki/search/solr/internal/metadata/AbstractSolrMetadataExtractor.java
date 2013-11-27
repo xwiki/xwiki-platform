@@ -312,13 +312,12 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     }
 
     /**
-     * Adds the properties of a given object to a Solr document inside the multiValued field
-     * {@link Fields#OBJECT_CONTENT}.
+     * Adds the properties of a given object to a Solr document.
      * 
-     * @param solrDocument the document where to add the properties.
-     * @param object the object whose properties to add.
-     * @param locale the locale of the indexed document. In case of translations, this will obviously be different than
-     *            the original document's locale.
+     * @param solrDocument the document where to add the properties
+     * @param object the object whose properties to add
+     * @param locale the locale of the indexed document; in case of translations, this will obviously be different than
+     *            the original document's locale
      */
     protected void setObjectContent(SolrInputDocument solrDocument, BaseObject object, Locale locale)
     {
@@ -326,8 +325,6 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             // Yes, the platform can return null objects.
             return;
         }
-
-        String fieldName = FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, locale);
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -343,19 +340,48 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
                 PropertyClass propertyClass = (PropertyClass) xClass.get(property.getName());
                 if (propertyClass instanceof PasswordClass) {
                     continue;
-                } else if (propertyValue instanceof List) {
-                    // Handle list property values, by adding each list entry.
-                    List< ? > propertyListValues = (List< ? >) propertyValue;
-                    for (Object propertyListValue : propertyListValues) {
-                        solrDocument.addField(fieldName,
-                            String.format(OBJCONTENT_FORMAT, property.getName(), propertyListValue));
-                    }
                 } else {
-                    // Generic toString on the property value
-                    solrDocument.addField(fieldName,
-                        String.format(OBJCONTENT_FORMAT, property.getName(), propertyValue));
+                    setPropertyValue(solrDocument, property, locale);
                 }
             }
         }
+    }
+
+    /**
+     * Add the value of the given object property to a Solr document.
+     * 
+     * @param solrDocument the document to add the object property value to
+     * @param property the object property whose value to add
+     * @param locale the locale of the indexed document
+     */
+    private void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<EntityReference> property, Locale locale)
+    {
+        Object propertyValue = property.getValue();
+        if (propertyValue instanceof List) {
+            // Handle list property values, by adding each list entry.
+            List< ? > propertyListValues = (List< ? >) propertyValue;
+            for (Object propertyListValue : propertyListValues) {
+                setPropertyValue(solrDocument, property, propertyListValue, locale);
+            }
+        } else {
+            // Generic toString on the property value.
+            setPropertyValue(solrDocument, property, propertyValue, locale);
+        }
+    }
+
+    /**
+     * Add the given value to a Solr document on the field corresponding to the specified object property.
+     * 
+     * @param solrDocument the document to add the value to
+     * @param property the object property instance used to get information about the property the given value
+     *            corresponds to
+     * @param value the value to add
+     * @param locale the locale of the indexed document
+     */
+    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<EntityReference> property,
+        Object value, Locale locale)
+    {
+        String fieldName = FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, locale);
+        solrDocument.addField(fieldName, String.format(OBJCONTENT_FORMAT, property.getName(), value));
     }
 }

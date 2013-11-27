@@ -39,7 +39,7 @@ import org.xwiki.wikistream.xar.internal.XARUtils.EventParameter;
  */
 public class AttachmentReader extends AbstractReader
 {
-    public class WikiAttachment
+    public static class WikiAttachment
     {
         public String name;
 
@@ -54,8 +54,13 @@ public class AttachmentReader extends AbstractReader
         }
     }
 
-    public WikiAttachment read(XMLStreamReader xmlReader, XARInputProperties properties) throws XMLStreamException,
-        WikiStreamException, ParseException
+    public AttachmentReader(XARInputProperties properties)
+    {
+        super(properties);
+    }
+
+    public WikiAttachment read(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException,
+        ParseException
     {
         WikiAttachment wikiAttachment = new WikiAttachment();
 

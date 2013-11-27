@@ -47,15 +47,19 @@ import org.xwiki.wikistream.xar.internal.XARModel;
  */
 public class WikiReader
 {
+    private DocumentLocaleReader documentReader;
+
+    private XARInputProperties properties;
+
     private String extensionId;
 
     private String version;
 
-    private DocumentLocaleReader documentReader;
-
-    public WikiReader(SyntaxFactory syntaxFactory, EntityReferenceResolver<String> relativeResolver)
+    public WikiReader(SyntaxFactory syntaxFactory, EntityReferenceResolver<String> relativeResolver,
+        XARInputProperties properties)
     {
-        this.documentReader = new DocumentLocaleReader(syntaxFactory, relativeResolver);
+        this.properties = properties;
+        this.documentReader = new DocumentLocaleReader(syntaxFactory, relativeResolver, properties);
     }
 
     public String getExtensionId()
@@ -68,19 +72,18 @@ public class WikiReader
         return this.version;
     }
 
-    public void read(Object filter, XARFilter proxyFilter, XARInputProperties properties) throws XMLStreamException,
-        IOException, WikiStreamException
+    public void read(Object filter, XARFilter proxyFilter) throws XMLStreamException, IOException, WikiStreamException
     {
         InputStream stream;
 
-        InputSource source = properties.getSource();
+        InputSource source = this.properties.getSource();
         if (source instanceof InputStreamInputSource) {
             stream = ((InputStreamInputSource) source).getInputStream();
         } else {
             throw new WikiStreamException("Unsupported source type [" + source.getClass() + "]");
         }
 
-        read(stream, filter, proxyFilter, properties);
+        read(stream, filter, proxyFilter);
 
         // Close last space
         if (this.documentReader.getCurrentSpace() != null) {
@@ -94,8 +97,8 @@ public class WikiReader
         }
     }
 
-    public void read(InputStream stream, Object filter, XARFilter proxyFilter, XARInputProperties properties)
-        throws XMLStreamException, IOException, WikiStreamException
+    public void read(InputStream stream, Object filter, XARFilter proxyFilter) throws XMLStreamException, IOException,
+        WikiStreamException
     {
         ZipArchiveInputStream zis = new ZipArchiveInputStream(stream, "UTF-8", false);
 
@@ -113,7 +116,9 @@ public class WikiReader
                 }
             } else {
                 try {
-                    this.documentReader.read(zis, filter, proxyFilter, properties);
+                    this.documentReader.read(zis, filter, proxyFilter);
+                } catch (SkipEntityException skip) {
+                    // TODO: put it in some status
                 } catch (Exception e) {
                     throw new WikiStreamException("Failed to read XAR XML document", e);
                 }

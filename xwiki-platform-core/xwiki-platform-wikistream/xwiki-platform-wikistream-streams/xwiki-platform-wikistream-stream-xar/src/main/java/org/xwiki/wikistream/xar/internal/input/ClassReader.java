@@ -41,7 +41,7 @@ import org.xwiki.wikistream.xar.internal.input.ClassPropertyReader.WikiClassProp
  */
 public class ClassReader extends AbstractReader
 {
-    private ClassPropertyReader propertyReader = new ClassPropertyReader();
+    private ClassPropertyReader propertyReader;
 
     public static class WikiClass
     {
@@ -63,8 +63,15 @@ public class ClassReader extends AbstractReader
         }
     }
 
-    public WikiClass read(XMLStreamReader xmlReader, XARInputProperties properties) throws XMLStreamException,
-        IOException, WikiStreamException, ParseException
+    public ClassReader(XARInputProperties properties)
+    {
+        super(properties);
+
+        this.propertyReader = new ClassPropertyReader(properties);
+    }
+
+    public WikiClass read(XMLStreamReader xmlReader) throws XMLStreamException, IOException, WikiStreamException,
+        ParseException
     {
         WikiClass wikiClass = new WikiClass();
 
@@ -82,7 +89,7 @@ public class ClassReader extends AbstractReader
                     wikiClass.parameters.put(parameter.name, convert(parameter.type, value));
                 }
             } else {
-                wikiClass.properties.add(this.propertyReader.read(xmlReader, properties));
+                wikiClass.properties.add(this.propertyReader.read(xmlReader));
             }
         }
 

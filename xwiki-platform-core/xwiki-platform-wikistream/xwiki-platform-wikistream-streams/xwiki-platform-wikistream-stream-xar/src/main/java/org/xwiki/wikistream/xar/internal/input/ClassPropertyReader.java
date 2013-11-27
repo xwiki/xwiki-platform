@@ -62,8 +62,13 @@ public class ClassPropertyReader extends AbstractReader
         }
     }
 
-    public WikiClassProperty read(XMLStreamReader xmlReader, XARInputProperties properties) throws XMLStreamException,
-        IOException, WikiStreamException, ParseException
+    public ClassPropertyReader(XARInputProperties properties)
+    {
+        super(properties);
+    }
+
+    public WikiClassProperty read(XMLStreamReader xmlReader) throws XMLStreamException, IOException,
+        WikiStreamException, ParseException
     {
         WikiClassProperty wikiClassProperty = new WikiClassProperty();
 

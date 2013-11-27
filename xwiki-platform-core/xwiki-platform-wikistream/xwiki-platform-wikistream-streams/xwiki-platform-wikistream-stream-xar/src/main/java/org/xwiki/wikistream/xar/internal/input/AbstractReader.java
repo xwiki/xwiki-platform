@@ -27,7 +27,7 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
-
+import org.xwiki.wikistream.xar.input.XARInputProperties;
 
 /**
  * @version $Id$
@@ -35,14 +35,19 @@ import org.xwiki.rendering.syntax.SyntaxFactory;
  */
 public abstract class AbstractReader
 {
-    private SyntaxFactory syntaxFactory;
+    protected SyntaxFactory syntaxFactory;
 
-    public AbstractReader()
+    protected XARInputProperties properties;
+
+    public AbstractReader(XARInputProperties properties)
     {
+        this.properties = properties;
     }
 
-    public AbstractReader(SyntaxFactory syntaxFactory)
+    public AbstractReader(SyntaxFactory syntaxFactory, XARInputProperties properties)
     {
+        this(properties);
+
         this.syntaxFactory = syntaxFactory;
     }
 

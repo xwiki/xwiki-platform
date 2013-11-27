@@ -128,6 +128,8 @@ public class ImportAction extends XWikiAction
     private String importPackage(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
         throws IOException, XWikiException, WikiStreamException
     {
+        PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
+
         String all = request.get("all");
         if (!"1".equals(all)) {
             String[] pages = request.getParameterValues("pages");
@@ -218,7 +220,6 @@ public class ImportAction extends XWikiAction
                     observation.notify(new XARImportedEvent(), null, context);
                 }
             } else {
-                PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
                 importer.Import(packFile.getContentInputStream(context));
                 if (pages != null) {
                     List<DocumentInfoAPI> filelist = importer.getFiles();

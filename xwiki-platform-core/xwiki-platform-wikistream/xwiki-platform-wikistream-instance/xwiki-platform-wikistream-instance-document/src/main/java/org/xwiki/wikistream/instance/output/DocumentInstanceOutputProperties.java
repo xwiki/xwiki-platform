@@ -136,7 +136,7 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
      * @return Indicate if the versions coming from the events should be kept
      */
     @PropertyName("Preserve version")
-    @PropertyDescription("Indicate if the versions coming from the events should be kept")
+    @PropertyDescription("Indicate if the versions comming from the events should be kept")
     public boolean isVersionPreserved()
     {
         return this.versionPreserved;
@@ -154,8 +154,7 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
      * @return Indicate if the authors coming from the events should be kept.
      */
     @PropertyName("Preserve author")
-    @PropertyDescription(
-        "Indicate if the authors comming from the events should be kept. Not taken into account if AUTHOR is set")
+    @PropertyDescription("Indicate if the authors comming from the events should be kept")
     public boolean isAuthorPreserved()
     {
         return authorPreserved;
@@ -163,7 +162,7 @@ public class DocumentInstanceOutputProperties extends InstanceOutputProperties
 
     /**
      * @param authorPreserved Indicate if the authors coming from the events should be kept. Not taken into account if
-     *            {@link #setAuthor(DocumentReference)} is used.
+     *            {@link #setAuthor(org.xwiki.model.reference.DocumentReference)} is used.
      */
     public void setAuthorPreserved(boolean authorPreserved)
     {

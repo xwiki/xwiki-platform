@@ -3,6 +3,8 @@ org.xwiki.search.solr.internal.DefaultSolrFieldNameEncoder
 org.xwiki.search.solr.internal.DefaultSolrIndexer
 org.xwiki.search.solr.internal.EmbeddedSolrInstance
 org.xwiki.search.solr.internal.RemoteSolrInstance
+org.xwiki.search.solr.internal.SolrFieldStringEntityReferenceResolver
+org.xwiki.search.solr.internal.SolrFieldStringEntityReferenceSerializer
 org.xwiki.search.solr.internal.SolrIndexAvailableLocalesListener
 org.xwiki.search.solr.internal.SolrIndexEventListener
 org.xwiki.search.solr.internal.SolrIndexInitializeListener

@@ -210,10 +210,9 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         } else {
             XWikiDocument document = (XWikiDocument) arg1;
 
-            if (document.getLocale() != null) {
-                this.bundleCache.remove(document.getLocale());
-            } else {
-                this.bundleCache.remove(Locale.ROOT);
+            this.bundleCache.remove(document.getLocale());
+
+            if (document.getLocale().equals(Locale.ROOT)) {
                 this.bundleCache.remove(document.getDefaultLocale());
             }
         }

@@ -19,9 +19,7 @@
  */
 package org.xwiki.wiki.user.internal;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +29,7 @@ import javax.inject.Provider;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -81,9 +79,7 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
         // instead of ZipArchiveInputStream (see: http://commons.apache.org/proper/commons-compress/zip.html)
         File tempFile = File.createTempFile(attachmentName, ".tmp");
         // We copy the content of the attachment
-        BufferedOutputStream tempFileOuputStream = new BufferedOutputStream(new FileOutputStream(tempFile));
-        IOUtils.copy(xar.getContentInputStream(xcontext), tempFileOuputStream);
-        tempFileOuputStream.close();
+        FileUtils.copyInputStreamToFile(xar.getContentInputStream(xcontext), tempFile);
 
         // Return the temp file
         return tempFile;

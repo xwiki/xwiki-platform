@@ -23,7 +23,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,6 +31,7 @@ import javax.inject.Provider;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -66,14 +66,14 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
         // Get the document
         XWikiDocument document = xwiki.getDocument(docReference, xcontext);
         if (document.isNew()) {
-            logger.warn(String.format("[%s] does not exist", docReference));
+            logger.warn("[{}] does not exist", docReference);
             return null;
         }
 
         // Get the attachment
         XWikiAttachment xar = document.getAttachment(attachmentName);
         if (xar == null) {
-            logger.warn(String.format("[%s] has no attachment named [%s].", docReference, attachmentName));
+            logger.warn("[{}] has no attachment named [{}].", docReference, attachmentName);
             return null;
         }
 
@@ -82,12 +82,7 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
         File tempFile = File.createTempFile(attachmentName, ".tmp");
         // We copy the content of the attachment
         BufferedOutputStream tempFileOuputStream = new BufferedOutputStream(new FileOutputStream(tempFile));
-        byte[] buffer = new byte[2048];
-        InputStream is = xar.getContentInputStream(xcontext);
-        int n;
-        while ((n = is.read(buffer)) > 0) {
-            tempFileOuputStream.write(buffer, 0, n);
-        }
+        IOUtils.copy(xar.getContentInputStream(xcontext), tempFileOuputStream);
         tempFileOuputStream.close();
 
         // Return the temp file
@@ -126,7 +121,7 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
             }
             zipFile.close();
         } catch (IOException e) {
-            logger.error(String.format("Error during the decompression of [%s].", attachmentName), e);
+            logger.error("Error during the decompression of [{}].", attachmentName, e);
         } finally {
             // Delete the temporary zip file
             if (tempZipFile != null) {

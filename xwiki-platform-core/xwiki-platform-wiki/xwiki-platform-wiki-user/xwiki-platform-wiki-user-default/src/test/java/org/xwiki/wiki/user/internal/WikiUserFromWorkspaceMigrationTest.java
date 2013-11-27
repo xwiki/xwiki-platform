@@ -60,6 +60,9 @@ public class WikiUserFromWorkspaceMigrationTest
             new MockitoComponentMockingRule(WikiUserFromWorkspaceMigration.class, HibernateDataMigration.class,
                     "R530000WikiUserFromWorkspaceMigration");
 
+    //@Rule
+    //public LogRule logCapture = new LogRule();
+
     private WikiDescriptorManager wikiDescriptorManager;
 
     private WikiUserConfigurationHelper wikiUserConfigurationHelper;
@@ -158,7 +161,6 @@ public class WikiUserFromWorkspaceMigrationTest
                 thenReturn(documentToRestore2FromMainWiki);
         when(xwiki.exists(documentToRestore2, xcontext)).thenReturn(true);
 
-        // Run
         mocker.getComponentUnderTest().hibernateMigrate();
 
         // Verify the user configuration is accurate
@@ -191,13 +193,19 @@ public class WikiUserFromWorkspaceMigrationTest
         verify(xwiki, times(1)).saveDocument(memberGroupDoc, "Upgrade candidacies from the old Workspace Application" +
                 " to the new Wiki Application.", xcontext);
 
-        // Verify the document to restore has been restored from the xar
+        // Verify we try to restore the documents from the xar
         verify(documentRestorerFromAttachedXAR).restoreDocumentFromAttachedXAR(eq(new DocumentReference("mainWiki",
                 "WorkspaceManager", "Install")), eq("workspace-template.xar"), any(List.class));
 
         // Verify the document to restore has been restored from the main wiki
         verify(xwiki).copyDocument(eq(documentToRestore2),
                 eq(new DocumentReference("workspace", "XWiki", "RegistrationConfig")), any(XWikiContext.class));
+
+        // Verify that the log contains a warning about the document that the migration failed to restore
+        /*assertTrue(logCapture.contains("Failed to restore some documents: " +
+                "[workspace:XWiki.AdminRegistrationSheet, workspace:XWiki.RegistrationHelp, " +
+                "workspace:XWiki.AdminUsersSheet]"));*/
+
     }
 
 }

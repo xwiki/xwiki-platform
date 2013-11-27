@@ -284,8 +284,9 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
      * - XWiki.AdminUsersSheet
      *
      * @param wikiId id of the wiki to upgrade
+     * @throws DataMigrationException if problem occurs
      */
-    public void restoreDeletedDocuments(String wikiId)
+    private void restoreDeletedDocuments(String wikiId) throws DataMigrationException
     {
         XWikiContext xcontext = getXWikiContext();
         XWiki xwiki = xcontext.getWiki();
@@ -324,7 +325,15 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
 
         // If the list is empty, the job is done
         if (!documentsToRestore.isEmpty()) {
-            logger.error("Failed to restore some documents: [{}]", documentsToRestore);
+            String documentsToRestoreAsString = new String();
+            int counter = 0;
+            for (DocumentReference d : documentsToRestore) {
+                if (counter++ > 0) {
+                    documentsToRestoreAsString += ", ";
+                }
+                documentsToRestoreAsString += d;
+            }
+            logger.error("Failed to restore some documents: [{}]", documentsToRestoreAsString);
         }
     }
 

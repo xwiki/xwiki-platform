@@ -515,8 +515,6 @@ $services.localization.render('platform.wiki.currentwiki.candidateHandledComment
 &lt;div id='candidates' class='xform'&gt;
 &lt;h2&gt;$services.localization.render('platform.wiki.currentwiki.candidates.label')&lt;/h2&gt;
 &lt;div class='xHint'&gt;$services.localization.render('platform.wiki.currentwiki.candidates.hint')&lt;/div&gt;
-#### HACK TO REMOVE: get the candidacies from the API in order to make the migration of candidacies ###
-#set ($discard = $services.wiki.user.getAllInvitations($services.wiki.currentWikiId))
 #set ($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
 #set ($candidateMembers = $groupDoc.getObjects($candidateClass))
 #foreach ($candidateMember in $candidateMembers)

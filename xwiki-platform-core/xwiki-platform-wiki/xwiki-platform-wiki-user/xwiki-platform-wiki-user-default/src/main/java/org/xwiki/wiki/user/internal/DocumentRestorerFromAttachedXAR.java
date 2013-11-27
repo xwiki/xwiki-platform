@@ -19,34 +19,29 @@
  */
 package org.xwiki.wiki.user.internal;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
-import org.xwiki.wiki.user.WikiUserConfiguration;
-import org.xwiki.wiki.user.WikiUserManagerException;
+import org.xwiki.model.reference.DocumentReference;
+
+import com.xpn.xwiki.XWikiException;
 
 /**
- * Component to load and save wiki user configuration in a wiki.
+ * Component to restore some document from a XAR attached to a wiki page.
  *
  * @version $Id$
- * @since 5.3M2
+ * @since 5.3RC1
  */
-@Unstable
 @Role
-public interface WikiUserConfigurationHelper
+public interface DocumentRestorerFromAttachedXAR
 {
     /**
-     * Get the configuration of the specified wiki.
-     * @param wikiId id of the wiki
-     * @return the configuration of that wiki
-     * @throws WikiUserManagerException if problems occur
+     * Restore the desired documents from a xar.
+     * @param docReference reference of the document that hold the XAR as attachment.
+     * @param attachmentName the name of the attachment
+     * @param documentsToRestore the list of documents we need to restore
+     * @throws XWikiException if problems occur
      */
-    WikiUserConfiguration getConfiguration(String wikiId) throws WikiUserManagerException;
-
-    /**
-     * Save the configuration of the specified wiki.
-     * @param configuration configuration to save
-     * @param wikiId id of the wiki concerned by this configuration
-     * @throws WikiUserManagerException if problems occur
-     */
-    void saveConfiguration(WikiUserConfiguration configuration, String wikiId) throws WikiUserManagerException;
+    void restoreDocumentFromAttachedXAR(DocumentReference docReference, String attachmentName,
+            List<DocumentReference> documentsToRestore) throws XWikiException;
 }

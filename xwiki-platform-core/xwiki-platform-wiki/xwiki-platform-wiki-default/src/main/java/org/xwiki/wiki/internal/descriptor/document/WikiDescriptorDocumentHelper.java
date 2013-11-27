@@ -42,6 +42,12 @@ public interface WikiDescriptorDocumentHelper
     DocumentReference getDocumentReferenceFromId(String wikiId);
 
     /**
+     * @param descriptorDocumentReference the reference to the document that hold the wiki descriptor
+     * @return the id of the wiki corresponding to the descriptor
+     */
+    String getWikiIdFromDocumentReference(DocumentReference descriptorDocumentReference);
+
+    /**
      * @param wikiId The id of the wiki that we want the descriptor document
      * @return the descriptor document corresponding to the wikiId
      * @throws WikiManagerException if problems occur

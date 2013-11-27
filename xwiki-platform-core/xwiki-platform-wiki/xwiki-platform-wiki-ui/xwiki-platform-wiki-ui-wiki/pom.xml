@@ -38,6 +38,8 @@
       <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
       org.xwiki.platform:xwiki-platform-workspace-template-features
     </xwiki.extension.features>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Wiki Application for subwikis</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

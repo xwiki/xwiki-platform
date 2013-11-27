@@ -15,7 +15,7 @@
   <date>1301083063000</date>
   <contentUpdateDate>1301083063000</contentUpdateDate>
   <version>1.1</version>
-  <title>#if("$!services.wiki.getById($services.wiki.currentWikiId).prettyName" != '')${services.wiki.getById($services.wiki.currentWikiId).prettyName}#{else}Wiki Main Page#end</title>
+  <title>#if("$!services.wiki.getById($services.wiki.currentWikiId).prettyName" != '')${services.wiki.getById($services.wiki.currentWikiId).prettyName}#{else}$services.localization.render('xe.home.title')#end</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

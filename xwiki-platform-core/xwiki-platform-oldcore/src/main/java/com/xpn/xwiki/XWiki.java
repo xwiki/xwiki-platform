@@ -761,11 +761,11 @@ public class XWiki implements EventListener
                 (Type) AttachmentRecycleBinStore.class, Param("xwiki.store.attachment.recyclebin.hint", "hibernate")));
         }
 
-        resetRenderingEngine(context);
-
-        // "Pre-initialize" XWikiStubContextProvider so that plugins or listeners reacting to potential document changes
-        // can use it
+        // "Pre-initialize" XWikiStubContextProvider so that rendering engine, plugins or listeners reacting to
+        // potential document changes can use it
         Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class).initialize(context);
+
+        resetRenderingEngine(context);
 
         // Prepare the Plugin Engine
         preparePlugins(context);

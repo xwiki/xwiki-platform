@@ -25,13 +25,39 @@
   <hidden>true</hidden>
   <content>{{include reference="XWiki.LiveTableResultsMacros" /}}
 {{velocity output="false"}}
-#**
- * Adds information about the specified live table row to the JSON returned by a live table data call.
- * NOTE: This macro uses Velocity variables available in gridresult_buildRowsJSON.
- *
- * @param $item the name of the document that feeds this live table row
- * @param $rows stores the JSON in memory so that it can be adjusted before serialization
- *#
+#*
+* We override the following macro from XWiki.LiveTableResultsMacros to disable the filter on hidden documents.
+* Ths should be removed when XWIKI-9739 will be fixed.
+*#
+#macro(gridresult_buildRowsJSON $map)
+  #set($offset = $mathtool.toInteger($request.get('offset')))
+  ## offset starts from 0 in velocity and 1 in javascript
+  #set($offset = $offset - 1)
+  #if (!$offset || $offset &lt; 0)
+    #set($offset = 0)
+  #end
+  #set($limit = $mathtool.toInteger($request.get('limit')))
+  #if (!$limit)
+    #set ($limit = 15)
+  #end
+  ######## WIKI UI MAINWIKI CUSTOMIZATION #########
+  ## The descriptors are always hidden, so we don't filter on the hidden column.
+  #set($query = $services.query.hql($sql).addFilter('currentlanguage').setLimit($limit).setOffset($offset).bindValues($sqlParams))
+  #################################################
+  #set($items = $query.execute())
+  #set($discard = $map.put('totalrows', $query.count()))
+  #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
+  #set($discard = $map.put('offset', $mathtool.add($offset, 1)))
+  #set($rows = [])
+  #foreach($item in $items)
+    #gridresult_buildRowJSON($item $rows)
+  #end
+  #set($discard = $map.put('rows', $rows))
+#end
+#*
+* We override the following macro from XWiki.LiveTableResultsMacros to add custom actions (join, leave, etc...)
+* and to display the membershipType.
+*#
 #macro(gridresult_buildRowJSON $item $rows)
   ## Handle both the case where the "language" filter is used and thus languages are returned too and the case where
   ## only the document name is returned. When more than the document name is returned the $item variable is a list.

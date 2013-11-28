@@ -22,10 +22,10 @@ package org.xwiki.wysiwyg.test.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.*;
 import org.openqa.selenium.By;
-import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
+import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.FormElement;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.wysiwyg.test.po.WYSIWYGEditPage;
@@ -36,8 +36,11 @@ import org.xwiki.wysiwyg.test.po.WYSIWYGEditPage;
  * @version $Id$
  * @since 5.1RC1
  */
-public abstract class AbstractWYSIWYGEditorTest extends AbstractAdminAuthenticatedTest
+public abstract class AbstractWYSIWYGEditorTest extends AbstractTest
 {
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+
     /**
      * The edited page.
      */
@@ -46,8 +49,13 @@ public abstract class AbstractWYSIWYGEditorTest extends AbstractAdminAuthenticat
     @BeforeClass
     public static void configure()
     {
-        loginAdminUser();
         enableAllEditingFeatures();
+    }
+
+    @Before
+    public void setUp() throws Exception
+    {
+        editPage = WYSIWYGEditPage.gotoPage(getTestClassName(), getTestMethodName()).waitUntilPageIsLoaded();
     }
 
     /**
@@ -86,13 +94,5 @@ public abstract class AbstractWYSIWYGEditorTest extends AbstractAdminAuthenticat
         if (save) {
             oep.clickSaveAndContinue();
         }
-    }
-
-    @Before
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        editPage = WYSIWYGEditPage.gotoPage(getTestClassName(), getTestMethodName()).waitUntilPageIsLoaded();
     }
 }

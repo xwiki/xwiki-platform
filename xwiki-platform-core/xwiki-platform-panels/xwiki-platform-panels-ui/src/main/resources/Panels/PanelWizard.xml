@@ -409,6 +409,7 @@ Rw52Dj97Ru7HP/4rSJIf/OBlePXVV5O/aGgkl+K37++g5vL/dmrHZnVCF2wAAAAASUVORK5CYII=
 
 .pagelayoutoptions  table td {
   border: 0;
+  float: left;
 }
 
 .pagelayoutoption label {

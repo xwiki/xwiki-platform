@@ -784,7 +784,6 @@
          attcontent</str>
 
        <!-- Trying to preserve compatibility with XWiki lucene plugin's queries. -->
-       <str name="f.object.qf">class</str>
        <str name="f.ft.qf">doccontent</str>
        <str name="f.web.qf">space</str>
 
@@ -796,6 +795,7 @@
        <str name="facet.field">name_exact</str>
        <str name="facet.field">type</str>
        <str name="facet.field">class</str>
+       <str name="facet.field">object</str>
        <str name="facet.field">date</str>
        <str name="facet.field">creationdate</str>
        <str name="facet.field">author</str>

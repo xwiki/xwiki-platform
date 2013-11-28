@@ -200,8 +200,14 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
     protected void setObjects(SolrInputDocument solrDocument, Locale locale, XWikiDocument originalDocument)
     {
         for (Map.Entry<DocumentReference, List<BaseObject>> objects : originalDocument.getXObjects().entrySet()) {
+            boolean hasObjectsOfThisType = false;
             for (BaseObject object : objects.getValue()) {
+                // Yes, the old core can return null objects.
+                hasObjectsOfThisType |= object != null;
                 setObjectContent(solrDocument, object, locale);
+            }
+            if (hasObjectsOfThisType) {
+                solrDocument.addField("object", localSerializer.serialize(objects.getKey()));
             }
         }
     }

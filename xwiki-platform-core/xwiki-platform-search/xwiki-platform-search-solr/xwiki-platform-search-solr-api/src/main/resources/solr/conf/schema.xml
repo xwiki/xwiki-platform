@@ -130,6 +130,8 @@
    <field name="creator_display" type="text_general" indexed="true" stored="true" />
    <field name="date" type="tdate" indexed="true" stored="true" />
    <field name="creationdate" type="tdate" indexed="true" stored="true" />
+   <!-- The type of objects stored by this document. E.g. [Blog.BlogPostClass, XWiki.TagClass, ..] -->
+   <field name="object" type="string" indexed="true" stored="true" multiValued="true" />
    <field name="objcontent_" type="text_general" indexed="true" stored="true" multiValued="true" />
 
    <!-- Attachment static fields -->

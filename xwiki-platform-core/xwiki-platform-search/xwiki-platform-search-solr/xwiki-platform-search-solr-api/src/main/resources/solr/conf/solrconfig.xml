@@ -755,7 +755,8 @@
      <lst name="defaults">
        <str name="echoParams">explicit</str>
        <int name="rows">10</int>
-       <str name="defType">edismax</str>
+       <!-- We use a custom Query Parser Plugin that adds dynamic aliases for multilingual fields -->
+       <str name="defType">xdismax</str>
 
        <str name="fl">*,score,popularity</str>
 
@@ -775,36 +776,12 @@
 
        <!-- Field aliasing. -->
 
-       <!-- Used to perform query expansion for multilingual fields. This way, a user can write a query on
-            the "title" field and all the "title_<language>" variations of the field will be used in the query. -->
-       <str name="f.title.qf">title__ title_ar title_bg title_ca title_cz title_da title_de title_en
-         title_el title_es title_eu title_fa title_fi title_fr title_ga title_gl title_hi title_hu
-         title_hy title_id title_it title_ja title_lv title_nl title_no title_pt title_ro title_ru
-         title_sv title_th title_tr</str>
-       <str name="f.doccontent.qf">doccontent__ doccontent_ar doccontent_bg doccontent_ca doccontent_cz doccontent_da doccontent_de doccontent_en
-         doccontent_el doccontent_es doccontent_eu doccontent_fa doccontent_fi doccontent_fr doccontent_ga doccontent_gl doccontent_hi doccontent_hu
-         doccontent_hy doccontent_id doccontent_it doccontent_ja doccontent_lv doccontent_nl doccontent_no doccontent_pt doccontent_ro doccontent_ru
-         doccontent_sv doccontent_th doccontent_tr</str>
-       <str name="f.doccontentraw.qf">doccontentraw__ doccontentraw_ar doccontentraw_bg doccontentraw_ca doccontentraw_cz doccontentraw_da doccontentraw_de doccontentraw_en
-         doccontentraw_el doccontentraw_es doccontentraw_eu doccontentraw_fa doccontentraw_fi doccontentraw_fr doccontentraw_ga doccontentraw_gl doccontentraw_hi doccontentraw_hu
-         doccontentraw_hy doccontentraw_id doccontentraw_it doccontentraw_ja doccontentraw_lv doccontentraw_nl doccontentraw_no doccontentraw_pt doccontentraw_ro doccontentraw_ru
-         doccontentraw_sv doccontentraw_th doccontentraw_tr</str>
-       <str name="f.comment.qf">comment__ comment_ar comment_bg comment_ca comment_cz comment_da comment_de comment_en
-         comment_el comment_es comment_eu comment_fa comment_fi comment_fr comment_ga comment_gl comment_hi comment_hu
-         comment_hy comment_id comment_it comment_ja comment_lv comment_nl comment_no comment_pt comment_ro comment_ru
-         comment_sv comment_th comment_tr</str>
-       <str name="f.objcontent.qf">objcontent__ objcontent_ar objcontent_bg objcontent_ca objcontent_cz objcontent_da objcontent_de objcontent_en
-         objcontent_el objcontent_es objcontent_eu objcontent_fa objcontent_fi objcontent_fr objcontent_ga objcontent_gl objcontent_hi objcontent_hu
-         objcontent_hy objcontent_id objcontent_it objcontent_ja objcontent_lv objcontent_nl objcontent_no objcontent_pt objcontent_ro objcontent_ru
-         objcontent_sv objcontent_th objcontent_tr</str>
-       <str name="f.propertyvalue.qf">propertyvalue__ propertyvalue_ar propertyvalue_bg propertyvalue_ca propertyvalue_cz propertyvalue_da propertyvalue_de propertyvalue_en
-         propertyvalue_el propertyvalue_es propertyvalue_eu propertyvalue_fa propertyvalue_fi propertyvalue_fr propertyvalue_ga propertyvalue_gl propertyvalue_hi propertyvalue_hu
-         propertyvalue_hy propertyvalue_id propertyvalue_it propertyvalue_ja propertyvalue_lv propertyvalue_nl propertyvalue_no propertyvalue_pt propertyvalue_ro propertyvalue_ru
-         propertyvalue_sv propertyvalue_th propertyvalue_tr</str>
-       <str name="f.attcontent.qf">attcontent__ attcontent_ar attcontent_bg attcontent_ca attcontent_cz attcontent_da attcontent_de attcontent_en
-         attcontent_el attcontent_es attcontent_eu attcontent_fa attcontent_fi attcontent_fr attcontent_ga attcontent_gl attcontent_hi attcontent_hu
-         attcontent_hy attcontent_id attcontent_it attcontent_ja attcontent_lv attcontent_nl attcontent_no attcontent_pt attcontent_ro attcontent_ru
-         attcontent_sv attcontent_th attcontent_tr</str>
+       <!-- The list of multilingual fields that will be expanded in the search query. This way, a user can write a
+            query on the "title" field and all the "title_<language>" variations of the field will be used in the query.
+            The list of languages for which a field is expanded is taken from the 'xwiki.supportedLocales' query
+            parameter. If this parameter is not defined, the ROOT locale is used instead. -->
+       <str name="xwiki.multilingualFields">title, doccontent, doccontentraw, comment, objcontent, propertyvalue,
+         attcontent</str>
 
        <!-- Trying to preserve compatibility with XWiki lucene plugin's queries. -->
        <str name="f.object.qf">class</str>
@@ -1729,6 +1706,9 @@
   <!--
      <queryParser name="myparser" class="com.mycompany.MyQParserPlugin"/>
     -->
+
+  <!-- A custom Query Parser Plugin that adds dynamic aliases for multilingual fields -->
+  <queryParser name="xdismax" class="org.xwiki.search.solr.internal.XWikiDismaxQParserPlugin" />
 
   <!-- Function Parsers
 

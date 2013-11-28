@@ -830,6 +830,13 @@
   #set ($discard = $query.setLimit($rows))
   #set ($discard = $query.setOffset($start))
   #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
+  ## We need to pass the list of supported locales so the names of the fields that are indexed in multiple languages are
+  ## expanded in the search query. For instance, the query "title:text" will be expanded to "title__:text AND
+  ## title_en:text AND title_fr:text" if the list of supported locales is [en, fr] and there's no locale filter applied.
+  #if (!$supportedLanguages)
+    #getSupportedLanguages()
+  #end
+  #set ($discard = $query.bindValue('xwiki.supportedLocales', $stringtool.join($supportedLanguages, ',')))
   #if ($boost != '')
     #set ($discard = $query.bindValue('qf', $boost))
   #end

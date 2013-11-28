@@ -45,6 +45,7 @@
       com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
       com.xpn.xwiki.plugin.packaging.PackagePlugin
     </xwikiCfgPlugins>
+    <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
   </properties>
   <dependencies>
     <dependency>

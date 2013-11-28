@@ -21,14 +21,13 @@ package org.xwiki.administration.test.ui;
 
 import java.net.URL;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.ImportAdministrationSectionPage;
-import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
+import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.HistoryPane;
@@ -40,8 +39,11 @@ import org.xwiki.test.ui.po.ViewPage;
  * @version $Id$
  * @since 2.3M1
  */
-public class ImportTest extends AbstractAdminAuthenticatedTest
+public class ImportTest extends AbstractTest
 {
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+
     private static final String PACKAGE_WITHOUT_HISTORY = "Main.TestPage-no-history.xar";
 
     private static final String PACKAGE_WITH_HISTORY = "Main.TestPage-with-history.xar";
@@ -52,12 +54,9 @@ public class ImportTest extends AbstractAdminAuthenticatedTest
 
     private ImportAdministrationSectionPage sectionPage;
 
-    @Override
     @Before
     public void setUp() throws Exception
     {
-        super.setUp();
-
         // Delete Test Page we import from XAR to ensure to start with a predefined state.
         getUtil().deletePage("Main", "TestPage");
 
@@ -191,6 +190,6 @@ public class ImportTest extends AbstractAdminAuthenticatedTest
         importedPage.openCommentsDocExtraPane();
         HistoryPane history = importedPage.openHistoryDocExtraPane();
 
-        Assert.assertEquals("Administrator", history.getCurrentAuthor());
+        Assert.assertEquals("superadmin", history.getCurrentAuthor());
     }
 }

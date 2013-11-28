@@ -781,7 +781,7 @@
             The list of languages for which a field is expanded is taken from the 'xwiki.supportedLocales' query
             parameter. If this parameter is not defined, the ROOT locale is used instead. -->
        <str name="xwiki.multilingualFields">title, doccontent, doccontentraw, comment, objcontent, propertyvalue,
-         attcontent</str>
+         attcontent, property.*, object.*</str>
 
        <!-- Trying to preserve compatibility with XWiki lucene plugin's queries. -->
        <str name="f.ft.qf">doccontent</str>

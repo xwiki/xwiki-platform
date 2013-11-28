@@ -19,14 +19,9 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
-import static org.hamcrest.CoreMatchers.both;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.hamcrest.collection.IsCollectionWithSize.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +34,7 @@ import java.util.Locale;
 import javax.inject.Provider;
 
 import org.apache.solr.common.SolrInputDocument;
+import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -62,6 +58,8 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.search.solr.internal.DefaultSolrFieldNameEncoder;
+import org.xwiki.search.solr.internal.SolrFieldStringEntityReferenceSerializer;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexerException;
 import org.xwiki.search.solr.internal.reference.DocumentSolrReferenceResolver;
@@ -85,7 +83,8 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  * @version $Id$
  */
 @ComponentList({DefaultStringEntityReferenceSerializer.class, LocalStringEntityReferenceSerializer.class,
-DocumentSolrMetadataExtractor.class, DefaultExecution.class, DocumentSolrReferenceResolver.class})
+DocumentSolrMetadataExtractor.class, DefaultExecution.class, DocumentSolrReferenceResolver.class,
+DefaultSolrFieldNameEncoder.class, SolrFieldStringEntityReferenceSerializer.class})
 public class DocumentSolrMetadataExtractorTest
 {
     @Rule
@@ -203,8 +202,8 @@ public class DocumentSolrMetadataExtractorTest
 
         when(this.mockDocument.getDocumentReference()).thenReturn(this.documentReference);
 
-        when(this.mockDocument.getTranslatedDocument(org.mockito.Matchers.isNull(Locale.class), eq(this.xcontext)))
-            .thenReturn(this.mockDocument);
+        when(this.mockDocument.getTranslatedDocument(isNull(Locale.class), eq(this.xcontext))).thenReturn(
+            this.mockDocument);
 
         when(this.mockDab.getDocument(this.documentReference)).thenReturn(this.mockDocument);
 
@@ -274,7 +273,8 @@ public class DocumentSolrMetadataExtractorTest
         Assert.assertEquals(this.localeENUS.toString(), solrDocument.getFieldValue(FieldUtils.LOCALE));
         Assert.assertEquals(this.languageENUS, solrDocument.getFieldValue(FieldUtils.LANGUAGE));
         Assert.assertThat((Collection) solrDocument.getFieldValues(FieldUtils.LOCALES),
-            both((Matcher) hasItems("", this.localeENUS.toString())).and((Matcher) hasSize(2)));
+            CoreMatchers.both((Matcher) CoreMatchers.hasItems("", this.localeENUS.toString()))
+                .and((Matcher) hasSize(2)));
         Assert.assertEquals(this.hidden, solrDocument.getFieldValue(FieldUtils.HIDDEN));
         Assert.assertEquals(EntityType.DOCUMENT.name(), solrDocument.getFieldValue(FieldUtils.TYPE));
 
@@ -306,7 +306,7 @@ public class DocumentSolrMetadataExtractorTest
         XWikiException thrown =
             new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Unreadable document");
-        when(this.mockXWiki.getDocument(org.mockito.Matchers.eq(reference), eq(this.xcontext))).thenThrow(thrown);
+        when(this.mockXWiki.getDocument(eq(reference), eq(this.xcontext))).thenThrow(thrown);
 
         // Call
         DocumentSolrMetadataExtractor extractor =
@@ -337,19 +337,24 @@ public class DocumentSolrMetadataExtractorTest
 
         // Mock
 
+        BaseObject mockComment = mock(BaseObject.class);
+
         BaseProperty<EntityReference> mockCommentField = mock(BaseProperty.class);
         when(mockCommentField.getName()).thenReturn("comment");
         when(mockCommentField.getValue()).thenReturn(commentContent);
+        when(mockCommentField.getObject()).thenReturn(mockComment);
         commentFields.add(mockCommentField);
 
         BaseProperty<EntityReference> mockAuthorField = mock(BaseProperty.class);
         when(mockAuthorField.getName()).thenReturn("author");
         when(mockAuthorField.getValue()).thenReturn(commentAuthor);
+        when(mockAuthorField.getObject()).thenReturn(mockComment);
         commentFields.add(mockAuthorField);
 
         BaseProperty<EntityReference> mockDateField = mock(BaseProperty.class);
         when(mockDateField.getName()).thenReturn("date");
         when(mockDateField.getValue()).thenReturn(commentDate);
+        when(mockDateField.getObject()).thenReturn(mockComment);
         commentFields.add(mockDateField);
 
         BaseProperty<EntityReference> mockPasswordField = mock(BaseProperty.class);
@@ -360,11 +365,8 @@ public class DocumentSolrMetadataExtractorTest
         BaseProperty<EntityReference> mockListField = mock(BaseProperty.class);
         when(mockListField.getName()).thenReturn("list");
         when(mockListField.getValue()).thenReturn(commentList);
+        when(mockListField.getObject()).thenReturn(mockComment);
         commentFields.add(mockListField);
-
-        BaseClass mockXClass = mock(BaseClass.class);
-
-        BaseObject mockComment = mock(BaseObject.class);
 
         when(mockComment.getStringValue("comment")).thenReturn(commentContent);
         when(mockComment.getStringValue("author")).thenReturn(commentAuthor);
@@ -375,8 +377,11 @@ public class DocumentSolrMetadataExtractorTest
         xObjects.put(commentsClassReference, Arrays.asList(mockComment));
         when(this.mockDocument.getXObjects()).thenReturn(xObjects);
 
+        BaseClass mockXClass = mock(BaseClass.class);
         when(mockComment.getXClass(this.xcontext)).thenReturn(mockXClass);
         when(mockComment.getFieldList()).thenReturn(commentFields);
+        when(mockComment.getRelativeXClassReference()).thenReturn(
+            commentsClassReference.removeParent(commentsClassReference.getWikiReference()));
 
         PropertyClass passwordClass = mock(PasswordClass.class);
         when(mockXClass.get("password")).thenReturn(passwordClass);
@@ -390,11 +395,31 @@ public class DocumentSolrMetadataExtractorTest
 
         // Assert and verify
 
+        Assert.assertEquals(Arrays.asList("space.commentsClass"), solrDocument.getFieldValues("object"));
+
+        Assert.assertSame(commentContent, solrDocument.getFieldValue(FieldUtils.getFieldName(
+            "property.space.commentsClass.comment", this.localeENUS)));
+        Assert
+            .assertSame(commentAuthor, solrDocument.getFieldValue(FieldUtils.getFieldName(
+                "property.space.commentsClass.author", this.localeENUS)));
+        Assert.assertSame(commentDate,
+            solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.date", this.localeENUS)));
+        Assert.assertNull(solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.password",
+            this.localeENUS)));
+        Assert.assertEquals(commentList,
+            solrDocument.getFieldValues(FieldUtils.getFieldName("property.space.commentsClass.list", this.localeENUS)));
+
         Collection<Object> objectProperties =
+            solrDocument.getFieldValues(FieldUtils.getFieldName("object.space.commentsClass", this.localeENUS));
+        MatcherAssert.assertThat(objectProperties, Matchers.<Object> containsInAnyOrder(commentContent, commentAuthor,
+            commentDate, commentList.get(0), commentList.get(1)));
+        Assert.assertEquals(5, objectProperties.size());
+
+        objectProperties =
             solrDocument.getFieldValues(FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, this.localeENUS));
-        MatcherAssert.assertThat(objectProperties, Matchers.containsInAnyOrder((Object) ("comment : " + commentContent),
-            (Object) ("author : " + commentAuthor), (Object) ("date : " + commentDate.toString()),
-            (Object) ("list : " + commentList.get(0)), (Object) ("list : " + commentList.get(1))));
+        MatcherAssert.assertThat(objectProperties, Matchers.<Object>containsInAnyOrder("comment : " + commentContent,
+            "author : " + commentAuthor,"date : " + commentDate.toString(), "list : " + commentList.get(0),
+            "list : " + commentList.get(1)));
         Assert.assertEquals(5, objectProperties.size());
     }
 }

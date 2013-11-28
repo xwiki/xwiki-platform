@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -37,12 +38,14 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.search.solr.internal.api.FieldUtils;
+import org.xwiki.search.solr.internal.api.SolrFieldNameEncoder;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 
 /**
  * Extract the metadata to be indexed from document.
@@ -74,6 +77,19 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
      */
     @Inject
     protected EntityReferenceSerializer<String> serializer;
+
+    /**
+     * Used to serialize entity reference to be used in dynamic field names.
+     */
+    @Inject
+    @Named("solr")
+    protected EntityReferenceSerializer<String> fieldNameSerializer;
+
+    /**
+     * Used to encode dynamic field names that may contain special characters.
+     */
+    @Inject
+    protected SolrFieldNameEncoder fieldNameEncoder;
 
     @Override
     public boolean setFieldsInternal(LengthSolrInputDocument solrDocument, EntityReference entityReference)
@@ -210,5 +226,26 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
                 solrDocument.addField("object", localSerializer.serialize(objects.getKey()));
             }
         }
+    }
+
+    @Override
+    protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<EntityReference> property,
+        Object value, Locale locale)
+    {
+        // We need to be able to query an object property alone.
+        EntityReference classReference = property.getObject().getRelativeXClassReference();
+        EntityReference propertyReference =
+            new EntityReference(property.getName(), EntityType.CLASS_PROPERTY, classReference);
+        String suffix = fieldNameEncoder.encode(fieldNameSerializer.serialize(propertyReference));
+        String propertyValueFieldName = "property." + suffix;
+        solrDocument.addField(FieldUtils.getFieldName(propertyValueFieldName, locale), value);
+
+        // We need to be able to query all properties of a specific type of object at once.
+        suffix = fieldNameEncoder.encode(fieldNameSerializer.serialize(classReference));
+        String objectOfTypeFieldName = "object." + suffix;
+        solrDocument.addField(FieldUtils.getFieldName(objectOfTypeFieldName, locale), value);
+
+        // We need to be able to query all objects from a document at once.
+        super.setPropertyValue(solrDocument, property, value, locale);
     }
 }

@@ -19,11 +19,10 @@
  */
 package org.xwiki.messagestream.test.ui;
 
-import org.junit.Test;
+import org.junit.*;
 import org.xwiki.administration.test.po.AdministrationPage;
-import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
-
-import org.junit.Assert;
+import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 
 /**
  * Verify the overall Administration application features.
@@ -31,8 +30,11 @@ import org.junit.Assert;
  * @version $Id$
  * @since 4.3M1
  */
-public class AdministrationTest extends AbstractAdminAuthenticatedTest
+public class AdministrationTest extends AbstractTest
 {
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+
     @Test
     public void verifyGlobalAndSpaceSections()
     {

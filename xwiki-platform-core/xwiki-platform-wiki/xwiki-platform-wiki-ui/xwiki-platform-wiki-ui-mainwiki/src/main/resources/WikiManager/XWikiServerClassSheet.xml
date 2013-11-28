@@ -102,7 +102,8 @@
           &lt;dd&gt;
             &lt;p&gt;
               $doc.display("secure", $firstalias)&lt;br/&gt;
-              {{translation key="platform.wiki.sheet.desc.secure"/}}
+              ## We don't use the translation macro here because we have wiki syntax in the parameter (see XWIKI-9744).
+              $services.localization.render("platform.wiki.sheet.desc.secure", ["//https//"])
             &lt;/p&gt;
           &lt;/dd&gt;
         &lt;dt&gt;{{translation key="platform.wiki.sheet.prop.iswikitemplate"/}}:&lt;/dt&gt;

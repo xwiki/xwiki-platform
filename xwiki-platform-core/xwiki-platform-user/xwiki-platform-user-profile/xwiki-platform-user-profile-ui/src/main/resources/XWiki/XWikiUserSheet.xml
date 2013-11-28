@@ -509,6 +509,14 @@ div.userInfo, div.userPreferences, div.watchlistManagement, div.userDashboard {
   background-color: $theme.backgroundSecondaryColor;
 }
 
+.userInfo {
+  -ms-word-break: break-all; /* IE8, IE9 */
+}
+
+.userInfo a {
+  word-wrap: break-word;
+}
+
 .userInfo img {
   max-width: 100%;
 }

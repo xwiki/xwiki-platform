@@ -11,9 +11,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1364502176000</creationDate>
-  <date>1364560703000</date>
-  <contentUpdateDate>1364560203000</contentUpdateDate>
+  <creationDate>1385551024000</creationDate>
+  <date>1385638578000</date>
+  <contentUpdateDate>1385551024000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.activity')</title>
   <defaultTemplate/>
@@ -1301,11 +1301,11 @@ $xwiki.ssx.use('Main.Activity')##
 #macro(displayRSSURL)
   #set ($rssURL = '')
   #set ($parameters = 'xpage=plain&amp;outputSyntax=plain')
-  #if ($aTags.size() &gt; 0)
-    #set ($parameters = "${parameters}&amp;tag=$listtool.get($aTags, 0)")
+  #foreach ($tag in $aTags)
+    #set ($parameters = "${parameters}&amp;tag=$tag")
   #end
-  #if ($aSpaces.size() &gt; 0)
-    #set ($parameters = "${parameters}&amp;space=$listtool.get($aSpaces, 0)")
+  #foreach ($space in $aSpaces)
+    #set ($parameters = "${parameters}&amp;space=$space")
   #end
   #set ($rssURL = $xwiki.getURL('Main.WebRss', 'view', $parameters))
   &lt;div class="rssURL"&gt;

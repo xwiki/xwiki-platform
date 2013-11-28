@@ -191,7 +191,7 @@ public class XARPackage implements WikiDocumentFilter, WikiSpaceFilter
         zipStream.putArchiveEntry(zipentry);
 
         try {
-            write(zipStream, encoding);
+            write((OutputStream) zipStream, encoding);
         } finally {
             zipStream.closeArchiveEntry();
         }

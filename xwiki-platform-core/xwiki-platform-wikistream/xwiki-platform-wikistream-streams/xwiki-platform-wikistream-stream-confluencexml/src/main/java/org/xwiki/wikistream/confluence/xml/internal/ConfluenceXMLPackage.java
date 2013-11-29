@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -161,7 +162,7 @@ public class ConfluenceXMLPackage
 
     private File tree;
 
-    private Map<Integer, Set<Integer>> pages = new HashMap<Integer, Set<Integer>>();
+    private Map<Integer, List<Integer>> pages = new HashMap<Integer, List<Integer>>();
 
     public ConfluenceXMLPackage(InputSource source) throws IOException, WikiStreamException, XMLStreamException,
         FactoryConfigurationError, NumberFormatException, ConfigurationException
@@ -283,7 +284,7 @@ public class ConfluenceXMLPackage
         return spaceProperties.getString(KEY_SPACE_NAME);
     }
 
-    public Map<Integer, Set<Integer>> getPages()
+    public Map<Integer, List<Integer>> getPages()
     {
         return this.pages;
     }
@@ -397,9 +398,9 @@ public class ConfluenceXMLPackage
         saveSpaceProperties(properties, spaceId);
 
         // Register space
-        Set<Integer> spacePages = this.pages.get(spaceId);
+        List<Integer> spacePages = this.pages.get(spaceId);
         if (spacePages == null) {
-            spacePages = new LinkedHashSet<Integer>();
+            spacePages = new LinkedList<Integer>();
             this.pages.put(spaceId, spacePages);
         }
     }
@@ -461,9 +462,9 @@ public class ConfluenceXMLPackage
         Integer originalVersion = (Integer) properties.getProperty("originalVersion");
         if (originalVersion == null) {
             Integer spaceId = (Integer) properties.getInteger("space", null);
-            Set<Integer> spacePages = this.pages.get(spaceId);
+            List<Integer> spacePages = this.pages.get(spaceId);
             if (spacePages == null) {
-                spacePages = new LinkedHashSet<Integer>();
+                spacePages = new LinkedList<Integer>();
                 this.pages.put(spaceId, spacePages);
             }
             spacePages.add(pageId);

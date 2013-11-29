@@ -334,6 +334,7 @@
 #end
 
 #set ($customSearchFacetValueDisplayer = {
+  'type': 'type',
   'wiki': 'wiki',
   'locale': 'locale',
   'author': 'user',
@@ -344,6 +345,10 @@
 
 #macro (displaySearchFacetValue_default $facetPrettyValue)
   $escapetool.xml($facetPrettyValue)
+#end
+
+#macro (displaySearchFacetValue_type $type)
+  $escapetool.xml($services.localization.render("solr.filterBy.type.$type.toLowerCase()"))
 #end
 
 #macro (displaySearchFacetValue_wiki $wikiName)
@@ -832,7 +837,7 @@
   #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
   ## We need to pass the list of supported locales so the names of the fields that are indexed in multiple languages are
   ## expanded in the search query. For instance, the query "title:text" will be expanded to "title__:text AND
-  ## title_en:text AND title_fr:text" if the list of supported locales is [en, fr] and there's no locale filter applied.
+  ## title_en:text AND title_fr:text" if the list of supported locales is [en, fr].
   #if (!$supportedLanguages)
     #getSupportedLanguages()
   #end

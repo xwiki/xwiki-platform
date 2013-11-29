@@ -102,6 +102,7 @@ solr.facet.date.after=After {0}
 solr.facet.date.before=Before {0}
 solr.facet.date.any=Any date
 
+solr.field.type=Result type
 solr.field.locale=Language
 solr.field.locale.emptyValue=No Language
 solr.field.locale.emptyValue.hint=Some documents don't have a language set because they contain scripts (which are not written in a natural language) or they make up the user interface which is displayed in the current language (like this page).

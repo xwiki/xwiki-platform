@@ -340,7 +340,8 @@
   'author': 'user',
   'creator': 'user',
   'date': 'date',
-  'creationdate': 'date'
+  'creationdate': 'date',
+  'class': 'class'
 })
 
 #macro (displaySearchFacetValue_default $facetPrettyValue)
@@ -590,6 +591,24 @@
   #end
 #end
 
+#macro (displaySearchFacetValue_class $classFullName)
+  #set ($classReference = $services.model.resolveDocument($classFullName, 'default'))
+  #set ($hint = $services.localization.render('solr.field.class.definedBy',
+    [$classReference.lastSpaceReference.name, $classReference.name]))
+  #set ($classPrettyName = $stringtool.removeEnd($classReference.name, 'Class'))
+  #set ($translationKey = "solr.field.class.$classPrettyName")
+  #if ($services.localization.get($translationKey))
+    #set ($classPrettyName = $services.localization.render('$translationKey'))
+  #else
+    ## Some of the default classes have names starting with 'XWiki'.
+    #set ($classPrettyName = $stringtool.removeStart($classPrettyName, 'XWiki'))
+    #set ($classPrettyName = $stringtool.join($stringtool.splitByCharacterTypeCamelCase($classPrettyName), ' '))
+    ## Make sure we don't have isolated upper case letters.
+    #set ($classPrettyName = $classPrettyName.replaceAll('(^| )([\p{Lu}]) ', '$1$2'))
+  #end
+  &lt;span title="$escapetool.xml($hint)"&gt;$escapetool.xml($classPrettyName)&lt;/span&gt;
+#end
+
 #macro (displaySearchResultsSort)
   #set ($defaultSortOrder = {
     'score': 'desc',
@@ -686,9 +705,10 @@
         [$escapetool.xml($searchResult.mimetype)])&lt;/div&gt;
     #end
     #set ($class = $searchResult.get('class'))
-    #if ("$!class" != '')
-      #set ($classReference = $services.model.resolveDocument($class, $services.model.createWikiReference($searchResult.wiki)))
-      #set ($classLink = "&lt;a href=""$xwiki.getURL($classReference)""&gt;$escapetool.xml($class)&lt;/a&gt;")
+    #if ("$!class" != '' &amp;&amp; $searchResult.type != 'DOCUMENT')
+      #set ($classFullName = $class.get(0))
+      #set ($classReference = $services.model.resolveDocument($classFullName, $services.model.createWikiReference($searchResult.wiki)))
+      #set ($classLink = "&lt;a href=""$xwiki.getURL($classReference)""&gt;$escapetool.xml($classFullName)&lt;/a&gt;")
       #set ($propertyName = $searchResult.propertyname)
       #if ("$!propertyName" == '')
         &lt;div class="search-result-object"&gt;$services.localization.render('solr.result.object', [$classLink])&lt;/div&gt;

@@ -61,6 +61,11 @@ public class ClassReader extends AbstractReader
 
             proxyFilter.endWikiClass(this.parameters);
         }
+
+        public boolean isEmpty()
+        {
+            return this.properties.isEmpty();
+        }
     }
 
     public ClassReader(XARInputProperties properties)

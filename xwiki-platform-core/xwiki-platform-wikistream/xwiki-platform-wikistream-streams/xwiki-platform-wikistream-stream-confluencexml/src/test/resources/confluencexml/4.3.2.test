@@ -1,28 +1,6 @@
 .#------------------------------------------------------------------------------
 .expect|wiki+xml
 .#------------------------------------------------------------------------------
-<user name="user2">
-  <p>
-    <parameters>
-      <entry>
-        <string>firstname</string>
-        <string></string>
-      </entry>
-      <entry>
-        <string>lastname</string>
-        <string>User2</string>
-      </entry>
-      <entry>
-        <string>email</string>
-        <string>tester2@yopmail.com</string>
-      </entry>
-      <entry>
-        <string>active</string>
-        <boolean>true</boolean>
-      </entry>
-    </parameters>
-  </p>
-</user>
 <user name="Admin">
   <p>
     <parameters>
@@ -67,15 +45,37 @@
     </parameters>
   </p>
 </user>
-<group name="twistedgroup"></group>
+<user name="user2">
+  <p>
+    <parameters>
+      <entry>
+        <string>firstname</string>
+        <string></string>
+      </entry>
+      <entry>
+        <string>lastname</string>
+        <string>User2</string>
+      </entry>
+      <entry>
+        <string>email</string>
+        <string>tester2@yopmail.com</string>
+      </entry>
+      <entry>
+        <string>active</string>
+        <boolean>true</boolean>
+      </entry>
+    </parameters>
+  </p>
+</user>
+<group name="XWikiAdminGroup">
+  <groupMemberGroup name="Admin"></groupMemberGroup>
+</group>
 <group name="XWikiAllGroup">
   <groupMemberGroup name="user2"></groupMemberGroup>
   <groupMemberGroup name="Admin"></groupMemberGroup>
   <groupMemberGroup name="user1"></groupMemberGroup>
 </group>
-<group name="XWikiAdminGroup">
-  <groupMemberGroup name="Admin"></groupMemberGroup>
-</group>
+<group name="twistedgroup"></group>
 <wikiSpace name="space1">
   <wikiDocument name="WebHome">
     <wikiDocumentLocale>
@@ -121,201 +121,6 @@
               </metadata>
             </metadata>
           </p>
-        </document>
-      </wikiDocumentRevision>
-    </wikiDocumentLocale>
-  </wikiDocument>
-  <wikiDocument name="space1 Home">
-    <wikiDocumentLocale>
-      <wikiDocumentRevision revision="1">
-        <p>
-          <parameters>
-            <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
-            </entry>
-            <entry>
-              <string>revision_author</string>
-              <string>admin</string>
-            </entry>
-            <entry>
-              <string>revision_comment</string>
-              <string></string>
-            </entry>
-            <entry>
-              <string>title</string>
-              <string>space1 Home</string>
-            </entry>
-          </parameters>
-        </p>
-        <document>
-          <p>
-            <metadata>
-              <metadata>
-                <entry>
-                  <string>syntax</string>
-                  <org.xwiki.rendering.syntax.Syntax>
-                    <type>
-                      <name>Confluence</name>
-                      <id>confluence+xhtml</id>
-                    </type>
-                    <version>1.0</version>
-                  </org.xwiki.rendering.syntax.Syntax>
-                </entry>
-              </metadata>
-            </metadata>
-          </p>
-          <group name="{class=contentLayout, data-atlassian-layout={&quot;name&quot;:&quot;pagelayout-two-right&quot;,&quot;columns&quot;:[&quot;large&quot;,&quot;aside&quot;],&quot;header&quot;:true,&quot;footer&quot;:true}}">
-            <group name="{class=header}">
-              <paragraph>
-                <word>This</word>
-                <space></space>
-                <word>is</word>
-                <space></space>
-                <word>the</word>
-                <space></space>
-                <word>home</word>
-                <space></space>
-                <word>of</word>
-                <space></space>
-                <word>the</word>
-                <space></space>
-                <word>space1</word>
-                <space></space>
-                <word>space</word>
-                <specialSymbol>.</specialSymbol>
-              </paragraph>
-              <paragraph>
-                <word>To</word>
-                <space></space>
-                <word>help</word>
-                <space></space>
-                <word>you</word>
-                <space></space>
-                <word>on</word>
-                <space></space>
-                <word>your</word>
-                <space></space>
-                <word>way</word>
-                <specialSymbol>,</specialSymbol>
-                <space></space>
-                <word>we</word>
-                <specialSymbol>'</specialSymbol>
-                <word>ve</word>
-                <space></space>
-                <word>inserted</word>
-                <space></space>
-                <word>some</word>
-                <space></space>
-                <word>of</word>
-                <space></space>
-                <word>our</word>
-                <space></space>
-                <word>favourite</word>
-                <space></space>
-                <word>macros</word>
-                <space></space>
-                <word>on</word>
-                <space></space>
-                <word>this</word>
-                <space></space>
-                <word>home</word>
-                <space></space>
-                <word>page</word>
-                <specialSymbol>.</specialSymbol>
-                <space></space>
-                <word>As</word>
-                <space></space>
-                <word>you</word>
-                <space></space>
-                <word>start</word>
-                <space></space>
-                <word>creating</word>
-                <space></space>
-                <word>pages</word>
-                <specialSymbol>,</specialSymbol>
-                <space></space>
-                <word>blogging</word>
-                <space></space>
-                <word>and</word>
-                <space></space>
-                <word>commenting</word>
-                <space></space>
-                <word>you</word>
-                <specialSymbol>'</specialSymbol>
-                <word>ll</word>
-                <space></space>
-                <word>see</word>
-                <space></space>
-                <word>the</word>
-                <space></space>
-                <word>macros</word>
-                <space></space>
-                <word>below</word>
-                <space></space>
-                <word>fill</word>
-                <space></space>
-                <word>up</word>
-                <space></space>
-                <word>with</word>
-                <space></space>
-                <word>all</word>
-                <space></space>
-                <word>the</word>
-                <space></space>
-                <word>activity</word>
-                <space></space>
-                <word>in</word>
-                <space></space>
-                <word>your</word>
-                <space></space>
-                <word>space</word>
-                <specialSymbol>.</specialSymbol>
-              </paragraph>
-            </group>
-            <group name="{class=columnLayout twoColumns}">
-              <group name="{class=cell large}">
-                <group name="{class=innerCell}">
-                  <paragraph></paragraph>
-                  <macro id="recently-updated"></macro>
-                </group>
-              </group>
-              <group name="{class=cell aside}">
-                <group name="{class=innerCell}">
-                  <section>
-                    <section>
-                      <section>
-                        <section>
-                          <section>
-                            <section>
-                              <header level="6" id="HNavigatespace">
-                                <word>Navigate</word>
-                                <space></space>
-                                <word>space</word>
-                              </header>
-                              <paragraph></paragraph>
-                              <macro id="pagetreesearch"></macro>
-                              <paragraph></paragraph>
-                              <macro id="pagetree"></macro>
-                            </section>
-                          </section>
-                        </section>
-                      </section>
-                    </section>
-                  </section>
-                </group>
-              </group>
-            </group>
-            <group name="{class=footer}">
-              <paragraph>
-                <space></space>
-              </paragraph>
-            </group>
-          </group>
         </document>
       </wikiDocumentRevision>
     </wikiDocumentLocale>
@@ -11426,6 +11231,201 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
       </wikiDocumentRevision>
     </wikiDocumentLocale>
   </wikiDocument>
+  <wikiDocument name="space1 Home">
+    <wikiDocumentLocale>
+      <wikiDocumentRevision revision="1">
+        <p>
+          <parameters>
+            <entry>
+              <string>parent_reference</string>
+              <null></null>
+            </entry>
+            <entry>
+              <string>revision</string>
+              <string>1</string>
+            </entry>
+            <entry>
+              <string>revision_author</string>
+              <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_comment</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>title</string>
+              <string>space1 Home</string>
+            </entry>
+          </parameters>
+        </p>
+        <document>
+          <p>
+            <metadata>
+              <metadata>
+                <entry>
+                  <string>syntax</string>
+                  <org.xwiki.rendering.syntax.Syntax>
+                    <type>
+                      <name>Confluence</name>
+                      <id>confluence+xhtml</id>
+                    </type>
+                    <version>1.0</version>
+                  </org.xwiki.rendering.syntax.Syntax>
+                </entry>
+              </metadata>
+            </metadata>
+          </p>
+          <group name="{class=contentLayout, data-atlassian-layout={&quot;name&quot;:&quot;pagelayout-two-right&quot;,&quot;columns&quot;:[&quot;large&quot;,&quot;aside&quot;],&quot;header&quot;:true,&quot;footer&quot;:true}}">
+            <group name="{class=header}">
+              <paragraph>
+                <word>This</word>
+                <space></space>
+                <word>is</word>
+                <space></space>
+                <word>the</word>
+                <space></space>
+                <word>home</word>
+                <space></space>
+                <word>of</word>
+                <space></space>
+                <word>the</word>
+                <space></space>
+                <word>space1</word>
+                <space></space>
+                <word>space</word>
+                <specialSymbol>.</specialSymbol>
+              </paragraph>
+              <paragraph>
+                <word>To</word>
+                <space></space>
+                <word>help</word>
+                <space></space>
+                <word>you</word>
+                <space></space>
+                <word>on</word>
+                <space></space>
+                <word>your</word>
+                <space></space>
+                <word>way</word>
+                <specialSymbol>,</specialSymbol>
+                <space></space>
+                <word>we</word>
+                <specialSymbol>'</specialSymbol>
+                <word>ve</word>
+                <space></space>
+                <word>inserted</word>
+                <space></space>
+                <word>some</word>
+                <space></space>
+                <word>of</word>
+                <space></space>
+                <word>our</word>
+                <space></space>
+                <word>favourite</word>
+                <space></space>
+                <word>macros</word>
+                <space></space>
+                <word>on</word>
+                <space></space>
+                <word>this</word>
+                <space></space>
+                <word>home</word>
+                <space></space>
+                <word>page</word>
+                <specialSymbol>.</specialSymbol>
+                <space></space>
+                <word>As</word>
+                <space></space>
+                <word>you</word>
+                <space></space>
+                <word>start</word>
+                <space></space>
+                <word>creating</word>
+                <space></space>
+                <word>pages</word>
+                <specialSymbol>,</specialSymbol>
+                <space></space>
+                <word>blogging</word>
+                <space></space>
+                <word>and</word>
+                <space></space>
+                <word>commenting</word>
+                <space></space>
+                <word>you</word>
+                <specialSymbol>'</specialSymbol>
+                <word>ll</word>
+                <space></space>
+                <word>see</word>
+                <space></space>
+                <word>the</word>
+                <space></space>
+                <word>macros</word>
+                <space></space>
+                <word>below</word>
+                <space></space>
+                <word>fill</word>
+                <space></space>
+                <word>up</word>
+                <space></space>
+                <word>with</word>
+                <space></space>
+                <word>all</word>
+                <space></space>
+                <word>the</word>
+                <space></space>
+                <word>activity</word>
+                <space></space>
+                <word>in</word>
+                <space></space>
+                <word>your</word>
+                <space></space>
+                <word>space</word>
+                <specialSymbol>.</specialSymbol>
+              </paragraph>
+            </group>
+            <group name="{class=columnLayout twoColumns}">
+              <group name="{class=cell large}">
+                <group name="{class=innerCell}">
+                  <paragraph></paragraph>
+                  <macro id="recently-updated"></macro>
+                </group>
+              </group>
+              <group name="{class=cell aside}">
+                <group name="{class=innerCell}">
+                  <section>
+                    <section>
+                      <section>
+                        <section>
+                          <section>
+                            <section>
+                              <header level="6" id="HNavigatespace">
+                                <word>Navigate</word>
+                                <space></space>
+                                <word>space</word>
+                              </header>
+                              <paragraph></paragraph>
+                              <macro id="pagetreesearch"></macro>
+                              <paragraph></paragraph>
+                              <macro id="pagetree"></macro>
+                            </section>
+                          </section>
+                        </section>
+                      </section>
+                    </section>
+                  </section>
+                </group>
+              </group>
+            </group>
+            <group name="{class=footer}">
+              <paragraph>
+                <space></space>
+              </paragraph>
+            </group>
+          </group>
+        </document>
+      </wikiDocumentRevision>
+    </wikiDocumentLocale>
+  </wikiDocument>
 </wikiSpace>
 <wikiSpace name="privatespace">
   <wikiDocument name="WebHome">
@@ -11472,6 +11472,68 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
               </metadata>
             </metadata>
           </p>
+        </document>
+      </wikiDocumentRevision>
+    </wikiDocumentLocale>
+  </wikiDocument>
+  <wikiDocument name="Private page 1">
+    <wikiDocumentLocale>
+      <wikiDocumentRevision revision="1">
+        <p>
+          <parameters>
+            <entry>
+              <string>parent_reference</string>
+              <org.xwiki.model.reference.EntityReference>
+                <name>privatespace Home</name>
+                <type>DOCUMENT</type>
+              </org.xwiki.model.reference.EntityReference>
+            </entry>
+            <entry>
+              <string>revision</string>
+              <string>1</string>
+            </entry>
+            <entry>
+              <string>revision_author</string>
+              <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_comment</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>title</string>
+              <string>Private page 1</string>
+            </entry>
+          </parameters>
+        </p>
+        <document>
+          <p>
+            <metadata>
+              <metadata>
+                <entry>
+                  <string>syntax</string>
+                  <org.xwiki.rendering.syntax.Syntax>
+                    <type>
+                      <name>Confluence</name>
+                      <id>confluence+xhtml</id>
+                    </type>
+                    <version>1.0</version>
+                  </org.xwiki.rendering.syntax.Syntax>
+                </entry>
+              </metadata>
+            </metadata>
+          </p>
+          <paragraph>
+            <word>Content</word>
+            <space></space>
+            <word>of</word>
+            <space></space>
+            <word>private</word>
+            <space></space>
+            <word>page</word>
+            <space></space>
+            <word>1</word>
+          </paragraph>
         </document>
       </wikiDocumentRevision>
     </wikiDocumentLocale>
@@ -11667,68 +11729,6 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
               </paragraph>
             </group>
           </group>
-        </document>
-      </wikiDocumentRevision>
-    </wikiDocumentLocale>
-  </wikiDocument>
-  <wikiDocument name="Private page 1">
-    <wikiDocumentLocale>
-      <wikiDocumentRevision revision="1">
-        <p>
-          <parameters>
-            <entry>
-              <string>parent_reference</string>
-              <org.xwiki.model.reference.EntityReference>
-                <name>privatespace Home</name>
-                <type>DOCUMENT</type>
-              </org.xwiki.model.reference.EntityReference>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
-            </entry>
-            <entry>
-              <string>revision_author</string>
-              <string>admin</string>
-            </entry>
-            <entry>
-              <string>revision_comment</string>
-              <string></string>
-            </entry>
-            <entry>
-              <string>title</string>
-              <string>Private page 1</string>
-            </entry>
-          </parameters>
-        </p>
-        <document>
-          <p>
-            <metadata>
-              <metadata>
-                <entry>
-                  <string>syntax</string>
-                  <org.xwiki.rendering.syntax.Syntax>
-                    <type>
-                      <name>Confluence</name>
-                      <id>confluence+xhtml</id>
-                    </type>
-                    <version>1.0</version>
-                  </org.xwiki.rendering.syntax.Syntax>
-                </entry>
-              </metadata>
-            </metadata>
-          </p>
-          <paragraph>
-            <word>Content</word>
-            <space></space>
-            <word>of</word>
-            <space></space>
-            <word>private</word>
-            <space></space>
-            <word>page</word>
-            <space></space>
-            <word>1</word>
-          </paragraph>
         </document>
       </wikiDocumentRevision>
     </wikiDocumentLocale>

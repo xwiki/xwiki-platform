@@ -223,7 +223,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
                 setObjectContent(solrDocument, object, locale);
             }
             if (hasObjectsOfThisType) {
-                solrDocument.addField("object", localSerializer.serialize(objects.getKey()));
+                solrDocument.addField(FieldUtils.CLASS, localSerializer.serialize(objects.getKey()));
             }
         }
     }

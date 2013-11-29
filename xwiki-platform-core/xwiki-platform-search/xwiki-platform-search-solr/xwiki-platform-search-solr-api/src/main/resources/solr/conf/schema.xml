@@ -131,7 +131,7 @@
    <field name="date" type="tdate" indexed="true" stored="true" />
    <field name="creationdate" type="tdate" indexed="true" stored="true" />
    <!-- The type of objects stored by this document. E.g. [Blog.BlogPostClass, XWiki.TagClass, ..] -->
-   <field name="object" type="string" indexed="true" stored="true" multiValued="true" />
+   <field name="class" type="string" indexed="true" stored="true" multiValued="true" />
    <field name="objcontent_" type="text_general" indexed="true" stored="true" multiValued="true" />
 
    <!-- Attachment static fields -->
@@ -143,7 +143,7 @@
 
    <!-- Object static fields -->
 
-   <field name="class" type="string" indexed="true" stored="true" />
+   <!-- class -->
    <field name="number" type="int" indexed="true" stored="true" />
    <!-- objcontent_ -->
 

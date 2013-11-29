@@ -126,7 +126,12 @@ public final class FieldUtils
     public static final String TYPE = "type";
 
     /**
-     * XWiki object class, only used for objects and properties.
+     * Used to index XClass names.
+     * <ul>
+     * <li>document: the type of objects a document has, e.g. [Blog.BlogPostClass, XWiki.TagClass, ..]</li>
+     * <li>object: the object type</li>
+     * <li>object property: the type of object this property belongs to</li>.
+     * </ul>
      */
     public static final String CLASS = "class";
 

@@ -395,7 +395,7 @@ public class DocumentSolrMetadataExtractorTest
 
         // Assert and verify
 
-        Assert.assertEquals(Arrays.asList("space.commentsClass"), solrDocument.getFieldValues("object"));
+        Assert.assertEquals(Arrays.asList("space.commentsClass"), solrDocument.getFieldValues(FieldUtils.CLASS));
 
         Assert.assertSame(commentContent, solrDocument.getFieldValue(FieldUtils.getFieldName(
             "property.space.commentsClass.comment", this.localeENUS)));

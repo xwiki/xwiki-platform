@@ -124,7 +124,6 @@
         <configuration>
           <includes>
             <include>**/*Test.java</include>
-            <include>**/*RenderingTests.java</include>
             <include>**/*IntegrationTests.java</include>
           </includes>
         </configuration>

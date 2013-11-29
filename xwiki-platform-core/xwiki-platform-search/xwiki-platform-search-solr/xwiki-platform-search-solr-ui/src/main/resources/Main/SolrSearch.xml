@@ -1565,7 +1565,7 @@ ul.search-results-sort {
 .search-results-sort li {
   display: inline;
   list-style-type: none;
-  padding-left: 1em;
+  padding-left: 1.5em;
 }
 .search-results-sort li:first-of-type {
   padding: 0;

@@ -20,6 +20,7 @@
 
 package com.xpn.xwiki.i18n;
 
+@Deprecated
 public class i18n {
     public static final int TRANSLATION_CONTENT = 1;
     public static final int TRANSLATION_OBJECTS = 2;

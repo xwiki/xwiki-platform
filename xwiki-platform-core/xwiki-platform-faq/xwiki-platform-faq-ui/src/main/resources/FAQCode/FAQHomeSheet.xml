@@ -33,7 +33,7 @@
   ## If this page is called with createFAQ=true then create a new page using the FAQTemplate template
   #if ($request.createFAQ == 'true')
     #set ($newFAQReference = $services.model.createDocumentReference('', "${faqSpace}", "$!{request.question}"))
-t    $response.sendRedirect($xwiki.getURL($newFAQReference, 'inline', "$!{request.queryString}&amp;title=${escapetool.url($request.question)}"))
+    $response.sendRedirect($xwiki.getURL($newFAQReference, 'inline', "$!{request.queryString}&amp;title=${escapetool.url($request.question)}"))
   #end
   #set ($description = $doc.getValue("description"))
   #if ("$!description" != "")

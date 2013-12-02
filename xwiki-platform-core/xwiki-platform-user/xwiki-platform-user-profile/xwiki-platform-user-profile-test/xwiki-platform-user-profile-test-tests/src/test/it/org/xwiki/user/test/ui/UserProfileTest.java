@@ -100,7 +100,7 @@ public class UserProfileTest extends AbstractTest
     {
         getUtil().recacheSecretToken();
         this.userName = getTestClassName() + getTestMethodName();
-        getUtil().createUser(this.userName, DEFAULT_PASSWORD);
+        getUtil().createUserAndLogin(this.userName, DEFAULT_PASSWORD);
 
         this.customProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
     }

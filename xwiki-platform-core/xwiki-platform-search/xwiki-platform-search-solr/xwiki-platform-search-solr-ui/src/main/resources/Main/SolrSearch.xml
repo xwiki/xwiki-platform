@@ -200,10 +200,10 @@
     #if ($debugMap)
 
       {{html}}
-      &lt;div&gt;&lt;strong&gt;Query Parser:&lt;/strong&gt; $!debugMap.get('QParser')&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Parsed Query:&lt;/strong&gt; $!debugMap.get('parsedquery_toString')&lt;/div&gt;
+      &lt;div&gt;&lt;strong&gt;Query Parser:&lt;/strong&gt; $!escapetool.xml($debugMap.get('QParser'))&lt;/div&gt;
+      &lt;div&gt;&lt;strong&gt;Parsed Query:&lt;/strong&gt; $!escapetool.xml($debugMap.get('parsedquery_toString'))&lt;/div&gt;
       &lt;div&gt;&lt;strong&gt;Filter Queries:&lt;/strong&gt; $!escapetool.xml($debugMap.get('filter_queries'))&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Processing time:&lt;/strong&gt; $!debugMap.get('timing')&lt;/div&gt;
+      &lt;div&gt;&lt;strong&gt;Processing time:&lt;/strong&gt; $!escapetool.xml($debugMap.get('timing'))&lt;/div&gt;
       {{/html}}
     #end
   )))
@@ -718,7 +718,13 @@
       #end
     #end
     #displaySearchResultHighlighting($searchResult)
+    {{/html}}
+
     ## Scoring debug data.
+    ## The reason we used a separate HTML block with no cleaning is because the scoring debug data may contain some
+    ## characters that are considered invalid by JDOM library which is used for parsing the HTML when cleaning is on.
+    ## E.g. "0x0 is not a legal XML character" (org.jdom.IllegalDataException).
+    {{html clean="false"}}
     &lt;div id="debug_$searchResult.id" class="hidden"&gt;
       $!escapetool.xml($searchResponse.explainMap.get($searchResult.id))
     &lt;/div&gt;

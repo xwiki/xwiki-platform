@@ -38,8 +38,11 @@ import org.xwiki.wysiwyg.test.po.WYSIWYGEditPage;
  */
 public abstract class AbstractWYSIWYGEditorTest extends AbstractTest
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+    // Note: We do not use the @Rule annotation since we need this rule to be executed before the configure() method
+    // below which runs **before** any @Rule (since it's tagged with @BeforeClass). Thus we trigger the authentication
+    // manually.
+    public static SuperAdminAuthenticationRule authenticationRule =
+        new SuperAdminAuthenticationRule(getUtil(), getDriver());
 
     /**
      * The edited page.
@@ -49,6 +52,7 @@ public abstract class AbstractWYSIWYGEditorTest extends AbstractTest
     @BeforeClass
     public static void configure()
     {
+        authenticationRule.authenticate();
         enableAllEditingFeatures();
     }
 

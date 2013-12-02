@@ -74,6 +74,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
@@ -332,6 +333,7 @@ public class DocumentSolrMetadataExtractorTest
         // Adding a fake password field to the comments class just to test the branch in the code.
         String commentPassword = "password";
         List<String> commentList = Arrays.asList("a", "list");
+        Long commentLikes = 13L;
 
         List<BaseProperty<EntityReference>> commentFields = new ArrayList<BaseProperty<EntityReference>>();
 
@@ -367,10 +369,18 @@ public class DocumentSolrMetadataExtractorTest
         when(mockListField.getValue()).thenReturn(commentList);
         when(mockListField.getObject()).thenReturn(mockComment);
         commentFields.add(mockListField);
-
-        when(mockComment.getStringValue("comment")).thenReturn(commentContent);
-        when(mockComment.getStringValue("author")).thenReturn(commentAuthor);
-        when(mockComment.getDateValue("date")).thenReturn(commentDate);
+        
+        BaseProperty<EntityReference> mockNumberField = mock(BaseProperty.class);
+        when(mockNumberField.getName()).thenReturn("likes");
+        when(mockNumberField.getValue()).thenReturn(commentLikes);
+        when(mockNumberField.getObject()).thenReturn(mockComment);
+        commentFields.add(mockNumberField);
+        
+        BaseProperty<EntityReference> mockBooleanField = mock(BaseProperty.class);
+        when(mockBooleanField.getName()).thenReturn("enabled");
+        when(mockBooleanField.getValue()).thenReturn(1);
+        when(mockBooleanField.getObject()).thenReturn(mockComment);
+        commentFields.add(mockBooleanField);
 
         // When handled as a general object
         HashMap<DocumentReference, List<BaseObject>> xObjects = new HashMap<DocumentReference, List<BaseObject>>();
@@ -383,9 +393,8 @@ public class DocumentSolrMetadataExtractorTest
         when(mockComment.getRelativeXClassReference()).thenReturn(
             commentsClassReference.removeParent(commentsClassReference.getWikiReference()));
 
-        PropertyClass passwordClass = mock(PasswordClass.class);
-        when(mockXClass.get("password")).thenReturn(passwordClass);
-        when(passwordClass.getClassType()).thenReturn("Password");
+        when(mockXClass.get("password")).thenReturn(mock(PasswordClass.class));
+        when(mockXClass.get("enabled")).thenReturn(mock(BooleanClass.class));
 
         // Call
 
@@ -402,24 +411,28 @@ public class DocumentSolrMetadataExtractorTest
         Assert
             .assertSame(commentAuthor, solrDocument.getFieldValue(FieldUtils.getFieldName(
                 "property.space.commentsClass.author", this.localeENUS)));
-        Assert.assertSame(commentDate,
-            solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.date", this.localeENUS)));
+        Assert.assertSame(commentDate, solrDocument.getFieldValue(FieldUtils.getFieldName(
+            "property.space.commentsClass.date", commentDate, this.localeENUS)));
         Assert.assertNull(solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.password",
             this.localeENUS)));
         Assert.assertEquals(commentList,
             solrDocument.getFieldValues(FieldUtils.getFieldName("property.space.commentsClass.list", this.localeENUS)));
+        Assert.assertSame(commentLikes, solrDocument.getFieldValue(FieldUtils.getFieldName(
+            "property.space.commentsClass.likes", commentLikes, this.localeENUS)));
+        Assert.assertTrue((Boolean) solrDocument.getFieldValue(FieldUtils.getFieldName(
+            "property.space.commentsClass.enabled", Boolean.TRUE, this.localeENUS)));
 
         Collection<Object> objectProperties =
             solrDocument.getFieldValues(FieldUtils.getFieldName("object.space.commentsClass", this.localeENUS));
         MatcherAssert.assertThat(objectProperties, Matchers.<Object> containsInAnyOrder(commentContent, commentAuthor,
-            commentDate, commentList.get(0), commentList.get(1)));
-        Assert.assertEquals(5, objectProperties.size());
+            commentDate, commentList.get(0), commentList.get(1), commentLikes, true));
+        Assert.assertEquals(7, objectProperties.size());
 
         objectProperties =
             solrDocument.getFieldValues(FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, this.localeENUS));
         MatcherAssert.assertThat(objectProperties, Matchers.<Object>containsInAnyOrder("comment : " + commentContent,
-            "author : " + commentAuthor,"date : " + commentDate.toString(), "list : " + commentList.get(0),
-            "list : " + commentList.get(1)));
-        Assert.assertEquals(5, objectProperties.size());
+            "author : " + commentAuthor,"date : " + commentDate, "list : " + commentList.get(0),
+            "list : " + commentList.get(1), "likes : " + commentLikes, "enabled : true"));
+        Assert.assertEquals(7, objectProperties.size());
     }
 }

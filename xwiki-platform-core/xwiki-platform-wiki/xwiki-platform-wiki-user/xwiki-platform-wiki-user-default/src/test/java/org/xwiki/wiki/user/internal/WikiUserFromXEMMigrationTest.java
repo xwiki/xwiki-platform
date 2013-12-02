@@ -49,22 +49,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link WikiUserFromWorkspaceMigration}.
+ * Tests for {@link WikiUserFromXEMMigration}.
  *
  * @since 5.3RC1
  */
-public class WikiUserFromWorkspaceMigrationTest
+public class WikiUserFromXEMMigrationTest
 {
     @Rule
-    public MockitoComponentMockingRule<WikiUserFromWorkspaceMigration> mocker =
-            new MockitoComponentMockingRule(WikiUserFromWorkspaceMigration.class, HibernateDataMigration.class,
-                    "R530000WikiUserFromWorkspaceMigration");
+    public MockitoComponentMockingRule<WikiUserFromXEMMigration> mocker =
+            new MockitoComponentMockingRule(WikiUserFromXEMMigration.class, HibernateDataMigration.class,
+                    "R530000WikiUserFromXEMMigration");
 
     private WikiDescriptorManager wikiDescriptorManager;
 
     private WikiUserConfigurationHelper wikiUserConfigurationHelper;
-
-    private DocumentRestorerFromAttachedXAR documentRestorerFromAttachedXAR;
 
     private Execution execution;
 
@@ -77,7 +75,6 @@ public class WikiUserFromWorkspaceMigrationTest
     {
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         wikiUserConfigurationHelper = mocker.getInstance(WikiUserConfigurationHelper.class);
-        documentRestorerFromAttachedXAR = mocker.getInstance(DocumentRestorerFromAttachedXAR.class);
         execution = mock(Execution.class);
         mocker.registerComponent(Execution.class, execution);
         xcontext = mock(XWikiContext.class);
@@ -151,13 +148,6 @@ public class WikiUserFromWorkspaceMigrationTest
         when(oldCandidacy.getDateValue("date")).thenReturn(new Date(2000));
         when(oldCandidacy.getDateValue("resolutionDate")).thenReturn(new Date(8000));
 
-        // Mocks about the old document to restore form the main wiki
-        DocumentReference documentToRestore2 = new DocumentReference("mainWiki", "XWiki", "RegistrationConfig");
-        XWikiDocument documentToRestore2FromMainWiki = mock(XWikiDocument.class);
-        when(xwiki.getDocument(eq(documentToRestore2), any(XWikiContext.class))).
-                thenReturn(documentToRestore2FromMainWiki);
-        when(xwiki.exists(documentToRestore2, xcontext)).thenReturn(true);
-
         // Run
         mocker.getComponentUnderTest().hibernateMigrate();
 
@@ -190,20 +180,6 @@ public class WikiUserFromWorkspaceMigrationTest
         verify(memberGroupDoc).removeXObject(oldCandidacy);
         verify(xwiki, times(1)).saveDocument(memberGroupDoc, "Upgrade candidacies from the old Workspace Application" +
                 " to the new Wiki Application.", xcontext);
-
-        // Verify we try to restore the documents from the xar
-        verify(documentRestorerFromAttachedXAR).restoreDocumentFromAttachedXAR(eq(new DocumentReference("mainWiki",
-                "WorkspaceManager", "Install")), eq("workspace-template.xar"), any(List.class));
-
-        // Verify the document to restore has been restored from the main wiki
-        verify(xwiki).copyDocument(eq(documentToRestore2),
-                eq(new DocumentReference("workspace", "XWiki", "RegistrationConfig")), any(XWikiContext.class));
-
-        // Verify that the log contains a warning about the documents that the migration failed to restore
-        verify(mocker.getMockedLogger()).warn("Failed to restore some documents: [{}]. You should import manually " +
-                "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your" +
-                " wiki, to restore these documents.", "workspace:XWiki.AdminRegistrationSheet, " +
-                "workspace:XWiki.RegistrationHelp, workspace:XWiki.AdminUsersSheet");
 
     }
 

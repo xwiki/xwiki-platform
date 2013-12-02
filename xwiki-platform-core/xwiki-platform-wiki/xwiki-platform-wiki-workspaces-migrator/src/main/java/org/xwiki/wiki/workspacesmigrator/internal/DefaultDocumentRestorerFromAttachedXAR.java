@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.user.internal;
+package org.xwiki.wiki.workspacesmigrator.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -94,6 +94,9 @@ public class DefaultDocumentRestorerFromAttachedXAR implements DocumentRestorerF
         File tempZipFile = null;
         try {
             tempZipFile = getTemporaryZipFile(docReference, attachmentName);
+            if (tempZipFile == null) {
+                return;
+            }
             ZipFile zipFile = new ZipFile(tempZipFile);
             // We look for each document to restore if there is a corresponding zipEntry.
             Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();

@@ -26,15 +26,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-wiki-user</artifactId>
+    <artifactId>xwiki-platform-wiki</artifactId>
     <version>5.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wiki-user-default</artifactId>
-  <name>XWiki Platform - Wiki - User - Default</name>
-  <description>Default implementation for XWiki Platform - Wiki - User - API</description>
+  <artifactId>xwiki-platform-wiki-workspaces-migrator</artifactId>
+  <name>XWiki Platform - Wiki - Workspaces Migrator</name>
+  <description>Migrator to upgrade wikis modified by the old Workspaces Application</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.92</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -44,7 +44,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-default</artifactId>
+      <artifactId>xwiki-platform-wiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

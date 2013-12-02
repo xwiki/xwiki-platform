@@ -23,11 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,7 +35,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.slf4j.Logger;
@@ -51,15 +47,23 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.extension.xar.internal.handler.packager.xml.DocumentHandler;
 import org.xwiki.extension.xar.internal.handler.packager.xml.DocumentImporterHandler;
 import org.xwiki.extension.xar.internal.handler.packager.xml.RootHandler;
 import org.xwiki.extension.xar.internal.handler.packager.xml.UnknownRootElement;
-import org.xwiki.extension.xar.internal.handler.packager.xml.XarPageLimitedHandler;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.wikistream.input.BeanInputWikiStreamFactory;
+import org.xwiki.wikistream.input.InputWikiStreamFactory;
+import org.xwiki.wikistream.internal.input.DefaultFileInputSource;
+import org.xwiki.wikistream.xar.input.XARInputProperties;
+import org.xwiki.wikistream.xar.internal.XARPackage;
+import org.xwiki.wikistream.xar.internal.XARPackage.Entry;
+import org.xwiki.wikistream.xar.internal.XARUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -102,6 +106,10 @@ public class DefaultPackager implements Packager, Initializable
 
     @Inject
     private MandatoryDocumentInitializerManager initializerManager;
+
+    @Inject
+    @Named(XARUtils.ROLEHINT)
+    private InputWikiStreamFactory xarReader;
 
     private SAXParserFactory parserFactory;
 
@@ -244,18 +252,14 @@ public class DefaultPackager implements Packager, Initializable
             if (configuration.getEntriesToImport() == null
                 || configuration.getEntriesToImport().contains(xarEntry.getEntryName())) {
                 DocumentReference documentReference =
-                    this.resolver.resolve(xarEntry.getDocumentReference(), wikiReference);
+                    new DocumentReference(this.resolver.resolve(xarEntry.getDocumentReference(), wikiReference),
+                        xarEntry.getDocumentReference().getLocale());
 
                 if (!configuration.isSkipMandatorytDocuments() || !isMandatoryDocument(documentReference)) {
                     try {
                         XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
 
                         if (!document.isNew()) {
-                            Locale locale = xarEntry.getLocale();
-                            if (locale != null && !Locale.ROOT.equals(locale)) {
-                                document = document.getTranslatedDocument(locale, xcontext);
-                            }
-
                             xcontext.getWiki().deleteDocument(document, xcontext);
 
                             this.logger.info("Successfully deleted document [{}] in language [{}]",
@@ -275,41 +279,19 @@ public class DefaultPackager implements Packager, Initializable
     }
 
     @Override
-    public List<XarEntry> getEntries(File xarFile) throws IOException
+    public List<Entry> getEntries(File xarFile) throws IOException
     {
-        List<XarEntry> documents = null;
+        XARInputProperties properties = new XARInputProperties();
+        properties.setSource(new DefaultFileInputSource(xarFile));
+        properties.setReferencesOnly(true);
 
-        FileInputStream fis = new FileInputStream(xarFile);
-        ZipArchiveInputStream zis = new ZipArchiveInputStream(fis);
+        BeanInputWikiStreamFactory<XARInputProperties> inputWikiStreamFactory =
+            (BeanInputWikiStreamFactory<XARInputProperties>) this.xarReader;
 
-        try {
-            for (ZipArchiveEntry zipEntry = zis.getNextZipEntry(); zipEntry != null; zipEntry = zis.getNextZipEntry()) {
-                if (!zipEntry.isDirectory()) {
-                    try {
-                        XarPageLimitedHandler documentHandler = new XarPageLimitedHandler(this.componentManager);
+        XARPackage xarPackage = new XARPackage();
+        inputWikiStreamFactory.createInputWikiStream(properties).read(xarPackage);
 
-                        parseDocument(zis, documentHandler);
-
-                        if (documents == null) {
-                            documents = new ArrayList<XarEntry>();
-                        }
-
-                        XarEntry xarEntry = documentHandler.getXarEntry();
-                        xarEntry.setEntryName(zipEntry.getName());
-
-                        documents.add(xarEntry);
-                    } catch (NotADocumentException e) {
-                        // Impossible to know that before parsing
-                    } catch (Exception e) {
-                        this.logger.error("Failed to parse document [" + zipEntry.getName() + "]", e);
-                    }
-                }
-            }
-        } finally {
-            fis.close();
-        }
-
-        return documents != null ? documents : Collections.<XarEntry> emptyList();
+        return xarPackage.getEntries();
     }
 
     public void parseDocument(InputStream in, ContentHandler documentHandler) throws ParserConfigurationException,
@@ -327,5 +309,22 @@ public class DefaultPackager implements Packager, Initializable
         } catch (UnknownRootElement e) {
             throw new NotADocumentException("Failed to parse stream", e);
         }
+    }
+
+    @Override
+    public XWikiDocument getXWikiDocument(LocalDocumentReference documentReference, XarFile xarFile)
+        throws NotADocumentException, ParserConfigurationException, SAXException, IOException
+    {
+        DocumentHandler documentHandler =
+            new DocumentHandler(this.componentManager, documentReference.getWikiReference().getName());
+
+        XarEntry realEntry = xarFile.getEntry(documentReference);
+        if (realEntry != null) {
+            parseDocument(xarFile.getInputStream(realEntry), documentHandler);
+
+            return documentHandler.getDocument();
+        }
+
+        return null;
     }
 }

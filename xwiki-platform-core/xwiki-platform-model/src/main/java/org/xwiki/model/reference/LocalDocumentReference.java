@@ -79,6 +79,15 @@ public class LocalDocumentReference extends EntityReference
     }
 
     /**
+     * @return the wiki reference of this document reference
+     * @since 5.3RC1
+     */
+    public WikiReference getWikiReference()
+    {
+        return (WikiReference) extractReference(EntityType.WIKI);
+    }
+
+    /**
      * @return the locale of this document reference
      */
     public Locale getLocale()

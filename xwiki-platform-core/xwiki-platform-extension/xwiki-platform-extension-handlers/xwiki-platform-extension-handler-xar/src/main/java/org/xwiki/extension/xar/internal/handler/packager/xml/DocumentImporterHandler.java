@@ -31,6 +31,7 @@ import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
 import org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter;
 import org.xwiki.extension.xar.internal.handler.packager.NotADocumentException;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
+import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntryMergeResult;
 import org.xwiki.extension.xar.internal.handler.packager.XarFile;
@@ -48,7 +49,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class DocumentImporterHandler extends DocumentHandler
 {
-    private DefaultPackager packager;
+    private Packager packager;
 
     private XarEntryMergeResult mergeResult;
 
@@ -158,14 +159,7 @@ public class DocumentImporterHandler extends DocumentHandler
         XarEntry xarEntry = new XarEntry(document.getSpace(), document.getName(), document.getLocale());
         XarFile previousXarFile = this.configuration.getPreviousPages().get(xarEntry);
         if (previousXarFile != null) {
-            DocumentHandler documentHandler = new DocumentHandler(getComponentManager(), document.getWikiName());
-
-            XarEntry realEntry = previousXarFile.getEntry(xarEntry.getDocumentReference(), xarEntry.getLocale());
-            if (realEntry != null) {
-                this.packager.parseDocument(previousXarFile.getInputStream(realEntry), documentHandler);
-
-                previousDocument = documentHandler.getDocument();
-            }
+            previousDocument = this.packager.getXWikiDocument(xarEntry.getDocumentReference(), previousXarFile);
         }
 
         return previousDocument;

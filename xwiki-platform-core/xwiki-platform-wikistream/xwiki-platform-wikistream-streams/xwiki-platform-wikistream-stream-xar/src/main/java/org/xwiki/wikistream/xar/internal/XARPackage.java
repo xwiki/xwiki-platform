@@ -60,6 +60,11 @@ public class XARPackage implements WikiDocumentFilter, WikiSpaceFilter
         public LocalDocumentReference reference;
 
         /**
+         * The name of the entry in the ZIP stream.
+         */
+        public String name;
+
+        /**
          * The default action to set in package.xml.
          */
         public int defaultAction = XARModel.ACTION_OVERWRITE;
@@ -70,6 +75,16 @@ public class XARPackage implements WikiDocumentFilter, WikiSpaceFilter
         public Entry(LocalDocumentReference reference)
         {
             this.reference = reference;
+        }
+
+        /**
+         * @param reference the reference of the entry
+         * @param name the name of the entry in the ZIP stream.
+         */
+        public Entry(LocalDocumentReference reference, String name)
+        {
+            this.reference = reference;
+            this.name = name;
         }
     }
 
@@ -183,6 +198,11 @@ public class XARPackage implements WikiDocumentFilter, WikiSpaceFilter
     public void addEntry(LocalDocumentReference reference)
     {
         this.entries.add(new Entry(reference));
+    }
+
+    public List<Entry> getEntries()
+    {
+        return this.entries;
     }
 
     public void write(ZipArchiveOutputStream zipStream, String encoding) throws WikiStreamException, IOException

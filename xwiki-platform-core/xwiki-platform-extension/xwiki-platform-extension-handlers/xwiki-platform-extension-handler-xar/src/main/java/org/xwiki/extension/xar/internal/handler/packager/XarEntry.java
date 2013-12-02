@@ -21,7 +21,6 @@ package org.xwiki.extension.xar.internal.handler.packager;
 
 import java.util.Locale;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
@@ -32,8 +31,6 @@ public class XarEntry
 {
     private LocalDocumentReference documentReference;
 
-    private Locale locale;
-
     private String entryName;
 
     public XarEntry()
@@ -42,14 +39,12 @@ public class XarEntry
 
     public XarEntry(String space, String page, Locale locale)
     {
-        this.documentReference = new LocalDocumentReference(space, page);
-        this.locale = locale;
+        this.documentReference = new LocalDocumentReference(space, page, locale);
     }
 
-    public XarEntry(LocalDocumentReference documentReference, Locale locale)
+    public XarEntry(LocalDocumentReference documentReference)
     {
         this.documentReference = documentReference;
-        this.locale = locale;
     }
 
     public LocalDocumentReference getDocumentReference()
@@ -60,16 +55,6 @@ public class XarEntry
     public void setDocumentReference(LocalDocumentReference documentReference)
     {
         this.documentReference = documentReference;
-    }
-
-    public Locale getLocale()
-    {
-        return this.locale;
-    }
-
-    public void setLocale(Locale locale)
-    {
-        this.locale = locale;
     }
 
     public String getEntryName()
@@ -87,18 +72,13 @@ public class XarEntry
     @Override
     public String toString()
     {
-        return this.documentReference + ", language = [" + getLocale() + "]";
+        return this.documentReference.toString();
     }
 
     @Override
     public int hashCode()
     {
-        HashCodeBuilder builder = new HashCodeBuilder();
-
-        builder.append(getDocumentReference());
-        builder.append(getLocale());
-
-        return builder.toHashCode();
+        return getDocumentReference().hashCode();
     }
 
     @Override
@@ -111,9 +91,9 @@ public class XarEntry
         } else if (obj instanceof XarEntry) {
             XarEntry xarEntry = (XarEntry) obj;
 
-            equals =
-                getDocumentReference().equals(xarEntry.getDocumentReference())
-                    && getLocale().equals(xarEntry.getLocale());
+            equals = getDocumentReference().equals(xarEntry.getDocumentReference());
+        } else if (obj instanceof LocalDocumentReference) {
+            equals = getDocumentReference().equals((LocalDocumentReference) obj);
         }
 
         return equals;

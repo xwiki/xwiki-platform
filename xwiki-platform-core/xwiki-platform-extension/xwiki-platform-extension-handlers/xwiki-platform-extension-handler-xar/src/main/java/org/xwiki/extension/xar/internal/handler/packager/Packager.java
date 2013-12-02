@@ -21,13 +21,20 @@ package org.xwiki.extension.xar.internal.handler.packager;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Take care of parsing xar files and handling database actions.
@@ -46,4 +53,16 @@ public interface Packager
     List<XarEntry> getEntries(File xarFile) throws IOException;
 
     void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration) throws XWikiException;
+
+    /**
+     * @since 5.3RC1
+     */
+    void parseDocument(InputStream in, ContentHandler documentHandler) throws ParserConfigurationException,
+        SAXException, IOException, NotADocumentException;
+
+    /**
+     * @since 5.3RC1
+     */
+    XWikiDocument getXWikiDocument(LocalDocumentReference documentReference, XarFile previousXarFile)
+        throws NotADocumentException, ParserConfigurationException, SAXException, IOException;
 }

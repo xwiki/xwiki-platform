@@ -586,18 +586,23 @@ public class XarExtensionHandlerTest
         XWikiDocument deletedpage =
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "deletedpage"),
                 getXWikiContext());
+        this.oldcore.getMockXWiki().deleteDocument(deletedpage, getXWikiContext());
+
         XWikiDocument modifieddeletedpage =
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "modifieddeletedpage"),
                 getXWikiContext());
+        this.oldcore.getMockXWiki().deleteDocument(modifieddeletedpage, getXWikiContext());
+
         XWikiDocument pagewithobject =
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "pagewithobject"),
                 getXWikiContext());
-
-        this.oldcore.getMockXWiki().deleteDocument(deletedpage, getXWikiContext());
-        this.oldcore.getMockXWiki().deleteDocument(modifieddeletedpage, getXWikiContext());
-
         pagewithobject.removeXObjects(new LocalDocumentReference("XWiki", "XWikiGroups"));
         this.oldcore.getMockXWiki().saveDocument(pagewithobject, getXWikiContext());
+
+        XWikiDocument deletedpagewithmodifications =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "modified"),
+                getXWikiContext());
+        deletedpagewithmodifications.setContent("modified content");
 
         // upgrade
 
@@ -659,6 +664,14 @@ public class XarExtensionHandlerTest
                 .getDocument(new DocumentReference("wiki", "space1", "page1"), getXWikiContext());
 
         Assert.assertTrue("Document wiki:space1.page1 has not been removed from the database", removedPage.isNew());
+
+        // space1.modified
+
+        XWikiDocument space1modified =
+            this.oldcore.getMockXWiki()
+                .getDocument(new DocumentReference("wiki", "space1", "modified"), getXWikiContext());
+
+        Assert.assertFalse("Document wiki:space1.modified has been removed from the database", space1modified.isNew());
 
         // space.deletedpage
 

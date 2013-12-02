@@ -158,8 +158,8 @@ public class DefaultDocumentMergeImporter implements DocumentMergeImporter
             saveDocument(mergedDocument, comment, false, configuration);
         }
 
-        return new XarEntryMergeResult(new XarEntry(new LocalDocumentReference(mergedDocument.getDocumentReference()),
-            mergedDocument.getLocale()), documentMergeResult);
+        return new XarEntryMergeResult(new XarEntry(new LocalDocumentReference(
+            mergedDocument.getDocumentReferenceWithLocale())), documentMergeResult);
     }
 
     private XWikiDocument getMandatoryDocument(DocumentReference documentReference)

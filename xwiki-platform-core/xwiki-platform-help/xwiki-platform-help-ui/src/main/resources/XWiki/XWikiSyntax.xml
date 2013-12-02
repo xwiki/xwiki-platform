@@ -66,7 +66,7 @@
 #set($catCount = -1)
 #set($catName = "")
 #set($catChildren = [])
-#set($results = $services.query.xwql('from doc.object(XWiki.XWikiSyntaxClass) as syntax order by syntax.category, syntax.section').addFilter('currentlanguage').execute())
+#set($results = $services.query.xwql('from doc.object(XWiki.XWikiSyntaxClass) as syntax order by syntax.category, syntax.section').addFilter('currentlanguage').addFilter('unique').execute())
 
 #if($results.empty)
   No syntax sections found!

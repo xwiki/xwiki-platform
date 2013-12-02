@@ -83,6 +83,12 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
      */
     private static final String WILDCARD = "*";
 
+    /**
+     * The names of the non-string dynamic fields are suffixed with the data type (instead of the locale) so that they
+     * are indexed correctly. Thus we need to add aliases for dynamic field names that will match all know data types.
+     */
+    private static final List<String> FIELD_TYPES = Arrays.asList("boolean", "int", "long", "float", "double", "date");
+
     @Override
     public QParser createParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req)
     {
@@ -108,8 +114,9 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
             return parameters;
         }
 
-        List<String> multilingualFields = getMultilingualFields(parameters);
-        if (multilingualFields.isEmpty()) {
+        List<String> multilingualFields = getListParameter("xwiki.multilingualFields", parameters);
+        List<String> typedDynamicFields = getListParameter("xwiki.typedDynamicFields", parameters);
+        if (multilingualFields.isEmpty() && typedDynamicFields.isEmpty()) {
             return parameters;
         }
 
@@ -118,8 +125,11 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
 
         Map<String, String> aliasParameters = new HashMap<String, String>();
         for (String fieldName : fieldNames) {
-            if (isMultilingualField(fieldName, multilingualFields)) {
-                addMultilingualAliases(fieldName, supportedLocales, aliasParameters);
+            if (matchesFieldName(fieldName, multilingualFields)) {
+                addAliases(fieldName, supportedLocales, aliasParameters);
+            }
+            if (matchesFieldName(fieldName, typedDynamicFields)) {
+                addAliases(fieldName, FIELD_TYPES, aliasParameters);
             }
         }
 
@@ -144,14 +154,17 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
     }
 
     /**
-     * @param parameter the query parameters
-     * @return the list of multilingual fields
+     * Get the value of a list parameter.
+     * 
+     * @param parameter the name of a list parameter (its value is a comma-separated list of strings)
+     * @param parameters the query parameters
+     * @return the list value
      */
-    private static List<String> getMultilingualFields(SolrParams parameters)
+    private static List<String> getListParameter(String parameter, SolrParams parameters)
     {
-        String multilingualFields = (String) parameters.get("xwiki.multilingualFields");
-        if (multilingualFields != null) {
-            return Arrays.asList(LIST_SEPARATOR.split(multilingualFields));
+        String value = (String) parameters.get(parameter);
+        if (value != null) {
+            return Arrays.asList(LIST_SEPARATOR.split(value));
         } else {
             return Collections.emptyList();
         }
@@ -173,21 +186,23 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
     }
 
     /**
-     * @param fieldName a field name
-     * @param multilingualFields the list of multilingual fields
-     * @return {@code true} if this field is indexed in multiple languages, {@code false} otherwise
+     * @param fieldName the field name to match
+     * @param fieldNames the list of field name patterns; a field name pattern is a string that can start or end with a
+     *            {@link #WILDCARD}.
+     * @return {@code true} if at least one of the field name patterns matches the given field name, {@code false}
+     *         otherwise
      */
-    private boolean isMultilingualField(String fieldName, List<String> multilingualFields)
+    private boolean matchesFieldName(String fieldName, List<String> fieldNamePatterns)
     {
-        for (String multilingualField : multilingualFields) {
-            if (multilingualField.equals(fieldName)) {
+        for (String fieldNamePattern : fieldNamePatterns) {
+            if (fieldNamePattern.equals(fieldName)) {
                 return true;
-            } else if (multilingualField.endsWith(WILDCARD)) {
-                if (fieldName.startsWith(multilingualField.substring(0, multilingualField.length() - 1))) {
+            } else if (fieldNamePattern.endsWith(WILDCARD)) {
+                if (fieldName.startsWith(fieldNamePattern.substring(0, fieldNamePattern.length() - 1))) {
                     return true;
                 }
-            } else if (multilingualField.startsWith(WILDCARD)) {
-                if (fieldName.endsWith(multilingualField.substring(1))) {
+            } else if (fieldNamePattern.startsWith(WILDCARD)) {
+                if (fieldName.endsWith(fieldNamePattern.substring(1))) {
                     return true;
                 }
             }
@@ -199,17 +214,18 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
      * Adds aliases for the specified field to the given parameters.
      * 
      * @param fieldName a field name
-     * @param supportedLocales the list of supported locales
+     * @param suffixes the list of alias suffixes
      * @param aliasParameters where to add the aliases
      */
-    private void addMultilingualAliases(String fieldName, List<String> supportedLocales,
-        Map<String, String> aliasParameters)
+    private void addAliases(String fieldName, List<String> suffixes, Map<String, String> aliasParameters)
     {
         String aliasParameterName = String.format("f.%s.qf", fieldName);
         StringBuilder aliasParameterValue = new StringBuilder();
-        for (String locale : supportedLocales) {
-            aliasParameterValue.append(' ').append(fieldName).append('_').append(locale);
+        for (String suffix : suffixes) {
+            aliasParameterValue.append(' ').append(fieldName).append('_').append(suffix);
         }
-        aliasParameters.put(aliasParameterName, aliasParameterValue.substring(1));
+        String previousValue = aliasParameters.get(aliasParameterName);
+        aliasParameters.put(aliasParameterName, previousValue == null ? aliasParameterValue.substring(1)
+            : previousValue + aliasParameterValue.toString());
     }
 }

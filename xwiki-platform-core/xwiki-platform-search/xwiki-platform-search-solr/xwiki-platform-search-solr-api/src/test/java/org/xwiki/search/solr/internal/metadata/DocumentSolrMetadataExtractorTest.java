@@ -26,6 +26,7 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -75,8 +76,9 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.PasswordClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
  * Tests for document metadata extraction.
@@ -434,5 +436,44 @@ public class DocumentSolrMetadataExtractorTest
             "author : " + commentAuthor,"date : " + commentDate, "list : " + commentList.get(0),
             "list : " + commentList.get(1), "likes : " + commentLikes, "enabled : true"));
         Assert.assertEquals(7, objectProperties.size());
+    }
+
+    /**
+     * @see "XWIKI-9417: Search does not return any results for Static List values"
+     */
+    @Test
+    public void setStaticListPropertyValue() throws Exception
+    {
+        BaseObject xobject = mock(BaseObject.class);
+
+        @SuppressWarnings("unchecked")
+        BaseProperty<EntityReference> listProperty = mock(BaseProperty.class);
+        when(listProperty.getName()).thenReturn("color");
+        when(listProperty.getValue()).thenReturn(Arrays.asList("red", "green"));
+        when(listProperty.getObject()).thenReturn(xobject);
+
+        DocumentReference classReference = new DocumentReference("wiki", "Space", "MyClass");
+        when(this.mockDocument.getXObjects()).thenReturn(
+            Collections.singletonMap(classReference, Arrays.asList(xobject)));
+
+        BaseClass xclass = mock(BaseClass.class);
+        when(xobject.getXClass(this.xcontext)).thenReturn(xclass);
+        when(xobject.getFieldList()).thenReturn(Arrays.asList(listProperty));
+        when(xobject.getRelativeXClassReference()).thenReturn(
+            classReference.removeParent(classReference.getWikiReference()));
+
+        StaticListClass staticListClass = mock(StaticListClass.class);
+        when(xclass.get("color")).thenReturn(staticListClass);
+        when(staticListClass.getMap(xcontext)).thenReturn(
+            Collections.singletonMap("red", new ListItem("red", "Dark Red")));
+
+        DocumentSolrMetadataExtractor extractor =
+            (DocumentSolrMetadataExtractor) this.mocker.getInstance(SolrMetadataExtractor.class, "document");
+        SolrInputDocument solrDocument = extractor.getSolrDocument(this.documentReference);
+
+        // Make sure both the raw value (which is saved in the database) and the display value (specified in the XClass)
+        // are indexed.
+        Assert.assertEquals(Arrays.asList("red", "Dark Red", "green"),
+            solrDocument.getFieldValues(FieldUtils.getFieldName("property.Space.MyClass.color", this.localeENUS)));
     }
 }

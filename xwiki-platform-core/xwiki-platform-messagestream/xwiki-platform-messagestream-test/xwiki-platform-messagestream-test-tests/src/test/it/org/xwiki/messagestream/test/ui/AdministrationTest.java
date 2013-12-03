@@ -20,6 +20,7 @@
 package org.xwiki.messagestream.test.ui;
 
 import org.junit.*;
+import org.openqa.selenium.By;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
@@ -42,12 +43,13 @@ public class AdministrationTest extends AbstractTest
 
         Assert.assertTrue(administrationPage.hasSection("MessageStream"));
 
-        // Select space administration (XWiki space, since that space exists)
-        AdministrationPage spaceAdministrationPage = administrationPage.selectSpaceToAdminister("XWiki");
+        // Select space administration (Main space, since that space exists)
+        AdministrationPage spaceAdministrationPage = administrationPage.selectSpaceToAdminister("Main");
 
-        // Note: I'm not sure this is good enough since waitUntilPageIsLoaded() tests for the existence of the footer
-        // but if the page hasn't started reloading then the footer will be present... However I ran this test 300
-        // times in a row without any failure...
+        // Since clicking on "Main" in the Select box will reload the page asynchronously we need to wait for the new
+        // page to be available. For this we wait for the heading to be changed to "Administration:Main".
+        spaceAdministrationPage.waitUntilElementIsVisible(By.id("HAdministration:Main"));
+        // Also wait till the page is fully loaded to be extra sure...
         spaceAdministrationPage.waitUntilPageIsLoaded();
 
         // All those sections should not be present

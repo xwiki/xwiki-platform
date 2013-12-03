@@ -301,10 +301,11 @@ public class TestUtils
 
     public void createUserAndLogin(final String username, final String password, Object... properties)
     {
-        createUserAndLogin(username, password, getURLToNonExistentPage(), properties);
+        createUserAndLoginWithRedirect(username, password, getURLToNonExistentPage(), properties);
     }
 
-    public void createUserAndLogin(final String username, final String password, String url, Object... properties)
+    public void createUserAndLoginWithRedirect(final String username, final String password, String url,
+        Object... properties)
     {
         createUser(username, password, getURLToLoginAndGotoPage(username, password, url), properties);
     }

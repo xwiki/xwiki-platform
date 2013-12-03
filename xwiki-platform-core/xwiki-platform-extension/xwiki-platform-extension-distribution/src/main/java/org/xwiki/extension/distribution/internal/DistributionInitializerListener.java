@@ -29,7 +29,6 @@ import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -77,8 +76,7 @@ public class DistributionInitializerListener implements EventListener
         if (distributionState != DistributionState.NONE) {
             if (event instanceof ApplicationReadyEvent) {
                 this.distributionManager.startFarmJob();
-            } else if (!((XWikiContext) arg2).isMainWiki()
-                && this.distributionManager.getUpgradeMode() == UpgradeMode.WIKI) {
+            } else if (!((XWikiContext) arg2).isMainWiki()) {
                 startWikiJob(((XWikiContext) arg2).getDatabase());
             }
         }

@@ -1765,9 +1765,10 @@ public class XWiki extends Api
     }
 
     /**
-     * API to list the current spaces in thiswiki
+     * API to list all non-hidden spaces in the current wiki.
      * 
-     * @return a list for strings reprenseting the spaces
+     * @return a list of string representing all non-hidden spaces (ie spaces that have non-hidden pages) for the
+     *         current wiki
      * @throws XWikiException if something went wrong
      */
     public List<String> getSpaces() throws XWikiException
@@ -1776,15 +1777,16 @@ public class XWiki extends Api
     }
 
     /**
-     * API to list all documents in a space
+     * API to list all non-hidden documents in a space.
      * 
-     * @param SpaceName space tolest
-     * @return A list of strings to lest the document
+     * @param spaceName the space for which to return all non-hidden documents
+     * @return the list of document names (in the format {@code Space.Page}) for non-hidden documents in the specified
+     *         space
      * @throws XWikiException if the loading went wrong
      */
-    public List<String> getSpaceDocsName(String SpaceName) throws XWikiException
+    public List<String> getSpaceDocsName(String spaceName) throws XWikiException
     {
-        return this.xwiki.getSpaceDocsName(SpaceName, getXWikiContext());
+        return this.xwiki.getSpaceDocsName(spaceName, getXWikiContext());
     }
 
     /**

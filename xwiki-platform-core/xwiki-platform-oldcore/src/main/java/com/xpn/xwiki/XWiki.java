@@ -5415,6 +5415,13 @@ public class XWiki implements EventListener
         }
     }
 
+    /**
+     * API to list all non-hidden spaces in the current wiki.
+     *
+     * @return a list of string representing all non-hidden spaces (ie spaces that have non-hidden pages) for the
+     *         current wiki
+     * @throws XWikiException if something went wrong
+     */
     public List<String> getSpaces(XWikiContext context) throws XWikiException
     {
         try {
@@ -5425,6 +5432,14 @@ public class XWiki implements EventListener
         }
     }
 
+    /**
+     * API to list all non-hidden documents in a space.
+     *
+     * @param spaceName the space for which to return all non-hidden documents
+     * @return the list of document names (in the format {@code Space.Page}) for non-hidden documents in the specified
+     *         space
+     * @throws XWikiException if the loading went wrong
+     */
     public List<String> getSpaceDocsName(String spaceName, XWikiContext context) throws XWikiException
     {
         try {

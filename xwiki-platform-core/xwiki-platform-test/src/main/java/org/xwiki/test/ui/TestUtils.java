@@ -299,7 +299,18 @@ public class TestUtils
         return loggedInUserName;
     }
 
-    public void createUser(final String username, final String password, Object... properties)
+    public void createUserAndLogin(final String username, final String password, Object... properties)
+    {
+        createUserAndLoginWithRedirect(username, password, getURLToNonExistentPage(), properties);
+    }
+
+    public void createUserAndLoginWithRedirect(final String username, final String password, String url,
+        Object... properties)
+    {
+        createUser(username, password, getURLToLoginAndGotoPage(username, password, url), properties);
+    }
+
+    public void createUser(final String username, final String password, String redirectURL, Object... properties)
     {
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("register", "1");
@@ -307,7 +318,7 @@ public class TestUtils
         parameters.put("register_password", password);
         parameters.put("register2_password", password);
         parameters.put("register_email", "");
-        parameters.put("xredirect", getURLToLoginAndGotoPage(username, password, getURLToNonExistentPage()));
+        parameters.put("xredirect", redirectURL);
         parameters.put("form_token", getSecretToken());
         getDriver().get(getURL("XWiki", "Register", "register", parameters));
         recacheSecretToken();
@@ -317,12 +328,12 @@ public class TestUtils
     }
 
     /**
-     * @deprecated starting with 5.0M2 use {@link #createUser(String, String, Object...)} instead
+     * @deprecated starting with 5.0M2 use {@link #createUserAndLogin(String, String, Object...)} instead
      */
     @Deprecated
     public void registerLoginAndGotoPage(final String username, final String password, final String pageURL)
     {
-        createUser(username, password);
+        createUserAndLogin(username, password);
         getDriver().get(pageURL);
     }
 
@@ -353,7 +364,12 @@ public class TestUtils
     public void gotoPage(String space, String page, String action, String queryString)
     {
         // Only navigate if the current URL is different from the one to go to, in order to improve performances.
-        String url = getURL(space, page, action, queryString);
+        gotoPage(getURL(space, page, action, queryString));
+    }
+
+    public void gotoPage(String url)
+    {
+        // Only navigate if the current URL is different from the one to go to, in order to improve performances.
         if (!getDriver().getCurrentUrl().equals(url)) {
             getDriver().get(url);
         }

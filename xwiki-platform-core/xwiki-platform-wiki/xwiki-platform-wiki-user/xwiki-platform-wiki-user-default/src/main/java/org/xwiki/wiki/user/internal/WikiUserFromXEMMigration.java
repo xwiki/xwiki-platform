@@ -50,7 +50,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  * @since 5.3RC1
  */
 @Component
-@Named("R530000WikiUserFromXEMMigration")
+@Named("R530010WikiUserFromXEMMigration")
 public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
 {
     private static final String WORKSPACE_CLASS_SPACE = "WorkspaceManager";
@@ -75,8 +75,8 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
     @Override
     public XWikiDBVersion getVersion()
     {
-        // XWiki 5.3, migration.
-        return new XWikiDBVersion(53000);
+        // XWiki 5.3, migration, to execute after xwiki-platform-wiki-workspaces-migrator.WorkspacesMigration.
+        return new XWikiDBVersion(53010);
     }
 
     @Override
@@ -238,6 +238,9 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
                     WikiCandidateMemberClassInitializer.DOCUMENT_NAME);
 
             for (BaseObject oldObject : candidacyObjects) {
+                if (oldObject == null) {
+                    continue;
+                }
                 // Transform the candidacy to the new class
                 BaseObject newObject = candidaciesDocument.newXObject(newCandidateClassReference, xcontext);
                 newObject.setStringValue(WikiCandidateMemberClassInitializer.FIELD_TYPE,

@@ -47,6 +47,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
@@ -326,23 +327,14 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             return;
         }
 
-        XWikiContext xcontext = this.xcontextProvider.get();
-
-        BaseClass xClass = object.getXClass(xcontext);
-
+        BaseClass xClass = object.getXClass(this.xcontextProvider.get());
         for (Object field : object.getFieldList()) {
+            @SuppressWarnings("unchecked")
             BaseProperty<EntityReference> property = (BaseProperty<EntityReference>) field;
-
             // Avoid indexing empty properties.
-            Object propertyValue = property.getValue();
-            if (propertyValue != null) {
-                // Avoid indexing password.
+            if (property.getValue() != null) {
                 PropertyClass propertyClass = (PropertyClass) xClass.get(property.getName());
-                if (propertyClass instanceof PasswordClass) {
-                    continue;
-                } else {
-                    setPropertyValue(solrDocument, property, locale);
-                }
+                setPropertyValue(solrDocument, propertyClass, property, locale);
             }
         }
     }
@@ -351,20 +343,29 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * Add the value of the given object property to a Solr document.
      * 
      * @param solrDocument the document to add the object property value to
+     * @param propertyClass the class that describes the given property
      * @param property the object property whose value to add
      * @param locale the locale of the indexed document
      */
-    private void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<EntityReference> property, Locale locale)
+    private void setPropertyValue(SolrInputDocument solrDocument, PropertyClass propertyClass,
+        BaseProperty<EntityReference> property, Locale locale)
     {
         Object propertyValue = property.getValue();
         if (propertyValue instanceof List) {
             // Handle list property values, by adding each list entry.
             List< ? > propertyListValues = (List< ? >) propertyValue;
             for (Object propertyListValue : propertyListValues) {
-                setPropertyValue(solrDocument, property, propertyListValue, locale);
+                if (propertyValue != null) {
+                    // Avoid indexing empty values.
+                    setPropertyValue(solrDocument, property, propertyListValue, locale);
+                }
             }
-        } else {
-            // Generic toString on the property value.
+        } else if (propertyValue instanceof Integer && propertyClass instanceof BooleanClass) {
+            // Boolean properties are stored as integers (0 is false and 1 is true).
+            Boolean booleanValue = ((Integer) propertyValue) != 0;
+            setPropertyValue(solrDocument, property, booleanValue, locale);
+        } else if (!(propertyClass instanceof PasswordClass)) {
+            // Avoid indexing passwords.
             setPropertyValue(solrDocument, property, propertyValue, locale);
         }
     }

@@ -19,6 +19,9 @@
  */
 package org.xwiki.test.ui;
 
+import java.io.IOException;
+
+import org.jboss.arquillian.phantom.resolver.ResolvingPhantomJSDriverService;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -61,17 +64,13 @@ public class WebDriverFactory
         } else if (browserName.startsWith("*chrome")) {
             driver = new ChromeDriver();
         } else if (browserName.startsWith("*phantomjs")) {
-            // Note 1: ATM PhantomJS needs to be installed first. In the future we should try to use
-            // https://github.com/papousek/selenium-phantomjs-driver
-            // Note 2: The phantomJS binary needs to be defined either in the PATH environment variable or through the
-            // system property: PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY
-            // Example: System.setProperty(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY,
-            //              "/Users/vmassol/Desktop/phantomjs-1.9.0-macosx/bin/phantomjs");
-            DesiredCapabilities capabilities = new DesiredCapabilities();
-            capabilities.setJavascriptEnabled(true);
-            capabilities.setCapability("takesScreenshot", true);
+            DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();
             capabilities.setCapability("handlesAlerts", true);
-            driver = new PhantomJSDriver(capabilities);
+            try {
+                driver = new PhantomJSDriver(ResolvingPhantomJSDriverService.createDefaultService(), capabilities);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             throw new RuntimeException("Unsupported browser name [" + browserName + "]");
         }

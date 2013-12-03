@@ -74,6 +74,7 @@ public class XWikiDismaxQParserPluginTest
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("qf", "title^0.4 comment^0.40 date^1.0");
         parameters.put("xwiki.multilingualFields", "title, property.*, foo, comment");
+        parameters.put("xwiki.typedDynamicFields", "property.*");
         parameters.put("xwiki.supportedLocales", "en, fr, zh_TW");
 
         String query = "title:text AND x:y AND property.Blog.BlogPostClass.summary:wiki AND title_ro:value";
@@ -81,7 +82,10 @@ public class XWikiDismaxQParserPluginTest
 
         assertEquals("title__ title_en title_fr title_zh_TW", paramsWithAliases.get("f.title.qf"));
         assertEquals("property.Blog.BlogPostClass.summary__ property.Blog.BlogPostClass.summary_en "
-            + "property.Blog.BlogPostClass.summary_fr property.Blog.BlogPostClass.summary_zh_TW",
+            + "property.Blog.BlogPostClass.summary_fr property.Blog.BlogPostClass.summary_zh_TW "
+            + "property.Blog.BlogPostClass.summary_boolean property.Blog.BlogPostClass.summary_int "
+            + "property.Blog.BlogPostClass.summary_long property.Blog.BlogPostClass.summary_float "
+            + "property.Blog.BlogPostClass.summary_double property.Blog.BlogPostClass.summary_date",
             paramsWithAliases.get("f.property.Blog.BlogPostClass.summary.qf"));
 
         // Event if this field doesn't appear in the query, it's a default field so it has to have the alias.
@@ -133,9 +137,13 @@ public class XWikiDismaxQParserPluginTest
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("qf", "title^0.4 comment^0.40");
         parameters.put("xwiki.multilingualFields", "title, foo");
+        parameters.put("xwiki.typedDynamicFields", "property.*");
         parameters.put("xwiki.supportedLocales", "en, fr");
 
         SolrParams paramsWithAliases = plugin.withFieldAliases("text", new MapSolrParams(parameters));
+
+        // 4 existing parameters plus one alias.
+        assertEquals(5, paramsWithAliases.toNamedList().size());
 
         // A default multilingual field.
         assertEquals("title__ title_en title_fr", paramsWithAliases.get("f.title.qf"));

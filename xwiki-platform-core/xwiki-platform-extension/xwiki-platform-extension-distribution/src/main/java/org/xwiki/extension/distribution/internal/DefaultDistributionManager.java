@@ -34,7 +34,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -89,12 +88,6 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
      */
     @Inject
     private ComponentManager componentManager;
-
-    /**
-     * Used to get the Execution Context.
-     */
-    @Inject
-    private Execution execution;
 
     /**
      * Used to create a new Execution Context from scratch.
@@ -184,8 +177,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
             final DistributionRequest request = new DistributionRequest();
             request.setId(getFarmJobId());
-            // FIXME: this is sheeting but there is no API to get the main wiki name at this level
-            request.setWiki("xwiki");
+            request.setWiki(this.xcontextProvider.get().getMainXWiki());
 
             Thread distributionJobThread = new Thread(new Runnable()
             {
@@ -201,7 +193,8 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                         throw new RuntimeException("Failed to initialize farm distribution job execution context", e);
                     }
 
-                    farmDistributionJob.start(request);
+                    farmDistributionJob.initialize(request);
+                    farmDistributionJob.run();
                 }
             });
 
@@ -247,7 +240,9 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                         throw new RuntimeException("Failed to initialize wiki distribution job execution context", e);
                     }
 
-                    wikiDistributionJobs.get(request.getWiki()).start(request);
+                    WikiDistributionJob job = wikiDistributionJobs.get(request.getWiki());
+                    job.initialize(request);
+                    job.run();
                 }
             });
 

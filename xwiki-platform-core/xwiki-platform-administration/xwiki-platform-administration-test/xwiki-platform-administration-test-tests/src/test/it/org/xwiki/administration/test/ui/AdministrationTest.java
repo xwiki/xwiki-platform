@@ -71,12 +71,12 @@ public class AdministrationTest extends AbstractTest
         Assert.assertTrue(administrationPage.hasSection("Export"));
         Assert.assertTrue(administrationPage.hasSection("Templates"));
 
-        // Select space administration (XWiki space, since that space exists)
-        AdministrationPage spaceAdministrationPage = administrationPage.selectSpaceToAdminister("XWiki");
+        // Select space administration (Main space, since that space exists)
+        AdministrationPage spaceAdministrationPage = administrationPage.selectSpaceToAdminister("Main");
 
-        // Since clicking on "XWiki" in the Select box will reload the page asynchronously we need to wait for the new
-        // page to be available. For this we wait for the heading to be changed to "Administration:XWiki".
-        spaceAdministrationPage.waitUntilElementIsVisible(By.id("HAdministration:XWiki"));
+        // Since clicking on "Main" in the Select box will reload the page asynchronously we need to wait for the new
+        // page to be available. For this we wait for the heading to be changed to "Administration:Main".
+        spaceAdministrationPage.waitUntilElementIsVisible(By.id("HAdministration:Main"));
         // Also wait till the page is fully loaded to be extra sure...
         spaceAdministrationPage.waitUntilPageIsLoaded();
 

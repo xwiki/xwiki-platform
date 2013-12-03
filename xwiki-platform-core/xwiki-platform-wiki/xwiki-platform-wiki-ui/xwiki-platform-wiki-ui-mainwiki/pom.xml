@@ -37,7 +37,8 @@
     <xwiki.extension.features>
       <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
       org.xwiki.platform:xwiki-platform-workspace-ui,
-      org.xwiki.platform:xwiki-platform-wiki-manager-ui
+      org.xwiki.platform:xwiki-platform-wiki-manager-ui,
+      com.xpn.xwiki.platform.applications:xwiki-plugin-wiki-manager
     </xwiki.extension.features>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Wiki Application</xwiki.extension.name>

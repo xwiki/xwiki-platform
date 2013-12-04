@@ -49,10 +49,12 @@ public class AdministrationTest extends AbstractTest
     @Test
     public void verifyGlobalAndSpaceSections()
     {
-        // Go to any page. Note that we go to a not existing page for 2 reasons:
-        // - verify that it has a menu action to administer the wiki
-        // - (more importantly) it's faster than going to the wiki's home page which will take longer to display... ;)
-        getUtil().gotoPage(getTestClassName(), getTestMethodName());
+        // Because of http://jira.xwiki.org/browse/XWIKI-9763 we need to create a test page to ensure there's at least
+        // one non-hidden page in the XWiki space
+        // TODO: Remove this once http://jira.xwiki.org/browse/XWIKI-9763 is fixed.
+        getUtil().createPage("XWiki", getTestClassName() + "-" + getTestMethodName(), "", "");
+
+        // Verify that pages have an Admin menu and navigate to the admin UI.
         AdministrablePage page = new AdministrablePage();
         AdministrationPage administrationPage = page.clickAdministerWiki();
 
@@ -71,7 +73,7 @@ public class AdministrationTest extends AbstractTest
         Assert.assertTrue(administrationPage.hasSection("Export"));
         Assert.assertTrue(administrationPage.hasSection("Templates"));
 
-        // Select space administration (XWiki space, since that space exists)
+        // Select XWiki space administration.
         AdministrationPage spaceAdministrationPage = administrationPage.selectSpaceToAdminister("XWiki");
 
         // Since clicking on "XWiki" in the Select box will reload the page asynchronously we need to wait for the new

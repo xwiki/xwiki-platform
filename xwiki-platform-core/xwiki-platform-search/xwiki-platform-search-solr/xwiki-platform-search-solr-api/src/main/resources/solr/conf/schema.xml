@@ -170,6 +170,8 @@
        EXAMPLE:  name="*_i" will match any field ending in _i (like myid_i, z_i)
        RESTRICTION: the glob-like pattern in the name attribute must have
        a "*" only at the start or the end.  -->
+
+   <!-- Dynamic text fields that are indexed based on their language. -->
    <dynamicField name="*__"  type="text_general"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_ar"  type="text_ar"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_bg"  type="text_bg"    indexed="true"  stored="true" multiValued="true" />
@@ -203,6 +205,15 @@
    <dynamicField name="*_sv"  type="text_sv"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_th"  type="text_th"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_tr"  type="text_tr"    indexed="true"  stored="true" multiValued="true" />
+
+   <!-- Dynamic fields that are indexed based on their data type.
+        We need this to be able to index correctly non-string XObject properties. -->
+   <dynamicField name="*_boolean" type="boolean" indexed="true" stored="true" multiValued="true" />
+   <dynamicField name="*_int" type="tint" indexed="true" stored="true" multiValued="true" />
+   <dynamicField name="*_long" type="tlong" indexed="true" stored="true" multiValued="true" />
+   <dynamicField name="*_float" type="tfloat" indexed="true" stored="true" multiValued="true" />
+   <dynamicField name="*_double" type="tdouble" indexed="true" stored="true" multiValued="true" />
+   <dynamicField name="*_date" type="tdate" indexed="true" stored="true" multiValued="true" />
 
    <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 

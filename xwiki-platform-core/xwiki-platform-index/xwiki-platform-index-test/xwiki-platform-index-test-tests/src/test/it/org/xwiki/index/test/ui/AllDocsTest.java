@@ -34,7 +34,6 @@ import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.EntityTreeElement;
 import org.xwiki.test.ui.po.LiveTableElement;
 
@@ -51,7 +50,7 @@ public class AllDocsTest extends AbstractTest
     {
         // Test 1: Verify that the Action column is displayed only for logged in users
         // Create a test user
-        getUtil().createUser(getClass().getSimpleName() + "_" + getTestMethodName(), "password");
+        getUtil().createUserAndLogin(getClass().getSimpleName() + "_" + getTestMethodName(), "password");
         AllDocsPage page = AllDocsPage.gotoPage();
         LiveTableElement livetable = page.clickIndexTab();
         assertTrue("No Actions column found", livetable.hasColumn("Actions"));

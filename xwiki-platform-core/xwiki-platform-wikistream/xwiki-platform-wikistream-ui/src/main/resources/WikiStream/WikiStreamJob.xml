@@ -134,7 +134,7 @@
       </use>
     </class>
     <property>
-      <cache>forbid</cache>
+      <cache>long</cache>
     </property>
     <property>
       <code>new Ajax.PeriodicalUpdater('wikistream_job_status', '${xwiki.getURL('WikiStreamJob', 'get')}', {

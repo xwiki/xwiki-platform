@@ -19,6 +19,7 @@
  */
 package org.xwiki.search.solr.internal.api;
 
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -273,5 +274,50 @@ public final class FieldUtils
         }
 
         return builder.toString();
+    }
+
+    /**
+     * Get the name of a dynamic field based on its value or the given locale. If the given value is not a string then
+     * the value type is suffixed to the field name so that its value is indexed properly (see schema.xml). Otherwise,
+     * the locale is suffixed to the field name so that the field text content is indexed based on the specified locale.
+     * 
+     * @param prefix the field name prefix
+     * @param value the field value
+     * @param locale the locale of the field value in case the value is a string (text)
+     * @return the name that should be used for the specified field in order for its value to be indexed correctly
+     */
+    public static String getFieldName(String prefix, Object value, Locale locale)
+    {
+        String fieldType = getDynamicFieldType(value);
+        if (fieldType != null) {
+            return prefix + FieldUtils.USCORE + fieldType;
+        } else {
+            return FieldUtils.getFieldName(prefix, locale);
+        }
+    }
+
+    /**
+     * Utility method that can be used to get a suffix to add to a dynamic field name so that its value is indexed
+     * properly.
+     * 
+     * @param value the value of a dynamic field
+     * @return the corresponding type, as per schema.xml, or {@code null} if the given value doesn't have a type known
+     *         by schema.xml
+     */
+    public static String getDynamicFieldType(Object value)
+    {
+        if (value instanceof Integer) {
+            // We could have grouped Integer with the rest of the final types but we use it's short name in schema.xml
+            return "int";
+        } else if (value instanceof Date) {
+            // Date is not final so we use "date" for any of its subclasses.
+            return DATE;
+        } else if (value instanceof Boolean || value instanceof Long || value instanceof Double
+            || value instanceof Float) {
+            // All these types are final so we are safe with using the simple class name.
+            return value.getClass().getSimpleName().toLowerCase();
+        }
+
+        return null;
     }
 }

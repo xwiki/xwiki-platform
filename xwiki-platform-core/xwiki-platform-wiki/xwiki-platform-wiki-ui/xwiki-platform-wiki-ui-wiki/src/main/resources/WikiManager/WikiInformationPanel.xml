@@ -149,22 +149,22 @@
       #end 
       #set ($membershipType = $services.wiki.user.getMembershipType($wiki.id))
       #set ($joinPageReference = $services.model.createDocumentReference(${services.wiki.mainWikiId}, 'WikiManager', 'JoinWiki'))
-      #set ($joinText = $services.localization.render("WikiManager.WikiCandidateMemberClass_membershipType_${membershipType.name().toLowerCase()}"))
+      #set ($joinText = $services.localization.render("WikiManager.WikiUserClass_membershipType_${membershipType.name().toLowerCase()}"))
       #set ($actionLabel = false)
       #set ($actionUrl = $xwiki.getURL($joinPageReference, 'view', "wikiId=${currentWiki}"))
       #if ($existingInvitationOrRequest)
         #if ($existingInvitationOrRequest.type == 'INVITATION')
-          #set ($joinText = $services.localization.render('platform.wiki.currentwiki.invitationPendingForCurrentWorkspace'))
+          #set ($joinText = $services.localization.render('platform.wiki.currentwiki.invitationPendingForCurrentWiki'))
           #set ($actionLabel = $services.localization.render('platform.wiki.currentwiki.invitation.view.label'))
         #else
-          #set ($joinText = $services.localization.render('platform.wiki.currentwiki.joinRequestPendingForCurrentWorkspace'))
+          #set ($joinText = $services.localization.render('platform.wiki.currentwiki.joinRequestPendingForCurrentWiki'))
           #set ($actionLabel = $services.localization.render('platform.wiki.currentwiki.joinrequest.cancel.label'))
           #set ($actionUrl = $xwiki.getURL($joinPageReference, 'view', "wikiId=${currentWiki}&amp;cancelJoinRequest=1"))
         #end
       #else
-        #if ($membershipType == 'request')
+        #if ($membershipType == 'REQUEST')
           #set ($actionLabel = $services.localization.render('platform.wiki.currentwiki.joinreques.request.label'))
-        #elseif ($membershipType == 'open')
+        #elseif ($membershipType == 'OPEN')
           #set ($actionLabel = $services.localization.render('platform.wiki.currentwiki.join.label'))
         #end
       #end

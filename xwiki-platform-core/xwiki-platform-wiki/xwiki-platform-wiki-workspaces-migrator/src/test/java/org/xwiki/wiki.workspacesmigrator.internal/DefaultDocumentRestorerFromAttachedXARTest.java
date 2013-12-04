@@ -17,8 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.user.internal;
+package org.xwiki.wiki.workspacesmigrator.internal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +61,12 @@ public class DefaultDocumentRestorerFromAttachedXARTest
 
     private com.xpn.xwiki.XWiki xwiki;
 
+    private XWikiDocument docToRestore1;
+
+    private XWikiDocument docToRestore2;
+
+    private List<DocumentReference> docsToRestore;
+
     @Before
     public void setUp() throws Exception
     {
@@ -68,6 +75,17 @@ public class DefaultDocumentRestorerFromAttachedXARTest
         when(xcontextProvider.get()).thenReturn(xcontext);
         xwiki = mock(com.xpn.xwiki.XWiki.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
+
+        // Inputs
+        docToRestore1 = mock(XWikiDocument.class);
+        DocumentReference docToRestoreRef1 = new DocumentReference("workspace", "XWiki", "AdminRegistrationSheet");
+        when(xwiki.getDocument(eq(docToRestoreRef1), any(XWikiContext.class))).thenReturn(docToRestore1);
+        docToRestore2 = mock(XWikiDocument.class);
+        DocumentReference docToRestoreRef2 = new DocumentReference("workspace", "XWiki", "RegistrationHelp");
+        when(xwiki.getDocument(eq(docToRestoreRef2), any(XWikiContext.class))).thenReturn(docToRestore2);
+        docsToRestore = new ArrayList<DocumentReference>();
+        docsToRestore.add(docToRestoreRef1);
+        docsToRestore.add(docToRestoreRef2);
     }
 
     @Test
@@ -81,17 +99,6 @@ public class DefaultDocumentRestorerFromAttachedXARTest
         when(workspaceInstallDoc.getAttachment("workspace-template.xar")).thenReturn(xeXar);
         when(xeXar.getContentInputStream(any(XWikiContext.class))).thenReturn(
                 getClass().getResourceAsStream("/test-restore-documents.xar"));
-        XWikiDocument docToRestore1 = mock(XWikiDocument.class);
-        DocumentReference docToRestoreRef1 = new DocumentReference("workspace", "XWiki", "AdminRegistrationSheet");
-        when(xwiki.getDocument(eq(docToRestoreRef1), any(XWikiContext.class))).thenReturn(docToRestore1);
-        XWikiDocument docToRestore2 = mock(XWikiDocument.class);
-        DocumentReference docToRestoreRef2 = new DocumentReference("workspace", "XWiki", "RegistrationHelp");
-        when(xwiki.getDocument(eq(docToRestoreRef2), any(XWikiContext.class))).thenReturn(docToRestore2);
-
-        // Inputs
-        List<DocumentReference> docsToRestore = new ArrayList<DocumentReference>();
-        docsToRestore.add(docToRestoreRef1);
-        docsToRestore.add(docToRestoreRef2);
 
         // Run
         mocker.getComponentUnderTest().restoreDocumentFromAttachedXAR(new DocumentReference("mainWiki",
@@ -103,4 +110,61 @@ public class DefaultDocumentRestorerFromAttachedXARTest
         verify(docToRestore2).fromXML(any(InputStream.class));
         verify(xwiki, times(1)).saveDocument(docToRestore2, xcontext);
     }
+
+    @Test
+    public void errorWhenNoDocument() throws Exception
+    {
+        // Mocks
+        XWikiDocument workspaceInstallDoc = mock(XWikiDocument.class);
+        DocumentReference workspaceInstallDocRef = new DocumentReference("mainWiki", "WorkspaceManager", "Install");
+        when(xwiki.getDocument(eq(workspaceInstallDocRef), any(XWikiContext.class))).thenReturn(workspaceInstallDoc);
+        when(workspaceInstallDoc.isNew()).thenReturn(true);
+
+        // Run
+        mocker.getComponentUnderTest().restoreDocumentFromAttachedXAR(new DocumentReference("mainWiki",
+                "WorkspaceManager", "Install"), "workspace-template.xar", docsToRestore);
+
+        // Verify
+        verify(mocker.getMockedLogger()).warn("[{}] does not exist", workspaceInstallDocRef);
+    }
+
+    @Test
+    public void errorWhenNoAttachment() throws Exception
+    {
+        // Mocks
+        XWikiDocument workspaceInstallDoc = mock(XWikiDocument.class);
+        DocumentReference workspaceInstallDocRef = new DocumentReference("mainWiki", "WorkspaceManager", "Install");
+        when(xwiki.getDocument(eq(workspaceInstallDocRef), any(XWikiContext.class))).thenReturn(workspaceInstallDoc);
+        when(workspaceInstallDoc.getAttachment("workspace-template.xar")).thenReturn(null);
+
+        // Run
+        mocker.getComponentUnderTest().restoreDocumentFromAttachedXAR(new DocumentReference("mainWiki",
+                "WorkspaceManager", "Install"), "workspace-template.xar", docsToRestore);
+
+        // Verify
+        verify(mocker.getMockedLogger()).warn("[{}] has no attachment named [{}].", workspaceInstallDocRef,
+                "workspace-template.xar");
+    }
+
+    @Test
+    public void errorZipInvalid() throws Exception
+    {
+        // Mocks
+        XWikiDocument workspaceInstallDoc = mock(XWikiDocument.class);
+        DocumentReference workspaceInstallDocRef = new DocumentReference("mainWiki", "WorkspaceManager", "Install");
+        when(xwiki.getDocument(eq(workspaceInstallDocRef), any(XWikiContext.class))).thenReturn(workspaceInstallDoc);
+        XWikiAttachment xeXar = mock(XWikiAttachment.class);
+        when(workspaceInstallDoc.getAttachment("workspace-template.xar")).thenReturn(xeXar);
+        when(xeXar.getContentInputStream(any(XWikiContext.class))).thenReturn(
+                getClass().getResourceAsStream("/invalid-xar.xar"));
+
+        // Run
+        mocker.getComponentUnderTest().restoreDocumentFromAttachedXAR(new DocumentReference("mainWiki",
+                "WorkspaceManager", "Install"), "workspace-template.xar", docsToRestore);
+
+        // Verify
+        verify(mocker.getMockedLogger()).error(eq("Error during the decompression of [{}]."),
+                eq("workspace-template.xar"), any(IOException.class));
+    }
+
 }

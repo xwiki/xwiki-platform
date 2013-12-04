@@ -89,6 +89,7 @@ public class LocalDocumentReference extends EntityReference
 
     /**
      * @return the locale of this document reference
+     * @since 5.3RC1
      */
     public Locale getLocale()
     {
@@ -97,6 +98,7 @@ public class LocalDocumentReference extends EntityReference
 
     /**
      * Set the locale of this document reference.
+     * @since 5.3RC1
      * 
      * @param locale the locale of this document reference
      */

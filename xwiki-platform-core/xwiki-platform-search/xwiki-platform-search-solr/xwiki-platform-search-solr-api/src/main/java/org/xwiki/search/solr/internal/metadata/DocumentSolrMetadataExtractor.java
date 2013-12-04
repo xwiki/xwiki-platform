@@ -238,7 +238,7 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
             new EntityReference(property.getName(), EntityType.CLASS_PROPERTY, classReference);
         String suffix = fieldNameEncoder.encode(fieldNameSerializer.serialize(propertyReference));
         String propertyValueFieldName = "property." + suffix;
-        solrDocument.addField(FieldUtils.getFieldName(propertyValueFieldName, locale), value);
+        solrDocument.addField(FieldUtils.getFieldName(propertyValueFieldName, value, locale), value);
 
         // We need to be able to query all properties of a specific type of object at once.
         suffix = fieldNameEncoder.encode(fieldNameSerializer.serialize(classReference));

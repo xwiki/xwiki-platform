@@ -41,19 +41,19 @@ public class UserDirectoryTest extends AbstractTest
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
 
     @Test
-    public void verifyAdminUserListed()
+    public void verifyUserIsListed()
     {
         // Delete possible existing user
         getUtil().deletePage("XWiki", "test");
 
         UserDirectoryPage page = UserDirectoryPage.gotoPage();
 
-        // Verify that the user directory is empty when there's on user in the wiki
+        // Verify that the user directory is empty when there's no user in the wiki
         LiveTableElement liveTableElement = page.getUserDirectoryLiveTable();
         assertEquals(0, liveTableElement.getRowCount());
 
         // Add a user and verify it's visible in the livetable
-        getUtil().createUser("test", "testtest", "first_name", "John", "last_name", "Doe");
+        getUtil().createUserAndLogin("test", "testtest", "first_name", "John", "last_name", "Doe");
         // Go back to the user directory page since the user creation navigated to another page
         page = UserDirectoryPage.gotoPage();
         assertEquals(1, liveTableElement.getRowCount());

@@ -158,6 +158,9 @@ public class DefaultWikiUserManager implements WikiUserManager
         List<BaseObject> memberObjects = groupDoc.getXObjects(classReference);
         if (memberObjects != null) {
             for (BaseObject object : memberObjects) {
+                if (object == null) {
+                    continue;
+                }
                 String member = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
                 if (!member.isEmpty() && !members.contains(member)) {
                     members.add(member);
@@ -258,6 +261,9 @@ public class DefaultWikiUserManager implements WikiUserManager
             // Get the member objects to remove
             List<BaseObject> objectsToRemove = new ArrayList<BaseObject>();
             for (BaseObject object : objects) {
+                if (object == null) {
+                    continue;
+                }
                 String member = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
                 if (userId.equals(member)) {
                     objectsToRemove.add(object);
@@ -289,6 +295,9 @@ public class DefaultWikiUserManager implements WikiUserManager
             List<BaseObject> objectsToRemove = new ArrayList<BaseObject>();
             for (String userId: userIds) {
                 for (BaseObject object : objects) {
+                    if (object == null) {
+                        continue;
+                    }
                     String member = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
                     if (userId.equals(member)) {
                         objectsToRemove.add(object);
@@ -346,7 +355,8 @@ public class DefaultWikiUserManager implements WikiUserManager
         List<BaseObject> candidacyObjects = groupDoc.getXObjects(candidateClassReference);
         if (candidacyObjects != null) {
             for (BaseObject object : candidacyObjects) {
-                if (object.getStringValue(WikiCandidateMemberClassInitializer.FIELD_TYPE).equals(typeString)) {
+                if (object != null
+                        && object.getStringValue(WikiCandidateMemberClassInitializer.FIELD_TYPE).equals(typeString)) {
                     candidacies.add(readCandidacyFromObject(object, wikiId));
                 }
             }

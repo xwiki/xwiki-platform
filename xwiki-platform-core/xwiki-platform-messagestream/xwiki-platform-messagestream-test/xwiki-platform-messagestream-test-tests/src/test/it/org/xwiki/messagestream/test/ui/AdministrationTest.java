@@ -20,6 +20,8 @@
 package org.xwiki.messagestream.test.ui;
 
 import org.junit.*;
+import org.openqa.selenium.By;
+import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
@@ -38,16 +40,23 @@ public class AdministrationTest extends AbstractTest
     @Test
     public void verifyGlobalAndSpaceSections()
     {
-        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        // Because of http://jira.xwiki.org/browse/XWIKI-9763 we need to create a test page to ensure there's at least
+        // one non-hidden page in the XWiki space
+        // TODO: Remove this once http://jira.xwiki.org/browse/XWIKI-9763 is fixed.
+        getUtil().createPage("XWiki", getTestClassName() + "-" + getTestMethodName(), "", "");
+
+        AdministrablePage page = new AdministrablePage();
+        AdministrationPage administrationPage = page.clickAdministerWiki();
 
         Assert.assertTrue(administrationPage.hasSection("MessageStream"));
 
-        // Select space administration (XWiki space, since that space exists)
+        // Select XWiki space administration.
         AdministrationPage spaceAdministrationPage = administrationPage.selectSpaceToAdminister("XWiki");
 
-        // Note: I'm not sure this is good enough since waitUntilPageIsLoaded() tests for the existence of the footer
-        // but if the page hasn't started reloading then the footer will be present... However I ran this test 300
-        // times in a row without any failure...
+        // Since clicking on "XWiki" in the Select box will reload the page asynchronously we need to wait for the new
+        // page to be available. For this we wait for the heading to be changed to "Administration:XWiki".
+        spaceAdministrationPage.waitUntilElementIsVisible(By.id("HAdministration:XWiki"));
+        // Also wait till the page is fully loaded to be extra sure...
         spaceAdministrationPage.waitUntilPageIsLoaded();
 
         // All those sections should not be present

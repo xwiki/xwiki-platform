@@ -19,9 +19,12 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -47,8 +50,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
  * Abstract implementation for a metadata extractor.
@@ -326,23 +332,14 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             return;
         }
 
-        XWikiContext xcontext = this.xcontextProvider.get();
-
-        BaseClass xClass = object.getXClass(xcontext);
-
+        BaseClass xClass = object.getXClass(this.xcontextProvider.get());
         for (Object field : object.getFieldList()) {
+            @SuppressWarnings("unchecked")
             BaseProperty<EntityReference> property = (BaseProperty<EntityReference>) field;
-
             // Avoid indexing empty properties.
-            Object propertyValue = property.getValue();
-            if (propertyValue != null) {
-                // Avoid indexing password.
+            if (property.getValue() != null) {
                 PropertyClass propertyClass = (PropertyClass) xClass.get(property.getName());
-                if (propertyClass instanceof PasswordClass) {
-                    continue;
-                } else {
-                    setPropertyValue(solrDocument, property, locale);
-                }
+                setPropertyValue(solrDocument, propertyClass, property, locale);
             }
         }
     }
@@ -351,21 +348,65 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
      * Add the value of the given object property to a Solr document.
      * 
      * @param solrDocument the document to add the object property value to
+     * @param propertyClass the class that describes the given property
      * @param property the object property whose value to add
      * @param locale the locale of the indexed document
      */
-    private void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<EntityReference> property, Locale locale)
+    private void setPropertyValue(SolrInputDocument solrDocument, PropertyClass propertyClass,
+        BaseProperty<EntityReference> property, Locale locale)
     {
         Object propertyValue = property.getValue();
-        if (propertyValue instanceof List) {
-            // Handle list property values, by adding each list entry.
-            List< ? > propertyListValues = (List< ? >) propertyValue;
-            for (Object propertyListValue : propertyListValues) {
-                setPropertyValue(solrDocument, property, propertyListValue, locale);
+        if (propertyClass instanceof StaticListClass) {
+            setStaticListPropertyValue(solrDocument, (StaticListClass) propertyClass, property, locale);
+        } else if (propertyValue instanceof Collection) {
+            // We iterate the collection instead of giving it to Solr because, although it supports passing collections,
+            // it reuses the collection in some cases, when the value of a field is set for the first time for instance,
+            // which can lead to side effects on our side.
+            for (Object value : (Collection< ? >) propertyValue) {
+                if (value != null) {
+                    // Avoid indexing null values.
+                    setPropertyValue(solrDocument, property, value, locale);
+                }
             }
-        } else {
-            // Generic toString on the property value.
+        } else if (propertyValue instanceof Integer && propertyClass instanceof BooleanClass) {
+            // Boolean properties are stored as integers (0 is false and 1 is true).
+            Boolean booleanValue = ((Integer) propertyValue) != 0;
+            setPropertyValue(solrDocument, property, booleanValue, locale);
+        } else if (!(propertyClass instanceof PasswordClass)) {
+            // Avoid indexing passwords.
             setPropertyValue(solrDocument, property, propertyValue, locale);
+        }
+    }
+
+    /**
+     * Add the values of a static list property to a Solr document. We add both the raw value (what is saved in the
+     * database) and the display value (the label seen by the user, which is specified in the XClass).
+     * 
+     * @param solrDocument the document to add the property value to
+     * @param propertyClass the static list class that should be used to get the list of known values
+     * @param property the static list property whose value to add
+     * @param locale the locale of the indexed document
+     * @see "XWIKI-9417: Search does not return any results for Static List values"
+     */
+    private void setStaticListPropertyValue(SolrInputDocument solrDocument, StaticListClass propertyClass,
+        BaseProperty<EntityReference> property, Locale locale)
+    {
+        // The list of known values specified in the XClass.
+        Map<String, ListItem> knownValues = propertyClass.getMap(this.xcontextProvider.get());
+        Object propertyValue = property.getValue();
+        // When multiple selection is on the value is a list. Otherwise, for single selection, the value is a string.
+        List< ? > rawValues = propertyValue instanceof List ? (List< ? >) propertyValue : Arrays.asList(propertyValue);
+        for (Object rawValue : rawValues) {
+            // Avoid indexing null values.
+            if (rawValue != null) {
+                // Index the raw value that is saved in the database.
+                setPropertyValue(solrDocument, property, rawValue, locale);
+                ListItem valueInfo = knownValues.get(rawValue);
+                if (valueInfo != null && valueInfo.getValue() != null && !valueInfo.getValue().equals(rawValue)) {
+                    // Index the display value (the label seen by the user) specified on the XClass.
+                    setPropertyValue(solrDocument, property, valueInfo.getValue(), locale);
+                }
+            }
         }
     }
 

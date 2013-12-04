@@ -200,10 +200,10 @@
     #if ($debugMap)
 
       {{html}}
-      &lt;div&gt;&lt;strong&gt;Query Parser:&lt;/strong&gt; $!debugMap.get('QParser')&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Parsed Query:&lt;/strong&gt; $!debugMap.get('parsedquery_toString')&lt;/div&gt;
+      &lt;div&gt;&lt;strong&gt;Query Parser:&lt;/strong&gt; $!escapetool.xml($debugMap.get('QParser'))&lt;/div&gt;
+      &lt;div&gt;&lt;strong&gt;Parsed Query:&lt;/strong&gt; $!escapetool.xml($debugMap.get('parsedquery_toString'))&lt;/div&gt;
       &lt;div&gt;&lt;strong&gt;Filter Queries:&lt;/strong&gt; $!escapetool.xml($debugMap.get('filter_queries'))&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Processing time:&lt;/strong&gt; $!debugMap.get('timing')&lt;/div&gt;
+      &lt;div&gt;&lt;strong&gt;Processing time:&lt;/strong&gt; $!escapetool.xml($debugMap.get('timing'))&lt;/div&gt;
       {{/html}}
     #end
   )))
@@ -340,7 +340,8 @@
   'author': 'user',
   'creator': 'user',
   'date': 'date',
-  'creationdate': 'date'
+  'creationdate': 'date',
+  'class': 'class'
 })
 
 #macro (displaySearchFacetValue_default $facetPrettyValue)
@@ -590,6 +591,24 @@
   #end
 #end
 
+#macro (displaySearchFacetValue_class $classFullName)
+  #set ($classReference = $services.model.resolveDocument($classFullName, 'default'))
+  #set ($hint = $services.localization.render('solr.field.class.definedBy',
+    [$classReference.lastSpaceReference.name, $classReference.name]))
+  #set ($classPrettyName = $stringtool.removeEnd($classReference.name, 'Class'))
+  #set ($translationKey = "solr.field.class.$classPrettyName")
+  #if ($services.localization.get($translationKey))
+    #set ($classPrettyName = $services.localization.render('$translationKey'))
+  #else
+    ## Some of the default classes have names starting with 'XWiki'.
+    #set ($classPrettyName = $stringtool.removeStart($classPrettyName, 'XWiki'))
+    #set ($classPrettyName = $stringtool.join($stringtool.splitByCharacterTypeCamelCase($classPrettyName), ' '))
+    ## Make sure we don't have isolated upper case letters.
+    #set ($classPrettyName = $classPrettyName.replaceAll('(^| )([\p{Lu}]) ', '$1$2'))
+  #end
+  &lt;span title="$escapetool.xml($hint)"&gt;$escapetool.xml($classPrettyName)&lt;/span&gt;
+#end
+
 #macro (displaySearchResultsSort)
   #set ($defaultSortOrder = {
     'score': 'desc',
@@ -686,9 +705,10 @@
         [$escapetool.xml($searchResult.mimetype)])&lt;/div&gt;
     #end
     #set ($class = $searchResult.get('class'))
-    #if ("$!class" != '')
-      #set ($classReference = $services.model.resolveDocument($class, $services.model.createWikiReference($searchResult.wiki)))
-      #set ($classLink = "&lt;a href=""$xwiki.getURL($classReference)""&gt;$escapetool.xml($class)&lt;/a&gt;")
+    #if ("$!class" != '' &amp;&amp; $searchResult.type != 'DOCUMENT')
+      #set ($classFullName = $class.get(0))
+      #set ($classReference = $services.model.resolveDocument($classFullName, $services.model.createWikiReference($searchResult.wiki)))
+      #set ($classLink = "&lt;a href=""$xwiki.getURL($classReference)""&gt;$escapetool.xml($classFullName)&lt;/a&gt;")
       #set ($propertyName = $searchResult.propertyname)
       #if ("$!propertyName" == '')
         &lt;div class="search-result-object"&gt;$services.localization.render('solr.result.object', [$classLink])&lt;/div&gt;
@@ -698,7 +718,13 @@
       #end
     #end
     #displaySearchResultHighlighting($searchResult)
+    {{/html}}
+
     ## Scoring debug data.
+    ## The reason we used a separate HTML block with no cleaning is because the scoring debug data may contain some
+    ## characters that are considered invalid by JDOM library which is used for parsing the HTML when cleaning is on.
+    ## E.g. "0x0 is not a legal XML character" (org.jdom.IllegalDataException).
+    {{html clean="false"}}
     &lt;div id="debug_$searchResult.id" class="hidden"&gt;
       $!escapetool.xml($searchResponse.explainMap.get($searchResult.id))
     &lt;/div&gt;
@@ -836,8 +862,8 @@
   #set ($discard = $query.setOffset($start))
   #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
   ## We need to pass the list of supported locales so the names of the fields that are indexed in multiple languages are
-  ## expanded in the search query. For instance, the query "title:text" will be expanded to "title__:text AND
-  ## title_en:text AND title_fr:text" if the list of supported locales is [en, fr].
+  ## expanded in the search query. For instance, the query "title:text" will be expanded to "title__:text OR
+  ## title_en:text OR title_fr:text" if the list of supported locales is [en, fr].
   #if (!$supportedLanguages)
     #getSupportedLanguages()
   #end
@@ -1545,7 +1571,7 @@ ul.search-results-sort {
 .search-results-sort li {
   display: inline;
   list-style-type: none;
-  padding-left: 1em;
+  padding-left: 1.5em;
 }
 .search-results-sort li:first-of-type {
   padding: 0;

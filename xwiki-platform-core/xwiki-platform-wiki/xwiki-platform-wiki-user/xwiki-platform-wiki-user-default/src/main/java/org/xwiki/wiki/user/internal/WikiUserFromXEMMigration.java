@@ -19,8 +19,6 @@
  */
 package org.xwiki.wiki.user.internal;
 
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -46,14 +44,14 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
- * Migrator to convert all workspaces (WorkspaceManager.WorkspaceClass) to new WikiUserConfiguration objects.
+ * Migrator to add a WikiUserConfiguration object on every existing wiki.
  *
  * @version $Id$
  * @since 5.3RC1
  */
 @Component
-@Named("R530000WikiUserFromWorkspaceMigration")
-public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigration
+@Named("R530010WikiUserFromXEMMigration")
+public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
 {
     private static final String WORKSPACE_CLASS_SPACE = "WorkspaceManager";
 
@@ -64,9 +62,6 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
-
-    @Inject
-    private DocumentRestorerFromAttachedXAR documentRestorerFromAttachedXAR;
 
     @Inject
     private Logger logger;
@@ -80,8 +75,8 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
     @Override
     public XWikiDBVersion getVersion()
     {
-        // XWiki 5.3, migration.
-        return new XWikiDBVersion(53000);
+        // XWiki 5.3, migration, to execute after xwiki-platform-wiki-workspaces-migrator.WorkspacesMigration.
+        return new XWikiDBVersion(53010);
     }
 
     @Override
@@ -155,8 +150,6 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
             throw new DataMigrationException("Unable to upgrade candidacies from the old Workspace Application to "
                     + "the new Wiki Application.");
         }
-
-        restoreDeletedDocuments(wikiId);
 
         // Finally, the migration is done, we can delete the old workspace object.
         deleteOldWorkspaceObject(oldObject, oldWikiDescriptor);
@@ -245,6 +238,9 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
                     WikiCandidateMemberClassInitializer.DOCUMENT_NAME);
 
             for (BaseObject oldObject : candidacyObjects) {
+                if (oldObject == null) {
+                    continue;
+                }
                 // Transform the candidacy to the new class
                 BaseObject newObject = candidaciesDocument.newXObject(newCandidateClassReference, xcontext);
                 newObject.setStringValue(WikiCandidateMemberClassInitializer.FIELD_TYPE,
@@ -273,105 +269,6 @@ public class WikiUserFromWorkspaceMigration extends AbstractHibernateDataMigrati
             // Save
             xwiki.saveDocument(candidaciesDocument, "Upgrade candidacies from the old Workspace Application to the "
                     + "new Wiki Application.", xcontext);
-        }
-    }
-
-    /**
-     * The WorkspaceManager.Install script has removed some pages, that we need to restore.
-     * - XWiki.AdminRegistrationSheet
-     * - XWiki.RegistrationConfig
-     * - XWiki.RegistrationHelp
-     * - XWiki.AdminUsersSheet
-     *
-     * @param wikiId id of the wiki to upgrade
-     */
-    private void restoreDeletedDocuments(String wikiId)
-    {
-        XWikiContext xcontext = getXWikiContext();
-        XWiki xwiki = xcontext.getWiki();
-
-        // Create the list of documents to restore
-        List<DocumentReference> documentsToRestore = new LinkedList<DocumentReference>();
-        documentsToRestore.add(new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, "AdminRegistrationSheet"));
-        documentsToRestore.add(new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, "RegistrationConfig"));
-        documentsToRestore.add(new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, "RegistrationHelp"));
-        documentsToRestore.add(new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, "AdminUsersSheet"));
-
-        // Remove from the list the document that already exists (so we don't need to restore them)
-        Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
-        while (itDocumentsToRestore.hasNext()) {
-            DocumentReference docRef = itDocumentsToRestore.next();
-            if (xwiki.exists(docRef, xcontext)) {
-                itDocumentsToRestore.remove();
-            }
-        }
-
-        // If the list is empty, there is nothing to do
-        if (documentsToRestore.isEmpty()) {
-            return;
-        }
-
-        // Try to restore from the workspace-template.xar
-        restoreDocumentsFromWorkspaceXar(documentsToRestore);
-
-        // If the list is empty, the job is done
-        if (documentsToRestore.isEmpty()) {
-            return;
-        }
-
-        // Try to copy these documents from the main wiki
-        restoreDocumentFromMainWiki(documentsToRestore);
-
-        // If the list is empty, the job is done
-        if (!documentsToRestore.isEmpty()) {
-            String documentsToRestoreAsString = new String();
-            int counter = 0;
-            for (DocumentReference d : documentsToRestore) {
-                if (counter++ > 0) {
-                    documentsToRestoreAsString += ", ";
-                }
-                documentsToRestoreAsString += d;
-            }
-            logger.warn("Failed to restore some documents: [{}]. You should import manually "
-                    + "(1) xwiki-platform-administration-ui.xar and then (2) xwiki-platform-wiki-ui-wiki.xar into your"
-                    + " wiki, to restore these documents.", documentsToRestoreAsString);
-        }
-    }
-
-    private void restoreDocumentsFromWorkspaceXar(List<DocumentReference> documentsToRestore)
-    {
-        DocumentReference installDocumentReference = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
-                WORKSPACE_CLASS_SPACE, "Install");
-        try {
-            documentRestorerFromAttachedXAR.restoreDocumentFromAttachedXAR(installDocumentReference,
-                    "workspace-template.xar", documentsToRestore);
-        } catch (XWikiException e) {
-            logger.error("Error while restoring documents from the Workspace XAR", e);
-        }
-    }
-
-    private void restoreDocumentFromMainWiki(List<DocumentReference> documentsToRestore)
-    {
-        XWikiContext xcontext = getXWikiContext();
-        XWiki xwiki = xcontext.getWiki();
-
-        Iterator<DocumentReference> itDocumentsToRestore = documentsToRestore.iterator();
-        while (itDocumentsToRestore.hasNext()) {
-            DocumentReference docRef = itDocumentsToRestore.next();
-
-            // Get the corresponding doc in the main wiki
-            DocumentReference mainDocRef = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
-                    docRef.getLastSpaceReference().getName(), docRef.getName());
-
-            // If the document exists in the main wiki, copy it
-            if (xwiki.exists(mainDocRef, xcontext)) {
-                try {
-                    xwiki.copyDocument(mainDocRef, docRef, xcontext);
-                    itDocumentsToRestore.remove();
-                } catch (XWikiException e) {
-                    logger.error("Failed to copy [{}] to [{}].", mainDocRef, docRef, e);
-                }
-            }
         }
     }
 }

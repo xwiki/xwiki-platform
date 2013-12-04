@@ -81,6 +81,11 @@ public class PanelTest extends AbstractTest
         // Create a new panel.
         String panelName = getTestMethodName();
         getUtil().deletePage("Panels", panelName);
+
+        // Create a user for the test so that we can give view rights to the panel page to that user.
+        String userName = String.format("%s%s", getTestClassName(), getTestMethodName());
+        getUtil().createUser(userName, "password", getUtil().getURLToNonExistentPage());
+
         PanelEditPage panelEditPage = PanelsHomePage.gotoPage().createPanel(panelName);
         panelEditPage.setContent(String.format(PanelEditPage.DEFAULT_CONTENT_FORMAT, panelName, "Panel content."));
         panelEditPage.clickSaveAndContinue();
@@ -90,9 +95,8 @@ public class PanelTest extends AbstractTest
             new AdministrablePage().clickAdministerWiki().clickPageElementsSection();
         String rightPanels = pageElements.getRightPanels();
         pageElements.setRightPanels(rightPanels + ",Panels." + panelName);
+        pageElements.clickSave();
         try {
-            pageElements.clickSave();
-
             // The panel should be visible for the administrator.
             Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
 
@@ -104,11 +108,14 @@ public class PanelTest extends AbstractTest
             this.authenticationRule.authenticate();
             RightsEditPage rightsEditor = getUtil().gotoPage("Panels", panelName).editRights();
             rightsEditor.switchToUsers();
-            // Explicit view right for the administrator.
-            rightsEditor.setRight("Admin", Right.VIEW, State.ALLOW);
+            // Explicit view right for the test user.
+            rightsEditor.setRight(userName, Right.VIEW, State.ALLOW);
 
-            // Check again the panel visibility for guest and then for administrator.
-            ViewPage page = getUtil().gotoPage(getTestClassName(), getTestMethodName());
+            // Check again the panel visibility for the test user and then for guest
+            getUtil().gotoPage(getUtil().getURLToLoginAndGotoPage(userName, "password",
+                getUtil().getURL(getTestClassName(), getTestMethodName())));
+            getUtil().recacheSecretToken();
+            ViewPage page = new ViewPage();
             Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
             page.logout();
             Assert.assertFalse(new PageWithPanels().hasPanel(panelName));

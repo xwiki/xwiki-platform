@@ -112,7 +112,17 @@ public class ImportAction extends XWikiAction
 
             BeanInputWikiStreamFactory<XARInputProperties> inputWikiStreamFactory =
                 Utils.getComponent((Type) InputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_11.serialize());
-            inputWikiStreamFactory.createInputWikiStream(properties).read(xarPackage);
+            BeanInputWikiStream<XARInputProperties> inputWikiStream =
+                inputWikiStreamFactory.createInputWikiStream(properties);
+
+            InputStream source = packFile.getContentInputStream(xcontext);
+            properties.setSource(new DefaultInputStreamInputSource(source));
+
+            try {
+                inputWikiStream.read(xarPackage);
+            } finally {
+                source.close();
+            }
 
             xarPackage.write(response.getOutputStream(), encoding);
         } else {

@@ -784,8 +784,8 @@
          attcontent, property.*, object.*</str>
 
        <!-- The list of typed (non-string) dynamic fields that will be expanded in the search query. The names of these
-            fields are suffixed with the name of their data type (e.g. *_int is a dynamic integer field). See schema.xml
-            for the list of known field types. This allows users to write a query like this:
+            fields are suffixed with the name of their data type (e.g. *_int is a dynamic integer field). This allows
+            users to write a query like this:
 
             property.Blog.BlogPostClass.publishDate:[NOW-1MONTH TO NOW]
 
@@ -796,6 +796,8 @@
             ...
             property.Blog.BlogPostClass.publishDate_date:[NOW-1MONTH TO NOW] -->
        <str name="xwiki.typedDynamicFields">property.*</str>
+       <!-- See the dynamic field definitions in schema.xml -->
+       <str name="xwiki.dynamicFieldTypes">boolean, int, long, float, double, date</str>
 
        <!-- Trying to preserve compatibility with XWiki lucene plugin's queries. -->
        <str name="f.object.qf">class</str>

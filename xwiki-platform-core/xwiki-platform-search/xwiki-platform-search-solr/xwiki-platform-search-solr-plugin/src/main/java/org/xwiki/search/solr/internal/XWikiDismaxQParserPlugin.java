@@ -83,12 +83,6 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
      */
     private static final String WILDCARD = "*";
 
-    /**
-     * The names of the non-string dynamic fields are suffixed with the data type (instead of the locale) so that they
-     * are indexed correctly. Thus we need to add aliases for dynamic field names that will match all know data types.
-     */
-    private static final List<String> FIELD_TYPES = Arrays.asList("boolean", "int", "long", "float", "double", "date");
-
     @Override
     public QParser createParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req)
     {
@@ -114,27 +108,66 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
             return parameters;
         }
 
+        Map<String, String> aliasParameters = new HashMap<String, String>();
+        addMultilingualFieldAliases(fieldNames, aliasParameters, parameters);
+        addTypedDynamicFieldAliases(fieldNames, aliasParameters, parameters);
+
+        return aliasParameters.isEmpty() ? parameters : SolrParams.wrapDefaults(new MapSolrParams(aliasParameters),
+            parameters);
+    }
+
+    /**
+     * Adds aliases for multilingual fields.
+     * 
+     * @param fieldNames the set of field names to add aliases for
+     * @param aliasParameters the map where the aliases are collected
+     * @param parameters the search query parameters used to extract the list of multilingual fields and the list of
+     *            supported locales
+     */
+    private void addMultilingualFieldAliases(Set<String> fieldNames, Map<String, String> aliasParameters,
+        SolrParams parameters)
+    {
         List<String> multilingualFields = getListParameter("xwiki.multilingualFields", parameters);
-        List<String> typedDynamicFields = getListParameter("xwiki.typedDynamicFields", parameters);
-        if (multilingualFields.isEmpty() && typedDynamicFields.isEmpty()) {
-            return parameters;
+        if (multilingualFields.isEmpty()) {
+            return;
         }
 
         // There is at least one supported locale, the ROOT locale.
         List<String> supportedLocales = getSupportedLocales(parameters);
 
-        Map<String, String> aliasParameters = new HashMap<String, String>();
         for (String fieldName : fieldNames) {
             if (matchesFieldName(fieldName, multilingualFields)) {
                 addAliases(fieldName, supportedLocales, aliasParameters);
             }
-            if (matchesFieldName(fieldName, typedDynamicFields)) {
-                addAliases(fieldName, FIELD_TYPES, aliasParameters);
-            }
+        }
+    }
+
+    /**
+     * Adds aliases for typed dynamic fields.
+     * <p>
+     * The names of the non-string dynamic fields must be suffixed with the data type (instead of the locale) in order
+     * for them to be indexed correctly. Thus we need to add aliases for dynamic field names that will match the
+     * configured data types.
+     * 
+     * @param fieldNames the set of field names to add aliases for
+     * @param aliasParameters the map where the aliases are collected
+     * @param parameters the search query parameters used to extract the list of typed dynamic fields and the list of
+     *            supported data types
+     */
+    private void addTypedDynamicFieldAliases(Set<String> fieldNames, Map<String, String> aliasParameters,
+        SolrParams parameters)
+    {
+        List<String> typedDynamicFields = getListParameter("xwiki.typedDynamicFields", parameters);
+        List<String> dynamicFieldTypes = getListParameter("xwiki.dynamicFieldTypes", parameters);
+        if (typedDynamicFields.isEmpty() || dynamicFieldTypes.isEmpty()) {
+            return;
         }
 
-        return aliasParameters.isEmpty() ? parameters : SolrParams.wrapDefaults(new MapSolrParams(aliasParameters),
-            parameters);
+        for (String fieldName : fieldNames) {
+            if (matchesFieldName(fieldName, typedDynamicFields)) {
+                addAliases(fieldName, dynamicFieldTypes, aliasParameters);
+            }
+        }
     }
 
     /**

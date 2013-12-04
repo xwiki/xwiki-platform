@@ -107,13 +107,26 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
         BaseObject oldObject = oldWikiDescriptor.getXObject(oldClassDocument);
 
         // Upgrade depending of the type
-        if (oldObject != null) {
+        if (oldObject != null || isWorkspaceTemplate(currentWikiId)) {
             // It's a workspace
             upgradeWorkspace(oldObject, currentWikiId, oldWikiDescriptor);
         } else {
             // It's a regular subwiki
             upgradeRegularSubwiki(currentWikiId);
         }
+    }
+
+    private boolean isWorkspaceTemplate(String wikiId)
+    {
+        // Context, XWiki
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+
+        // In the first version of the Workspace Application, workspacetemplate did not have the workspace object.
+        // We test for the existence of WorkspaceInformationPanel just to be sure that the workspacetemplate is a
+        // workspace.
+        return wikiId.equals("workspacetemplate") && xwiki.exists(new DocumentReference(wikiId,
+                "Panels", "WorkspaceInformationPanel"), context);
     }
 
     private void saveConfiguration(WikiUserConfiguration configuration, String wikiId)
@@ -152,7 +165,9 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
         }
 
         // Finally, the migration is done, we can delete the old workspace object.
-        deleteOldWorkspaceObject(oldObject, oldWikiDescriptor);
+        if (oldObject != null) {
+            deleteOldWorkspaceObject(oldObject, oldWikiDescriptor);
+        }
     }
 
     /**
@@ -177,16 +192,22 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
         // No local users
         configuration.setUserScope(UserScope.GLOBAL_ONLY);
 
-        // Get the membershipType value
-        String membershipTypeValue = oldObject.getStringValue("membershipType");
-        MembershipType membershipType;
-        try {
-            membershipType = MembershipType.valueOf(membershipTypeValue.toUpperCase());
-        } catch (Exception e) {
-            // Default value
-            membershipType = MembershipType.INVITE;
+        // Set the membershipType value
+        if (oldObject != null) {
+            // Get the membershipType value
+            String membershipTypeValue = oldObject.getStringValue("membershipType");
+            MembershipType membershipType;
+            try {
+                membershipType = MembershipType.valueOf(membershipTypeValue.toUpperCase());
+            } catch (Exception e) {
+                // Default value
+                membershipType = MembershipType.INVITE;
+            }
+            configuration.setMembershipType(membershipType);
+        } else {
+            // If there is no workspace object, we put a default value.
+            configuration.setMembershipType(MembershipType.INVITE);
         }
-        configuration.setMembershipType(membershipType);
 
         // Save the new configuration
         saveConfiguration(configuration, wikiId);

@@ -230,22 +230,22 @@ public class DocumentSolrMetadataExtractor extends AbstractSolrMetadataExtractor
 
     @Override
     protected void setPropertyValue(SolrInputDocument solrDocument, BaseProperty<EntityReference> property,
-        Object value, Locale locale)
+        TypedValue typedValue, Locale locale)
     {
         // We need to be able to query an object property alone.
         EntityReference classReference = property.getObject().getRelativeXClassReference();
         EntityReference propertyReference =
             new EntityReference(property.getName(), EntityType.CLASS_PROPERTY, classReference);
         String suffix = fieldNameEncoder.encode(fieldNameSerializer.serialize(propertyReference));
-        String propertyValueFieldName = "property." + suffix;
-        solrDocument.addField(FieldUtils.getFieldName(propertyValueFieldName, value, locale), value);
+        String propertyValueFieldName = FieldUtils.getFieldName("property." + suffix, typedValue.getType(), locale);
+        solrDocument.addField(propertyValueFieldName, typedValue.getValue());
 
         // We need to be able to query all properties of a specific type of object at once.
         suffix = fieldNameEncoder.encode(fieldNameSerializer.serialize(classReference));
         String objectOfTypeFieldName = "object." + suffix;
-        solrDocument.addField(FieldUtils.getFieldName(objectOfTypeFieldName, locale), value);
+        solrDocument.addField(FieldUtils.getFieldName(objectOfTypeFieldName, locale), typedValue.getValue());
 
         // We need to be able to query all objects from a document at once.
-        super.setPropertyValue(solrDocument, property, value, locale);
+        super.setPropertyValue(solrDocument, property, typedValue, locale);
     }
 }

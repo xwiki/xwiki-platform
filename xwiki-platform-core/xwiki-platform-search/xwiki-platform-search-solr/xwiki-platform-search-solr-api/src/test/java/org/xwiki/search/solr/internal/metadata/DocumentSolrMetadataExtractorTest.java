@@ -79,6 +79,7 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 
 /**
  * Tests for document metadata extraction.
@@ -395,6 +396,7 @@ public class DocumentSolrMetadataExtractorTest
         when(mockComment.getRelativeXClassReference()).thenReturn(
             commentsClassReference.removeParent(commentsClassReference.getWikiReference()));
 
+        when(mockXClass.get("comment")).thenReturn(mock(TextAreaClass.class));
         when(mockXClass.get("password")).thenReturn(mock(PasswordClass.class));
         when(mockXClass.get("enabled")).thenReturn(mock(BooleanClass.class));
 
@@ -408,21 +410,20 @@ public class DocumentSolrMetadataExtractorTest
 
         Assert.assertEquals(Arrays.asList("space.commentsClass"), solrDocument.getFieldValues(FieldUtils.CLASS));
 
+        // A TextArea property must be indexed as a localized text.
         Assert.assertSame(commentContent, solrDocument.getFieldValue(FieldUtils.getFieldName(
             "property.space.commentsClass.comment", this.localeENUS)));
-        Assert
-            .assertSame(commentAuthor, solrDocument.getFieldValue(FieldUtils.getFieldName(
-                "property.space.commentsClass.author", this.localeENUS)));
-        Assert.assertSame(commentDate, solrDocument.getFieldValue(FieldUtils.getFieldName(
-            "property.space.commentsClass.date", commentDate, this.localeENUS)));
+
+        Assert.assertSame(commentAuthor, solrDocument.getFieldValue("property.space.commentsClass.author_string"));
+        Assert.assertSame(commentDate, solrDocument.getFieldValue("property.space.commentsClass.date_date"));
+        Assert.assertEquals(commentList, solrDocument.getFieldValues("property.space.commentsClass.list_string"));
+        Assert.assertSame(commentLikes, solrDocument.getFieldValue("property.space.commentsClass.likes_long"));
+        Assert.assertTrue((Boolean) solrDocument.getFieldValue("property.space.commentsClass.enabled_boolean"));
+
+        // Make sure the password is not indexed (neither as a string nor as a localized text).
+        Assert.assertNull(solrDocument.getFieldValue("property.space.commentsClass.password_string"));
         Assert.assertNull(solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.password",
             this.localeENUS)));
-        Assert.assertEquals(commentList,
-            solrDocument.getFieldValues(FieldUtils.getFieldName("property.space.commentsClass.list", this.localeENUS)));
-        Assert.assertSame(commentLikes, solrDocument.getFieldValue(FieldUtils.getFieldName(
-            "property.space.commentsClass.likes", commentLikes, this.localeENUS)));
-        Assert.assertTrue((Boolean) solrDocument.getFieldValue(FieldUtils.getFieldName(
-            "property.space.commentsClass.enabled", Boolean.TRUE, this.localeENUS)));
 
         Collection<Object> objectProperties =
             solrDocument.getFieldValues(FieldUtils.getFieldName("object.space.commentsClass", this.localeENUS));
@@ -458,7 +459,7 @@ public class DocumentSolrMetadataExtractorTest
 
         BaseClass xclass = mock(BaseClass.class);
         when(xobject.getXClass(this.xcontext)).thenReturn(xclass);
-        when(xobject.getFieldList()).thenReturn(Arrays.asList(listProperty));
+        when(xobject.getFieldList()).thenReturn(Arrays.<Object> asList(listProperty));
         when(xobject.getRelativeXClassReference()).thenReturn(
             classReference.removeParent(classReference.getWikiReference()));
 
@@ -472,8 +473,10 @@ public class DocumentSolrMetadataExtractorTest
         SolrInputDocument solrDocument = extractor.getSolrDocument(this.documentReference);
 
         // Make sure both the raw value (which is saved in the database) and the display value (specified in the XClass)
-        // are indexed.
-        Assert.assertEquals(Arrays.asList("red", "Dark Red", "green"),
+        // are indexed. The raw values are indexed as strings in order to be able to perform exact matches.
+        Assert.assertEquals(Arrays.asList("red", "green"),
+            solrDocument.getFieldValues("property.Space.MyClass.color_string"));
+        Assert.assertEquals(Collections.singletonList("Dark Red"),
             solrDocument.getFieldValues(FieldUtils.getFieldName("property.Space.MyClass.color", this.localeENUS)));
     }
 }

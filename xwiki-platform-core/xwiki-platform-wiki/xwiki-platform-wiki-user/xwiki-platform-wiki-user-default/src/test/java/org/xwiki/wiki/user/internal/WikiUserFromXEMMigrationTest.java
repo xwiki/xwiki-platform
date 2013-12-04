@@ -192,8 +192,8 @@ public class WikiUserFromXEMMigrationTest
         when(xwiki.getDocument(eq(new DocumentReference("mainWiki", XWiki.SYSTEM_SPACE, "XWikiServerWorkspacetemplate")),
                 any(XWikiContext.class))).thenReturn(oldDescriptorDocument);
 
-        // Mock about the workspace panel
-        when(xwiki.exists(eq(new DocumentReference("workspacetemplate", "Panels", "WorkspaceInformationPanel")),
+        // Mock about the workspace special page
+        when(xwiki.exists(eq(new DocumentReference("workspacetemplate", "XWiki", "ManageWorkspace")),
                 any(XWikiContext.class))).thenReturn(true);
 
         // Mocks about candidacies

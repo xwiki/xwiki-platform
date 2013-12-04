@@ -127,10 +127,10 @@ public class WorkspaceMigrationTest
         when(xwiki.getDocument(eq(new DocumentReference("mainWiki", XWiki.SYSTEM_SPACE,
                 "XWikiServerWorkspacetemplate")), any(XWikiContext.class))).thenReturn(oldDescriptorDocument);
 
-        // Mock that the workspace panel exists
-        DocumentReference workspacePanelReference = new DocumentReference("workspacetemplate", "Panels",
-                "WorkspaceInformationPanel");
-        when(xwiki.exists(eq(workspacePanelReference), any(XWikiContext.class))).thenReturn(true);
+        // Mock that the workspace special page exists
+        DocumentReference workspacePageReference = new DocumentReference("workspacetemplate", "XWiki",
+                "ManageWorkspace");
+        when(xwiki.exists(eq(workspacePageReference), any(XWikiContext.class))).thenReturn(true);
 
         // Run
         mocker.getComponentUnderTest().hibernateMigrate();

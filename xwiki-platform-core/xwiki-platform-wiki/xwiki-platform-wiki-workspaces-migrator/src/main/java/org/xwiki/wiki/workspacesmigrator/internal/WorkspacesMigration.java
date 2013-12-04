@@ -26,6 +26,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -34,6 +35,8 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
@@ -51,6 +54,8 @@ public class WorkspacesMigration extends AbstractHibernateDataMigration
 {
     private static final String WORKSPACE_CLASS_SPACE = "WorkspaceManager";
 
+    private static final String WORKSPACE_CLASS_PAGE = "WorkspaceClass";
+
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
@@ -66,16 +71,53 @@ public class WorkspacesMigration extends AbstractHibernateDataMigration
     @Override
     protected void hibernateMigrate() throws DataMigrationException, XWikiException
     {
-        String currentWiki = wikiDescriptorManager.getCurrentWikiId();
+        // Current wiki
+        String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
 
         // Delete the search suggest config object
-        deleteSearchSuggestCustomConfig(currentWiki);
+        deleteSearchSuggestCustomConfig(currentWikiId);
 
-        // If it is not the main wiki
-        if (!currentWiki.equals(wikiDescriptorManager.getMainWikiId())) {
-            // Restore the document removed by WorkspaceManager.Install
-            restoreDeletedDocuments(currentWiki);
+        // If the wiki is a workspace
+        if (isWorkspace(currentWikiId)) {
+            // Restore the documents removed by WorkspaceManager.Install
+            restoreDeletedDocuments(currentWikiId);
         }
+    }
+
+    private boolean isWorkspace(String wikiId) throws DataMigrationException, XWikiException
+    {
+        // The main wiki is not a workspace
+        if (wikiId.equals(wikiDescriptorManager.getMainWikiId())) {
+            return false;
+        }
+
+        // Context, XWiki
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+
+        // Get the old wiki descriptor
+        DocumentReference oldWikiDescriptorReference = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
+                XWiki.SYSTEM_SPACE, String.format("XWikiServer%s", StringUtils.capitalize(wikiId)));
+        XWikiDocument oldWikiDescriptor = xwiki.getDocument(oldWikiDescriptorReference, context);
+
+        // Try to get the old workspace object
+        DocumentReference oldClassDocument = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
+                WORKSPACE_CLASS_SPACE, WORKSPACE_CLASS_PAGE);
+        BaseObject oldObject = oldWikiDescriptor.getXObject(oldClassDocument);
+
+        return (oldObject != null) || isWorkspaceTemplate(wikiId);
+    }
+
+    private boolean isWorkspaceTemplate(String wikiId)
+    {
+        // Context, XWiki
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+
+        // In the first version of the Workspace Application, workspacetemplate did not have the workspace object.
+        // We test for the existence of XWiki.ManageWorkspace just to be sure that the workspacetemplate is a workspace.
+        return wikiId.equals("workspacetemplate") && xwiki.exists(new DocumentReference(wikiId,
+                "XWiki", "ManageWorkspace"), context);
     }
 
     @Override

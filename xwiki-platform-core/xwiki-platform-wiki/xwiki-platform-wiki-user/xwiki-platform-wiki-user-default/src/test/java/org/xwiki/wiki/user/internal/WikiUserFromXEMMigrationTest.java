@@ -58,7 +58,7 @@ public class WikiUserFromXEMMigrationTest
     @Rule
     public MockitoComponentMockingRule<WikiUserFromXEMMigration> mocker =
             new MockitoComponentMockingRule(WikiUserFromXEMMigration.class, HibernateDataMigration.class,
-                    "R530000WikiUserFromXEMMigration");
+                    "R530010WikiUserFromXEMMigration");
 
     private WikiDescriptorManager wikiDescriptorManager;
 
@@ -181,6 +181,35 @@ public class WikiUserFromXEMMigrationTest
         verify(xwiki, times(1)).saveDocument(memberGroupDoc, "Upgrade candidacies from the old Workspace Application" +
                 " to the new Wiki Application.", xcontext);
 
+    }
+
+    @Test
+    public void upgradeOldWorkspaceTemplate() throws Exception
+    {
+        // Mocks about the descriptor
+        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("workspacetemplate");
+        XWikiDocument oldDescriptorDocument = mock(XWikiDocument.class);
+        when(xwiki.getDocument(eq(new DocumentReference("mainWiki", XWiki.SYSTEM_SPACE, "XWikiServerWorkspacetemplate")),
+                any(XWikiContext.class))).thenReturn(oldDescriptorDocument);
+
+        // Mock about the workspace special page
+        when(xwiki.exists(eq(new DocumentReference("workspacetemplate", "XWiki", "ManageWorkspace")),
+                any(XWikiContext.class))).thenReturn(true);
+
+        // Mocks about candidacies
+        DocumentReference memberGroupRef = new DocumentReference("workspacetemplate", XWiki.SYSTEM_SPACE,
+                "XWikiAllGroup");
+        XWikiDocument memberGroupDoc = mock(XWikiDocument.class);
+        when(xwiki.getDocument(eq(memberGroupRef), any(XWikiContext.class))).thenReturn(memberGroupDoc);
+
+        // Run
+        mocker.getComponentUnderTest().hibernateMigrate();
+
+        // Verify the user configuration is accurate
+        WikiUserConfiguration expectedConfiguration = new WikiUserConfiguration();
+        expectedConfiguration.setUserScope(UserScope.GLOBAL_ONLY);
+        expectedConfiguration.setMembershipType(MembershipType.INVITE);
+        verify(wikiUserConfigurationHelper).saveConfiguration(eq(expectedConfiguration), eq("workspacetemplate"));
     }
 
 }

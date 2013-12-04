@@ -123,10 +123,9 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
         XWiki xwiki = context.getWiki();
 
         // In the first version of the Workspace Application, workspacetemplate did not have the workspace object.
-        // We test for the existence of WorkspaceInformationPanel just to be sure that the workspacetemplate is a
-        // workspace.
+        // We test for the existence of XWiki.ManageWorkspace just to be sure that the workspacetemplate is a workspace.
         return wikiId.equals("workspacetemplate") && xwiki.exists(new DocumentReference(wikiId,
-                "Panels", "WorkspaceInformationPanel"), context);
+                "XWiki", "ManageWorkspace"), context);
     }
 
     private void saveConfiguration(WikiUserConfiguration configuration, String wikiId)

@@ -84,6 +84,7 @@
     #set ($wikiId = $docName.toLowerCase().replaceAll("xwiki.xwikiserver", ""))
     #set ($wiki = $services.wiki.getById($wikiId))
     ## Init membership actions as denied.
+    #set ($itemMembershipType = $services.wiki.user.getMembershipType($wiki.id))
     #set ($itemHasJoin = false)
     #set ($itemHasRequestJoin = false)
     #set ($itemHasCancelJoinRequest = false)
@@ -111,7 +112,6 @@
           #end
         #end
       #end
-      #set ($itemMembershipType = $services.wiki.user.getMembershipType($wiki.id))
       #if ($existingInvitation)
         #set ($itemHasViewInvitation = true)
         #set ($viewInvitationUrl = $xwiki.getURL($joinWikiDocumentReference, 'view', "wikiId=${wikiId}"))
@@ -183,10 +183,7 @@
       #gridresult_buildColumnJSON($colname $row)
     #end
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
-    #set($docConfUserRef = $services.model.createDocumentReference($wiki.id, 'WikiManager', 'WikiUserConfiguration'))
-    #set($docConfUser = $xwiki.getDocument($docConfUserRef))
-    #set($objWikiUser = $docConfUser.getObject('WikiManager.WikiUserClass'))
-    #set($discard = $row.put('membershipType', $objWikiUser.membershipType))
+    #set($discard = $row.put('membershipType', $services.localization.render("WikiManager.WikiUserClass_membershipType_${itemMembershipType.name().toLowerCase()}")))
     #set($discard = $row.put('doc_hasjoin', $itemHasJoin))
     #set($discard = $row.put('doc_hasrequestJoin', $itemHasRequestJoin))
     #set($discard = $row.put('doc_hasviewInvitation', $itemHasViewInvitation))

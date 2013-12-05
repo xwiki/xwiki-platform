@@ -71,6 +71,13 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     private static final String OBJCONTENT_FORMAT = "%s : %s";
 
     /**
+     * The maximum number of characters allowed in a short text. This should be the same as the maximum length of a
+     * StringProperty, as specified by xwiki.hbm.xml. We need this limit to be able to handle differently short strings
+     * and large strings when indexing XObject properties.
+     */
+    protected static final int SHORT_TEXT_LIMIT = 255;
+
+    /**
      * Logging framework.
      */
     @Inject
@@ -359,11 +366,17 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
         Object propertyValue = property.getValue();
         if (propertyClass instanceof StaticListClass) {
             setStaticListPropertyValue(solrDocument, property, (StaticListClass) propertyClass, locale);
-        } else if ((propertyClass != null && "String".equals(propertyClass.getClassType()))
-            || propertyClass instanceof TextAreaClass) {
-            // Index String and TextArea properties as text, based on the document locale. We didn't check if the
+        } else if (propertyClass instanceof TextAreaClass
+            || (propertyClass != null && "String".equals(propertyClass.getClassType()))
+            || String.valueOf(propertyValue).length() > SHORT_TEXT_LIMIT) {
+            // Index TextArea and String properties as text, based on the document locale. We didn't check if the
             // property class is an instance of StringClass because it has subclasses that don't store free text (like
-            // the EmailClass). We also didn't want to include the PasswordClass (which extends StringClass).
+            // the EmailClass). Plus we didn't want to include the PasswordClass (which extends StringClass).
+            //
+            // We also index large strings as localized text in order to cover custom XClass properties that may not
+            // extend TextArea but still have large strings as value, and also the case when a TextArea property is
+            // removed from an XClass but there are still objects that have a (large) value set for it (the property
+            // class is null in this case). The 255 limit is defined in xwiki.hbm.xml for string properties.
             setPropertyValue(solrDocument, property, new TypedValue(propertyValue, TypedValue.TEXT), locale);
         } else if (propertyValue instanceof Collection) {
             // We iterate the collection instead of giving it to Solr because, although it supports passing collections,

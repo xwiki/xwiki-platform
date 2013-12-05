@@ -425,6 +425,18 @@ public class DocumentSolrMetadataExtractorTest
         Assert.assertNull(solrDocument.getFieldValue(FieldUtils.getFieldName("property.space.commentsClass.password",
             this.localeENUS)));
 
+        // Check the sort fields.
+        Assert.assertSame(commentAuthor, solrDocument.getFieldValue("property.space.commentsClass.author_sortString"));
+        Assert.assertSame(commentDate, solrDocument.getFieldValue("property.space.commentsClass.date_sortDate"));
+        // The last value is used for sorting because we cannot sort on fields with multiple values.
+        Assert.assertEquals("list", solrDocument.getFieldValue("property.space.commentsClass.list_sortString"));
+        Assert.assertSame(commentLikes, solrDocument.getFieldValue("property.space.commentsClass.likes_sortLong"));
+        Assert.assertTrue((Boolean) solrDocument.getFieldValue("property.space.commentsClass.enabled_sortBoolean"));
+
+        // Localized texts are sorted as strings if they are not too large.
+        Assert.assertSame(commentContent, solrDocument.getFieldValue(
+            "property.space.commentsClass.comment_sortString"));
+
         Collection<Object> objectProperties =
             solrDocument.getFieldValues(FieldUtils.getFieldName("object.space.commentsClass", this.localeENUS));
         MatcherAssert.assertThat(objectProperties, Matchers.<Object> containsInAnyOrder(commentContent, commentAuthor,
@@ -478,5 +490,10 @@ public class DocumentSolrMetadataExtractorTest
             solrDocument.getFieldValues("property.Space.MyClass.color_string"));
         Assert.assertEquals(Collections.singletonList("Dark Red"),
             solrDocument.getFieldValues(FieldUtils.getFieldName("property.Space.MyClass.color", this.localeENUS)));
+
+        // Check the sort field. Only the last value we set is used for sorting because we cannot sort on fields that
+        // have multiple values.
+        Assert.assertEquals(Collections.singletonList("green"),
+            solrDocument.getFieldValues("property.Space.MyClass.color_sortString"));
     }
 }

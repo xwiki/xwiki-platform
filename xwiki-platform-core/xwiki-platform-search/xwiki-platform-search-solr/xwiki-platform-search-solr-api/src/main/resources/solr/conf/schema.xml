@@ -125,7 +125,7 @@
    <field name="doclocale" type="string" indexed="true" stored="true" />
    <field name="author" type="string" indexed="true" stored="true" />
    <field name="author_display" type="text_general" indexed="true" stored="true" />
-   <field name="author_display_sort" type="lowercase" indexed="true" stored="true" />
+   <field name="author_display_sort" type="lowercase" indexed="true" stored="false" />
    <field name="creator" type="string" indexed="true" stored="true" />
    <field name="creator_display" type="text_general" indexed="true" stored="true" />
    <field name="date" type="tdate" indexed="true" stored="true" />
@@ -206,8 +206,10 @@
    <dynamicField name="*_th"  type="text_th"    indexed="true"  stored="true" multiValued="true" />
    <dynamicField name="*_tr"  type="text_tr"    indexed="true"  stored="true" multiValued="true" />
 
-   <!-- Dynamic fields that are indexed based on their data type.
-        We need this to be able to index correctly non-string XObject properties. -->
+  <!-- Dynamic fields that are indexed based on their data type. We need this to be able to index correctly non-string
+       XObject properties. Note that all these fields have to be multiValued because object properties can have multiple
+       values and also documents can have multiple objects of the same type (and these fields will collect values from
+       all the objects found on a document). -->
    <dynamicField name="*_boolean" type="boolean" indexed="true" stored="true" multiValued="true" />
    <dynamicField name="*_int" type="tint" indexed="true" stored="true" multiValued="true" />
    <dynamicField name="*_long" type="tlong" indexed="true" stored="true" multiValued="true" />
@@ -215,6 +217,18 @@
    <dynamicField name="*_double" type="tdouble" indexed="true" stored="true" multiValued="true" />
    <dynamicField name="*_string" type="string" indexed="true" stored="true" multiValued="true" />
    <dynamicField name="*_date" type="tdate" indexed="true" stored="true" multiValued="true" />
+
+   <!-- Dynamic fields used for sorting. Unlike the previous fields these must be single valued because we cannot sort
+        on multiValued fields. Note that for XObject properties with multiple values (either because they have multiple
+        selection enabled or because there are multiple XObjects of the same type on a document) the last value found
+        (e.g. from the last object) is used for sorting. -->
+   <dynamicField name="*_sortBoolean" type="boolean" indexed="true" stored="false" />
+   <dynamicField name="*_sortInt" type="tint" indexed="true" stored="false" />
+   <dynamicField name="*_sortLong" type="tlong" indexed="true" stored="false" />
+   <dynamicField name="*_sortFloat" type="tfloat" indexed="true" stored="false" />
+   <dynamicField name="*_sortDouble" type="tdouble" indexed="true" stored="false" />
+   <dynamicField name="*_sortString" type="lowercase" indexed="true" stored="false" />
+   <dynamicField name="*_sortDate" type="tdate" indexed="true" stored="false" />
 
    <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 

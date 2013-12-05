@@ -279,7 +279,7 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
         // specified.
         if (this.classSheetBinder.getSheets(document).isEmpty()) {
             String wikiName = document.getDocumentReference().getWikiReference().getName();
-            DocumentReference sheet = new DocumentReference(wikiName, "WikiManager", "XWikiServerClassSheet");
+            DocumentReference sheet = new DocumentReference(wikiName, XWiki.SYSTEM_SPACE, "XWikiServerClassSheet");
             needsUpdate |= this.classSheetBinder.bind(document, sheet);
         }
 

@@ -22,16 +22,10 @@ package org.xwiki.wikistream.xar.internal.input;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wikistream.WikiStreamException;
@@ -40,6 +34,7 @@ import org.xwiki.wikistream.input.InputStreamInputSource;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARModel;
+import org.xwiki.wikistream.xar.internal.XarPackage;
 
 /**
  * @version $Id$
@@ -51,9 +46,7 @@ public class WikiReader
 
     private XARInputProperties properties;
 
-    private String extensionId;
-
-    private String version;
+    private XarPackage xarPackage = new XarPackage();
 
     public WikiReader(SyntaxFactory syntaxFactory, EntityReferenceResolver<String> relativeResolver,
         XARInputProperties properties)
@@ -62,14 +55,9 @@ public class WikiReader
         this.documentReader = new DocumentLocaleReader(syntaxFactory, relativeResolver, properties);
     }
 
-    public String getExtensionId()
+    public XarPackage getXarPackage()
     {
-        return this.extensionId;
-    }
-
-    public String getVersion()
-    {
-        return this.version;
+        return this.xarPackage;
     }
 
     public void read(Object filter, XARFilter proxyFilter) throws XMLStreamException, IOException, WikiStreamException
@@ -92,7 +80,7 @@ public class WikiReader
         }
 
         // TODO: send extension event
-        if (this.extensionId != null) {
+        if (this.xarPackage.getPackageExtensionId() != null) {
 
         }
     }
@@ -110,7 +98,7 @@ public class WikiReader
             } else if (entry.getName().equals(XARModel.PATH_PACKAGE)) {
                 // The entry is the manifest (package.xml). Read this differently.
                 try {
-                    readDescriptor(zis);
+                    this.xarPackage.readDescriptor(zis);
                 } catch (Exception e) {
                     // TODO: LOG warning
                 }
@@ -124,32 +112,5 @@ public class WikiReader
                 }
             }
         }
-    }
-
-    public void readDescriptor(InputStream stream) throws ParserConfigurationException, SAXException, IOException
-    {
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document doc = dBuilder.parse(stream);
-
-        doc.getDocumentElement().normalize();
-
-        this.extensionId = getElementText(doc, "extensionId");
-        this.version = getElementText(doc, "version");
-
-        // Decided to not take into account those properties, this should not be package decision
-        // this.name = getElementText(doc, "name");
-        // this.description = getElementText(doc, "description");
-        // this.licence = getElementText(doc, "licence");
-        // this.authorName = getElementText(doc, "author");
-        // this.backupPack = new Boolean(getElementText(doc, "backupPack")).booleanValue();
-        // this.preserveVersion = new Boolean(getElementText(doc, "preserveVersion")).booleanValue();
-    }
-
-    private String getElementText(Document doc, String tagName)
-    {
-        NodeList nList = doc.getElementsByTagName(tagName);
-
-        return nList.item(0).getTextContent();
     }
 }

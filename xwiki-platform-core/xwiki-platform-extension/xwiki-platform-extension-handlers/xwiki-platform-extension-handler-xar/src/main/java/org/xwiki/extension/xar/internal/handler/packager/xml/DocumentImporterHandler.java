@@ -32,11 +32,11 @@ import org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter;
 import org.xwiki.extension.xar.internal.handler.packager.NotADocumentException;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
-import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
 import org.xwiki.extension.xar.internal.handler.packager.XarEntryMergeResult;
-import org.xwiki.extension.xar.internal.handler.packager.XarFile;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.wikistream.xar.internal.XarFile;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -156,10 +156,13 @@ public class DocumentImporterHandler extends DocumentHandler
         XWikiDocument previousDocument = null;
 
         XWikiDocument document = getDocument();
-        XarEntry xarEntry = new XarEntry(document.getSpace(), document.getName(), document.getLocale());
-        XarFile previousXarFile = this.configuration.getPreviousPages().get(xarEntry);
+        LocalDocumentReference reference =
+            new LocalDocumentReference(document.getSpace(), document.getName(), document.getLocale());
+        XarFile previousXarFile = this.configuration.getPreviousPages().get(reference);
         if (previousXarFile != null) {
-            previousDocument = this.packager.getXWikiDocument(xarEntry.getDocumentReference(), previousXarFile);
+            previousDocument =
+                this.packager.getXWikiDocument(document.getDocumentReference().getWikiReference(), reference,
+                    previousXarFile);
         }
 
         return previousDocument;
@@ -194,8 +197,6 @@ public class DocumentImporterHandler extends DocumentHandler
 
             saveDocumentSetContextUser(dbDocument, comment, true, context);
 
-            // reset content since it could consume lots of memory and it's not used in diff for now
-            attachment.setAttachment_content(null);
             getDocument().getAttachmentList().add(attachment);
         } catch (Exception e) {
             throw new SAXException("Failed to save attachment [" + attachment + "]", e);

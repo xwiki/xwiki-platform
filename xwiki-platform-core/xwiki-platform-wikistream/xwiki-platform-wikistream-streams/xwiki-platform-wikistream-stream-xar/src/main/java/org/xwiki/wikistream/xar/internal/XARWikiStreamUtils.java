@@ -21,9 +21,9 @@ package org.xwiki.wikistream.xar.internal;
 
 /**
  * @version $Id$
- * @since 5.2M2
+ * @since 5.4M1
  */
-public final class XARUtils
+public final class XARWikiStreamUtils
 {
     /**
      * @version $Id$

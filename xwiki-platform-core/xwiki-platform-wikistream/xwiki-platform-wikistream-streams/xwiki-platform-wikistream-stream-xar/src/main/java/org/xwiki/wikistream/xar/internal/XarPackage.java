@@ -19,15 +19,28 @@
  */
 package org.xwiki.wikistream.xar.internal;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.lang3.ObjectUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -42,56 +55,20 @@ import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
  * @version $Id$
  * @since 5.3RC1
  */
-public class XARPackage implements WikiDocumentFilter, WikiSpaceFilter
+public class XarPackage implements WikiDocumentFilter, WikiSpaceFilter
 {
     private static final LocalStringEntityReferenceSerializer TOSTRING_SERIALIZER =
         new LocalStringEntityReferenceSerializer();
 
     /**
-     * An entry in a XAR.
-     * 
-     * @version $Id$
+     * @see #getPackageExtensionId()
      */
-    public static class Entry
-    {
-        /**
-         * The reference of the entry.
-         */
-        public LocalDocumentReference reference;
-
-        /**
-         * The name of the entry in the ZIP stream.
-         */
-        public String name;
-
-        /**
-         * The default action to set in package.xml.
-         */
-        public int defaultAction = XARModel.ACTION_OVERWRITE;
-
-        /**
-         * @param reference the reference of the entry
-         */
-        public Entry(LocalDocumentReference reference)
-        {
-            this.reference = reference;
-        }
-
-        /**
-         * @param reference the reference of the entry
-         * @param name the name of the entry in the ZIP stream.
-         */
-        public Entry(LocalDocumentReference reference, String name)
-        {
-            this.reference = reference;
-            this.name = name;
-        }
-    }
+    private String packageExtensionId;
 
     /**
-     * @see #isPreserveVersion()
+     * @see #isPackagePreserveVersion()
      */
-    private boolean preserveVersion = true;
+    private boolean packagePreserveVersion = true;
 
     /**
      * @see #getPackageName()
@@ -123,16 +100,111 @@ public class XARPackage implements WikiDocumentFilter, WikiSpaceFilter
      */
     private boolean packageBackupPack;
 
-    private final List<Entry> entries = new LinkedList<Entry>();
+    private final Map<LocalDocumentReference, XarEntry> entries = new LinkedHashMap<LocalDocumentReference, XarEntry>();
 
-    public boolean isPreserveVersion()
+    public XarPackage()
     {
-        return this.preserveVersion;
+
+    }
+
+    public XarPackage(ZipFile zipFile) throws XarException, IOException
+    {
+        read(zipFile);
+    }
+
+    public XarPackage(File file) throws IOException, XarException
+    {
+        ZipFile zipFile = new ZipFile(file);
+
+        try {
+            read(zipFile);
+        } finally {
+            zipFile.close();
+        }
+    }
+
+    public XarPackage(InputStream xarStream) throws IOException, XarException
+    {
+        read(xarStream);
+    }
+
+    public XarPackage(Collection<XarEntry> entries)
+    {
+        for (XarEntry entry : entries) {
+            this.entries.put(entry.getReference(), entry);
+        }
+    }
+
+    public void read(InputStream xarStream) throws IOException, XarException
+    {
+        ZipArchiveInputStream zis = new ZipArchiveInputStream(xarStream);
+
+        try {
+            for (ZipArchiveEntry entry = zis.getNextZipEntry(); entry != null; entry = zis.getNextZipEntry()) {
+                if (!entry.isDirectory()) {
+                    InputStream stream = zis;
+
+                    try {
+                        if (entry.getName().equals(XARModel.PATH_PACKAGE)) {
+                            readDescriptor(stream);
+                        } else {
+                            XarEntry xarEntry = new XarEntry(XarUtils.getReference(stream), entry.getName());
+                            this.entries.put(xarEntry.getReference(), xarEntry);
+
+                        }
+                    } finally {
+                        stream.close();
+                    }
+                }
+            }
+        } finally {
+            zis.close();
+        }
+    }
+
+    public void read(ZipFile zipFile) throws IOException, XarException
+    {
+        Enumeration<ZipArchiveEntry> entries = zipFile.getEntries();
+
+        while (entries.hasMoreElements()) {
+            ZipArchiveEntry entry = entries.nextElement();
+
+            if (!entry.isDirectory()) {
+                InputStream stream = zipFile.getInputStream(entry);
+
+                try {
+                    if (entry.getName().equals(XARModel.PATH_PACKAGE)) {
+                        readDescriptor(stream);
+                    } else {
+                        XarEntry xarEntry = new XarEntry(XarUtils.getReference(stream), entry.getName());
+                        this.entries.put(xarEntry.getReference(), xarEntry);
+
+                    }
+                } finally {
+                    stream.close();
+                }
+            }
+        }
+    }
+
+    public String getPackageExtensionId()
+    {
+        return this.packageExtensionId;
+    }
+
+    public void setPackageExtensionId(String packageExtensionId)
+    {
+        this.packageExtensionId = packageExtensionId;
+    }
+
+    public boolean isPackagePreserveVersion()
+    {
+        return this.packagePreserveVersion;
     }
 
     public void setPreserveVersion(boolean preserveVersion)
     {
-        this.preserveVersion = preserveVersion;
+        this.packagePreserveVersion = preserveVersion;
     }
 
     public String getPackageName()
@@ -197,12 +269,61 @@ public class XARPackage implements WikiDocumentFilter, WikiSpaceFilter
 
     public void addEntry(LocalDocumentReference reference)
     {
-        this.entries.add(new Entry(reference));
+        this.entries.put(reference, new XarEntry(reference));
     }
 
-    public List<Entry> getEntries()
+    public Collection<XarEntry> getEntries()
     {
-        return this.entries;
+        return this.entries.values();
+    }
+
+    public static Collection<XarEntry> getEntries(File file) throws XarException, IOException
+    {
+        XarPackage xarPackage = new XarPackage(file);
+
+        return xarPackage.getEntries();
+    }
+
+    public XarEntry getEntry(LocalDocumentReference reference)
+    {
+        return this.entries.get(reference);
+    }
+
+    public void readDescriptor(InputStream stream) throws XarException, IOException
+    {
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+
+        DocumentBuilder dBuilder;
+        try {
+            dBuilder = dbFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new XarException("Failed to create a new Document builder", e);
+        }
+
+        Document doc;
+        try {
+            doc = dBuilder.parse(stream);
+        } catch (SAXException e) {
+            throw new XarException("Failed to parse XML document", e);
+        }
+
+        doc.getDocumentElement().normalize();
+
+        this.packageExtensionId = getElementText(doc, "extensionId");
+        this.packageVersion = getElementText(doc, "version");
+        this.packageName = getElementText(doc, "name");
+        this.packageDescription = getElementText(doc, "description");
+        this.packageLicense = getElementText(doc, "licence");
+        this.packageAuthor = getElementText(doc, "author");
+        this.packageBackupPack = Boolean.valueOf(getElementText(doc, "backupPack")).booleanValue();
+        this.packagePreserveVersion = Boolean.valueOf(getElementText(doc, "preserveVersion")).booleanValue();
+    }
+
+    private String getElementText(Document doc, String tagName)
+    {
+        NodeList nList = doc.getElementsByTagName(tagName);
+
+        return nList.getLength() > 0 ? nList.item(0).getTextContent() : null;
     }
 
     public void write(ZipArchiveOutputStream zipStream, String encoding) throws WikiStreamException, IOException
@@ -232,15 +353,16 @@ public class XARPackage implements WikiDocumentFilter, WikiSpaceFilter
             writer.writeElement(XARModel.ELEMENT_INFOS_AUTHOR, getPackageAuthor());
             writer.writeElement(XARModel.ELEMENT_INFOS_VERSION, getPackageVersion());
             writer.writeElement(XARModel.ELEMENT_INFOS_ISBACKUPPACK, isPackageBackupPack() ? "1" : "0");
-            writer.writeElement(XARModel.ELEMENT_INFOS_ISPRESERVEVERSION, isPreserveVersion() ? "1" : "0");
+            writer.writeElement(XARModel.ELEMENT_INFOS_ISPRESERVEVERSION, isPackagePreserveVersion() ? "1" : "0");
             writer.writeEndElement();
 
             writer.writeStartElement(XARModel.ELEMENT_FILES);
-            for (Entry entry : this.entries) {
+            for (XarEntry entry : this.entries.values()) {
                 writer.writeStartElement(XARModel.ELEMENT_FILES_FILES);
-                writer.writeAttribute(XARModel.ATTRIBUTE_DEFAULTACTION, String.valueOf(entry.defaultAction));
-                writer.writeAttribute(XARModel.ATTRIBUTE_LOCALE, ObjectUtils.toString(entry.reference.getLocale(), ""));
-                writer.writeCharacters(TOSTRING_SERIALIZER.serialize(entry.reference));
+                writer.writeAttribute(XARModel.ATTRIBUTE_DEFAULTACTION, String.valueOf(entry.getDefaultAction()));
+                writer.writeAttribute(XARModel.ATTRIBUTE_LOCALE,
+                    ObjectUtils.toString(entry.getReference().getLocale(), ""));
+                writer.writeCharacters(TOSTRING_SERIALIZER.serialize(entry.getReference()));
                 writer.writeEndElement();
             }
             writer.writeEndElement();

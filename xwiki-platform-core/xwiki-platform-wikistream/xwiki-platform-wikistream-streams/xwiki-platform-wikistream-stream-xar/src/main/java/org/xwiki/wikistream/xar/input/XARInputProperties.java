@@ -35,11 +35,6 @@ import org.xwiki.wikistream.xml.input.XMLInputProperties;
 public class XARInputProperties extends XMLInputProperties
 {
     /**
-     * @see #isReferencesOnly()
-     */
-    private boolean referencesOnly;
-
-    /**
      * @see #getEntities()
      */
     private EntityReferenceSet entities;
@@ -48,24 +43,6 @@ public class XARInputProperties extends XMLInputProperties
      * @see #isWithHistory()
      */
     private boolean withHistory = true;
-
-    /**
-     * @return if true events should be generated only for the document references (skip anything else)
-     */
-    @PropertyName("References only")
-    @PropertyDescription("Indicate if events should be generated only for the document references (skip enything else)")
-    public boolean isReferencesOnly()
-    {
-        return this.referencesOnly;
-    }
-
-    /**
-     * @param referencesOnly if true events should be generated only for the document references (skip anything else)
-     */
-    public void setReferencesOnly(boolean referencesOnly)
-    {
-        this.referencesOnly = referencesOnly;
-    }
 
     /**
      * @return The entities to take into account or skip

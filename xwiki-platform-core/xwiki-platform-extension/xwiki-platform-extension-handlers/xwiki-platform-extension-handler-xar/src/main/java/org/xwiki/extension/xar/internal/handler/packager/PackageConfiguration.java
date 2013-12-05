@@ -24,6 +24,8 @@ import java.util.Set;
 
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.wikistream.xar.internal.XarFile;
 
 /**
  * @version $Id$
@@ -41,7 +43,7 @@ public interface PackageConfiguration
 
     boolean isLogEnabled();
 
-    Map<XarEntry, XarFile> getPreviousPages();
+    Map<LocalDocumentReference, XarFile> getPreviousPages();
 
     Set<String> getEntriesToImport();
     

@@ -38,7 +38,7 @@ import org.xwiki.wikistream.input.ReaderInputSource;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
 import org.xwiki.wikistream.xml.input.SourceInputSource;
 
 /**
@@ -46,7 +46,7 @@ import org.xwiki.wikistream.xml.input.SourceInputSource;
  * @since 5.2RC1
  */
 @Component
-@Named(XARUtils.ROLEHINT)
+@Named(XARWikiStreamUtils.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProperties, XARFilter>
 {

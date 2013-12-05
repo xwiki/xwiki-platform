@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -32,6 +31,10 @@ import org.xml.sax.SAXException;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.wikistream.xar.internal.XarEntry;
+import org.xwiki.wikistream.xar.internal.XarException;
+import org.xwiki.wikistream.xar.internal.XarFile;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -48,9 +51,7 @@ public interface Packager
     void importXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException,
         ComponentLookupException;
 
-    void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException;
-
-    List<XarEntry> getEntries(File xarFile) throws IOException;
+    void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException, XarException;
 
     void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration) throws XWikiException;
 
@@ -63,6 +64,6 @@ public interface Packager
     /**
      * @since 5.3RC1
      */
-    XWikiDocument getXWikiDocument(LocalDocumentReference documentReference, XarFile previousXarFile)
-        throws NotADocumentException, ParserConfigurationException, SAXException, IOException;
+    XWikiDocument getXWikiDocument(WikiReference wikiReference, LocalDocumentReference documentReference,
+        XarFile previousXarFile) throws NotADocumentException, ParserConfigurationException, SAXException, IOException;
 }

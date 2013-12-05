@@ -797,7 +797,7 @@
             property.Blog.BlogPostClass.publishDate_date:[NOW-1MONTH TO NOW] -->
        <str name="xwiki.typedDynamicFields">property.*</str>
        <!-- See the dynamic field definitions in schema.xml -->
-       <str name="xwiki.dynamicFieldTypes">boolean, int, long, float, double, date</str>
+       <str name="xwiki.dynamicFieldTypes">boolean, int, long, float, double, string, date</str>
 
        <!-- Trying to preserve compatibility with XWiki lucene plugin's queries. -->
        <str name="f.object.qf">class</str>

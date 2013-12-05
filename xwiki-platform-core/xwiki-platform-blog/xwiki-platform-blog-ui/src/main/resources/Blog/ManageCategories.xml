@@ -292,11 +292,22 @@ XWiki.blog.Categories = Class.create({
   },
   createAddSubcategoryForm : function (item) {
     var parent = item.up('.blog-categories-list');
+    var ajaxParams = {};
+    var urlParams = item.getAttribute('href').toQueryParams();
+    var entry = urlParams.entry;
+    if(entry &amp;&amp; entry != '') {
+      ajaxParams['entry'] = entry;
+    }
+    var entryObjNb = urlParams.entryObjNb;
+    if(entryObjNb &amp;&amp; entryObjNb != '') {
+      ajaxParams['entryObjNb'] = entryObjNb;
+    }
     if (!parent._x_add_form) {
       if (!parent.disabled) {
         new Ajax.Request(
           "$doc.getURL('view', 'xpage=plain&amp;display=addForm&amp;ajax=1')",
           {
+            parameters : ajaxParams,
             onCreate : function () {
               // ignore "cascade" clicks
               parent.disabled = true;
@@ -346,6 +357,11 @@ XWiki.blog.Categories = Class.create({
     this.activateForm(form);
   },
   ajaxifyAddForm : function(form) {
+    var params = 'ajax=1&amp;xpage=plain&amp;';
+    var separator = '?';
+    if(form.action.toQueryParams().entry)
+      separator = '&amp;';
+    params = separator + params;
     form.setAttribute('autocomplete', 'off');
     form.down('input[type=text]').setAttribute('autocomplete', 'off');
     form.down('input[type=text]').setAttribute('autocomplete', 'off');
@@ -355,9 +371,9 @@ XWiki.blog.Categories = Class.create({
       if (form.newCategoryName.value != '') {
         new Ajax.Request(
           #if("$!{request.mode}" == 'select')
-            form.action + '?ajax=1&amp;xpage=plain&amp;mode=select&amp;' + form.serialize(),
+            form.action + params + 'mode=select&amp;' + form.serialize(),
           #else
-            form.action + '?ajax=1&amp;xpage=plain&amp;' + form.serialize(),
+            form.action + params + form.serialize(),
           #end
           {
             onCreate : function () {
@@ -372,9 +388,24 @@ XWiki.blog.Categories = Class.create({
                 reference.insert({after : response.responseText});
                 this.initialize();
               }*/
+              var checkedCategories = [];
+                $$(".blog-categories-list").each(function(item){
+                  item.select('input[type=checkbox]').each(function(input){
+                    if(input.checked){
+                      checkedCategories.push(input.value);
+                    }
+                });
+              });
               $$(".blog-categories-list").first().replace(response.responseText);
               this.initialize();
               form.reset();
+              $$(".blog-categories-list").each(function(item){
+                item.select('input[type=checkbox]').each(function(input){
+                  if(!input.checked &amp;&amp; checkedCategories.contains(input.value)){
+                    input.checked = true;
+                  }
+                });
+              });
             }.bind(this),
             onFailure : function (response) {
               new XWiki.widgets.Notification(response.responseText || "$services.localization.render('core.widgets.ajaxRequest.error.noServer')", "error");
@@ -701,14 +732,14 @@ input.category-name-input {
     #set($newCategoryParent = $escapetool.url($request.newCategoryParent))
     #if($request.ajax)
       #if("$!{request.mode}" == 'select')
-        #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;listType=selectable&amp;root=${newCategoryParent}")})
+        #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;listType=selectable&amp;root=${newCategoryParent}&amp;entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}")})
       #else
-        #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;root=${newCategoryParent}")})
-      #end
-      $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${escapetool.url($xredirect)}&amp;xhidden=1&amp;form_token=$!{services.csrf.getToken()}"))
+        #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;root=${newCategoryParent}&amp;entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}")})
+      #end      
     #else ## request.ajax
-      $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${escapetool.url(${doc.getURL()})}&amp;xhidden=1&amp;form_token=$!{services.csrf.getToken()}"))
+      #set($xredirect = $escapetool.url($doc.getURL('view', "entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}")))
     #end
+    $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${escapetool.url($xredirect)}&amp;xhidden=1&amp;form_token=$!{services.csrf.getToken()}"))
   #end ## empty title
 #end
 #####################################################

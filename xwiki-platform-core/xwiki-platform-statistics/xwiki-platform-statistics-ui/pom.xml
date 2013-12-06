@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-statistics</artifactId>
-    <version>5.2.2-SNAPSHOT</version>
+    <version>5.2.2</version>
   </parent>
   <artifactId>xwiki-platform-statistics-ui</artifactId>
   <name>XWiki Platform - Statistics - UI</name>

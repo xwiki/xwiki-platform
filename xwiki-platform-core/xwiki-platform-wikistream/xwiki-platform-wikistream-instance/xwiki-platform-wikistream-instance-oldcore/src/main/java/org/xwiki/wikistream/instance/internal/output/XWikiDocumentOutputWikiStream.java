@@ -33,10 +33,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.annotation.Role;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.filter.FilterDescriptorManager;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -73,11 +73,13 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
  * @version $Id$
  * @since 5.4M1
  */
-@Component
-@Role
+@Component(roles = XWikiDocumentOutputWikiStream.class)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
 {
+    @Inject
+    private FilterDescriptorManager filterManager;
+
     @Inject
     @Named("current")
     private DocumentReferenceResolver<EntityReference> entityResolver;
@@ -120,6 +122,17 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
     private BaseObject currentXObject;
 
     private BaseClass currentXObjectClass;
+
+    private Object filter;
+
+    protected Object getFilter() throws WikiStreamException
+    {
+        if (this.filter == null) {
+            this.filter = this.filterManager.createCompositeFilter(this.contentListener, this);
+        }
+
+        return this.filter;
+    }
 
     public void setProperties(DocumentInstanceOutputProperties properties)
     {
@@ -254,9 +267,12 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
             new XWikiDocument(this.entityResolver.resolve(this.currentEntityReference, this.properties != null
                 ? this.properties.getDefaultReference() : null));
 
+        this.document.setCreationDate(this.currentCreationDate);
+        this.document.setCreator(this.currentCreationAuthor);
+        this.document.setDefaultLocale(this.currentDefaultLocale);
+
         this.document.setSyntax(getSyntax(WikiDocumentFilter.PARAMETER_SYNTAX, parameters, null));
 
-        this.document.setDefaultLocale(this.currentDefaultLocale);
         this.document.setLocale(this.currentLocale);
 
         this.document.setParentReference(getEntityReference(WikiDocumentFilter.PARAMETER_PARENT, parameters, null));
@@ -265,6 +281,26 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
         this.document.setDefaultTemplate(getString(WikiDocumentFilter.PARAMETER_DEFAULTTEMPLATE, parameters, null));
         this.document.setValidationScript(getString(WikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT, parameters, null));
         this.document.setHidden(getBoolean(WikiDocumentFilter.PARAMETER_HIDDEN, parameters, false));
+
+        this.document.setMinorEdit(getBoolean(WikiDocumentFilter.PARAMETER_REVISION_MINOR, parameters, false));
+        this.document.setAuthor(getString(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
+        this.document.setContentAuthor(getString(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters, null));
+
+        String revisions = getString(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS, parameters, null);
+        if (revisions != null) {
+            try {
+                this.document.setDocumentArchive(revisions);
+            } catch (XWikiException e) {
+                throw new WikiStreamException("Failed to set document archive", e);
+            }
+        }
+
+        this.document.setVersion(version);
+
+        this.document.setDate(getDate(WikiDocumentFilter.PARAMETER_REVISION_DATE, parameters, new Date()));
+        this.document.setComment(getString(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, parameters, ""));
+
+        this.document.setContentUpdateDate(getDate(WikiDocumentFilter.PARAMETER_CONTENT_DATE, parameters, new Date()));
 
         // Content
 
@@ -308,27 +344,6 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
             this.currentWikiPrinter = null;
         }
 
-        this.document.setMinorEdit(getBoolean(WikiDocumentFilter.PARAMETER_REVISION_MINOR, parameters, false));
-        this.document.setCreator(this.currentCreationAuthor);
-        this.document.setAuthor(getString(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
-        this.document.setContentAuthor(getString(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters, null));
-
-        String revisions = getString(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS, parameters, null);
-        if (revisions != null) {
-            try {
-                this.document.setDocumentArchive(revisions);
-            } catch (XWikiException e) {
-                throw new WikiStreamException("Failed to set document archive", e);
-            }
-        }
-
-        this.document.setCreationDate(this.currentCreationDate);
-        this.document.setDate(getDate(WikiDocumentFilter.PARAMETER_REVISION_DATE, parameters, new Date()));
-        this.document.setComment(getString(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, parameters, ""));
-
-        this.document.setContentUpdateDate(getDate(WikiDocumentFilter.PARAMETER_CONTENT_DATE, parameters, new Date()));
-
-        this.document.setVersion(version);
     }
 
     @Override
@@ -351,7 +366,7 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
 
         // Version
 
-        if (this.properties.isVersionPreserved()) {
+        if (this.properties == null || this.properties.isVersionPreserved()) {
             if (parameters.containsKey(WikiAttachmentFilter.PARAMETER_REVISION)) {
                 attachment.setVersion(getString(WikiAttachmentFilter.PARAMETER_REVISION, parameters, null));
             }

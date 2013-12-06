@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxTranslations</name>
+  <language>de</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1380645339000</creationDate>
+  <date>1380645418000</date>
+  <contentUpdateDate>1380645418000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxTranslations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language de generated from http://www.l10n.xwiki.org
+help.changesyntax=Syntax wechseln
+help.choose_syntax=Syntax auswählen
+help.syntaxall=Alles
+help.syntaxpage.title=XWiki Syntax Hilfe
+help.syntaxtitle=XWiki Syntax {0}
+</content>
+</xwikidoc>

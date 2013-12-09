@@ -40,7 +40,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-crypto-common</artifactId>
+      <artifactId>xwiki-platform-crypto-password</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

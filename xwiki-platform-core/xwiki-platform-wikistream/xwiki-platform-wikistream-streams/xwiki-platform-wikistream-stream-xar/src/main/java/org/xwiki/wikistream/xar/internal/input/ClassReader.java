@@ -83,7 +83,7 @@ public class ClassReader extends AbstractReader
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
 
-            if (XARClassModel.ELEMENT_NAME.equals(elementName)) {
+            if (wikiClass.name == null && XARClassModel.ELEMENT_NAME.equals(elementName)) {
                 wikiClass.name = xmlReader.getElementText();
             } else if (XARClassModel.CLASS_PARAMETERS.containsKey(elementName)) {
                 String value = xmlReader.getElementText();

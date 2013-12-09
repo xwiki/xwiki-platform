@@ -183,7 +183,7 @@ public class DocumentLocaleReader extends AbstractReader
 
     private void sendBeginWikiDocumentLocale(XARFilter proxyFilter, boolean force) throws WikiStreamException
     {
-        if (this.currentSpace != null && this.currentDocument != null && this.currentDocumentLocale != null) {
+        if (force || (this.currentSpace != null && this.currentDocument != null && this.currentDocumentLocale != null)) {
             LocalDocumentReference reference =
                 new LocalDocumentReference(this.currentSpace, this.currentDocument, this.currentDocumentLocale);
 

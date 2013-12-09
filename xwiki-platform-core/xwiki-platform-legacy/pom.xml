@@ -40,6 +40,7 @@
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-legacy-annotation</module>
+    <module>xwiki-platform-legacy-crypto-script</module>
     <module>xwiki-platform-legacy-model</module>
     <module>xwiki-platform-legacy-observation</module>
     <module>xwiki-platform-legacy-office-importer</module>

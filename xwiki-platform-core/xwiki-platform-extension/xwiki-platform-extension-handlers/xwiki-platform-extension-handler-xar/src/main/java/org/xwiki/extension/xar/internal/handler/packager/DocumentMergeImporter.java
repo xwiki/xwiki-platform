@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
+import java.util.Date;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -39,6 +40,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializerManager;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
@@ -109,6 +111,9 @@ public class DocumentMergeImporter
                             DocumentReference userReference = configuration.getUserReference();
                             nextDocument.setAuthorReference(userReference);
                             nextDocument.setContentAuthorReference(userReference);
+                            for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
+                                attachment.setAuthor(nextDocument.getAuthor());
+                            }
 
                             documentToSave =
                                 askDocumentToSave(currentDocument, previousDocument, nextDocument, null, configuration);
@@ -153,8 +158,16 @@ public class DocumentMergeImporter
             if (userReference != null) {
                 nextDocument.setAuthorReference(userReference);
                 nextDocument.setContentAuthorReference(userReference);
+                for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
+                    attachment.setAuthor(nextDocument.getAuthor());
+                }
                 mergedDocument.setAuthorReference(userReference);
                 mergedDocument.setContentAuthorReference(userReference);
+                for (XWikiAttachment attachment : mergedDocument.getAttachmentList()) {
+                    if (attachment.isContentDirty()) {
+                        attachment.setAuthor(mergedDocument.getAuthor());
+                    }
+                }
             }
 
             XWikiDocument documentToSave =
@@ -284,18 +297,11 @@ public class DocumentMergeImporter
 
         XWikiDocument currentDocument = getDatabaseDocument(document, xcontext);
 
-        DocumentReference userReference = configuration.getUserReference();
-
         if (!currentDocument.isNew()) {
             if (document != currentDocument) {
                 if (document.isNew()) {
                     currentDocument.loadAttachmentsContent(xcontext);
                     currentDocument.apply(document);
-                    if (setCreator) {
-                        currentDocument.setCreatorReference(document.getCreatorReference());
-                    }
-                    currentDocument.setAuthorReference(document.getAuthorReference());
-                    currentDocument.setContentAuthorReference(document.getContentAuthorReference());
                 } else {
                     currentDocument = document;
                 }
@@ -304,13 +310,49 @@ public class DocumentMergeImporter
             currentDocument = document;
         }
 
-        if (userReference != null) {
+        // Set document authors
+        DocumentReference configuredUser = configuration.getUserReference();
+        if (configuredUser != null) {
             if (setCreator) {
-                currentDocument.setCreatorReference(userReference);
+                currentDocument.setCreatorReference(configuredUser);
             }
-            currentDocument.setAuthorReference(userReference);
-            currentDocument.setContentAuthorReference(userReference);
+            currentDocument.setAuthorReference(configuredUser);
+            currentDocument.setContentAuthorReference(configuredUser);
+
+            // Set attachments authors
+            for (XWikiAttachment attachment : currentDocument.getAttachmentList()) {
+                if (attachment.isContentDirty()) {
+                    attachment.setAuthor(currentDocument.getAuthor());
+                }
+            }
+        } else {
+            if (document != currentDocument) {
+                if (setCreator) {
+                    currentDocument.setCreatorReference(document.getCreatorReference());
+                }
+                currentDocument.setAuthorReference(document.getAuthorReference());
+                currentDocument.setContentAuthorReference(document.getContentAuthorReference());
+
+                // Set attachments authors
+                for (XWikiAttachment attachment : document.getAttachmentList()) {
+                    if (attachment.isContentDirty()) {
+                        currentDocument.getAttachment(attachment.getFilename()).setAuthor(attachment.getAuthor());
+                    }
+                }
+            }
         }
+
+        // Set version and dates
+        if (!currentDocument.isNew()) {
+            currentDocument.setMinorEdit(false);
+            currentDocument.incrementVersion();
+            Date ndate = new Date();
+            document.setDate(ndate);
+            document.setContentUpdateDate(ndate);
+        }
+
+        currentDocument.setMetaDataDirty(false);
+        currentDocument.setContentDirty(false);
 
         saveDocumentSetContextUser(currentDocument, comment);
     }

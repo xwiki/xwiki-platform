@@ -186,11 +186,12 @@ public class Packager
         }
 
         DocumentReference reference = nextDocument.getDocumentReferenceWithLocale();
+        LocalDocumentReference localReference = new LocalDocumentReference(reference);
         XWikiDocument currentDocument = xcontext.getWiki().getDocument(reference, xcontext);
         XWikiDocument previousDocument;
-        XarFile previousXarFile = configuration.getPreviousPages().get(reference);
+        XarFile previousXarFile = configuration.getPreviousPages().get(localReference);
         if (previousXarFile != null) {
-            previousDocument = getXWikiDocument(wikiReference, new LocalDocumentReference(reference), previousXarFile);
+            previousDocument = getXWikiDocument(wikiReference, localReference, previousXarFile);
         } else {
             previousDocument = null;
         }

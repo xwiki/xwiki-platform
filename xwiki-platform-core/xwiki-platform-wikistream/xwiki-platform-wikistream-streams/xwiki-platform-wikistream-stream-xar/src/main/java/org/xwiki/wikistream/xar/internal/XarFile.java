@@ -24,8 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.List;
-import java.util.zip.ZipException;
 
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.xwiki.model.reference.LocalDocumentReference;

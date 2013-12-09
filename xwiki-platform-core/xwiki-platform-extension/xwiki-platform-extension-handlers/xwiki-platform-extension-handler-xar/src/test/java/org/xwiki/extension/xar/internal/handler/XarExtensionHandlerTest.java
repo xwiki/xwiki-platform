@@ -20,6 +20,7 @@
 package org.xwiki.extension.xar.internal.handler;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -42,12 +43,9 @@ import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
-import org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter;
-import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobManager;
-import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
@@ -77,8 +75,6 @@ public class XarExtensionHandlerTest
     public MockitoRepositoryUtilsRule repositoryUtil = new MockitoRepositoryUtilsRule(this.componentManager,
         this.oldcore);
 
-    private JobStatus mockJobStatus;
-
     private Map<DocumentReference, XWikiDocument> documents = new HashMap<DocumentReference, XWikiDocument>();
 
     private ExtensionId localXarExtensiontId1;
@@ -93,16 +89,10 @@ public class XarExtensionHandlerTest
 
     private DocumentReference contextUser;
 
-    private Packager defaultPackager;
-
-    private DocumentMergeImporter importer;
-
     @Before
     public void setUp() throws Exception
     {
         // mock
-
-        this.mockJobStatus = Mockito.mock(JobStatus.class);
 
         this.contextUser = new DocumentReference(getXWikiContext().getDatabase(), "XWiki", "ExtensionUser");
 
@@ -148,8 +138,19 @@ public class XarExtensionHandlerTest
                     boolean minorEdit = (Boolean) invocation.getArguments()[2];
 
                     document.setMinorEdit(minorEdit);
-                    document.incrementVersion();
                     document.setNew(false);
+
+                    if (document.isContentDirty() || document.isMetaDataDirty()) {
+                        Date ndate = new Date();
+                        document.setDate(ndate);
+                        if (document.isContentDirty()) {
+                            document.setContentUpdateDate(ndate);
+                            document.setContentAuthorReference(document.getAuthorReference());
+                        }
+                        document.incrementVersion();
+                        document.setContentDirty(false);
+                        document.setMetaDataDirty(false);
+                    }
 
                     XWikiDocument previousDocument = documents.get(document.getDocumentReferenceWithLocale());
 
@@ -221,8 +222,6 @@ public class XarExtensionHandlerTest
         this.jobManager = this.componentManager.getInstance(JobManager.class);
         this.xarExtensionRepository =
             this.componentManager.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
-        this.defaultPackager = this.componentManager.getInstance(Packager.class);
-        this.importer = this.componentManager.getInstance(DocumentMergeImporter.class);
 
         // Get rid of wiki macro listener
         this.componentManager.<ObservationManager> getInstance(ObservationManager.class).removeListener(
@@ -233,14 +232,14 @@ public class XarExtensionHandlerTest
     {
         Mockito.when(
             this.oldcore.getMockRightService().hasAccessLevel(Mockito.eq("admin"),
-                Mockito.eq("xwiki:XWiki.ExtensionUser"), Mockito.eq("XWiki.XWikiPreferences"),
+                Mockito.eq(this.contextUser.toString()), Mockito.eq("XWiki.XWikiPreferences"),
                 Mockito.any(XWikiContext.class))).thenReturn(right);
     }
 
     private void verifyHasAdminRight(int times) throws XWikiException
     {
         Mockito.verify(this.oldcore.getMockRightService(), Mockito.times(times)).hasAccessLevel(Mockito.eq("admin"),
-            Mockito.eq("xwiki:XWiki.ExtensionUser"), Mockito.eq("XWiki.XWikiPreferences"),
+            Mockito.eq(this.contextUser.toString()), Mockito.eq("XWiki.XWikiPreferences"),
             Mockito.any(XWikiContext.class));
     }
 
@@ -272,7 +271,7 @@ public class XarExtensionHandlerTest
         List<LogEvent> errors = installJob.getStatus().getLog().getLogsFrom(LogLevel.WARN);
         if (!errors.isEmpty()) {
             if (errors.get(0).getThrowable() != null) {
-                throw errors.get(0).getThrowable();    
+                throw errors.get(0).getThrowable();
             } else {
                 throw new Exception(errors.get(0).getFormattedMessage());
             }
@@ -295,7 +294,7 @@ public class XarExtensionHandlerTest
         List<LogEvent> errors = uninstallJob.getStatus().getLog().getLogsFrom(LogLevel.WARN);
         if (!errors.isEmpty()) {
             if (errors.get(0).getThrowable() != null) {
-                throw errors.get(0).getThrowable();    
+                throw errors.get(0).getThrowable();
             } else {
                 throw new Exception(errors.get(0).getFormattedMessage());
             }
@@ -340,6 +339,7 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "2.1", page.getVersion());
         Assert.assertEquals("Wrong version", Locale.ROOT, page.getLocale());
         Assert.assertFalse("Document is hidden", page.isHidden());
+        Assert.assertFalse("Document is minor edit", page.isMinorEdit());
 
         BaseClass baseClass = page.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
@@ -352,7 +352,7 @@ public class XarExtensionHandlerTest
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "pagewithattachment"),
                 getXWikiContext());
         Assert.assertFalse(pagewithattachment.isNew());
-        Assert.assertEquals("Wrong version", "2.1", pagewithattachment.getVersion());
+        Assert.assertEquals("Wrong version", "1.1", pagewithattachment.getVersion());
         Assert.assertEquals("Wrong creator", this.contextUser, pagewithattachment.getCreatorReference());
         Assert.assertEquals("Wrong author", this.contextUser, pagewithattachment.getAuthorReference());
         Assert.assertEquals("Wrong content author", this.contextUser, pagewithattachment.getContentAuthorReference());
@@ -363,7 +363,7 @@ public class XarExtensionHandlerTest
         Assert.assertEquals(18, attachment.getContentSize(getXWikiContext()));
         Assert
             .assertEquals("attachment content", IOUtils.toString(attachment.getContentInputStream(getXWikiContext())));
-        Assert.assertEquals("xwiki:XWiki.ExtensionUser", attachment.getAuthor());
+        Assert.assertEquals(this.contextUser.toString(), attachment.getAuthor());
 
         // space1.page1
 
@@ -477,7 +477,7 @@ public class XarExtensionHandlerTest
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "pagewithattachment"),
                 getXWikiContext());
         Assert.assertFalse(pagewithattachment.isNew());
-        Assert.assertEquals("Wrong version", "2.1", pagewithattachment.getVersion());
+        Assert.assertEquals("Wrong version", "1.1", pagewithattachment.getVersion());
         Assert.assertEquals("Wrong creator", xarCreatorReference, pagewithattachment.getCreatorReference());
         Assert.assertEquals("Wrong author", xarAuthorReference, pagewithattachment.getAuthorReference());
         Assert.assertEquals("Wrong content author", xarContentAuthorReference,
@@ -847,7 +847,7 @@ public class XarExtensionHandlerTest
 
         Assert.assertEquals("Wrong content", "content", modifiedpage.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
-        Assert.assertEquals("Wrong versions", "3.1", modifiedpage.getVersion());
+        Assert.assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
         Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
 
         BaseClass baseClass = modifiedpage.getXClass();

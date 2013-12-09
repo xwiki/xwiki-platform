@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.wikistream.xar.internal.XarEntry;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wikistream.xar.internal.XarFile;
 
 /**
@@ -44,7 +44,7 @@ public class PackageConfiguration
 
     private boolean logEnabled = false;
 
-    private Map<XarEntry, XarFile> previousPages;
+    private Map<LocalDocumentReference, XarFile> previousPages;
 
     private Set<String> entriesToImport;
 
@@ -110,12 +110,12 @@ public class PackageConfiguration
         this.entriesToImport = entriesToImport;
     }
 
-    public Map<XarEntry, XarFile> getPreviousPages()
+    public Map<LocalDocumentReference, XarFile> getPreviousPages()
     {
-        return this.previousPages != null ? this.previousPages : Collections.<XarEntry, XarFile> emptyMap();
+        return this.previousPages != null ? this.previousPages : Collections.<LocalDocumentReference, XarFile> emptyMap();
     }
 
-    public void setPreviousPages(Map<XarEntry, XarFile> previousPages)
+    public void setPreviousPages(Map<LocalDocumentReference, XarFile> previousPages)
     {
         this.previousPages = previousPages;
     }

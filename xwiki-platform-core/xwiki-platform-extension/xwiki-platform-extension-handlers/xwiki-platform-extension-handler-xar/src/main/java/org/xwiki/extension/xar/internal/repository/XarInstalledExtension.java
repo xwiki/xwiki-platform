@@ -21,7 +21,6 @@ package org.xwiki.extension.xar.internal.repository;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 
 import org.xwiki.extension.InstalledExtension;
@@ -29,7 +28,6 @@ import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.wrap.WrappingInstalledExtension;
 import org.xwiki.wikistream.xar.internal.XarEntry;
 import org.xwiki.wikistream.xar.internal.XarException;
-import org.xwiki.wikistream.xar.internal.XarFile;
 import org.xwiki.wikistream.xar.internal.XarPackage;
 
 /**

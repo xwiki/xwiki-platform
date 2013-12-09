@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.xar.internal;
 
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 public class XarEntry
@@ -78,7 +79,15 @@ public class XarEntry
     @Override
     public boolean equals(Object obj)
     {
-        return obj instanceof XarEntry && getReference().equals(((XarEntry) obj).getReference());
+        if (obj instanceof XarEntry) {
+            return getReference().equals(((XarEntry) obj).getReference());
+        }
+
+        if (obj instanceof EntityReference) {
+            return getReference().equals(obj);
+        }
+
+        return false;
     }
 
     @Override

@@ -33,7 +33,7 @@ import org.xwiki.crypto.internal.LineWrapperOutputStream;
  * Abstract base class for encoder based on Bouncy Castle encoders.
  *
  * @version $Id$
- * @since 5.3M1
+ * @since 5.4M1
  */
 public abstract class AbstractBinaryStringEncoder implements BinaryStringEncoder
 {

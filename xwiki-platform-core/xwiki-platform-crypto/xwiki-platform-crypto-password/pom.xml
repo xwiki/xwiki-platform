@@ -25,7 +25,7 @@
   <parent>
     <artifactId>xwiki-platform-crypto</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -40,7 +40,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-crypto-password</artifactId>
+      <artifactId>xwiki-platform-crypto-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -42,7 +42,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
  * Signed Public Key and Challenge parser for SPKAC request compatible with the <keygen> form control.
  *
  * @version $Id$
- * @since 5.3RC1
+ * @since 5.4M1
  */
 public class SpkacRequest
 {

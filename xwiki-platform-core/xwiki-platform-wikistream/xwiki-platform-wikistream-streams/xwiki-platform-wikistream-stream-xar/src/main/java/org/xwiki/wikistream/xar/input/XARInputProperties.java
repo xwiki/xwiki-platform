@@ -45,6 +45,11 @@ public class XARInputProperties extends XMLInputProperties
     private boolean withHistory = true;
 
     /**
+     * @see #isForceDocument()
+     */
+    private boolean forceDocument;
+
+    /**
      * @return The entities to take into account or skip
      */
     @PropertyName("Entities")
@@ -78,5 +83,23 @@ public class XARInputProperties extends XMLInputProperties
     public void setWithHistory(boolean withHistory)
     {
         this.withHistory = withHistory;
+    }
+
+    /**
+     * @return true if the input should be forced as document
+     */
+    @PropertyName("Force document")
+    @PropertyDescription("Force considering the input stream as a document")
+    public boolean isForceDocument()
+    {
+        return this.forceDocument;
+    }
+
+    /**
+     * @param forceDocument true if the input should be forced as document
+     */
+    public void setForceDocument(boolean forceDocument)
+    {
+        this.forceDocument = forceDocument;
     }
 }

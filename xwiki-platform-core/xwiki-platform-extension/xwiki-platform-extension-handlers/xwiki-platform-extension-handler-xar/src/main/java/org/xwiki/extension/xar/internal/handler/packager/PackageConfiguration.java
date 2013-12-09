@@ -19,33 +19,114 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.wikistream.xar.internal.XarEntry;
 import org.xwiki.wikistream.xar.internal.XarFile;
 
 /**
  * @version $Id$
  * @since 4.0M2
  */
-public interface PackageConfiguration
+public class PackageConfiguration
 {
-    String getWiki();
+    private String wiki;
 
-    DocumentReference getUserReference();
+    private DocumentReference user;
 
-    boolean isInteractive();
+    private boolean interactive;
 
-    JobStatus getJobStatus();
+    private JobStatus jobStatus;
 
-    boolean isLogEnabled();
+    private boolean logEnabled = false;
 
-    Map<LocalDocumentReference, XarFile> getPreviousPages();
+    private Map<XarEntry, XarFile> previousPages;
 
-    Set<String> getEntriesToImport();
-    
-    boolean isSkipMandatorytDocuments();
+    private Set<String> entriesToImport;
+
+    private boolean skipMandatorytDocuments = true;
+
+    public String getWiki()
+    {
+        return this.wiki;
+    }
+
+    public void setWiki(String wiki)
+    {
+        this.wiki = wiki;
+    }
+
+    public DocumentReference getUserReference()
+    {
+        return this.user;
+    }
+
+    public void setUser(DocumentReference user)
+    {
+        this.user = user;
+    }
+
+    public boolean isInteractive()
+    {
+        return this.interactive;
+    }
+
+    public void setInteractive(boolean interactive)
+    {
+        this.interactive = interactive;
+    }
+
+    public JobStatus getJobStatus()
+    {
+        return this.jobStatus;
+    }
+
+    public void setJobStatus(JobStatus jobStatus)
+    {
+        this.jobStatus = jobStatus;
+    }
+
+    public boolean isLogEnabled()
+    {
+        return this.logEnabled;
+    }
+
+    public void setLogEnabled(boolean logEnabled)
+    {
+        this.logEnabled = logEnabled;
+    }
+
+    public Set<String> getEntriesToImport()
+    {
+        return this.entriesToImport;
+    }
+
+    public void setEntriesToImport(Set<String> entriesToImport)
+    {
+        this.entriesToImport = entriesToImport;
+    }
+
+    public Map<XarEntry, XarFile> getPreviousPages()
+    {
+        return this.previousPages != null ? this.previousPages : Collections.<XarEntry, XarFile> emptyMap();
+    }
+
+    public void setPreviousPages(Map<XarEntry, XarFile> previousPages)
+    {
+        this.previousPages = previousPages;
+    }
+
+    public boolean isSkipMandatorytDocuments()
+    {
+        return this.skipMandatorytDocuments;
+    }
+
+    public void setSkipMandatorytDocuments(boolean skipMandatorytDocuments)
+    {
+        this.skipMandatorytDocuments = skipMandatorytDocuments;
+    }
 }

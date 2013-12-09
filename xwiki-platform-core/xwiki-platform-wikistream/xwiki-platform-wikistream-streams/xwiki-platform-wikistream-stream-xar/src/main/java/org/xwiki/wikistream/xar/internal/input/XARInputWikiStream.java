@@ -68,7 +68,8 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
     {
         InputSource inputSource = this.properties.getSource();
 
-        if (inputSource instanceof ReaderInputSource || inputSource instanceof SourceInputSource) {
+        if (this.properties.isForceDocument() || inputSource instanceof ReaderInputSource
+            || inputSource instanceof SourceInputSource) {
             readDocument(filter, proxyFilter);
         } else if (inputSource instanceof InputStreamInputSource) {
             InputStream stream;

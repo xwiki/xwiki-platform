@@ -37,7 +37,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
-import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
+import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
@@ -149,7 +149,7 @@ public class XarExtensionJobFinishedListener implements EventListener
 
     private PackageConfiguration createPackageConfiguration(Request request, String wiki)
     {
-        DefaultPackageConfiguration configuration = new DefaultPackageConfiguration();
+        PackageConfiguration configuration = new PackageConfiguration();
 
         configuration.setInteractive(false);
         configuration.setUser(XarExtensionHandler.getRequestUserReference(XarExtensionHandler.PROPERTY_USERREFERENCE,

@@ -53,6 +53,16 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wikistream-instance-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wikistream-stream-xar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-properties</artifactId>
       <version>${commons.version}</version>
@@ -104,7 +114,6 @@
               **/XarExtensionHandler.java,
               **/XarExtensionJobFinishedListener.java,
               **/DefaultPackageConfiguration.java,
-              **/DefaultPackager.java,
               **/NotADocumentException.java,
               **/PackageConfiguration.java,
               **/Packager.java,
@@ -124,7 +133,7 @@
               **/XarInstalledExtensionRepository.java,
               **/DocumentScriptSafeProvider.java,
               **/SafeConflictQuestion.java,
-              **/DefaultDocumentMergeImporter.java,
+              **/DocumentMergeImporter.java,
               **/WikiEventListener.java
           </excludes>
         </configuration>

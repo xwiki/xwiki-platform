@@ -19,7 +19,6 @@
  */
 package org.xwiki.extension.xar.internal.handler;
 
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +33,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.UninstallException;
@@ -44,11 +42,8 @@ import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
-import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
-import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
 import org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
-import org.xwiki.extension.xar.internal.handler.packager.xml.DocumentImporterHandler;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobManager;
@@ -58,13 +53,11 @@ import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -100,7 +93,7 @@ public class XarExtensionHandlerTest
 
     private DocumentReference contextUser;
 
-    private DefaultPackager defaultPackager;
+    private Packager defaultPackager;
 
     private DocumentMergeImporter importer;
 
@@ -964,98 +957,6 @@ public class XarExtensionHandlerTest
                 getXWikiContext());
 
         Assert.assertTrue(pageWiki2.isNew());
-    }
-
-    // DocumentImporterHandler
-
-    private XWikiDocument importDocument(String resource, boolean interactive, String wiki)
-        throws ComponentLookupException, Exception
-    {
-        DefaultPackageConfiguration configuration = new DefaultPackageConfiguration();
-        if (interactive) {
-            configuration.setInteractive(interactive);
-            configuration.setJobStatus(this.mockJobStatus);
-        }
-
-        DocumentImporterHandler documentHandler =
-            new DocumentImporterHandler(this.defaultPackager, this.componentManager, wiki, this.importer);
-        documentHandler.setConfiguration(configuration);
-
-        InputStream is = getClass().getResourceAsStream(resource);
-        try {
-            this.defaultPackager.parseDocument(is, documentHandler);
-        } finally {
-            is.close();
-        }
-
-        return documentHandler.getDocument();
-    }
-
-    @Test
-    public void testImportDocumentWithDifferentExistingDocument() throws Throwable
-    {
-        XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
-        this.oldcore.getMockXWiki().saveDocument(existingDocument, "", true, getXWikiContext());
-
-        importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
-
-        Mockito.verify(mockJobStatus, Mockito.times(1)).ask(Mockito.anyObject());
-    }
-
-    @Test
-    public void testImportDocumentWithDifferentExistingMandatoryDocument() throws Throwable
-    {
-        XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
-        existingDocument.setSyntax(Syntax.XWIKI_2_0);
-        this.oldcore.getMockXWiki().saveDocument(existingDocument, "", true, getXWikiContext());
-
-        // register a mandatory document initializer
-        MandatoryDocumentInitializer mandatoryInitializer =
-            this.componentManager.registerMockComponent(MandatoryDocumentInitializer.class, "space.page");
-
-        Mockito.when(mandatoryInitializer.updateDocument(Mockito.any(XWikiDocument.class))).thenReturn(true);
-
-        importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
-
-        Mockito.verify(mockJobStatus, Mockito.never()).ask(Mockito.anyObject());
-    }
-
-    @Test
-    public void testUninstallMandatory() throws Throwable
-    {
-        // register a mandatory document initializer
-        MandatoryDocumentInitializer mandatoryInitializer =
-            this.componentManager.registerMockComponent(MandatoryDocumentInitializer.class, "space.page");
-
-        Mockito.when(mandatoryInitializer.updateDocument(Mockito.any(XWikiDocument.class))).thenReturn(true);
-
-        mockHasAdminRight(true);
-
-        install(this.localXarExtensiontId1, "wiki", this.contextUser);
-
-        verifyHasAdminRight(2);
-
-        // uninstall
-
-        uninstall(this.localXarExtensiontId1, "wiki");
-
-        verifyHasAdminRight(3);
-
-        // validate
-
-        XWikiDocument page =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
-
-        Assert.assertFalse("Document wiki.space.page has been removed from the database", page.isNew());
-    }
-
-    @Test
-    public void testImportDocumentWithEqualsExistingDocument() throws Throwable
-    {
-        importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
-
-        // Does not produces any conflict
-        importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
     }
 
     // rights check

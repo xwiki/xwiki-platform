@@ -46,8 +46,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.extension.xar.internal.handler.ConflictQuestion;
 import org.xwiki.extension.xar.internal.handler.ConflictQuestion.GlobalAction;
-import org.xwiki.extension.xar.internal.handler.packager.DefaultDocumentMergeImporter;
-import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
+import org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter;
+import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
@@ -62,7 +62,7 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 
 /**
- * Validate {@link DefaultDocumentMergeImporter}.
+ * Validate {@link DocumentMergeImporter}.
  * 
  * @version $Id$
  */
@@ -71,7 +71,7 @@ public class DefaultDocumentMergeImporterTest
 {
     @Rule
     public MockitoComponentMockingRule<DocumentMergeImporter> importer =
-        new MockitoComponentMockingRule<DocumentMergeImporter>(DefaultDocumentMergeImporter.class);
+        new MockitoComponentMockingRule<DocumentMergeImporter>(DocumentMergeImporter.class);
 
     private DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
@@ -83,7 +83,7 @@ public class DefaultDocumentMergeImporterTest
 
     private XWikiDocument mergedDocument;
 
-    private DefaultPackageConfiguration configuration;
+    private PackageConfiguration configuration;
 
     private MergeResult mergeResult;
 
@@ -140,7 +140,7 @@ public class DefaultDocumentMergeImporterTest
 
         // merge
 
-        this.configuration = new DefaultPackageConfiguration();
+        this.configuration = new PackageConfiguration();
 
         this.mergeResult = new MergeResult();
         when(

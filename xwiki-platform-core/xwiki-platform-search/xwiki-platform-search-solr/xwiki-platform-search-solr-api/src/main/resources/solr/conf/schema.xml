@@ -98,52 +98,80 @@
    <!-- Fields that are common to all entity types (document, attachment, object and object property) -->
 
    <field name="id" type="string" indexed="true" stored="true" required="true" />
+   <!-- The entity type: DOCUMENT, ATTACHMENT, OBJECT, OBJECT_PROPERTY -->
    <field name="type" type="string" indexed="true" stored="true" />
    <field name="wiki" type="string" indexed="true" stored="true" />
+   <!-- The space name. This field is analyzed and thus mostly used for free text search.  -->
    <field name="space" type="text_general" indexed="true" stored="true" />
+   <!-- We also need to store the space name verbatim for faceting (exact matching). -->
    <field name="space_exact" type="string" indexed="true" stored="false" />
+   <!-- The document name. This field is analyzed and thus mostly used for free text search. -->
    <field name="name" type="text_general" indexed="true" stored="true" />
+   <!-- We also need to store the document name verbatim for faceting (exact matching).
+        This facet is useful for attachments and objects for instance. -->
    <field name="name_exact" type="string" indexed="true" stored="false" />
    <field name="locale" type="string" indexed="true" stored="true" />
    <!-- The list of locales covered by this entry. Dynamically determined from the list of enabled locales and the various locales of the document -->
    <field name="locales" type="string" indexed="true" stored="true" multiValued="true" />
    <!-- Contains only the language part of the locale -->
    <field name="language" type="string" indexed="true" stored="true" />
+   <!-- Whether the entity is hidden on not. Only documents can be made hidden explicitly.
+        The attachments, objects and object properties are hidden if the document that holds them is hidden. -->
    <field name="hidden" type="boolean" indexed="true" stored="true" />
 
    <!-- Document static fields -->
 
+   <!-- I don't think we need this field, do we? -->
    <field name="fullname" type="string" indexed="true" stored="true" />
+   <!-- The localized title, indexed based on the document locale -->
    <field name="title_" type="text_general" indexed="true" stored="true" />
+   <!-- We need a dedicated field for sort because analyzed fields cannot be used for sort. -->
    <field name="title_sort" type="lowercase" indexed="true" stored="false" />
+   <!-- The rendered document content (transformations are not executed)
+        NOTE: The reason we added the 'doc' prefix instead of keeping just 'content' is because we wanted to be able to
+        use a different boost value for document content than for the object and the attachment content (see the 'qf'
+        parameter in solrconfig.xml). -->
    <field name="doccontent_" type="text_general" indexed="true" stored="true" />
    <field name="doccontentraw_" type="text_general" indexed="true" stored="true" />
+   <!-- We need to index the document version (revision) to be able to detect when the index is not up to date (not in
+        sync with the database). This check is performed at XWiki startup for instance (see IndexerJob#addMissing). -->
    <field name="version" type="string" indexed="true" stored="true" />
-   <!-- The version summary -->
+   <!-- The version summary. A brief description of the changes made in the latest version. -->
    <field name="comment_" type="text_general" indexed="true" stored="true" />
    <!-- Contains the technical locale of the document (i.e. empty for default entry) -->
    <field name="doclocale" type="string" indexed="true" stored="true" />
+   <!-- The last author. This field is used for faceting (exact matching) -->
    <field name="author" type="string" indexed="true" stored="true" />
+   <!-- The last author, this time analyzed and thus used for free text search -->
    <field name="author_display" type="text_general" indexed="true" stored="true" />
    <field name="author_display_sort" type="lowercase" indexed="true" stored="false" />
+   <!-- The document creator, stored verbatim for faceting (exact matching) -->
    <field name="creator" type="string" indexed="true" stored="true" />
+   <!-- The document creator, this time analyzed and thus used for free text search. -->
    <field name="creator_display" type="text_general" indexed="true" stored="true" />
    <field name="date" type="tdate" indexed="true" stored="true" />
    <field name="creationdate" type="tdate" indexed="true" stored="true" />
-   <!-- The type of objects stored by this document. E.g. [Blog.BlogPostClass, XWiki.TagClass, ..] -->
+
+   <!-- In order to avoid joins we index object data on document rows (at the cost of duplicating information). -->
+   <!-- The type of objects stored by this document. E.g. [Blog.BlogPostClass, XWiki.TagClass, ..]
+        You can also use 'object' in search queries, as an alias to 'class'. -->
    <field name="class" type="string" indexed="true" stored="true" multiValued="true" />
+   <!-- This field collects the values from all the properties of all the objects found on the indexed document. -->
    <field name="objcontent_" type="text_general" indexed="true" stored="true" multiValued="true" />
 
    <!-- Attachment static fields -->
 
    <field name="filename" type="text_filename" indexed="true" stored="true" />
    <field name="mimetype" type="string" indexed="true" stored="true" />
+   <!-- We need to index the attachment version (revision) to be able to detect when the Solr index is out of date (not
+        in sync with the database). E.g. 1.2 -->
    <field name="attversion" type="string" indexed="true" stored="true" />
    <field name="attcontent_" type="text_general" indexed="true" stored="false" />
 
    <!-- Object static fields -->
 
    <!-- class -->
+   <!-- The object number, identifies an object when there are multiple objects of the same type on a document. -->
    <field name="number" type="int" indexed="true" stored="true" />
    <!-- objcontent_ -->
 

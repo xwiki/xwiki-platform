@@ -35,7 +35,7 @@ import org.xwiki.crypto.params.cipher.symmetric.KeyParameter;
  */
 @Component(hints = { "DES/CBC/PKCS5Padding", "DES/CBC/PKCS7Padding", "1.3.14.3.2.7" })
 @Singleton
-public class DesCbcPaddedCipherFactory extends AbstractBcCbcPaddedCipherFactory
+public class BcDesCbcPaddedCipherFactory extends AbstractBcCbcPaddedCipherFactory
 {
     /** Supported key sizes for this Cipher. */
     private static final int[] KEY_SIZES = new int[] {8};

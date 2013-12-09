@@ -37,7 +37,7 @@ public class BcRc2CbcPaddedCipherFactoryTest extends AbstractSymmetricCipherFact
     @Rule
     @SuppressWarnings("unchecked")
     public final MockitoComponentMockingRule<CipherFactory> mocker =
-        new MockitoComponentMockingRule(Rc2CbcPaddedCipherFactory.class);
+        new MockitoComponentMockingRule(BcRc2CbcPaddedCipherFactory.class);
 
     {
         CIPHER_ALGO = "RC2/CBC/PKCS5Padding";

@@ -31,7 +31,7 @@ public class BcDesCbcPaddedCipherFactoryTest extends AbstractSymmetricCipherFact
     @Rule
     @SuppressWarnings("unchecked")
     public final MockitoComponentMockingRule<CipherFactory> mocker =
-        new MockitoComponentMockingRule(DesCbcPaddedCipherFactory.class);
+        new MockitoComponentMockingRule(BcDesCbcPaddedCipherFactory.class);
 
     {
         CIPHER_ALGO = "DES/CBC/PKCS5Padding";

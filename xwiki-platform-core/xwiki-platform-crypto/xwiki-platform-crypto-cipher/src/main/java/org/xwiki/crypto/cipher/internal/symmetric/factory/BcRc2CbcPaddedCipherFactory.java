@@ -36,7 +36,7 @@ import org.xwiki.crypto.params.cipher.symmetric.KeyParameter;
  */
 @Component(hints = { "RC2/CBC/PKCS5Padding", "RC2/CBC/PKCS7Padding", "1.2.840.113549.3.2" })
 @Singleton
-public class Rc2CbcPaddedCipherFactory extends AbstractBcCbcPaddedCipherFactory
+public class BcRc2CbcPaddedCipherFactory extends AbstractBcCbcPaddedCipherFactory
 {
     /** Supported key sizes for this Cipher. RC2 support up to 128 bytes, but we limit here to 64 since more is rare. */
     private static final int[] KEY_SIZES = newKeySizeArray(1, 64, 1);

@@ -126,7 +126,11 @@ solr.field.propertyvalue=Property Value
 solr.field.filename=Attachment Name
 solr.field.attcontent=Attachment Content
 solr.field.comment=Comments
-solr.field.objcontent=Objects</content>
+solr.field.objcontent=Objects
+solr.field.mimetype=Media Type
+solr.field.attauthor=Uploaded By
+solr.field.attdate=Upload Date
+solr.field.attsize=File Size</content>
   <object>
     <name>Main.SolrTranslations</name>
     <number>0</number>

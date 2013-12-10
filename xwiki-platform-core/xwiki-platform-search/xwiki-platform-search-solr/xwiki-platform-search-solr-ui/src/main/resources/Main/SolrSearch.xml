@@ -265,8 +265,10 @@
   'locale': 'locale',
   'author': 'user',
   'creator': 'user',
+  'attauthor': 'user',
   'date': 'date',
-  'creationdate': 'date'
+  'creationdate': 'date',
+  'attdate': 'date'
 })
 
 #macro (displaySearchFacetValues $facetValues)
@@ -339,9 +341,12 @@
   'locale': 'locale',
   'author': 'user',
   'creator': 'user',
+  'attauthor': 'user',
   'date': 'date',
   'creationdate': 'date',
-  'class': 'class'
+  'attdate': 'date',
+  'class': 'class',
+  'attsize': 'size'
 })
 
 #macro (displaySearchFacetValue_default $facetPrettyValue)
@@ -609,6 +614,10 @@
   &lt;span title="$escapetool.xml($hint)"&gt;$escapetool.xml($classPrettyName)&lt;/span&gt;
 #end
 
+#macro (displaySearchFacetValue_size $size)
+  #dynamicsize($mathtool.toInteger($size))
+#end
+
 #macro (displaySearchResultsSort)
   #set ($defaultSortOrder = {
     'score': 'desc',
@@ -700,9 +709,9 @@
     #set ($author = $xwiki.getUserName($searchResultTranslatedDocument.author))
     &lt;div class="search-result-author"&gt;$services.localization.render('solr.result.author', [$author, $date])&lt;/div&gt;
     ##
-    #if ("$!searchResult.mimetype" != '')
+    #if ("$!searchResult.mimetype" != '' &amp;&amp; $searchResult.type != 'DOCUMENT')
       &lt;div class="search-result-mediaType"&gt;$services.localization.render('solr.result.mediaType',
-        [$escapetool.xml($searchResult.mimetype)])&lt;/div&gt;
+        [$escapetool.xml($searchResult.mimetype.get(0))])&lt;/div&gt;
     #end
     #set ($class = $searchResult.get('class'))
     #if ("$!class" != '' &amp;&amp; $searchResult.type != 'DOCUMENT')
@@ -736,7 +745,7 @@
   #set ($title = $searchResultTranslatedDocument.plainTitle)
   #set ($titleURL = $searchResultDocument.getURL())
   #if ($searchResult.type == 'ATTACHMENT')
-    #set ($title = $searchResult.filename)
+    #set ($title = $searchResult.filename.get(0))
     #set ($titleURL = $searchResultDocument.getAttachmentURL($searchResult.filename))
   #elseif ($searchResult.type == 'DOCUMENT' &amp;&amp; $searchResult.locale != ''
     &amp;&amp; $xcontext.language != $searchResult.locale)

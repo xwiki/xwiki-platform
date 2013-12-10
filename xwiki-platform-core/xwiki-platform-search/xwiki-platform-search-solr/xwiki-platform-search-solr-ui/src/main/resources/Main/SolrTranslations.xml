@@ -48,6 +48,10 @@ solr.sortBy.score=Relevance
 solr.sortBy.title_sort=Title
 solr.sortBy.date=Last Modification Date
 solr.sortBy.author_display_sort=Last Author
+solr.sortBy.filename_sort=File Name
+solr.sortBy.attsize_sort=File Size
+solr.sortBy.attdate_sort=Upload Date
+solr.sortBy.attauthor_display_sort=Uploaded By
 solr.sortOrder.asc=Ascending
 solr.sortOrder.desc=Descending
 

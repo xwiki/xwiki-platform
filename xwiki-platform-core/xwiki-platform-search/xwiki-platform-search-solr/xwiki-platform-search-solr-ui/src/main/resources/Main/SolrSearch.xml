@@ -619,12 +619,25 @@
 #end
 
 #macro (displaySearchResultsSort)
-  #set ($defaultSortOrder = {
-    'score': 'desc',
-    'title_sort' : 'asc',
-    'date' : 'desc',
-    'author_display_sort' : 'asc'
+  #set ($defaultSortOrderByEntityType = {
+    'DOCUMENT': {
+      'score': 'desc',
+      'title_sort': 'asc',
+      'date': 'desc',
+      'author_display_sort': 'asc'
+    },
+    'ATTACHMENT': {
+      'score': 'desc',
+      'filename_sort': 'asc',
+      'attsize_sort': 'asc',
+      'attdate_sort': 'desc',
+      'attauthor_display_sort': 'asc'
+    }
   })
+  #set ($defaultSortOrder = $defaultSortOrderByEntityType.get($type))
+  #if (!$defaultSortOrder)
+    #set ($defaultSortOrder = {'score': 'desc'})
+  #end
   #set ($sortOrderSymbol = {
     'asc': "\u25B2",
     'desc': "\u25BC"

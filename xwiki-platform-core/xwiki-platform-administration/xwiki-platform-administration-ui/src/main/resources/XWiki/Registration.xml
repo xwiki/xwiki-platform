@@ -861,7 +861,6 @@ $heading
     #end
     ## If there is a "global" doAfterRegistration, do that as well.
     #set($discard = $doAfterRegistration.toString())
-    #end
     ## Define some strings which may be used by autoLogin or loginButton
     #set($userName = $!request.get('xwikiname'))
     #set($password = $!request.get('register_password'))

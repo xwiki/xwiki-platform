@@ -877,7 +877,21 @@
     #getSupportedLanguages()
   #end
   #set ($discard = $query.bindValue('xwiki.supportedLocales', $stringtool.join($supportedLanguages, ',')))
-  #if ($boost != '')
+  ## Specify which index fields are matched when a free text search is performed.
+  #set ($defaultBoost = {
+    'DOCUMENT': 'title^10.0 name^10.0
+                 doccontent^2.0
+                 objcontent^0.4 filename^0.4 attcontent^0.4 doccontentraw^0.4
+                 author_display^0.08 creator_display^0.08
+                 comment^0.016 attauthor_display^0.016 space^0.016',
+    'ATTACHMENT': 'filename^5.0 attcontent attauthor_display^0.2',
+    'OBJECT': 'objcontent',
+    'OBJECT_PROPERTY': 'propertyvalue'
+  })
+  #if ($boost == '')
+    #set ($boost = $defaultBoost.get($type))
+  #end
+  #if ("$!boost" != '')
     #set ($discard = $query.bindValue('qf', $boost))
   #end
   #if ($debug != '')

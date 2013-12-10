@@ -254,7 +254,10 @@ public class DocumentSolrMetadataExtractorTest
 
         assertEquals(Locale.US.toString(), solrDocument.getFieldValue(FieldUtils.LOCALE));
         assertEquals(Locale.US.getLanguage(), solrDocument.getFieldValue(FieldUtils.LANGUAGE));
-        assertEquals(Arrays.asList(Locale.US.toString(), ""), solrDocument.getFieldValues(FieldUtils.LOCALES));
+        Collection< ? > actualLocales = solrDocument.getFieldValues(FieldUtils.LOCALES);
+        // The order of the locales in the returned collection is nondeterministic.
+        assertTrue(actualLocales.size() == 2 && actualLocales.contains("")
+            && actualLocales.contains(Locale.US.toString()));
         assertEquals(this.document.isHidden(), solrDocument.getFieldValue(FieldUtils.HIDDEN));
         assertEquals(EntityType.DOCUMENT.name(), solrDocument.getFieldValue(FieldUtils.TYPE));
 

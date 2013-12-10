@@ -159,14 +159,34 @@
    <!-- This field collects the values from all the properties of all the objects found on the indexed document. -->
    <field name="objcontent_" type="text_general" indexed="true" stored="true" multiValued="true" />
 
+   <!-- In order to avoid joins we index attachment data on document rows (at the cost of duplicating information). -->
+   <!-- The attachment file name. E.g. ['todo.txt', 'logo.png'] -->
+   <field name="filename" type="text_filename" indexed="true" stored="true" multiValued="true" />
+   <!-- The attachment media type. E.g. ['text/plain', 'image/png'] -->
+   <field name="mimetype" type="string" indexed="true" stored="true" multiValued="true" />
+   <!-- The user that uploaded the attachment. Used for faceting (exact matching). -->
+   <field name="attauthor" type="string" indexed="true" stored="true" multiValued="true" />
+   <!-- Used for free text search. -->
+   <field name="attauthor_display" type="text_general" indexed="true" stored="true" multiValued="true" />
+   <!-- The date when the attachment was uploaded. -->
+   <field name="attdate" type="tdate" indexed="true" stored="true" multiValued="true" />
+   <field name="attcontent_" type="text_general" indexed="true" stored="false" multiValued="true" />
+   <!-- The attachment size in bytes. -->
+   <field name="attsize" type="tlong" indexed="true" stored="true" multiValued="true" />
+
    <!-- Attachment static fields -->
 
-   <field name="filename" type="text_filename" indexed="true" stored="true" />
-   <field name="mimetype" type="string" indexed="true" stored="true" />
+   <!-- filename, minetype, attauthor, attauthor_display, attdate, attcontent_, attsize -->
    <!-- We need to index the attachment version (revision) to be able to detect when the Solr index is out of date (not
         in sync with the database). E.g. 1.2 -->
    <field name="attversion" type="string" indexed="true" stored="true" />
-   <field name="attcontent_" type="text_general" indexed="true" stored="false" />
+   <field name="filename_sort" type="lowercase" indexed="true" stored="false" />
+   <field name="attauthor_display_sort" type="lowercase" indexed="true" stored="false" />
+   <!-- We need dedicated fields for sort because the corresponding fields are multiValued (they are reused on document
+        rows, see above, and a document can have multiple attachments) and Solr doesn't support sorting on multiValued
+        fields. -->
+   <field name="attdate_sort" type="tdate" indexed="true" stored="false" />
+   <field name="attsize_sort" type="tlong" indexed="true" stored="false" />
 
    <!-- Object static fields -->
 

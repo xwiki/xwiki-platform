@@ -817,6 +817,10 @@
        <str name="facet.field">type</str>
        <str name="facet.field">class</str>
        <str name="facet.field">name_exact</str>
+       <str name="facet.field">mimetype</str>
+       <str name="facet.field">attauthor</str>
+       <str name="facet.field">attdate</str>
+       <str name="facet.field">attsize</str>
 
        <!-- Highlighting defaults -->
        <str name="hl">true</str>

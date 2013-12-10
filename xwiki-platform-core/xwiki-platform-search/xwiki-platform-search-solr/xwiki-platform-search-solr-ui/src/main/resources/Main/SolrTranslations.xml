@@ -59,8 +59,7 @@ solr.result.language=Language
 solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
 solr.result.author=Modified by {0} on {1}
 solr.result.mediaType=File of type {0}
-solr.result.object=Object of type {0}
-solr.result.property=Property {0}#{1}
+solr.result.uploadedBy=Uploaded by {0} on {1} ({2})
 solr.result.highlightAll=Highlight all matches
 
 solr.filter.title=Advanced Options

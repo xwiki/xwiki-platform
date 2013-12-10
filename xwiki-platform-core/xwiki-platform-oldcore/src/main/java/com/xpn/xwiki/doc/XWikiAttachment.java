@@ -791,7 +791,7 @@ public class XWikiAttachment implements Cloneable
         return modified;
     }
 
-    public boolean equals(XWikiAttachment otherAttachment, XWikiContext xcontext) throws XWikiException
+    public boolean equalsData(XWikiAttachment otherAttachment, XWikiContext xcontext) throws XWikiException
     {
         try {
             if (getFilesize() == otherAttachment.getFilesize()) {
@@ -821,7 +821,7 @@ public class XWikiAttachment implements Cloneable
         MergeConfiguration configuration, XWikiContext xcontext, MergeResult mergeResult)
     {
         try {
-            if (equals(previousAttachment, xcontext)) {
+            if (equalsData(previousAttachment, xcontext)) {
                 this.apply(nextAttachment);
                 mergeResult.setModified(true);
             } else {

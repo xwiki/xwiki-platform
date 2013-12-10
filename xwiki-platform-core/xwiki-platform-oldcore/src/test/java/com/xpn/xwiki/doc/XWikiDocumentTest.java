@@ -1533,22 +1533,22 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testEqualsDatas()
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
-        XWikiDocument otherDocyment = document.clone();
+        XWikiDocument otherDocument = document.clone();
 
-        Assert.assertTrue(document.equals(otherDocyment));
-        Assert.assertTrue(document.equalsData(otherDocyment));
+        Assert.assertTrue(document.equals(otherDocument));
+        Assert.assertTrue(document.equalsData(otherDocument));
 
-        otherDocyment.setAuthorReference(new DocumentReference("wiki", "space", "otherauthor"));
-        otherDocyment.setContentAuthorReference(otherDocyment.getAuthorReference());
-        otherDocyment.setCreatorReference(otherDocyment.getAuthorReference());
-        otherDocyment.setVersion("42.0");
-        otherDocyment.setComment("other comment");
-        otherDocyment.setMinorEdit(true);
+        otherDocument.setAuthorReference(new DocumentReference("wiki", "space", "otherauthor"));
+        otherDocument.setContentAuthorReference(otherDocument.getAuthorReference());
+        otherDocument.setCreatorReference(otherDocument.getAuthorReference());
+        otherDocument.setVersion("42.0");
+        otherDocument.setComment("other comment");
+        otherDocument.setMinorEdit(true);
 
         document.setMinorEdit(false);
 
-        Assert.assertFalse(document.equals(otherDocyment));
-        Assert.assertTrue(document.equalsData(otherDocyment));
+        Assert.assertFalse(document.equals(otherDocument));
+        Assert.assertTrue(document.equalsData(otherDocument));
     }
 
     public void testContentDirtyWhenAttachmenListChanges()

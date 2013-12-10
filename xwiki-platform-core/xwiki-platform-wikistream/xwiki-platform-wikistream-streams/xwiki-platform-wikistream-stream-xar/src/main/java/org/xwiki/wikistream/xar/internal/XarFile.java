@@ -34,6 +34,8 @@ import org.xwiki.model.reference.LocalDocumentReference;
  */
 public class XarFile implements Closeable
 {
+    private File file;
+
     private ZipFile zipFile;
 
     private XarPackage xarPackage;
@@ -45,13 +47,14 @@ public class XarFile implements Closeable
 
     public XarFile(File file, Collection<XarEntry> pages) throws XarException, IOException
     {
-        try {
-            this.zipFile = new ZipFile(file);
-        } catch (IOException e) {
-            throw new XarException("Failed to pase zip file", e);
-        }
-
+        this.file = file;
+        this.zipFile = new ZipFile(file);
         this.xarPackage = pages != null ? new XarPackage(pages) : new XarPackage(this.zipFile);
+    }
+
+    public File getFile()
+    {
+        return this.file;
     }
 
     public void close() throws IOException
@@ -82,6 +85,6 @@ public class XarFile implements Closeable
     @Override
     public String toString()
     {
-        return this.zipFile.toString();
+        return this.file.toString();
     }
 }

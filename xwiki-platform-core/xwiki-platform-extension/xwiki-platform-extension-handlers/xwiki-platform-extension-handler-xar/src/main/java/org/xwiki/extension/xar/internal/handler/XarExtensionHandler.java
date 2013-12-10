@@ -46,8 +46,6 @@ import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.internal.AbstractExtensionHandler;
 import org.xwiki.extension.job.internal.AbstractExtensionJob;
 import org.xwiki.extension.job.plan.ExtensionPlan;
-import org.xwiki.extension.job.plan.ExtensionPlanAction;
-import org.xwiki.extension.job.plan.ExtensionPlanAction.Action;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
@@ -62,7 +60,6 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wikistream.xar.internal.XarEntry;
 import org.xwiki.wikistream.xar.internal.XarException;
 import org.xwiki.wikistream.xar.internal.XarFile;
-import org.xwiki.wikistream.xar.internal.XarPackage;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -78,12 +75,6 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 public class XarExtensionHandler extends AbstractExtensionHandler
 {
     public static final String TYPE = "xar";
-
-    public static final String CONTEXTKEY_PREVIOUSXARPAGES = "extension.xar.installplan.previouspages";
-
-    public static final String CONTEXTKEY_XARPAGES = "extension.xar.installplan.pages";
-
-    protected static final String WIKI_NAMESPACEPREFIX = "wiki:";
 
     protected static final String PROPERTY_USERREFERENCE = "user.reference";
 
@@ -126,22 +117,6 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     @Inject
     private Execution execution;
 
-    protected static String getWikiFromNamespace(String namespace) throws UnsupportedNamespaceException
-    {
-        String wiki = namespace;
-
-        if (wiki != null) {
-            if (wiki.startsWith(WIKI_NAMESPACEPREFIX)) {
-                wiki = wiki.substring(WIKI_NAMESPACEPREFIX.length());
-            } else {
-                throw new UnsupportedNamespaceException("Unsupported namespace [" + namespace
-                    + "], only wiki:wikiid format is supported");
-            }
-        }
-
-        return wiki;
-    }
-
     protected static DocumentReference getRequestUserReference(String property, Request request)
     {
         Object obj = request.getProperty(property);
@@ -153,7 +128,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         return null;
     }
 
-    private void initializePagesIndex() throws ExtensionException
+    private void initializePagesIndex() throws ExtensionException, XarException, IOException
     {
         ExecutionContext context = this.execution.getContext();
 
@@ -161,102 +136,27 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             ExtensionPlan plan = (ExtensionPlan) context.getProperty(AbstractExtensionJob.CONTEXTKEY_PLAN);
 
             if (plan != null) {
-                Map<String, Map<XarEntry, XarInstalledExtension>> previousXAREntries =
-                    (Map<String, Map<XarEntry, XarInstalledExtension>>) context
-                        .getProperty(CONTEXTKEY_PREVIOUSXARPAGES);
-                Map<String, Map<XarEntry, LocalExtension>> nextXAREntries =
-                    (Map<String, Map<XarEntry, LocalExtension>>) context.getProperty(CONTEXTKEY_XARPAGES);
+                XarExtensionPlan xarPlan =
+                    (XarExtensionPlan) context.getProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN);
 
-                if (nextXAREntries == null) {
-                    previousXAREntries = new HashMap<String, Map<XarEntry, XarInstalledExtension>>();
-                    nextXAREntries = new HashMap<String, Map<XarEntry, LocalExtension>>();
+                if (xarPlan == null) {
+                    this.logger.info("Preparing XAR extension plan");
 
-                    for (ExtensionPlanAction action : plan.getActions()) {
-                        if (action.getExtension().getType().equals(TYPE)) {
-                            // Get previous entries
-                            Collection<InstalledExtension> previousExtensions = action.getPreviousExtensions();
-                            for (InstalledExtension previousExtension : previousExtensions) {
-                                if (previousExtension != null) {
-                                    XarInstalledExtension previousXARExtension =
-                                        (XarInstalledExtension) this.xarRepository
-                                            .getInstalledExtension(previousExtension.getId());
+                    context.setProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN, new XarExtensionPlan(plan,
+                        this.xarRepository, this.localReposirory));
 
-                                    for (XarEntry entry : previousXARExtension.getPages()) {
-                                        String wiki;
-                                        try {
-                                            wiki = getWikiFromNamespace(action.getNamespace());
-                                        } catch (UnsupportedNamespaceException e) {
-                                            throw new ExtensionException("Failed to extract wiki id from namespace", e);
-                                        }
-                                        Map<XarEntry, XarInstalledExtension> pages = previousXAREntries.get(wiki);
-                                        if (pages == null) {
-                                            pages = new HashMap<XarEntry, XarInstalledExtension>();
-                                            previousXAREntries.put(wiki, pages);
-                                        }
-                                        pages.put(entry, previousXARExtension);
-                                    }
-                                }
-                            }
-
-                            // Get new entries
-                            LocalExtension nextExtension =
-                                action.getAction() != Action.UNINSTALL && action.getExtension() != null
-                                    ? this.localReposirory.getLocalExtension(action.getExtension().getId()) : null;
-
-                            if (nextExtension != null) {
-                                try {
-                                    Collection<XarEntry> entries =
-                                        XarPackage.getEntries(new File(nextExtension.getFile().getAbsolutePath()));
-
-                                    for (XarEntry entry : entries) {
-                                        String wiki;
-                                        try {
-                                            wiki = getWikiFromNamespace(action.getNamespace());
-                                        } catch (UnsupportedNamespaceException e) {
-                                            throw new ExtensionException("Failed to extract wiki id from namespace", e);
-                                        }
-                                        Map<XarEntry, LocalExtension> pages = nextXAREntries.get(wiki);
-                                        if (pages == null) {
-                                            pages = new HashMap<XarEntry, LocalExtension>();
-                                            nextXAREntries.put(wiki, pages);
-                                        }
-                                        pages.put(entry, nextExtension);
-                                    }
-                                } catch (IOException e) {
-                                    this.logger.error("Failed to parse extension file [{}]", nextExtension.getFile()
-                                        .getAbsolutePath(), e);
-                                } catch (XarException e) {
-                                    this.logger.error("Failed to parse extension file [{}]", nextExtension.getFile()
-                                        .getAbsolutePath(), e);
-                                }
-                            }
-                        }
-                    }
-
-                    context.setProperty(CONTEXTKEY_PREVIOUSXARPAGES, previousXAREntries);
-                    context.setProperty(CONTEXTKEY_XARPAGES, nextXAREntries);
+                    this.logger.info("XAR extension plan ready");
                 }
             }
         }
     }
 
-    private Map<String, Map<XarEntry, XarInstalledExtension>> getPreviousXAREntries()
+    private XarExtensionPlan getXARInstallPlan()
     {
         ExecutionContext context = this.execution.getContext();
 
         if (context != null) {
-            return (Map<String, Map<XarEntry, XarInstalledExtension>>) context.getProperty(CONTEXTKEY_PREVIOUSXARPAGES);
-        }
-
-        return null;
-    }
-
-    private Map<String, Map<XarEntry, LocalExtension>> getNextXAREntries()
-    {
-        ExecutionContext context = this.execution.getContext();
-
-        if (context != null) {
-            return (Map<String, Map<XarEntry, LocalExtension>>) context.getProperty(CONTEXTKEY_XARPAGES);
+            return (XarExtensionPlan) context.getProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN);
         }
 
         return null;
@@ -270,7 +170,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         if (!request.isRemote()) {
             String wiki;
             try {
-                wiki = getWikiFromNamespace(namespace);
+                wiki = XarHandlerUtils.getWikiFromNamespace(namespace);
             } catch (UnsupportedNamespaceException e) {
                 throw new InstallException("Failed to extract wiki id from namespace", e);
             }
@@ -288,7 +188,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         if (!request.isRemote()) {
             String wiki;
             try {
-                wiki = getWikiFromNamespace(namespace);
+                wiki = XarHandlerUtils.getWikiFromNamespace(namespace);
             } catch (UnsupportedNamespaceException e) {
                 throw new InstallException("Failed to extract wiki id from namespace", e);
             }
@@ -303,7 +203,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     {
         try {
             initializePagesIndex();
-        } catch (ExtensionException e) {
+        } catch (Exception e) {
             throw new InstallException("Failed to initialize extension plan index", e);
         }
 
@@ -325,7 +225,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     {
         try {
             initializePagesIndex();
-        } catch (ExtensionException e) {
+        } catch (Exception e) {
             throw new UninstallException("Failed to initialize extension plan index", e);
         }
 
@@ -342,7 +242,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             if (currentJob == null) {
                 String wiki;
                 try {
-                    wiki = getWikiFromNamespace(namespace);
+                    wiki = XarHandlerUtils.getWikiFromNamespace(namespace);
                 } catch (UnsupportedNamespaceException e) {
                     throw new UninstallException("Failed to extract wiki id from namespace", e);
                 }
@@ -358,7 +258,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 try {
                     XarInstalledExtension xarLocalExtension =
                         (XarInstalledExtension) this.xarRepository.resolve(installedExtension.getId());
-                    Collection<XarEntry> pages = xarLocalExtension.getPages();
+                    Collection<XarEntry> pages = xarLocalExtension.getXarPackage().getEntries();
                     this.packager.unimportPages(pages, configuration);
                 } catch (Exception e) {
                     // Not supposed to be possible
@@ -404,26 +304,26 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
 
         // Previous pages
-        Map<String, Map<XarEntry, XarInstalledExtension>> previousXAREntries = getPreviousXAREntries();
+        Map<String, Map<XarEntry, XarExtensionPlanEntry>> previousXAREntries = getXARInstallPlan().previousXAREntries;
         Map<LocalDocumentReference, XarFile> previousPages = new HashMap<LocalDocumentReference, XarFile>();
-        Map<XarEntry, XarInstalledExtension> previousXAREntriesOnRoot = previousXAREntries.get(null);
+        Map<XarEntry, XarExtensionPlanEntry> previousXAREntriesOnRoot = previousXAREntries.get(null);
         if (previousXAREntriesOnRoot != null) {
-            for (Map.Entry<XarEntry, XarInstalledExtension> entry : previousXAREntriesOnRoot.entrySet()) {
+            for (Map.Entry<XarEntry, XarExtensionPlanEntry> entry : previousXAREntriesOnRoot.entrySet()) {
+                XarExtensionPlanEntry planEntry = entry.getValue();
                 try {
-                    previousPages.put(entry.getKey().getReference(), new XarFile(new File(entry.getValue().getFile()
-                        .getAbsolutePath()), entry.getValue().getPages()));
+                    previousPages.put(entry.getKey().getReference(), planEntry.xarFile);
                 } catch (Exception e) {
                     // Should never happen
                     this.logger.error("Failed to create XARFile for installed extension [{}]", entry.getValue(), e);
                 }
             }
         }
-        Map<XarEntry, XarInstalledExtension> previousXAREntriesOnWiki = previousXAREntries.get(wiki);
+        Map<XarEntry, XarExtensionPlanEntry> previousXAREntriesOnWiki = previousXAREntries.get(wiki);
         if (previousXAREntriesOnWiki != null) {
-            for (Map.Entry<XarEntry, XarInstalledExtension> entry : previousXAREntriesOnWiki.entrySet()) {
+            for (Map.Entry<XarEntry, XarExtensionPlanEntry> entry : previousXAREntriesOnWiki.entrySet()) {
+                XarExtensionPlanEntry planEntry = entry.getValue();
                 try {
-                    previousPages.put(entry.getKey().getReference(), new XarFile(new File(entry.getValue().getFile()
-                        .getAbsolutePath()), entry.getValue().getPages()));
+                    previousPages.put(entry.getKey().getReference(), planEntry.xarFile);
                 } catch (Exception e) {
                     // Should never happen
                     this.logger.error("Failed to create XARFile for installed extension [{}]", entry.getValue(), e);
@@ -434,7 +334,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
         // Entries to import
         if (extension != null) {
-            Map<String, Map<XarEntry, LocalExtension>> nextXAREntries = getNextXAREntries();
+            Map<String, Map<XarEntry, LocalExtension>> nextXAREntries = getXARInstallPlan().nextXAREntries;
 
             Set<String> entriesToImport = new HashSet<String>();
 
@@ -513,7 +413,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     {
         String wiki;
         try {
-            wiki = getWikiFromNamespace(namespace);
+            wiki = XarHandlerUtils.getWikiFromNamespace(namespace);
         } catch (UnsupportedNamespaceException e) {
             throw new InstallException("Failed to extract wiki id from namespace", e);
         }
@@ -544,7 +444,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     {
         String wiki;
         try {
-            wiki = getWikiFromNamespace(namespace);
+            wiki = XarHandlerUtils.getWikiFromNamespace(namespace);
         } catch (UnsupportedNamespaceException e) {
             throw new UninstallException("Failed to extract wiki id from namespace", e);
         }

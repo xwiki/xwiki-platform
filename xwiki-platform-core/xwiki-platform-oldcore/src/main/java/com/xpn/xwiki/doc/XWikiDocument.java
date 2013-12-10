@@ -3681,62 +3681,66 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * related information. For example it allows to compare a document comming from a another wiki and easily check if
      * thoses actually are the same thing whatever the plumbing differences.
      * 
-     * @param doc the document to compare
+     * @param otherDocument the document to compare
      * @return true if bith documents have the same datas
      * @since 4.1.1
      */
-    public boolean equalsData(XWikiDocument doc)
+    public boolean equalsData(XWikiDocument otherDocument)
     {
         // Same Java object, they sure are equal
-        if (this == doc) {
+        if (this == otherDocument) {
             return true;
         }
 
-        if (ObjectUtils.notEqual(getParentReference(), doc.getParentReference())) {
+        if (ObjectUtils.notEqual(getParentReference(), otherDocument.getParentReference())) {
             return false;
         }
 
-        if (!getFormat().equals(doc.getFormat())) {
+        if (!getFormat().equals(otherDocument.getFormat())) {
             return false;
         }
 
-        if (!getTitle().equals(doc.getTitle())) {
+        if (!getTitle().equals(otherDocument.getTitle())) {
             return false;
         }
 
-        if (!getContent().equals(doc.getContent())) {
+        if (!getContent().equals(otherDocument.getContent())) {
             return false;
         }
 
-        if (!getDefaultTemplate().equals(doc.getDefaultTemplate())) {
+        if (!getDefaultTemplate().equals(otherDocument.getDefaultTemplate())) {
             return false;
         }
 
-        if (!getValidationScript().equals(doc.getValidationScript())) {
+        if (!getValidationScript().equals(otherDocument.getValidationScript())) {
             return false;
         }
 
-        if (ObjectUtils.notEqual(getSyntax(), doc.getSyntax())) {
+        if (ObjectUtils.notEqual(getSyntax(), otherDocument.getSyntax())) {
             return false;
         }
 
-        if (isHidden() != doc.isHidden()) {
+        if (isHidden() != otherDocument.isHidden()) {
             return false;
         }
 
-        if (!getXClass().equals(doc.getXClass())) {
+        // XClass
+
+        if (!getXClass().equals(otherDocument.getXClass())) {
             return false;
         }
+
+        // XObjects
 
         Set<DocumentReference> myObjectClassReferences = getXObjects().keySet();
-        Set<DocumentReference> otherObjectClassReferences = doc.getXObjects().keySet();
+        Set<DocumentReference> otherObjectClassReferences = otherDocument.getXObjects().keySet();
         if (!myObjectClassReferences.equals(otherObjectClassReferences)) {
             return false;
         }
 
         for (DocumentReference reference : myObjectClassReferences) {
             List<BaseObject> myObjects = getXObjects(reference);
-            List<BaseObject> otherObjects = doc.getXObjects(reference);
+            List<BaseObject> otherObjects = otherDocument.getXObjects(reference);
             if (myObjects.size() != otherObjects.size()) {
                 return false;
             }
@@ -3751,6 +3755,24 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 if (!myObjects.get(i).equals(otherObjects.get(i))) {
                     return false;
                 }
+            }
+        }
+
+        // Attachments
+        List<XWikiAttachment> attachments = getAttachmentList();
+        List<XWikiAttachment> otherAttachments = otherDocument.getAttachmentList();
+        if (attachments.size() != otherAttachments.size()) {
+            return false;
+        }
+        for (XWikiAttachment attachment : attachments) {
+            XWikiAttachment otherAttachment = otherDocument.getAttachment(attachment.getFilename());
+            try {
+                if (otherAttachment == null || attachment.equalsData(otherAttachment, null)) {
+                    return false;
+                }
+            } catch (XWikiException e) {
+                throw new RuntimeException(String.format("Failed to compare attachments with reference [%0]",
+                    attachment.getReference()), e);
             }
         }
 
@@ -6001,7 +6023,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 difflist.add(new AttachmentDiff(fileName, org.xwiki.diff.Delta.Type.DELETE, origAttach, newAttach));
             } else {
                 try {
-                    if (!origAttach.equals(newAttach, context)) {
+                    if (!origAttach.equalsData(newAttach, context)) {
                         difflist.add(new AttachmentDiff(fileName, org.xwiki.diff.Delta.Type.CHANGE, origAttach,
                             newAttach));
                     }
@@ -8432,7 +8454,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     case DELETE:
                         if (attachment != null) {
                             try {
-                                if (attachment.equals(previousAttachment, context)) {
+                                if (attachment.equalsData(previousAttachment, context)) {
                                     removeAttachment(attachment);
                                     mergeResult.setModified(true);
                                 } else {
@@ -8453,7 +8475,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     case INSERT:
                         if (attachment != null) {
                             try {
-                                if (!attachment.equals(nextAttachment, context)) {
+                                if (!attachment.equalsData(nextAttachment, context)) {
                                     // XXX: collision between DB and new: attachment to add but a different one already
                                     // exists in the DB
                                     mergeResult.getLog().error("Collision found on attachment [{}]",

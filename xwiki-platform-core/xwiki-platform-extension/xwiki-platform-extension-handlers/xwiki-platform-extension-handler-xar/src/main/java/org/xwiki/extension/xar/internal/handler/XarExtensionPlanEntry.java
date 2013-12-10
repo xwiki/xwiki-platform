@@ -17,49 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.repository;
+package org.xwiki.extension.xar.internal.handler;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 
-import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.repository.ExtensionRepository;
-import org.xwiki.extension.wrap.WrappingInstalledExtension;
+import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.wikistream.xar.internal.XarException;
-import org.xwiki.wikistream.xar.internal.XarPackage;
+import org.xwiki.wikistream.xar.internal.XarFile;
 
 /**
  * @version $Id$
- * @since 4.0M1
+ * @since 5.4M1
  */
-public class XarInstalledExtension extends WrappingInstalledExtension<InstalledExtension>
+public class XarExtensionPlanEntry implements Closeable
 {
-    private XarInstalledExtensionRepository repository;
+    public final XarInstalledExtension extension;
 
-    private XarPackage xarPackage;
+    public final XarFile xarFile;
 
-    public XarInstalledExtension(InstalledExtension installedExtension, XarInstalledExtensionRepository repository)
-        throws IOException, XarException
+    public XarExtensionPlanEntry(XarInstalledExtension extension) throws XarException, IOException
     {
-        super(installedExtension);
-
-        this.repository = repository;
-        this.xarPackage = new XarPackage(new File(getFile().getAbsolutePath()));
+        this.extension = extension;
+        this.xarFile = new XarFile(new File(extension.getFile().getAbsolutePath()));
     }
-
-    /**
-     * @since 5.4M1
-     */
-    public XarPackage getXarPackage()
-    {
-        return this.xarPackage;
-    }
-
-    // ExtensionRepository
 
     @Override
-    public ExtensionRepository getRepository()
+    public void close() throws IOException
     {
-        return this.repository;
+        this.xarFile.close();
     }
 }

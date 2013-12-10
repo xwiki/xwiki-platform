@@ -188,6 +188,7 @@ public class Packager
         DocumentReference reference = nextDocument.getDocumentReferenceWithLocale();
         LocalDocumentReference localReference = new LocalDocumentReference(reference);
         XWikiDocument currentDocument = xcontext.getWiki().getDocument(reference, xcontext);
+        currentDocument.loadAttachments(xcontext);
         XWikiDocument previousDocument;
         XarFile previousXarFile = configuration.getPreviousPages().get(localReference);
         if (previousXarFile != null) {

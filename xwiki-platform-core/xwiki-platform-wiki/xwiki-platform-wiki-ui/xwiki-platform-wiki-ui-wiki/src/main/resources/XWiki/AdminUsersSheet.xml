@@ -43,7 +43,13 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#if($services.wiki.user.hasLocalUsersEnabled())
+## We include new settings from the Wiki Manager (fixme: XWIKI-9774)
+{{include reference="WikiManager.WikiUsers" /}}
+
+##
+## The Users management is enabled only if local users are enabled
+##
+#if("$!services.wiki.user.userScope" != 'GLOBAL_ONLY')
 ### Globally administrate the users in a wiki.
 #set($formname = "update")
 #set($saveaction = "save")
@@ -68,6 +74,7 @@
   #set($mainwk = true)
 #end
 {{html}}
+&lt;h2&gt;$services.localization.render('admin.users')&lt;/h2&gt;
 &lt;div id="xwikieditcontent"&gt;
   &lt;table id="userstable" class="xwiki-livetable"&gt;
     &lt;tr&gt;
@@ -141,8 +148,6 @@
 &lt;/div&gt; ## end of xwikieditcontent
 {{/html}}
 
-#else
-  {{include reference="WikiManager.WikiUsers" /}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

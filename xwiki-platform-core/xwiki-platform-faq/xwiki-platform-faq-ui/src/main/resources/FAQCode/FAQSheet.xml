@@ -31,7 +31,7 @@
       #set ($answer = $doc.getValue("answer"))
       #if ("$!answer" != "")
         ## Make sure to resolve reference based on the right document
-        {{context document="$services.model.serialize($doc.documentReference)"}}
+        {{context document="$services.model.serialize($doc.documentReference).replaceAll('~', '~~').replaceAll('"', '~"')"}}
         $answer
         {{/context}}
       #else

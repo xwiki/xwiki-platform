@@ -129,9 +129,9 @@
     wikiName.observe('keyup', wikiNameChanged);
     if(prettyName.value.blank() || wikiName.value.blank()){
       $('wizard-next').disabled = true;
-    } 
+    }
   }
-  
+
   /**
    * Pretty name changed
    */
@@ -139,7 +139,7 @@
     var prettyName = $('prettyname');
     if(prettyName.value.blank()){
       $('wikiprettynamevalidation').innerHTML = "$MSG_ERROR_WIKIPRETTYNAMEEMPTY";
-      prettyName.addClassName('xErrorField');          
+      prettyName.addClassName('xErrorField');
     }else{
       $('wikiprettynamevalidation').innerHTML = '';
       prettyName.removeClassName('xErrorField');
@@ -163,7 +163,7 @@
    */
   function validateWikiName(){
     var wikiNameElement = $('wikiname');
-    var wikiname = wikiNameElement.value; 
+    var wikiname = wikiNameElement.value;
     var filteredWikiName = filterWikiName(wikiname);
     if (wikiname != filteredWikiName) {
       wikiNameElement.value = filteredWikiName;
@@ -353,7 +353,7 @@ XWiki.ProvisioningBar = Class.create({
       }.bind(this)
    });
   },
-  _refresh : function (status) {    
+  _refresh : function (status) {
     if (status.status == 'FINISHED') {
       $('ui-progress').addClassName('hidden');
       $('successMessage').removeClassName('hidden');
@@ -678,7 +678,8 @@ return XWiki;
   #elseif($request.step == 'create')
     #create()
   #elseif($request.step == 'finalize')
-    #setMembers()
+    #set($wikiDescriptor = $services.wiki.getById($request.wikiId))
+    #setMembers($wikiDescriptor)
   #else
     ## Default step
     #stepType()
@@ -1039,9 +1040,6 @@ return XWiki;
 ## This macro set the members of the wiki
 ##################################
 #macro(setMembers $wikiDescriptor)
-  #if(!$wikiDescriptor)
-    #set($wikiDescriptor = $services.wiki.getById($request.wikiId))
-  #end
   ## Set the membership type and the local users
   #set ($discard = $services.wiki.user.setMembershipType($wikiDescriptor.id, $request.membershipType))
   #set ($discard = $services.wiki.user.setUserScope($wikiDescriptor.id, $request.userScope))

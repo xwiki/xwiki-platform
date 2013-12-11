@@ -291,6 +291,7 @@
 {{/velocity}}
 
 {{velocity}}
+### MANAGE CANDIDACIES ###
 #macro (printException $exception)
   #if($exception.message)
     {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$exception.message]){{/error}}
@@ -313,7 +314,7 @@
   ##
   #set ($candidateNumber = $mathtool.toInteger("$!{request.candidateNumber}"))
   #set ($candidacy = $services.wiki.user.getCandidacy($wiki.id, $candidateNumber))
-  #if ($candidacy &amp;&amp; $$candidacy.status == 'PENDING')
+  #if ($candidacy &amp;&amp; $candidacy.status == 'PENDING')
     #if ($request.acceptUser)
       #set ($success = $services.wiki.user.acceptRequest($candidacy, $request.reviewerComment, $request.reviewerPrivateComment))
       #if ($success)
@@ -410,8 +411,7 @@ $services.localization.render('platform.wiki.currentwiki.candidateHandledComment
     #end
   #end
 #end
-
-### MEMBERSHIP TYPE ###
+### MEMBERSHIP TYPE AND USER SCOPE ###
 #set($userConfRef = $services.model.createDocumentReference('', 'WikiManager', 'WikiUserConfiguration'))
 #set($userConfDoc = $xwiki.getDocument($userConfRef))
 #set($updateWikiUserReference = $services.model.createDocumentReference('', 'WikiManager', 'UpdateWikiUser'))
@@ -445,9 +445,9 @@ $services.localization.render('platform.wiki.currentwiki.candidateHandledComment
   &lt;/form&gt;
 {{/html}}
 
-
-##
-## In the original sheet, this was displayed only in edit mode. 
+## CANDIDACIES AND MEMBERS MANAGEMENT UI
+## This part is enabled only if we allow glocal users
+#if("$!services.wiki.user.userScope" != 'LOCAL_ONLY')
 #if($hasEditGroupRight)
 {{html}}
 #userPicker_import()
@@ -491,7 +491,7 @@ $services.localization.render('platform.wiki.currentwiki.candidateHandledComment
 
 {{html}}
   &lt;div class='xform'&gt;
-    &lt;h2&gt;Existing users&lt;/h2&gt;
+    &lt;h2&gt;$services.localization.render('admin.xwiki.members.title')&lt;/h2&gt;
   &lt;/div&gt;
 {{/html}}
 #set($columnOptions = {
@@ -549,7 +549,7 @@ $services.localization.render('platform.wiki.currentwiki.candidateHandledComment
       &lt;div class='reviewerComment'&gt;
         &lt;label&gt;
             $services.localization.render('platform.wiki.currentwiki.candidates.reviewermessage.label')
-        &lt;/label&gt; 
+        &lt;/label&gt;
         #if($status == 'pending' &amp;&amp; $type == 'request')
           &lt;textarea name='reviewerComment'/&gt;
         #else
@@ -594,5 +594,6 @@ $services.localization.render('platform.wiki.currentwiki.candidateHandledComment
 #end
 &lt;/div&gt;
 {{/html}}
+#end
 {{/velocity}}</content>
 </xwikidoc>

@@ -265,8 +265,10 @@
   'locale': 'locale',
   'author': 'user',
   'creator': 'user',
+  'attauthor': 'user',
   'date': 'date',
-  'creationdate': 'date'
+  'creationdate': 'date',
+  'attdate': 'date'
 })
 
 #macro (displaySearchFacetValues $facetValues)
@@ -339,9 +341,12 @@
   'locale': 'locale',
   'author': 'user',
   'creator': 'user',
+  'attauthor': 'user',
   'date': 'date',
   'creationdate': 'date',
-  'class': 'class'
+  'attdate': 'date',
+  'class': 'class',
+  'attsize': 'size'
 })
 
 #macro (displaySearchFacetValue_default $facetPrettyValue)
@@ -609,13 +614,30 @@
   &lt;span title="$escapetool.xml($hint)"&gt;$escapetool.xml($classPrettyName)&lt;/span&gt;
 #end
 
+#macro (displaySearchFacetValue_size $size)
+  #dynamicsize($mathtool.toInteger($size))
+#end
+
 #macro (displaySearchResultsSort)
-  #set ($defaultSortOrder = {
-    'score': 'desc',
-    'title_sort' : 'asc',
-    'date' : 'desc',
-    'author_display_sort' : 'asc'
+  #set ($defaultSortOrderByEntityType = {
+    'DOCUMENT': {
+      'score': 'desc',
+      'title_sort': 'asc',
+      'date': 'desc',
+      'author_display_sort': 'asc'
+    },
+    'ATTACHMENT': {
+      'score': 'desc',
+      'filename_sort': 'asc',
+      'attsize_sort': 'asc',
+      'attdate_sort': 'desc',
+      'attauthor_display_sort': 'asc'
+    }
   })
+  #set ($defaultSortOrder = $defaultSortOrderByEntityType.get($type))
+  #if (!$defaultSortOrder)
+    #set ($defaultSortOrder = {'score': 'desc'})
+  #end
   #set ($sortOrderSymbol = {
     'asc': "\u25B2",
     'desc': "\u25BC"
@@ -686,37 +708,13 @@
 #end
 
 #macro (displaySearchResult $searchResult)
-  #set ($searchResultDocumentReference = $services.model.createDocumentReference($searchResult.wiki, $searchResult.space, $searchResult.name))
+  #set ($searchResultDocumentReference = $services.model.createDocumentReference($searchResult.wiki,
+    $searchResult.space, $searchResult.name))
   #set ($searchResultDocument = $xwiki.getDocument($searchResultDocumentReference))
-  #set ($searchResultTranslatedDocument = $searchResultDocument.getTranslatedDocument($searchResult.locale))
   (% class="search-result type-$searchResult.type.toLowerCase()" %)(((
     ## We use the HTML macro here mainly because we don't have a way to escape the wiki syntax in the data provided by the user.
     {{html}}
-    #displaySearchResultTitle()
-    #displaySearchResultLocation()
-    ##
-    #set ($date = $datetool.format('d MMM yyyy', $searchResultTranslatedDocument.date))
-    ## FIXME: handle multiwiki setup for authors. Better: index absolute authors instead.
-    #set ($author = $xwiki.getUserName($searchResultTranslatedDocument.author))
-    &lt;div class="search-result-author"&gt;$services.localization.render('solr.result.author', [$author, $date])&lt;/div&gt;
-    ##
-    #if ("$!searchResult.mimetype" != '')
-      &lt;div class="search-result-mediaType"&gt;$services.localization.render('solr.result.mediaType',
-        [$escapetool.xml($searchResult.mimetype)])&lt;/div&gt;
-    #end
-    #set ($class = $searchResult.get('class'))
-    #if ("$!class" != '' &amp;&amp; $searchResult.type != 'DOCUMENT')
-      #set ($classFullName = $class.get(0))
-      #set ($classReference = $services.model.resolveDocument($classFullName, $services.model.createWikiReference($searchResult.wiki)))
-      #set ($classLink = "&lt;a href=""$xwiki.getURL($classReference)""&gt;$escapetool.xml($classFullName)&lt;/a&gt;")
-      #set ($propertyName = $searchResult.propertyname)
-      #if ("$!propertyName" == '')
-        &lt;div class="search-result-object"&gt;$services.localization.render('solr.result.object', [$classLink])&lt;/div&gt;
-      #else
-        &lt;div class="search-result-property"&gt;$services.localization.render('solr.result.property',
-          [$classLink, $escapetool.xml($propertyName)])&lt;/div&gt;
-      #end
-    #end
+    #evaluate("${escapetool.h}displaySearchResult_$searchResult.type.toLowerCase()(${escapetool.d}searchResult)")
     #displaySearchResultHighlighting($searchResult)
     {{/html}}
 
@@ -732,20 +730,71 @@
   )))
 #end
 
+#macro (displaySearchResult_document $searchResult)
+  #set ($searchResultTranslatedDocument = $searchResultDocument.getTranslatedDocument($searchResult.locale))
+  #displaySearchResultTitle()
+  #displaySearchResultLocation()
+  &lt;div class="search-result-author"&gt;
+    $services.localization.render('core.footer.modification', [
+      $xwiki.getUserName($searchResultTranslatedDocument.author),
+      $xwiki.formatDate($searchResultTranslatedDocument.date)
+    ])
+  &lt;/div&gt;
+#end
+
+#macro (displaySearchResult_attachment $searchResult)
+  &lt;h2 class="search-result-title"&gt;
+    #set ($fileName = $searchResult.filename.get(0))
+    #set ($attachmentURL = $searchResultDocument.getAttachmentURL($fileName))
+    #set ($downloadHint = $services.localization.render('core.viewers.attachments.download'))
+    &lt;a href="$attachmentURL" title="$escapetool.xml($downloadHint)"&gt;$escapetool.xml($fileName)&lt;/a&gt;
+    #set ($attachmentHistoryURL = $searchResultDocument.getAttachmentURL($fileName, 'viewattachrev'))
+    #set ($historyHint = $services.localization.render('core.viewers.attachments.showHistory'))
+    &lt;a href="$attachmentHistoryURL" title="$escapetool.xml($historyHint)" class="search-result-version"&gt;
+      $escapetool.xml($searchResult.attversion)
+    &lt;/a&gt;
+  &lt;/h2&gt;
+  #displaySearchResultLocation($searchResult)
+  &lt;div class="search-result-uploader"&gt;
+    #set ($uploader = $xwiki.getUserName($searchResult.attauthor.get(0)))
+    #set ($uploadDate = $xwiki.formatDate($searchResult.attdate.get(0)))
+    #set ($fileSize = "#dynamicsize($searchResult.attsize.get(0))")
+    $services.localization.render('solr.result.uploadedBy', [$uploader, $uploadDate, $fileSize])
+  &lt;/div&gt;
+  &lt;div class="search-result-mediaType"&gt;$services.localization.render('solr.result.mediaType',
+    [$escapetool.xml($searchResult.mimetype.get(0))])&lt;/div&gt;
+#end
+
+#macro (displaySearchResult_object $searchResult)
+  &lt;h2 class="search-result-title"&gt;
+    #displaySearchResultXClassLink($searchResult)
+  &lt;/h2&gt;
+  #displaySearchResultLocation($searchResult)
+#end
+
+#macro (displaySearchResult_object_property $searchResult)
+  &lt;h2 class="search-result-title"&gt;
+    #displaySearchResultXClassLink($searchResult)^$searchResult.propertyname
+  &lt;/h2&gt;
+  #displaySearchResultLocation($searchResult)
+#end
+
+#macro (displaySearchResultXClassLink $searchResult)
+  #set ($classFullName = $searchResult.get('class').get(0))
+  #set ($classReference = $services.model.resolveDocument($classFullName,
+    $services.model.createWikiReference($searchResult.wiki)))
+  &lt;a href="$xwiki.getURL($classReference)"&gt;$escapetool.xml($classFullName)&lt;/a&gt;##
+#end
+
 #macro (displaySearchResultTitle)
-  #set ($title = $searchResultTranslatedDocument.plainTitle)
   #set ($titleURL = $searchResultDocument.getURL())
-  #if ($searchResult.type == 'ATTACHMENT')
-    #set ($title = $searchResult.filename)
-    #set ($titleURL = $searchResultDocument.getAttachmentURL($searchResult.filename))
-  #elseif ($searchResult.type == 'DOCUMENT' &amp;&amp; $searchResult.locale != ''
-    &amp;&amp; $xcontext.language != $searchResult.locale)
+  #if ($searchResult.locale != '' &amp;&amp; $xcontext.language != $searchResult.locale)
     #set ($titleURL = $searchResultDocument.getURL('view', "language=$searchResult.locale"))
   #end
   &lt;h2 class="search-result-title"&gt;
-    &lt;a href="$titleURL"&gt;$escapetool.xml($title)&lt;/a&gt;
-    ## Display document language for document results when multiple language results are requested.
-    #if ($request.lang == '' &amp;&amp; $searchResult.type == 'DOCUMENT' &amp;&amp; $searchResult.locale != '')
+    &lt;a href="$titleURL"&gt;$escapetool.xml($searchResultTranslatedDocument.plainTitle)&lt;/a&gt;
+    ## Display document language when multiple language results are requested.
+    #if ($request.lang == '' &amp;&amp; $searchResult.locale != '')
       &lt;span title="$escapetool.xml($services.localization.render('solr.result.language'))"
         class="search-result-language" &gt;($escapetool.xml($searchResult.locale))&lt;/span&gt;
     #end
@@ -868,7 +917,21 @@
     #getSupportedLanguages()
   #end
   #set ($discard = $query.bindValue('xwiki.supportedLocales', $stringtool.join($supportedLanguages, ',')))
-  #if ($boost != '')
+  ## Specify which index fields are matched when a free text search is performed.
+  #set ($defaultBoost = {
+    'DOCUMENT': 'title^10.0 name^10.0
+                 doccontent^2.0
+                 objcontent^0.4 filename^0.4 attcontent^0.4 doccontentraw^0.4
+                 author_display^0.08 creator_display^0.08
+                 comment^0.016 attauthor_display^0.016 space^0.016',
+    'ATTACHMENT': 'filename^5.0 attcontent attauthor_display^0.2',
+    'OBJECT': 'objcontent',
+    'OBJECT_PROPERTY': 'propertyvalue'
+  })
+  #if ($boost == '')
+    #set ($boost = $defaultBoost.get($type))
+  #end
+  #if ("$!boost" != '')
     #set ($discard = $query.bindValue('qf', $boost))
   #end
   #if ($debug != '')
@@ -1640,6 +1703,13 @@ a.sort-item.active, a.sort-item.active:hover {
   margin: 0;
 }
 
+.search-result-version {
+  font-size: 70%;
+  font-weight: normal;
+  padding-left: 0.5em;
+  vertical-align: top;
+}
+
 .search-result-language {
   font-size: 0.7em;
   font-style: italic;
@@ -1649,17 +1719,15 @@ a.sort-item.active, a.sort-item.active:hover {
 .search-result-location,
 .search-result-author,
 .search-result-language,
-.search-result-mediaType,
-.search-result-object,
-.search-result-property {
+.search-result-uploader,
+.search-result-mediaType {
   color: $theme.textSecondaryColor;
 }
 
 .search-result-location,
 .search-result-author,
+.search-result-uploader,
 .search-result-mediaType,
-.search-result-object,
-.search-result-property,
 .search-result-highlight {
   line-height: 1.4em;
 }

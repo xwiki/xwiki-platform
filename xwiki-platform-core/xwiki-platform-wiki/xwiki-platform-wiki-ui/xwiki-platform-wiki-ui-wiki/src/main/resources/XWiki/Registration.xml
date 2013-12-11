@@ -862,9 +862,9 @@ $heading
       #end
     #end
     ## If there is a "global" doAfterRegistration, do that as well.
-    #if($doAfterRegistration)
-      #set($discard = $doAfterRegistration.toString())
-    #end
+    ## Calling toString() on a #define block will execute it and we discard the result.
+    #set($discard = $doAfterRegistration.toString())
+    ##
     ## Define some strings which may be used by autoLogin or loginButton
     #set($userName = $!request.get('xwikiname'))
     #set($password = $!request.get('register_password'))

@@ -30,9 +30,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.crypto.cipher.internal.symmetric.factory.BcAesCbcPaddedCipherFactory;
 import org.xwiki.crypto.cipher.internal.symmetric.factory.BcBlowfishCbcPaddedCipherFactory;
+import org.xwiki.crypto.cipher.internal.symmetric.factory.BcDesCbcPaddedCipherFactory;
 import org.xwiki.crypto.cipher.internal.symmetric.factory.BcDesEdeCbcPaddedCipherFactory;
-import org.xwiki.crypto.cipher.internal.symmetric.factory.DesCbcPaddedCipherFactory;
-import org.xwiki.crypto.cipher.internal.symmetric.factory.Rc2CbcPaddedCipherFactory;
+import org.xwiki.crypto.cipher.internal.symmetric.factory.BcRc2CbcPaddedCipherFactory;
 import org.xwiki.crypto.internal.digest.factory.BcSHA224DigestFactory;
 import org.xwiki.crypto.internal.digest.factory.BcSHA256DigestFactory;
 import org.xwiki.crypto.internal.digest.factory.BcSHA384DigestFactory;
@@ -60,8 +60,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 @ComponentList({DefaultKeyDerivationFunctionFactory.class, BcPKCS5S2KeyDerivationFunctionFactory.class,
-    BcPBES2Rc2CipherFactory.class, Rc2CbcPaddedCipherFactory.class,
-    BcPBES2DesCipherFactory.class, DesCbcPaddedCipherFactory.class,
+    BcPBES2Rc2CipherFactory.class, BcRc2CbcPaddedCipherFactory.class,
+    BcPBES2DesCipherFactory.class, BcDesCbcPaddedCipherFactory.class,
     BcPBES2DesEdeCipherFactory.class, BcDesEdeCbcPaddedCipherFactory.class,
     BcPBES2BlowfishCipherFactory.class, BcBlowfishCbcPaddedCipherFactory.class,
     BcPBES2AesCipherFactory.class, BcAesCbcPaddedCipherFactory.class, BcScryptKeyDerivationFunctionFactory.class,

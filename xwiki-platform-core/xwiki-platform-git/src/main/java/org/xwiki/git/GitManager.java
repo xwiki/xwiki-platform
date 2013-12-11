@@ -59,7 +59,8 @@ public interface GitManager
     Set<PersonIdent> findAuthors(List<Repository> repositories);
 
     /**
-     * Count commits done by all authors in the passed repositories and since the passed date.
+     * Count commits done by all authors in the passed repositories and since the passed date. Note that authors are
+     * uniquely identified by their email addresses.
      *
      * @param since the date from which to start counting. If null then counts from the beginning
      * @param repositories the list of repositories in which to look for commits

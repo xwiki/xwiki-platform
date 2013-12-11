@@ -48,6 +48,10 @@ solr.sortBy.score=Relevance
 solr.sortBy.title_sort=Title
 solr.sortBy.date=Last Modification Date
 solr.sortBy.author_display_sort=Last Author
+solr.sortBy.filename_sort=File Name
+solr.sortBy.attsize_sort=File Size
+solr.sortBy.attdate_sort=Upload Date
+solr.sortBy.attauthor_display_sort=Uploaded By
 solr.sortOrder.asc=Ascending
 solr.sortOrder.desc=Descending
 
@@ -55,8 +59,7 @@ solr.result.language=Language
 solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
 solr.result.author=Modified by {0} on {1}
 solr.result.mediaType=File of type {0}
-solr.result.object=Object of type {0}
-solr.result.property=Property {0}#{1}
+solr.result.uploadedBy=Uploaded by {0} on {1} ({2})
 solr.result.highlightAll=Highlight all matches
 
 solr.filter.title=Advanced Options
@@ -126,7 +129,11 @@ solr.field.propertyvalue=Property Value
 solr.field.filename=Attachment Name
 solr.field.attcontent=Attachment Content
 solr.field.comment=Comments
-solr.field.objcontent=Objects</content>
+solr.field.objcontent=Objects
+solr.field.mimetype=Media Type
+solr.field.attauthor=Uploaded By
+solr.field.attdate=Upload Date
+solr.field.attsize=File Size</content>
   <object>
     <name>Main.SolrTranslations</name>
     <number>0</number>

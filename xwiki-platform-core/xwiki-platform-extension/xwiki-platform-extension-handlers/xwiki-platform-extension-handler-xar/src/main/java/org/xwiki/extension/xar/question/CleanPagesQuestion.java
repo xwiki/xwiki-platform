@@ -17,22 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.handler.packager;
+package org.xwiki.extension.xar.question;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.xwiki.model.reference.DocumentReference;
 
 /**
+ * The pages planned for deleted.
+ * <p>
+ * Expect a confirmation for each one.
  * 
- * @version $Id$
- * @since 4.0M1
+ * @version $Id$he
+ * @since 5.4M1
  */
-public class PackagerException extends Exception
+public class CleanPagesQuestion
 {
-    public PackagerException(String message)
+    private Map<DocumentReference, Boolean> pages;
+
+    /**
+     * @param pages the pages planned for deletion
+     */
+    public CleanPagesQuestion(Collection<DocumentReference> pages)
     {
-        super(message);
+        this.pages = new HashMap<DocumentReference, Boolean>(pages.size());
+
+        for (DocumentReference page : pages) {
+            this.pages.put(page, true);
+        }
     }
 
-    public PackagerException(String message, Exception e)
+    /**
+     * @return the pages planned for deletion
+     */
+    public Map<DocumentReference, Boolean> getPages()
     {
-        super(message, e);
+        return this.pages;
     }
 }

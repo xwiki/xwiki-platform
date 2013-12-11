@@ -17,22 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.handler.packager;
+package org.xwiki.wikistream.xar.internal;
 
 /**
- * 
  * @version $Id$
- * @since 4.0M1
+ * @since 5.4M1
  */
-public class NotADocumentException extends PackagerException
+public final class XARWikiStreamUtils
 {
-    public NotADocumentException(String message)
+    /**
+     * @version $Id$
+     * @since 5.3RC1
+     */
+    public static class EventParameter
     {
-        super(message);
+        public String name;
+
+        public Class< ? > type;
+
+        public EventParameter(String name, Class< ? > type)
+        {
+            this.name = name;
+            this.type = type;
+        }
+
+        public EventParameter(String name)
+        {
+            this(name, String.class);
+        }
     }
 
-    public NotADocumentException(String message, Exception e)
-    {
-        super(message, e);
-    }
+    /**
+     * @since 5.2RC1
+     */
+    public static final String ROLEHINT = "xwiki+xar/1.1";
 }

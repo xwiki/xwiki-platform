@@ -51,7 +51,7 @@ import org.xwiki.wikistream.xar.internal.XARDocumentModel;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARObjectModel;
 import org.xwiki.wikistream.xar.internal.XARObjectPropertyModel;
-import org.xwiki.wikistream.xar.internal.XARUtils;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
 import org.xwiki.wikistream.xar.output.XAROutputProperties;
 import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
 
@@ -60,7 +60,7 @@ import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
  * @since 5.2M2
  */
 @Component
-@Named(XARUtils.ROLEHINT)
+@Named(XARWikiStreamUtils.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputProperties> implements XARFilter
 {

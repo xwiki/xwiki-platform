@@ -32,7 +32,7 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
 import org.xwiki.wikistream.xar.internal.XARFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils.EventParameter;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
 import org.xwiki.wikistream.xar.internal.input.ClassPropertyReader.WikiClassProperty;
 
 /**

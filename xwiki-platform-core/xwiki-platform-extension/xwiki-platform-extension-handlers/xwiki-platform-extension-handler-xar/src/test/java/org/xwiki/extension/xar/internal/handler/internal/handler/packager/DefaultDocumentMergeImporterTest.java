@@ -30,7 +30,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
 import java.util.Locale;
 
 import javax.inject.Provider;
@@ -44,11 +43,10 @@ import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.extension.xar.internal.handler.ConflictQuestion;
-import org.xwiki.extension.xar.internal.handler.ConflictQuestion.GlobalAction;
-import org.xwiki.extension.xar.internal.handler.packager.DefaultDocumentMergeImporter;
-import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter;
+import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
+import org.xwiki.extension.xar.question.ConflictQuestion;
+import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -62,7 +60,7 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 
 /**
- * Validate {@link DefaultDocumentMergeImporter}.
+ * Validate {@link DocumentMergeImporter}.
  * 
  * @version $Id$
  */
@@ -70,10 +68,10 @@ import com.xpn.xwiki.doc.merge.MergeResult;
 public class DefaultDocumentMergeImporterTest
 {
     @Rule
-    public MockitoComponentMockingRule<DocumentMergeImporter> importer =
-        new MockitoComponentMockingRule<DocumentMergeImporter>(DefaultDocumentMergeImporter.class);
+    public MockitoComponentMockingRule<DocumentMergeImporter> mocker =
+        new MockitoComponentMockingRule<DocumentMergeImporter>(DocumentMergeImporter.class);
 
-    private DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+    private DocumentReference documentReference = new DocumentReference("wiki", "space", "page", Locale.ROOT);
 
     private XWikiDocument previousDocument;
 
@@ -83,7 +81,7 @@ public class DefaultDocumentMergeImporterTest
 
     private XWikiDocument mergedDocument;
 
-    private DefaultPackageConfiguration configuration;
+    private PackageConfiguration configuration;
 
     private MergeResult mergeResult;
 
@@ -102,7 +100,7 @@ public class DefaultDocumentMergeImporterTest
     {
         this.xcontext = mock(XWikiContext.class);
 
-        Provider<XWikiContext> xcontextProvider = this.importer.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(this.xcontext);
     }
 
@@ -117,30 +115,26 @@ public class DefaultDocumentMergeImporterTest
 
         this.previousDocument = mock(XWikiDocument.class, "previous");
         when(this.previousDocument.isNew()).thenReturn(false);
-        when(this.previousDocument.getLocale()).thenReturn(Locale.ROOT);
-        when(this.previousDocument.getDocumentReference()).thenReturn(this.documentReference);
+        when(this.previousDocument.getDocumentReferenceWithLocale()).thenReturn(this.documentReference);
 
         this.currentDocument = mock(XWikiDocument.class, "current");
         when(this.currentDocument.isNew()).thenReturn(false);
-        when(this.currentDocument.getLocale()).thenReturn(Locale.ROOT);
-        when(this.currentDocument.getDocumentReference()).thenReturn(this.documentReference);
+        when(this.currentDocument.getDocumentReferenceWithLocale()).thenReturn(this.documentReference);
         when(this.xwiki.getDocument(same(this.documentReference), same(xcontext))).thenReturn(this.currentDocument);
 
         this.nextDocument = mock(XWikiDocument.class, "next");
         when(this.nextDocument.isNew()).thenReturn(false);
-        when(this.nextDocument.getLocale()).thenReturn(Locale.ROOT);
-        when(this.nextDocument.getDocumentReference()).thenReturn(this.documentReference);
+        when(this.nextDocument.getDocumentReferenceWithLocale()).thenReturn(this.documentReference);
 
-        this.mergedDocument = mock(XWikiDocument.class, "clone");
+        this.mergedDocument = mock(XWikiDocument.class, "merged");
         when(this.mergedDocument.isNew()).thenReturn(false);
-        when(this.mergedDocument.getLocale()).thenReturn(Locale.ROOT);
-        when(this.mergedDocument.getDocumentReference()).thenReturn(this.documentReference);
+        when(this.mergedDocument.getDocumentReferenceWithLocale()).thenReturn(this.documentReference);
 
         when(this.currentDocument.clone()).thenReturn(this.mergedDocument);
 
         // merge
 
-        this.configuration = new DefaultPackageConfiguration();
+        this.configuration = new PackageConfiguration();
 
         this.mergeResult = new MergeResult();
         when(
@@ -155,7 +149,7 @@ public class DefaultDocumentMergeImporterTest
         // execution
 
         this.econtext = new ExecutionContext();
-        this.execution = this.importer.getInstance(Execution.class);
+        this.execution = this.mocker.getInstance(Execution.class);
         when(this.execution.getContext()).thenReturn(this.econtext);
     }
 
@@ -166,7 +160,7 @@ public class DefaultDocumentMergeImporterTest
     {
         this.mergeResult.setModified(false);
 
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
         verifyZeroInteractions(this.xwiki, this.xcontext);
@@ -175,7 +169,7 @@ public class DefaultDocumentMergeImporterTest
     @Test
     public void testMergeNoCurrent() throws ComponentLookupException, Exception
     {
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, null, this.nextDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, null, this.nextDocument,
             this.configuration);
 
         verifyZeroInteractions(this.xwiki, this.xcontext);
@@ -186,7 +180,7 @@ public class DefaultDocumentMergeImporterTest
     {
         this.mergeResult.setModified(true);
 
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
         verify(this.xwiki).saveDocument(same(this.mergedDocument), eq("comment"), eq(false), same(this.xcontext));
@@ -198,10 +192,11 @@ public class DefaultDocumentMergeImporterTest
     public void testMergeInteractiveChangesNoConflict() throws ComponentLookupException, Exception
     {
         this.configuration.setInteractive(true);
+        this.configuration.setUser(new DocumentReference("wiki", "space", "user"));
 
         this.mergeResult.setModified(true);
 
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
         verifyZeroInteractions(this.jobStatus);
@@ -227,18 +222,19 @@ public class DefaultDocumentMergeImporterTest
     public void testMergeInteractiveChangesConflictAnswerCurrent() throws ComponentLookupException, Exception
     {
         this.configuration.setInteractive(true);
+        this.configuration.setUser(new DocumentReference("wiki", "space", "user"));
 
         this.mergeResult.setModified(true);
         this.mergeResult.getLog().error("error");
 
         answerGlobalAction(GlobalAction.CURRENT, false);
 
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
         // another try
 
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
         verify(this.jobStatus, times(2)).ask(anyObject());
@@ -250,20 +246,21 @@ public class DefaultDocumentMergeImporterTest
     public void testMergeInteractiveChangesConflictAnswerNext() throws ComponentLookupException, Exception
     {
         this.configuration.setInteractive(true);
+        this.configuration.setUser(new DocumentReference("wiki", "space", "user"));
 
         this.mergeResult.setModified(true);
         this.mergeResult.getLog().error("error");
 
         answerGlobalAction(GlobalAction.NEXT, false);
 
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
         verify(this.xwiki).saveDocument(same(this.nextDocument), eq("comment"), eq(false), same(this.xcontext));
 
         // another try
 
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
         verify(this.jobStatus, times(2)).ask(anyObject());
@@ -275,20 +272,21 @@ public class DefaultDocumentMergeImporterTest
     public void testMergeInteractiveChangesConflictAnswerMerged() throws ComponentLookupException, Exception
     {
         this.configuration.setInteractive(true);
+        this.configuration.setUser(new DocumentReference("wiki", "space", "user"));
 
         this.mergeResult.setModified(true);
         this.mergeResult.getLog().error("error");
 
         answerGlobalAction(GlobalAction.MERGED, false);
 
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
         verify(this.xwiki).saveDocument(same(this.mergedDocument), eq("comment"), eq(false), same(this.xcontext));
 
         // another try
 
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
         verify(this.jobStatus, times(2)).ask(anyObject());
@@ -300,20 +298,21 @@ public class DefaultDocumentMergeImporterTest
     public void testMergeInteractiveChangesConflictAnswerPrevious() throws ComponentLookupException, Exception
     {
         this.configuration.setInteractive(true);
+        this.configuration.setUser(new DocumentReference("wiki", "space", "user"));
 
         this.mergeResult.setModified(true);
         this.mergeResult.getLog().error("error");
 
         answerGlobalAction(GlobalAction.PREVIOUS, false);
 
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
         verify(this.xwiki).saveDocument(same(this.previousDocument), eq("comment"), eq(false), same(this.xcontext));
 
         // another try
 
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
         verify(this.jobStatus, times(2)).ask(anyObject());
@@ -325,20 +324,21 @@ public class DefaultDocumentMergeImporterTest
     public void testMergeInteractiveChangesConflictAnswerPreviousAlways() throws ComponentLookupException, Exception
     {
         this.configuration.setInteractive(true);
+        this.configuration.setUser(new DocumentReference("wiki", "space", "user"));
 
         this.mergeResult.setModified(true);
         this.mergeResult.getLog().error("error");
 
         answerGlobalAction(GlobalAction.PREVIOUS, true);
 
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
         verify(this.xwiki).saveDocument(same(this.previousDocument), eq("comment"), eq(false), same(this.xcontext));
 
         // another try
 
-        this.importer.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
         // Make sure we don't ask the job status this time
@@ -354,8 +354,7 @@ public class DefaultDocumentMergeImporterTest
     {
         when(this.currentDocument.isNew()).thenReturn(true);
 
-        this.importer.getComponentUnderTest()
-            .saveDocument("comment", null, null, this.nextDocument, this.configuration);
+        this.mocker.getComponentUnderTest().saveDocument("comment", null, null, this.nextDocument, this.configuration);
 
         verify(this.xwiki).saveDocument(same(this.nextDocument), eq("comment"), eq(false), same(this.xcontext));
     }
@@ -365,7 +364,7 @@ public class DefaultDocumentMergeImporterTest
     {
         when(this.currentDocument.equalsData(same(this.nextDocument))).thenReturn(false);
 
-        this.importer.getComponentUnderTest().saveDocument("comment", null, this.currentDocument, this.nextDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", null, this.currentDocument, this.nextDocument,
             this.configuration);
 
         verify(this.xwiki).saveDocument(same(this.nextDocument), eq("comment"), eq(false), same(this.xcontext));
@@ -376,7 +375,7 @@ public class DefaultDocumentMergeImporterTest
     {
         when(this.currentDocument.equalsData(same(this.nextDocument))).thenReturn(true);
 
-        this.importer.getComponentUnderTest().saveDocument("comment", null, this.currentDocument, this.nextDocument,
+        this.mocker.getComponentUnderTest().saveDocument("comment", null, this.currentDocument, this.nextDocument,
             this.configuration);
 
         verifyZeroInteractions(this.xwiki, this.xcontext);

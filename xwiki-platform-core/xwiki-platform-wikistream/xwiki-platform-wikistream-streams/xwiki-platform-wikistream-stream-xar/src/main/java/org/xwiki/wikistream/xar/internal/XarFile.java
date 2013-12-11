@@ -17,36 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.handler.packager;
+package org.xwiki.wikistream.xar.internal;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * @version $Id$
- * @since 4.0M1
+ * @since 5.4M1
  */
-public class XarFile
+public class XarFile implements Closeable
 {
+    private File file;
+
     private ZipFile zipFile;
 
-    private Map<XarEntry, XarEntry> entries = new HashMap<XarEntry, XarEntry>();
+    private XarPackage xarPackage;
 
-    public XarFile(File file, Collection<XarEntry> entries) throws IOException
+    public XarFile(File file) throws XarException, IOException
     {
-        this.zipFile = new ZipFile(file);
+        this(file, null);
+    }
 
-        for (XarEntry xarEntry : entries) {
-            this.entries.put(xarEntry, xarEntry);
-        }
+    public XarFile(File file, Collection<XarEntry> pages) throws XarException, IOException
+    {
+        this.file = file;
+        this.zipFile = new ZipFile(file);
+        this.xarPackage = pages != null ? new XarPackage(pages) : new XarPackage(this.zipFile);
+    }
+
+    public File getFile()
+    {
+        return this.file;
     }
 
     public void close() throws IOException
@@ -54,29 +62,29 @@ public class XarFile
         this.zipFile.close();
     }
 
-    public InputStream getInputStream(XarEntry entry) throws IOException
+    public InputStream getInputStream(LocalDocumentReference reference) throws IOException
     {
-        XarEntry realEntry = this.entries.get(entry);
-        if (realEntry == null) {
-            throw new IOException("Failed to find entry [" + entry + "]");
+        XarEntry entry = this.xarPackage.getEntry(reference);
+        if (entry == null) {
+            throw new IOException("Failed to find entry for referenc [" + reference + "]");
         }
 
-        return this.zipFile.getInputStream(this.zipFile.getEntry(realEntry.getEntryName()));
+        return this.zipFile.getInputStream(this.zipFile.getEntry(entry.getName()));
     }
 
     public Collection<XarEntry> getEntries()
     {
-        return this.entries.values();
+        return this.xarPackage.getEntries();
     }
 
-    public XarEntry getEntry(LocalDocumentReference reference, Locale locale)
+    public XarEntry getEntry(LocalDocumentReference reference)
     {
-        return this.entries.get(new XarEntry(reference, locale));
+        return this.xarPackage.getEntry(reference);
     }
 
     @Override
     public String toString()
     {
-        return this.zipFile.toString();
+        return this.file.toString();
     }
 }

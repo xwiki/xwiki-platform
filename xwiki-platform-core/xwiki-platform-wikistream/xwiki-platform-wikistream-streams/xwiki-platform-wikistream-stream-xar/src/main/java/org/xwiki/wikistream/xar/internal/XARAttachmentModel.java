@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.wikistream.filter.xwiki.XWikiWikiAttachmentFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils.EventParameter;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
 
 /**
  * @version $Id$

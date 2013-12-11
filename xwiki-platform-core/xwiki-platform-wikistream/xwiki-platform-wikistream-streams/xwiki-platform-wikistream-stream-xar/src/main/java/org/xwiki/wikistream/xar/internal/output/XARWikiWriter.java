@@ -32,7 +32,7 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.output.FileOutputTarget;
 import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 import org.xwiki.wikistream.output.OutputTarget;
-import org.xwiki.wikistream.xar.internal.XARPackage;
+import org.xwiki.wikistream.xar.internal.XarPackage;
 import org.xwiki.wikistream.xar.output.XAROutputProperties;
 
 /**
@@ -49,7 +49,7 @@ public class XARWikiWriter
 
     private final ZipArchiveOutputStream zipStream;
 
-    private XARPackage xarPackage = new XARPackage();
+    private XarPackage xarPackage = new XarPackage();
 
     public XARWikiWriter(String name, Map<String, Object> wikiParameters, XAROutputProperties xarProperties)
         throws WikiStreamException

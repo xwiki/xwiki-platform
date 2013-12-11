@@ -44,12 +44,11 @@ import org.xwiki.wikistream.xar.internal.XARClassModel;
 import org.xwiki.wikistream.xar.internal.XARDocumentModel;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARObjectModel;
-import org.xwiki.wikistream.xar.internal.XARUtils.EventParameter;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
 import org.xwiki.wikistream.xar.internal.input.AttachmentReader.WikiAttachment;
 import org.xwiki.wikistream.xar.internal.input.ClassReader.WikiClass;
 import org.xwiki.wikistream.xar.internal.input.WikiObjectReader.WikiObject;
 import org.xwiki.wikistream.xml.internal.input.XMLInputWikiStreamUtils;
-import org.xwiki.xml.stax.StAXUtils;
 
 /**
  * @version $Id$
@@ -216,8 +215,7 @@ public class DocumentLocaleReader extends AbstractReader
 
     private boolean canSendBeginWikiDocumentRevision(boolean force)
     {
-        return !this.properties.isReferencesOnly()
-            && this.sentBeginWikiDocumentLocale
+        return this.sentBeginWikiDocumentLocale
             && !this.sentBeginWikiDocumentRevision
             && (force || (this.currentDocumentRevision != null && this.currentDocumentRevisionParameters.size() == XARDocumentModel.DOCUMENTREVISION_PARAMETERS
                 .size()));
@@ -235,12 +233,10 @@ public class DocumentLocaleReader extends AbstractReader
 
     private void sendEndWikiDocumentRevision(XARFilter proxyFilter) throws WikiStreamException
     {
-        if (!this.properties.isReferencesOnly()) {
-            sendBeginWikiDocumentRevision(proxyFilter, true);
+        sendBeginWikiDocumentRevision(proxyFilter, true);
 
-            proxyFilter.endWikiDocumentRevision(this.currentDocumentRevision, this.currentDocumentRevisionParameters);
-            this.sentBeginWikiDocumentRevision = false;
-        }
+        proxyFilter.endWikiDocumentRevision(this.currentDocumentRevision, this.currentDocumentRevisionParameters);
+        this.sentBeginWikiDocumentRevision = false;
     }
 
     public void read(Object filter, XARFilter proxyFilter) throws XMLStreamException, IOException, WikiStreamException,
@@ -282,28 +278,15 @@ public class DocumentLocaleReader extends AbstractReader
     private void readDocument(XMLStreamReader xmlReader, Object filter, XARFilter proxyFilter)
         throws XMLStreamException, WikiStreamException, ParseException, IOException
     {
-        for (xmlReader.nextTag(); xmlReader.isStartElement()
-            && (!this.sentBeginWikiDocumentLocale || !this.properties.isReferencesOnly()); xmlReader.nextTag()) {
+        for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
 
             if (elementName.equals(XARAttachmentModel.ELEMENT_ATTACHMENT)) {
-                if (!this.properties.isReferencesOnly()) {
-                    readAttachment(xmlReader, filter, proxyFilter);
-                } else {
-                    StAXUtils.skipElement(xmlReader);
-                }
+                readAttachment(xmlReader, filter, proxyFilter);
             } else if (elementName.equals(XARObjectModel.ELEMENT_OBJECT)) {
-                if (!this.properties.isReferencesOnly()) {
-                    readObject(xmlReader, filter, proxyFilter);
-                } else {
-                    StAXUtils.skipElement(xmlReader);
-                }
+                readObject(xmlReader, filter, proxyFilter);
             } else if (elementName.equals(XARClassModel.ELEMENT_CLASS)) {
-                if (!this.properties.isReferencesOnly()) {
-                    readClass(xmlReader, filter, proxyFilter);
-                } else {
-                    StAXUtils.skipElement(xmlReader);
-                }
+                readClass(xmlReader, filter, proxyFilter);
             } else {
                 String value = xmlReader.getElementText();
 

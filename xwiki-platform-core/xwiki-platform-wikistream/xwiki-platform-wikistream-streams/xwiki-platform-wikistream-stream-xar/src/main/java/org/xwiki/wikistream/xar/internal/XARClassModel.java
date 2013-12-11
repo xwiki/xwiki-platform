@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.wikistream.model.filter.WikiClassFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils.EventParameter;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
 
 /**
  * @version $Id$

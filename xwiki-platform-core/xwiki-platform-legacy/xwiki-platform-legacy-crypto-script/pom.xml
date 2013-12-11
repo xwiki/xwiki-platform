@@ -35,7 +35,8 @@
   <properties>
     <!-- The features provided by this module -->
     <xwiki.extension.features>
-      org.xwiki.platform:xwiki-platform-crypto-script
+      org.xwiki.platform:xwiki-platform-crypto-script,
+      org.xwiki.platform:xwiki-platform-crypto
     </xwiki.extension.features>
     <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
   </properties>

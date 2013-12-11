@@ -150,5 +150,6 @@ platform.wiki.currentwiki.candidates.hint=Users which have requested or which ha
 admin.xwiki.manageworkspace.description=Manage settings such as wiki name, description, owner and membership type.
 admin.xwiki.workspaceusers.description=Manage wiki members: add, remove, invite, accept or reject wiki members.
 admin.xwiki.usersconfiguration.title=Configuration
+admin.xwiki.members.title=Current Members
 </content>
 </xwikidoc>

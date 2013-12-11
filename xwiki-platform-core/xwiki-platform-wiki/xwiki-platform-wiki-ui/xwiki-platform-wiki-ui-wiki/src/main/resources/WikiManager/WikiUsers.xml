@@ -288,7 +288,9 @@
 #end
 #hasGroupRight('edit' $hasEditGroupRight)
 #hasGroupRight('delete' $hasDeleteGroupRight)
-{{/velocity}}{{velocity}}
+{{/velocity}}
+
+{{velocity}}
 ### MANAGE CANDIDACIES ###
 #macro (printException $exception)
   #if($exception.message)

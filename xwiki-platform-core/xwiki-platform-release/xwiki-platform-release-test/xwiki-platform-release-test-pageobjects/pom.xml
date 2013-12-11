@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-release-test</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.3</version>
   </parent>
   <artifactId>xwiki-platform-release-test-pageobjects</artifactId>
   <name>XWiki Platform - Release - Tests - Page Objects</name>

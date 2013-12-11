@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wikistream-events</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.3</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-events-user</artifactId>
   <name>XWiki Platform - WikiStream - Events - User</name>

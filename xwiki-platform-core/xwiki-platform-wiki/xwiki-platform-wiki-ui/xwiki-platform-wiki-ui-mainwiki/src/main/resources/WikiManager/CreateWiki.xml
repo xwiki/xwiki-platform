@@ -678,7 +678,8 @@ return XWiki;
   #elseif($request.step == 'create')
     #create()
   #elseif($request.step == 'finalize')
-    #setMembers($services.wiki.getById($request.wikiId))
+    #set($wikiDescriptor = $services.wiki.getById($request.wikiId))
+    #setMembers($wikiDescriptor)
   #else
     ## Default step
     #stepType()

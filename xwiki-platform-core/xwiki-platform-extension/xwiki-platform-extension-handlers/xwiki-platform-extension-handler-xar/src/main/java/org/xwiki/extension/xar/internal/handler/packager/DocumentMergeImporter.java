@@ -20,7 +20,6 @@
 package org.xwiki.extension.xar.internal.handler.packager;
 
 import java.util.Date;
-import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -37,7 +36,6 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wikistream.xar.internal.XarEntry;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializerManager;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -269,33 +267,13 @@ public class DocumentMergeImporter
         return documentToSave;
     }
 
-    private XWikiDocument getDatabaseDocument(XWikiDocument document, XWikiContext context) throws XWikiException
-    {
-        XWikiDocument existingDocument = context.getWiki().getDocument(document.getDocumentReference(), context);
-
-        if (!document.getLocale().equals(Locale.ROOT)) {
-            Locale defaultLocale = existingDocument.getDefaultLocale();
-            XWikiDocument translatedDocument = existingDocument.getTranslatedDocument(document.getLocale(), context);
-
-            if (translatedDocument == existingDocument) {
-                translatedDocument = new XWikiDocument(document.getDocumentReference());
-                translatedDocument.setDefaultLocale(defaultLocale);
-                translatedDocument.setTranslation(1);
-                translatedDocument.setLocale(document.getLocale());
-            }
-
-            existingDocument = translatedDocument;
-        }
-
-        return existingDocument;
-    }
-
     private void saveDocument(XWikiDocument document, String comment, boolean setCreator,
         PackageConfiguration configuration) throws Exception
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        XWikiDocument currentDocument = getDatabaseDocument(document, xcontext);
+        XWikiDocument currentDocument =
+            xcontext.getWiki().getDocument(document.getDocumentReferenceWithLocale(), xcontext);
 
         if (!currentDocument.isNew()) {
             if (document != currentDocument) {

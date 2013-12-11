@@ -51,11 +51,14 @@ import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
+import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -217,6 +220,9 @@ public class XarExtensionHandlerTest
         ((XWikiStubContextProvider) this.componentManager.getInstance(XWikiStubContextProvider.class))
             .initialize(getXWikiContext());
 
+        CoreConfiguration coreConfiguration = this.componentManager.getInstance(CoreConfiguration.class);
+        Mockito.when(coreConfiguration.getDefaultDocumentSyntax()).thenReturn(Syntax.PLAIN_1_0);
+
         // lookup
 
         this.jobManager = this.componentManager.getInstance(JobManager.class);
@@ -314,6 +320,15 @@ public class XarExtensionHandlerTest
         existingDocument.addXObject(object);
         existingDocument.setCreatorReference(new DocumentReference("wiki", "space", "existingcreator"));
         this.oldcore.getMockXWiki().saveDocument(existingDocument, "", true, getXWikiContext());
+
+        MandatoryDocumentInitializer mandatoryInitializer =
+            this.componentManager.registerMockComponent(MandatoryDocumentInitializer.class, "space.mandatory");
+        Mockito.when(mandatoryInitializer.updateDocument(Mockito.any(XWikiDocument.class))).thenReturn(true);
+        XWikiDocument mandatoryDocument = new XWikiDocument(new DocumentReference("wiki", "space", "mandatory"));
+        mandatoryDocument.setCreatorReference(new DocumentReference("wiki", "space", "existingcreator"));
+        mandatoryDocument.setSyntax(Syntax.PLAIN_1_0);
+        mandatoryDocument.setContent("modified content");
+        this.oldcore.getMockXWiki().saveDocument(mandatoryDocument, "", true, getXWikiContext());
 
         // install
 
@@ -423,10 +438,17 @@ public class XarExtensionHandlerTest
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "hiddenpage"),
                 getXWikiContext());
 
-        Assert.assertNotNull("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage);
         Assert.assertFalse("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage.isNew());
 
         Assert.assertTrue("Document is not hidden", hiddenpage.isHidden());
+
+        // space.mandatory
+
+        XWikiDocument mandatorypage =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "mandatory"),
+                getXWikiContext());
+
+        Assert.assertEquals("Document wiki:space.mandatory has been overwritten", "1.1", mandatorypage.getVersion());
     }
 
     @Test
@@ -902,6 +924,35 @@ public class XarExtensionHandlerTest
                 .getDocument(new DocumentReference("wiki", "space1", "page1"), getXWikiContext());
 
         Assert.assertTrue("Document wiki.space1.page1 has not been removed from the database", page1.isNew());
+    }
+
+    @Test
+    public void testUninstallMandatory() throws Throwable
+    {
+        // register a mandatory document initializer
+        MandatoryDocumentInitializer mandatoryInitializer =
+            this.componentManager.registerMockComponent(MandatoryDocumentInitializer.class, "space.page");
+
+        Mockito.when(mandatoryInitializer.updateDocument(Mockito.any(XWikiDocument.class))).thenReturn(true);
+
+        mockHasAdminRight(true);
+
+        install(this.localXarExtensiontId1, "wiki", this.contextUser);
+
+        verifyHasAdminRight(2);
+
+        // uninstall
+
+        uninstall(this.localXarExtensiontId1, "wiki");
+
+        verifyHasAdminRight(3);
+
+        // validate
+
+        XWikiDocument page =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
+
+        Assert.assertFalse("Document wiki.space.page has been removed from the database", page.isNew());
     }
 
     @Test

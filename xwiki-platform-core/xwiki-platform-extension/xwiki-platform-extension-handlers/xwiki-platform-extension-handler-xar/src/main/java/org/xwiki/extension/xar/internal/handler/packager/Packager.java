@@ -56,9 +56,7 @@ import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARModel;
 import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
 import org.xwiki.wikistream.xar.internal.XarEntry;
-import org.xwiki.wikistream.xar.internal.XarException;
 import org.xwiki.wikistream.xar.internal.XarFile;
-import org.xwiki.wikistream.xar.internal.XarPackage;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -216,23 +214,6 @@ public class Packager
         }
 
         return null;
-    }
-
-    public void unimportXAR(File xarFile, PackageConfiguration configuration) throws IOException, XWikiException,
-        XarException
-    {
-        Collection<XarEntry> entries = XarPackage.getEntries(xarFile);
-
-        if (configuration.getWiki() == null) {
-            XWikiContext xcontext = this.xcontextProvider.get();
-            List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
-
-            for (String subwiki : wikis) {
-                unimportPagesFromWiki(entries, subwiki, configuration);
-            }
-        } else {
-            unimportPagesFromWiki(entries, configuration.getWiki(), configuration);
-        }
     }
 
     public void unimportPages(Collection<XarEntry> pages, PackageConfiguration configuration) throws XWikiException

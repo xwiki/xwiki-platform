@@ -33,10 +33,21 @@ import org.xwiki.wikistream.xar.internal.XarFile;
  */
 public class XarExtensionPlanEntry implements Closeable
 {
+    /**
+     * The extension.
+     */
     public final XarInstalledExtension extension;
 
+    /**
+     * The extension file opened as XAR file.
+     */
     public final XarFile xarFile;
 
+    /**
+     * @param extension the extension
+     * @throws XarException when failing to parse extension file
+     * @throws IOException when failing to parse extension file
+     */
     public XarExtensionPlanEntry(XarInstalledExtension extension) throws XarException, IOException
     {
         this.extension = extension;

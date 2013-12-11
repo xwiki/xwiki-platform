@@ -204,10 +204,12 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
     {
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
-        if (extension.getType().equals(XarExtensionHandler.TYPE)) {
-            extension = this.extensions.get(extension.getId());
-        } else {
-            extension = null;
+        if (extension != null) {
+            if (extension.getType().equals(XarExtensionHandler.TYPE)) {
+                extension = this.extensions.get(extension.getId());
+            } else {
+                extension = null;
+            }
         }
 
         return extension;

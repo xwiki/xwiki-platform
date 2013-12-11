@@ -36,6 +36,11 @@ import org.xwiki.xml.stax.StAXUtils;
  */
 public final class XarUtils
 {
+    private XarUtils()
+    {
+        // Utility class
+    }
+
     /**
      * Extract {@link LocalDocumentReference} from a XAR document XML stream.
      * 

@@ -393,7 +393,7 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
     {
         if (this.currentXObject != null) {
             this.currentXClass = new BaseClass();
-            this.currentXClass.setDocumentReference(this.currentXClass.getXClassReference());
+            this.currentXClass.setDocumentReference(this.currentXObject.getXClassReference());
             this.currentXObjectClass = this.currentXClass;
         } else {
             this.currentXClass = this.document.getXClass();

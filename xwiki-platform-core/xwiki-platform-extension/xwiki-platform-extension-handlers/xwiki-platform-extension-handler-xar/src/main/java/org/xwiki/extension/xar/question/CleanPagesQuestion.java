@@ -17,29 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.xar.internal.script;
+package org.xwiki.extension.xar.question;
 
-import javax.inject.Inject;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.xwiki.extension.internal.safe.ScriptSafeProvider;
-import org.xwiki.extension.xar.question.ConflictQuestion;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
- * @version $Id$
- * @since 4.0M2
+ * The pages planned for deleted.
+ * <p>
+ * Expect a confirmation for each one.
+ * 
+ * @version $Id$he
+ * @since 5.4M1
  */
-public class ConflictQuestionScriptSafeProvider implements ScriptSafeProvider<ConflictQuestion>
+public class CleanPagesQuestion
 {
-    /**
-     * Used to provide collection elements safe versions.
-     */
-    @Inject
-    @SuppressWarnings("rawtypes")
-    private ScriptSafeProvider safeProvider;
+    private Map<DocumentReference, Boolean> pages;
 
-    @Override
-    public <S> S get(ConflictQuestion unsafe)
+    /**
+     * @param pages the pages planned for deletion
+     */
+    public CleanPagesQuestion(Collection<DocumentReference> pages)
     {
-        return (S) new SafeConflictQuestion(unsafe, this.safeProvider);
+        this.pages = new HashMap<DocumentReference, Boolean>(pages.size());
+
+        for (DocumentReference page : pages) {
+            this.pages.put(page, true);
+        }
+    }
+
+    /**
+     * @return the pages planned for deletion
+     */
+    public Map<DocumentReference, Boolean> getPages()
+    {
+        return this.pages;
     }
 }

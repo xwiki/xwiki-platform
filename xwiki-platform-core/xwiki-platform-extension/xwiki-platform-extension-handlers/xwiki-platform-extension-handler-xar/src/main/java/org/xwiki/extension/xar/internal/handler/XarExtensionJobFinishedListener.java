@@ -20,9 +20,9 @@
 package org.xwiki.extension.xar.internal.handler;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,10 +40,10 @@ import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
+import org.xwiki.extension.xar.question.CleanPagesQuestion;
 import org.xwiki.job.Request;
 import org.xwiki.job.event.JobFinishedEvent;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.wikistream.xar.internal.XarEntry;
@@ -93,7 +93,7 @@ public class XarExtensionJobFinishedListener implements EventListener
     }
 
     @Override
-    public void onEvent(Event event, Object o, Object o1)
+    public void onEvent(Event event, Object source, Object data)
     {
         JobFinishedEvent jobFinishedEvent = (JobFinishedEvent) event;
 
@@ -119,88 +119,100 @@ public class XarExtensionJobFinishedListener implements EventListener
 
                         Packager packager = this.packagerProvider.get();
 
-                        for (Map.Entry<String, Map<XarEntry, XarExtensionPlanEntry>> wikiEntry : previousXAREntries
-                            .entrySet()) {
-                            String wiki = wikiEntry.getKey();
-                            WikiReference wikiReference = wiki != null ? new WikiReference(wiki) : null;
-                            Map<XarEntry, XarExtensionPlanEntry> previousPages = wikiEntry.getValue();
-                            Map<XarEntry, LocalExtension> nextPages =
-                                wiki != null ? nextXAREntries.get(wiki) : rootNextPages;
-                            if (nextPages == null) {
-                                nextPages = Collections.emptyMap();
-                            }
+                        // Get pages to delete
 
-                            Map<XarEntry, XarExtensionPlanEntry> previousPagesToDelete =
-                                new HashMap<XarEntry, XarExtensionPlanEntry>(previousPages);
-                            for (Map.Entry<XarEntry, XarExtensionPlanEntry> pageEntry : previousPages.entrySet()) {
-                                XarEntry previousPage = pageEntry.getKey();
-                                XarExtensionPlanEntry xarPlanEntry = pageEntry.getValue();
-
-                                if (nextPages.containsKey(previousPage) || rootNextPages.containsKey(previousPage)) {
-                                    previousPagesToDelete.remove(previousPage);
-                                } else {
-                                    DocumentReference documentReference =
-                                        new DocumentReference(previousPage.getReference(), wikiReference);
-                                    XWikiDocument currentDocument;
-                                    try {
-                                        currentDocument = xcontext.getWiki().getDocument(documentReference, xcontext);
-                                    } catch (Exception e) {
-                                        this.logger.error("Failed to get document [{}]", documentReference, e);
-                                        // Lets be safe and skip removing that page
-                                        previousPagesToDelete.remove(previousPage);
-                                        continue;
-                                    }
-
-                                    if (currentDocument.isNew()) {
-                                        // Current already removed
-                                        previousPagesToDelete.remove(previousPage);
-                                        continue;
-                                    }
-
-                                    XWikiDocument previousDocument;
-                                    try {
-                                        previousDocument =
-                                            packager.getXWikiDocument(wikiReference, previousPage.getReference(),
-                                                xarPlanEntry.xarFile);
-                                    } catch (Exception e) {
-                                        this.logger.error("Failed to get document [{}] from XAR [{}]",
-                                            documentReference, xarPlanEntry.xarFile, e);
-                                        // Lets be safe and skip removing that page
-                                        previousPagesToDelete.remove(previousPage);
-                                        continue;
-                                    }
-
-                                    try {
-                                        currentDocument.loadAttachments(xcontext);
-                                        // XXX: conflict between current and new
-                                        if (!currentDocument.equalsData(previousDocument)) {
-                                            previousPagesToDelete.remove(previousPage);
-                                        }
-                                    } catch (Exception e) {
-                                        this.logger.error("Failed to load attachments", e);
-                                        // Lets be safe and skip removing that page
-                                        previousPagesToDelete.remove(previousPage);
-                                        continue;
-                                    }
-                                }
-                            }
-                            previousXAREntries.put(wikiEntry.getKey(), previousPagesToDelete);
-                        }
+                        List<DocumentReference> pagesToDelete = new ArrayList<DocumentReference>();
 
                         for (Map.Entry<String, Map<XarEntry, XarExtensionPlanEntry>> previousWikiEntry : previousXAREntries
                             .entrySet()) {
                             if (!previousWikiEntry.getValue().isEmpty()) {
                                 try {
-                                    packager.unimportPages(
+                                    pagesToDelete.addAll(packager.getDocumentReferences(
                                         previousWikiEntry.getValue().keySet(),
                                         createPackageConfiguration(jobFinishedEvent.getRequest(),
-                                            previousWikiEntry.getKey()));
+                                            previousWikiEntry.getKey())));
+
                                 } catch (Exception e) {
                                     this.logger
                                         .warn(
                                             "Exception when cleaning pages removed since previous xar extension version",
                                             e);
                                 }
+                            }
+                        }
+
+                        // Create cleanup question
+
+                        CleanPagesQuestion question = new CleanPagesQuestion(pagesToDelete);
+
+                        // Deal with conflicts before sending the question
+
+                        Map<DocumentReference, Boolean> pages = question.getPages();
+                        for (Map.Entry<DocumentReference, Boolean> entry : pages.entrySet()) {
+                            DocumentReference reference = entry.getKey();
+
+                            // Get current
+                            XWikiDocument currentDocument;
+                            try {
+                                currentDocument = xcontext.getWiki().getDocument(reference, xcontext);
+                            } catch (Exception e) {
+                                this.logger.error("Failed to get document [{}]", reference, e);
+                                // Lets be safe and skip removing that page
+                                pages.put(reference, false);
+                                continue;
+                            }
+                            if (currentDocument.isNew()) {
+                                // Current already removed
+                                pages.put(reference, false);
+                                continue;
+                            }
+
+                            // Get previous
+                            XWikiDocument previousDocument;
+                            try {
+                                previousDocument = xarExtensionPlan.getPreviousXWikiDocument(reference, packager);
+                            } catch (Exception e) {
+                                this.logger.error("Failed to get previous version of document [{}]", reference, e);
+                                // Lets be safe and skip removing that page
+                                pages.put(reference, false);
+                                continue;
+                            }
+
+                            // Compare previous and current
+                            try {
+                                currentDocument.loadAttachmentsContent(xcontext);
+                                if (!currentDocument.equalsData(previousDocument)) {
+                                    // XXX: conflict between current and new
+                                    pages.put(reference, false);
+                                }
+                            } catch (Exception e) {
+                                this.logger.error("Failed to load attachments", e);
+                                // Lets be safe and skip removing that page
+                                pages.put(reference, false);
+                                continue;
+                            }
+                        }
+
+                        // TODO: enable it when UI is ready
+                        // Ask confirmation
+                        // if (jobFinishedEvent.getRequest().isInteractive()) {
+                        // try {
+                        // job.getStatus().ask(question);
+                        // } catch (InterruptedException e) {
+                        // this.logger.warn("The thread has been interrupted", e);
+                        //
+                        // // The thread has been interrupted, do nothing
+                        // return;
+                        // }
+                        // }
+
+                        // Delete pages
+
+                        PackageConfiguration configuration = createPackageConfiguration(jobFinishedEvent.getRequest());
+
+                        for (Map.Entry<DocumentReference, Boolean> entry : question.getPages().entrySet()) {
+                            if (entry.getValue()) {
+                                packager.deleteDocument(entry.getKey(), configuration);
                             }
                         }
                     } finally {
@@ -215,6 +227,11 @@ public class XarExtensionJobFinishedListener implements EventListener
                 }
             }
         }
+    }
+
+    private PackageConfiguration createPackageConfiguration(Request request)
+    {
+        return createPackageConfiguration(request, null);
     }
 
     private PackageConfiguration createPackageConfiguration(Request request, String wiki)

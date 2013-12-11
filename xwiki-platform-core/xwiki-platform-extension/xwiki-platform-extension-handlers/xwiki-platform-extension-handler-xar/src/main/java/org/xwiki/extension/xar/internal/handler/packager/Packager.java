@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -37,6 +38,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.extension.xar.internal.handler.XarExtensionPlan;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -186,13 +188,12 @@ public class Packager
         }
 
         DocumentReference reference = nextDocument.getDocumentReferenceWithLocale();
-        LocalDocumentReference localReference = new LocalDocumentReference(reference);
         XWikiDocument currentDocument = xcontext.getWiki().getDocument(reference, xcontext);
-        currentDocument.loadAttachments(xcontext);
+        currentDocument.loadAttachmentsContent(xcontext);
         XWikiDocument previousDocument;
-        XarFile previousXarFile = configuration.getPreviousPages().get(localReference);
-        if (previousXarFile != null) {
-            previousDocument = getXWikiDocument(wikiReference, localReference, previousXarFile);
+        XarExtensionPlan xarExtensionPlan = configuration.getXarExtensionPlan();
+        if (xarExtensionPlan != null) {
+            previousDocument = xarExtensionPlan.getPreviousXWikiDocument(reference, this);
         } else {
             previousDocument = null;
         }
@@ -252,7 +253,6 @@ public class Packager
     {
         WikiReference wikiReference = new WikiReference(wiki);
 
-        XWikiContext xcontext = this.xcontextProvider.get();
         for (XarEntry xarEntry : entries) {
             // Only delete what should be deleted.
             if (configuration.getEntriesToImport() == null
@@ -262,20 +262,27 @@ public class Packager
                         .getReference().getLocale());
 
                 if (!configuration.isSkipMandatorytDocuments() || !isMandatoryDocument(documentReference)) {
-                    try {
-                        XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
-
-                        if (!document.isNew()) {
-                            xcontext.getWiki().deleteDocument(document, xcontext);
-
-                            this.logger.info("Successfully deleted document [{}] in language [{}]",
-                                document.getDocumentReference(), document.getRealLocale());
-                        }
-                    } catch (XWikiException e) {
-                        this.logger.error("Failed to delete document [{}]", documentReference, e);
-                    }
+                    deleteDocument(documentReference, configuration);
                 }
             }
+        }
+    }
+
+    public void deleteDocument(DocumentReference documentReference, PackageConfiguration configuration)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        try {
+            XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+            if (!document.isNew()) {
+                xcontext.getWiki().deleteDocument(document, xcontext);
+
+                this.logger.info("Successfully deleted document [{}] in language [{}]",
+                    document.getDocumentReference(), document.getRealLocale());
+            }
+        } catch (XWikiException e) {
+            this.logger.error("Failed to delete document [{}]", documentReference, e);
         }
     }
 
@@ -304,23 +311,61 @@ public class Packager
     public XWikiDocument getXWikiDocument(InputStream stream, WikiReference wikiReference) throws WikiStreamException,
         ComponentLookupException, IOException
     {
-        XWikiDocumentOutputWikiStream documentFilter =
-            this.componentManager.getInstance(XWikiDocumentOutputWikiStream.class);
-
+        // Output
         DocumentInstanceOutputProperties documentProperties = new DocumentInstanceOutputProperties();
         documentProperties.setDefaultReference(wikiReference);
+        XWikiDocumentOutputWikiStream documentFilter =
+            this.componentManager.getInstance(XWikiDocumentOutputWikiStream.class);
+        documentFilter.setProperties(documentProperties);
 
+        // Input
         XARInputProperties xarProperties = new XARInputProperties();
-
         xarProperties.setForceDocument(true);
         xarProperties.setSource(new DefaultInputStreamInputSource(stream));
-
         BeanInputWikiStream<XARInputProperties> xarWikiStream =
             ((BeanInputWikiStreamFactory<XARInputProperties>) this.xarWikiStreamFactory)
                 .createInputWikiStream(xarProperties);
 
+        // Convert
         xarWikiStream.read(documentFilter);
 
         return documentFilter.getDocument();
+    }
+
+    public List<DocumentReference> getDocumentReferences(Collection<XarEntry> pages, PackageConfiguration configuration)
+        throws XWikiException
+    {
+        List<DocumentReference> documents = new ArrayList<DocumentReference>(pages.size());
+
+        if (configuration.getWiki() == null) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
+
+            for (String subwiki : wikis) {
+                getDocumentReferencesFromWiki(documents, pages, subwiki, configuration);
+            }
+        } else {
+            getDocumentReferencesFromWiki(documents, pages, configuration.getWiki(), configuration);
+        }
+
+        return documents;
+    }
+
+    private void getDocumentReferencesFromWiki(List<DocumentReference> documents, Collection<XarEntry> pages,
+        String wiki, PackageConfiguration configuration)
+    {
+        WikiReference wikiReference = new WikiReference(wiki);
+
+        for (XarEntry xarEntry : pages) {
+            // Only delete what should be deleted.
+            if (configuration.getEntriesToImport() == null
+                || configuration.getEntriesToImport().contains(xarEntry.getName())) {
+                DocumentReference documentReference = new DocumentReference(xarEntry.getReference(), wikiReference);
+
+                if (!configuration.isSkipMandatorytDocuments() || !isMandatoryDocument(documentReference)) {
+                    documents.add(documentReference);
+                }
+            }
+        }
     }
 }

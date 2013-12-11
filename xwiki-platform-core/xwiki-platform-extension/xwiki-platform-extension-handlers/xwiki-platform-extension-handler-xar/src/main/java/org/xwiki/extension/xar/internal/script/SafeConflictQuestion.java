@@ -22,8 +22,8 @@ package org.xwiki.extension.xar.internal.script;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.xwiki.extension.internal.safe.AbstractSafeObject;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
-import org.xwiki.extension.xar.internal.handler.ConflictQuestion;
-import org.xwiki.extension.xar.internal.handler.ConflictQuestion.GlobalAction;
+import org.xwiki.extension.xar.question.ConflictQuestion;
+import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;

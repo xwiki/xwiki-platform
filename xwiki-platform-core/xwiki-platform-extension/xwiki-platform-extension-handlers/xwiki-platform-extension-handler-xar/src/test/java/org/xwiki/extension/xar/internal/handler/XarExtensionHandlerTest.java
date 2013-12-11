@@ -950,7 +950,7 @@ public class XarExtensionHandlerTest
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space1", "page1"),
                 getXWikiContext());
 
-        Assert.assertTrue(pageWiki1.isNew());
+        Assert.assertTrue("Document wiki1:space1.page1 hasn't been removed from the database", pageWiki1.isNew());
 
         pageWiki2 =
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki2", "space1", "page1"),

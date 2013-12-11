@@ -19,14 +19,11 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
+import org.xwiki.extension.xar.internal.handler.XarExtensionPlan;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.wikistream.xar.internal.XarFile;
 
 /**
  * @version $Id$
@@ -44,7 +41,7 @@ public class PackageConfiguration
 
     private boolean logEnabled = false;
 
-    private Map<LocalDocumentReference, XarFile> previousPages;
+    private XarExtensionPlan xarExtensionPlan;
 
     private Set<String> entriesToImport;
 
@@ -110,14 +107,14 @@ public class PackageConfiguration
         this.entriesToImport = entriesToImport;
     }
 
-    public Map<LocalDocumentReference, XarFile> getPreviousPages()
+    public XarExtensionPlan getXarExtensionPlan()
     {
-        return this.previousPages != null ? this.previousPages : Collections.<LocalDocumentReference, XarFile> emptyMap();
+        return this.xarExtensionPlan;
     }
 
-    public void setPreviousPages(Map<LocalDocumentReference, XarFile> previousPages)
+    public void setXarExtensionPlan(XarExtensionPlan xarExtensionPlan)
     {
-        this.previousPages = previousPages;
+        this.xarExtensionPlan = xarExtensionPlan;
     }
 
     public boolean isSkipMandatorytDocuments()

@@ -22,7 +22,6 @@ package org.xwiki.extension.xar.internal.handler;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -56,10 +55,8 @@ import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wikistream.xar.internal.XarEntry;
 import org.xwiki.wikistream.xar.internal.XarException;
-import org.xwiki.wikistream.xar.internal.XarFile;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -151,7 +148,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
     }
 
-    private XarExtensionPlan getXARInstallPlan()
+    private XarExtensionPlan getXARExtensionPlan()
     {
         ExecutionContext context = this.execution.getContext();
 
@@ -208,14 +205,12 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
 
         // import xar into wiki (add new version when the page already exists)
-        PackageConfiguration configuration = createPackageConfiguration(newLocalExtension, request, wiki);
+        PackageConfiguration configuration = createPackageConfiguration(newLocalExtension, request, wiki, getXARExtensionPlan());
         try {
             this.packager.importXAR("Install extensoin [" + newLocalExtension + "]", new File(newLocalExtension
                 .getFile().getAbsolutePath()), configuration);
         } catch (Exception e) {
             throw new InstallException("Failed to import xar for extension [" + newLocalExtension + "]", e);
-        } finally {
-            cleanPackageConfiguration(configuration);
         }
     }
 
@@ -254,7 +249,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 // TODO: maybe remove only unmodified page ? At least ask for sure when question/answer system will be
                 // implemented
 
-                PackageConfiguration configuration = createPackageConfiguration(null, request, wiki);
+                PackageConfiguration configuration =
+                    createPackageConfiguration(null, request, wiki, getXARExtensionPlan());
                 try {
                     XarInstalledExtension xarLocalExtension =
                         (XarInstalledExtension) this.xarRepository.resolve(installedExtension.getId());
@@ -264,8 +260,6 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                     // Not supposed to be possible
                     throw new UninstallException("Failed to get xar extension [" + installedExtension.getId()
                         + "] from xar repository", e);
-                } finally {
-                    cleanPackageConfiguration(configuration);
                 }
             } else {
                 // The actual delete of pages is done in XarExtensionJobFinishedListener
@@ -273,18 +267,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
     }
 
-    private void cleanPackageConfiguration(PackageConfiguration configuration)
-    {
-        for (XarFile xarFile : configuration.getPreviousPages().values()) {
-            try {
-                xarFile.close();
-            } catch (IOException e) {
-                this.logger.warn("Failed to close XARFile [{}]", xarFile, e);
-            }
-        }
-    }
-
-    private PackageConfiguration createPackageConfiguration(LocalExtension extension, Request request, String wiki)
+    private PackageConfiguration createPackageConfiguration(LocalExtension extension, Request request, String wiki,
+        XarExtensionPlan xarExtensionPlan)
     {
         PackageConfiguration configuration = new PackageConfiguration();
 
@@ -293,6 +277,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         configuration.setWiki(wiki);
         configuration.setLogEnabled(true);
         configuration.setSkipMandatorytDocuments(true);
+        configuration.setXarExtensionPlan(xarExtensionPlan);
 
         try {
             Job currentJob = this.componentManager.<JobContext> getInstance(JobContext.class).getCurrentJob();
@@ -303,38 +288,9 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             this.logger.error("Failed to lookup JobContext, it will be impossible to do interactive install");
         }
 
-        // Previous pages
-        Map<String, Map<XarEntry, XarExtensionPlanEntry>> previousXAREntries = getXARInstallPlan().previousXAREntries;
-        Map<LocalDocumentReference, XarFile> previousPages = new HashMap<LocalDocumentReference, XarFile>();
-        Map<XarEntry, XarExtensionPlanEntry> previousXAREntriesOnRoot = previousXAREntries.get(null);
-        if (previousXAREntriesOnRoot != null) {
-            for (Map.Entry<XarEntry, XarExtensionPlanEntry> entry : previousXAREntriesOnRoot.entrySet()) {
-                XarExtensionPlanEntry planEntry = entry.getValue();
-                try {
-                    previousPages.put(entry.getKey().getReference(), planEntry.xarFile);
-                } catch (Exception e) {
-                    // Should never happen
-                    this.logger.error("Failed to create XARFile for installed extension [{}]", entry.getValue(), e);
-                }
-            }
-        }
-        Map<XarEntry, XarExtensionPlanEntry> previousXAREntriesOnWiki = previousXAREntries.get(wiki);
-        if (previousXAREntriesOnWiki != null) {
-            for (Map.Entry<XarEntry, XarExtensionPlanEntry> entry : previousXAREntriesOnWiki.entrySet()) {
-                XarExtensionPlanEntry planEntry = entry.getValue();
-                try {
-                    previousPages.put(entry.getKey().getReference(), planEntry.xarFile);
-                } catch (Exception e) {
-                    // Should never happen
-                    this.logger.error("Failed to create XARFile for installed extension [{}]", entry.getValue(), e);
-                }
-            }
-        }
-        configuration.setPreviousPages(previousPages);
-
         // Entries to import
         if (extension != null) {
-            Map<String, Map<XarEntry, LocalExtension>> nextXAREntries = getXARInstallPlan().nextXAREntries;
+            Map<String, Map<XarEntry, LocalExtension>> nextXAREntries = getXARExtensionPlan().nextXAREntries;
 
             Set<String> entriesToImport = new HashSet<String>();
 

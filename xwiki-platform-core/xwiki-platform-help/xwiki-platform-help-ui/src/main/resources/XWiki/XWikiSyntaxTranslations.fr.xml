@@ -24,6 +24,10 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language fr generated from http://www.l10n.xwiki.org
+help.changesyntax=Modifier la syntaxe
+help.choose_syntax=Sélectionner la syntaxe
+help.syntaxall=Tout
+help.syntaxpage.title=Guide de syntaxe XWiki
 help.syntaxtitle=Syntaxe XWiki {0}
 </content>
 </xwikidoc>

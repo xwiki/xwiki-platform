@@ -27,6 +27,9 @@
 solr.facets.hint=Selecteer een categorie en activeer filters op de huidige resultaten
 solr.facets.resetAll=Herstel alle
 solr.facets.title=Verfijn uw zoekopdracht
+solr.field.attcontent=Bijlage Inhoud
+solr.field.filename=Bijlage Naam
+solr.field.objcontent=Objecten
 solr.filter.hint=Selecteer vooraf gedefinieerde filters die toegepast zullen worden op uw query
 solr.filter.title=Geavanceerde opties
 solr.filter.toggle=Schakel de zoekfilter in

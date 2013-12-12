@@ -534,7 +534,7 @@ public class ConfluenceXMLPackage
         String propertyClass = xmlReader.getAttributeValue(null, "class");
 
         if (propertyClass == null) {
-            return xmlReader.getElementText();
+            return fixCData(xmlReader.getElementText());
         } else if (propertyClass.equals("java.util.List") || propertyClass.equals("java.util.Collection")) {
             return readListProperty(xmlReader);
         } else if (propertyClass.equals("java.util.Set")) {
@@ -550,6 +550,19 @@ public class ConfluenceXMLPackage
         }
 
         return null;
+    }
+    
+    /**
+     * to protect content with cdata section inside of cdata elements confluence adds a single space after two consecutive curly braces.
+     * we need to undo this patch as otherwise the content parser will complain about invalid content.
+     * strictly speaking this needs only to be done for string valued properties
+     */
+    private String fixCData(String elementText)
+    {
+        if (elementText == null) {
+            return elementText;
+        }
+        return elementText.replaceAll("]] ", "]]");
     }
 
     private Integer readIdProperty(XMLStreamReader xmlReader) throws WikiStreamException, XMLStreamException

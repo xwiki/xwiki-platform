@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -154,6 +155,18 @@ public class ConfluenceXMLPackage
      */
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss.SSS");
 
+    /**
+     * pattern to find the end of "intentionally damaged" CDATA end sections.
+     * Confluence does this to nest CDATA sections inside CDATA sections.
+     * Interestingly it does not care if there is a &gt; after the ]].
+     */
+    private static final Pattern FIND_BROKEN_CDATA_PATTERN = Pattern.compile("]] ");
+
+    /**
+     * replacement to repair the CDATA 
+     */
+    private static final String REPAIRED_CDATA_END = "]]";
+    
     private File directory;
 
     private File entities;
@@ -562,7 +575,7 @@ public class ConfluenceXMLPackage
         if (elementText == null) {
             return elementText;
         }
-        return elementText.replaceAll("]] ", "]]");
+        return FIND_BROKEN_CDATA_PATTERN.matcher(elementText).replaceAll(REPAIRED_CDATA_END);
     }
 
     private Integer readIdProperty(XMLStreamReader xmlReader) throws WikiStreamException, XMLStreamException

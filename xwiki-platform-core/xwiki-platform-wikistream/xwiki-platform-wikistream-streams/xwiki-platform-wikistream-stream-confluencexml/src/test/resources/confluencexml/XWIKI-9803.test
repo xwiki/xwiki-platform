@@ -5,7 +5,7 @@
 .#  - attachments with several versions fail to load
 .#  - macros are mapped to paragraphs (expected text needs to be updated)
 .#------------------------------------------------------------------------------
-<wikiSpace name="Test XRENDERING-324">
+<wikiSpace name="Test XWIKI-9803">
   <wikiDocument name="WebHome">
     <wikiDocumentLocale>
       <wikiDocumentRevision revision="1">
@@ -223,5 +223,5 @@ AICAgCH5BAEAAA8AIf4WR0lGIFNtYXJ0U2F2ZXIgVmVyMS4xYQAsAAAAAAEAAQBABALwAQA7</conten
 </wikiSpace>
 .#------------------------------------------------------------------------------
 .input|confluence+xml
-.configuration.source=XRENDERING-324.xml.zip
+.configuration.source=XWIKI-9803.xml.zip
 .#------------------------------------------------------------------------------

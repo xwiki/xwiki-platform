@@ -20,6 +20,14 @@
         <string>active</string>
         <boolean>true</boolean>
       </entry>
+      <entry>
+        <string>revision_date</string>
+        <date>2013-10-14 10:18:48.960 UTC</date>
+      </entry>
+      <entry>
+        <string>creation_date</string>
+        <date>2013-10-14 10:18:48.960 UTC</date>
+      </entry>
     </parameters>
   </p>
 </user>
@@ -41,6 +49,14 @@
       <entry>
         <string>active</string>
         <boolean>true</boolean>
+      </entry>
+      <entry>
+        <string>revision_date</string>
+        <date>2013-10-14 13:42:39.532 UTC</date>
+      </entry>
+      <entry>
+        <string>creation_date</string>
+        <date>2013-10-14 13:42:39.532 UTC</date>
       </entry>
     </parameters>
   </p>
@@ -64,18 +80,63 @@
         <string>active</string>
         <boolean>true</boolean>
       </entry>
+      <entry>
+        <string>revision_date</string>
+        <date>2013-10-14 13:43:28.188 UTC</date>
+      </entry>
+      <entry>
+        <string>creation_date</string>
+        <date>2013-10-14 13:43:28.188 UTC</date>
+      </entry>
     </parameters>
   </p>
 </user>
 <group name="XWikiAdminGroup">
+  <p>
+    <parameters>
+      <entry>
+        <string>revision_date</string>
+        <date>2013-10-14 10:18:48.836 UTC</date>
+      </entry>
+      <entry>
+        <string>creation_date</string>
+        <date>2013-10-14 10:18:48.836 UTC</date>
+      </entry>
+    </parameters>
+  </p>
   <groupMemberGroup name="Admin"></groupMemberGroup>
 </group>
 <group name="XWikiAllGroup">
+  <p>
+    <parameters>
+      <entry>
+        <string>revision_date</string>
+        <date>2013-10-14 10:18:48.847 UTC</date>
+      </entry>
+      <entry>
+        <string>creation_date</string>
+        <date>2013-10-14 10:18:48.847 UTC</date>
+      </entry>
+    </parameters>
+  </p>
   <groupMemberGroup name="user2"></groupMemberGroup>
   <groupMemberGroup name="Admin"></groupMemberGroup>
   <groupMemberGroup name="user1"></groupMemberGroup>
 </group>
-<group name="twistedgroup"></group>
+<group name="twistedgroup">
+  <p>
+    <parameters>
+      <entry>
+        <string>revision_date</string>
+        <date>2013-10-14 13:43:47.360 UTC</date>
+      </entry>
+      <entry>
+        <string>creation_date</string>
+        <date>2013-10-14 13:43:47.360 UTC</date>
+      </entry>
+    </parameters>
+  </p>
+</group>
 <wikiSpace name="space1">
   <wikiDocument name="WebHome">
     <wikiDocumentLocale>
@@ -93,6 +154,10 @@
             <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 12:53:25.489 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -141,6 +206,10 @@
             <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:07:38.580 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -692,6 +761,10 @@
             <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:28:41.980 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -1717,6 +1790,10 @@
             <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:30:07.55 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -2770,6 +2847,10 @@
               <string>admin</string>
             </entry>
             <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:30:16.93 UTC</date>
+            </entry>
+            <entry>
               <string>revision_comment</string>
               <string>Task marked complete</string>
             </entry>
@@ -3821,6 +3902,10 @@
               <string>admin</string>
             </entry>
             <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:30:33.783 UTC</date>
+            </entry>
+            <entry>
               <string>revision_comment</string>
               <string></string>
             </entry>
@@ -4841,6 +4926,10 @@
             <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:32:14.75 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -5881,6 +5970,10 @@
             <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:34:06.749 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -9945,12 +10038,20 @@ qR5YLx5GLMbKNc/Ascim+P57jj6gu7VYmvXjUKyWJCkDsMMf4VN02oXS1AzycnJyScCocpCXqZ//
                 <string>admin</string>
               </entry>
               <entry>
+                <string>creation_date</string>
+                <date>2013-10-14 12:54:42.800 UTC</date>
+              </entry>
+              <entry>
                 <string>revision</string>
                 <string>1</string>
               </entry>
               <entry>
                 <string>revision_author</string>
                 <string>admin</string>
+              </entry>
+              <entry>
+                <string>revision_date</string>
+                <date>2013-10-14 13:07:38.600 UTC</date>
               </entry>
               <entry>
                 <string>revision_comment</string>
@@ -11182,12 +11283,20 @@ NpxO9xniijf9hnOo44FJLpN4zDeOJHhkQxsyH3U4oS4N8fRh4bnlkgUNI7fVie9Ri3Z0fIkoKjTW
                 <string>admin</string>
               </entry>
               <entry>
+                <string>creation_date</string>
+                <date>2013-10-14 12:54:58.369 UTC</date>
+              </entry>
+              <entry>
                 <string>revision</string>
                 <string>1</string>
               </entry>
               <entry>
                 <string>revision_author</string>
                 <string>admin</string>
+              </entry>
+              <entry>
+                <string>revision_date</string>
+                <date>2013-10-14 13:07:38.591 UTC</date>
               </entry>
               <entry>
                 <string>revision_comment</string>
@@ -11214,12 +11323,20 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
                 <string>admin</string>
               </entry>
               <entry>
+                <string>creation_date</string>
+                <date>2013-10-14 13:05:29.969 UTC</date>
+              </entry>
+              <entry>
                 <string>revision</string>
                 <string>1</string>
               </entry>
               <entry>
                 <string>revision_author</string>
                 <string>admin</string>
+              </entry>
+              <entry>
+                <string>revision_date</string>
+                <date>2013-10-14 13:07:38.630 UTC</date>
               </entry>
               <entry>
                 <string>revision_comment</string>
@@ -11247,6 +11364,10 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
             <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 12:53:25.501 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -11446,6 +11567,10 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
               <string>admin</string>
             </entry>
             <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:37:24.456 UTC</date>
+            </entry>
+            <entry>
               <string>revision_comment</string>
               <string></string>
             </entry>
@@ -11495,6 +11620,10 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
             <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:37:52.357 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -11554,6 +11683,10 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
             <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:37:24.463 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -11753,6 +11886,10 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
               <string>admin</string>
             </entry>
             <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:32:33.976 UTC</date>
+            </entry>
+            <entry>
               <string>revision_comment</string>
               <string></string>
             </entry>
@@ -11799,6 +11936,10 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
             <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:33:07.495 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -11877,6 +12018,10 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
             <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:35:10.951 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -11968,6 +12113,10 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
             <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:32:33.982 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -30373,12 +30522,20 @@ nzbO2eCi2LGbxjwtYZ5oo2rqiv8NRyb5/wA5VyXC08mOZwAAAABJRU5ErkJggg==</content>
                 <string>admin</string>
               </entry>
               <entry>
+                <string>creation_date</string>
+                <date>2013-10-14 13:39:11.550 UTC</date>
+              </entry>
+              <entry>
                 <string>revision</string>
                 <string>1</string>
               </entry>
               <entry>
                 <string>revision_author</string>
                 <string>admin</string>
+              </entry>
+              <entry>
+                <string>revision_date</string>
+                <date>2013-10-14 13:39:11.550 UTC</date>
               </entry>
               <entry>
                 <string>revision_comment</string>

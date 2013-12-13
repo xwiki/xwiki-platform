@@ -69,7 +69,11 @@ public class OutputTargetConverter extends AbstractConverter<OutputTarget>
         OutputTarget outputTarget;
 
         // TODO: use some OutputTargetParser instead to make it extensible
-        outputTarget = new StringWriterOutputTarget();
+        if (source.startsWith("file:")) {
+            outputTarget = new DefaultFileOutputTarget(new File(source.substring("file:".length())));
+        } else {
+            outputTarget = new StringWriterOutputTarget();
+        }
 
         return outputTarget;
     }

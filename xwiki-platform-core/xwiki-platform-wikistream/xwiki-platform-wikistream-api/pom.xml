@@ -123,6 +123,7 @@
               org/xwiki/wikistream/internal/output/DefaultFileOutputTarget.java,
               org/xwiki/wikistream/internal/output/DefaultOutputStreamOutputTarget.java,
               org/xwiki/wikistream/internal/output/DefaultWriterOutputTarget.java,
+              org/xwiki/wikistream/internal/output/OutputTargetConverter.java,
               org/xwiki/wikistream/internal/utils/AllFilterInvocationHandler.java,
               org/xwiki/wikistream/output/BeanOutputWikiStreamFactory.java,
               org/xwiki/wikistream/output/FileOutputTarget.java,

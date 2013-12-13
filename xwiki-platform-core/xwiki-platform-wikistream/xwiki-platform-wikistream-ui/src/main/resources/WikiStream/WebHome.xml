@@ -12,8 +12,8 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1384767919000</date>
-  <contentUpdateDate>1384767894000</contentUpdateDate>
+  <date>1386932372000</date>
+  <contentUpdateDate>1386932364000</contentUpdateDate>
   <version>1.1</version>
   <title>WikiStream</title>
   <defaultTemplate/>
@@ -44,6 +44,7 @@
 #set($inputProperties = {})
 ## Set response output by default
 #if ($services.wikistream.getInputWikiStreamDescriptor($request.input).getPropertyDescriptor('source'))
+  #set($sourceStandardInput = true)
   #set($void = $inputProperties.put('source', $request.inputStream))
 #end
 #foreach($parameterName in $request.parameterNames)
@@ -58,6 +59,7 @@
 #set($outputProperties = {})
 ## Set response output by default
 #if ($services.wikistream.getOutputWikiStreamDescriptor($request.output).getPropertyDescriptor('target'))
+  #set($targetStandardOutput = true)
   #set($void = $outputProperties.put('target', $response.outputStream))
 #end
 #foreach($parameterName in $request.parameterNames)
@@ -72,20 +74,26 @@
 
 {{velocity}}
 #if ($request.convert)
-  #if ($services.wikistream.startConvert($input, $inputProperties, $output, $outputProperties).join())
-    {{success}}Conversion started.{{/success}}
+  #if ($targetStandardOutput)
+    $response.setHeader('Content-Disposition', 'attachment; filename=target');
+    $services.wikistream.startConvert($input, $inputProperties, $output, $outputProperties).join()
+    $xcontext.setFinished(true)
   #else
-    #set ($lastError = $services.wikistream.lastError)
-    #if ($lastError)
-      {{error}}
-        Failed to start conversion
+    #if ($services.wikistream.startConvert($input, $inputProperties, $output, $outputProperties))
+      {{success}}Conversion started.{{/success}}
+    #else
+      #set ($lastError = $services.wikistream.lastError)
+      #if ($lastError)
+        {{error}}
+          Failed to start conversion
 
-        {{html}}
-          &lt;pre&gt;
-            #printThrowable($lastError)
-          &lt;/pre&gt;
-        {{/html}}
-      {{/error}}
+          {{html}}
+            &lt;pre&gt;
+              #printThrowable($lastError)
+            &lt;/pre&gt;
+          {{/html}}
+        {{/error}}
+      #end
     #end
   #end
 #end

@@ -114,6 +114,8 @@ public class ConfluenceXMLPackage
 
     public static final String KEY_ATTACHMENT_REVISION = "attachmentVersion";
 
+    public static final String KEY_ATTACHMENT_ORIGINAL_REVISION = "originalVersion";
+
     public static final String KEY_ATTACHMENT_DTO = "imageDetailsDTO";
 
     public static final String KEY_GROUP_NAME = "name";

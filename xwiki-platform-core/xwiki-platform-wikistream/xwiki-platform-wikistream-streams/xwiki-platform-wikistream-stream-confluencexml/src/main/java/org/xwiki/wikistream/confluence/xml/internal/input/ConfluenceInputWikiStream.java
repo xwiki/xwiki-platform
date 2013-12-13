@@ -411,7 +411,8 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
         long attachmentSize = attachmentProperties.getLong(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENT_SIZE);
 
         int version = attachmentProperties.getInt(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION);
-        File contentFile = this.confluencePackage.getAttachmentFile(pageId, attachmentId, version);
+        int originalRevisionId = attachmentProperties.getInt(ConfluenceXMLPackage.KEY_ATTACHMENT_ORIGINAL_REVISION, attachmentId);
+        File contentFile = this.confluencePackage.getAttachmentFile(pageId, originalRevisionId, version);
 
         FilterEventParameters attachmentParameters = new FilterEventParameters();
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_CONTENT_TYPE,

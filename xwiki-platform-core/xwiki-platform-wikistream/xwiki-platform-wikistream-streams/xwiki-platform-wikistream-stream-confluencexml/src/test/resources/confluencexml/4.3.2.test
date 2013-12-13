@@ -1330,14 +1330,7 @@
                   <space></space>
                   <word>macro</word>
                 </paragraph>
-                <paragraph>
-                  <word>info</word>
-                  <space></space>
-                  <word>default</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="info default macro">
                   <p>
                     <parameters>
                       <entry>
@@ -1408,12 +1401,7 @@
                 <macro id="create-space-button"></macro>
                 <paragraph></paragraph>
                 <macro id="change-history"></macro>
-                <paragraph>
-                  <word>Column</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="column">
+                <macro id="column" content="Column macro">
                   <p>
                     <parameters>
                       <entry>
@@ -1453,38 +1441,9 @@
                 <macro id="contributors"></macro>
                 <paragraph></paragraph>
                 <macro id="contributors-summary"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>meta</word>
-                  <space></space>
-                  <word>data</word>
-                  <space></space>
-                  <word>detail</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="details"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>box</word>
-                  <space></space>
-                  <word>to</word>
-                  <space></space>
-                  <word>expand</word>
-                </paragraph>
-                <macro id="expand"></macro>
-                <paragraph>
-                  <word>Excerpt</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="excerpt">
+                <macro id="details" content="Content of meta data detail macro"></macro>
+                <macro id="expand" content="Content of box to expand"></macro>
+                <macro id="excerpt" content="Excerpt content">
                   <p>
                     <parameters>
                       <entry>
@@ -1509,16 +1468,7 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>info</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="content of info macro">
                   <p>
                     <parameters>
                       <entry>
@@ -1588,16 +1538,7 @@
                   <word>following</word>
                 </paragraph>
                 <macro id="network"></macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="note">
+                <macro id="note" content="content of the macro">
                   <p>
                     <parameters>
                       <entry>
@@ -1685,24 +1626,10 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="section"></macro>
+                <macro id="section" content="content of the macro"></macro>
                 <paragraph></paragraph>
                 <macro id="recently-updated-dashboard"></macro>
-                <paragraph>
-                  <word>tip</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="tip">
+                <macro id="tip" content="tip content">
                   <p>
                     <parameters>
                       <entry>
@@ -1734,14 +1661,8 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="panel"></macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="warning">
+                <macro id="panel" content="content"></macro>
+                <macro id="warning" content="content">
                   <p>
                     <parameters>
                       <entry>
@@ -1758,10 +1679,7 @@
                   <space></space>
                   <word>maccro</word>
                 </paragraph>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="toc-zone"></macro>
+                <macro id="toc-zone" content="content"></macro>
                 <paragraph>
                   <space></space>
                 </paragraph>
@@ -2385,14 +2303,7 @@
                   <space></space>
                   <word>macro</word>
                 </paragraph>
-                <paragraph>
-                  <word>info</word>
-                  <space></space>
-                  <word>default</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="info default macro">
                   <p>
                     <parameters>
                       <entry>
@@ -2463,12 +2374,7 @@
                 <macro id="create-space-button"></macro>
                 <paragraph></paragraph>
                 <macro id="change-history"></macro>
-                <paragraph>
-                  <word>Column</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="column">
+                <macro id="column" content="Column macro">
                   <p>
                     <parameters>
                       <entry>
@@ -2508,38 +2414,9 @@
                 <macro id="contributors"></macro>
                 <paragraph></paragraph>
                 <macro id="contributors-summary"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>meta</word>
-                  <space></space>
-                  <word>data</word>
-                  <space></space>
-                  <word>detail</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="details"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>box</word>
-                  <space></space>
-                  <word>to</word>
-                  <space></space>
-                  <word>expand</word>
-                </paragraph>
-                <macro id="expand"></macro>
-                <paragraph>
-                  <word>Excerpt</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="excerpt">
+                <macro id="details" content="Content of meta data detail macro"></macro>
+                <macro id="expand" content="Content of box to expand"></macro>
+                <macro id="excerpt" content="Excerpt content">
                   <p>
                     <parameters>
                       <entry>
@@ -2564,16 +2441,7 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>info</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="content of info macro">
                   <p>
                     <parameters>
                       <entry>
@@ -2643,16 +2511,7 @@
                   <word>following</word>
                 </paragraph>
                 <macro id="network"></macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="note">
+                <macro id="note" content="content of the macro">
                   <p>
                     <parameters>
                       <entry>
@@ -2740,24 +2599,10 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="section"></macro>
+                <macro id="section" content="content of the macro"></macro>
                 <paragraph></paragraph>
                 <macro id="recently-updated-dashboard"></macro>
-                <paragraph>
-                  <word>tip</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="tip">
+                <macro id="tip" content="tip content">
                   <p>
                     <parameters>
                       <entry>
@@ -2789,14 +2634,8 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="panel"></macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="warning">
+                <macro id="panel" content="content"></macro>
+                <macro id="warning" content="content">
                   <p>
                     <parameters>
                       <entry>
@@ -2813,10 +2652,7 @@
                   <space></space>
                   <word>maccro</word>
                 </paragraph>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="toc-zone"></macro>
+                <macro id="toc-zone" content="content"></macro>
                 <paragraph>
                   <space></space>
                 </paragraph>
@@ -3440,14 +3276,7 @@
                   <space></space>
                   <word>macro</word>
                 </paragraph>
-                <paragraph>
-                  <word>info</word>
-                  <space></space>
-                  <word>default</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="info default macro">
                   <p>
                     <parameters>
                       <entry>
@@ -3518,12 +3347,7 @@
                 <macro id="create-space-button"></macro>
                 <paragraph></paragraph>
                 <macro id="change-history"></macro>
-                <paragraph>
-                  <word>Column</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="column">
+                <macro id="column" content="Column macro">
                   <p>
                     <parameters>
                       <entry>
@@ -3563,38 +3387,9 @@
                 <macro id="contributors"></macro>
                 <paragraph></paragraph>
                 <macro id="contributors-summary"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>meta</word>
-                  <space></space>
-                  <word>data</word>
-                  <space></space>
-                  <word>detail</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="details"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>box</word>
-                  <space></space>
-                  <word>to</word>
-                  <space></space>
-                  <word>expand</word>
-                </paragraph>
-                <macro id="expand"></macro>
-                <paragraph>
-                  <word>Excerpt</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="excerpt">
+                <macro id="details" content="Content of meta data detail macro"></macro>
+                <macro id="expand" content="Content of box to expand"></macro>
+                <macro id="excerpt" content="Excerpt content">
                   <p>
                     <parameters>
                       <entry>
@@ -3619,16 +3414,7 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>info</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="content of info macro">
                   <p>
                     <parameters>
                       <entry>
@@ -3698,16 +3484,7 @@
                   <word>following</word>
                 </paragraph>
                 <macro id="network"></macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="note">
+                <macro id="note" content="content of the macro">
                   <p>
                     <parameters>
                       <entry>
@@ -3795,24 +3572,10 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="section"></macro>
+                <macro id="section" content="content of the macro"></macro>
                 <paragraph></paragraph>
                 <macro id="recently-updated-dashboard"></macro>
-                <paragraph>
-                  <word>tip</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="tip">
+                <macro id="tip" content="tip content">
                   <p>
                     <parameters>
                       <entry>
@@ -3844,14 +3607,8 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="panel"></macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="warning">
+                <macro id="panel" content="content"></macro>
+                <macro id="warning" content="content">
                   <p>
                     <parameters>
                       <entry>
@@ -3868,10 +3625,7 @@
                   <space></space>
                   <word>maccro</word>
                 </paragraph>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="toc-zone"></macro>
+                <macro id="toc-zone" content="content"></macro>
                 <paragraph>
                   <space></space>
                 </paragraph>
@@ -4466,14 +4220,7 @@
                   <space></space>
                   <word>macro</word>
                 </paragraph>
-                <paragraph>
-                  <word>info</word>
-                  <space></space>
-                  <word>default</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="info default macro">
                   <p>
                     <parameters>
                       <entry>
@@ -4544,12 +4291,7 @@
                 <macro id="create-space-button"></macro>
                 <paragraph></paragraph>
                 <macro id="change-history"></macro>
-                <paragraph>
-                  <word>Column</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="column">
+                <macro id="column" content="Column macro">
                   <p>
                     <parameters>
                       <entry>
@@ -4589,38 +4331,9 @@
                 <macro id="contributors"></macro>
                 <paragraph></paragraph>
                 <macro id="contributors-summary"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>meta</word>
-                  <space></space>
-                  <word>data</word>
-                  <space></space>
-                  <word>detail</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="details"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>box</word>
-                  <space></space>
-                  <word>to</word>
-                  <space></space>
-                  <word>expand</word>
-                </paragraph>
-                <macro id="expand"></macro>
-                <paragraph>
-                  <word>Excerpt</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="excerpt">
+                <macro id="details" content="Content of meta data detail macro"></macro>
+                <macro id="expand" content="Content of box to expand"></macro>
+                <macro id="excerpt" content="Excerpt content">
                   <p>
                     <parameters>
                       <entry>
@@ -4645,16 +4358,7 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>info</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="content of info macro">
                   <p>
                     <parameters>
                       <entry>
@@ -4724,16 +4428,7 @@
                   <word>following</word>
                 </paragraph>
                 <macro id="network"></macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="note">
+                <macro id="note" content="content of the macro">
                   <p>
                     <parameters>
                       <entry>
@@ -4821,24 +4516,10 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="section"></macro>
+                <macro id="section" content="content of the macro"></macro>
                 <paragraph></paragraph>
                 <macro id="recently-updated-dashboard"></macro>
-                <paragraph>
-                  <word>tip</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="tip">
+                <macro id="tip" content="tip content">
                   <p>
                     <parameters>
                       <entry>
@@ -4870,14 +4551,8 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="panel"></macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="warning">
+                <macro id="panel" content="content"></macro>
+                <macro id="warning" content="content">
                   <p>
                     <parameters>
                       <entry>
@@ -4894,10 +4569,7 @@
                   <space></space>
                   <word>maccro</word>
                 </paragraph>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="toc-zone"></macro>
+                <macro id="toc-zone" content="content"></macro>
                 <paragraph>
                   <space></space>
                 </paragraph>
@@ -5507,14 +5179,7 @@
                   <space></space>
                   <word>macro</word>
                 </paragraph>
-                <paragraph>
-                  <word>info</word>
-                  <space></space>
-                  <word>default</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="info default macro">
                   <p>
                     <parameters>
                       <entry>
@@ -5585,12 +5250,7 @@
                 <macro id="create-space-button"></macro>
                 <paragraph></paragraph>
                 <macro id="change-history"></macro>
-                <paragraph>
-                  <word>Column</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="column">
+                <macro id="column" content="Column macro">
                   <p>
                     <parameters>
                       <entry>
@@ -5630,38 +5290,9 @@
                 <macro id="contributors"></macro>
                 <paragraph></paragraph>
                 <macro id="contributors-summary"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>meta</word>
-                  <space></space>
-                  <word>data</word>
-                  <space></space>
-                  <word>detail</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="details"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>box</word>
-                  <space></space>
-                  <word>to</word>
-                  <space></space>
-                  <word>expand</word>
-                </paragraph>
-                <macro id="expand"></macro>
-                <paragraph>
-                  <word>Excerpt</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="excerpt">
+                <macro id="details" content="Content of meta data detail macro"></macro>
+                <macro id="expand" content="Content of box to expand"></macro>
+                <macro id="excerpt" content="Excerpt content">
                   <p>
                     <parameters>
                       <entry>
@@ -5686,16 +5317,7 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>info</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="content of info macro">
                   <p>
                     <parameters>
                       <entry>
@@ -5765,16 +5387,7 @@
                   <word>following</word>
                 </paragraph>
                 <macro id="network"></macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="note">
+                <macro id="note" content="content of the macro">
                   <p>
                     <parameters>
                       <entry>
@@ -5862,24 +5475,10 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="section"></macro>
+                <macro id="section" content="content of the macro"></macro>
                 <paragraph></paragraph>
                 <macro id="recently-updated-dashboard"></macro>
-                <paragraph>
-                  <word>tip</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="tip">
+                <macro id="tip" content="tip content">
                   <p>
                     <parameters>
                       <entry>
@@ -5911,14 +5510,8 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="panel"></macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="warning">
+                <macro id="panel" content="content"></macro>
+                <macro id="warning" content="content">
                   <p>
                     <parameters>
                       <entry>
@@ -5935,10 +5528,7 @@
                   <space></space>
                   <word>maccro</word>
                 </paragraph>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="toc-zone"></macro>
+                <macro id="toc-zone" content="content"></macro>
                 <paragraph>
                   <space></space>
                 </paragraph>
@@ -6563,14 +6153,7 @@
                   <space></space>
                   <word>macro</word>
                 </paragraph>
-                <paragraph>
-                  <word>info</word>
-                  <space></space>
-                  <word>default</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="info default macro">
                   <p>
                     <parameters>
                       <entry>
@@ -6641,12 +6224,7 @@
                 <macro id="create-space-button"></macro>
                 <paragraph></paragraph>
                 <macro id="change-history"></macro>
-                <paragraph>
-                  <word>Column</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="column">
+                <macro id="column" content="Column macro">
                   <p>
                     <parameters>
                       <entry>
@@ -6686,38 +6264,9 @@
                 <macro id="contributors"></macro>
                 <paragraph></paragraph>
                 <macro id="contributors-summary"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>meta</word>
-                  <space></space>
-                  <word>data</word>
-                  <space></space>
-                  <word>detail</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="details"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>box</word>
-                  <space></space>
-                  <word>to</word>
-                  <space></space>
-                  <word>expand</word>
-                </paragraph>
-                <macro id="expand"></macro>
-                <paragraph>
-                  <word>Excerpt</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="excerpt">
+                <macro id="details" content="Content of meta data detail macro"></macro>
+                <macro id="expand" content="Content of box to expand"></macro>
+                <macro id="excerpt" content="Excerpt content">
                   <p>
                     <parameters>
                       <entry>
@@ -6742,16 +6291,7 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>info</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="content of info macro">
                   <p>
                     <parameters>
                       <entry>
@@ -6821,16 +6361,7 @@
                   <word>following</word>
                 </paragraph>
                 <macro id="network"></macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="note">
+                <macro id="note" content="content of the macro">
                   <p>
                     <parameters>
                       <entry>
@@ -6918,24 +6449,10 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="section"></macro>
+                <macro id="section" content="content of the macro"></macro>
                 <paragraph></paragraph>
                 <macro id="recently-updated-dashboard"></macro>
-                <paragraph>
-                  <word>tip</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="tip">
+                <macro id="tip" content="tip content">
                   <p>
                     <parameters>
                       <entry>
@@ -6967,14 +6484,8 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="panel"></macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="warning">
+                <macro id="panel" content="content"></macro>
+                <macro id="warning" content="content">
                   <p>
                     <parameters>
                       <entry>
@@ -6991,10 +6502,7 @@
                   <space></space>
                   <word>maccro</word>
                 </paragraph>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="toc-zone"></macro>
+                <macro id="toc-zone" content="content"></macro>
                 <paragraph>
                   <space></space>
                 </paragraph>

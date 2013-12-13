@@ -30,7 +30,10 @@
     #if ($xcontext.action == "view")
       #set ($answer = $doc.getValue("answer"))
       #if ("$!answer" != "")
-        ## Make sure to resolve reference based on the right document
+        ## Make sure to resolve reference based on the right document. Escape double quotes in the name of the document (because otherwise it's  
+        ## considered as the end of the parameter value) as follows: we replace all " with ~" (escape character in wiki syntax), 
+        ## but before that we escape all the tilde with double tilde to prevent the unfortunate case when a quote would already be preceeded by a tilde 
+        ## and the quote escape would make ~~" which would mean that tilde escapes tilde and quote stays unescaped.
         {{context document="$services.model.serialize($doc.documentReference).replaceAll('~', '~~').replaceAll('"', '~"')"}}
         $answer
         {{/context}}

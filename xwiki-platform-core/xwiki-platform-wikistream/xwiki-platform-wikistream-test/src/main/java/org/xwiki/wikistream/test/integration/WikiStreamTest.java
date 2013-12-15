@@ -136,7 +136,8 @@ public class WikiStreamTest
             Assert.assertEquals(expect.toString(), actual.toString());
         } else if (actual instanceof ByteArrayOutputTarget) {
             byte[] actualBytes = ((ByteArrayOutputTarget) actual).toByteArray();
-            byte[] expectButes = IOUtils.toByteArray(((InputStreamInputSource) expect).getInputStream());
+            byte[] expectBytes = IOUtils.toByteArray(((InputStreamInputSource) expect).getInputStream());
+            Assert.assertArrayEquals(expectBytes, actualBytes);
         } else {
             // No idea how to compare that
             Assert.fail("Output target type [" + actual.getClass() + "] is not supported");

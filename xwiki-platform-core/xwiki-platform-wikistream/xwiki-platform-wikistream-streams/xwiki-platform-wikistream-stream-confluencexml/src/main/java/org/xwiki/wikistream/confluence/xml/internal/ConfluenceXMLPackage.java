@@ -396,10 +396,12 @@ public class ConfluenceXMLPackage
 
         int attachmentId = readObjectProperties(xmlReader, properties);
 
-        int pageId = properties.getInt("content");
+        if (properties.containsKey(KEY_ATTACHMENT_CONTENT)) {
+            int pageId = properties.getInt(KEY_ATTACHMENT_CONTENT);
 
-        // Save attachment
-        saveAttachmentProperties(properties, pageId, attachmentId);
+            // Save attachment
+            saveAttachmentProperties(properties, pageId, attachmentId);
+        }
     }
 
     private void readSpaceObject(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException,

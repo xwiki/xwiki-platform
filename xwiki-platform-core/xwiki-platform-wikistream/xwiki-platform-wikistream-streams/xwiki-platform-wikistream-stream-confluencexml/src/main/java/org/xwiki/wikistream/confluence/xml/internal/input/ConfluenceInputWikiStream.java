@@ -252,21 +252,18 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
             proxyFilter.endWikiSpace(spaceName, spaceParameters);
         }
 
-        // try {
-        // this.confluencePackage.close();
-        // } catch (IOException e) {
-        // throw new WikiStreamException("Failed to close package", e);
-        // }
+        // Cleanup
+
+        try {
+            this.confluencePackage.close();
+        } catch (IOException e) {
+            throw new WikiStreamException("Failed to close package", e);
+        }
     }
 
     private void readPage(int pageId, Object filter, ConfluenceFilter proxyFilter) throws WikiStreamException
     {
-        PropertiesConfiguration pageProperties;
-        try {
-            pageProperties = this.confluencePackage.getPageProperties(pageId);
-        } catch (ConfigurationException e) {
-            throw new WikiStreamException("Failed to get page properties", e);
-        }
+        PropertiesConfiguration pageProperties = getPageProperties(pageId);
 
         String documentName;
         if (pageProperties.containsKey(ConfluenceXMLPackage.KEY_PAGE_HOMEPAGE)) {
@@ -286,16 +283,18 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
         Locale locale = Locale.ROOT;
 
         FilterEventParameters documentLocaleParameters = new FilterEventParameters();
-        documentParameters.put(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR,
+        documentLocaleParameters.put(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR,
             pageProperties.getString(ConfluenceXMLPackage.KEY_PAGE_CREATION_AUTHOR));
         try {
-            documentParameters.put(WikiDocumentFilter.PARAMETER_CREATION_DATE,
+            documentLocaleParameters.put(WikiDocumentFilter.PARAMETER_CREATION_DATE,
                 this.confluencePackage.getDate(pageProperties, ConfluenceXMLPackage.KEY_PAGE_CREATION_DATE));
         } catch (ParseException e) {
             if (this.properties.isVerbose()) {
                 this.logger.error("Failed to parse date", e);
             }
         }
+        documentLocaleParameters.put(WikiDocumentFilter.PARAMETER_LASTREVISION,
+            pageProperties.getString(ConfluenceXMLPackage.KEY_PAGE_REVISION));
 
         // > WikiDocumentLocale
         proxyFilter.beginWikiDocumentLocale(locale, documentLocaleParameters);
@@ -319,15 +318,19 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
         proxyFilter.endWikiDocument(documentName, documentParameters);
     }
 
-    private void readPageRevision(Integer pageId, Object filter, ConfluenceFilter proxyFilter)
-        throws WikiStreamException
+    private PropertiesConfiguration getPageProperties(Integer pageId) throws WikiStreamException
     {
-        PropertiesConfiguration pageProperties;
         try {
-            pageProperties = this.confluencePackage.getPageProperties(pageId);
+            return this.confluencePackage.getPageProperties(pageId);
         } catch (ConfigurationException e) {
             throw new WikiStreamException("Failed to get page properties", e);
         }
+    }
+
+    private void readPageRevision(Integer pageId, Object filter, ConfluenceFilter proxyFilter)
+        throws WikiStreamException
+    {
+        PropertiesConfiguration pageProperties = getPageProperties(pageId);
 
         readPageRevision(pageId, pageProperties, filter, proxyFilter);
     }
@@ -346,8 +349,6 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
                 this.logger.error("Failed to parse parent", e);
             }
         }
-        documentRevisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION,
-            pageProperties.getString(ConfluenceXMLPackage.KEY_PAGE_REVISION));
         documentRevisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR,
             pageProperties.getString(ConfluenceXMLPackage.KEY_PAGE_REVISION_AUTHOR));
         try {
@@ -411,7 +412,8 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
         long attachmentSize = attachmentProperties.getLong(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENT_SIZE);
 
         int version = attachmentProperties.getInt(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION);
-        int originalRevisionId = attachmentProperties.getInt(ConfluenceXMLPackage.KEY_ATTACHMENT_ORIGINAL_REVISION, attachmentId);
+        int originalRevisionId =
+            attachmentProperties.getInt(ConfluenceXMLPackage.KEY_ATTACHMENT_ORIGINAL_REVISION, attachmentId);
         File contentFile = this.confluencePackage.getAttachmentFile(pageId, originalRevisionId, version);
 
         FilterEventParameters attachmentParameters = new FilterEventParameters();

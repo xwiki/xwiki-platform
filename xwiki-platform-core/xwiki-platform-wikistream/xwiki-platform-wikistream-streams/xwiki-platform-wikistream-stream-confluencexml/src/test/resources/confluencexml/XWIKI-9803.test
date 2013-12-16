@@ -7,16 +7,28 @@
 <wikiSpace name="Test XWIKI-9803">
   <wikiDocument name="WebHome">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <null></null>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2011-08-20 14:55:49.598 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -64,16 +76,28 @@
   </wikiDocument>
   <wikiDocument name="with [[brace]]s (and [single brace])">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <null></null>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-12-12 12:30:15.120 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>2</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -143,10 +167,6 @@
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>2</string>
             </entry>
             <entry>
               <string>revision_author</string>

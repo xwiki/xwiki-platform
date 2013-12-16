@@ -140,16 +140,28 @@
 <wikiSpace name="space1">
   <wikiDocument name="WebHome">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 12:53:25.489 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -192,16 +204,28 @@
   </wikiDocument>
   <wikiDocument name="Page 1">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:07:38.580 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>7</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -753,10 +777,6 @@
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>2</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -1700,10 +1720,6 @@
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>3</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -2675,10 +2691,6 @@
               <null></null>
             </entry>
             <entry>
-              <string>revision</string>
-              <string>4</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
             </entry>
@@ -3648,10 +3660,6 @@
               <null></null>
             </entry>
             <entry>
-              <string>revision</string>
-              <string>5</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
             </entry>
@@ -4590,10 +4598,6 @@
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>6</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -5552,10 +5556,6 @@
                 <name>space1 Home</name>
                 <type>DOCUMENT</type>
               </org.xwiki.model.reference.EntityReference>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>7</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -10858,16 +10858,28 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
   </wikiDocument>
   <wikiDocument name="space1 Home">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 12:53:25.501 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -11059,16 +11071,28 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
 <wikiSpace name="privatespace">
   <wikiDocument name="WebHome">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:37:24.456 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -11111,6 +11135,22 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
   </wikiDocument>
   <wikiDocument name="Private page 1">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:37:52.357 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
@@ -11120,10 +11160,6 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
                 <name>privatespace Home</name>
                 <type>DOCUMENT</type>
               </org.xwiki.model.reference.EntityReference>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -11177,16 +11213,28 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
   </wikiDocument>
   <wikiDocument name="privatespace Home">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:37:24.463 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -11378,16 +11426,28 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
 <wikiSpace name="space2">
   <wikiDocument name="WebHome">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:32:33.976 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -11430,16 +11490,28 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
   </wikiDocument>
   <wikiDocument name="Page 2">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:33:07.495 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>2</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -11518,10 +11590,6 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
                 <name>space2 Home</name>
                 <type>DOCUMENT</type>
               </org.xwiki.model.reference.EntityReference>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>2</string>
             </entry>
             <entry>
               <string>revision_author</string>
@@ -11607,16 +11675,28 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
   </wikiDocument>
   <wikiDocument name="space2 Home">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:32:33.982 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
               <string>parent_reference</string>
               <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
             </entry>
             <entry>
               <string>revision_author</string>

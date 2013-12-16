@@ -34,6 +34,11 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     private boolean withRevisions = true;
 
     /**
+     * @see #isWithJRCSRevisions()
+     */
+    private boolean withJRCSRevisions = true;
+
+    /**
      * @see #isWithWikiAttachments()
      */
     private boolean withWikiAttachments = true;
@@ -54,23 +59,41 @@ public class DocumentInstanceInputProperties extends InstanceInputProperties
     private boolean withWikiDocumentContentHTML;
 
     /**
-     * @return Indicate if events should be generated for history
+     * @return Indicates if events should be generated for history
      */
     @PropertyName("With revisions")
-    @PropertyDescription("Indicate if events should be generated for history")
+    @PropertyDescription("Indicates if events should be generated for history")
     public boolean isWithRevisions()
     {
         return this.withRevisions;
     }
 
     /**
-     * @param withRevisions Indicate if events should be generated for history
+     * @param withRevisions Indicates if events should be generated for history
      */
     public void setWithRevisions(boolean withRevisions)
     {
         this.withRevisions = withRevisions;
     }
 
+    /**
+     * @return Indicates if JRCS based history should be added to document locale event properties
+     */
+    @PropertyName("With JRCS revisions")
+    @PropertyDescription("Indicates if JRCS based history should be added to document locale event properties")
+    public boolean isWithJRCSRevisions()
+    {
+        return withJRCSRevisions;
+    }
+    
+    /**
+     * @param withJRCSRevisions Indicates if JRCS based history should be added to document locale event properties
+     */
+    public void setWithJRCSRevisions(boolean withJRCSRevisions)
+    {
+        this.withJRCSRevisions = withJRCSRevisions;
+    }
+    
     /**
      * @return Indicate if events should be generated for attachments
      */

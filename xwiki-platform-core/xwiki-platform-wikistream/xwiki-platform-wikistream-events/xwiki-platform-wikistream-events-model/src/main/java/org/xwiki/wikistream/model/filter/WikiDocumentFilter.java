@@ -118,8 +118,9 @@ public interface WikiDocumentFilter
 
     /**
      * @type {@link String}
+     * @since 5.4M1
      */
-    String PARAMETER_REVISION = "revision";
+    String PARAMETER_LASTREVISION = "lastrevision";
 
     /**
      * @type {@link java.util.Date}

@@ -76,7 +76,7 @@ public class XWikiAttachmentEventGenerator extends
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, attachment.getDate());
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION, attachment.getVersion());
 
-        if (properties.isWithRevisions()) {
+        if (properties.isWithJRCSRevisions()) {
             try {
                 // We need to make sure content is loaded
                 XWikiAttachmentArchive archive;

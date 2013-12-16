@@ -2,17 +2,13 @@
 .expect|wiki+xml
 .# XWIKI-9803 - test that CDATA sections are repaired properly
 .# XWIKI-9807 - attachments with several versions fail to load
-.# XRENDERING-325 - macros are mapped to paragraphs (expected text needs to be updated)
+.# XWIKI-9817 - empty pages have no "bodyType" attribute
 .#------------------------------------------------------------------------------
 <wikiSpace name="Test XWIKI-9803">
   <wikiDocument name="WebHome">
     <wikiDocumentLocale>
       <p>
         <parameters>
-          <entry>
-            <string>creation_author</string>
-            <null></null>
-          </entry>
           <entry>
             <string>creation_date</string>
             <date>2011-08-20 14:55:49.598 UTC</date>
@@ -26,14 +22,6 @@
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
-            <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision_author</string>
-              <null></null>
-            </entry>
             <entry>
               <string>revision_date</string>
               <date>2011-08-20 14:55:49.598 UTC</date>
@@ -79,10 +67,6 @@
       <p>
         <parameters>
           <entry>
-            <string>creation_author</string>
-            <null></null>
-          </entry>
-          <entry>
             <string>creation_date</string>
             <date>2013-12-12 12:30:15.120 UTC</date>
           </entry>
@@ -95,14 +79,6 @@
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
-            <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision_author</string>
-              <null></null>
-            </entry>
             <entry>
               <string>revision_date</string>
               <date>2013-12-12 12:30:15.120 UTC</date>
@@ -164,14 +140,6 @@
       <wikiDocumentRevision revision="2">
         <p>
           <parameters>
-            <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision_author</string>
-              <null></null>
-            </entry>
             <entry>
               <string>revision_date</string>
               <date>2013-12-12 12:38:02.510 UTC</date>
@@ -303,8 +271,30 @@ AICAgCH5BAEAAA8AIf4WR0lGIFNtYXJ0U2F2ZXIgVmVyMS4xYQAsAAAAAAEAAQBABALwAQA7</conten
       </wikiDocumentRevision>
     </wikiDocumentLocale>
   </wikiDocument>
+  <wikiDocument name="empty">
+    <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
+      <wikiDocumentRevision revision="1">
+        <p>
+          <parameters>
+            <entry>
+              <string>title</string>
+              <string>empty</string>
+            </entry>
+          </parameters>
+        </p>
+      </wikiDocumentRevision>
+    </wikiDocumentLocale>
+  </wikiDocument>
 </wikiSpace>
 .#------------------------------------------------------------------------------
 .input|confluence+xml
-.configuration.source=XWIKI-9803.xml.zip
+.configuration.source=misc.xml.zip
 .#------------------------------------------------------------------------------

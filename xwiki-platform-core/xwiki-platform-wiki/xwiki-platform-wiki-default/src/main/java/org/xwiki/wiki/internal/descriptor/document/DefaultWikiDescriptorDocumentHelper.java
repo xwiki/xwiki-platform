@@ -29,10 +29,12 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
@@ -63,6 +65,9 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private ComponentManager componentManager;
 
     @Override
     public DocumentReference getDocumentReferenceFromId(String wikiId)
@@ -139,6 +144,7 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
                     + "and doc.fullName <> 'XWiki.XWikiServerClassTemplate'",
                     Query.XWQL);
             query.setWiki(wikiDescriptorManager.getMainWikiId());
+            query.addFilter(componentManager.<QueryFilter>getInstance(QueryFilter.class, "unique"));
             List<String> documentNames = query.execute();
 
             if (documentNames != null && !documentNames.isEmpty()) {

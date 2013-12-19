@@ -401,6 +401,7 @@ XWiki.blog.Categories = Class.create({
               form.reset();
               $$(".blog-categories-list").each(function(item){
                 item.select('input[type=checkbox]').each(function(input){
+                  input.checked = false;
                   if(!input.checked &amp;&amp; checkedCategories.contains(input.value)){
                     input.checked = true;
                   }
@@ -732,12 +733,12 @@ input.category-name-input {
     #set($newCategoryParent = $escapetool.url($request.newCategoryParent))
     #if($request.ajax)
       #if("$!{request.mode}" == 'select')
-        #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;listType=selectable&amp;root=${newCategoryParent}&amp;entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}")})
+        #set($xredirect = $doc.getURL('view', "xpage=plain&amp;display=list&amp;listType=selectable&amp;root=${newCategoryParent}&amp;entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}"))
       #else
-        #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;root=${newCategoryParent}&amp;entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}")})
+        #set($xredirect = $doc.getURL('view', "xpage=plain&amp;display=list&amp;root=${newCategoryParent}&amp;entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}"))
       #end      
     #else ## request.ajax
-      #set($xredirect = $escapetool.url($doc.getURL('view', "entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}")))
+      #set($xredirect = $doc.getURL('view', "entry=$!{request.entry}&amp;entryObjNb=$!{request.entryObjNb}"))
     #end
     $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${escapetool.url($xredirect)}&amp;xhidden=1&amp;form_token=$!{services.csrf.getToken()}"))
   #end ## empty title

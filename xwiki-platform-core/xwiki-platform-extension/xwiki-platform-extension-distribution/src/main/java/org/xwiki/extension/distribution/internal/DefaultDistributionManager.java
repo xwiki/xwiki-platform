@@ -49,6 +49,7 @@ import org.xwiki.extension.distribution.internal.job.WikiDistributionJobStatus;
 import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.internal.core.MavenCoreExtension;
+import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobManager;
 import org.xwiki.job.internal.JobStatusStorage;
@@ -153,13 +154,23 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             String mainUIId = mavenModel.getProperties().getProperty("xwiki.extension.distribution.ui");
 
             if (mainUIId != null) {
-                this.mainUIExtensionId = new ExtensionId(mainUIId, this.distributionExtension.getId().getVersion());
+                String mainUIVersion =
+                    mavenModel.getProperties().getProperty("xwiki.extension.distribution.ui.version");
+
+                this.mainUIExtensionId =
+                    new ExtensionId(mainUIId, mainUIVersion != null ? new DefaultVersion(mainUIVersion)
+                        : this.distributionExtension.getId().getVersion());
             }
 
             String wikiUIId = mavenModel.getProperties().getProperty("xwiki.extension.distribution.wikiui");
 
             if (wikiUIId != null) {
-                this.wikiUIExtensionId = new ExtensionId(wikiUIId, this.distributionExtension.getId().getVersion());
+                String wikiUIVersion =
+                    mavenModel.getProperties().getProperty("xwiki.extension.distribution.wikiui.version");
+
+                this.wikiUIExtensionId =
+                    new ExtensionId(wikiUIId, wikiUIVersion != null ? new DefaultVersion(wikiUIVersion)
+                        : this.distributionExtension.getId().getVersion());
             }
         }
     }

@@ -12,8 +12,8 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1384765802000</date>
-  <contentUpdateDate>1383919277000</contentUpdateDate>
+  <date>1386945094000</date>
+  <contentUpdateDate>1386945094000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <defaultTemplate/>
@@ -35,10 +35,15 @@
         &lt;label for="$descriptorId"&gt;$descriptor.name&lt;/label&gt;
         &lt;span class="xHint"&gt;$descriptor.description&lt;/span&gt;
         &lt;span class="xHint"&gt;&lt;tt&gt;$descriptor.type.getName()&lt;/tt&gt;&lt;/span&gt;
+        #if ($descriptor.type.getName() == 'org.xwiki.wikistream.output.OutputTarget')
+          &lt;span class="xHint"&gt;&lt;tt&gt;Supported format is &lt;strong&gt;file:&amp;lt;path in server&amp;gt;&lt;/strong&gt; (e.g. &lt;strong&gt;file:/home/myuser/target.xml&lt;/strong&gt;). When empty it send a file named &lt;strong&gt;target&lt;/strong&gt; to the browser.&lt;/tt&gt;&lt;/span&gt;
+        #elseif ($descriptor.type.getName() == 'org.xwiki.wikistream.input.InputSource')
+          &lt;span class="xHint"&gt;&lt;tt&gt;Supported formats are &lt;strong&gt;file:&amp;lt;path in server&amp;gt;&lt;/strong&gt; (e.g. &lt;strong&gt;file:/home/myuser/target.ext&lt;/strong&gt;) and &lt;strong&gt;url:&amp;lt;url&amp;gt;&lt;/strong&gt; (e.g. &lt;strong&gt;url:http://myserver/some/file/to/parse.ext&lt;/strong&gt;). When empty it read the request input stream.&lt;/tt&gt;&lt;/span&gt;
+        #end
       &lt;/dt&gt;
       &lt;dd&gt;
         ## TODO: design a real framework to generate form by type
-        #if (($descriptor.defaultValue || "$!descriptor.defaultValue" != '') &amp;&amp; ($descriptor.type.getName() == "boolean" || $descriptor.type.getName() == "int" || $descriptor.type.getName() == "java.lang.String"))
+        #if (($descriptor.defaultValue || "$!descriptor.defaultValue" != '') &amp;&amp; ($descriptor.type.getName() == 'boolean' || $descriptor.type.getName() == 'int' || $descriptor.type.getName() == 'java.lang.String'))
           &lt;input type="text" id="$descriptorId" name="$descriptorId" value="$descriptor.defaultValue"/&gt;
         #else
           &lt;input type="text" id="$descriptorId" name="$descriptorId"/&gt;

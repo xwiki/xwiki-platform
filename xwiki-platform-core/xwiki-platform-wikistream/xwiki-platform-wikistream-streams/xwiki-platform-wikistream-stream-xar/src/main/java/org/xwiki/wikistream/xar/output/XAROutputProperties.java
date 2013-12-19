@@ -39,6 +39,11 @@ public class XAROutputProperties extends XMLOutputProperties
     private boolean preserveVersion = true;
 
     /**
+     * @see #isForceDocument()
+     */
+    private boolean forceDocument;
+
+    /**
      * @see #getPackageName()
      */
     private String packageName;
@@ -84,6 +89,24 @@ public class XAROutputProperties extends XMLOutputProperties
     public void setPreserveVersion(boolean preserveVersion)
     {
         this.preserveVersion = preserveVersion;
+    }
+
+    /**
+     * @return true if a unique document should be serialized instead of a XAR package
+     */
+    @PropertyName("Force document")
+    @PropertyDescription("Force serializing a unique document XML instead of a XAR package")
+    public boolean isForceDocument()
+    {
+        return this.forceDocument;
+    }
+
+    /**
+     * @param forceDocument true if a unique document should be serialized instead of a XAR package
+     */
+    public void setForceDocument(boolean forceDocument)
+    {
+        this.forceDocument = forceDocument;
     }
 
     // package.xml

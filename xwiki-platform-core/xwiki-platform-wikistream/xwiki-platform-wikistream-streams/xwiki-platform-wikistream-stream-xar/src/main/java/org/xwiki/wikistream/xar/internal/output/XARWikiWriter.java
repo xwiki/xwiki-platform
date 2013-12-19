@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Locale;
-import java.util.Map;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
@@ -32,7 +31,7 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.output.FileOutputTarget;
 import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 import org.xwiki.wikistream.output.OutputTarget;
-import org.xwiki.wikistream.xar.internal.XARPackage;
+import org.xwiki.wikistream.xar.internal.XarPackage;
 import org.xwiki.wikistream.xar.output.XAROutputProperties;
 
 /**
@@ -43,19 +42,16 @@ public class XARWikiWriter
 {
     private final String name;
 
-    private final Map<String, Object> wikiProperties;
-
     private final XAROutputProperties xarProperties;
 
     private final ZipArchiveOutputStream zipStream;
 
-    private XARPackage xarPackage = new XARPackage();
-
-    public XARWikiWriter(String name, Map<String, Object> wikiParameters, XAROutputProperties xarProperties)
+    private XarPackage xarPackage = new XarPackage();
+    
+    public XARWikiWriter(String name, XAROutputProperties xarProperties)
         throws WikiStreamException
     {
         this.name = name;
-        this.wikiProperties = wikiParameters;
         this.xarProperties = xarProperties;
 
         OutputTarget target = this.xarProperties.getTarget();
@@ -85,11 +81,6 @@ public class XARWikiWriter
     public String getName()
     {
         return this.name;
-    }
-
-    public Map<String, Object> getMetadata()
-    {
-        return this.wikiProperties;
     }
 
     public OutputStream newEntry(LocalDocumentReference reference) throws WikiStreamException

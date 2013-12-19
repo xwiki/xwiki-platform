@@ -19,6 +19,7 @@
  */
 package org.xwiki.search.solr.internal.metadata;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,6 +33,8 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.tika.Tika;
+import org.apache.tika.metadata.Metadata;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -46,6 +49,7 @@ import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -156,7 +160,7 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
             return this.componentManager.getInstance(SolrReferenceResolver.class, entityReference.getType().toString()
                 .toLowerCase());
         } catch (ComponentLookupException e) {
-            throw new SolrIndexerException("Faile to find solr reference redolver for type reference ["
+            throw new SolrIndexerException("Faile to find solr reference resolver for type reference ["
                 + entityReference + "]");
         }
     }
@@ -448,5 +452,33 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     {
         String fieldName = FieldUtils.getFieldName(FieldUtils.OBJECT_CONTENT, locale);
         solrDocument.addField(fieldName, String.format(OBJCONTENT_FORMAT, property.getName(), typedValue.getValue()));
+    }
+
+    /**
+     * Tries to extract text indexable content from a generic attachment.
+     * 
+     * @param attachment the attachment to extract the content from
+     * @return the text representation of the attachment's content
+     * @throws SolrIndexerException if problems occur
+     */
+    protected String getContentAsText(XWikiAttachment attachment)
+    {
+        try {
+            Tika tika = new Tika();
+
+            Metadata metadata = new Metadata();
+            metadata.set(Metadata.RESOURCE_NAME_KEY, attachment.getFilename());
+
+            InputStream in = attachment.getContentInputStream(this.xcontextProvider.get());
+
+            try {
+                return tika.parseToString(in, metadata);
+            } finally {
+                in.close();
+            }
+        } catch (Exception e) {
+            this.logger.error("Failed to retrieve the content of attachment [{}]", attachment.getReference(), e);
+            return null;
+        }
     }
 }

@@ -366,12 +366,6 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Young API that has been refactored to introduce the new Resource module -->
-            <exclude>org/xwiki/url/**</exclude>
-            <exclude>org/xwiki/container/Request</exclude>
-            <!-- XWikiURL (now Resource) should only be in the Execution Context and not in the Request -->
-            <exclude>org/xwiki/container/servlet/ServletRequest</exclude>
-            <exclude>org/xwiki/container/portlet/PortletRequest</exclude>
             <!-- Lots of refactoring in WikiStream -->
             <exclude>org/xwiki/wikistream/**</exclude>
           </excludes>

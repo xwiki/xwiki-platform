@@ -74,11 +74,10 @@ public abstract class AbstractReader
     {
         Locale locale = null;
         if (value != null) {
-            String valueString = value.toString();
-            if (valueString.length() == 0) {
+            if (value.length() == 0) {
                 locale = Locale.ROOT;
             } else {
-                locale = LocaleUtils.toLocale(valueString);
+                locale = LocaleUtils.toLocale(value);
             }
         }
 

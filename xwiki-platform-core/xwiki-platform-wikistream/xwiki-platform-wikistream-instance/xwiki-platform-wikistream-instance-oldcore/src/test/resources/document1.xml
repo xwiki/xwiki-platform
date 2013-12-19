@@ -15,6 +15,10 @@
                 <string>creation_date</string>
                 <date>2000-01-01 00:00:00.0 UTC</date>
               </entry>
+              <entry>
+                <string>lastrevision</string>
+                <string>1.1</string>
+              </entry>
             </parameters>
           </p>
           <wikiDocumentRevision revision="1.1">
@@ -115,6 +119,10 @@
               <entry>
                 <string>creation_date</string>
                 <date>2000-01-01 00:00:00.0 UTC</date>
+              </entry>
+              <entry>
+                <string>lastrevision</string>
+                <string>1.42</string>
               </entry>
             </parameters>
           </p>

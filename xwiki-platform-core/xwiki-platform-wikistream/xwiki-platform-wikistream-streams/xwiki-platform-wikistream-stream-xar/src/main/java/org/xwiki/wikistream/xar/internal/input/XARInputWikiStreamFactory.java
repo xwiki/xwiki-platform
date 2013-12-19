@@ -27,7 +27,7 @@ import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
 
 /**
  * Generate events from XAR WikiStream package.
@@ -36,7 +36,7 @@ import org.xwiki.wikistream.xar.internal.XARUtils;
  * @since 5.2M2
  */
 @Component
-@Named(XARUtils.ROLEHINT)
+@Named(XARWikiStreamUtils.ROLEHINT)
 @Singleton
 public class XARInputWikiStreamFactory extends AbstractBeanInputWikiStreamFactory<XARInputProperties, XARFilter>
 {

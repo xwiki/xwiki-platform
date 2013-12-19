@@ -12,11 +12,10 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1312816151000</creationDate>
-  <date>1359110702000</date>
-  <contentUpdateDate>1359110702000</contentUpdateDate>
+  <date>1384856926000</date>
+  <contentUpdateDate>1384856926000</contentUpdateDate>
   <version>1.1</version>
   <title>#if($doc.getObject('ExtensionCode.ExtensionClass'))$doc.getObject('ExtensionCode.ExtensionClass').getProperty('name').value#{else}Extension sheet#end</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -155,6 +154,127 @@
       <use>always</use>
     </property>
   </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>ExtensionCode.ExtensionSheet</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>2e60500a-2494-4583-97e6-603e30162f4a</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.extensionSummary td, /* PROBLEM: General styling reset */
+.extensionInfo td {
+  border: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.box.floatinginfobox, .box.toc {
+  max-width: 49%;
+}
+
+.box .label {  /* PROBLEM: Usage of a class with meaning inside Bootstrap */
+  color: inherit;
+  text-align: inherit;
+  display: table-cell;
+}
+
+.toc .label {
+  margin: 0;
+}
+
+/* Download and Source button alignment */
+.box &gt; p {
+  margin-bottom: 0;
+}
+
+/* Spacing for repository info message */
+.box .extensionInfo {
+  margin-top: 10px;
+}</code>
+    </property>
+    <property>
+      <name>Junco</name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
   <content>{{include document="ExtensionCode.RepositoryCode"/}}
 
 {{velocity output="false"}}
@@ -219,7 +339,7 @@
       #if ("$!typeDisplay" == '')
         #set($typeDisplay = $type)
       #end
-      |(% class="label" %)Type(%%)|$typeDisplay
+      |(% class="label" width='30%' %)Type(%%)|$typeDisplay
       ##------- Developed By --------
       #set($authors = $doc.getValue("authors"))
       |(% class="label" %)Developed by(%%)|#if ($authors.isEmpty())
@@ -227,21 +347,6 @@
         #else
           $doc.authors
         #end
-      ##------- Features --------
-      #set($features = $doc.getValue("features"))
-      #if ($features &amp;&amp; $features.size() &gt; 0)
-        |(% class="label" %)Features(%%)|#if($features.size() &gt; 1)
-          (((
-            #foreach($feature in $features)
-              * ${feature}
-            #end
-          )))
-          #elseif ($features.size() == 1)
-            $features.get(0)
-          #else
-
-          #end
-      #end
       ##------- Website --------------
       #set($website = $extension.getProperty("website").value)
       #if ("$!website" != '')
@@ -347,9 +452,6 @@
     |Source|$doc.display('source')
     |Display Icon Location
 (Syntax: #set($comment = '##')${comment}icon:{{html}}&lt;a href="http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png" target="_blank"&gt;icon name&lt;/a&gt;{{/html}}${comment})|$doc.display("icon")
-    #if (!$doc.isNew())
-      |Features (a list of virtual ids, e.g. an old id for an extension which changed its id)|#if($proxyExtensionObject)$doc.display('features', 'view')#else$doc.display('features')#end~
-    #end
 
     #foreach($sheetExtension in $sheetExtensions)
       $doc.display('edit', 'view', $sheetExtension)
@@ -438,7 +540,16 @@
     #end
 
     #if ($isEditMode &amp;&amp; !$proxyExtensionObject)
-      = Add/Edit Downloads =
+      #set($extversions = $doc.getObjects("ExtensionCode.ExtensionVersionClass"))
+      #if($extversions &amp;&amp; $extversions.size()&gt;0)
+      = Current Downloads =
+         #foreach($versionobj in $extversions)
+            #set($ok = $doc.use($versionobj))
+            {{html clean="false"}} $xwiki.includeForm("ExtensionCode.ExtensionVersionSheet") {{/html}}
+         #end
+      #end
+
+      = Add Downloads =
       #if ($doc.isNew())
         {{info}}In order to add Download information for this extension, save this page first and edit it again.{{/info}}
       #else
@@ -446,9 +557,25 @@
 
         We don't have a slick UI yet to add new download versions or edit existing downloads version so for the moment it's a 2 step process:
         * If you're providing a new download, [[attach the new version to this page&gt;&gt;path:$xwiki.getURL($doc.fullName, 'view', 'viewer=attachments')]] and come back to this page. Make sure you put the version in the filename (e.g. ubercoolmacro-1.0.xar).
-        * Add Download information for the new attachment by going to the [[object editor&gt;&gt;path:$xwiki.getURL($doc.fullName, 'edit', 'editor=object')]] and adding an object of type ${escapetool.h}#ExtensionCode.ExtensionVersionClass${escapetool.h}#. Make sure to fill the data, especially the version and the link to the attachment. To link to an attachment, you can use {{{attach:ubercoolmacro-1.0.xar}}}
+ 
+      #set($xredirect = $doc.getURL("edit"))
+      #set($addobjecturl = $doc.getURL('objectadd', "classname=ExtensionCode.ExtensionVersionClass&amp;form_token=$!{services.csrf.getToken()}&amp;xredirect=${escapetool.url($xredirect)}"))
+      * Add Download information for the new attachment by filing in a new [[Extension Version&gt;&gt;path:$addobjecturl]]. Make sure to fill the data, especially the version and the link to the attachment. To link to an attachment, you can use {{{attach:ubercoolmacro-1.0.xar}}}.
 
-        You can also associate dependencies to each version using the ${escapetool.h}#ExtensionCode.ExtensionDependencyClass${escapetool.h}#:
+      #set($extdeps = $doc.getObjects("ExtensionCode.ExtensionDependencyClass"))
+      #if($extdeps &amp;&amp; $extdeps.size()&gt;0)
+      = Current Dependencies =
+         #foreach($depobj in $extdeps)
+            #set($ok = $doc.use($depobj))
+            {{html clean="false"}} $xwiki.includeForm("ExtensionCode.ExtensionDependencySheet") {{/html}}
+         #end
+      #end
+
+      = Add Dependencies =
+
+      #set($xredirect = $doc.getURL("edit"))
+      #set($addobjecturl = $doc.getURL('objectadd', "classname=ExtensionCode.ExtensionDependencyClass&amp;form_token=$!{services.csrf.getToken()}&amp;xredirect=${escapetool.url($xredirect)}"))
+        You can also associate dependencies to each version by filing in the following information in a new [[Dependency&gt;&gt;path:$addobjecturl]]:
         * ${escapetool.h}#Extension version${escapetool.h}# is the version on which this dependency is assigned
         * ${escapetool.h}#Dependency id${escapetool.h}# is the identifier of the dependency extension on the repository where it is localed
         * ${escapetool.h}#Dependency version constraint${escapetool.h}# is the version related information of the dependency. Can be a version (e.g. ${escapetool.h}#1.0${escapetool.h}#) or one or several ranges of versions based on Maven standard syntax (e.g. ${escapetool.h}#[1.0,)${escapetool.h}# which mean at least ${escapetool.h}#1.0${escapetool.h}#)

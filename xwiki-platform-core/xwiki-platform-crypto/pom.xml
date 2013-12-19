@@ -32,16 +32,8 @@
   <artifactId>xwiki-platform-crypto</artifactId>
   <name>XWiki Platform - Cryptographic Services</name>
   <description>XWiki Platform - Cryptographic Services</description>
-  <properties>
-    <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
-  </properties>
+  <packaging>pom</packaging>
   <dependencies>
-    <!-- Used by CryptoScriptService which provides a service to Velocity scripts -->
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-script</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
     <!-- The core cryptography engine, used everywhere -->
     <dependency>
       <groupId>org.bouncycastle</groupId>
@@ -51,26 +43,11 @@
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpkix-jdk15on</artifactId>
     </dependency>
-    <!-- Used exclusively by UserDocumentUtils -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <!-- Used exclusively by UserDocumentUtils -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
+  <modules>
+    <module>xwiki-platform-crypto-common</module>
+    <module>xwiki-platform-crypto-cipher</module>
+    <module>xwiki-platform-crypto-password</module>
+    <module>xwiki-platform-crypto-script</module>
+  </modules>
 </project>

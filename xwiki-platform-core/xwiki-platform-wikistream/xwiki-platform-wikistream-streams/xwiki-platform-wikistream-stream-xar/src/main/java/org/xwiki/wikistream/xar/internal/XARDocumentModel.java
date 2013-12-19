@@ -27,7 +27,7 @@ import java.util.Map;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils.EventParameter;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
 
 /**
  * @version $Id$

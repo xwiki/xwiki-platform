@@ -12,8 +12,8 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1384767919000</date>
-  <contentUpdateDate>1384767894000</contentUpdateDate>
+  <date>1386947927000</date>
+  <contentUpdateDate>1386947927000</contentUpdateDate>
   <version>1.1</version>
   <title>WikiStream</title>
   <defaultTemplate/>
@@ -42,10 +42,6 @@
 #set($output = $request.output)
 
 #set($inputProperties = {})
-## Set response output by default
-#if ($services.wikistream.getInputWikiStreamDescriptor($request.input).getPropertyDescriptor('source'))
-  #set($void = $inputProperties.put('source', $request.inputStream))
-#end
 #foreach($parameterName in $request.parameterNames)
   #if ($parameterName.startsWith('wikistream_input_properties_descriptor_'))
     #set($propertyName = $parameterName.substring(39))
@@ -54,12 +50,13 @@
     #end
   #end
 #end
+## Set response output by default
+#if (!$inputProperties.source &amp;&amp; $services.wikistream.getInputWikiStreamDescriptor($request.input).getPropertyDescriptor('source'))
+  #set($sourceStandardInput = true)
+  #set($void = $inputProperties.put('source', $request.inputStream))
+#end
 
 #set($outputProperties = {})
-## Set response output by default
-#if ($services.wikistream.getOutputWikiStreamDescriptor($request.output).getPropertyDescriptor('target'))
-  #set($void = $outputProperties.put('target', $response.outputStream))
-#end
 #foreach($parameterName in $request.parameterNames)
   #if ($parameterName.startsWith('wikistream_output_properties_descriptor_'))
     #set($propertyName = $parameterName.substring(40))
@@ -68,24 +65,35 @@
     #end
   #end
 #end
+## Set response output by default
+#if (!$outputProperties.target &amp;&amp; $services.wikistream.getOutputWikiStreamDescriptor($request.output).getPropertyDescriptor('target'))
+  #set($targetStandardOutput = true)
+  #set($void = $outputProperties.put('target', $response.outputStream))
+#end
 {{/velocity}}
 
 {{velocity}}
 #if ($request.convert)
-  #if ($services.wikistream.startConvert($input, $inputProperties, $output, $outputProperties).join())
-    {{success}}Conversion started.{{/success}}
+  #if ($targetStandardOutput)
+    $response.setHeader('Content-Disposition', 'attachment; filename=target');
+    $services.wikistream.startConvert($input, $inputProperties, $output, $outputProperties).join()
+    $xcontext.setFinished(true)
   #else
-    #set ($lastError = $services.wikistream.lastError)
-    #if ($lastError)
-      {{error}}
-        Failed to start conversion
+    #if ($services.wikistream.startConvert($input, $inputProperties, $output, $outputProperties))
+      {{success}}Conversion started.{{/success}}
+    #else
+      #set ($lastError = $services.wikistream.lastError)
+      #if ($lastError)
+        {{error}}
+          Failed to start conversion
 
-        {{html}}
-          &lt;pre&gt;
-            #printThrowable($lastError)
-          &lt;/pre&gt;
-        {{/html}}
-      {{/error}}
+          {{html}}
+            &lt;pre&gt;
+              #printThrowable($lastError)
+            &lt;/pre&gt;
+          {{/html}}
+        {{/error}}
+      #end
     #end
   #end
 #end

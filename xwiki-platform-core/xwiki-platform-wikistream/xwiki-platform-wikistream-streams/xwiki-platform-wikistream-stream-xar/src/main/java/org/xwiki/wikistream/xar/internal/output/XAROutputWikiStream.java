@@ -44,6 +44,7 @@ import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
 import org.xwiki.wikistream.model.filter.WikiClassFilter;
 import org.xwiki.wikistream.model.filter.WikiObjectFilter;
+import org.xwiki.wikistream.output.WriterOutputTarget;
 import org.xwiki.wikistream.xar.internal.XARAttachmentModel;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
 import org.xwiki.wikistream.xar.internal.XARClassPropertyModel;
@@ -51,16 +52,17 @@ import org.xwiki.wikistream.xar.internal.XARDocumentModel;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARObjectModel;
 import org.xwiki.wikistream.xar.internal.XARObjectPropertyModel;
-import org.xwiki.wikistream.xar.internal.XARUtils;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
 import org.xwiki.wikistream.xar.output.XAROutputProperties;
 import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
+import org.xwiki.wikistream.xml.output.ResultOutputTarget;
 
 /**
  * @version $Id$
  * @since 5.2M2
  */
 @Component
-@Named(XARUtils.ROLEHINT)
+@Named(XARWikiStreamUtils.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputProperties> implements XARFilter
 {
@@ -133,7 +135,7 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     @Override
     public void beginWiki(String name, FilterEventParameters parameters) throws WikiStreamException
     {
-        this.wikiWriter = new XARWikiWriter(name, parameters, this.properties);
+        this.wikiWriter = new XARWikiWriter(name, this.properties);
     }
 
     @Override
@@ -173,17 +175,29 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.currentDocumentParameters = null;
     }
 
+    private boolean isTargetTextualContent()
+    {
+        return this.properties.getTarget() instanceof WriterOutputTarget
+            || this.properties.getTarget() instanceof ResultOutputTarget;
+    }
+
     @Override
     public void beginWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws WikiStreamException
     {
         if (this.writer == null) {
-            if (this.wikiWriter != null) {
+            if (this.wikiWriter == null && (this.properties.isForceDocument() || isTargetTextualContent())) {
+                this.writer = new WikiStreamXMLStreamWriter(this.properties, true);
+            } else {
+                if (this.wikiWriter == null) {
+                    this.wikiWriter =
+                        new XARWikiWriter(this.properties.getPackageName() != null ? this.properties.getPackageName()
+                            : "package", this.properties);
+                }
+
                 this.writer =
                     new WikiStreamXMLStreamWriter(this.wikiWriter.newEntry(new LocalDocumentReference(
                         this.currentDocumentReference, locale)), this.properties.getEncoding(),
                         this.properties.isFormat(), true);
-            } else {
-                this.writer = new WikiStreamXMLStreamWriter(this.properties, true);
             }
         }
 

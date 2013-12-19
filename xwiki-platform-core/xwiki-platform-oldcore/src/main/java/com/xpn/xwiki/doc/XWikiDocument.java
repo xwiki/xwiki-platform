@@ -3681,62 +3681,66 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * related information. For example it allows to compare a document comming from a another wiki and easily check if
      * thoses actually are the same thing whatever the plumbing differences.
      * 
-     * @param doc the document to compare
+     * @param otherDocument the document to compare
      * @return true if bith documents have the same datas
      * @since 4.1.1
      */
-    public boolean equalsData(XWikiDocument doc)
+    public boolean equalsData(XWikiDocument otherDocument)
     {
         // Same Java object, they sure are equal
-        if (this == doc) {
+        if (this == otherDocument) {
             return true;
         }
 
-        if (ObjectUtils.notEqual(getParentReference(), doc.getParentReference())) {
+        if (ObjectUtils.notEqual(getParentReference(), otherDocument.getParentReference())) {
             return false;
         }
 
-        if (!getFormat().equals(doc.getFormat())) {
+        if (!getFormat().equals(otherDocument.getFormat())) {
             return false;
         }
 
-        if (!getTitle().equals(doc.getTitle())) {
+        if (!getTitle().equals(otherDocument.getTitle())) {
             return false;
         }
 
-        if (!getContent().equals(doc.getContent())) {
+        if (!getContent().equals(otherDocument.getContent())) {
             return false;
         }
 
-        if (!getDefaultTemplate().equals(doc.getDefaultTemplate())) {
+        if (!getDefaultTemplate().equals(otherDocument.getDefaultTemplate())) {
             return false;
         }
 
-        if (!getValidationScript().equals(doc.getValidationScript())) {
+        if (!getValidationScript().equals(otherDocument.getValidationScript())) {
             return false;
         }
 
-        if (ObjectUtils.notEqual(getSyntax(), doc.getSyntax())) {
+        if (ObjectUtils.notEqual(getSyntax(), otherDocument.getSyntax())) {
             return false;
         }
 
-        if (isHidden() != doc.isHidden()) {
+        if (isHidden() != otherDocument.isHidden()) {
             return false;
         }
 
-        if (!getXClass().equals(doc.getXClass())) {
+        // XClass
+
+        if (!getXClass().equals(otherDocument.getXClass())) {
             return false;
         }
+
+        // XObjects
 
         Set<DocumentReference> myObjectClassReferences = getXObjects().keySet();
-        Set<DocumentReference> otherObjectClassReferences = doc.getXObjects().keySet();
+        Set<DocumentReference> otherObjectClassReferences = otherDocument.getXObjects().keySet();
         if (!myObjectClassReferences.equals(otherObjectClassReferences)) {
             return false;
         }
 
         for (DocumentReference reference : myObjectClassReferences) {
             List<BaseObject> myObjects = getXObjects(reference);
-            List<BaseObject> otherObjects = doc.getXObjects(reference);
+            List<BaseObject> otherObjects = otherDocument.getXObjects(reference);
             if (myObjects.size() != otherObjects.size()) {
                 return false;
             }
@@ -3751,6 +3755,24 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 if (!myObjects.get(i).equals(otherObjects.get(i))) {
                     return false;
                 }
+            }
+        }
+
+        // Attachments
+        List<XWikiAttachment> attachments = getAttachmentList();
+        List<XWikiAttachment> otherAttachments = otherDocument.getAttachmentList();
+        if (attachments.size() != otherAttachments.size()) {
+            return false;
+        }
+        for (XWikiAttachment attachment : attachments) {
+            XWikiAttachment otherAttachment = otherDocument.getAttachment(attachment.getFilename());
+            try {
+                if (otherAttachment == null || attachment.equalsData(otherAttachment, null)) {
+                    return false;
+                }
+            } catch (XWikiException e) {
+                throw new RuntimeException(String.format("Failed to compare attachments with reference [%0]",
+                    attachment.getReference()), e);
             }
         }
 
@@ -5998,10 +6020,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             String fileName = origAttach.getFilename();
             XWikiAttachment newAttach = toDoc.getAttachment(fileName);
             if (newAttach == null) {
-                difflist.add(new AttachmentDiff(fileName, origAttach.getVersion(), null));
+                difflist.add(new AttachmentDiff(fileName, org.xwiki.diff.Delta.Type.DELETE, origAttach, newAttach));
             } else {
-                if (!origAttach.getVersion().equals(newAttach.getVersion())) {
-                    difflist.add(new AttachmentDiff(fileName, origAttach.getVersion(), newAttach.getVersion()));
+                try {
+                    if (!origAttach.equalsData(newAttach, context)) {
+                        difflist.add(new AttachmentDiff(fileName, org.xwiki.diff.Delta.Type.CHANGE, origAttach,
+                            newAttach));
+                    }
+                } catch (XWikiException e) {
+                    LOGGER.error("Failed to compare attachments [{}] and [{}]", origAttach, newAttach);
                 }
             }
         }
@@ -6010,7 +6037,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             String fileName = newAttach.getFilename();
             XWikiAttachment origAttach = fromDoc.getAttachment(fileName);
             if (origAttach == null) {
-                difflist.add(new AttachmentDiff(fileName, null, newAttach.getVersion()));
+                difflist.add(new AttachmentDiff(fileName, org.xwiki.diff.Delta.Type.INSERT, origAttach, newAttach));
             }
         }
 
@@ -8273,10 +8300,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * <p>
      * All 3 documents are supposed to have the same document reference and language already since that's what makes
      * them uniques.
-     * <p>
-     * Important note: this method does not take care of attachments contents related operations and only remove
-     * attachments which need to be removed from the list. For memory handling reasons all attachments contents related
-     * operations should be done elsewhere.
      * 
      * @param previousDocument the previous version of the document
      * @param newDocument the next version of the document
@@ -8423,12 +8446,66 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (!attachmentsDiff.isEmpty()) {
             // Apply deleted attachment diff on result (new attachment has already been saved)
             for (AttachmentDiff diff : attachmentsDiff) {
-                if (diff.getNewVersion() == null) {
-                    XWikiAttachment attachmentResult = getAttachment(diff.getFileName());
+                XWikiAttachment previousAttachment = diff.getOrigAttachment();
+                XWikiAttachment nextAttachment = diff.getNewAttachment();
+                XWikiAttachment attachment = getAttachment(diff.getFileName());
 
-                    removeAttachment(attachmentResult);
-
-                    mergeResult.setModified(true);
+                switch (diff.getType()) {
+                    case DELETE:
+                        if (attachment != null) {
+                            try {
+                                if (attachment.equalsData(previousAttachment, context)) {
+                                    removeAttachment(attachment);
+                                    mergeResult.setModified(true);
+                                } else {
+                                    // XXX: collision between DB and new: attachment modified by user
+                                    mergeResult.getLog().error("Collision found on attachment [{}]",
+                                        attachment.getReference());
+                                }
+                            } catch (XWikiException e) {
+                                mergeResult.getLog().error("Failed to compare attachments with reference [{}]",
+                                    attachment.getReference());
+                            }
+                        } else {
+                            // Already removed from DB, lets assume the user is prescient
+                            mergeResult.getLog().warn("Attachment [{}] already removed",
+                                previousAttachment.getReference());
+                        }
+                        break;
+                    case INSERT:
+                        if (attachment != null) {
+                            try {
+                                if (!attachment.equalsData(nextAttachment, context)) {
+                                    // XXX: collision between DB and new: attachment to add but a different one already
+                                    // exists in the DB
+                                    mergeResult.getLog().error("Collision found on attachment [{}]",
+                                        attachment.getReference());
+                                } else {
+                                    // Already added to the DB, lets assume the user is prescient
+                                    mergeResult.getLog().warn("Attachment [{}] already added",
+                                        previousAttachment.getReference());
+                                }
+                            } catch (XWikiException e) {
+                                mergeResult.getLog().error("Failed to compare attachments with reference [{}]",
+                                    attachment.getReference());
+                            }
+                        } else {
+                            addAttachment(configuration.isProvidedVersionsModifiables() ? nextAttachment
+                                : (XWikiAttachment) nextAttachment.clone());
+                            mergeResult.setModified(true);
+                        }
+                        break;
+                    case CHANGE:
+                        if (attachment != null) {
+                            attachment.merge(previousAttachment, nextAttachment, configuration, context, mergeResult);
+                        } else {
+                            // XXX: collision between DB and new: attachment modified but does not exist in the DB
+                            mergeResult.getLog().error("Collision found on attachment [{}]",
+                                previousAttachment.getReference());
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
         }

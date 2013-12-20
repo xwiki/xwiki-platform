@@ -367,7 +367,7 @@ public class XWikiHibernateBaseStore implements Initializable
             if (schema == null) {
                 if (databaseProduct == DatabaseProduct.DERBY) {
                     schema = "APP";
-                } else if (databaseProduct == DatabaseProduct.HSQLDB) {
+                } else if (databaseProduct == DatabaseProduct.HSQLDB || databaseProduct == DatabaseProduct.H2) {
                     schema = "PUBLIC";
                 } else if (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode()) {
                     schema = "public";
@@ -379,9 +379,9 @@ public class XWikiHibernateBaseStore implements Initializable
             // virtual
             schema = wikiName.replace('-', '_');
 
-            // For HSQLDB we only support uppercase schema names. This is because Hibernate doesn't properly generate
+            // For HSQLDB/H2 we only support uppercase schema names. This is because Hibernate doesn't properly generate
             // quotes around schema names when it qualifies the table name when it generates the update script.
-            if (databaseProduct == DatabaseProduct.HSQLDB) {
+            if (DatabaseProduct.HSQLDB == databaseProduct || DatabaseProduct.H2 == databaseProduct) {
                 schema = StringUtils.upperCase(schema);
             }
         }
@@ -461,6 +461,7 @@ public class XWikiHibernateBaseStore implements Initializable
             DatabaseProduct databaseProduct = getDatabaseProductName();
             if (databaseProduct == DatabaseProduct.ORACLE
                 || databaseProduct == DatabaseProduct.HSQLDB
+                || databaseProduct == DatabaseProduct.H2
                 || databaseProduct == DatabaseProduct.DERBY
                 || databaseProduct == DatabaseProduct.DB2
                 || (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode()))
@@ -679,7 +680,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 if (DatabaseProduct.ORACLE == databaseProduct) {
                     executeSQL("alter session set current_schema = " + escapedSchemaName, session);
                 } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.HSQLDB == databaseProduct
-                    || DatabaseProduct.DB2 == databaseProduct) {
+                    || DatabaseProduct.DB2 == databaseProduct || DatabaseProduct.H2 == databaseProduct) {
                     executeSQL("SET SCHEMA " + escapedSchemaName, session);
                 } else if (DatabaseProduct.POSTGRESQL == databaseProduct && isInSchemaMode()) {
                     executeSQL("SET search_path TO " + escapedSchemaName, session);

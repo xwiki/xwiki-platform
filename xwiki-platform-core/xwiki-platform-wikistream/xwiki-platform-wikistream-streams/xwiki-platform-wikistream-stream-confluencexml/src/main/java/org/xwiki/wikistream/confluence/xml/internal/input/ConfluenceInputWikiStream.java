@@ -38,7 +38,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.StreamParser;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.confluence.input.ConfluenceInputProperties;
 import org.xwiki.wikistream.confluence.xml.internal.ConfluenceFilter;
@@ -315,7 +317,7 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
         }
 
         // Current version
-        readPageRevision(pageId, pageProperties, proxyFilter);
+        readPageRevision(pageId, filter, proxyFilter);
 
         // < WikiDocumentLocale
         proxyFilter.endWikiDocumentLocale(locale, documentLocaleParameters);
@@ -378,31 +380,54 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
         documentRevisionParameters.put(WikiDocumentFilter.PARAMETER_TITLE,
             pageProperties.getString(ConfluenceXMLPackage.KEY_PAGE_TITLE));
 
+        String bodyContent = null;
+        Syntax bodySyntax = null;
+        int bodyType = -1;
+
+        if (pageProperties.containsKey(ConfluenceXMLPackage.KEY_PAGE_BODY)
+            && pageProperties.containsKey(ConfluenceXMLPackage.KEY_PAGE_BODY_TYPE)) {
+            bodyContent = pageProperties.getString(ConfluenceXMLPackage.KEY_PAGE_BODY);
+            bodyType = pageProperties.getInt(ConfluenceXMLPackage.KEY_PAGE_BODY_TYPE);
+
+            switch (bodyType) {
+                case 0:
+                    bodySyntax = Syntax.CONFLUENCE_1_0;
+                    break;
+                case 2:
+                    bodySyntax = Syntax.CONFLUENCEXHTML_1_0;
+                    break;
+                default:
+                    if (this.properties.isVerbose()) {
+                        this.logger.error("Unknown body type [{}]", bodyType);
+                    }
+                    break;
+            }
+        }
+
+        // If target filter does not support rendering events, pass the content as it is
+        if (!(filter instanceof Listener) && bodyContent != null && bodySyntax != null) {
+            documentRevisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT, bodyContent);
+            documentRevisionParameters.put(WikiDocumentFilter.PARAMETER_SYNTAX, bodySyntax);
+        }
+
         // > WikiDocumentRevision
         proxyFilter.beginWikiDocumentRevision(revision, documentRevisionParameters);
 
         // Content
-        if (pageProperties.containsKey(ConfluenceXMLPackage.KEY_PAGE_BODY)
-            && pageProperties.containsKey(ConfluenceXMLPackage.KEY_PAGE_BODY_TYPE)) {
-            String confluenceBody = pageProperties.getString(ConfluenceXMLPackage.KEY_PAGE_BODY);
-            int bodyType = pageProperties.getInt(ConfluenceXMLPackage.KEY_PAGE_BODY_TYPE);
-
+        if (filter instanceof Listener && bodyContent != null && bodySyntax != null) {
             try {
                 switch (bodyType) {
                     case 0:
-                        this.confluenceWIKIParser.parse(new StringReader(confluenceBody), proxyFilter);
+                        this.confluenceWIKIParser.parse(new StringReader(bodyContent), proxyFilter);
                         break;
                     case 2:
-                        this.confluenceXHTMLParser.parse(new StringReader(confluenceBody), proxyFilter);
+                        this.confluenceXHTMLParser.parse(new StringReader(bodyContent), proxyFilter);
                         break;
                     default:
-                        if (this.properties.isVerbose()) {
-                            this.logger.error("Usupported body type [{}]", bodyType);
-                        }
                         break;
                 }
             } catch (org.xwiki.rendering.parser.ParseException e) {
-                throw new WikiStreamException(String.format("Failed parser content [%s]", confluenceBody), e);
+                throw new WikiStreamException(String.format("Failed parser content [%s]", bodyContent), e);
             }
         }
 

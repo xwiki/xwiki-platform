@@ -163,7 +163,7 @@ public class WikiStreamType implements Comparable<WikiStreamType>
         int versionIndex = str.lastIndexOf('/');
 
         if (versionIndex == 0) {
-            throw new IllegalArgumentException("'/' is inavlid as first character: " + str);
+            throw new IllegalArgumentException("'/' is invalid as first character: " + str);
         }
 
         if (versionIndex != -1) {

@@ -487,7 +487,9 @@ public class Document extends Api
      * it returns the default language in the wiki where the document is stored.
      * 
      * @return the language of the document.
-     * @todo Deprecate it but be prepared to fix all the resulting Velocity warnings that will appear in the logs
+     * @deprecated since 5.4M1 use {@link #getLocale()} instead
+     * @todo Add a @Deprecated annotation too but be prepared to fix all the resulting Velocity warnings that will
+     *       appear in the logs
      */
     public String getLanguage()
     {

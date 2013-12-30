@@ -63,11 +63,11 @@ public class XARWikiWriter
             } else if (target instanceof OutputStreamOutputTarget) {
                 this.zipStream = new ZipArchiveOutputStream(((OutputStreamOutputTarget) target).getOutputStream());
             } else {
-                throw new WikiStreamException(String.format("Unsupported output target [%s]. Only [%s] is suppoted",
+                throw new WikiStreamException(String.format("Unsupported output target [%s]. Only [%s] is supported",
                     target, OutputStreamOutputTarget.class));
             }
         } catch (IOException e) {
-            throw new WikiStreamException("Files to create zip output stream", e);
+            throw new WikiStreamException("Failed to create zip output stream", e);
         }
 
         this.zipStream.setEncoding("UTF8");

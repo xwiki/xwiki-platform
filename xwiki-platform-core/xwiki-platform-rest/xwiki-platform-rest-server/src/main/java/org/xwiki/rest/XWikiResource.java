@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest;
 
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,6 +37,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rest.internal.Utils;
@@ -180,18 +182,18 @@ public class XWikiResource implements XWikiRestComponent, Initializable
         if (language != null) {
             doc = doc.getTranslatedDocument(language);
 
-            /*
-             * If the language of the translated document is not the one we requested, then the requested translation
-             * doesn't exist. new translated document by hand.
-             */
-            if (!language.equals(doc.getLanguage())) {
+            // If the language of the translated document is not the one we requested, then the requested translation
+            // doesn't exist. new translated document by hand.
+            // TODO: Ideally this method should take a Locale as input and not a String
+            Locale locale = LocaleUtils.toLocale(language);
+            if (!locale.equals(doc.getLocale())) {
                 /* If we are here the requested translation doesn't exist */
                 if (failIfDoesntExist) {
                     throw new WebApplicationException(Status.NOT_FOUND);
                 } else {
                     XWikiDocument xwikiDocument =
                             new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
-                    xwikiDocument.setLanguage(language);
+                    xwikiDocument.setLocale(locale);
                     doc = new Document(xwikiDocument, getXWikiContext());
 
                     existed = false;

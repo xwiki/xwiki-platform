@@ -44,9 +44,6 @@
       <dateproperty1>
         <classType>com.xpn.xwiki.objects.classes.DateClass</classType>
       </dateproperty1>
-      <dateproperty2>
-        <classType>com.xpn.xwiki.objects.classes.DateClass</classType>
-      </dateproperty2>
     </class>
     <property>
       <booleanproperty1>0</booleanproperty1>
@@ -77,9 +74,6 @@
     </property>
     <property>
       <dateproperty1>2013-02-10 11:41:23.0</dateproperty1>
-    </property>
-    <property>
-      <dateproperty2>Wed Feb 20 11:41:23 GMT 2013</dateproperty2>
     </property>
   </object>
 </xwikidoc>
@@ -131,7 +125,6 @@
               <wikiClassPropertyField name="multiSelect" value="1"></wikiClassPropertyField>
             </wikiClassProperty>
             <wikiClassProperty name="dateproperty1" type="com.xpn.xwiki.objects.classes.DateClass"></wikiClassProperty>
-            <wikiClassProperty name="dateproperty2" type="com.xpn.xwiki.objects.classes.DateClass"></wikiClassProperty>
           </wikiClass>
           <wikiObjectProperty name="booleanproperty1" value="0"></wikiObjectProperty>
           <wikiObjectProperty name="booleanproperty2" value="1"></wikiObjectProperty>
@@ -157,11 +150,6 @@
           <wikiObjectProperty name="dateproperty1">
             <p>
               <value t="java.util.Date">2013-02-10 10:41:23.0 UTC</value>
-            </p>
-          </wikiObjectProperty>
-          <wikiObjectProperty name="dateproperty2">
-            <p>
-              <value t="java.util.Date">2013-02-20 11:41:23.0 UTC</value>
             </p>
           </wikiObjectProperty>
         </wikiObject>

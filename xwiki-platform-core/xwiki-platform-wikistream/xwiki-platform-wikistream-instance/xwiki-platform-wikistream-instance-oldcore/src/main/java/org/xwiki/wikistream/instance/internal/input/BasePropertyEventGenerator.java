@@ -44,7 +44,7 @@ public class BasePropertyEventGenerator extends
     {
         // * WikiObjectProperty
 
-        propertyFilter.onWikiObjectProperty(xclassProperty.getName(), xclassProperty.toText(),
+        propertyFilter.onWikiObjectProperty(xclassProperty.getName(), xclassProperty.getValue(),
             FilterEventParameters.EMPTY);
     }
 }

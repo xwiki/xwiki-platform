@@ -463,6 +463,7 @@
     <module>xwiki-platform-wikistream</module>
     <module>xwiki-platform-wiki-manager</module>
     <module>xwiki-platform-wysiwyg</module>
+    <module>xwiki-platform-xar</module>
     <module>xwiki-platform-xml</module>
     <module>xwiki-platform-xmlrpc</module>
     <module>xwiki-platform-zipexplorer</module>

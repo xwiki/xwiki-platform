@@ -23,11 +23,14 @@ package org.xwiki.wikistream.xar.internal.input;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.LocaleUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.wikistream.xar.input.XARInputProperties;
+import org.xwiki.wikistream.WikiStreamException;
 
 /**
  * @version $Id$
@@ -35,36 +38,31 @@ import org.xwiki.wikistream.xar.input.XARInputProperties;
  */
 public abstract class AbstractReader
 {
+    @Inject
     protected SyntaxFactory syntaxFactory;
 
-    protected XARInputProperties properties;
-
-    public AbstractReader(XARInputProperties properties)
-    {
-        this.properties = properties;
-    }
-
-    public AbstractReader(SyntaxFactory syntaxFactory, XARInputProperties properties)
-    {
-        this(properties);
-
-        this.syntaxFactory = syntaxFactory;
-    }
-
-    protected Object convert(Class< ? > type, String source) throws ParseException
+    protected Object convert(Class< ? > type, String source) throws WikiStreamException
     {
         Object value = source;
 
         if (type == Locale.class) {
             value = toLocale(source);
         } else if (type == Date.class) {
-            value = new Date(Long.parseLong(source));
+            value = StringUtils.isNotEmpty(source) ? new Date(Long.parseLong(source)) : null;
         } else if (type == Boolean.class) {
-            value = Boolean.valueOf(source).booleanValue();
+            value = StringUtils.isNotEmpty(source) ? Boolean.valueOf(source).booleanValue() : null;
         } else if (type == Syntax.class) {
-            value = this.syntaxFactory.createSyntaxFromIdString(source);
+            if (StringUtils.isNotEmpty(source)) {
+                try {
+                    value = this.syntaxFactory.createSyntaxFromIdString(source);
+                } catch (ParseException e) {
+                    throw new WikiStreamException(String.format("Failed to create Syntax istance for [%s]", source), e);
+                }
+            } else {
+                value = null;
+            }
         } else if (type == Integer.class) {
-            value = Integer.parseInt(source);
+            value = StringUtils.isNotEmpty(source) ? Integer.parseInt(source) : null;
         }
 
         return value;

@@ -39,8 +39,9 @@ public interface WikiObjectPropertyFilter
      * @param value the value of the property
      * @param parameters the properties of the property
      * @throws WikiStreamException when failing to send event
+     * @since 5.4M1
      */
-    void onWikiObjectProperty(@Name("name") String name, @Name("value") String value,
+    void onWikiObjectProperty(@Name("name") String name, @Name("value") Object value,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 }

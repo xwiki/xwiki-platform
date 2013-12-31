@@ -1,0 +1,88 @@
+.#------------------------------------------------------------------------------
+.inputexpect|xwiki+xar/1.1
+.#------------------------------------------------------------------------------
+<?xml version="1.0" ?>
+<xwikidoc version="1.1">
+  <web>space</web>
+  <name>page</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <version>1.1</version>
+  <object>
+    <name>space.page</name>
+    <number>0</number>
+    <className>space.class</className>
+    <class>
+      <name>space.class</name>
+      <listproperty1>
+        <multiSelect>0</multiSelect>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </listproperty1>
+      <listproperty2>
+        <multiSelect>1</multiSelect>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </listproperty2>
+    </class>
+    <property>
+      <listproperty1> value</listproperty1>
+    </property>
+    <property>
+      <listproperty2>
+        <value>value1</value>
+        <value>value2</value>
+      </listproperty2>
+    </property>
+  </object>
+</xwikidoc>
+
+.#------------------------------------------------------------------------------
+.inputexpect|wiki+xml
+.#------------------------------------------------------------------------------
+<wikiSpace name="space">
+  <wikiDocument name="page">
+    <p>
+      <parameters>
+        <entry>
+          <string>locale</string>
+          <locale></locale>
+        </entry>
+      </parameters>
+    </p>
+    <wikiDocumentLocale>
+      <wikiDocumentRevision revision="1.1">
+        <wikiObject>
+          <p>
+            <parameters>
+              <entry>
+                <string>number</string>
+                <int>0</int>
+              </entry>
+              <entry>
+                <string>class_reference</string>
+                <string>space.class</string>
+              </entry>
+            </parameters>
+          </p>
+          <wikiClass>
+            <wikiClassProperty name="listproperty1" type="com.xpn.xwiki.objects.classes.StaticListClass">
+              <wikiClassPropertyField name="multiSelect" value="0"></wikiClassPropertyField>
+            </wikiClassProperty>
+            <wikiClassProperty name="listproperty2" type="com.xpn.xwiki.objects.classes.StaticListClass">
+              <wikiClassPropertyField name="multiSelect" value="1"></wikiClassPropertyField>
+            </wikiClassProperty>
+          </wikiClass>
+          <wikiObjectProperty name="listproperty1" value=" value"></wikiObjectProperty>
+          <wikiObjectProperty name="listproperty2">
+            <p>
+              <value t="java.util.ArrayList">
+                <string>value1</string>
+                <string>value2</string>
+              </value>
+            </p>
+          </wikiObjectProperty>
+        </wikiObject>
+      </wikiDocumentRevision>
+    </wikiDocumentLocale>
+  </wikiDocument>
+</wikiSpace>

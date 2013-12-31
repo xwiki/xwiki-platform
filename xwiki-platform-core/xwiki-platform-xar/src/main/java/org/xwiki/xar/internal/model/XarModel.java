@@ -17,14 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xar.internal;
+package org.xwiki.xar.internal.model;
 
 /**
- * 
  * @version $Id$
- * @since 5.2M2
+ * @since 5.4M1
  */
-public class XARModel
+public class XarModel
 {
     public static final String PATH_PACKAGE = "package.xml";
 

@@ -322,7 +322,11 @@
                   <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
                 </wikiClassProperty>
               </wikiClass>
-              <wikiObjectProperty name="prop2" value="2"></wikiObjectProperty>
+              <wikiObjectProperty name="prop2">
+                <p>
+                  <value t="java.lang.Long">2</value>
+                </p>
+              </wikiObjectProperty>
             </wikiObject>
             <wikiObject name="wiki:space.page[0]">
               <p>
@@ -384,7 +388,11 @@
                   <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
                 </wikiClassProperty>
               </wikiClass>
-              <wikiObjectProperty name="prop1" value="1"></wikiObjectProperty>
+              <wikiObjectProperty name="prop1">
+                <p>
+                  <value t="java.lang.Long">1</value>
+                </p>
+              </wikiObjectProperty>
             </wikiObject>
           </wikiDocumentRevision>
         </wikiDocumentLocale>

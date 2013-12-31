@@ -504,12 +504,13 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
     }
 
     @Override
-    public void onWikiObjectProperty(String name, String value, FilterEventParameters parameters)
+    public void onWikiObjectProperty(String name, Object value, FilterEventParameters parameters)
         throws WikiStreamException
     {
         PropertyClassInterface propertyclass = (PropertyClassInterface) this.currentXObjectClass.safeget(name);
 
-        PropertyInterface property = propertyclass.fromString(value);
+        PropertyInterface property =
+            value instanceof String ? propertyclass.fromString((String) value) : propertyclass.fromValue(value);
 
         this.currentXObject.safeput(name, property);
     }

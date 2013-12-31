@@ -31,8 +31,8 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.output.FileOutputTarget;
 import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 import org.xwiki.wikistream.output.OutputTarget;
-import org.xwiki.wikistream.xar.internal.XarPackage;
 import org.xwiki.wikistream.xar.output.XAROutputProperties;
+import org.xwiki.xar.internal.XarPackage;
 
 /**
  * @version $Id$
@@ -47,9 +47,8 @@ public class XARWikiWriter
     private final ZipArchiveOutputStream zipStream;
 
     private XarPackage xarPackage = new XarPackage();
-    
-    public XARWikiWriter(String name, XAROutputProperties xarProperties)
-        throws WikiStreamException
+
+    public XARWikiWriter(String name, XAROutputProperties xarProperties) throws WikiStreamException
     {
         this.name = name;
         this.xarProperties = xarProperties;
@@ -123,19 +122,19 @@ public class XARWikiWriter
         }
     }
 
-    private void writePackage() throws WikiStreamException, IOException
+    private void writePackage() throws WikiStreamException
     {
-        this.xarPackage.write(this.zipStream, xarProperties.getEncoding());
+        try {
+            this.xarPackage.write(this.zipStream, xarProperties.getEncoding());
+        } catch (Exception e) {
+            throw new WikiStreamException("Failed to write package.xml entry", e);
+        }
     }
 
     public void close() throws WikiStreamException
     {
         // Add package.xml descriptor
-        try {
-            writePackage();
-        } catch (IOException e) {
-            throw new WikiStreamException("Failed to write package.xml entry", e);
-        }
+        writePackage();
 
         // Close zip stream
         try {

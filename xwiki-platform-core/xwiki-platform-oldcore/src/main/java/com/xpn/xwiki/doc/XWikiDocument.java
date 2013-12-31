@@ -121,6 +121,10 @@ import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.xar.internal.model.XarAttachmentModel;
+import org.xwiki.xar.internal.model.XarClassModel;
+import org.xwiki.xar.internal.model.XarDocumentModel;
+import org.xwiki.xar.internal.model.XarObjectModel;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -4307,8 +4311,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // constructed XWikiDocument object has a valid name or space (by using current document values if they are
         // missing). This is important since document name, space and wiki must always be set in a XWikiDocument
         // instance.
-        String name = getElement(docel, "name");
-        String space = getElement(docel, "web");
+        String name = getElement(docel, XarDocumentModel.ELEMENT_NAME);
+        String space = getElement(docel, XarDocumentModel.ELEMENT_SPACE);
 
         if (StringUtils.isEmpty(name) || StringUtils.isEmpty(space)) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -4320,63 +4324,63 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         reference = this.currentReferenceDocumentReferenceResolver.resolve(reference);
         setDocumentReference(new DocumentReference(reference));
 
-        String parent = getElement(docel, "parent");
+        String parent = getElement(docel, XarDocumentModel.ELEMENT_PARENT);
         if (StringUtils.isNotEmpty(parent)) {
             setParentReference(this.relativeEntityReferenceResolver.resolve(parent, EntityType.DOCUMENT));
         }
 
-        setCreator(getElement(docel, "creator"));
-        setAuthor(getElement(docel, "author"));
-        setCustomClass(getElement(docel, "customClass"));
-        setContentAuthor(getElement(docel, "contentAuthor"));
-        if (docel.element("version") != null) {
-            setVersion(getElement(docel, "version"));
+        setCreator(getElement(docel, XarDocumentModel.ELEMENT_CREATION_AUTHOR));
+        setAuthor(getElement(docel, XarDocumentModel.ELEMENT_REVISION_AUTHOR));
+        setCustomClass(getElement(docel, XarDocumentModel.ELEMENT_CUSTOMCLASS));
+        setContentAuthor(getElement(docel, XarDocumentModel.ELEMENT_CONTENT_AUTHOR));
+        if (docel.element(XarDocumentModel.ELEMENT_REVISION) != null) {
+            setVersion(getElement(docel, XarDocumentModel.ELEMENT_REVISION));
         }
-        setContent(getElement(docel, "content"));
-        setLanguage(getElement(docel, "language"));
-        setDefaultLanguage(getElement(docel, "defaultLanguage"));
-        setTitle(getElement(docel, "title"));
-        setDefaultTemplate(getElement(docel, "defaultTemplate"));
-        setValidationScript(getElement(docel, "validationScript"));
-        setComment(getElement(docel, "comment"));
+        setContent(getElement(docel, XarDocumentModel.ELEMENT_CONTENT));
+        setLanguage(getElement(docel, XarDocumentModel.ELEMENT_LOCALE));
+        setDefaultLanguage(getElement(docel, XarDocumentModel.ELEMENT_DEFAULTLOCALE));
+        setTitle(getElement(docel, XarDocumentModel.ELEMENT_TITLE));
+        setDefaultTemplate(getElement(docel, XarDocumentModel.ELEMENT_DEFAULTTEMPLATE));
+        setValidationScript(getElement(docel, XarDocumentModel.ELEMENT_VALIDATIONSCRIPT));
+        setComment(getElement(docel, XarDocumentModel.ELEMENT_REVISION_COMMENT));
 
-        String minorEdit = getElement(docel, "minorEdit");
+        String minorEdit = getElement(docel, XarDocumentModel.ELEMENT_REVISION_MINOR);
         setMinorEdit(Boolean.valueOf(minorEdit).booleanValue());
 
-        String hidden = getElement(docel, "hidden");
+        String hidden = getElement(docel, XarDocumentModel.ELEMENT_HIDDEN);
         setHidden(Boolean.valueOf(hidden).booleanValue());
 
-        String strans = getElement(docel, "translation");
+        String strans = getElement(docel, XarDocumentModel.ELEMENT_ISTRANSLATION);
         if ((strans == null) || strans.equals("")) {
             setTranslation(0);
         } else {
             setTranslation(Integer.parseInt(strans));
         }
 
-        String archive = getElement(docel, "versions");
+        String archive = getElement(docel, XarDocumentModel.ELEMENT_REVISIONS);
         if (withArchive && archive != null && archive.length() > 0) {
             setDocumentArchive(archive);
         }
 
-        String sdate = getElement(docel, "date");
+        String sdate = getElement(docel, XarDocumentModel.ELEMENT_REVISION_DATE);
         if (!sdate.equals("")) {
             Date date = new Date(Long.parseLong(sdate));
             setDate(date);
         }
 
-        String contentUpdateDateString = getElement(docel, "contentUpdateDate");
+        String contentUpdateDateString = getElement(docel, XarDocumentModel.ELEMENT_CONTENT_DATE);
         if (!StringUtils.isEmpty(contentUpdateDateString)) {
             Date contentUpdateDate = new Date(Long.parseLong(contentUpdateDateString));
             setContentUpdateDate(contentUpdateDate);
         }
 
-        String scdate = getElement(docel, "creationDate");
+        String scdate = getElement(docel, XarDocumentModel.ELEMENT_CREATION_DATE);
         if (!scdate.equals("")) {
             Date cdate = new Date(Long.parseLong(scdate));
             setCreationDate(cdate);
         }
 
-        String syntaxId = getElement(docel, "syntaxId");
+        String syntaxId = getElement(docel, XarDocumentModel.ELEMENT_SYNTAX);
         if ((syntaxId == null) || (syntaxId.length() == 0)) {
             // Documents that don't have syntax ids are considered old documents and thus in
             // XWiki Syntax 1.0 since newer documents always have syntax ids.
@@ -4385,7 +4389,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             setSyntaxId(syntaxId);
         }
 
-        List<Element> atels = docel.elements("attachment");
+        List<Element> atels = docel.elements(XarAttachmentModel.ELEMENT_ATTACHMENT);
         for (Element atel : atels) {
             XWikiAttachment attach = new XWikiAttachment();
             attach.setDoc(this);
@@ -4393,7 +4397,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             getAttachmentList().add(attach);
         }
 
-        Element cel = docel.element("class");
+        Element cel = docel.element(XarClassModel.ELEMENT_CLASS);
         BaseClass bclass = new BaseClass();
         if (cel != null) {
             bclass.fromXML(cel);
@@ -4401,7 +4405,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         @SuppressWarnings("unchecked")
-        List<Element> objels = docel.elements("object");
+        List<Element> objels = docel.elements(XarObjectModel.ELEMENT_OBJECT);
         for (Element objel : objels) {
             BaseObject bobject = new BaseObject();
             bobject.fromXML(objel);
@@ -4424,7 +4428,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public static boolean containsXMLWikiDocument(Document domdoc)
     {
-        return domdoc.getRootElement().getName().equals("xwikidoc");
+        return domdoc.getRootElement().getName().equals(XarDocumentModel.ELEMENT_DOCUMENT);
     }
 
     public void setAttachmentList(List<XWikiAttachment> list)

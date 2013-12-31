@@ -53,10 +53,10 @@ import org.xwiki.wikistream.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.wikistream.internal.input.BeanInputWikiStream;
 import org.xwiki.wikistream.internal.input.DefaultInputStreamInputSource;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
-import org.xwiki.wikistream.xar.internal.XARModel;
 import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
-import org.xwiki.wikistream.xar.internal.XarEntry;
-import org.xwiki.wikistream.xar.internal.XarFile;
+import org.xwiki.xar.internal.XarEntry;
+import org.xwiki.xar.internal.XarFile;
+import org.xwiki.xar.internal.model.XarModel;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -150,7 +150,7 @@ public class Packager
             for (ArchiveEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()) {
                 if (!entry.isDirectory()) {
                     // Only import what should be imported
-                    if (!entry.getName().equals(XARModel.PATH_PACKAGE)
+                    if (!entry.getName().equals(XarModel.PATH_PACKAGE)
                         && (configuration.getEntriesToImport() == null || configuration.getEntriesToImport().contains(
                             entry.getName()))) {
                         XarEntryMergeResult entityMergeResult =

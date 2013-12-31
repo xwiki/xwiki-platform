@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xar.internal;
+package org.xwiki.xar.internal;
 
 import java.io.InputStream;
 import java.util.Locale;
@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.xar.internal.model.XarDocumentModel;
 import org.xwiki.xml.stax.StAXUtils;
 
 /**
@@ -67,24 +68,24 @@ public final class XarUtils
 
             xmlReader.nextTag();
 
-            xmlReader.require(XMLStreamReader.START_ELEMENT, null, XARDocumentModel.ELEMENT_DOCUMENT);
+            xmlReader.require(XMLStreamReader.START_ELEMENT, null, XarDocumentModel.ELEMENT_DOCUMENT);
 
             for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
                 String elementName = xmlReader.getLocalName();
 
-                if (XARDocumentModel.ELEMENT_NAME.equals(elementName)) {
+                if (XarDocumentModel.ELEMENT_NAME.equals(elementName)) {
                     page = xmlReader.getElementText();
 
                     if (space != null && locale != null) {
                         break;
                     }
-                } else if (XARDocumentModel.ELEMENT_SPACE.equals(elementName)) {
+                } else if (XarDocumentModel.ELEMENT_SPACE.equals(elementName)) {
                     space = xmlReader.getElementText();
 
                     if (page != null && locale != null) {
                         break;
                     }
-                } else if (XARDocumentModel.ELEMENT_LOCALE.equals(elementName)) {
+                } else if (XarDocumentModel.ELEMENT_LOCALE.equals(elementName)) {
                     String value = xmlReader.getElementText();
                     if (value.length() == 0) {
                         locale = Locale.ROOT;

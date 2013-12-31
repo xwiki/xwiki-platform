@@ -73,12 +73,12 @@ public class DateXarObjectPropertySerializer implements XarObjectPropertySeriali
             // I suppose this is a date format used a long time ago. DateProperty is using the above date format now.
             SimpleDateFormat sdfOld = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.US);
             this.logger.warn("Failed to parse date [{}] using format [{}]. Trying again with format [{}].", value,
-                sdf.toString(), sdfOld.toString());
+                sdf.toPattern(), sdfOld.toPattern());
             try {
                 return sdfOld.parse(value);
             } catch (ParseException exception) {
                 this.logger.warn("Failed to parse date [{}] using format [{}]. Defaulting to the current date.", value,
-                    sdfOld.toString());
+                    sdfOld.toPattern());
                 return new Date();
             }
         }

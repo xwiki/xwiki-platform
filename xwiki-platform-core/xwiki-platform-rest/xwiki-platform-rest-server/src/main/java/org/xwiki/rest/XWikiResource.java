@@ -183,7 +183,13 @@ public class XWikiResource implements XWikiRestComponent, Initializable
             // If the language of the translated document is not the one we requested, then the requested translation
             // doesn't exist. new translated document by hand.
             // TODO: Ideally this method should take a Locale as input and not a String
-            Locale locale = LocaleUtils.toLocale(language);
+            Locale locale;
+            try {
+                locale = LocaleUtils.toLocale(language);
+            } catch (Exception e) {
+                // Language is invalid, we consider that the translation has not been found.
+                throw new WebApplicationException(Status.NOT_FOUND);
+            }
             if (!locale.equals(doc.getLocale())) {
                 // If we are here the requested translation doesn't exist
                 if (failIfDoesntExist) {

@@ -509,6 +509,8 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
     {
         PropertyClassInterface propertyclass = (PropertyClassInterface) this.currentXObjectClass.safeget(name);
 
+        // Bulletproofing using PropertyClassInterface##fromString when a String is passed (in case it's not really a
+        // String property)
         PropertyInterface property =
             value instanceof String ? propertyclass.fromString((String) value) : propertyclass.fromValue(value);
 

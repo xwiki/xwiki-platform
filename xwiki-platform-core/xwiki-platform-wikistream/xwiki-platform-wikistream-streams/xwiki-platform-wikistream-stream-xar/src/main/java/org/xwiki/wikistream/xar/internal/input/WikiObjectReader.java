@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.model.filter.WikiObjectFilter;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARObjectModel;
@@ -58,15 +59,28 @@ public class WikiObjectReader extends AbstractReader implements XARXMLReader<Wik
     {
         public WikiClass wikiClass;
 
-        public String name;
-
         public FilterEventParameters parameters = new FilterEventParameters();
 
         private List<WikiObjectProperty> properties = new ArrayList<WikiObjectProperty>();
 
         public void send(XARFilter proxyFilter) throws WikiStreamException
         {
-            proxyFilter.beginWikiObject(this.name, this.parameters);
+            String name = null;
+
+            if (this.parameters.containsKey(WikiObjectFilter.PARAMETER_CLASS_REFERENCE)) {
+                StringBuilder nameBuilder =
+                    new StringBuilder(this.parameters.get(WikiObjectFilter.PARAMETER_CLASS_REFERENCE).toString());
+
+                if (this.parameters.containsKey(WikiObjectFilter.PARAMETER_NUMBER)) {
+                    nameBuilder.append('[');
+                    nameBuilder.append(this.parameters.get(WikiObjectFilter.PARAMETER_NUMBER));
+                    nameBuilder.append(']');
+                }
+
+                name = nameBuilder.toString();
+            }
+
+            proxyFilter.beginWikiObject(name, this.parameters);
 
             this.wikiClass.send(proxyFilter);
 
@@ -74,7 +88,7 @@ public class WikiObjectReader extends AbstractReader implements XARXMLReader<Wik
                 property.send(proxyFilter);
             }
 
-            proxyFilter.endWikiObject(this.name, this.parameters);
+            proxyFilter.endWikiObject(name, this.parameters);
         }
     }
 
@@ -99,7 +113,7 @@ public class WikiObjectReader extends AbstractReader implements XARXMLReader<Wik
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
             if (elementName.equals(XARClassModel.ELEMENT_CLASS)) {
-                wikiObject.wikiClass = classReader.read(xmlReader);
+                wikiObject.wikiClass = this.classReader.read(xmlReader);
             } else if (elementName.equals(XARObjectPropertyModel.ELEMENT_PROPERTY)) {
                 wikiObject.properties.add(readObjectProperty(xmlReader, wikiObject.wikiClass));
             } else {

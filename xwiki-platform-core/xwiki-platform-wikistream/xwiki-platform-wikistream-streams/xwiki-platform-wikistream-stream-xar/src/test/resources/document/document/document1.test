@@ -291,7 +291,7 @@
             <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
           </wikiClassProperty>
         </wikiClass>
-        <wikiObject>
+        <wikiObject name="space.page[0]">
           <p>
             <parameters>
               <entry>
@@ -353,7 +353,7 @@
           </wikiClass>
           <wikiObjectProperty name="prop1" value="1"></wikiObjectProperty>
         </wikiObject>
-        <wikiObject>
+        <wikiObject name="otherclass[0]">
           <p>
             <parameters>
               <entry>

@@ -481,7 +481,9 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
     @Override
     public void beginWikiObject(String name, FilterEventParameters parameters) throws WikiStreamException
     {
-        this.currentEntityReference = new EntityReference(name, EntityType.OBJECT, this.currentEntityReference);
+        if (name != null) {
+            this.currentEntityReference = new EntityReference(name, EntityType.OBJECT, this.currentEntityReference);
+        }
 
         this.currentXObject = new BaseObject();
 
@@ -512,7 +514,9 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
     @Override
     public void endWikiObject(String name, FilterEventParameters parameters) throws WikiStreamException
     {
-        this.currentEntityReference = this.currentEntityReference.getParent();
+        if (this.currentEntityReference.getType() == EntityType.OBJECT) {
+            this.currentEntityReference = this.currentEntityReference.getParent();
+        }
 
         this.currentXObject = null;
         this.currentXObjectClass = null;

@@ -70,14 +70,14 @@ public class DefaultWikiCreator implements WikiCreator
         try {
             xwiki.getStore().createWiki(wikiId, context);
         } catch (Exception e) {
-            throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databasecreation"), e);
+            throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databasecreation", wikiId), e);
         }
 
         // Init database/schema
         try {
             xwiki.updateDatabase(wikiId, true, true, context);
         } catch (Exception e) {
-            throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databaseupdate"), e);
+            throw new WikiManagerException(localizationManager.getTranslationPlain("wiki.databaseupdate", wikiId), e);
         }
 
         return createDescriptor(wikiId, wikiAlias);

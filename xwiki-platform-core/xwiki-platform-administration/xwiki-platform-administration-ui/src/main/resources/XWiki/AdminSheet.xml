@@ -3740,8 +3740,9 @@ document.observe('xwiki:dom:loaded', function() {
         #end
         &lt;optgroup label="$services.localization.render('admin.gotospaceadministration')"&gt;
         #foreach($spaceitem in $xwiki.spaces)
-          #if ($xwiki.hasAccessLevel('admin', $xcontext.user, "${spaceitem}.WebPreferences"))
-            &lt;option value="$xwiki.getURL("${spaceitem}.WebPreferences", 'admin')" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$escapetool.xml($spaceitem)&lt;/option&gt;
+          #set ($spacePreferencesDocument = $services.model.createDocumentReference('', $spaceitem, 'WebPreferences'))
+          #if ($xwiki.hasAccessLevel('admin', $xcontext.user, $services.model.serialize($spacePreferencesDocument, 'default')))
+            &lt;option value="$xwiki.getURL($spacePreferencesDocument, 'admin', '')" #if("$!{currentSpace}" == ${spaceitem} &amp;&amp; "$!{editor}" != 'globaladmin')selected="selected"#end&gt;$escapetool.xml($spaceitem)&lt;/option&gt;
           #end
         #end
         &lt;/optgroup&gt;

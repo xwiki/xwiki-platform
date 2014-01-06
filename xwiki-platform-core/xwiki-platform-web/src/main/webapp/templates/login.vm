@@ -49,7 +49,7 @@
 </table>
 <div class="buttons"><span class="buttonwrapper"><input type="submit" class="button" value="$services.localization.render('login')"/></span></div>
 ## TODO: Replace this with an interface extension once IX are implemented
-#if($xwiki.exists('XWiki.ResetPassword') && $xwiki.hasAccess('view', 'XWiki.ResetPassword'))
+#if($xwiki.exists('XWiki.ResetPassword') && $xwiki.hasAccessLevel('view', 'XWiki.ResetPassword'))
   <div style="font-size: 70%; margin-top: 2em;">$services.localization.render('plaform.web.login.forgotUserNameOrPassword', ["<a href='$xwiki.getURL('XWiki.ForgotUsername')'>", '</a>', "<a href='$xwiki.getURL('XWiki.ResetPassword')'>", '</a>'])</div>
 #end
 #xwikimessageboxend()

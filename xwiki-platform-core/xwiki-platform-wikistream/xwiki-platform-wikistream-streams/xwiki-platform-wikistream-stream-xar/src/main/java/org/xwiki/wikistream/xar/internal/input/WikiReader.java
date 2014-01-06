@@ -22,37 +22,42 @@ package org.xwiki.wikistream.xar.internal.input;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.inject.Inject;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.input.InputStreamInputSource;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARFilter;
-import org.xwiki.wikistream.xar.internal.XARModel;
-import org.xwiki.wikistream.xar.internal.XarPackage;
+import org.xwiki.xar.internal.XarPackage;
+import org.xwiki.xar.internal.model.XarModel;
 
 /**
  * @version $Id$
  * @since 5.2RC1
  */
+@Component(roles = WikiReader.class)
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class WikiReader
 {
+    @Inject
     private DocumentLocaleReader documentReader;
 
     private XARInputProperties properties;
 
     private XarPackage xarPackage = new XarPackage();
 
-    public WikiReader(SyntaxFactory syntaxFactory, EntityReferenceResolver<String> relativeResolver,
-        XARInputProperties properties)
+    public void setProperties(XARInputProperties properties)
     {
         this.properties = properties;
-        this.documentReader = new DocumentLocaleReader(syntaxFactory, relativeResolver, properties);
+
+        this.documentReader.setProperties(properties);
     }
 
     public XarPackage getXarPackage()
@@ -95,7 +100,7 @@ public class WikiReader
                 // The entry is either a directory or is something inside of the META-INF dir.
                 // (we use that directory to put meta data such as LICENSE/NOTICE files.)
                 continue;
-            } else if (entry.getName().equals(XARModel.PATH_PACKAGE)) {
+            } else if (entry.getName().equals(XarModel.PATH_PACKAGE)) {
                 // The entry is the manifest (package.xml). Read this differently.
                 try {
                     this.xarPackage.readDescriptor(zis);
@@ -108,7 +113,8 @@ public class WikiReader
                 } catch (SkipEntityException skip) {
                     // TODO: put it in some status
                 } catch (Exception e) {
-                    throw new WikiStreamException("Failed to read XAR XML document", e);
+                    throw new WikiStreamException(String.format("Failed to read XAR XML document from entry [%s]",
+                        entry.getName()), e);
                 }
             }
         }

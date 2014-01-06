@@ -20,6 +20,14 @@
         <string>active</string>
         <boolean>true</boolean>
       </entry>
+      <entry>
+        <string>revision_date</string>
+        <date>2013-10-14 10:18:48.960 UTC</date>
+      </entry>
+      <entry>
+        <string>creation_date</string>
+        <date>2013-10-14 10:18:48.960 UTC</date>
+      </entry>
     </parameters>
   </p>
 </user>
@@ -41,6 +49,14 @@
       <entry>
         <string>active</string>
         <boolean>true</boolean>
+      </entry>
+      <entry>
+        <string>revision_date</string>
+        <date>2013-10-14 13:42:39.532 UTC</date>
+      </entry>
+      <entry>
+        <string>creation_date</string>
+        <date>2013-10-14 13:42:39.532 UTC</date>
       </entry>
     </parameters>
   </p>
@@ -64,35 +80,92 @@
         <string>active</string>
         <boolean>true</boolean>
       </entry>
+      <entry>
+        <string>revision_date</string>
+        <date>2013-10-14 13:43:28.188 UTC</date>
+      </entry>
+      <entry>
+        <string>creation_date</string>
+        <date>2013-10-14 13:43:28.188 UTC</date>
+      </entry>
     </parameters>
   </p>
 </user>
 <group name="XWikiAdminGroup">
+  <p>
+    <parameters>
+      <entry>
+        <string>revision_date</string>
+        <date>2013-10-14 10:18:48.836 UTC</date>
+      </entry>
+      <entry>
+        <string>creation_date</string>
+        <date>2013-10-14 10:18:48.836 UTC</date>
+      </entry>
+    </parameters>
+  </p>
   <groupMemberGroup name="Admin"></groupMemberGroup>
 </group>
 <group name="XWikiAllGroup">
+  <p>
+    <parameters>
+      <entry>
+        <string>revision_date</string>
+        <date>2013-10-14 10:18:48.847 UTC</date>
+      </entry>
+      <entry>
+        <string>creation_date</string>
+        <date>2013-10-14 10:18:48.847 UTC</date>
+      </entry>
+    </parameters>
+  </p>
   <groupMemberGroup name="user2"></groupMemberGroup>
   <groupMemberGroup name="Admin"></groupMemberGroup>
   <groupMemberGroup name="user1"></groupMemberGroup>
 </group>
-<group name="twistedgroup"></group>
+<group name="twistedgroup">
+  <p>
+    <parameters>
+      <entry>
+        <string>revision_date</string>
+        <date>2013-10-14 13:43:47.360 UTC</date>
+      </entry>
+      <entry>
+        <string>creation_date</string>
+        <date>2013-10-14 13:43:47.360 UTC</date>
+      </entry>
+    </parameters>
+  </p>
+</group>
 <wikiSpace name="space1">
   <wikiDocument name="WebHome">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 12:53:25.489 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 12:53:25.489 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -127,20 +200,32 @@
   </wikiDocument>
   <wikiDocument name="Page 1">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:07:38.580 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>7</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:07:38.580 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -682,16 +767,12 @@
         <p>
           <parameters>
             <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>2</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:28:41.980 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -1257,14 +1338,7 @@
                   <space></space>
                   <word>macro</word>
                 </paragraph>
-                <paragraph>
-                  <word>info</word>
-                  <space></space>
-                  <word>default</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="info default macro">
                   <p>
                     <parameters>
                       <entry>
@@ -1335,12 +1409,7 @@
                 <macro id="create-space-button"></macro>
                 <paragraph></paragraph>
                 <macro id="change-history"></macro>
-                <paragraph>
-                  <word>Column</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="column">
+                <macro id="column" content="Column macro">
                   <p>
                     <parameters>
                       <entry>
@@ -1380,38 +1449,9 @@
                 <macro id="contributors"></macro>
                 <paragraph></paragraph>
                 <macro id="contributors-summary"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>meta</word>
-                  <space></space>
-                  <word>data</word>
-                  <space></space>
-                  <word>detail</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="details"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>box</word>
-                  <space></space>
-                  <word>to</word>
-                  <space></space>
-                  <word>expand</word>
-                </paragraph>
-                <macro id="expand"></macro>
-                <paragraph>
-                  <word>Excerpt</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="excerpt">
+                <macro id="details" content="Content of meta data detail macro"></macro>
+                <macro id="expand" content="Content of box to expand"></macro>
+                <macro id="excerpt" content="Excerpt content">
                   <p>
                     <parameters>
                       <entry>
@@ -1436,16 +1476,7 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>info</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="content of info macro">
                   <p>
                     <parameters>
                       <entry>
@@ -1515,16 +1546,7 @@
                   <word>following</word>
                 </paragraph>
                 <macro id="network"></macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="note">
+                <macro id="note" content="content of the macro">
                   <p>
                     <parameters>
                       <entry>
@@ -1612,24 +1634,10 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="section"></macro>
+                <macro id="section" content="content of the macro"></macro>
                 <paragraph></paragraph>
                 <macro id="recently-updated-dashboard"></macro>
-                <paragraph>
-                  <word>tip</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="tip">
+                <macro id="tip" content="tip content">
                   <p>
                     <parameters>
                       <entry>
@@ -1661,14 +1669,8 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="panel"></macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="warning">
+                <macro id="panel" content="content"></macro>
+                <macro id="warning" content="content">
                   <p>
                     <parameters>
                       <entry>
@@ -1685,10 +1687,7 @@
                   <space></space>
                   <word>maccro</word>
                 </paragraph>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="toc-zone"></macro>
+                <macro id="toc-zone" content="content"></macro>
                 <paragraph>
                   <space></space>
                 </paragraph>
@@ -1707,16 +1706,12 @@
         <p>
           <parameters>
             <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>3</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:30:07.55 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -2308,14 +2303,7 @@
                   <space></space>
                   <word>macro</word>
                 </paragraph>
-                <paragraph>
-                  <word>info</word>
-                  <space></space>
-                  <word>default</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="info default macro">
                   <p>
                     <parameters>
                       <entry>
@@ -2386,12 +2374,7 @@
                 <macro id="create-space-button"></macro>
                 <paragraph></paragraph>
                 <macro id="change-history"></macro>
-                <paragraph>
-                  <word>Column</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="column">
+                <macro id="column" content="Column macro">
                   <p>
                     <parameters>
                       <entry>
@@ -2431,38 +2414,9 @@
                 <macro id="contributors"></macro>
                 <paragraph></paragraph>
                 <macro id="contributors-summary"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>meta</word>
-                  <space></space>
-                  <word>data</word>
-                  <space></space>
-                  <word>detail</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="details"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>box</word>
-                  <space></space>
-                  <word>to</word>
-                  <space></space>
-                  <word>expand</word>
-                </paragraph>
-                <macro id="expand"></macro>
-                <paragraph>
-                  <word>Excerpt</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="excerpt">
+                <macro id="details" content="Content of meta data detail macro"></macro>
+                <macro id="expand" content="Content of box to expand"></macro>
+                <macro id="excerpt" content="Excerpt content">
                   <p>
                     <parameters>
                       <entry>
@@ -2487,16 +2441,7 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>info</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="content of info macro">
                   <p>
                     <parameters>
                       <entry>
@@ -2566,16 +2511,7 @@
                   <word>following</word>
                 </paragraph>
                 <macro id="network"></macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="note">
+                <macro id="note" content="content of the macro">
                   <p>
                     <parameters>
                       <entry>
@@ -2663,24 +2599,10 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="section"></macro>
+                <macro id="section" content="content of the macro"></macro>
                 <paragraph></paragraph>
                 <macro id="recently-updated-dashboard"></macro>
-                <paragraph>
-                  <word>tip</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="tip">
+                <macro id="tip" content="tip content">
                   <p>
                     <parameters>
                       <entry>
@@ -2712,14 +2634,8 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="panel"></macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="warning">
+                <macro id="panel" content="content"></macro>
+                <macro id="warning" content="content">
                   <p>
                     <parameters>
                       <entry>
@@ -2736,10 +2652,7 @@
                   <space></space>
                   <word>maccro</word>
                 </paragraph>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="toc-zone"></macro>
+                <macro id="toc-zone" content="content"></macro>
                 <paragraph>
                   <space></space>
                 </paragraph>
@@ -2758,16 +2671,12 @@
         <p>
           <parameters>
             <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>4</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:30:16.93 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -3359,14 +3268,7 @@
                   <space></space>
                   <word>macro</word>
                 </paragraph>
-                <paragraph>
-                  <word>info</word>
-                  <space></space>
-                  <word>default</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="info default macro">
                   <p>
                     <parameters>
                       <entry>
@@ -3437,12 +3339,7 @@
                 <macro id="create-space-button"></macro>
                 <paragraph></paragraph>
                 <macro id="change-history"></macro>
-                <paragraph>
-                  <word>Column</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="column">
+                <macro id="column" content="Column macro">
                   <p>
                     <parameters>
                       <entry>
@@ -3482,38 +3379,9 @@
                 <macro id="contributors"></macro>
                 <paragraph></paragraph>
                 <macro id="contributors-summary"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>meta</word>
-                  <space></space>
-                  <word>data</word>
-                  <space></space>
-                  <word>detail</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="details"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>box</word>
-                  <space></space>
-                  <word>to</word>
-                  <space></space>
-                  <word>expand</word>
-                </paragraph>
-                <macro id="expand"></macro>
-                <paragraph>
-                  <word>Excerpt</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="excerpt">
+                <macro id="details" content="Content of meta data detail macro"></macro>
+                <macro id="expand" content="Content of box to expand"></macro>
+                <macro id="excerpt" content="Excerpt content">
                   <p>
                     <parameters>
                       <entry>
@@ -3538,16 +3406,7 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>info</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="content of info macro">
                   <p>
                     <parameters>
                       <entry>
@@ -3617,16 +3476,7 @@
                   <word>following</word>
                 </paragraph>
                 <macro id="network"></macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="note">
+                <macro id="note" content="content of the macro">
                   <p>
                     <parameters>
                       <entry>
@@ -3714,24 +3564,10 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="section"></macro>
+                <macro id="section" content="content of the macro"></macro>
                 <paragraph></paragraph>
                 <macro id="recently-updated-dashboard"></macro>
-                <paragraph>
-                  <word>tip</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="tip">
+                <macro id="tip" content="tip content">
                   <p>
                     <parameters>
                       <entry>
@@ -3763,14 +3599,8 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="panel"></macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="warning">
+                <macro id="panel" content="content"></macro>
+                <macro id="warning" content="content">
                   <p>
                     <parameters>
                       <entry>
@@ -3787,10 +3617,7 @@
                   <space></space>
                   <word>maccro</word>
                 </paragraph>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="toc-zone"></macro>
+                <macro id="toc-zone" content="content"></macro>
                 <paragraph>
                   <space></space>
                 </paragraph>
@@ -3809,16 +3636,12 @@
         <p>
           <parameters>
             <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>5</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:30:33.783 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -4381,14 +4204,7 @@
                   <space></space>
                   <word>macro</word>
                 </paragraph>
-                <paragraph>
-                  <word>info</word>
-                  <space></space>
-                  <word>default</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="info default macro">
                   <p>
                     <parameters>
                       <entry>
@@ -4459,12 +4275,7 @@
                 <macro id="create-space-button"></macro>
                 <paragraph></paragraph>
                 <macro id="change-history"></macro>
-                <paragraph>
-                  <word>Column</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="column">
+                <macro id="column" content="Column macro">
                   <p>
                     <parameters>
                       <entry>
@@ -4504,38 +4315,9 @@
                 <macro id="contributors"></macro>
                 <paragraph></paragraph>
                 <macro id="contributors-summary"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>meta</word>
-                  <space></space>
-                  <word>data</word>
-                  <space></space>
-                  <word>detail</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="details"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>box</word>
-                  <space></space>
-                  <word>to</word>
-                  <space></space>
-                  <word>expand</word>
-                </paragraph>
-                <macro id="expand"></macro>
-                <paragraph>
-                  <word>Excerpt</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="excerpt">
+                <macro id="details" content="Content of meta data detail macro"></macro>
+                <macro id="expand" content="Content of box to expand"></macro>
+                <macro id="excerpt" content="Excerpt content">
                   <p>
                     <parameters>
                       <entry>
@@ -4560,16 +4342,7 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>info</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="content of info macro">
                   <p>
                     <parameters>
                       <entry>
@@ -4639,16 +4412,7 @@
                   <word>following</word>
                 </paragraph>
                 <macro id="network"></macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="note">
+                <macro id="note" content="content of the macro">
                   <p>
                     <parameters>
                       <entry>
@@ -4736,24 +4500,10 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="section"></macro>
+                <macro id="section" content="content of the macro"></macro>
                 <paragraph></paragraph>
                 <macro id="recently-updated-dashboard"></macro>
-                <paragraph>
-                  <word>tip</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="tip">
+                <macro id="tip" content="tip content">
                   <p>
                     <parameters>
                       <entry>
@@ -4785,14 +4535,8 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="panel"></macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="warning">
+                <macro id="panel" content="content"></macro>
+                <macro id="warning" content="content">
                   <p>
                     <parameters>
                       <entry>
@@ -4809,10 +4553,7 @@
                   <space></space>
                   <word>maccro</word>
                 </paragraph>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="toc-zone"></macro>
+                <macro id="toc-zone" content="content"></macro>
                 <paragraph>
                   <space></space>
                 </paragraph>
@@ -4831,16 +4572,12 @@
         <p>
           <parameters>
             <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>6</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:32:14.75 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -5418,14 +5155,7 @@
                   <space></space>
                   <word>macro</word>
                 </paragraph>
-                <paragraph>
-                  <word>info</word>
-                  <space></space>
-                  <word>default</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="info default macro">
                   <p>
                     <parameters>
                       <entry>
@@ -5496,12 +5226,7 @@
                 <macro id="create-space-button"></macro>
                 <paragraph></paragraph>
                 <macro id="change-history"></macro>
-                <paragraph>
-                  <word>Column</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="column">
+                <macro id="column" content="Column macro">
                   <p>
                     <parameters>
                       <entry>
@@ -5541,38 +5266,9 @@
                 <macro id="contributors"></macro>
                 <paragraph></paragraph>
                 <macro id="contributors-summary"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>meta</word>
-                  <space></space>
-                  <word>data</word>
-                  <space></space>
-                  <word>detail</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="details"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>box</word>
-                  <space></space>
-                  <word>to</word>
-                  <space></space>
-                  <word>expand</word>
-                </paragraph>
-                <macro id="expand"></macro>
-                <paragraph>
-                  <word>Excerpt</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="excerpt">
+                <macro id="details" content="Content of meta data detail macro"></macro>
+                <macro id="expand" content="Content of box to expand"></macro>
+                <macro id="excerpt" content="Excerpt content">
                   <p>
                     <parameters>
                       <entry>
@@ -5597,16 +5293,7 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>info</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="content of info macro">
                   <p>
                     <parameters>
                       <entry>
@@ -5676,16 +5363,7 @@
                   <word>following</word>
                 </paragraph>
                 <macro id="network"></macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="note">
+                <macro id="note" content="content of the macro">
                   <p>
                     <parameters>
                       <entry>
@@ -5773,24 +5451,10 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="section"></macro>
+                <macro id="section" content="content of the macro"></macro>
                 <paragraph></paragraph>
                 <macro id="recently-updated-dashboard"></macro>
-                <paragraph>
-                  <word>tip</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="tip">
+                <macro id="tip" content="tip content">
                   <p>
                     <parameters>
                       <entry>
@@ -5822,14 +5486,8 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="panel"></macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="warning">
+                <macro id="panel" content="content"></macro>
+                <macro id="warning" content="content">
                   <p>
                     <parameters>
                       <entry>
@@ -5846,10 +5504,7 @@
                   <space></space>
                   <word>maccro</word>
                 </paragraph>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="toc-zone"></macro>
+                <macro id="toc-zone" content="content"></macro>
                 <paragraph>
                   <space></space>
                 </paragraph>
@@ -5875,12 +5530,12 @@
               </org.xwiki.model.reference.EntityReference>
             </entry>
             <entry>
-              <string>revision</string>
-              <string>7</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:34:06.749 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -6470,14 +6125,7 @@
                   <space></space>
                   <word>macro</word>
                 </paragraph>
-                <paragraph>
-                  <word>info</word>
-                  <space></space>
-                  <word>default</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="info default macro">
                   <p>
                     <parameters>
                       <entry>
@@ -6548,12 +6196,7 @@
                 <macro id="create-space-button"></macro>
                 <paragraph></paragraph>
                 <macro id="change-history"></macro>
-                <paragraph>
-                  <word>Column</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="column">
+                <macro id="column" content="Column macro">
                   <p>
                     <parameters>
                       <entry>
@@ -6593,38 +6236,9 @@
                 <macro id="contributors"></macro>
                 <paragraph></paragraph>
                 <macro id="contributors-summary"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>meta</word>
-                  <space></space>
-                  <word>data</word>
-                  <space></space>
-                  <word>detail</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="details"></macro>
-                <paragraph>
-                  <word>Content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>box</word>
-                  <space></space>
-                  <word>to</word>
-                  <space></space>
-                  <word>expand</word>
-                </paragraph>
-                <macro id="expand"></macro>
-                <paragraph>
-                  <word>Excerpt</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="excerpt">
+                <macro id="details" content="Content of meta data detail macro"></macro>
+                <macro id="expand" content="Content of box to expand"></macro>
+                <macro id="excerpt" content="Excerpt content">
                   <p>
                     <parameters>
                       <entry>
@@ -6649,16 +6263,7 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>info</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="info">
+                <macro id="info" content="content of info macro">
                   <p>
                     <parameters>
                       <entry>
@@ -6728,16 +6333,7 @@
                   <word>following</word>
                 </paragraph>
                 <macro id="network"></macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="note">
+                <macro id="note" content="content of the macro">
                   <p>
                     <parameters>
                       <entry>
@@ -6825,24 +6421,10 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                  <space></space>
-                  <word>of</word>
-                  <space></space>
-                  <word>the</word>
-                  <space></space>
-                  <word>macro</word>
-                </paragraph>
-                <macro id="section"></macro>
+                <macro id="section" content="content of the macro"></macro>
                 <paragraph></paragraph>
                 <macro id="recently-updated-dashboard"></macro>
-                <paragraph>
-                  <word>tip</word>
-                  <space></space>
-                  <word>content</word>
-                </paragraph>
-                <macro id="tip">
+                <macro id="tip" content="tip content">
                   <p>
                     <parameters>
                       <entry>
@@ -6874,14 +6456,8 @@
                     </parameters>
                   </p>
                 </macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="panel"></macro>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="warning">
+                <macro id="panel" content="content"></macro>
+                <macro id="warning" content="content">
                   <p>
                     <parameters>
                       <entry>
@@ -6898,10 +6474,7 @@
                   <space></space>
                   <word>maccro</word>
                 </paragraph>
-                <paragraph>
-                  <word>content</word>
-                </paragraph>
-                <macro id="toc-zone"></macro>
+                <macro id="toc-zone" content="content"></macro>
                 <paragraph>
                   <space></space>
                 </paragraph>
@@ -9945,12 +9518,20 @@ qR5YLx5GLMbKNc/Ascim+P57jj6gu7VYmvXjUKyWJCkDsMMf4VN02oXS1AzycnJyScCocpCXqZ//
                 <string>admin</string>
               </entry>
               <entry>
+                <string>creation_date</string>
+                <date>2013-10-14 12:54:42.800 UTC</date>
+              </entry>
+              <entry>
                 <string>revision</string>
                 <string>1</string>
               </entry>
               <entry>
                 <string>revision_author</string>
                 <string>admin</string>
+              </entry>
+              <entry>
+                <string>revision_date</string>
+                <date>2013-10-14 13:07:38.600 UTC</date>
               </entry>
               <entry>
                 <string>revision_comment</string>
@@ -11182,12 +10763,20 @@ NpxO9xniijf9hnOo44FJLpN4zDeOJHhkQxsyH3U4oS4N8fRh4bnlkgUNI7fVie9Ri3Z0fIkoKjTW
                 <string>admin</string>
               </entry>
               <entry>
+                <string>creation_date</string>
+                <date>2013-10-14 12:54:58.369 UTC</date>
+              </entry>
+              <entry>
                 <string>revision</string>
                 <string>1</string>
               </entry>
               <entry>
                 <string>revision_author</string>
                 <string>admin</string>
+              </entry>
+              <entry>
+                <string>revision_date</string>
+                <date>2013-10-14 13:07:38.591 UTC</date>
               </entry>
               <entry>
                 <string>revision_comment</string>
@@ -11214,12 +10803,20 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
                 <string>admin</string>
               </entry>
               <entry>
+                <string>creation_date</string>
+                <date>2013-10-14 13:05:29.969 UTC</date>
+              </entry>
+              <entry>
                 <string>revision</string>
                 <string>1</string>
               </entry>
               <entry>
                 <string>revision_author</string>
                 <string>admin</string>
+              </entry>
+              <entry>
+                <string>revision_date</string>
+                <date>2013-10-14 13:07:38.630 UTC</date>
               </entry>
               <entry>
                 <string>revision_comment</string>
@@ -11233,20 +10830,32 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
   </wikiDocument>
   <wikiDocument name="space1 Home">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 12:53:25.501 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 12:53:25.501 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -11430,20 +11039,32 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
 <wikiSpace name="privatespace">
   <wikiDocument name="WebHome">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:37:24.456 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:37:24.456 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -11478,6 +11099,22 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
   </wikiDocument>
   <wikiDocument name="Private page 1">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:37:52.357 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
@@ -11489,12 +11126,12 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
               </org.xwiki.model.reference.EntityReference>
             </entry>
             <entry>
-              <string>revision</string>
-              <string>1</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:37:52.357 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -11540,20 +11177,32 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
   </wikiDocument>
   <wikiDocument name="privatespace Home">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:37:24.463 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:37:24.463 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -11737,20 +11386,32 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
 <wikiSpace name="space2">
   <wikiDocument name="WebHome">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:32:33.976 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:32:33.976 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -11785,20 +11446,32 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
   </wikiDocument>
   <wikiDocument name="Page 2">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:33:07.495 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>2</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:33:07.495 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -11871,12 +11544,12 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
               </org.xwiki.model.reference.EntityReference>
             </entry>
             <entry>
-              <string>revision</string>
-              <string>2</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:35:10.951 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -11954,20 +11627,32 @@ cyAvPg0KPC9HbG9iYWxTZXR0aW5ncz4=</content>
   </wikiDocument>
   <wikiDocument name="space2 Home">
     <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_author</string>
+            <string>admin</string>
+          </entry>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-10-14 13:32:33.982 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
       <wikiDocumentRevision revision="1">
         <p>
           <parameters>
             <entry>
-              <string>parent_reference</string>
-              <null></null>
-            </entry>
-            <entry>
-              <string>revision</string>
-              <string>1</string>
-            </entry>
-            <entry>
               <string>revision_author</string>
               <string>admin</string>
+            </entry>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-10-14 13:32:33.982 UTC</date>
             </entry>
             <entry>
               <string>revision_comment</string>
@@ -30373,12 +30058,20 @@ nzbO2eCi2LGbxjwtYZ5oo2rqiv8NRyb5/wA5VyXC08mOZwAAAABJRU5ErkJggg==</content>
                 <string>admin</string>
               </entry>
               <entry>
+                <string>creation_date</string>
+                <date>2013-10-14 13:39:11.550 UTC</date>
+              </entry>
+              <entry>
                 <string>revision</string>
                 <string>1</string>
               </entry>
               <entry>
                 <string>revision_author</string>
                 <string>admin</string>
+              </entry>
+              <entry>
+                <string>revision_date</string>
+                <date>2013-10-14 13:39:11.550 UTC</date>
               </entry>
               <entry>
                 <string>revision_comment</string>

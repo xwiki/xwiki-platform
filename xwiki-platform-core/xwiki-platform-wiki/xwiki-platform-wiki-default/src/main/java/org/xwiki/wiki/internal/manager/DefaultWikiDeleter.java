@@ -59,14 +59,14 @@ public class DefaultWikiDeleter implements WikiDeleter
 
         // Check if we try to delete the main wiki
         if (wikiId.equals(wikiDescriptorManager.getMainWikiId())) {
-            throw new WikiManagerException("can't delete main wiki");
+            throw new WikiManagerException("It's not allowed to delete the main wiki!");
         }
 
         // Delete the database
         try {
             xwiki.getStore().deleteWiki(wikiId, context);
         } catch (XWikiException e) {
-            throw new WikiManagerException("can't delete database");
+            throw new WikiManagerException(String.format("Error deleting the database [%s]", wikiId), e);
         }
 
         // Delete the descriptor document
@@ -74,8 +74,8 @@ public class DefaultWikiDeleter implements WikiDeleter
             XWikiDocument descriptorDocument = descriptorDocumentHelper.getDocumentFromWikiId(wikiId);
             xwiki.deleteDocument(descriptorDocument, context);
         } catch (XWikiException e) {
-            throw new WikiManagerException("can't delete descriptor document");
+            throw new WikiManagerException(
+                String.format("Error deleting the Wiki Descriptor Document for database [%s]", wikiId), e);
         }
-
     }
 }

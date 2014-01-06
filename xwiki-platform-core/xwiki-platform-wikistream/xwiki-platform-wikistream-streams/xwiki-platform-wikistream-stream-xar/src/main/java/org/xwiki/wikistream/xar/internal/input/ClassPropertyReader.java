@@ -19,17 +19,16 @@
  */
 package org.xwiki.wikistream.xar.internal.input;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARClassPropertyModel;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 
@@ -37,7 +36,9 @@ import org.xwiki.wikistream.xar.internal.XARFilter;
  * @version $Id$
  * @since 5.2RC1
  */
-public class ClassPropertyReader extends AbstractReader
+@Component
+@Singleton
+public class ClassPropertyReader extends AbstractReader implements XARXMLReader<ClassPropertyReader.WikiClassProperty>
 {
     public static class WikiClassProperty
     {
@@ -62,13 +63,7 @@ public class ClassPropertyReader extends AbstractReader
         }
     }
 
-    public ClassPropertyReader(XARInputProperties properties)
-    {
-        super(properties);
-    }
-
-    public WikiClassProperty read(XMLStreamReader xmlReader) throws XMLStreamException, IOException,
-        WikiStreamException, ParseException
+    public WikiClassProperty read(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException
     {
         WikiClassProperty wikiClassProperty = new WikiClassProperty();
 

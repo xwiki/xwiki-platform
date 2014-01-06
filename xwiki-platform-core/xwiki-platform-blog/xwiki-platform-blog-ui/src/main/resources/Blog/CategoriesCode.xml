@@ -218,8 +218,10 @@
  *###
 #macro(displaySelectableCategory $name $level)
   #set($categoryDoc = $xwiki.getDocument($name))
-  #set($nameUrl = $escapetool.url($name))
-  #set($addCategURL = $doc.getURL('view', "xaction=showAddCategory&amp;amp;parentCategory=$nameUrl"))
+  #set($addCategURL = $doc.getURL('view', $escapetool.url({
+    'xaction': 'showAddCategory',
+    'parentCategory' : $name
+  })))
   #set($addEntryParams = false)
   #if($isBlogPost)
     #set($entry = $xwiki.getDocument($doc.fullName))
@@ -231,7 +233,13 @@
     #set($addEntryParams = true)
   #end
   #if($isBlogPost || $addEntryParams)
-    #set($addCategURL = $doc.getURL('view', "xaction=showAddCategory&amp;amp;entry=${entry.fullName}&amp;amp;entryObjNb=${entryObj.number}&amp;amp;parentCategory=$nameUrl"))
+    ## parentCategory must be the last param
+    #set($addCategURL = $doc.getURL('view', $escapetool.url({
+      'xaction': 'showAddCategory',
+      'entry': $entry.fullName,
+      'entryObjNb': $entryObj.number,
+      'parentCategory': $name
+    })))
   #end
   #foreach($i in [1..$level])*#end ##
 &lt;span class="blog-category-level"&gt;&lt;span class="blog-category"&gt;##
@@ -239,7 +247,7 @@
 &lt;/span&gt;##
 #if($xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName) &amp;&amp; ("$!{request.xaction}" != "showAddCategory" || "$!{request.parentCategory}" != $name))
 &lt;span class="blog-category-tools"&gt;##
-&lt;a href="${addCategURL}" class="tool add-subcategory"&gt;#toolImage('chart_organisation_add' 'Add a subcategory ')&lt;/a&gt;##
+&lt;a href="$escapetool.xml($addCategURL)" class="tool add-subcategory"&gt;#toolImage('chart_organisation_add' 'Add a subcategory ')&lt;/a&gt;##
 &lt;/span&gt;##
 #end
 &lt;/span&gt;
@@ -253,7 +261,7 @@
  * control for choosing the parent category among existing categories.
  *###
 ## DO NOT CHANGE INDENTATION
-#macro(addCategoryForm) #set($addCategURL = $doc.getURL()) #if("$!request.entry" != '') #set($addCategURL = "${addCategURL}?entry=${request.entry}&amp;amp;entryObjNb=$!{request.entryObjNb}")#end&lt;form action="${addCategURL}" method="post" class="category-add-form"&gt;&lt;div class='create-category'&gt; &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt; &lt;input type="hidden" name="xaction" value="create"/&gt; &lt;label&gt;$services.localization.render('xe.blog.categories.new')&lt;br/&gt; &lt;input type="text" name="newCategoryName" class="category-name-input" /&gt;&lt;/label&gt;&lt;br/&gt;#if("$!{request.parentCategory}" == "")&lt;label&gt;#* $services.localization.render('xe.blog.categories.parent')*# Subcategory of:&lt;br/&gt; &lt;select name="newCategoryParent" id="blog_category_selectBox" class="category-add-input"&gt; &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt; $!processedCategories.clear() #displayCategoriesHierarchy($tree 'option') &lt;/select&gt; &lt;br/&gt;&lt;/label&gt;#else&lt;input type="hidden" name="newCategoryParent" value="${escapetool.xml($request.parentCategory)}"/&gt;#end&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="Add" /&gt;&lt;/span&gt; &lt;a href="$doc.getURL()"&gt;Cancel&lt;/a&gt; &lt;/div&gt;&lt;/form&gt; #end
+#macro(addCategoryForm) #set($addCategURL = $doc.getURL()) #if("$!request.entry" != '') #set($addCategURL = "${addCategURL}?entry=$escapetool.url($request.entry)&amp;amp;entryObjNb=$escapetool.url($!request.entryObjNb)")#end&lt;form action="${addCategURL}" method="post" class="category-add-form"&gt;&lt;div class='create-category'&gt; &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt; &lt;input type="hidden" name="xaction" value="create"/&gt; &lt;label&gt;$services.localization.render('xe.blog.categories.new')&lt;br/&gt; &lt;input type="text" name="newCategoryName" class="category-name-input" /&gt;&lt;/label&gt;&lt;br/&gt;#if("$!{request.parentCategory}" == "")&lt;label&gt;#* $services.localization.render('xe.blog.categories.parent')*# Subcategory of:&lt;br/&gt; &lt;select name="newCategoryParent" id="blog_category_selectBox" class="category-add-input"&gt; &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt; $!processedCategories.clear() #displayCategoriesHierarchy($tree 'option') &lt;/select&gt; &lt;br/&gt;&lt;/label&gt;#else&lt;input type="hidden" name="newCategoryParent" value="${escapetool.xml($request.parentCategory)}"/&gt;#end&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="Add" /&gt;&lt;/span&gt; &lt;a href="$doc.getURL()"&gt;Cancel&lt;/a&gt; &lt;/div&gt;&lt;/form&gt; #end
 ##
 ##
 ##
@@ -405,7 +413,10 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
   #getCategoriesHierarchy("$!{space}" $tree)
   #displayCategoriesHierarchy($tree $displayType)
   #if($xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName))
-    #set($addCategURL = $doc.getURL('view', "xaction=showAddCategory&amp;amp;parentCategory="))
+    #set($addCategURL = $doc.getURL('view', $escapetool.url({
+      'xaction' : 'showAddCategory',
+      'parentCategory' : ''
+    })))
     #if($isBlogPost || ("$!request.entry" != '' &amp;&amp; "$!request.entryObjNb" != ''))
       #set($entryParam = $!doc.fullName)
       #set($entryObjNbParam = $!entryObj.number)
@@ -413,9 +424,14 @@ $escapetool.xml($!categoryDoc.getObject(${blogCategoryClassname}).getProperty('d
         #set($entryParam = $!request.entry)
         #set($entryObjNbParam = $!request.entryObjNb)
       #end
-      #set($addCategURL = "${addCategURL}&amp;amp;entry=${entryParam}&amp;amp;entryObjNb=${entryObjNbParam}")
+      #set($addCategURL = $doc.getURL('view', $escapetool.url({
+        'xaction' : 'showAddCategory',
+        'parentCategory' : '',
+        'entry' : $entryParam,
+        'entryObjNb' : $entryObjNbParam
+      })))
     #end
-    * &lt;span class="blog-add-category-label"&gt;&lt;a href="${addCategURL}"&gt;$services.localization.render('xe.blog.categories.addcategory')&lt;/a&gt;&lt;/span&gt;
+    * &lt;span class="blog-add-category-label"&gt;&lt;a href="$escapetool.xml($addCategURL)"&gt;$services.localization.render('xe.blog.categories.addcategory')&lt;/a&gt;&lt;/span&gt;
      #if("$!{request.xaction}" == "showAddCategory" &amp;&amp; "$!{request.parentCategory}" == "") #addCategoryForm() #end
   #end
 

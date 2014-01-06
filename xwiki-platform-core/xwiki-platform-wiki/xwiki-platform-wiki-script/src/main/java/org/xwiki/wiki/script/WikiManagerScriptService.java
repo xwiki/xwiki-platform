@@ -136,7 +136,7 @@ public class WikiManagerScriptService implements ScriptService
 
         try {
             // Check if the current script has the programing rights
-            checkProgrammingRights("Creating a wiki require programming rights");
+            checkProgrammingRights("Creating a wiki requires Programming rights");
 
             // Check right access
             WikiReference mainWikiReference = new WikiReference(getMainWikiId());

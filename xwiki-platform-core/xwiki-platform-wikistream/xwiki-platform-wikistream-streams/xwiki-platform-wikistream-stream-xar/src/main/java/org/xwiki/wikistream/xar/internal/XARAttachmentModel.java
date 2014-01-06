@@ -25,31 +25,14 @@ import java.util.Map;
 
 import org.xwiki.wikistream.filter.xwiki.XWikiWikiAttachmentFilter;
 import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
+import org.xwiki.xar.internal.model.XarAttachmentModel;
 
 /**
  * @version $Id$
  * @since 5.2M2
  */
-public class XARAttachmentModel
+public class XARAttachmentModel extends XarAttachmentModel
 {
-    public static final String ELEMENT_ATTACHMENT = "attachment";
-
-    public static final String ELEMENT_NAME = "filename";
-
-    public static final String ELEMENT_CONTENT_SIZE = "filesize";
-
-    public static final String ELEMENT_CONTENT = "content";
-
-    public static final String ELEMENT_REVISION = "version";
-
-    public static final String ELEMENT_REVISION_AUTHOR = "author";
-
-    public static final String ELEMENT_REVISION_DATE = "date";
-
-    public static final String ELEMENT_REVISION_COMMENT = "comment";
-
-    public static final String ELEMENT_REVISIONS = "versions";
-
     // Utils
 
     public static final Map<String, EventParameter> ATTACHMENT_PARAMETERS = new HashMap<String, EventParameter>()
@@ -57,7 +40,8 @@ public class XARAttachmentModel
         {
             put(ELEMENT_REVISION, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION));
             put(ELEMENT_REVISION_AUTHOR, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));
-            put(ELEMENT_REVISION_DATE, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE, Date.class));
+            put(ELEMENT_REVISION_DATE,
+                new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE, Date.class));
             put(ELEMENT_REVISION_COMMENT, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT));
             put(ELEMENT_REVISIONS, new EventParameter(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
         }

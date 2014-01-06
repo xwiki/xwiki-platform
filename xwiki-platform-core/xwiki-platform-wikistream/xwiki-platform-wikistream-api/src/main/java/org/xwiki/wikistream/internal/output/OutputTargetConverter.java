@@ -64,12 +64,16 @@ public class OutputTargetConverter extends AbstractConverter<OutputTarget>
         return (G) outputTarget;
     }
 
-    private OutputTarget fromString(String source)
+    private OutputTarget fromString(String target)
     {
         OutputTarget outputTarget;
 
         // TODO: use some OutputTargetParser instead to make it extensible
-        outputTarget = new StringWriterOutputTarget();
+        if (target.startsWith("file:")) {
+            outputTarget = new DefaultFileOutputTarget(new File(target.substring("file:".length())));
+        } else {
+            outputTarget = new StringWriterOutputTarget();
+        }
 
         return outputTarget;
     }

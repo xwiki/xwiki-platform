@@ -17,11 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xar.internal;
+package org.xwiki.xar.internal;
 
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.xar.internal.model.XarModel;
 
+/**
+ * 
+ * @version $Id$
+ * @since 5.4M1
+ */
 public class XarEntry
 {
     /**
@@ -46,7 +52,7 @@ public class XarEntry
 
     public XarEntry(LocalDocumentReference reference, String name)
     {
-        this(reference, name, XARModel.ACTION_OVERWRITE);
+        this(reference, name, XarModel.ACTION_OVERWRITE);
     }
 
     public XarEntry(LocalDocumentReference reference, String name, int defaultAction)

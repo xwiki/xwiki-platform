@@ -367,7 +367,7 @@ public class XWikiHibernateBaseStore implements Initializable
             if (schema == null) {
                 if (databaseProduct == DatabaseProduct.DERBY) {
                     schema = "APP";
-                } else if (databaseProduct == DatabaseProduct.HSQLDB) {
+                } else if (databaseProduct == DatabaseProduct.HSQLDB || databaseProduct == DatabaseProduct.H2) {
                     schema = "PUBLIC";
                 } else if (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode()) {
                     schema = "public";
@@ -379,9 +379,9 @@ public class XWikiHibernateBaseStore implements Initializable
             // virtual
             schema = wikiName.replace('-', '_');
 
-            // For HSQLDB we only support uppercase schema names. This is because Hibernate doesn't properly generate
+            // For HSQLDB/H2 we only support uppercase schema names. This is because Hibernate doesn't properly generate
             // quotes around schema names when it qualifies the table name when it generates the update script.
-            if (databaseProduct == DatabaseProduct.HSQLDB) {
+            if (DatabaseProduct.HSQLDB == databaseProduct || DatabaseProduct.H2 == databaseProduct) {
                 schema = StringUtils.upperCase(schema);
             }
         }
@@ -445,7 +445,6 @@ public class XWikiHibernateBaseStore implements Initializable
         Session session;
         Connection connection;
         DatabaseMetadata meta;
-        Statement stmt = null;
         Dialect dialect = Dialect.getDialect(getConfiguration().getProperties());
         boolean bTransaction = true;
         String dschema = null;
@@ -461,6 +460,7 @@ public class XWikiHibernateBaseStore implements Initializable
             DatabaseProduct databaseProduct = getDatabaseProductName();
             if (databaseProduct == DatabaseProduct.ORACLE
                 || databaseProduct == DatabaseProduct.HSQLDB
+                || databaseProduct == DatabaseProduct.H2
                 || databaseProduct == DatabaseProduct.DERBY
                 || databaseProduct == DatabaseProduct.DB2
                 || (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode()))
@@ -475,22 +475,20 @@ public class XWikiHibernateBaseStore implements Initializable
             }
 
             meta = new DatabaseMetadata(connection, dialect);
-            stmt = connection.createStatement();
             schemaSQL = config.generateSchemaUpdateScript(dialect, meta);
 
-            // In order to circumvent a bug in Hibernate (See the javadoc of XWHS#createSequence for details), we need
-            // to ensure that Hibernate will create the "hibernate_sequence" sequence.
+            // In order to circumvent a bug in Hibernate (See the javadoc of XWHS#createHibernateSequenceIfRequired for
+            // details), we need to ensure that Hibernate will create the "hibernate_sequence" sequence.
             createHibernateSequenceIfRequired(contextSchema, session);
 
         } catch (Exception e) {
             throw new HibernateException("Failed creating schema update script", e);
         } finally {
             try {
-                if (stmt != null) {
-                    stmt.close();
-                }
                 if (bTransaction) {
-                    endTransaction(context, false, false);
+                    // Use "true" so that the hibernate sequence that was possibly created above can be committed
+                    // properly (and not be rolled back!).
+                    endTransaction(context, true);
                 }
                 if (dschema != null) {
                     config.setProperty(Environment.DEFAULT_SCHEMA, dschema);
@@ -507,7 +505,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * deleted attachments for example - The reason we use generated ids and not custom computed ones is because
      * we don't need to address rows from these tables). For a lot of database the Dialect uses an Identity
      * Generator (when the DB supports it). PostgreSQL and Oracle don't support it and Hibernate defaults to
-     * a Sequence Generate which uses a sequence named "hibernate_sequence" by default. Hibernate will normally
+     * a Sequence Generator which uses a sequence named "hibernate_sequence" by default. Hibernate will normally
      * create such a sequence automatically when updating the schema (see #getSchemaUpdateScript).
      * However the problem is that Hibernate maintains a cache of sequence names per catalog and will only
      * generate the sequence creation SQL if the sequence is not in this cache. Since the main wiki is updated
@@ -537,7 +535,8 @@ public class XWikiHibernateBaseStore implements Initializable
                     this.loggerManager.pushLogListener(null);
                     session.createSQLQuery(sequenceSQL).executeUpdate();
                 } catch(HibernateException e) {
-                    // Sequence failed to be created, we assume it already exists!
+                    // Sequence failed to be created, we assume it already exists and that's why an exception was
+                    // raised!
                 } finally {
                     this.loggerManager.popLogListener();
                 }
@@ -679,7 +678,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 if (DatabaseProduct.ORACLE == databaseProduct) {
                     executeSQL("alter session set current_schema = " + escapedSchemaName, session);
                 } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.HSQLDB == databaseProduct
-                    || DatabaseProduct.DB2 == databaseProduct) {
+                    || DatabaseProduct.DB2 == databaseProduct || DatabaseProduct.H2 == databaseProduct) {
                     executeSQL("SET SCHEMA " + escapedSchemaName, session);
                 } else if (DatabaseProduct.POSTGRESQL == databaseProduct && isInSchemaMode()) {
                     executeSQL("SET search_path TO " + escapedSchemaName, session);

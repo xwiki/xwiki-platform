@@ -47,8 +47,8 @@ import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.repository.internal.AbstractCachedExtensionRepository;
 import org.xwiki.extension.repository.internal.RepositoryUtils;
-import org.xwiki.extension.repository.internal.local.AbstractCachedExtensionRepository;
 import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
@@ -56,7 +56,7 @@ import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.wikistream.xar.internal.XarException;
+import org.xwiki.xar.internal.XarException;
 
 /**
  * Local repository proxy for XAR extensions.

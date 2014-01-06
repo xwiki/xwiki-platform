@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.xar.internal;
+package org.xwiki.xar.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,12 +26,16 @@ import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
+
+import javanet.staxutils.IndentingXMLStreamWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -41,21 +45,17 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.model.filter.WikiDocumentFilter;
-import org.xwiki.wikistream.model.filter.WikiSpaceFilter;
-import org.xwiki.wikistream.xml.internal.output.WikiStreamXMLStreamWriter;
+import org.xwiki.xar.internal.model.XarModel;
 
 /**
  * Manipulate package.xml XAR package file.
  * 
  * @version $Id$
- * @since 5.3RC1
+ * @since 5.4M1
  */
-public class XarPackage implements WikiDocumentFilter, WikiSpaceFilter
+public class XarPackage
 {
     private static final LocalStringEntityReferenceSerializer TOSTRING_SERIALIZER =
         new LocalStringEntityReferenceSerializer();
@@ -145,7 +145,7 @@ public class XarPackage implements WikiDocumentFilter, WikiSpaceFilter
                     InputStream stream = zis;
 
                     try {
-                        if (entry.getName().equals(XARModel.PATH_PACKAGE)) {
+                        if (entry.getName().equals(XarModel.PATH_PACKAGE)) {
                             readDescriptor(stream);
                         } else {
                             XarEntry xarEntry = new XarEntry(XarUtils.getReference(stream), entry.getName());
@@ -173,7 +173,7 @@ public class XarPackage implements WikiDocumentFilter, WikiSpaceFilter
                 InputStream stream = zipFile.getInputStream(entry);
 
                 try {
-                    if (entry.getName().equals(XARModel.PATH_PACKAGE)) {
+                    if (entry.getName().equals(XarModel.PATH_PACKAGE)) {
                         readDescriptor(stream);
                     } else {
                         XarEntry xarEntry = new XarEntry(XarUtils.getReference(stream), entry.getName());
@@ -326,9 +326,9 @@ public class XarPackage implements WikiDocumentFilter, WikiSpaceFilter
         return nList.getLength() > 0 ? nList.item(0).getTextContent() : null;
     }
 
-    public void write(ZipArchiveOutputStream zipStream, String encoding) throws WikiStreamException, IOException
+    public void write(ZipArchiveOutputStream zipStream, String encoding) throws XarException, IOException
     {
-        ZipArchiveEntry zipentry = new ZipArchiveEntry(XARModel.PATH_PACKAGE);
+        ZipArchiveEntry zipentry = new ZipArchiveEntry(XarModel.PATH_PACKAGE);
         zipStream.putArchiveEntry(zipentry);
 
         try {
@@ -338,29 +338,36 @@ public class XarPackage implements WikiDocumentFilter, WikiSpaceFilter
         }
     }
 
-    public void write(OutputStream stream, String encoding) throws WikiStreamException, IOException
+    public void write(OutputStream stream, String encoding) throws XarException, IOException
     {
-        WikiStreamXMLStreamWriter writer = new WikiStreamXMLStreamWriter(stream, encoding, true, true);
+        XMLStreamWriter writer;
+        try {
+            writer = XMLOutputFactory.newInstance().createXMLStreamWriter(stream, encoding);
+        } catch (Exception e) {
+            throw new XarException("Failed to create an instance of XML stream writer", e);
+        }
+
+        writer = new IndentingXMLStreamWriter(writer);
 
         try {
             writer.writeStartDocument();
-            writer.writeStartElement(XARModel.ELEMENT_PACKAGE);
+            writer.writeStartElement(XarModel.ELEMENT_PACKAGE);
 
-            writer.writeStartElement(XARModel.ELEMENT_INFOS);
-            writer.writeElement(XARModel.ELEMENT_INFOS_NAME, getPackageName());
-            writer.writeElement(XARModel.ELEMENT_INFOS_DESCRIPTION, getPackageDescription());
-            writer.writeElement(XARModel.ELEMENT_INFOS_LICENSE, getPackageLicense());
-            writer.writeElement(XARModel.ELEMENT_INFOS_AUTHOR, getPackageAuthor());
-            writer.writeElement(XARModel.ELEMENT_INFOS_VERSION, getPackageVersion());
-            writer.writeElement(XARModel.ELEMENT_INFOS_ISBACKUPPACK, isPackageBackupPack() ? "1" : "0");
-            writer.writeElement(XARModel.ELEMENT_INFOS_ISPRESERVEVERSION, isPackagePreserveVersion() ? "1" : "0");
+            writer.writeStartElement(XarModel.ELEMENT_INFOS);
+            writeElement(writer, XarModel.ELEMENT_INFOS_NAME, getPackageName());
+            writeElement(writer, XarModel.ELEMENT_INFOS_DESCRIPTION, getPackageDescription());
+            writeElement(writer, XarModel.ELEMENT_INFOS_LICENSE, getPackageLicense());
+            writeElement(writer, XarModel.ELEMENT_INFOS_AUTHOR, getPackageAuthor());
+            writeElement(writer, XarModel.ELEMENT_INFOS_VERSION, getPackageVersion());
+            writeElement(writer, XarModel.ELEMENT_INFOS_ISBACKUPPACK, isPackageBackupPack() ? "1" : "0");
+            writeElement(writer, XarModel.ELEMENT_INFOS_ISPRESERVEVERSION, isPackagePreserveVersion() ? "1" : "0");
             writer.writeEndElement();
 
-            writer.writeStartElement(XARModel.ELEMENT_FILES);
+            writer.writeStartElement(XarModel.ELEMENT_FILES);
             for (XarEntry entry : this.entries.values()) {
-                writer.writeStartElement(XARModel.ELEMENT_FILES_FILES);
-                writer.writeAttribute(XARModel.ATTRIBUTE_DEFAULTACTION, String.valueOf(entry.getDefaultAction()));
-                writer.writeAttribute(XARModel.ATTRIBUTE_LOCALE,
+                writer.writeStartElement(XarModel.ELEMENT_FILES_FILES);
+                writer.writeAttribute(XarModel.ATTRIBUTE_DEFAULTACTION, String.valueOf(entry.getDefaultAction()));
+                writer.writeAttribute(XarModel.ATTRIBUTE_LOCALE,
                     ObjectUtils.toString(entry.getReference().getLocale(), ""));
                 writer.writeCharacters(TOSTRING_SERIALIZER.serialize(entry.getReference()));
                 writer.writeEndElement();
@@ -369,64 +376,30 @@ public class XarPackage implements WikiDocumentFilter, WikiSpaceFilter
             writer.writeEndDocument();
 
             writer.flush();
+        } catch (Exception e) {
+            throw new XarException("Failed to write XML", e);
         } finally {
-            writer.close();
+            try {
+                writer.close();
+            } catch (XMLStreamException e) {
+                throw new XarException("Failed to close XML writer", e);
+            }
         }
     }
 
-    // WikiSpaceFilter
-
-    private String currentSpace;
-
-    private String currentDocument;
-
-    @Override
-    public void beginWikiSpace(String name, FilterEventParameters parameters) throws WikiStreamException
+    private void writeElement(XMLStreamWriter streamWriter, String localName, String value) throws XMLStreamException
     {
-        this.currentSpace = name;
+        if (value != null) {
+            if (value.isEmpty()) {
+                streamWriter.writeEmptyElement(localName);
+            } else {
+                streamWriter.writeStartElement(localName);
+                streamWriter.writeCharacters(value);
+                streamWriter.writeEndElement();
+            }
+        } else {
+            streamWriter.writeEmptyElement(localName);
+        }
     }
 
-    @Override
-    public void endWikiSpace(String name, FilterEventParameters parameters) throws WikiStreamException
-    {
-        this.currentSpace = null;
-    }
-
-    // WikiDocumentFilter
-
-    @Override
-    public void beginWikiDocument(String name, FilterEventParameters parameters) throws WikiStreamException
-    {
-        this.currentDocument = name;
-    }
-
-    @Override
-    public void endWikiDocument(String name, FilterEventParameters parameters) throws WikiStreamException
-    {
-        this.currentDocument = null;
-    }
-
-    @Override
-    public void beginWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws WikiStreamException
-    {
-        addEntry(new LocalDocumentReference(this.currentSpace, this.currentDocument, locale));
-    }
-
-    @Override
-    public void endWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws WikiStreamException
-    {
-        // Nothing to do
-    }
-
-    @Override
-    public void beginWikiDocumentRevision(String revision, FilterEventParameters parameters) throws WikiStreamException
-    {
-        // Don't care
-    }
-
-    @Override
-    public void endWikiDocumentRevision(String revision, FilterEventParameters parameters) throws WikiStreamException
-    {
-        // Don't care
-    }
 }

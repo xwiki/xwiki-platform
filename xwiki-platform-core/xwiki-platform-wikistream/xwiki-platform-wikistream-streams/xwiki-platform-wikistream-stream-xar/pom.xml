@@ -33,13 +33,9 @@
   <name>XWiki Platform - WikiStream - XAR</name>
   <description>XWiki Platform - WikiStream - XAR</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
-    </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
@@ -56,7 +52,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
+      <artifactId>xwiki-platform-xar</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -87,14 +83,9 @@
               org/xwiki/wikistream/xar/internal/XARClassModel.java,
               org/xwiki/wikistream/xar/internal/XARClassPropertyModel.java,
               org/xwiki/wikistream/xar/internal/XARDocumentModel.java,
-              org/xwiki/wikistream/xar/internal/XarEntry.java,
-              org/xwiki/wikistream/xar/internal/XarFile.java,
               org/xwiki/wikistream/xar/internal/XARFilter.java,
-              org/xwiki/wikistream/xar/internal/XARModel.java,
               org/xwiki/wikistream/xar/internal/XARObjectModel.java,
               org/xwiki/wikistream/xar/internal/XARObjectPropertyModel.java,
-              org/xwiki/wikistream/xar/internal/XarPackage.java,
-              org/xwiki/wikistream/xar/internal/XarUtils.java,
               org/xwiki/wikistream/xar/internal/XARWikiStreamUtils.java,
               org/xwiki/wikistream/xar/internal/input/AbstractReader.java,
               org/xwiki/wikistream/xar/internal/input/AttachmentReader.java,

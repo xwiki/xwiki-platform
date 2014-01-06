@@ -79,6 +79,8 @@ public class InputSourceConverter extends AbstractConverter<InputSource>
             } catch (Exception e) {
                 throw new ConversionException("Failed to create input source for URL [" + source + "]", e);
             }
+        } else if (source.startsWith("file:")) {
+            inputSource = new DefaultFileInputSource(new File(source.substring("file:".length())));
         } else {
             inputSource = new StringInputSource(source);
         }

@@ -24,23 +24,14 @@ import java.util.Map;
 
 import org.xwiki.wikistream.model.filter.WikiObjectFilter;
 import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
+import org.xwiki.xar.internal.model.XarObjectModel;
 
 /**
  * @version $Id$
  * @since 5.2M2
  */
-public class XARObjectModel
+public class XARObjectModel extends XarObjectModel
 {
-    public static final String ELEMENT_OBJECT = "object";
-
-    public static final String ELEMENT_NAME = "name";
-
-    public static final String ELEMENT_NUMBER = "number";
-
-    public static final String ELEMENT_CLASSNAME = "className";
-
-    public static final String ELEMENT_GUID = "guid";
-
     // Utils
 
     public static final Map<String, EventParameter> OBJECT_PARAMETERS = new HashMap<String, EventParameter>()

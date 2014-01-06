@@ -22,7 +22,7 @@ package org.xwiki.extension.xar.internal.handler.packager;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.xwiki.wikistream.xar.internal.XarEntry;
+import org.xwiki.xar.internal.XarEntry;
 
 /**
  * 

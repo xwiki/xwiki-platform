@@ -19,12 +19,13 @@
  */
 package org.xwiki.wikistream.xar.internal;
 
+import org.xwiki.xar.internal.model.XarClassPropertyModel;
+
 /**
  * 
  * @version $Id$
  * @since 5.2M2
  */
-public class XARClassPropertyModel
+public class XARClassPropertyModel extends XarClassPropertyModel
 {
-    public static final String ELEMENT_CLASSTYPE = "classType";
 }

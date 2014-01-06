@@ -21,6 +21,7 @@ package org.xwiki.wikistream.instance.internal.input;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -93,7 +94,7 @@ public class BaseObjectEventGenerator extends
             String pname = xproperty.getName();
             if (pname != null && !pname.trim().equals("")) {
                 ((BasePropertyEventGenerator) this.propertyEventGenerator).write(xproperty, filter, objectFilter,
-                    properties);
+                    (Map<String, Object>)properties);
             }
         }
 

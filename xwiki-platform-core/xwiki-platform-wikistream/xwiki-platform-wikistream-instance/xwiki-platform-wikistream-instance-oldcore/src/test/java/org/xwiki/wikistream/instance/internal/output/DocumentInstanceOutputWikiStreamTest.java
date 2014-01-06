@@ -82,7 +82,8 @@ public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiSt
         Assert.assertEquals(new DocumentReference("wiki", "XWiki", "author"), document.getAuthorReference());
         Assert.assertEquals(toDate("2000-01-02 00:00:00.0 UTC"), document.getDate());
         Assert.assertEquals(toDate("2000-01-03 00:00:00.0 UTC"), document.getContentUpdateDate());
-        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"), document.getContentAuthorReference());
+        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "contentAuthor"),
+            document.getContentAuthorReference());
         Assert.assertEquals(true, document.isMinorEdit());
         Assert.assertEquals("comment", document.getComment());
         Assert.assertEquals("1.42", document.getVersion());
@@ -123,10 +124,10 @@ public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiSt
         Assert.assertEquals(false, numberFiled.isUnmodifiable());
 
         // Objects
-        
+
         Map<DocumentReference, List<BaseObject>> objects = document.getXObjects();
         Assert.assertEquals(2, objects.size());
-        
+
         // Object 1
 
         List<BaseObject> documentObjects = objects.get(new DocumentReference("wiki", "space", "page"));
@@ -136,13 +137,48 @@ public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiSt
         Assert.assertEquals(new DocumentReference("wiki", "space", "page"), documentObject.getXClassReference());
         Assert.assertEquals("e2167721-2a64-430c-9520-bac1c0ee68cb", documentObject.getGuid());
 
+        Assert.assertEquals(1, documentObject.getFieldList().size());
+        Assert.assertEquals(1, documentObject.getIntValue("prop1"));
+
         // Object 2
 
         List<BaseObject> otherObjects = objects.get(new DocumentReference("wiki", "otherspace", "otherclass"));
         Assert.assertEquals(1, otherObjects.size());
         BaseObject otherObject = otherObjects.get(0);
         Assert.assertEquals(0, otherObject.getNumber());
-        Assert.assertEquals(new DocumentReference("wiki", "otherspace", "otherclass"), otherObject.getXClassReference());
+        Assert
+            .assertEquals(new DocumentReference("wiki", "otherspace", "otherclass"), otherObject.getXClassReference());
         Assert.assertEquals("8eaeac52-e2f2-47b2-87e1-bc6909597b39", otherObject.getGuid());
+
+        Assert.assertEquals(1, otherObject.getFieldList().size());
+        Assert.assertEquals(2, otherObject.getIntValue("prop2"));
+    }
+
+    @Test
+    public void testDocumentwithunexistingobjectproperty() throws WikiStreamException, XWikiException, ParseException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        importFromXML("documentwithunexistingobjectproperty", outputProperties);
+
+        XWikiDocument document =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+                this.oldcore.getXWikiContext());
+
+        Assert.assertFalse(document.isNew());
+
+        // Objects
+
+        Map<DocumentReference, List<BaseObject>> objects = document.getXObjects();
+        Assert.assertEquals(1, objects.size());
+
+        List<BaseObject> documentObjects = objects.get(new DocumentReference("wiki", "space", "page"));
+        Assert.assertEquals(1, documentObjects.size());
+        BaseObject documentObject = documentObjects.get(0);
+        Assert.assertEquals(0, documentObject.getNumber());
+        Assert.assertEquals(new DocumentReference("wiki", "space", "page"), documentObject.getXClassReference());
+
+        Assert.assertEquals(1, documentObject.getFieldList().size());
+        Assert.assertEquals(1, documentObject.getIntValue("prop1"));
     }
 }

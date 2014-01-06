@@ -21,14 +21,14 @@ package org.xwiki.wikistream.xar.internal.input;
 
 import java.io.ByteArrayInputStream;
 
+import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.codec.binary.Base64;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARAttachmentModel;
 import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
@@ -37,7 +37,9 @@ import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
  * @version $Id$
  * @since 5.2RC1
  */
-public class AttachmentReader extends AbstractReader
+@Component
+@Singleton
+public class AttachmentReader extends AbstractReader implements XARXMLReader<AttachmentReader.WikiAttachment>
 {
     public static class WikiAttachment
     {
@@ -54,13 +56,7 @@ public class AttachmentReader extends AbstractReader
         }
     }
 
-    public AttachmentReader(XARInputProperties properties)
-    {
-        super(properties);
-    }
-
-    public WikiAttachment read(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException,
-        ParseException
+    public WikiAttachment read(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException
     {
         WikiAttachment wikiAttachment = new WikiAttachment();
 
@@ -72,7 +68,10 @@ public class AttachmentReader extends AbstractReader
             EventParameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
 
             if (parameter != null) {
-                wikiAttachment.parameters.put(parameter.name, convert(parameter.type, value));
+                Object wsValue = convert(parameter.type, value);
+                if (wsValue != null) {
+                    wikiAttachment.parameters.put(parameter.name, wsValue);
+                }
             } else {
                 if (XARAttachmentModel.ELEMENT_NAME.equals(elementName)) {
                     wikiAttachment.name = value;

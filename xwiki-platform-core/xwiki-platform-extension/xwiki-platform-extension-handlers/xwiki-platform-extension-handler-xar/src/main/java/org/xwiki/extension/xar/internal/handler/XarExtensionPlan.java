@@ -43,9 +43,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.xar.internal.XarEntry;
-import org.xwiki.wikistream.xar.internal.XarException;
-import org.xwiki.wikistream.xar.internal.XarPackage;
+import org.xwiki.xar.internal.XarEntry;
+import org.xwiki.xar.internal.XarException;
+import org.xwiki.xar.internal.XarPackage;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 

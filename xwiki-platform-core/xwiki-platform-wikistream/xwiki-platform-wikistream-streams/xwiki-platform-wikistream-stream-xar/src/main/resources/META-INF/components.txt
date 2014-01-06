@@ -1,3 +1,9 @@
+org.xwiki.wikistream.xar.internal.input.AttachmentReader
+org.xwiki.wikistream.xar.internal.input.ClassPropertyReader
+org.xwiki.wikistream.xar.internal.input.ClassReader
+org.xwiki.wikistream.xar.internal.input.DocumentLocaleReader
+org.xwiki.wikistream.xar.internal.input.WikiObjectReader
+org.xwiki.wikistream.xar.internal.input.WikiReader
 org.xwiki.wikistream.xar.internal.input.XARInputWikiStream
 org.xwiki.wikistream.xar.internal.input.XARInputWikiStreamFactory
 org.xwiki.wikistream.xar.internal.output.XAROutputWikiStream

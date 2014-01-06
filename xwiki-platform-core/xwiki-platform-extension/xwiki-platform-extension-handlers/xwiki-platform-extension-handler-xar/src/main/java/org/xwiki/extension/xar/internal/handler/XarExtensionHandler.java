@@ -55,8 +55,8 @@ import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.wikistream.xar.internal.XarEntry;
-import org.xwiki.wikistream.xar.internal.XarException;
+import org.xwiki.xar.internal.XarEntry;
+import org.xwiki.xar.internal.XarException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

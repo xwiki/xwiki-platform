@@ -28,6 +28,7 @@ import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
 import org.xwiki.diff.DiffManager;
+import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
@@ -234,7 +235,7 @@ public class ListProperty extends BaseProperty implements Cloneable
         List<String> list = getList();
         for (String value : list) {
             if (value != null) {
-                Element vel = new DOMElement("value");
+                Element vel = new DOMElement(ListXarObjectPropertySerializer.ELEMENT_VALUE);
                 vel.setText(value);
                 el.add(vel);
             }

@@ -63,6 +63,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.objects.classes.PropertyClassProvider;
 import com.xpn.xwiki.internal.objects.meta.PropertyMetaClassInterface;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -480,12 +481,26 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
     @Override
     public void beginWikiObject(String name, FilterEventParameters parameters) throws WikiStreamException
     {
-        String className = getString(WikiObjectFilter.PARAMETER_CLASS_REFERENCE, parameters, null);
-
-        int number = getInt(WikiObjectFilter.PARAMETER_NUMBER, parameters, 0);
+        if (name != null) {
+            this.currentEntityReference = new EntityReference(name, EntityType.OBJECT, this.currentEntityReference);
+        }
 
         this.currentXObject = new BaseObject();
-        this.currentXObject.setClassName(className);
+
+        int number = getInt(WikiObjectFilter.PARAMETER_NUMBER, parameters, -1);
+
+        String className = getString(WikiObjectFilter.PARAMETER_CLASS_REFERENCE, parameters, null);
+        if (className == null) {
+            BaseObjectReference reference = new BaseObjectReference(this.currentEntityReference);
+
+            this.currentXObject.setXClassReference(reference.getXClassReference());
+
+            if (number < 0 && reference.getObjectNumber() != null) {
+                number = reference.getObjectNumber();
+            }
+        } else {
+            this.currentXObject.setClassName(className);
+        }
 
         if (number < 0) {
             this.document.addXObject(this.currentXObject);
@@ -499,18 +514,29 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
     @Override
     public void endWikiObject(String name, FilterEventParameters parameters) throws WikiStreamException
     {
+        if (this.currentEntityReference.getType() == EntityType.OBJECT) {
+            this.currentEntityReference = this.currentEntityReference.getParent();
+        }
+
         this.currentXObject = null;
         this.currentXObjectClass = null;
     }
 
     @Override
-    public void onWikiObjectProperty(String name, String value, FilterEventParameters parameters)
+    public void onWikiObjectProperty(String name, Object value, FilterEventParameters parameters)
         throws WikiStreamException
     {
         PropertyClassInterface propertyclass = (PropertyClassInterface) this.currentXObjectClass.safeget(name);
 
-        PropertyInterface property = propertyclass.fromString(value);
+        if (propertyclass != null) {
+            // Bulletproofing using PropertyClassInterface#fromString when a String is passed (in case it's not really a
+            // String property)
+            PropertyInterface property =
+                value instanceof String ? propertyclass.fromString((String) value) : propertyclass.fromValue(value);
 
-        this.currentXObject.safeput(name, property);
+            this.currentXObject.safeput(name, property);
+        } else {
+            // TODO: Log something ?
+        }
     }
 }

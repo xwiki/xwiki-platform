@@ -306,12 +306,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (DatabaseProduct.ORACLE == databaseProduct) {
                 stmt.execute("create user " + escapedSchema + " identified by " + escapedSchema);
                 stmt.execute("grant resource to " + escapedSchema);
-            } else if (DatabaseProduct.DERBY == databaseProduct) {
+            } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.DB2 == databaseProduct
+                || DatabaseProduct.H2 == databaseProduct)
+            {
                 stmt.execute("CREATE SCHEMA " + escapedSchema);
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {
                 stmt.execute("CREATE SCHEMA " + escapedSchema + " AUTHORIZATION DBA");
-            } else if (DatabaseProduct.DB2 == databaseProduct) {
-                stmt.execute("CREATE SCHEMA " + escapedSchema);
             } else if (DatabaseProduct.MYSQL == databaseProduct) {
                 // TODO: find a proper java lib to convert from java encoding to mysql charset name and collation
                 if (context.getWiki().getEncoding().equals("UTF-8")) {
@@ -406,14 +406,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         if (DatabaseProduct.ORACLE == databaseProduct) {
             statement.execute("DROP USER " + escapedSchemaName + " CASCADE");
-        } else if (DatabaseProduct.DERBY == databaseProduct) {
+        } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.MYSQL == databaseProduct
+            || DatabaseProduct.H2 == databaseProduct)
+        {
             statement.execute("DROP SCHEMA " + escapedSchemaName);
         } else if (DatabaseProduct.HSQLDB == databaseProduct) {
             statement.execute("DROP SCHEMA " + escapedSchemaName + " CASCADE");
         } else if (DatabaseProduct.DB2 == databaseProduct) {
             statement.execute("DROP SCHEMA " + escapedSchemaName + " RESTRICT");
-        } else if (DatabaseProduct.MYSQL == databaseProduct) {
-            statement.execute("DROP DATABASE " + escapedSchemaName);
         } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
             if (isInSchemaMode()) {
                 statement.execute("DROP SCHEMA " + escapedSchemaName + " CASCADE");

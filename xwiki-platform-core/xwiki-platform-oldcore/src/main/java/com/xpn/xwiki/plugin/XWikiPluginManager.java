@@ -27,10 +27,12 @@ import java.util.Vector;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.classloader.ClassLoaderManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.web.Utils;
 
 public class XWikiPluginManager
 {
@@ -79,7 +81,12 @@ public class XWikiPluginManager
             args[0] = name;
             args[1] = className;
             args[2] = context;
-            Class<XWikiPluginInterface> pluginClass = (Class<XWikiPluginInterface>) Class.forName(className);
+            Class<XWikiPluginInterface> pluginClass =
+                (Class<XWikiPluginInterface>) Class.forName(
+                    className,
+                    true,
+                    Utils.getComponent(ClassLoaderManager.class).getURLClassLoader("wiki:" + context.getDatabase(),
+                        false));
             XWikiPluginInterface plugin = pluginClass.getConstructor(classes).newInstance(args);
             if (plugin != null) {
                 this.plugins.add(plugin.getName());

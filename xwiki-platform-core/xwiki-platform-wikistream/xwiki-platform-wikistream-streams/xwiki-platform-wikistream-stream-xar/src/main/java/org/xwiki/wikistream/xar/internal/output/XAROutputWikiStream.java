@@ -96,6 +96,13 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     private WikiStreamXMLStreamWriter writer;
 
     private Map<String, String> currentObjectProperties;
+    
+    /**
+     * the size of the chunks used when attachments are streamed.
+     * As the attachment data is base64 encoded in the process, this size must be a multiple of three
+     * to prevent padding between the chunks; see XWIKI-9830
+     */
+    private static final int ATTACHMENT_BUFFER_CHUNK_SIZE = 4095;
 
     @Override
     public void close() throws IOException
@@ -362,18 +369,18 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
             long contentSize = 0;
 
             this.writer.writeStartElement(XARAttachmentModel.ELEMENT_CONTENT);
-            byte[] buffer = new byte[4096];
+            byte[] buffer = new byte[ATTACHMENT_BUFFER_CHUNK_SIZE];
             int readSize;
             do {
                 try {
-                    readSize = content.read(buffer, 0, 4096);
+                    readSize = content.read(buffer, 0, ATTACHMENT_BUFFER_CHUNK_SIZE);
                 } catch (IOException e) {
                     throw new WikiStreamException("Failed to read content stream", e);
                 }
 
                 if (readSize > 0) {
                     String chunk;
-                    if (readSize == 4096) {
+                    if (readSize == ATTACHMENT_BUFFER_CHUNK_SIZE) {
                         chunk = Base64.encodeBase64String(buffer);
                     } else {
                         chunk = Base64.encodeBase64String(ArrayUtils.subarray(buffer, 0, readSize));
@@ -381,7 +388,7 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
                     this.writer.writeCharacters(chunk);
                     contentSize += readSize;
                 }
-            } while (readSize == 4096);
+            } while (readSize == ATTACHMENT_BUFFER_CHUNK_SIZE);
             this.writer.writeEndElement();
 
             this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(contentSize));

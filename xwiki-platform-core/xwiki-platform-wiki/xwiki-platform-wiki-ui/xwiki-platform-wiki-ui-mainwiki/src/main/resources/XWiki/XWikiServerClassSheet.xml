@@ -123,10 +123,9 @@
           &lt;/dd&gt;
         &lt;dt&gt;{{translation key="platform.wiki.sheet.prop.description"/}}:&lt;/dt&gt;
           &lt;dd&gt;
-            &lt;p&gt;
-              $doc.display("description", $firstalias)&lt;br/&gt;
-              {{translation key="platform.wiki.sheet.desc.description"/}}
-            &lt;/p&gt;
+            ## No &lt;p&gt; here because the "description" field contains its owns.
+            $doc.display("description", $firstalias)&lt;br/&gt;
+            {{translation key="platform.wiki.sheet.desc.description"/}}
           &lt;/dd&gt;
         &lt;dt&gt;{{translation key="platform.wiki.sheet.prop.homepage"/}}:&lt;/dt&gt;
           &lt;dd&gt;

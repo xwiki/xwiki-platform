@@ -42,6 +42,15 @@ import org.xwiki.test.jmock.annotation.MockingRequirement;
 public class MessageToolTranslationMessageParserTest extends AbstractMockingComponentTestCase<TranslationMessageParser>
 {
     @Test
+    public void messageEmpty() throws ComponentLookupException
+    {
+        TranslationMessage translationMessage = getMockedComponent().parse("");
+
+        Assert.assertEquals("", translationMessage.getRawSource());
+        Assert.assertEquals(new CompositeBlock(), translationMessage.render(null, null));
+    }
+
+    @Test
     public void messageSimple() throws ComponentLookupException
     {
         TranslationMessage translationMessage = getMockedComponent().parse("word");

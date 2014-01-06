@@ -26,32 +26,38 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-wiki-template</artifactId>
+    <artifactId>xwiki-platform-wiki-rest</artifactId>
     <version>5.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wiki-template-api</artifactId>
-  <name>XWiki Platform - Wiki - Template - API</name>
-  <description>XWiki Platform - Wiki - Template - API</description>
+  <artifactId>xwiki-platform-wiki-rest-default</artifactId>
+  <name>XWiki Platform - Wiki - REST - Default implementation</name>
+  <description>Default implementation for XWiki Platform - Wiki - REST - API</description>
   <packaging>jar</packaging>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-rest-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-template-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-server</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>clirr-maven-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <!-- add a new method in WikiTemplateManager -->
-            <exclude>**/WikiTemplateManager**</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

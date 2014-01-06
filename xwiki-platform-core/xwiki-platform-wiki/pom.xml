@@ -40,6 +40,15 @@
     <module>xwiki-platform-wiki-template</module>
     <module>xwiki-platform-wiki-user</module>
     <module>xwiki-platform-wiki-ui</module>
+    <module>xwiki-platform-wiki-rest</module>
     <module>xwiki-platform-wiki-workspaces-migrator</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-wiki-test</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

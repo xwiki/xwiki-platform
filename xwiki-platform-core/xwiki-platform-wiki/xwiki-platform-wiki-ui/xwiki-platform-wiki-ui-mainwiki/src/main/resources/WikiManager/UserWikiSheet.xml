@@ -108,13 +108,19 @@
 
 XWiki.UserWikiTab = Class.create({
   initialize : function () {
-    this.addListeners();
+    this.addLinks();
   },
 
-  addListeners : function() {
+  addLinks : function() {
     var elements = $('wikis') ? $('wikis').childElements() : [];
     for (var i = 0; i &lt; elements.length; ++i) {
-      elements[i].down('.wikiActivity a').observe('click', this.onWikiClicked);
+      // Add a link to display the activity of the wiki
+      var span = new Element('span', {'class': 'wikiActivity'});
+      elements[i].insert(span);
+      var link = new Element('a', {href: 'javascript:void(0)'});
+      span.insert(link);
+      link.update('$escapetool.javascript($services.localization.render('platform.wiki.users.profile.activity.show')) &amp;#187;');
+      link.observe('click', this.onWikiClicked);
     }
   },
 
@@ -327,7 +333,6 @@ return XWiki;
         #foreach ($wiki in $joinedWikis)
           &lt;li id='$wiki.id'&gt;
             &lt;span class='wikiHomepage'&gt;&lt;a href='$xwiki.getURL($wiki.mainPageReference)'&gt;$wiki.prettyName&lt;/a&gt;&lt;/span&gt;
-            &lt;span class='wikiActivity'&gt;&lt;a href='javascript:void(0)'&gt;$services.localization.render('platform.wiki.users.profile.activity.show') &amp;#187;&lt;/a&gt;&lt;/span&gt;
           &lt;/li&gt;
         #end
         &lt;/ul&gt;

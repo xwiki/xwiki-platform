@@ -602,41 +602,31 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             return;
         }
 
-        XWikiContext context = getXWikiContext();
-
-        // Save context values so that we can restore them as they were before the migration.
-        String currentDatabase = context.getDatabase();
-        String currentOriginalDatabase = context.getOriginalDatabase();
+        // We should migrate the main wiki first to be able to access subwiki descriptors if needed.
+        if (!migrateDatabase(getMainXWiki())) {
+            String message = "Main wiki database migration failed, it is not safe to continue!";
+            logger.error(message);
+            throw new DataMigrationException(message);
+        }
 
         int errorCount = 0;
-        try {
-            for (String database : getDatabasesToMigrate()) {
-                // Set up the context so that it points to the virtual wiki corresponding to the
-                // database.
-                context.setDatabase(database);
-                context.setOriginalDatabase(database);
-                try {
-                    startMigrationsForDatabase();
-                } catch (DataMigrationException e) {
-                    // Log each failure for better troubleshooting.
-                    logger.error("Failed to migrate database [{}]", database, e);
-                    errorCount++;
-                }
+        for (String database : getDatabasesToMigrate()) {
+            if (!migrateDatabase(database)) {
+                errorCount++;
             }
-            if (errorCount > 0) {
-                String message =
-                    String.format("%s database migration(s) failed, it is not safe to continue!", errorCount);
-                logger.error(message);
-                throw new DataMigrationException(message);
-            }
-        } finally {
-            context.setDatabase(currentDatabase);
-            context.setOriginalDatabase(currentOriginalDatabase);
+        }
+
+        if (errorCount > 0) {
+            String message =
+                String.format("%s wiki database migration(s) failed.", errorCount);
+            logger.error(message);
+            throw new DataMigrationException(message);
         }
     }
 
     /**
-     * Returns the names of the databases that should be migrated.
+     * Returns the names of the databases that should be migrated. The main wiki database should have been migrated
+     * and are never returned.
      * This is controlled through the "xwiki.store.migration.databases" configuration property in xwiki.cfg.
      * A value of "all" or no value at all will add all databases. Note that the main database is automatically added
      * even if not specified.
@@ -647,11 +637,6 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
     private Set<String> getDatabasesToMigrate() throws DataMigrationException
     {
         Set<String> databasesToMigrate = new LinkedHashSet<String>();
-
-        // Always migrate the main database. We also want this to be the first database migrated so
-        // it has to be the first returned in the list.
-        // FIXME: this is wrong. The order of addition is irrelevant in a Set.
-        databasesToMigrate.add(getMainXWiki());
 
         // Add the databases listed by the user (if any). If there's no database name or
         // a single database named and if it's "all" or "ALL" then automatically add all the registered databases.
@@ -664,27 +649,49 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             Collections.addAll(databasesToMigrate, databases);
         }
 
+        // Remove the main wiki if listed since it should have already been migrated.
+        databasesToMigrate.remove(getMainXWiki());
+
         return databasesToMigrate;
     }
 
     /**
-     * It is assumed that before calling this method the XWiki context has been set with the
-     * database to migrate.
+     * Migrate a given database and log error appropriately.
      *
-     * @throws DataMigrationException if there is an error updating the database.
+     * @param database name of the database to migrate.
+     * @return false if there is an error updating the database.
      */
-    private void startMigrationsForDatabase() throws DataMigrationException
+    private boolean migrateDatabase(String database)
     {
+        XWikiContext context = getXWikiContext();
+
+        // Save context values so that we can restore them as they were before the migration.
+        String currentDatabase = context.getDatabase();
+        String currentOriginalDatabase = context.getOriginalDatabase();
+
         try {
+            // Set up the context so that it points to the virtual wiki corresponding to the
+            // database.
+            context.setDatabase(database);
+            context.setOriginalDatabase(database);
+
             Collection<XWikiMigration> neededMigrations = getNeededMigrations();
             updateSchema(neededMigrations);
             startMigrations(neededMigrations);
         } catch (Exception e) {
-            updateMigrationStatus(getDBVersion(), e);
-            String message = String.format("Failed to migrate database [%s]...", getXWikiContext().getDatabase());
-            logger.info(message, e);
-            throw new DataMigrationException(message, e);
+            try {
+                updateMigrationStatus(getDBVersion(), e);
+            } catch (DataMigrationException e1) {
+                // Should not happen and could be safely ignored.
+            }
+            String message = String.format("Failed to migrate database [%s]...", database);
+            logger.error(message, e);
+            return false;
+        } finally {
+            context.setDatabase(currentDatabase);
+            context.setOriginalDatabase(currentOriginalDatabase);
         }
+        return true;
     }
 
     /**

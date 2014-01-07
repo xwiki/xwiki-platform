@@ -153,7 +153,7 @@
   #if ("$!spaceMacroParam" != '')
     #set ($spaceParam = $spaceMacroParam)
   #end
-  #set ($docNames = $services.query.hql('where doc.space=? order by doc.creationDate desc').setLimit($limit).bindValues([${spaceParam}]).execute())
+  #set ($docNames = $services.query.hql('where doc.space=? order by doc.creationDate desc').addFilter('currentlanguage').addFilter('hidden').setLimit($limit).bindValues([${spaceParam}]).execute())
   {{html}}
     #displayDocumentList($docNames false []) 
     ## Note: we pass an empty blacklistedSpaces list since we are used as a space dashboard, not a global dashboard

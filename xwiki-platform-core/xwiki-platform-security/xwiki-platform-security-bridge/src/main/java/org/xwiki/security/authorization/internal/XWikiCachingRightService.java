@@ -330,7 +330,7 @@ public class XWikiCachingRightService implements XWikiRightService
     }
  
     @Override
-    public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
+    public boolean hasAccessLevel(String rightName, String username, String docname, XWikiContext context)
         throws XWikiException
     {
         WikiReference wikiReference = new WikiReference(context.getDatabase());
@@ -343,7 +343,9 @@ public class XWikiCachingRightService implements XWikiRightService
             user = null;
         }
 
-        return authorizationManager.hasAccess(Right.toRight(right), user, document);
+        Right right = Right.toRight(rightName);
+
+        return !(user == null && needsAuth(right, context)) && authorizationManager.hasAccess(right, user, document);
     }
 
     @Override

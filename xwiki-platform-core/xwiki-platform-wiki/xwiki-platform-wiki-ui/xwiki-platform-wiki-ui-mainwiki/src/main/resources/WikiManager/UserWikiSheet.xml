@@ -108,23 +108,18 @@
 
 XWiki.UserWikiTab = Class.create({
   initialize : function () {
-    this.addLinks();
+    this.addListeners();
   },
 
-  addLinks : function() {
+  addListeners : function() {
     var elements = $('wikis') ? $('wikis').childElements() : [];
     for (var i = 0; i &lt; elements.length; ++i) {
-      // Add a link to display the activity of the wiki
-      var span = new Element('span', {'class': 'wikiActivity'});
-      elements[i].insert(span);
-      var link = new Element('a', {href: 'javascript:void(0)'});
-      span.insert(link);
-      link.update('$escapetool.javascript($services.localization.render('platform.wiki.users.profile.activity.show')) &amp;#187;');
-      link.observe('click', this.onWikiClicked);
+      elements[i].down('.wikiActivity a').observe('click', this.onWikiClicked);
     }
   },
 
   onWikiClicked : function (event) {
+    event.stop();
     var element = Event.element(event);
     var wikiId = element.up('li').id;
     new Ajax.Request("$xwiki.getURL('WikiManager.WikiActivityServiceCode')", {
@@ -315,7 +310,7 @@ return XWiki;
   #end
   #set($documentUser = $doc.prefixedFullName)
   #set($isMyProfile = ($currentUser == $documentUser))
-  {{html clean='false'}}
+  {{html clean='false' wiki='true'}}
   &lt;div class='half column'&gt;
     &lt;div class='profile-section highlighted-profile-section'&gt;
       &lt;h1&gt;$services.localization.render('platform.wiki.users.profile.joinedwikis.label')&lt;/h1&gt;
@@ -333,6 +328,7 @@ return XWiki;
         #foreach ($wiki in $joinedWikis)
           &lt;li id='$wiki.id'&gt;
             &lt;span class='wikiHomepage'&gt;&lt;a href='$xwiki.getURL($wiki.mainPageReference)'&gt;$wiki.prettyName&lt;/a&gt;&lt;/span&gt;
+            &lt;span class='wikiActivity'&gt;&lt;a href='$doc.getURL('view', "category=$!{request.category}&amp;wikiName=$wiki.id")'&gt;$services.localization.render('platform.wiki.users.profile.activity.show') &amp;#187;&lt;/a&gt;&lt;/span&gt;
           &lt;/li&gt;
         #end
         &lt;/ul&gt;
@@ -341,6 +337,9 @@ return XWiki;
   &lt;/div&gt;
   &lt;div id='wikiActivity' class='half column'&gt;
     &lt;div id='wikiActivityColumn'&gt;
+    #if("$!request.wikiName" != '')
+      {{include reference="WikiManager.WikiActivityServiceCode" /}}
+    #end
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;

@@ -21,13 +21,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy</artifactId>
-    <version>5.4-SNAPSHOT</version>
+    <version>5.4-milestone-1</version>
   </parent>
   <artifactId>xwiki-platform-legacy-crypto-script</artifactId>
   <name>XWiki Platform - Cryptographic Services - Legacy API</name>
@@ -126,10 +125,9 @@
                        file; we need the new line at the end of the destination file!
                      * the text content of the header element inside the concat task is trimmed when the POM is parsed.
                        See http://jira.codehaus.org/browse/PLX-461 -->
-                <echo message="${line.separator}" file="${project.build.directory}/classes/META-INF/components.txt"
-                    append="true"/>
+                <echo message="${line.separator}" file="${project.build.directory}/classes/META-INF/components.txt" append="true" />
                 <concat destfile="${project.build.directory}/classes/META-INF/components.txt" append="true">
-                  <filelist dir="${basedir}/src/main/resources/META-INF/" files="components.txt"/>
+                  <filelist dir="${basedir}/src/main/resources/META-INF/" files="components.txt" />
                 </concat>
               </target>
             </configuration>

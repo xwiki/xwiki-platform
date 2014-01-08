@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki-manager-test</artifactId>
-    <version>5.4-SNAPSHOT</version>
+    <version>5.4-milestone-1</version>
   </parent>
   <artifactId>xwiki-platform-wiki-manager-test-tests</artifactId>
   <name>XWiki Platform - Wiki Manager - Tests - Functional Tests</name>

@@ -56,10 +56,6 @@
     &lt;/div&gt;
     &lt;dl class="search-filter-left"&gt;
       &lt;dt&gt;
-        &lt;label for="searchFilterWiki"&gt;$services.localization.render('solr.filterBy.wiki')&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;#wikiSelector()&lt;/dd&gt;
-      &lt;dt&gt;
         &lt;label for="searchFilterType"&gt;$services.localization.render('solr.filterBy.type')&lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
@@ -92,10 +88,6 @@
       #end
     &lt;/dl&gt;
     &lt;dl class="search-filter-right"&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterSpace"&gt;$services.localization.render('solr.filterBy.space')&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;#spaceSelector()&lt;/dd&gt;
       &lt;dt&gt;
         &lt;label for="searchFilterFileType"&gt;$services.localization.render('solr.filterBy.fileType')&lt;/label&gt;
       &lt;/dt&gt;
@@ -145,52 +137,6 @@
     #set ($discard = $supportedLanguages.add($defaultLanguage))
   #end
   #set ($supportedLanguages = $sorttool.sort($supportedLanguages))
-#end
-
-#macro (wikiSelector )
-  #if ($xcontext.isMainWiki())
-    #set ($wikiNames = $xwiki.wikiNames)
-  #else
-    #set ($wikiNames = [$xcontext.database])
-  #end
-  #set ($wikis = [])
-  #foreach ($wikiName in $wikiNames)
-    #set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
-    #if ("$!wikiPrettyName.trim()" == '')
-      #set ($wikiPrettyName = $wikiName)
-    #end
-    #set ($discard = $wikis.add({'value': $wikiName, 'label': $wikiPrettyName}))
-  #end
-  &lt;select id="searchFilterWiki" name="wiki"&gt;
-    #if ($xcontext.isMainWiki() &amp;&amp; $wikis.size() &gt; 1)
-      ## The main wiki can search in all wikis.
-      &lt;option value=""&gt;$services.localization.render('solr.filterBy.wiki.all')&lt;/option&gt;
-    #end
-    #foreach ($aWiki in $sorttool.sort($wikis, 'label'))
-      &lt;option value="$escapetool.xml($aWiki.value)" #if ($wiki == "$!aWiki.value")selected="selected"#end&gt;$escapetool.xml($aWiki.label)&lt;/option&gt;
-    #end
-  &lt;/select&gt;
-#end
-
-#macro (spaceSelector)
-  #set ($spaces = [])
-  #set ($wikiNames = $xwiki.wikiNames)
-  #if ($wiki == $xcontext.database || ($wiki == '' &amp;&amp; $wikiNames.size() == 1))
-    #set ($spaces = $xwiki.spaces)
-  #elseif ($wikiNames.contains($wiki) &amp;&amp; $doc.hasProgrammingRights())
-    #set ($spaces = $services.query.xwql('select distinct doc.space from Document as doc order by doc.space').setWiki($wiki).execute())
-  #end
-  &lt;select id="searchFilterSpace" name="space" title="$services.localization.render('search.page.bar.spaces.title')"&gt;
-    &lt;option value="" #if($space == '')selected="selected"#end&gt;$services.localization.render('search.page.bar.spaces.all')&lt;/option&gt;
-    #foreach ($aSpace in $spaces)
-      #set ($spaceReservedDocRef = $services.model.createDocumentReference($wiki,
-        $aSpace, "DocumentReservedForInternalXWikiUsage$mathtool.random(0, 999)"))
-      #if (!$blacklistedSpaces.contains($aSpace) &amp;&amp; $xwiki.hasAccessLevel('view',
-        $services.model.serialize($spaceReservedDocRef, 'default')))
-        &lt;option value="$escapetool.xml($aSpace)" #if($space == $aSpace)selected="selected"#end&gt;$escapetool.xml($aSpace)&lt;/option&gt;
-      #end
-    #end
-  &lt;/select&gt;
 #end
 
 #macro (displaySearchDebugInfo)
@@ -977,11 +923,9 @@
   #if ($language != '')
     #set ($discard = $filters.put('locales', [$language]))
   #end
-  #if ($wiki != '')
-    #set ($discard = $filters.put('wiki', [$wiki]))
-  #end
-  #if ($space != '' &amp;&amp; !$blacklistedSpaces.contains($space))
-    #set ($discard = $filters.put('space_exact', ["#escapeFilterValue($space)"]))
+  #if (!$xcontext.isMainWiki())
+    ## Subwikis search by default in their content only.
+    #set ($discard = $filters.put('wiki', [$xcontext.database]))
   #end
   #if ($type != '')
     #set ($discard = $filters.put('type', [$type]))
@@ -1024,10 +968,11 @@ $value##
 
 #macro (processRequestParameters)
   #set ($text = "$!request.text")
-  #set ($space = "$!request.space")
   #set ($fileType = "$!request.fileType")
   #set ($boost = "$!request.boost")
   #set ($debug = "$!request.debug")
+  ##
+  ## Pagination
   #set ($rows = $numbertool.integer($request.rows))
   #if ("$!rows" == '')
     #set ($rows = 10)
@@ -1036,6 +981,8 @@ $value##
   #if ("$!start" == '')
     #set ($start = 0)
   #end
+  ##
+  ## Sort
   #set ($sort = $request.sort)
   #if ("$!sort" == '')
     #set ($sort = 'score')
@@ -1046,6 +993,8 @@ $value##
   #elseif ($sortOrder != 'desc')
     #set ($sortOrder = 'asc')
   #end
+  ##
+  ## Language
   ## Can't use 'language' as request parameter because it's used by view mode to select the display language.
   #set ($language = $request.lang)
   ## An empty value for the language parameter means no language query filter (all languages are considered).
@@ -1057,11 +1006,6 @@ $value##
   #if ($type != '' &amp;&amp; "$!type" == '')
     ## The type parameter is null (not set on the request).
     #set ($type = 'DOCUMENT')
-  #end
-  ## Subwikis search by default in their content only.
-  #set ($wiki = "$!request.wiki")
-  #if ($wiki == '' &amp;&amp; !$xcontext.isMainWiki())
-    #set ($wiki = $xcontext.database)
   #end
 #end
 

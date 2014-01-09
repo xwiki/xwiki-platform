@@ -207,6 +207,7 @@
 #end
 
 #set ($customSearchFacetValuesDisplayer = {
+  'type': 'type',
   'wiki': 'wiki',
   'locale': 'locale',
   'author': 'user',
@@ -225,13 +226,13 @@
   #evaluate("${escapetool.h}displaySearchFacetValues_${displayer}(${escapetool.d}facetValues)")
 #end
 
-#macro (displaySearchFacetValues_default $facetValues)
+#macro (displaySearchFacetValues_default $facetValues $customQueryStringParameters)
   &lt;ul&gt;
-    #displaySearchFacetValuesLimited($facetValues)
+    #displaySearchFacetValuesLimited($facetValues $customQueryStringParameters)
   &lt;/ul&gt;
 #end
 
-#macro (displaySearchFacetValuesLimited $facetValues)
+#macro (displaySearchFacetValuesLimited $facetValues $customQueryStringParameters)
   #set ($limitRequestParameter = "l_$facetField.name")
   #set ($limit = $mathtool.toInteger($request.getParameter($limitRequestParameter)))
   #if ("$!limit" == '')
@@ -240,7 +241,7 @@
   #set ($limit = $mathtool.max($mathtool.min($limit, $facetValues.size()), 0))
   #foreach ($facetValue in $facetValues)
     #if ($foreach.index &lt; $limit)
-      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+      &lt;li&gt;#displaySearchFacetValue($facetValue $customQueryStringParameters)&lt;/li&gt;
     #else
       #extendQueryString($url {$limitRequestParameter: [$mathtool.add($limit, 5)]})
       &lt;li&gt;&lt;a href="$url" class="more"&gt;&amp;hellip; $escapetool.xml($services.localization.render(
@@ -250,7 +251,7 @@
   #end
 #end
 
-#macro (displaySearchFacetValue $facetValue)
+#macro (displaySearchFacetValue $facetValue $customQueryStringParameters)
   #set ($selectedValues = [])
   #if ($facetRequestValues)
     #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
@@ -260,7 +261,11 @@
     #set ($discard = $selectedValues.add($facetValue.name))
   #end
   ## Reset the pagination because the number of results can change when a facet is applied.
-  #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
+  #set ($queryStringParameters = {$facetRequestParameter: $selectedValues, 'firstIndex': []})
+  #if ($customQueryStringParameters)
+    #set ($discard = $queryStringParameters.putAll($customQueryStringParameters))
+  #end
+  #extendQueryString($url $queryStringParameters)
   &lt;div class="itemCount"&gt;$facetValue.count&lt;/div&gt;
   &lt;a href="$url" class="itemName#if ($selected) selected#end#if ($facetValue.name == '') empty#end"&gt;
     #if ($facetValue.name == '')
@@ -297,6 +302,12 @@
 
 #macro (displaySearchFacetValue_default $facetPrettyValue)
   $escapetool.xml($facetPrettyValue)
+#end
+
+#macro (displaySearchFacetValues_type $facetValues)
+  ## We have to reset the sort when the result type selection changes because the sort fields depend on the selected
+  ## result type.
+  #displaySearchFacetValues_default($facetValues {'sort': [], 'sortOrder': []})
 #end
 
 #macro (displaySearchFacetValue_type $type)

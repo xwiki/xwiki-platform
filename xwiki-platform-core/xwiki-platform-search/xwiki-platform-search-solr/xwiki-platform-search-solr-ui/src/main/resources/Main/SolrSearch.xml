@@ -237,13 +237,12 @@
   #set ($facetValues = $facetField.values)
   ## Keep only the values that have at least one match.
   #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
-  ## Display the facets that have values specified on the request or that have at least 2 different values matched.
-  #set ($facetRequestParameter = "f_$facetField.name")
-  #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
-  #set ($facetValuesLimit = $request.getParameter("l_$facetField.name"))
-  #if ($facetRequestValues || $facetValues.size() &gt; 1)
+  #if ($facetValues.size() &gt; 0)
     ## Show active facets (that have selected values or that have an explicit limit on the number of values, i.e.
     ## pagination) as expanded. Collapse the rest, otherwise you have to scroll to see all the available facets.
+    #set ($facetRequestParameter = "f_$facetField.name")
+    #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
+    #set ($facetValuesLimit = $request.getParameter("l_$facetField.name"))
     (% class="search-facet#if ($facetRequestValues || $facetValuesLimit) expanded#end" %)(((
       {{html}}
       #set ($facetPrettyNameKey = "solr.field.$facetField.name")
@@ -917,6 +916,18 @@
     #getSupportedLanguages()
   #end
   #set ($discard = $query.bindValue('xwiki.supportedLocales', $stringtool.join($supportedLanguages, ',')))
+  #setQueryFields($query)
+  #setFacetFields($query)
+  #setFilterQuery($query)
+  #if ($debug != '')
+    #set ($discard = $query.bindValue('debugQuery', 'on'))
+  #end
+  ##
+  ## Execute the query.
+  #set ($searchResponse = $query.execute()[0])
+#end
+
+#macro (setQueryFields $query)
   ## Specify which index fields are matched when a free text search is performed.
   #set ($defaultBoost = {
     'DOCUMENT': 'title^10.0 name^10.0
@@ -934,9 +945,32 @@
   #if ("$!boost" != '')
     #set ($discard = $query.bindValue('qf', $boost))
   #end
-  #if ($debug != '')
-    #set ($discard = $query.bindValue('debugQuery', 'on'))
+#end
+
+#macro (setFacetFields $query)
+  ## The facets are displayed in this order so keep the most important facets first.
+  #set ($facetFields = ['type', 'wiki', 'space_exact', 'locale', 'author', 'creator', 'date',
+    'creationdate', 'class', 'name_exact', 'mimetype', 'attauthor', 'attdate', 'attsize'])
+  ## In order to support multi-select faceting we need to exclude the corresponding filters when faceting.
+  ## See http://wiki.apache.org/solr/SimpleFacetParameters#Multi-Select_Faceting_and_LocalParams
+  #set ($facetFieldsWithFilterExcludes = [])
+  ## Not all facets support multiple selection:
+  ## * we use different query fields for different result types so the number of matches for the type facet changes when
+  ##   a result type is selected/unselected.
+  ## * date facets have ranges that intersect and so multiple selection doesn't make sense
+  ##   (e.g. 'Today' is included in 'Last 7 days' so it doesn't make sense to select both)
+  #set ($facetFieldsWithSingleSelection = ['type', 'date', 'creationdate', 'attdate'])
+  #foreach ($facet in $facetFields)
+    #set ($excludeTaggedFilter = '')
+    #if (!$facetFieldsWithSingleSelection.contains($facet))
+      #set ($excludeTaggedFilter = "{!ex=$facet}")
+    #end
+    #set ($discard = $facetFieldsWithFilterExcludes.add("$excludeTaggedFilter$facet"))
   #end
+  #set ($discard = $query.bindValue('facet.field', $facetFieldsWithFilterExcludes))
+#end
+
+#macro (setFilterQuery $query)
   ##
   ## Collect the query filters.
   #set ($filters = {})
@@ -969,28 +1003,14 @@
     #end
   #end
   ##
-  ## Build the query filter. Use AND as the default operation between different filters/facets.
-  #if ($filters.size() &gt; 0)
-    #set ($queryFilter = '{!q.op=AND}')
-    #foreach ($filter in $filters.entrySet())
-      #if ($filter.value.size() &gt; 1)
-        ## Use OR between different values of the same filter/facet.
-        #set ($queryFilter = "$queryFilter $filter.key:(")
-        #set ($separator = '')
-        #foreach ($value in $filter.value)
-          #set ($queryFilter = "$queryFilter$separator$value")
-          #set ($separator = ' OR ')
-        #end
-        #set ($queryFilter = "$queryFilter)")
-      #else
-        #set ($queryFilter = "$queryFilter $filter.key:$filter.value.get(0)")
-      #end
-    #end
-    #set ($discard = $query.bindValue('fq', $queryFilter))
+  ## Build the filter query.
+  #set ($filterQuery = [])
+  #foreach ($filter in $filters.entrySet())
+    ## Use OR between different values of the same filter/facet.
+    ## Tag the filter so that we can exclude it when faceting in order to support multi-select faceting.
+    #set ($discard = $filterQuery.add("{!tag=$filter.key}$filter.key:($!stringtool.join($filter.value, ' OR '))"))
   #end
-  ##
-  ## Execute the query.
-  #set ($searchResponse = $query.execute()[0])
+  #set ($discard = $query.bindValue('fq', $filterQuery))
 #end
 
 #macro (escapeFilterValue $value)

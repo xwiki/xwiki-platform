@@ -33,6 +33,9 @@
   <name>XWiki Platform - Wiki - Template - Script</name>
   <description>Script services for XWiki Platform - Wiki - Template</description>
   <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.10</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

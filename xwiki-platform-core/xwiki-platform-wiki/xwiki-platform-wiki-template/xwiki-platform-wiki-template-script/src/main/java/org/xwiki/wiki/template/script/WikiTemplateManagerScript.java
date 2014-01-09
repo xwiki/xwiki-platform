@@ -40,6 +40,7 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
+import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.template.WikiTemplateManager;
 import org.xwiki.wiki.template.WikiTemplateManagerException;
 
@@ -223,7 +224,11 @@ public class WikiTemplateManagerScript implements ScriptService
     public JobStatus getWikiProvisioningJobStatus(List<String> jobId)
     {
         try {
-            return wikiTemplateManager.getWikiProvisioningJob(jobId).getStatus();
+            WikiProvisioningJob wikiProvisioningJob = wikiTemplateManager.getWikiProvisioningJob(jobId);
+            if (wikiProvisioningJob == null) {
+                return null;
+            }
+            return wikiProvisioningJob.getStatus();
         } catch (WikiTemplateManagerException e) {
             return null;
         }

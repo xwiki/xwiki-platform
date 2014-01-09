@@ -65,12 +65,6 @@ solr.result.highlightAll=Highlight all matches
 solr.filter.title=Advanced Options
 solr.filter.hint=Select predefined filters that will be applied on your query.
 solr.filter.toggle=Toggle the search filter
-solr.filterBy.type=Result type
-solr.filterBy.type.all=All result types
-solr.filterBy.type.document=Document
-solr.filterBy.type.attachment=Attachment
-solr.filterBy.type.object=Object
-solr.filterBy.type.object_property=Object property
 solr.filterBy.language=Language
 solr.filterBy.language.all=All languages
 solr.filterBy.fileType=Attachment media type
@@ -89,6 +83,11 @@ solr.facets.expandAll=Expand all
 solr.facets.collapseAll=Collapse all
 solr.facets.emptyValue=Empty Value
 solr.facets.moreValues={0} more
+
+solr.filterBy.type.document=Document
+solr.filterBy.type.attachment=Attachment
+solr.filterBy.type.object=Object
+solr.filterBy.type.object_property=Object property
 
 solr.facet.date.today=Today
 solr.facet.date.last7Days=Last 7 days

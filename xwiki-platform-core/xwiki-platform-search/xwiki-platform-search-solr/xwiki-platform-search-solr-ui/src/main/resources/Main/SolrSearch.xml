@@ -33,6 +33,7 @@
     &lt;div class="hidden"&gt;
       &lt;input type="hidden" name="sort" value="$!escapetool.xml($sort)"/&gt;
       &lt;input type="hidden" name="sortOrder" value="$!escapetool.xml($sortOrder)"/&gt;
+      &lt;input type="hidden" name="f_type" value="DOCUMENT"/&gt;
     &lt;/div&gt;
     &lt;div class="search-bar"&gt;
       &lt;label class="hidden" for="searchQuery"&gt;$services.localization.render('search.page.bar.query.label')&lt;/label&gt;
@@ -55,19 +56,6 @@
       &lt;p class="xHint"&gt;$services.localization.render('solr.filter.hint')&lt;/p&gt;
     &lt;/div&gt;
     &lt;dl class="search-filter-left"&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterType"&gt;$services.localization.render('solr.filterBy.type')&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;select id="searchFilterType" name="type"&gt;
-          &lt;option value=""&gt;$services.localization.render('solr.filterBy.type.all')&lt;/option&gt;
-          #foreach ($aType in ['DOCUMENT', 'ATTACHMENT', 'OBJECT', 'OBJECT_PROPERTY'])
-            &lt;option value="$aType" #if ($aType == $type)selected="selected"#end&gt;
-              $escapetool.xml($services.localization.render("solr.filterBy.type.$aType.toLowerCase()"))
-            &lt;/option&gt;
-          #end
-        &lt;/select&gt;
-      &lt;/dd&gt;
       #if ($xwiki.isMultiLingual())
         &lt;dt&gt;
           &lt;label for="searchFilterLanguage"&gt;$services.localization.render('solr.filterBy.language')&lt;/label&gt;
@@ -957,9 +945,6 @@
     ## The list of wikis that are searched by default can be configured.
     #set ($discard = $filters.put('wiki', $wikisSearchableFromMainWiki))
   #end
-  #if ($type != '')
-    #set ($discard = $filters.put('type', [$type]))
-  #end
   #if ($fileType != '')
     #set ($discard = $filters.put('mimetype', [$fileType]))
   #end
@@ -1032,10 +1017,12 @@ $value##
     ## The language parameter is null (not set on the request).
     #set ($language = "$!xcontext.language")
   #end
-  #set ($type = $request.type)
-  #if ($type != '' &amp;&amp; "$!type" == '')
-    ## The type parameter is null (not set on the request).
-    #set ($type = 'DOCUMENT')
+  ##
+  ## Result type
+  ## We store the selected result type because we need it to decide what search and sort fields to use.
+  #set ($type = $request.getParameterValues('f_type'))
+  #if ($type &amp;&amp; $type.size() == 1)
+    #set ($type = $type.get(0))
   #end
 #end
 

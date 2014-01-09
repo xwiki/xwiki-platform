@@ -35,12 +35,20 @@
                   </org.xwiki.rendering.syntax.Syntax>
                 </entry>
                 <entry>
+                  <string>hidden</string>
+                  <boolean>false</boolean>
+                </entry>
+                <entry>
                   <string>revision_author</string>
                   <string>XWiki.author</string>
                 </entry>
                 <entry>
                   <string>revision_date</string>
                   <date>2000-01-01 00:00:00.0 UTC</date>
+                </entry>
+                <entry>
+                  <string>revision_minor</string>
+                  <boolean>false</boolean>
                 </entry>
                 <entry>
                   <string>content_author</string>

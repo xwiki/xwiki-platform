@@ -85,6 +85,7 @@
     #set ($wiki = $services.wiki.getById($wikiId))
     ## Init membership actions as denied.
     #set ($itemMembershipType = $services.wiki.user.getMembershipType($wiki.id))
+    #set ($itemUserScope = $services.wiki.user.getUserScope($wiki.id))
     #set ($itemHasJoin = false)
     #set ($itemHasRequestJoin = false)
     #set ($itemHasCancelJoinRequest = false)
@@ -100,7 +101,7 @@
         #set ($itemHasLeave = true)
         #set ($leaveUrl = $xwiki.getURL($leaveWikiDocumentReference, 'view', "wikiId=${wikiId}"))
       #end
-    #else
+    #elseif($itemUserScope != 'LOCAL_ONLY')
       ##
       ## Determine if, regardless of membership type, an existing invitation exists for the 
       #set ($invitations = $services.wiki.user.getAllInvitations($wikiId))
@@ -183,7 +184,11 @@
       #gridresult_buildColumnJSON($colname $row)
     #end
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
-    #set($discard = $row.put('membershipType', $services.localization.render("WikiManager.WikiUserClass_membershipType_${itemMembershipType.name().toLowerCase()}")))
+    #if($itemUserScope == 'LOCAL_ONLY')
+      #set($discard = $row.put('membershipType', $services.localization.render("platform.wiki.browse.emptyvalue")))
+    #else
+      #set($discard = $row.put('membershipType', $services.localization.render("WikiManager.WikiUserClass_membershipType_${itemMembershipType.name().toLowerCase()}")))
+    #end
     #set($discard = $row.put('doc_hasjoin', $itemHasJoin))
     #set($discard = $row.put('doc_hasrequestJoin', $itemHasRequestJoin))
     #set($discard = $row.put('doc_hasviewInvitation', $itemHasViewInvitation))

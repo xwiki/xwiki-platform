@@ -121,6 +121,14 @@
    * Init the event handlers
    */
   function init() {
+    if ($('prettyname')) {
+      initStepType();
+    } else if ($('owner')) {
+      initStepUsers();
+    }
+  }
+  
+  function initStepType() {
     var prettyName = $('prettyname');
     prettyName.observe('change', prettyNameChanged);
     prettyName.observe('keyup', prettyNameChanged);
@@ -131,7 +139,14 @@
       $('wizard-next').disabled = true;
     }
   }
-
+  
+  function initStepUsers() {
+    userScopeChanged();
+    $$('input[type=radio][name=userScope]').each(function (item){
+      item.observe('click', userScopeChanged);
+    });
+  }
+  
   /**
    * Pretty name changed
    */
@@ -233,6 +248,25 @@
 
     return result;
   }
+
+  function userScopeChanged(){
+    var value = $$('input:checked[type=radio][name=userScope]')[0].value
+    if (value=='local_only') {
+      // Disable membership type radio button
+      $$('input[type=radio][name=membershipType]').each(function (item){
+        item.disabled = true;
+      });
+      // Disable the members
+      $('members').disabled = true;
+    } else {
+      // Enable membership type radio button
+      $$('input[type=radio][name=membershipType]').each(function (item){
+        item.disabled = false;
+      });
+      // Enable the members
+      $('members').disabled = false;
+    }
+  };
 
   /**
    * Call Init
@@ -1041,23 +1075,25 @@ return XWiki;
 ##################################
 #macro(setMembers $wikiDescriptor)
   ## Set the membership type and the local users
-  #set ($discard = $services.wiki.user.setMembershipType($wikiDescriptor.id, $request.membershipType))
   #set ($discard = $services.wiki.user.setUserScope($wikiDescriptor.id, $request.userScope))
-  #set ($groupsClassName = "${wikiDescriptor.id}:XWiki.XWikiGroups")    
-  ## Save the members
-  #set ($members = [])
-  #getRequestList($members 'members')
-  ## Remove empty strings from the list of members (the user picker submits by default an empty string).
-  #set ($discard = $members.removeAll(['']))
-  #if ("$!members" != '' &amp;&amp; $members.size() &gt; 0)
-    ## Enforce global users
-    #foreach ($member in $members)
-      #if (!$member.startsWith("${services.wiki.mainWikiId}:"))
-        #set ($member = "${services.wiki.mainWikiId}:${member}")
+  #if ($request.userScope != 'local_only')
+    #set ($discard = $services.wiki.user.setMembershipType($wikiDescriptor.id, $request.membershipType))
+    #set ($groupsClassName = "${wikiDescriptor.id}:XWiki.XWikiGroups")    
+    ## Save the members
+    #set ($members = [])
+    #getRequestList($members 'members')
+    ## Remove empty strings from the list of members (the user picker submits by default an empty string).
+    #set ($discard = $members.removeAll(['']))
+    #if ("$!members" != '' &amp;&amp; $members.size() &gt; 0)
+      ## Enforce global users
+      #foreach ($member in $members)
+        #if (!$member.startsWith("${services.wiki.mainWikiId}:"))
+          #set ($member = "${services.wiki.mainWikiId}:${member}")
+        #end
       #end
+      ## Add the members
+      #set($discard = $services.wiki.user.addMembers($members, $wikiDescriptor.id))
     #end
-    ## Add the members
-    #set($discard = $services.wiki.user.addMembers($members, $wikiDescriptor.id))
   #end
   ## Redirect to the new wiki's homepage.
   #set ($discard = $response.sendRedirect($xwiki.getURL($wikiDescriptor.mainPageReference)))

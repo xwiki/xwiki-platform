@@ -25,8 +25,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.internal.descriptor.document.WikiDescriptorDocumentHelper;
 import org.xwiki.wiki.user.MembershipType;
 import org.xwiki.wiki.user.UserScope;
 import org.xwiki.wiki.user.WikiUserConfiguration;
@@ -42,6 +40,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Default implementation of {@link WikiUserConfigurationHelper}.
  *
  * @version $Id$
+ * @since 5.3M2
  */
 @Component
 @Singleton
@@ -53,12 +52,6 @@ public class DefaultWikiUserConfigurationHelper implements WikiUserConfiguration
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
-
-    @Inject
-    private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
 
     private XWikiDocument getDocument(String wikiId) throws WikiUserManagerException
     {

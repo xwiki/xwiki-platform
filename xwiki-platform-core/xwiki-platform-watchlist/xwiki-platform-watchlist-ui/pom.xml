@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-watchlist</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-watchlist-ui</artifactId>
   <name>XWiki Platform - WatchList - UI</name>
@@ -43,6 +43,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-watchlist-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+     <!-- Needed in order to display the wiki pretty name. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

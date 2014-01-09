@@ -27,11 +27,11 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wikistream-events</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-events-xwiki</artifactId>
-  <name>XWiki Platform - Wiki Stream - Events - XWiki</name>
-  <description>XWiki Platform - Wiki Stream - XWiki specific events</description>
+  <name>XWiki Platform - WikiStream - Events - XWiki</name>
+  <description>XWiki Platform - WikiStream - XWiki specific events</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>

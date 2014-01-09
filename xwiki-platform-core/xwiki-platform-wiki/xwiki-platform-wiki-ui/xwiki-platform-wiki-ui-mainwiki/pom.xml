@@ -27,7 +27,7 @@
   <parent>
     <artifactId>xwiki-platform-wiki-ui</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-ui-mainwiki</artifactId>
   <packaging>xar</packaging>
@@ -36,14 +36,25 @@
   <properties>
     <xwiki.extension.features>
       <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-      org.xwiki.platform:xwiki-workspace-ui
+      org.xwiki.platform:xwiki-platform-workspace-ui,
+      org.xwiki.platform:xwiki-platform-wiki-manager-ui,
+      com.xpn.xwiki.platform.applications:xwiki-plugin-wiki-manager
     </xwiki.extension.features>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Wiki Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <!-- needed until the UI has removed every relation to the default implementation -->
       <artifactId>xwiki-platform-wiki-user-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <!-- needed until the UI has removed every relation to the default implementation -->
+      <artifactId>xwiki-platform-wiki-template-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

@@ -37,6 +37,7 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.descriptor.CompositeWikiStreamDescriptor;
 import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 import org.xwiki.wikistream.instance.internal.InstanceUtils;
+import org.xwiki.wikistream.instance.output.InstanceOutputProperties;
 import org.xwiki.wikistream.instance.output.OutputInstanceWikiStreamFactory;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;

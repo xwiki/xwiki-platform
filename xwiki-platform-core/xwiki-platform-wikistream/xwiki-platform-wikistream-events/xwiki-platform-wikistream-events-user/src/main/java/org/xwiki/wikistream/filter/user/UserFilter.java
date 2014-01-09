@@ -37,41 +37,51 @@ public interface UserFilter
     // Properties
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_FIRSTNAME = "firstname";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_LASTNAME = "lastname";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_EMAIL = "email";
 
     /**
-     * @type String
+     * @type {@link java.util.Date}
      */
     String PARAMETER_CREATION_DATE = "creation_date";
 
     /**
-     * @type String
+     * @type {@link java.util.Date}
      */
     String PARAMETER_REVISION_DATE = "revision_date";
 
     /**
-     * @type Boolean
+     * @type {@link Boolean}
      */
     String PARAMETER_ACTIVE = "active";
 
     // Events
 
+    /**
+     * @param name the name of the user
+     * @param parameters the parameters of the user
+     * @throws WikiStreamException when failing to send event
+     */
     void beginUser(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param name the name of the user
+     * @param parameters the parameters of the user
+     * @throws WikiStreamException when failing to send event
+     */
     void endUser(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;

@@ -33,20 +33,18 @@ import javax.inject.Inject;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.message.TranslationMessage;
 import org.xwiki.localization.message.TranslationMessageParser;
 
 /**
- * Base class for {@link TranslationBundle}s getting resource from classloader. Provides methods for loading properties
- * from documents, watching loaded documents and invalidating cached translations.
+ * Base class for {@link org.xwiki.localization.TranslationBundle}s getting resource from classloader. Provides methods
+ * for loading properties from documents, watching loaded documents and invalidating cached translations.
  * 
  * @version $Id$
  * @since 4.5M1
  */
-public abstract class AbstractURLResourceTranslationBundle extends AbstractCachedTranslationBundle implements
-    TranslationBundle
+public abstract class AbstractURLResourceTranslationBundle extends AbstractCachedTranslationBundle
 {
     /**
      * The prefix to use in all resource based translations.

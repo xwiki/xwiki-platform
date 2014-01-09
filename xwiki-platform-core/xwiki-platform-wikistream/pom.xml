@@ -27,11 +27,11 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Wiki Stream</name>
+  <name>XWiki Platform - WikiStream</name>
   <modules>
     <module>xwiki-platform-wikistream-api</module>
     <module>xwiki-platform-wikistream-xml</module>

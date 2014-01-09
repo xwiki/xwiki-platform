@@ -32,6 +32,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.xwiki.XWikiWikiAttachmentFilter;
+import org.xwiki.wikistream.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.XWikiAttachmentFilter;
 import org.xwiki.wikistream.model.filter.WikiAttachmentFilter;
@@ -49,10 +50,10 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 @Singleton
 // TODO: add support for real revision events (instead of the jrcs archive )
 public class XWikiAttachmentEventGenerator extends
-    AbstractBeanEntityEventGenerator<XWikiAttachment, XWikiAttachmentFilter, XWikiAttachmentInputProperties>
+    AbstractBeanEntityEventGenerator<XWikiAttachment, XWikiAttachmentFilter, DocumentInstanceInputProperties>
 {
     public static final ParameterizedType ROLE = new DefaultParameterizedType(null, EntityEventGenerator.class,
-        XWikiAttachment.class, XWikiAttachmentInputProperties.class);
+        XWikiAttachment.class, DocumentInstanceInputProperties.class);
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -62,7 +63,7 @@ public class XWikiAttachmentEventGenerator extends
 
     @Override
     public void write(XWikiAttachment attachment, Object filter, XWikiAttachmentFilter attachmentFilter,
-        XWikiAttachmentInputProperties properties) throws WikiStreamException
+        DocumentInstanceInputProperties properties) throws WikiStreamException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -75,7 +76,7 @@ public class XWikiAttachmentEventGenerator extends
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, attachment.getDate());
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION, attachment.getVersion());
 
-        if (properties.isWithWikiAttachmentRevisions()) {
+        if (properties.isWithJRCSRevisions()) {
             try {
                 // We need to make sure content is loaded
                 XWikiAttachmentArchive archive;
@@ -91,17 +92,12 @@ public class XWikiAttachmentEventGenerator extends
 
         InputStream content;
         Long size;
-        if (properties.isWithWikiAttachmentContent()) {
-            try {
-                content = attachment.getContentInputStream(xcontext);
-                size = Long.valueOf(attachment.getFilesize());
-            } catch (XWikiException e) {
-                throw new WikiStreamException(String.format("Failed to get content of attachment [%s]",
-                    attachment.getReference()), e);
-            }
-        } else {
-            content = null;
-            size = null;
+        try {
+            content = attachment.getContentInputStream(xcontext);
+            size = Long.valueOf(attachment.getFilesize());
+        } catch (XWikiException e) {
+            throw new WikiStreamException(String.format("Failed to get content of attachment [%s]",
+                attachment.getReference()), e);
         }
 
         // WikiAttachment

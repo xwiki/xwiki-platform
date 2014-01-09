@@ -27,12 +27,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wiki-user</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki-user-default</artifactId>
   <name>XWiki Platform - Wiki - User - Default</name>
   <description>Default implementation for XWiki Platform - Wiki - User - API</description>
   <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.15</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -41,13 +44,19 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-default</artifactId>
+      <artifactId>xwiki-platform-wiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

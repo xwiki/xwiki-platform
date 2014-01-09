@@ -26,7 +26,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xar.internal.XARFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
+import org.xwiki.wikistream.xar.output.XAROutputProperties;
 
 /**
  * Generate XAR package from WikiStream events.
@@ -35,13 +36,13 @@ import org.xwiki.wikistream.xar.internal.XARUtils;
  * @since 5.2M2
  */
 @Component
-@Named(XARUtils.ROLEHINT)
+@Named(XARWikiStreamUtils.ROLEHINT)
 @Singleton
 public class XAROutputWikiStreamFactory extends AbstractBeanOutputWikiStreamFactory<XAROutputProperties, XARFilter>
 {
     public XAROutputWikiStreamFactory()
     {
-        super(WikiStreamType.XWIKI_XAR_10);
+        super(WikiStreamType.XWIKI_XAR_11);
 
         setName("XAR output stream");
         setDescription("Write XAR package from wiki events.");

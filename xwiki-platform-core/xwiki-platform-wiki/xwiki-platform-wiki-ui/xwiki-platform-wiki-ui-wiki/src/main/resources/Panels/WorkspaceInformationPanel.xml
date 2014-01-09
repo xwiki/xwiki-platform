@@ -108,14 +108,16 @@
       <content>{{velocity}}
 #set($newPanelReference = $services.model.createDocumentReference('', 'WikiManager', 'WikiInformationPanel'))
 #set($newPanelDocument = $xwiki.getDocument($newPanelReference))
+{{html}}
 $newPanelDocument.display('content', 'view')
+{{/html}}
 {{/velocity}}</content>
     </property>
     <property>
-      <description>Provides information about the current workspace (should not be used anymore).</description>
+      <description>This panel is deprecated, you should not use it anymore. Please use Wiki Information instead.</description>
     </property>
     <property>
-      <name>Legacy Workspace Information</name>
+      <name>Workspace Information - Legacy</name>
     </property>
     <property>
       <type>view</type>

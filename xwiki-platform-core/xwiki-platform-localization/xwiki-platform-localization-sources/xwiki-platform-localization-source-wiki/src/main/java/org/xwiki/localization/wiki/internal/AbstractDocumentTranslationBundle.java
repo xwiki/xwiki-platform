@@ -64,7 +64,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @since 4.3M2
  */
 public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTranslationBundle implements
-    TranslationBundle, DisposableCacheValue, Disposable, EventListener
+    DisposableCacheValue, Disposable, EventListener
 {
     /**
      * Make default wiki document based translation priority a bit higher than the default one.
@@ -136,15 +136,13 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
 
         XWikiDocument document = context.getWiki().getDocument(this.documentReference, context);
 
-        if (locale != null && !locale.equals(Locale.ROOT)) {
-            XWikiDocument tdocument = document.getTranslatedDocument(locale, context);
+        if (locale != null && !locale.equals(Locale.ROOT) && !locale.equals(document.getDefaultLocale())) {
+            document = context.getWiki().getDocument(new DocumentReference(document.getDocumentReference(), locale), context);
 
-            if (tdocument == document) {
+            if (document.isNew()) {
                 // No document found for this locale
                 return null;
             }
-
-            document = tdocument;
         }
 
         String content = document.getContent();
@@ -210,7 +208,11 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         } else {
             XWikiDocument document = (XWikiDocument) arg1;
 
-            bundleCache.remove(document.getLocale() != null ? document.getLocale() : Locale.ROOT);
+            this.bundleCache.remove(document.getLocale());
+
+            if (document.getLocale().equals(Locale.ROOT)) {
+                this.bundleCache.remove(document.getDefaultLocale());
+            }
         }
     }
 

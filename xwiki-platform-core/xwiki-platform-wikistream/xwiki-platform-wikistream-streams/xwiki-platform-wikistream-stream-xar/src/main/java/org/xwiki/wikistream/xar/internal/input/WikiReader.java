@@ -22,64 +22,61 @@ package org.xwiki.wikistream.xar.internal.input;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.inject.Inject;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.input.InputStreamInputSource;
+import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARFilter;
-import org.xwiki.wikistream.xar.internal.XARModel;
+import org.xwiki.xar.internal.XarPackage;
+import org.xwiki.xar.internal.model.XarModel;
 
 /**
  * @version $Id$
  * @since 5.2RC1
  */
+@Component(roles = WikiReader.class)
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class WikiReader
 {
-    private String extensionId;
-
-    private String version;
-
+    @Inject
     private DocumentLocaleReader documentReader;
 
-    public WikiReader(SyntaxFactory syntaxFactory, EntityReferenceResolver<String> relativeResolver)
+    private XARInputProperties properties;
+
+    private XarPackage xarPackage = new XarPackage();
+
+    public void setProperties(XARInputProperties properties)
     {
-        this.documentReader = new DocumentLocaleReader(syntaxFactory, relativeResolver);
+        this.properties = properties;
+
+        this.documentReader.setProperties(properties);
     }
 
-    public String getExtensionId()
+    public XarPackage getXarPackage()
     {
-        return this.extensionId;
+        return this.xarPackage;
     }
 
-    public String getVersion()
-    {
-        return this.version;
-    }
-
-    public void read(Object filter, XARFilter proxyFilter, XARInputProperties properties) throws XMLStreamException,
-        IOException, WikiStreamException
+    public void read(Object filter, XARFilter proxyFilter) throws XMLStreamException, IOException, WikiStreamException
     {
         InputStream stream;
 
-        InputSource source = properties.getSource();
+        InputSource source = this.properties.getSource();
         if (source instanceof InputStreamInputSource) {
             stream = ((InputStreamInputSource) source).getInputStream();
         } else {
             throw new WikiStreamException("Unsupported source type [" + source.getClass() + "]");
         }
 
-        read(stream, filter, proxyFilter, properties);
+        read(stream, filter, proxyFilter);
 
         // Close last space
         if (this.documentReader.getCurrentSpace() != null) {
@@ -88,13 +85,13 @@ public class WikiReader
         }
 
         // TODO: send extension event
-        if (this.extensionId != null) {
+        if (this.xarPackage.getPackageExtensionId() != null) {
 
         }
     }
 
-    public void read(InputStream stream, Object filter, XARFilter proxyFilter, XARInputProperties properties)
-        throws XMLStreamException, IOException, WikiStreamException
+    public void read(InputStream stream, Object filter, XARFilter proxyFilter) throws XMLStreamException, IOException,
+        WikiStreamException
     {
         ZipArchiveInputStream zis = new ZipArchiveInputStream(stream, "UTF-8", false);
 
@@ -103,47 +100,23 @@ public class WikiReader
                 // The entry is either a directory or is something inside of the META-INF dir.
                 // (we use that directory to put meta data such as LICENSE/NOTICE files.)
                 continue;
-            } else if (entry.getName().equals(XARModel.PATH_PACKAGE)) {
+            } else if (entry.getName().equals(XarModel.PATH_PACKAGE)) {
                 // The entry is the manifest (package.xml). Read this differently.
                 try {
-                    readDescriptor(zis);
+                    this.xarPackage.readDescriptor(zis);
                 } catch (Exception e) {
                     // TODO: LOG warning
                 }
             } else {
                 try {
-                    this.documentReader.read(zis, filter, proxyFilter, properties);
+                    this.documentReader.read(zis, filter, proxyFilter);
+                } catch (SkipEntityException skip) {
+                    // TODO: put it in some status
                 } catch (Exception e) {
-                    throw new WikiStreamException("Failed to read XAR XML document", e);
+                    throw new WikiStreamException(String.format("Failed to read XAR XML document from entry [%s]",
+                        entry.getName()), e);
                 }
             }
         }
-    }
-
-    public void readDescriptor(InputStream stream) throws ParserConfigurationException, SAXException, IOException
-    {
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document doc = dBuilder.parse(stream);
-
-        doc.getDocumentElement().normalize();
-
-        this.extensionId = getElementText(doc, "extensionId");
-        this.version = getElementText(doc, "version");
-
-        // Decided to not take into account those properties, this should not be package decision
-        // this.name = getElementText(doc, "name");
-        // this.description = getElementText(doc, "description");
-        // this.licence = getElementText(doc, "licence");
-        // this.authorName = getElementText(doc, "author");
-        // this.backupPack = new Boolean(getElementText(doc, "backupPack")).booleanValue();
-        // this.preserveVersion = new Boolean(getElementText(doc, "preserveVersion")).booleanValue();
-    }
-
-    private String getElementText(Document doc, String tagName)
-    {
-        NodeList nList = doc.getElementsByTagName(tagName);
-
-        return nList.item(0).getTextContent();
     }
 }

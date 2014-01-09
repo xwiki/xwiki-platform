@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-administration-test</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-administration-test-tests</artifactId>
   <name>XWiki Platform - Administration - Tests - Functional Tests</name>
@@ -45,6 +45,7 @@
       com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
       com.xpn.xwiki.plugin.packaging.PackagePlugin
     </xwikiCfgPlugins>
+    <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
   </properties>
   <dependencies>
     <dependency>

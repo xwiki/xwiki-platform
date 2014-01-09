@@ -10,3 +10,4 @@ org.xwiki.wikistream.instance.internal.output.DocumentInstanceOutputWikiStream
 org.xwiki.wikistream.instance.internal.output.DocumentInstanceOutputWikiStreamFactory
 org.xwiki.wikistream.instance.internal.output.UserInstanceOutputWikiStream
 org.xwiki.wikistream.instance.internal.output.UserInstanceOutputWikiStreamFactory
+org.xwiki.wikistream.instance.internal.output.XWikiDocumentOutputWikiStream

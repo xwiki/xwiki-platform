@@ -123,7 +123,7 @@
 #end
 
 #macro (displayDefaultUIExtension $distributionUIId)
-  #set ($installedVersion = $services.extension.getInstalledExtension($distributionUIId.id, $extensionNamespace))
+  #set ($installedVersion = $services.extension.installed.getInstalledExtension($distributionUIId.id, $extensionNamespace))
   #set ($showCompleteStepButton = $installedVersion.isValid($extensionNamespace))
   (% class="xLabel" %)
   {{translation key="platform.extension.distributionWizard.uiStepUILabel"/}}
@@ -131,7 +131,8 @@
   #if (!$installedVersion && (!$distributionUIJobStatus || $distributionUIJobStatus.state == 'FINISHED'))
     ## There is no previous version of the default UI installed on the current wiki and there is no job running for
     ## the default UI either.
-    #set ($documentCount = $xwiki.countDocuments(''))
+    #set ($documentCount = 0)
+    #set ($documentCount = $documentCount.parseInt($services.query.xwql('').addFilter('unique').addFilter('count').execute()))
     #if ($distributionState == 'NEW' && $documentCount > 30)
 
       ## There are documents in the database but there is no info about the default UI that was previously installed.

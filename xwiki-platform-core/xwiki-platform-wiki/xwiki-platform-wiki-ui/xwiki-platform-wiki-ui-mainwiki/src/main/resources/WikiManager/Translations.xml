@@ -95,9 +95,9 @@ platform.wiki.menu.deletewiki=Delete
 platform.wiki.menu.userwikis=Wikis
 
 ## Dependencies
-platform.wiki.dependencies.wiki.missing=The Wiki java component is not installed. This page will not work properly. Make sure that the "Wiki API" extension is installed (using the Extension Manager) or that the file 'xwiki-platform-wiki-api-&lt;version&gt;.jar' is present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
-platform.wiki.dependencies.template.missing=
-platform.wiki.dependencies.user.missing=
+platform.wiki.dependencies.wiki.missing=The "Wiki" java component is not installed. This page will not work properly. Make sure that the "Wiki API" and "Wiki Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+platform.wiki.dependencies.template.missing=The "Wiki Template" java component is not installed. This page will not work properly. Make sure that the "Wiki Template API" and "Wiki Template Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
 platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
 
 ## Create
@@ -240,7 +240,7 @@ platform.wiki.sheet.title.createnewalias=Create new alias
 platform.wiki.sheet.title.viewaliases=View aliases
 platform.wiki.sheet.desc.wikiprettyname=The display name of the wiki.
 platform.wiki.sheet.desc.owner=A global user who will have all the rights on this wiki.
-platform.wiki.sheet.desc.secure=If enabled, all this wiki's generated externals URLs will starting with ~~https~~.
+platform.wiki.sheet.desc.secure=If enabled, all this wiki''s generated externals URLs will starting with {0}.
 platform.wiki.sheet.desc.iswikitemplate=Indicate if this wiki can be use as template when creating a new wiki.
 platform.wiki.sheet.desc.server=The alias used to access the wiki.
 platform.wiki.sheet.desc.description=A brief wiki description.
@@ -252,7 +252,6 @@ platform.wiki.sheet.prop.description=Description
 platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.homepage=Home page
 platform.wiki.sheet.prop.iswikitemplate=Wiki template
-
 
 ###############################################################################
 ## Deprecated

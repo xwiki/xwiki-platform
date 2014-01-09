@@ -79,6 +79,6 @@ public class DefaultTranslationMessage implements TranslationMessage
     @Override
     public String toString()
     {
-        return getRawSource().toString();
+        return getRawSource();
     }
 }

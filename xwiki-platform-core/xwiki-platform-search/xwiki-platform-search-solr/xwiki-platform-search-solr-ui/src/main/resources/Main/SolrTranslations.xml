@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Main</web>
   <name>SolrTranslations</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.SolrSearch</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1385047506000</creationDate>
+  <parent>Main.SolrSearch</parent>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1369063635000</creationDate>
-  <date>1369655569000</date>
-  <contentUpdateDate>1369654393000</contentUpdateDate>
+  <date>1385298756000</date>
+  <contentUpdateDate>1385298756000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Translations</title>
   <defaultTemplate/>
@@ -22,7 +22,123 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>solr.admin.title=Solr Search Administration
+solr.admin.submit=Apply
+solr.admin.error.notallowed=You are not allowed to perform this action.
+solr.admin.error.norights=Administration rights are required to access this section.
+
+solr.admin.status.title=Status
+solr.admin.status.queueSize.label=Queue Size
+solr.admin.status.queueSize.hint=The number of entities that are left to be indexed, re-indexed or deleted from the index (depending on the executed action).
+
+solr.admin.indexing.title=Indexing
+solr.admin.indexing.action.label=Action
+solr.admin.indexing.action.hint=The action to perform on the index.
+solr.admin.indexing.action.select_index=Add to index
+solr.admin.indexing.action.select_delete=Delete from index
+solr.admin.indexing.action.select_reindex=Reindex
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.wiki.hint=The wiki for which all its documents will be affected by the selected action.
+solr.admin.indexing.wiki.select_farm=Entire farm
+solr.admin.indexing.query.label=Custom query
+solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
+
+solr.sortBy=Sort by:
+solr.sortBy.score=Relevance
+solr.sortBy.title_sort=Title
+solr.sortBy.date=Last Modification Date
+solr.sortBy.author_display_sort=Last Author
+solr.sortBy.filename_sort=File Name
+solr.sortBy.attsize_sort=File Size
+solr.sortBy.attdate_sort=Upload Date
+solr.sortBy.attauthor_display_sort=Uploaded By
+solr.sortOrder.asc=Ascending
+solr.sortOrder.desc=Descending
+
+solr.result.language=Language
+solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
+solr.result.author=Modified by {0} on {1}
+solr.result.mediaType=File of type {0}
+solr.result.uploadedBy=Uploaded by {0} on {1} ({2})
+solr.result.highlightAll=Highlight all matches
+
+solr.filter.title=Advanced Options
+solr.filter.hint=Select predefined filters that will be applied on your query.
+solr.filter.toggle=Toggle the search filter
+solr.filterBy.wiki=Wiki
+solr.filterBy.wiki.all=All wikis
+solr.filterBy.type=Result type
+solr.filterBy.type.all=All result types
+solr.filterBy.type.document=Document
+solr.filterBy.type.attachment=Attachment
+solr.filterBy.type.object=Object
+solr.filterBy.type.object_property=Object property
+solr.filterBy.language=Language
+solr.filterBy.language.all=All languages
+solr.filterBy.space=Space
+solr.filterBy.fileType=Attachment media type
+solr.filterBy.fileType.all=All media types
+solr.filterBy.fileType.image=Image
+solr.filterBy.fileType.audio=Audio
+solr.filterBy.fileType.video=Video
+solr.filterBy.fileType.text=Text
+solr.filter.queryBoost.label=Query boost
+solr.filter.queryBoost.hint=Allows to modify the relevance of certain fields e.g. title^1.2 name^2.0 author^1.0 doccontent^0.5
+
+solr.facets.title=Refine your search
+solr.facets.hint=Select a category and activate filters on the current results
+solr.facets.resetAll=Reset all
+solr.facets.expandAll=Expand all
+solr.facets.collapseAll=Collapse all
+solr.facets.emptyValue=Empty Value
+solr.facets.moreValues={0} more
+
+solr.facet.date.today=Today
+solr.facet.date.last7Days=Last 7 days
+solr.facet.date.last30Days=Last 30 days
+solr.facet.date.customInterval=Custom date &amp; time interval
+solr.facet.date.start=Start date and time
+solr.facet.date.end=End date and time
+solr.facet.date.applyCustomInterval=Apply
+solr.facet.date.between=From {0} to {1}
+solr.facet.date.after=After {0}
+solr.facet.date.before=Before {0}
+solr.facet.date.any=Any date
+
+solr.field.type=Result type
+solr.field.locale=Language
+solr.field.locale.emptyValue=No Language
+solr.field.locale.emptyValue.hint=Some documents don't have a language set because they contain scripts (which are not written in a natural language) or they make up the user interface which is displayed in the current language (like this page).
+solr.field.wiki=Wiki
+solr.field.space=Space
+solr.field.space_exact=Space
+solr.field.name=Page
+solr.field.name_exact=Page
+solr.field.title=Title
+solr.field.author=Last Author
+solr.field.author_display=Last Author
+solr.field.creator_display=Creator
+solr.field.date=Last Modification Date
+solr.field.creationdate=Creation Date
+solr.field.doccontent=Rendered Document Content
+solr.field.doccontentraw=Raw Document Content
+solr.field.class=Object Type
+solr.field.class.definedBy=Defined by {0} \u00BB {1}
+solr.field.propertyname=Property Name
+solr.field.propertyvalue=Property Value
+solr.field.filename=Attachment Name
+solr.field.attcontent=Attachment Content
+solr.field.comment=Comments
+solr.field.objcontent=Objects
+solr.field.mimetype=Media Type
+solr.field.attauthor=Uploaded By
+solr.field.attdate=Upload Date
+solr.field.attsize=File Size</content>
   <object>
+    <name>Main.SolrTranslations</name>
+    <number>0</number>
+    <className>XWiki.TranslationDocumentClass</className>
+    <guid>54715b8e-2403-4d0f-9b46-26f2b0e9e339</guid>
     <class>
       <name>XWiki.TranslationDocumentClass</name>
       <customClass/>
@@ -49,111 +165,8 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
-    <name>Main.SolrTranslations</name>
-    <number>0</number>
-    <className>XWiki.TranslationDocumentClass</className>
-    <guid>54715b8e-2403-4d0f-9b46-26f2b0e9e339</guid>
     <property>
       <scope>WIKI</scope>
     </property>
   </object>
-  <content>solr.admin.title=Solr Search Administration
-solr.admin.submit=Apply
-solr.admin.error.notallowed=You are not allowed to perform this action.
-solr.admin.error.norights=Administration rights are required to access this section.
-
-solr.admin.status.title=Status
-solr.admin.status.queueSize.label=Queue Size
-solr.admin.status.queueSize.hint=The number of entities that are left to be indexed, re-indexed or deleted from the index (depending on the executed action).
-
-solr.admin.indexing.title=Indexing
-solr.admin.indexing.action.label=Action
-solr.admin.indexing.action.hint=The action to perform on the index.
-solr.admin.indexing.action.select_index=Add to index
-solr.admin.indexing.action.select_delete=Delete from index
-solr.admin.indexing.action.select_reindex=Reindex
-solr.admin.indexing.wiki.label=Wiki
-solr.admin.indexing.wiki.hint=The wiki for which all its documents will be affected by the selected action.
-solr.admin.indexing.wiki.select_farm=Entire farm
-solr.admin.indexing.query.label=Custom query
-solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
-
-solr.sortBy=Sort by:
-solr.sortBy.score=Relevance
-solr.sortBy.title_sort=Title
-solr.sortBy.date=Date
-solr.sortBy.author_display_sort=Last Author
-solr.sortOrder.asc=Ascending
-solr.sortOrder.desc=Descending
-
-solr.result.language=Language
-solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
-solr.result.author=Modified by {0} on {1}
-solr.result.mediaType=File of type {0}
-solr.result.object=Object of type {0}
-solr.result.property=Property {0}#{1}
-solr.result.highlightAll=Highlight all matches
-
-solr.filter.title=Advanced Options
-solr.filter.hint=Select predefined filters that will be applied on your query.
-solr.filter.toggle=Toggle the search filter
-solr.filterBy.wiki=Wiki
-solr.filterBy.wiki.all=All wikis
-solr.filterBy.type=Type
-solr.filterBy.type.all=All types
-solr.filterBy.type.document=Document
-solr.filterBy.type.attachment=Attachment
-solr.filterBy.type.object=Object
-solr.filterBy.type.object_property=Object property
-solr.filterBy.language=Language
-solr.filterBy.language.all=All languages
-solr.filterBy.space=Space
-solr.filterBy.fileType=File type
-solr.filterBy.fileType.all=All file types
-solr.filterBy.fileType.image=Image
-solr.filterBy.fileType.audio=Audio
-solr.filterBy.fileType.video=Video
-solr.filterBy.fileType.text=Text
-solr.filter.queryBoost.label=Query boost
-solr.filter.queryBoost.hint=Allows to modify the relevance of certain fields e.g. title^1.2 name^2.0 author^1.0 doccontent^0.5
-
-solr.facets.title=Refine your search
-solr.facets.hint=Select a category and activate filters on the current results
-solr.facets.resetAll=Reset all
-solr.facets.expandAll=Expand all
-solr.facets.collapseAll=Collapse all
-solr.facets.emptyValue=Empty Value
-solr.facets.moreValues={0} more
-
-solr.facet.date.today=Today
-solr.facet.date.last7Days=Last 7 days
-solr.facet.date.last30Days=Last 30 days
-solr.facet.date.customInterval=Custom interval
-solr.facet.date.start=Start date
-solr.facet.date.end=End date
-solr.facet.date.between=From {0} to {1}
-solr.facet.date.after=After {0}
-solr.facet.date.before=Before {0}
-solr.facet.date.any=Any date
-
-solr.field.locale=Language
-solr.field.locale.emptyValue=No Language
-solr.field.wiki=Wiki
-solr.field.space=Space
-solr.field.space_exact=Space
-solr.field.name=Page
-solr.field.name_exact=Page
-solr.field.title=Title
-solr.field.author_display=Author
-solr.field.creator_display=Creator
-solr.field.date=Last Modification Date
-solr.field.creationdate=Creation Date
-solr.field.doccontent=Rendered Document Content
-solr.field.doccontentraw=Raw Document Content
-solr.field.propertyname=Property Name
-solr.field.propertyvalue=Property Value
-solr.field.filename=Attachment Name
-solr.field.attcontent=Attachment Content
-solr.field.comment=Comments
-solr.field.objcontent=Objects</content>
 </xwikidoc>

@@ -11,11 +11,12 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1382871831000</creationDate>
-  <date>1382871831000</date>
-  <contentUpdateDate>1382871831000</contentUpdateDate>
+  <creationDate>1384507498000</creationDate>
+  <date>1384508603000</date>
+  <contentUpdateDate>1384508603000</contentUpdateDate>
   <version>1.1</version>
   <title>XWikiSyntaxHeadings</title>
+  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -38,14 +39,17 @@
 1.1.1.1.1 Ebene 5
 1.1.1.1.1.1 Ebene 6
 )))|(((
-{{html}}
-&lt;!-- Note: replace this with wiki syntax when http://jira.xwiki.org/jira/browse/XWIKI-4358 is implemented --&gt;
-&lt;h1 id="Hlevel1"&gt;&lt;span&gt;Ebene 1&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&lt;h2 id="Hlevel2"&gt;&lt;span&gt;Ebene 2&lt;/span&gt;&lt;/h2&gt;&lt;h3 id="Hlevel3"&gt;&lt;span&gt;Ebene 3&lt;/span&gt;&lt;/h3&gt;&lt;h4 id="Hlevel4"&gt;&lt;span&gt;Ebene 4&lt;/span&gt;&lt;/h4&gt;&lt;h5 id="Hlevel5"&gt;&lt;span&gt;Ebene 5&lt;/span&gt;&lt;/h5&gt;&lt;h6 id="Hlevel6"&gt;&lt;span&gt;Ebene 6&lt;/span&gt;&lt;/h6&gt;
-{{/html}})))
+= Ebene 1 = 
+== Ebene 2 ==
+=== Ebene 3 ===
+==== Ebene 4 ====
+===== Ebene 5 =====
+====== Ebene 6 ======
+)))
 |Parametrisierte Überschrift|&lt;h1&gt;&lt;span style="color:blue"&gt;Überschrift&lt;/span&gt;&lt;/h1&gt;|(((
-{{html}}
-&lt;h1 id="Hheading" style="color:blue"&gt;&lt;span&gt;Überschrift&lt;/span&gt;&lt;/h1&gt;
-{{/html}})))
+(% style="color:blue" %)
+= Überschrift =
+)))
 |Überschrift mit XWiki Syntax|1.1.1 Überschrift mit *fett*|(((=== Überschrift mit **fett** ===)))
 
 === 2.0 Headings ===
@@ -59,13 +63,16 @@
 ===== Ebene 5 =====
 ====== Ebene 6 ======
 }}})))|(((
-{{html}}
-&lt;!-- Note: replace this with wiki syntax when http://jira.xwiki.org/jira/browse/XWIKI-4358 is implemented --&gt;
-&lt;h1 id="Hlevel1"&gt;&lt;span&gt;Ebene 1&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&lt;h2 id="Hlevel2"&gt;&lt;span&gt;Ebene 2&lt;/span&gt;&lt;/h2&gt;&lt;h3 id="Hlevel3"&gt;&lt;span&gt;Ebene 3&lt;/span&gt;&lt;/h3&gt;&lt;h4 id="Hlevel4"&gt;&lt;span&gt;Ebene 4&lt;/span&gt;&lt;/h4&gt;&lt;h5 id="Hlevel5"&gt;&lt;span&gt;Ebene 5&lt;/span&gt;&lt;/h5&gt;&lt;h6 id="Hlevel6"&gt;&lt;span&gt;Ebene 6&lt;/span&gt;&lt;/h6&gt;
-{{/html}})))
+= Ebene 1 = 
+== Ebene 2 ==
+=== Ebene 3 ===
+==== Ebene 4 ====
+===== Ebene 5 =====
+====== Ebene 6 ======
+)))
 |Parametrisierte Überschrift|{{{(% style="color:blue" %)}}}\\= Überschrift =|(((
-{{html}}
-&lt;h1 id="Hheading" style="color:blue"&gt;&lt;span&gt;Überschrift&lt;/span&gt;&lt;/h1&gt;
-{{/html}})))
+(% style="color:blue" %)
+= Überschrift =
+)))
 |Überschrift mit XWiki Syntax|{{{=== Überschrift mit **fett** ===}}}|(((=== Überschrift mit **fett** ===)))</content>
 </xwikidoc>

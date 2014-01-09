@@ -20,7 +20,7 @@
 package com.xpn.xwiki.internal.event;
 
 import org.xwiki.observation.event.AbstractFilterableEvent;
-import org.xwiki.observation.event.BeginEvent;
+import org.xwiki.observation.event.BeginFoldEvent;
 
 /**
  * Event to notify of the starting import of a XAR package.
@@ -30,7 +30,7 @@ import org.xwiki.observation.event.BeginEvent;
  * 
  * @version $Id$
  */
-public class XARImportingEvent extends AbstractFilterableEvent implements BeginEvent
+public class XARImportingEvent extends AbstractFilterableEvent implements BeginFoldEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class

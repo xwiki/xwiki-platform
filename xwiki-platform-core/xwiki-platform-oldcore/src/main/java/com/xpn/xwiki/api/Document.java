@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 
@@ -485,11 +486,26 @@ public class Document extends Api
      * Get the language of the document. If the document is a translation it returns the language set for it, otherwise,
      * it returns the default language in the wiki where the document is stored.
      * 
-     * @return The language of the document.
+     * @return the language of the document.
+     * @deprecated since 5.4M1 use {@link #getLocale()} instead
+     * @todo Add a @Deprecated annotation too but be prepared to fix all the resulting Velocity warnings that will
+     *       appear in the logs
      */
     public String getLanguage()
     {
         return this.doc.getLanguage();
+    }
+
+    /**
+     * Get the locale of the document. If the document is a translation it returns the locale set for it, otherwise,
+     * it returns the root locale.
+     *
+     * @return the locale of the document
+     * @since 5.4M1
+     */
+    public Locale getLocale()
+    {
+        return this.doc.getLocale();
     }
 
     /**

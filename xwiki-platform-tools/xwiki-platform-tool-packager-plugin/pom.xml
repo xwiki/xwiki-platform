@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -220,6 +220,12 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wikistream-instance-oldcore</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
       <scope>runtime</scope>
@@ -236,10 +242,10 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- We need pick a Wiki Descriptor implementation @ runtime -->
+    <!-- We need pick a Wiki implementation @ runtime -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-descriptor-default</artifactId>
+      <artifactId>xwiki-platform-wiki-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

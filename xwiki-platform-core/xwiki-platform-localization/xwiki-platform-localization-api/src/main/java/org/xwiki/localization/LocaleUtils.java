@@ -57,10 +57,11 @@ public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
     }
 
     /**
-     * Extends {@link org.apache.commons.lang3.LocaleUtils} which return {@link Locale.ROOT} for an empty string.
+     * Extends {@link org.apache.commons.lang3.LocaleUtils} which return {@link Locale#ROOT} for an empty string.
      * 
      * @param str the locale String to convert, null returns null
      * @return a Locale, null if null input
+     * @throws IllegalArgumentException if the string is an invalid format
      * @since 5.2M1
      */
     public static Locale toLocale(String str)

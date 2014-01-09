@@ -27,15 +27,11 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wikistream</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-events</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Wiki Stream - Events</name>
-  <properties>
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-    <xwiki.clirr.skip>true</xwiki.clirr.skip>
-  </properties>
+  <name>XWiki Platform - WikiStream - Events</name>
   <modules>
     <module>xwiki-platform-wikistream-events-model</module>
     <module>xwiki-platform-wikistream-events-xwiki</module>

@@ -26,6 +26,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 
@@ -148,9 +149,39 @@ public class LiveTableElement extends BaseElement
      */
     public int getRowCount()
     {
-        WebElement liveTableBody = getDriver().findElement(By.id(livetableId + "-display"));
+        WebElement liveTableBody = getUtil().findElementWithoutWaiting(getDriver(), By.id(livetableId + "-display"));
         // We use XPath because we're interested only in the direct children.
-        return liveTableBody.findElements(By.xpath("tr")).size();
+        return getUtil().findElementsWithoutWaiting(getDriver(), liveTableBody, By.xpath("tr")).size();
+    }
+
+    /**
+     * @since 5.3RC1
+     */
+    public WebElement getRow(int rowNumber)
+    {
+        WebElement liveTableBody = getUtil().findElementWithoutWaiting(getDriver(), By.id(livetableId + "-display"));
+        return getUtil().findElementWithoutWaiting(getDriver(), liveTableBody, By.xpath("tr[" + rowNumber + "]"));
+    }
+
+    /**
+     * @since 5.3RC1
+     */
+    public WebElement getCell(WebElement rowElement, int columnNumber)
+    {
+        return getUtil().findElementWithoutWaiting(getDriver(), rowElement, By.xpath("td[" + columnNumber + "]"));
+    }
+
+    /**
+     * @since 5.3RC1
+     */
+    public ViewPage clickCell(int rowNumber, int columnNumber)
+    {
+        WebElement tdElement = getCell(getRow(rowNumber), columnNumber);
+        // First scroll the element into view, if needed, by moving the mouse to the top left corner of the element.
+        new Actions(getDriver()).moveToElement(tdElement, 0, 0).perform();
+        // Find the first A element and click it!
+        tdElement.findElement(By.tagName("a")).click();
+        return new ViewPage();
     }
 
     /**

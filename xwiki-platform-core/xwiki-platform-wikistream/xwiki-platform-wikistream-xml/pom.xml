@@ -27,10 +27,10 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wikistream</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-xml</artifactId>
-  <name>XWiki Platform - Wiki Stream - XML</name>
+  <name>XWiki Platform - WikiStream - XML</name>
   <description>XML related tools for wiki streams</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
@@ -64,22 +64,17 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-              org/xwiki/wikistream/xml/input/source/SourceInputSource.java,
-              org/xwiki/wikistream/xml/internal/DefaultResultOutputTarget.java,
               org/xwiki/wikistream/xml/internal/input/AbstractXMLBeanInputWikiStreamFactory.java,
               org/xwiki/wikistream/xml/internal/input/AbstractXMLInputWikiStream.java,
               org/xwiki/wikistream/xml/internal/input/DefaultSourceInputSource.java,
               org/xwiki/wikistream/xml/internal/input/DefaultXMLInputWikiStream.java,
-              org/xwiki/wikistream/xml/internal/input/XMLInputProperties.java,
               org/xwiki/wikistream/xml/internal/input/XMLInputWikiStreamUtils.java,
               org/xwiki/wikistream/xml/internal/output/AbstractXMLBeanOutputWikiStreamFactory.java,
               org/xwiki/wikistream/xml/internal/output/AbstractXMLOutputWikiStream.java,
               org/xwiki/wikistream/xml/internal/output/DefaultResultInputSource.java,
               org/xwiki/wikistream/xml/internal/output/DefaultXMLOutputWikiStream.java,
               org/xwiki/wikistream/xml/internal/output/WikiStreamXMLStreamWriter.java,
-              org/xwiki/wikistream/xml/internal/output/XMLOutputProperties.java,
-              org/xwiki/wikistream/xml/internal/output/XMLOutputWikiStreamUtils.java,
-              org/xwiki/wikistream/xml/output/ResultOutputTarget.java
+              org/xwiki/wikistream/xml/internal/output/XMLOutputWikiStreamUtils.java
           </excludes>
         </configuration>
       </plugin>

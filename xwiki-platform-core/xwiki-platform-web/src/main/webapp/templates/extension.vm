@@ -574,10 +574,12 @@ Caused by: #printThrowable($throwable.cause true)
     #end
     #set ($argument = $log.argumentArray.get($foreach.index))
     #set ($message = "$message$escapetool.xml($messageElement)")
-    ## Assume the argument is an entity reference.
-    #set ($reference = $services.model.serialize($argument))
-    #if ($reference)
-      #set ($message = "$message<a href=""$xwiki.getURL($argument)"">$escapetool.xml($reference)</a>")
+    ## This code prints a message from the log. The $argument is the entity that is concerned by the message.
+    ## We will display a link to that entity, so we need to extract the document from it.
+    #set ($documentReference = $argument.extractReference("DOCUMENT"))
+    #if ($documentReference)
+      #set ($serializedArgument = $services.model.serialize($argument))
+      #set ($message = "$message<a href=""$xwiki.getURL($documentReference)"">$escapetool.xml($serializedArgument)</a>")
     #elseif ($argument.id && ($argument.version || $argument.versionConstraint))
       #if ($resolveRemotely)
         ## Assume the argument is an extension dependency.
@@ -1205,7 +1207,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #set ($wikiName = $stringtool.removeStart($namespace, 'wiki:'))
 #set ($wikiReference = $services.model.createDocumentReference($wikiName, '', '').wikiReference)
 #set ($wikiHomeDocumentReference = $services.model.resolveDocument('', 'default', $wikiReference))
-#set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wikiName).wikiPrettyName)
+#set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
 #if ("$!wikiPrettyName.trim()" == '')
 #set ($wikiPrettyName = $wikiName)
 #end

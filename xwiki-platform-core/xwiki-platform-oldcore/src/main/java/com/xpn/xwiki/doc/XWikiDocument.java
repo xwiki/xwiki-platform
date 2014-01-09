@@ -121,6 +121,10 @@ import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.xar.internal.model.XarAttachmentModel;
+import org.xwiki.xar.internal.model.XarClassModel;
+import org.xwiki.xar.internal.model.XarDocumentModel;
+import org.xwiki.xar.internal.model.XarObjectModel;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -3573,6 +3577,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         setContentDirty(true);
     }
 
+    /**
+     * Load attachment content from database.
+     * 
+     * @param context the XWiki context
+     * @throws XWikiException when failing to load attachments
+     * @since 5.3M2
+     */
+    public void loadAttachmentsContent(XWikiContext context) throws XWikiException
+    {
+        for (XWikiAttachment attachment : getAttachmentList()) {
+            attachment.loadContent(context);
+        }
+    }
+
     public void loadAttachments(XWikiContext context) throws XWikiException
     {
         for (XWikiAttachment attachment : getAttachmentList()) {
@@ -3668,62 +3686,66 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * related information. For example it allows to compare a document comming from a another wiki and easily check if
      * thoses actually are the same thing whatever the plumbing differences.
      * 
-     * @param doc the document to compare
+     * @param otherDocument the document to compare
      * @return true if bith documents have the same datas
      * @since 4.1.1
      */
-    public boolean equalsData(XWikiDocument doc)
+    public boolean equalsData(XWikiDocument otherDocument)
     {
         // Same Java object, they sure are equal
-        if (this == doc) {
+        if (this == otherDocument) {
             return true;
         }
 
-        if (ObjectUtils.notEqual(getParentReference(), doc.getParentReference())) {
+        if (ObjectUtils.notEqual(getParentReference(), otherDocument.getParentReference())) {
             return false;
         }
 
-        if (!getFormat().equals(doc.getFormat())) {
+        if (!getFormat().equals(otherDocument.getFormat())) {
             return false;
         }
 
-        if (!getTitle().equals(doc.getTitle())) {
+        if (!getTitle().equals(otherDocument.getTitle())) {
             return false;
         }
 
-        if (!getContent().equals(doc.getContent())) {
+        if (!getContent().equals(otherDocument.getContent())) {
             return false;
         }
 
-        if (!getDefaultTemplate().equals(doc.getDefaultTemplate())) {
+        if (!getDefaultTemplate().equals(otherDocument.getDefaultTemplate())) {
             return false;
         }
 
-        if (!getValidationScript().equals(doc.getValidationScript())) {
+        if (!getValidationScript().equals(otherDocument.getValidationScript())) {
             return false;
         }
 
-        if (ObjectUtils.notEqual(getSyntax(), doc.getSyntax())) {
+        if (ObjectUtils.notEqual(getSyntax(), otherDocument.getSyntax())) {
             return false;
         }
 
-        if (isHidden() != doc.isHidden()) {
+        if (isHidden() != otherDocument.isHidden()) {
             return false;
         }
 
-        if (!getXClass().equals(doc.getXClass())) {
+        // XClass
+
+        if (!getXClass().equals(otherDocument.getXClass())) {
             return false;
         }
+
+        // XObjects
 
         Set<DocumentReference> myObjectClassReferences = getXObjects().keySet();
-        Set<DocumentReference> otherObjectClassReferences = doc.getXObjects().keySet();
+        Set<DocumentReference> otherObjectClassReferences = otherDocument.getXObjects().keySet();
         if (!myObjectClassReferences.equals(otherObjectClassReferences)) {
             return false;
         }
 
         for (DocumentReference reference : myObjectClassReferences) {
             List<BaseObject> myObjects = getXObjects(reference);
-            List<BaseObject> otherObjects = doc.getXObjects(reference);
+            List<BaseObject> otherObjects = otherDocument.getXObjects(reference);
             if (myObjects.size() != otherObjects.size()) {
                 return false;
             }
@@ -3738,6 +3760,24 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 if (!myObjects.get(i).equals(otherObjects.get(i))) {
                     return false;
                 }
+            }
+        }
+
+        // Attachments
+        List<XWikiAttachment> attachments = getAttachmentList();
+        List<XWikiAttachment> otherAttachments = otherDocument.getAttachmentList();
+        if (attachments.size() != otherAttachments.size()) {
+            return false;
+        }
+        for (XWikiAttachment attachment : attachments) {
+            XWikiAttachment otherAttachment = otherDocument.getAttachment(attachment.getFilename());
+            try {
+                if (otherAttachment == null || attachment.equalsData(otherAttachment, null)) {
+                    return false;
+                }
+            } catch (XWikiException e) {
+                throw new RuntimeException(String.format("Failed to compare attachments with reference [%0]",
+                    attachment.getReference()), e);
             }
         }
 
@@ -4272,8 +4312,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // constructed XWikiDocument object has a valid name or space (by using current document values if they are
         // missing). This is important since document name, space and wiki must always be set in a XWikiDocument
         // instance.
-        String name = getElement(docel, "name");
-        String space = getElement(docel, "web");
+        String name = getElement(docel, XarDocumentModel.ELEMENT_NAME);
+        String space = getElement(docel, XarDocumentModel.ELEMENT_SPACE);
 
         if (StringUtils.isEmpty(name) || StringUtils.isEmpty(space)) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -4285,63 +4325,63 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         reference = this.currentReferenceDocumentReferenceResolver.resolve(reference);
         setDocumentReference(new DocumentReference(reference));
 
-        String parent = getElement(docel, "parent");
+        String parent = getElement(docel, XarDocumentModel.ELEMENT_PARENT);
         if (StringUtils.isNotEmpty(parent)) {
             setParentReference(this.relativeEntityReferenceResolver.resolve(parent, EntityType.DOCUMENT));
         }
 
-        setCreator(getElement(docel, "creator"));
-        setAuthor(getElement(docel, "author"));
-        setCustomClass(getElement(docel, "customClass"));
-        setContentAuthor(getElement(docel, "contentAuthor"));
-        if (docel.element("version") != null) {
-            setVersion(getElement(docel, "version"));
+        setCreator(getElement(docel, XarDocumentModel.ELEMENT_CREATION_AUTHOR));
+        setAuthor(getElement(docel, XarDocumentModel.ELEMENT_REVISION_AUTHOR));
+        setCustomClass(getElement(docel, XarDocumentModel.ELEMENT_CUSTOMCLASS));
+        setContentAuthor(getElement(docel, XarDocumentModel.ELEMENT_CONTENT_AUTHOR));
+        if (docel.element(XarDocumentModel.ELEMENT_REVISION) != null) {
+            setVersion(getElement(docel, XarDocumentModel.ELEMENT_REVISION));
         }
-        setContent(getElement(docel, "content"));
-        setLanguage(getElement(docel, "language"));
-        setDefaultLanguage(getElement(docel, "defaultLanguage"));
-        setTitle(getElement(docel, "title"));
-        setDefaultTemplate(getElement(docel, "defaultTemplate"));
-        setValidationScript(getElement(docel, "validationScript"));
-        setComment(getElement(docel, "comment"));
+        setContent(getElement(docel, XarDocumentModel.ELEMENT_CONTENT));
+        setLanguage(getElement(docel, XarDocumentModel.ELEMENT_LOCALE));
+        setDefaultLanguage(getElement(docel, XarDocumentModel.ELEMENT_DEFAULTLOCALE));
+        setTitle(getElement(docel, XarDocumentModel.ELEMENT_TITLE));
+        setDefaultTemplate(getElement(docel, XarDocumentModel.ELEMENT_DEFAULTTEMPLATE));
+        setValidationScript(getElement(docel, XarDocumentModel.ELEMENT_VALIDATIONSCRIPT));
+        setComment(getElement(docel, XarDocumentModel.ELEMENT_REVISION_COMMENT));
 
-        String minorEdit = getElement(docel, "minorEdit");
+        String minorEdit = getElement(docel, XarDocumentModel.ELEMENT_REVISION_MINOR);
         setMinorEdit(Boolean.valueOf(minorEdit).booleanValue());
 
-        String hidden = getElement(docel, "hidden");
+        String hidden = getElement(docel, XarDocumentModel.ELEMENT_HIDDEN);
         setHidden(Boolean.valueOf(hidden).booleanValue());
 
-        String strans = getElement(docel, "translation");
+        String strans = getElement(docel, XarDocumentModel.ELEMENT_ISTRANSLATION);
         if ((strans == null) || strans.equals("")) {
             setTranslation(0);
         } else {
             setTranslation(Integer.parseInt(strans));
         }
 
-        String archive = getElement(docel, "versions");
+        String archive = getElement(docel, XarDocumentModel.ELEMENT_REVISIONS);
         if (withArchive && archive != null && archive.length() > 0) {
             setDocumentArchive(archive);
         }
 
-        String sdate = getElement(docel, "date");
+        String sdate = getElement(docel, XarDocumentModel.ELEMENT_REVISION_DATE);
         if (!sdate.equals("")) {
             Date date = new Date(Long.parseLong(sdate));
             setDate(date);
         }
 
-        String contentUpdateDateString = getElement(docel, "contentUpdateDate");
+        String contentUpdateDateString = getElement(docel, XarDocumentModel.ELEMENT_CONTENT_DATE);
         if (!StringUtils.isEmpty(contentUpdateDateString)) {
             Date contentUpdateDate = new Date(Long.parseLong(contentUpdateDateString));
             setContentUpdateDate(contentUpdateDate);
         }
 
-        String scdate = getElement(docel, "creationDate");
+        String scdate = getElement(docel, XarDocumentModel.ELEMENT_CREATION_DATE);
         if (!scdate.equals("")) {
             Date cdate = new Date(Long.parseLong(scdate));
             setCreationDate(cdate);
         }
 
-        String syntaxId = getElement(docel, "syntaxId");
+        String syntaxId = getElement(docel, XarDocumentModel.ELEMENT_SYNTAX);
         if ((syntaxId == null) || (syntaxId.length() == 0)) {
             // Documents that don't have syntax ids are considered old documents and thus in
             // XWiki Syntax 1.0 since newer documents always have syntax ids.
@@ -4350,7 +4390,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             setSyntaxId(syntaxId);
         }
 
-        List<Element> atels = docel.elements("attachment");
+        List<Element> atels = docel.elements(XarAttachmentModel.ELEMENT_ATTACHMENT);
         for (Element atel : atels) {
             XWikiAttachment attach = new XWikiAttachment();
             attach.setDoc(this);
@@ -4358,7 +4398,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             getAttachmentList().add(attach);
         }
 
-        Element cel = docel.element("class");
+        Element cel = docel.element(XarClassModel.ELEMENT_CLASS);
         BaseClass bclass = new BaseClass();
         if (cel != null) {
             bclass.fromXML(cel);
@@ -4366,7 +4406,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         @SuppressWarnings("unchecked")
-        List<Element> objels = docel.elements("object");
+        List<Element> objels = docel.elements(XarObjectModel.ELEMENT_OBJECT);
         for (Element objel : objels) {
             BaseObject bobject = new BaseObject();
             bobject.fromXML(objel);
@@ -4389,7 +4429,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public static boolean containsXMLWikiDocument(Document domdoc)
     {
-        return domdoc.getRootElement().getName().equals("xwikidoc");
+        return domdoc.getRootElement().getName().equals(XarDocumentModel.ELEMENT_DOCUMENT);
     }
 
     public void setAttachmentList(List<XWikiAttachment> list)
@@ -5104,6 +5144,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return null;
+    }
+
+    /**
+     * Add passed attachment to the document.
+     * 
+     * @param attachment the attachment to add
+     * @since 5.3M2
+     */
+    public void addAttachment(XWikiAttachment attachment)
+    {
+        attachment.setDoc(this);
+        getAttachmentList().add(attachment);
     }
 
     /**
@@ -5973,10 +6025,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             String fileName = origAttach.getFilename();
             XWikiAttachment newAttach = toDoc.getAttachment(fileName);
             if (newAttach == null) {
-                difflist.add(new AttachmentDiff(fileName, origAttach.getVersion(), null));
+                difflist.add(new AttachmentDiff(fileName, org.xwiki.diff.Delta.Type.DELETE, origAttach, newAttach));
             } else {
-                if (!origAttach.getVersion().equals(newAttach.getVersion())) {
-                    difflist.add(new AttachmentDiff(fileName, origAttach.getVersion(), newAttach.getVersion()));
+                try {
+                    if (!origAttach.equalsData(newAttach, context)) {
+                        difflist.add(new AttachmentDiff(fileName, org.xwiki.diff.Delta.Type.CHANGE, origAttach,
+                            newAttach));
+                    }
+                } catch (XWikiException e) {
+                    LOGGER.error("Failed to compare attachments [{}] and [{}]", origAttach, newAttach);
                 }
             }
         }
@@ -5985,7 +6042,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             String fileName = newAttach.getFilename();
             XWikiAttachment origAttach = fromDoc.getAttachment(fileName);
             if (origAttach == null) {
-                difflist.add(new AttachmentDiff(fileName, null, newAttach.getVersion()));
+                difflist.add(new AttachmentDiff(fileName, org.xwiki.diff.Delta.Type.INSERT, origAttach, newAttach));
             }
         }
 
@@ -8248,10 +8305,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * <p>
      * All 3 documents are supposed to have the same document reference and language already since that's what makes
      * them uniques.
-     * <p>
-     * Important note: this method does not take care of attachments contents related operations and only remove
-     * attachments which need to be removed from the list. For memory handling reasons all attachments contents related
-     * operations should be done elsewhere.
      * 
      * @param previousDocument the previous version of the document
      * @param newDocument the next version of the document
@@ -8398,12 +8451,66 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (!attachmentsDiff.isEmpty()) {
             // Apply deleted attachment diff on result (new attachment has already been saved)
             for (AttachmentDiff diff : attachmentsDiff) {
-                if (diff.getNewVersion() == null) {
-                    XWikiAttachment attachmentResult = getAttachment(diff.getFileName());
+                XWikiAttachment previousAttachment = diff.getOrigAttachment();
+                XWikiAttachment nextAttachment = diff.getNewAttachment();
+                XWikiAttachment attachment = getAttachment(diff.getFileName());
 
-                    removeAttachment(attachmentResult);
-
-                    mergeResult.setModified(true);
+                switch (diff.getType()) {
+                    case DELETE:
+                        if (attachment != null) {
+                            try {
+                                if (attachment.equalsData(previousAttachment, context)) {
+                                    removeAttachment(attachment);
+                                    mergeResult.setModified(true);
+                                } else {
+                                    // XXX: collision between DB and new: attachment modified by user
+                                    mergeResult.getLog().error("Collision found on attachment [{}]",
+                                        attachment.getReference());
+                                }
+                            } catch (XWikiException e) {
+                                mergeResult.getLog().error("Failed to compare attachments with reference [{}]",
+                                    attachment.getReference());
+                            }
+                        } else {
+                            // Already removed from DB, lets assume the user is prescient
+                            mergeResult.getLog().warn("Attachment [{}] already removed",
+                                previousAttachment.getReference());
+                        }
+                        break;
+                    case INSERT:
+                        if (attachment != null) {
+                            try {
+                                if (!attachment.equalsData(nextAttachment, context)) {
+                                    // XXX: collision between DB and new: attachment to add but a different one already
+                                    // exists in the DB
+                                    mergeResult.getLog().error("Collision found on attachment [{}]",
+                                        attachment.getReference());
+                                } else {
+                                    // Already added to the DB, lets assume the user is prescient
+                                    mergeResult.getLog().warn("Attachment [{}] already added",
+                                        previousAttachment.getReference());
+                                }
+                            } catch (XWikiException e) {
+                                mergeResult.getLog().error("Failed to compare attachments with reference [{}]",
+                                    attachment.getReference());
+                            }
+                        } else {
+                            addAttachment(configuration.isProvidedVersionsModifiables() ? nextAttachment
+                                : (XWikiAttachment) nextAttachment.clone());
+                            mergeResult.setModified(true);
+                        }
+                        break;
+                    case CHANGE:
+                        if (attachment != null) {
+                            attachment.merge(previousAttachment, nextAttachment, configuration, context, mergeResult);
+                        } else {
+                            // XXX: collision between DB and new: attachment modified but does not exist in the DB
+                            mergeResult.getLog().error("Collision found on attachment [{}]",
+                                previousAttachment.getReference());
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -8438,13 +8545,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * have the same reference. Like {@link #merge(XWikiDocument, XWikiDocument, MergeConfiguration, XWikiContext)},
      * this method is dealing with "real" data and should not change everything related to version management and
      * document identifier.
-     * <p>
-     * This method also does not take into account attachments because: <u>
-     * <li>removing attachments means directly modifying the database, there is no way to indicate attachment to remove
-     * later like with objects (this could be improved later)</li>
-     * <li>copying them all from one XWikiDocument to another could be very expensive for the memory if done all at once
-     * since it mean loading all the attachment content in memory. Better doing it one by one after before or after the
-     * call to this method.</li>
      * 
      * @param document the document to apply
      * @return false is nothing changed
@@ -8556,7 +8656,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 }
             }
         }
-        // Add new attachments or update existing objects
+        // Add new attachments or update existing attachments
+        for (XWikiAttachment attachment : document.getAttachmentList()) {
+            XWikiAttachment originalAttachment = getAttachment(attachment.getFilename());
+            if (originalAttachment == null) {
+                addAttachment(attachment);
+            } else {
+                originalAttachment.apply(attachment);
+            }
+        }
 
         return modified;
     }

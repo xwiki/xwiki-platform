@@ -19,11 +19,11 @@
  */
 package com.xpn.xwiki.objects;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
+import org.xwiki.xar.internal.property.DateXarObjectPropertySerializer;
 
 /**
  * Represents a date property.
@@ -76,7 +76,7 @@ public class DateProperty extends BaseProperty implements Cloneable
     {
         // FIXME: The value of a date property should be serialized using the date timestamp or the date format
         // specified in the XClass the date property belongs to.
-        return getValue() == null ? "" : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S").format(getValue());
+        return getValue() == null ? "" : DateXarObjectPropertySerializer.DEFAULT_FORMAT.format(getValue());
     }
 
     @Override

@@ -232,16 +232,16 @@ public class PdfExportImpl implements PdfExport
      */
     private String convertToStrictXHtml(String input)
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Cleaning HTML: " + input);
-        }
+        LOGGER.debug("Cleaning HTML:\n{}", input);
 
         HTMLCleaner cleaner = Utils.getComponent(HTMLCleaner.class);
         HTMLCleanerConfiguration config = cleaner.getDefaultConfiguration();
         List<HTMLFilter> filters = new ArrayList<HTMLFilter>(config.getFilters());
         filters.add(Utils.getComponent(HTMLFilter.class, "uniqueId"));
         config.setFilters(filters);
-        return HTMLUtils.toString(cleaner.clean(new StringReader(input), config));
+        String result = HTMLUtils.toString(cleaner.clean(new StringReader(input), config));
+        LOGGER.debug("Cleaned XHTML:\n{}", result);
+        return result;
     }
 
     /**
@@ -260,17 +260,13 @@ public class PdfExportImpl implements PdfExport
     protected void exportXHTML(String xhtml, OutputStream out, ExportType type, XWikiContext context)
         throws XWikiException
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Final XHTML for export: " + xhtml);
-        }
+        LOGGER.debug("Final XHTML for export:\n{}", xhtml);
 
         // XSL Transformation to XML-FO
         String xmlfo = convertXHtmlToXMLFO(xhtml, context);
 
         // Debug output
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("XSL-FO source: " + xmlfo);
-        }
+        LOGGER.debug("Final XSL-FO source:\n{}", xmlfo);
 
         renderXSLFO(xmlfo, out, type, context);
     }
@@ -293,6 +289,7 @@ public class PdfExportImpl implements PdfExport
     private String convertXHtmlToXMLFO(String xhtml, XWikiContext context) throws XWikiException
     {
         String xmlfo = applyXSLT(xhtml, getXhtml2FopXslt(context));
+        LOGGER.debug("Intermediary XSL-FO:\n{}", xmlfo);
         return applyXSLT(xmlfo, getFopCleanupXslt(context));
     }
 
@@ -405,6 +402,7 @@ public class PdfExportImpl implements PdfExport
      */
     private String applyCSS(String html, String css, XWikiContext context)
     {
+        LOGGER.debug("Applying the following CSS:\n{}", css);
         try {
             // Prepare the input
             Reader re = new StringReader(html);

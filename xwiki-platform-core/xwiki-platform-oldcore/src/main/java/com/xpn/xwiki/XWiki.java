@@ -573,7 +573,7 @@ public class XWiki implements EventListener
         return callPrivateMethod(obj, methodName, null, null);
     }
 
-    public static Object callPrivateMethod(Object obj, String methodName, Class< ? >[] classes, Object[] args)
+    public static Object callPrivateMethod(Object obj, String methodName, Class<?>[] classes, Object[] args)
     {
         try {
             Method method = obj.getClass().getDeclaredMethod(methodName, classes);
@@ -761,11 +761,11 @@ public class XWiki implements EventListener
                 (Type) AttachmentRecycleBinStore.class, Param("xwiki.store.attachment.recyclebin.hint", "hibernate")));
         }
 
-        resetRenderingEngine(context);
-
-        // "Pre-initialize" XWikiStubContextProvider so that plugins or listeners reacting to potential document changes
-        // can use it
+        // "Pre-initialize" XWikiStubContextProvider so that rendering engine, plugins or listeners reacting to
+        // potential document changes can use it
         Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class).initialize(context);
+
+        resetRenderingEngine(context);
 
         // Prepare the Plugin Engine
         preparePlugins(context);
@@ -981,7 +981,7 @@ public class XWiki implements EventListener
     {
         String storeclass = Param(param, defClass);
         try {
-            Class< ? >[] classes = new Class< ? >[] {XWikiContext.class};
+            Class<?>[] classes = new Class<?>[] {XWikiContext.class};
             Object[] args = new Object[] {context};
             Object result = Class.forName(storeclass).getConstructor(classes).newInstance(args);
             return result;
@@ -1684,7 +1684,7 @@ public class XWiki implements EventListener
         }
 
         String content = getResourceContent(template);
-        return privilegedTemplateRenderer.evaluateTemplate(content, template);
+        return this.privilegedTemplateRenderer.evaluateTemplate(content, template);
     }
 
     public String parseTemplate(String template, String skin, XWikiContext context)
@@ -2198,10 +2198,10 @@ public class XWiki implements EventListener
         if (cookies == null) {
             return null;
         }
-        for (int i = 0; i < cookies.length; i++) {
-            String name = cookies[i].getName();
+        for (Cookie cookie : cookies) {
+            String name = cookie.getName();
             if (name.equals(prefname)) {
-                String value = cookies[i].getValue();
+                String value = cookie.getValue();
                 if (!value.trim().equals("")) {
                     return value;
                 } else {
@@ -3323,7 +3323,7 @@ public class XWiki implements EventListener
      *         </ul>
      * @throws XWikiException failed to create the new user
      */
-    public int createUser(String userName, Map<String, ? > map, XWikiContext context) throws XWikiException
+    public int createUser(String userName, Map<String, ?> map, XWikiContext context) throws XWikiException
     {
         return createUser(userName, map, "edit", context);
     }
@@ -3341,7 +3341,7 @@ public class XWiki implements EventListener
      *         </ul>
      * @throws XWikiException failed to create the new user
      */
-    public int createUser(String userName, Map<String, ? > map, String userRights, XWikiContext context)
+    public int createUser(String userName, Map<String, ?> map, String userRights, XWikiContext context)
         throws XWikiException
     {
         BaseClass userClass = context.getWiki().getUserClass(context);
@@ -3365,7 +3365,7 @@ public class XWiki implements EventListener
      *             {@link #createUser(String, Map, EntityReference, String, Syntax, String, XWikiContext)} instead
      */
     @Deprecated
-    public int createUser(String userName, Map<String, ? > map, String parent, String content, String syntaxId,
+    public int createUser(String userName, Map<String, ?> map, String parent, String content, String syntaxId,
         String userRights, XWikiContext context) throws XWikiException
     {
         Syntax syntax;
@@ -3403,7 +3403,7 @@ public class XWiki implements EventListener
      *         </ul>
      * @throws XWikiException failed to create the new user
      */
-    public int createUser(String userName, Map<String, ? > map, EntityReference parentReference, String content,
+    public int createUser(String userName, Map<String, ?> map, EntityReference parentReference, String content,
         Syntax syntax, String userRights, XWikiContext context) throws XWikiException
     {
         BaseClass userClass = getUserClass(context);
@@ -3488,18 +3488,6 @@ public class XWiki implements EventListener
         }
     }
 
-    /**
-     * @deprecated replaced by {@link #setUserDefaultGroup(String fullwikiname, XWikiContext context)}
-     * @param context
-     * @param fullwikiname
-     * @throws XWikiException
-     */
-    @Deprecated
-    public void SetUserDefaultGroup(XWikiContext context, String fullwikiname) throws XWikiException
-    {
-        setUserDefaultGroup(fullwikiname, context);
-    }
-
     public void protectUserPage(String userName, String userRights, XWikiDocument doc, XWikiContext context)
         throws XWikiException
     {
@@ -3508,31 +3496,11 @@ public class XWiki implements EventListener
         EntityReference relativeRightClassReference =
             rightClassReference.removeParent(rightClassReference.getWikiReference());
 
-        // Add protection to the page
-        BaseObject newrightsobject = doc.newXObject(relativeRightClassReference, context);
-        newrightsobject.setLargeStringValue("groups", "XWiki.XWikiAdminGroup");
-        newrightsobject.setStringValue("levels", userRights);
-        newrightsobject.setIntValue("allow", 1);
-
+        // Allow users to edit their own profiles
         BaseObject newuserrightsobject = doc.newXObject(relativeRightClassReference, context);
         newuserrightsobject.setLargeStringValue("users", userName);
         newuserrightsobject.setStringValue("levels", userRights);
         newuserrightsobject.setIntValue("allow", 1);
-    }
-
-    /**
-     * @deprecated replaced by {@link #protectUserPage(String,String,XWikiDocument,XWikiContext)}
-     * @param context
-     * @param fullwikiname
-     * @param userRights
-     * @param doc
-     * @throws XWikiException
-     */
-    @Deprecated
-    public void ProtectUserPage(XWikiContext context, String fullwikiname, String userRights, XWikiDocument doc)
-        throws XWikiException
-    {
-        protectUserPage(fullwikiname, userRights, doc, context);
     }
 
     public User getUser(XWikiContext context)
@@ -4472,6 +4440,7 @@ public class XWiki implements EventListener
      *             {@link #getVirtualWikisDatabaseNames(XWikiContext)} to get the list of wikis if needed.
      * @return true for multi-wiki/false for mono-wiki
      */
+    @Deprecated
     public boolean isVirtualMode()
     {
         return true;
@@ -4534,8 +4503,8 @@ public class XWiki implements EventListener
                 if ((request.getParameter("topic") != null) && (action.equals("edit") || action.equals("inline"))) {
                     reference = this.currentMixedDocumentReferenceResolver.resolve(request.getParameter("topic"));
                 } else {
-                    reference = new DocumentReference(
-                        entityResource.getEntityReference().extractReference(EntityType.DOCUMENT));
+                    reference =
+                        new DocumentReference(entityResource.getEntityReference().extractReference(EntityType.DOCUMENT));
                 }
             } else {
                 // TODO: Handle references not pointing to a document...
@@ -4629,8 +4598,8 @@ public class XWiki implements EventListener
                 String allowed = Param("xwiki.inactiveuser.allowedpages", "");
                 if (context.getAction().equals("view") && !allowed.equals("")) {
                     String[] allowedList = StringUtils.split(allowed, " ,");
-                    for (int i = 0; i < allowedList.length; i++) {
-                        if (allowedList[i].equals(doc.getFullName())) {
+                    for (String element : allowedList) {
+                        if (element.equals(doc.getFullName())) {
                             allow = true;
                             break;
                         }
@@ -4876,7 +4845,7 @@ public class XWiki implements EventListener
                             }
                             factoryService =
                                 (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
-                                    .getConstructor(new Class< ? >[] {XWiki.class}).newInstance(new Object[] {this});
+                                    .getConstructor(new Class<?>[] {XWiki.class}).newInstance(new Object[] {this});
                         } catch (Exception e) {
                             factoryService = null;
                             LOGGER.warn("Failed to initialize URLFactory Service [" + urlFactoryServiceClass + "]", e);
@@ -5446,6 +5415,13 @@ public class XWiki implements EventListener
         }
     }
 
+    /**
+     * API to list all non-hidden spaces in the current wiki.
+     *
+     * @return a list of string representing all non-hidden spaces (ie spaces that have non-hidden pages) for the
+     *         current wiki
+     * @throws XWikiException if something went wrong
+     */
     public List<String> getSpaces(XWikiContext context) throws XWikiException
     {
         try {
@@ -5456,6 +5432,14 @@ public class XWiki implements EventListener
         }
     }
 
+    /**
+     * API to list all non-hidden documents in a space.
+     *
+     * @param spaceName the space for which to return all non-hidden documents
+     * @return the list of document names (in the format {@code Space.Page}) for non-hidden documents in the specified
+     *         space
+     * @throws XWikiException if the loading went wrong
+     */
     public List<String> getSpaceDocsName(String spaceName, XWikiContext context) throws XWikiException
     {
         try {
@@ -6207,7 +6191,7 @@ public class XWiki implements EventListener
                     // If the attachment trash is not available, don't lose the existing attachment
                     if (getAttachmentRecycleBinStore() != null) {
                         getAttachmentRecycleBinStore().saveToRecycleBin(equivalentAttachment, context.getUser(),
-                                new Date(), context, true);
+                            new Date(), context, true);
                         toRestore.add(oldAttachment);
                     }
                     continue;
@@ -6524,7 +6508,7 @@ public class XWiki implements EventListener
     {
         XWikiMessageTool msg = context.getMessageTool();
 
-        List< ? > parameters = (List< ? >) context.get("messageParameters");
+        List<?> parameters = (List<?>) context.get("messageParameters");
 
         String translatedMessage;
         if (parameters != null) {
@@ -6572,7 +6556,7 @@ public class XWiki implements EventListener
      */
     @Unstable
     public List<XWikiAttachment> searchAttachments(String parametrizedSqlClause, boolean checkRight, int nb, int start,
-        List< ? > parameterValues, XWikiContext context) throws XWikiException
+        List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         parametrizedSqlClause = parametrizedSqlClause.trim().replaceFirst("^and ", "").replaceFirst("^where ", "");
 
@@ -6591,7 +6575,7 @@ public class XWiki implements EventListener
             if (!filenamesByDocFullName.containsKey(docFullName)) {
                 filenamesByDocFullName.put(docFullName, new ArrayList<String>());
             }
-            filenamesByDocFullName.get(docFullName).add((String) filename);
+            filenamesByDocFullName.get(docFullName).add(filename);
         }
 
         List<XWikiAttachment> out = new ArrayList<XWikiAttachment>();
@@ -6628,7 +6612,7 @@ public class XWiki implements EventListener
      * @since 5.0M2
      */
     @Unstable
-    public int countAttachments(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
+    public int countAttachments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
         parametrizedSqlClause = parametrizedSqlClause.trim().replaceFirst("^and ", "").replaceFirst("^where ", "");

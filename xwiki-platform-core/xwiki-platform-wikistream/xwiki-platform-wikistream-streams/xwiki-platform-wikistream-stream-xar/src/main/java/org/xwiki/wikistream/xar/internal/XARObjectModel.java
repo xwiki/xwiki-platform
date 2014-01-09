@@ -23,32 +23,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.wikistream.model.filter.WikiObjectFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
+import org.xwiki.xar.internal.model.XarObjectModel;
 
 /**
  * @version $Id$
  * @since 5.2M2
  */
-public class XARObjectModel
+public class XARObjectModel extends XarObjectModel
 {
-    public static final String ELEMENT_OBJECT = "object";
-
-    public static final String ELEMENT_NAME = "name";
-
-    public static final String ELEMENT_NUMBER = "number";
-
-    public static final String ELEMENT_CLASSNAME = "className";
-
-    public static final String ELEMENT_GUID = "guid";
-
     // Utils
 
-    public static final Map<String, Parameter> OBJECT_PARAMETERS = new HashMap<String, Parameter>()
+    public static final Map<String, EventParameter> OBJECT_PARAMETERS = new HashMap<String, EventParameter>()
     {
         {
-            put(ELEMENT_CLASSNAME, new Parameter(WikiObjectFilter.PARAMETER_CLASS_REFERENCE));
-            put(ELEMENT_GUID, new Parameter(WikiObjectFilter.PARAMETER_GUID));
-            put(ELEMENT_NUMBER, new Parameter(WikiObjectFilter.PARAMETER_NUMBER, Integer.class));
+            put(ELEMENT_CLASSNAME, new EventParameter(WikiObjectFilter.PARAMETER_CLASS_REFERENCE));
+            put(ELEMENT_GUID, new EventParameter(WikiObjectFilter.PARAMETER_GUID));
+            put(ELEMENT_NUMBER, new EventParameter(WikiObjectFilter.PARAMETER_NUMBER, Integer.class));
         }
     };
 }

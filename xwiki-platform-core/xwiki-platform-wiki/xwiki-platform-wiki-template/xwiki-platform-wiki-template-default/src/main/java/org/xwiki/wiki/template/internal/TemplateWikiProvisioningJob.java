@@ -24,12 +24,16 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.xwiki.bridge.event.WikiCopiedEvent;
+import org.xwiki.bridge.event.WikiProvisionedEvent;
+import org.xwiki.bridge.event.WikiProvisioningEvent;
+import org.xwiki.bridge.event.WikiProvisioningFailedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.job.internal.DefaultJobStatus;
 import org.xwiki.wiki.internal.manager.WikiCopier;
+import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobRequest;
 
@@ -66,11 +70,18 @@ public class TemplateWikiProvisioningJob extends AbstractJob<WikiProvisioningJob
             throw new Exception("The provisioning parameter is not a valid String.");
         }
 
+        XWikiContext xcontext = xcontextProvider.get();
         String wikiId = request.getWikiId();
         String templateId = (String) request.getProvisioningJobParameter();
 
-        wikiCopier.copyDocuments(templateId, wikiId, false);
-        observationManager.notify(new WikiCopiedEvent(templateId, wikiId), templateId, xcontextProvider.get());
+        try {
+            observationManager.notify(new WikiProvisioningEvent(wikiId), wikiId, xcontext);
+            wikiCopier.copyDocuments(templateId, wikiId, false);
+            observationManager.notify(new WikiProvisionedEvent(wikiId), wikiId, xcontext);
+            observationManager.notify(new WikiCopiedEvent(templateId, wikiId), templateId, xcontext);
+        } catch (WikiManagerException e) {
+            observationManager.notify(new WikiProvisioningFailedEvent(wikiId), wikiId, xcontext);
+        }
     }
 
     @Override

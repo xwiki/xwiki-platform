@@ -21,6 +21,7 @@ package org.xwiki.wikistream.instance.internal.input;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -30,6 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.BaseObjectFilter;
 import org.xwiki.wikistream.model.filter.WikiObjectFilter;
@@ -46,10 +48,10 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Component
 @Singleton
 public class BaseObjectEventGenerator extends
-    AbstractBeanEntityEventGenerator<BaseObject, BaseObjectFilter, BaseObjectInputProperties>
+    AbstractBeanEntityEventGenerator<BaseObject, BaseObjectFilter, DocumentInstanceInputProperties>
 {
     public static final ParameterizedType ROLE = new DefaultParameterizedType(null, EntityEventGenerator.class,
-        BaseObject.class, BaseObjectInputProperties.class);
+        BaseObject.class, DocumentInstanceInputProperties.class);
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -61,8 +63,8 @@ public class BaseObjectEventGenerator extends
     private EntityEventGenerator<BaseProperty> propertyEventGenerator;
 
     @Override
-    public void write(BaseObject xobject, Object filter, BaseObjectFilter objectFilter, BaseObjectInputProperties properties)
-        throws WikiStreamException
+    public void write(BaseObject xobject, Object filter, BaseObjectFilter objectFilter,
+        DocumentInstanceInputProperties properties) throws WikiStreamException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -92,7 +94,7 @@ public class BaseObjectEventGenerator extends
             String pname = xproperty.getName();
             if (pname != null && !pname.trim().equals("")) {
                 ((BasePropertyEventGenerator) this.propertyEventGenerator).write(xproperty, filter, objectFilter,
-                    properties);
+                    (Map<String, Object>)properties);
             }
         }
 

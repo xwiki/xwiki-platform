@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Main</web>
   <name>SolrSearch</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1384924669000</creationDate>
+  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1368797502000</creationDate>
-  <date>1369664406000</date>
-  <contentUpdateDate>1369664375000</contentUpdateDate>
+  <date>1384924669000</date>
+  <contentUpdateDate>1384924669000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search</title>
   <defaultTemplate/>
@@ -22,88 +22,1173 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity output='false'}}
+#set ($defaultDateFormat = 'yyyy/MM/dd HH:mm')
+#set ($iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+#set ($rangePattern = $regextool.compile('^\[(.+) TO (.+)\]$'))
+
+#macro (displaySearchForm)
+  {{html}}
+  &lt;form class="search-form" action=""&gt;
+    &lt;div class="hidden"&gt;
+      &lt;input type="hidden" name="sort" value="$!escapetool.xml($sort)"/&gt;
+      &lt;input type="hidden" name="sortOrder" value="$!escapetool.xml($sortOrder)"/&gt;
+    &lt;/div&gt;
+    &lt;div class="search-bar"&gt;
+      &lt;label class="hidden" for="searchQuery"&gt;$services.localization.render('search.page.bar.query.label')&lt;/label&gt;
+      &lt;input type="text" id="searchQuery" name="text" class="search-query withTip useTitleAsTip"
+        title="$services.localization.render('search.page.bar.query.title')" value="$escapetool.xml($text)"/&gt;##
+      &lt;span class="buttonwrapper"&gt;##
+        &lt;input type="submit" value="$services.localization.render('search.page.bar.submit')"
+          class="button" title="$services.localization.render('search.page.bar.submit.title')" /&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+    #displaySearchFilter()
+  &lt;/form&gt;
+  {{/html}}
+#end
+
+#macro (displaySearchFilter)
+  &lt;div class="search-filter xform&gt;
+    &lt;div class="search-filter-header"&gt;
+      &lt;strong&gt;$services.localization.render('solr.filter.title')&lt;/strong&gt;
+      &lt;p class="xHint"&gt;$services.localization.render('solr.filter.hint')&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;dl class="search-filter-left"&gt;
+      &lt;dt&gt;
+        &lt;label for="searchFilterWiki"&gt;$services.localization.render('solr.filterBy.wiki')&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;#wikiSelector()&lt;/dd&gt;
+      &lt;dt&gt;
+        &lt;label for="searchFilterType"&gt;$services.localization.render('solr.filterBy.type')&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;select id="searchFilterType" name="type"&gt;
+          &lt;option value=""&gt;$services.localization.render('solr.filterBy.type.all')&lt;/option&gt;
+          #foreach ($aType in ['DOCUMENT', 'ATTACHMENT', 'OBJECT', 'OBJECT_PROPERTY'])
+            &lt;option value="$aType" #if ($aType == $type)selected="selected"#end&gt;
+              $escapetool.xml($services.localization.render("solr.filterBy.type.$aType.toLowerCase()"))
+            &lt;/option&gt;
+          #end
+        &lt;/select&gt;
+      &lt;/dd&gt;
+      #if ($xwiki.isMultiLingual())
+        &lt;dt&gt;
+          &lt;label for="searchFilterLanguage"&gt;$services.localization.render('solr.filterBy.language')&lt;/label&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;select id="searchFilterLanguage" name="lang"&gt;
+            &lt;option value=""&gt;$services.localization.render('solr.filterBy.language.all')&lt;/option&gt;
+            #getSupportedLanguages()
+            #set ($currentLocale = $services.localization.currentLocale)
+            #foreach ($supportedLanguage in $supportedLanguages)
+              #set ($locale = $services.localization.toLocale($supportedLanguage))
+              &lt;option value="$supportedLanguage" #if ($language == $supportedLanguage)selected="selected"#end&gt;
+                $escapetool.xml($locale.getDisplayName($currentLocale))
+              &lt;/option&gt;
+            #end
+          &lt;/select&gt;
+        &lt;/dd&gt;
+      #end
+    &lt;/dl&gt;
+    &lt;dl class="search-filter-right"&gt;
+      &lt;dt&gt;
+        &lt;label for="searchFilterSpace"&gt;$services.localization.render('solr.filterBy.space')&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;#spaceSelector()&lt;/dd&gt;
+      &lt;dt&gt;
+        &lt;label for="searchFilterFileType"&gt;$services.localization.render('solr.filterBy.fileType')&lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;select id="searchFilterFileType" name="fileType"&gt;
+          &lt;option value=""&gt;$services.localization.render('solr.filterBy.fileType.all')&lt;/option&gt;
+          #set ($fileTypeOptions = $collectionstool.orderedMap)
+          #set ($discard = $fileTypeOptions.put('image*', 'Image'))
+          #set ($discard = $fileTypeOptions.put('audio*', 'Audio'))
+          #set ($discard = $fileTypeOptions.put('video*', 'Video'))
+          #set ($discard = $fileTypeOptions.put('text*', 'Text'))
+          #foreach ($aFileType in ['image', 'audio', 'video', 'text'])
+            &lt;option value="$aFileType*" #if ("$aFileType*" == $fileType)selected="selected"#end&gt;
+              $services.localization.render("solr.filterBy.fileType.$aFileType")
+            &lt;/option&gt;
+          #end
+        &lt;/select&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+    &lt;div class="clearfloats"&gt;&lt;/div&gt;
+    &lt;dl&gt;
+      &lt;dt&gt;
+        &lt;label for="searchFilterBoost"&gt;$services.localization.render('solr.filter.queryBoost.label')&lt;/label&gt;
+        &lt;span class="xHint"&gt;$services.localization.render('solr.filter.queryBoost.hint')&lt;/span&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;input id="searchFilterBoost" name="boost" type="text" value="$escapetool.xml($boost)" /&gt;
+      &lt;/dd&gt;
+    &lt;/dl&gt;
+  &lt;/div&gt;
+#end
+
+#**
+ * Get the list of supported languages.
+ *#
+#macro (getSupportedLanguages)
+  #set ($supportedLanguagesRaw = $xwiki.getXWikiPreference('languages').split('[, |]'))
+  #set ($supportedLanguages = [])
+  #foreach ($supportedLanguage in $supportedLanguagesRaw)
+    #if ($supportedLanguage.trim() != '')
+      #set ($discard = $supportedLanguages.add($supportedLanguage))
+    #end
+  #end
+  ## Make sure the default language is included.
+  #set ($defaultLanguage = $xwiki.getXWikiPreference('default_language', 'en'))
+  #if (!$supportedLanguages.contains($defaultLanguage))
+    #set ($discard = $supportedLanguages.add($defaultLanguage))
+  #end
+  #set ($supportedLanguages = $sorttool.sort($supportedLanguages))
+#end
+
+#macro (wikiSelector )
+  #if ($xcontext.isMainWiki())
+    #set ($wikiNames = $xwiki.wikiNames)
+  #else
+    #set ($wikiNames = [$xcontext.database])
+  #end
+  #set ($wikis = [])
+  #foreach ($wikiName in $wikiNames)
+    #set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
+    #if ("$!wikiPrettyName.trim()" == '')
+      #set ($wikiPrettyName = $wikiName)
+    #end
+    #set ($discard = $wikis.add({'value': $wikiName, 'label': $wikiPrettyName}))
+  #end
+  &lt;select id="searchFilterWiki" name="wiki"&gt;
+    #if ($xcontext.isMainWiki() &amp;&amp; $wikis.size() &gt; 1)
+      ## The main wiki can search in all wikis.
+      &lt;option value=""&gt;$services.localization.render('solr.filterBy.wiki.all')&lt;/option&gt;
+    #end
+    #foreach ($aWiki in $sorttool.sort($wikis, 'label'))
+      &lt;option value="$escapetool.xml($aWiki.value)" #if ($wiki == "$!aWiki.value")selected="selected"#end&gt;$escapetool.xml($aWiki.label)&lt;/option&gt;
+    #end
+  &lt;/select&gt;
+#end
+
+#macro (spaceSelector)
+  #set ($spaces = [])
+  #set ($wikiNames = $xwiki.wikiNames)
+  #if ($wiki == $xcontext.database || ($wiki == '' &amp;&amp; $wikiNames.size() == 1))
+    #set ($spaces = $xwiki.spaces)
+  #elseif ($wikiNames.contains($wiki) &amp;&amp; $doc.hasProgrammingRights())
+    #set ($spaces = $services.query.xwql('select distinct doc.space from Document as doc order by doc.space').setWiki($wiki).execute())
+  #end
+  &lt;select id="searchFilterSpace" name="space" title="$services.localization.render('search.page.bar.spaces.title')"&gt;
+    &lt;option value="" #if($space == '')selected="selected"#end&gt;$services.localization.render('search.page.bar.spaces.all')&lt;/option&gt;
+    #foreach ($aSpace in $spaces)
+      #set ($spaceReservedDocRef = $services.model.createDocumentReference($wiki,
+        $aSpace, "DocumentReservedForInternalXWikiUsage$mathtool.random(0, 999)"))
+      #if (!$blacklistedSpaces.contains($aSpace) &amp;&amp; $xwiki.hasAccessLevel('view',
+        $services.model.serialize($spaceReservedDocRef, 'default')))
+        &lt;option value="$escapetool.xml($aSpace)" #if($space == $aSpace)selected="selected"#end&gt;$escapetool.xml($aSpace)&lt;/option&gt;
+      #end
+    #end
+  &lt;/select&gt;
+#end
+
+#macro (displaySearchDebugInfo)
+  (% class="search-debug#if ($debug == '') hidden#end" %)(((
+    Debug is On
+    #set ($debugMap = $searchResponse.debugMap)
+    #if ($debugMap)
+
+      {{html}}
+      &lt;div&gt;&lt;strong&gt;Query Parser:&lt;/strong&gt; $!escapetool.xml($debugMap.get('QParser'))&lt;/div&gt;
+      &lt;div&gt;&lt;strong&gt;Parsed Query:&lt;/strong&gt; $!escapetool.xml($debugMap.get('parsedquery_toString'))&lt;/div&gt;
+      &lt;div&gt;&lt;strong&gt;Filter Queries:&lt;/strong&gt; $!escapetool.xml($debugMap.get('filter_queries'))&lt;/div&gt;
+      &lt;div&gt;&lt;strong&gt;Processing time:&lt;/strong&gt; $!escapetool.xml($debugMap.get('timing'))&lt;/div&gt;
+      {{/html}}
+    #end
+  )))
+#end
+
+#macro (displaySearchFacets $searchResponse)
+  (% class="search-facets xform" %)(((
+    (% class="search-facets-header" %)(((
+      **{{translation key="solr.facets.title"/}}**
+
+      (% class="xHint" %)
+      {{translation key="solr.facets.hint"/}}
+    )))
+    (% class="search-facets-actions" %)(((
+      #set ($resetParameters = {})
+      #foreach ($parameter in $request.parameterMap.entrySet())
+        #if ($parameter.key.startsWith('f_') || $parameter.key.startsWith('l_'))
+          #set ($discard = $resetParameters.put($parameter.key, []))
+        #end
+      #end
+      #extendQueryString($url $resetParameters)
+      [[{{translation key="solr.facets.resetAll"}}&gt;&gt;path:$url]]
+    )))
+    #foreach ($facetField in $searchResponse.facetFields)
+      #displaySearchFacet($facetField)
+    #end
+  )))
+#end
+
+#macro (displaySearchFacet $facetField)
+  #set ($facetValues = $facetField.values)
+  ## Keep only the values that have at least one match.
+  #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
+  ## Display the facets that have values specified on the request or that have at least 2 different values matched.
+  #set ($facetRequestParameter = "f_$facetField.name")
+  #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
+  #set ($facetValuesLimit = $request.getParameter("l_$facetField.name"))
+  #if ($facetRequestValues || $facetValues.size() &gt; 1)
+    ## Show active facets (that have selected values or that have an explicit limit on the number of values, i.e.
+    ## pagination) as expanded. Collapse the rest, otherwise you have to scroll to see all the available facets.
+    (% class="search-facet#if ($facetRequestValues || $facetValuesLimit) expanded#end" %)(((
+      {{html}}
+      #set ($facetPrettyNameKey = "solr.field.$facetField.name")
+      #if ($services.localization.get($facetPrettyNameKey))
+        #set ($facetPrettyName = $services.localization.render($facetPrettyNameKey))
+      #else
+        #set ($facetPrettyName = $facetField.name)
+      #end
+      &lt;div class="search-facet-header"&gt;$escapetool.xml($facetPrettyName)&lt;/div&gt; 
+      &lt;div class="search-facet-body"&gt;
+        #displaySearchFacetValues($facetValues)
+      &lt;/div&gt;
+      {{/html}}
+    )))
+  #end
+#end
+
+#set ($customSearchFacetValuesDisplayer = {
+  'locale': 'locale',
+  'author': 'user',
+  'creator': 'user',
+  'attauthor': 'user',
+  'date': 'date',
+  'creationdate': 'date',
+  'attdate': 'date'
+})
+
+#macro (displaySearchFacetValues $facetValues)
+  #set ($displayer = $customSearchFacetValuesDisplayer.get($facetField.name))
+  #if (!$displayer)
+    #set ($displayer = 'default')
+  #end
+  #evaluate("${escapetool.h}displaySearchFacetValues_${displayer}(${escapetool.d}facetValues)")
+#end
+
+#macro (displaySearchFacetValues_default $facetValues)
+  &lt;ul&gt;
+    #displaySearchFacetValuesLimited($facetValues)
+  &lt;/ul&gt;
+#end
+
+#macro (displaySearchFacetValuesLimited $facetValues)
+  #set ($limitRequestParameter = "l_$facetField.name")
+  #set ($limit = $mathtool.toInteger($request.getParameter($limitRequestParameter)))
+  #if ("$!limit" == '')
+    #set ($limit = 5)
+  #end
+  #set ($limit = $mathtool.max($mathtool.min($limit, $facetValues.size()), 0))
+  #foreach ($facetValue in $facetValues)
+    #if ($foreach.index &lt; $limit)
+      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+    #else
+      #extendQueryString($url {$limitRequestParameter: [$mathtool.add($limit, 5)]})
+      &lt;li&gt;&lt;a href="$url" class="more"&gt;&amp;hellip; $escapetool.xml($services.localization.render(
+        'solr.facets.moreValues', [$mathtool.sub($facetValues.size(), $limit)]))&lt;/a&gt;&lt;/li&gt;
+      #break
+    #end
+  #end
+#end
+
+#macro (displaySearchFacetValue $facetValue)
+  #set ($selectedValues = [])
+  #if ($facetRequestValues)
+    #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
+  #end
+  #set ($selected = $selectedValues.remove($facetValue.name))
+  #if (!$selected)
+    #set ($discard = $selectedValues.add($facetValue.name))
+  #end
+  ## Reset the pagination because the number of results can change when a facet is applied.
+  #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
+  &lt;div class="itemCount"&gt;$facetValue.count&lt;/div&gt;
+  &lt;a href="$url" class="itemName#if ($selected) selected#end#if ($facetValue.name == '') empty#end"&gt;
+    #if ($facetValue.name == '')
+      #set ($facetPrettyValueKey = "solr.field.${facetField.name}.emptyValue")
+      #if (!$services.localization.get($facetPrettyValueKey))
+        #set ($facetPrettyValueKey = "solr.facets.emptyValue")
+      #end
+      #set ($facetPrettyValue = $services.localization.render($facetPrettyValueKey))
+    #else
+      #set ($facetPrettyValue = $facetValue.name)
+    #end
+    #set ($displayer = $customSearchFacetValueDisplayer.get($facetField.name))
+    #if (!$displayer)
+      #set ($displayer = 'default')
+    #end
+    #evaluate("${escapetool.h}displaySearchFacetValue_${displayer}(${escapetool.d}facetPrettyValue)")
+  &lt;/a&gt;
+  &lt;div class="clearfloats"&gt;&lt;/div&gt;
+#end
+
+#set ($customSearchFacetValueDisplayer = {
+  'type': 'type',
+  'wiki': 'wiki',
+  'locale': 'locale',
+  'author': 'user',
+  'creator': 'user',
+  'attauthor': 'user',
+  'date': 'date',
+  'creationdate': 'date',
+  'attdate': 'date',
+  'class': 'class',
+  'attsize': 'size'
+})
+
+#macro (displaySearchFacetValue_default $facetPrettyValue)
+  $escapetool.xml($facetPrettyValue)
+#end
+
+#macro (displaySearchFacetValue_type $type)
+  $escapetool.xml($services.localization.render("solr.filterBy.type.$type.toLowerCase()"))
+#end
+
+#macro (displaySearchFacetValue_wiki $wikiName)
+  #set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
+  #if ("$!wikiPrettyName.trim()" == '')
+    #set ($wikiPrettyName = $wikiName)
+  #end
+  $escapetool.xml($wikiPrettyName)
+#end
+
+#macro (displaySearchFacetValues_locale $facetValues)
+  #set ($currentLocale = $services.localization.currentLocale)
+  #displaySearchFacetValues_default($facetValues)
+#end
+
+#macro (displaySearchFacetValue_locale $facetPrettyValue)
+  #if ($facetValue.name == $facetPrettyValue)
+    #set ($locale = $services.localization.toLocale($facetValue.name))
+    $escapetool.xml($locale.getDisplayName($currentLocale))
+  #else
+    $escapetool.xml($facetPrettyValue)
+    #set ($hint = $escapetool.xml($services.localization.render('solr.field.locale.emptyValue.hint')))
+    &lt;img src="$xwiki.getSkinFile('/icons/silk/information.png')" alt="$hint" title="$hint" class="icon" /&gt;
+  #end
+#end
+
+#macro (displaySearchFacetValues_user $facetValues)
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
+  &lt;ul class="users"&gt;
+    #displaySearchFacetValuesLimited($facetValues)
+  &lt;/ul&gt;
+#end
+
+#macro (displaySearchFacetValue_user $user)
+  #set ($userReference = $services.model.resolveDocument($user))
+  ## The string returned by XWiki#getUserName() is XML encoded.
+  #set ($userName = $xwiki.getUserName($user, false))
+  &lt;span class="user"&gt;
+    &lt;span class="user-avatar-wrapper"&gt;
+      #getUserAvatarURL($userReference $avatarURL 30)
+      &lt;img src="$escapetool.xml($avatarURL.url)" class="icon" alt="$userName" /&gt;
+    &lt;/span&gt;
+    &lt;span class="user-name"&gt;$userName&lt;/span&gt;
+    &lt;span&gt;
+      &lt;span class="user-alias"&gt;$escapetool.xml($userReference.name)&lt;/span&gt;
+      ## Display the wiki only for local users.
+      #if ($userReference.wikiReference.name != $xcontext.getMainWikiName())
+        &lt;span class="user-wiki"&gt;$escapetool.xml($userReference.wikiReference.name)&lt;/span&gt;
+      #end
+    &lt;/span&gt;
+  &lt;/span&gt;
+#end
+
+#macro (displaySearchFacetValues_date $facetValues)
+  ##
+  ## Build the list of date intervals.
+  ##
+  ## 1. Predefined date intervals.
+  #set ($now = $xwiki.jodatime.dateTime)
+  ## Solr indexes the dates in UTC timezone.
+  #set ($utcTimezone = $xwiki.jodatime.getTimezone(0))
+  #set ($now = $now.toDateTime($utcTimezone))
+  #set ($intervals = [
+    {
+      'label': $services.localization.render('solr.facet.date.today'),
+      'start': $now.withTimeAtStartOfDay(),
+      'end'  : $now,
+      'name' : '[NOW/DAY TO NOW]',
+      'count': 0
+    }, {
+      'label': $services.localization.render('solr.facet.date.last7Days'),
+      'start': $now.minusDays(7),
+      'end'  : $now,
+      'name' : '[NOW-7DAYS TO NOW]',
+      'count': 0
+    }, {
+      'label': $services.localization.render('solr.facet.date.last30Days'),
+      'start': $now.minusDays(30),
+      'end'  : $now,
+      'name' : '[NOW-30DAYS TO NOW]',
+      'count': 0
+    }
+  ])
+  ## 2. Date intervals specified on the request.
+  #set ($iso8601Formatter = $xwiki.jodatime.getDateTimeFormatterForPattern($iso8601DateFormat))
+  #set ($iso8601Formatter = $iso8601Formatter.withZone($utcTimezone))
+  #if ($facetRequestValues)
+    #set ($selectedIntervals = [])
+    #foreach ($selectedValue in $facetRequestValues)
+      ## Determine if the value/range is custom.
+      #set ($custom = true)
+      #foreach ($interval in $intervals)
+        #if ($interval.name == $selectedValue)
+          #set ($discard = $selectedIntervals.add($interval))
+          #set ($custom = false)
+          #break
+        #end
+      #end
+      #if ($custom)
+        #set ($rangeMatcher = $rangePattern.matcher($selectedValue))
+        #if ($rangeMatcher.matches())
+          #set ($range = [$rangeMatcher.group(1), $rangeMatcher.group(2)])
+          #foreach ($point in $range)
+            #if ($point == '*')
+              #set ($point = $NULL)
+            #else
+              #set ($point = $iso8601Formatter.parseDateTime($point))
+            #end
+            #set ($discard = $range.set($foreach.index, $point))
+          #end
+          #set ($discard = $selectedIntervals.add({
+            'start': $range.get(0),
+            'end'  : $range.get(1),
+            'name' : $selectedValue,
+            'count': 0
+          }))
+        #end
+      #end
+    #end
+    #set ($intervals = $selectedIntervals)
+  #end
+  ##
+  ## Count matches for each date interval.
+  ##
+  #foreach ($facetValue in $facetValues)
+    #set ($dateValue = $iso8601Formatter.parseDateTime($facetValue.name))
+    #foreach ($interval in $intervals)
+      #if ((!$interval.start || $dateValue.isAfter($interval.start))
+          &amp;&amp; (!$interval.end || $dateValue.isBefore($interval.end)))
+        #set ($discard = $interval.put('count', $mathtool.add($interval.count, $facetValue.count)))
+      #end
+    #end
+  #end
+  ## Filter the unselected date intervals that don't have matches.
+  #if (!$facetRequestValues)
+    #set ($intervalsWithMatches = [])
+    #foreach ($interval in $intervals)
+      #if ($interval.count &gt; 0)
+        #set ($discard = $intervalsWithMatches.add($interval))
+      #end
+    #end
+    #set ($intervals = $intervalsWithMatches)
+  #end
+  ##
+  ## Display date intervals.
+  ##
+  &lt;ul&gt;
+    #foreach ($facetValue in $intervals)
+      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+    #end
+    #if (!$facetRequestValues)
+      ## Allow users to specify a custom interval.
+      &lt;li class="customDateInterval"&gt;
+        #displaySearchFacetValue_customDateInterval()
+      &lt;/li&gt;
+    #end
+  &lt;/ul&gt;
+#end
+
+#macro (displaySearchFacetValue_customDateInterval)
+  ## A simple date picker widget.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js', true))
+  ## Used to parse and serialize the selected date using the specified date format.
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js', true))
+  ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
+  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
+  &lt;form action="$doc.getURL('get')"&gt;
+    &lt;div class="hidden"&gt;
+      ## Reset the pagination because the number of results can change when a facet is applied.
+      #extendQueryString($url {
+        $facetRequestParameter: ['[* TO *]'],
+        'firstIndex': [],
+        'timezoneOffset': []
+      })
+      &lt;input type="hidden" name="xredirect" value="$escapetool.xml($url)" /&gt;
+      &lt;input type="hidden" name="facet" value="$escapetool.xml($facetRequestParameter)" /&gt;
+    &lt;/div&gt;
+    &lt;div class="itemName"&gt;$escapetool.xml($services.localization.render('solr.facet.date.customInterval'))&lt;/div&gt;
+    &lt;dl&gt;
+      &lt;dt class="hidden"&gt;
+        &lt;label for="$escapetool.xml($facetRequestParameter)_startDate"&gt;
+          $escapetool.xml($services.localization.render('solr.facet.date.start'))
+        &lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;input type="text" id="$escapetool.xml($facetRequestParameter)_startDate" name="startDate"
+          value="$escapetool.xml($services.localization.render('solr.facet.date.start'))"
+          class="datetime withTip" title="$escapetool.xml($dateFormat)" /&gt;
+      &lt;/dd&gt;
+      &lt;dt class="hidden"&gt;
+        &lt;label for="$escapetool.xml($facetRequestParameter)_endDate"&gt;
+          $escapetool.xml($services.localization.render('solr.facet.date.end'))
+        &lt;/label&gt;
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        &lt;input type="text" id="$escapetool.xml($facetRequestParameter)_endDate" name="endDate"
+          value="$escapetool.xml($services.localization.render('solr.facet.date.end'))"
+          class="datetime withTip" title="$escapetool.xml($dateFormat)" /&gt;
+      &lt;/dt&gt;
+    &lt;/dl&gt;
+    &lt;div&gt;
+      &lt;span class="buttonwrapper"&gt;
+        &lt;input type="submit" class="button" value="$escapetool.xml($services.localization.render(
+          'solr.facet.date.applyCustomInterval'))" /&gt;
+      &lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+#end
+
+#macro (displaySearchFacetValue_date $facetPrettyValue)
+  #if ($facetValue.label)
+    $escapetool.xml($facetValue.label)
+  #elseif ($facetValue.start || $facetValue.end)
+    ## Compute the client timezone.
+    #set ($timezoneOffsetInMinutes = $mathtool.toInteger($request.timezoneOffset))
+    #set ($offsetHours = $timezoneOffsetInMinutes / 60)
+    #set ($offsetMinutes = $mathtool.abs($timezoneOffsetInMinutes) % 60)
+    #set ($clientTimezone = $xwiki.jodatime.getTimezone($offsetHours, $offsetMinutes))
+    ## Obtain a date printer.
+    #set ($configuredDateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
+    #set ($datePrinter = $xwiki.jodatime.getDateTimeFormatterForPattern($configuredDateFormat))
+    #set ($datePrinter = $datePrinter.withLocale($services.localization.currentLocale).withZone($clientTimezone))
+    ## Display the custom interval.
+    #if (!$facetValue.start)
+      $escapetool.xml($services.localization.render('solr.facet.date.before',
+        [$datePrinter.print($facetValue.end)]))
+    #elseif (!$facetValue.end)
+      $escapetool.xml($services.localization.render('solr.facet.date.after',
+        [$datePrinter.print($facetValue.start)]))
+    #else
+      $services.localization.render('solr.facet.date.between',
+        ["$datePrinter.print($facetValue.start)&lt;br/&gt;", $datePrinter.print($facetValue.end)])
+    #end
+  #else
+    $escapetool.xml($services.localization.render('solr.facet.date.any'))
+  #end
+#end
+
+#macro (displaySearchFacetValue_class $classFullName)
+  #set ($classReference = $services.model.resolveDocument($classFullName, 'default'))
+  #set ($hint = $services.localization.render('solr.field.class.definedBy',
+    [$classReference.lastSpaceReference.name, $classReference.name]))
+  #set ($classPrettyName = $stringtool.removeEnd($classReference.name, 'Class'))
+  #set ($translationKey = "solr.field.class.$classPrettyName")
+  #if ($services.localization.get($translationKey))
+    #set ($classPrettyName = $services.localization.render('$translationKey'))
+  #else
+    ## Some of the default classes have names starting with 'XWiki'.
+    #set ($classPrettyName = $stringtool.removeStart($classPrettyName, 'XWiki'))
+    #set ($classPrettyName = $stringtool.join($stringtool.splitByCharacterTypeCamelCase($classPrettyName), ' '))
+    ## Make sure we don't have isolated upper case letters.
+    #set ($classPrettyName = $classPrettyName.replaceAll('(^| )([\p{Lu}]) ', '$1$2'))
+  #end
+  &lt;span title="$escapetool.xml($hint)"&gt;$escapetool.xml($classPrettyName)&lt;/span&gt;
+#end
+
+#macro (displaySearchFacetValue_size $size)
+  #dynamicsize($mathtool.toInteger($size))
+#end
+
+#macro (displaySearchResultsSort)
+  #set ($defaultSortOrderByEntityType = {
+    'DOCUMENT': {
+      'score': 'desc',
+      'title_sort': 'asc',
+      'date': 'desc',
+      'author_display_sort': 'asc'
+    },
+    'ATTACHMENT': {
+      'score': 'desc',
+      'filename_sort': 'asc',
+      'attsize_sort': 'asc',
+      'attdate_sort': 'desc',
+      'attauthor_display_sort': 'asc'
+    }
+  })
+  #set ($defaultSortOrder = $defaultSortOrderByEntityType.get($type))
+  #if (!$defaultSortOrder)
+    #set ($defaultSortOrder = {'score': 'desc'})
+  #end
+  #set ($sortOrderSymbol = {
+    'asc': "\u25B2",
+    'desc': "\u25BC"
+  })
+  (% class="search-results-sort" %)
+  * {{translation key="solr.sortBy"/}}
+  #foreach ($entry in $defaultSortOrder.entrySet())
+    #set ($class = 'sort-item')
+    #set ($sortOrderIndicator = $NULL)
+    #set ($targetSortOrder = $entry.value)
+    #if ($sort == $entry.key)
+      #set ($class = "$class active")
+      #set ($sortOrderHint = $services.localization.render("solr.sortOrder.$sortOrder"))
+      #set ($sortOrderIndicator = "(% class=""sort-item-order"" title=""$sortOrderHint"" %)$sortOrderSymbol.get($sortOrder)(%%)")
+      #set ($targetSortOrder = "#if ($sortOrder == 'asc')desc#{else}asc#end")
+    #end
+    #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
+    * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:$url||class="$class"]]
+  #end
+#end
+
+#macro (extendQueryString $url $extraParameters)
+  #set ($parameters = {})
+  #set ($discard = $parameters.putAll($request.getParameterMap()))
+  #set ($discard = $parameters.putAll($extraParameters))
+  #set ($queryString = $escapetool.url($parameters))
+  #set ($url = $NULL)
+  #setVariable("$url" $doc.getURL('view', $queryString))
+#end
+
+#macro (displaySearchResults)
+  #set ($results = $searchResponse.results)
+  #set ($paginationParameters = {
+    'url': $doc.getURL('view', "$!request.queryString.replaceAll('firstIndex=[0-9]*', '')"),
+    'totalItems': $results.numFound,
+    'defaultItemsPerPage': $rows,
+    'position': 'top'
+  })
+  {{html}}#pagination($paginationParameters){{/html}}
+  (% class="search-results" %)(((
+    #foreach ($searchResult in $results)
+      #displaySearchResult($searchResult)
+    #end
+  )))
+  #set ($discard = $paginationParameters.put('position', 'bottom'))
+  {{html}}#pagination($paginationParameters){{/html}}
+
+  #displayRSSLink()
+#end
+
+#macro (displayRSSLink)
+  {{html}}
+  #set ($parameters = {})
+  ## We keep most of the current request parameters so that the RSS feed matches the current search query and filters.
+  #set ($discard = $parameters.putAll($request.getParameterMap()))
+  ## The feed will provide the most recent results that match the search query and filters.
+  #set ($discard = $parameters.put('sort', 'date'))
+  #set ($discard = $parameters.put('sortOrder', 'desc'))
+  ## Reset the pagination so that only the top results are included.
+  #set ($discard = $parameters.remove('firstIndex'))
+  ## Add the parameters required to output the RSS feed instead of the search UI.
+  #set ($discard = $parameters.put('outputSyntax', 'plain'))
+  #set ($discard = $parameters.put('media', 'rss'))
+  &lt;a href="$doc.getURL('get', $escapetool.url($parameters))" class="hasIcon iconRSS"&gt;
+    $services.localization.render('search.rss', ["[$escapetool.xml($text)]"])
+  &lt;/a&gt;
+  {{/html}}
+#end
+
+#macro (displaySearchResult $searchResult)
+  #set ($searchResultDocumentReference = $services.model.createDocumentReference($searchResult.wiki,
+    $searchResult.space, $searchResult.name))
+  #set ($searchResultDocument = $xwiki.getDocument($searchResultDocumentReference))
+  (% class="search-result type-$searchResult.type.toLowerCase()" %)(((
+    ## We use the HTML macro here mainly because we don't have a way to escape the wiki syntax in the data provided by the user.
+    {{html}}
+    #evaluate("${escapetool.h}displaySearchResult_$searchResult.type.toLowerCase()(${escapetool.d}searchResult)")
+    #displaySearchResultHighlighting($searchResult)
+    {{/html}}
+
+    ## Scoring debug data.
+    ## The reason we used a separate HTML block with no cleaning is because the scoring debug data may contain some
+    ## characters that are considered invalid by JDOM library which is used for parsing the HTML when cleaning is on.
+    ## E.g. "0x0 is not a legal XML character" (org.jdom.IllegalDataException).
+    {{html clean="false"}}
+    &lt;div id="debug_$searchResult.id" class="hidden"&gt;
+      $!escapetool.xml($searchResponse.explainMap.get($searchResult.id))
+    &lt;/div&gt;
+    {{/html}}
+  )))
+#end
+
+#macro (displaySearchResult_document $searchResult)
+  #set ($searchResultTranslatedDocument = $searchResultDocument.getTranslatedDocument($searchResult.locale))
+  #displaySearchResultTitle()
+  #displaySearchResultLocation()
+  &lt;div class="search-result-author"&gt;
+    $services.localization.render('core.footer.modification', [
+      $xwiki.getUserName($searchResultTranslatedDocument.author),
+      $xwiki.formatDate($searchResultTranslatedDocument.date)
+    ])
+  &lt;/div&gt;
+#end
+
+#macro (displaySearchResult_attachment $searchResult)
+  &lt;h2 class="search-result-title"&gt;
+    #set ($fileName = $searchResult.filename.get(0))
+    #set ($attachmentURL = $searchResultDocument.getAttachmentURL($fileName))
+    #set ($downloadHint = $services.localization.render('core.viewers.attachments.download'))
+    &lt;a href="$attachmentURL" title="$escapetool.xml($downloadHint)"&gt;$escapetool.xml($fileName)&lt;/a&gt;
+    #set ($attachmentHistoryURL = $searchResultDocument.getAttachmentURL($fileName, 'viewattachrev'))
+    #set ($historyHint = $services.localization.render('core.viewers.attachments.showHistory'))
+    &lt;a href="$attachmentHistoryURL" title="$escapetool.xml($historyHint)" class="search-result-version"&gt;
+      $escapetool.xml($searchResult.attversion)
+    &lt;/a&gt;
+  &lt;/h2&gt;
+  #displaySearchResultLocation($searchResult)
+  &lt;div class="search-result-uploader"&gt;
+    #set ($uploader = $xwiki.getUserName($searchResult.attauthor.get(0)))
+    #set ($uploadDate = $xwiki.formatDate($searchResult.attdate.get(0)))
+    #set ($fileSize = "#dynamicsize($searchResult.attsize.get(0))")
+    $services.localization.render('solr.result.uploadedBy', [$uploader, $uploadDate, $fileSize])
+  &lt;/div&gt;
+  &lt;div class="search-result-mediaType"&gt;$services.localization.render('solr.result.mediaType',
+    [$escapetool.xml($searchResult.mimetype.get(0))])&lt;/div&gt;
+#end
+
+#macro (displaySearchResult_object $searchResult)
+  &lt;h2 class="search-result-title"&gt;
+    #displaySearchResultXClassLink($searchResult)
+  &lt;/h2&gt;
+  #displaySearchResultLocation($searchResult)
+#end
+
+#macro (displaySearchResult_object_property $searchResult)
+  &lt;h2 class="search-result-title"&gt;
+    #displaySearchResultXClassLink($searchResult)^$searchResult.propertyname
+  &lt;/h2&gt;
+  #displaySearchResultLocation($searchResult)
+#end
+
+#macro (displaySearchResultXClassLink $searchResult)
+  #set ($classFullName = $searchResult.get('class').get(0))
+  #set ($classReference = $services.model.resolveDocument($classFullName,
+    $services.model.createWikiReference($searchResult.wiki)))
+  &lt;a href="$xwiki.getURL($classReference)"&gt;$escapetool.xml($classFullName)&lt;/a&gt;##
+#end
+
+#macro (displaySearchResultTitle)
+  #set ($titleURL = $searchResultDocument.getURL())
+  #if ($searchResult.locale != '' &amp;&amp; $xcontext.language != $searchResult.locale)
+    #set ($titleURL = $searchResultDocument.getURL('view', "language=$searchResult.locale"))
+  #end
+  &lt;h2 class="search-result-title"&gt;
+    &lt;a href="$titleURL"&gt;$escapetool.xml($searchResultTranslatedDocument.plainTitle)&lt;/a&gt;
+    ## Display document language when multiple language results are requested.
+    #if ($request.lang == '' &amp;&amp; $searchResult.locale != '')
+      &lt;span title="$escapetool.xml($services.localization.render('solr.result.language'))"
+        class="search-result-language" &gt;($escapetool.xml($searchResult.locale))&lt;/span&gt;
+    #end
+  &lt;/h2&gt;
+#end
+
+#macro (displaySearchResultLocation $searchResult)
+  #set ($wikiPrettyName = $services.wiki.getById($searchResult.wiki).prettyName)
+  #if ("$!wikiPrettyName.trim()" == '')
+    #set ($wikiPrettyName = $searchResult.wiki)
+  #end
+  #set ($wikiReference = $services.model.createWikiReference($searchResult.wiki))
+  #set ($wikiHomeDocRef = $services.model.resolveDocument('', 'default', $wikiReference))
+  #set ($wikiLink = "&lt;a href=""$xwiki.getURL($wikiHomeDocRef)""&gt;$escapetool.xml($wikiPrettyName)&lt;/a&gt;")
+  ##
+  #set ($spaceReference = $services.model.createSpaceReference($searchResult.space, $wikiReference))
+  #set ($spaceHomeDocRef = $services.model.resolveDocument('', 'default', $spaceReference))
+  #set ($spaceLink = "&lt;a href=""$xwiki.getURL($spaceHomeDocRef)""&gt;$escapetool.xml($searchResult.space)&lt;/a&gt;")
+  ##
+  #set ($documentLink = "&lt;a href=""$searchResultDocument.getURL()""&gt;$escapetool.xml($searchResult.name)&lt;/a&gt;")
+  &lt;div class="search-result-location"&gt;$services.localization.render('solr.result.location',
+    [$wikiLink, $spaceLink, $documentLink])&lt;/div&gt;
+#end
+
+#macro (displaySearchResultHighlighting $searchResult)
+  #getSearchResultHighlighting($searchResult $highlighting)
+  #if ($highlighting.size() &gt; 0)
+    &lt;dl class="search-result-highlights"&gt;
+      #foreach ($entry in $highlighting)
+        &lt;dt&gt;
+          #if ($services.localization.get("solr.field.$entry.field"))
+            $services.localization.render("solr.field.$entry.field")
+          #else
+            $entry.field
+          #end
+        &lt;/dt&gt;
+        &lt;dd&gt;#displaySearchResultMatches($entry.matches)&lt;/dd&gt;
+      #end
+    &lt;/dl&gt;
+  #end
+#end
+
+#macro (displaySearchResultMatches $matches)
+  #foreach ($match in $matches)
+    #if ($foreach.count &gt; 1)
+      &lt;span class="separator"&gt;&amp;hellip;&lt;/span&gt;
+    #end
+    &lt;blockquote class="search-result-highlight"&gt;$match&lt;/blockquote&gt;
+  #end
+#end
+
+#macro (getSearchResultHighlighting $searchResult $return)
+  #set ($highlighting = $searchResponse.highlighting.get($searchResult.id))
+  #set ($highlightingByLanguage = {})
+  #foreach ($entry in $highlighting.entrySet())
+    ## Remove the language suffix (e.g. _en, _fr, _de) from the field name.
+    #set ($field = $stringtool.substringBefore($entry.key, '_'))
+    ## Extract the language.
+    #set ($lang = $stringtool.substringAfter($entry.key, '_'))
+    #if ($lang == $field)
+      ## No language.
+      #set ($lang = '_')
+    #end
+    #set ($matchesByLanguage = $highlightingByLanguage.get($field))
+    #if (!$matchesByLanguage)
+      #set ($matchesByLanguage = {})
+      #set ($discard = $highlightingByLanguage.put($field, $matchesByLanguage))
+    #end
+    #set ($discard = $matchesByLanguage.put($lang, $entry.value))
+  #end
+  ## Keep only the matches correspoding to the search result locale.
+  #set ($highlighting = [])
+  ## Fields with a higher index will be displayed first. Fields that are not included will be displayed at the end.
+  #set ($fieldPriority = ['filename', 'attcontent', 'objcontent', 'comment', 'propertyname', 'propertyvalue', 'title', 'doccontent'])
+  #foreach ($entry in $highlightingByLanguage.entrySet())
+    #if ($searchResult.locale != '')
+      #set ($matches = $entry.value.get($searchResult.locale))
+    #else
+      ## No language.
+      #set ($matches = $entry.value.get('_'))
+    #end
+    #if (!$matches)
+      ## This should not happen but let's play safe.
+      #set ($matches = $entry.value.entrySet().iterator().next().value)
+    #end
+    ## Sanitize the matches.
+    #foreach ($match in $matches)
+      #set ($match = $match.replace('&lt;span class="search-text-highlight"&gt;', "\u0011"))
+      #set ($match = $match.replace('&lt;span class="search-text-highlight-stop"&gt;&lt;/span&gt;&lt;/span&gt;', "\u0013"))
+      #set ($match = $escapetool.xml($match))
+      #set ($match = $match.replace("\u0011", '&lt;span class="search-text-highlight"&gt;'))
+      #set ($match = $match.replace("\u0013", '&lt;/span&gt;'))
+      #set ($discard = $matches.set($mathtool.sub($foreach.count, 1), $match))
+    #end
+    #set ($discard = $highlighting.add({
+      'field': $entry.key,
+      'priority': $fieldPriority.indexOf($entry.key),
+      'matches': $matches
+    }))
+  #end
+  #set ($highlighting = $sorttool.sort($highlighting, 'priority:desc'))
+  #set ($return = $NULL)
+  #setVariable("$return" $highlighting)
+#end
+
+#macro (getSearchResults)
+  #set ($queryString = "$!{text}")
+  ##
+  ## Create the query and set the query string.
+  #set ($query = $services.query.createQuery($queryString, 'solr'))
+  ##
+  ## Set query parameters.
+  #set ($discard = $query.setLimit($rows))
+  #set ($discard = $query.setOffset($start))
+  #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
+  ## We need to pass the list of supported locales so the names of the fields that are indexed in multiple languages are
+  ## expanded in the search query. For instance, the query "title:text" will be expanded to "title__:text OR
+  ## title_en:text OR title_fr:text" if the list of supported locales is [en, fr].
+  #if (!$supportedLanguages)
+    #getSupportedLanguages()
+  #end
+  #set ($discard = $query.bindValue('xwiki.supportedLocales', $stringtool.join($supportedLanguages, ',')))
+  ## Specify which index fields are matched when a free text search is performed.
+  #set ($defaultBoost = {
+    'DOCUMENT': 'title^10.0 name^10.0
+                 doccontent^2.0
+                 objcontent^0.4 filename^0.4 attcontent^0.4 doccontentraw^0.4
+                 author_display^0.08 creator_display^0.08
+                 comment^0.016 attauthor_display^0.016 space^0.016',
+    'ATTACHMENT': 'filename^5.0 attcontent attauthor_display^0.2',
+    'OBJECT': 'objcontent',
+    'OBJECT_PROPERTY': 'propertyvalue'
+  })
+  #if ($boost == '')
+    #set ($boost = $defaultBoost.get($type))
+  #end
+  #if ("$!boost" != '')
+    #set ($discard = $query.bindValue('qf', $boost))
+  #end
+  #if ($debug != '')
+    #set ($discard = $query.bindValue('debugQuery', 'on'))
+  #end
+  ##
+  ## Collect the query filters.
+  #set ($filters = {})
+  #if ($language != '')
+    #set ($discard = $filters.put('locales', [$language]))
+  #end
+  #if ($wiki != '')
+    #set ($discard = $filters.put('wiki', [$wiki]))
+  #end
+  #if ($space != '' &amp;&amp; !$blacklistedSpaces.contains($space))
+    #set ($discard = $filters.put('space_exact', ["#escapeFilterValue($space)"]))
+  #end
+  #if ($type != '')
+    #set ($discard = $filters.put('type', [$type]))
+  #end
+  #if ($fileType != '')
+    #set ($discard = $filters.put('mimetype', [$fileType]))
+  #end
+  #if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
+    #set ($discard = $filters.put('hidden', [false]))
+  #end
+  ## Add the facets.
+  #foreach ($parameter in $request.parameterMap.entrySet())
+    #if ($parameter.key.startsWith('f_'))
+      #set ($escapedValues = [])
+      #foreach ($value in $parameter.value)
+        #set ($discard = $escapedValues.add("#escapeFilterValue($value)"))
+      #end
+      #set ($discard = $filters.put($parameter.key.substring(2), $escapedValues))
+    #end
+  #end
+  ##
+  ## Build the query filter. Use AND as the default operation between different filters/facets.
+  #if ($filters.size() &gt; 0)
+    #set ($queryFilter = '{!q.op=AND}')
+    #foreach ($filter in $filters.entrySet())
+      #if ($filter.value.size() &gt; 1)
+        ## Use OR between different values of the same filter/facet.
+        #set ($queryFilter = "$queryFilter $filter.key:(")
+        #set ($separator = '')
+        #foreach ($value in $filter.value)
+          #set ($queryFilter = "$queryFilter$separator$value")
+          #set ($separator = ' OR ')
+        #end
+        #set ($queryFilter = "$queryFilter)")
+      #else
+        #set ($queryFilter = "$queryFilter $filter.key:$filter.value.get(0)")
+      #end
+    #end
+    #set ($discard = $query.bindValue('fq', $queryFilter))
+  #end
+  ##
+  ## Execute the query.
+  #set ($searchResponse = $query.execute()[0])
+#end
+
+#macro (escapeFilterValue $value)
+## Check if the given value is a range.
+#if ($rangePattern.matcher($value).matches())##
+$value##
+#else##
+"$stringtool.replaceEach($value, ['\', '"'], ['\\', '\"'])"##
+#end##
+#end
+
+#macro (processRequestParameters)
+  #set ($text = "$!request.text")
+  #set ($space = "$!request.space")
+  #set ($fileType = "$!request.fileType")
+  #set ($boost = "$!request.boost")
+  #set ($debug = "$!request.debug")
+  #set ($rows = $numbertool.integer($request.rows))
+  #if ("$!rows" == '')
+    #set ($rows = 10)
+  #end
+  #set ($start = $numbertool.integer($request.firstIndex))
+  #if ("$!start" == '')
+    #set ($start = 0)
+  #end
+  #set ($sort = $request.sort)
+  #if ("$!sort" == '')
+    #set ($sort = 'score')
+  #end
+  #set ($sortOrder = $request.sortOrder)
+  #if ("$!sortOrder" == '')
+    #set ($sortOrder = 'desc')
+  #elseif ($sortOrder != 'desc')
+    #set ($sortOrder = 'asc')
+  #end
+  ## Can't use 'language' as request parameter because it's used by view mode to select the display language.
+  #set ($language = $request.lang)
+  ## An empty value for the language parameter means no language query filter (all languages are considered).
+  #if ($language != '' &amp;&amp; "$!language" == '')
+    ## The language parameter is null (not set on the request).
+    #set ($language = "$!xcontext.language")
+  #end
+  #set ($type = $request.type)
+  #if ($type != '' &amp;&amp; "$!type" == '')
+    ## The type parameter is null (not set on the request).
+    #set ($type = 'DOCUMENT')
+  #end
+  ## Subwikis search by default in their content only.
+  #set ($wiki = "$!request.wiki")
+  #if ($wiki == '' &amp;&amp; !$xcontext.isMainWiki())
+    #set ($wiki = $xcontext.database)
+  #end
+#end
+
+#macro (displaySearchUI)
+  #set ($discard = $xwiki.ssx.use('Main.SolrSearch'))
+  #set ($discard = $xwiki.jsx.use('Main.SolrSearch'))
+  ## Disable the document extra data: comments, attachments, history...
+  #set ($docextras = [])
+  #processRequestParameters()
+  (% class="search-form-container" %)(((
+    #displaySearchForm()
+  )))
+  #if ($text != '')
+    #getSearchResults()
+    #displaySearchDebugInfo()
+    (% class="search-results-container" %)(((
+      #displaySearchFacets($searchResponse)
+      (% class="search-results-left" %)(((
+        #displaySearchResultsSort()
+
+        #displaySearchResults()
+      )))
+    )))
+  #end
+#end
+
+#macro (convertDateFormat $dateString $inputFormat $dateParser $datePrinter $return)
+  ## We don't use the given date parser directly because it can throw IllegalArgumentException.
+  #set ($date = $datetool.toDate($inputFormat, $dateString, $services.localization.currentLocale))
+  #if ($date)
+    #set ($date = $datePrinter.print($dateParser.parseDateTime($dateString)))
+  #else
+    #set ($date = '*')
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" $date)
+#end
+
+#macro (handleCustomDateInterval)
+  ## Compute the client timezone.
+  #set ($timezoneOffsetInMinutes = $mathtool.toInteger($request.timezoneOffset))
+  #set ($offsetHours = $timezoneOffsetInMinutes / 60)
+  #set ($offsetMinutes = $mathtool.abs($timezoneOffsetInMinutes) % 60)
+  #set ($clientTimezone = $xwiki.jodatime.getTimezone($offsetHours, $offsetMinutes))
+  ## Obtain a date parser.
+  #set ($configuredDateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
+  #set ($dateParser = $xwiki.jodatime.getDateTimeFormatterForPattern($configuredDateFormat))
+  #set ($dateParser = $dateParser.withLocale($services.localization.currentLocale).withZone($clientTimezone))
+  ## Obtain a date printer (Solr indexes the dates in ISO8601 format with UTC timezone).
+  #set ($datePrinter = $xwiki.jodatime.getDateTimeFormatterForPattern($iso8601DateFormat))
+  #set ($utcTimezone = $xwiki.jodatime.getTimezone(0))
+  #set ($datePrinter = $datePrinter.withZone($utcTimezone))
+  ## Convert the given dates.
+  #convertDateFormat($request.startDate $configuredDateFormat $dateParser $datePrinter $startDate)
+  #convertDateFormat($request.endDate $configuredDateFormat $dateParser $datePrinter $endDate)
+  #set ($interval = "[$startDate TO $endDate]")
+  #set ($xredirect = $request.xredirect.replaceFirst(
+    "\b$regextool.quote($escapetool.url($request.facet))=[^&amp;$escapetool.d]*",
+    $escapetool.url({
+      $request.facet: $interval,
+      'timezoneOffset': $request.timezoneOffset
+    })))
+  $response.sendRedirect($xredirect)
+#end
+
+#macro (outputRSSFeed)
+  ##
+  ## Get the search results.
+  ##
+  #processRequestParameters()
+  #getSearchResults()
+  #set ($list = [])
+  #set ($results = $searchResponse.results)
+  #foreach ($searchResult in $results)
+    #set ($searchResultDocumentReference = $services.model.createDocumentReference(
+      $searchResult.wiki, $searchResult.space, $searchResult.name))
+    #set ($discard = $list.add("$searchResultDocumentReference"))
+  #end
+  ##
+  ## Compute the feed URI.
+  ##
+  #set ($parameters = {})
+  #set ($discard = $parameters.putAll($request.getParameterMap()))
+  #set ($discard = $parameters.remove('outputSyntax'))
+  #set ($discard = $parameters.remove('media'))
+  #set ($feedURI = $doc.getExternalURL('view', $escapetool.url($parameters)))
+  ##
+  ## Configure the feed.
+  ##
+  #set ($feed = $xwiki.feed.getDocumentFeed($list, {}))
+  #set ($discard = $feed.setLink($feedURI))
+  #set ($discard = $feed.setUri($feedURI))
+  #set ($discard = $feed.setAuthor('XWiki'))
+  #set ($title = $services.localization.render('search.rss', ["[$text]"]))
+  #set ($discard = $feed.setTitle($title))
+  #set ($discard = $feed.setDescription($title))
+  #set ($discard = $feed.setLanguage($xcontext.language))
+  #set ($discard = $feed.setCopyright($xwiki.getXWikiPreference('copyright')))
+  ##
+  ## Output the feed.
+  ##
+  #set ($discard = $response.setContentType('application/rss+xml'))
+  $xwiki.feed.getFeedOutput($feed, 'rss_2.0')
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ($request.media == 'rss')
+  #outputRSSFeed()
+#elseif ($xcontext.action == 'get' &amp;&amp; "$!request.facet" != '' &amp;&amp; ($request.startDate || $request.endDate))
+  #handleCustomDateInterval()
+#else
+  #displaySearchUI()
+#end
+{{/velocity}}</content>
   <attachment>
     <filename>dark-grey-disclosure-arrow-down.png</filename>
-    <filesize>94</filesize>
-    <author>XWiki.Admin</author>
-    <date>1368010970000</date>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1368007370000</date>
     <version>1.1</version>
     <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJUlEQVQIW2OIjIz8jwszAAkGbBJA
-wACTZECXAEuCCGQFMAkQBgCrMjrDUR6EaAAAAABJRU5ErkJggg==
-</content>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJUlEQVQIW2OIjIz8jwszAAkGbBJAwACTZECXAEuCCGQFMAkQBgCrMjrDUR6EaAAAAABJRU5ErkJggg==</content>
+    <filesize>94</filesize>
   </attachment>
   <attachment>
     <filename>dark-grey-disclosure-arrow-left.png</filename>
-    <filesize>2806</filesize>
-    <author>XWiki.Admin</author>
-    <date>1368436548000</date>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1368432948000</date>
     <version>1.1</version>
     <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAYAAAAvZezQAAAKQ2lDQ1BJQ0MgcHJvZmlsZQAAeNqd
-U3dYk/cWPt/3ZQ9WQtjwsZdsgQAiI6wIyBBZohCSAGGEEBJAxYWIClYUFRGcSFXEgtUKSJ2I4qAo
-uGdBiohai1VcOO4f3Ke1fXrv7e371/u855zn/M55zw+AERImkeaiagA5UoU8Otgfj09IxMm9gAIV
-SOAEIBDmy8JnBcUAAPADeXh+dLA//AGvbwACAHDVLiQSx+H/g7pQJlcAIJEA4CIS5wsBkFIAyC5U
-yBQAyBgAsFOzZAoAlAAAbHl8QiIAqg0A7PRJPgUA2KmT3BcA2KIcqQgAjQEAmShHJAJAuwBgVYFS
-LALAwgCgrEAiLgTArgGAWbYyRwKAvQUAdo5YkA9AYACAmUIszAAgOAIAQx4TzQMgTAOgMNK/4Klf
-cIW4SAEAwMuVzZdL0jMUuJXQGnfy8ODiIeLCbLFCYRcpEGYJ5CKcl5sjE0jnA0zODAAAGvnRwf44
-P5Dn5uTh5mbnbO/0xaL+a/BvIj4h8d/+vIwCBAAQTs/v2l/l5dYDcMcBsHW/a6lbANpWAGjf+V0z
-2wmgWgrQevmLeTj8QB6eoVDIPB0cCgsL7SViob0w44s+/zPhb+CLfvb8QB7+23rwAHGaQJmtwKOD
-/XFhbnauUo7nywRCMW735yP+x4V//Y4p0eI0sVwsFYrxWIm4UCJNx3m5UpFEIcmV4hLpfzLxH5b9
-CZN3DQCshk/ATrYHtctswH7uAQKLDljSdgBAfvMtjBoLkQAQZzQyefcAAJO/+Y9AKwEAzZek4wAA
-vOgYXKiUF0zGCAAARKCBKrBBBwzBFKzADpzBHbzAFwJhBkRADCTAPBBCBuSAHAqhGJZBGVTAOtgE
-tbADGqARmuEQtMExOA3n4BJcgetwFwZgGJ7CGLyGCQRByAgTYSE6iBFijtgizggXmY4EImFINJKA
-pCDpiBRRIsXIcqQCqUJqkV1II/ItchQ5jVxA+pDbyCAyivyKvEcxlIGyUQPUAnVAuagfGorGoHPR
-dDQPXYCWomvRGrQePYC2oqfRS+h1dAB9io5jgNExDmaM2WFcjIdFYIlYGibHFmPlWDVWjzVjHVg3
-dhUbwJ5h7wgkAouAE+wIXoQQwmyCkJBHWExYQ6gl7CO0EroIVwmDhDHCJyKTqE+0JXoS+cR4Yjqx
-kFhGrCbuIR4hniVeJw4TX5NIJA7JkuROCiElkDJJC0lrSNtILaRTpD7SEGmcTCbrkG3J3uQIsoCs
-IJeRt5APkE+S+8nD5LcUOsWI4kwJoiRSpJQSSjVlP+UEpZ8yQpmgqlHNqZ7UCKqIOp9aSW2gdlAv
-U4epEzR1miXNmxZDy6Qto9XQmmlnafdoL+l0ugndgx5Fl9CX0mvoB+nn6YP0dwwNhg2Dx0hiKBlr
-GXsZpxi3GS+ZTKYF05eZyFQw1zIbmWeYD5hvVVgq9ip8FZHKEpU6lVaVfpXnqlRVc1U/1XmqC1Sr
-VQ+rXlZ9pkZVs1DjqQnUFqvVqR1Vu6k2rs5Sd1KPUM9RX6O+X/2C+mMNsoaFRqCGSKNUY7fGGY0h
-FsYyZfFYQtZyVgPrLGuYTWJbsvnsTHYF+xt2L3tMU0NzqmasZpFmneZxzQEOxrHg8DnZnErOIc4N
-znstAy0/LbHWaq1mrX6tN9p62r7aYu1y7Rbt69rvdXCdQJ0snfU6bTr3dQm6NrpRuoW623XP6j7T
-Y+t56Qn1yvUO6d3RR/Vt9KP1F+rv1u/RHzcwNAg2kBlsMThj8MyQY+hrmGm40fCE4agRy2i6kcRo
-o9FJoye4Ju6HZ+M1eBc+ZqxvHGKsNN5l3Gs8YWJpMtukxKTF5L4pzZRrmma60bTTdMzMyCzcrNis
-yeyOOdWca55hvtm82/yNhaVFnMVKizaLx5balnzLBZZNlvesmFY+VnlW9VbXrEnWXOss623WV2xQ
-G1ebDJs6m8u2qK2brcR2m23fFOIUjynSKfVTbtox7PzsCuya7AbtOfZh9iX2bfbPHcwcEh3WO3Q7
-fHJ0dcx2bHC866ThNMOpxKnD6VdnG2ehc53zNRemS5DLEpd2lxdTbaeKp26fesuV5RruutK10/Wj
-m7ub3K3ZbdTdzD3Ffav7TS6bG8ldwz3vQfTw91jicczjnaebp8LzkOcvXnZeWV77vR5Ps5wmntYw
-bcjbxFvgvct7YDo+PWX6zukDPsY+Ap96n4e+pr4i3z2+I37Wfpl+B/ye+zv6y/2P+L/hefIW8U4F
-YAHBAeUBvYEagbMDawMfBJkEpQc1BY0FuwYvDD4VQgwJDVkfcpNvwBfyG/ljM9xnLJrRFcoInRVa
-G/owzCZMHtYRjobPCN8Qfm+m+UzpzLYIiOBHbIi4H2kZmRf5fRQpKjKqLupRtFN0cXT3LNas5Fn7
-Z72O8Y+pjLk722q2cnZnrGpsUmxj7Ju4gLiquIF4h/hF8ZcSdBMkCe2J5MTYxD2J43MC52yaM5zk
-mlSWdGOu5dyiuRfm6c7Lnnc8WTVZkHw4hZgSl7I/5YMgQlAvGE/lp25NHRPyhJuFT0W+oo2iUbG3
-uEo8kuadVpX2ON07fUP6aIZPRnXGMwlPUit5kRmSuSPzTVZE1t6sz9lx2S05lJyUnKNSDWmWtCvX
-MLcot09mKyuTDeR55m3KG5OHyvfkI/lz89sVbIVM0aO0Uq5QDhZML6greFsYW3i4SL1IWtQz32b+
-6vkjC4IWfL2QsFC4sLPYuHhZ8eAiv0W7FiOLUxd3LjFdUrpkeGnw0n3LaMuylv1Q4lhSVfJqedzy
-jlKD0qWlQyuCVzSVqZTJy26u9Fq5YxVhlWRV72qX1VtWfyoXlV+scKyorviwRrjm4ldOX9V89Xlt
-2treSrfK7etI66Trbqz3Wb+vSr1qQdXQhvANrRvxjeUbX21K3nShemr1js20zcrNAzVhNe1bzLas
-2/KhNqP2ep1/XctW/a2rt77ZJtrWv913e/MOgx0VO97vlOy8tSt4V2u9RX31btLugt2PGmIbur/m
-ft24R3dPxZ6Pe6V7B/ZF7+tqdG9s3K+/v7IJbVI2jR5IOnDlm4Bv2pvtmne1cFoqDsJB5cEn36Z8
-e+NQ6KHOw9zDzd+Zf7f1COtIeSvSOr91rC2jbaA9ob3v6IyjnR1eHUe+t/9+7zHjY3XHNY9XnqCd
-KD3x+eSCk+OnZKeenU4/PdSZ3Hn3TPyZa11RXb1nQ8+ePxd07ky3X/fJ897nj13wvHD0Ivdi2yW3
-S609rj1HfnD94UivW2/rZffL7Vc8rnT0Tes70e/Tf/pqwNVz1/jXLl2feb3vxuwbt24m3Ry4Jbr1
-+Hb27Rd3Cu5M3F16j3iv/L7a/eoH+g/qf7T+sWXAbeD4YMBgz8NZD+8OCYee/pT/04fh0kfMR9Uj
-RiONj50fHxsNGr3yZM6T4aeypxPPyn5W/3nrc6vn3/3i+0vPWPzY8Av5i8+/rnmp83Lvq6mvOscj
-xx+8znk98ab8rc7bfe+477rfx70fmSj8QP5Q89H6Y8en0E/3Pud8/vwv94Tz+4A5JREAAAAGYktH
-RAD/AP8A/6C9p5MAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfdBQ0JDwtHZQw0AAAANElE
-QVQI11XMsREAMAjDQEG2ZECGYhmnCRxxpy9skogI3nSqagLAdzRMAHhm2gcAG/tj8ALJCRB9gw0S
-owAAAABJRU5ErkJggg==
-</content>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAYAAAAvZezQAAAKQ2lDQ1BJQ0MgcHJvZmlsZQAAeNqdU3dYk/cWPt/3ZQ9WQtjwsZdsgQAiI6wIyBBZohCSAGGEEBJAxYWIClYUFRGcSFXEgtUKSJ2I4qAouGdBiohai1VcOO4f3Ke1fXrv7e371/u855zn/M55zw+AERImkeaiagA5UoU8Otgfj09IxMm9gAIVSOAEIBDmy8JnBcUAAPADeXh+dLA//AGvbwACAHDVLiQSx+H/g7pQJlcAIJEA4CIS5wsBkFIAyC5UyBQAyBgAsFOzZAoAlAAAbHl8QiIAqg0A7PRJPgUA2KmT3BcA2KIcqQgAjQEAmShHJAJAuwBgVYFSLALAwgCgrEAiLgTArgGAWbYyRwKAvQUAdo5YkA9AYACAmUIszAAgOAIAQx4TzQMgTAOgMNK/4KlfcIW4SAEAwMuVzZdL0jMUuJXQGnfy8ODiIeLCbLFCYRcpEGYJ5CKcl5sjE0jnA0zODAAAGvnRwf44P5Dn5uTh5mbnbO/0xaL+a/BvIj4h8d/+vIwCBAAQTs/v2l/l5dYDcMcBsHW/a6lbANpWAGjf+V0z2wmgWgrQevmLeTj8QB6eoVDIPB0cCgsL7SViob0w44s+/zPhb+CLfvb8QB7+23rwAHGaQJmtwKOD/XFhbnauUo7nywRCMW735yP+x4V//Y4p0eI0sVwsFYrxWIm4UCJNx3m5UpFEIcmV4hLpfzLxH5b9CZN3DQCshk/ATrYHtctswH7uAQKLDljSdgBAfvMtjBoLkQAQZzQyefcAAJO/+Y9AKwEAzZek4wAAvOgYXKiUF0zGCAAARKCBKrBBBwzBFKzADpzBHbzAFwJhBkRADCTAPBBCBuSAHAqhGJZBGVTAOtgEtbADGqARmuEQtMExOA3n4BJcgetwFwZgGJ7CGLyGCQRByAgTYSE6iBFijtgizggXmY4EImFINJKApCDpiBRRIsXIcqQCqUJqkV1II/ItchQ5jVxA+pDbyCAyivyKvEcxlIGyUQPUAnVAuagfGorGoHPRdDQPXYCWomvRGrQePYC2oqfRS+h1dAB9io5jgNExDmaM2WFcjIdFYIlYGibHFmPlWDVWjzVjHVg3dhUbwJ5h7wgkAouAE+wIXoQQwmyCkJBHWExYQ6gl7CO0EroIVwmDhDHCJyKTqE+0JXoS+cR4YjqxkFhGrCbuIR4hniVeJw4TX5NIJA7JkuROCiElkDJJC0lrSNtILaRTpD7SEGmcTCbrkG3J3uQIsoCsIJeRt5APkE+S+8nD5LcUOsWI4kwJoiRSpJQSSjVlP+UEpZ8yQpmgqlHNqZ7UCKqIOp9aSW2gdlAvU4epEzR1miXNmxZDy6Qto9XQmmlnafdoL+l0ugndgx5Fl9CX0mvoB+nn6YP0dwwNhg2Dx0hiKBlrGXsZpxi3GS+ZTKYF05eZyFQw1zIbmWeYD5hvVVgq9ip8FZHKEpU6lVaVfpXnqlRVc1U/1XmqC1SrVQ+rXlZ9pkZVs1DjqQnUFqvVqR1Vu6k2rs5Sd1KPUM9RX6O+X/2C+mMNsoaFRqCGSKNUY7fGGY0hFsYyZfFYQtZyVgPrLGuYTWJbsvnsTHYF+xt2L3tMU0NzqmasZpFmneZxzQEOxrHg8DnZnErOIc4NznstAy0/LbHWaq1mrX6tN9p62r7aYu1y7Rbt69rvdXCdQJ0snfU6bTr3dQm6NrpRuoW623XP6j7TY+t56Qn1yvUO6d3RR/Vt9KP1F+rv1u/RHzcwNAg2kBlsMThj8MyQY+hrmGm40fCE4agRy2i6kcRoo9FJoye4Ju6HZ+M1eBc+ZqxvHGKsNN5l3Gs8YWJpMtukxKTF5L4pzZRrmma60bTTdMzMyCzcrNisyeyOOdWca55hvtm82/yNhaVFnMVKizaLx5balnzLBZZNlvesmFY+VnlW9VbXrEnWXOss623WV2xQG1ebDJs6m8u2qK2brcR2m23fFOIUjynSKfVTbtox7PzsCuya7AbtOfZh9iX2bfbPHcwcEh3WO3Q7fHJ0dcx2bHC866ThNMOpxKnD6VdnG2ehc53zNRemS5DLEpd2lxdTbaeKp26fesuV5RruutK10/Wjm7ub3K3ZbdTdzD3Ffav7TS6bG8ldwz3vQfTw91jicczjnaebp8LzkOcvXnZeWV77vR5Ps5wmntYwbcjbxFvgvct7YDo+PWX6zukDPsY+Ap96n4e+pr4i3z2+I37Wfpl+B/ye+zv6y/2P+L/hefIW8U4FYAHBAeUBvYEagbMDawMfBJkEpQc1BY0FuwYvDD4VQgwJDVkfcpNvwBfyG/ljM9xnLJrRFcoInRVaG/owzCZMHtYRjobPCN8Qfm+m+UzpzLYIiOBHbIi4H2kZmRf5fRQpKjKqLupRtFN0cXT3LNas5Fn7Z72O8Y+pjLk722q2cnZnrGpsUmxj7Ju4gLiquIF4h/hF8ZcSdBMkCe2J5MTYxD2J43MC52yaM5zkmlSWdGOu5dyiuRfm6c7Lnnc8WTVZkHw4hZgSl7I/5YMgQlAvGE/lp25NHRPyhJuFT0W+oo2iUbG3uEo8kuadVpX2ON07fUP6aIZPRnXGMwlPUit5kRmSuSPzTVZE1t6sz9lx2S05lJyUnKNSDWmWtCvXMLcot09mKyuTDeR55m3KG5OHyvfkI/lz89sVbIVM0aO0Uq5QDhZML6greFsYW3i4SL1IWtQz32b+6vkjC4IWfL2QsFC4sLPYuHhZ8eAiv0W7FiOLUxd3LjFdUrpkeGnw0n3LaMuylv1Q4lhSVfJqedzyjlKD0qWlQyuCVzSVqZTJy26u9Fq5YxVhlWRV72qX1VtWfyoXlV+scKyorviwRrjm4ldOX9V89Xlt2treSrfK7etI66Trbqz3Wb+vSr1qQdXQhvANrRvxjeUbX21K3nShemr1js20zcrNAzVhNe1bzLas2/KhNqP2ep1/XctW/a2rt77ZJtrWv913e/MOgx0VO97vlOy8tSt4V2u9RX31btLugt2PGmIbur/mft24R3dPxZ6Pe6V7B/ZF7+tqdG9s3K+/v7IJbVI2jR5IOnDlm4Bv2pvtmne1cFoqDsJB5cEn36Z8e+NQ6KHOw9zDzd+Zf7f1COtIeSvSOr91rC2jbaA9ob3v6IyjnR1eHUe+t/9+7zHjY3XHNY9XnqCdKD3x+eSCk+OnZKeenU4/PdSZ3Hn3TPyZa11RXb1nQ8+ePxd07ky3X/fJ897nj13wvHD0Ivdi2yW3S609rj1HfnD94UivW2/rZffL7Vc8rnT0Tes70e/Tf/pqwNVz1/jXLl2feb3vxuwbt24m3Ry4Jbr1+Hb27Rd3Cu5M3F16j3iv/L7a/eoH+g/qf7T+sWXAbeD4YMBgz8NZD+8OCYee/pT/04fh0kfMR9UjRiONj50fHxsNGr3yZM6T4aeypxPPyn5W/3nrc6vn3/3i+0vPWPzY8Av5i8+/rnmp83Lvq6mvOscjxx+8znk98ab8rc7bfe+477rfx70fmSj8QP5Q89H6Y8en0E/3Pud8/vwv94Tz+4A5JREAAAAGYktHRAD/AP8A/6C9p5MAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfdBQ0JDwtHZQw0AAAANElEQVQI11XMsREAMAjDQEG2ZECGYhmnCRxxpy9skogI3nSqagLAdzRMAHhm2gcAG/tj8ALJCRB9gw0SowAAAABJRU5ErkJggg==</content>
+    <filesize>2806</filesize>
   </attachment>
   <attachment>
     <filename>light-grey-disclosure-arrow-down.png</filename>
-    <filesize>93</filesize>
-    <author>XWiki.Admin</author>
-    <date>1368010970000</date>
+    <author>xwiki:XWiki.Admin</author>
+    <date>1368007370000</date>
     <version>1.1</version>
     <comment/>
-    <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJElEQVQIW2M4c+bMf1yY4f///wzY
-JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
-</content>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJElEQVQIW2M4c+bMf1yY4f///wzYJEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC</content>
+    <filesize>93</filesize>
   </attachment>
   <object>
+    <name>Main.SolrSearch</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>0e4d1f86-8a36-4c04-9cd6-4a5988f42bc1</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -175,10 +1260,6 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.SolrSearch</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>0e4d1f86-8a36-4c04-9cd6-4a5988f42bc1</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -272,17 +1353,40 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
   var CustomDateIntervalBehavior = Class.create({
     initialize: function(container) {
       this.container = container;
-      container.down('a.itemName').observe('click', this._onToggle.bindAsEventListener(this));
+      var form = this.container.down('form');
+
+      // Note that we change the sign because Date#getTimezoneOffset() returns (UTC - local time)
+      // and we need (local time - UTC) on the server.
+      var timezoneOffset = new Element('input', {
+        type: 'hidden',
+        name: 'timezoneOffset',
+        value: -new Date().getTimezoneOffset()
+      });
+      form.down('div.hidden').insert(timezoneOffset);
+
+      var checkbox = new Element('input', {type: 'checkbox'});
+      checkbox.observe('click', function() {
+        form.toggle();
+      });
+
+      var label = new Element('label', {'class': 'itemName'});
+      label.insert(checkbox);
+      label.insert(form.down('.itemName').remove().innerHTML);
+      form.hide().insert({before: label});
     },
 
     _onToggle: function(event) {
       var link = event.element();
       var startDate = this.container.down('input.datetime');
       var endDate = startDate.next('input.datetime');
+      // We change the sign because Date#getTimezoneOffset() returns (UTC - local time)
+      // and we need (local time - UTC) on the server.
+      var timezoneOffset = -new Date().getTimezoneOffset();
       link.href = XWiki.currentDocument.getURL('get', Object.toQueryString({
         facet: startDate.name,
         startDate: startDate.value,
         endDate: endDate.value,
+        timezoneOffset: timezoneOffset,
         xredirect: link.readAttribute('href')
       }));
     }
@@ -342,6 +1446,10 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
     </property>
   </object>
   <object>
+    <name>Main.SolrSearch</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>eabef30e-f82e-4813-88e7-45db2633610e</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -413,10 +1521,6 @@ JEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.SolrSearch</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>eabef30e-f82e-4813-88e7-45db2633610e</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -530,7 +1634,7 @@ ul.search-results-sort {
 .search-results-sort li {
   display: inline;
   list-style-type: none;
-  padding-left: 1em;
+  padding-left: 1.5em;
 }
 .search-results-sort li:first-of-type {
   padding: 0;
@@ -599,6 +1703,13 @@ a.sort-item.active, a.sort-item.active:hover {
   margin: 0;
 }
 
+.search-result-version {
+  font-size: 70%;
+  font-weight: normal;
+  padding-left: 0.5em;
+  vertical-align: top;
+}
+
 .search-result-language {
   font-size: 0.7em;
   font-style: italic;
@@ -608,17 +1719,15 @@ a.sort-item.active, a.sort-item.active:hover {
 .search-result-location,
 .search-result-author,
 .search-result-language,
-.search-result-mediaType,
-.search-result-object,
-.search-result-property {
+.search-result-uploader,
+.search-result-mediaType {
   color: $theme.textSecondaryColor;
 }
 
 .search-result-location,
 .search-result-author,
+.search-result-uploader,
 .search-result-mediaType,
-.search-result-object,
-.search-result-property,
 .search-result-highlight {
   line-height: 1.4em;
 }
@@ -822,8 +1931,15 @@ a.search-result-highlightAll:after {
 /**
  * Date Facet
  */
-.search-facet-body li.customDateInterval input {
+.search-facet-body .customDateInterval input {
   margin-bottom: .3em;
+}
+.search-facet-body .customDateInterval .itemName {
+  cursor: pointer;
+  padding-left: 0;
+}
+.search-facet-body .customDateInterval form {
+  margin-top: .5em;
 }
 
 /**
@@ -868,966 +1984,4 @@ a.search-result-highlightAll:after {
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{velocity output='false'}}
-#set ($rangePattern = $regextool.compile('^\[(.+) TO (.+)\]$'))
-
-#macro (displaySearchForm)
-  {{html}}
-  &lt;form class="search-form" action=""&gt;
-    &lt;div class="hidden"&gt;
-      &lt;input type="hidden" name="sort" value="$!escapetool.xml($sort)"/&gt;
-      &lt;input type="hidden" name="sortOrder" value="$!escapetool.xml($sortOrder)"/&gt;
-    &lt;/div&gt;
-    &lt;div class="search-bar"&gt;
-      &lt;label class="hidden" for="searchQuery"&gt;$services.localization.render('search.page.bar.query.label')&lt;/label&gt;
-      &lt;input type="text" id="searchQuery" name="text" class="search-query withTip useTitleAsTip"
-        title="$services.localization.render('search.page.bar.query.title')" value="$escapetool.xml($text)"/&gt;##
-      &lt;span class="buttonwrapper"&gt;##
-        &lt;input type="submit" value="$services.localization.render('search.page.bar.submit')"
-          class="button" title="$services.localization.render('search.page.bar.submit.title')" /&gt;
-      &lt;/span&gt;
-    &lt;/div&gt;
-    #displaySearchFilter()
-  &lt;/form&gt;
-  {{/html}}
-#end
-
-#macro (displaySearchFilter)
-  &lt;div class="search-filter xform&gt;
-    &lt;div class="search-filter-header"&gt;
-      &lt;strong&gt;$services.localization.render('solr.filter.title')&lt;/strong&gt;
-      &lt;p class="xHint"&gt;$services.localization.render('solr.filter.hint')&lt;/p&gt;
-    &lt;/div&gt;
-    &lt;dl class="search-filter-left"&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterWiki"&gt;$services.localization.render('solr.filterBy.wiki')&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;#wikiSelector()&lt;/dd&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterType"&gt;$services.localization.render('solr.filterBy.type')&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;select id="searchFilterType" name="type"&gt;
-          &lt;option value=""&gt;$services.localization.render('solr.filterBy.type.all')&lt;/option&gt;
-          #foreach ($aType in ['DOCUMENT', 'ATTACHMENT', 'OBJECT', 'OBJECT_PROPERTY'])
-            &lt;option value="$aType" #if ($aType == $type)selected="selected"#end&gt;
-              $escapetool.xml($services.localization.render("solr.filterBy.type.$aType.toLowerCase()"))
-            &lt;/option&gt;
-          #end
-        &lt;/select&gt;
-      &lt;/dd&gt;
-      #if ($xwiki.isMultiLingual())
-        &lt;dt&gt;
-          &lt;label for="searchFilterLanguage"&gt;$services.localization.render('solr.filterBy.language')&lt;/label&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
-          &lt;select id="searchFilterLanguage" name="lang"&gt;
-            &lt;option value=""&gt;$services.localization.render('solr.filterBy.language.all')&lt;/option&gt;
-            #getSupportedLanguages()
-            #foreach ($supportedLanguage in $supportedLanguages)
-              &lt;option value="$supportedLanguage" #if ($language == $supportedLanguage)selected="selected"#end&gt;$supportedLanguage&lt;/option&gt;
-            #end
-          &lt;/select&gt;
-        &lt;/dd&gt;
-      #end
-    &lt;/dl&gt;
-    &lt;dl class="search-filter-right"&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterSpace"&gt;$services.localization.render('solr.filterBy.space')&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;#spaceSelector()&lt;/dd&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterFileType"&gt;$services.localization.render('solr.filterBy.fileType')&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;select id="searchFilterFileType" name="fileType"&gt;
-          &lt;option value=""&gt;$services.localization.render('solr.filterBy.fileType.all')&lt;/option&gt;
-          #set ($fileTypeOptions = $collectionstool.orderedMap)
-          #set ($discard = $fileTypeOptions.put('image*', 'Image'))
-          #set ($discard = $fileTypeOptions.put('audio*', 'Audio'))
-          #set ($discard = $fileTypeOptions.put('video*', 'Video'))
-          #set ($discard = $fileTypeOptions.put('text*', 'Text'))
-          #foreach ($aFileType in ['image', 'audio', 'video', 'text'])
-            &lt;option value="$aFileType*" #if ("$aFileType*" == $fileType)selected="selected"#end&gt;
-              $services.localization.render("solr.filterBy.fileType.$aFileType")
-            &lt;/option&gt;
-          #end
-        &lt;/select&gt;
-      &lt;/dd&gt;
-    &lt;/dl&gt;
-    &lt;div class="clearfloats"&gt;&lt;/div&gt;
-    &lt;dl&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterBoost"&gt;$services.localization.render('solr.filter.queryBoost.label')&lt;/label&gt;
-        &lt;span class="xHint"&gt;$services.localization.render('solr.filter.queryBoost.hint')&lt;/span&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;input id="searchFilterBoost" name="boost" type="text" value="$escapetool.xml($boost)" /&gt;
-      &lt;/dd&gt;
-    &lt;/dl&gt;
-  &lt;/div&gt;
-#end
-
-#**
- * Get the list of supported languages.
- *#
-#macro (getSupportedLanguages)
-  #set ($supportedLanguagesRaw = $xwiki.getXWikiPreference('languages').split('[, |]'))
-  #set ($supportedLanguages = [])
-  #foreach ($supportedLanguage in $supportedLanguagesRaw)
-    #if ($supportedLanguage.trim() != '')
-      #set ($discard = $supportedLanguages.add($supportedLanguage))
-    #end
-  #end
-  ## Make sure the default language is included.
-  #set ($defaultLanguage = $xwiki.getXWikiPreference('default_language', 'en'))
-  #if (!$supportedLanguages.contains($defaultLanguage))
-    #set ($discard = $supportedLanguages.add($defaultLanguage))
-  #end
-  #set ($supportedLanguages = $sorttool.sort($supportedLanguages))
-#end
-
-#macro (wikiSelector )
-  #if ($xcontext.isMainWiki())
-    #set ($wikiNames = $xwiki.wikiNames)
-  #else
-    #set ($wikiNames = [$xcontext.database])
-  #end
-  #set ($wikis = [])
-  #foreach ($wikiName in $wikiNames)
-    #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wikiName).wikiPrettyName)
-    #if ("$!wikiPrettyName.trim()" == '')
-      #set ($wikiPrettyName = $wikiName)
-    #end
-    #set ($discard = $wikis.add({'value': $wikiName, 'label': $wikiPrettyName}))
-  #end
-  &lt;select id="searchFilterWiki" name="wiki"&gt;
-    #if ($xcontext.isMainWiki() &amp;&amp; $wikis.size() &gt; 1)
-      ## The main wiki can search in all wikis.
-      &lt;option value=""&gt;$services.localization.render('solr.filterBy.wiki.all')&lt;/option&gt;
-    #end
-    #foreach ($aWiki in $sorttool.sort($wikis, 'label'))
-      &lt;option value="$escapetool.xml($aWiki.value)" #if ($wiki == "$!aWiki.value")selected="selected"#end&gt;$escapetool.xml($aWiki.label)&lt;/option&gt;
-    #end
-  &lt;/select&gt;
-#end
-
-#macro (spaceSelector)
-  #set ($spaces = [])
-  #set ($wikiNames = $xwiki.wikiNames)
-  #if ($wiki == $xcontext.database || ($wiki == '' &amp;&amp; $wikiNames.size() == 1))
-    #set ($spaces = $xwiki.spaces)
-  #elseif ($wikiNames.contains($wiki) &amp;&amp; $doc.hasProgrammingRights())
-    #set ($spaces = $services.query.xwql('select distinct doc.space from Document as doc order by doc.space').setWiki($wiki).execute())
-  #end
-  &lt;select id="searchFilterSpace" name="space" title="$services.localization.render('search.page.bar.spaces.title')"&gt;
-    &lt;option value="" #if($space == '')selected="selected"#end&gt;$services.localization.render('search.page.bar.spaces.all')&lt;/option&gt;
-    #foreach ($aSpace in $spaces)
-      #set ($spaceReservedDocRef = $services.model.createDocumentReference($wiki,
-        $aSpace, "DocumentReservedForInternalXWikiUsage$mathtool.random(0, 999)"))
-      #if (!$blacklistedSpaces.contains($aSpace) &amp;&amp; $xwiki.hasAccessLevel('view',
-        $services.model.serialize($spaceReservedDocRef, 'default')))
-        &lt;option value="$escapetool.xml($aSpace)" #if($space == $aSpace)selected="selected"#end&gt;$escapetool.xml($aSpace)&lt;/option&gt;
-      #end
-    #end
-  &lt;/select&gt;
-#end
-
-#macro (displaySearchDebugInfo)
-  (% class="search-debug#if ($debug == '') hidden#end" %)(((
-    Debug is On
-    #set ($debugMap = $searchResponse.debugMap)
-    #if ($debugMap)
-
-      {{html}}
-      &lt;div&gt;&lt;strong&gt;Query Parser:&lt;/strong&gt; $!debugMap.get('QParser')&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Parsed Query:&lt;/strong&gt; $!debugMap.get('parsedquery_toString')&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Filter Queries:&lt;/strong&gt; $!escapetool.xml($debugMap.get('filter_queries'))&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Processing time:&lt;/strong&gt; $!debugMap.get('timing')&lt;/div&gt;
-      {{/html}}
-    #end
-  )))
-#end
-
-#macro (displaySearchFacets $searchResponse)
-  (% class="search-facets xform" %)(((
-    (% class="search-facets-header" %)(((
-      **{{translation key="solr.facets.title"/}}**
-
-      (% class="xHint" %)
-      {{translation key="solr.facets.hint"/}}
-    )))
-    (% class="search-facets-actions" %)(((
-      #set ($resetParameters = {})
-      #foreach ($parameter in $request.parameterMap.entrySet())
-        #if ($parameter.key.startsWith('f_'))
-          #set ($discard = $resetParameters.put($parameter.key, []))
-        #end
-      #end
-      #extendQueryString($url $resetParameters)
-      [[{{translation key="solr.facets.resetAll"}}&gt;&gt;path:$url]]
-    )))
-    #foreach ($facetField in $searchResponse.facetFields)
-      #displaySearchFacet($facetField)
-    #end
-  )))
-#end
-
-#macro (displaySearchFacet $facetField)
-  #set ($facetValues = $facetField.values)
-  ## Keep only the values that have at least one match.
-  #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
-  ## Display the facets that have values specified on the request or that have at least 2 different values matched.
-  #set ($facetRequestParameter = "f_$facetField.name")
-  #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
-  #if ($facetRequestValues || $facetValues.size() &gt; 1)
-    (% class="search-facet expanded" %)(((
-      {{html}}
-      #set ($facetPrettyNameKey = "solr.field.$facetField.name")
-      #if ($services.localization.get($facetPrettyNameKey))
-        #set ($facetPrettyName = $services.localization.render($facetPrettyNameKey))
-      #else
-        #set ($facetPrettyName = $facetField.name)
-      #end
-      &lt;div class="search-facet-header"&gt;$escapetool.xml($facetPrettyName)&lt;/div&gt; 
-      &lt;div class="search-facet-body"&gt;
-        #displaySearchFacetValues($facetValues)
-      &lt;/div&gt;
-      {{/html}}
-    )))
-  #end
-#end
-
-#set ($customSearchFacetValuesDisplayer = {
-  'locale': 'locale',
-  'author': 'user',
-  'creator': 'user',
-  'date': 'date',
-  'creationdate': 'date'
-})
-
-#macro (displaySearchFacetValues $facetValues)
-  #set ($displayer = $customSearchFacetValuesDisplayer.get($facetField.name))
-  #if (!$displayer)
-    #set ($displayer = 'default')
-  #end
-  #evaluate("${escapetool.h}displaySearchFacetValues_${displayer}(${escapetool.d}facetValues)")
-#end
-
-#macro (displaySearchFacetValues_default $facetValues)
-  &lt;ul&gt;
-    #displaySearchFacetValuesLimited($facetValues)
-  &lt;/ul&gt;
-#end
-
-#macro (displaySearchFacetValuesLimited $facetValues)
-  #set ($limitRequestParameter = "l_$facetField.name")
-  #set ($limit = $mathtool.toInteger($request.getParameter($limitRequestParameter)))
-  #if ("$!limit" == '')
-    #set ($limit = 5)
-  #end
-  #set ($limit = $mathtool.max($mathtool.min($limit, $facetValues.size()), 0))
-  #foreach ($facetValue in $facetValues)
-    #if ($foreach.index &lt; $limit)
-      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
-    #else
-      #extendQueryString($url {$limitRequestParameter: [$mathtool.add($limit, 5)]})
-      &lt;li&gt;&lt;a href="$url" class="more"&gt;&amp;hellip; $escapetool.xml($services.localization.render(
-        'solr.facets.moreValues', [$mathtool.sub($facetValues.size(), $limit)]))&lt;/a&gt;&lt;/li&gt;
-      #break
-    #end
-  #end
-#end
-
-#macro (displaySearchFacetValue $facetValue)
-  #set ($selectedValues = [])
-  #if ($facetRequestValues)
-    #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
-  #end
-  #set ($selected = $selectedValues.remove($facetValue.name))
-  #if (!$selected)
-    #set ($discard = $selectedValues.add($facetValue.name))
-  #end
-  ## Reset the pagination because the number of results can change when a facet is applied.
-  #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
-  &lt;div class="itemCount"&gt;$facetValue.count&lt;/div&gt;
-  &lt;a href="$url" class="itemName#if ($selected) selected#end#if ($facetValue.name == '') empty#end"&gt;
-    #if ($facetValue.name == '')
-      #set ($facetPrettyValueKey = "solr.field.${facetField.name}.emptyValue")
-      #if (!$services.localization.get($facetPrettyValueKey))
-        #set ($facetPrettyValueKey = "solr.facets.emptyValue")
-      #end
-      #set ($facetPrettyValue = $services.localization.render($facetPrettyValueKey))
-    #else
-      #set ($facetPrettyValue = $facetValue.name)
-    #end
-    #set ($displayer = $customSearchFacetValueDisplayer.get($facetField.name))
-    #if (!$displayer)
-      #set ($displayer = 'default')
-    #end
-    #evaluate("${escapetool.h}displaySearchFacetValue_${displayer}(${escapetool.d}facetPrettyValue)")
-  &lt;/a&gt;
-  &lt;div class="clearfloats"&gt;&lt;/div&gt;
-#end
-
-#set ($customSearchFacetValueDisplayer = {
-  'wiki': 'wiki',
-  'locale': 'locale',
-  'author': 'user',
-  'creator': 'user',
-  'date': 'date',
-  'creationdate': 'date'
-})
-
-#macro (displaySearchFacetValue_default $facetPrettyValue)
-  $escapetool.xml($facetPrettyValue)
-#end
-
-#macro (displaySearchFacetValue_wiki $wikiName)
-  #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($wikiName).wikiPrettyName)
-  #if ("$!wikiPrettyName.trim()" == '')
-    #set ($wikiPrettyName = $wikiName)
-  #end
-  $escapetool.xml($wikiPrettyName)
-#end
-
-#macro (displaySearchFacetValues_locale $facetValues)
-  #set ($currentLocale = $services.localization.currentLocale)
-  #displaySearchFacetValues_default($facetValues)
-#end
-
-#macro (displaySearchFacetValue_locale $facetPrettyValue)
-  #if ($facetValue.name == $facetPrettyValue)
-    #set ($locale = $services.localization.toLocale($facetValue.name))
-    $escapetool.xml($locale.getDisplayName($currentLocale))
-  #else
-    $escapetool.xml($facetPrettyValue)
-  #end
-#end
-
-#macro (displaySearchFacetValues_user $facetValues)
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
-  &lt;ul class="users"&gt;
-    #displaySearchFacetValuesLimited($facetValues)
-  &lt;/ul&gt;
-#end
-
-#macro (displaySearchFacetValue_user $user)
-  #set ($userReference = $services.model.resolveDocument($user))
-  #set ($userName = $escapetool.xml($xwiki.getUserName($user, false)))
-  &lt;span class="user"&gt;
-    &lt;span class="user-avatar-wrapper"&gt;
-      #getUserAvatarURL($userReference $avatarURL 30)
-      &lt;img src="$escapetool.xml($avatarURL.url)" class="icon" alt="$userName" /&gt;
-    &lt;/span&gt;
-    &lt;span class="user-name"&gt;$userName&lt;/span&gt;
-    &lt;span&gt;
-      &lt;span class="user-alias"&gt;$escapetool.xml($userReference.name)&lt;/span&gt;
-      ## Display the wiki only for local users.
-      #if ($userReference.wikiReference.name != $xcontext.getMainWikiName())
-        &lt;span class="user-wiki"&gt;$escapetool.xml($userReference.wikiReference.name)&lt;/span&gt;
-      #end
-    &lt;/span&gt;
-  &lt;/span&gt;
-#end
-
-#macro (displaySearchFacetValues_date $facetValues)
-  ##
-  ## Build the list of date intervals.
-  ##
-  ## 1. Predefined date intervals.
-  #set ($now = $xwiki.jodatime.dateTime)
-  #set ($intervals = [
-    {
-      'label': $services.localization.render('solr.facet.date.today'),
-      'start': $now.withTimeAtStartOfDay(),
-      'end'  : $now,
-      'name' : '[NOW/DAY TO NOW]',
-      'count': 0
-    }, {
-      'label': $services.localization.render('solr.facet.date.last7Days'),
-      'start': $now.minusDays(7),
-      'end'  : $now,
-      'name' : '[NOW-7DAYS TO NOW]',
-      'count': 0
-    }, {
-      'label': $services.localization.render('solr.facet.date.last30Days'),
-      'start': $now.minusDays(30),
-      'end'  : $now,
-      'name' : '[NOW-30DAYS TO NOW]',
-      'count': 0
-    }
-  ])
-  ## 2. Date intervals specified on the request.
-  #set ($iso8601Formatter = $xwiki.jodatime.getDateTimeFormatterForPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
-  #if ($facetRequestValues)
-    #set ($selectedIntervals = [])
-    #foreach ($selectedValue in $facetRequestValues)
-      ## Determine if the value/range is custom.
-      #set ($custom = true)
-      #foreach ($interval in $intervals)
-        #if ($interval.name == $selectedValue)
-          #set ($discard = $selectedIntervals.add($interval))
-          #set ($custom = false)
-          #break
-        #end
-      #end
-      #if ($custom)
-        #set ($rangeMatcher = $rangePattern.matcher($selectedValue))
-        #if ($rangeMatcher.matches())
-          #set ($range = [$rangeMatcher.group(1), $rangeMatcher.group(2)])
-          #foreach ($point in $range)
-            #if ($point == '*')
-              #set ($point = $NULL)
-            #else
-              #set ($point = $iso8601Formatter.parseDateTime($point))
-            #end
-            #set ($discard = $range.set($foreach.index, $point))
-          #end
-          #set ($discard = $selectedIntervals.add({
-            'start': $range.get(0),
-            'end'  : $range.get(1),
-            'name' : $selectedValue,
-            'count': 0
-          }))
-        #end
-      #end
-    #end
-    #set ($intervals = $selectedIntervals)
-  #end
-  ##
-  ## Count matches for each date interval.
-  ##
-  #foreach ($facetValue in $facetValues)
-    #set ($dateValue = $iso8601Formatter.parseDateTime($facetValue.name))
-    #foreach ($interval in $intervals)
-      #if ((!$interval.start || $dateValue.isAfter($interval.start))
-          &amp;&amp; (!$interval.end || $dateValue.isBefore($interval.end)))
-        #set ($discard = $interval.put('count', $mathtool.add($interval.count, $facetValue.count)))
-      #end
-    #end
-  #end
-  ## Filter the unselected date intervals that don't have matches.
-  #if (!$facetRequestValues)
-    #set ($intervalsWithMatches = [])
-    #foreach ($interval in $intervals)
-      #if ($interval.count &gt; 0)
-        #set ($discard = $intervalsWithMatches.add($interval))
-      #end
-    #end
-    #set ($intervals = $intervalsWithMatches)
-  #end
-  ##
-  ## Display date intervals.
-  ##
-  &lt;ul&gt;
-    #foreach ($facetValue in $intervals)
-      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
-    #end
-    #if (!$facetRequestValues)
-      ## Allow users to specify a custom interval.
-      &lt;li class="customDateInterval"&gt;
-        #displaySearchFacetValue_customDateInterval()
-      &lt;/li&gt;
-    #end
-  &lt;/ul&gt;
-#end
-
-#macro (displaySearchFacetValue_customDateInterval)
-  ## Reset the pagination because the number of results can change when a facet is applied.
-  #extendQueryString($url {$facetRequestParameter: ['[* TO *]'], 'firstIndex': []})
-  &lt;a href="$url" class="itemName"&gt;
-    $escapetool.xml($services.localization.render('solr.facet.date.customInterval'))
-  &lt;/a&gt;
-  ## A simple date picker widget.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js', true))
-  ## Used to parse and serialize the selected date using the specified date format.
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js', true))
-  ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
-  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
-  &lt;input type="text" name="$escapetool.xml($facetRequestParameter)" class="datetime withTip"
-    value="$escapetool.xml($services.localization.render('solr.facet.date.start'))"
-    title="$escapetool.xml($dateFormat)" /&gt;
-  &lt;input type="text" name="$escapetool.xml($facetRequestParameter)" class="datetime withTip"
-    value="$escapetool.xml($services.localization.render('solr.facet.date.end'))"
-    title="$escapetool.xml($dateFormat)" /&gt;
-  &lt;div class="clearfloats"&gt;&lt;/div&gt;
-#end
-
-#macro (displaySearchFacetValue_date $facetPrettyValue)
-  #if ($facetValue.label)
-    $escapetool.xml($facetValue.label)
-  #elseif ($facetValue.start &amp;&amp; $facetValue.end)
-    $services.localization.render('solr.facet.date.between',
-      ["$xwiki.formatDate($facetValue.start.toDate())&lt;br/&gt;",
-      $xwiki.formatDate($facetValue.end.toDate())])
-  #elseif ($facetValue.start)
-    $escapetool.xml($services.localization.render('solr.facet.date.after',
-      [$xwiki.formatDate($facetValue.start.toDate())]))
-  #elseif ($facetValue.end)
-    $escapetool.xml($services.localization.render('solr.facet.date.before',
-      [$xwiki.formatDate($facetValue.end.toDate())]))
-  #else
-    $escapetool.xml($services.localization.render('solr.facet.date.any'))
-  #end
-#end
-
-#macro (displaySearchResultsSort)
-  #set ($defaultSortOrder = {
-    'score': 'desc',
-    'title_sort' : 'asc',
-    'date' : 'desc',
-    'author_display_sort' : 'asc'
-  })
-  #set ($sortOrderSymbol = {
-    'asc': "\u25B2",
-    'desc': "\u25BC"
-  })
-  (% class="search-results-sort" %)
-  * {{translation key="solr.sortBy"/}}
-  #foreach ($entry in $defaultSortOrder.entrySet())
-    #set ($class = 'sort-item')
-    #set ($sortOrderIndicator = $NULL)
-    #set ($targetSortOrder = $entry.value)
-    #if ($sort == $entry.key)
-      #set ($class = "$class active")
-      #set ($sortOrderHint = $services.localization.render("solr.sortOrder.$sortOrder"))
-      #set ($sortOrderIndicator = "(% class=""sort-item-order"" title=""$sortOrderHint"" %)$sortOrderSymbol.get($sortOrder)(%%)")
-      #set ($targetSortOrder = "#if ($sortOrder == 'asc')desc#{else}asc#end")
-    #end
-    #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
-    * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:$url||class="$class"]]
-  #end
-#end
-
-#macro (extendQueryString $url $extraParameters)
-  #set ($parameters = {})
-  #set ($discard = $parameters.putAll($request.getParameterMap()))
-  #set ($discard = $parameters.putAll($extraParameters))
-  #set ($queryString = $escapetool.url($parameters))
-  #set ($url = $NULL)
-  #setVariable("$url" $doc.getURL('view', $queryString))
-#end
-
-#macro (displaySearchResults)
-  #set ($results = $searchResponse.results)
-  #set ($paginationParameters = {
-    'url': $doc.getURL('view', "$!request.queryString.replaceAll('firstIndex=[0-9]*', '')"),
-    'totalItems': $results.numFound,
-    'defaultItemsPerPage': $rows,
-    'position': 'top'
-  })
-  {{html}}#pagination($paginationParameters){{/html}}
-  (% class="search-results" %)(((
-    #foreach ($searchResult in $results)
-      #displaySearchResult($searchResult)
-    #end
-  )))
-  #set ($discard = $paginationParameters.put('position', 'bottom'))
-  {{html}}#pagination($paginationParameters){{/html}}
-
-  #displayRSSLink()
-#end
-
-#macro (displayRSSLink)
-  {{html}}
-  #set ($parameters = {})
-  ## We keep most of the current request parameters so that the RSS feed matches the current search query and filters.
-  #set ($discard = $parameters.putAll($request.getParameterMap()))
-  ## The feed will provide the most recent results that match the search query and filters.
-  #set ($discard = $parameters.put('sort', 'date'))
-  #set ($discard = $parameters.put('sortOrder', 'desc'))
-  ## Reset the pagination so that only the top results are included.
-  #set ($discard = $parameters.remove('firstIndex'))
-  ## Add the parameters required to output the RSS feed instead of the search UI.
-  #set ($discard = $parameters.put('outputSyntax', 'plain'))
-  #set ($discard = $parameters.put('media', 'rss'))
-  &lt;a href="$doc.getURL('get', $escapetool.url($parameters))" class="hasIcon iconRSS"&gt;
-    $services.localization.render('search.rss', ["[$escapetool.xml($text)]"])
-  &lt;/a&gt;
-  {{/html}}
-#end
-
-#macro (displaySearchResult $searchResult)
-  #set ($searchResultDocumentReference = $services.model.createDocumentReference($searchResult.wiki, $searchResult.space, $searchResult.name))
-  #set ($searchResultDocument = $xwiki.getDocument($searchResultDocumentReference))
-  #set ($searchResultTranslatedDocument = $searchResultDocument.getTranslatedDocument($searchResult.locale))
-  (% class="search-result type-$searchResult.type.toLowerCase()" %)(((
-    ## We use the HTML macro here mainly because we don't have a way to escape the wiki syntax in the data provided by the user.
-    {{html}}
-    #displaySearchResultTitle()
-    #displaySearchResultLocation()
-    ##
-    #set ($date = $datetool.format('d MMM yyyy', $searchResultTranslatedDocument.date))
-    ## FIXME: handle multiwiki setup for authors. Better: index absolute authors instead.
-    #set ($author = $xwiki.getUserName($searchResultTranslatedDocument.author))
-    &lt;div class="search-result-author"&gt;$services.localization.render('solr.result.author', [$author, $date])&lt;/div&gt;
-    ##
-    #if ("$!searchResult.mimetype" != '')
-      &lt;div class="search-result-mediaType"&gt;$services.localization.render('solr.result.mediaType',
-        [$escapetool.xml($searchResult.mimetype)])&lt;/div&gt;
-    #end
-    #set ($class = $searchResult.get('class'))
-    #if ("$!class" != '')
-      #set ($classReference = $services.model.resolveDocument($class, $services.model.createWikiReference($searchResult.wiki)))
-      #set ($classLink = "&lt;a href=""$xwiki.getURL($classReference)""&gt;$escapetool.xml($class)&lt;/a&gt;")
-      #set ($propertyName = $searchResult.propertyname)
-      #if ("$!propertyName" == '')
-        &lt;div class="search-result-object"&gt;$services.localization.render('solr.result.object', [$classLink])&lt;/div&gt;
-      #else
-        &lt;div class="search-result-property"&gt;$services.localization.render('solr.result.property',
-          [$classLink, $escapetool.xml($propertyName)])&lt;/div&gt;
-      #end
-    #end
-    #displaySearchResultHighlighting($searchResult)
-    ## Scoring debug data.
-    &lt;div id="debug_$searchResult.id" class="hidden"&gt;
-      $!escapetool.xml($searchResponse.explainMap.get($searchResult.id))
-    &lt;/div&gt;
-    {{/html}}
-  )))
-#end
-
-#macro (displaySearchResultTitle)
-  #set ($title = $searchResultTranslatedDocument.plainTitle)
-  #set ($titleURL = $searchResultDocument.getURL())
-  #if ($searchResult.type == 'ATTACHMENT')
-    #set ($title = $searchResult.filename)
-    #set ($titleURL = $searchResultDocument.getAttachmentURL($searchResult.filename))
-  #elseif ($searchResult.type == 'DOCUMENT' &amp;&amp; $searchResult.locale != ''
-    &amp;&amp; $xcontext.language != $searchResult.locale)
-    #set ($titleURL = $searchResultDocument.getURL('view', "language=$searchResult.locale"))
-  #end
-  &lt;h2 class="search-result-title"&gt;
-    &lt;a href="$titleURL"&gt;$escapetool.xml($title)&lt;/a&gt;
-    ## Display document language for document results when multiple language results are requested.
-    #if ($request.lang == '' &amp;&amp; $searchResult.type == 'DOCUMENT' &amp;&amp; $searchResult.locale != '')
-      &lt;span title="$escapetool.xml($services.localization.render('solr.result.language'))"
-        class="search-result-language" &gt;($escapetool.xml($searchResult.locale))&lt;/span&gt;
-    #end
-  &lt;/h2&gt;
-#end
-
-#macro (displaySearchResultLocation $searchResult)
-  #set ($wikiPrettyName = $services.wikimanager.getWikiDocument($searchResult.wiki).wikiPrettyName)
-  #if ("$!wikiPrettyName.trim()" == '')
-    #set ($wikiPrettyName = $searchResult.wiki)
-  #end
-  #set ($wikiReference = $services.model.createWikiReference($searchResult.wiki))
-  #set ($wikiHomeDocRef = $services.model.resolveDocument('', 'default', $wikiReference))
-  #set ($wikiLink = "&lt;a href=""$xwiki.getURL($wikiHomeDocRef)""&gt;$escapetool.xml($wikiPrettyName)&lt;/a&gt;")
-  ##
-  #set ($spaceReference = $services.model.createSpaceReference($searchResult.space, $wikiReference))
-  #set ($spaceHomeDocRef = $services.model.resolveDocument('', 'default', $spaceReference))
-  #set ($spaceLink = "&lt;a href=""$xwiki.getURL($spaceHomeDocRef)""&gt;$escapetool.xml($searchResult.space)&lt;/a&gt;")
-  ##
-  #set ($documentLink = "&lt;a href=""$searchResultDocument.getURL()""&gt;$escapetool.xml($searchResult.name)&lt;/a&gt;")
-  &lt;div class="search-result-location"&gt;$services.localization.render('solr.result.location',
-    [$wikiLink, $spaceLink, $documentLink])&lt;/div&gt;
-#end
-
-#macro (displaySearchResultHighlighting $searchResult)
-  #getSearchResultHighlighting($searchResult $highlighting)
-  #if ($highlighting.size() &gt; 0)
-    &lt;dl class="search-result-highlights"&gt;
-      #foreach ($entry in $highlighting)
-        &lt;dt&gt;
-          #if ($services.localization.get("solr.field.$entry.field"))
-            $services.localization.render("solr.field.$entry.field")
-          #else
-            $entry.field
-          #end
-        &lt;/dt&gt;
-        &lt;dd&gt;#displaySearchResultMatches($entry.matches)&lt;/dd&gt;
-      #end
-    &lt;/dl&gt;
-  #end
-#end
-
-#macro (displaySearchResultMatches $matches)
-  #foreach ($match in $matches)
-    #if ($foreach.count &gt; 1)
-      &lt;span class="separator"&gt;&amp;hellip;&lt;/span&gt;
-    #end
-    &lt;blockquote class="search-result-highlight"&gt;$match&lt;/blockquote&gt;
-  #end
-#end
-
-#macro (getSearchResultHighlighting $searchResult $return)
-  #set ($highlighting = $searchResponse.highlighting.get($searchResult.id))
-  #set ($highlightingByLanguage = {})
-  #foreach ($entry in $highlighting.entrySet())
-    ## Remove the language suffix (e.g. _en, _fr, _de) from the field name.
-    #set ($field = $stringtool.substringBefore($entry.key, '_'))
-    ## Extract the language.
-    #set ($lang = $stringtool.substringAfter($entry.key, '_'))
-    #if ($lang == $field)
-      ## No language.
-      #set ($lang = '_')
-    #end
-    #set ($matchesByLanguage = $highlightingByLanguage.get($field))
-    #if (!$matchesByLanguage)
-      #set ($matchesByLanguage = {})
-      #set ($discard = $highlightingByLanguage.put($field, $matchesByLanguage))
-    #end
-    #set ($discard = $matchesByLanguage.put($lang, $entry.value))
-  #end
-  ## Keep only the matches correspoding to the search result locale.
-  #set ($highlighting = [])
-  ## Fields with a higher index will be displayed first. Fields that are not included will be displayed at the end.
-  #set ($fieldPriority = ['filename', 'attcontent', 'objcontent', 'comment', 'propertyname', 'propertyvalue', 'title', 'doccontent'])
-  #foreach ($entry in $highlightingByLanguage.entrySet())
-    #if ($searchResult.locale != '')
-      #set ($matches = $entry.value.get($searchResult.locale))
-    #else
-      ## No language.
-      #set ($matches = $entry.value.get('_'))
-    #end
-    #if (!$matches)
-      ## This should not happen but let's play safe.
-      #set ($matches = $entry.value.entrySet().iterator().next().value)
-    #end
-    ## Sanitize the matches.
-    #foreach ($match in $matches)
-      #set ($match = $match.replace('&lt;span class="search-text-highlight"&gt;', "\u0011"))
-      #set ($match = $match.replace('&lt;span class="search-text-highlight-stop"&gt;&lt;/span&gt;&lt;/span&gt;', "\u0013"))
-      #set ($match = $escapetool.xml($match))
-      #set ($match = $match.replace("\u0011", '&lt;span class="search-text-highlight"&gt;'))
-      #set ($match = $match.replace("\u0013", '&lt;/span&gt;'))
-      #set ($discard = $matches.set($mathtool.sub($foreach.count, 1), $match))
-    #end
-    #set ($discard = $highlighting.add({
-      'field': $entry.key,
-      'priority': $fieldPriority.indexOf($entry.key),
-      'matches': $matches
-    }))
-  #end
-  #set ($highlighting = $sorttool.sort($highlighting, 'priority:desc'))
-  #set ($return = $NULL)
-  #setVariable("$return" $highlighting)
-#end
-
-#macro (getSearchResults)
-  #set ($queryString = "$!{text}")
-  ##
-  ## Create the query and set the query string.
-  #set ($query = $services.query.createQuery($queryString, 'solr'))
-  ##
-  ## Set query parameters.
-  #set ($discard = $query.setLimit($rows))
-  #set ($discard = $query.setOffset($start))
-  #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
-  #if ($boost != '')
-    #set ($discard = $query.bindValue('qf', $boost))
-  #end
-  #if ($debug != '')
-    #set ($discard = $query.bindValue('debugQuery', 'on'))
-  #end
-  ##
-  ## Collect the query filters.
-  #set ($filters = {})
-  #if ($language != '')
-    #set ($discard = $filters.put('locales', [$language]))
-  #end
-  #if ($wiki != '')
-    #set ($discard = $filters.put('wiki', [$wiki]))
-  #end
-  #if ($space != '' &amp;&amp; !$blacklistedSpaces.contains($space))
-    #set ($discard = $filters.put('space_exact', ["#escapeFilterValue($space)"]))
-  #end
-  #if ($type != '')
-    #set ($discard = $filters.put('type', [$type]))
-  #end
-  #if ($fileType != '')
-    #set ($discard = $filters.put('mimetype', [$fileType]))
-  #end
-  #if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
-    #set ($discard = $filters.put('hidden', [false]))
-  #end
-  ## Add the facets.
-  #foreach ($parameter in $request.parameterMap.entrySet())
-    #if ($parameter.key.startsWith('f_'))
-      #set ($escapedValues = [])
-      #foreach ($value in $parameter.value)
-        #set ($discard = $escapedValues.add("#escapeFilterValue($value)"))
-      #end
-      #set ($discard = $filters.put($parameter.key.substring(2), $escapedValues))
-    #end
-  #end
-  ##
-  ## Build the query filter. Use AND as the default operation between different filters/facets.
-  #if ($filters.size() &gt; 0)
-    #set ($queryFilter = '{!q.op=AND}')
-    #foreach ($filter in $filters.entrySet())
-      #if ($filter.value.size() &gt; 1)
-        ## Use OR between different values of the same filter/facet.
-        #set ($queryFilter = "$queryFilter $filter.key:(")
-        #set ($separator = '')
-        #foreach ($value in $filter.value)
-          #set ($queryFilter = "$queryFilter$separator$value")
-          #set ($separator = ' OR ')
-        #end
-        #set ($queryFilter = "$queryFilter)")
-      #else
-        #set ($queryFilter = "$queryFilter $filter.key:$filter.value.get(0)")
-      #end
-    #end
-    #set ($discard = $query.bindValue('fq', $queryFilter))
-  #end
-  ##
-  ## Execute the query.
-  #set ($searchResponse = $query.execute()[0])
-#end
-
-#macro (escapeFilterValue $value)
-## Check if the given value is a range.
-#if ($rangePattern.matcher($value).matches())##
-$value##
-#else##
-"$stringtool.replaceEach($value, ['\', '"'], ['\\', '\"'])"##
-#end##
-#end
-
-#macro (processRequestParameters)
-  #set ($text = "$!request.text")
-  #set ($space = "$!request.space")
-  #set ($fileType = "$!request.fileType")
-  #set ($boost = "$!request.boost")
-  #set ($debug = "$!request.debug")
-  #set ($rows = $numbertool.integer($request.rows))
-  #if ("$!rows" == '')
-    #set ($rows = 10)
-  #end
-  #set ($start = $numbertool.integer($request.firstIndex))
-  #if ("$!start" == '')
-    #set ($start = 0)
-  #end
-  #set ($sort = $request.sort)
-  #if ("$!sort" == '')
-    #set ($sort = 'score')
-  #end
-  #set ($sortOrder = $request.sortOrder)
-  #if ("$!sortOrder" == '')
-    #set ($sortOrder = 'desc')
-  #elseif ($sortOrder != 'desc')
-    #set ($sortOrder = 'asc')
-  #end
-  ## Can't use 'language' as request parameter because it's used by view mode to select the display language.
-  #set ($language = $request.lang)
-  ## An empty value for the language parameter means no language query filter (all languages are considered).
-  #if ($language != '' &amp;&amp; "$!language" == '')
-    ## The language parameter is null (not set on the request).
-    #set ($language = "$!xcontext.language")
-  #end
-  #set ($type = $request.type)
-  #if ($type != '' &amp;&amp; "$!type" == '')
-    ## The type parameter is null (not set on the request).
-    #set ($type = 'DOCUMENT')
-  #end
-  ## Subwikis search by default in their content only.
-  #set ($wiki = "$!request.wiki")
-  #if ($wiki == '' &amp;&amp; !$xcontext.isMainWiki())
-    #set ($wiki = $xcontext.database)
-  #end
-#end
-
-#macro (displaySearchUI)
-  #set ($discard = $xwiki.ssx.use('Main.SolrSearch'))
-  #set ($discard = $xwiki.jsx.use('Main.SolrSearch'))
-  ## Disable the document extra data: comments, attachments, history...
-  #set ($docextras = [])
-  #processRequestParameters()
-  (% class="search-form-container" %)(((
-    #displaySearchForm()
-    #displaySearchDebugInfo()
-  )))
-  #if ($text != '')
-    #getSearchResults()
-    (% class="search-results-container" %)(((
-      #displaySearchFacets($searchResponse)
-      (% class="search-results-left" %)(((
-        #displaySearchResultsSort()
-
-        #displaySearchResults()
-      )))
-    )))
-  #end
-#end
-
-#macro (convertDateFormat $dateString $inputFormat $outputFormat $return)
-  #set ($date = $datetool.toDate($inputFormat, $dateString))
-  #if ($date)
-    #set ($date = $datetool.format($outputFormat, $date))
-  #else
-    #set ($date = '*')
-  #end
-  #set ($return = $NULL)
-  #setVariable("$return" $date)
-#end
-
-#macro (handleCustomDateInterval)
-  #set ($configuredDateFormat = $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm'))
-  #set ($iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-  #convertDateFormat($request.startDate $configuredDateFormat $iso8601DateFormat $startDate)
-  #convertDateFormat($request.endDate $configuredDateFormat $iso8601DateFormat $endDate)
-  #set ($interval = "[$startDate TO $endDate]")
-  #set ($xredirect = $request.xredirect.replaceFirst(
-    "\b$regextool.quote($escapetool.url($request.facet))=[^&amp;$escapetool.d]*",
-    "$escapetool.url($request.facet)=$escapetool.url($interval)"))
-  $response.sendRedirect($xredirect)
-#end
-
-#macro (outputRSSFeed)
-  ##
-  ## Get the search results.
-  ##
-  #processRequestParameters()
-  #getSearchResults()
-  #set ($list = [])
-  #set ($results = $searchResponse.results)
-  #foreach ($searchResult in $results)
-    #set ($searchResultDocumentReference = $services.model.createDocumentReference(
-      $searchResult.wiki, $searchResult.space, $searchResult.name))
-    #set ($discard = $list.add("$searchResultDocumentReference"))
-  #end
-  ##
-  ## Compute the feed URI.
-  ##
-  #set ($parameters = {})
-  #set ($discard = $parameters.putAll($request.getParameterMap()))
-  #set ($discard = $parameters.remove('outputSyntax'))
-  #set ($discard = $parameters.remove('media'))
-  #set ($feedURI = $doc.getExternalURL('view', $escapetool.url($parameters)))
-  ##
-  ## Configure the feed.
-  ##
-  #set ($feed = $xwiki.feed.getDocumentFeed($list, {}))
-  #set ($discard = $feed.setLink($feedURI))
-  #set ($discard = $feed.setUri($feedURI))
-  #set ($discard = $feed.setAuthor('XWiki'))
-  #set ($title = $services.localization.render('search.rss', ["[$text]"]))
-  #set ($discard = $feed.setTitle($title))
-  #set ($discard = $feed.setDescription($title))
-  #set ($discard = $feed.setLanguage($xcontext.language))
-  #set ($discard = $feed.setCopyright($xwiki.getXWikiPreference('copyright')))
-  ##
-  ## Output the feed.
-  ##
-  #set ($discard = $response.setContentType('application/rss+xml'))
-  $xwiki.feed.getFeedOutput($feed, 'rss_2.0')
-#end
-{{/velocity}}
-
-{{velocity}}
-#if ($request.media == 'rss')
-  #outputRSSFeed()
-#elseif ($xcontext.action == 'get' &amp;&amp; "$!request.facet" != '' &amp;&amp; ($request.startDate || $request.endDate))
-  #handleCustomDateInterval()
-#else
-  #displaySearchUI()
-#end
-{{/velocity}}</content>
 </xwikidoc>

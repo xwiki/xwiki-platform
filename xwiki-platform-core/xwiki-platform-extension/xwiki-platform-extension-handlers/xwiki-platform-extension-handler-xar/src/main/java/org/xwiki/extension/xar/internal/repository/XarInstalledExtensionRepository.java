@@ -47,16 +47,16 @@ import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.repository.DefaultExtensionRepositoryDescriptor;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.repository.internal.AbstractCachedExtensionRepository;
 import org.xwiki.extension.repository.internal.RepositoryUtils;
-import org.xwiki.extension.repository.internal.local.AbstractCachedExtensionRepository;
 import org.xwiki.extension.repository.result.CollectionIterableResult;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
-import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
+import org.xwiki.xar.internal.XarException;
 
 /**
  * Local repository proxy for XAR extensions.
@@ -75,9 +75,6 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
 
     @Inject
     private transient InstalledExtensionRepository installedRepository;
-
-    @Inject
-    private transient Packager packager;
 
     @Inject
     private transient ObservationManager observation;
@@ -137,16 +134,16 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
             if (extension instanceof InstalledExtension) {
                 try {
                     addXarExtension((InstalledExtension) extension);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     this.logger.error("Failed to parse extension [" + extension + "]", e);
                 }
             }
         }
     }
 
-    private void addXarExtension(InstalledExtension extension) throws IOException
+    private void addXarExtension(InstalledExtension extension) throws IOException, XarException
     {
-        XarInstalledExtension xarExtension = new XarInstalledExtension(extension, this, this.packager);
+        XarInstalledExtension xarExtension = new XarInstalledExtension(extension, this);
 
         addCachedExtension(xarExtension);
     }
@@ -162,7 +159,7 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
             if (localExtension.getType().equalsIgnoreCase(XarExtensionHandler.TYPE)) {
                 try {
                     addXarExtension(localExtension);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     this.logger.error("Failed to parse extension [" + localExtension + "]", e);
                 }
             }
@@ -207,10 +204,12 @@ public class XarInstalledExtensionRepository extends AbstractCachedExtensionRepo
     {
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
-        if (extension.getType().equals(XarExtensionHandler.TYPE)) {
-            extension = this.extensions.get(extension.getId());
-        } else {
-            extension = null;
+        if (extension != null) {
+            if (extension.getType().equals(XarExtensionHandler.TYPE)) {
+                extension = this.extensions.get(extension.getId());
+            } else {
+                extension = null;
+            }
         }
 
         return extension;

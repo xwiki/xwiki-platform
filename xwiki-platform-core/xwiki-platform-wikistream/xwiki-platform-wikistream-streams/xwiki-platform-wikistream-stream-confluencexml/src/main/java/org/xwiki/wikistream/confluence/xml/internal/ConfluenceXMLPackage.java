@@ -27,14 +27,17 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -111,6 +114,8 @@ public class ConfluenceXMLPackage
 
     public static final String KEY_ATTACHMENT_REVISION = "attachmentVersion";
 
+    public static final String KEY_ATTACHMENT_ORIGINAL_REVISION = "originalVersion";
+
     public static final String KEY_ATTACHMENT_DTO = "imageDetailsDTO";
 
     public static final String KEY_GROUP_NAME = "name";
@@ -150,8 +155,20 @@ public class ConfluenceXMLPackage
     /**
      * 2012-03-07 17:16:48.158
      */
-    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss.SSS");
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
+    /**
+     * pattern to find the end of "intentionally damaged" CDATA end sections.
+     * Confluence does this to nest CDATA sections inside CDATA sections.
+     * Interestingly it does not care if there is a &gt; after the ]].
+     */
+    private static final Pattern FIND_BROKEN_CDATA_PATTERN = Pattern.compile("]] ");
+
+    /**
+     * replacement to repair the CDATA 
+     */
+    private static final String REPAIRED_CDATA_END = "]]";
+    
     private File directory;
 
     private File entities;
@@ -160,7 +177,7 @@ public class ConfluenceXMLPackage
 
     private File tree;
 
-    private Map<Integer, Set<Integer>> pages = new HashMap<Integer, Set<Integer>>();
+    private Map<Integer, List<Integer>> pages = new HashMap<Integer, List<Integer>>();
 
     public ConfluenceXMLPackage(InputSource source) throws IOException, WikiStreamException, XMLStreamException,
         FactoryConfigurationError, NumberFormatException, ConfigurationException
@@ -282,7 +299,7 @@ public class ConfluenceXMLPackage
         return spaceProperties.getString(KEY_SPACE_NAME);
     }
 
-    public Map<Integer, Set<Integer>> getPages()
+    public Map<Integer, List<Integer>> getPages()
     {
         return this.pages;
     }
@@ -379,10 +396,12 @@ public class ConfluenceXMLPackage
 
         int attachmentId = readObjectProperties(xmlReader, properties);
 
-        int pageId = properties.getInt("content");
+        if (properties.containsKey(KEY_ATTACHMENT_CONTENT)) {
+            int pageId = properties.getInt(KEY_ATTACHMENT_CONTENT);
 
-        // Save attachment
-        saveAttachmentProperties(properties, pageId, attachmentId);
+            // Save attachment
+            saveAttachmentProperties(properties, pageId, attachmentId);
+        }
     }
 
     private void readSpaceObject(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException,
@@ -396,9 +415,9 @@ public class ConfluenceXMLPackage
         saveSpaceProperties(properties, spaceId);
 
         // Register space
-        Set<Integer> spacePages = this.pages.get(spaceId);
+        List<Integer> spacePages = this.pages.get(spaceId);
         if (spacePages == null) {
-            spacePages = new HashSet<Integer>();
+            spacePages = new LinkedList<Integer>();
             this.pages.put(spaceId, spacePages);
         }
     }
@@ -460,9 +479,9 @@ public class ConfluenceXMLPackage
         Integer originalVersion = (Integer) properties.getProperty("originalVersion");
         if (originalVersion == null) {
             Integer spaceId = (Integer) properties.getInteger("space", null);
-            Set<Integer> spacePages = this.pages.get(spaceId);
+            List<Integer> spacePages = this.pages.get(spaceId);
             if (spacePages == null) {
-                spacePages = new HashSet<Integer>();
+                spacePages = new LinkedList<Integer>();
                 this.pages.put(spaceId, spacePages);
             }
             spacePages.add(pageId);
@@ -532,7 +551,7 @@ public class ConfluenceXMLPackage
         String propertyClass = xmlReader.getAttributeValue(null, "class");
 
         if (propertyClass == null) {
-            return xmlReader.getElementText();
+            return fixCData(xmlReader.getElementText());
         } else if (propertyClass.equals("java.util.List") || propertyClass.equals("java.util.Collection")) {
             return readListProperty(xmlReader);
         } else if (propertyClass.equals("java.util.Set")) {
@@ -548,6 +567,19 @@ public class ConfluenceXMLPackage
         }
 
         return null;
+    }
+    
+    /**
+     * to protect content with cdata section inside of cdata elements confluence adds a single space after two consecutive curly braces.
+     * we need to undo this patch as otherwise the content parser will complain about invalid content.
+     * strictly speaking this needs only to be done for string valued properties
+     */
+    private String fixCData(String elementText)
+    {
+        if (elementText == null) {
+            return elementText;
+        }
+        return FIND_BROKEN_CDATA_PATTERN.matcher(elementText).replaceAll(REPAIRED_CDATA_END);
     }
 
     private Integer readIdProperty(XMLStreamReader xmlReader) throws WikiStreamException, XMLStreamException
@@ -649,15 +681,15 @@ public class ConfluenceXMLPackage
         return new File(folder, "properties.properties");
     }
 
-    public List<Integer> getAttachments(int pageId)
+    public Collection<Integer> getAttachments(int pageId)
     {
         File folder = getAttachmentsFolder(pageId);
 
-        List<Integer> attachments;
+        Collection<Integer> attachments;
         if (folder.exists()) {
             String[] attachmentFolders = folder.list();
 
-            attachments = new ArrayList<Integer>(attachmentFolders.length);
+            attachments = new TreeSet<Integer>();
             for (String attachmentIdString : attachmentFolders) {
                 if (NumberUtils.isNumber(attachmentIdString)) {
                     attachments.add(Integer.valueOf(attachmentIdString));
@@ -725,33 +757,43 @@ public class ConfluenceXMLPackage
         return new PropertiesConfiguration(file);
     }
 
-    public List<Integer> getUsers()
+    public Collection<Integer> getUsers()
     {
         File folder = getUsersFolder();
 
-        String[] userFolders = folder.list();
+        Collection<Integer> users;
+        if (folder.exists()) {
+            String[] userFolders = folder.list();
 
-        List<Integer> users = new ArrayList<Integer>(userFolders.length);
-        for (String userIdString : userFolders) {
-            if (NumberUtils.isNumber(userIdString)) {
-                users.add(Integer.valueOf(userIdString));
+            users = new TreeSet<Integer>();
+            for (String userIdString : userFolders) {
+                if (NumberUtils.isNumber(userIdString)) {
+                    users.add(Integer.valueOf(userIdString));
+                }
             }
+        } else {
+            users = Collections.emptyList();
         }
 
         return users;
     }
 
-    public List<Integer> getGroups()
+    public Collection<Integer> getGroups()
     {
         File folder = getGroupsFolder();
 
-        String[] groupFolders = folder.list();
+        Collection<Integer> groups;
+        if (folder.exists()) {
+            String[] groupFolders = folder.list();
 
-        List<Integer> groups = new ArrayList<Integer>(groupFolders.length);
-        for (String groupIdString : groupFolders) {
-            if (NumberUtils.isNumber(groupIdString)) {
-                groups.add(Integer.valueOf(groupIdString));
+            groups = new TreeSet<Integer>();
+            for (String groupIdString : groupFolders) {
+                if (NumberUtils.isNumber(groupIdString)) {
+                    groups.add(Integer.valueOf(groupIdString));
+                }
             }
+        } else {
+            groups = Collections.emptyList();
         }
 
         return groups;

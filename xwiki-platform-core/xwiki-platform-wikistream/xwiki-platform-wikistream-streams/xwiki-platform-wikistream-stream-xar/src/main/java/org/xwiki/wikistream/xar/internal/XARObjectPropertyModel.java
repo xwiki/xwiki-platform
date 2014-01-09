@@ -19,12 +19,12 @@
  */
 package org.xwiki.wikistream.xar.internal;
 
+import org.xwiki.xar.internal.model.XarObjectPropertyModel;
+
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
-public class XARObjectPropertyModel
+public class XARObjectPropertyModel extends XarObjectPropertyModel
 {
-    public static final String ELEMENT_PROPERTY = "property";
 }

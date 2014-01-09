@@ -23,34 +23,30 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($queryFilter = "$!request.query")
+#set ($queryStmt = "$!request.query")
 #set ($input = "$!request.input")
-#if ($queryFilter != '' &amp;&amp; $input != '')
-  #set ($queryFilter = $queryFilter.replaceAll('__INPUT__', $input))
+#if ($queryStmt != '' &amp;&amp; $input != '')
+  #set ($queryStmt = $queryStmt.replaceAll('__INPUT__', $input))
   #set ($limit = $mathtool.toInteger($request.nb))
   #if (!$limit)
     #set ($limit = 3)
   #end
-  ## We look for documents having both an object of type WorkspaceManager.WorkspaceClass and an object of type
-  ## XWiki.XWikiServerClass so we must perform a join. We use the document name as join condition because we
-  ## know all workspace descriptors are in the same space on the main wiki.
-  #set ($query = $services.query.createQuery('{!join from=name_exact to=name_exact}class:WorkspaceManager.WorkspaceClass', 'solr'))
+  ## We look for documents having an object of type XWiki.XWikiServerClass.
+  #set ($query = $services.query.createQuery($queryStmt, 'solr'))
   #set ($discard = $query.setLimit($limit))
-  #set ($discard = $query.bindValue('fq', $queryFilter))
   #set ($discard = $response.setContentType('text/xml'))
   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
   &lt;results&gt;
     #foreach ($result in $query.execute()[0].results)
       #set ($documentReference = $services.model.createDocumentReference($result.wiki, $result.space, $result.name))
-      #set ($wiki = $services.wikimanager.getWikiFromDocumentName("$documentReference"))
-      #set ($wikiDescriptor = $wiki.firstWikiAlias)
+      #set ($wikiId = $result.name.replaceAll('XWikiServer', '').toLowerCase())
+      #set ($wikiDescriptor = $services.wiki.getById($wikiId))
       #if ($wikiDescriptor)
-        #set ($wikiReference = $services.model.createWikiReference($wikiDescriptor.wikiName))
-        #set ($name = $wikiDescriptor.wikiPrettyName)
+        #set ($name = $wikiDescriptor.prettyName)
         #if ("$!name.trim()" == '')
-          #set ($name = $wikiReference.name)
+          #set ($name = $wikiDescriptor.id)
         #end
-        #set ($wikiHomeDocRef = $services.model.resolveDocument($wikiDescriptor.homePage, 'default', $wikiReference))
+        #set ($wikiHomeDocRef = $wikiDescriptor.mainPageReference)
         #set ($url = $xwiki.getURL($wikiHomeDocRef))
         &lt;rs id="$escapetool.xml($url)" info="$escapetool.xml($wikiHomeDocRef)"&gt;$escapetool.xml($name)&lt;/rs&gt;
       #end

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr-api</artifactId>
   <name>XWiki Platform - Search - Solr - API</name>
@@ -35,8 +35,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Solr Search API</xwiki.extension.name>
-    <solr.version>${lucene.version}</solr.version>
-    <xwiki.jacoco.instructionRatio>0.38</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.48</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Solr -->
@@ -69,20 +68,6 @@
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
-      <version>${solr.version}</version>
-      <exclusions>
-        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-jdk14</artifactId>
-        </exclusion>
-        <!-- Solr is using an old version of Woodstox but we need the newer version which is used by our Cache
-             module -->
-        <exclusion>
-          <groupId>org.codehaus.woodstox</groupId>
-          <artifactId>wstx-asl</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>
@@ -139,6 +124,13 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-query-manager</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <!-- This is needed at runtime by solrconfig.xml. -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-solr-plugin</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- Testing dependencies -->

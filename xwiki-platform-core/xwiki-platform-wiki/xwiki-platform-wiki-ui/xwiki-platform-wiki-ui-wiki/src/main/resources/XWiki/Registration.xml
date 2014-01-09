@@ -253,7 +253,7 @@
   </object>
   <content>{{velocity}}
 ## Check if the wiki has local user enabled
-#if($services.wiki.user.hasLocalUsersEnabled())
+#if($services.wiki.user.getUserScope() != "GLOBAL_ONLY")
 ## These are defined in other places around XWiki, changing them here will result in undefined behavior.
 #set($redirectParam = 'xredirect')
 #set($userSpace = 'XWiki.')
@@ -862,9 +862,9 @@ $heading
       #end
     #end
     ## If there is a "global" doAfterRegistration, do that as well.
-    #if($doAfterRegistration)
-      #set($discard = $doAfterRegistration.toString())
-    #end
+    ## Calling toString() on a #define block will execute it and we discard the result.
+    #set($discard = $doAfterRegistration.toString())
+    ##
     ## Define some strings which may be used by autoLogin or loginButton
     #set($userName = $!request.get('xwikiname'))
     #set($password = $!request.get('register_password'))
@@ -1103,4 +1103,3 @@ $heading
 #end
 {{/velocity}}</content>
 </xwikidoc>
-

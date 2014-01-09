@@ -41,15 +41,16 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.BeanInputWikiStreamFactory;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
+import org.xwiki.wikistream.instance.input.InstanceInputProperties;
 import org.xwiki.wikistream.instance.internal.AbstractInstanceWikiStreamTest;
 import org.xwiki.wikistream.instance.internal.InstanceModel;
-import org.xwiki.wikistream.instance.internal.output.InstanceOutputProperties;
+import org.xwiki.wikistream.instance.output.InstanceOutputProperties;
 import org.xwiki.wikistream.internal.output.StringWriterOutputTarget;
 import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStream;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
-import org.xwiki.wikistream.wikixml.internal.output.WikiXMLOutputProperties;
+import org.xwiki.wikistream.wikixml.output.WikiXMLOutputProperties;
 
 /**
  * Base class to validate an instance sub {@link InputInstanceWikiStream}.

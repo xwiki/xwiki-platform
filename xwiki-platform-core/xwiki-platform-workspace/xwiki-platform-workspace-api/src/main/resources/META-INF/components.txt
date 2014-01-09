@@ -1,2 +1,0 @@
-org.xwiki.workspace.internal.DefaultWorkspaceManager
-org.xwiki.workspace.script.WorkspaceManagerScriptService

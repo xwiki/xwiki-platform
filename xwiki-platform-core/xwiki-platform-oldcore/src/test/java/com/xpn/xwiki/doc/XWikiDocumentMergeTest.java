@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.logging.LogLevel;
@@ -49,7 +48,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
 
     private XWikiDocument previousDocument;
 
-    private XWikiDocument newDocument;
+    private XWikiDocument nextDocument;
 
     private BaseObject xobject;
 
@@ -65,7 +64,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
 
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         this.previousDocument = this.document.clone();
-        this.newDocument = this.document.clone();
+        this.nextDocument = this.document.clone();
 
         this.xclass = new BaseClass();
         this.xclass.setDocumentReference(new DocumentReference("wiki", "classspace", "class"));
@@ -91,15 +90,17 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
         this.configuration = new MergeConfiguration();
     }
 
-    private void merge() throws Exception
+    private MergeResult merge() throws Exception
     {
         MergeResult result =
-            this.document.merge(this.previousDocument, this.newDocument, this.configuration, getContext());
+            this.document.merge(this.previousDocument, this.nextDocument, this.configuration, getContext());
 
         List<LogEvent> exception = result.getLog().getLogs(LogLevel.ERROR);
         if (!exception.isEmpty()) {
             throw new MergeException(exception.get(0).getFormattedMessage(), exception.get(0).getThrowable());
         }
+
+        return result;
     }
 
     // Tests
@@ -110,7 +111,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     public void testMergeContent() throws Exception
     {
         this.previousDocument.setContent("some content");
-        this.newDocument.setContent("some new content");
+        this.nextDocument.setContent("some new content");
         this.document.setContent("some content");
 
         merge();
@@ -122,7 +123,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     public void testMergeContentModified() throws Exception
     {
         this.previousDocument.setContent("some content");
-        this.newDocument.setContent("some content\nafter");
+        this.nextDocument.setContent("some content\nafter");
         this.document.setContent("before\nsome content");
 
         merge();
@@ -130,7 +131,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("before\nsome content\nafter", this.document.getContent());
 
         this.previousDocument.setContent("some content");
-        this.newDocument.setContent("some content\nafter");
+        this.nextDocument.setContent("some content\nafter");
         this.document.setContent("some content");
 
         merge();
@@ -141,7 +142,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     @Test
     public void testMergeNewObjectAdded() throws Exception
     {
-        this.newDocument.addXObject(this.xobject);
+        this.nextDocument.addXObject(this.xobject);
 
         merge();
 
@@ -171,14 +172,160 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
 
         BaseObject newobj = this.xobject.clone();
         newobj.setStringValue("test", "test2");
-        this.newDocument.addXObject(newobj);
+        this.nextDocument.addXObject(newobj);
 
         merge();
 
         BaseObject mergedobj = this.document.getXObject(this.xclass.getReference(), 0);
-        
+
         Assert.assertNotNull(mergedobj);
         Assert.assertEquals("test12", mergedobj.getStringValue("test"));
+    }
+
+    @Test
+    public void testMergeAttachmentEquals() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.previousDocument.addAttachment(attachment);
+        this.nextDocument.addAttachment((XWikiAttachment) attachment.clone());
+        this.document.addAttachment((XWikiAttachment) attachment.clone());
+
+        MergeResult result = merge();
+
+        Assert.assertFalse(result.isModified());
+    }
+
+    @Test
+    public void testMergeAttachmentEqualsDeletedCurrent() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.previousDocument.addAttachment(attachment);
+        this.nextDocument.addAttachment((XWikiAttachment) attachment.clone());
+
+        MergeResult result = merge();
+
+        Assert.assertFalse(result.isModified());
+    }
+
+    @Test
+    public void testMergeAttachmentEqualsAddedCurrent() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.document.addAttachment(attachment);
+
+        MergeResult result = merge();
+
+        Assert.assertFalse(result.isModified());
+    }
+
+    @Test
+    public void testMergeAttachmentEqualsModifiedCurrent() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.previousDocument.addAttachment(attachment);
+        this.nextDocument.addAttachment((XWikiAttachment) attachment.clone());
+
+        attachment = (XWikiAttachment) attachment.clone();
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8});
+        attachment.setFilesize(9);
+
+        this.document.addAttachment(attachment);
+
+        MergeResult result = merge();
+
+        Assert.assertFalse(result.isModified());
+    }
+
+    @Test
+    public void testMergeAttachmentNew() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.nextDocument.addAttachment(attachment);
+
+        MergeResult result = merge();
+
+        Assert.assertTrue(result.isModified());
+
+        XWikiAttachment newAttachment = this.document.getAttachment("file");
+
+        Assert.assertNotNull(newAttachment);
+        Assert.assertEquals(10, newAttachment.getFilesize());
+        Assert.assertArrayEquals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, newAttachment.getContent(null));
+    }
+
+    @Test
+    public void testMergeAttachmentDeleted() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.document.addAttachment(attachment);
+        this.previousDocument.addAttachment((XWikiAttachment) attachment.clone());
+
+        MergeResult result = merge();
+
+        Assert.assertTrue(result.isModified());
+
+        XWikiAttachment newAttachment = this.document.getAttachment("file");
+
+        Assert.assertNull(newAttachment);
+    }
+
+    @Test
+    public void testMergeAttachmentModified() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.document.addAttachment(attachment);
+        this.previousDocument.addAttachment((XWikiAttachment) attachment.clone());
+
+        attachment = (XWikiAttachment) attachment.clone();
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8});
+        attachment.setFilesize(9);
+
+        this.nextDocument.addAttachment(attachment);
+
+        MergeResult result = merge();
+
+        Assert.assertTrue(result.isModified());
+
+        XWikiAttachment newAttachment = this.document.getAttachment("file");
+
+        Assert.assertNotNull(newAttachment);
+        Assert.assertEquals(9, newAttachment.getFilesize());
+        Assert.assertArrayEquals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8}, newAttachment.getContent(null));
     }
 
     // #apply

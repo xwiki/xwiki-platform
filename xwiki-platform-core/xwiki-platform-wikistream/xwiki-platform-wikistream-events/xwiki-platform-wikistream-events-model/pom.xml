@@ -27,11 +27,11 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wikistream-events</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-events-model</artifactId>
-  <name>XWiki Platform - Wiki Stream - Events - Model</name>
-  <description>XWiki Platform - Wiki Stream - Model related events</description>
+  <name>XWiki Platform - WikiStream - Events - Model</name>
+  <description>XWiki Platform - WikiStream - Model related events</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
@@ -39,6 +39,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wikistream-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-model</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

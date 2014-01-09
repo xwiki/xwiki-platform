@@ -4,11 +4,11 @@
 <div class="componentcontainer">
 <strong id="xwikimenutitle" class="hidden">$services.localization.render('core.menu.main.title')</strong>
 <div class="rightmenu">
+#set ($discard = $xwiki.ssfx.use('uicomponents/wiki/wiki.css', true))
 #set ($isWikiAPIAvailable = ("!$services.wiki" != '') && ("!$services.wiki.user" != ''))
 #set ($mainWikiHomeDocumentReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'Main', 'WebHome'))
 #set ($WikiManagerMainDocReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'WebHome'))
 #set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
-#set ($cantHaveLocalUsers = $isWikiAPIAvailable && !$xcontext.isMainWiki() && $services.wiki.user.getUserScope()=='GLOBAL_ONLY')
 #set ($isMainWikiUser = ($xcontext.mainWikiName == "$!{xcontext.userReference.wikiReference.name}"))
 #set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
 ##
@@ -126,8 +126,8 @@
 ##
 ## This menu is displayed if:
 ## - Wiki UI is available
-## - The current wiki is the main wiki OR the current wiki has no support for local users
-#set ($displayHomeMenu = $isWikiUIAvailable && ($xcontext.isMainWiki() || $cantHaveLocalUsers))
+## - The current wiki is the main wiki OR the current wiki has support for local users only
+#set ($displayHomeMenu = $isWikiUIAvailable && ($xcontext.isMainWiki() || ("$!services.wiki.user" != '' && $services.wiki.user.getUserScope()=='GLOBAL_ONLY')))
 #if ($displayHomeMenu)
   #xwikitopmenuentrystart($xwiki.getURL($mainWikiHomeDocumentReference) $services.localization.render('core.menu.type.home') 'tmMainWiki' 'hasIcon')
   #set ($hasPreviousMenuSection = false)
@@ -181,8 +181,8 @@
 #set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin || $xwiki.exists('Main.AllDocs') || $canDeleteWiki)
 #set ($wikiEntryId = 'tmWiki')
 #set ($wikiEntryText = $services.localization.render('core.menu.type.wiki'))
-#set ($wikiName = $!{services.wikimanager.getWikiDocument($xcontext.getDatabase()).getWikiPrettyName()})
-## If no pretty name is available (no wikimanager service or pretty name is empty), use the wiki name.
+#set ($wikiName = $services.wiki.getById($xcontext.database).prettyName)
+## If no pretty name is available (no wiki script service or pretty name is empty), use the wiki name.
 #if ("$!wikiName.trim()" == '')
   #set ($wikiName = $xcontext.getDatabase())
 #end
@@ -263,7 +263,8 @@
     #set ($hasPreviousMenuSection = true)
   #end
   #if ($hasSpaceAdmin && $isAdminAppInstalled)
-    #set ($adminspaceaction = $!xwiki.getURL("${doc.space}.WebPreferences", 'admin'))
+    #set ($spaceAdminDocRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebPreferences'))
+    #set ($adminspaceaction = $xwiki.getURL($spaceAdminDocRef, 'admin'))
     #submenuitem($adminspaceaction $services.localization.render('core.menu.admin.space', [$escapetool.xml($doc.space)]) 'tmAdminSpace')
     #set ($hasPreviousMenuSection = true)
   #end

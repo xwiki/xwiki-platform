@@ -21,6 +21,7 @@ package org.xwiki.wikistream.input;
 
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.internal.input.BeanInputWikiStream;
 
 /**
  * @version $Id$
@@ -29,5 +30,5 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface BeanInputWikiStreamFactory<P> extends InputWikiStreamFactory
 {
-    InputWikiStream createInputWikiStream(P properties) throws WikiStreamException;
+    BeanInputWikiStream<P> createInputWikiStream(P properties) throws WikiStreamException;
 }

@@ -25,6 +25,8 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
 import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.internal.output.BeanOutputWikiStream;
+import org.xwiki.wikistream.xml.output.XMLOutputProperties;
 
 /**
  * @param <P>
@@ -32,6 +34,7 @@ import org.xwiki.wikistream.WikiStreamException;
  * @since 5.2M2
  */
 public class DefaultXMLOutputWikiStream<P extends XMLOutputProperties, F> extends AbstractXMLOutputWikiStream<P>
+    implements BeanOutputWikiStream<P>
 {
     private final AbstractXMLBeanOutputWikiStreamFactory<P, F> factory;
 
@@ -48,5 +51,11 @@ public class DefaultXMLOutputWikiStream<P extends XMLOutputProperties, F> extend
         WikiStreamException
     {
         return this.factory.createListener(this.result, properties);
+    }
+
+    @Override
+    public void setProperties(P properties) throws WikiStreamException
+    {
+        // Not needed
     }
 }

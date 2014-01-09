@@ -31,6 +31,7 @@ import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
+import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -291,7 +292,7 @@ public abstract class ListClass extends PropertyClass
         }
 
         @SuppressWarnings("unchecked")
-        List<Element> elist = ppcel.elements("value");
+        List<Element> elist = ppcel.elements(ListXarObjectPropertySerializer.ELEMENT_VALUE);
         BaseProperty lprop = newProperty();
 
         if (lprop instanceof ListProperty) {
@@ -429,14 +430,11 @@ public abstract class ListClass extends PropertyClass
             selectlist = ((ListProperty) prop).getList();
             List<String> newlist = new ArrayList<String>();
             for (String value : selectlist) {
-                // We have to escape the XML special chars because the output of the display methods is assumed to be
-                // HTML and the list values should be handled as plain text not HTML.
-                newlist.add(XMLUtils.escape(getDisplayValue(value, name, map, context)));
+                newlist.add(getDisplayValue(value, name, map, context));
             }
             buffer.append(StringUtils.join(newlist, separator));
         } else {
-            // Escape the value because it has to be treated as plain text not HTML.
-            buffer.append(XMLUtils.escape(getDisplayValue(prop.getValue(), name, map, context)));
+            buffer.append(getDisplayValue(prop.getValue(), name, map, context));
         }
     }
 
@@ -503,7 +501,7 @@ public abstract class ListClass extends PropertyClass
             String display = XMLUtils.escape(getDisplayValue(rawvalue, name, map, context));
             input radio =
                 new input((getDisplayType().equals("radio") && !isMultiSelect()) ? input.radio : input.checkbox, prefix
-                + name, value);
+                    + name, value);
             radio.setAttributeFilter(new XMLAttributeValueFilter());
             radio.setID("xwiki-form-" + name + "-" + object.getNumber() + "-" + count);
             radio.setDisabled(isDisabled());

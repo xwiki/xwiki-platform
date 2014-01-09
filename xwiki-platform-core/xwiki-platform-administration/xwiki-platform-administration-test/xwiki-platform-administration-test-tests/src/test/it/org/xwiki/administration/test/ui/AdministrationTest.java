@@ -19,12 +19,12 @@
  */
 package org.xwiki.administration.test.ui;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.*;
+import org.openqa.selenium.By;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.AdministrationPage;
-import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
+import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 
 /**
  * Verify the overall Administration application features.
@@ -32,8 +32,11 @@ import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
  * @version $Id$
  * @since 4.3M1
  */
-public class AdministrationTest extends AbstractAdminAuthenticatedTest
+public class AdministrationTest extends AbstractTest
 {
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+
     /**
      * This method makes the following tests :
      *
@@ -46,10 +49,12 @@ public class AdministrationTest extends AbstractAdminAuthenticatedTest
     @Test
     public void verifyGlobalAndSpaceSections()
     {
-        // Go to any page. Note that we go to a not existing page for 2 reasons:
-        // - verify that it has a menu action to administer the wiki
-        // - (more importantly) it's faster than going to the wiki's home page which will take longer to display... ;)
-        getUtil().gotoPage(getTestClassName(), getTestMethodName());
+        // Because of http://jira.xwiki.org/browse/XWIKI-9763 we need to create a test page to ensure there's at least
+        // one non-hidden page in the XWiki space
+        // TODO: Remove this once http://jira.xwiki.org/browse/XWIKI-9763 is fixed.
+        getUtil().createPage("XWiki", getTestClassName() + "-" + getTestMethodName(), "", "");
+
+        // Verify that pages have an Admin menu and navigate to the admin UI.
         AdministrablePage page = new AdministrablePage();
         AdministrationPage administrationPage = page.clickAdministerWiki();
 
@@ -68,12 +73,13 @@ public class AdministrationTest extends AbstractAdminAuthenticatedTest
         Assert.assertTrue(administrationPage.hasSection("Export"));
         Assert.assertTrue(administrationPage.hasSection("Templates"));
 
-        // Select space administration (XWiki space, since that space exists)
+        // Select XWiki space administration.
         AdministrationPage spaceAdministrationPage = administrationPage.selectSpaceToAdminister("XWiki");
 
-        // Note: I'm not sure this is good enough since waitUntilPageIsLoaded() tests for the existence of the footer
-        // but if the page hasn't started reloading then the footer will be present... However I ran this test 300
-        // times in a row without any failure...
+        // Since clicking on "XWiki" in the Select box will reload the page asynchronously we need to wait for the new
+        // page to be available. For this we wait for the heading to be changed to "Administration:XWiki".
+        spaceAdministrationPage.waitUntilElementIsVisible(By.id("HAdministration:XWiki"));
+        // Also wait till the page is fully loaded to be extra sure...
         spaceAdministrationPage.waitUntilPageIsLoaded();
 
         Assert.assertTrue(spaceAdministrationPage.hasSection("Presentation"));

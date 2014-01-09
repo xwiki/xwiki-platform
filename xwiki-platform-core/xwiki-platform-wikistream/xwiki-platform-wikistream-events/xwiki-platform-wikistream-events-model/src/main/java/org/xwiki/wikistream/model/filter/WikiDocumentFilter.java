@@ -39,130 +39,161 @@ public interface WikiDocumentFilter
     // Properties
 
     /**
-     * @type Syntax
+     * @type {@link org.xwiki.rendering.syntax.Syntax}
      */
     String PARAMETER_SYNTAX = "syntax";
 
     /**
-     * @type EntityReference
+     * @type {@link org.xwiki.model.reference.EntityReference}
      */
     String PARAMETER_PARENT = "parent_reference";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_TITLE = "title";
 
     /**
-     * @type Boolean
+     * @type {@link Boolean}
      */
     String PARAMETER_HIDDEN = "hidden";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_CUSTOMCLASS = "customclass";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_DEFAULTTEMPLATE = "defaulttemplate";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_VALIDATIONSCRIPT = "validationscript";
 
     // content
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_CONTENT = "content";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_CONTENT_HTML = "content_html";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_CONTENT_AUTHOR = "content_author";
 
     /**
-     * @type Date
+     * @type {@link java.util.Date}
      */
     String PARAMETER_CONTENT_DATE = "content_date";
 
     // creation
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_CREATION_AUTHOR = "creation_author";
 
     /**
-     * @type Date
+     * @type {@link java.util.Date}
      */
     String PARAMETER_CREATION_DATE = "creation_date";
 
     // locale
 
     /**
-     * @type Locale
+     * @type {@link Locale}
      */
     String PARAMETER_LOCALE = "locale";
 
     // revision
 
     /**
-     * @type String
+     * @type {@link String}
+     * @since 5.4M1
      */
-    String PARAMETER_REVISION = "revision";
+    String PARAMETER_LASTREVISION = "lastrevision";
 
     /**
-     * @type Date
+     * @type {@link java.util.Date}
      */
     String PARAMETER_REVISION_DATE = "revision_date";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_REVISION_AUTHOR = "revision_author";
 
     /**
-     * @type String
+     * @type {@link String}
      */
     String PARAMETER_REVISION_COMMENT = "revision_comment";
 
     /**
-     * @type Boolean
+     * @type {@link Boolean}
      */
     String PARAMETER_REVISION_MINOR = "revision_minor";
 
     // Events
 
+    /**
+     * @param name the name of the document
+     * @param parameters the properties of the document
+     * @throws WikiStreamException when failing to send event
+     */
     void beginWikiDocument(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param name the name of the document
+     * @param parameters the properties of the document
+     * @throws WikiStreamException when failing to send event
+     */
     void endWikiDocument(@Name("name") String name,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param locale the locale of the document
+     * @param parameters the properties of the document locale
+     * @throws WikiStreamException when failing to send event
+     */
     void beginWikiDocumentLocale(@Default("") @Name("locale") Locale locale,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param locale the locale of the document
+     * @param parameters the properties of the document
+     * @throws WikiStreamException when failing to send event
+     */
     void endWikiDocumentLocale(@Default("") @Name("locale") Locale locale,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param revision the revision of the document
+     * @param parameters the properties of the document revision
+     * @throws WikiStreamException when failing to send event
+     */
     void beginWikiDocumentRevision(@Name("revision") String revision,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;
 
+    /**
+     * @param revision the revision of the document
+     * @param parameters the properties of the document revision
+     * @throws WikiStreamException when failing to send event
+     */
     void endWikiDocumentRevision(@Name("revision") String revision,
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws WikiStreamException;

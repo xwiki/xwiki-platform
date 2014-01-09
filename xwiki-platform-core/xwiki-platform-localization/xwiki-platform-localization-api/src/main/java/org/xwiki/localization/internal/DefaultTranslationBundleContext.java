@@ -20,7 +20,8 @@
 package org.xwiki.localization.internal;
 
 import java.util.Collection;
-import java.util.PriorityQueue;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -73,18 +74,18 @@ public class DefaultTranslationBundleContext implements TranslationBundleContext
     /**
      * @return the current bundles
      */
-    private PriorityQueue<TranslationBundle> initializeContextBundle()
+    private SortedSet<TranslationBundle> initializeContextBundle()
     {
-        PriorityQueue<TranslationBundle> bundles;
+        SortedSet<TranslationBundle> bundles;
 
         try {
             bundles =
-                new PriorityQueue<TranslationBundle>(this.componentManager.get().<TranslationBundle> getInstanceList(
+                new TreeSet<TranslationBundle>(this.componentManager.get().<TranslationBundle> getInstanceList(
                     TranslationBundle.class));
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to lookup Bundle components", e);
 
-            bundles = new PriorityQueue<TranslationBundle>();
+            bundles = new TreeSet<TranslationBundle>();
         }
 
         return bundles;
@@ -93,13 +94,13 @@ public class DefaultTranslationBundleContext implements TranslationBundleContext
     /**
      * @return the current bundles
      */
-    private PriorityQueue<TranslationBundle> getBundlesInternal()
+    private SortedSet<TranslationBundle> getBundlesInternal()
     {
-        PriorityQueue<TranslationBundle> bundles;
+        SortedSet<TranslationBundle> bundles;
 
         ExecutionContext context = this.execution.getContext();
         if (context != null) {
-            bundles = (PriorityQueue<TranslationBundle>) context.getProperty(CKEY_BUNDLES);
+            bundles = (SortedSet<TranslationBundle>) context.getProperty(CKEY_BUNDLES);
 
             if (bundles == null) {
                 bundles = initializeContextBundle();

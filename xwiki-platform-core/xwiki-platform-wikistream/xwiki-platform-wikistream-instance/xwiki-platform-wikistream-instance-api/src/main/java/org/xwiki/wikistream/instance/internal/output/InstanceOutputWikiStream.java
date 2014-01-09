@@ -34,6 +34,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.FilterDescriptorManager;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.instance.internal.InstanceUtils;
+import org.xwiki.wikistream.instance.output.InstanceOutputProperties;
 import org.xwiki.wikistream.instance.output.OutputInstanceWikiStreamFactory;
 import org.xwiki.wikistream.internal.output.AbstractBeanOutputWikiStream;
 

@@ -27,13 +27,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wikistream-streams</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-stream-wikixml</artifactId>
-  <name>XWiki Platform - Wiki Stream - Generic XML</name>
-  <description>XWiki Platform - Wiki Stream - Generic XML</description>
+  <name>XWiki Platform - WikiStream - Generic XML</name>
+  <description>XWiki Platform - WikiStream - Generic XML</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.70</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

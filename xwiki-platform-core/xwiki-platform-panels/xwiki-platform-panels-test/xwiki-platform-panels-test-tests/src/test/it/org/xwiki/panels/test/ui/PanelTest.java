@@ -19,14 +19,14 @@
  */
 package org.xwiki.panels.test.ui;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.PageElementsAdministrationSectionPage;
 import org.xwiki.panels.test.po.PageWithPanels;
 import org.xwiki.panels.test.po.PanelEditPage;
 import org.xwiki.panels.test.po.PanelsHomePage;
-import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
+import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.EditRightsPane.Right;
 import org.xwiki.test.ui.po.EditRightsPane.State;
 import org.xwiki.test.ui.po.ViewPage;
@@ -38,8 +38,11 @@ import org.xwiki.test.ui.po.editor.RightsEditPage;
  * @version $Id$
  * @since 5.0M2
  */
-public class PanelTest extends AbstractAdminAuthenticatedTest
+public class PanelTest extends AbstractTest
 {
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+
     /**
      * @see "XWIKI-8591: Cannot use a panel with a name containing spaces"
      */
@@ -78,6 +81,11 @@ public class PanelTest extends AbstractAdminAuthenticatedTest
         // Create a new panel.
         String panelName = getTestMethodName();
         getUtil().deletePage("Panels", panelName);
+
+        // Create a user for the test so that we can give view rights to the panel page to that user.
+        String userName = String.format("%s%s", getTestClassName(), getTestMethodName());
+        getUtil().createUser(userName, "password", getUtil().getURLToNonExistentPage());
+
         PanelEditPage panelEditPage = PanelsHomePage.gotoPage().createPanel(panelName);
         panelEditPage.setContent(String.format(PanelEditPage.DEFAULT_CONTENT_FORMAT, panelName, "Panel content."));
         panelEditPage.clickSaveAndContinue();
@@ -87,9 +95,8 @@ public class PanelTest extends AbstractAdminAuthenticatedTest
             new AdministrablePage().clickAdministerWiki().clickPageElementsSection();
         String rightPanels = pageElements.getRightPanels();
         pageElements.setRightPanels(rightPanels + ",Panels." + panelName);
+        pageElements.clickSave();
         try {
-            pageElements.clickSave();
-
             // The panel should be visible for the administrator.
             Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
 
@@ -98,20 +105,23 @@ public class PanelTest extends AbstractAdminAuthenticatedTest
             Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
 
             // Login and limit the view right on the panel document.
-            loginAdminUser();
+            this.authenticationRule.authenticate();
             RightsEditPage rightsEditor = getUtil().gotoPage("Panels", panelName).editRights();
             rightsEditor.switchToUsers();
-            // Explicit view right for the administrator.
-            rightsEditor.setRight("Admin", Right.VIEW, State.ALLOW);
+            // Explicit view right for the test user.
+            rightsEditor.setRight(userName, Right.VIEW, State.ALLOW);
 
-            // Check again the panel visibility for guest and then for administrator.
-            ViewPage page = getUtil().gotoPage(getTestClassName(), getTestMethodName());
+            // Check again the panel visibility for the test user and then for guest
+            getUtil().gotoPage(getUtil().getURLToLoginAndGotoPage(userName, "password",
+                getUtil().getURL(getTestClassName(), getTestMethodName())));
+            getUtil().recacheSecretToken();
+            ViewPage page = new ViewPage();
             Assert.assertTrue(new PageWithPanels().hasPanel(panelName));
             page.logout();
             Assert.assertFalse(new PageWithPanels().hasPanel(panelName));
         } finally {
             // Restore the right panels.
-            loginAdminUser();
+            this.authenticationRule.authenticate();
             pageElements = PageElementsAdministrationSectionPage.gotoPage();
             pageElements.setRightPanels(rightPanels);
             pageElements.clickSave();

@@ -385,9 +385,9 @@ xwiki.editcomment.mandatory=$xwikiCfgEditCommentMandatory
 # xwiki.editcomment.suggested=0
 
 
-#-------------------------------------------------------------------------------------
+#---------------------------------------
 # LDAP
-#-------------------------------------------------------------------------------------
+#
 
 #-# LDAP authentication service
 # xwiki.authentication.authclass=com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl
@@ -416,12 +416,19 @@ xwiki.authentication.ldap.base_DN=
 #-# The default is ({0}={1})
 # xwiki.authentication.ldap.user_search_fmt=({0}={1})
 
-#-# Only members of the following group will be verified in the LDAP
-#-# otherwise only users that are found after searching starting from the base_DN
+#-# Only members of the following group can authenticate.
+#-# The following kind of groups are supported:
+#-# * LDAP static groups (users/subgroups are listed statically in the group object)
+#-# * [Since 3.3M1] LDAP organization units (users/subgroups are sub object of the provided organization unit)
+#-# * [Since 3.3M1] LDAP filter (users/groups are object found in a search with the provided filter)
 # xwiki.authentication.ldap.user_group=cn=developers,ou=groups,o=MegaNova,c=US
 
 #-# [Since 1.5RC1, XWikiLDAPAuthServiceImpl]
-#-# Only users not member of the following group can autheticate
+#-# Only users not member of the following group can authenticate.
+#-# The following kind of groups are supported:
+#-# * LDAP static groups (users/subgroups are listed statically in the group object)
+#-# * [Since 3.3M1] LDAP organization units (users/subgroups are sub object of the provided organization unit)
+#-# * [Since 3.3M1] LDAP filter (users/groups are object found in a search with the provided filter)
 # xwiki.authentication.ldap.exclude_group=cn=admin,ou=groups,o=MegaNova,c=US
 
 #-# Specifies the LDAP attribute containing the identifier to be used as the XWiki name
@@ -448,7 +455,8 @@ xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email
 xwiki.authentication.ldap.update_user=1
 
 #-# [Since 1.3M2, XWikiLDAPAuthServiceImpl]
-#-# Maps XWiki groups to LDAP groups, separator is "|". The following kind of groups are supported:
+#-# Maps XWiki groups to LDAP groups, separator is "|".
+#-# The following kind of groups are supported:
 #-# * LDAP static groups (users/subgroups are listed statically in the group object)
 #-# * [Since 3.3M1] LDAP organization units (users/subgroups are sub object of the provided organization unit)
 #-# * [Since 3.3M1] LDAP filter (users/groups are object found in a search with the provided filter),
@@ -509,6 +517,7 @@ xwiki.authentication.ldap.trylocal=1
 #-# The maximum number of milliseconds the client waits for any operation under these constraints to complete.
 #-# The default is 1000
 # xwiki.authentication.ldap.timeout=1000
+
 
 #---------------------------------------
 # WYSIWYG Editor configuration
@@ -658,5 +667,10 @@ xwiki.plugin.image.cache.capacity=30
 #-# This property will be removed as soon as WikiStream is old/stable enough.
 #-# By default WikiStream is used, uncomment to use the old system.
 # xwiki.action.export.xar.usewikistream=0
+#-# [Since 5.3RC1]
+#-# Indicate if WikiStream should be used when importing a XAR in the import action.
+#-# This property will be removed as soon as WikiStream is old/stable enough.
+#-# By default the old system is used, uncomment to use WikiStream.
+# xwiki.action.import.xar.usewikistream=1
 
 $!xwikiCfgAdditionalProperties

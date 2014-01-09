@@ -36,10 +36,13 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.filter.UnknownFilter;
 import org.xwiki.filter.xml.serializer.XMLSerializerFactory;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.wikixml.internal.input.WikiXMLInputWikiStreamFactory;
+import org.xwiki.wikistream.wikixml.output.WikiXMLOutputProperties;
 import org.xwiki.wikistream.xml.internal.output.AbstractXMLBeanOutputWikiStreamFactory;
 
 /**
@@ -61,6 +64,9 @@ public class WikiXMLOutputWikiStreamFactory extends
     @Inject
     private Provider<ComponentManager> contextComponentManager;
 
+    /**
+     * Default constructor.
+     */
     public WikiXMLOutputWikiStreamFactory()
     {
         super(WikiStreamType.WIKI_XML);
@@ -72,17 +78,21 @@ public class WikiXMLOutputWikiStreamFactory extends
     @Override
     public Collection<Class< ? >> getFilterInterfaces() throws WikiStreamException
     {
-        List<InputWikiStreamFactory> factorys;
+        List<InputWikiStreamFactory> factories;
         try {
-            factorys = this.contextComponentManager.get().getInstanceList(InputWikiStreamFactory.class);
+            factories = this.contextComponentManager.get().getInstanceList(InputWikiStreamFactory.class);
         } catch (ComponentLookupException e) {
             throw new WikiStreamException("Failed to lookup InputWikiStreamFactory components instances", e);
         }
 
         Set<Class< ? >> filters = new HashSet<Class< ? >>();
 
-        for (InputWikiStreamFactory factory : factorys) {
-            filters.addAll(factory.getFilterInterfaces());
+        filters.add(UnknownFilter.class);
+
+        for (InputWikiStreamFactory factory : factories) {
+            if (factory.getClass() != WikiXMLInputWikiStreamFactory.class) {
+                filters.addAll(factory.getFilterInterfaces());
+            }
         }
 
         return filters;

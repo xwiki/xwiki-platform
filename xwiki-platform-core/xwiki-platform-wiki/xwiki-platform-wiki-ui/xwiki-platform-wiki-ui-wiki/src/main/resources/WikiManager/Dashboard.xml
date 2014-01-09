@@ -425,10 +425,11 @@
   #if ("$!contributor" != '' &amp;&amp; !$contributor.endsWith('superadmin') &amp;&amp; "$!contributor" != 'workspacetemplate:XWiki.Admin' &amp;&amp;
        ( $DISPLAY_GLOBAL_ADMIN || "$!contributor" != 'xwiki:XWiki.Admin' ) &amp;&amp;
        ( $xcontext.mainWiki || "$!contributor" != 'XWiki.Admin' ) &amp;&amp;
-       ( "$!contributor" != 'XWiki.XWikiGuest' )
+       ( "$!contributor" != 'XWiki.XWikiGuest' ) &amp;&amp; $xwiki.exists($contributor)
       )
     #set ($validContributors = $validContributors + 1)
-    1. [[$xwiki.getUserName($!{contributor}, false)&gt;&gt;$!{contributor}]]
+    #set ($contributorDoc = $xwiki.getDocument($contributor))
+    1. [[$!{contributorDoc.first_name} $!{contributorDoc.last_name}&gt;&gt;$!{contributor}]]
   #end
   #if ($validContributors == $MAX_CONTRIBUTORS)
     #break

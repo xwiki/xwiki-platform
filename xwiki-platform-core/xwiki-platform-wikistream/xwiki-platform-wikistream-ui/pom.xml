@@ -27,15 +27,18 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wikistream</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wikistream-ui</artifactId>
-  <name>XWiki Platform - Wiki Stream - UI</name>
+  <name>XWiki Platform - WikiStream - UI</name>
   <packaging>xar</packaging>
   <description>XWiki WikiStream, an application for manipulating WikiStream modules.</description>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>WikiStream Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -366,12 +366,6 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Young API that has been refactored to introduce the new Resource module -->
-            <exclude>org/xwiki/url/**</exclude>
-            <exclude>org/xwiki/container/Request</exclude>
-            <!-- XWikiURL (now Resource) should only be in the Execution Context and not in the Request -->
-            <exclude>org/xwiki/container/servlet/ServletRequest</exclude>
-            <exclude>org/xwiki/container/portlet/PortletRequest</exclude>
             <!-- Lots of refactoring in WikiStream -->
             <exclude>org/xwiki/wikistream/**</exclude>
           </excludes>
@@ -468,8 +462,8 @@
     <module>xwiki-platform-wiki</module>
     <module>xwiki-platform-wikistream</module>
     <module>xwiki-platform-wiki-manager</module>
-    <module>xwiki-platform-workspace</module>
     <module>xwiki-platform-wysiwyg</module>
+    <module>xwiki-platform-xar</module>
     <module>xwiki-platform-xml</module>
     <module>xwiki-platform-xmlrpc</module>
     <module>xwiki-platform-zipexplorer</module>

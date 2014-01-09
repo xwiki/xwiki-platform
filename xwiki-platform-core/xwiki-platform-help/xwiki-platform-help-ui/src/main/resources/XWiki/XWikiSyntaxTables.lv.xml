@@ -11,11 +11,12 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1382899147000</creationDate>
-  <date>1382899147000</date>
-  <contentUpdateDate>1382899147000</contentUpdateDate>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497989000</date>
+  <contentUpdateDate>1301497989000</contentUpdateDate>
   <version>1.1</version>
   <title>XWikiSyntaxTables</title>
+  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -63,7 +64,7 @@ Viki tabulas ļauj vienkāršā veidā attēlot saturu tabulas formā.
 {{{
 $xwiki.ssfx.use("js/xwiki/table/table.css")
 $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
-&lt;table id="tableid" class="grid sortable filterable doOddEven"&gt;
+&lt;table id="table1id" class="grid sortable filterable doOddEven"&gt;
 &lt;tr class="sortHeader"&gt;
 &lt;th&gt;1. virsraksts&lt;/th&gt;
 &lt;th&gt;2. virsraksts&lt;/th&gt;
@@ -85,7 +86,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 {{/velocity}}
 
 {{html}}
-&lt;table id="tableid" class="grid sortable filterable doOddEven"&gt;
+&lt;table id="table1id" class="grid sortable filterable doOddEven"&gt;
 &lt;tr class="sortHeader"&gt;
 &lt;th&gt;1. virsraksts&lt;/th&gt;
 &lt;th&gt;2. virsraksts&lt;/th&gt;

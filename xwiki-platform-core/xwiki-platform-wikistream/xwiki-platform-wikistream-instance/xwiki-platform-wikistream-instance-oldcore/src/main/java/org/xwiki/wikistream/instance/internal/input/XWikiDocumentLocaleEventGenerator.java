@@ -31,11 +31,13 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
+import org.xwiki.wikistream.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.wikistream.instance.input.EntityEventGenerator;
 import org.xwiki.wikistream.instance.internal.XWikiDocumentFilter;
 import org.xwiki.wikistream.model.filter.WikiDocumentFilter;
@@ -53,12 +55,11 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  */
 @Component
 @Singleton
-// TODO: add support for real revision events (instead of the jrcs archive)
 public class XWikiDocumentLocaleEventGenerator extends
-    AbstractBeanEntityEventGenerator<XWikiDocument, XWikiDocumentFilter, XWikiDocumentInputProperties>
+    AbstractBeanEntityEventGenerator<XWikiDocument, XWikiDocumentFilter, DocumentInstanceInputProperties>
 {
     public static final ParameterizedType ROLE = new DefaultParameterizedType(null, EntityEventGenerator.class,
-        XWikiDocument.class, XWikiDocumentInputProperties.class);
+        XWikiDocument.class, DocumentInstanceInputProperties.class);
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -77,7 +78,7 @@ public class XWikiDocumentLocaleEventGenerator extends
 
     @Override
     public void write(XWikiDocument document, Object filter, XWikiDocumentFilter documentFilter,
-        XWikiDocumentInputProperties properties) throws WikiStreamException
+        DocumentInstanceInputProperties properties) throws WikiStreamException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
@@ -85,7 +86,7 @@ public class XWikiDocumentLocaleEventGenerator extends
 
         FilterEventParameters localeParameters = new FilterEventParameters();
 
-        if (properties.isWithWikiDocumentRevisions()) {
+        if (properties.isWithJRCSRevisions()) {
             try {
                 localeParameters.put(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS,
                     document.getDocumentArchive(xcontext).getArchive(xcontext));
@@ -96,9 +97,33 @@ public class XWikiDocumentLocaleEventGenerator extends
 
         localeParameters.put(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, document.getCreator());
         localeParameters.put(WikiDocumentFilter.PARAMETER_CREATION_DATE, document.getCreationDate());
+        localeParameters.put(WikiDocumentFilter.PARAMETER_LASTREVISION, document.getVersion());
 
         documentFilter.beginWikiDocumentLocale(document.getLocale(), localeParameters);
 
+        if (properties.isWithRevisions()) {
+            try {
+                for (Version version : document.getRevisions(xcontext)) {
+                    XWikiDocument revisionDocument =
+                        xcontext.getWiki().getDocument(document, version.toString(), xcontext);
+
+                    writeRevision(revisionDocument, filter, documentFilter, properties);
+                }
+            } catch (XWikiException e) {
+                this.logger.error("Failed to get document [{}] history", document.getDocumentReference(), e);
+            }
+        }
+
+        writeRevision(document, filter, documentFilter, properties);
+
+        // < WikiDocumentLocale
+
+        documentFilter.endWikiDocumentLocale(document.getLocale(), FilterEventParameters.EMPTY);
+    }
+
+    private void writeRevision(XWikiDocument document, Object filter, XWikiDocumentFilter documentFilter,
+        DocumentInstanceInputProperties properties) throws WikiStreamException
+    {
         // > WikiDocumentRevision
 
         FilterEventParameters revisionParameters = new FilterEventParameters();
@@ -139,11 +164,13 @@ public class XWikiDocumentLocaleEventGenerator extends
 
             if (properties.isWithWikiDocumentContentHTML()) {
                 try {
-                    revisionParameters
-                        .put(WikiDocumentFilter.PARAMETER_CONTENT_HTML, document.getRenderedContent(xcontext));
+                    XWikiContext xcontext = this.xcontextProvider.get();
+
+                    revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT_HTML,
+                        document.getRenderedContent(xcontext));
                 } catch (XWikiException e) {
-                    this.logger.error("Failed to render content of document [{}] as HTML", document.getDocumentReference(),
-                        e);
+                    this.logger.error("Failed to render content of document [{}] as HTML",
+                        document.getDocumentReference(), e);
                 }
             }
         }
@@ -182,8 +209,7 @@ public class XWikiDocumentLocaleEventGenerator extends
         if (properties.isWithWikiClass()) {
             BaseClass xclass = document.getXClass();
             if (!xclass.getFieldList().isEmpty()) {
-                ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, documentFilter,
-                    (BaseClassInputProperties) properties);
+                ((BaseClassEventGenerator) this.classEventGenerator).write(xclass, filter, documentFilter, properties);
             }
         }
 
@@ -193,7 +219,7 @@ public class XWikiDocumentLocaleEventGenerator extends
                 for (BaseObject xobject : xobjects) {
                     if (xobject != null) {
                         ((BaseObjectEventGenerator) this.objectEventGenerator).write(xobject, filter, documentFilter,
-                            (BaseObjectInputProperties) properties);
+                            properties);
                     }
                 }
             }
@@ -202,9 +228,5 @@ public class XWikiDocumentLocaleEventGenerator extends
         // < WikiDocumentRevision
 
         documentFilter.endWikiDocumentRevision(document.getVersion(), revisionParameters);
-
-        // < WikiDocumentLocale
-
-        documentFilter.endWikiDocumentLocale(document.getLocale(), FilterEventParameters.EMPTY);
     }
 }

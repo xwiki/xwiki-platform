@@ -19,6 +19,8 @@
  */
 package org.xwiki.wiki.user;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -74,5 +76,23 @@ public class WikiUserConfiguration
     public MembershipType getMembershipType()
     {
         return membershipType;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (!(o instanceof WikiUserConfiguration)) {
+            return false;
+        }
+
+        WikiUserConfiguration otherConfig = (WikiUserConfiguration) o;
+        return new EqualsBuilder().append(this.membershipType, otherConfig.membershipType)
+                .append(this.userScope, otherConfig.userScope).isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(this.membershipType).append(this.userScope).toHashCode();
     }
 }

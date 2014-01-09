@@ -32,8 +32,10 @@
   #set ($faqSpace = $doc.space)
   ## If this page is called with createFAQ=true then create a new page using the FAQTemplate template
   #if ($request.createFAQ == 'true')
-    #set ($newFAQReference = $services.model.createDocumentReference('', "${faqSpace}", "$!{request.question}"))
-t    $response.sendRedirect($xwiki.getURL($newFAQReference, 'inline', "$!{request.queryString}&amp;title=${escapetool.url($request.question)}"))
+    ## Remove the "?" if it's the last character since the FAQ sheet adds one automatically
+    #set ($question = $stringtool.stripEnd($stringtool.trim($!{request.question}), '?'))
+    #set ($newFAQReference = $services.model.createDocumentReference('', "${faqSpace}", "$question"))
+    $response.sendRedirect($xwiki.getURL($newFAQReference, 'inline', "$!{request.queryString}&amp;title=${escapetool.url($question)}"))
   #end
   #set ($description = $doc.getValue("description"))
   #if ("$!description" != "")
@@ -48,7 +50,7 @@ t    $response.sendRedirect($xwiki.getURL($newFAQReference, 'inline', "$!{reques
     $services.localization.render('platform.faq.search.title')
     (((
     {{html}}
-    &lt;form action="$xwiki.getURL('FAQCode.FAQSearch')"&gt;
+    &lt;form action="$xwiki.getURL('FAQ.FAQSearch')"&gt;
       &lt;div&gt;
       ## Both Lucene and SOLR searches obey the $request.space param
       &lt;input type="hidden" name="space" value="${faqSpace}" /&gt;

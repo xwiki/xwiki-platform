@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wiki</artifactId>
   <name>XWiki Platform - Wiki - Parent POM</name>
@@ -40,5 +40,6 @@
     <module>xwiki-platform-wiki-template</module>
     <module>xwiki-platform-wiki-user</module>
     <module>xwiki-platform-wiki-ui</module>
+    <module>xwiki-platform-wiki-workspaces-migrator</module>
   </modules>
 </project>

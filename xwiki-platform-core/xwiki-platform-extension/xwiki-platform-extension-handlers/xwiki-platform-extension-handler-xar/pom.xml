@@ -27,14 +27,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-handlers</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-handler-xar</artifactId>
   <name>XWiki Platform - Extension - Handler - XAR</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Extension - Handler - XAR</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.69</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -50,6 +50,16 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-extension-script</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wikistream-instance-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-xar</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -104,7 +114,6 @@
               **/XarExtensionHandler.java,
               **/XarExtensionJobFinishedListener.java,
               **/DefaultPackageConfiguration.java,
-              **/DefaultPackager.java,
               **/NotADocumentException.java,
               **/PackageConfiguration.java,
               **/Packager.java,
@@ -124,8 +133,9 @@
               **/XarInstalledExtensionRepository.java,
               **/DocumentScriptSafeProvider.java,
               **/SafeConflictQuestion.java,
-              **/DefaultDocumentMergeImporter.java,
-              **/WikiEventListener.java
+              **/DocumentMergeImporter.java,
+              **/WikiEventListener.java,
+              **/XarExtensionPlan.java
           </excludes>
         </configuration>
       </plugin>

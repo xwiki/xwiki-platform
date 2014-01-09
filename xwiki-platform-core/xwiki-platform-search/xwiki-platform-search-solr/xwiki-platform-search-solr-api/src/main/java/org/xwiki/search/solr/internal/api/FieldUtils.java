@@ -38,6 +38,11 @@ import java.util.Locale;
 public final class FieldUtils
 {
     /**
+     * The suffix added to the fields used for sorting.
+     */
+    public static final String SORT_SUFFIX = "_sort";
+
+    /**
      * Keyword field, holds a string uniquely identifying a document across the index. this is used for finding old
      * versions of a document to be indexed.
      */
@@ -105,7 +110,7 @@ public final class FieldUtils
     /**
      * Lowercased, unanalyzed and not stored version of the document's title, used for sorting.
      */
-    public static final String TITLE_SORT = "title_sort";
+    public static final String TITLE_SORT = TITLE + SORT_SUFFIX;
 
     /**
      * Version of the document (example: {@code 4.2}).
@@ -126,7 +131,12 @@ public final class FieldUtils
     public static final String TYPE = "type";
 
     /**
-     * XWiki object class, only used for objects and properties.
+     * Used to index XClass names.
+     * <ul>
+     * <li>document: the type of objects a document has, e.g. [Blog.BlogPostClass, XWiki.TagClass, ..]</li>
+     * <li>object: the object type</li>
+     * <li>object property: the type of object this property belongs to</li>.
+     * </ul>
      */
     public static final String CLASS = "class";
 
@@ -156,7 +166,7 @@ public final class FieldUtils
     /**
      * Lowercased, unanalyzed and not stored version of the document's last author display version, used for sorting.
      */
-    public static final String AUTHOR_DISPLAY_SORT = "author_display_sort";
+    public static final String AUTHOR_DISPLAY_SORT = AUTHOR_DISPLAY + SORT_SUFFIX;
 
     /**
      * Creator of the document.
@@ -213,6 +223,41 @@ public final class FieldUtils
     public static final String ATTACHMENT_VERSION = "attversion";
 
     /**
+     * The date when the last version of the attachment was uploaded.
+     */
+    public static final String ATTACHMENT_DATE = "attdate";
+
+    /**
+     * Same as {@link #ATTACHMENT_DATE} but single valued so that it can be used for sorting.
+     */
+    public static final String ATTACHMENT_DATE_SORT = ATTACHMENT_DATE + SORT_SUFFIX;
+
+    /**
+     * The size in bytes of the last version of the attachment.
+     */
+    public static final String ATTACHMENT_SIZE = "attsize";
+
+    /**
+     * Same as {@link #ATTACHMENT_SIZE} but single valued so that it can be used for sorting.
+     */
+    public static final String ATTACHMENT_SIZE_SORT = ATTACHMENT_SIZE + SORT_SUFFIX;
+
+    /**
+     * The user that uploaded the last version of the attachment.
+     */
+    public static final String ATTACHMENT_AUTHOR = "attauthor";
+
+    /**
+     * The display name of the user that uploaded the last version of the attachment.
+     */
+    public static final String ATTACHMENT_AUTHOR_DISPLAY = ATTACHMENT_AUTHOR + "_display";
+
+    /**
+     * Same as {@link #ATTACHMENT_AUTHOR_DISPLAY} but used for sorting.
+     */
+    public static final String ATTACHMENT_AUTHOR_DISPLAY_SORT = ATTACHMENT_AUTHOR_DISPLAY + SORT_SUFFIX;
+
+    /**
      * For storing mimetype of the attachments.
      */
     public static final String MIME_TYPE = "mimetype";
@@ -221,6 +266,11 @@ public final class FieldUtils
      * Filename, only used for attachments.
      */
     public static final String FILENAME = "filename";
+
+    /**
+     * The attachment file name, used for sorting.
+     */
+    public static final String FILENAME_SORT = FILENAME + SORT_SUFFIX;
 
     /**
      * For storing property name.
@@ -268,5 +318,24 @@ public final class FieldUtils
         }
 
         return builder.toString();
+    }
+
+    /**
+     * Get the name of a dynamic field based on its type or the given locale. If the field type is specified then it is
+     * suffixed to the field name so that its value is indexed properly (see schema.xml). Otherwise, the locale is
+     * suffixed to the field name so that the field text content is indexed based on the specified locale.
+     * 
+     * @param prefix the field name prefix
+     * @param type the field type
+     * @param locale the locale of the field value in case the type is not specified
+     * @return the name that should be used for the specified field in order for its value to be indexed correctly
+     */
+    public static String getFieldName(String prefix, String type, Locale locale)
+    {
+        if (type != null) {
+            return prefix + FieldUtils.USCORE + type;
+        } else {
+            return FieldUtils.getFieldName(prefix, locale);
+        }
     }
 }

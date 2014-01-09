@@ -19,28 +19,32 @@
  */
 package org.xwiki.wikistream.xar.internal.input;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
 import org.xwiki.wikistream.xar.internal.XARFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils.Parameter;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
 import org.xwiki.wikistream.xar.internal.input.ClassPropertyReader.WikiClassProperty;
 
 /**
  * @version $Id$
  * @since 5.2RC1
  */
-public class ClassReader extends AbstractReader
+@Component
+@Singleton
+public class ClassReader extends AbstractReader implements XARXMLReader<ClassReader.WikiClass>
 {
-    private ClassPropertyReader propertyReader = new ClassPropertyReader();
+    @Inject
+    private XARXMLReader<ClassPropertyReader.WikiClassProperty> propertyReader;
 
     public static class WikiClass
     {
@@ -48,40 +52,52 @@ public class ClassReader extends AbstractReader
 
         public FilterEventParameters parameters = new FilterEventParameters();
 
-        private List<WikiClassProperty> properties = new ArrayList<WikiClassProperty>();
+        public Map<String, WikiClassProperty> properties = new LinkedHashMap<String, WikiClassProperty>();
 
         public void send(XARFilter proxyFilter) throws WikiStreamException
         {
             proxyFilter.beginWikiClass(this.parameters);
 
-            for (WikiClassProperty property : this.properties) {
+            for (WikiClassProperty property : this.properties.values()) {
                 property.send(proxyFilter);
             }
 
             proxyFilter.endWikiClass(this.parameters);
         }
+
+        public boolean isEmpty()
+        {
+            return this.properties.isEmpty();
+        }
+
+        public void addProperty(WikiClassProperty property)
+        {
+            this.properties.put(property.name, property);
+        }
     }
 
-    public WikiClass read(XMLStreamReader xmlReader, XARInputProperties properties) throws XMLStreamException,
-        IOException, WikiStreamException, ParseException
+    public WikiClass read(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException
     {
         WikiClass wikiClass = new WikiClass();
 
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
 
-            if (XARClassModel.ELEMENT_NAME.equals(elementName)) {
+            if (wikiClass.name == null && XARClassModel.ELEMENT_NAME.equals(elementName)) {
                 wikiClass.name = xmlReader.getElementText();
             } else if (XARClassModel.CLASS_PARAMETERS.containsKey(elementName)) {
                 String value = xmlReader.getElementText();
 
-                Parameter parameter = XARClassModel.CLASS_PARAMETERS.get(elementName);
+                EventParameter parameter = XARClassModel.CLASS_PARAMETERS.get(elementName);
 
                 if (parameter != null) {
-                    wikiClass.parameters.put(parameter.name, convert(parameter.type, value));
+                    Object wsValue = convert(parameter.type, value);
+                    if (wsValue != null) {
+                        wikiClass.parameters.put(parameter.name, wsValue);
+                    }
                 }
             } else {
-                wikiClass.properties.add(this.propertyReader.read(xmlReader, properties));
+                wikiClass.addProperty((WikiClassProperty) this.propertyReader.read(xmlReader));
             }
         }
 

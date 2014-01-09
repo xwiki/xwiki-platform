@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-localization</artifactId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-localization-macro</artifactId>
   <name>XWiki Platform - Localization - Macro</name>
@@ -36,6 +36,7 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Translation Macro</xwiki.extension.name>
+    <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

@@ -11,11 +11,12 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1382897887000</creationDate>
-  <date>1382897887000</date>
-  <contentUpdateDate>1382897887000</contentUpdateDate>
+  <creationDate>1384507498000</creationDate>
+  <date>1384508603000</date>
+  <contentUpdateDate>1384508603000</contentUpdateDate>
   <version>1.1</version>
   <title>XWikiSyntaxHeadings</title>
+  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -38,14 +39,17 @@
 1.1.1.1.1 livello 5
 1.1.1.1.1.1 livello 6
 )))|(((
-{{html}}
-&lt;!-- Nota: sostituire questo con sintassi xwiki se accade come http://jira.xwiki.org/jira/browse/XWIKI-4358 --&gt;
-&lt;h1 id="Hlevel1"&gt;&lt;span&gt;livello 1&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&lt;h2 id="Hlevel2"&gt;&lt;span&gt;livello 2&lt;/span&gt;&lt;/h2&gt;&lt;h3 id="Hlevel3"&gt;&lt;span&gt;livello 3&lt;/span&gt;&lt;/h3&gt;&lt;h4 id="Hlevel4"&gt;&lt;span&gt;livello 4&lt;/span&gt;&lt;/h4&gt;&lt;h5 id="Hlevel5"&gt;&lt;span&gt;livello 5&lt;/span&gt;&lt;/h5&gt;&lt;h6 id="Hlevel6"&gt;&lt;span&gt;livello 6&lt;/span&gt;&lt;/h6&gt;
-{{/html}})))
+= livello 1 = 
+== livello 2 ==
+=== livello 3 ===
+==== livello 4 ====
+===== livello 5 =====
+====== livello 6 ======
+)))
 |Titoli con Parametri|&lt;h1&gt;&lt;span style="color:blue"&gt;titolo&lt;/span&gt;&lt;/h1&gt;|(((
-{{html}}
-&lt;h1 id="Hheader" style="color:blue"&gt;&lt;span&gt;titolo&lt;/span&gt;&lt;/h1&gt;
-{{/html}})))
+(% style="color:blue" %)
+= titolo =
+)))
 |Titoli con sintassi XWiki|1.1.1 Titolo con *grassetto*|(((=== Titolo con **grassetto** ===)))
 
 === 2.0 Headings ===
@@ -59,13 +63,16 @@
 ===== livello 5 =====
 ====== livello 6 ======
 }}})))|(((
-{{html}}
-&lt;!-- Nota: sostituire questo con sintassi xwiki se accade come http://jira.xwiki.org/jira/browse/XWIKI-4358 --&gt;
-&lt;h1 id="Hlevel1"&gt;&lt;span&gt;livello 1&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&lt;h2 id="Hlevel2"&gt;&lt;span&gt;livello 2&lt;/span&gt;&lt;/h2&gt;&lt;h3 id="Hlevel3"&gt;&lt;span&gt;livello 3&lt;/span&gt;&lt;/h3&gt;&lt;h4 id="Hlevel4"&gt;&lt;span&gt;livello 4&lt;/span&gt;&lt;/h4&gt;&lt;h5 id="Hlevel5"&gt;&lt;span&gt;livello 5&lt;/span&gt;&lt;/h5&gt;&lt;h6 id="Hlevel6"&gt;&lt;span&gt;livello 6&lt;/span&gt;&lt;/h6&gt;
-{{/html}})))
+= livello 1 = 
+== livello 2 ==
+=== livello 3 ===
+==== livello 4 ====
+===== livello 5 =====
+====== livello 6 ======
+)))
 |Titoli con Parametri|{{{(% style="color:blue" %)}}}\\= titolo =|(((
-{{html}}
-&lt;h1 id="Hheader" style="color:blue"&gt;&lt;span&gt;titolo&lt;/span&gt;&lt;/h1&gt;
-{{/html}})))
+(% style="color:blue" %)
+= titolo =
+)))
 |Titoli con sintassi XWiki|{{{=== Titolo con **grassetto** ===}}}|(((=== Titolo con **grassetto** ===)))</content>
 </xwikidoc>

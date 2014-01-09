@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 
 /**
@@ -55,13 +54,6 @@ public class DefaultXWikiRenderingConfiguration implements XWikiRenderingConfigu
      */
     @Inject
     private ConfigurationSource configuration;
-
-    /**
-     * Used to convert transformation component hints into {@link org.xwiki.rendering.transformation.Transformation}
-     * objects.
-     */
-    @Inject
-    private ComponentManager componentManager;
 
     @Override
     public String getLinkLabelFormat()

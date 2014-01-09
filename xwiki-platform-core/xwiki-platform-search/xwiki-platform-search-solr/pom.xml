@@ -27,14 +27,40 @@
   <parent>
     <artifactId>xwiki-platform-search</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>5.3-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - Search - Solr - Parent POM</name>
   <description>Parent project for the Solr search engine.</description>
+  <properties>
+    <solr.version>${lucene.version}</solr.version>
+  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.solr</groupId>
+        <artifactId>solr-core</artifactId>
+        <version>${solr.version}</version>
+        <exclusions>
+          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+          </exclusion>
+          <!-- Solr is using an old version of Woodstox but we need the newer version which is used by our Cache
+               module -->
+          <exclusion>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>wstx-asl</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <modules>
     <module>xwiki-platform-search-solr-api</module>
+    <module>xwiki-platform-search-solr-plugin</module>
     <module>xwiki-platform-search-solr-query</module>
     <module>xwiki-platform-search-solr-ui</module>
   </modules>

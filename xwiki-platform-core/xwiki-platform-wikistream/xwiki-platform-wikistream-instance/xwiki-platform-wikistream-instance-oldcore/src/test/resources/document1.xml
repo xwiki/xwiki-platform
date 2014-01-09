@@ -15,6 +15,10 @@
                 <string>creation_date</string>
                 <date>2000-01-01 00:00:00.0 UTC</date>
               </entry>
+              <entry>
+                <string>lastrevision</string>
+                <string>1.1</string>
+              </entry>
             </parameters>
           </p>
           <wikiDocumentRevision revision="1.1">
@@ -115,6 +119,10 @@
               <entry>
                 <string>creation_date</string>
                 <date>2000-01-01 00:00:00.0 UTC</date>
+              </entry>
+              <entry>
+                <string>lastrevision</string>
+                <string>1.42</string>
               </entry>
             </parameters>
           </p>
@@ -314,7 +322,11 @@
                   <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
                 </wikiClassProperty>
               </wikiClass>
-              <wikiObjectProperty name="prop2" value="2"></wikiObjectProperty>
+              <wikiObjectProperty name="prop2">
+                <p>
+                  <value t="java.lang.Long">2</value>
+                </p>
+              </wikiObjectProperty>
             </wikiObject>
             <wikiObject name="wiki:space.page[0]">
               <p>
@@ -376,7 +388,11 @@
                   <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
                 </wikiClassProperty>
               </wikiClass>
-              <wikiObjectProperty name="prop1" value="1"></wikiObjectProperty>
+              <wikiObjectProperty name="prop1">
+                <p>
+                  <value t="java.lang.Long">1</value>
+                </p>
+              </wikiObjectProperty>
             </wikiObject>
           </wikiDocumentRevision>
         </wikiDocumentLocale>

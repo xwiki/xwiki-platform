@@ -586,7 +586,8 @@ public class PackageMojo extends AbstractMojo
         // because for example some XARs mayb depend on JARs and we need those JARs to be packaged!
         Set<Artifact> jarArtifacts = new HashSet<Artifact>();
         for (Artifact artifact : resolvedArtifacts) {
-            if (artifact.getType().equals("jar")) {
+            // Note: test-jar is used in functional tests from time to time and we need to package them too.
+            if (artifact.getType().equals("jar") || artifact.getType().equals("test-jar")) {
                 jarArtifacts.add(artifact);
             }
         }
@@ -630,7 +631,7 @@ public class PackageMojo extends AbstractMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-url-standard", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-wiki-descriptor-default", getXWikiPlatformVersion(), null, "jar"));
+            "xwiki-platform-wiki-default", getXWikiPlatformVersion(), null, "jar"));
 
         // Ensures all logging goes through SLF4J and Logback.
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.commons",
@@ -641,6 +642,11 @@ public class PackageMojo extends AbstractMojo
             getDependencyManagementVersion(pomProject, "org.slf4j", "jcl-over-slf4j"), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.slf4j", "log4j-over-slf4j",
             getDependencyManagementVersion(pomProject, "org.slf4j", "log4j-over-slf4j"), null, "jar"));
+
+        // When writing functional tests there's is often the need to export pages as XAR. Thus, in order to make
+        // developer's life easy, we also include the wikistream module (used for XAR exports).
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-wikistream-instance-oldcore", getXWikiPlatformVersion(), null, "jar"));
 
         return mandatoryTopLevelArtifacts;
     }

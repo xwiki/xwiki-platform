@@ -207,6 +207,7 @@
 #end
 
 #set ($customSearchFacetValuesDisplayer = {
+  'wiki': 'wiki',
   'locale': 'locale',
   'author': 'user',
   'creator': 'user',
@@ -300,6 +301,21 @@
 
 #macro (displaySearchFacetValue_type $type)
   $escapetool.xml($services.localization.render("solr.filterBy.type.$type.toLowerCase()"))
+#end
+
+#macro (displaySearchFacetValues_wiki $facetValues)
+  #set ($actualFacetValues = $facetValues)
+  ## If the list of wikis that are searchable from the main wiki is restricted then we need to hide some values.
+  #if ($wikisSearchableFromMainWiki &amp;&amp; $xcontext.isMainWiki() &amp;&amp; !$facetRequestValues)
+    #set ($actualFacetValues = [])
+    #foreach ($facetValue in $facetValues)
+      #if ($wikisSearchableFromMainWiki.contains($facetValue.name))
+        #set ($discard = $actualFacetValues.add($facetValue))
+      #end
+    #end
+  #end
+  ## We need to reset the sort because the available sort fields depend on the selected result type.
+  #displaySearchFacetValues_default($actualFacetValues)
 #end
 
 #macro (displaySearchFacetValue_wiki $wikiName)
@@ -926,6 +942,9 @@
   #if (!$xcontext.isMainWiki())
     ## Subwikis search by default in their content only.
     #set ($discard = $filters.put('wiki', [$xcontext.database]))
+  #elseif ($wikisSearchableFromMainWiki)
+    ## The list of wikis that are searched by default can be configured.
+    #set ($discard = $filters.put('wiki', $wikisSearchableFromMainWiki))
   #end
   #if ($type != '')
     #set ($discard = $filters.put('type', [$type]))

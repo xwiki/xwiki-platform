@@ -254,6 +254,11 @@ public class Packager
         XWikiContext xcontext = this.xcontextProvider.get();
 
         try {
+            // Make sure to have an expected context as much as possible
+            if (configuration.getUserReference() != null) {
+                xcontext.setUserReference(configuration.getUserReference());
+            }
+
             XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
 
             if (!document.isNew()) {

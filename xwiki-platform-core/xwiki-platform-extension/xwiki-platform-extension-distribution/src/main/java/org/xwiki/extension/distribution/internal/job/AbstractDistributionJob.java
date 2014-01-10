@@ -28,7 +28,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
 import org.xwiki.job.internal.AbstractJob;
 
@@ -119,8 +118,6 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
 
         // Initialize steps
         WelcomeDistributionStep welcomeStep = (WelcomeDistributionStep) getStep(steps, WelcomeDistributionStep.ID);
-        UpgradeModeDistributionStep upgrademodeStep =
-            (UpgradeModeDistributionStep) getStep(steps, UpgradeModeDistributionStep.ID);
 
         for (DistributionStep step : steps) {
             step.initialize(this);
@@ -129,12 +126,6 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
             if (step.getState() == null) {
                 if (welcomeStep != null) {
                     welcomeStep.setState(null);
-                }
-
-                // TODO: find some better rule
-                // CANCELED by default, will be enabled only if it's enabled in the status or if another step is
-                if (upgrademodeStep != null && upgrademodeStep.getState() == State.CANCELED) {
-                    upgrademodeStep.setState(null);
                 }
             }
         }

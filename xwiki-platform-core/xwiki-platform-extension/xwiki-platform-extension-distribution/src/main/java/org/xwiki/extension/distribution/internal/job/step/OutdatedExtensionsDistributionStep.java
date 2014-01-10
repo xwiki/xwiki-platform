@@ -28,8 +28,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 @Component
 @Named(OutdatedExtensionsDistributionStep.ID)
@@ -52,10 +52,8 @@ public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
         if (getState() == null) {
             setState(State.COMPLETED);
 
-            UpgradeMode upgradeMode = this.distributionManager.getUpgradeMode();
-
             Collection<InstalledExtension> installedExtensions;
-            if (upgradeMode == UpgradeMode.ALLINONE) {
+            if (isMainWiki()) {
                 installedExtensions = this.installedRepository.getInstalledExtensions();
             } else {
                 installedExtensions = this.installedRepository.getInstalledExtensions(getNamespace());

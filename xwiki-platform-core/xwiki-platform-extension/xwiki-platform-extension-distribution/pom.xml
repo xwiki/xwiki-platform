@@ -84,7 +84,6 @@
             **/DefaultDistributionManager.java,
             **/FarmDistributionJobStatus.java,
             **/OutdatedExtensionsDistributionStep.java,
-            **/UpgradeModeDistributionStep.java,
             **/WelcomeDistributionStep.java,
             **/WikisDefaultUIDistributionStep.java,
             **/WikiDistributionJob.java,

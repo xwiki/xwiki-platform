@@ -21,17 +21,13 @@ package org.xwiki.extension.distribution.internal.job.step;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-
-import com.xpn.xwiki.XWikiContext;
 
 @Component
 @Named(DefaultUIDistributionStep.ID)
@@ -42,9 +38,6 @@ public class DefaultUIDistributionStep extends AbstractDistributionStep
 
     @Inject
     private transient InstalledExtensionRepository installedRepository;
-
-    @Inject
-    private transient Provider<XWikiContext> xcontextProvider;
 
     public DefaultUIDistributionStep()
     {
@@ -67,17 +60,7 @@ public class DefaultUIDistributionStep extends AbstractDistributionStep
                     this.installedRepository.getInstalledExtension(extensionUI.getId(), namespace);
                 if (installedExtension == null
                     || !installedExtension.getId().getVersion().equals(extensionUI.getVersion())) {
-                    XWikiContext xcontext = this.xcontextProvider.get();
-
-                    if (!xcontext.isMainWiki(getWiki())) {
-                        // Enable the step for empty wikis only
-                        if (this.distributionManager.getUpgradeMode() != UpgradeMode.ALLINONE
-                            || this.installedRepository.getInstalledExtensions(namespace).isEmpty()) {
-                            setState(null);
-                        }
-                    } else {
-                        setState(null);
-                    }
+                    setState(null);
                 }
             }
         }

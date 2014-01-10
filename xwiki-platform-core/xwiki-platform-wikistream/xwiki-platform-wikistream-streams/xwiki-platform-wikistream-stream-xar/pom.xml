@@ -31,9 +31,12 @@
   </parent>
   <artifactId>xwiki-platform-wikistream-stream-xar</artifactId>
   <name>XWiki Platform - WikiStream - XAR</name>
-  <description>XWiki Platform - WikiStream - XAR</description>
+  <description>Wiki stream extension to read and write XAR packages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
+
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>WikiStream Confluence XAR module</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

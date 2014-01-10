@@ -3771,7 +3771,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         for (XWikiAttachment attachment : attachments) {
             XWikiAttachment otherAttachment = otherDocument.getAttachment(attachment.getFilename());
             try {
-                if (otherAttachment == null || attachment.equalsData(otherAttachment, null)) {
+                if (otherAttachment == null || !attachment.equalsData(otherAttachment, null)) {
                     return false;
                 }
             } catch (XWikiException e) {

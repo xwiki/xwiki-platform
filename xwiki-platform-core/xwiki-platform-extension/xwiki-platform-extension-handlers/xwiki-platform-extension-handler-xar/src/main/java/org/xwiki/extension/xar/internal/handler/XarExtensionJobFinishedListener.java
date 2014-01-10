@@ -145,9 +145,17 @@ public class XarExtensionJobFinishedListener implements EventListener
 
                         CleanPagesQuestion question = new CleanPagesQuestion(pagesToDelete);
 
+                        Map<DocumentReference, Boolean> pages = question.getPages();
+
+                        // Remove pages which are in the next XAR packages
+                        for (DocumentReference previousReference : pagesToDelete) {
+                            if (xarExtensionPlan.containsNewPage(previousReference)) {
+                                pages.remove(previousReference);
+                            }
+                        }
+
                         // Deal with conflicts before sending the question
 
-                        Map<DocumentReference, Boolean> pages = question.getPages();
                         for (Map.Entry<DocumentReference, Boolean> entry : pages.entrySet()) {
                             DocumentReference reference = entry.getKey();
 

@@ -64,6 +64,9 @@ public class XarExtensionPlan implements Closeable
 
     public final Map<String, Map<XarEntry, XarExtensionPlanEntry>> previousXAREntries;
 
+    /**
+     * Map<namespace, >
+     */
     public final Map<String, Map<XarEntry, LocalExtension>> nextXAREntries;
 
     public XarExtensionPlan(ExtensionPlan plan, InstalledExtensionRepository xarRepository,
@@ -163,6 +166,29 @@ public class XarExtensionPlan implements Closeable
         return planEntry;
     }
 
+    public LocalExtension getNextXarExtension(String wiki, LocalDocumentReference localDocumentReference)
+    {
+        XarEntry xarEntry = new XarEntry(localDocumentReference);
+
+        LocalExtension nextExtension = null;
+
+        Map<XarEntry, LocalExtension> wikiEntry = this.nextXAREntries.get(wiki);
+
+        if (wikiEntry != null) {
+            nextExtension = wikiEntry.get(xarEntry);
+        }
+
+        if (nextExtension == null) {
+            wikiEntry = this.nextXAREntries.get(null);
+
+            if (wikiEntry != null) {
+                nextExtension = wikiEntry.get(xarEntry);
+            }
+        }
+
+        return nextExtension;
+    }
+
     public XWikiDocument getPreviousXWikiDocument(DocumentReference documentReference, Packager packager)
         throws WikiStreamException, ComponentLookupException, IOException
     {
@@ -189,5 +215,18 @@ public class XarExtensionPlan implements Closeable
                 entry.close();
             }
         }
+    }
+
+    public boolean containsNewPage(DocumentReference documentReference)
+    {
+        WikiReference wikiReference = documentReference.getWikiReference();
+        LocalDocumentReference localDocumentReference = new LocalDocumentReference(documentReference);
+
+        return containsNewPage(wikiReference, localDocumentReference);
+    }
+
+    public boolean containsNewPage(WikiReference wikiReference, LocalDocumentReference localDocumentReference)
+    {
+        return getNextXarExtension(wikiReference.getName(), localDocumentReference) != null;
     }
 }

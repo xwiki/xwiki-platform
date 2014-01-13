@@ -357,7 +357,7 @@ public class WikiUserManagerScriptService implements ScriptService
             candidacy = wikiUserManager.getCandidacy(wikiId, candidacyId);
             // Check the rights
             if (!canSeeCandidacy(candidacy)) {
-                // TODO;
+                setLastError(new WikiUserManagerScriptServiceException("You are not allowed to see this candidacy."));
                 candidacy = null;
             }
         } catch (WikiUserManagerException e) {

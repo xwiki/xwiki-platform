@@ -34,7 +34,7 @@
   <description>Script Services for XWiki Platform - Wiki - User</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.48</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

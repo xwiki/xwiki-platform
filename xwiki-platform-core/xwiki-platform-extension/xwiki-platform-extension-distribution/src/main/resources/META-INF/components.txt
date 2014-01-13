@@ -6,6 +6,5 @@ org.xwiki.extension.distribution.internal.job.FarmDistributionJob
 org.xwiki.extension.distribution.internal.job.WikiDistributionJob
 org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep
 org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep
-org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep
 org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep
 org.xwiki.extension.distribution.internal.job.step.WikisDefaultUIDistributionStep

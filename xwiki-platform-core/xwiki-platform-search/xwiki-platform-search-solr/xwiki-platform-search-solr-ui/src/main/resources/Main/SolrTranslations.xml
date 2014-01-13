@@ -101,6 +101,15 @@ solr.facet.date.after=After {0}
 solr.facet.date.before=Before {0}
 solr.facet.date.any=Any date
 
+solr.facet.size.tiny=Tiny
+solr.facet.size.small=Small
+solr.facet.size.medium=Medium
+solr.facet.size.large=Large
+solr.facet.size.between=Between {0} and {1}
+solr.facet.size.lessThan=Less than {0}
+solr.facet.size.moreThan=More than {0}
+solr.facet.size.any=Any size
+
 solr.field.type=Result type
 solr.field.locale=Language
 solr.field.locale.emptyValue=No Language

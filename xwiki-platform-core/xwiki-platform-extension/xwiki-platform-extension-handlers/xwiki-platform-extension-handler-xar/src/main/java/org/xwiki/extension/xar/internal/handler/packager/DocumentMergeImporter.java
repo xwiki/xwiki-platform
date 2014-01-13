@@ -82,11 +82,6 @@ public class DocumentMergeImporter
     {
         XarEntryMergeResult mergeResult = null;
 
-        if (configuration.isLogEnabled()) {
-            this.logger.info("Importing document [{}] in language [{}]...", nextDocument.getDocumentReference(),
-                nextDocument.getRealLocale());
-        }
-
         // Merge and save
         if (currentDocument != null && !currentDocument.isNew()) {
             if (previousDocument != null) {

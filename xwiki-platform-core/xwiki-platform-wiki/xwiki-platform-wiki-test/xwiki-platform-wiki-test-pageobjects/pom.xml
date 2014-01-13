@@ -26,32 +26,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-wiki-template</artifactId>
+    <artifactId>xwiki-platform-wiki-test</artifactId>
     <version>5.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-wiki-template-api</artifactId>
-  <name>XWiki Platform - Wiki - Template - API</name>
-  <description>XWiki Platform - Wiki - Template - API</description>
+  <artifactId>xwiki-platform-wiki-test-pageobjects</artifactId>
+  <name>XWiki Platform - Wiki - Tests - Page Objects</name>
   <packaging>jar</packaging>
+  <description>XWiki Platform - Wiki - Tests - Page Objects</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-api</artifactId>
+      <artifactId>xwiki-platform-test</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>clirr-maven-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <!-- add a new method in WikiTemplateManager -->
-            <exclude>**/WikiTemplateManager**</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

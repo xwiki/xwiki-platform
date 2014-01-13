@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.job.event.status.JobStatus;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
@@ -60,7 +61,13 @@ public class WikiTemplateManagerScript implements ScriptService
     /**
      * Field name of the last API exception inserted in context.
      */
+    @Deprecated
     public static final String CONTEXT_LASTEXCEPTION = "lastexception";
+
+    /**
+     * The key under which the last encountered error is stored in the current execution context.
+     */
+    private static final String WIKITEMPLATEERROR_KEY = "scriptservice.wiki.template.error";
 
     @Inject
     private WikiTemplateManager wikiTemplateManager;
@@ -70,6 +77,9 @@ public class WikiTemplateManagerScript implements ScriptService
 
     @Inject
     private AuthorizationManager authorizationManager;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * Used to access current {@link com.xpn.xwiki.XWikiContext}.
@@ -90,6 +100,27 @@ public class WikiTemplateManagerScript implements ScriptService
     private Logger logger;
 
     /**
+     * Get the error generated while performing the previously called action.
+     *
+     * @return an eventual exception or {@code null} if no exception was thrown
+     */
+    public Exception getLastError()
+    {
+        return (Exception) this.execution.getContext().getProperty(WIKITEMPLATEERROR_KEY);
+    }
+
+    /**
+     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
+     *
+     * @param e the exception to store, can be {@code null} to clear the previously stored exception
+     * @see #getLastError()
+     */
+    private void setLastError(Exception e)
+    {
+        this.execution.getContext().setProperty(WIKITEMPLATEERROR_KEY, e);
+    }
+
+    /**
      * Get the list of all wiki templates.
      *
      * @return list of wiki templates
@@ -99,6 +130,7 @@ public class WikiTemplateManagerScript implements ScriptService
         try {
             return wikiTemplateManager.getTemplates();
         } catch (WikiTemplateManagerException e) {
+            error("Error while getting all the wiki templates.", e);
             return new ArrayList<WikiDescriptor>();
         }
     }
@@ -112,8 +144,8 @@ public class WikiTemplateManagerScript implements ScriptService
      */
     public boolean setTemplate(String wikiId, boolean value)
     {
+        XWikiContext context = xcontextProvider.get();
         try {
-            XWikiContext context = xcontextProvider.get();
             // Check if the current script has the programing rights
             authorizationManager.checkAccess(Right.PROGRAM, context.getDoc().getAuthorReference(),
                     context.getDoc().getDocumentReference());
@@ -123,7 +155,8 @@ public class WikiTemplateManagerScript implements ScriptService
             String owner = descriptor.getOwnerId();
             // Check right access
             WikiReference wikiReference = new WikiReference(descriptor.getId());
-            if (!context.getUserReference().toString().equals(owner)) {
+            String currentUser = entityReferenceSerializer.serialize(context.getUserReference());
+            if (!currentUser.equals(owner)) {
                 authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(), wikiReference);
             }
             // Do the job
@@ -131,25 +164,31 @@ public class WikiTemplateManagerScript implements ScriptService
             // Return success
             return true;
         } catch (WikiTemplateManagerException e) {
-            //TODO log
+            error(String.format("Failed to set the template value [%s] for the wiki [%s].", value, wikiId), e);
             return false;
         } catch (AccessDeniedException e) {
-            //TODO log
+            error(String.format("Access denied for [%s] to change the template value of the wiki [%s]. The user has"
+                    + " not the right to perform this operation or the script has not the programming right.",
+                    context.getUserReference(), wikiId), e);
             return false;
         } catch (WikiManagerException e) {
-            //TODO log
+            error(String.format("Failed to get the descriptor of the wiki [%s].", wikiId), e);
             return false;
         }
     }
 
     /**
      * @param wikiId The id of the wiki to test
-     * @return if the wiki is a template or not
-     * @throws WikiTemplateManagerException if problems occur
+     * @return if the wiki is a template or not (or null if problems occur)
      */
-    public boolean isTemplate(String wikiId) throws WikiTemplateManagerException
+    public Boolean isTemplate(String wikiId)
     {
-        return wikiTemplateManager.isTemplate(wikiId);
+        try {
+            return wikiTemplateManager.isTemplate(wikiId);
+        } catch (WikiTemplateManagerException e) {
+            error(String.format("Failed to get if the wiki [%s] is a template or not.", wikiId), e);
+            return null;
+        }
     }
 
     /**
@@ -195,21 +234,18 @@ public class WikiTemplateManagerScript implements ScriptService
      */
     private void error(String errorMessage, Exception e)
     {
-        String errorMessageToLog = errorMessage;
-        if (errorMessageToLog == null) {
-            errorMessageToLog = e.getMessage();
-        }
+        // Log exception.
+        logger.error(errorMessage, e);
 
-        /* Log exception. */
-        logger.error(errorMessageToLog, e);
-
-        /* Store exception in context. */
-        this.execution.getContext().setProperty(CONTEXT_LASTEXCEPTION, e);
+        // Store exception in context.
+        setLastError(e);
     }
 
     /**
-     * @return the last exception, or null if there is not
+     * @return the last exception, or null if there is not.
+     * @deprecated since 5.4RC1 use {@link #getLastError()} ()} instead
      */
+    @Deprecated
     public Exception getLastException()
     {
         return (Exception) this.execution.getContext().getProperty(CONTEXT_LASTEXCEPTION);
@@ -230,6 +266,7 @@ public class WikiTemplateManagerScript implements ScriptService
             }
             return wikiProvisioningJob.getStatus();
         } catch (WikiTemplateManagerException e) {
+            error("Failed to get tge wiki provisioning job.", e);
             return null;
         }
     }

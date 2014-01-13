@@ -96,7 +96,8 @@ public class WikiUserManagerScriptService implements ScriptService
     /**
      * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
      *
-     * @param e Exception to set
+     * @param e the exception to store, can be {@code null} to clear the previously stored exception
+     * @see #getLastError()
      */
     private void setLastError(Exception e)
     {

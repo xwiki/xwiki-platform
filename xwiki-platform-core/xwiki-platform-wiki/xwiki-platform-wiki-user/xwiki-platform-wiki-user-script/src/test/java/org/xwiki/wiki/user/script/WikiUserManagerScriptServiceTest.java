@@ -143,7 +143,7 @@ public class WikiUserManagerScriptServiceTest
     private Exception currentScriptHasNotAdminRight() throws AccessDeniedException
     {
         WikiReference wiki = new WikiReference("subwiki");
-        Exception exception = new AccessDeniedException(Right.PROGRAM, userDocRef, wiki);
+        Exception exception = new AccessDeniedException(Right.ADMIN, userDocRef, wiki);
         doThrow(exception).when(authorizationManager).checkAccess(eq(Right.ADMIN), eq(userDocRef), eq(wiki));
 
         return exception;

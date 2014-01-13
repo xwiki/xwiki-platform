@@ -132,7 +132,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         return null;
     }
 
-    private void initializePagesIndex() throws ExtensionException, XarException, IOException
+    private void initializePagesIndex(Request request) throws ExtensionException, XarException, IOException
     {
         ExecutionContext context = this.execution.getContext();
 
@@ -144,12 +144,16 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                     (XarExtensionPlan) context.getProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN);
 
                 if (xarPlan == null) {
-                    this.logger.info(LOG_EXTENSIONPLAN_BEGIN, "Preparing XAR extension plan");
+                    if (request.isVerbose()) {
+                        this.logger.info(LOG_EXTENSIONPLAN_BEGIN, "Preparing XAR extension plan");
+                    }
 
                     context.setProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN, new XarExtensionPlan(plan,
                         this.xarRepository, this.localReposirory));
 
-                    this.logger.info(LOG_EXTENSIONPLAN_END, "XAR extension plan ready");
+                    if (request.isVerbose()) {
+                        this.logger.info(LOG_EXTENSIONPLAN_END, "XAR extension plan ready");
+                    }
                 }
             }
         }
@@ -206,7 +210,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         throws InstallException
     {
         try {
-            initializePagesIndex();
+            initializePagesIndex(request);
         } catch (Exception e) {
             throw new InstallException("Failed to initialize extension plan index", e);
         }
@@ -227,7 +231,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         throws UninstallException
     {
         try {
-            initializePagesIndex();
+            initializePagesIndex(request);
         } catch (Exception e) {
             throw new UninstallException("Failed to initialize extension plan index", e);
         }

@@ -287,8 +287,10 @@ public class Packager
             if (!document.isNew()) {
                 xcontext.getWiki().deleteDocument(document, xcontext);
 
-                this.logger.info(LOG_DELETEDDOCUMENT, "Deleted document [{}]",
-                    document.getDocumentReferenceWithLocale());
+                if (configuration.isVerbose()) {
+                    this.logger.info(LOG_DELETEDDOCUMENT, "Deleted document [{}]",
+                        document.getDocumentReferenceWithLocale());
+                }
             }
         } catch (XWikiException e) {
             this.logger.error(LOG_DELETEDDOCUMENT_FAILURE, "Failed to delete document [{}]", documentReference, e);

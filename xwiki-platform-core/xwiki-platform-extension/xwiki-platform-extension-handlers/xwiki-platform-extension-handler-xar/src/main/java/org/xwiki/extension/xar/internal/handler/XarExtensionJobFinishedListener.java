@@ -250,7 +250,7 @@ public class XarExtensionJobFinishedListener implements EventListener
         configuration.setUser(XarExtensionHandler.getRequestUserReference(XarExtensionHandler.PROPERTY_USERREFERENCE,
             request));
         configuration.setWiki(wiki);
-        configuration.setLogEnabled(true);
+        configuration.setVerbose(request.isVerbose());
         configuration.setSkipMandatorytDocuments(true);
 
         return configuration;

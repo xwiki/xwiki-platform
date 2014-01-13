@@ -39,7 +39,7 @@ public class PackageConfiguration
 
     private JobStatus jobStatus;
 
-    private boolean logEnabled = false;
+    private boolean verbose = false;
 
     private XarExtensionPlan xarExtensionPlan;
 
@@ -87,14 +87,14 @@ public class PackageConfiguration
         this.jobStatus = jobStatus;
     }
 
-    public boolean isLogEnabled()
+    public boolean isVerbose()
     {
-        return this.logEnabled;
+        return this.verbose;
     }
 
-    public void setLogEnabled(boolean logEnabled)
+    public void setVerbose(boolean verbose)
     {
-        this.logEnabled = logEnabled;
+        this.verbose = verbose;
     }
 
     public Set<String> getEntriesToImport()

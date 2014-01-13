@@ -39,6 +39,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.xar.internal.handler.XarExtensionPlan;
+import org.xwiki.logging.marker.BeginTranslationMarker;
+import org.xwiki.logging.marker.EndTranslationMarker;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -75,6 +77,15 @@ import com.xpn.xwiki.internal.event.XARImportingEvent;
 @Singleton
 public class Packager
 {
+    private static final BeginTranslationMarker LOG_INSTALLDOCUMENT_BEGIN = new BeginTranslationMarker(
+        "extension.xar.log.install.document.begin");
+
+    private static final EndTranslationMarker LOG_INSTALLDOCUMENT_SUCCESS_END = new EndTranslationMarker(
+        "extension.xar.log.install.document.success.end");
+
+    private static final EndTranslationMarker LOG_INSTALLDOCUMENT_FAILURE_END = new EndTranslationMarker(
+        "extension.xar.log.install.document.failure.end");
+
     @Inject
     private ComponentManager componentManager;
 
@@ -196,20 +207,25 @@ public class Packager
             previousDocument = null;
         }
 
+        if (configuration.isVerbose()) {
+            this.logger.info(LOG_INSTALLDOCUMENT_BEGIN, "Installing document [{}]",
+                nextDocument.getDocumentReferenceWithLocale());
+        }
+
         try {
             XarEntryMergeResult entityMergeResult =
                 this.importer.saveDocument(comment, previousDocument, currentDocument, nextDocument, configuration);
 
-            if (configuration.isLogEnabled()) {
-                this.logger.info("Successfully imported document [{}] in language [{}]",
-                    nextDocument.getDocumentReference(), nextDocument.getRealLocale());
+            if (configuration.isVerbose()) {
+                this.logger.info(LOG_INSTALLDOCUMENT_SUCCESS_END, "Done installing document [{}]",
+                    nextDocument.getDocumentReferenceWithLocale());
             }
 
             return entityMergeResult;
         } catch (Exception e) {
-            if (configuration.isLogEnabled()) {
-                this.logger.info("Failed to import document [{}] in language [{}]",
-                    nextDocument.getDocumentReference(), nextDocument.getRealLocale());
+            if (configuration.isVerbose()) {
+                this.logger.error(LOG_INSTALLDOCUMENT_FAILURE_END, "Failed to install document [{}]",
+                    nextDocument.getDocumentReferenceWithLocale(), e);
             }
         }
 

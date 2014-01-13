@@ -203,7 +203,8 @@
   'attauthor': 'user',
   'date': 'date',
   'creationdate': 'date',
-  'attdate': 'date'
+  'attdate': 'date',
+  'attsize': 'size'
 })
 
 #macro (displaySearchFacetValues $facetValues)
@@ -574,8 +575,118 @@
   &lt;span title="$escapetool.xml($hint)"&gt;$escapetool.xml($classPrettyName)&lt;/span&gt;
 #end
 
-#macro (displaySearchFacetValue_size $size)
-  #dynamicsize($mathtool.toInteger($size))
+#macro (displaySearchFacetValues_size $facetValues)
+  ##
+  ## Predefined size intervals, specified in bytes.
+  ##
+  #set ($intervals = [
+    {
+      'id': 'tiny',
+      'end'  : 10240
+    }, {
+      'id': 'small',
+      'start': 10240,
+      'end'  : 512000
+    }, {
+      'id': 'medium',
+      'start': 512000,
+      'end'  : 5242880
+    }, {
+      'id': 'large',
+      'start': 5242880
+    }
+  ])
+  #foreach ($interval in $intervals)
+    #set ($start = $interval.start)
+    #set ($end = $interval.end)
+    #if (!$start)
+      #set ($start = '*')
+      #set ($hint = $services.localization.render('solr.facet.size.lessThan', ["#dynamicsize($end)"]))
+    #elseif (!$end)
+      #set ($end = '*')
+      #set ($hint = $services.localization.render('solr.facet.size.moreThan', ["#dynamicsize($start)"]))
+    #else
+      #set ($hint = $services.localization.render('solr.facet.size.between', ["#dynamicsize($start)", "#dynamicsize($end)"]))
+    #end
+    #set ($discard = $interval.putAll({
+      'label': $services.localization.render("solr.facet.size.$interval.id"),
+      'hint': $hint,
+      'name': "[$start TO $end]",
+      'count': 0
+    }))
+  #end
+  ##
+  ## Add custom size intervals specified on the request.
+  ##
+  #foreach ($selectedValue in $facetRequestValues)
+    ## Determine if the value/range is custom.
+    #set ($custom = true)
+    #foreach ($interval in $intervals)
+      #if ($interval.name == $selectedValue)
+        #set ($custom = false)
+        #break
+      #end
+    #end
+    #if ($custom)
+      #set ($rangeMatcher = $rangePattern.matcher($selectedValue))
+      #if ($rangeMatcher.matches())
+        #set ($discard = $intervals.add({
+          'start': $mathtool.toInteger($rangeMatcher.group(1)),
+          'end'  : $mathtool.toInteger($rangeMatcher.group(2)),
+          'name' : $selectedValue,
+          'count': 0
+        }))
+      #end
+    #end
+  #end
+  ##
+  ## Count matches for each date interval.
+  ##
+  #foreach ($facetValue in $facetValues)
+    #set ($size = $mathtool.toInteger($facetValue.name))
+    #foreach ($interval in $intervals)
+      #if ((!$interval.start || $interval.start &lt;= $size)
+          &amp;&amp; (!$interval.end || $size &lt; $interval.end))
+        #set ($discard = $interval.put('count', $mathtool.add($interval.count, $facetValue.count)))
+      #end
+    #end
+  #end
+  ## Filter the unselected size intervals that don't have matches.
+  #set ($intervalsWithMatches = [])
+  #foreach ($interval in $intervals)
+    #if ($interval.count &gt; 0 || $facetRequestValues.contains($interval.name))
+      #set ($discard = $intervalsWithMatches.add($interval))
+    #end
+  #end
+  #set ($intervals = $intervalsWithMatches)
+  ##
+  ## Display the size intervals.
+  ##
+  &lt;ul&gt;
+    #foreach ($facetValue in $intervals)
+      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+    #end
+  &lt;/ul&gt;
+#end
+
+#macro (displaySearchFacetValue_size $sizeInterval)
+  #if ($facetValue.label)
+    &lt;span title="$escapetool.xml($facetValue.hint)"&gt;$escapetool.xml($facetValue.label)&lt;/span&gt;
+  #elseif ($facetValue.start || $facetValue.end)
+    ## Display the custom interval.
+    #if (!$facetValue.start)
+      $escapetool.xml($services.localization.render('solr.facet.size.lessThan',
+        ["#dynamicsize($facetValue.end)"]))
+    #elseif (!$facetValue.end)
+      $escapetool.xml($services.localization.render('solr.facet.size.moreThan',
+        ["#dynamicsize($facetValue.start)"]))
+    #else
+      $services.localization.render('solr.facet.size.between',
+        ["#dynamicsize($facetValue.start)", "#dynamicsize($facetValue.end)"])
+    #end
+  #else
+    $escapetool.xml($services.localization.render('solr.facet.size.any'))
+  #end
 #end
 
 #macro (displaySearchResultsSort)

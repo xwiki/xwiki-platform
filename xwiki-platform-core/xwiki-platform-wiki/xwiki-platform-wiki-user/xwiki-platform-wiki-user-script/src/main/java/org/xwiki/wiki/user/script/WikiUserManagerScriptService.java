@@ -28,6 +28,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
@@ -56,6 +57,11 @@ import com.xpn.xwiki.XWikiContext;
 @Unstable
 public class WikiUserManagerScriptService implements ScriptService
 {
+    /**
+     * The key under which the last encountered error is stored in the current execution context.
+     */
+    private static final String WIKIUSERERROR_KEY = "scriptservice.wiki.user.error";
+
     @Inject
     private WikiUserManager wikiUserManager;
 
@@ -70,6 +76,32 @@ public class WikiUserManagerScriptService implements ScriptService
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    /**
+     * Provides access to the current context.
+     */
+    @Inject
+    private Execution execution;
+
+    /**
+     * Get the error generated while performing the previously called action.
+     *
+     * @return an eventual exception or {@code null} if no exception was thrown
+     */
+    public Exception getLastError()
+    {
+        return (Exception) this.execution.getContext().getProperty(WIKIUSERERROR_KEY);
+    }
+
+    /**
+     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
+     *
+     * @param e Exception to set
+     */
+    private void setLastError(Exception e)
+    {
+        this.execution.getContext().setProperty(WIKIUSERERROR_KEY, e);
+    }
 
     /**
      * @return the user scope
@@ -88,6 +120,7 @@ public class WikiUserManagerScriptService implements ScriptService
         try {
             return wikiUserManager.getUserScope(wikiId);
         } catch (WikiUserManagerException e) {
+            setLastError(e);
             return null;
         }
     }
@@ -110,8 +143,13 @@ public class WikiUserManagerScriptService implements ScriptService
             // Do the job
             wikiUserManager.setUserScope(wikiId, UserScope.valueOf(scope.toUpperCase()));
         } catch (WikiUserManagerException e) {
+            setLastError(e);
             success = false;
         } catch (AccessDeniedException e) {
+            setLastError(e);
+            success = false;
+        } catch (IllegalArgumentException e) {
+            setLastError(e);
             success = false;
         }
         return success;
@@ -134,6 +172,7 @@ public class WikiUserManagerScriptService implements ScriptService
         try {
             return wikiUserManager.getMembershipType(wikiId);
         } catch (WikiUserManagerException e) {
+            setLastError(e);
             return null;
         }
     }
@@ -156,8 +195,13 @@ public class WikiUserManagerScriptService implements ScriptService
             // Do the job
             wikiUserManager.setMembershipType(wikiId, MembershipType.valueOf(type.toUpperCase()));
         } catch (WikiUserManagerException e) {
+            setLastError(e);
             success = false;
         } catch (AccessDeniedException e) {
+            setLastError(e);
+            success = false;
+        } catch (IllegalArgumentException e) {
+            setLastError(e);
             success = false;
         }
         return success;
@@ -172,6 +216,7 @@ public class WikiUserManagerScriptService implements ScriptService
         try {
             return wikiUserManager.getMembers(wikiId);
         } catch (WikiUserManagerException e) {
+            setLastError(e);
             return null;
         }
     }
@@ -188,7 +233,7 @@ public class WikiUserManagerScriptService implements ScriptService
         try {
             return wikiUserManager.isMember(userId, wikiId);
         } catch (WikiUserManagerException e) {
-            // Todo
+            setLastError(e);
             return null;
         }
     }
@@ -212,10 +257,10 @@ public class WikiUserManagerScriptService implements ScriptService
             // Add the member
             wikiUserManager.addMember(userId, wikiId);
         } catch (AccessDeniedException e) {
-            // TODO
+            setLastError(e);
             return false;
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
             return false;
         }
 
@@ -241,10 +286,10 @@ public class WikiUserManagerScriptService implements ScriptService
             // Add the member
             wikiUserManager.addMembers(userIds, wikiId);
         } catch (AccessDeniedException e) {
-            // TODO
+            setLastError(e);
             return false;
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
             return false;
         }
 
@@ -270,10 +315,10 @@ public class WikiUserManagerScriptService implements ScriptService
             // Add the member
             wikiUserManager.removeMember(userId, wikiId);
         } catch (AccessDeniedException e) {
-            // TODO
+            setLastError(e);
             return false;
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
             return false;
         }
 
@@ -316,7 +361,7 @@ public class WikiUserManagerScriptService implements ScriptService
                 candidacy = null;
             }
         } catch (WikiUserManagerException e) {
-            //TODO
+            setLastError(e);
         }
 
         return candidacy;
@@ -352,7 +397,7 @@ public class WikiUserManagerScriptService implements ScriptService
             Collection<MemberCandidacy> candidacies = wikiUserManager.getAllInvitations(wikiId);
             return filterAuthorizedCandidacies(candidacies);
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
             return null;
         }
     }
@@ -369,7 +414,7 @@ public class WikiUserManagerScriptService implements ScriptService
             Collection<MemberCandidacy> candidacies = wikiUserManager.getAllRequests(wikiId);
             return filterAuthorizedCandidacies(candidacies);
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
             return null;
         }
     }
@@ -394,7 +439,7 @@ public class WikiUserManagerScriptService implements ScriptService
         try {
             wikiUserManager.join(userId, wikiId);
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
             return false;
         }
         return true;
@@ -421,7 +466,7 @@ public class WikiUserManagerScriptService implements ScriptService
         try {
             wikiUserManager.leave(userId, wikiId);
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
             return false;
         }
 
@@ -441,7 +486,7 @@ public class WikiUserManagerScriptService implements ScriptService
         try {
             return wikiUserManager.askToJoin(userId, wikiId, message);
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
             return null;
         }
     }
@@ -467,9 +512,9 @@ public class WikiUserManagerScriptService implements ScriptService
             wikiUserManager.acceptRequest(request, message, privateComment);
             return true;
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
         } catch (AccessDeniedException e) {
-            // TODO
+            setLastError(e);
         }
 
         return false;
@@ -496,9 +541,9 @@ public class WikiUserManagerScriptService implements ScriptService
             wikiUserManager.refuseRequest(request, message, privateComment);
             return true;
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
         } catch (AccessDeniedException e) {
-            // TODO
+            setLastError(e);
         }
 
         return false;
@@ -527,9 +572,9 @@ public class WikiUserManagerScriptService implements ScriptService
             wikiUserManager.cancelCandidacy(candidacy);
             return true;
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
         } catch (AccessDeniedException e) {
-            // TODO
+            setLastError(e);
         }
 
         return false;
@@ -555,9 +600,9 @@ public class WikiUserManagerScriptService implements ScriptService
             // Do the job
             return wikiUserManager.invite(userId, wikiId, message);
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
         } catch (AccessDeniedException e) {
-            // TODO
+            setLastError(e);
         }
         return null;
     }
@@ -588,7 +633,7 @@ public class WikiUserManagerScriptService implements ScriptService
         try {
             wikiUserManager.acceptInvitation(invitation, message);
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
             return false;
         }
 
@@ -621,7 +666,7 @@ public class WikiUserManagerScriptService implements ScriptService
         try {
             wikiUserManager.refuseInvitation(invitation, message);
         } catch (WikiUserManagerException e) {
-            // TODO
+            setLastError(e);
             return false;
         }
 

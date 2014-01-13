@@ -58,7 +58,7 @@ import org.xwiki.wiki.rest.WikiManagerREST;
  * Tests for the Wiki manager REST API.
  *
  * @version $Id$
- * @since 5.4M1
+ * @since 5.4RC1
  */
 public class WikiManagerRestTest
 {

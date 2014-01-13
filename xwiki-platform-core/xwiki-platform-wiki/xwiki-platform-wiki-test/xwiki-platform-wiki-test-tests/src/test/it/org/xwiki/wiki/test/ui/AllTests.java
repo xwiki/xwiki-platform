@@ -26,7 +26,7 @@ import org.xwiki.test.integration.XWikiExecutorSuite;
  * Runs all functional tests found in the classpath.
  *
  * @version $Id$
- * @since 5.4M1
+ * @since 5.4RC1
  */
 @RunWith(XWikiExecutorSuite.class)
 public class AllTests

@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
  * UI tests for the Wiki application.
  *
  * @version $Id$
- * @since 5.3RC1
+ * @since 5.4RC1
  */
 public class WikiTest extends AbstractTest
 {

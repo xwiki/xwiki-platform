@@ -54,7 +54,7 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * Default implementation for {@link org.xwiki.wiki.rest.WikiManagerREST}.
  *
- * @since 5.4M1
+ * @since 5.4RC1
  * @version $Id$
  */
 @Component("org.xwiki.wiki.rest.internal.DefaultWikiManagerREST")

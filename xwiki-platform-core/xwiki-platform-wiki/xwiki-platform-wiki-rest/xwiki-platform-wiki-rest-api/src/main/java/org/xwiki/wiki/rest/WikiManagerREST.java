@@ -29,7 +29,7 @@ import org.xwiki.rest.model.jaxb.Wiki;
 /**
  * REST API to create wikis.
  *
- * @since 5.4M1
+ * @since 5.4RC1
  * @version $Id$
  */
 @Path("/wikimanager")

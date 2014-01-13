@@ -260,7 +260,7 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * @since 5.3RC1
+     * @since 5.4RC1
      */
     public void moveToCreateMenu()
     {

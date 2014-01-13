@@ -41,6 +41,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.xar.internal.handler.XarExtensionPlan;
 import org.xwiki.logging.marker.BeginTranslationMarker;
 import org.xwiki.logging.marker.EndTranslationMarker;
+import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -85,6 +86,12 @@ public class Packager
 
     private static final EndTranslationMarker LOG_INSTALLDOCUMENT_FAILURE_END = new EndTranslationMarker(
         "extension.xar.log.install.document.failure.end");
+
+    private static final TranslationMarker LOG_DELETEDDOCUMENT = new TranslationMarker(
+        "extension.xar.log.delete.document");
+
+    private static final TranslationMarker LOG_DELETEDDOCUMENT_FAILURE = new TranslationMarker(
+        "extension.xar.log.delete.document.failure");
 
     @Inject
     private ComponentManager componentManager;
@@ -280,11 +287,11 @@ public class Packager
             if (!document.isNew()) {
                 xcontext.getWiki().deleteDocument(document, xcontext);
 
-                this.logger.info("Successfully deleted document [{}] in language [{}]",
-                    document.getDocumentReference(), document.getRealLocale());
+                this.logger.info(LOG_DELETEDDOCUMENT, "Deleted document [{}]",
+                    document.getDocumentReferenceWithLocale());
             }
         } catch (XWikiException e) {
-            this.logger.error("Failed to delete document [{}]", documentReference, e);
+            this.logger.error(LOG_DELETEDDOCUMENT_FAILURE, "Failed to delete document [{}]", documentReference, e);
         }
     }
 

@@ -239,6 +239,8 @@ public class WikiTemplateManagerScript implements ScriptService
 
         // Store exception in context.
         setLastError(e);
+        // Deprecated but still usable
+        this.execution.getContext().setProperty(CONTEXT_LASTEXCEPTION, e);
     }
 
     /**

@@ -750,22 +750,22 @@ return XWiki;
 #macro(wizardFooter $prev $next $create $finalize)
   &lt;div class="clearfloats"&gt;&lt;/div&gt;
   &lt;div class="wizard-footer buttons"&gt;
-    #if($prev!='')
+    #if("$!prev" !='')
       &lt;span class="buttonwrapper left"&gt;      
-        &lt;button value="$prev" title="Previous Step" name="step" id="wizard-next" class="button secondary"&gt;Previous Step&lt;/button&gt;
+        &lt;button value="$prev" title="Previous Step" name="step" id="wizard-previous" class="button secondary"&gt;Previous Step&lt;/button&gt;
       &lt;/span&gt;
     #end
-    #if($next!='')
+    #if("$!next" !='')
       &lt;span class="buttonwrapper"&gt;
         &lt;button value="$next" title="Go to next step" name="step" id="wizard-next" class="button"&gt;Go to next step&lt;/button&gt;
       &lt;/span&gt;
     #end
-    #if($create!='')
+    #if("$!create" !='')
       &lt;span class="buttonwrapper"&gt;
-        &lt;button value="$create" title="Create" name="step" id="wizard-next" class="button"&gt;Create&lt;/button&gt;
+        &lt;button value="$create" title="Create" name="step" id="wizard-create" class="button"&gt;Create&lt;/button&gt;
       &lt;/span&gt;
     #end
-    #if($finalize != '')
+    #if("$!finalize" != '')
       &lt;span class="buttonwrapper"&gt;
         &lt;button value="finalize" title="Finalize" name="step" id="finalize" class="button hidden"&gt;$finalize&lt;/button&gt;
       &lt;/span&gt;

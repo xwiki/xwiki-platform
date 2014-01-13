@@ -164,12 +164,18 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
             descriptor.setOwnerId(ownerId);
             wikiDescriptorManager.saveDescriptor(descriptor);
 
-            // finally, create a template provisioner job
-            return wikiProvisionerExecutor.createAndExecuteJob(newWikiId,
-                    TemplateWikiProvisioningJob.JOBTYPE, templateId);
-
+            // finally, we apply the template to the new wiki
+            return applyTemplate(newWikiId, templateId);
         } catch (WikiManagerException e) {
             throw new WikiTemplateManagerException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public WikiProvisioningJob applyTemplate(String wikiId, String templateId) throws WikiTemplateManagerException
+    {
+        try {
+            return wikiProvisionerExecutor.createAndExecuteJob(wikiId, TemplateWikiProvisioningJob.JOBTYPE, templateId);
         } catch (WikiProvisioningJobException e) {
             throw new WikiTemplateManagerException(e.getMessage(), e);
         }

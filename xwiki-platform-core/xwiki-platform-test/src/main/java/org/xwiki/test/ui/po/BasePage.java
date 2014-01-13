@@ -260,11 +260,19 @@ public class BasePage extends BaseElement
     }
 
     /**
+     * @since 5.4RC1
+     */
+    public void moveToCreateMenu()
+    {
+        new Actions(getDriver()).moveToElement(createMenu).perform();
+    }
+
+    /**
      * @since 4.5M1
      */
     public CreatePagePage createPage()
     {
-        new Actions(getDriver()).moveToElement(createMenu).perform();
+        moveToCreateMenu();
         this.createPageMenuLink.click();
         return new CreatePagePage();
     }
@@ -274,7 +282,7 @@ public class BasePage extends BaseElement
      */
     public CreateSpacePage createSpace()
     {
-        new Actions(getDriver()).moveToElement(createMenu).perform();
+        moveToCreateMenu();
         this.createSpaceMenuLink.click();
         return new CreateSpacePage();
     }

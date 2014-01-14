@@ -32,7 +32,7 @@
   <artifactId>xwiki-platform-index-ui</artifactId>
   <name>XWiki Platform - Index - UI</name>
   <packaging>xar</packaging>
-  <description>An Index of all pages, attachments, deleted pages, etc found in the wiki.</description>
+  <description>An Index of all pages, attachments, orphans and deleted pages and attachments found in the wiki.</description>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>

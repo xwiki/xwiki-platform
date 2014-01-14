@@ -31,7 +31,9 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.LogTree;
 import org.xwiki.logging.LoggerManager;
+import org.xwiki.logging.event.LogEvent;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -97,5 +99,23 @@ public class LoggingScriptService implements ScriptService
         }
 
         this.loggerManager.setLoggerLevel(logger, level);
+    }
+
+    /**
+     * Create a tree representation of a series of logs.
+     * 
+     * @param logs the logs
+     * @return the logs as a {@link LogTree}
+     * @since 5.4RC1
+     */
+    public LogTree toLogTree(Iterable<LogEvent> logs)
+    {
+        LogTree logTree = new LogTree();
+
+        for (LogEvent logEvent : logs) {
+            logTree.log(logEvent);
+        }
+
+        return logTree;
     }
 }

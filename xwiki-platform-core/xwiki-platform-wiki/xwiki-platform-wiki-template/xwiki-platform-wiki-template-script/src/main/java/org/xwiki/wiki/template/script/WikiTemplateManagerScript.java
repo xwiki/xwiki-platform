@@ -186,7 +186,7 @@ public class WikiTemplateManagerScript implements ScriptService
         try {
             return wikiTemplateManager.isTemplate(wikiId);
         } catch (WikiTemplateManagerException e) {
-            error(String.format("Failed to get if the wiki [%s] is a tem    plate or not.", wikiId), e);
+            error(String.format("Failed to get if the wiki [%s] is a template or not.", wikiId), e);
             return null;
         }
     }

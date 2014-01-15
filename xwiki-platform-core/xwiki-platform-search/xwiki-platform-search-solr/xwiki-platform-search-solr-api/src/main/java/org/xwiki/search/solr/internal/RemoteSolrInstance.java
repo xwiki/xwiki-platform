@@ -86,14 +86,14 @@ public class RemoteSolrInstance extends AbstractSolrInstance
     @Override
     public void initialize() throws InitializationException
     {
-        String remoteURL = configuration.getInstanceConfiguration(TYPE, "url", DEFAULT_REMOTE_URL);
+        String remoteURL = this.configuration.getInstanceConfiguration(TYPE, "url", DEFAULT_REMOTE_URL);
 
         try {
             this.generateAndAttachConfigurationZipIfNotExist();
         } catch (Exception e) {
             // This is not a critical issue, since the remote server may already be configured.
             // We still log it as an error though.
-            logger.error("Failed to generate the remote server's configuration.", e);
+            this.logger.error("Failed to generate the remote server's configuration.", e);
         }
 
         // Initialize the remote Solr server.
@@ -165,6 +165,6 @@ public class RemoteSolrInstance extends AbstractSolrInstance
      */
     private XWikiContext getXWikiContext()
     {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 }

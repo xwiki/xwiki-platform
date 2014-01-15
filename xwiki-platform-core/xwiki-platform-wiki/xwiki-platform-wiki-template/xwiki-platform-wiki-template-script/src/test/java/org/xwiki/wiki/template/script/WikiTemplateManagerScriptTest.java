@@ -129,9 +129,9 @@ public class WikiTemplateManagerScriptTest
     }
 
     /**
-     * @return the exception expected when the current script has the not the admin right
+     * @return the exception expected when the current user has the not the admin right
      */
-    private Exception currentScriptHasNotAdminRight() throws AccessDeniedException
+    private Exception currentUserHasNotAdminRight() throws AccessDeniedException
     {
         WikiReference wiki = new WikiReference("wikiId");
         Exception exception = new AccessDeniedException(Right.ADMIN, currentUserRef, wiki);
@@ -141,9 +141,9 @@ public class WikiTemplateManagerScriptTest
     }
 
     /**
-     * @return the exception expected when the current script has the not the 'create wiki' right
+     * @return the exception expected when the current user has the not the 'create wiki' right
      */
-    private Exception currentScriptHasNotCreateWikiRight() throws AccessDeniedException
+    private Exception currentUserHasNotCreateWikiRight() throws AccessDeniedException
     {
         WikiReference wiki = new WikiReference("mainWiki");
         Exception exception = new AccessDeniedException(Right.CREATE_WIKI, currentUserRef, wiki);
@@ -211,7 +211,7 @@ public class WikiTemplateManagerScriptTest
     @Test
     public void setTemplateWithoutAdminRight() throws Exception
     {
-        Exception exception = currentScriptHasNotAdminRight();
+        Exception exception = currentUserHasNotAdminRight();
 
         WikiDescriptor wikiDescriptor = new WikiDescriptor("wikiId", "wikiAlias");
         when(wikiDescriptorManager.getById("wikiId")).thenReturn(wikiDescriptor);
@@ -306,7 +306,7 @@ public class WikiTemplateManagerScriptTest
     @Test
     public void createWikiFromTemplateWithoutCreateRight() throws Exception
     {
-        Exception exception = currentScriptHasNotCreateWikiRight();
+        Exception exception = currentUserHasNotCreateWikiRight();
 
         // Test
         boolean result = mocker.getComponentUnderTest().createWikiFromTemplate("newWikiId", "newWikiAlias",

@@ -138,9 +138,9 @@ public class WikiUserManagerScriptServiceTest
     }
 
     /**
-     * @return the exception expected when the current script has the not the admin right
+     * @return the exception expected when the current user has the not the admin right
      */
-    private Exception currentScriptHasNotAdminRight() throws AccessDeniedException
+    private Exception currentUserHasNotAdminRight() throws AccessDeniedException
     {
         WikiReference wiki = new WikiReference("subwiki");
         Exception exception = new AccessDeniedException(Right.ADMIN, userDocRef, wiki);
@@ -189,7 +189,7 @@ public class WikiUserManagerScriptServiceTest
     public void setUserScopeWithoutAdminRight() throws Exception
     {
         // Current script has not the admin right
-        Exception exception = currentScriptHasNotAdminRight();
+        Exception exception = currentUserHasNotAdminRight();
 
         boolean result = mocker.getComponentUnderTest().setUserScope("subwiki", "LOCAL_ONLY");
         assertEquals(false, result);
@@ -255,7 +255,7 @@ public class WikiUserManagerScriptServiceTest
     public void setMembershipTypeWithoutAdminRight() throws Exception
     {
         // Current script has not the admin right
-        Exception exception = currentScriptHasNotAdminRight();
+        Exception exception = currentUserHasNotAdminRight();
 
         boolean result = mocker.getComponentUnderTest().setMembershipType("subwiki", "INVITE");
         assertEquals(false, result);
@@ -346,7 +346,7 @@ public class WikiUserManagerScriptServiceTest
     public void addMemberWithoutAdminRight() throws Exception
     {
         // Current script has not the admin right
-        Exception exception = currentScriptHasNotAdminRight();
+        Exception exception = currentUserHasNotAdminRight();
 
         boolean result = mocker.getComponentUnderTest().addMember("xwiki:XWiki.UserA", "subwiki");
         assertEquals(false, result);
@@ -379,7 +379,7 @@ public class WikiUserManagerScriptServiceTest
     public void addMembersWithoutAdminRight() throws Exception
     {
         // Current script has not the admin right
-        Exception exception = currentScriptHasNotAdminRight();
+        Exception exception = currentUserHasNotAdminRight();
 
         Collection<String> userIds = new ArrayList<String>();
         boolean result = mocker.getComponentUnderTest().addMembers(userIds, "subwiki");
@@ -411,7 +411,7 @@ public class WikiUserManagerScriptServiceTest
     public void removeMemberWithoutAdminRight() throws Exception
     {
         // Current script has not the admin right
-        Exception exception = currentScriptHasNotAdminRight();
+        Exception exception = currentUserHasNotAdminRight();
 
         boolean result = mocker.getComponentUnderTest().removeMember("xwiki:XWiki.UserA", "subwiki");
         assertEquals(false, result);

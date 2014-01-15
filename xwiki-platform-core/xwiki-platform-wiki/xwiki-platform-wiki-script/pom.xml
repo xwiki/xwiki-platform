@@ -33,6 +33,9 @@
   <name>XWiki Platform - Wiki - Script services</name>
   <description>Script services for the wiki module.</description>
   <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -49,5 +52,25 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- change a return type in WikiManagerScriptService (from boolean to Boolean) -->
+            <exclude>**/WikiManagerScriptService**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -328,7 +328,7 @@ return XWiki;
         #foreach ($wiki in $joinedWikis)
           &lt;li id='$wiki.id'&gt;
             &lt;span class='wikiHomepage'&gt;&lt;a href='$xwiki.getURL($wiki.mainPageReference)'&gt;$wiki.prettyName&lt;/a&gt;&lt;/span&gt;
-            &lt;span class='wikiActivity'&gt;&lt;a href='$doc.getURL('view', "category=$!{request.category}&amp;wikiName=$wiki.id")'&gt;$services.localization.render('platform.wiki.users.profile.activity.show') &amp;#187;&lt;/a&gt;&lt;/span&gt;
+            &lt;span class='wikiActivity'&gt;&lt;a href='$doc.getURL('view', "category=wikis&amp;amp;wikiName=$wiki.id")'&gt;$services.localization.render('platform.wiki.users.profile.activity.show') &amp;#187;&lt;/a&gt;&lt;/span&gt;
           &lt;/li&gt;
         #end
         &lt;/ul&gt;

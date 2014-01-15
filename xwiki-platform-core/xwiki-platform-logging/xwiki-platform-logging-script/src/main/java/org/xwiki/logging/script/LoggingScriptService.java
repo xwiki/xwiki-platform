@@ -30,8 +30,11 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.localization.Translation;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogTree;
+import org.xwiki.logging.LogUtils;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.script.service.ScriptService;
@@ -58,6 +61,9 @@ public class LoggingScriptService implements ScriptService
      */
     @Inject
     private DocumentAccessBridge bridge;
+
+    @Inject
+    private ContextualLocalizationManager localization;
 
     // Get/Set log levels
 
@@ -117,5 +123,29 @@ public class LoggingScriptService implements ScriptService
         }
 
         return logTree;
+    }
+
+    /**
+     * Translate the passed {@link LogEvent} based on the translation message corresponding to the translation key
+     * stored in the {@link LogEvent}.
+     * <p>
+     * The translation message pattern use the same syntax than standard message pattern except that it's optionally
+     * possible to provide a custom index as in <code>Some {1} translation {0} message</code> in order to modify the
+     * order of the argument which can be required depending on the language.
+     * 
+     * @param logEvent the {@link LogEvent} to translate
+     * @return the translated version of the passed {@link LogEvent}
+     */
+    public LogEvent translate(LogEvent logEvent)
+    {
+        if (logEvent.getTranslationKey() != null) {
+            Translation translation = this.localization.getTranslation(logEvent.getTranslationKey());
+
+            if (translation != null) {
+                return LogUtils.translate(logEvent, (String) translation.getRawSource());
+            }
+        }
+
+        return logEvent;
     }
 }

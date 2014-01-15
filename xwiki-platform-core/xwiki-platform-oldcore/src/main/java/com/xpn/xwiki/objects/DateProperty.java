@@ -48,7 +48,7 @@ public class DateProperty extends BaseProperty implements Cloneable
     {
         // Make sure to store a Date and not some extended Date or it's going to be a nightmare to compare between
         // them
-        Date date = (Date) value;
+        Date date = (Date) getValue();
         if (date != null && date.getClass() != Date.class) {
             date = new Date(((Date) value).getTime());
         }
@@ -84,7 +84,7 @@ public class DateProperty extends BaseProperty implements Cloneable
     {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        result = prime * result + ((this.value == null) ? 0 : this.value.hashCode());
         return result;
     }
 

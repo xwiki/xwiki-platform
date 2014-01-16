@@ -36,6 +36,9 @@ public interface XWikiConstants
     /** Name of document where space rights are stored. */
     String SPACE_DOC = "WebPreferences";
 
+    /** Prefix of wiki descriptor documents. */
+    String WIKI_DESCRIPTOR_PREFIX = "XWikiServer";
+
     /** Name of group class. */
     String GROUP_CLASS = "XWiki.XWikiGroups";
 

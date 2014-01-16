@@ -228,11 +228,23 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
     {
         if (ref.getName().equals(XWikiConstants.WIKI_DOC)
             && ref.getLastSpaceReference().getName().equals(XWikiConstants.XWIKI_SPACE)) {
+            // For XWiki.XWikiPreferences, remove the whole wiki.
             securityCache.remove(securityReferenceFactory.newEntityReference(ref.getWikiReference()));
         } else if (ref.getName().equals(XWikiConstants.SPACE_DOC)) {
+            // For WebPreferences, remove the whole space.
             securityCache.remove(securityReferenceFactory.newEntityReference(ref.getParent()));
         } else {
+            // For any other documents, remove that document cache.
             securityCache.remove(securityReferenceFactory.newEntityReference(ref));
+            if (ref.getName().startsWith(XWikiConstants.WIKI_DESCRIPTOR_PREFIX)
+                && ref.getLastSpaceReference().getName().equals(XWikiConstants.XWIKI_SPACE)
+                && ref.getWikiReference().getName().equals(getXWikiContext().getMainXWiki())) {
+                // For xwiki:XWiki.XWikiServer... documents, also remove the whole corresponding wiki.
+                securityCache.remove(securityReferenceFactory.newEntityReference(
+                    new WikiReference(
+                        ref.getName().substring(XWikiConstants.WIKI_DESCRIPTOR_PREFIX.length()).toLowerCase())
+                ));
+            }
         }
     }
 }

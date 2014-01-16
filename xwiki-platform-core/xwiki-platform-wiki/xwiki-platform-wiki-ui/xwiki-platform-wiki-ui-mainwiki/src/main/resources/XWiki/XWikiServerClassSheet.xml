@@ -25,7 +25,6 @@
   <content>{{velocity}}
 {{html clean="false" wiki="true"}}
 #set ($WikiManager = $services.wiki)
-#set ($Exception = $WikiManager.lastException)
 ##
 #set ($action = $request.getParameter("action"))
 #set ($domain = $request.getParameter("domain"))

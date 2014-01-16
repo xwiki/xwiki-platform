@@ -35,7 +35,17 @@
     &lt;div class="hidden"&gt;
       &lt;input type="hidden" name="sort" value="$!escapetool.xml($sort)"/&gt;
       &lt;input type="hidden" name="sortOrder" value="$!escapetool.xml($sortOrder)"/&gt;
-      &lt;input type="hidden" name="f_type" value="DOCUMENT"/&gt;
+      #if ("$!request.debug" != '')
+        &lt;input type="hidden" name="debug" value="$escapetool.xml($request.debug)"/&gt;
+      #end
+      ## Preserve the current facet values when submitting a new search query.
+      #foreach ($entry in $request.parameterMap.entrySet())
+        #if ($entry.key.startsWith('f_') || $entry.key.startsWith('l_'))
+          #foreach ($value in $entry.value)
+            &lt;input type="hidden" name="$escapetool.xml($entry.key)" value="$escapetool.xml($value)"/&gt;
+          #end
+        #end
+      #end
     &lt;/div&gt;
     &lt;div class="search-bar"&gt;
       &lt;label class="hidden" for="searchQuery"&gt;$services.localization.render('search.page.bar.query.label')&lt;/label&gt;
@@ -46,83 +56,54 @@
           class="button" title="$services.localization.render('search.page.bar.submit.title')" /&gt;
       &lt;/span&gt;
     &lt;/div&gt;
-    #displaySearchFilter()
   &lt;/form&gt;
   {{/html}}
 #end
 
-#macro (displaySearchFilter)
-  &lt;div class="search-filter xform&gt;
-    &lt;div class="search-filter-header"&gt;
-      &lt;strong&gt;$services.localization.render('solr.filter.title')&lt;/strong&gt;
-      &lt;p class="xHint"&gt;$services.localization.render('solr.filter.hint')&lt;/p&gt;
-    &lt;/div&gt;
-    &lt;dl class="search-filter-left"&gt;
-      #if ($xwiki.isMultiLingual())
-        &lt;dt&gt;
-          &lt;label for="searchFilterLanguage"&gt;$services.localization.render('solr.filterBy.language')&lt;/label&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
-          &lt;select id="searchFilterLanguage" name="lang"&gt;
-            &lt;option value=""&gt;$services.localization.render('solr.filterBy.language.all')&lt;/option&gt;
-            #getSupportedLanguages()
-            #set ($currentLocale = $services.localization.currentLocale)
-            #foreach ($supportedLanguage in $supportedLanguages)
-              #set ($locale = $services.localization.toLocale($supportedLanguage))
-              &lt;option value="$supportedLanguage" #if ($language == $supportedLanguage)selected="selected"#end&gt;
-                $escapetool.xml($locale.getDisplayName($currentLocale))
-              &lt;/option&gt;
-            #end
-          &lt;/select&gt;
-        &lt;/dd&gt;
-      #end
-    &lt;/dl&gt;
-    &lt;div class="clearfloats"&gt;&lt;/div&gt;
-    &lt;dl&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterBoost"&gt;$services.localization.render('solr.filter.queryBoost.label')&lt;/label&gt;
-        &lt;span class="xHint"&gt;$services.localization.render('solr.filter.queryBoost.hint')&lt;/span&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;input id="searchFilterBoost" name="boost" type="text" value="$escapetool.xml($boost)" /&gt;
-      &lt;/dd&gt;
-    &lt;/dl&gt;
-  &lt;/div&gt;
-#end
-
-#**
- * Get the list of supported languages.
- *#
-#macro (getSupportedLanguages)
-  #set ($supportedLanguagesRaw = $xwiki.getXWikiPreference('languages').split('[, |]'))
-  #set ($supportedLanguages = [])
-  #foreach ($supportedLanguage in $supportedLanguagesRaw)
-    #if ($supportedLanguage.trim() != '')
-      #set ($discard = $supportedLanguages.add($supportedLanguage))
-    #end
-  #end
-  ## Make sure the default language is included.
-  #set ($defaultLanguage = $xwiki.getXWikiPreference('default_language', 'en'))
-  #if (!$supportedLanguages.contains($defaultLanguage))
-    #set ($discard = $supportedLanguages.add($defaultLanguage))
-  #end
-  #set ($supportedLanguages = $sorttool.sort($supportedLanguages))
-#end
-
 #macro (displaySearchDebugInfo)
-  (% class="search-debug#if ($debug == '') hidden#end" %)(((
-    Debug is On
+  (% class="search-debug" %)(((
+    === Debug Information ===
     #set ($debugMap = $searchResponse.debugMap)
     #if ($debugMap)
 
       {{html}}
-      &lt;div&gt;&lt;strong&gt;Query Parser:&lt;/strong&gt; $!escapetool.xml($debugMap.get('QParser'))&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Parsed Query:&lt;/strong&gt; $!escapetool.xml($debugMap.get('parsedquery_toString'))&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Filter Queries:&lt;/strong&gt; $!escapetool.xml($debugMap.get('filter_queries'))&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Processing time:&lt;/strong&gt; $!escapetool.xml($debugMap.get('timing'))&lt;/div&gt;
+      &lt;dl&gt;
+        &lt;dt&gt;Query Parser&lt;/dt&gt;
+        &lt;dd&gt;$!escapetool.xml($debugMap.get('QParser'))&lt;/dd&gt;
+        &lt;dt&gt;Parsed Query&lt;/dt&gt;
+        &lt;dd&gt;$!escapetool.xml($debugMap.get('parsedquery_toString'))&lt;/dd&gt;
+        &lt;dt&gt;Filter Queries&lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;ul&gt;
+            #foreach ($filterQuery in $debugMap.get('filter_queries'))
+              &lt;li&gt;$!escapetool.xml($filterQuery)&lt;/li&gt;
+            #end
+          &lt;/ul&gt;
+        &lt;/dd&gt;
+        &lt;dt&gt;Processing Time&lt;/dt&gt;
+        &lt;dd&gt;
+          #displayProcessingTime($debugMap.get('timing'))
+        &lt;/dd&gt;
+      &lt;/dl&gt;
       {{/html}}
     #end
   )))
+#end
+
+#macro (displayProcessingTime $timing)
+  &lt;ul&gt;
+    ## The timing is not a Map but a NamedList.
+    #foreach ($entry in $timing)
+      &lt;li&gt;
+        $!escapetool.xml($entry.key):
+        #if ($entry.value.time &amp;&amp; $entry.value.size() &gt; 1)
+          #displayProcessingTime($entry.value)
+        #else
+          $!escapetool.xml($entry.value)
+        #end
+      &lt;/li&gt;
+    #end
+  &lt;/ul&gt;
 #end
 
 #macro (displaySearchFacets $searchResponse)
@@ -953,16 +934,16 @@
     #evaluate("${escapetool.h}displaySearchResult_$searchResult.type.toLowerCase()(${escapetool.d}searchResult)")
     #displaySearchResultHighlighting($searchResult)
     {{/html}}
+    #if ($debug)
 
-    ## Scoring debug data.
-    ## The reason we used a separate HTML block with no cleaning is because the scoring debug data may contain some
-    ## characters that are considered invalid by JDOM library which is used for parsing the HTML when cleaning is on.
-    ## E.g. "0x0 is not a legal XML character" (org.jdom.IllegalDataException).
-    {{html clean="false"}}
-    &lt;div id="debug_$searchResult.id" class="hidden"&gt;
-      $!escapetool.xml($searchResponse.explainMap.get($searchResult.id))
-    &lt;/div&gt;
-    {{/html}}
+      ## Scoring debug data.
+      ## The reason we used a separate HTML block with no cleaning is because the scoring debug data may contain some
+      ## characters that are considered invalid by JDOM library which is used for parsing the HTML when cleaning is on.
+      ## E.g. "0x0 is not a legal XML character" (org.jdom.IllegalDataException).
+      {{html clean="false"}}
+      &lt;div class="search-result-debug"&gt;$!escapetool.xml($searchResponse.explainMap.get($searchResult.id))&lt;/div&gt;
+      {{/html}}
+    #end
   )))
 #end
 
@@ -1023,14 +1004,14 @@
 #end
 
 #macro (displaySearchResultTitle)
+  #set ($showLocale = $searchResult.locale != '' &amp;&amp; $searchResult.locale != $xcontext.language)
   #set ($titleURL = $searchResultDocument.getURL())
-  #if ($searchResult.locale != '' &amp;&amp; $xcontext.language != $searchResult.locale)
+  #if ($showLocale)
     #set ($titleURL = $searchResultDocument.getURL('view', "language=$searchResult.locale"))
   #end
   &lt;h2 class="search-result-title"&gt;
     &lt;a href="$titleURL"&gt;$escapetool.xml($searchResultTranslatedDocument.plainTitle)&lt;/a&gt;
-    ## Display document language when multiple language results are requested.
-    #if ($request.lang == '' &amp;&amp; $searchResult.locale != '')
+    #if ($showLocale)
       &lt;span title="$escapetool.xml($services.localization.render('solr.result.language'))"
         class="search-result-language" &gt;($escapetool.xml($searchResult.locale))&lt;/span&gt;
     #end
@@ -1089,17 +1070,17 @@
     ## Remove the language suffix (e.g. _en, _fr, _de) from the field name.
     #set ($field = $stringtool.substringBefore($entry.key, '_'))
     ## Extract the language.
-    #set ($lang = $stringtool.substringAfter($entry.key, '_'))
-    #if ($lang == $field)
+    #set ($language = $stringtool.substringAfter($entry.key, '_'))
+    #if ($language == $field)
       ## No language.
-      #set ($lang = '_')
+      #set ($language = '_')
     #end
     #set ($matchesByLanguage = $highlightingByLanguage.get($field))
     #if (!$matchesByLanguage)
       #set ($matchesByLanguage = {})
       #set ($discard = $highlightingByLanguage.put($field, $matchesByLanguage))
     #end
-    #set ($discard = $matchesByLanguage.put($lang, $entry.value))
+    #set ($discard = $matchesByLanguage.put($language, $entry.value))
   #end
   ## Keep only the matches correspoding to the search result locale.
   #set ($highlighting = [])
@@ -1146,22 +1127,37 @@
   #set ($discard = $query.setLimit($rows))
   #set ($discard = $query.setOffset($start))
   #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
-  ## We need to pass the list of supported locales so the names of the fields that are indexed in multiple languages are
-  ## expanded in the search query. For instance, the query "title:text" will be expanded to "title__:text OR
-  ## title_en:text OR title_fr:text" if the list of supported locales is [en, fr].
-  #if (!$supportedLanguages)
-    #getSupportedLanguages()
-  #end
-  #set ($discard = $query.bindValue('xwiki.supportedLocales', $stringtool.join($supportedLanguages, ',')))
+  #setSupportedLocales($query)
   #setQueryFields($query)
   #setFacetFields($query)
   #setFilterQuery($query)
-  #if ($debug != '')
+  #if ($debug)
     #set ($discard = $query.bindValue('debugQuery', 'on'))
   #end
   ##
   ## Execute the query.
   #set ($searchResponse = $query.execute()[0])
+#end
+
+#**
+ * We have to set the list of supported locales so the names of the fields that are indexed in multiple languages are
+ * expanded in the search query. For instance, the query "title:text" will be expanded to "title__:text OR
+ * title_en:text OR title_fr:text" if the list of supported locales is [en, fr].
+ *#
+#macro (setSupportedLocales $query)
+  #set ($supportedLanguagesRaw = $xwiki.getXWikiPreference('languages').split('[, |]'))
+  #set ($supportedLanguages = [])
+  #foreach ($supportedLanguage in $supportedLanguagesRaw)
+    #if ($supportedLanguage.trim() != '')
+      #set ($discard = $supportedLanguages.add($supportedLanguage))
+    #end
+  #end
+  ## Make sure the default language is included.
+  #set ($defaultLanguage = $xwiki.getXWikiPreference('default_language', 'en'))
+  #if (!$supportedLanguages.contains($defaultLanguage))
+    #set ($discard = $supportedLanguages.add($defaultLanguage))
+  #end
+  #set ($discard = $query.bindValue('xwiki.supportedLocales', $stringtool.join($supportedLanguages, ',')))
 #end
 
 #macro (setQueryFields $query)
@@ -1211,9 +1207,6 @@
   ##
   ## Collect the query filters.
   #set ($filters = {})
-  #if ($language != '')
-    #set ($discard = $filters.put('locales', [$language]))
-  #end
   #if (!$xcontext.isMainWiki())
     ## Subwikis search by default in their content only.
     #set ($discard = $filters.put('wiki', [$xcontext.database]))
@@ -1257,7 +1250,7 @@ $value##
 #macro (processRequestParameters)
   #set ($text = "$!request.text")
   #set ($boost = "$!request.boost")
-  #set ($debug = "$!request.debug")
+  #set ($debug = "$!request.debug" != '')
   ##
   ## Pagination
   #set ($rows = $numbertool.integer($request.rows))
@@ -1281,15 +1274,6 @@ $value##
     #set ($sortOrder = 'asc')
   #end
   ##
-  ## Language
-  ## Can't use 'language' as request parameter because it's used by view mode to select the display language.
-  #set ($language = $request.lang)
-  ## An empty value for the language parameter means no language query filter (all languages are considered).
-  #if ($language != '' &amp;&amp; "$!language" == '')
-    ## The language parameter is null (not set on the request).
-    #set ($language = "$!xcontext.language")
-  #end
-  ##
   ## Result type
   ## We store the selected result type because we need it to decide what search and sort fields to use.
   #set ($type = $request.getParameterValues('f_type'))
@@ -1309,7 +1293,9 @@ $value##
   )))
   #if ($text != '')
     #getSearchResults()
-    #displaySearchDebugInfo()
+    #if ($debug)
+      #displaySearchDebugInfo()
+    #end
     (% class="search-results-container" %)(((
       #displaySearchFacets($searchResponse)
       (% class="search-results-left" %)(((
@@ -1527,33 +1513,6 @@ $value##
     </property>
     <property>
       <code>(function () {
-  var SearchFilterBehavior = Class.create({
-    initialize: function(container) {
-      this.container = container.hide().addClassName('popup');
-      var toggle = new Element('input', {
-        type: 'button',
-        'class': 'search-filter-toggle',
-        title: "$escapetool.javascript($services.localization.render('solr.filter.toggle'))"
-      });
-      toggle.observe('click', this._onToggle.bindAsEventListener(this));
-      this.container.up('.search-form').down('.search-query').insert({after: toggle});
-    },
-
-    _onToggle: function(event) {
-      this.container.toggle();
-
-      // Fix the height of the document content container (XWIKI-9189). The search filter is displayed with position
-      // absolute so that it floats over the search results (as a popup) and the document content container has
-      // overflow:auto to prevent long text/images/tables from overflowing outside of the content area. Because of this
-      // the content container is not resized when the search filter is displayed. Instead, when there are no search
-      // results, we get a vertical scroll bar.
-      var docContentContainer = $('xwikicontent');
-      docContentContainer &amp;&amp; docContentContainer.setStyle({
-        minHeight: this.container.visible() ? docContentContainer.scrollHeight + 'px' : ''
-      });
-    }
-  });
-
   var SearchFacetsBehavior = Class.create({
     initialize: function(container) {
       this.container = container;
@@ -1693,9 +1652,6 @@ $value##
   });
 
   var init = function() {
-    var searchFilter = $('body').down('.search-filter');
-    searchFilter &amp;&amp; new SearchFilterBehavior(searchFilter);
-
     $('body').select('.search-facet .mediaTypes').each(function(mediaTypeFacet) {
       new MediaTypeFacetBehavior(mediaTypeFacet);
     });
@@ -1839,67 +1795,6 @@ $value##
 
 .search-bar input[type="submit"].button {
   margin-left: 1em;
-}
-
-/**
- * Search filter
- */
-
-.search-form .search-filter-toggle {
-  background: url("$doc.getAttachmentURL('light-grey-disclosure-arrow-down.png')") no-repeat scroll 50% 50% $theme.pageContentBackgroundColor;
-  border: 0 none;
-  height: 16px;
-  margin: 0 0 0 -20px;
-  padding: 0;
-  vertical-align: middle;
-  width: 16px;
-  z-index: 2;
-}  
-
-.search-form .search-bar:hover .search-filter-toggle {
-  background-image: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-down.png')");
-}
-
-.search-filter {
-  background: $theme.backgroundSecondaryColor;
-  border: 1px solid $theme.borderColor;
-  border-radius: 0 0 4px 4px;
-  margin-top: .5em;
-  padding: 0 0.5em 0.5em;
-  width: 76%;
-}
-
-.search-filter.popup {
-  margin-top: -1px;
-  position: absolute;
-  z-index: 3;
-}
-
-.search-filter, .search-facets {
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-  /* Leave space for the bottom shadow. */
-  margin-bottom: 2px;
-}
-
-.search-filter-header {
-  padding: 1em .5em .5em;
-  border-bottom: 1px solid $theme.borderColor;
-}
-
-.search-filter-header strong,
-.search-facets-header strong {
-  #css_textShadow('0', '1px', '0', $theme.pageContentBackgroundColor)
-}
-
-.search-filter-left, .search-filter-right {
-  float: left;
-  width: 50%;
-}
-
-.search-filter select {
-  border: 2px solid #E8E8E8;
-  color: #636B75;
-  padding: .25em;
 }
 
 /**
@@ -2050,12 +1945,19 @@ a.search-result-highlightAll:after {
   content: ' \bb';
 }
 
+.search-result-debug {
+  white-space: pre;
+}
+
 /**
  * Facets
  */
 
 .search-facets {
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
   float: right;
+  /* Leave space for the bottom shadow. */
+  margin-bottom: 2px;
   max-width: 19.5em;
   width: 19.5em;
   border-radius: 4px;
@@ -2271,13 +2173,6 @@ a.search-result-highlightAll:after {
 /**
  * Miscellaneous
  */
-
-.debug  {
-  float: right;
-  position: relative;
-  padding: 5px 10px;
-  margin-right: -10px;
-}
 
 .paginationFilter .resultsNo,
 .paginationFilter .controlPagination,

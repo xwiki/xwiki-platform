@@ -62,14 +62,6 @@ solr.result.mediaType=File of type {0}
 solr.result.uploadedBy=Uploaded by {0} on {1} ({2})
 solr.result.highlightAll=Highlight all matches
 
-solr.filter.title=Advanced Options
-solr.filter.hint=Select predefined filters that will be applied on your query.
-solr.filter.toggle=Toggle the search filter
-solr.filterBy.language=Language
-solr.filterBy.language.all=All languages
-solr.filter.queryBoost.label=Query boost
-solr.filter.queryBoost.hint=Allows to modify the relevance of certain fields e.g. title^1.2 name^2.0 author^1.0 doccontent^0.5
-
 solr.facets.title=Refine your search
 solr.facets.hint=Select a category and activate filters on the current results
 solr.facets.resetAll=Reset all

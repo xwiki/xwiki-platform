@@ -59,7 +59,7 @@ public final class FieldUtils
     public static final String LOCALE = "locale";
 
     /**
-     * Technical locale of the document (emty for the default document entry). Not indexed, mostly used to find the
+     * Technical locale of the document (empty for the default document entry). Not indexed, mostly used to find the
      * document in database.
      */
     public static final String DOCUMENT_LOCALE = "doclocale";

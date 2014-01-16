@@ -582,15 +582,15 @@
   #set ($intervals = [
     {
       'id': 'tiny',
-      'end'  : 10240
+      'end': 10240
     }, {
       'id': 'small',
       'start': 10240,
-      'end'  : 512000
+      'end': 512000
     }, {
       'id': 'medium',
       'start': 512000,
-      'end'  : 5242880
+      'end': 5242880
     }, {
       'id': 'large',
       'start': 5242880
@@ -651,14 +651,15 @@
       #end
     #end
   #end
-  ## Filter the unselected size intervals that don't have matches.
+  ## Filter the size intervals that don't have matches.
   #set ($intervalsWithMatches = [])
   #foreach ($interval in $intervals)
     #if ($interval.count &gt; 0 || $facetRequestValues.contains($interval.name))
       #set ($discard = $intervalsWithMatches.add($interval))
     #end
   #end
-  #set ($intervals = $intervalsWithMatches)
+  ## Make sure we sort the intervals based on the number of matches.
+  #set ($intervals = $sorttool.sort($intervalsWithMatches, 'count:desc'))
   ##
   ## Display the size intervals.
   ##

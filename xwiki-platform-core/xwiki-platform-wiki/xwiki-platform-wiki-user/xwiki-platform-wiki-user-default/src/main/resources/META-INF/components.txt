@@ -3,3 +3,4 @@ org.xwiki.wiki.user.internal.DefaultWikiUserConfigurationHelper
 org.xwiki.wiki.user.internal.WikiUserClassDocumentInitializer
 org.xwiki.wiki.user.internal.WikiUserFromXEMMigration
 org.xwiki.wiki.user.internal.WikiCandidateMemberClassInitializer
+org.xwiki.wiki.user.internal.MembersMigration

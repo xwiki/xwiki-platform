@@ -57,6 +57,8 @@ import com.xpn.xwiki.objects.BaseObject;
 @Singleton
 public class DefaultWikiUserManager implements WikiUserManager
 {
+    private static final String MEMBERS_GROUP_PAGE_NAME = "XWikiMemberGroup";
+
     private static final String GROUP_CLASS_NAME = "XWikiGroups";
 
     private static final String GROUP_CLASS_MEMBER_FIELD = "member";
@@ -111,7 +113,8 @@ public class DefaultWikiUserManager implements WikiUserManager
     private XWikiDocument getMembersGroupDocument(String wikiId) throws WikiUserManagerException
     {
         // Reference to the document
-        DocumentReference memberGroupReference = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, "XWikiAllGroup");
+        DocumentReference memberGroupReference = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE,
+                MEMBERS_GROUP_PAGE_NAME);
 
         // Get the document
         try {

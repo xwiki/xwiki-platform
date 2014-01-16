@@ -241,7 +241,8 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
                 && ref.getWikiReference().getName().equals(getXWikiContext().getMainXWiki())) {
                 // For xwiki:XWiki.XWikiServer... documents, also remove the whole corresponding wiki.
                 securityCache.remove(securityReferenceFactory.newEntityReference(
-                    new WikiReference(ref.getName().substring(XWikiConstants.WIKI_DESCRIPTOR_PREFIX.length()))
+                    new WikiReference(
+                        ref.getName().substring(XWikiConstants.WIKI_DESCRIPTOR_PREFIX.length()).toLowerCase())
                 ));
             }
         }

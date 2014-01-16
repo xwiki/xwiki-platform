@@ -205,6 +205,9 @@ The full format of an image is either **##image~: (reference)##** or **##~[~[ima
 ** **Icon** reference in the form **##{{{(icon:)}}} (iconName)##**. Example: **##icon:accept##**
 *** **##icon:##** A required string identifying the image reference as an icon from the [[XWiki Icon Set&gt;&gt;http://www.famfamfam.com/lab/icons/silk/previews/index_abc.png]].
 *** **##iconName##**: A required string identifying the icon referenced. Example: ##accept##
+** **Data URI** in the form **##{{{(data:)}}} (content)##**. Example: **##data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==##**
+*** **##data:##** A required string identifying the image as being specified inline using the [[Data URI scheme>>http://en.wikipedia.org/wiki/Data_URI_scheme]].
+*** **##content##**: The encoded image. Example: ##image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==##
 * **##parameters##**: An optional list of space-separated parameters passed to the image. Example: ##width="800" height="600" alt="img.png" title="My nice image"##
 ** **HTML attributes**: All attributes defined by the HTML standard will be added to the rendered HTML ##&lt;img&gt;## tag.
 *** **##style##**: CSS style information that should be applied to the image. Examples: ##style="float:right;height:50"## (image on right side, height 50 px), ##style="display:block;margin-left:auto;margin-right:auto;width:80%"## (image centered, width 80% of block width), ##style="vertical-align:bottom"## (text starts at bottom of picture)

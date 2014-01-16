@@ -36,14 +36,5 @@
   <modules>
     <module>xwiki-platform-wiki-manager-api</module>
     <module>xwiki-platform-wiki-manager-ui</module>
-    <module>xwiki-platform-wiki-manager-rest</module>
   </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-wiki-manager-test</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>

@@ -17,18 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.manager.rest.test;
+package org.xwiki.wiki.user.internal;
 
-import org.junit.runner.RunWith;
-import org.xwiki.test.integration.XWikiExecutorSuite;
-
-/**
- * Runs all functional tests found in the classpath.
- *
- * @version $Id$
- * @since 4.3M2
- */
-@RunWith(XWikiExecutorSuite.class)
-public class AllTests
+public class MembersMigration
 {
 }

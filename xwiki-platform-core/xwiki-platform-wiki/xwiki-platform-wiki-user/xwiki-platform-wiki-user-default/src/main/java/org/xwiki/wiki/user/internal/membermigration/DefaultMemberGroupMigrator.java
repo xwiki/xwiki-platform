@@ -17,13 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.user.internal;
+package org.xwiki.wiki.user.internal.membermigration;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -39,24 +39,15 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.store.migration.DataMigrationException;
-import com.xpn.xwiki.store.migration.XWikiDBVersion;
-import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
-/**
- * Component that create a XWiki.XWikiMemberGroup for subwikis initialized with the list of current users (located in
- * XWiki.XWikiAllGroup). It also update rights given to XWikiAllGroup to also occurs on XWikiMemberGroup.
- *
- * @since 5.4RC1
- * @version $Id$
- */
 @Component
-@Named("R540000MembersMMigration")
-public class MembersMigration extends AbstractHibernateDataMigration
+public class DefaultMemberGroupMigrator implements MemberGroupMigrator
 {
     private static final String GROUP_CLASS_NAME = "XWikiGroups";
 
     private static final String GROUP_CLASS_MEMBER_FIELD = "member";
+
+    private static final String ALL_GROUP_PAGE_NAME = "XWikiAllGroup";
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -70,61 +61,50 @@ public class MembersMigration extends AbstractHibernateDataMigration
     @Inject
     private Logger logger;
 
-    @Override
-    public String getDescription()
-    {
-        return "http://jira.xwiki.org/browse/XWIKI-9886";
-    }
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     @Override
-    public XWikiDBVersion getVersion()
+    public void migrateGroups(String wikiId)
     {
-        return new XWikiDBVersion(54000);
-    }
+        String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
 
-    @Override
-    public boolean shouldExecute(XWikiDBVersion startupVersion)
-    {
-        // We migrate only subwikis
-        return !wikiDescriptorManager.getCurrentWikiId().equals(wikiDescriptorManager.getMainWikiId());
-    }
+        DocumentReference allGroupDocRef = new DocumentReference(currentWikiId, XWiki.SYSTEM_SPACE,
+                ALL_GROUP_PAGE_NAME);
 
-    @Override
-    protected void hibernateMigrate() throws DataMigrationException, XWikiException
-    {
         try {
-            List<String> users = getAllGlobalUsersFromAllGroup();
-            wikiUserManager.addMembers(users, wikiDescriptorManager.getCurrentWikiId());
+            List<String> users = getAllGlobalUsersFromAllGroup(allGroupDocRef, currentWikiId);
+            wikiUserManager.addMembers(users, currentWikiId);
+            removeGlobalUsersFromAllGroup(allGroupDocRef, currentWikiId);
         } catch (WikiUserManagerException e) {
             logger.error("Failed to add create the member list of wiki {}. The migration of wiki members has failed",
-                    wikiDescriptorManager.getCurrentWikiId(), e);
-
+                    currentWikiId, e);
         } catch (XWikiException e) {
             logger.error("Failed to get the XWikiAllGroup document in the wiki {}. The migration if wiki members has"
-                    + " failed.", wikiDescriptorManager.getCurrentWikiId(), e);
+                    + " failed.", currentWikiId, e);
         }
+
     }
 
     /**
      * @return the list of global users contained in XWikiAllGroup
      */
-    private List<String> getAllGlobalUsersFromAllGroup() throws XWikiException
+    private List<String> getAllGlobalUsersFromAllGroup(DocumentReference allGroupDocRef, String currentWiki)
+            throws XWikiException
     {
         // The result list to return
         List<String> members = new ArrayList<String>();
 
         // Get XWiki objects
-        XWikiContext xcontext = getXWikiContext();
+        XWikiContext xcontext = xcontextProvider.get();
         XWiki xwiki = xcontext.getWiki();
 
         // Get the XWikiAllGroup document
-        DocumentReference allGroupDocRef = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
-                XWiki.SYSTEM_SPACE, "XWikiAllGroup");
         XWikiDocument allGroupDoc = xwiki.getDocument(allGroupDocRef, xcontext);
 
         // Get the group objects
         DocumentReference classReference =
-                new DocumentReference(wikiDescriptorManager.getCurrentWikiId(), XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
+                new DocumentReference(currentWiki, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
         List<BaseObject> memberObjects = allGroupDoc.getXObjects(classReference);
         if (memberObjects != null) {
             // For each member object
@@ -145,11 +125,47 @@ public class MembersMigration extends AbstractHibernateDataMigration
         return members;
     }
 
+    private void removeGlobalUsersFromAllGroup(DocumentReference allGroupDocRef, String currentWiki)
+            throws XWikiException
+    {
+        // Get XWiki objects
+        XWikiContext xcontext = xcontextProvider.get();
+        XWiki xwiki = xcontext.getWiki();
+
+        // Get the document
+        XWikiDocument groupDoc = xwiki.getDocument(allGroupDocRef, xcontext);
+
+        // Document status
+        boolean modified = false;
+
+        // Get the group objects
+        DocumentReference classReference =
+                new DocumentReference(currentWiki, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
+        List<BaseObject> memberObjects = groupDoc.getXObjects(classReference);
+        if (memberObjects != null) {
+            // For each member object
+            for (BaseObject object : memberObjects) {
+                if (object == null) {
+                    continue;
+                }
+                String userId = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
+                if (isGlobalUser(userId)) {
+                    // remove the object
+                    groupDoc.removeXObject(object);
+                    modified = true;
+                }
+            }
+        }
+
+        if (modified) {
+            xwiki.saveDocument(groupDoc, "Remove all global users from this group.", xcontext);
+        }
+    }
+
     private boolean isGlobalUser(String userId)
     {
         DocumentReference userDocRef = documentReferenceResolver.resolve(userId);
         WikiReference wiki = userDocRef.getWikiReference();
         return (wiki != null && wiki.getName().equals(wikiDescriptorManager.getMainWikiId()));
     }
-
 }

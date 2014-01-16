@@ -111,7 +111,7 @@
       // Nothing to add.
       return;
     }
-    new Ajax.Request("$xwiki.getURL('XWiki.XWikiAllGroup', 'get', 'xpage=adduorg')", {
+    new Ajax.Request("$xwiki.getURL('XWiki.XWikiMemberGroup', 'get', 'xpage=adduorg')", {
       parameters: form.serialize(),
       onSuccess: function() {
         // Clear the list of selected users.
@@ -404,8 +404,8 @@
     </property>
   </object>
   <content>{{velocity output="false"}}
-## Use XWikiAllGroup as the group target.
-#set($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
+## Use XWikiMemberGroup as the group target.
+#set($groupDoc = $xwiki.getDocument('XWiki.XWikiMemberGroup'))
 #macro(hasGroupRight $right $hasGroupRight)
   #set($result = $xwiki.hasAccessLevel($right, $xcontext.user, $groupDoc.fullName) &amp;&amp; $groupDoc.getObject('XWiki.XWikiGroups', false))
   #set($hasGroupRight = $NULL)
@@ -645,7 +645,7 @@ $services.localization.render('platform.wiki.currentwiki.candidateHandledComment
 &lt;div id='candidates' class='xform'&gt;
 &lt;h2&gt;$services.localization.render('platform.wiki.currentwiki.candidates.label')&lt;/h2&gt;
 &lt;div class='xHint'&gt;$services.localization.render('platform.wiki.currentwiki.candidates.hint')&lt;/div&gt;
-#set ($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
+#set ($groupDoc = $xwiki.getDocument('XWiki.XWikiMemberGroup'))
 #set ($candidateMembers = $groupDoc.getObjects($candidateClass))
 #foreach ($candidateMember in $candidateMembers)
   #set ($userFullName = $candidateMember.userName)

@@ -59,6 +59,8 @@ public class DefaultWikiUserManager implements WikiUserManager
 {
     private static final String MEMBERS_GROUP_PAGE_NAME = "XWikiMemberGroup";
 
+    private static final String ALL_GROUP_PAGE = "XWiki.XWikiAllGroup";
+
     private static final String GROUP_CLASS_NAME = "XWikiGroups";
 
     private static final String GROUP_CLASS_MEMBER_FIELD = "member";
@@ -211,7 +213,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         // If the group does not contain any user yet, add an empty member (cf: XWIKI-6275).
         List<BaseObject> memberObjects = groupDoc.getXObjects(classReference);
         if (memberObjects == null || memberObjects.isEmpty()) {
-            addMemberObject(groupDoc, "", classReference);
+            addMemberObject(groupDoc, ALL_GROUP_PAGE, classReference);
         }
 
         // Add the user
@@ -235,7 +237,7 @@ public class DefaultWikiUserManager implements WikiUserManager
         // If the group does not contain any user yet, add an empty member (cf: XWIKI-6275).
         List<BaseObject> memberObjects = groupDoc.getXObjects(classReference);
         if (memberObjects == null || memberObjects.isEmpty()) {
-            addMemberObject(groupDoc, "", classReference);
+            addMemberObject(groupDoc, ALL_GROUP_PAGE, classReference);
         }
 
         // Add members

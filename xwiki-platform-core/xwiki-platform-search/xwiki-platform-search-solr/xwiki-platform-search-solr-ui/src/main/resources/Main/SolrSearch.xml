@@ -31,7 +31,7 @@
 
 #macro (displaySearchForm)
   {{html}}
-  &lt;form class="search-form" action=""&gt;
+  &lt;form class="search-form half" action=""&gt;
     &lt;div class="hidden"&gt;
       &lt;input type="hidden" name="sort" value="$!escapetool.xml($sort)"/&gt;
       &lt;input type="hidden" name="sortOrder" value="$!escapetool.xml($sortOrder)"/&gt;
@@ -1774,14 +1774,7 @@ $value##
  */
 
 .search-form-container {
-  clear: both;
   margin: 2em 0 1em;
-}
-
-.search-form {
-  margin: 0 auto;
-  position: relative;
-  width: 55%;
 }
 
 .search-form .search-query {
@@ -1794,7 +1787,7 @@ $value##
 }
 
 .search-bar input[type="submit"].button {
-  margin-left: 1em;
+  margin-left: .5em;
 }
 
 /**

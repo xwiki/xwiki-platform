@@ -1208,7 +1208,17 @@
 #macro (setFilterQuery $query)
   ##
   ## Collect the query filters.
-  #set ($filters = {})
+  ## Filter the search results based on the current language. The following results are kept:
+  ## * the translations in the current language, for those entities that support translations (e.g. a document
+  ##     translation in the current language)
+  ## * the translations in the supported/available languages, for those entities whose default language is the
+  ##     current language (e.g. if a document has French as default language and the list of supported languages
+  ##     is ['en', 'fr', 'ro'] then English an Romanian translations are included if they exist and the current
+  ##     language is French)
+  ## * the entities that don't support translations (attachments, objects) but which are bound to an entity
+  ##     (document) whose default language is the current language
+  ## * the entities that don't have a language set (e.g. documents that are translated with translation keys)
+  #set ($filters = {'locales': [$xcontext.language]})
   #if (!$xcontext.isMainWiki())
     ## Subwikis search by default in their content only.
     #set ($discard = $filters.put('wiki', [$xcontext.database]))

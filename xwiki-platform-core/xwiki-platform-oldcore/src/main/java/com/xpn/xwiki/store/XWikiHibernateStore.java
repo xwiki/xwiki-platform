@@ -1814,7 +1814,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
         // If we're in a non-main wiki & the user is global,
         // switch to the global wiki and delete locks held there.
-        if (ctx.isMainWiki()
+        if (!ctx.isMainWiki()
             && ctx.isMainWiki(ctx.getUserReference().getWikiReference().getName()))
         {
             final String cdb = ctx.getDatabase();

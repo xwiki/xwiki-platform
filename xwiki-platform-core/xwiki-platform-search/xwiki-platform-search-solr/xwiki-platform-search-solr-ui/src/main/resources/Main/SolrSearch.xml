@@ -35,6 +35,8 @@
     &lt;div class="hidden"&gt;
       &lt;input type="hidden" name="sort" value="$!escapetool.xml($sort)"/&gt;
       &lt;input type="hidden" name="sortOrder" value="$!escapetool.xml($sortOrder)"/&gt;
+      ## The parameter used to determine if the request has been redirected with default search filters.
+      &lt;input type="hidden" name="r" value="$!escapetool.xml($request.r)"/&gt;
       #if ("$!request.debug" != '')
         &lt;input type="hidden" name="debug" value="$escapetool.xml($request.debug)"/&gt;
       #end
@@ -1392,8 +1394,15 @@ $value##
   #outputRSSFeed()
 #elseif ($xcontext.action == 'get' &amp;&amp; "$!request.facet" != '' &amp;&amp; ($request.startDate || $request.endDate))
   #handleCustomDateInterval()
-#else
+#elseif ("$!request.r" == '1')
   #displaySearchUI()
+#else
+  ## Redirect using the default search filters
+  #extendQueryString($url {
+    'r': 1,
+    'f_type': 'DOCUMENT'
+  })
+  $response.sendRedirect($url)
 #end
 {{/velocity}}</content>
   <attachment>

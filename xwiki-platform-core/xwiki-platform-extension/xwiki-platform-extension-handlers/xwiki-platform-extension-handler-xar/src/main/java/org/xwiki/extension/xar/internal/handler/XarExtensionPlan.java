@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionException;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.job.plan.ExtensionPlan;
@@ -75,6 +76,8 @@ public class XarExtensionPlan implements Closeable
         this.previousXAREntries = new HashMap<String, Map<XarEntry, XarExtensionPlanEntry>>();
         this.nextXAREntries = new HashMap<String, Map<XarEntry, LocalExtension>>();
 
+        Map<ExtensionId, XarExtensionPlanEntry> planEntry = new HashMap<ExtensionId, XarExtensionPlanEntry>();
+
         for (ExtensionPlanAction action : plan.getActions()) {
             if (action.getExtension().getType().equals(XarExtensionHandler.TYPE)) {
                 // Get previous entries
@@ -83,6 +86,13 @@ public class XarExtensionPlan implements Closeable
                     if (previousExtension != null) {
                         XarInstalledExtension previousXARExtension =
                             (XarInstalledExtension) xarRepository.getInstalledExtension(previousExtension.getId());
+
+                        XarExtensionPlanEntry xarPlanEntry = planEntry.get(previousXARExtension.getId());
+                        if (xarPlanEntry == null) {
+                            xarPlanEntry =
+                                new XarExtensionPlanEntry(previousXARExtension, previousXARExtension.getXarPackage());
+                            planEntry.put(previousXARExtension.getId(), xarPlanEntry);
+                        }
 
                         for (XarEntry entry : previousXARExtension.getXarPackage().getEntries()) {
                             String wiki;
@@ -96,7 +106,7 @@ public class XarExtensionPlan implements Closeable
                                 pages = new HashMap<XarEntry, XarExtensionPlanEntry>();
                                 this.previousXAREntries.put(wiki, pages);
                             }
-                            pages.put(entry, new XarExtensionPlanEntry(previousXARExtension));
+                            pages.put(entry, xarPlanEntry);
                         }
                     }
                 }
@@ -164,6 +174,29 @@ public class XarExtensionPlan implements Closeable
         }
 
         return planEntry;
+    }
+
+    public XarInstalledExtension getPreviousXarExtension(DocumentReference documentReference)
+    {
+        String wiki = documentReference.getWikiReference().getName();
+        LocalDocumentReference localDocumentReference = new LocalDocumentReference(documentReference);
+
+        return getPreviousXarExtension(wiki, localDocumentReference);
+    }
+
+    public XarInstalledExtension getPreviousXarExtension(String wiki, LocalDocumentReference localDocumentReference)
+    {
+        XarExtensionPlanEntry entry = getPreviousXarExtensionPlanEntry(wiki, localDocumentReference);
+
+        return entry != null ? entry.extension : null;
+    }
+
+    public LocalExtension getNextXarExtension(DocumentReference documentReference)
+    {
+        WikiReference wikiReference = documentReference.getWikiReference();
+        LocalDocumentReference localDocumentReference = new LocalDocumentReference(documentReference);
+
+        return getNextXarExtension(wikiReference.getName(), localDocumentReference);
     }
 
     public LocalExtension getNextXarExtension(String wiki, LocalDocumentReference localDocumentReference)

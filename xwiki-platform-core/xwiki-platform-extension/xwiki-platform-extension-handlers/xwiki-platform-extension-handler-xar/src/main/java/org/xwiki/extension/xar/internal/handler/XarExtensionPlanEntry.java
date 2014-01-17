@@ -26,6 +26,7 @@ import java.io.IOException;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.xar.internal.XarException;
 import org.xwiki.xar.internal.XarFile;
+import org.xwiki.xar.internal.XarPackage;
 
 /**
  * @version $Id$
@@ -52,6 +53,19 @@ public class XarExtensionPlanEntry implements Closeable
     {
         this.extension = extension;
         this.xarFile = new XarFile(new File(extension.getFile().getAbsolutePath()));
+    }
+
+    /**
+     * @param extension the extension
+     * @param xarPackage the xar package
+     * @throws XarException when failing to parse extension file
+     * @throws IOException when failing to parse extension file
+     */
+    public XarExtensionPlanEntry(XarInstalledExtension extension, XarPackage xarPackage) throws XarException,
+        IOException
+    {
+        this.extension = extension;
+        this.xarFile = new XarFile(new File(extension.getFile().getAbsolutePath()), xarPackage);
     }
 
     @Override

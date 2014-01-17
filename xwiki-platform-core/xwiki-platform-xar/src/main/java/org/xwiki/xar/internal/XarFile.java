@@ -42,14 +42,19 @@ public class XarFile implements Closeable
 
     public XarFile(File file) throws XarException, IOException
     {
-        this(file, null);
+        this(file, (XarPackage) null);
     }
 
     public XarFile(File file, Collection<XarEntry> pages) throws XarException, IOException
     {
+        this(file, pages != null ? new XarPackage(pages) : null);
+    }
+
+    public XarFile(File file, XarPackage xarPackage) throws XarException, IOException
+    {
         this.file = file;
         this.zipFile = new ZipFile(file);
-        this.xarPackage = pages != null ? new XarPackage(pages) : new XarPackage(this.zipFile);
+        this.xarPackage = xarPackage != null ? xarPackage : new XarPackage(this.zipFile);
     }
 
     public File getFile()

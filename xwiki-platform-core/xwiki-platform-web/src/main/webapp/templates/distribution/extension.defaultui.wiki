@@ -134,13 +134,17 @@
     #if ($distributionState == 'DIFFERENT')
       ## TODO: Display the previous distribution UI extension to let the user uninstall it.
     #else
-      ## Determine if this is a new install or an upgrade from a version where the default distribution UI wasn't installed with
-      ## the Extension Manager (or at least it wasn't marked as installed).
+      ## Determine if this is a new install or an upgrade from a version where the default distribution UI wasn't
+      ## installed with the Extension Manager (or at least it wasn't marked as installed).
       ## Check if there are other extensions installed.
       #set ($installedExtensionCount = $services.extension.installed.getInstalledExtensions($extensionNamespace).size())
-      ## Check if the database is 'empty' (ignoring the documents that are automatically created).
-      #set ($documentCount = $services.query.xwql('').addFilter('unique').addFilter('count').execute().get(0))
-      #if ($installedExtensionCount > 0 || $documentCount > 33)
+      ## Check how many documents that are not XClasses are in the database (a number of XClasses are created
+      ## automatically at startup when the database is empty and we don't want to take them into account).
+      #set ($documentCount = $services.query.xwql("where doc.xWikiClassXML = ''").addFilter('unique').addFilter(
+        'count').execute().get(0))
+      ## Unfortunately there are still 3 documents that are not XClasses and which are created automatically (Watchlist
+      ## notifiers) and we want to exclude them also.
+      #if ($installedExtensionCount > 0 || $documentCount > 3)
 
         ## There are documents in the database (past the default set that is automatically created), maybe from the
         ## previous version of the default distribution UI, but the UI is not marked as installed.

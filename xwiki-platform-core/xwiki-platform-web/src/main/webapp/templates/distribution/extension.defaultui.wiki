@@ -131,14 +131,21 @@
   #if (!$installedVersion && (!$distributionUIJobStatus || $distributionUIJobStatus.state == 'FINISHED'))
     ## There is no previous version of the default UI installed on the current wiki and there is no job running for
     ## the default UI either.
-    #set ($documentCount = 0)
-    #set ($documentCount = $documentCount.parseInt($services.query.xwql('').addFilter('unique').addFilter('count').execute()))
-    #if ($distributionState == 'NEW' && $documentCount > 30)
-
-      ## There are documents in the database but there is no info about the default UI that was previously installed.
-      #repairPreviousUI()
-    #elseif ($distributionState == 'DIFFERENT')
+    #if ($distributionState == 'DIFFERENT')
       ## TODO: Display the previous distribution UI extension to let the user uninstall it.
+    #else
+      ## Determine if this is a new install or an upgrade from a version where the default distribution UI wasn't installed with
+      ## the Extension Manager (or at least it wasn't marked as installed).
+      ## Check if there are other extensions installed.
+      #set ($installedExtensionCount = $services.extension.installed.getInstalledExtensions($extensionNamespace).size())
+      ## Check if the database is 'empty' (ignoring the documents that are automatically created).
+      #set ($documentCount = $services.query.xwql('').addFilter('unique').addFilter('count').execute().get(0))
+      #if ($installedExtensionCount > 0 || $documentCount > 33)
+
+        ## There are documents in the database (past the default set that is automatically created), maybe from the
+        ## previous version of the default distribution UI, but the UI is not marked as installed.
+        #repairPreviousUI()
+      #end
     #end
   #end
 

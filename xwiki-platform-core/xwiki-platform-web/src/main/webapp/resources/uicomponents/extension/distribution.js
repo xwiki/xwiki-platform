@@ -82,28 +82,31 @@ XWiki.DefaultUIStep = Class.create({
 
   _enhancePreviousUiInput : function() {
     // The element used to toggle advanced input.
-    var pencil = new Element('input', {
+    var versionEditButton = new Element('input', {
       type: 'image',
       'class': 'icon',
       src: '$xwiki.getSkinFile("icons/silk/pencil.png")',
       alt: "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint'))",
       title: "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint'))"
     });
-    var idInput = $('previousUiId');
     var versionInput = $('previousUiVersion');
     var versionList = $('previousUiVersionList');
-    // Display the version list by default instead of the version input.
-    versionList.up('dd').removeClassName('hidden').previous().removeClassName('hidden');
+    var idEditButton = versionEditButton.cloneNode();
+    var idInput = $('previousUiId');
+    // Display the version list by default instead of the version input. Allow the users to enter a different version.
+    versionList.insert({'after': versionEditButton}).up('dd').removeClassName('hidden').addClassName('versionSelector')
+      .previous().removeClassName('hidden');
     versionInput.up('dd').hide().previous().hide();
     // Hide the id input and its hint by default because we auto-complete the id based on the selected version.
     idInput.hide().up('dd').previous().down('.xHint').hide();
     // Display a pencil next to the id value to let the user change it.
-    idInput.insert({after: pencil}).insert({after: new Element('span')});
+    idInput.insert({after: idEditButton}).insert({after: new Element('span')});
     // Hide the id label and value by default. Display it when the user selects a version.
     idInput.up('dd').hide().previous().hide();
     versionList.observe('change', this._onSelectPreviousUiVersion.bind(this));
     // Allow advanced input.
-    pencil.observe('click', this._switchToAdvancedPreviousUiInput.bindAsEventListener(this));
+    versionEditButton.observe('click', this._switchToAdvancedPreviousUiInput.bindAsEventListener(this));
+    idEditButton.observe('click', this._switchToAdvancedPreviousUiInput.bindAsEventListener(this));
   },
 
   _onSelectPreviousUiVersion : function() {
@@ -152,13 +155,16 @@ XWiki.DefaultUIStep = Class.create({
 
   _switchToAdvancedPreviousUiInput : function(event) {
     event.stop();
-    event.element().hide().previous().hide();
-    // Show the id input and its hint.
-    $('previousUiId').show().activate().up('dd').previous().down('.xHint').show();
+    // Hide the version list and its edit button.
+    $('previousUiVersionList').up('dd').hide().previous().hide();
+    // Make sure the id and its edit button are hidden.
+    $('previousUiId').next().hide().next().hide();
     // Show the version input and its hint.
     $('previousUiVersion').up('dd').show().previous().show();
-    // Hide the version list.
-    $('previousUiVersionList').up('dd').hide().previous().hide();
+    // Show the id input and its hint.
+    $('previousUiId').show().up('dd').show().previous().show().down('.xHint').show();
+    // Focus the right input depending on which edit button was clicked.
+    event.element().previous('select') ? $('previousUiVersion').activate() : $('previousUiId').activate();
   },
 
   _hidePreviousUiForm : function(event) {

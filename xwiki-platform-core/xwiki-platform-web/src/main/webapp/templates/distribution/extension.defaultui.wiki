@@ -49,6 +49,8 @@
       <dt class="hidden">
         <label for="previousUiVersionList">$escapetool.xml($services.localization.render(
           'platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
+        <span class="xHint">$escapetool.xml($services.localization.render(
+          'platform.extension.distributionWizard.uiStepPreviousUIVersionListHint'))</span>
       </dt>
       <dd class="hidden">
         #getVersions($distributionUIId.id $versions)

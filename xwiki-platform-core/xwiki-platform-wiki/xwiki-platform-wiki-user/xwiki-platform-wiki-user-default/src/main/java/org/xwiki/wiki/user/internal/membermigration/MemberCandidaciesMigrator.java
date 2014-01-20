@@ -24,19 +24,18 @@ import org.xwiki.component.annotation.Role;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 
 /**
- * Migrator to create a valid XWiki.XWikiMemberGroup from the existing XWiki.XWikiAllGroup, and remove glocal users from
- * XWiki.XWikiALlGroup.
+ * Component to mov candidacies from XWikiAllGroup to XWikiMemberGroup.
  *
  * @version $Id$
  * @since 5.4RC1
  */
 @Role
-public interface MemberGroupMigrator
+public interface MemberCandidaciesMigrator
 {
     /**
-     * Migrate the groups of the specified wiki.
+     * Migrate candidacies of the specified wiki.
      * @param wikiId id of the wiki to migrate
      * @throws DataMigrationException if problems occur
      */
-    void migrateGroups(String wikiId) throws DataMigrationException;
+    void migrateCandidacies(String wikiId) throws DataMigrationException;
 }

@@ -30,22 +30,36 @@ import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.user.WikiUserManager;
+import org.xwiki.wiki.user.WikiUserManagerException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.store.migration.DataMigrationException;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Tests for {@link DefaultMemberGroupMigrator}.
+ *
+ * @version $Id$
+ * @since 5.4RC1
+ */
 public class DefaultMemberGroupMigratorTest
 {
     @Rule
@@ -106,17 +120,21 @@ public class DefaultMemberGroupMigratorTest
         when(member3.getStringValue("member")).thenReturn(userGlobal1);
         BaseObject member4 = mock(BaseObject.class);
         when(member4.getStringValue("member")).thenReturn(userGlobal2);
+        BaseObject member5 = mock(BaseObject.class);
+        when(member5.getStringValue("member")).thenReturn("");
         List<BaseObject> membersOfAllGroup = new ArrayList<BaseObject>();
         membersOfAllGroup.add(member1);
         membersOfAllGroup.add(null);
         membersOfAllGroup.add(member2);
         membersOfAllGroup.add(member3);
         membersOfAllGroup.add(member4);
+        membersOfAllGroup.add(member5);
 
-        when(documentReferenceResolver.resolve(userLocal1)).thenReturn(userLocalRef1);
-        when(documentReferenceResolver.resolve(userLocal2)).thenReturn(userLocalRef2);
-        when(documentReferenceResolver.resolve(userGlobal1)).thenReturn(userGlobalRef1);
-        when(documentReferenceResolver.resolve(userGlobal2)).thenReturn(userGlobalRef2);
+        WikiReference wikiReference = new WikiReference("subwiki");
+        when(documentReferenceResolver.resolve(eq(userLocal1), eq(wikiReference))).thenReturn(userLocalRef1);
+        when(documentReferenceResolver.resolve(eq(userLocal2), eq(wikiReference))).thenReturn(userLocalRef2);
+        when(documentReferenceResolver.resolve(eq(userGlobal1), eq(wikiReference))).thenReturn(userGlobalRef1);
+        when(documentReferenceResolver.resolve(eq(userGlobal2), eq(wikiReference))).thenReturn(userGlobalRef2);
 
         DocumentReference allGroupRef = new DocumentReference("subwiki", "XWiki", "XWikiAllGroup");
         DocumentReference memberGroupRef = new DocumentReference("subwiki", "XWiki", "XWikiMemberGroup");
@@ -149,4 +167,52 @@ public class DefaultMemberGroupMigratorTest
         // The document has been saved
         verify(xwiki).saveDocument(allGroupDoc, "Remove all global users from this group.", xcontext);
     }
+
+    @Test
+    public void migrateGroupsException() throws Exception
+    {
+        Exception exception = new XWikiException();
+        DocumentReference allGroupRef = new DocumentReference("subwiki", "XWiki", "XWikiAllGroup");
+        when(xwiki.getDocument(eq(allGroupRef), any(XWikiContext.class))).thenThrow(exception);
+
+        // Test
+        boolean exceptionCaught = false;
+        try {
+            mocker.getComponentUnderTest().migrateGroups("subwiki");
+        } catch (DataMigrationException e) {
+            exceptionCaught = true;
+            assertEquals("Failed to get or save the XWiki.XWikiAllGroup document in the wiki [subwiki].",
+                    e.getMessage());
+        }
+
+        assertTrue(exceptionCaught);
+    }
+
+    @Test
+    public void migrateGroupsWikiUserException() throws Exception
+    {
+        DocumentReference allGroupRef = new DocumentReference("subwiki", "XWiki", "XWikiAllGroup");
+        DocumentReference memberGroupRef = new DocumentReference("subwiki", "XWiki", "XWikiMemberGroup");
+
+        XWikiDocument allGroupDoc = mock(XWikiDocument.class);
+        XWikiDocument memberGroupDoc = mock(XWikiDocument.class);
+
+        when(xwiki.getDocument(allGroupRef, xcontext)).thenReturn(allGroupDoc);
+        when(xwiki.getDocument(memberGroupRef, xcontext)).thenReturn(memberGroupDoc);
+
+        Exception exception = new WikiUserManagerException("error in addMembers");
+        doThrow(exception).when(wikiUserManager).addMembers(any(List.class), eq("subwiki"));
+
+        // Test
+        boolean exceptionCaught = false;
+        try {
+            mocker.getComponentUnderTest().migrateGroups("subwiki");
+        } catch (DataMigrationException e) {
+            exceptionCaught = true;
+            assertEquals("Failed to create the member list of wiki [subwiki].", e.getMessage());
+        }
+
+        assertTrue(exceptionCaught);
+    }
+
 }

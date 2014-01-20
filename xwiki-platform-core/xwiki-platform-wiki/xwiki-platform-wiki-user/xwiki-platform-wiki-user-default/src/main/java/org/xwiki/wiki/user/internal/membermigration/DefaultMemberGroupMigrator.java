@@ -39,7 +39,14 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.store.migration.DataMigrationException;
 
+/**
+ * Default implementation for {@link org.xwiki.wiki.user.internal.membermigration.MemberGroupMigrator}.
+ *
+ * @version $Id$
+ * @since 5.4RC1
+ */
 @Component
 public class DefaultMemberGroupMigrator implements MemberGroupMigrator
 {
@@ -65,23 +72,20 @@ public class DefaultMemberGroupMigrator implements MemberGroupMigrator
     private Provider<XWikiContext> xcontextProvider;
 
     @Override
-    public void migrateGroups(String wikiId)
+    public void migrateGroups(String wikiId) throws DataMigrationException
     {
-        String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
-
-        DocumentReference allGroupDocRef = new DocumentReference(currentWikiId, XWiki.SYSTEM_SPACE,
+        DocumentReference allGroupDocRef = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE,
                 ALL_GROUP_PAGE_NAME);
-
         try {
-            List<String> users = getAllGlobalUsersFromAllGroup(allGroupDocRef, currentWikiId);
-            wikiUserManager.addMembers(users, currentWikiId);
-            removeGlobalUsersFromAllGroup(allGroupDocRef, currentWikiId);
+            List<String> users = getAllGlobalUsersFromAllGroup(allGroupDocRef, wikiId);
+            wikiUserManager.addMembers(users, wikiId);
+            removeGlobalUsersFromAllGroup(allGroupDocRef, wikiId);
         } catch (WikiUserManagerException e) {
-            logger.error("Failed to add create the member list of wiki {}. The migration of wiki members has failed",
-                    currentWikiId, e);
+            throw new DataMigrationException(String.format("Failed to create the member list of wiki [%s].",
+                    wikiId), e);
         } catch (XWikiException e) {
-            logger.error("Failed to get the XWikiAllGroup document in the wiki {}. The migration if wiki members has"
-                    + " failed.", currentWikiId, e);
+            throw new DataMigrationException(String.format("Failed to get or save the XWiki.XWikiAllGroup document"
+                    + " in the wiki [%s].", wikiId), e);
         }
 
     }
@@ -90,7 +94,7 @@ public class DefaultMemberGroupMigrator implements MemberGroupMigrator
      * @return the list of global users contained in XWikiAllGroup
      */
     private List<String> getAllGlobalUsersFromAllGroup(DocumentReference allGroupDocRef, String currentWiki)
-            throws XWikiException
+        throws XWikiException
     {
         // The result list to return
         List<String> members = new ArrayList<String>();
@@ -101,6 +105,9 @@ public class DefaultMemberGroupMigrator implements MemberGroupMigrator
 
         // Get the XWikiAllGroup document
         XWikiDocument allGroupDoc = xwiki.getDocument(allGroupDocRef, xcontext);
+
+        // Reference to the current wiki
+        WikiReference wikiReference = new WikiReference(currentWiki);
 
         // Get the group objects
         DocumentReference classReference =
@@ -115,7 +122,7 @@ public class DefaultMemberGroupMigrator implements MemberGroupMigrator
                 // Get the userId
                 String userId = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
                 // If the user is global
-                if (isGlobalUser(userId)) {
+                if (isGlobalUser(userId, wikiReference)) {
                     // Add it the the list
                     members.add(userId);
                 }
@@ -126,7 +133,7 @@ public class DefaultMemberGroupMigrator implements MemberGroupMigrator
     }
 
     private void removeGlobalUsersFromAllGroup(DocumentReference allGroupDocRef, String currentWiki)
-            throws XWikiException
+        throws XWikiException
     {
         // Get XWiki objects
         XWikiContext xcontext = xcontextProvider.get();
@@ -134,6 +141,9 @@ public class DefaultMemberGroupMigrator implements MemberGroupMigrator
 
         // Get the document
         XWikiDocument groupDoc = xwiki.getDocument(allGroupDocRef, xcontext);
+
+        // Reference to the current wiki
+        WikiReference wikiReference = new WikiReference(currentWiki);
 
         // Document status
         boolean modified = false;
@@ -149,7 +159,7 @@ public class DefaultMemberGroupMigrator implements MemberGroupMigrator
                     continue;
                 }
                 String userId = object.getStringValue(GROUP_CLASS_MEMBER_FIELD);
-                if (isGlobalUser(userId)) {
+                if (isGlobalUser(userId, wikiReference)) {
                     // remove the object
                     groupDoc.removeXObject(object);
                     modified = true;
@@ -162,9 +172,12 @@ public class DefaultMemberGroupMigrator implements MemberGroupMigrator
         }
     }
 
-    private boolean isGlobalUser(String userId)
+    private boolean isGlobalUser(String userId, WikiReference currentWiki)
     {
-        DocumentReference userDocRef = documentReferenceResolver.resolve(userId);
+        if (userId.equals("")) {
+            return false;
+        }
+        DocumentReference userDocRef = documentReferenceResolver.resolve(userId, currentWiki);
         WikiReference wiki = userDocRef.getWikiReference();
         return (wiki != null && wiki.getName().equals(wikiDescriptorManager.getMainWikiId()));
     }

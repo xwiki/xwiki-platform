@@ -1074,13 +1074,9 @@ return XWiki;
   #set($membersValue = '')
   #foreach($m in $members)
     #if($m != '')
-      #if($velocityCount &gt; 1)
-        #set($membersValue = "${membersValue},")
-      #end
-      #set($membersValue = "${membersValue}${m}")
+      &lt;input type="hidden" name="members" value="$!escapetool.xml($m)" /&gt;
     #end
   #end
-  &lt;input type="hidden" name="members" value="$!escapetool.xml($membersValue)" /&gt;
 #end
 ##################################
 ##     TEMPLATE PROVISIONING

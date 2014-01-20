@@ -110,8 +110,8 @@ public class DefaultMemberCandidaciesMigratorTest
         // Verify
         verify(newCandidacy).setStringValue("type", "test Type");
         verify(allGroupDoc).removeXObject(oldCandidacy);
-        verify(xwiki).saveDocument(allGroupDoc, "Move candidacies from XWikiAllGroup to XWikiMemberGroup.", xcontext);
-        verify(xwiki).saveDocument(memberGroupDoc, "Move candidacies from XWikiAllGroup to XWikiMemberGroup.", xcontext);
+        verify(xwiki).saveDocument(allGroupDoc, "[UPGRADE] Move candidacies from XWikiAllGroup to XWikiMemberGroup.", xcontext);
+        verify(xwiki).saveDocument(memberGroupDoc, "[UPGRADE] Move candidacies from XWikiAllGroup to XWikiMemberGroup.", xcontext);
 
     }
 

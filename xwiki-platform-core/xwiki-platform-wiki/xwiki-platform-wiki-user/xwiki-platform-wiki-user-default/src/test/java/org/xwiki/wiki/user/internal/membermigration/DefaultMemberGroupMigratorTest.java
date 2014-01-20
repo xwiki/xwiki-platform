@@ -165,7 +165,7 @@ public class DefaultMemberGroupMigratorTest
         verify(allGroupDoc, never()).removeXObject(member1);
         verify(allGroupDoc, never()).removeXObject(member2);
         // The document has been saved
-        verify(xwiki).saveDocument(allGroupDoc, "Remove all global users from this group.", xcontext);
+        verify(xwiki).saveDocument(allGroupDoc, "[UPGRADE] Remove all global users from this group.", xcontext);
     }
 
     @Test

@@ -106,7 +106,7 @@ public class DefaultMemberCandidaciesMigrator implements MemberCandidaciesMigrat
                 }
 
                 // Save
-                String message = "Move candidacies from XWikiAllGroup to XWikiMemberGroup.";
+                String message = "[UPGRADE] Move candidacies from XWikiAllGroup to XWikiMemberGroup.";
                 xwiki.saveDocument(memberGroup, message, xcontext);
                 xwiki.saveDocument(allGroup, message, xcontext);
             }

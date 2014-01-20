@@ -136,11 +136,11 @@ public class DefaultMemberRightsMigratorTest
 
         // Verify XWikiRights
         verify(obj1).setLargeStringValue(eq("groups"), eq("Test,,XWiki.XWikiMemberGroup,Test2"));
-        verify(xwiki).saveDocument(doc1, "Set rights for XWikiMemberGroup", xcontext);
+        verify(xwiki).saveDocument(doc1, "[UPGRADE] Set rights for XWikiMemberGroup", xcontext);
 
         // Verify XWikiGlobalRights
         verify(obj2).setLargeStringValue(eq("groups"), eq("XWiki.XWikiMemberGroup"));
-        verify(xwiki).saveDocument(doc2, "Set rights for XWikiMemberGroup", xcontext);
+        verify(xwiki).saveDocument(doc2, "[UPGRADE] Set rights for XWikiMemberGroup", xcontext);
     }
 
     @Test

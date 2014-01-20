@@ -168,7 +168,7 @@ public class DefaultMemberGroupMigrator implements MemberGroupMigrator
         }
 
         if (modified) {
-            xwiki.saveDocument(groupDoc, "Remove all global users from this group.", xcontext);
+            xwiki.saveDocument(groupDoc, "[UPGRADE] Remove all global users from this group.", xcontext);
         }
     }
 

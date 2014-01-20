@@ -151,7 +151,7 @@ public class DefaultMemberRightsMigrator implements MemberRightsMigrator
 
         // Save the document
         if (modified) {
-            xwiki.saveDocument(doc, "Set rights for XWikiMemberGroup", xcontext);
+            xwiki.saveDocument(doc, "[UPGRADE] Set rights for XWikiMemberGroup", xcontext);
         }
     }
 }

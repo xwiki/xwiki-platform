@@ -60,7 +60,7 @@ XWiki.DefaultUIStep = Class.create({
     var hidePreviousUiForm = this._hidePreviousUiForm.bindAsEventListener(this);
     secondaryButton.observe('click', hidePreviousUiForm);
     // Simplify the way the previous UI is specified.
-    this._enhancePreviousUiInput();
+    $('previousUiVersionList') && this._enhancePreviousUiInput();
     // Enhance and show the upgrade question.
     var question = form.previous().removeClassName('hidden');
     question.down('.button').observe('click', function(event) {
@@ -110,47 +110,15 @@ XWiki.DefaultUIStep = Class.create({
   },
 
   _onSelectPreviousUiVersion : function() {
-    var idInput = $('previousUiId');
-    idInput.up('dd').show().previous().show();
     var versionList = $('previousUiVersionList');
-    // FIXME: We should retrieve the list of previous versions for the recommended UI, by getting the available versions
-    // for each of its features (old identifiers).
-    $('previousUiVersion').value = versionList.options[versionList.selectedIndex].value;
-    // Auto-complete the id based on the selected version.
-    if (versionList.selectedIndex == 0) {
-      var id = '';
-    } else if (versionList.length == 102) {
-      // XWiki Manager versions
-      if (versionList.selectedIndex < 27) {
-        // 4.2M2 -> 3.3-milestone-1
-        var id = 'org.xwiki.manager:xwiki-manager-ui';
-      } else if (versionList.selectedIndex < 38) {
-        // 3.2.1 -> 3.1-milestone-1
-        var id = 'org.xwiki.manager:xwiki-manager-wiki-administrator';
-      } else if (versionList.selectedIndex < 46) {
-        // 3.0.1 -> 2.6
-        var id = 'org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator';
-      } else {
-        // 2.5.2 -> 1.0-milestone-1
-        var id = 'com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator';
-      }
-    } else {
-      // XWiki Enterprise versions
-      if (versionList.selectedIndex < 27) {
-        // 4.2M2 -> 3.3-milestone-1
-        var id = 'org.xwiki.enterprise:xwiki-enterprise-ui';
-      } else if (versionList.selectedIndex < 53) {
-        // 3.2.1 -> 2.6-rc-1
-        var id = 'org.xwiki.enterprise:xwiki-enterprise-wiki';
-      } else {
-        // 2.5.2 -> 1.1-milestone-3
-        var id = 'com.xpn.xwiki.products:xwiki-enterprise-wiki';
-      }
-    }
-    // Update the value of the hidden input.
-    idInput.value = id;
-    // Update the displayed value.
-    idInput.next().update(id);
+    var selectedVersion = versionList.options[versionList.selectedIndex];
+    // Fill the version input with the selected value in case the user decides to modify it.
+    $('previousUiVersion').value = selectedVersion.value;
+    // Show the extension id that corresponds to the selected version.
+    var idInput = $('previousUiId');
+    idInput.next().update(selectedVersion.title).up('dd').show().previous().show();
+    // Fill the id input with the extension id that corresponds to the selected version.
+    idInput.value = selectedVersion.title;
   },
 
   _switchToAdvancedPreviousUiInput : function(event) {

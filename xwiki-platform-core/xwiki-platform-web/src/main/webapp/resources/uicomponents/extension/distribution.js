@@ -300,19 +300,8 @@ XWiki.OutdatedExtensionsStep = Class.create(AbstractExtensionListStep, {
 
 var WikisStep = Class.create(AbstractExtensionListStep, {
   _isCompleted : function() {
-    // This step is completed when all the listed wikis have the recommended user interface version installed.
-    var wikiCount = this.container.down('dl').childElements().length / 2;
-    var extensions = this.container.select('.extension-item');
-    if (wikiCount != extensions.length) {
-      // Some extensions couldn't be resolved.
-      return false;
-    }
-    for (var i = 0; i < extensions.length; i++) {
-      if (!extensions[i].hasClassName('extension-item-installed')) {
-        // The recommended user interface version is not installed.
-        return false;
-      }
-    }
+    // It's not mandatory to upgrade all the wikis in this step because the upgrade can be performed later by accessing
+    // each wiki separately. So unless there is a subwiki upgrade in progress, this step is always completed.
     return true;
   }
 });

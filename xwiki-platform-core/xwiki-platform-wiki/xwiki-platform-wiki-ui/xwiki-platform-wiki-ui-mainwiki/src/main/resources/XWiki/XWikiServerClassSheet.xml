@@ -89,7 +89,7 @@
 
   #end
 #end
-#####################Unable########
+#############################
 ##      DELETE ALIAS
 #############################
 #macro(deleteAlias)
@@ -113,22 +113,36 @@
 #############################
 #macro(displaySettings)
   = {{translation key="platform.wiki.sheet.title.settings"/}} =
-  #displayField('wikiprettyname', $descriptorObj)
-  #displayField('owner', $descriptorObj)
-  #displayField('secure', $descriptorObj)
-  #displayField('iswikitemplate', $templateObj)
-  #displayField('server', $descriptorObj)
-  #displayField('description', $descriptorObj)
-  #displayField('homepage', $descriptorObj)
+  {{html wiki="true" clean="false"}}
+  &lt;div class="xform"&gt;
+  &lt;dl&gt;
+    #displayField('wikiprettyname', $descriptorObj)
+    #displayField('owner', $descriptorObj)
+    #displayField('secure', $descriptorObj)
+    #displayField('iswikitemplate', $templateObj)
+    #displayField('server', $descriptorObj)
+    #displayField('description', $descriptorObj)
+    #displayField('homepage', $descriptorObj)
+  &lt;/dl&gt;
+  &lt;/div&gt;
+  {{/html}}
 #end
 #############################
 ##      DISPLAY FIELD
 #############################
 #macro(displayField $fieldName $object)
   #if ("$!object" != '')
-    ; {{translation key="platform.wiki.sheet.prop.${fieldName}"/}}:
-    : $object.get($fieldName)
-    {{translation key="platform.wiki.sheet.desc.${fieldName}"/}}
+    &lt;dt&gt;
+      #if ($xcontext.action=='edit')
+        &lt;label for="${object.xWikiClass.name}_${object.number}_${fieldName}"&gt;
+      #else
+        &lt;label&gt;
+      #end
+      {{translation key="platform.wiki.sheet.prop.${fieldName}" /}}:
+      &lt;/label&gt;
+      &lt;span class="xHint"&gt;{{translation key="platform.wiki.sheet.desc.${fieldName}" /}}&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;$object.get($fieldName)&lt;/dd&gt;
   #end
 #end
 #############################
@@ -141,9 +155,17 @@
     #foreach ($alias in $aliases)
       #if ($velocityCount &gt; 1)
         == $alias.display('server', 'view') ==
-        #displayField('description', $alias)
-        #displayField('homepage', $alias)
-        #deleteButton($alias)
+        {{html wiki="true" clean="false"}}
+        &lt;div class="xform"&gt;
+          &lt;dl&gt;
+            #displayField('description', $alias)
+            #displayField('homepage', $alias)
+          &lt;/dl&gt;
+        &lt;/div&gt;
+        {{/html}}
+        #if ($xcontext.action == 'view')
+          #deleteButton($alias)
+        #end
       #end
     #end 
   #end
@@ -156,10 +178,12 @@
 
     {{html}}
       &lt;form method="get" action="$doc.getURL('view')"&gt;
-        &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-        &lt;input type="hidden" name="action" value="delete"/&gt;
-        &lt;input type="hidden" name="domain" value="$alias.server"/&gt;
-        &lt;input type="submit" class="button" value="$services.localization.render('delete')"/&gt;
+        &lt;fieldset&gt;
+          &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+          &lt;input type="hidden" name="action" value="delete"/&gt;
+          &lt;input type="hidden" name="domain" value="$alias.server"/&gt;
+          &lt;input type="submit" class="button" value="$services.localization.render('delete')"/&gt;
+        &lt;/fieldset&gt;
       &lt;/form&gt;
     {{/html}}
 

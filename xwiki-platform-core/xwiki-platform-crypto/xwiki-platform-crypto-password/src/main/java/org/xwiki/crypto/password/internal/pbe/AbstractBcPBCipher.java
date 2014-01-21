@@ -32,7 +32,7 @@ import org.xwiki.crypto.password.KeyDerivationFunction;
  * @version $Id$
  * @since 5.4M1
  */
-public abstract class AbstractBcPBCypher extends AbstractPBCipher
+public abstract class AbstractBcPBCipher extends AbstractPBCipher
 {
     /**
      * New PBE Cipher instance, that wrap the cipher created using the given key derivation function and parameters.
@@ -41,7 +41,7 @@ public abstract class AbstractBcPBCypher extends AbstractPBCipher
      * @param kdf the key derivation function used to derive the key of this cipher.
      * @param parameters the cipher parameter used.
      */
-    public AbstractBcPBCypher(Cipher cipher, KeyDerivationFunction kdf, SymmetricCipherParameters parameters)
+    public AbstractBcPBCipher(Cipher cipher, KeyDerivationFunction kdf, SymmetricCipherParameters parameters)
     {
         super(cipher, kdf, parameters);
     }

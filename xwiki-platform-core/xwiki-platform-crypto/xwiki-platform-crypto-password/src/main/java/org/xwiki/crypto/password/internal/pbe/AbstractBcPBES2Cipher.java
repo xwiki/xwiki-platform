@@ -36,7 +36,7 @@ import org.xwiki.crypto.password.internal.kdf.PBES2Parameters;
  *
  * @version $Id$
  */
-public abstract class AbstractBcPBES2Cipher extends AbstractBcPBCypher
+public abstract class AbstractBcPBES2Cipher extends AbstractBcPBCipher
 {
     /**
      * New PBE Cipher instance, that wrap the cipher created using the given key derivation function and parameters.

@@ -35,6 +35,7 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.internal.AbstractExtensionJob;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
@@ -88,6 +89,9 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
      */
     @Inject
     private LocalExtensionRepository localRepository;
+
+    @Inject
+    private CoreExtensionRepository coreRepository;
 
     @Override
     public String getType()
@@ -267,16 +271,20 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
      */
     private void repairDependency(ExtensionDependency extensionDependency, String namespace)
     {
-        if (extensionDependency.getVersionConstraint().getVersion() == null) {
-            this.logger.warn("Can't repair extension dependency [{}] with version range ([{}])"
-                + " since there is no way to know what has been installed", extensionDependency.getId(),
-                extensionDependency.getVersionConstraint());
-        } else {
-            try {
-                repairExtension(new ExtensionId(extensionDependency.getId(), extensionDependency.getVersionConstraint()
-                    .getVersion()), namespace, true);
-            } catch (InstallException e) {
-                this.logger.warn("Failed to repair dependency [{}]", extensionDependency, e);
+        // Skip core extensions
+        if (this.coreRepository.getCoreExtension(extensionDependency.getId()) == null) {
+            if (extensionDependency.getVersionConstraint().getVersion() == null) {
+                this.logger.warn("Can't repair extension dependency [{}] with version range ([{}])"
+                    + " since there is no way to know what has been installed", extensionDependency.getId(),
+                    extensionDependency.getVersionConstraint());
+
+            } else {
+                try {
+                    repairExtension(new ExtensionId(extensionDependency.getId(), extensionDependency
+                        .getVersionConstraint().getVersion()), namespace, true);
+                } catch (InstallException e) {
+                    this.logger.warn("Failed to repair dependency [{}]", extensionDependency, e);
+                }
             }
         }
     }

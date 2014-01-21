@@ -75,7 +75,7 @@ public class BcPKCS5S2KeyDerivationFunctionFactoryTest
     public void pbkdf2ConformanceTest1() throws Exception
     {
         byte[] salt = Hex.decode("12 34 56 78 78 56 34 12");
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray(), PKCS5);
+        byte[] password = PasswordToByteConverter.convert("password", PKCS5);
         byte[] key = Hex.decode("D1 DA A7 86 15 F2 87 E6");
 
         assertThat(getKDFInstance(
@@ -88,7 +88,7 @@ public class BcPKCS5S2KeyDerivationFunctionFactoryTest
     {
         byte[] salt = Hex.decode("12 34 56 78 78 56 34 12");
         byte[] password = PasswordToByteConverter.convert(
-            "All n-entities must communicate with other n-entities via n-1 entiteeheehees".toCharArray(), PKCS5);
+            "All n-entities must communicate with other n-entities via n-1 entiteeheehees", PKCS5);
         byte[] key = Hex.decode("6A 89 70 BF 68 C9 2C AE A8 4A 8D F2 85 10 85 86");
 
         assertThat(getKDFInstance(
@@ -100,7 +100,7 @@ public class BcPKCS5S2KeyDerivationFunctionFactoryTest
     public void pbkdf2ConfluenceTest() throws Exception
     {
         byte[] salt = Hex.decode("0d0217254d37f2ee0fec576cb854d8ff");
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray());
+        byte[] password = PasswordToByteConverter.convert("password");
         byte[] key = Hex.decode("edf96e6e3591f8d96b9ed4addc47a7632edea176bb2fa8a03fa3179b75b5bf09");
 
         assertThat(getKDFInstance(
@@ -111,7 +111,7 @@ public class BcPKCS5S2KeyDerivationFunctionFactoryTest
     public void pbkdf2PKCS12Test() throws Exception
     {
         byte[] salt = Hex.decode("12 34 56 78 78 56 34 12");
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray(), PKCS12);
+        byte[] password = PasswordToByteConverter.convert("password", PKCS12);
         byte[] key = new byte[] { 5, 54, -36, -24, 96, -76, 7, -128 };
 
         assertThat(getKDFInstance(
@@ -122,7 +122,7 @@ public class BcPKCS5S2KeyDerivationFunctionFactoryTest
     public void pbkdf2WithIVTest() throws Exception
     {
         byte[] salt = Hex.decode("12 34 56 78 78 56 34 12");
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray());
+        byte[] password = PasswordToByteConverter.convert("password");
         byte[] key = Hex.decode("d1daa78615f287e6a1c8b120d7062a493f98d203e6be49a6adf4fa574b6e64ee");
         byte[] iv = Hex.decode("df377ef2e8ad463fb711f1b4ff27139a");
 
@@ -136,7 +136,7 @@ public class BcPKCS5S2KeyDerivationFunctionFactoryTest
     @Test
     public void pbkdf2KeyWithRandomSalt() throws Exception
     {
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray());
+        byte[] password = PasswordToByteConverter.convert("password");
 
         PBKDF2Parameters kdfParam1 = new PBKDF2Parameters(32, 5);
         KeyParameter params1 = getKDFInstance(kdfParam1).derive(password);
@@ -154,7 +154,7 @@ public class BcPKCS5S2KeyDerivationFunctionFactoryTest
     public void pbkdf2KeyWithRandomIterationCount() throws Exception
     {
         byte[] salt = Hex.decode("12 34 56 78 78 56 34 12");
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray());
+        byte[] password = PasswordToByteConverter.convert("password");
 
         PBKDF2Parameters kdfParam1 = new PBKDF2Parameters(24, salt);
         KeyParameter params1 = getKDFInstance(kdfParam1).derive(password);
@@ -171,7 +171,7 @@ public class BcPKCS5S2KeyDerivationFunctionFactoryTest
     @Test
     public void pbkdf2KeyWithRandomSaltAndIterationCount() throws Exception
     {
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray());
+        byte[] password = PasswordToByteConverter.convert("password");
 
         PBKDF2Parameters kdfParam1 = new PBKDF2Parameters(16);
         KeyParameter params1 = getKDFInstance(kdfParam1).derive(password);
@@ -188,7 +188,7 @@ public class BcPKCS5S2KeyDerivationFunctionFactoryTest
     @Test
     public void pbkdf2KeyWithIVWithRandomSalt() throws Exception
     {
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray());
+        byte[] password = PasswordToByteConverter.convert("password");
 
         PBKDF2Parameters kdfParam1 = new PBKDF2Parameters(32, 5);
         KeyWithIVParameters params1 = getKDFInstance(kdfParam1).derive(password, 16);
@@ -207,7 +207,7 @@ public class BcPKCS5S2KeyDerivationFunctionFactoryTest
     public void pbkdf2KeyWithIVWithRandomIterationCount() throws Exception
     {
         byte[] salt = Hex.decode("12 34 56 78 78 56 34 12");
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray());
+        byte[] password = PasswordToByteConverter.convert("password");
 
         PBKDF2Parameters kdfParam1 = new PBKDF2Parameters(24, salt);
         KeyWithIVParameters params1 = getKDFInstance(kdfParam1).derive(password, 12);
@@ -225,7 +225,7 @@ public class BcPKCS5S2KeyDerivationFunctionFactoryTest
     @Test
     public void pbkdf2KeyWithIVWithRandomSaltAndIterationCount() throws Exception
     {
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray());
+        byte[] password = PasswordToByteConverter.convert("password");
 
         PBKDF2Parameters kdfParam1 = new PBKDF2Parameters(16);
         KeyWithIVParameters params1 = getKDFInstance(kdfParam1).derive(password, 8);
@@ -243,7 +243,7 @@ public class BcPKCS5S2KeyDerivationFunctionFactoryTest
     @Test
     public void pbkdf2SerializationDeserializationTest() throws Exception
     {
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray());
+        byte[] password = PasswordToByteConverter.convert("password");
         KeyDerivationFunction kdf = getKDFInstance(new PBKDF2Parameters(32, 1000));
         KeyWithIVParameters params = kdf.derive(password, 8);
 

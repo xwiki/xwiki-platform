@@ -52,9 +52,32 @@ public final class PasswordToByteConverter
      * @param password password to convert.
      * @return a bytes array representing the password.
      */
+    public static byte[] convert(String password)
+    {
+        return convert(password.toCharArray());
+    }
+
+    /**
+     * Convert password to bytes.
+     *
+     * @param password password to convert.
+     * @return a bytes array representing the password.
+     */
     public static byte[] convert(char[] password)
     {
         return convert(password, ToBytesMode.PKCS5_UTF8);
+    }
+
+    /**
+     * Convert password to bytes.
+     *
+     * @param password password to convert.
+     * @param mode mode of conversion.
+     * @return a bytes array representing the password.
+     */
+    public static byte[] convert(String password, ToBytesMode mode)
+    {
+        return convert(password.toCharArray(), mode);
     }
 
     /**

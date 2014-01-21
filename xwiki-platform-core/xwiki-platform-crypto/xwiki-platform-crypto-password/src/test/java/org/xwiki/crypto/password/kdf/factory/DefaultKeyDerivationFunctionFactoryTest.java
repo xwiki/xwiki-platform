@@ -64,7 +64,7 @@ public class DefaultKeyDerivationFunctionFactoryTest
     @Test
     public void Pbkdf2DecodingTest() throws Exception
     {
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray());
+        byte[] password = PasswordToByteConverter.convert("password");
         byte[] encoded = Base64.decode("MCYGCSqGSIb3DQEFDDAZBBAcO15L0rQ01O2RJ5UhyqCdAgID6AIBIA==");
 
         KeyDerivationFunction kdf = getKDFInstance(new PBKDF2Parameters(32, 1000, Hex.decode(
@@ -82,7 +82,7 @@ public class DefaultKeyDerivationFunctionFactoryTest
     @Test
     public void ScryptDecodingTest() throws Exception
     {
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray());
+        byte[] password = PasswordToByteConverter.convert("password");
         byte[] encoded = Base64.decode("MCwGCSsGAQQB2kcECzAfBBAcO15L0rQ01O2RJ5UhyqCdAgICAAIBEAIBAgIBIA==");
 
         KeyDerivationFunction kdf = getKDFInstance(new ScryptParameters(32, 512, 2, 16, Hex.decode("1c3b5e4bd2b434d4ed91279521caa09d")));

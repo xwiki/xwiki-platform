@@ -101,7 +101,7 @@ public class BcScryptKeyDerivationFunctionFactoryTest
     @Test
     public void scryptSerializationDeserializationTest() throws Exception
     {
-        byte[] password = PasswordToByteConverter.convert("password".toCharArray());
+        byte[] password = PasswordToByteConverter.convert("password");
         KeyDerivationFunction kdf = getKDFInstance(new ScryptParameters(64, 512, 8));
         KeyWithIVParameters params = kdf.derive(password, 8);
 

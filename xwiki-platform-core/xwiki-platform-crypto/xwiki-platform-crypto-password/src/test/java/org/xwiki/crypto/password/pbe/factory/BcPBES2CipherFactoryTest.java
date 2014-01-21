@@ -19,9 +19,6 @@
  */
 package org.xwiki.crypto.password.pbe.factory;
 
-import java.io.ByteArrayInputStream;
-
-import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.pkcs.EncryptedPrivateKeyInfo;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
@@ -68,7 +65,7 @@ import static org.junit.Assert.assertThat;
     BcSHA224DigestFactory.class, BcSHA256DigestFactory.class, BcSHA384DigestFactory.class, BcSHA512DigestFactory.class})
 public class BcPBES2CipherFactoryTest
 {
-    private static final byte[] PASSWORD = PasswordToByteConverter.convert("changeit".toCharArray());
+    private static final byte[] PASSWORD = PasswordToByteConverter.convert("changeit");
 
     /**
      * Sample RSA KEY and encrypted versions taken from not-yet-commons-ssl source code.
@@ -142,9 +139,7 @@ public class BcPBES2CipherFactoryTest
     private void testPBES2Conformance(MockitoComponentMockingRule<? extends PasswordBasedCipherFactory> mocker,
         String iv, int keySize, String salt, byte[] data) throws Exception
     {
-        ByteArrayInputStream bIn = new ByteArrayInputStream(data);
-        ASN1InputStream dIn = new ASN1InputStream(bIn);
-        EncryptedPrivateKeyInfo info = EncryptedPrivateKeyInfo.getInstance(dIn.readObject());
+        EncryptedPrivateKeyInfo info = EncryptedPrivateKeyInfo.getInstance(data);
 
         PasswordBasedCipher cipher = factory.getInstance(false, PASSWORD, info.getEncryptionAlgorithm().getEncoded());
 

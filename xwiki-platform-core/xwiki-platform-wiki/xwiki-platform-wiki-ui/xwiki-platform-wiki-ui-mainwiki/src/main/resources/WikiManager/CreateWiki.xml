@@ -519,7 +519,10 @@ return XWiki;
   display: inline;
   text-transform: none;
 }
-      </code>
+
+.whatnext{
+  margin: 1em;
+}</code>
     </property>
     <property>
       <name>CSS</name>
@@ -748,7 +751,6 @@ return XWiki;
 ## Display the wizard footer
 ##################################
 #macro(wizardFooter $prev $next $create $finalize)
-  &lt;div class="clearfloats"&gt;&lt;/div&gt;
   &lt;div class="wizard-footer buttons"&gt;
     #if("$!prev" !='')
       &lt;span class="buttonwrapper left"&gt;      
@@ -884,6 +886,7 @@ return XWiki;
         &lt;/div&gt;
       ### END OF WIZARD BODY
       &lt;/div&gt;
+      &lt;div class="clearfloats"&gt;&lt;/div&gt;
       #wizardFooter('', 'members', '')
     &lt;/form&gt;
   {{/html}}
@@ -1011,6 +1014,12 @@ return XWiki;
         &lt;/div&gt;
       ### END OF WIZARD BODY
       &lt;/div&gt;
+      &lt;div class="clearfloats"&gt;&lt;/div&gt;
+      #if ("$!request.template" == '' || $request.template == 'xwikinotemplate')
+        &lt;div class="box infomessage whatnext"&gt;
+          &lt;p&gt;$services.localization.render('platform.wiki.create.wizard.step.dw')&lt;/p&gt;
+        &lt;/div&gt;
+      #end
       #wizardFooter('type', '', 'create')
     &lt;/form&gt;
   {{/html}}

@@ -226,6 +226,7 @@ platform.wiki.create.wizard.template.noTemplate=No template (default)
 platform.wiki.create.wizard.userScope.label=User Scope
 platform.wiki.create.wizard.userScope.hint=Select what kind of users can access to the wiki
 platform.wiki.create.wizard.template.label=Template
+platform.wiki.create.wizard.step.dw=After clicking on "create", the wiki will be created but then the Distribution Wizard will be started to initialize your wiki. If you skip it, your wiki will be empty.
 
 ## Admin
 admin.wikis=Wikis

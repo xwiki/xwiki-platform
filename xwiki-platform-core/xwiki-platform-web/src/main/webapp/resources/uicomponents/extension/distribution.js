@@ -210,7 +210,8 @@ XWiki.DefaultUIStep = Class.create({
   },
 
   _onPreviousUiExtensionStatusChanged : function(status) {
-    if (status == 'installed') {
+    // The previous UI can have the status 'installed-invalid' if one of its dependencies are not met anymore.
+    if (status && status.startsWith('installed')) {
       var form = $('previousUi');
       // Remove the previous UI extension display.
       form.next().remove();

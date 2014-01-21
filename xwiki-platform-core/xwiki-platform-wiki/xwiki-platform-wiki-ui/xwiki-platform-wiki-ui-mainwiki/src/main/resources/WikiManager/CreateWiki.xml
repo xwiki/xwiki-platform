@@ -1095,7 +1095,7 @@ return XWiki;
         #set ($discard = $globalMembers.add("${member}"))
       #end
       ## Add the members
-      #set($discard = $services.wiki.user.addMembers($globalMembers, $wikiDescriptor.id))
+      #set ($discard = $services.wiki.user.addMembers($globalMembers, $wikiDescriptor.id))
     #end
   #end
   ## Redirect to the new wiki's homepage.

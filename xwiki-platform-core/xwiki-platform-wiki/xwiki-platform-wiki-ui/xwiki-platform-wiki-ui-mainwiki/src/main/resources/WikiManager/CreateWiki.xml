@@ -1088,21 +1088,23 @@ return XWiki;
   #set ($discard = $services.wiki.user.setUserScope($wikiDescriptor.id, $request.userScope))
   #if ($request.userScope != 'local_only')
     #set ($discard = $services.wiki.user.setMembershipType($wikiDescriptor.id, $request.membershipType))
-    #set ($groupsClassName = "${wikiDescriptor.id}:XWiki.XWikiGroups")    
+    #set ($groupsClassName = "${wikiDescriptor.id}:XWiki.XWikiGroups")
     ## Save the members
     #set ($members = [])
     #getRequestList($members 'members')
     ## Remove empty strings from the list of members (the user picker submits by default an empty string).
     #set ($discard = $members.removeAll(['']))
     #if ("$!members" != '' &amp;&amp; $members.size() &gt; 0)
+      #set ($globalMembers = [])
       ## Enforce global users
       #foreach ($member in $members)
         #if (!$member.startsWith("${services.wiki.mainWikiId}:"))
           #set ($member = "${services.wiki.mainWikiId}:${member}")
         #end
+        #set ($discard = $globalMembers.add("${member}"))
       #end
       ## Add the members
-      #set($discard = $services.wiki.user.addMembers($members, $wikiDescriptor.id))
+      #set ($discard = $services.wiki.user.addMembers($globalMembers, $wikiDescriptor.id))
     #end
   #end
   ## Redirect to the new wiki's homepage.

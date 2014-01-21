@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -83,6 +84,9 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     @Inject
     private WikiDescriptorDocumentHelper wikiDescriptorDocumentHelper;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public DefaultWikiDescriptor buildDescriptorObject(List<BaseObject> serverClassObjects, XWikiDocument document)
     {
@@ -91,8 +95,12 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
 
         if (descriptor != null) {
             // Create WikiAlias instances for the other XWikiServerClass objects
-            for (int i = 1; i < serverClassObjects.size(); i++) {
-                String descriptorAlias = extractWikiAlias(serverClassObjects.get(i));
+            for (int i = 1; i < serverClassObjects.size(); ++i) {
+                BaseObject serverClassObject = serverClassObjects.get(i);
+                if (serverClassObject == null) {
+                    continue;
+                }
+                String descriptorAlias = extractWikiAlias(serverClassObject);
                 descriptor.addAlias(descriptorAlias);
             }
 
@@ -110,7 +118,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
                 WikiPropertyGroupManager wikiPropertyGroupManager = wikiPropertyGroupManagerProvider.get();
                 wikiPropertyGroupManager.loadForDescriptor(descriptor);
             } catch (WikiPropertyGroupException e) {
-                // log
+                logger.error("Failed to load wiki property groups for wiki [{}].", descriptor.getId(), e);
             }
         }
 

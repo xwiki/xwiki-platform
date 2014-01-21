@@ -307,6 +307,14 @@ var WikisStep = Class.create(AbstractExtensionListStep, {
 });
 
 function init() {
+  // Make sure the users don't cancel the wizard by mistake.
+  var cancelButton = $('body').down('#stepButtons button[value=CANCEL]');
+  cancelButton && cancelButton.observe('click', function(event) {
+    if (!window.confirm("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.cancelConfirmation'))")) {
+      event.stop();
+    }
+  });
+
   $('extension.defaultui') && new XWiki.DefaultUIStep();
   $('extension.defaultui.wikis') && new WikisStep();
   $('extension.outdatedextensions') && new XWiki.OutdatedExtensionsStep();

@@ -43,6 +43,7 @@ import org.xwiki.script.service.ScriptService;
 public class DeprecatedXarExtensionScriptService implements ScriptService, Initializable
 {
     @Inject
+    @Named("extension.xar")
     private ScriptService service;
 
     private XarExtensionScriptService xarService;

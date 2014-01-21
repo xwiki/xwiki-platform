@@ -33,7 +33,7 @@
   <name>XWiki Platform - Cryptographic Services - Password API</name>
   <description>Provides passwords encryption and validation</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.65</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.66</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Cryptographic Services for Password Encryption</xwiki.extension.name>
   </properties>

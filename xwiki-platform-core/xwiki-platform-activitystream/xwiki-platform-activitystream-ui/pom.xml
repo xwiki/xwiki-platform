@@ -32,6 +32,7 @@
   <artifactId>xwiki-platform-activitystream-ui</artifactId>
   <name>XWiki Platform - Activity Stream - UI</name>
   <packaging>xar</packaging>
+  <description>Display all activity in the wiki or farm</description>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>

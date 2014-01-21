@@ -100,13 +100,14 @@
       #extensionActionButton('hideDetails' true 'visibilityAction')
     #else
       ## The given extension is displayed alone.
-      #em_linkButton($xback 'extensions.actions.back')
+      #em_linkButton($xback 'extensions.actions.back' 'extension-link')
     #end
   #else
     ## The given extension is displayed in a list of extensions.
     #extensionActionButton('showDetails' true)
-    <input type="hidden" name="xback" value="$escapetool.xml($xback)" />
   #end
+  ## Make sure the URL to get back is preserved when we submit an extension action.
+  <input type="hidden" name="xback" value="$escapetool.xml($xback)" />
 #end
 
 #macro (displayExtensionActionButtons_jobTriggers $extension)

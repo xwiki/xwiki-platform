@@ -1086,14 +1086,14 @@ return XWiki;
     ## Remove empty strings from the list of members (the user picker submits by default an empty string).
     #set ($discard = $members.removeAll(['']))
     #if ("$!members" != '' &amp;&amp; $members.size() &gt; 0)
-      #set( $globalMembers = [])
+      #set ($globalMembers = [])
       ## Enforce global users
       #foreach ($member in $members)
         #if (!$member.startsWith("${services.wiki.mainWikiId}:"))
           #set ($member = "${services.wiki.mainWikiId}:${member}")
         #end
+        #set ($discard = $globalMembers.add("${member}"))
       #end
-      #set($discard = $globalMembers.add("${member}"))
       ## Add the members
       #set($discard = $services.wiki.user.addMembers($globalMembers, $wikiDescriptor.id))
     #end

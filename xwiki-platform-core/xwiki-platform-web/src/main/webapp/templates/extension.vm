@@ -955,8 +955,8 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (repairXarExtension $extensionId $extensionVersion)
-  #set ($discard = $services.xarextension.repairInstalledExtension($extensionId, $extensionVersion, $xcontext.database))
-  #handleExtensionJobStartFailure('extensions.install.error.repairXarFailure' $services.xarextension)
+  #set ($discard = $services.extension.xar.repairInstalledExtension($extensionId, $extensionVersion, $xcontext.database))
+  #handleExtensionJobStartFailure('extensions.install.error.repairXarFailure' $services.extension.xar)
 #end
 
 #macro (handleExtensionJobStartFailure $errorMessageKey $scriptService)

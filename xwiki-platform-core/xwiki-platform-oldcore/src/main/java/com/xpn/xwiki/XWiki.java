@@ -6137,6 +6137,41 @@ public class XWiki implements EventListener
         }
     }
 
+    /**
+     * Restore a document with passed index from recycle bin.
+     * 
+     * @param doc the document to restore
+     * @param comment the comment to use when saving the document
+     * @param context the XWiki context
+     * @throws XWikiException when failing to restore document
+     * @since 5.4RC1
+     */
+    public void restoreFromRecycleBin(final XWikiDocument doc, String comment, XWikiContext context) throws XWikiException
+    {
+        XWikiDeletedDocument[] deletedDocuments = getRecycleBinStore().getAllDeletedDocuments(doc, context, true);
+        if (deletedDocuments != null && deletedDocuments.length > 0) {
+            long index = deletedDocuments[0].getId();
+            restoreFromRecycleBin(doc, index, comment, context);
+        }
+    }
+
+    /**
+     * Restore a document with passed index from recycle bin.
+     * 
+     * @param doc the document to restore
+     * @param index the index of the document in the recycle bin
+     * @param comment the comment to use when saving the document
+     * @param context the XWiki context
+     * @throws XWikiException when failing to restore document
+     * @since 5.4RC1
+     */
+    public void restoreFromRecycleBin(final XWikiDocument doc, long index, String comment, XWikiContext context) throws XWikiException
+    {
+        XWikiDocument newdoc = getRecycleBinStore().restoreFromRecycleBin(doc, index, context, true);
+        saveDocument(newdoc, comment, context);
+        getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
+    }
+
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, XWikiContext context) throws XWikiException
     {
         LOGGER.debug("Rolling back [" + tdoc + "] to version " + rev);

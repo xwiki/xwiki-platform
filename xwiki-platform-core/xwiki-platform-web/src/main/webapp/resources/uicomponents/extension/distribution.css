@@ -32,7 +32,7 @@
 #welcome .steps.vertical .description {
   font-size: smaller;
 }
-/* The extension actions available on the Distribution Wizard steps should target a single wiki whenever posible. */
+/* The extension actions available on the Distribution Wizard steps should target a single wiki whenever possible. */
 #distributionWizard .extension-actions button[class~="alternative-action"][value$="Globally"] {
   display: none;
 }
@@ -53,4 +53,64 @@
   display: list-item;
   list-style-position: inside;
   margin-top: 1.5em;
+}
+#documents ul.documents {
+  background-color: $theme.pageContentBackgroundColor;
+  border: 1px dotted $theme.borderColor;
+  margin: 0 0 1em 0 !important;
+  padding: 3px !important;
+  width: 98%;
+}
+ul.documents li.xitem div.xitemcontainer {
+  text-indent: 0;
+}
+ul.documents li.xitem div.xitemcontainer .parent:before {
+  content: '\229F';
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 400;
+  height: 16px;
+  margin-right: 20px;
+  text-align: center;
+  width: 16px;
+}
+ul.documents li.xitem div.xitemcontainer .parent.collapsed:before {
+  content: '\229E'
+}
+ul.package li.collapsed div.xitemcontainer {
+  display: none;
+}
+ul.documents li.xitem div.xitemcontainer .parent {
+  cursor: pointer;
+}
+ul.documents li.xitem div.xitemcontainer div.wikiname {
+  background: transparent url("$xwiki.getSkinFile('icons/silk/world.png')") no-repeat scroll 18px .1em;
+  font-weight: bold;
+}
+ul.documents li.xitem div.xitemcontainer div.spacename {
+  background: transparent url("$xwiki.getSkinFile('icons/silk/folder.png')") no-repeat scroll 18px .1em;
+  font-weight: bold;
+}
+ul.documents div.documentname {
+  background: transparent url("$xwiki.getSkinFile('icons/silk/page_white.png')") no-repeat scroll 18px .1em;
+}
+ul.documents span.documentname {
+  padding-left: 40px;
+}
+ul.documents span.documentname.created {
+  background: transparent url("$xwiki.getSkinFile('icons/silk/page_white_add.png')") no-repeat scroll 18px .1em;
+}
+ul.documents span.documentname.deleted {
+  background: transparent url("$xwiki.getSkinFile('icons/silk/page_white_delete.png')") no-repeat scroll 18px .1em;
+}
+ul.documents span.documentname.modified {
+  background: transparent url("$xwiki.getSkinFile('icons/silk/page_white_edit.png')") no-repeat scroll 18px .1em;
+}
+ul.documents .documentactions {
+  float:right;
+  height: 16px;
+  text-align: top;
+}
+ul.documents .buttonwrapper {
+    margin: 0px 0px 0px 5px;
 }

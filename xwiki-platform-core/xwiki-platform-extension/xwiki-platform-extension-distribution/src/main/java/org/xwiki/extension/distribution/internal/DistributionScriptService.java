@@ -20,6 +20,8 @@
 package org.xwiki.extension.distribution.internal;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,12 +32,15 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
+import org.xwiki.extension.distribution.internal.DocumentsModifiedDuringDistributionListener.DocumentStatus;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.event.status.JobStatus.State;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -105,6 +110,10 @@ public class DistributionScriptService implements ScriptService
      */
     @Inject
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    @Inject
+    @Named(DocumentsModifiedDuringDistributionListener.NAME)
+    private EventListener modifiedDocumentsListener;
 
     /**
      * @param <T> the type of the object
@@ -245,5 +254,59 @@ public class DistributionScriptService implements ScriptService
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * @return the document modified during the Distribution Wizard execution
+     * @since 5.4RC1
+     */
+    public Map<DocumentReference, DocumentStatus> getModifiedDocuments()
+    {
+        return ((DocumentsModifiedDuringDistributionListener) this.modifiedDocumentsListener).getDocuments().get(
+            this.xcontextProvider.get().getDatabase());
+    }
+
+    /**
+     * @return the document modified during the Distribution Wizard execution
+     * @since 5.4RC1
+     */
+    public Map<String, Map<String, Map<String, Map<String, DocumentStatus>>>> getModifiedDocumentsTree()
+    {
+        Map<DocumentReference, DocumentStatus> documents =
+            ((DocumentsModifiedDuringDistributionListener) this.modifiedDocumentsListener).getDocuments().get(
+                this.xcontextProvider.get().getDatabase());
+
+        Map<String, Map<String, Map<String, Map<String, DocumentStatus>>>> tree =
+            new TreeMap<String, Map<String, Map<String, Map<String, DocumentStatus>>>>();
+        for (Map.Entry<DocumentReference, DocumentStatus> document : documents.entrySet()) {
+            DocumentReference reference = document.getKey();
+            String wiki = reference.getWikiReference().getName();
+            // TODO: add support for subspaces
+            String space = reference.getLastSpaceReference().getName();
+            String page = reference.getName();
+            String locale = reference.getLocale() != null ? reference.getLocale().toString() : "";
+
+            Map<String, Map<String, Map<String, DocumentStatus>>> spaces = tree.get(wiki);
+            if (spaces == null) {
+                spaces = new TreeMap<String, Map<String, Map<String, DocumentStatus>>>();
+                tree.put(wiki, spaces);
+            }
+
+            Map<String, Map<String, DocumentStatus>> pages = spaces.get(space);
+            if (pages == null) {
+                pages = new TreeMap<String, Map<String, DocumentStatus>>();
+                spaces.put(space, pages);
+            }
+
+            Map<String, DocumentStatus> locales = pages.get(page);
+            if (locales == null) {
+                locales = new TreeMap<String, DocumentStatus>();
+                pages.put(page, locales);
+            }
+
+            locales.put(locale, document.getValue());
+        }
+
+        return tree;
     }
 }

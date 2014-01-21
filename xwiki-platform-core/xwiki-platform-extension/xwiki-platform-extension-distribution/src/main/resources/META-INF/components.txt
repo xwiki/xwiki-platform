@@ -1,10 +1,12 @@
 org.xwiki.extension.distribution.internal.DefaultDistributionManager
 org.xwiki.extension.distribution.internal.DistributionInitializerListener
 org.xwiki.extension.distribution.internal.DistributionScriptService
+org.xwiki.extension.distribution.internal.DocumentsModifiedDuringDistributionListener
 org.xwiki.extension.distribution.internal.WikiDistributionWikiEventListener
 org.xwiki.extension.distribution.internal.job.FarmDistributionJob
 org.xwiki.extension.distribution.internal.job.WikiDistributionJob
 org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep
 org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep
+org.xwiki.extension.distribution.internal.job.step.ReportDistributionStep
 org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep
 org.xwiki.extension.distribution.internal.job.step.WikisDefaultUIDistributionStep

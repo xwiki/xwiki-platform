@@ -97,12 +97,8 @@ public class UndeleteActionTest
         XWikiRecycleBinStoreInterface recycleBin = mock(XWikiRecycleBinStoreInterface.class);
         when(context.getWiki().getRecycleBinStore()).thenReturn(recycleBin);
 
-        XWikiDocument restoredDocument = mock(XWikiDocument.class);
-        when(recycleBin.restoreFromRecycleBin(context.getDoc(), 13, context, true)).thenReturn(restoredDocument);
-
         assertFalse(undeleteAction.action(context));
 
-        verify(context.getWiki()).saveDocument(restoredDocument, "Restored from recycle bin", context);
-        verify(context.getWiki().getRecycleBinStore()).deleteFromRecycleBin(context.getDoc(), 13, context, true);
+        verify(context.getWiki()).restoreFromRecycleBin(context.getDoc(), 13, "Restored from recycle bin", context);
     }
 }

@@ -28,6 +28,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
+import org.xwiki.extension.distribution.internal.job.step.ReportDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
 import org.xwiki.job.internal.AbstractJob;
 
@@ -69,6 +70,17 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
             steps.add(0, welcomeStep);
         } catch (ComponentLookupException e1) {
             this.logger.error("Failed to get step instance for id [{}]", WelcomeDistributionStep.ID);
+        }
+
+        // Add Report step
+        try {
+            DistributionStep welcomeStep =
+                this.componentManager.<DistributionStep> getInstance(DistributionStep.class, ReportDistributionStep.ID);
+            welcomeStep.setState(State.COMPLETED);
+
+            steps.add(welcomeStep);
+        } catch (ComponentLookupException e1) {
+            this.logger.error("Failed to get step instance for id [{}]", ReportDistributionStep.ID);
         }
 
         // Create status
@@ -118,6 +130,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
 
         // Initialize steps
         WelcomeDistributionStep welcomeStep = (WelcomeDistributionStep) getStep(steps, WelcomeDistributionStep.ID);
+        ReportDistributionStep reportStep = (ReportDistributionStep) getStep(steps, ReportDistributionStep.ID);
 
         for (DistributionStep step : steps) {
             step.initialize(this);
@@ -126,6 +139,9 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
             if (step.getState() == null) {
                 if (welcomeStep != null) {
                     welcomeStep.setState(null);
+                }
+                if (reportStep != null) {
+                    reportStep.setState(null);
                 }
             }
         }

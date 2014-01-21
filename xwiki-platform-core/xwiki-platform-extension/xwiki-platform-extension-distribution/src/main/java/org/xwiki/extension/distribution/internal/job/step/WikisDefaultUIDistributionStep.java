@@ -35,6 +35,12 @@ import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
+/**
+ * Optional step to install sub-wikis default UI extensions.
+ * 
+ * @version $Id$
+ * @since 5.2RC1
+ */
 @Component
 @Named(WikisDefaultUIDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)

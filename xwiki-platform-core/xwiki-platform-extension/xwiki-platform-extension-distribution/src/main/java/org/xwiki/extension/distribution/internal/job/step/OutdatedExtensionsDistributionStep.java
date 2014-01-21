@@ -29,8 +29,13 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+/**
+ * List and allow to upgrade outdated extensions.
+ * 
+ * @version $Id$
+ * @since 5.0RC1
+ */
 @Component
 @Named(OutdatedExtensionsDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)

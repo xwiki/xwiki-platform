@@ -324,6 +324,16 @@ function init() {
 // When the document is loaded, trigger the enhancements.
 (XWiki.domIsLoaded && init()) || document.observe("xwiki:dom:loaded", init);
 
+$('body').select('.expandable .parent').each(function(parent) {
+	parent.toggleClassName("collapsed");
+	parent.next().toggle();
+	parent.observe('click', function(event) {
+		parent.toggleClassName("collapsed");
+		parent.next().toggle();
+	  });
+	});
+
+
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));

@@ -26,18 +26,19 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 
 /**
+ * Show a report of what happen during Distribution Wizard execution.
  * 
  * @version $Id$
- * @since 5.0RC1
+ * @since 5.4RC1
  */
 @Component
-@Named(WelcomeDistributionStep.ID)
+@Named(ReportDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class WelcomeDistributionStep extends AbstractDistributionStep
+public class ReportDistributionStep extends AbstractDistributionStep
 {
-    public static final String ID = "welcome";
+    public static final String ID = "report";
 
-    public WelcomeDistributionStep()
+    public ReportDistributionStep()
     {
         super(ID);
     }

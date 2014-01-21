@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.xwiki.crypto.password.kdf.factory;
+package org.xwiki.crypto.password.internal.kdf.factory;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
@@ -29,7 +29,6 @@ import org.xwiki.crypto.params.cipher.symmetric.KeyWithIVParameters;
 import org.xwiki.crypto.password.KeyDerivationFunction;
 import org.xwiki.crypto.password.KeyDerivationFunctionFactory;
 import org.xwiki.crypto.password.PasswordToByteConverter;
-import org.xwiki.crypto.password.internal.kdf.factory.BcPKCS5S2KeyDerivationFunctionFactory;
 import org.xwiki.crypto.password.params.PBKDF2Parameters;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 

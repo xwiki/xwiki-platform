@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.crypto.password.pbe.factory;
+package org.xwiki.crypto.password.internal.pbe.factory;
 
 import org.bouncycastle.asn1.pkcs.EncryptedPrivateKeyInfo;
 import org.bouncycastle.util.encoders.Base64;
@@ -41,12 +41,6 @@ import org.xwiki.crypto.password.PasswordToByteConverter;
 import org.xwiki.crypto.password.internal.kdf.factory.BcPKCS5S2KeyDerivationFunctionFactory;
 import org.xwiki.crypto.password.internal.kdf.factory.BcScryptKeyDerivationFunctionFactory;
 import org.xwiki.crypto.password.internal.kdf.factory.DefaultKeyDerivationFunctionFactory;
-import org.xwiki.crypto.password.internal.pbe.factory.BcPBES2AesCipherFactory;
-import org.xwiki.crypto.password.internal.pbe.factory.BcPBES2BlowfishCipherFactory;
-import org.xwiki.crypto.password.internal.pbe.factory.BcPBES2CipherFactory;
-import org.xwiki.crypto.password.internal.pbe.factory.BcPBES2DesCipherFactory;
-import org.xwiki.crypto.password.internal.pbe.factory.BcPBES2DesEdeCipherFactory;
-import org.xwiki.crypto.password.internal.pbe.factory.BcPBES2Rc2CipherFactory;
 import org.xwiki.crypto.password.params.KeyDerivationFunctionParameters;
 import org.xwiki.crypto.password.params.PBKDF2Parameters;
 import org.xwiki.crypto.password.params.ScryptParameters;

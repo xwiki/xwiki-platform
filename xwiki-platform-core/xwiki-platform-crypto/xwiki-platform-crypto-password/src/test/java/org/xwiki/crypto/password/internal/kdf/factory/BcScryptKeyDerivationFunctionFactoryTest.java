@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.crypto.password.kdf.factory;
+package org.xwiki.crypto.password.internal.kdf.factory;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
@@ -27,7 +27,6 @@ import org.xwiki.crypto.params.cipher.symmetric.KeyWithIVParameters;
 import org.xwiki.crypto.password.KeyDerivationFunction;
 import org.xwiki.crypto.password.KeyDerivationFunctionFactory;
 import org.xwiki.crypto.password.PasswordToByteConverter;
-import org.xwiki.crypto.password.internal.kdf.factory.BcScryptKeyDerivationFunctionFactory;
 import org.xwiki.crypto.password.params.ScryptParameters;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 

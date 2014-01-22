@@ -2001,7 +2001,12 @@ $xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {'forceSkinAction': true
 #if($requestErrors && $requestErrors.containsKey($fieldId))
 #set($fieldError = $requestErrors.get($fieldId))
 #if($fieldError)
-#set($ok = $parameters.put('convertInput', false))
+#set($ok = $parameters.put('inputURL', $editedDocument.getURL('edit', $escapetool.url({
+  'xpage': 'wysiwyginput',
+  'token': $services.csrf.token,
+  'key': $request.key,
+  'field': $fieldId
+}))))
 #error("${fieldId}: ${fieldError.message}")
 #set($ok = $requestErrors.remove($fieldId))
 #if($requestErrors.isEmpty())

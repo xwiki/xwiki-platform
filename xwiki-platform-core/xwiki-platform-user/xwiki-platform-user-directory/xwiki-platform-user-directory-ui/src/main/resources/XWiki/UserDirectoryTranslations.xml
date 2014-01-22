@@ -61,5 +61,5 @@
   <content>userdirectory.userScopeFilter=User scope:
 userdirectory.userScopeFilter.hint=Select what kind of users you want to display.
 userdirectory.userScopeFilter.local=Local users
-userdirectory.userScopeFilter.global=Global users that are members of the wiki</content>
+userdirectory.userScopeFilter.global=Global users who are members of this wiki</content>
 </xwikidoc>

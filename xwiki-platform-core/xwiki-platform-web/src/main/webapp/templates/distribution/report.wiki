@@ -1,0 +1,133 @@
+##syntax=xwiki/2.1
+{{velocity output="false"}}
+## NOTE: We don't use #template because it currently registers the Velocity macros in a different namespace which makes
+## them unavailable in the current wiki page or the current template. We also tried #parse but it "randomly" fails to
+## register the Velocity macros from the parsed template. The only solution we found is to use #evaluate with #include
+## but unfortunately this doesn't allow the template to be overridden from the skin.
+#evaluate("#include('extension.vm')")
+{{/velocity}}
+
+{{velocity}}
+  #if ($request.document)
+    #set($actionDocumentReference = $services.model.resolveDocument($request.document))
+    #set($actionDocument = $xwiki.getDocument($actionDocumentReference))
+    #if ($request.get('documentaction_delete.x'))
+      #if (!$actionDocument.isNew())
+        #set($void = $actionDocument.delete())
+        {{info}}$services.localization.render('platform.extension.distributionWizard.reportStepDocumentDeletedSuccess', "**${request.document}**"){{/info}}
+      #end
+    #elseif ($request.get('documentaction_rollback.x'))
+      #if ($request.previousVersion)
+        #set($actionDocument = $services.model.resolve($request.document))
+        #if ($actionDocument.isNew())
+          ## We hope it's not been deleted and created several times (and we also hope recycle bin hasn't been skipped)
+          #set($void = $xwiki.xWiki.restoreFromRecycleBin($actionDocument.document, 'Restored from recycle bin', $xcontext.context))
+          {{info}}$services.localization.render('platform.extension.distributionWizard.reportStepDocumentRestoredSuccess', "**${request.document}**"){{/info}}
+          ## TODO: also make sure it's the rigth version and if not rollback it to the right version
+        #else
+          #set($void = $xwiki.xWiki.rollback($actionDocument.document, $request.previousVersion, $xcontext.context))
+          {{info}}$services.localization.render('platform.extension.distributionWizard.reportStepDocumentRollbackedSuccess', "**${request.document}**", "**${request.previousVersion}**"){{/info}}
+        #end
+      #end
+    #end
+  #end
+{{/velocity}}
+
+{{velocity output="false"}}
+  #set($modifiedWikis = $services.distribution.modifiedDocumentsTree)
+  #set($deletedIconSrc = $escapetool.xml($xwiki.getSkinFile('icons/silk/cross.png')))
+  #set($rollbackIconSrc = $escapetool.xml($xwiki.getSkinFile('icons/silk/arrow_undo.png')))
+
+  #macro(displayReportPageActions, $status)
+      # TODO: use ajax instead if JS is enabled
+      <form class="documentactions" method="get">
+      <input type="hidden" name="document" value="$services.model.serialize($status.reference)"/>
+      #if ($status.previousVersion)
+        <input type="hidden" name="previousVersion" value="$services.model.serialize($status.previousVersion)"/>
+      #end
+
+      #if ($status.action.toString() != 'DELETED')<input type="image" src="$deletedIconSrc" name="documentaction_delete" alt="delete">#end
+      #if ($status.previousVersion)<input type="image" src="$rollbackIconSrc" alt="rollback" name="documentaction_rollback" alt="rollback">#end
+    </form>
+  #end
+{{/velocity}}
+
+{{velocity}}
+#if ("$!{request.action}" == '')
+  {{translation key="platform.extension.distributionWizard.reportStepDescription"/}} 
+
+  = {{translation key="platform.extension.distributionWizard.reportStepDocumentsTitle"/}} =
+
+  {{translation key="platform.extension.distributionWizard.reportStepDocumentsDescription"/}} 
+
+  #if (!$modifiedWikis.isEmpty())
+    {{html}}
+    <div id="documents">
+      <ul class="xlist documents expandable">
+      #foreach($wiki in $sorttool.sort($modifiedWikis.keySet()))
+        <li class="xitem">
+          <div class="xitemcontainer">
+            <div class="parent wikiname">$wiki</div>
+            <ul class="xlist">
+            ## TODO: add support for sub-spaces
+            #foreach($space in $modifiedWikis.get($wiki).keySet())
+              <li class="xitem">
+                <div class="xitemcontainer">
+                  <div class="parent spacename">$space</div>
+                  <ul class="xlist">
+                  ## List each document in the space
+                  #foreach($page in $modifiedWikis.get($wiki).get($space).keySet())
+                    ## List each locale of the document
+                    #set($locales = $modifiedWikis.get($wiki).get($space).get($page))
+                    #set($rootLocale = $locales.get(''))
+                    #if ($locales.size() == 1)
+                      <li class="xitem xhighlight">
+                        <div class="xitemcontainer xpagecontainer">
+                          <span class="documentname $rootLocale.action.toString().toLowerCase()">$page</span> #displayReportPageActions($rootLocale)
+                        </div>
+                      </li>
+                    #else
+                      <li class="xitem">
+                      <div class="xitemcontainer">
+                        <div class="parent documentname $rootLocale.action.toString().toLowerCase()">$page</div>
+                        <ul class="xlist">
+                        #foreach($document in $modifiedWikis.get($wiki).get($space).get($page).values())
+                          <li class="xitem xhighlight">
+                            <div class="xitemcontainer xpagecontainer">
+                              <span class="documentname $document.action.toString().toLowerCase()">
+                                #if ("$!{document.reference.locale}" == '')
+                                  $services.localization.render('platform.extension.distributionWizard.reportStepDocumentsDefaultLanguage')
+                                #else
+                                  $document.reference.locale
+                                #end
+                              </span>
+
+                              #displayReportPageActions($document)
+                            </div>
+                          </li>
+                        #end
+                        </ul>
+                      </div>
+                      </li>
+                    #end
+                  #end
+                  </ul>
+                </div>
+              </li>
+            #end
+            </ul>
+          </div>
+        </li>
+      #end
+      </ul>
+    </div>
+    {{/html}}
+  #end
+#else
+  
+#end
+{{/velocity}}
+
+{{velocity output="false"}}
+#set ($showCompleteStepButton = true)
+{{/velocity}}

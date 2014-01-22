@@ -24,13 +24,12 @@ import java.io.InputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.input.InputStreamInputSource;
@@ -38,7 +37,7 @@ import org.xwiki.wikistream.input.ReaderInputSource;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
 import org.xwiki.wikistream.xml.input.SourceInputSource;
 
 /**
@@ -46,16 +45,15 @@ import org.xwiki.wikistream.xml.input.SourceInputSource;
  * @since 5.2RC1
  */
 @Component
-@Named(XARUtils.ROLEHINT)
+@Named(XARWikiStreamUtils.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProperties, XARFilter>
 {
     @Inject
-    private SyntaxFactory syntaxFactory;
+    private Provider<WikiReader> wikiReaderProvider;
 
     @Inject
-    @Named("relative")
-    private EntityReferenceResolver<String> relativeResolver;
+    private Provider<DocumentLocaleReader> documentLocaleReaderProvider;
 
     @Override
     public void close() throws IOException
@@ -68,7 +66,8 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
     {
         InputSource inputSource = this.properties.getSource();
 
-        if (inputSource instanceof ReaderInputSource || inputSource instanceof SourceInputSource) {
+        if (this.properties.isForceDocument() || inputSource instanceof ReaderInputSource
+            || inputSource instanceof SourceInputSource) {
             readDocument(filter, proxyFilter);
         } else if (inputSource instanceof InputStreamInputSource) {
             InputStream stream;
@@ -92,9 +91,9 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
             }
 
             if (iszip) {
-                readDocument(filter, proxyFilter);
-            } else {
                 readXAR(filter, proxyFilter);
+            } else {
+                readDocument(filter, proxyFilter);
             }
         } else {
             throw new WikiStreamException(
@@ -104,7 +103,8 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
 
     private void readXAR(Object filter, XARFilter proxyFilter) throws WikiStreamException
     {
-        WikiReader wikiReader = new WikiReader(this.syntaxFactory, this.relativeResolver, this.properties);
+        WikiReader wikiReader = this.wikiReaderProvider.get();
+        wikiReader.setProperties(this.properties);
 
         try {
             wikiReader.read(filter, proxyFilter);
@@ -115,8 +115,8 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
 
     protected void readDocument(Object filter, XARFilter proxyFilter) throws WikiStreamException
     {
-        DocumentLocaleReader documentReader =
-            new DocumentLocaleReader(this.syntaxFactory, this.relativeResolver, this.properties);
+        DocumentLocaleReader documentReader = documentLocaleReaderProvider.get();
+        documentReader.setProperties(this.properties);
 
         try {
             documentReader.read(filter, proxyFilter);

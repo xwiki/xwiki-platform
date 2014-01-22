@@ -22,8 +22,6 @@ package org.xwiki.extension.distribution.internal.job;
 import java.util.List;
 
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 
@@ -38,37 +36,15 @@ public class FarmDistributionJobStatus extends DistributionJobStatus<Distributio
      */
     private static final long serialVersionUID = 1L;
 
-    private UpgradeModeDistributionStep upgradeModeStep;
-
     public FarmDistributionJobStatus(DistributionRequest request, ObservationManager observationManager,
         LoggerManager loggerManager, List<DistributionStep> steps)
     {
         super(request, observationManager, loggerManager, steps);
-
-        init();
     }
 
     public FarmDistributionJobStatus(DistributionJobStatus<DistributionRequest> status,
         ObservationManager observationManager, LoggerManager loggerManager)
     {
         super(status, observationManager, loggerManager);
-
-        init();
-    }
-
-    private void init()
-    {
-        if (getSteps() != null) {
-            for (DistributionStep step : getSteps()) {
-                if (step instanceof UpgradeModeDistributionStep) {
-                    this.upgradeModeStep = (UpgradeModeDistributionStep) step;
-                }
-            }
-        }
-    }
-
-    public UpgradeMode getUpgradeMode()
-    {
-        return this.upgradeModeStep != null ? this.upgradeModeStep.getUpgradeMode() : UpgradeMode.WIKI;
     }
 }

@@ -1,9 +1,18 @@
 #if ($type == 'edit' || $type == 'search')
   #set ($isMultiSelect = $field.getProperty('multiSelect').value == 1)
   #userPicker_import($isMultiSelect)
-  #set($id = $escapetool.xml("${prefix}${name}"))
-  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)"
-    class="suggestUsers#if ($isMultiSelect) multipleSelection#end" />
+  #set ($id = $escapetool.xml("${prefix}${name}"))
+  #set ($class = 'suggestUsers')
+  #set ($userScope = "$!services.wiki.user.userScope")
+  #if ($userScope == 'LOCAL_AND_GLOBAL')
+    #set ($class = "$class withScope")
+  #elseif ($userScope == 'GLOBAL_ONLY')
+    #set ($class = "$class global")
+  #end
+  #if ($isMultiSelect)
+    #set ($class = "$class multipleSelection")
+  #end
+  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)" class="$class" />
 #elseif ($type == 'view' || $type == 'rendered')
   #set ($values = $value.split('\s*,\s*'))
   #set ($selectedUsers = [])

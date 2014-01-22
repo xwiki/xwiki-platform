@@ -23,32 +23,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.wikistream.model.filter.WikiClassFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils.EventParameter;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
+import org.xwiki.xar.internal.model.XarClassModel;
 
 /**
  * @version $Id$
  * @since 5.2M2
  */
-public class XARClassModel
+public class XARClassModel extends XarClassModel
 {
-    public static final String ELEMENT_CLASS = "class";
-
-    public static final String ELEMENT_NAME = "name";
-
-    public static final String ELEMENT_CUSTOMCLASS = "customClass";
-
-    public static final String ELEMENT_CUSTOMMAPPING = "customMapping";
-
-    public static final String ELEMENT_SHEET_DEFAULTVIEW = "defaultViewSheet";
-
-    public static final String ELEMENT_SHEET_DEFAULTEDIT = "defaultEditSheet";
-
-    public static final String ELEMENT_DEFAULTSPACE = "defaultWeb";
-
-    public static final String ELEMENT_NAMEFIELD = "nameField";
-
-    public static final String ELEMENT_VALIDATIONSCRIPT = "validationScript";
-
     // Utils
 
     public static final Map<String, EventParameter> CLASS_PARAMETERS = new HashMap<String, EventParameter>()

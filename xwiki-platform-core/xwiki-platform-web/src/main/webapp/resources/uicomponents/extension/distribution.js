@@ -60,7 +60,7 @@ XWiki.DefaultUIStep = Class.create({
     var hidePreviousUiForm = this._hidePreviousUiForm.bindAsEventListener(this);
     secondaryButton.observe('click', hidePreviousUiForm);
     // Simplify the way the previous UI is specified.
-    this._enhancePreviousUiInput();
+    $('previousUiVersionList') && this._enhancePreviousUiInput();
     // Enhance and show the upgrade question.
     var question = form.previous().removeClassName('hidden');
     question.down('.button').observe('click', function(event) {
@@ -82,83 +82,57 @@ XWiki.DefaultUIStep = Class.create({
 
   _enhancePreviousUiInput : function() {
     // The element used to toggle advanced input.
-    var pencil = new Element('input', {
+    var versionEditButton = new Element('input', {
       type: 'image',
       'class': 'icon',
       src: '$xwiki.getSkinFile("icons/silk/pencil.png")',
       alt: "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint'))",
       title: "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint'))"
     });
-    var idInput = $('previousUiId');
     var versionInput = $('previousUiVersion');
     var versionList = $('previousUiVersionList');
-    // Display the version list by default instead of the version input.
-    versionList.up('dd').removeClassName('hidden').previous().removeClassName('hidden');
+    var idEditButton = versionEditButton.cloneNode();
+    var idInput = $('previousUiId');
+    // Display the version list by default instead of the version input. Allow the users to enter a different version.
+    versionList.insert({'after': versionEditButton}).up('dd').removeClassName('hidden').addClassName('versionSelector')
+      .previous().removeClassName('hidden');
     versionInput.up('dd').hide().previous().hide();
     // Hide the id input and its hint by default because we auto-complete the id based on the selected version.
     idInput.hide().up('dd').previous().down('.xHint').hide();
     // Display a pencil next to the id value to let the user change it.
-    idInput.insert({after: pencil}).insert({after: new Element('span')});
+    idInput.insert({after: idEditButton}).insert({after: new Element('span')});
     // Hide the id label and value by default. Display it when the user selects a version.
     idInput.up('dd').hide().previous().hide();
     versionList.observe('change', this._onSelectPreviousUiVersion.bind(this));
     // Allow advanced input.
-    pencil.observe('click', this._switchToAdvancedPreviousUiInput.bindAsEventListener(this));
+    versionEditButton.observe('click', this._switchToAdvancedPreviousUiInput.bindAsEventListener(this));
+    idEditButton.observe('click', this._switchToAdvancedPreviousUiInput.bindAsEventListener(this));
   },
 
   _onSelectPreviousUiVersion : function() {
-    var idInput = $('previousUiId');
-    idInput.up('dd').show().previous().show();
     var versionList = $('previousUiVersionList');
-    // FIXME: We should retrieve the list of previous versions for the recommended UI, by getting the available versions
-    // for each of its features (old identifiers).
-    $('previousUiVersion').value = versionList.options[versionList.selectedIndex].value;
-    // Auto-complete the id based on the selected version.
-    if (versionList.selectedIndex == 0) {
-      var id = '';
-    } else if (versionList.length == 102) {
-      // XWiki Manager versions
-      if (versionList.selectedIndex < 27) {
-        // 4.2M2 -> 3.3-milestone-1
-        var id = 'org.xwiki.manager:xwiki-manager-ui';
-      } else if (versionList.selectedIndex < 38) {
-        // 3.2.1 -> 3.1-milestone-1
-        var id = 'org.xwiki.manager:xwiki-manager-wiki-administrator';
-      } else if (versionList.selectedIndex < 46) {
-        // 3.0.1 -> 2.6
-        var id = 'org.xwiki.manager:xwiki-enterprise-manager-wiki-administrator';
-      } else {
-        // 2.5.2 -> 1.0-milestone-1
-        var id = 'com.xpn.xwiki.products:xwiki-enterprise-manager-wiki-administrator';
-      }
-    } else {
-      // XWiki Enterprise versions
-      if (versionList.selectedIndex < 27) {
-        // 4.2M2 -> 3.3-milestone-1
-        var id = 'org.xwiki.enterprise:xwiki-enterprise-ui';
-      } else if (versionList.selectedIndex < 53) {
-        // 3.2.1 -> 2.6-rc-1
-        var id = 'org.xwiki.enterprise:xwiki-enterprise-wiki';
-      } else {
-        // 2.5.2 -> 1.1-milestone-3
-        var id = 'com.xpn.xwiki.products:xwiki-enterprise-wiki';
-      }
-    }
-    // Update the value of the hidden input.
-    idInput.value = id;
-    // Update the displayed value.
-    idInput.next().update(id);
+    var selectedVersion = versionList.options[versionList.selectedIndex];
+    // Fill the version input with the selected value in case the user decides to modify it.
+    $('previousUiVersion').value = selectedVersion.value;
+    // Show the extension id that corresponds to the selected version.
+    var idInput = $('previousUiId');
+    idInput.next().update(selectedVersion.title).up('dd').show().previous().show();
+    // Fill the id input with the extension id that corresponds to the selected version.
+    idInput.value = selectedVersion.title;
   },
 
   _switchToAdvancedPreviousUiInput : function(event) {
     event.stop();
-    event.element().hide().previous().hide();
-    // Show the id input and its hint.
-    $('previousUiId').show().activate().up('dd').previous().down('.xHint').show();
+    // Hide the version list and its edit button.
+    $('previousUiVersionList').up('dd').hide().previous().hide();
+    // Make sure the id and its edit button are hidden.
+    $('previousUiId').next().hide().next().hide();
     // Show the version input and its hint.
     $('previousUiVersion').up('dd').show().previous().show();
-    // Hide the version list.
-    $('previousUiVersionList').up('dd').hide().previous().hide();
+    // Show the id input and its hint.
+    $('previousUiId').show().up('dd').show().previous().show().down('.xHint').show();
+    // Focus the right input depending on which edit button was clicked.
+    event.element().previous('select') ? $('previousUiVersion').activate() : $('previousUiId').activate();
   },
 
   _hidePreviousUiForm : function(event) {
@@ -236,7 +210,8 @@ XWiki.DefaultUIStep = Class.create({
   },
 
   _onPreviousUiExtensionStatusChanged : function(status) {
-    if (status == 'installed') {
+    // The previous UI can have the status 'installed-invalid' if one of its dependencies are not met anymore.
+    if (status && status.startsWith('installed')) {
       var form = $('previousUi');
       // Remove the previous UI extension display.
       form.next().remove();
@@ -326,24 +301,21 @@ XWiki.OutdatedExtensionsStep = Class.create(AbstractExtensionListStep, {
 
 var WikisStep = Class.create(AbstractExtensionListStep, {
   _isCompleted : function() {
-    // This step is completed when all the listed wikis have the recommended user interface version installed.
-    var wikiCount = this.container.down('dl').childElements().length / 2;
-    var extensions = this.container.select('.extension-item');
-    if (wikiCount != extensions.length) {
-      // Some extensions couldn't be resolved.
-      return false;
-    }
-    for (var i = 0; i < extensions.length; i++) {
-      if (!extensions[i].hasClassName('extension-item-installed')) {
-        // The recommended user interface version is not installed.
-        return false;
-      }
-    }
+    // It's not mandatory to upgrade all the wikis in this step because the upgrade can be performed later by accessing
+    // each wiki separately. So unless there is a subwiki upgrade in progress, this step is always completed.
     return true;
   }
 });
 
 function init() {
+  // Make sure the users don't cancel the wizard by mistake.
+  var cancelButton = $('body').down('#stepButtons button[value=CANCEL]');
+  cancelButton && cancelButton.observe('click', function(event) {
+    if (!window.confirm("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.cancelConfirmation'))")) {
+      event.stop();
+    }
+  });
+
   $('extension.defaultui') && new XWiki.DefaultUIStep();
   $('extension.defaultui.wikis') && new WikisStep();
   $('extension.outdatedextensions') && new XWiki.OutdatedExtensionsStep();
@@ -352,6 +324,16 @@ function init() {
 
 // When the document is loaded, trigger the enhancements.
 (XWiki.domIsLoaded && init()) || document.observe("xwiki:dom:loaded", init);
+
+$('body').select('.expandable .parent').each(function(parent) {
+	parent.toggleClassName("collapsed");
+	parent.next().toggle();
+	parent.observe('click', function(event) {
+		parent.toggleClassName("collapsed");
+		parent.next().toggle();
+	  });
+	});
+
 
 // End XWiki augmentation.
 return XWiki;

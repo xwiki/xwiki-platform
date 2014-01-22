@@ -61,7 +61,7 @@ import org.xwiki.security.authorization.cache.SecurityShadowEntry;
 public class DefaultSecurityCache implements SecurityCache, Initializable
 {
     /** Default capacity for security cache. */
-    private static final int DEFAULT_CAPACITY = 500;
+    private static final int DEFAULT_CAPACITY = 10000;
 
     /** Separator used for composing key for the cache. */
     private static final String KEY_CACHE_SEPARATOR = "@@";

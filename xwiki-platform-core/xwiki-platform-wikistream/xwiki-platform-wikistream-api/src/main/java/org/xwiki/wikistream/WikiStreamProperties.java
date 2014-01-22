@@ -19,6 +19,8 @@
  */
 package org.xwiki.wikistream;
 
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -33,6 +35,8 @@ public interface WikiStreamProperties
     /**
      * @return true if the stream should log details of what is happening
      */
+    @PropertyName("Verbose")
+    @PropertyDescription("Indicates if the stream should log details of what is happening")
     boolean isVerbose();
 
     /**

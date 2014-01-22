@@ -26,13 +26,28 @@
 #set ($defaultDateFormat = 'yyyy/MM/dd HH:mm')
 #set ($iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'")
 #set ($rangePattern = $regextool.compile('^\[(.+) TO (.+)\]$'))
+#set ($wildcardPattern = $regextool.compile('^\(.*\*.*\)$'))
+#set ($facetPaginationStep = 5)
 
 #macro (displaySearchForm)
   {{html}}
-  &lt;form class="search-form" action=""&gt;
+  &lt;form class="search-form half" action=""&gt;
     &lt;div class="hidden"&gt;
       &lt;input type="hidden" name="sort" value="$!escapetool.xml($sort)"/&gt;
       &lt;input type="hidden" name="sortOrder" value="$!escapetool.xml($sortOrder)"/&gt;
+      ## The parameter used to determine if the request has been redirected with default search filters.
+      &lt;input type="hidden" name="r" value="$!escapetool.xml($request.r)"/&gt;
+      #if ("$!request.debug" != '')
+        &lt;input type="hidden" name="debug" value="$escapetool.xml($request.debug)"/&gt;
+      #end
+      ## Preserve the current facet values when submitting a new search query.
+      #foreach ($entry in $request.parameterMap.entrySet())
+        #if ($entry.key.startsWith('f_') || $entry.key.startsWith('l_'))
+          #foreach ($value in $entry.value)
+            &lt;input type="hidden" name="$escapetool.xml($entry.key)" value="$escapetool.xml($value)"/&gt;
+          #end
+        #end
+      #end
     &lt;/div&gt;
     &lt;div class="search-bar"&gt;
       &lt;label class="hidden" for="searchQuery"&gt;$services.localization.render('search.page.bar.query.label')&lt;/label&gt;
@@ -43,170 +58,54 @@
           class="button" title="$services.localization.render('search.page.bar.submit.title')" /&gt;
       &lt;/span&gt;
     &lt;/div&gt;
-    #displaySearchFilter()
   &lt;/form&gt;
   {{/html}}
 #end
 
-#macro (displaySearchFilter)
-  &lt;div class="search-filter xform&gt;
-    &lt;div class="search-filter-header"&gt;
-      &lt;strong&gt;$services.localization.render('solr.filter.title')&lt;/strong&gt;
-      &lt;p class="xHint"&gt;$services.localization.render('solr.filter.hint')&lt;/p&gt;
-    &lt;/div&gt;
-    &lt;dl class="search-filter-left"&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterWiki"&gt;$services.localization.render('solr.filterBy.wiki')&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;#wikiSelector()&lt;/dd&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterType"&gt;$services.localization.render('solr.filterBy.type')&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;select id="searchFilterType" name="type"&gt;
-          &lt;option value=""&gt;$services.localization.render('solr.filterBy.type.all')&lt;/option&gt;
-          #foreach ($aType in ['DOCUMENT', 'ATTACHMENT', 'OBJECT', 'OBJECT_PROPERTY'])
-            &lt;option value="$aType" #if ($aType == $type)selected="selected"#end&gt;
-              $escapetool.xml($services.localization.render("solr.filterBy.type.$aType.toLowerCase()"))
-            &lt;/option&gt;
-          #end
-        &lt;/select&gt;
-      &lt;/dd&gt;
-      #if ($xwiki.isMultiLingual())
-        &lt;dt&gt;
-          &lt;label for="searchFilterLanguage"&gt;$services.localization.render('solr.filterBy.language')&lt;/label&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
-          &lt;select id="searchFilterLanguage" name="lang"&gt;
-            &lt;option value=""&gt;$services.localization.render('solr.filterBy.language.all')&lt;/option&gt;
-            #getSupportedLanguages()
-            #set ($currentLocale = $services.localization.currentLocale)
-            #foreach ($supportedLanguage in $supportedLanguages)
-              #set ($locale = $services.localization.toLocale($supportedLanguage))
-              &lt;option value="$supportedLanguage" #if ($language == $supportedLanguage)selected="selected"#end&gt;
-                $escapetool.xml($locale.getDisplayName($currentLocale))
-              &lt;/option&gt;
-            #end
-          &lt;/select&gt;
-        &lt;/dd&gt;
-      #end
-    &lt;/dl&gt;
-    &lt;dl class="search-filter-right"&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterSpace"&gt;$services.localization.render('solr.filterBy.space')&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;#spaceSelector()&lt;/dd&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterFileType"&gt;$services.localization.render('solr.filterBy.fileType')&lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;select id="searchFilterFileType" name="fileType"&gt;
-          &lt;option value=""&gt;$services.localization.render('solr.filterBy.fileType.all')&lt;/option&gt;
-          #set ($fileTypeOptions = $collectionstool.orderedMap)
-          #set ($discard = $fileTypeOptions.put('image*', 'Image'))
-          #set ($discard = $fileTypeOptions.put('audio*', 'Audio'))
-          #set ($discard = $fileTypeOptions.put('video*', 'Video'))
-          #set ($discard = $fileTypeOptions.put('text*', 'Text'))
-          #foreach ($aFileType in ['image', 'audio', 'video', 'text'])
-            &lt;option value="$aFileType*" #if ("$aFileType*" == $fileType)selected="selected"#end&gt;
-              $services.localization.render("solr.filterBy.fileType.$aFileType")
-            &lt;/option&gt;
-          #end
-        &lt;/select&gt;
-      &lt;/dd&gt;
-    &lt;/dl&gt;
-    &lt;div class="clearfloats"&gt;&lt;/div&gt;
-    &lt;dl&gt;
-      &lt;dt&gt;
-        &lt;label for="searchFilterBoost"&gt;$services.localization.render('solr.filter.queryBoost.label')&lt;/label&gt;
-        &lt;span class="xHint"&gt;$services.localization.render('solr.filter.queryBoost.hint')&lt;/span&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;input id="searchFilterBoost" name="boost" type="text" value="$escapetool.xml($boost)" /&gt;
-      &lt;/dd&gt;
-    &lt;/dl&gt;
-  &lt;/div&gt;
-#end
-
-#**
- * Get the list of supported languages.
- *#
-#macro (getSupportedLanguages)
-  #set ($supportedLanguagesRaw = $xwiki.getXWikiPreference('languages').split('[, |]'))
-  #set ($supportedLanguages = [])
-  #foreach ($supportedLanguage in $supportedLanguagesRaw)
-    #if ($supportedLanguage.trim() != '')
-      #set ($discard = $supportedLanguages.add($supportedLanguage))
-    #end
-  #end
-  ## Make sure the default language is included.
-  #set ($defaultLanguage = $xwiki.getXWikiPreference('default_language', 'en'))
-  #if (!$supportedLanguages.contains($defaultLanguage))
-    #set ($discard = $supportedLanguages.add($defaultLanguage))
-  #end
-  #set ($supportedLanguages = $sorttool.sort($supportedLanguages))
-#end
-
-#macro (wikiSelector )
-  #if ($xcontext.isMainWiki())
-    #set ($wikiNames = $xwiki.wikiNames)
-  #else
-    #set ($wikiNames = [$xcontext.database])
-  #end
-  #set ($wikis = [])
-  #foreach ($wikiName in $wikiNames)
-    #set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
-    #if ("$!wikiPrettyName.trim()" == '')
-      #set ($wikiPrettyName = $wikiName)
-    #end
-    #set ($discard = $wikis.add({'value': $wikiName, 'label': $wikiPrettyName}))
-  #end
-  &lt;select id="searchFilterWiki" name="wiki"&gt;
-    #if ($xcontext.isMainWiki() &amp;&amp; $wikis.size() &gt; 1)
-      ## The main wiki can search in all wikis.
-      &lt;option value=""&gt;$services.localization.render('solr.filterBy.wiki.all')&lt;/option&gt;
-    #end
-    #foreach ($aWiki in $sorttool.sort($wikis, 'label'))
-      &lt;option value="$escapetool.xml($aWiki.value)" #if ($wiki == "$!aWiki.value")selected="selected"#end&gt;$escapetool.xml($aWiki.label)&lt;/option&gt;
-    #end
-  &lt;/select&gt;
-#end
-
-#macro (spaceSelector)
-  #set ($spaces = [])
-  #set ($wikiNames = $xwiki.wikiNames)
-  #if ($wiki == $xcontext.database || ($wiki == '' &amp;&amp; $wikiNames.size() == 1))
-    #set ($spaces = $xwiki.spaces)
-  #elseif ($wikiNames.contains($wiki) &amp;&amp; $doc.hasProgrammingRights())
-    #set ($spaces = $services.query.xwql('select distinct doc.space from Document as doc order by doc.space').setWiki($wiki).execute())
-  #end
-  &lt;select id="searchFilterSpace" name="space" title="$services.localization.render('search.page.bar.spaces.title')"&gt;
-    &lt;option value="" #if($space == '')selected="selected"#end&gt;$services.localization.render('search.page.bar.spaces.all')&lt;/option&gt;
-    #foreach ($aSpace in $spaces)
-      #set ($spaceReservedDocRef = $services.model.createDocumentReference($wiki,
-        $aSpace, "DocumentReservedForInternalXWikiUsage$mathtool.random(0, 999)"))
-      #if (!$blacklistedSpaces.contains($aSpace) &amp;&amp; $xwiki.hasAccessLevel('view',
-        $services.model.serialize($spaceReservedDocRef, 'default')))
-        &lt;option value="$escapetool.xml($aSpace)" #if($space == $aSpace)selected="selected"#end&gt;$escapetool.xml($aSpace)&lt;/option&gt;
-      #end
-    #end
-  &lt;/select&gt;
-#end
-
 #macro (displaySearchDebugInfo)
-  (% class="search-debug#if ($debug == '') hidden#end" %)(((
-    Debug is On
+  (% class="search-debug" %)(((
+    === Debug Information ===
     #set ($debugMap = $searchResponse.debugMap)
     #if ($debugMap)
 
       {{html}}
-      &lt;div&gt;&lt;strong&gt;Query Parser:&lt;/strong&gt; $!escapetool.xml($debugMap.get('QParser'))&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Parsed Query:&lt;/strong&gt; $!escapetool.xml($debugMap.get('parsedquery_toString'))&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Filter Queries:&lt;/strong&gt; $!escapetool.xml($debugMap.get('filter_queries'))&lt;/div&gt;
-      &lt;div&gt;&lt;strong&gt;Processing time:&lt;/strong&gt; $!escapetool.xml($debugMap.get('timing'))&lt;/div&gt;
+      &lt;dl&gt;
+        &lt;dt&gt;Query Parser&lt;/dt&gt;
+        &lt;dd&gt;$!escapetool.xml($debugMap.get('QParser'))&lt;/dd&gt;
+        &lt;dt&gt;Parsed Query&lt;/dt&gt;
+        &lt;dd&gt;$!escapetool.xml($debugMap.get('parsedquery_toString'))&lt;/dd&gt;
+        &lt;dt&gt;Filter Queries&lt;/dt&gt;
+        &lt;dd&gt;
+          &lt;ul&gt;
+            #foreach ($filterQuery in $debugMap.get('filter_queries'))
+              &lt;li&gt;$!escapetool.xml($filterQuery)&lt;/li&gt;
+            #end
+          &lt;/ul&gt;
+        &lt;/dd&gt;
+        &lt;dt&gt;Processing Time&lt;/dt&gt;
+        &lt;dd&gt;
+          #displayProcessingTime($debugMap.get('timing'))
+        &lt;/dd&gt;
+      &lt;/dl&gt;
       {{/html}}
     #end
   )))
+#end
+
+#macro (displayProcessingTime $timing)
+  &lt;ul&gt;
+    ## The timing is not a Map but a NamedList.
+    #foreach ($entry in $timing)
+      &lt;li&gt;
+        $!escapetool.xml($entry.key):
+        #if ($entry.value.time &amp;&amp; $entry.value.size() &gt; 1)
+          #displayProcessingTime($entry.value)
+        #else
+          $!escapetool.xml($entry.value)
+        #end
+      &lt;/li&gt;
+    #end
+  &lt;/ul&gt;
 #end
 
 #macro (displaySearchFacets $searchResponse)
@@ -237,13 +136,12 @@
   #set ($facetValues = $facetField.values)
   ## Keep only the values that have at least one match.
   #set ($discard = $facetValues.removeAll($facetField.getLimitingFields(1).values))
-  ## Display the facets that have values specified on the request or that have at least 2 different values matched.
-  #set ($facetRequestParameter = "f_$facetField.name")
-  #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
-  #set ($facetValuesLimit = $request.getParameter("l_$facetField.name"))
-  #if ($facetRequestValues || $facetValues.size() &gt; 1)
+  #if ($facetValues.size() &gt; 0)
     ## Show active facets (that have selected values or that have an explicit limit on the number of values, i.e.
     ## pagination) as expanded. Collapse the rest, otherwise you have to scroll to see all the available facets.
+    #set ($facetRequestParameter = "f_$facetField.name")
+    #set ($facetRequestValues = $request.getParameterValues($facetRequestParameter))
+    #set ($facetValuesLimit = $request.getParameter("l_$facetField.name"))
     (% class="search-facet#if ($facetRequestValues || $facetValuesLimit) expanded#end" %)(((
       {{html}}
       #set ($facetPrettyNameKey = "solr.field.$facetField.name")
@@ -262,13 +160,17 @@
 #end
 
 #set ($customSearchFacetValuesDisplayer = {
+  'type': 'type',
+  'wiki': 'wiki',
   'locale': 'locale',
   'author': 'user',
   'creator': 'user',
   'attauthor': 'user',
   'date': 'date',
   'creationdate': 'date',
-  'attdate': 'date'
+  'attdate': 'date',
+  'attsize': 'size',
+  'mimetype': 'mediaType'
 })
 
 #macro (displaySearchFacetValues $facetValues)
@@ -279,24 +181,24 @@
   #evaluate("${escapetool.h}displaySearchFacetValues_${displayer}(${escapetool.d}facetValues)")
 #end
 
-#macro (displaySearchFacetValues_default $facetValues)
+#macro (displaySearchFacetValues_default $facetValues $customQueryStringParameters)
   &lt;ul&gt;
-    #displaySearchFacetValuesLimited($facetValues)
+    #displaySearchFacetValuesLimited($facetValues $customQueryStringParameters)
   &lt;/ul&gt;
 #end
 
-#macro (displaySearchFacetValuesLimited $facetValues)
+#macro (displaySearchFacetValuesLimited $facetValues $customQueryStringParameters)
   #set ($limitRequestParameter = "l_$facetField.name")
   #set ($limit = $mathtool.toInteger($request.getParameter($limitRequestParameter)))
   #if ("$!limit" == '')
-    #set ($limit = 5)
+    #set ($limit = $facetPaginationStep)
   #end
   #set ($limit = $mathtool.max($mathtool.min($limit, $facetValues.size()), 0))
   #foreach ($facetValue in $facetValues)
     #if ($foreach.index &lt; $limit)
-      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+      &lt;li&gt;#displaySearchFacetValue($facetValue $customQueryStringParameters)&lt;/li&gt;
     #else
-      #extendQueryString($url {$limitRequestParameter: [$mathtool.add($limit, 5)]})
+      #extendQueryString($url {$limitRequestParameter: [$mathtool.add($limit, $facetPaginationStep)]})
       &lt;li&gt;&lt;a href="$url" class="more"&gt;&amp;hellip; $escapetool.xml($services.localization.render(
         'solr.facets.moreValues', [$mathtool.sub($facetValues.size(), $limit)]))&lt;/a&gt;&lt;/li&gt;
       #break
@@ -304,7 +206,7 @@
   #end
 #end
 
-#macro (displaySearchFacetValue $facetValue)
+#macro (displaySearchFacetValue $facetValue $customQueryStringParameters)
   #set ($selectedValues = [])
   #if ($facetRequestValues)
     #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
@@ -314,7 +216,11 @@
     #set ($discard = $selectedValues.add($facetValue.name))
   #end
   ## Reset the pagination because the number of results can change when a facet is applied.
-  #extendQueryString($url {$facetRequestParameter: $selectedValues, 'firstIndex': []})
+  #set ($queryStringParameters = {$facetRequestParameter: $selectedValues, 'firstIndex': []})
+  #if ($customQueryStringParameters)
+    #set ($discard = $queryStringParameters.putAll($customQueryStringParameters))
+  #end
+  #extendQueryString($url $queryStringParameters)
   &lt;div class="itemCount"&gt;$facetValue.count&lt;/div&gt;
   &lt;a href="$url" class="itemName#if ($selected) selected#end#if ($facetValue.name == '') empty#end"&gt;
     #if ($facetValue.name == '')
@@ -346,15 +252,37 @@
   'creationdate': 'date',
   'attdate': 'date',
   'class': 'class',
-  'attsize': 'size'
+  'attsize': 'size',
+  'mimetype': 'mediaType'
 })
 
 #macro (displaySearchFacetValue_default $facetPrettyValue)
   $escapetool.xml($facetPrettyValue)
 #end
 
+#macro (displaySearchFacetValues_type $facetValues)
+  ## We have to reset the sort when the result type selection changes because the sort fields depend on the selected
+  ## result type.
+  #displaySearchFacetValues_default($facetValues {'sort': [], 'sortOrder': []})
+#end
+
 #macro (displaySearchFacetValue_type $type)
   $escapetool.xml($services.localization.render("solr.filterBy.type.$type.toLowerCase()"))
+#end
+
+#macro (displaySearchFacetValues_wiki $facetValues)
+  #set ($actualFacetValues = $facetValues)
+  ## If the list of wikis that are searchable from the main wiki is restricted then we need to hide some values.
+  #if ($wikisSearchableFromMainWiki &amp;&amp; $xcontext.isMainWiki() &amp;&amp; !$facetRequestValues)
+    #set ($actualFacetValues = [])
+    #foreach ($facetValue in $facetValues)
+      #if ($wikisSearchableFromMainWiki.contains($facetValue.name))
+        #set ($discard = $actualFacetValues.add($facetValue))
+      #end
+    #end
+  #end
+  ## We need to reset the sort because the available sort fields depend on the selected result type.
+  #displaySearchFacetValues_default($actualFacetValues)
 #end
 
 #macro (displaySearchFacetValue_wiki $wikiName)
@@ -614,8 +542,299 @@
   &lt;span title="$escapetool.xml($hint)"&gt;$escapetool.xml($classPrettyName)&lt;/span&gt;
 #end
 
-#macro (displaySearchFacetValue_size $size)
-  #dynamicsize($mathtool.toInteger($size))
+#macro (displaySearchFacetValues_size $facetValues)
+  ##
+  ## Predefined size intervals, specified in bytes.
+  ##
+  #set ($intervals = [
+    {
+      'id': 'tiny',
+      'end': 10240
+    }, {
+      'id': 'small',
+      'start': 10240,
+      'end': 512000
+    }, {
+      'id': 'medium',
+      'start': 512000,
+      'end': 5242880
+    }, {
+      'id': 'large',
+      'start': 5242880
+    }
+  ])
+  #foreach ($interval in $intervals)
+    #set ($start = $interval.start)
+    #set ($end = $interval.end)
+    #if (!$start)
+      #set ($start = '*')
+      #set ($hint = $services.localization.render('solr.facet.size.lessThan', ["#dynamicsize($end)"]))
+    #elseif (!$end)
+      #set ($end = '*')
+      #set ($hint = $services.localization.render('solr.facet.size.moreThan', ["#dynamicsize($start)"]))
+    #else
+      #set ($hint = $services.localization.render('solr.facet.size.between', ["#dynamicsize($start)", "#dynamicsize($end)"]))
+    #end
+    #set ($discard = $interval.putAll({
+      'label': $services.localization.render("solr.facet.size.$interval.id"),
+      'hint': $hint,
+      'name': "[$start TO $end]",
+      'count': 0
+    }))
+  #end
+  ##
+  ## Add custom size intervals specified on the request.
+  ##
+  #foreach ($selectedValue in $facetRequestValues)
+    ## Determine if the value/range is custom.
+    #set ($custom = true)
+    #foreach ($interval in $intervals)
+      #if ($interval.name == $selectedValue)
+        #set ($custom = false)
+        #break
+      #end
+    #end
+    #if ($custom)
+      #set ($rangeMatcher = $rangePattern.matcher($selectedValue))
+      #if ($rangeMatcher.matches())
+        #set ($discard = $intervals.add({
+          'start': $mathtool.toInteger($rangeMatcher.group(1)),
+          'end'  : $mathtool.toInteger($rangeMatcher.group(2)),
+          'name' : $selectedValue,
+          'count': 0
+        }))
+      #end
+    #end
+  #end
+  ##
+  ## Count matches for each date interval.
+  ##
+  #foreach ($facetValue in $facetValues)
+    #set ($size = $mathtool.toInteger($facetValue.name))
+    #foreach ($interval in $intervals)
+      #if ((!$interval.start || $interval.start &lt;= $size)
+          &amp;&amp; (!$interval.end || $size &lt; $interval.end))
+        #set ($discard = $interval.put('count', $mathtool.add($interval.count, $facetValue.count)))
+      #end
+    #end
+  #end
+  ## Filter the size intervals that don't have matches.
+  #set ($intervalsWithMatches = [])
+  #foreach ($interval in $intervals)
+    #if ($interval.count &gt; 0 || $facetRequestValues.contains($interval.name))
+      #set ($discard = $intervalsWithMatches.add($interval))
+    #end
+  #end
+  ## Make sure we sort the intervals based on the number of matches.
+  #set ($intervals = $sorttool.sort($intervalsWithMatches, 'count:desc'))
+  ##
+  ## Display the size intervals.
+  ##
+  &lt;ul&gt;
+    #foreach ($facetValue in $intervals)
+      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
+    #end
+  &lt;/ul&gt;
+#end
+
+#macro (displaySearchFacetValue_size $sizeInterval)
+  #if ($facetValue.label)
+    &lt;span title="$escapetool.xml($facetValue.hint)"&gt;$escapetool.xml($facetValue.label)&lt;/span&gt;
+  #elseif ($facetValue.start || $facetValue.end)
+    ## Display the custom interval.
+    #if (!$facetValue.start)
+      $escapetool.xml($services.localization.render('solr.facet.size.lessThan',
+        ["#dynamicsize($facetValue.end)"]))
+    #elseif (!$facetValue.end)
+      $escapetool.xml($services.localization.render('solr.facet.size.moreThan',
+        ["#dynamicsize($facetValue.start)"]))
+    #else
+      $services.localization.render('solr.facet.size.between',
+        ["#dynamicsize($facetValue.start)", "#dynamicsize($facetValue.end)"])
+    #end
+  #else
+    $escapetool.xml($services.localization.render('solr.facet.size.any'))
+  #end
+#end
+
+#macro (displaySearchFacetValues_mediaType $facetValues)
+  #set ($categoryMap = {
+    'text': ['text/', 'application/xml', 'application/javascript', 'application/ecmascript',
+      'application/json', 'application/x-sh', '+xml'],
+    'image': ['image/'],
+    'office': ['application/pdf', 'application/postscript', 'application/msword', 'application/vnd.ms-',
+      'application/vnd.oasis.opendocument.', 'application/vnd.openxmlformats-officedocument.'],
+    'archive': ['application/zip', 'application/x-gzip', 'application/x-bzip', 'application/x-tar',
+      'application/x-gtar', 'application/vnd.xara', '-archive', '-compressed', '-package', '+zip'],
+    'audio': ['audio/'],
+    'video': ['video/'],
+    'font': ['application/font-', 'application/x-font-']
+  })
+  #groupMediaTypes($facetValues $categoryMap true)
+  ## We also need to group some technical media types inside a category.
+  #set ($subcategoryMap = {
+    'office': {
+      'word': ['application/msword', 'application/vnd.ms-word.', 'application/vnd.oasis.opendocument.text',
+        'application/vnd.openxmlformats-officedocument.word'],
+      'presentation': ['application/vnd.ms-powerpoint', 'application/vnd.oasis.opendocument.presentation',
+        'application/vnd.openxmlformats-officedocument.presentation'],
+      'spreadsheet': ['application/vnd.ms-excel', 'application/vnd.oasis.opendocument.spreadsheet',
+        'application/vnd.openxmlformats-officedocument.spreadsheet']
+    }
+  })
+  #foreach ($facetValue in $facetValues)
+    #set ($subcategories = $subcategoryMap.get($facetValue.id))
+    #if ($subcategories)
+      #groupMediaTypes($facetValue.mediaTypesWithCounts $subcategories)
+      ## Update the list of media types to be able to unselect all subcategories when a category is selected.
+      #set ($discard = $facetValue.mediaTypes.clear())
+      #foreach ($mediaType in $facetValue.mediaTypesWithCounts)
+        #set ($discard = $facetValue.mediaTypes.add($mediaType.name))
+      #end
+    #end
+  #end
+  #displayMediaTypesWithPagination($facetValues)
+#end
+
+#macro (groupMediaTypes $mediaTypes $groups $groupRemainingMediaTypes)
+  #set ($matchedGroups = [])
+  #set ($groupedMediaTypes = [])
+  #foreach ($entry in $groups.entrySet())
+    #set ($group = {
+      'id': $entry.key,
+      'count': 0,
+      'mediaTypes': [],
+      'mediaTypesWithCounts': []
+    })
+    #foreach ($mediaType in $mediaTypes)
+      ## See if this media type is included in this group.
+      #foreach ($pattern in $entry.value)
+        #if ($mediaType.name == $pattern || $mediaType.name.startsWith($pattern) || $mediaType.name.endsWith($pattern))
+          #set ($group.count = $group.count + $mediaType.count)
+          #set ($discard = $group.mediaTypes.add($mediaType.name))
+          #set ($discard = $group.mediaTypesWithCounts.add($mediaType))
+          #set ($discard = $groupedMediaTypes.add($mediaType))
+          #break
+        #end
+      #end
+    #end
+    #if ($group.count &gt; 0)
+      ## Compute the filter value.
+      #joinMediaTypes($entry.value $escapedFilterValue)
+      #set ($discard = $group.put('name', $escapedFilterValue))
+      #set ($discard = $matchedGroups.add($group))
+    #end
+  #end
+  #set ($discard = $mediaTypes.removeAll($groupedMediaTypes))
+  #if ($groupRemainingMediaTypes &amp;&amp; $mediaTypes.size() &gt; 0)
+    #set ($other = {
+      'id': 'other',
+      'count': 0,
+      'mediaTypes': [],
+      'mediaTypesWithCounts': []
+    })
+    #set ($discard = $other.mediaTypesWithCounts.addAll($mediaTypes))
+    #foreach ($mediaType in $mediaTypes)
+      #set ($other.count = $other.count + $mediaType.count)
+      #set ($discard = $other.mediaTypes.add($mediaType.name))
+    #end
+    #joinMediaTypes($other.mediaTypes $escapedFilterValue)
+    #set ($discard = $other.put('name', $escapedFilterValue))
+    #set ($discard = $mediaTypes.clear())
+    #set ($discard = $mediaTypes.add($other))
+  #end
+  #set ($discard = $mediaTypes.addAll($matchedGroups))
+  ## Sort the media type groups based on the number of matches.
+  ## Note that the sort tool doesn't change the passed list.
+  #set ($sortedMediaTypes = $sorttool.sort($mediaTypes, 'count:desc'))
+  #set ($discard = $mediaTypes.clear())
+  #set ($discard = $mediaTypes.addAll($sortedMediaTypes))
+#end
+
+#macro (joinMediaTypes $mediaTypes $return)
+  #set ($escapedMediaTypes = [])
+  #foreach ($mediaType in $mediaTypes)
+    ## Escape the characters that have special meaning in the filter query.
+    #set ($escapedMediaType = $mediaType.replaceAll('([/.+\-])', '\\$1'))
+    #if ($mediaType.indexOf('/') &gt; 0)
+      ## Prefix.
+      #set ($escapedMediaType = "$escapedMediaType*")
+    #else
+      ## Suffix.
+      #set ($escapedMediaType = "*$escapedMediaType")
+    #end
+    #set ($discard = $escapedMediaTypes.add($escapedMediaType))
+  #end
+  #set ($return = $NULL)
+  #setVariable("$return" "($stringtool.join($escapedMediaTypes, ' '))")
+#end
+
+#macro (displayMediaTypesWithPagination $categories)
+  #set ($limitRequestParameter = "l_$facetField.name")
+  #set ($categoryLimit = $mathtool.toInteger($request.getParameter($limitRequestParameter)))
+  #if ("$!categoryLimit" == '')
+    #set ($categoryLimit = $facetPaginationStep)
+  #end
+  #set ($categoryLimit = $mathtool.max($mathtool.min($categoryLimit, $categories.size()), 0))
+  &lt;ul class="mediaTypes"&gt;
+    #foreach ($category in $categories)
+      #if ($foreach.index &lt; $categoryLimit)
+        &lt;li&gt;
+          ## Backup the selected values to be able to restore them afterwards.
+          #set ($facetRequestValuesBackup = $facetRequestValues)
+          ## When an entire category is selected we need to remove the values that were selected from that category.
+          #set ($facetRequestValues = [])
+          #if ($facetRequestValuesBackup)
+            #set ($discard = $facetRequestValues.addAll($facetRequestValuesBackup.subList(0,
+              $facetRequestValuesBackup.size())))
+            #set ($discard = $facetRequestValues.removeAll($category.mediaTypes))
+          #end
+          &lt;div class="mediaTypeCategory"&gt;#displaySearchFacetValue($category)&lt;/div&gt;
+          ## When a media type is selected, it's category should be unselected.
+          #set ($facetRequestValues = [])
+          #if ($facetRequestValuesBackup)
+            #set ($discard = $facetRequestValues.addAll($facetRequestValuesBackup.subList(0,
+              $facetRequestValuesBackup.size())))
+            #set ($discard = $facetRequestValues.remove($category.name))
+          #end
+          &lt;ul&gt;#displaySearchFacetValuesLimited($category.mediaTypesWithCounts)&lt;/ul&gt;
+          ## Restore the selected values.
+          #set ($facetRequestValues = $facetRequestValuesBackup)
+        &lt;/li&gt;
+      #else
+        #extendQueryString($url {$limitRequestParameter: [$mathtool.add($categoryLimit, $facetPaginationStep)]})
+        &lt;li&gt;&lt;a href="$url" class="more"&gt;&amp;hellip; $escapetool.xml($services.localization.render(
+          'solr.facets.moreValues', [$mathtool.sub($categories.size(), $categoryLimit)]))&lt;/a&gt;&lt;/li&gt;
+        #break
+      #end
+    #end
+  &lt;/ul&gt;
+#end
+
+#macro (displaySearchFacetValue_mediaType $mediaType)
+  #if ($facetValue.id)
+    ## A media type category.
+    $services.localization.render("solr.filterBy.fileType.$facetValue.id")
+  #else
+    #set ($prettyName = $stringtool.substringAfter($mediaType, '/'))
+    ## Fonts have a dedicated category so we can remove the 'x-font-' prefix.
+    #set ($prettyName = $stringtool.removeStart($prettyName, 'x-font-'))
+    ## Non-standard media type, i.e. not registered with the Internet Assigned Numbers Authority (IANA).
+    #set ($prettyName = $stringtool.removeStart($prettyName, 'x-'))
+    ## Vendor specific media type.
+    #set ($prettyName = $stringtool.removeStart($prettyName, 'vnd.'))
+    ## Many media types end with '+xml' or something similar. Let's remove this part.
+    #set ($prettyName = $stringtool.substringBeforeLast($prettyName, '+'))
+    ## Attempt to translate the pretty name.
+    #set ($translationKey = "solr.facet.fileType.${category.id}.$prettyName")
+    #if ($services.localization.get($translationKey))
+      #set ($prettyName = $services.localization.render($translationKey))
+    #elseif ($prettyName.length() &lt; 5)
+      ## Probably a file extension (or acronym).
+      #set ($prettyName = $prettyName.toUpperCase())
+    #end
+    &lt;span title="$mediaType"&gt;$prettyName&lt;/span&gt;
+  #end
 #end
 
 #macro (displaySearchResultsSort)
@@ -717,16 +936,16 @@
     #evaluate("${escapetool.h}displaySearchResult_$searchResult.type.toLowerCase()(${escapetool.d}searchResult)")
     #displaySearchResultHighlighting($searchResult)
     {{/html}}
+    #if ($debug)
 
-    ## Scoring debug data.
-    ## The reason we used a separate HTML block with no cleaning is because the scoring debug data may contain some
-    ## characters that are considered invalid by JDOM library which is used for parsing the HTML when cleaning is on.
-    ## E.g. "0x0 is not a legal XML character" (org.jdom.IllegalDataException).
-    {{html clean="false"}}
-    &lt;div id="debug_$searchResult.id" class="hidden"&gt;
-      $!escapetool.xml($searchResponse.explainMap.get($searchResult.id))
-    &lt;/div&gt;
-    {{/html}}
+      ## Scoring debug data.
+      ## The reason we used a separate HTML block with no cleaning is because the scoring debug data may contain some
+      ## characters that are considered invalid by JDOM library which is used for parsing the HTML when cleaning is on.
+      ## E.g. "0x0 is not a legal XML character" (org.jdom.IllegalDataException).
+      {{html clean="false"}}
+      &lt;div class="search-result-debug"&gt;$!escapetool.xml($searchResponse.explainMap.get($searchResult.id))&lt;/div&gt;
+      {{/html}}
+    #end
   )))
 #end
 
@@ -787,14 +1006,14 @@
 #end
 
 #macro (displaySearchResultTitle)
+  #set ($showLocale = $searchResult.locale != '' &amp;&amp; $searchResult.locale != $xcontext.language)
   #set ($titleURL = $searchResultDocument.getURL())
-  #if ($searchResult.locale != '' &amp;&amp; $xcontext.language != $searchResult.locale)
+  #if ($showLocale)
     #set ($titleURL = $searchResultDocument.getURL('view', "language=$searchResult.locale"))
   #end
   &lt;h2 class="search-result-title"&gt;
     &lt;a href="$titleURL"&gt;$escapetool.xml($searchResultTranslatedDocument.plainTitle)&lt;/a&gt;
-    ## Display document language when multiple language results are requested.
-    #if ($request.lang == '' &amp;&amp; $searchResult.locale != '')
+    #if ($showLocale)
       &lt;span title="$escapetool.xml($services.localization.render('solr.result.language'))"
         class="search-result-language" &gt;($escapetool.xml($searchResult.locale))&lt;/span&gt;
     #end
@@ -853,17 +1072,17 @@
     ## Remove the language suffix (e.g. _en, _fr, _de) from the field name.
     #set ($field = $stringtool.substringBefore($entry.key, '_'))
     ## Extract the language.
-    #set ($lang = $stringtool.substringAfter($entry.key, '_'))
-    #if ($lang == $field)
+    #set ($language = $stringtool.substringAfter($entry.key, '_'))
+    #if ($language == $field)
       ## No language.
-      #set ($lang = '_')
+      #set ($language = '_')
     #end
     #set ($matchesByLanguage = $highlightingByLanguage.get($field))
     #if (!$matchesByLanguage)
       #set ($matchesByLanguage = {})
       #set ($discard = $highlightingByLanguage.put($field, $matchesByLanguage))
     #end
-    #set ($discard = $matchesByLanguage.put($lang, $entry.value))
+    #set ($discard = $matchesByLanguage.put($language, $entry.value))
   #end
   ## Keep only the matches correspoding to the search result locale.
   #set ($highlighting = [])
@@ -910,13 +1129,40 @@
   #set ($discard = $query.setLimit($rows))
   #set ($discard = $query.setOffset($start))
   #set ($discard = $query.bindValue('sort', "${sort} ${sortOrder}"))
-  ## We need to pass the list of supported locales so the names of the fields that are indexed in multiple languages are
-  ## expanded in the search query. For instance, the query "title:text" will be expanded to "title__:text OR
-  ## title_en:text OR title_fr:text" if the list of supported locales is [en, fr].
-  #if (!$supportedLanguages)
-    #getSupportedLanguages()
+  #setSupportedLocales($query)
+  #setQueryFields($query)
+  #setFacetFields($query)
+  #setFilterQuery($query)
+  #if ($debug)
+    #set ($discard = $query.bindValue('debugQuery', 'on'))
+  #end
+  ##
+  ## Execute the query.
+  #set ($searchResponse = $query.execute()[0])
+#end
+
+#**
+ * We have to set the list of supported locales so the names of the fields that are indexed in multiple languages are
+ * expanded in the search query. For instance, the query "title:text" will be expanded to "title__:text OR
+ * title_en:text OR title_fr:text" if the list of supported locales is [en, fr].
+ *#
+#macro (setSupportedLocales $query)
+  #set ($supportedLanguagesRaw = $xwiki.getXWikiPreference('languages').split('[, |]'))
+  #set ($supportedLanguages = [])
+  #foreach ($supportedLanguage in $supportedLanguagesRaw)
+    #if ($supportedLanguage.trim() != '')
+      #set ($discard = $supportedLanguages.add($supportedLanguage))
+    #end
+  #end
+  ## Make sure the default language is included.
+  #set ($defaultLanguage = $xwiki.getXWikiPreference('default_language', 'en'))
+  #if (!$supportedLanguages.contains($defaultLanguage))
+    #set ($discard = $supportedLanguages.add($defaultLanguage))
   #end
   #set ($discard = $query.bindValue('xwiki.supportedLocales', $stringtool.join($supportedLanguages, ',')))
+#end
+
+#macro (setQueryFields $query)
   ## Specify which index fields are matched when a free text search is performed.
   #set ($defaultBoost = {
     'DOCUMENT': 'title^10.0 name^10.0
@@ -934,26 +1180,51 @@
   #if ("$!boost" != '')
     #set ($discard = $query.bindValue('qf', $boost))
   #end
-  #if ($debug != '')
-    #set ($discard = $query.bindValue('debugQuery', 'on'))
+#end
+
+#macro (setFacetFields $query)
+  ## The facets are displayed in this order so keep the most important facets first.
+  #set ($facetFields = ['type', 'wiki', 'space_exact', 'locale', 'author', 'creator', 'date',
+    'creationdate', 'class', 'name_exact', 'mimetype', 'attauthor', 'attdate', 'attsize'])
+  ## In order to support multi-select faceting we need to exclude the corresponding filters when faceting.
+  ## See http://wiki.apache.org/solr/SimpleFacetParameters#Multi-Select_Faceting_and_LocalParams
+  #set ($facetFieldsWithFilterExcludes = [])
+  ## Not all facets support multiple selection:
+  ## * we use different query fields for different result types so the number of matches for the type facet changes when
+  ##   a result type is selected/unselected.
+  ## * date facets have ranges that intersect and so multiple selection doesn't make sense
+  ##   (e.g. 'Today' is included in 'Last 7 days' so it doesn't make sense to select both)
+  #set ($facetFieldsWithSingleSelection = ['type', 'date', 'creationdate', 'attdate'])
+  #foreach ($facet in $facetFields)
+    #set ($excludeTaggedFilter = '')
+    #if (!$facetFieldsWithSingleSelection.contains($facet))
+      #set ($excludeTaggedFilter = "{!ex=$facet}")
+    #end
+    #set ($discard = $facetFieldsWithFilterExcludes.add("$excludeTaggedFilter$facet"))
   #end
+  #set ($discard = $query.bindValue('facet.field', $facetFieldsWithFilterExcludes))
+#end
+
+#macro (setFilterQuery $query)
   ##
   ## Collect the query filters.
-  #set ($filters = {})
-  #if ($language != '')
-    #set ($discard = $filters.put('locales', [$language]))
-  #end
-  #if ($wiki != '')
-    #set ($discard = $filters.put('wiki', [$wiki]))
-  #end
-  #if ($space != '' &amp;&amp; !$blacklistedSpaces.contains($space))
-    #set ($discard = $filters.put('space_exact', ["#escapeFilterValue($space)"]))
-  #end
-  #if ($type != '')
-    #set ($discard = $filters.put('type', [$type]))
-  #end
-  #if ($fileType != '')
-    #set ($discard = $filters.put('mimetype', [$fileType]))
+  ## Filter the search results based on the current language. The following results are kept:
+  ## * the translations in the current language, for those entities that support translations (e.g. a document
+  ##     translation in the current language)
+  ## * the translations in the supported/available languages, for those entities whose default language is the
+  ##     current language (e.g. if a document has French as default language and the list of supported languages
+  ##     is ['en', 'fr', 'ro'] then English an Romanian translations are included if they exist and the current
+  ##     language is French)
+  ## * the entities that don't support translations (attachments, objects) but which are bound to an entity
+  ##     (document) whose default language is the current language
+  ## * the entities that don't have a language set (e.g. documents that are translated with translation keys)
+  #set ($filters = {'locales': [$xcontext.language]})
+  #if (!$xcontext.isMainWiki())
+    ## Subwikis search by default in their content only.
+    #set ($discard = $filters.put('wiki', [$xcontext.database]))
+  #elseif ($wikisSearchableFromMainWiki)
+    ## The list of wikis that are searched by default can be configured.
+    #set ($discard = $filters.put('wiki', $wikisSearchableFromMainWiki))
   #end
   #if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
     #set ($discard = $filters.put('hidden', [false]))
@@ -969,33 +1240,19 @@
     #end
   #end
   ##
-  ## Build the query filter. Use AND as the default operation between different filters/facets.
-  #if ($filters.size() &gt; 0)
-    #set ($queryFilter = '{!q.op=AND}')
-    #foreach ($filter in $filters.entrySet())
-      #if ($filter.value.size() &gt; 1)
-        ## Use OR between different values of the same filter/facet.
-        #set ($queryFilter = "$queryFilter $filter.key:(")
-        #set ($separator = '')
-        #foreach ($value in $filter.value)
-          #set ($queryFilter = "$queryFilter$separator$value")
-          #set ($separator = ' OR ')
-        #end
-        #set ($queryFilter = "$queryFilter)")
-      #else
-        #set ($queryFilter = "$queryFilter $filter.key:$filter.value.get(0)")
-      #end
-    #end
-    #set ($discard = $query.bindValue('fq', $queryFilter))
+  ## Build the filter query.
+  #set ($filterQuery = [])
+  #foreach ($filter in $filters.entrySet())
+    ## Use OR between different values of the same filter/facet.
+    ## Tag the filter so that we can exclude it when faceting in order to support multi-select faceting.
+    #set ($discard = $filterQuery.add("{!tag=$filter.key}$filter.key:($!stringtool.join($filter.value, ' OR '))"))
   #end
-  ##
-  ## Execute the query.
-  #set ($searchResponse = $query.execute()[0])
+  #set ($discard = $query.bindValue('fq', $filterQuery))
 #end
 
 #macro (escapeFilterValue $value)
 ## Check if the given value is a range.
-#if ($rangePattern.matcher($value).matches())##
+#if ($rangePattern.matcher($value).matches() || $wildcardPattern.matcher($value).matches())##
 $value##
 #else##
 "$stringtool.replaceEach($value, ['\', '"'], ['\\', '\"'])"##
@@ -1004,10 +1261,10 @@ $value##
 
 #macro (processRequestParameters)
   #set ($text = "$!request.text")
-  #set ($space = "$!request.space")
-  #set ($fileType = "$!request.fileType")
   #set ($boost = "$!request.boost")
-  #set ($debug = "$!request.debug")
+  #set ($debug = "$!request.debug" != '')
+  ##
+  ## Pagination
   #set ($rows = $numbertool.integer($request.rows))
   #if ("$!rows" == '')
     #set ($rows = 10)
@@ -1016,6 +1273,8 @@ $value##
   #if ("$!start" == '')
     #set ($start = 0)
   #end
+  ##
+  ## Sort
   #set ($sort = $request.sort)
   #if ("$!sort" == '')
     #set ($sort = 'score')
@@ -1026,22 +1285,12 @@ $value##
   #elseif ($sortOrder != 'desc')
     #set ($sortOrder = 'asc')
   #end
-  ## Can't use 'language' as request parameter because it's used by view mode to select the display language.
-  #set ($language = $request.lang)
-  ## An empty value for the language parameter means no language query filter (all languages are considered).
-  #if ($language != '' &amp;&amp; "$!language" == '')
-    ## The language parameter is null (not set on the request).
-    #set ($language = "$!xcontext.language")
-  #end
-  #set ($type = $request.type)
-  #if ($type != '' &amp;&amp; "$!type" == '')
-    ## The type parameter is null (not set on the request).
-    #set ($type = 'DOCUMENT')
-  #end
-  ## Subwikis search by default in their content only.
-  #set ($wiki = "$!request.wiki")
-  #if ($wiki == '' &amp;&amp; !$xcontext.isMainWiki())
-    #set ($wiki = $xcontext.database)
+  ##
+  ## Result type
+  ## We store the selected result type because we need it to decide what search and sort fields to use.
+  #set ($type = $request.getParameterValues('f_type'))
+  #if ($type &amp;&amp; $type.size() == 1)
+    #set ($type = $type.get(0))
   #end
 #end
 
@@ -1056,7 +1305,9 @@ $value##
   )))
   #if ($text != '')
     #getSearchResults()
-    #displaySearchDebugInfo()
+    #if ($debug)
+      #displaySearchDebugInfo()
+    #end
     (% class="search-results-container" %)(((
       #displaySearchFacets($searchResponse)
       (% class="search-results-left" %)(((
@@ -1153,8 +1404,15 @@ $value##
   #outputRSSFeed()
 #elseif ($xcontext.action == 'get' &amp;&amp; "$!request.facet" != '' &amp;&amp; ($request.startDate || $request.endDate))
   #handleCustomDateInterval()
-#else
+#elseif ("$!request.r" == '1')
   #displaySearchUI()
+#else
+  ## Redirect using the default search filters
+  #extendQueryString($url {
+    'r': 1,
+    'f_type': 'DOCUMENT'
+  })
+  $response.sendRedirect($url)
 #end
 {{/velocity}}</content>
   <attachment>
@@ -1172,8 +1430,8 @@ $value##
     <date>1368432948000</date>
     <version>1.1</version>
     <comment/>
-    <content>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</content>
-    <filesize>2806</filesize>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAQAAACFbCRbAAAAJ0lEQVQI1y3GMQEAIAwDsGy4RCCiMDOOciU1Nsy6MHSgA33qh7RJH1DfCDMFeFsmAAAAAElFTkSuQmCC</content>
+    <filesize>96</filesize>
   </attachment>
   <attachment>
     <filename>light-grey-disclosure-arrow-down.png</filename>
@@ -1183,6 +1441,15 @@ $value##
     <comment/>
     <content>iVBORw0KGgoAAAANSUhEUgAAAAcAAAAECAYAAABCxiV9AAAAJElEQVQIW2M4c+bMf1yY4f///wzYJEDiYEl0BTAxuCRMATIfAOkKWg0ssytEAAAAAElFTkSuQmCC</content>
     <filesize>93</filesize>
+  </attachment>
+  <attachment>
+    <filename>light-grey-disclosure-arrow-left.png</filename>
+    <author>XWiki.Admin</author>
+    <date>1389774699000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>iVBORw0KGgoAAAANSUhEUgAAAAQAAAAHCAQAAACFbCRbAAAAJUlEQVQI1zXKsQ0AIADDMLf//8ZJMFRMzpAc4HbQQQeVH5abwwPlkgTcUkPn+AAAAABJRU5ErkJggg==</content>
+    <filesize>94</filesize>
   </attachment>
   <object>
     <name>Main.SolrSearch</name>
@@ -1265,33 +1532,6 @@ $value##
     </property>
     <property>
       <code>(function () {
-  var SearchFilterBehavior = Class.create({
-    initialize: function(container) {
-      this.container = container.hide().addClassName('popup');
-      var toggle = new Element('input', {
-        type: 'button',
-        'class': 'search-filter-toggle',
-        title: "$escapetool.javascript($services.localization.render('solr.filter.toggle'))"
-      });
-      toggle.observe('click', this._onToggle.bindAsEventListener(this));
-      this.container.up('.search-form').down('.search-query').insert({after: toggle});
-    },
-
-    _onToggle: function(event) {
-      this.container.toggle();
-
-      // Fix the height of the document content container (XWIKI-9189). The search filter is displayed with position
-      // absolute so that it floats over the search results (as a popup) and the document content container has
-      // overflow:auto to prevent long text/images/tables from overflowing outside of the content area. Because of this
-      // the content container is not resized when the search filter is displayed. Instead, when there are no search
-      // results, we get a vertical scroll bar.
-      var docContentContainer = $('xwikicontent');
-      docContentContainer &amp;&amp; docContentContainer.setStyle({
-        minHeight: this.container.visible() ? docContentContainer.scrollHeight + 'px' : ''
-      });
-    }
-  });
-
   var SearchFacetsBehavior = Class.create({
     initialize: function(container) {
       this.container = container;
@@ -1392,6 +1632,21 @@ $value##
     }
   });
 
+  var MediaTypeFacetBehavior = Class.create({
+    initialize: function(container) {
+      container.select('.mediaTypeCategory').each(function(category) {
+        var subtypes = category.next('ul');
+        var selected = category.down('.selected') || subtypes.down('.selected');
+        !selected &amp;&amp; category.addClassName('closed');
+        subtypes.toggle(selected);
+        category.down('.itemCount').observe('click', function(event) {
+          category.toggleClassName('closed');
+          subtypes.toggle();
+        });
+      });
+    }
+  });
+
   var SearchResultBehavior = Class.create({
     initialize: function(container) {
       this.container = container;
@@ -1416,8 +1671,9 @@ $value##
   });
 
   var init = function() {
-    var searchFilter = $('body').down('.search-filter');
-    searchFilter &amp;&amp; new SearchFilterBehavior(searchFilter);
+    $('body').select('.search-facet .mediaTypes').each(function(mediaTypeFacet) {
+      new MediaTypeFacetBehavior(mediaTypeFacet);
+    });
 
     var searchFacets = $('body').down('.search-facets');
     searchFacets &amp;&amp; new SearchFacetsBehavior(searchFacets);
@@ -1537,14 +1793,7 @@ $value##
  */
 
 .search-form-container {
-  clear: both;
   margin: 2em 0 1em;
-}
-
-.search-form {
-  margin: 0 auto;
-  position: relative;
-  width: 55%;
 }
 
 .search-form .search-query {
@@ -1557,68 +1806,7 @@ $value##
 }
 
 .search-bar input[type="submit"].button {
-  margin-left: 1em;
-}
-
-/**
- * Search filter
- */
-
-.search-form .search-filter-toggle {
-  background: url("$doc.getAttachmentURL('light-grey-disclosure-arrow-down.png')") no-repeat scroll 50% 50% $theme.pageContentBackgroundColor;
-  border: 0 none;
-  height: 16px;
-  margin: 0 0 0 -20px;
-  padding: 0;
-  vertical-align: middle;
-  width: 16px;
-  z-index: 2;
-}  
-
-.search-form .search-bar:hover .search-filter-toggle {
-  background-image: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-down.png')");
-}
-
-.search-filter {
-  background: $theme.backgroundSecondaryColor;
-  border: 1px solid $theme.borderColor;
-  border-radius: 0 0 4px 4px;
-  margin-top: .5em;
-  padding: 0 0.5em 0.5em;
-  width: 76%;
-}
-
-.search-filter.popup {
-  margin-top: -1px;
-  position: absolute;
-  z-index: 3;
-}
-
-.search-filter, .search-facets {
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-  /* Leave space for the bottom shadow. */
-  margin-bottom: 2px;
-}
-
-.search-filter-header {
-  padding: 1em .5em .5em;
-  border-bottom: 1px solid $theme.borderColor;
-}
-
-.search-filter-header strong,
-.search-facets-header strong {
-  #css_textShadow('0', '1px', '0', $theme.pageContentBackgroundColor)
-}
-
-.search-filter-left, .search-filter-right {
-  float: left;
-  width: 50%;
-}
-
-.search-filter select {
-  border: 2px solid #E8E8E8;
-  color: #636B75;
-  padding: .25em;
+  margin-left: .5em;
 }
 
 /**
@@ -1769,12 +1957,19 @@ a.search-result-highlightAll:after {
   content: ' \bb';
 }
 
+.search-result-debug {
+  white-space: pre;
+}
+
 /**
  * Facets
  */
 
 .search-facets {
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
   float: right;
+  /* Leave space for the bottom shadow. */
+  margin-bottom: 2px;
   max-width: 19.5em;
   width: 19.5em;
   border-radius: 4px;
@@ -1958,15 +2153,38 @@ a.search-result-highlightAll:after {
 }
 
 /**
+ * Media Type Facet
+ */
+.search-facet-body ul.mediaTypes ul {
+  margin-left: 1em;
+}
+
+/* Don't highlight the entire media type category. */
+.search-facet-body ul.mediaTypes &gt; li:hover {
+  background-color: transparent;
+}
+.search-facet-body .mediaTypeCategory:hover {
+  background-color: $theme.highlightColor;
+}
+
+.mediaTypeCategory .itemCount {
+  background: url("$doc.getAttachmentURL('light-grey-disclosure-arrow-down.png')") no-repeat scroll 100% 50% transparent;
+  cursor: pointer;
+  padding-right: 9px;
+}
+.mediaTypeCategory .itemCount:hover {
+  background-image: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-down.png')")
+}
+.mediaTypeCategory.closed .itemCount {
+  background-image: url("$doc.getAttachmentURL('light-grey-disclosure-arrow-left.png')")
+}
+.mediaTypeCategory.closed .itemCount:hover {
+  background-image: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-left.png')")
+}
+
+/**
  * Miscellaneous
  */
-
-.debug  {
-  float: right;
-  position: relative;
-  padding: 5px 10px;
-  margin-right: -10px;
-}
 
 .paginationFilter .resultsNo,
 .paginationFilter .controlPagination,

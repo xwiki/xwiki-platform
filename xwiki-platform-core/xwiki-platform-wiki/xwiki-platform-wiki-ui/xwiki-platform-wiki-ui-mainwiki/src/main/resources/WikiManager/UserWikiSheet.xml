@@ -119,6 +119,7 @@ XWiki.UserWikiTab = Class.create({
   },
 
   onWikiClicked : function (event) {
+    event.stop();
     var element = Event.element(event);
     var wikiId = element.up('li').id;
     new Ajax.Request("$xwiki.getURL('WikiManager.WikiActivityServiceCode')", {
@@ -309,7 +310,7 @@ return XWiki;
   #end
   #set($documentUser = $doc.prefixedFullName)
   #set($isMyProfile = ($currentUser == $documentUser))
-  {{html clean='false'}}
+  {{html clean='false' wiki='true'}}
   &lt;div class='half column'&gt;
     &lt;div class='profile-section highlighted-profile-section'&gt;
       &lt;h1&gt;$services.localization.render('platform.wiki.users.profile.joinedwikis.label')&lt;/h1&gt;
@@ -327,7 +328,7 @@ return XWiki;
         #foreach ($wiki in $joinedWikis)
           &lt;li id='$wiki.id'&gt;
             &lt;span class='wikiHomepage'&gt;&lt;a href='$xwiki.getURL($wiki.mainPageReference)'&gt;$wiki.prettyName&lt;/a&gt;&lt;/span&gt;
-            &lt;span class='wikiActivity'&gt;&lt;a href='javascript:void(0)'&gt;$services.localization.render('platform.wiki.users.profile.activity.show') &amp;#187;&lt;/a&gt;&lt;/span&gt;
+            &lt;span class='wikiActivity'&gt;&lt;a href='$doc.getURL('view', "category=wikis&amp;amp;wikiName=$wiki.id")'&gt;$services.localization.render('platform.wiki.users.profile.activity.show') &amp;#187;&lt;/a&gt;&lt;/span&gt;
           &lt;/li&gt;
         #end
         &lt;/ul&gt;
@@ -336,6 +337,9 @@ return XWiki;
   &lt;/div&gt;
   &lt;div id='wikiActivity' class='half column'&gt;
     &lt;div id='wikiActivityColumn'&gt;
+    #if("$!request.wikiName" != '')
+      {{include reference="WikiManager.WikiActivityServiceCode" /}}
+    #end
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;

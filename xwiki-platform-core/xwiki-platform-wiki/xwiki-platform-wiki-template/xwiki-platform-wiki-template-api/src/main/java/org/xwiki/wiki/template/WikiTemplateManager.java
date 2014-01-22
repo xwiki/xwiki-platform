@@ -76,6 +76,18 @@ public interface WikiTemplateManager
         boolean failOnExist) throws WikiTemplateManagerException;
 
     /**
+     * Apply a template to an existing wiki.
+     *
+     * @param wikiId if of the wiki on which the template will be installed
+     * @param templateId id of the template to use
+     * @return the job that provisions the wiki with the template content
+     * @throws WikiTemplateManagerException if problems occur
+     *
+     * @since 5.4RC1
+     */
+    WikiProvisioningJob applyTemplate(String wikiId, String templateId) throws WikiTemplateManagerException;
+
+    /**
      * Get the wiki provisioning job.
      *
      * @param jobId id of wiki provisioning job

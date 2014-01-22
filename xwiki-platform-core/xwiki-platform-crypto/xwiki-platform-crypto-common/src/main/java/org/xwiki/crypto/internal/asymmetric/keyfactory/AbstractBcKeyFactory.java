@@ -50,8 +50,16 @@ public abstract class AbstractBcKeyFactory implements AsymmetricKeyFactory, Asym
     private static final String CLASS_ERROR = "Expected a %s %s key, but key class is %s.";
     private static final String ALGORITHM_ERROR = "Expected a %s %s key, but key algorithm is %s.";
 
+    /**
+     * @return the appropriate BC converter to create JCA public and private key instance from key info.
+     */
     protected abstract AsymmetricKeyInfoConverter getKeyInfoConverter();
 
+    /**
+     * Check the type of the key parameter against the expected type for the current factory.
+     * @param key the parameters to check
+     * @return null if the parameter is of the expected type, else a string representing the expected type.
+     */
     protected abstract String checkKeyType(BcAsymmetricKeyParameters key);
 
     //

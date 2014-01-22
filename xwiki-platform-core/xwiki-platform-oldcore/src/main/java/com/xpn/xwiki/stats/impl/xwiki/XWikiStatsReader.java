@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,9 +141,17 @@ public class XWikiStatsReader
     {
         String nameFilter;
 
-        if (scope.getType() == Scope.SPACE_SCOPE && "".equals(scope.getName())) {
-            // Note that the query is made to work with Oracle which treats empty strings as null.
+        // Note that these queries are made to work with Oracle which treats empty strings as null.
+        if (scope.getType() == Scope.SPACE_SCOPE && StringUtils.isEmpty(scope.getName())) {
+            // Select all names that are not page names (i.e. they are space names), excluding empty names which
+            // represent global scopes.
             nameFilter = "name not like '%.%' and (name <> '' or (name is not null and '' is null))";
+        } else if (scope.getType() == Scope.GLOBAL_SCOPE && StringUtils.isEmpty(scope.getName())) {
+            // Select all names that are empty (i.e. global)
+            nameFilter = "name = '' or name is null";
+        } else if (scope.getType() == Scope.PAGE_SCOPE && StringUtils.isEmpty(scope.getName())) {
+            // Select all names that are page names
+            nameFilter = "name like '%.%'";
         } else {
             nameFilter = "name like ?";
             paramList.add(scope.getPattern());
@@ -216,7 +225,7 @@ public class XWikiStatsReader
         try {
             String query =
                 MessageFormat.format("select name, sum(pageViews) from DocumentStats"
-                    + " where {0} and action=? and ? <= period and period < ? group by name order"
+                    + " where ({0}) and action=? and ? <= period and period < ? group by name order"
                     + " by sum(pageViews) {1}", nameFilter, sortOrder);
 
             paramList.add(action);
@@ -288,7 +297,7 @@ public class XWikiStatsReader
         try {
             String query =
                 MessageFormat.format("select name, sum(pageViews) from RefererStats"
-                    + " where {0} and referer like ? and ? <= period and period < ? group by name"
+                    + " where ({0}) and referer like ? and ? <= period and period < ? group by name"
                     + " order by sum(pageViews) {1}", nameFilter, sortOrder);
 
             paramList.add(getHqlValidDomain(domain));
@@ -335,7 +344,7 @@ public class XWikiStatsReader
         try {
             String query =
                 MessageFormat.format("select referer, sum(pageViews) from RefererStats"
-                    + " where {0} and referer like ? and ? <= period and period < ?"
+                    + " where ({0}) and referer like ? and ? <= period and period < ?"
                     + " group by referer order by sum(pageViews) {1}", nameFilter, sortOrder);
 
             paramList.add(getHqlValidDomain(domain));

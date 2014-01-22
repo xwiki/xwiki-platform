@@ -19,11 +19,10 @@
  */
 package org.xwiki.extension.distribution.internal.job.step;
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -31,12 +30,17 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-
+/**
+ * Optional step to install sub-wikis default UI extensions.
+ * 
+ * @version $Id$
+ * @since 5.2RC1
+ */
 @Component
 @Named(WikisDefaultUIDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
@@ -46,9 +50,6 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
 
     @Inject
     private transient InstalledExtensionRepository installedRepository;
-
-    @Inject
-    private transient Provider<XWikiContext> xcontextProvider;
 
     @Inject
     private Logger logger;
@@ -64,13 +65,13 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
         if (getState() != State.CANCELED) {
             setState(State.COMPLETED);
 
-            if (this.distributionManager.getUpgradeMode() == UpgradeMode.ALLINONE) {
-                XWikiContext xcontext = this.xcontextProvider.get();
+            if (isMainWiki()) {
+                WikiDescriptorManager wikiDescriptorManager = this.wikiDescriptorManagerProvider.get();
 
-                List<String> wikis;
+                Collection<WikiDescriptor> wikis;
                 try {
-                    wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
-                } catch (XWikiException e) {
+                    wikis = wikiDescriptorManager.getAll();
+                } catch (WikiManagerException e) {
                     this.logger.error("Failed to get the list of wikis", e);
                     setState(null);
                     return;
@@ -78,9 +79,9 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
 
                 ExtensionId wikiExtensionUI = this.distributionManager.getWikiUIExtensionId();
 
-                for (String wiki : wikis) {
-                    if (!xcontext.isMainWiki(wiki)) {
-                        String namespace = "wiki:" + wiki;
+                for (WikiDescriptor wiki : wikis) {
+                    if (!wikiDescriptorManager.getMainWikiId().equals(wiki.getId())) {
+                        String namespace = "wiki:" + wiki.getId();
 
                         // Only if the UI is not already installed
                         if (wikiExtensionUI != null) {

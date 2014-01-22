@@ -41,12 +41,22 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-extension-handler-xar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-security-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -76,10 +86,11 @@
             **/DistributionStep.java,
             **/DistributionStepStatus.java,
             **/DistributionScriptService.java,
+            **/DocumentsModifiedDuringDistributionListener.java,
             **/DefaultDistributionManager.java,
             **/FarmDistributionJobStatus.java,
             **/OutdatedExtensionsDistributionStep.java,
-            **/UpgradeModeDistributionStep.java,
+            **/ReportDistributionStep.java,
             **/WelcomeDistributionStep.java,
             **/WikisDefaultUIDistributionStep.java,
             **/WikiDistributionJob.java,

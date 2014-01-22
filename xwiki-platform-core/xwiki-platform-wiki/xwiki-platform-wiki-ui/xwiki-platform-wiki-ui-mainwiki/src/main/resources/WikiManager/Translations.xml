@@ -226,6 +226,7 @@ platform.wiki.create.wizard.template.noTemplate=No template (default)
 platform.wiki.create.wizard.userScope.label=User Scope
 platform.wiki.create.wizard.userScope.hint=Select what kind of users can access to the wiki
 platform.wiki.create.wizard.template.label=Template
+platform.wiki.create.wizard.step.dw=After clicking on "create", the wiki will be created but then the Distribution Wizard will be started to initialize your wiki. If you skip it, your wiki will be empty.
 
 ## Admin
 admin.wikis=Wikis
@@ -233,6 +234,7 @@ admin.wikis.template=Wiki Template
 admin.wikis.rights=Wiki Creation Right
 
 ## XWikiServer Sheet
+platform.wiki.sheet.title=Descriptor of the wiki \"{0}\"
 platform.wiki.sheet.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
 platform.wiki.sheet.erroraliasdoesnotexists=Wiki alias \"{0}\" does not exists.
 platform.wiki.sheet.title.settings=Wiki properties
@@ -252,6 +254,9 @@ platform.wiki.sheet.prop.description=Description
 platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.homepage=Home page
 platform.wiki.sheet.prop.iswikitemplate=Wiki template
+platform.wiki.sheet.descriptor=This page defines how to access the \"{0}\" wiki, and some properties about it. For more configurations, please go to the
+platform.wiki.sheet.descriptor.admin=administraton page of the wiki.
+platform.wiki.sheet.aliases=An alias is an other name for the wiki. You can add aliases to create different URLs for the wiki.
 
 ###############################################################################
 ## Deprecated

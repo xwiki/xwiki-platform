@@ -35,6 +35,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReferenceTree;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
@@ -450,5 +451,31 @@ public class ModelScriptService implements ScriptService
         } catch (ComponentLookupException ex) {
             return null;
         }
+    }
+
+    /**
+     * Convert passed references to a tree of references.
+     * 
+     * @param references the references
+     * @return the references as a tree
+     * @since 5.4RC1
+     */
+    @Unstable
+    public EntityReferenceTree toTree(Iterable< ? extends EntityReference> references)
+    {
+        return new EntityReferenceTree(references);
+    }
+
+    /**
+     * Convert passed references to a tree of references.
+     * 
+     * @param references the references
+     * @return the references as a tree
+     * @since 5.4RC1
+     */
+    @Unstable
+    public EntityReferenceTree toTree(EntityReference... references)
+    {
+        return new EntityReferenceTree(references);
     }
 }

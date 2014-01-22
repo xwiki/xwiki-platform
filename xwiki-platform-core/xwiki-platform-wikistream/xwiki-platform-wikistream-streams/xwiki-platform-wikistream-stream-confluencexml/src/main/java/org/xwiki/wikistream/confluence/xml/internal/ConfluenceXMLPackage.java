@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -113,6 +114,8 @@ public class ConfluenceXMLPackage
 
     public static final String KEY_ATTACHMENT_REVISION = "attachmentVersion";
 
+    public static final String KEY_ATTACHMENT_ORIGINAL_REVISION = "originalVersion";
+
     public static final String KEY_ATTACHMENT_DTO = "imageDetailsDTO";
 
     public static final String KEY_GROUP_NAME = "name";
@@ -152,8 +155,20 @@ public class ConfluenceXMLPackage
     /**
      * 2012-03-07 17:16:48.158
      */
-    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd G 'at' HH:mm:ss.SSS");
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
+    /**
+     * pattern to find the end of "intentionally damaged" CDATA end sections.
+     * Confluence does this to nest CDATA sections inside CDATA sections.
+     * Interestingly it does not care if there is a &gt; after the ]].
+     */
+    private static final Pattern FIND_BROKEN_CDATA_PATTERN = Pattern.compile("]] ");
+
+    /**
+     * replacement to repair the CDATA 
+     */
+    private static final String REPAIRED_CDATA_END = "]]";
+    
     private File directory;
 
     private File entities;
@@ -381,10 +396,12 @@ public class ConfluenceXMLPackage
 
         int attachmentId = readObjectProperties(xmlReader, properties);
 
-        int pageId = properties.getInt("content");
+        if (properties.containsKey(KEY_ATTACHMENT_CONTENT)) {
+            int pageId = properties.getInt(KEY_ATTACHMENT_CONTENT);
 
-        // Save attachment
-        saveAttachmentProperties(properties, pageId, attachmentId);
+            // Save attachment
+            saveAttachmentProperties(properties, pageId, attachmentId);
+        }
     }
 
     private void readSpaceObject(XMLStreamReader xmlReader) throws XMLStreamException, WikiStreamException,
@@ -534,7 +551,7 @@ public class ConfluenceXMLPackage
         String propertyClass = xmlReader.getAttributeValue(null, "class");
 
         if (propertyClass == null) {
-            return xmlReader.getElementText();
+            return fixCData(xmlReader.getElementText());
         } else if (propertyClass.equals("java.util.List") || propertyClass.equals("java.util.Collection")) {
             return readListProperty(xmlReader);
         } else if (propertyClass.equals("java.util.Set")) {
@@ -550,6 +567,19 @@ public class ConfluenceXMLPackage
         }
 
         return null;
+    }
+    
+    /**
+     * to protect content with cdata section inside of cdata elements confluence adds a single space after two consecutive curly braces.
+     * we need to undo this patch as otherwise the content parser will complain about invalid content.
+     * strictly speaking this needs only to be done for string valued properties
+     */
+    private String fixCData(String elementText)
+    {
+        if (elementText == null) {
+            return elementText;
+        }
+        return FIND_BROKEN_CDATA_PATTERN.matcher(elementText).replaceAll(REPAIRED_CDATA_END);
     }
 
     private Integer readIdProperty(XMLStreamReader xmlReader) throws WikiStreamException, XMLStreamException

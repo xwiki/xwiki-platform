@@ -598,6 +598,12 @@
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-xar</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wikistream-instance-api</artifactId>
       <version>${project.version}</version>
     </dependency>

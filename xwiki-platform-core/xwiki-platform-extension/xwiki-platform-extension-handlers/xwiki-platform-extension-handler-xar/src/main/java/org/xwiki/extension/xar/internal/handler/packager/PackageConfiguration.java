@@ -19,9 +19,9 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
-import java.util.Map;
 import java.util.Set;
 
+import org.xwiki.extension.xar.internal.handler.XarExtensionPlan;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -29,21 +29,101 @@ import org.xwiki.model.reference.DocumentReference;
  * @version $Id$
  * @since 4.0M2
  */
-public interface PackageConfiguration
+public class PackageConfiguration
 {
-    String getWiki();
+    private String wiki;
 
-    DocumentReference getUserReference();
+    private DocumentReference user;
 
-    boolean isInteractive();
+    private boolean interactive;
 
-    JobStatus getJobStatus();
+    private JobStatus jobStatus;
 
-    boolean isLogEnabled();
+    private boolean verbose = false;
 
-    Map<XarEntry, XarFile> getPreviousPages();
+    private XarExtensionPlan xarExtensionPlan;
 
-    Set<String> getEntriesToImport();
-    
-    boolean isSkipMandatorytDocuments();
+    private Set<String> entriesToImport;
+
+    private boolean skipMandatorytDocuments = true;
+
+    public String getWiki()
+    {
+        return this.wiki;
+    }
+
+    public void setWiki(String wiki)
+    {
+        this.wiki = wiki;
+    }
+
+    public DocumentReference getUserReference()
+    {
+        return this.user;
+    }
+
+    public void setUser(DocumentReference user)
+    {
+        this.user = user;
+    }
+
+    public boolean isInteractive()
+    {
+        return this.interactive;
+    }
+
+    public void setInteractive(boolean interactive)
+    {
+        this.interactive = interactive;
+    }
+
+    public JobStatus getJobStatus()
+    {
+        return this.jobStatus;
+    }
+
+    public void setJobStatus(JobStatus jobStatus)
+    {
+        this.jobStatus = jobStatus;
+    }
+
+    public boolean isVerbose()
+    {
+        return this.verbose;
+    }
+
+    public void setVerbose(boolean verbose)
+    {
+        this.verbose = verbose;
+    }
+
+    public Set<String> getEntriesToImport()
+    {
+        return this.entriesToImport;
+    }
+
+    public void setEntriesToImport(Set<String> entriesToImport)
+    {
+        this.entriesToImport = entriesToImport;
+    }
+
+    public XarExtensionPlan getXarExtensionPlan()
+    {
+        return this.xarExtensionPlan;
+    }
+
+    public void setXarExtensionPlan(XarExtensionPlan xarExtensionPlan)
+    {
+        this.xarExtensionPlan = xarExtensionPlan;
+    }
+
+    public boolean isSkipMandatorytDocuments()
+    {
+        return this.skipMandatorytDocuments;
+    }
+
+    public void setSkipMandatorytDocuments(boolean skipMandatorytDocuments)
+    {
+        this.skipMandatorytDocuments = skipMandatorytDocuments;
+    }
 }

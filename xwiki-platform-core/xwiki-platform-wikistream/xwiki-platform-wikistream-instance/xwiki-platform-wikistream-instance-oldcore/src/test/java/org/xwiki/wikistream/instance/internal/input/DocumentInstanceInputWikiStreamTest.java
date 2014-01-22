@@ -50,6 +50,7 @@ public class DocumentInstanceInputWikiStreamTest extends AbstractInstanceInputWi
 
         DocumentInstanceInputProperties inputProperties = new DocumentInstanceInputProperties();
         inputProperties.setWithRevisions(false);
+        inputProperties.setWithJRCSRevisions(false);
 
         assertXML("document1", outputProperties, inputProperties);
     }

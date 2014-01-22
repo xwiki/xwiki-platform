@@ -31,15 +31,14 @@
   </parent>
   <artifactId>xwiki-platform-wikistream-stream-xar</artifactId>
   <name>XWiki Platform - WikiStream - XAR</name>
-  <description>XWiki Platform - WikiStream - XAR</description>
+  <description>Wiki stream extension to read and write XAR packages</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
+
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>WikiStream Confluence XAR module</xwiki.extension.name>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
-    </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
@@ -56,7 +55,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
+      <artifactId>xwiki-platform-xar</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -88,11 +87,9 @@
               org/xwiki/wikistream/xar/internal/XARClassPropertyModel.java,
               org/xwiki/wikistream/xar/internal/XARDocumentModel.java,
               org/xwiki/wikistream/xar/internal/XARFilter.java,
-              org/xwiki/wikistream/xar/internal/XARModel.java,
               org/xwiki/wikistream/xar/internal/XARObjectModel.java,
               org/xwiki/wikistream/xar/internal/XARObjectPropertyModel.java,
-              org/xwiki/wikistream/xar/internal/XARPackage.java,
-              org/xwiki/wikistream/xar/internal/XARUtils.java,
+              org/xwiki/wikistream/xar/internal/XARWikiStreamUtils.java,
               org/xwiki/wikistream/xar/internal/input/AbstractReader.java,
               org/xwiki/wikistream/xar/internal/input/AttachmentReader.java,
               org/xwiki/wikistream/xar/internal/input/ClassPropertyReader.java,

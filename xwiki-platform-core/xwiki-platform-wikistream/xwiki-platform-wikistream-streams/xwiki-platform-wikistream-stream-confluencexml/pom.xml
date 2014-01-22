@@ -31,8 +31,12 @@
   </parent>
   <artifactId>xwiki-platform-wikistream-stream-confluencexml</artifactId>
   <name>XWiki Platform - WikiStream - Confluence XML</name>
-  <description>XWiki Platform - WikiStream - Confluence XML</description>  <properties>
+  <description>Wiki stream extension to parse a Confluence XML package</description>
+  <properties>
     <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
+
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>WikiStream Confluence XML module</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

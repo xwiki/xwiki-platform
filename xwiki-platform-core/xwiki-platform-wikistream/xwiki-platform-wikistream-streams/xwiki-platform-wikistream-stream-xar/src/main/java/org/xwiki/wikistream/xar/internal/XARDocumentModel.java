@@ -27,72 +27,15 @@ import java.util.Map;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wikistream.filter.xwiki.XWikiWikiDocumentFilter;
-import org.xwiki.wikistream.xar.internal.XARUtils.EventParameter;
+import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
+import org.xwiki.xar.internal.model.XarDocumentModel;
 
 /**
  * @version $Id$
  * @since 5.2M2
  */
-public class XARDocumentModel
+public class XARDocumentModel extends XarDocumentModel
 {
-    public static final String ELEMENT_DOCUMENT = "xwikidoc";
-
-    public static final String ATTRIBUTE_STREAMVERSION = "version";
-
-    public static final String ELEMENT_SPACE = "web";
-
-    public static final String ELEMENT_NAME = "name";
-
-    public static final String ELEMENT_LOCALE = "language";
-
-    public static final String ELEMENT_DEFAULTLOCALE = "defaultLanguage";
-
-    public static final String ELEMENT_ISTRANSLATION = "translation";
-
-    public static final String ELEMENT_PARENT = "parent";
-
-    public static final String ELEMENT_TITLE = "title";
-
-    public static final String ELEMENT_HIDDEN = "hidden";
-
-    public static final String ELEMENT_CUSTOMCLASS = "customClass";
-
-    public static final String ELEMENT_DEFAULTTEMPLATE = "defaultTemplate";
-
-    public static final String ELEMENT_VALIDATIONSCRIPT = "validationScript";
-
-    public static final String ELEMENT_SYNTAX = "syntaxId";
-
-    // content
-
-    public static final String ELEMENT_CONTENT = "content";
-
-    public static final String ELEMENT_CONTENT_AUTHOR = "contentAuthor";
-
-    public static final String ELEMENT_CONTENT_DATE = "contentUpdateDate";
-
-    public static final String ELEMENT_CONTENT_HTML = "renderedcontent";
-
-    // creation
-
-    public static final String ELEMENT_CREATION_AUTHOR = "creator";
-
-    public static final String ELEMENT_CREATION_DATE = "creationDate";
-
-    // revision
-
-    public static final String ELEMENT_REVISION_DATE = "date";
-
-    public static final String ELEMENT_REVISION = "version";
-
-    public static final String ELEMENT_REVISION_AUTHOR = "author";
-
-    public static final String ELEMENT_REVISION_COMMENT = "comment";
-
-    public static final String ELEMENT_REVISION_MINOR = "minorEdit";
-
-    public static final String ELEMENT_REVISIONS = "versions";
-
     // Utils
 
     public static final Map<String, EventParameter> DOCUMENT_PARAMETERS = new HashMap<String, EventParameter>()
@@ -125,7 +68,8 @@ public class XARDocumentModel
             put(ELEMENT_REVISION_AUTHOR, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_AUTHOR));
             put(ELEMENT_REVISION_COMMENT, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_COMMENT));
             put(ELEMENT_REVISION_DATE, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_DATE, Date.class));
-            put(ELEMENT_REVISION_MINOR, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR, Boolean.class));
+            put(ELEMENT_REVISION_MINOR, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_REVISION_MINOR,
+                Boolean.class));
             put(ELEMENT_SYNTAX, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_SYNTAX, Syntax.class));
             put(ELEMENT_TITLE, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_TITLE));
             put(ELEMENT_VALIDATIONSCRIPT, new EventParameter(XWikiWikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT));

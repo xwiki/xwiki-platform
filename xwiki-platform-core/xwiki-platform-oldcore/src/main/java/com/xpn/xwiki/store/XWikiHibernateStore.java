@@ -252,7 +252,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             // Capture Logs since we voluntarily generate storage errors to check if the wiki already exists and
             // we don't want to pollute application logs with "normal errors"...
-            if (!logger.isDebugEnabled()) {
+            if (!this.logger.isDebugEnabled()) {
                 this.loggerManager.pushLogListener(null);
             }
 
@@ -279,7 +279,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
 
             // Restore proper logging
-            if (!logger.isDebugEnabled()) {
+            if (!this.logger.isDebugEnabled()) {
                 this.loggerManager.popLogListener();
             }
         }
@@ -306,12 +306,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (DatabaseProduct.ORACLE == databaseProduct) {
                 stmt.execute("create user " + escapedSchema + " identified by " + escapedSchema);
                 stmt.execute("grant resource to " + escapedSchema);
-            } else if (DatabaseProduct.DERBY == databaseProduct) {
+            } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.DB2 == databaseProduct
+                || DatabaseProduct.H2 == databaseProduct)
+            {
                 stmt.execute("CREATE SCHEMA " + escapedSchema);
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {
                 stmt.execute("CREATE SCHEMA " + escapedSchema + " AUTHORIZATION DBA");
-            } else if (DatabaseProduct.DB2 == databaseProduct) {
-                stmt.execute("CREATE SCHEMA " + escapedSchema);
             } else if (DatabaseProduct.MYSQL == databaseProduct) {
                 // TODO: find a proper java lib to convert from java encoding to mysql charset name and collation
                 if (context.getWiki().getEncoding().equals("UTF-8")) {
@@ -323,7 +323,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 if (isInSchemaMode()) {
                     stmt.execute("CREATE SCHEMA " + escapedSchema);
                 } else {
-                    logger.error("Creation of a new database is currently only supported in the schema mode, "
+                    this.logger.error("Creation of a new database is currently only supported in the schema mode, "
                         + "see http://jira.xwiki.org/browse/XWIKI-8753");
                 }
             } else {
@@ -406,19 +406,19 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         if (DatabaseProduct.ORACLE == databaseProduct) {
             statement.execute("DROP USER " + escapedSchemaName + " CASCADE");
-        } else if (DatabaseProduct.DERBY == databaseProduct) {
+        } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.MYSQL == databaseProduct
+            || DatabaseProduct.H2 == databaseProduct)
+        {
             statement.execute("DROP SCHEMA " + escapedSchemaName);
         } else if (DatabaseProduct.HSQLDB == databaseProduct) {
             statement.execute("DROP SCHEMA " + escapedSchemaName + " CASCADE");
         } else if (DatabaseProduct.DB2 == databaseProduct) {
             statement.execute("DROP SCHEMA " + escapedSchemaName + " RESTRICT");
-        } else if (DatabaseProduct.MYSQL == databaseProduct) {
-            statement.execute("DROP DATABASE " + escapedSchemaName);
         } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
             if (isInSchemaMode()) {
                 statement.execute("DROP SCHEMA " + escapedSchemaName + " CASCADE");
             } else {
-                logger.warn("Subwiki deletion not yet supported in Database mode for PostgreSQL");
+                this.logger.warn("Subwiki deletion not yet supported in Database mode for PostgreSQL");
             }
         }
     }
@@ -715,8 +715,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                 }
                             }
                             if (newProperty == null) {
-                                logger.warn("Incompatible data migration when changing field {} of class {}",
-                                        prop.getName(), prop.getClassName());
+                                this.logger.warn("Incompatible data migration when changing field {} of class {}",
+                                    prop.getName(), prop.getClassName());
                                 continue;
                             }
                             newProperty.setId(brokenProperty.getId());
@@ -941,7 +941,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
         }
 
-        logger.debug("Loaded XWikiDocument: " + doc.getDocumentReference());
+        this.logger.debug("Loaded XWikiDocument: [{}]", doc.getDocumentReference());
 
         return doc;
     }
@@ -1419,9 +1419,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 ((BaseProperty) property).setValueDirty(false);
             } catch (ObjectNotFoundException e) {
                 // Let's accept that there is no data in property tables but log it
-                if (logger.isErrorEnabled()) {
-                    logger.error("No data for property " + property.getName() + " of object id " + property.getId());
-                }
+                this.logger.error("No data for property [{}] of object id [{}]", property.getName(), property.getId());
             }
 
             // TODO: understand why collections are lazy loaded
@@ -1816,7 +1814,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
         // If we're in a non-main wiki & the user is global,
         // switch to the global wiki and delete locks held there.
-        if (ctx.isMainWiki()
+        if (!ctx.isMainWiki()
             && ctx.isMainWiki(ctx.getUserReference().getWikiReference().getName()))
         {
             final String cdb = ctx.getDatabase();
@@ -2090,12 +2088,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @param parameterValues the values to add to query.
      * @return the id of the next parameter to add.
      */
-    private int injectParameterListToQuery(int parameterId, Query query, Collection< ? > parameterValues)
+    private int injectParameterListToQuery(int parameterId, Query query, Collection<?> parameterValues)
     {
         int index = parameterId;
 
         if (parameterValues != null) {
-            for (Iterator< ? > valueIt = parameterValues.iterator(); valueIt.hasNext(); ++index) {
+            for (Iterator<?> valueIt = parameterValues.iterator(); valueIt.hasNext(); ++index) {
                 injectParameterToQuery(index, query, valueIt.next());
             }
         }
@@ -2116,14 +2114,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List< ? > parameterValues,
+    public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
         return searchDocumentReferences(parametrizedSqlClause, 0, 0, parameterValues, context);
     }
 
     @Override
-    public List<String> searchDocumentsNames(String parametrizedSqlClause, List< ? > parameterValues,
+    public List<String> searchDocumentsNames(String parametrizedSqlClause, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
         return searchDocumentsNames(parametrizedSqlClause, 0, 0, parameterValues, context);
@@ -2131,7 +2129,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     @Override
     public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
-        List< ? > parameterValues, XWikiContext context) throws XWikiException
+        List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         String sql = createSQLQuery("select distinct doc.space, doc.name", parametrizedSqlClause);
         return searchDocumentReferencesInternal(sql, nb, start, parameterValues, context);
@@ -2139,7 +2137,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     @Override
     public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
-        List< ? > parameterValues, XWikiContext context) throws XWikiException
+        List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         String sql = createSQLQuery("select distinct doc.space, doc.name", parametrizedSqlClause);
         return searchDocumentsNamesInternal(sql, nb, start, parameterValues, context);
@@ -2191,11 +2189,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public <T> List<T> search(String sql, int nb, int start, XWikiContext context) throws XWikiException
     {
-        return search(sql, nb, start, (List< ? >) null, context);
+        return search(sql, nb, start, (List<?>) null, context);
     }
 
     @Override
-    public <T> List<T> search(String sql, int nb, int start, List< ? > parameterValues, XWikiContext context)
+    public <T> List<T> search(String sql, int nb, int start, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
         return search(sql, nb, start, null, parameterValues, context);
@@ -2209,7 +2207,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List< ? > parameterValues,
+    public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
         boolean bTransaction = true;
@@ -2363,7 +2361,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public int countDocuments(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
+    public int countDocuments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
         String sql = createSQLQuery("select count(distinct doc.fullName)", parametrizedSqlClause);
@@ -2389,7 +2387,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @since 2.2M1
      */
     private List<DocumentReference> searchDocumentReferencesInternal(String sql, int nb, int start,
-        List< ? > parameterValues, XWikiContext context) throws XWikiException
+        List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         List<DocumentReference> documentReferences = new ArrayList<DocumentReference>();
         for (Object[] result : searchGenericInternal(sql, nb, start, parameterValues, context)) {
@@ -2405,7 +2403,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     /**
      * @since 2.2M1
      */
-    private List<Object[]> searchGenericInternal(String sql, int nb, int start, List< ? > parameterValues,
+    private List<Object[]> searchGenericInternal(String sql, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
         boolean bTransaction = false;
@@ -2463,7 +2461,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
-        boolean checkRight, int nb, int start, List< ? > parameterValues, XWikiContext context) throws XWikiException
+        boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         // Search documents
         List<Object[]> documentDatas = new ArrayList<Object[]>();
@@ -2802,13 +2800,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             String propname = hibprop.getName();
             PropertyClass propclass = (PropertyClass) bclass.getField(propname);
             if (propclass == null) {
-                logger.warn("Mapping contains invalid field name " + propname);
+                this.logger.warn("Mapping contains invalid field name [{}]", propname);
                 return false;
             }
 
             boolean result = isValidColumnType(hibprop.getValue().getType().getName(), propclass.getClassName());
             if (result == false) {
-                logger.warn("Mapping contains invalid type in field " + propname);
+                this.logger.warn("Mapping contains invalid type in field [{}]", propname);
                 return false;
             }
         }
@@ -2857,7 +2855,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public List<XWikiDocument> searchDocuments(String wheresql, List< ? > parameterValues, XWikiContext context)
+    public List<XWikiDocument> searchDocuments(String wheresql, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
         return searchDocuments(wheresql, 0, 0, parameterValues, context);
@@ -2885,7 +2883,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List< ? > parameterValues,
+    public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
         return searchDocuments(wheresql, true, nb, start, parameterValues, context);
@@ -2893,7 +2891,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
-        List< ? > parameterValues, XWikiContext context) throws XWikiException
+        List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         return searchDocuments(wheresql, distinctbylanguage, false, nb, start, parameterValues, context);
     }
@@ -2914,7 +2912,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     @Override
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
-        int nb, int start, List< ? > parameterValues, XWikiContext context) throws XWikiException
+        int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         return searchDocuments(wheresql, distinctbylanguage, customMapping, true, nb, start, parameterValues, context);
     }

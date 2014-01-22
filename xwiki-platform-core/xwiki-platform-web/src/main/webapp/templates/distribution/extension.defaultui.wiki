@@ -6,19 +6,25 @@
 ## but unfortunately this doesn't allow the template to be overridden from the skin.
 #evaluate("#include('extension.vm')")
 
-#macro (getVersions $extensionId $versions)
-  ## FIXME: We should retrieve the list of previous versions for the recommended UI, by getting the available versions
-  ## for each of its features (old identifiers).
-  #if ($xwiki.hasSubWikis() && $xcontext.isMainWiki())
-    ## XWiki Manager versions
-    #set ($return = '4.2-milestone-2,4.2-milestone-1,4.1.4,4.1.3,4.1.2,4.1.1,4.1,4.1-rc-1,4.1-milestone-2,4.1-milestone-1,4.0.1,4.0,4.0-rc-1,4.0-milestone-2,4.0-milestone-1,3.5.1,3.5,3.5-milestone-1,3.4,3.4-rc-1,3.4-milestone-1,3.3.1,3.3,3.3-rc-1,3.3-milestone-2,3.3-milestone-1,3.2.1,3.2,3.2-rc-1,3.2-milestone-3,3.2-milestone-2,3.2-milestone-1,3.1.1,3.1,3.1-rc-1,3.1-milestone-2,3.1-milestone-1,3.0.1,3.0,2.7.2,2.7.1,2.7,2.6.2,2.6.1,2.6,2.5.2,2.5.1,2.5,2.4.4,2.4.3,2.4.2,2.4.1,2.4,2.3.2,2.3.1,2.3,2.2.6,2.2.5,2.2.4,2.2.3,2.2.2,2.2.1,2.2,2.1.2,2.1.1,2.1,2.0.5,2.0.4,2.0.3,2.0.2,2.0.1.1,2.0.1,2.0,1.7.4,1.7.3,1.7.2,1.7.1,1.7,1.6.4,1.6.3,1.6.2,1.6.1,1.6,1.5.1,1.5,1.4.1,1.4,1.3,1.3-rc-1,1.2.1,1.2,1.2-rc-1,1.2-milestone-2,1.2-milestone-1,1.1.1,1.1,1.0,1.0-rc-1,1.0-milestone-3,1.0-milestone-2,1.0-milestone-1')
-  #else
-    ## XWiki Enterprise versions
-    #set ($return = '4.2-milestone-2,4.2-milestone-1,4.1.4,4.1.3,4.1.2,4.1.1,4.1,4.1-rc-1,4.1-milestone-2,4.1-milestone-1,4.0.1,4.0,4.0-rc-1,4.0-milestone-2,4.0-milestone-1,3.5.1,3.5,3.5-milestone-1,3.4,3.4-rc-1,3.4-milestone-1,3.3.1,3.3,3.3-rc-1,3.3-milestone-2,3.3-milestone-1,3.2.1,3.2,3.2-rc-1,3.2-milestone-3,3.2-milestone-2,3.2-milestone-1,3.1.1,3.1,3.1-rc-1,3.1-milestone-2,3.1-milestone-1,3.0.1,3.0,3.0-rc-1,3.0-milestone-3,3.0-milestone-2,3.0-milestone-1,2.7.2,2.7.1,2.7,2.7-rc-1,2.6.2,2.6.1,2.6,2.6-rc-2,2.6-rc-1,2.5.2,2.5.1,2.5,2.5-rc-1,2.5-milestone-2,2.5-milestone-1,2.4.4,2.4.3,2.4.2,2.4.1,2.4,2.4-rc-1,2.4-milestone-2,2.4-milestone-1,2.3.2,2.3.1,2.3,2.3-rc-1,2.3-milestone-2,2.3-milestone-1,2.2.6,2.2.5,2.2.4,2.2.3,2.2.2,2.2.1,2.2,2.2-rc-2,2.2-rc-1,2.2-milestone-2,2.2-milestone-1,2.1.2,2.1.1,2.1,2.1-rc-1,2.1-milestone-1,2.0.5,2.0.4,2.0.3,2.0.2,2.0.1,2.0,2.0-rc-2,2.0-rc-1,2.0-milestone-4,2.0-milestone-3,2.0-milestone-2,2.0-milestone-1,1.9.4,1.9.3,1.9.2,1.9.1,1.9,1.9-rc-1,1.9-milestone-2,1.9-milestone-1,1.8.4,1.8.3,1.8.2,1.8.1,1.8,1.8-rc-2,1.8-rc-1,1.8-milestone-2,1.8-milestone-1,1.7.2,1.7.1,1.7,1.7-rc-1,1.7-milestone-3,1.7-milestone-2,1.7-milestone-1,1.6.2,1.6.1,1.6,1.6-milestone-2,1.6-milestone-1,1.5.2,1.5.1,1.5,1.5-rc-2,1.5-rc-1,1.5-milestone-2,1.5-milestone-1,1.4.2,1.4.1,1.4,1.4-rc-1,1.4-milestone-2,1.4-milestone-1,1.3.2,1.3.1,1.3,1.3-rc-1,1.3-milestone-2,1.3-milestone-1,1.2.2,1.2.1,1.2,1.2-rc-3,1.2-rc-2,1.2-rc-1,1.2-milestone-2,1.2-milestone-1,1.1.2,1.1.1,1.1,1.1-rc-2,1.1-rc-1,1.1-milestone-4,1.1-milestone-3')
+#macro (getVersions $extension $versionsByFeature)
+  ## Retrieve the list of available versions for each of the features (identifiers) of the given extension.
+  #set ($return = $collectionstool.orderedMap)
+  #set ($features = [])
+  #set ($discard = $features.addAll($extension.features))
+  #set ($discard = $features.add($extension.id.id))
+  #set ($discard = $collectionstool.reverse($features))
+  #foreach ($feature in $features)
+    #set ($stableVersions = [])
+    #foreach ($version in $services.extension.resolveVersions($feature, 0, -1))
+      #if ($version.type == 'STABLE')
+        #set ($discard = $stableVersions.add($version.value))
+      #end
+    #end
+    #set ($discard = $collectionstool.reverse($stableVersions))
+    #set ($discard = $return.put($feature, $stableVersions))
   #end
-  #set ($return = $return.split(','))
-  #set ($versions = $NULL)
-  #setVariable("$versions" $return)
+  #set ($versionsByFeature = $NULL)
+  #setVariable("$versionsByFeature" $return)
 #end
 
 #macro (displayUpgradeQuestion)
@@ -46,21 +52,29 @@
     <div class="xHint">$escapetool.xml($services.localization.render(
       'platform.extension.distributionWizard.uiStepPreviousUIFormHint'))</div>
     <dl>
-      <dt class="hidden">
-        <label for="previousUiVersionList">$escapetool.xml($services.localization.render(
-          'platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
-      </dt>
-      <dd class="hidden">
-        #getVersions($distributionUIId.id $versions)
-        <select id="previousUiVersionList">
-          <option value=""></option>
-          #foreach ($version in $versions)
-            <option value="$version"#if ($version == $request.previousUiVersion) selected="selected"#end>
-              $version
-            </option>
-          #end
-        </select>
-      </dd>
+      #if ($distributionUIExtension)
+        ## Display a drop down list with the available versions.
+        <dt class="hidden">
+          <label for="previousUiVersionList">$escapetool.xml($services.localization.render(
+            'platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
+          <span class="xHint">$escapetool.xml($services.localization.render(
+            'platform.extension.distributionWizard.uiStepPreviousUIVersionListHint'))</span>
+        </dt>
+        <dd class="hidden">
+          #getVersions($distributionUIExtension $versionsByFeature)
+          <select id="previousUiVersionList">
+            <option value=""></option>
+            #foreach ($entry in $versionsByFeature.entrySet())
+              #foreach ($version in $entry.value)
+                <option #if ($version == $request.previousUiVersion)selected="selected"#end
+                    value="$version" title="$entry.key">
+                  $version
+                </option>
+              #end
+            #end
+          </select>
+        </dd>
+      #end
       <dt>
         <label for="previousUiVersion">$escapetool.xml($services.localization.render(
           'platform.extension.distributionWizard.uiStepPreviousUIVersionLabel'))</label>
@@ -123,7 +137,8 @@
 #end
 
 #macro (displayDefaultUIExtension $distributionUIId)
-  #set ($installedVersion = $services.extension.getInstalledExtension($distributionUIId.id, $extensionNamespace))
+  #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
+  #set ($installedVersion = $services.extension.installed.getInstalledExtension($distributionUIId.id, $extensionNamespace))
   #set ($showCompleteStepButton = $installedVersion.isValid($extensionNamespace))
   (% class="xLabel" %)
   {{translation key="platform.extension.distributionWizard.uiStepUILabel"/}}
@@ -131,20 +146,31 @@
   #if (!$installedVersion && (!$distributionUIJobStatus || $distributionUIJobStatus.state == 'FINISHED'))
     ## There is no previous version of the default UI installed on the current wiki and there is no job running for
     ## the default UI either.
-    #set ($documentCount = $xwiki.countDocuments(''))
-    #if ($distributionState == 'NEW' && $documentCount > 30)
-
-      ## There are documents in the database but there is no info about the default UI that was previously installed.
-      #repairPreviousUI()
-    #elseif ($distributionState == 'DIFFERENT')
+    #if ($distributionState == 'DIFFERENT')
       ## TODO: Display the previous distribution UI extension to let the user uninstall it.
+    #else
+      ## Determine if this is a new install or an upgrade from a version where the default distribution UI wasn't
+      ## installed with the Extension Manager (or at least it wasn't marked as installed).
+      ## Check if there are other extensions installed.
+      #set ($installedExtensionCount = $services.extension.installed.getInstalledExtensions($extensionNamespace).size())
+      ## Check how many documents that are not XClasses are in the database (a number of XClasses are created
+      ## automatically at startup when the database is empty and we don't want to take them into account).
+      #set ($documentCount = $services.query.xwql("where doc.xWikiClassXML = ''").addFilter('unique').addFilter(
+        'count').execute().get(0))
+      ## Unfortunately there are still 3 documents that are not XClasses and which are created automatically (Watchlist
+      ## notifiers) and we want to exclude them also.
+      #if ($installedExtensionCount > 0 || $documentCount > 3)
+
+        ## There are documents in the database (past the default set that is automatically created), maybe from the
+        ## previous version of the default distribution UI, but the UI is not marked as installed.
+        #repairPreviousUI()
+      #end
     #end
   #end
 
   (% class="xHint" %)
   {{translation key="platform.extension.distributionWizard.uiStepUIHint"/}}
 
-  #set ($distributionUIExtension = $services.extension.resolve($distributionUIId.id, $distributionUIId.version.value))
   #if ($distributionUIExtension)
     {{warning}}{{translation key="platform.extension.distributionWizard.uiStepInternetAccessWarning"/}}{{/warning}}
 

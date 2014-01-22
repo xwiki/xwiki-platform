@@ -21,13 +21,12 @@ package org.xwiki.extension.xar.internal.repository;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.ExtensionRepository;
 import org.xwiki.extension.wrap.WrappingInstalledExtension;
-import org.xwiki.extension.xar.internal.handler.packager.Packager;
-import org.xwiki.extension.xar.internal.handler.packager.XarEntry;
+import org.xwiki.xar.internal.XarException;
+import org.xwiki.xar.internal.XarPackage;
 
 /**
  * @version $Id$
@@ -37,26 +36,23 @@ public class XarInstalledExtension extends WrappingInstalledExtension<InstalledE
 {
     private XarInstalledExtensionRepository repository;
 
-    private List<XarEntry> pages;
+    private XarPackage xarPackage;
 
-    public XarInstalledExtension(InstalledExtension installedExtension, XarInstalledExtensionRepository repository,
-        Packager packager) throws IOException
+    public XarInstalledExtension(InstalledExtension installedExtension, XarInstalledExtensionRepository repository)
+        throws IOException, XarException
     {
         super(installedExtension);
 
         this.repository = repository;
-
-        enumeratePages(packager);
+        this.xarPackage = new XarPackage(new File(getFile().getAbsolutePath()));
     }
 
-    public List<XarEntry> getPages()
+    /**
+     * @since 5.4M1
+     */
+    public XarPackage getXarPackage()
     {
-        return this.pages;
-    }
-
-    private void enumeratePages(Packager packager) throws IOException
-    {
-        this.pages = packager.getEntries(new File(getFile().getAbsolutePath()));
+        return this.xarPackage;
     }
 
     // ExtensionRepository

@@ -121,6 +121,14 @@
    * Init the event handlers
    */
   function init() {
+    if ($('prettyname')) {
+      initStepType();
+    } else if ($('owner')) {
+      initStepUsers();
+    }
+  }
+  
+  function initStepType() {
     var prettyName = $('prettyname');
     prettyName.observe('change', prettyNameChanged);
     prettyName.observe('keyup', prettyNameChanged);
@@ -130,6 +138,13 @@
     if(prettyName.value.blank() || wikiName.value.blank()){
       $('wizard-next').disabled = true;
     }
+  }
+
+  function initStepUsers() {
+    userScopeChanged();
+    $$('input[type=radio][name=userScope]').each(function (item){
+      item.observe('click', userScopeChanged);
+    });
   }
 
   /**
@@ -233,6 +248,25 @@
 
     return result;
   }
+
+  function userScopeChanged(){
+    var value = $$('input:checked[type=radio][name=userScope]')[0].value
+    if (value=='local_only') {
+      // Disable membership type radio button
+      $$('input[type=radio][name=membershipType]').each(function (item){
+        item.disabled = true;
+      });
+      // Disable the members
+      $('members').disabled = true;
+    } else {
+      // Enable membership type radio button
+      $$('input[type=radio][name=membershipType]').each(function (item){
+        item.disabled = false;
+      });
+      // Enable the members
+      $('members').disabled = false;
+    }
+  };
 
   /**
    * Call Init
@@ -485,7 +519,10 @@ return XWiki;
   display: inline;
   text-transform: none;
 }
-      </code>
+
+.whatnext{
+  margin: 1em;
+}</code>
     </property>
     <property>
       <name>CSS</name>
@@ -678,7 +715,8 @@ return XWiki;
   #elseif($request.step == 'create')
     #create()
   #elseif($request.step == 'finalize')
-    #setMembers()
+    #set($wikiDescriptor = $services.wiki.getById($request.wikiId))
+    #setMembers($wikiDescriptor)
   #else
     ## Default step
     #stepType()
@@ -713,24 +751,23 @@ return XWiki;
 ## Display the wizard footer
 ##################################
 #macro(wizardFooter $prev $next $create $finalize)
-  &lt;div class="clearfloats"&gt;&lt;/div&gt;
   &lt;div class="wizard-footer buttons"&gt;
-    #if($prev!='')
-      &lt;span class="buttonwrapper left"&gt;
-        &lt;button value="$prev" title="Previous Step" name="step" id="wizard-next" class="button secondary"&gt;Previous Step&lt;/button&gt;
+    #if("$!prev" !='')
+      &lt;span class="buttonwrapper left"&gt;      
+        &lt;button value="$prev" title="Previous Step" name="step" id="wizard-previous" class="button secondary"&gt;Previous Step&lt;/button&gt;
       &lt;/span&gt;
     #end
-    #if($next!='')
+    #if("$!next" !='')
       &lt;span class="buttonwrapper"&gt;
         &lt;button value="$next" title="Go to next step" name="step" id="wizard-next" class="button"&gt;Go to next step&lt;/button&gt;
       &lt;/span&gt;
     #end
-    #if($create!='')
+    #if("$!create" !='')
       &lt;span class="buttonwrapper"&gt;
-        &lt;button value="$create" title="Create" name="step" id="wizard-next" class="button"&gt;Create&lt;/button&gt;
+        &lt;button value="$create" title="Create" name="step" id="wizard-create" class="button"&gt;Create&lt;/button&gt;
       &lt;/span&gt;
     #end
-    #if($finalize != '')
+    #if("$!finalize" != '')
       &lt;span class="buttonwrapper"&gt;
         &lt;button value="finalize" title="Finalize" name="step" id="finalize" class="button hidden"&gt;$finalize&lt;/button&gt;
       &lt;/span&gt;
@@ -849,6 +886,7 @@ return XWiki;
         &lt;/div&gt;
       ### END OF WIZARD BODY
       &lt;/div&gt;
+      &lt;div class="clearfloats"&gt;&lt;/div&gt;
       #wizardFooter('', 'members', '')
     &lt;/form&gt;
   {{/html}}
@@ -982,6 +1020,12 @@ return XWiki;
         &lt;/div&gt;
       ### END OF WIZARD BODY
       &lt;/div&gt;
+      &lt;div class="clearfloats"&gt;&lt;/div&gt;
+      #if ("$!request.template" == '' || $request.template == 'xwikinotemplate')
+        &lt;div class="box infomessage whatnext"&gt;
+          &lt;p&gt;$services.localization.render('platform.wiki.create.wizard.step.dw')&lt;/p&gt;
+        &lt;/div&gt;
+      #end
       #wizardFooter('type', '', 'create')
     &lt;/form&gt;
   {{/html}}
@@ -1011,7 +1055,8 @@ return XWiki;
   #set($fromTemplate = false)
   #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
     ## check if the wiki is already in creation
-    #if(!$services.wiki.template.getWikiCreationStatus($request.wikiname))
+    #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $request.wikiname])
+    #if("$!services.wiki.template.getWikiProvisioningJobStatus($jobId)" == '')
       #set($discard = $services.wiki.template.createWikiFromTemplate($request.wikiname, $request.wikiname, $request.template, $request.ownerId, true))
     #end
     #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
@@ -1045,27 +1090,28 @@ return XWiki;
 ## This macro set the members of the wiki
 ##################################
 #macro(setMembers $wikiDescriptor)
-  #if(!$wikiDescriptor)
-    #set($wikiDescriptor = $services.wiki.getById($request.wikiId))
-  #end
   ## Set the membership type and the local users
-  #set ($discard = $services.wiki.user.setMembershipType($wikiDescriptor.id, $request.membershipType))
   #set ($discard = $services.wiki.user.setUserScope($wikiDescriptor.id, $request.userScope))
-  #set ($groupsClassName = "${wikiDescriptor.id}:XWiki.XWikiGroups")
-  ## Save the members
-  #set ($members = [])
-  #getRequestList($members 'members')
-  ## Remove empty strings from the list of members (the user picker submits by default an empty string).
-  #set ($discard = $members.removeAll(['']))
-  #if ("$!members" != '' &amp;&amp; $members.size() &gt; 0)
-    ## Enforce global users
-    #foreach ($member in $members)
-      #if (!$member.startsWith("${services.wiki.mainWikiId}:"))
-        #set ($member = "${services.wiki.mainWikiId}:${member}")
+  #if ($request.userScope != 'local_only')
+    #set ($discard = $services.wiki.user.setMembershipType($wikiDescriptor.id, $request.membershipType))
+    #set ($groupsClassName = "${wikiDescriptor.id}:XWiki.XWikiGroups")
+    ## Save the members
+    #set ($members = [])
+    #getRequestList($members 'members')
+    ## Remove empty strings from the list of members (the user picker submits by default an empty string).
+    #set ($discard = $members.removeAll(['']))
+    #if ("$!members" != '' &amp;&amp; $members.size() &gt; 0)
+      #set ($globalMembers = [])
+      ## Enforce global users
+      #foreach ($member in $members)
+        #if (!$member.startsWith("${services.wiki.mainWikiId}:"))
+          #set ($member = "${services.wiki.mainWikiId}:${member}")
+        #end
+        #set ($discard = $globalMembers.add("${member}"))
       #end
+      ## Add the members
+      #set ($discard = $services.wiki.user.addMembers($globalMembers, $wikiDescriptor.id))
     #end
-    ## Add the members
-    #set($discard = $services.wiki.user.addMembers($members, $wikiDescriptor.id))
   #end
   ## Redirect to the new wiki's homepage.
   #set ($discard = $response.sendRedirect($xwiki.getURL($wikiDescriptor.mainPageReference)))

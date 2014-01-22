@@ -32,6 +32,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
@@ -64,7 +65,13 @@ public class WikiManagerScriptService implements ScriptService
     /**
      * Field name of the last API exception inserted in context.
      */
+    @Deprecated
     public static final String CONTEXT_LASTEXCEPTION = "lastexception";
+
+    /**
+     * The key under which the last encountered error is stored in the current execution context.
+     */
+    private static final String WIKIERROR_KEY = "scriptservice.wiki.error";
 
     @Inject
     private WikiManager wikiManager;
@@ -86,6 +93,9 @@ public class WikiManagerScriptService implements ScriptService
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
     private ScriptServiceManager scriptServiceManager;
@@ -110,13 +120,33 @@ public class WikiManagerScriptService implements ScriptService
         return scriptServiceManager.get(ROLEHINT + '.' + serviceName);
     }
 
+    /**
+     * Get the error generated while performing the previously called action.
+     *
+     * @return an eventual exception or {@code null} if no exception was thrown
+     */
+    public Exception getLastError()
+    {
+        return (Exception) this.execution.getContext().getProperty(WIKIERROR_KEY);
+    }
+
+    /**
+     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
+     *
+     * @param e the exception to store, can be {@code null} to clear the previously stored exception
+     * @see #getLastError()
+     */
+    private void setLastError(Exception e)
+    {
+        this.execution.getContext().setProperty(WIKIERROR_KEY, e);
+    }
+
     // TODO: move to new API a soon as a proper helper is provided
-    private void checkProgrammingRights(String message) throws AuthorizationException
+    private void checkProgrammingRights() throws AuthorizationException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
-        if (!xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
-            throw new AuthorizationException(message);
-        }
+        authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
+                xcontext.getDoc().getDocumentReference());
     }
 
     /**
@@ -136,7 +166,7 @@ public class WikiManagerScriptService implements ScriptService
 
         try {
             // Check if the current script has the programing rights
-            checkProgrammingRights("Creating a wiki require programming rights");
+            checkProgrammingRights();
 
             // Check right access
             WikiReference mainWikiReference = new WikiReference(getMainWikiId());
@@ -170,10 +200,10 @@ public class WikiManagerScriptService implements ScriptService
 
         try {
             // Check if the current script has the programming rights
-            checkProgrammingRights("Deleting a wiki require programming rights");
+            checkProgrammingRights();
 
             // Test right
-            if (!canDeleteWiki(context.getUser(), wikiId)) {
+            if (!canDeleteWiki(entityReferenceSerializer.serialize(context.getUserReference()), wikiId)) {
                 throw new AuthorizationException("You don't have the right to delete the wiki");
             }
 
@@ -284,16 +314,15 @@ public class WikiManagerScriptService implements ScriptService
      * Test if a wiki exists.
      * 
      * @param wikiId unique identifier to test
-     * @return true if a wiki with this Id exists on the system.
+     * @return true if a wiki with this Id exists on the system or null if some error occurs.
      */
-    public boolean exists(String wikiId)
+    public Boolean exists(String wikiId)
     {
         try {
             return wikiDescriptorManager.exists(wikiId);
         } catch (WikiManagerException e) {
             error(e);
-
-            return false;
+            return null;
         }
     }
 
@@ -301,16 +330,15 @@ public class WikiManagerScriptService implements ScriptService
      * Check if the wikiId is valid and available (the name is not already taken for technical reasons).
      * 
      * @param wikiId the Id to test
-     * @return true if the Id is valid and available
+     * @return true if the Id is valid and available or null if some error occurs
      */
-    public boolean idAvailable(String wikiId)
+    public Boolean idAvailable(String wikiId)
     {
         try {
             return wikiManager.idAvailable(wikiId);
         } catch (WikiManagerException e) {
             error(e);
-
-            return false;
+            return null;
         }
     }
 
@@ -357,32 +385,35 @@ public class WikiManagerScriptService implements ScriptService
 
         try {
             // Check if the current script has the programming rights
-            checkProgrammingRights("Saving wiki descriptor require programming rights");
+            checkProgrammingRights();
 
             // Get the wiki owner
             WikiDescriptor oldDescriptor = wikiDescriptorManager.getById(descriptor.getId());
-            String owner = oldDescriptor.getOwnerId();
-            // Check right access
-            WikiReference wikiReference = new WikiReference(oldDescriptor.getId());
-            if (!context.getUserReference().toString().equals(owner)) {
-                authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(), wikiReference);
+            if (oldDescriptor != null) {
+                String owner = oldDescriptor.getOwnerId();
+                // Check right access
+                WikiReference wikiReference = new WikiReference(oldDescriptor.getId());
+                if (!entityReferenceSerializer.serialize(context.getUserReference()).equals(owner)) {
+                    authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(), wikiReference);
+                }
+            } else {
+                // Saving a descriptor that did not already exist should be reserved to global admins
+                authorizationManager.checkAccess(Right.ADMIN, context.getUserReference(),
+                        new WikiReference(wikiDescriptorManager.getMainWikiId()));
             }
             wikiDescriptorManager.saveDescriptor(descriptor);
 
             return true;
         } catch (Exception e) {
             error(e);
-
             return false;
         }
     }
 
     /**
      * Log exception and store it in the context.
-     * 
-     * @param errorMessage error message
+     *
      * @param e the caught exception
-     * @see #CONTEXT_LASTEXCEPTION
      */
     private void error(Exception e)
     {
@@ -394,7 +425,6 @@ public class WikiManagerScriptService implements ScriptService
      * 
      * @param errorMessage error message
      * @param e the caught exception
-     * @see #CONTEXT_LASTEXCEPTION
      */
     private void error(String errorMessage, Exception e)
     {
@@ -403,16 +433,20 @@ public class WikiManagerScriptService implements ScriptService
             errorMessageToLog = e.getMessage();
         }
 
-        /* Log exception. */
+        // Log exception.
         logger.error(errorMessageToLog, e);
 
-        /* Store exception in context. */
+        // Store exception in context.
+        setLastError(e);
+        // Deprecated
         this.execution.getContext().setProperty(CONTEXT_LASTEXCEPTION, e);
     }
 
     /**
      * @return the last exception, or null if there is not
+     * @deprecated since 5.4RC1 use {@link #getLastError()} ()} instead
      */
+    @Deprecated
     public Exception getLastException()
     {
         return (Exception) this.execution.getContext().getProperty(CONTEXT_LASTEXCEPTION);

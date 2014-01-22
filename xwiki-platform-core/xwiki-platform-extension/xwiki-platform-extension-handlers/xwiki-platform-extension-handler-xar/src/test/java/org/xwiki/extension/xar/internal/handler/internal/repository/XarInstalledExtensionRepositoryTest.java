@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.repository.search.SearchException;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
 import org.xwiki.test.annotation.AllComponents;
@@ -44,21 +45,30 @@ public class XarInstalledExtensionRepositoryTest
     @Before
     public void setUp() throws Exception
     {
-        this.installedExtensionRepository =
-            this.mocker.getInstance(InstalledExtensionRepository.class, "xar");
+        this.installedExtensionRepository = this.mocker.getInstance(InstalledExtensionRepository.class, "xar");
     }
 
     // Tests
 
     @Test
-    public void testInit() throws ResolveException
+    public void testInit() throws ResolveException, SearchException
     {
         Assert.assertTrue(this.installedExtensionRepository.countExtensions() == 1);
 
+        Assert
+        .assertNotNull(this.installedExtensionRepository.resolve(new ExtensionId("xarinstalledextension", "1.0")));
+        
         Assert.assertNotNull(this.installedExtensionRepository.getInstalledExtension(new ExtensionId(
             "xarinstalledextension", "1.0")));
+        Assert.assertNotNull(this.installedExtensionRepository.getInstalledExtension("xarinstalledextension", null));
+        Assert.assertNull(this.installedExtensionRepository.getInstalledExtension("notexisting", null));
 
-        Assert
-            .assertNotNull(this.installedExtensionRepository.resolve(new ExtensionId("xarinstalledextension", "1.0")));
+        Assert.assertEquals(1, this.installedExtensionRepository.getInstalledExtensions().size());
+        Assert.assertEquals(1, this.installedExtensionRepository.getInstalledExtensions(null).size());
+
+        Assert.assertEquals(1, this.installedExtensionRepository.search("xarinstalledextension", 0, -1).getSize());
+        Assert.assertEquals(1, this.installedExtensionRepository.search(null, 0, -1).getSize());
+        Assert.assertEquals(1, this.installedExtensionRepository.searchInstalledExtensions("xarinstalledextension", null, 0, -1).getSize());
+        Assert.assertEquals(1, this.installedExtensionRepository.searchInstalledExtensions(null, null, 0, -1).getSize());
     }
 }

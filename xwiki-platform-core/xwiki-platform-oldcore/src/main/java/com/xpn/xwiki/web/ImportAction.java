@@ -44,7 +44,8 @@ import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
-import org.xwiki.wikistream.xar.internal.XARPackage;
+import org.xwiki.xar.internal.XarException;
+import org.xwiki.xar.internal.XarPackage;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -99,30 +100,14 @@ public class ImportAction extends XWikiAction
     }
 
     private void getPackageInfos(XWikiAttachment packFile, XWikiResponse response, XWikiContext xcontext)
-        throws IOException, XWikiException, WikiStreamException
+        throws IOException, XWikiException, WikiStreamException, XarException
     {
         String encoding = xcontext.getWiki().getEncoding();
         response.setContentType(MediaType.APPLICATION_XML.toString());
         response.setCharacterEncoding(encoding);
 
         if (xcontext.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 0) == 1) {
-            XARPackage xarPackage = new XARPackage();
-            XARInputProperties properties = new XARInputProperties();
-            properties.setReferencesOnly(true);
-
-            BeanInputWikiStreamFactory<XARInputProperties> inputWikiStreamFactory =
-                Utils.getComponent((Type) InputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_11.serialize());
-            BeanInputWikiStream<XARInputProperties> inputWikiStream =
-                inputWikiStreamFactory.createInputWikiStream(properties);
-
-            InputStream source = packFile.getContentInputStream(xcontext);
-            properties.setSource(new DefaultInputStreamInputSource(source));
-
-            try {
-                inputWikiStream.read(xarPackage);
-            } finally {
-                source.close();
-            }
+            XarPackage xarPackage = new XarPackage(packFile.getContentInputStream(xcontext));
 
             xarPackage.write(response.getOutputStream(), encoding);
         } else {

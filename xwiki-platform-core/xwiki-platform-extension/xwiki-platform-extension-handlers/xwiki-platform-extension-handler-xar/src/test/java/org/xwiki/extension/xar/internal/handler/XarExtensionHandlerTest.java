@@ -19,8 +19,8 @@
  */
 package org.xwiki.extension.xar.internal.handler;
 
-import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +34,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.UninstallException;
@@ -44,15 +43,9 @@ import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
-import org.xwiki.extension.xar.internal.handler.packager.DefaultPackageConfiguration;
-import org.xwiki.extension.xar.internal.handler.packager.DefaultPackager;
-import org.xwiki.extension.xar.internal.handler.packager.DocumentMergeImporter;
-import org.xwiki.extension.xar.internal.handler.packager.Packager;
-import org.xwiki.extension.xar.internal.handler.packager.xml.DocumentImporterHandler;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobManager;
-import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
@@ -62,6 +55,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
+import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
@@ -84,10 +78,7 @@ public class XarExtensionHandlerTest
     public MockitoRepositoryUtilsRule repositoryUtil = new MockitoRepositoryUtilsRule(this.componentManager,
         this.oldcore);
 
-    private JobStatus mockJobStatus;
-
-    private Map<DocumentReference, Map<String, XWikiDocument>> documents =
-        new HashMap<DocumentReference, Map<String, XWikiDocument>>();
+    private Map<DocumentReference, XWikiDocument> documents = new HashMap<DocumentReference, XWikiDocument>();
 
     private ExtensionId localXarExtensiontId1;
 
@@ -101,16 +92,10 @@ public class XarExtensionHandlerTest
 
     private DocumentReference contextUser;
 
-    private DefaultPackager defaultPackager;
-
-    private DocumentMergeImporter importer;
-
     @Before
     public void setUp() throws Exception
     {
         // mock
-
-        this.mockJobStatus = Mockito.mock(JobStatus.class);
 
         this.contextUser = new DocumentReference(getXWikiContext().getDatabase(), "XWiki", "ExtensionUser");
 
@@ -133,14 +118,11 @@ public class XarExtensionHandlerTest
             {
                 DocumentReference target = (DocumentReference) invocation.getArguments()[0];
 
-                Map<String, XWikiDocument> documentLanguages = documents.get(target);
-
-                if (documentLanguages == null) {
-                    documentLanguages = new HashMap<String, XWikiDocument>();
-                    documents.put(target, documentLanguages);
+                if (target.getLocale() == null) {
+                    target = new DocumentReference(target, Locale.ROOT);
                 }
 
-                XWikiDocument document = documentLanguages.get("");
+                XWikiDocument document = documents.get(target);
 
                 if (document == null) {
                     document = new XWikiDocument(target);
@@ -159,19 +141,21 @@ public class XarExtensionHandlerTest
                     boolean minorEdit = (Boolean) invocation.getArguments()[2];
 
                     document.setMinorEdit(minorEdit);
-                    document.incrementVersion();
                     document.setNew(false);
 
-                    Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
-
-                    XWikiDocument previousDocument;
-                    if (documentLanguages == null) {
-                        documentLanguages = new HashMap<String, XWikiDocument>();
-                        documents.put(document.getDocumentReference(), documentLanguages);
-                        previousDocument = null;
-                    } else {
-                        previousDocument = documentLanguages.get(document.getLanguage());
+                    if (document.isContentDirty() || document.isMetaDataDirty()) {
+                        Date ndate = new Date();
+                        document.setDate(ndate);
+                        if (document.isContentDirty()) {
+                            document.setContentUpdateDate(ndate);
+                            document.setContentAuthorReference(document.getAuthorReference());
+                        }
+                        document.incrementVersion();
+                        document.setContentDirty(false);
+                        document.setMetaDataDirty(false);
                     }
+
+                    XWikiDocument previousDocument = documents.get(document.getDocumentReferenceWithLocale());
 
                     for (XWikiAttachment attachment : document.getAttachmentList()) {
                         if (!attachment.isContentDirty()) {
@@ -180,7 +164,7 @@ public class XarExtensionHandlerTest
                         }
                     }
 
-                    documentLanguages.put(document.getLanguage(), document.clone());
+                    documents.put(document.getDocumentReferenceWithLocale(), document);
 
                     return null;
                 }
@@ -208,11 +192,7 @@ public class XarExtensionHandlerTest
             {
                 XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
 
-                Map<String, XWikiDocument> documentLanguages = documents.get(document.getDocumentReference());
-
-                if (documentLanguages != null) {
-                    documentLanguages.remove(document.getLanguage());
-                }
+                documents.remove(document.getDocumentReferenceWithLocale());
 
                 return null;
             }
@@ -240,13 +220,14 @@ public class XarExtensionHandlerTest
         ((XWikiStubContextProvider) this.componentManager.getInstance(XWikiStubContextProvider.class))
             .initialize(getXWikiContext());
 
+        CoreConfiguration coreConfiguration = this.componentManager.getInstance(CoreConfiguration.class);
+        Mockito.when(coreConfiguration.getDefaultDocumentSyntax()).thenReturn(Syntax.PLAIN_1_0);
+
         // lookup
 
         this.jobManager = this.componentManager.getInstance(JobManager.class);
         this.xarExtensionRepository =
             this.componentManager.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
-        this.defaultPackager = this.componentManager.getInstance(Packager.class);
-        this.importer = this.componentManager.getInstance(DocumentMergeImporter.class);
 
         // Get rid of wiki macro listener
         this.componentManager.<ObservationManager> getInstance(ObservationManager.class).removeListener(
@@ -257,14 +238,14 @@ public class XarExtensionHandlerTest
     {
         Mockito.when(
             this.oldcore.getMockRightService().hasAccessLevel(Mockito.eq("admin"),
-                Mockito.eq("xwiki:XWiki.ExtensionUser"), Mockito.eq("XWiki.XWikiPreferences"),
+                Mockito.eq(this.contextUser.toString()), Mockito.eq("XWiki.XWikiPreferences"),
                 Mockito.any(XWikiContext.class))).thenReturn(right);
     }
 
     private void verifyHasAdminRight(int times) throws XWikiException
     {
         Mockito.verify(this.oldcore.getMockRightService(), Mockito.times(times)).hasAccessLevel(Mockito.eq("admin"),
-            Mockito.eq("xwiki:XWiki.ExtensionUser"), Mockito.eq("XWiki.XWikiPreferences"),
+            Mockito.eq(this.contextUser.toString()), Mockito.eq("XWiki.XWikiPreferences"),
             Mockito.any(XWikiContext.class));
     }
 
@@ -295,7 +276,11 @@ public class XarExtensionHandlerTest
 
         List<LogEvent> errors = installJob.getStatus().getLog().getLogsFrom(LogLevel.WARN);
         if (!errors.isEmpty()) {
-            throw errors.get(0).getThrowable();
+            if (errors.get(0).getThrowable() != null) {
+                throw errors.get(0).getThrowable();
+            } else {
+                throw new Exception(errors.get(0).getFormattedMessage());
+            }
         }
 
         return (XarInstalledExtension) this.xarExtensionRepository.resolve(extensionId);
@@ -314,7 +299,11 @@ public class XarExtensionHandlerTest
 
         List<LogEvent> errors = uninstallJob.getStatus().getLog().getLogsFrom(LogLevel.WARN);
         if (!errors.isEmpty()) {
-            throw errors.get(0).getThrowable();
+            if (errors.get(0).getThrowable() != null) {
+                throw errors.get(0).getThrowable();
+            } else {
+                throw new Exception(errors.get(0).getFormattedMessage());
+            }
         }
     }
 
@@ -331,6 +320,15 @@ public class XarExtensionHandlerTest
         existingDocument.addXObject(object);
         existingDocument.setCreatorReference(new DocumentReference("wiki", "space", "existingcreator"));
         this.oldcore.getMockXWiki().saveDocument(existingDocument, "", true, getXWikiContext());
+
+        MandatoryDocumentInitializer mandatoryInitializer =
+            this.componentManager.registerMockComponent(MandatoryDocumentInitializer.class, "space.mandatory");
+        Mockito.when(mandatoryInitializer.updateDocument(Mockito.any(XWikiDocument.class))).thenReturn(true);
+        XWikiDocument mandatoryDocument = new XWikiDocument(new DocumentReference("wiki", "space", "mandatory"));
+        mandatoryDocument.setCreatorReference(new DocumentReference("wiki", "space", "existingcreator"));
+        mandatoryDocument.setSyntax(Syntax.PLAIN_1_0);
+        mandatoryDocument.setContent("modified content");
+        this.oldcore.getMockXWiki().saveDocument(mandatoryDocument, "", true, getXWikiContext());
 
         // install
 
@@ -356,6 +354,7 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "2.1", page.getVersion());
         Assert.assertEquals("Wrong version", Locale.ROOT, page.getLocale());
         Assert.assertFalse("Document is hidden", page.isHidden());
+        Assert.assertFalse("Document is minor edit", page.isMinorEdit());
 
         BaseClass baseClass = page.getXClass();
         Assert.assertNotNull(baseClass.getField("property"));
@@ -368,7 +367,7 @@ public class XarExtensionHandlerTest
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "pagewithattachment"),
                 getXWikiContext());
         Assert.assertFalse(pagewithattachment.isNew());
-        Assert.assertEquals("Wrong version", "2.1", pagewithattachment.getVersion());
+        Assert.assertEquals("Wrong version", "1.1", pagewithattachment.getVersion());
         Assert.assertEquals("Wrong creator", this.contextUser, pagewithattachment.getCreatorReference());
         Assert.assertEquals("Wrong author", this.contextUser, pagewithattachment.getAuthorReference());
         Assert.assertEquals("Wrong content author", this.contextUser, pagewithattachment.getContentAuthorReference());
@@ -379,7 +378,7 @@ public class XarExtensionHandlerTest
         Assert.assertEquals(18, attachment.getContentSize(getXWikiContext()));
         Assert
             .assertEquals("attachment content", IOUtils.toString(attachment.getContentInputStream(getXWikiContext())));
-        Assert.assertEquals("xwiki:XWiki.ExtensionUser", attachment.getAuthor());
+        Assert.assertEquals(this.contextUser.toString(), attachment.getAuthor());
 
         // space1.page1
 
@@ -406,7 +405,7 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
 
         // translated.translated.tr
-        XWikiDocument translated = this.documents.get(translatedReference).get("tr");
+        XWikiDocument translated = this.documents.get(new DocumentReference(translatedReference, new Locale("tr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in langauge tr has not been saved in the database",
             translated);
@@ -420,7 +419,7 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
 
         // translated.translated.fr
-        XWikiDocument translated2 = this.documents.get(translatedReference).get("fr");
+        XWikiDocument translated2 = this.documents.get(new DocumentReference(translatedReference, new Locale("fr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in language fr has not been saved in the database",
             translated2);
@@ -439,10 +438,17 @@ public class XarExtensionHandlerTest
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "hiddenpage"),
                 getXWikiContext());
 
-        Assert.assertNotNull("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage);
         Assert.assertFalse("Document wiki:space.hiddenpage has not been saved in the database", hiddenpage.isNew());
 
         Assert.assertTrue("Document is not hidden", hiddenpage.isHidden());
+
+        // space.mandatory
+
+        XWikiDocument mandatorypage =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "mandatory"),
+                getXWikiContext());
+
+        Assert.assertEquals("Document wiki:space.mandatory has been overwritten", "1.1", mandatorypage.getVersion());
     }
 
     @Test
@@ -493,7 +499,7 @@ public class XarExtensionHandlerTest
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "pagewithattachment"),
                 getXWikiContext());
         Assert.assertFalse(pagewithattachment.isNew());
-        Assert.assertEquals("Wrong version", "2.1", pagewithattachment.getVersion());
+        Assert.assertEquals("Wrong version", "1.1", pagewithattachment.getVersion());
         Assert.assertEquals("Wrong creator", xarCreatorReference, pagewithattachment.getCreatorReference());
         Assert.assertEquals("Wrong author", xarAuthorReference, pagewithattachment.getAuthorReference());
         Assert.assertEquals("Wrong content author", xarContentAuthorReference,
@@ -533,7 +539,7 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
 
         // translated.translated.tr
-        XWikiDocument translated = this.documents.get(translatedReference).get("tr");
+        XWikiDocument translated = this.documents.get(new DocumentReference(translatedReference, new Locale("tr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in langauge tr has not been saved in the database",
             translated);
@@ -547,7 +553,7 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
 
         // translated.translated.fr
-        XWikiDocument translated2 = this.documents.get(translatedReference).get("fr");
+        XWikiDocument translated2 = this.documents.get(new DocumentReference(translatedReference, new Locale("fr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in language fr has not been saved in the database",
             translated2);
@@ -586,18 +592,23 @@ public class XarExtensionHandlerTest
         XWikiDocument deletedpage =
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "deletedpage"),
                 getXWikiContext());
+        this.oldcore.getMockXWiki().deleteDocument(deletedpage, getXWikiContext());
+
         XWikiDocument modifieddeletedpage =
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "modifieddeletedpage"),
                 getXWikiContext());
+        this.oldcore.getMockXWiki().deleteDocument(modifieddeletedpage, getXWikiContext());
+
         XWikiDocument pagewithobject =
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "pagewithobject"),
                 getXWikiContext());
-
-        this.oldcore.getMockXWiki().deleteDocument(deletedpage, getXWikiContext());
-        this.oldcore.getMockXWiki().deleteDocument(modifieddeletedpage, getXWikiContext());
-
         pagewithobject.removeXObjects(new LocalDocumentReference("XWiki", "XWikiGroups"));
         this.oldcore.getMockXWiki().saveDocument(pagewithobject, getXWikiContext());
+
+        XWikiDocument deletedpagewithmodifications =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space1", "modified"),
+                getXWikiContext());
+        deletedpagewithmodifications.setContent("modified content");
 
         // upgrade
 
@@ -613,6 +624,7 @@ public class XarExtensionHandlerTest
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "samespace", "samepage"),
                 getXWikiContext());
 
+        Assert.assertFalse("Document samespace has been removed from the database", samepage.isNew());
         Assert.assertEquals("Wrong versions", "1.1", samepage.getVersion());
 
         // space.page
@@ -683,7 +695,15 @@ public class XarExtensionHandlerTest
                 getXWikiContext());
 
         Assert.assertNull("Document wiki:space.pagewithobject does not contain an XWiki.XWikiGroups object",
-                pagewithobject.getXObject(new LocalDocumentReference("XWiki", "XWikiGroups")));
+            pagewithobject.getXObject(new LocalDocumentReference("XWiki", "XWikiGroups")));
+
+        // space1.modified
+
+        XWikiDocument space1modified =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space1", "modified"),
+                getXWikiContext());
+
+        Assert.assertFalse("Document wiki:space.modified has been removed from the database", space1modified.isNew());
     }
 
     @Test
@@ -703,12 +723,23 @@ public class XarExtensionHandlerTest
         XWikiDocument deletedpage =
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "deletedpage"),
                 getXWikiContext());
+        this.oldcore.getMockXWiki().deleteDocument(deletedpage, getXWikiContext());
+
         XWikiDocument modifieddeletedpage =
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "modifieddeletedpage"),
                 getXWikiContext());
-
-        this.oldcore.getMockXWiki().deleteDocument(deletedpage, getXWikiContext());
         this.oldcore.getMockXWiki().deleteDocument(modifieddeletedpage, getXWikiContext());
+
+        XWikiDocument pagewithobject =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "pagewithobject"),
+                getXWikiContext());
+        pagewithobject.removeXObjects(new LocalDocumentReference("XWiki", "XWikiGroups"));
+        this.oldcore.getMockXWiki().saveDocument(pagewithobject, getXWikiContext());
+
+        XWikiDocument deletedpagewithmodifications =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space1", "modified"),
+                getXWikiContext());
+        deletedpagewithmodifications.setContent("modified content");
 
         // upgrade
 
@@ -786,6 +817,23 @@ public class XarExtensionHandlerTest
                 getXWikiContext());
 
         Assert.assertTrue("Document wiki:space.modifieddeletedpage has been restored", modifieddeletedpage.isNew());
+
+        // space.pagewithobject
+
+        pagewithobject =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "pagewithobject"),
+                getXWikiContext());
+
+        Assert.assertNull("Document wiki:space.pagewithobject does not contain an XWiki.XWikiGroups object",
+            pagewithobject.getXObject(new LocalDocumentReference("XWiki", "XWikiGroups")));
+
+        // space1.modified
+
+        XWikiDocument space1modified =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space1", "modified"),
+                getXWikiContext());
+
+        Assert.assertFalse("Document wiki:space1.modified has been removed from the database", space1modified.isNew());
     }
 
     @Test
@@ -822,7 +870,7 @@ public class XarExtensionHandlerTest
 
         Assert.assertEquals("Wrong content", "content", modifiedpage.getContent());
         Assert.assertEquals("Wrong author", this.contextUser, modifiedpage.getAuthorReference());
-        Assert.assertEquals("Wrong versions", "3.1", modifiedpage.getVersion());
+        Assert.assertEquals("Wrong versions", "2.1", modifiedpage.getVersion());
         Assert.assertEquals("Wrong version", Locale.ROOT, modifiedpage.getLocale());
 
         BaseClass baseClass = modifiedpage.getXClass();
@@ -880,6 +928,35 @@ public class XarExtensionHandlerTest
     }
 
     @Test
+    public void testUninstallMandatory() throws Throwable
+    {
+        // register a mandatory document initializer
+        MandatoryDocumentInitializer mandatoryInitializer =
+            this.componentManager.registerMockComponent(MandatoryDocumentInitializer.class, "space.page");
+
+        Mockito.when(mandatoryInitializer.updateDocument(Mockito.any(XWikiDocument.class))).thenReturn(true);
+
+        mockHasAdminRight(true);
+
+        install(this.localXarExtensiontId1, "wiki", this.contextUser);
+
+        verifyHasAdminRight(2);
+
+        // uninstall
+
+        uninstall(this.localXarExtensiontId1, "wiki");
+
+        verifyHasAdminRight(3);
+
+        // validate
+
+        XWikiDocument page =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
+
+        Assert.assertFalse("Document wiki.space.page has been removed from the database", page.isNew());
+    }
+
+    @Test
     public void testInstallOnRoot() throws Throwable
     {
         mockHasAdminRight(true);
@@ -925,105 +1002,13 @@ public class XarExtensionHandlerTest
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space1", "page1"),
                 getXWikiContext());
 
-        Assert.assertTrue(pageWiki1.isNew());
+        Assert.assertTrue("Document wiki1:space1.page1 hasn't been removed from the database", pageWiki1.isNew());
 
         pageWiki2 =
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki2", "space1", "page1"),
                 getXWikiContext());
 
         Assert.assertTrue(pageWiki2.isNew());
-    }
-
-    // DocumentImporterHandler
-
-    private XWikiDocument importDocument(String resource, boolean interactive, String wiki)
-        throws ComponentLookupException, Exception
-    {
-        DefaultPackageConfiguration configuration = new DefaultPackageConfiguration();
-        if (interactive) {
-            configuration.setInteractive(interactive);
-            configuration.setJobStatus(this.mockJobStatus);
-        }
-
-        DocumentImporterHandler documentHandler =
-            new DocumentImporterHandler(this.defaultPackager, this.componentManager, wiki, this.importer);
-        documentHandler.setConfiguration(configuration);
-
-        InputStream is = getClass().getResourceAsStream(resource);
-        try {
-            this.defaultPackager.parseDocument(is, documentHandler);
-        } finally {
-            is.close();
-        }
-
-        return documentHandler.getDocument();
-    }
-
-    @Test
-    public void testImportDocumentWithDifferentExistingDocument() throws Throwable
-    {
-        XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
-        this.oldcore.getMockXWiki().saveDocument(existingDocument, "", true, getXWikiContext());
-
-        importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
-
-        Mockito.verify(mockJobStatus, Mockito.times(1)).ask(Mockito.anyObject());
-    }
-
-    @Test
-    public void testImportDocumentWithDifferentExistingMandatoryDocument() throws Throwable
-    {
-        XWikiDocument existingDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
-        existingDocument.setSyntax(Syntax.XWIKI_2_0);
-        this.oldcore.getMockXWiki().saveDocument(existingDocument, "", true, getXWikiContext());
-
-        // register a mandatory document initializer
-        MandatoryDocumentInitializer mandatoryInitializer =
-            this.componentManager.registerMockComponent(MandatoryDocumentInitializer.class, "space.page");
-
-        Mockito.when(mandatoryInitializer.updateDocument(Mockito.any(XWikiDocument.class))).thenReturn(true);
-
-        importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
-
-        Mockito.verify(mockJobStatus, Mockito.never()).ask(Mockito.anyObject());
-    }
-
-    @Test
-    public void testUninstallMandatory() throws Throwable
-    {
-        // register a mandatory document initializer
-        MandatoryDocumentInitializer mandatoryInitializer =
-            this.componentManager.registerMockComponent(MandatoryDocumentInitializer.class, "space.page");
-
-        Mockito.when(mandatoryInitializer.updateDocument(Mockito.any(XWikiDocument.class))).thenReturn(true);
-
-        mockHasAdminRight(true);
-
-        install(this.localXarExtensiontId1, "wiki", this.contextUser);
-
-        verifyHasAdminRight(2);
-
-        // uninstall
-
-        uninstall(this.localXarExtensiontId1, "wiki");
-
-        verifyHasAdminRight(3);
-
-        // validate
-
-        XWikiDocument page =
-            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"), getXWikiContext());
-
-        Assert.assertFalse("Document wiki.space.page has been removed from the database", page.isNew());
-    }
-
-    @Test
-    public void testImportDocumentWithEqualsExistingDocument() throws Throwable
-    {
-        importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
-
-        // Does not produces any conflict
-        importDocument("/packagefile/xarextension1/space/page.xml", true, "wiki");
     }
 
     // rights check

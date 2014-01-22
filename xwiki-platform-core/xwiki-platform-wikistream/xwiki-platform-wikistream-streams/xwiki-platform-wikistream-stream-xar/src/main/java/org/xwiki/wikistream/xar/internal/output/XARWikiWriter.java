@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Locale;
-import java.util.Map;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
@@ -32,8 +31,8 @@ import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.output.FileOutputTarget;
 import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 import org.xwiki.wikistream.output.OutputTarget;
-import org.xwiki.wikistream.xar.internal.XARPackage;
 import org.xwiki.wikistream.xar.output.XAROutputProperties;
+import org.xwiki.xar.internal.XarPackage;
 
 /**
  * @version $Id$
@@ -43,19 +42,15 @@ public class XARWikiWriter
 {
     private final String name;
 
-    private final Map<String, Object> wikiProperties;
-
     private final XAROutputProperties xarProperties;
 
     private final ZipArchiveOutputStream zipStream;
 
-    private XARPackage xarPackage = new XARPackage();
+    private XarPackage xarPackage = new XarPackage();
 
-    public XARWikiWriter(String name, Map<String, Object> wikiParameters, XAROutputProperties xarProperties)
-        throws WikiStreamException
+    public XARWikiWriter(String name, XAROutputProperties xarProperties) throws WikiStreamException
     {
         this.name = name;
-        this.wikiProperties = wikiParameters;
         this.xarProperties = xarProperties;
 
         OutputTarget target = this.xarProperties.getTarget();
@@ -67,11 +62,11 @@ public class XARWikiWriter
             } else if (target instanceof OutputStreamOutputTarget) {
                 this.zipStream = new ZipArchiveOutputStream(((OutputStreamOutputTarget) target).getOutputStream());
             } else {
-                throw new WikiStreamException(String.format("Unsupported output target [%s]. Only [%s] is suppoted",
+                throw new WikiStreamException(String.format("Unsupported output target [%s]. Only [%s] is supported",
                     target, OutputStreamOutputTarget.class));
             }
         } catch (IOException e) {
-            throw new WikiStreamException("Files to create zip output stream", e);
+            throw new WikiStreamException("Failed to create zip output stream", e);
         }
 
         this.zipStream.setEncoding("UTF8");
@@ -85,11 +80,6 @@ public class XARWikiWriter
     public String getName()
     {
         return this.name;
-    }
-
-    public Map<String, Object> getMetadata()
-    {
-        return this.wikiProperties;
     }
 
     public OutputStream newEntry(LocalDocumentReference reference) throws WikiStreamException
@@ -132,19 +122,19 @@ public class XARWikiWriter
         }
     }
 
-    private void writePackage() throws WikiStreamException, IOException
+    private void writePackage() throws WikiStreamException
     {
-        this.xarPackage.write(this.zipStream, xarProperties.getEncoding());
+        try {
+            this.xarPackage.write(this.zipStream, xarProperties.getEncoding());
+        } catch (Exception e) {
+            throw new WikiStreamException("Failed to write package.xml entry", e);
+        }
     }
 
     public void close() throws WikiStreamException
     {
         // Add package.xml descriptor
-        try {
-            writePackage();
-        } catch (IOException e) {
-            throw new WikiStreamException("Failed to write package.xml entry", e);
-        }
+        writePackage();
 
         // Close zip stream
         try {

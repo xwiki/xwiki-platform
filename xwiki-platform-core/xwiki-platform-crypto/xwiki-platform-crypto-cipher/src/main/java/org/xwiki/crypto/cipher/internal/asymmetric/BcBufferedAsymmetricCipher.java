@@ -40,7 +40,7 @@ import org.xwiki.crypto.cipher.AsymmetricCipher;
 public class BcBufferedAsymmetricCipher implements AsymmetricCipher
 {
     private static final RuntimeException NO_STREAMING_ERROR =
-        new UnsupportedOperationException("Asymmetic cipher does not support being streamed.");
+        new UnsupportedOperationException("Asymmetric cipher does not support being streamed.");
 
 
     private final BufferedAsymmetricBlockCipher cipher;

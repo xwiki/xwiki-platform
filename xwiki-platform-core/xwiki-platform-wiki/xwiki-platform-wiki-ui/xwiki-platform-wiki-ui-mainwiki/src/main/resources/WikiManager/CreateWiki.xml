@@ -129,9 +129,9 @@
     wikiName.observe('keyup', wikiNameChanged);
     if(prettyName.value.blank() || wikiName.value.blank()){
       $('wizard-next').disabled = true;
-    } 
+    }
   }
-  
+
   /**
    * Pretty name changed
    */
@@ -139,7 +139,7 @@
     var prettyName = $('prettyname');
     if(prettyName.value.blank()){
       $('wikiprettynamevalidation').innerHTML = "$MSG_ERROR_WIKIPRETTYNAMEEMPTY";
-      prettyName.addClassName('xErrorField');          
+      prettyName.addClassName('xErrorField');
     }else{
       $('wikiprettynamevalidation').innerHTML = '';
       prettyName.removeClassName('xErrorField');
@@ -163,7 +163,7 @@
    */
   function validateWikiName(){
     var wikiNameElement = $('wikiname');
-    var wikiname = wikiNameElement.value; 
+    var wikiname = wikiNameElement.value;
     var filteredWikiName = filterWikiName(wikiname);
     if (wikiname != filteredWikiName) {
       wikiNameElement.value = filteredWikiName;
@@ -353,7 +353,7 @@ XWiki.ProvisioningBar = Class.create({
       }.bind(this)
    });
   },
-  _refresh : function (status) {    
+  _refresh : function (status) {
     if (status.status == 'FINISHED') {
       $('ui-progress').addClassName('hidden');
       $('successMessage').removeClassName('hidden');
@@ -646,7 +646,7 @@ return XWiki;
 ##         Create a new (sub)wiki - WIZARD
 ##
 ## This wizard let user create a new wiki.
-## The 'controller' macro call the good submacro 
+## The 'controller' macro call the good submacro
 ## depending on the step
 ##
 #######################################################
@@ -655,7 +655,7 @@ return XWiki;
 #########################
 #set($docextras = {})
 #########################
-## PLUGINS DEPENDANCIES
+## PLUGINS DEPENDENCIES
 #########################
 #if (!$services.wiki)
   {{error}}{{translation key="platform.wiki.dependencies.wiki.missing"/}}{{/error}}
@@ -672,7 +672,7 @@ return XWiki;
 ##################################
 ##         CONTROLLER
 ##################################
-#macro(controller)  
+#macro(controller)
   #if($request.step == 'members')
     #stepMembers()
   #elseif($request.step == 'create')
@@ -705,7 +705,7 @@ return XWiki;
     #end
     &lt;div class="clearfloats"&gt;&lt;/div&gt;
   &lt;/div&gt;
-    
+
 #end
 ##################################
 ##           FOOTER
@@ -716,7 +716,7 @@ return XWiki;
   &lt;div class="clearfloats"&gt;&lt;/div&gt;
   &lt;div class="wizard-footer buttons"&gt;
     #if($prev!='')
-      &lt;span class="buttonwrapper left"&gt;      
+      &lt;span class="buttonwrapper left"&gt;
         &lt;button value="$prev" title="Previous Step" name="step" id="wizard-next" class="button secondary"&gt;Previous Step&lt;/button&gt;
       &lt;/span&gt;
     #end
@@ -865,7 +865,7 @@ return XWiki;
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
       #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.users'), 2)
-      ### WIZARD BODY ###  
+      ### WIZARD BODY ###
       &lt;div class="wizard-body"&gt;
         ### FIRST STEP VALUES
         &lt;input type="hidden" name="wikiprettyname" value="$!escapetool.xml($request.getParameter('wikiprettyname'))" /&gt;
@@ -893,7 +893,7 @@ return XWiki;
                   &lt;input type="text" id="owner" name="ownerId" value="$!value" class="suggestUsers"/&gt;
                 &lt;/dd&gt;
               &lt;/dl&gt;
-            #else              
+            #else
               &lt;input id="owner" name="ownerId" type="hidden" value="${xcontext.mainWikiName}:${xcontext.user}"/&gt;
             #end
           &lt;/div&gt;
@@ -929,7 +929,7 @@ return XWiki;
             &lt;/dl&gt;
           &lt;/div&gt;
         ### END OF WIZARD FIRST HALF
-        &lt;/div&gt;        
+        &lt;/div&gt;
         ### WIZARD SECOND HALF
         &lt;div class="half"&gt;
           ### MEMBERSHIP TYPE
@@ -1016,14 +1016,14 @@ return XWiki;
     #end
     #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
     #set($fromTemplate = true)
-  #else 
+  #else
     #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $request.wikiname, $request.ownerId, true))
   #end
   #if (!$wikiDescriptor)
 
     {{error}}$services.localization.render('platform.wiki.create.error', [$request.wikiname, $services.wiki.lastException]){{/error}}
 
-  #else    
+  #else
     ## Set the pretty name
     #set ($discard = $wikiDescriptor.setPrettyName($request.wikiprettyname))
     #set ($discard = $wikiDescriptor.setDescription($request.description))
@@ -1051,7 +1051,7 @@ return XWiki;
   ## Set the membership type and the local users
   #set ($discard = $services.wiki.user.setMembershipType($wikiDescriptor.id, $request.membershipType))
   #set ($discard = $services.wiki.user.setUserScope($wikiDescriptor.id, $request.userScope))
-  #set ($groupsClassName = "${wikiDescriptor.id}:XWiki.XWikiGroups")    
+  #set ($groupsClassName = "${wikiDescriptor.id}:XWiki.XWikiGroups")
   ## Save the members
   #set ($members = [])
   #getRequestList($members 'members')

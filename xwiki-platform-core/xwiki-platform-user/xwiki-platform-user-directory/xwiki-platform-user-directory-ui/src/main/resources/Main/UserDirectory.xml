@@ -212,6 +212,7 @@
     #set($discard = $options.put('extraParams', 'userScope=local'))
   #end
   #if ($userScope == 'LOCAL_AND_GLOBAL')
+    #set($discard = $xwiki.jsx.use('Main.UserDirectory'))
 
     {{html}}
       &lt;form class="xform third" action=""&gt;
@@ -243,7 +244,7 @@
     <name>Main.UserDirectory</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
-    <guid>db8b5440-0448-4d1c-a923-83d40b1b73a7</guid>
+    <guid>b88f66f2-98d2-4e84-9fb7-edad89c0b19f</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -362,13 +363,13 @@
 </code>
     </property>
     <property>
-      <name>Dynamuic filter for user scope</name>
+      <name>Dynamic filter for user scope</name>
     </property>
     <property>
       <parse>0</parse>
     </property>
     <property>
-      <use>currentPage</use>
+      <use>onDemand</use>
     </property>
   </object>
   <object>

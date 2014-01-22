@@ -394,6 +394,12 @@ ul.activityList {
   position: relative;
 }
 
+.activityWiki {
+  color: $theme.textSecondaryColor;
+  font-size: .875em;
+  padding-right: .2em;
+}
+
 .activityUser {
   padding-left: 0;
   width: 100%;
@@ -1444,13 +1450,16 @@ $xwiki.ssx.use('Main.Activity')##
       #if ($isFirstEntry)
         #if ($event.application != 'MessageStream')
           #set ($pageFullName = "$!{event.wiki}:$!{pageName}")
-          #set ($pageTitle = "$!{xwiki.getDocument($pageFullName).plainTitle}")
+          #set ($document = $xwiki.getDocument($pageFullName))
+          #set ($pageTitle = "$!{document.plainTitle}")
           #if ($pageTitle == '')
             #set ($pageTitle = $pageName)
           #end
-          &lt;a href="$xwiki.getURL(${pageFullName})" class="typePage type"&gt;
-            $!{escapetool.xml($pageTitle)}
-          &lt;/a&gt;
+          &lt;a href="$xwiki.getURL(${pageFullName})" class="typePage type" title="$!{escapetool.xml($services.localization.render('activity.link.title', [$services.wiki.getById("$!event.wiki").defaultAlias, $document.space, $document.name]))}"&gt;$!{escapetool.xml($pageTitle)}&lt;/a&gt;
+          #if ($event.wiki != $services.wiki.currentWikiId)
+            #set($wikiPrettyName = $services.wiki.getById($event.wiki).prettyName)
+            &lt;span class="activityWiki"&gt;($!{escapetool.xml($wikiPrettyName)})&lt;/span&gt;
+          #end
         #end
       #else
         $xwiki.getUserName($!event.user)
@@ -1574,6 +1583,7 @@ $xwiki.ssx.use('Main.Activity')##
       ## -------------------------------------------------------------------
       #set ($pageName = $page.get(0))
       #set ($pageDate = $page.get(1))
+      #set ($pageWiki = $page.get(2))
       ## If the affected document name matches ".*:XWiki[.][0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}" then it is a GUID corresponding to message stream events, and not a real document.
       ## Always assume access to messages. For the rest of the documents, check access.
       #if ($pageName.matches(".*:XWiki[.][0-9a-z]{8}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{12}") || ($xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${pageName}") &amp;&amp; !$iterationDocuments.contains($pageName)))
@@ -1583,8 +1593,8 @@ $xwiki.ssx.use('Main.Activity')##
         #set ($whereClause = " AND $!filterClause AND day(date)=" + ${xwiki.formatDate($pageDate, 'd')})
         #set ($whereClause = $whereClause + " AND month(date)=" + ${xwiki.formatDate($pageDate, 'M')})
         #set ($whereClause = $whereClause + " AND year(date)=" + ${xwiki.formatDate($pageDate, 'yyyy')})
-        #set ($whereClause = "act.page=? AND act.space&lt;&gt;'Scheduler'" + $!whereClause)
-        #set ($subqueryParameters = [$pageName])
+        #set ($whereClause = "act.wiki=? AND act.page=? AND act.space&lt;&gt;'Scheduler'" + $!whereClause)
+        #set ($subqueryParameters = [$pageWiki, $pageName])
         #set ($discard = $subqueryParameters.addAll($filterParameters))
         #set ($events= $xwiki.activitystream.searchEvents("$!whereClause", false, 0, 0, $subqueryParameters))
         #if ($events.size() &gt; 0)

@@ -203,6 +203,35 @@
    'tagCloud' : true,
    'rowCount': 10
 })
+## Add a filter for subwikis
+#if ($xcontext.database != $xcontext.mainWikiName &amp;&amp; "$!services.wiki" != '' &amp;&amp; "$!services.wiki.user" != '')
+  #set($userScope = $services.wiki.user.getUserScope($services.wiki.currentWikiId))
+  #if ($userScope == 'GLOBAL_ONLY')
+    #set($discard = $options.put('extraParams', 'userScope=global'))
+  #else
+    #set($discard = $options.put('extraParams', 'userScope=local'))
+  #end
+  #if ($userScope == 'LOCAL_AND_GLOBAL')
+
+    {{html}}
+      &lt;form class="xform third" action=""&gt;
+        &lt;dl&gt;
+          &lt;dt&gt;
+            &lt;label for="userScopeFilter"&gt;$services.localization.render('userdirectory.userScopeFilter')&lt;/label&gt;
+            &lt;span class="xHint"&gt;$services.localization.render('userdirectory.userScopeFilter.hint')&lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+            &lt;select name="userScope" id="userScopeFilter"&gt;
+              &lt;option value="local"&gt;$services.localization.render('userdirectory.userScopeFilter.local')&lt;/option&gt;
+              &lt;option value="global"&gt;$services.localization.render('userdirectory.userScopeFilter.global')&lt;/option&gt;
+            &lt;/select&gt;
+          &lt;/dd&gt;
+        &lt;/dl&gt;
+      &lt;/form&gt;
+    {{/html}}
+
+  #end
+#end
 #livetable('userdirectory' $columns $columnsProperties $options)
 ##
 ## Clean up any existing fake user from the current in-memory document to avoid side-effects
@@ -210,6 +239,138 @@
   #set ($discard = $doc.removeObject($fakeUser))
 #end
 {{/velocity}}</content>
+  <object>
+    <name>Main.UserDirectory</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>db8b5440-0448-4d1c-a923-83d40b1b73a7</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>(function(){
+
+  /**
+   * Init
+   */
+  function init() {
+    var userScope = $('userScopeFilter');
+    if (userScope === null) {
+      // Nothing to do
+      return;
+    }
+    userScope.observe('change', onUserScopeChange);
+  }
+  
+  function onUserScopeChange(event) {
+    var value = $('userScopeFilter').value;
+    var livetable = window["livetable_userdirectory"];
+    var url = livetable.getUrl;
+    if (url.search("userScope=") &gt;= 0) {
+      // Replace the old value
+      if (value == 'local') {
+        url = url.replace("userScope=global", "userScope=local");
+      } else {
+        url = url.replace("userScope=local", "userScope=global");
+      }
+    } else {
+      url = url + "&amp;userScope=" + value;
+    }
+    livetable.getUrl = url;
+    // Reload the livetable
+    livetable.clearCache();
+    livetable.showRows(1, livetable.limit);
+  }
+  
+  /**
+   * Call Init
+   */
+  (XWiki &amp;&amp; XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
+
+})();
+</code>
+    </property>
+    <property>
+      <name>Dynamuic filter for user scope</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
+    </property>
+  </object>
   <object>
     <name>Main.UserDirectory</name>
     <number>0</number>

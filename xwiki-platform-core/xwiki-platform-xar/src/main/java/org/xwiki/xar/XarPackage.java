@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.xar.internal;
+package org.xwiki.xar;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,14 +47,17 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.stability.Unstable;
+import org.xwiki.xar.internal.XarUtils;
 import org.xwiki.xar.internal.model.XarModel;
 
 /**
  * Manipulate package.xml XAR package file.
  * 
  * @version $Id$
- * @since 5.4M1
+ * @since 5.4RC1
  */
+@Unstable
 public class XarPackage
 {
     private static final LocalStringEntityReferenceSerializer TOSTRING_SERIALIZER =
@@ -131,7 +134,7 @@ public class XarPackage
     public XarPackage(Collection<XarEntry> entries)
     {
         for (XarEntry entry : entries) {
-            this.entries.put(entry.getReference(), entry);
+            this.entries.put(entry, entry);
         }
     }
 
@@ -142,19 +145,7 @@ public class XarPackage
         try {
             for (ZipArchiveEntry entry = zis.getNextZipEntry(); entry != null; entry = zis.getNextZipEntry()) {
                 if (!entry.isDirectory()) {
-                    InputStream stream = zis;
-
-                    try {
-                        if (entry.getName().equals(XarModel.PATH_PACKAGE)) {
-                            readDescriptor(stream);
-                        } else {
-                            XarEntry xarEntry = new XarEntry(XarUtils.getReference(stream), entry.getName());
-                            this.entries.put(xarEntry.getReference(), xarEntry);
-
-                        }
-                    } finally {
-                        stream.close();
-                    }
+                    readEntry(zis, entry);
                 }
             }
         } finally {
@@ -173,17 +164,22 @@ public class XarPackage
                 InputStream stream = zipFile.getInputStream(entry);
 
                 try {
-                    if (entry.getName().equals(XarModel.PATH_PACKAGE)) {
-                        readDescriptor(stream);
-                    } else {
-                        XarEntry xarEntry = new XarEntry(XarUtils.getReference(stream), entry.getName());
-                        this.entries.put(xarEntry.getReference(), xarEntry);
-
-                    }
+                    readEntry(stream, entry);
                 } finally {
                     stream.close();
                 }
             }
+        }
+    }
+
+    private void readEntry(InputStream stream, ZipArchiveEntry entry) throws XarException, IOException
+    {
+        if (entry.getName().equals(XarModel.PATH_PACKAGE)) {
+            readDescriptor(stream);
+        } else {
+            XarEntry xarEntry = new XarEntry(XarUtils.getReference(stream), entry.getName());
+            this.entries.put(xarEntry, xarEntry);
+
         }
     }
 
@@ -367,9 +363,8 @@ public class XarPackage
             for (XarEntry entry : this.entries.values()) {
                 writer.writeStartElement(XarModel.ELEMENT_FILES_FILES);
                 writer.writeAttribute(XarModel.ATTRIBUTE_DEFAULTACTION, String.valueOf(entry.getDefaultAction()));
-                writer.writeAttribute(XarModel.ATTRIBUTE_LOCALE,
-                    ObjectUtils.toString(entry.getReference().getLocale(), ""));
-                writer.writeCharacters(TOSTRING_SERIALIZER.serialize(entry.getReference()));
+                writer.writeAttribute(XarModel.ATTRIBUTE_LOCALE, ObjectUtils.toString(entry.getLocale(), ""));
+                writer.writeCharacters(TOSTRING_SERIALIZER.serialize(entry));
                 writer.writeEndElement();
             }
             writer.writeEndElement();

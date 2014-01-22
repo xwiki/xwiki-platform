@@ -32,7 +32,7 @@ import org.xwiki.wikistream.output.FileOutputTarget;
 import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 import org.xwiki.wikistream.output.OutputTarget;
 import org.xwiki.wikistream.xar.output.XAROutputProperties;
-import org.xwiki.xar.internal.XarPackage;
+import org.xwiki.xar.XarPackage;
 
 /**
  * @version $Id$

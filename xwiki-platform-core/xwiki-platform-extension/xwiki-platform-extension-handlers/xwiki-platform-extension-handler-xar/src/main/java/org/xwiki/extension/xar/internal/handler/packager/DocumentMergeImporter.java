@@ -33,7 +33,7 @@ import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.xar.internal.XarEntry;
+import org.xwiki.xar.XarEntry;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;

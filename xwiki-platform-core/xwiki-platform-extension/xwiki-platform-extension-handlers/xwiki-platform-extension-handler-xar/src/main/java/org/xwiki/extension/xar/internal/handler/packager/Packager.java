@@ -57,8 +57,8 @@ import org.xwiki.wikistream.internal.input.BeanInputWikiStream;
 import org.xwiki.wikistream.internal.input.DefaultInputStreamInputSource;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
-import org.xwiki.xar.internal.XarEntry;
-import org.xwiki.xar.internal.XarFile;
+import org.xwiki.xar.XarEntry;
+import org.xwiki.xar.XarFile;
 import org.xwiki.xar.internal.model.XarModel;
 
 import com.xpn.xwiki.XWikiContext;
@@ -260,10 +260,9 @@ public class Packager
         for (XarEntry xarEntry : entries) {
             // Only delete what should be deleted.
             if (configuration.getEntriesToImport() == null
-                || configuration.getEntriesToImport().contains(xarEntry.getName())) {
+                || configuration.getEntriesToImport().contains(xarEntry.getEntryName())) {
                 DocumentReference documentReference =
-                    new DocumentReference(this.resolver.resolve(xarEntry.getReference(), wikiReference), xarEntry
-                        .getReference().getLocale());
+                    new DocumentReference(this.resolver.resolve(xarEntry, wikiReference), xarEntry.getLocale());
 
                 if (!configuration.isSkipMandatorytDocuments() || !isMandatoryDocument(documentReference)) {
                     deleteDocument(documentReference, configuration);
@@ -307,7 +306,7 @@ public class Packager
     {
         XarEntry realEntry = xarFile.getEntry(documentReference);
         if (realEntry != null) {
-            InputStream stream = xarFile.getInputStream(realEntry.getReference());
+            InputStream stream = xarFile.getInputStream(realEntry);
 
             try {
                 return getXWikiDocument(stream, wikiReference);
@@ -370,8 +369,8 @@ public class Packager
         for (XarEntry xarEntry : pages) {
             // Only delete what should be deleted.
             if (configuration.getEntriesToImport() == null
-                || configuration.getEntriesToImport().contains(xarEntry.getName())) {
-                DocumentReference documentReference = new DocumentReference(xarEntry.getReference(), wikiReference);
+                || configuration.getEntriesToImport().contains(xarEntry.getEntryName())) {
+                DocumentReference documentReference = new DocumentReference(xarEntry, wikiReference);
 
                 if (!configuration.isSkipMandatorytDocuments() || !isMandatoryDocument(documentReference)) {
                     documents.add(documentReference);

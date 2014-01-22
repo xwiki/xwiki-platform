@@ -46,7 +46,7 @@ import org.xwiki.job.event.JobFinishedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.xar.internal.XarEntry;
+import org.xwiki.xar.XarEntry;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;

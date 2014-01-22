@@ -24,9 +24,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
-import org.xwiki.xar.internal.XarException;
-import org.xwiki.xar.internal.XarFile;
-import org.xwiki.xar.internal.XarPackage;
+import org.xwiki.xar.XarException;
+import org.xwiki.xar.XarFile;
+import org.xwiki.xar.XarPackage;
 
 /**
  * @version $Id$

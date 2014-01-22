@@ -65,9 +65,9 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-              org/xwiki/xar/internal/XarEntry.java,
-              org/xwiki/xar/internal/XarFile.java,
-              org/xwiki/xar/internal/XarPackage.java,
+              org/xwiki/xar/XarEntry.java,
+              org/xwiki/xar/XarFile.java,
+              org/xwiki/xar/XarPackage.java,
               org/xwiki/xar/internal/XarUtils.java,
               org/xwiki/xar/internal/model/XarAttachmentModel.java,
               org/xwiki/xar/internal/model/XarClassModel.java,

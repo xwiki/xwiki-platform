@@ -17,28 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.xar.internal;
+package org.xwiki.xar;
 
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.xar.internal.model.XarModel;
 
 /**
- * 
  * @version $Id$
- * @since 5.4M1
+ * @since 5.4RC1
  */
-public class XarEntry
+@Unstable
+public class XarEntry extends LocalDocumentReference
 {
-    /**
-     * The reference of the entry.
-     */
-    private LocalDocumentReference reference;
-
     /**
      * The name of the entry in the ZIP stream.
      */
-    private String name;
+    private String entryName;
 
     /**
      * The default action to set in package.xml.
@@ -57,18 +52,14 @@ public class XarEntry
 
     public XarEntry(LocalDocumentReference reference, String name, int defaultAction)
     {
-        this.reference = reference;
-        this.name = name;
+        super(reference);
+
+        this.entryName = name;
     }
 
-    public LocalDocumentReference getReference()
+    public String getEntryName()
     {
-        return this.reference;
-    }
-
-    public String getName()
-    {
-        return this.name;
+        return this.entryName;
     }
 
     public int getDefaultAction()
@@ -77,34 +68,14 @@ public class XarEntry
     }
 
     @Override
-    public int hashCode()
-    {
-        return getReference().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (obj instanceof XarEntry) {
-            return getReference().equals(((XarEntry) obj).getReference());
-        }
-
-        if (obj instanceof EntityReference) {
-            return getReference().equals(obj);
-        }
-
-        return false;
-    }
-
-    @Override
     public String toString()
     {
-        StringBuilder str = new StringBuilder(getReference().toString());
+        StringBuilder str = new StringBuilder(super.toString());
 
-        if (getName() != null) {
+        if (getEntryName() != null) {
             str.append(' ');
             str.append('(');
-            str.append(getName());
+            str.append(getEntryName());
             str.append(')');
         }
 

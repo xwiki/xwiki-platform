@@ -20,21 +20,17 @@
 package org.xwiki.xar.script;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
-import org.xwiki.xar.internal.XarEntry;
-import org.xwiki.xar.internal.XarPackage;
+import org.xwiki.xar.XarPackage;
 
 /**
  * Provide APIs to manipulate XAR files.
@@ -84,15 +80,15 @@ public class XarScriptService implements ScriptService
     // ScriptService
 
     /**
-     * Extract the list of the document in the passed XAR file.
+     * Generate a {@link XarPackage} from the passed XAR file.
      * 
      * @param file the XAR file
-     * @return the documents in the passed XAR file
+     * @return the package
      */
-    public List<LocalDocumentReference> getReferences(File file)
+    public XarPackage getXarPackage(File file)
     {
         try {
-            return getReferences(new XarPackage(file));
+            return new XarPackage(file);
         } catch (Exception e) {
             setError(e);
         }
@@ -101,30 +97,28 @@ public class XarScriptService implements ScriptService
     }
 
     /**
-     * Extract the list of the document in the passed XAR file.
+     * Generate a {@link XarPackage} from the passed XAR file.
      * 
      * @param stream the XAR file
-     * @return the documents in the passed XAR file
+     * @param close indicate if the passed stream should be closed at the end
+     * @return the package
      */
-    public List<LocalDocumentReference> getReferences(InputStream stream)
+    public XarPackage getXarPackage(InputStream stream, boolean close)
     {
         try {
-            return getReferences(new XarPackage(stream));
+            return new XarPackage(stream);
         } catch (Exception e) {
             setError(e);
+        } finally {
+            if (close) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    // TODO: log something ?
+                }
+            }
         }
 
         return null;
-    }
-
-    private List<LocalDocumentReference> getReferences(XarPackage xarPackage)
-    {
-        Collection<XarEntry> entries = xarPackage.getEntries();
-        List<LocalDocumentReference> references = new ArrayList<LocalDocumentReference>(entries.size());
-        for (XarEntry entry : entries) {
-            references.add(entry.getReference());
-        }
-
-        return references;
     }
 }

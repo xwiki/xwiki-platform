@@ -67,6 +67,15 @@ public class LocalDocumentReference extends EntityReference
     }
 
     /**
+     * @param reference the reference to clone
+     * @since 5.4RC1
+     */
+    public LocalDocumentReference(EntityReference reference)
+    {
+        super(reference);
+    }
+
+    /**
      * @param entityReference the reference
      * @param locale the new locale for this reference, if null, locale is removed
      * @since 5.3RC1
@@ -98,8 +107,8 @@ public class LocalDocumentReference extends EntityReference
 
     /**
      * Set the locale of this document reference.
-     * @since 5.3RC1
      * 
+     * @since 5.3RC1
      * @param locale the locale of this document reference
      */
     protected void setLocale(Locale locale)

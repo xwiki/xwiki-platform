@@ -56,7 +56,7 @@ import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.xar.internal.XarException;
+import org.xwiki.xar.XarException;
 
 /**
  * Local repository proxy for XAR extensions.

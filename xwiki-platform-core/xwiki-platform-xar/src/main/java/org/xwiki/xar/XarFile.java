@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.xar.internal;
+package org.xwiki.xar;
 
 import java.io.Closeable;
 import java.io.File;
@@ -27,11 +27,13 @@ import java.util.Collection;
 
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * @version $Id$
- * @since 5.4M1
+ * @since 5.4RC1
  */
+@Unstable
 public class XarFile implements Closeable
 {
     private File file;
@@ -74,7 +76,7 @@ public class XarFile implements Closeable
             throw new IOException("Failed to find entry for referenc [" + reference + "]");
         }
 
-        return this.zipFile.getInputStream(this.zipFile.getEntry(entry.getName()));
+        return this.zipFile.getInputStream(this.zipFile.getEntry(entry.getEntryName()));
     }
 
     public Collection<XarEntry> getEntries()

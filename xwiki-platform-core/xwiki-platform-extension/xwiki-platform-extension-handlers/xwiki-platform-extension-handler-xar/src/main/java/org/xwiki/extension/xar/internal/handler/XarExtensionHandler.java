@@ -56,8 +56,8 @@ import org.xwiki.job.Request;
 import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.xar.internal.XarEntry;
-import org.xwiki.xar.internal.XarException;
+import org.xwiki.xar.XarEntry;
+import org.xwiki.xar.XarException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -310,7 +310,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             if (nextXAREntriesOnRoot != null) {
                 for (Map.Entry<XarEntry, LocalExtension> entry : nextXAREntriesOnRoot.entrySet()) {
                     if (entry.getValue() == extension) {
-                        entriesToImport.add(entry.getKey().getName());
+                        entriesToImport.add(entry.getKey().getEntryName());
                     }
                 }
             }
@@ -318,7 +318,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             if (nextXAREntriesOnWiki != null) {
                 for (Map.Entry<XarEntry, LocalExtension> entry : nextXAREntriesOnWiki.entrySet()) {
                     if (entry.getValue() == extension) {
-                        entriesToImport.add(entry.getKey().getName());
+                        entriesToImport.add(entry.getKey().getEntryName());
                     }
                 }
             }

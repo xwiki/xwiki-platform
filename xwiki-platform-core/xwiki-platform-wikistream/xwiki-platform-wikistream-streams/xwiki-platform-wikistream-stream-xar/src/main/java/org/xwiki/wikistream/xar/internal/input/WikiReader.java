@@ -35,7 +35,7 @@ import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.input.InputStreamInputSource;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARFilter;
-import org.xwiki.xar.internal.XarPackage;
+import org.xwiki.xar.XarPackage;
 import org.xwiki.xar.internal.model.XarModel;
 
 /**

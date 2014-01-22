@@ -260,7 +260,7 @@ public class ExportAction extends XWikiAction
             // Create input wiki stream
             DocumentInstanceInputProperties inputProperties = new DocumentInstanceInputProperties();
 
-            inputProperties.setWithJRCSRevisions(backup);
+            inputProperties.setWithJRCSRevisions(history);
             inputProperties.setWithRevisions(false);
 
             EntityReferenceSet entities = new EntityReferenceSet();
@@ -304,7 +304,7 @@ public class ExportAction extends XWikiAction
                 xarProperties.setPackageVersion(version);
             }
             xarProperties.setPackageBackupPack(backup);
-            xarProperties.setPreserveVersion(backup);
+            xarProperties.setPreserveVersion(backup || history);
 
             BeanOutputWikiStreamFactory<XAROutputProperties> xarWikiStreamFactory =
                 Utils.getComponent((Type) OutputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_11.serialize());

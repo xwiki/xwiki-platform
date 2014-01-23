@@ -25,9 +25,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
 import com.xpn.xwiki.plugin.globalsearch.GlobalSearchPluginApi;
@@ -481,7 +483,12 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
      */
     public XWikiServer createWikiDocument() throws XWikiException
     {
-        return XWikiServerClass.getInstance(this.context).newXObjectDocument(this.context);
+        XWikiServer document = XWikiServerClass.getInstance(this.context).newXObjectDocument(this.context);
+        XWikiDocument xwikidoc = document.getDocument();
+        DocumentReference currentUserReference = getXWikiContext().getUserReference();
+        xwikidoc.setCreatorReference(currentUserReference);
+        xwikidoc.setAuthorReference(currentUserReference);
+        return document;
     }
 
     /**

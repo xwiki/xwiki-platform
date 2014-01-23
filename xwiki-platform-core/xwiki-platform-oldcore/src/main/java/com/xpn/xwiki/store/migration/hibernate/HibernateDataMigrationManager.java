@@ -336,11 +336,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     }
 
     @Override
-    protected synchronized void startMigrations() throws DataMigrationException {
-        if (this.migrations == null) {
-            return;
-        }
-
+    protected void startMigrations() throws DataMigrationException {
         XWikiContext context = getXWikiContext();
         XWikiHibernateBaseStore store = getStore();
 

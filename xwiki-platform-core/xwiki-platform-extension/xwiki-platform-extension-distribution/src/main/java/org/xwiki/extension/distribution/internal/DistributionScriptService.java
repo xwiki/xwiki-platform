@@ -278,33 +278,36 @@ public class DistributionScriptService implements ScriptService
 
         Map<String, Map<String, Map<String, Map<String, DocumentStatus>>>> tree =
             new TreeMap<String, Map<String, Map<String, Map<String, DocumentStatus>>>>();
-        for (Map.Entry<DocumentReference, DocumentStatus> document : documents.entrySet()) {
-            DocumentReference reference = document.getKey();
-            String wiki = reference.getWikiReference().getName();
-            // TODO: add support for subspaces
-            String space = reference.getLastSpaceReference().getName();
-            String page = reference.getName();
-            String locale = reference.getLocale() != null ? reference.getLocale().toString() : "";
 
-            Map<String, Map<String, Map<String, DocumentStatus>>> spaces = tree.get(wiki);
-            if (spaces == null) {
-                spaces = new TreeMap<String, Map<String, Map<String, DocumentStatus>>>();
-                tree.put(wiki, spaces);
+        if (documents != null) {
+            for (Map.Entry<DocumentReference, DocumentStatus> document : documents.entrySet()) {
+                DocumentReference reference = document.getKey();
+                String wiki = reference.getWikiReference().getName();
+                // TODO: add support for subspaces
+                String space = reference.getLastSpaceReference().getName();
+                String page = reference.getName();
+                String locale = reference.getLocale() != null ? reference.getLocale().toString() : "";
+
+                Map<String, Map<String, Map<String, DocumentStatus>>> spaces = tree.get(wiki);
+                if (spaces == null) {
+                    spaces = new TreeMap<String, Map<String, Map<String, DocumentStatus>>>();
+                    tree.put(wiki, spaces);
+                }
+
+                Map<String, Map<String, DocumentStatus>> pages = spaces.get(space);
+                if (pages == null) {
+                    pages = new TreeMap<String, Map<String, DocumentStatus>>();
+                    spaces.put(space, pages);
+                }
+
+                Map<String, DocumentStatus> locales = pages.get(page);
+                if (locales == null) {
+                    locales = new TreeMap<String, DocumentStatus>();
+                    pages.put(page, locales);
+                }
+
+                locales.put(locale, document.getValue());
             }
-
-            Map<String, Map<String, DocumentStatus>> pages = spaces.get(space);
-            if (pages == null) {
-                pages = new TreeMap<String, Map<String, DocumentStatus>>();
-                spaces.put(space, pages);
-            }
-
-            Map<String, DocumentStatus> locales = pages.get(page);
-            if (locales == null) {
-                locales = new TreeMap<String, DocumentStatus>();
-                pages.put(page, locales);
-            }
-
-            locales.put(locale, document.getValue());
         }
 
         return tree;

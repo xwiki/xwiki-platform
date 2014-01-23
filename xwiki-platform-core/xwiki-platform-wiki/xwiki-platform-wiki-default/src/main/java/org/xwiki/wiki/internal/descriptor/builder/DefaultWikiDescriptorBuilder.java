@@ -193,6 +193,15 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             // Set the document as hidden
             descriptorDoc.setHidden(true);
 
+            // The document must have a creator
+            if (descriptorDoc.getCreatorReference() == null) {
+                descriptorDoc.setCreatorReference(context.getUserReference());
+            }
+            // The document must have an author
+            if (descriptorDoc.getAuthorReference() == null) {
+                descriptorDoc.setAuthorReference(context.getUserReference());
+            }
+
             // Save the document
             xwiki.saveDocument(descriptorDoc, context);
 

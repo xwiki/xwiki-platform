@@ -541,6 +541,15 @@ public final class WikiManager
                 }
             }
 
+            // The document must have a creator
+            if (docToSave.getCreatorReference() == null) {
+                docToSave.setCreatorReference(context.getUserReference());
+            }
+            // The document must have an author
+            if (docToSave.getAuthorReference() == null) {
+                docToSave.setAuthorReference(context.getUserReference());
+            }
+
             wikiSuperDocToSave = wikiClass.newXObjectDocument(docToSave, 0, context);
 
             wikiSuperDocToSave.mergeObject(userWikiSuperDoc);

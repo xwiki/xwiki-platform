@@ -128,6 +128,14 @@ public class DefaultWikiUserConfigurationHelper implements WikiUserConfiguration
         try {
             XWiki xwiki = context.getWiki();
             document.setHidden(true);
+            // The document must have a creator
+            if (document.getCreatorReference() == null) {
+                document.setCreatorReference(context.getUserReference());
+            }
+            // The document must have an author
+            if (document.getAuthorReference() == null) {
+                document.setAuthorReference(context.getUserReference());
+            }
             xwiki.saveDocument(document, "Changed configuration.", context);
         } catch (XWikiException e) {
             throw new WikiUserManagerException(

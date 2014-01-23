@@ -117,6 +117,14 @@ public class WikiTemplatePropertyGroupProvider implements WikiPropertyGroupProvi
                     true, context);
             object.setIntValue(WikiTemplateClassDocumentInitializer.FIELD_ISWIKITEMPLATE,
                     templateGroup.isTemplate() ? 1 : 0);
+            // The document must have a creator
+            if (descriptorDocument.getCreatorReference() == null) {
+                descriptorDocument.setCreatorReference(context.getUserReference());
+            }
+            // The document must have an author
+            if (descriptorDocument.getAuthorReference() == null) {
+                descriptorDocument.setAuthorReference(context.getUserReference());
+            }
             xwiki.saveDocument(descriptorDocument, String.format("Changed property group [%s].", GROUP_NAME), context);
         } catch (WikiManagerException e) {
             throw new WikiPropertyGroupException(String.format(errorMessageNoDescriptorDocument, wikiId), e);

@@ -76,12 +76,14 @@ public class BouncyCastleDigest implements Digest
     @Override
     public FilterInputStream getInputStream(InputStream is)
     {
+        digest.reset();
         return new DigestInputStream(is, digest);
     }
 
     @Override
     public OutputStream getOutputStream()
     {
+        digest.reset();
         return new org.bouncycastle.crypto.io.DigestOutputStream(digest);
     }
 

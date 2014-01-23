@@ -39,7 +39,7 @@
   #set($rollbackIconSrc = $escapetool.xml($xwiki.getSkinFile('icons/silk/arrow_undo.png')))
 
   #macro(displayReportPageActions, $status)
-      # TODO: use ajax instead if JS is enabled
+      ## TODO: use ajax instead if JS is enabled
       <form class="documentactions" method="get">
       <input type="hidden" name="document" value="$services.model.serialize($status.reference)"/>
       #if ($status.previousVersion)

@@ -139,14 +139,14 @@
       $('wizard-next').disabled = true;
     }
   }
-  
+
   function initStepUsers() {
     userScopeChanged();
     $$('input[type=radio][name=userScope]').each(function (item){
       item.observe('click', userScopeChanged);
     });
   }
-  
+
   /**
    * Pretty name changed
    */
@@ -683,7 +683,7 @@ return XWiki;
 ##         Create a new (sub)wiki - WIZARD
 ##
 ## This wizard let user create a new wiki.
-## The 'controller' macro call the good submacro 
+## The 'controller' macro call the good submacro
 ## depending on the step
 ##
 #######################################################
@@ -692,7 +692,7 @@ return XWiki;
 #########################
 #set($docextras = {})
 #########################
-## PLUGINS DEPENDANCIES
+## PLUGINS DEPENDENCIES
 #########################
 #if (!$services.wiki)
   {{error}}{{translation key="platform.wiki.dependencies.wiki.missing"/}}{{/error}}
@@ -709,7 +709,7 @@ return XWiki;
 ##################################
 ##         CONTROLLER
 ##################################
-#macro(controller)  
+#macro(controller)
   #if($request.step == 'members')
     #stepMembers()
   #elseif($request.step == 'create')
@@ -743,7 +743,7 @@ return XWiki;
     #end
     &lt;div class="clearfloats"&gt;&lt;/div&gt;
   &lt;/div&gt;
-    
+
 #end
 ##################################
 ##           FOOTER
@@ -903,7 +903,7 @@ return XWiki;
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
       #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.users'), 2)
-      ### WIZARD BODY ###  
+      ### WIZARD BODY ###
       &lt;div class="wizard-body"&gt;
         ### FIRST STEP VALUES
         &lt;input type="hidden" name="wikiprettyname" value="$!escapetool.xml($request.getParameter('wikiprettyname'))" /&gt;
@@ -931,7 +931,7 @@ return XWiki;
                   &lt;input type="text" id="owner" name="ownerId" value="$!value" class="suggestUsers"/&gt;
                 &lt;/dd&gt;
               &lt;/dl&gt;
-            #else              
+            #else
               &lt;input id="owner" name="ownerId" type="hidden" value="${xcontext.mainWikiName}:${xcontext.user}"/&gt;
             #end
           &lt;/div&gt;
@@ -967,7 +967,7 @@ return XWiki;
             &lt;/dl&gt;
           &lt;/div&gt;
         ### END OF WIZARD FIRST HALF
-        &lt;/div&gt;        
+        &lt;/div&gt;
         ### WIZARD SECOND HALF
         &lt;div class="half"&gt;
           ### MEMBERSHIP TYPE
@@ -1006,7 +1006,13 @@ return XWiki;
                 &lt;span class="xHint"&gt;$services.localization.render('platform.wiki.create.wizard.desc.members')&lt;/span&gt;
               &lt;/dt&gt;
               &lt;dd&gt;
-                &lt;input type="text" id="members" name="members" value="$!escapetool.xml($request.members)" class="suggestUsers multipleSelection"/&gt;
+                #set($listMembers = '')
+                #set($sep = '')
+                #foreach($m in $request.getParameterValues('members'))
+                  #set($listMembers = "${listMembers}${sep}$!escapetool.xml($m)")
+                  #set($sep = ',')
+                #end
+                &lt;input type="text" id="members" name="members" value="$listMembers" class="suggestUsers multipleSelection"/&gt;
               &lt;/dd&gt;
             &lt;/dl&gt;
           &lt;/div&gt;
@@ -1055,14 +1061,14 @@ return XWiki;
     #end
     #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
     #set($fromTemplate = true)
-  #else 
+  #else
     #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $request.wikiname, $request.ownerId, true))
   #end
   #if (!$wikiDescriptor)
 
     {{error}}$services.localization.render('platform.wiki.create.error', [$request.wikiname, $services.wiki.lastException]){{/error}}
 
-  #else    
+  #else
     ## Set the pretty name
     #set ($discard = $wikiDescriptor.setPrettyName($request.wikiprettyname))
     #set ($discard = $wikiDescriptor.setDescription($request.description))
@@ -1120,13 +1126,9 @@ return XWiki;
   #set($membersValue = '')
   #foreach($m in $members)
     #if($m != '')
-      #if($velocityCount &gt; 1)
-        #set($membersValue = "${membersValue},")
-      #end
-      #set($membersValue = "${membersValue}${m}")
+      &lt;input type="hidden" name="members" value="$!escapetool.xml($m)" /&gt;
     #end
   #end
-  &lt;input type="hidden" name="members" value="$!escapetool.xml($membersValue)" /&gt;
 #end
 ##################################
 ##     TEMPLATE PROVISIONING

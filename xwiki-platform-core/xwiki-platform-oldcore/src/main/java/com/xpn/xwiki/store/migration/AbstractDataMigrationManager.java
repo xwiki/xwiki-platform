@@ -542,24 +542,19 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
 
             // Proceed with migration (only once)
             if (this.migrations != null) {
-                try {
-                    XWikiConfig config = getXWikiConfig();
-                    if ("1".equals(config.getProperty("xwiki.store.migration", "0"))
-                        && !"0".equals(config.getProperty("xwiki.store.hibernate.updateschema"))) {
-                        // Run migrations
-                        logger.info("Storage schema updates and data migrations are enabled");
+                XWikiConfig config = getXWikiConfig();
+                if ("1".equals(config.getProperty("xwiki.store.migration", "0"))
+                    && !"0".equals(config.getProperty("xwiki.store.hibernate.updateschema"))) {
+                    // Run migrations
+                    logger.info("Storage schema updates and data migrations are enabled");
 
-                        startMigrations();
+                    startMigrations();
 
-                        // TODO: Improve or remove this which is inappropriate in a container environment
-                        if ("1".equals(config.getProperty("xwiki.store.migration.exitAfterEnd", "0"))) {
-                            logger.error("Exiting because xwiki.store.migration.exitAfterEnd is set");
-                            System.exit(0);
-                        }
+                    // TODO: Improve or remove this which is inappropriate in a container environment
+                    if ("1".equals(config.getProperty("xwiki.store.migration.exitAfterEnd", "0"))) {
+                        logger.error("Exiting because xwiki.store.migration.exitAfterEnd is set");
+                        System.exit(0);
                     }
-                } finally {
-                    // data migration are no more needed, migration only happen once
-                    this.migrations = null;
                 }
             }
 
@@ -602,25 +597,29 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             return;
         }
 
-        // We should migrate the main wiki first to be able to access subwiki descriptors if needed.
-        if (!migrateDatabase(getMainXWiki())) {
-            String message = "Main wiki database migration failed, it is not safe to continue!";
-            logger.error(message);
-            throw new DataMigrationException(message);
-        }
-
-        int errorCount = 0;
-        for (String database : getDatabasesToMigrate()) {
-            if (!migrateDatabase(database)) {
-                errorCount++;
+        try {
+            // We should migrate the main wiki first to be able to access subwiki descriptors if needed.
+            if (!migrateDatabase(getMainXWiki())) {
+                String message = "Main wiki database migration failed, it is not safe to continue!";
+                logger.error(message);
+                throw new DataMigrationException(message);
             }
-        }
 
-        if (errorCount > 0) {
-            String message =
-                String.format("%s wiki database migration(s) failed.", errorCount);
-            logger.error(message);
-            throw new DataMigrationException(message);
+            int errorCount = 0;
+            for (String database : getDatabasesToMigrate()) {
+                if (!migrateDatabase(database)) {
+                    errorCount++;
+                }
+            }
+
+            if (errorCount > 0) {
+                String message =
+                    String.format("%s wiki database migration(s) failed.", errorCount);
+                logger.error(message);
+                throw new DataMigrationException(message);
+            }
+        } finally {
+            this.migrations = null;
         }
     }
 

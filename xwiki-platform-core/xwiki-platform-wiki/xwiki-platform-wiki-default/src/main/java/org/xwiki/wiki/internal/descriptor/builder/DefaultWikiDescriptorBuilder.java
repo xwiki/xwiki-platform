@@ -193,6 +193,7 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             // Set the document as hidden
             descriptorDoc.setHidden(true);
 
+<<<<<<< HEAD
             // The document must have a creator
             if (descriptorDoc.getCreatorReference() == null) {
                 descriptorDoc.setCreatorReference(context.getUserReference());
@@ -201,6 +202,12 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
             if (descriptorDoc.getAuthorReference() == null) {
                 descriptorDoc.setAuthorReference(context.getUserReference());
             }
+=======
+            // Set the document parent
+            DocumentReference parentReference = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
+                    "WikiManager", "WebHome");
+            descriptorDoc.setParentReference(parentReference);
+>>>>>>> XWIKI-9921: Make new wikis descriptor pages as children of WikiManager.WebHome
 
             // Save the document
             xwiki.saveDocument(descriptorDoc, context);

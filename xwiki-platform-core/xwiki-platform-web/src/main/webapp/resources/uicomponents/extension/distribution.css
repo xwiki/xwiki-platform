@@ -36,13 +36,13 @@
 #distributionWizard .extension-actions button[class~="alternative-action"][value$="Globally"] {
   display: none;
 }
-#previousUi dt label {
+.previousUI dt label {
   font-size: .75em;
 }
-#previousUi .versionSelector {
+.previousUI .versionSelector {
   padding-right: 20px;
 }
-#previousUi .versionSelector .icon {
+.previousUI .versionSelector .icon {
   padding: 1px 0 0 4px;
   position: absolute;
 }

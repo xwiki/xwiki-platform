@@ -6,7 +6,6 @@ var XWiki = (function (XWiki) {
 XWiki.DefaultUIStep = Class.create({
   initialize : function () {
     document.observe('xwiki:extension:statusChanged', this._onExtensionStatusChanged.bindAsEventListener(this));
-    this._maybeEnhancePreviousUiForm();
   },
 
   /**
@@ -26,9 +25,6 @@ XWiki.DefaultUIStep = Class.create({
       if (extension.getId() == '$services.distribution.getUIExtensionId().id'
           && extension.getVersion() == '$services.distribution.getUIExtensionId().version.value') {
         this._onDefaultUiExtensionStatusChanged(stepButtons, status);
-      } else if (this._previousUiExtensionId && extension.getId() == this._previousUiExtensionId.id
-          && extension.getVersion() == this._previousUiExtensionId.version) {
-        this._onPreviousUiExtensionStatusChanged(status);
       }
     }
   },
@@ -47,179 +43,6 @@ XWiki.DefaultUIStep = Class.create({
       stepButtons[0].up().addClassName('hidden');
       stepButtons[1].up().removeClassName('hidden');
       stepButtons[2].up().removeClassName('hidden');
-    }
-  },
-
-  _maybeEnhancePreviousUiForm : function() {
-    var form = $('previousUi');
-    if (!form) return;
-    // Enhance the form actions.
-    form.down('.button').observe('click', this._resolvePreviousUiExtension.bindAsEventListener(this));
-    var secondaryButton = form.down('.button.secondary');
-    secondaryButton.up().removeClassName('hidden');
-    var hidePreviousUiForm = this._hidePreviousUiForm.bindAsEventListener(this);
-    secondaryButton.observe('click', hidePreviousUiForm);
-    // Simplify the way the previous UI is specified.
-    $('previousUiVersionList') && this._enhancePreviousUiInput();
-    // Enhance and show the upgrade question.
-    var question = form.previous().removeClassName('hidden');
-    question.down('.button').observe('click', function(event) {
-      event.stop();
-      question.hide();
-      // Make sure the form is enabled because the browser can cache the state of the form fields (see XWIKI-9717).
-      form.enable().show().focusFirstElement();
-    }).activate();
-    question.down('.button.secondary').observe('click', hidePreviousUiForm);
-    // Hide the form.
-    form.hide()
-    // Hide the recommended UI (everything up to the step buttons).
-    var stop = $('stepButtons').up('form');
-    var next = form.next();
-    while (next && next != stop) {
-      next = next.hide().next();
-    }
-  },
-
-  _enhancePreviousUiInput : function() {
-    // The element used to toggle advanced input.
-    var versionEditButton = new Element('input', {
-      type: 'image',
-      'class': 'icon',
-      src: '$xwiki.getSkinFile("icons/silk/pencil.png")',
-      alt: "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint'))",
-      title: "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint'))"
-    });
-    var versionInput = $('previousUiVersion');
-    var versionList = $('previousUiVersionList');
-    var idEditButton = versionEditButton.cloneNode();
-    var idInput = $('previousUiId');
-    // Display the version list by default instead of the version input. Allow the users to enter a different version.
-    versionList.insert({'after': versionEditButton}).up('dd').removeClassName('hidden').addClassName('versionSelector')
-      .previous().removeClassName('hidden');
-    versionInput.up('dd').hide().previous().hide();
-    // Hide the id input and its hint by default because we auto-complete the id based on the selected version.
-    idInput.hide().up('dd').previous().down('.xHint').hide();
-    // Display a pencil next to the id value to let the user change it.
-    idInput.insert({after: idEditButton}).insert({after: new Element('span')});
-    // Hide the id label and value by default. Display it when the user selects a version.
-    idInput.up('dd').hide().previous().hide();
-    versionList.observe('change', this._onSelectPreviousUiVersion.bind(this));
-    // Allow advanced input.
-    versionEditButton.observe('click', this._switchToAdvancedPreviousUiInput.bindAsEventListener(this));
-    idEditButton.observe('click', this._switchToAdvancedPreviousUiInput.bindAsEventListener(this));
-  },
-
-  _onSelectPreviousUiVersion : function() {
-    var versionList = $('previousUiVersionList');
-    var selectedVersion = versionList.options[versionList.selectedIndex];
-    // Fill the version input with the selected value in case the user decides to modify it.
-    $('previousUiVersion').value = selectedVersion.value;
-    // Show the extension id that corresponds to the selected version.
-    var idInput = $('previousUiId');
-    idInput.next().update(selectedVersion.title).up('dd').show().previous().show();
-    // Fill the id input with the extension id that corresponds to the selected version.
-    idInput.value = selectedVersion.title;
-  },
-
-  _switchToAdvancedPreviousUiInput : function(event) {
-    event.stop();
-    // Hide the version list and its edit button.
-    $('previousUiVersionList').up('dd').hide().previous().hide();
-    // Make sure the id and its edit button are hidden.
-    $('previousUiId').next().hide().next().hide();
-    // Show the version input and its hint.
-    $('previousUiVersion').up('dd').show().previous().show();
-    // Show the id input and its hint.
-    $('previousUiId').show().up('dd').show().previous().show().down('.xHint').show();
-    // Focus the right input depending on which edit button was clicked.
-    event.element().previous('select') ? $('previousUiVersion').activate() : $('previousUiId').activate();
-  },
-
-  _hidePreviousUiForm : function(event) {
-    event && event.stop();
-    var form = $('previousUi');
-    form.hide().previous().hide();
-    for (var next = form.next(); next; next = next.show().next());
-  },
-
-  _resolvePreviousUiExtension : function(event) {
-    event.stop();
-    var form = $('previousUi');
-    var formData = form.serialize(true);
-    new Ajax.Request(form.action, {
-      parameters: {
-        extensionId: formData.previousUiId,
-        extensionVersion: formData.previousUiVersion,
-        hideExtensionDetails: true
-      },
-      onCreate: function() {
-        form.disable();
-        // Remove the message corresponding to a failed search.
-        var message = form.down('.buttons').next();
-        message && message.remove();
-      },
-      onSuccess: function(response) {
-        var container = new Element('div').update(response.responseText);
-        var previousUiExtension = container.down('.extension-item');
-        if (previousUiExtension) {
-          if (previousUiExtension.down('button[name="extensionAction"][value="install"]')) {
-            // The specified previous UI is not installed. We have to update the extension index.
-            this._previousUiExtensionId = {
-              id: formData.previousUiId,
-              version: formData.previousUiVersion
-            };
-            this._displayPreviousUiExtension(previousUiExtension);
-          } else {
-            // The specified previous UI is probably already installed. Just show the recommended UI.
-            this._hidePreviousUiForm();
-          }
-        } else {
-          // Display the received message.
-          form.enable().insert(container);
-        }
-      }.bind(this),
-      on0: function(response) {
-        response.request.options.onFailure(response);
-      },
-      onFailure: function() {
-        form.enable();
-        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRequestFailed'))", 'error');
-      }
-    });
-  },
-
-  _displayPreviousUiExtension : function(previousUiExtension) {
-    var form = $('previousUi');
-    var hint = new Element('div', {'class': 'xHint'}).update("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIHint'))".escapeHTML());
-    var container = new Element('div').insert(hint).insert(previousUiExtension);
-    form.hide().insert({after: container});
-    // Enhance the extension display.
-    document.fire('xwiki:dom:updated', {elements: [container]});
-    // Hack the install button to perform a fake install (only mark the extension as installed).
-    var installButton = previousUiExtension.down('button[name="extensionAction"][value="install"]');
-    installButton.update("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRepairLabel'))".escapeHTML());
-    installButton.title = "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRepairHint'))";
-    installButton.value = 'repairXAR';
-    installButton.activate();
-    // Add the form token (for CSRF protection) to execute the job without confirmation (without a job plan).
-    installButton.insert({after: new Element('input', {
-      type: 'hidden',
-      name: 'form_token',
-      value: document.head.down('meta[name="form_token"]').readAttribute('content')
-    })});
-  },
-
-  _onPreviousUiExtensionStatusChanged : function(status) {
-    // The previous UI can have the status 'installed-invalid' if one of its dependencies are not met anymore.
-    if (status && status.startsWith('installed')) {
-      var form = $('previousUi');
-      // Remove the previous UI extension display.
-      form.next().remove();
-      // Display the default UI extension.
-      for (var next = form.next(); next; next = next.show().next());
-      // Refresh the display of the default UI extension so that we get the upgrade button.
-      var defaultUiExtension = form.next('.xform').previous().down('.extension-item');
-      defaultUiExtension && defaultUiExtension._extensionBehaviour.refresh({hideExtensionDetails: true});
     }
   }
 });
@@ -307,6 +130,183 @@ var WikisStep = Class.create(AbstractExtensionListStep, {
   }
 });
 
+var PreviousUIForm = Class.create({
+  initialize : function (form) {
+    this.form = form;
+    this.versionList = form.down('select.versions');
+    this.versionInput = form.down('input[name="previousUIVersion"]');
+    this.idInput = form.down('input[name="previousUIId"]');
+    this.recommendedUI = form.next('.recommendedUI').hide();
+    this.upgradeQuestion = form.previous('form.upgradeQuestion');
+
+    document.observe('xwiki:extension:statusChanged',
+      this._onPreviousUIExtensionStatusChanged.bindAsEventListener(this));
+
+    // Enhance the form actions.
+    form.down('.button').observe('click', this._resolvePreviousUIExtension.bindAsEventListener(this));
+    var secondaryButton = form.down('.button.secondary');
+    secondaryButton.up().removeClassName('hidden');
+    secondaryButton.observe('click', this._hidePreviousUIForm.bindAsEventListener(this));
+
+    // Simplify the way the previous UI is specified.
+    this.versionList && this._enhancePreviousUIInput();
+
+    // Enhance and show the upgrade question.
+    this.upgradeQuestion && this._enhanceUpgradeQuestion();
+  },
+
+  _enhancePreviousUIInput : function() {
+    // The element used to toggle advanced input.
+    var versionEditButton = new Element('input', {
+      type: 'image',
+      'class': 'icon',
+      src: '$xwiki.getSkinFile("icons/silk/pencil.png")',
+      alt: "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint'))",
+      title: "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIAdvancedInputHint'))"
+    });
+    var idEditButton = versionEditButton.cloneNode();
+    // Display the version list by default instead of the version input. Allow the users to enter a different version.
+    this.versionList.insert({'after': versionEditButton}).up('dd').removeClassName('hidden')
+      .addClassName('versionSelector').previous().removeClassName('hidden');
+    this.versionInput.up('dd').hide().previous().hide();
+    // Hide the id input and its hint by default because we auto-complete the id based on the selected version.
+    this.idInput.hide().up('dd').previous().down('.xHint').hide();
+    // Display a pencil next to the id value to let the user change it.
+    this.idInput.insert({after: idEditButton}).insert({after: new Element('span')});
+    // Hide the id label and value by default. Display it when the user selects a version.
+    this.idInput.up('dd').hide().previous().hide();
+    this.versionList.observe('change', this._onSelectPreviousUIVersion.bind(this));
+    // Allow advanced input.
+    versionEditButton.observe('click', this._switchToAdvancedPreviousUIInput.bindAsEventListener(this));
+    idEditButton.observe('click', this._switchToAdvancedPreviousUIInput.bindAsEventListener(this));
+  },
+
+  _enhanceUpgradeQuestion : function() {
+    this.upgradeQuestion.removeClassName('hidden').down('.button').observe('click', function(event) {
+      event.stop();
+      this.upgradeQuestion.hide();
+      // Make sure the form is enabled because the browser can cache the state of the form fields (see XWIKI-9717).
+      this.form.enable().show().focusFirstElement();
+    }.bindAsEventListener(this)).activate();
+    this.upgradeQuestion.down('.button.secondary').observe('click', this._hidePreviousUIForm.bindAsEventListener(this));
+    // Hide the form.
+    this.form.hide()
+  },
+
+  _onSelectPreviousUIVersion : function() {
+    var selectedVersion = this.versionList.options[this.versionList.selectedIndex];
+    // Fill the version input with the selected value in case the user decides to modify it.
+    this.versionInput.value = selectedVersion.value;
+    // Show the extension id that corresponds to the selected version.
+    this.idInput.next().update(selectedVersion.title).up('dd').show().previous().show();
+    // Fill the id input with the extension id that corresponds to the selected version.
+    this.idInput.value = selectedVersion.title;
+  },
+
+  _switchToAdvancedPreviousUIInput : function(event) {
+    event.stop();
+    // Hide the version list and its edit button.
+    this.versionList.up('dd').hide().previous().hide();
+    // Make sure the id and its edit button are hidden.
+    this.idInput.next().hide().next().hide();
+    // Show the version input and its hint.
+    this.versionInput.up('dd').show().previous().show();
+    // Show the id input and its hint.
+    this.idInput.show().up('dd').show().previous().show().down('.xHint').show();
+    // Focus the right input depending on which edit button was clicked.
+    event.element().previous() == this.versionList ? this.versionInput.activate() : this.idInput.activate();
+  },
+
+  _hidePreviousUIForm : function(event) {
+    event && event.stop();
+    this.form.hide();
+    this.upgradeQuestion && this.upgradeQuestion.hide();
+    this.recommendedUI.show();
+  },
+
+  _resolvePreviousUIExtension : function(event) {
+    event.stop();
+    var formData = this.form.serialize(true);
+    new Ajax.Request(this.form.action, {
+      parameters: {
+        extensionId: formData.previousUIId,
+        extensionVersion: formData.previousUIVersion,
+        extensionNamespace: 'wiki:' + formData.wiki,
+        hideExtensionDetails: true
+      },
+      onCreate: function() {
+        this.form.disable();
+        // Remove the message corresponding to a failed search.
+        var message = this.form.down('.buttons').next();
+        message && message.remove();
+      }.bind(this),
+      onSuccess: function(response) {
+        var container = new Element('div').update(response.responseText);
+        var previousUIExtension = container.down('.extension-item');
+        if (previousUIExtension) {
+          if (previousUIExtension.down('button[name="extensionAction"][value="install"]')) {
+            // The specified previous UI is not installed. We have to update the extension index.
+            this.previousUIExtensionId = {
+              id: formData.previousUIId,
+              version: formData.previousUIVersion
+            };
+            this._displayPreviousUIExtension(previousUIExtension);
+          } else {
+            // The specified previous UI is probably already installed. Just show the recommended UI.
+            this._hidePreviousUIForm();
+          }
+        } else {
+          // Display the received message.
+          this.form.enable().insert(container);
+        }
+      }.bind(this),
+      on0: function(response) {
+        response.request.options.onFailure(response);
+      },
+      onFailure: function() {
+        this.form.enable();
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRequestFailed'))", 'error');
+      }.bind(this)
+    });
+  },
+
+  _displayPreviousUIExtension : function(previousUIExtension) {
+    var hint = new Element('div', {'class': 'xHint'}).update("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIHint'))".escapeHTML());
+    var container = new Element('div').insert(hint).insert(previousUIExtension);
+    this.form.hide().insert({after: container});
+    // Enhance the extension display.
+    document.fire('xwiki:dom:updated', {elements: [container]});
+    // Hack the install button to perform a fake install (only mark the extension as installed).
+    var installButton = previousUIExtension.down('button[name="extensionAction"][value="install"]');
+    installButton.update("$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRepairLabel'))".escapeHTML());
+    installButton.title = "$escapetool.javascript($services.localization.render('platform.extension.distributionWizard.uiStepPreviousUIRepairHint'))";
+    installButton.value = 'repairXAR';
+    installButton.activate();
+    // Add the form token (for CSRF protection) to execute the job without confirmation (without a job plan).
+    installButton.insert({after: new Element('input', {
+      type: 'hidden',
+      name: 'form_token',
+      value: document.head.down('meta[name="form_token"]').readAttribute('content')
+    })});
+  },
+
+  _onPreviousUIExtensionStatusChanged : function(event) {
+    var extension = event.memo.extension;
+    var status = extension.getStatus();
+    // The previous UI can have the status 'installed-invalid' if one of its dependencies are not met anymore.
+    if (this.previousUIExtensionId && extension.getId() == this.previousUIExtensionId.id
+        && extension.getVersion() == this.previousUIExtensionId.version && status && status.startsWith('installed')) {
+      // Remove the previous UI extension display.
+      this.form.next().remove();
+      // Display the default UI extension.
+      for (var next = this.form.next(); next; next = next.show().next());
+      // Refresh the display of the recommended UI extension so that we get the upgrade button.
+      var recommendedUIExtension = this.recommendedUI.down('.extension-item');
+      recommendedUIExtension && recommendedUIExtension._extensionBehaviour.refresh({hideExtensionDetails: true});
+    }
+  }
+});
+
 function init() {
   // Make sure the users don't cancel the wizard by mistake.
   var cancelButton = $('body').down('#stepButtons button[value=CANCEL]');
@@ -316,24 +316,31 @@ function init() {
     }
   });
 
+  // Enhance the form that repairs the previous UI.
+  $('body').select('form.previousUI').each(function(previousUIForm) {
+    new PreviousUIForm(previousUIForm);
+  });
+
+  // Enhance the tree of documents.
+  $('body').select('.expandable .parent').each(function(parent) {
+    var toggle = function() {
+      parent.toggleClassName("collapsed");
+      parent.next().toggle();
+    };
+    parent.observe('click', toggle);
+    // The tree is initially collapsed.
+    toggle();
+  });
+
   $('extension.defaultui') && new XWiki.DefaultUIStep();
   $('extension.defaultui.wikis') && new WikisStep();
   $('extension.outdatedextensions') && new XWiki.OutdatedExtensionsStep();
+
   return true;
 }
 
 // When the document is loaded, trigger the enhancements.
 (XWiki.domIsLoaded && init()) || document.observe("xwiki:dom:loaded", init);
-
-$('body').select('.expandable .parent').each(function(parent) {
-	parent.toggleClassName("collapsed");
-	parent.next().toggle();
-	parent.observe('click', function(event) {
-		parent.toggleClassName("collapsed");
-		parent.next().toggle();
-	  });
-	});
-
 
 // End XWiki augmentation.
 return XWiki;

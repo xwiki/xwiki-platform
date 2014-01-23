@@ -5,6 +5,7 @@
 ## register the Velocity macros from the parsed template. The only solution we found is to use #evaluate with #include
 ## but unfortunately this doesn't allow the template to be overridden from the skin.
 #evaluate("#include('extension.vm')")
+#evaluate("#include('distribution/macros.vm')")
 {{/velocity}}
 
 {{velocity}}
@@ -24,15 +25,18 @@
       #set ($extensionNamespace = "wiki:$wikiName")
       <dt>#displayExtensionNamespace($extensionNamespace)</dt>
       <dd>
-        #if ($extension)
-          #displayExtension($extension)
-        #else
-          <div class="box infomessage">
-            $services.localization.render('extensions.advancedSearch.noResults',
-            ["<strong>$!escapetool.xml($extensionId.id)</strong>",
-            "<strong>$!escapetool.xml($extensionId.version)</strong>"])
-          </div>
-        #end
+        #maybeRepairPreviousUI($wikiName $extension)
+        <div class="recommendedUI">
+          #if ($extension)
+            #displayExtension($extension)
+          #else
+            <div class="box infomessage">
+              $services.localization.render('extensions.advancedSearch.noResults',
+              ["<strong>$!escapetool.xml($extensionId.id)</strong>",
+              "<strong>$!escapetool.xml($extensionId.version)</strong>"])
+            </div>
+          #end
+        </div>
       </dd>
     #end
   #end

@@ -135,8 +135,18 @@ public class DistributionScriptService implements ScriptService
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.isMainWiki() ? this.distributionManager.getFarmDistributionState() : this.distributionManager
-            .getWikiDistributionState(xcontext.getDatabase());
+        return getState(xcontext.getDatabase());
+    }
+
+    /**
+     * @return the current distribution state
+     */
+    public DistributionState getState(String wiki)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki(wiki) ? this.distributionManager.getFarmDistributionState() : this.distributionManager
+            .getWikiDistributionState(wiki);
     }
 
     /**

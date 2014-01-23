@@ -955,7 +955,12 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (repairXarExtension $extensionId $extensionVersion)
-  #set ($discard = $services.extension.xar.repairInstalledExtension($extensionId, $extensionVersion, $xcontext.database))
+  #if ($extensionNamespace.startsWith('wiki:'))
+    #set ($wikiName = $extensionNamespace.substring(5))
+  #else
+    #set ($wikiName = $xcontext.database)
+  #end
+  #set ($discard = $services.extension.xar.repairInstalledExtension($extensionId, $extensionVersion, $wikiName))
   #handleExtensionJobStartFailure('extensions.install.error.repairXarFailure' $services.extension.xar)
 #end
 

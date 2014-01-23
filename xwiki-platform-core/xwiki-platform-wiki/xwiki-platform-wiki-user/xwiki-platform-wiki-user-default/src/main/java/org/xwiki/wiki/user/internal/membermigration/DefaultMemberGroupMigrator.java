@@ -20,6 +20,7 @@
 package org.xwiki.wiki.user.internal.membermigration;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -31,8 +32,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.user.WikiUserManager;
-import org.xwiki.wiki.user.WikiUserManagerException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -56,11 +55,10 @@ public class DefaultMemberGroupMigrator implements MemberGroupMigrator
 
     private static final String ALL_GROUP_PAGE_NAME = "XWikiAllGroup";
 
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    private static final String GLOBAL_MEMBER_GROUP_PAGE_NAME = "XWikiGlobalMemberGroup";
 
     @Inject
-    private WikiUserManager wikiUserManager;
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
@@ -76,24 +74,38 @@ public class DefaultMemberGroupMigrator implements MemberGroupMigrator
     {
         DocumentReference allGroupDocRef = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE,
                 ALL_GROUP_PAGE_NAME);
+        DocumentReference globalMemberGroupDocRef = new DocumentReference(wikiId, XWiki.SYSTEM_SPACE,
+                GLOBAL_MEMBER_GROUP_PAGE_NAME);
         try {
-            List<String> users = getAllGlobalUsersFromAllGroup(allGroupDocRef, wikiId);
-            wikiUserManager.addMembers(users, wikiId);
+            List<String> usersToAdd = getAllGlobalUsersFromGroup(allGroupDocRef, wikiId);
+            List<String> existingUsers = getAllGlobalUsersFromGroup(globalMemberGroupDocRef, wikiId);
+
+            // Remove from the users list whose who are already there
+            Iterator<String> iterator = usersToAdd.iterator();
+            while (iterator.hasNext()) {
+                String user = iterator.next();
+                if (existingUsers.contains(user)) {
+                    iterator.remove();
+                }
+            }
+
+            // Add the users to the GlobalMemberGroup
+            addMembersToGroup(usersToAdd, globalMemberGroupDocRef, wikiId);
+
+            // Remove global users from XWikiAllGroup
             removeGlobalUsersFromAllGroup(allGroupDocRef, wikiId);
-        } catch (WikiUserManagerException e) {
-            throw new DataMigrationException(String.format("Failed to create the member list of wiki [%s].",
-                    wikiId), e);
         } catch (XWikiException e) {
-            throw new DataMigrationException(String.format("Failed to get or save the XWiki.XWikiAllGroup document"
-                    + " in the wiki [%s].", wikiId), e);
+            throw new DataMigrationException(String.format("Failed to migrate groups in the wiki [%s].", wikiId), e);
         }
 
     }
 
     /**
-     * @return the list of global users contained in XWikiAllGroup
+     * @param groupDocRef reference of the group
+     * @param wikiId id of the wiki of the group
+     * @return the list of global users contained in the group
      */
-    private List<String> getAllGlobalUsersFromAllGroup(DocumentReference allGroupDocRef, String currentWiki)
+    private List<String> getAllGlobalUsersFromGroup(DocumentReference groupDocRef, String wikiId)
         throws XWikiException
     {
         // The result list to return
@@ -104,14 +116,14 @@ public class DefaultMemberGroupMigrator implements MemberGroupMigrator
         XWiki xwiki = xcontext.getWiki();
 
         // Get the XWikiAllGroup document
-        XWikiDocument allGroupDoc = xwiki.getDocument(allGroupDocRef, xcontext);
+        XWikiDocument allGroupDoc = xwiki.getDocument(groupDocRef, xcontext);
 
         // Reference to the current wiki
-        WikiReference wikiReference = new WikiReference(currentWiki);
+        WikiReference wikiReference = new WikiReference(wikiId);
 
         // Get the group objects
         DocumentReference classReference =
-                new DocumentReference(currentWiki, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
+                new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
         List<BaseObject> memberObjects = allGroupDoc.getXObjects(classReference);
         if (memberObjects != null) {
             // For each member object
@@ -130,6 +142,43 @@ public class DefaultMemberGroupMigrator implements MemberGroupMigrator
         }
 
         return members;
+    }
+
+    /**
+     * Add the specified members in the GlobalMemberGroup.
+     * @param members members to add
+     * @param groupReference reference of the group
+     * @param wikiId id of the document where the migration occurs
+     * @throws XWikiException if problem occurs
+     */
+    private void addMembersToGroup(List<String> members, DocumentReference groupReference, String wikiId)
+        throws XWikiException
+    {
+        // Get XWiki objects
+        XWikiContext xcontext = xcontextProvider.get();
+        XWiki xwiki = xcontext.getWiki();
+
+        // Get the document
+        XWikiDocument groupDoc = xwiki.getDocument(groupReference, xcontext);
+
+        // If the group does not contain any user yet, add an empty member (cf: XWIKI-6275).
+        DocumentReference classReference =
+                new DocumentReference(wikiId, XWiki.SYSTEM_SPACE, GROUP_CLASS_NAME);
+        List<BaseObject> existingObjects = groupDoc.getXObjects(classReference);
+        if (existingObjects == null || existingObjects.isEmpty()) {
+            BaseObject newObject = groupDoc.newXObject(classReference, xcontext);
+            newObject.setStringValue(GROUP_CLASS_MEMBER_FIELD, "");
+        }
+
+        // Add the members
+        for (String member : members) {
+            BaseObject newObject = groupDoc.newXObject(classReference, xcontext);
+            newObject.setStringValue(GROUP_CLASS_MEMBER_FIELD, member);
+        }
+
+        // Save the document
+        xwiki.saveDocument(groupDoc, "[UPGRADE] Add all global users who are members of this wiki in this group.",
+                xcontext);
     }
 
     private void removeGlobalUsersFromAllGroup(DocumentReference allGroupDocRef, String currentWiki)

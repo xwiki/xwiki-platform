@@ -32,9 +32,8 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 
 /**
- * Component that create a XWiki.XWikiMemberGroup for subwikis initialized with the list of current users (located in
- * XWiki.XWikiAllGroup). It also update rights given to XWikiAllGroup to occurs on XWikiMemberGroup and move candidacies
- * to XWiki.XWikiMemberGroup.
+ * Component that create a XWiki.XWikiGlobalMemberGroup for subwikis, initialized with the list of current global users
+ * (located in XWiki.XWikiAllGroup), only when xwiki.authentication.group.allgroupimplicit  == 2.
  *
  * @since 5.4RC1
  * @version $Id$
@@ -45,12 +44,6 @@ public class MembersMigration extends AbstractHibernateDataMigration
 {
     @Inject
     private MemberGroupMigrator memberGroupMigrator;
-
-    @Inject
-    private MemberRightsMigrator memberRightsMigrator;
-
-    @Inject
-    private MemberCandidaciesMigrator memberCandidaciesMigrator;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
@@ -73,8 +66,9 @@ public class MembersMigration extends AbstractHibernateDataMigration
     @Override
     public boolean shouldExecute(XWikiDBVersion startupVersion)
     {
-        // We migrate only subwikis
-        return !wikiDescriptorManager.getCurrentWikiId().equals(wikiDescriptorManager.getMainWikiId());
+        // We migrate only subwikis and if allgroupimplicit == 2
+        return !wikiDescriptorManager.getCurrentWikiId().equals(wikiDescriptorManager.getMainWikiId())
+                && getAllGroupImplicitParam() == 2;
     }
 
     @Override
@@ -82,7 +76,10 @@ public class MembersMigration extends AbstractHibernateDataMigration
     {
         String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
         memberGroupMigrator.migrateGroups(currentWikiId);
-        memberRightsMigrator.upgradeRights(currentWikiId);
-        memberCandidaciesMigrator.migrateCandidacies(currentWikiId);
+    }
+
+    private long getAllGroupImplicitParam()
+    {
+        return getXWikiContext().getWiki().ParamAsLong("xwiki.authentication.group.allgroupimplicit", 0);
     }
 }

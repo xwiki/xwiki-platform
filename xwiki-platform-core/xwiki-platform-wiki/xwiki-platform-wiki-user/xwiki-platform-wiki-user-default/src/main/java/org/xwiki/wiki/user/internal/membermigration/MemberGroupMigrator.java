@@ -24,8 +24,8 @@ import org.xwiki.component.annotation.Role;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 
 /**
- * Migrator to create a valid XWiki.XWikiMemberGroup from the existing XWiki.XWikiAllGroup, and remove glocal users from
- * XWiki.XWikiALlGroup.
+ * Migrator to create a valid XWiki.XWikiGLobalMemberGroup from the existing XWiki.XWikiAllGroup,
+ * and remove glocal users from XWiki.XWikiAllGroup.
  *
  * @version $Id$
  * @since 5.4RC1

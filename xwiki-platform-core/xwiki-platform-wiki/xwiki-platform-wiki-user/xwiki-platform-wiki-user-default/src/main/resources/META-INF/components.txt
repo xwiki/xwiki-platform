@@ -5,5 +5,3 @@ org.xwiki.wiki.user.internal.WikiUserFromXEMMigration
 org.xwiki.wiki.user.internal.WikiCandidateMemberClassInitializer
 org.xwiki.wiki.user.internal.membermigration.MembersMigration
 org.xwiki.wiki.user.internal.membermigration.DefaultMemberGroupMigrator
-org.xwiki.wiki.user.internal.membermigration.DefaultMemberRightsMigrator
-org.xwiki.wiki.user.internal.membermigration.DefaultMemberCandidaciesMigrator

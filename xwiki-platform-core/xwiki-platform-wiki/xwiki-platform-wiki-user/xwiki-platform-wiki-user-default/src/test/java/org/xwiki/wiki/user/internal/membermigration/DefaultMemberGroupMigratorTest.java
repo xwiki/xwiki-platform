@@ -34,8 +34,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.user.WikiUserManager;
-import org.xwiki.wiki.user.WikiUserManagerException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -48,7 +46,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -68,8 +65,6 @@ public class DefaultMemberGroupMigratorTest
 
     private WikiDescriptorManager wikiDescriptorManager;
 
-    private WikiUserManager wikiUserManager;
-
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     private Provider<XWikiContext> xcontextProvider;
@@ -82,7 +77,6 @@ public class DefaultMemberGroupMigratorTest
     public void setUp() throws Exception
     {
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        wikiUserManager = mocker.getInstance(WikiUserManager.class);
         documentReferenceResolver = mocker.getInstance(new DefaultParameterizedType(null,
                 DocumentReferenceResolver.class, String.class));
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
@@ -137,27 +131,41 @@ public class DefaultMemberGroupMigratorTest
         when(documentReferenceResolver.resolve(eq(userGlobal2), eq(wikiReference))).thenReturn(userGlobalRef2);
 
         DocumentReference allGroupRef = new DocumentReference("subwiki", "XWiki", "XWikiAllGroup");
-        DocumentReference memberGroupRef = new DocumentReference("subwiki", "XWiki", "XWikiMemberGroup");
+        DocumentReference memberGroupRef = new DocumentReference("subwiki", "XWiki", "XWikiGlobalMemberGroup");
 
         XWikiDocument allGroupDoc = mock(XWikiDocument.class);
         XWikiDocument memberGroupDoc = mock(XWikiDocument.class);
 
-        when(xwiki.getDocument(allGroupRef, xcontext)).thenReturn(allGroupDoc);
-        when(xwiki.getDocument(memberGroupRef, xcontext)).thenReturn(memberGroupDoc);
+        when(xwiki.getDocument(eq(allGroupRef), any(XWikiContext.class))).thenReturn(allGroupDoc);
+        when(xwiki.getDocument(eq(memberGroupRef), any(XWikiContext.class))).thenReturn(memberGroupDoc);
 
         DocumentReference memberClass = new DocumentReference("subwiki", "XWiki", "XWikiGroups");
         when(allGroupDoc.getXObjects(eq(memberClass))).thenReturn(membersOfAllGroup);
+
+        // User Global 2 is already a member of GlobalMemberGroup;
+        List<BaseObject> membersOfGlobalMemberGroup = new ArrayList<BaseObject>();
+        membersOfGlobalMemberGroup.add(member4);
+        when(memberGroupDoc.getXObjects(eq(memberClass))).thenReturn(membersOfGlobalMemberGroup);
+
+        BaseObject newObject = mock(BaseObject.class);
+        when(memberGroupDoc.newXObject(eq(memberClass), any(XWikiContext.class))).thenReturn(newObject);
 
         // Test
         mocker.getComponentUnderTest().migrateGroups("subwiki");
 
         // Verify
-        List<String> expectedMembers = new ArrayList<String>();
-        expectedMembers.add(userGlobal1);
-        expectedMembers.add(userGlobal2);
 
-        // Only global users has been added in the member list
-        verify(wikiUserManager).addMembers(eq(expectedMembers), eq("subwiki"));
+        // The user GlobalUser1 has been added
+        verify(newObject).setStringValue(eq("member"), eq(userGlobal1));
+        // The user GlobalUser2 has not been added becaise it was already there
+        verify(newObject, never()).setStringValue(eq("member"), eq(userGlobal2));
+        // The local users has not been added
+        verify(newObject, never()).setStringValue(eq("member"), eq(userLocal1));
+        verify(newObject, never()).setStringValue(eq("member"), eq(userLocal2));
+        // The document has been saved
+        verify(xwiki).saveDocument(memberGroupDoc, "[UPGRADE] Add all global users who are members "
+                + "of this wiki in this group.", xcontext);
+
         // Ony Global users have been removed from XWikiAllGroup
         verify(allGroupDoc).removeXObject(member3);
         verify(allGroupDoc).removeXObject(member4);
@@ -181,38 +189,9 @@ public class DefaultMemberGroupMigratorTest
             mocker.getComponentUnderTest().migrateGroups("subwiki");
         } catch (DataMigrationException e) {
             exceptionCaught = true;
-            assertEquals("Failed to get or save the XWiki.XWikiAllGroup document in the wiki [subwiki].",
-                    e.getMessage());
+            assertEquals("Failed to migrate groups in the wiki [subwiki].", e.getMessage());
         }
 
         assertTrue(exceptionCaught);
     }
-
-    @Test
-    public void migrateGroupsWikiUserException() throws Exception
-    {
-        DocumentReference allGroupRef = new DocumentReference("subwiki", "XWiki", "XWikiAllGroup");
-        DocumentReference memberGroupRef = new DocumentReference("subwiki", "XWiki", "XWikiMemberGroup");
-
-        XWikiDocument allGroupDoc = mock(XWikiDocument.class);
-        XWikiDocument memberGroupDoc = mock(XWikiDocument.class);
-
-        when(xwiki.getDocument(allGroupRef, xcontext)).thenReturn(allGroupDoc);
-        when(xwiki.getDocument(memberGroupRef, xcontext)).thenReturn(memberGroupDoc);
-
-        Exception exception = new WikiUserManagerException("error in addMembers");
-        doThrow(exception).when(wikiUserManager).addMembers(any(List.class), eq("subwiki"));
-
-        // Test
-        boolean exceptionCaught = false;
-        try {
-            mocker.getComponentUnderTest().migrateGroups("subwiki");
-        } catch (DataMigrationException e) {
-            exceptionCaught = true;
-            assertEquals("Failed to create the member list of wiki [subwiki].", e.getMessage());
-        }
-
-        assertTrue(exceptionCaught);
-    }
-
 }

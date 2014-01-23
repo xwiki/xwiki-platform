@@ -852,7 +852,18 @@ $xwiki.ssx.use('Main.Activity')##
   #set ($aWikisString = $xcontext.macro.params.get('wikis'))
   #asList('aWikis' $aWikisString)
   #if ($aWikis.size() == 0)
-    $aWikis.add($xcontext.database)
+	## if no wikis has been set and we are in the main wiki, then we should try to list every wikis where the user has view right
+    #if ("$!services.wiki" != '' &amp;&amp; $services.wiki.mainWikiId == $services.wiki.currentWikiId)
+      #set ($allWikis = $services.wiki.getAll())
+      #foreach ($wiki in $allWikis)
+        #if ($xwiki.checkAccess($wiki.mainPageReference, 'view'))
+          $aWikis.add($wiki.id)
+        #end
+      #end
+    #else
+      ## else, only check the current wiki
+      $aWikis.add($xcontext.database)
+    #end
   #end
 #end
 ## Spaces

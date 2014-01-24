@@ -147,6 +147,11 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
 
     private <T> T get(Type type, String key, FilterEventParameters parameters, T def)
     {
+        return get(type, key, parameters, def, true);
+    }
+
+    private <T> T get(Type type, String key, FilterEventParameters parameters, T def, boolean replaceNull)
+    {
         if (!parameters.containsKey(key)) {
             return def;
         }
@@ -154,7 +159,7 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
         Object value = parameters.get(key);
 
         if (value == null) {
-            return null;
+            return replaceNull ? def : null;
         }
 
         if (TypeUtils.isInstance(value, type)) {
@@ -352,8 +357,6 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
         throws WikiStreamException
     {
         XWikiAttachment attachment = new XWikiAttachment(this.document, name);
-
-        attachment.setAuthor("");
 
         try {
             attachment.setContent(content);

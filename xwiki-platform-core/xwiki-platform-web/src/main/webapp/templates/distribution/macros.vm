@@ -148,8 +148,8 @@
       #set ($installedExtensionCount = $services.extension.installed.getInstalledExtensions("wiki:$wiki").size())
       ## Check how many documents that are not XClasses are in the database (a number of XClasses are created
       ## automatically at startup when the database is empty and we don't want to take them into account).
-      #set ($documentCount = $services.query.xwql("where doc.xWikiClassXML = ''").setWiki($wiki).addFilter(
-        'unique').addFilter('count').execute().get(0))
+      #set ($documentCount = $services.query.xwql("where doc.xWikiClassXML is null or doc.xWikiClassXML not like '<%'"
+        ).setWiki($wiki).addFilter('unique').addFilter('count').execute().get(0))
       ## Unfortunately there are still 3 documents that are not XClasses and which are created automatically (Watchlist
       ## notifiers) and we want to exclude them also.
       #if ($installedExtensionCount > 0 || $documentCount > 3)

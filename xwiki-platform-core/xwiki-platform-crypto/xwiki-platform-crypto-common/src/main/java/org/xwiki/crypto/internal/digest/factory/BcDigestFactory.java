@@ -23,7 +23,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xwiki.crypto.DigestFactory;
 
 /**
- * Please comment here
+ * Bouncy Castle based Digest common interface.
  *
  * @version $Id$
  */

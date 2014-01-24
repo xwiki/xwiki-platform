@@ -11,7 +11,7 @@
   #if ($request.document)
     #set($actionDocumentReference = $services.model.resolveDocument($request.document))
     #set($actionDocumentLocale = $services.localization.toLocale($!request.document_locale))
-    #set($actionDocumentReference = $services.model.createDocumentReference($actionDocumentReference, $actionDocumentLocale);
+    #set($actionDocumentReference = $services.model.createDocumentReference($actionDocumentReference, $actionDocumentLocale))
     #set($actionDocument = $xwiki.getDocument($actionDocumentReference))
     #if ($request.get('documentaction_delete.x'))
       #if (!$actionDocument.isNew())

@@ -24,7 +24,6 @@ import javax.inject.Named;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.crypto.Digest;
-import org.xwiki.crypto.DigestFactory;
 import org.xwiki.crypto.internal.digest.BouncyCastleDigest;
 import org.xwiki.crypto.params.DigestParameters;
 
@@ -34,13 +33,8 @@ import org.xwiki.crypto.params.DigestParameters;
  * @version $Id$
  * @since 5.4M1
  */
-public abstract class AbstractBcDigestFactory implements DigestFactory
+public abstract class AbstractBcDigestFactory implements BcDigestFactory
 {
-    /**
-     * @return a new cipher engine instance.
-     */
-    public abstract org.bouncycastle.crypto.Digest getDigestInstance();
-
     @Override
     public String getDigestAlgorithmName()
     {
@@ -63,11 +57,6 @@ public abstract class AbstractBcDigestFactory implements DigestFactory
     {
         return getDigestInstance().getDigestSize();
     }
-
-    /**
-     * @return the algorithm identifier of digest produced by this factory.
-     */
-    public abstract AlgorithmIdentifier getAlgorithmIdentifier();
 
     @Override
     public Digest getInstance()

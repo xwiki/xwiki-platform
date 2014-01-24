@@ -35,6 +35,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.crypto.DigestFactory;
 import org.xwiki.crypto.internal.digest.factory.AbstractBcDigestFactory;
+import org.xwiki.crypto.internal.digest.factory.BcDigestFactory;
 import org.xwiki.crypto.password.KeyDerivationFunction;
 import org.xwiki.crypto.password.internal.kdf.AbstractBcPBKDF2;
 import org.xwiki.crypto.password.internal.kdf.PBKDF2Params;
@@ -77,24 +78,17 @@ public class BcPKCS5S2KeyDerivationFunctionFactory extends AbstractBcKDFFactory
 
         PBKDF2Parameters kdfParams = (PBKDF2Parameters) params;
         PKCS5S2ParametersGenerator generator;
-        DigestFactory factory = null;
+        BcDigestFactory factory = null;
         if (kdfParams.getPseudoRandomFuntionHint() != null) {
-            factory = getFactory(kdfParams.getPseudoRandomFuntionHint());
-
-            if (!(factory instanceof AbstractBcDigestFactory)) {
-                throw new IllegalArgumentException(
-                    "Requested digest algorithm is not implemented by a factory compatible with this factory."
-                        + " Factory found: " + factory.getClass().getName());
-            }
-            generator =
-                new PKCS5S2ParametersGenerator(((AbstractBcDigestFactory) factory).getDigestInstance());
+            factory = this.getDigestFactory(kdfParams.getPseudoRandomFuntionHint());
+            generator = new PKCS5S2ParametersGenerator(factory.getDigestInstance());
         } else {
             generator = new PKCS5S2ParametersGenerator();
         }
 
         return new AbstractBcPBKDF2(generator, (PBKDF2Parameters) params,
                         (factory != null)
-                            ? toHmacAlgId(((AbstractBcDigestFactory) factory).getAlgorithmIdentifier())
+                            ? toHmacAlgId(factory.getAlgorithmIdentifier())
                             : HMAC_SHA1) {
             @Override
             public KeyDerivationFunc getKeyDerivationFunction()
@@ -133,12 +127,20 @@ public class BcPKCS5S2KeyDerivationFunctionFactory extends AbstractBcKDFFactory
         );
     }
 
-    private DigestFactory getFactory(String hint)
+    private BcDigestFactory getDigestFactory(String hint)
     {
         try {
-            return manager.getInstance(DigestFactory.class, hint);
+            DigestFactory factory = manager.getInstance(DigestFactory.class, hint);
+
+            if (!(factory instanceof BcDigestFactory)) {
+                throw new IllegalArgumentException(
+                    "Requested digest algorithm is not implemented by a factory compatible with this factory."
+                        + " Factory found: " + factory.getClass().getName());
+            }
+
+            return (AbstractBcDigestFactory) factory;
         } catch (ComponentLookupException e) {
-            throw new UnsupportedOperationException("Digest algorithm not found.", e);
+            throw new UnsupportedOperationException("Digest algorithm not found: " + hint, e);
         }
     }
 

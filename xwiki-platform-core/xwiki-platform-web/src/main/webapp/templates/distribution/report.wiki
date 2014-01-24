@@ -10,6 +10,8 @@
 {{velocity}}
   #if ($request.document)
     #set($actionDocumentReference = $services.model.resolveDocument($request.document))
+    #set($actionDocumentLocale = $services.localization.toLocale($!request.document_locale))
+    #set($actionDocumentReference = $actionDocumentReference, $actionDocumentLocale);
     #set($actionDocument = $xwiki.getDocument($actionDocumentReference))
     #if ($request.get('documentaction_delete.x'))
       #if (!$actionDocument.isNew())
@@ -40,8 +42,9 @@
 
   #macro(displayReportPageActions, $status)
       ## TODO: use ajax instead if JS is enabled
-      <form class="documentactions" method="get">
+      <form class="documentactions" method="post">
       <input type="hidden" name="document" value="$services.model.serialize($status.reference)"/>
+      <input type="hidden" name="document_locale" value="$!{status.reference.locale}"/>
       #if ($status.previousVersion)
         <input type="hidden" name="previousVersion" value="$services.model.serialize($status.previousVersion)"/>
       #end

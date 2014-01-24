@@ -44,7 +44,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
-@ComponentList({Base64BinaryStringEncoder.class, BcRSAKeyFactory.class, DefaultSecureRandomProvider.class})
+@ComponentList({Base64BinaryStringEncoder.class, DefaultSecureRandomProvider.class})
 public class BcRSAKeyFactoryTest
 {
     private static final String PRIVATE_KEY = "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDCmjim/3likJ4"

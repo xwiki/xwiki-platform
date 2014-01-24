@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -37,6 +38,27 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class EntityReferenceTreeNode
 {
+    /**
+     * USed to order {@link Locale}s.
+     * 
+     * @version $Id$
+     */
+    static final class LocaleComparator implements Comparator<Locale>
+    {
+        static final LocaleComparator INSTANCE = new LocaleComparator();
+
+        private LocaleComparator()
+        {
+            // Stateless
+        }
+
+        @Override
+        public int compare(Locale locale1, Locale locale2)
+        {
+            return locale1.toString().compareTo(locale2.toString());
+        }
+    }
+
     private final EntityReference reference;
 
     private final int referenceSize;
@@ -44,6 +66,8 @@ public class EntityReferenceTreeNode
     private final Comparator<String> comparator;
 
     private Map<String, EntityReferenceTreeNode> children;
+
+    private Map<Locale, EntityReference> locales;
 
     protected EntityReferenceTreeNode(Comparator<String> comparator)
     {
@@ -77,7 +101,20 @@ public class EntityReferenceTreeNode
             childNode.addChild(childReference);
         }
 
+        if (childNodeReference.getParameter(DocumentReference.LOCALE) != null) {
+            childNode.addLocale(childReference);
+        }
+
         this.children.put(childNode.getReference().getName(), childNode);
+    }
+
+    void addLocale(EntityReference childReference)
+    {
+        if (this.locales == null) {
+            this.locales = new TreeMap<Locale, EntityReference>(LocaleComparator.INSTANCE);
+        }
+
+        this.locales.put((Locale) childReference.getParameter(DocumentReference.LOCALE), childReference);
     }
 
     /**
@@ -103,6 +140,14 @@ public class EntityReferenceTreeNode
     public Collection<EntityReferenceTreeNode> getChildren()
     {
         return this.children != null ? this.children.values() : Collections.<EntityReferenceTreeNode> emptyList();
+    }
+
+    /**
+     * @return the child reference nodes
+     */
+    public Collection<EntityReference> getLocales()
+    {
+        return this.locales != null ? this.locales.values() : Collections.<EntityReference> emptyList();
     }
 
     @Override

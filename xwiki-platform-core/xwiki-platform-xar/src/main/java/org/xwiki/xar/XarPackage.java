@@ -41,6 +41,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.ObjectUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -140,11 +141,11 @@ public class XarPackage
 
     public void read(InputStream xarStream) throws IOException, XarException
     {
-        ZipArchiveInputStream zis = new ZipArchiveInputStream(xarStream);
+        ZipArchiveInputStream zis = new ZipArchiveInputStream(xarStream, "UTF-8", false);
 
         try {
             for (ZipArchiveEntry entry = zis.getNextZipEntry(); entry != null; entry = zis.getNextZipEntry()) {
-                if (!entry.isDirectory()) {
+                if (zis.canReadEntryData(entry)) {
                     readEntry(zis, entry);
                 }
             }
@@ -298,7 +299,8 @@ public class XarPackage
 
         Document doc;
         try {
-            doc = dBuilder.parse(stream);
+            // DocumentBuilder#parse close the passed stream which is not what we want
+            doc = dBuilder.parse(new CloseShieldInputStream(stream));
         } catch (SAXException e) {
             throw new XarException("Failed to parse XML document", e);
         }

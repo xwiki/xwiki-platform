@@ -24,7 +24,7 @@ $response.setContentType("application/x-json")
     #set($pageinfos = {
         "defaultAction" : $page.defaultAction.toString(),
         "language" : $page.locale.toString(),
-        "fullName" : $services.model.serialize($page, "local")
+        "fullName" : $services.model.serialize($page, 'local')
       })
 
     #set($pagesMap = $files.get($page.spaceName))

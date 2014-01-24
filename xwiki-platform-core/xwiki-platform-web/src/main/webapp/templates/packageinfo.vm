@@ -1,4 +1,4 @@
-$response.setContentType("application/x-json")
+##$response.setContentType("application/x-json")
 #if("$!request.document" == "")
  #set($packageDoc = $doc)
 #else 
@@ -7,8 +7,11 @@ $response.setContentType("application/x-json")
 #if("$!request.package" == "")
  #set($error = "No package name was given")
 #else
- #set($package = $packageDoc.getAttachment($request.package))
+ #set($attachment = $packageDoc.getAttachment($request.package))
  #if($package)
+  #set($package = $services.xar.getXarPackage($package))
+ 
+ 
   #set($packager = $xwiki.package)
   #set($ok = $packager.importPackageFromByteArray($package.content))
   $packager.toJSON()

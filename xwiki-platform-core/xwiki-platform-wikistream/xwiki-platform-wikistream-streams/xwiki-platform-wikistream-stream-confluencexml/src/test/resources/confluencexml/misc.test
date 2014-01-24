@@ -3,6 +3,7 @@
 .# XWIKI-9803 - test that CDATA sections are repaired properly
 .# XWIKI-9807 - attachments with several versions fail to load
 .# XWIKI-9817 - empty pages have no "bodyType" attribute
+.# XWIKI-9922 - When attachment author/creator is not provided parser send null author/creator
 .#------------------------------------------------------------------------------
 <wikiSpace name="Test XWIKI-9803">
   <wikiDocument name="WebHome">
@@ -206,20 +207,12 @@ AICAgCH5BAEAAA8AIf4WR0lGIFNtYXJ0U2F2ZXIgVmVyMS4xYQAsAAAAAAEAAQBABALwAQA7</conten
                 <string>image/gif</string>
               </entry>
               <entry>
-                <string>creation_author</string>
-                <null></null>
-              </entry>
-              <entry>
                 <string>creation_date</string>
                 <date>2013-12-12 12:38:37.720 UTC</date>
               </entry>
               <entry>
                 <string>revision</string>
                 <string>2</string>
-              </entry>
-              <entry>
-                <string>revision_author</string>
-                <null></null>
               </entry>
               <entry>
                 <string>revision_date</string>
@@ -242,20 +235,12 @@ AICAgCH5BAEAAA8AIf4WR0lGIFNtYXJ0U2F2ZXIgVmVyMS4xYQAsAAAAAAEAAQBABALwAQA7</conten
                 <string>image/gif</string>
               </entry>
               <entry>
-                <string>creation_author</string>
-                <null></null>
-              </entry>
-              <entry>
                 <string>creation_date</string>
                 <date>2013-12-12 12:30:04.989 UTC</date>
               </entry>
               <entry>
                 <string>revision</string>
                 <string>1</string>
-              </entry>
-              <entry>
-                <string>revision_author</string>
-                <null></null>
               </entry>
               <entry>
                 <string>revision_date</string>

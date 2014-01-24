@@ -989,7 +989,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     Integer number = (Integer) result[2];
 
                     // Do not try to convert broken records which would cause duplicated ids
-                    if (!statsName.startsWith(".") && !statsName.endsWith(".")) {
+                    if (statsName != null && !statsName.startsWith(".") && !statsName.endsWith(".")) {
                         long newId = R40000XWIKI6990DataMigration.this.statsIdComputer.getId(statsName, number);
 
                         if (oldId != newId) {

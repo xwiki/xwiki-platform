@@ -104,4 +104,23 @@ public class EntityReferenceTreeNode
     {
         return this.children != null ? this.children.values() : Collections.<EntityReferenceTreeNode> emptyList();
     }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder();
+
+        if (getReference() != null) {
+            builder.append(getReference());
+        }
+
+        if (!getChildren().isEmpty()) {
+            if (builder.length() > 0) {
+                builder.append(" = ");
+            }
+            builder.append(getChildren());
+        }
+
+        return builder.toString();
+    }
 }

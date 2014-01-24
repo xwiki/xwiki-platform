@@ -19,6 +19,7 @@
  */
 package org.xwiki.xar;
 
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.stability.Unstable;
 import org.xwiki.xar.internal.model.XarModel;
@@ -65,6 +66,16 @@ public class XarEntry extends LocalDocumentReference
     public int getDefaultAction()
     {
         return this.defaultAction;
+    }
+
+    public String getSpaceName()
+    {
+        return extractReference(EntityType.SPACE).getName();
+    }
+
+    public String getDocumentName()
+    {
+        return getName();
     }
 
     @Override

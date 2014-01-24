@@ -1,4 +1,4 @@
-##$response.setContentType("application/x-json")
+$response.setContentType("application/x-json")
 #if("$!request.document" == "")
  #set($packageDoc = $doc)
 #else 
@@ -8,13 +8,46 @@
  #set($error = "No package name was given")
 #else
  #set($attachment = $packageDoc.getAttachment($request.package))
- #if($package)
-  #set($package = $services.xar.getXarPackage($package))
- 
- 
-  #set($packager = $xwiki.package)
-  #set($ok = $packager.importPackageFromByteArray($package.content))
-  $packager.toJSON()
+ #if($attachment)
+  #set($package = $services.xar.getXarPackage($attachment.contentInputStream, true))
+  #set($infos = {
+      "name" : $package.packageName,
+      "description" : $package.packageDescription,
+      "licence" : $package.packageLicense,
+      "author" : $package.packageAuthor,
+      "version" : $package.packageVersion,
+      "backup" : $package.isPackageBackupPack()
+    })
+
+  #set($files = {})
+  #foreach($page in $package.entries)
+    #set($pageinfos = {
+        "defaultAction" : $page.defaultAction.toString(),
+        "language" : $page.locale.toString(),
+        "fullName" : $services.model.serialize($page, "local")
+      })
+
+    #set($pagesMap = $files.get($page.spaceName))
+    #if (!$pagesMap)
+      #set($pagesMap = {})
+      #set($void = $files.put($page.spaceName, $pagesMap))
+    #end
+
+    #set($localesMap = $pagesMap.get($page.documentName))
+    #if (!$localesMap)
+      #set($localesMap = [])
+      #set($void = $pagesMap.put($page.documentName, $localesMap))
+    #end
+
+    #set($void = $localesMap.add($pageinfos))
+  #end
+
+  #set($json = {
+      "infos" : $infos,
+      "files" : $files
+    })
+
+  $jsontool.serialize($json)
  #else
   #set($error = "Package not found")
  #end

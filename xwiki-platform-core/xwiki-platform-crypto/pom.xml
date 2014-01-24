@@ -49,5 +49,6 @@
     <module>xwiki-platform-crypto-cipher</module>
     <module>xwiki-platform-crypto-password</module>
     <module>xwiki-platform-crypto-script</module>
+    <module>xwiki-platform-crypto-signer</module>
   </modules>
 </project>

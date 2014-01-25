@@ -132,10 +132,8 @@
 #end
 
 #macro (maybeRepairPreviousUI $wiki $recommendedUIExtension)
-  #set ($discard = "#getExtensionJobStatus($recommendedUIExtension.id.id $recommendedUIExtension.id.version.value
-    $recommendedUIJobStatus)")
-  #set ($installedVersion = $services.extension.installed.getInstalledExtension($recommendedUIExtension.id.id,
-    "wiki:$wiki"))
+  #getExtensionJobStatus($recommendedUIExtension.id.id $recommendedUIExtension.id.version.value $recommendedUIJobStatus)
+  #getInstalledExtension($recommendedUIExtension "wiki:$wiki" $installedVersion)
   #if (!$installedVersion && (!$recommendedUIJobStatus || $recommendedUIJobStatus.state == 'FINISHED'))
     ## There is no previous version of the recommended UI installed on the specified wiki and there is no job running
     ## for the recommended UI either.

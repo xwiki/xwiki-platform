@@ -397,6 +397,7 @@
     <module>xwiki-platform-captcha</module>
     <module>xwiki-platform-chart</module>
     <module>xwiki-platform-classloader</module>
+    <module>xwiki-platform-classwizard</module>
     <module>xwiki-platform-colibri</module>
     <module>xwiki-platform-colorthemes</module>
     <module>xwiki-platform-component</module>

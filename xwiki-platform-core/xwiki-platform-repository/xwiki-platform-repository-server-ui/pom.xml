@@ -48,11 +48,17 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-scheduler-ui</artifactId>
       <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-classwizard-ui</artifactId>
+      <version>${platform.version}</version>
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>

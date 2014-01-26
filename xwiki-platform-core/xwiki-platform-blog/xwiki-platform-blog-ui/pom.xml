@@ -40,4 +40,13 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Blog Application</xwiki.extension.name>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-classwizard-ui</artifactId>
+      <version>${platform.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

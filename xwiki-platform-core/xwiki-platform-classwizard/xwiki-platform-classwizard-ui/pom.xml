@@ -26,26 +26,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-dashboard</artifactId>
+    <artifactId>xwiki-platform-classwizard</artifactId>
     <version>5.4-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-dashboard-ui</artifactId>
-  <name>XWiki Platform - Dashboard - UI</name>
+  <artifactId>xwiki-platform-classwizard-ui</artifactId>
+  <name>XWiki Platform - Class Wizard - UI</name>
   <packaging>xar</packaging>
-  <description>Dashboard Application</description>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Dashboard Application</xwiki.extension.name>
+    <xwiki.extension.name>Class Wizard Application</xwiki.extension.name>
   </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-classwizard-ui</artifactId>
-      <version>${platform.version}</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
 </project>

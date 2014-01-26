@@ -23,9 +23,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.environment.Environment;
@@ -52,6 +55,9 @@ import com.xpn.xwiki.web.XWikiResponse;
 @Deprecated
 public class GraphVizPlugin extends XWikiDefaultPlugin
 {
+    /** Detects HTML character references produced by the {@link com.xpn.xwiki.render.filter.EscapeFilter}. */
+    private static final Pattern HTML_ESCAPE_PATTERN = Pattern.compile("&#([0-9]++);");
+
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(com.xpn.xwiki.plugin.graphviz.GraphVizPlugin.class);
 
@@ -315,7 +321,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
     {
         File dfile = getTempFile(hashCode, "input.dot", dot);
         if (!dfile.exists()) {
-            FileUtils.write(dfile, content, XWiki.DEFAULT_ENCODING);
+            FileUtils.write(dfile, undoEscapeFilter(content), XWiki.DEFAULT_ENCODING);
         }
 
         File ofile = getTempFile(hashCode, extension, dot);
@@ -419,6 +425,36 @@ public class GraphVizPlugin extends XWikiDefaultPlugin
             } catch (InterruptedException ex) {
                 // Expected result if the dot process terminates on time
             }
+        }
+    }
+
+    /**
+     * When rendering using Radeox, {@link com.xpn.xwiki.render.filter.EscapeFilter} replaces all instances of
+     * {@code \\char} backslash escapes with a HTML character reference. Unfortunately this also happens for GraphViz
+     * content, which isn't right, since some backslash escapes are valid GraphViz syntax. This method undoes this kind
+     * of escaping to preserve node and edge label formatting, if the character reference is an ASCII character.
+     *
+     * @param escapedContent the macro content, already filtered by Radeox and possibly containing broken backslash
+     *        escapes
+     * @return the content with HTML character references replaced with backslash escapes
+     */
+    private String undoEscapeFilter(String escapedContent)
+    {
+        if (StringUtils.isNotEmpty(escapedContent)) {
+            Matcher matcher = HTML_ESCAPE_PATTERN.matcher(escapedContent);
+            StringBuffer result = new StringBuffer(escapedContent.length());
+            while (matcher.find()) {
+                int codepoint = Integer.valueOf(matcher.group(1));
+                if (codepoint >= 65 && codepoint <= 122) {
+                    matcher.appendReplacement(result, new String(new int[] {92, 92, codepoint}, 0, 3));
+                } else {
+                    matcher.appendReplacement(result, "$0");
+                }
+            }
+            matcher.appendTail(result);
+            return result.toString();
+        } else {
+            return "";
         }
     }
 }

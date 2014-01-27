@@ -208,7 +208,7 @@ public class ImportAction extends XWikiAction
                 xarProperties.setSource(new DefaultInputStreamInputSource(source));
 
                 try {
-                    xarWikiStream.read(instanceWikiStream);
+                    xarWikiStream.read(instanceWikiStream.getFilter());
                 } finally {
                     source.close();
 

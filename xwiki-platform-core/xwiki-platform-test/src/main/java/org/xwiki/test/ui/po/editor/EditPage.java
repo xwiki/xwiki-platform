@@ -125,10 +125,17 @@ public class EditPage extends BasePage
 
     public void clickSaveAndContinue()
     {
+        this.clickSaveAndContinue(true);
+    }
+
+    public void clickSaveAndContinue(boolean wait)
+    {
         this.saveandcontinue.click();
 
-        // Wait until the page is really saved.
-        waitForNotificationSuccessMessage("Saved");
+        if (wait) {
+            // Wait until the page is really saved.
+            waitForNotificationSuccessMessage("Saved");
+        }
     }
 
     public ViewPage clickSaveAndView()

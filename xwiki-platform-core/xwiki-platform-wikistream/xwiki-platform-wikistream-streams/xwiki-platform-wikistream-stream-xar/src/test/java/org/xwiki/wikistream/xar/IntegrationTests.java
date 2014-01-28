@@ -22,7 +22,6 @@ package org.xwiki.wikistream.xar;
 import org.junit.runner.RunWith;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.wikistream.test.integration.WikiStreamTestSuite;
-import org.xwiki.wikistream.test.integration.WikiStreamTestSuite.Scope;
 
 /**
  * Run all tests found in the classpath. These {@code *.test} files must follow the conventions described in
@@ -32,7 +31,6 @@ import org.xwiki.wikistream.test.integration.WikiStreamTestSuite.Scope;
  */
 @RunWith(WikiStreamTestSuite.class)
 @AllComponents
-//@Scope("xar")
 public class IntegrationTests
 {
 }

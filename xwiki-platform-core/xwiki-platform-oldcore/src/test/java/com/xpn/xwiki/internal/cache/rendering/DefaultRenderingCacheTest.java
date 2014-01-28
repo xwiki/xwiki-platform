@@ -21,7 +21,9 @@ package com.xpn.xwiki.internal.cache.rendering;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.jmock.Expectations;
 import org.junit.Assert;
@@ -32,7 +34,11 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.internal.MockConfigurationSource;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.cache.rendering.CachedItem.UsedExtension;
+import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 
@@ -44,6 +50,35 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
  */
 public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
 {
+	
+	private static class TestRenderingCacheAware extends XWikiDefaultPlugin implements RenderingCacheAware {
+		 
+		public TestRenderingCacheAware(String name, String className, XWikiContext context) {
+			super(name, className, context);
+		}
+	   
+		private static Map<String,Map<String,Object>> markerMap = new HashMap<String, Map<String,Object>>(){{put("Hello",new HashMap<String, Object>(){{put("a","A");}});}};
+		private static Set<String> markerSet = new HashSet<String>(){{add("Hello");}};
+	   
+		@Override
+		public UsedExtension getAdditionalCacheInfos(XWikiContext context) {
+			Assert.assertNotNull(context);
+			return new UsedExtension(markerSet,markerMap);
+		}
+		
+		@Override
+		public void restoreCachedInfos(XWikiContext context, UsedExtension infos) {
+			Assert.assertNotNull(infos);
+			Assert.assertNotNull(context);
+			Assert.assertEquals(markerMap, infos.parameters);
+			Assert.assertEquals(markerSet, infos.resource);
+		}
+	}
+	
+	private TestRenderingCacheAware testRenderingCacheAware;
+	
+	private XWikiPluginManager mockPluginManager;
+	
     private XWiki mockXWiki;
 
     private XWikiDocument document;
@@ -61,6 +96,9 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
+        this.testRenderingCacheAware  = new TestRenderingCacheAware("Test","Test",getContext());
+        this.mockPluginManager = getMockery().mock(XWikiPluginManager.class);
+        
         this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         this.document.setOriginalDocument(this.document.clone());
 
@@ -73,10 +111,18 @@ public class DefaultRenderingCacheTest extends AbstractBridgedComponentTestCase
         this.renderingCache = getComponentManager().getInstance(RenderingCache.class);
 
         // @formatter:off
-        getMockery().checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{        	
             allowing(mockXWiki).getDocument(document.getDocumentReference(), getContext()); will(returnValue(document));
+            allowing(mockXWiki).getPluginManager(); will(returnValue(mockPluginManager));
+            allowing(mockPluginManager).getPlugin("jsx"); will(returnValue(testRenderingCacheAware));
+            allowing(mockPluginManager).getPlugin("ssx"); will(returnValue(null));
+            allowing(mockPluginManager).getPlugin("jsfx"); will(returnValue(null));
+            allowing(mockPluginManager).getPlugin("ssfx"); will(returnValue(null));
+            allowing(mockPluginManager).getPlugin("jsrx"); will(returnValue(null));
+            allowing(mockPluginManager).getPlugin("ssrx"); will(returnValue(null));
             allowing(mockRequest).getParameterMap(); will(returnValue(parameters));
             allowing(mockRequest).getParameter("refresh"); will(returnValue(refresh));
+            allowing(mockPluginManager).getPlugins();
         }});
         //@formatter:on
     }

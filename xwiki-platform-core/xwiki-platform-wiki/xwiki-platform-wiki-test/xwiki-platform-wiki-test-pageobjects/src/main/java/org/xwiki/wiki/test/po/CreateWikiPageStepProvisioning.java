@@ -56,4 +56,9 @@ public class CreateWikiPageStepProvisioning extends ExtendedViewPage
     {
         return finalizeButton.isEnabled();
     }
+
+    public boolean isFinalizeButtonVisible()
+    {
+        return finalizeButton.isDisplayed();
+    }
 }

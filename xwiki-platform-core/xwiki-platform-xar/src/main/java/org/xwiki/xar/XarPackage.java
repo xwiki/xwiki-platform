@@ -145,7 +145,7 @@ public class XarPackage
 
         try {
             for (ZipArchiveEntry entry = zis.getNextZipEntry(); entry != null; entry = zis.getNextZipEntry()) {
-                if (zis.canReadEntryData(entry)) {
+                if (!entry.isDirectory() && zis.canReadEntryData(entry)) {
                     readEntry(zis, entry);
                 }
             }

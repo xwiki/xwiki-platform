@@ -52,7 +52,7 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
     private transient InstalledExtensionRepository installedRepository;
 
     @Inject
-    private Logger logger;
+    private transient Logger logger;
 
     public WikisDefaultUIDistributionStep()
     {

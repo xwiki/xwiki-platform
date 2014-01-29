@@ -129,8 +129,6 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
     @Override
     public void endWikiDocumentRevision(String version, FilterEventParameters parameters) throws WikiStreamException
     {
-        // TODO
-
         XWikiDocument inputDocument = this.documentListener.getDocument();
 
         XWikiContext xcontext = this.xcontextProvider.get();

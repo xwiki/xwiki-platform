@@ -80,6 +80,28 @@ public class BaseElement
     }
 
     /**
+     * Wait until the element given by the locator is displayed. Give up after specified timeout
+     * (in seconds).
+     * <p></p>
+     * Only use this API if you absolutely need a longer timeout than the default, otherwise use
+     * {@link #waitUntilElementIsVisible(org.openqa.selenium.By)}.
+     *
+     * @param locator the locator for the element to look for
+     * @param timeout the timeout after which to give up
+     * @since 5.4RC1
+     */
+    public void waitUntilElementIsVisible(final By locator, int timeout)
+    {
+        int currentTimeout = getUtil().getTimeout();
+        try {
+            getUtil().setTimeout(timeout);
+            waitUntilElementsAreVisible(new By[] {locator}, true);
+        } finally {
+            getUtil().setTimeout(currentTimeout);
+        }
+    }
+
+    /**
      * Wait until one or all of a array of element locators are displayed.
      * 
      * @param locators the array of element locators to look for.

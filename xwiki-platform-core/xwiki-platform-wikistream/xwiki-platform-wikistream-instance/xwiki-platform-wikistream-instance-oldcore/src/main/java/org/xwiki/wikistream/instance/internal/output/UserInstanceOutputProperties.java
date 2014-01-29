@@ -20,6 +20,8 @@
 package org.xwiki.wikistream.instance.internal.output;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.wikistream.instance.output.InstanceOutputProperties;
 
 /**
@@ -34,63 +36,108 @@ public class UserInstanceOutputProperties extends InstanceOutputProperties
 
     private boolean authorSet = false;
 
-    private boolean preserveVersion = false;
+    private boolean versionPreserved = false;
 
     private String groupPrefix = "";
 
     private String groupSuffix = "";
 
+    /**
+     * @return the comment to use when saving users
+     */
+    @PropertyName("Save comment")
+    @PropertyDescription("The comment to use when saving a user")
     public String getSaveComment()
     {
         return this.saveComment;
     }
 
+    /**
+     * @param saveComment the version comment to use when saving users
+     */
     public void setSaveComment(String saveComment)
     {
         this.saveComment = saveComment;
     }
 
+    /**
+     * @return the author to use when saving users
+     */
+    @PropertyName("Save author")
+    @PropertyDescription("The author to use when saving a user")
     public DocumentReference getAuthor()
     {
         return this.author;
     }
 
+    /**
+     * @param author the author to use when saving users
+     */
     public void setAuthor(DocumentReference author)
     {
         this.author = author;
         this.authorSet = true;
     }
 
+    /**
+     * @return true if the author have been explicitely set
+     */
     public boolean isAuthorSet()
     {
         return this.authorSet;
     }
 
-    public boolean isPreserveVersion()
+    /**
+     * @return Indicate if the versions related informations coming from the events should be kept
+     * @since 5.4RC1
+     */
+    @PropertyName("Preserve version")
+    @PropertyDescription("Indicate if the versions related informations comming from the events should be kept")
+    public boolean isVersionPreserved()
     {
-        return this.preserveVersion;
+        return this.versionPreserved;
     }
 
-    public void setPreserveVersion(boolean preserveVersion)
+    /**
+     * @param versionPreserved Indicate if the versions related informations coming from the events should be kept
+     * @since 5.4RC1
+     */
+    public void setVersionPreserved(boolean versionPreserved)
     {
-        this.preserveVersion = preserveVersion;
+        this.versionPreserved = versionPreserved;
     }
 
+    /**
+     * @return the prefix to add before each new group name
+     */
+    @PropertyName("Group name prefix")
+    @PropertyDescription("The prefix to add before each new group name")
     public String getGroupPrefix()
     {
         return this.groupPrefix;
     }
 
+    /**
+     * @param groupPrefix The prefix to add before each new group name
+     */
     public void setGroupPrefix(String groupPrefix)
     {
         this.groupPrefix = groupPrefix;
     }
 
+    /**
+     * @return The suffix to add after each new group name
+     */
+    @PropertyName("Group name suffix")
+    @PropertyDescription("The suffix to add after each new group name")
     public String getGroupSuffix()
     {
         return this.groupSuffix;
     }
 
+    /**
+     * @param groupSuffix The prefix to add before each new group
+     */
     public void setGroupSuffix(String groupSuffix)
     {
         this.groupSuffix = groupSuffix;

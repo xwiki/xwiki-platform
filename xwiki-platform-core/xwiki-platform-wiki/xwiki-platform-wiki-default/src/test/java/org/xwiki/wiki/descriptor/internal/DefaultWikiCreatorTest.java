@@ -98,5 +98,7 @@ public class DefaultWikiCreatorTest
         verify(xwiki).updateDatabase(eq("wikiid1"), eq(true), eq(true), any(XWikiContext.class));
         // Verify that the descriptor document has been saved
         verify(wikiDescriptorBuilder).save(eq(descriptor));
+        // Verify that the descriptor has been reloaded after being saved
+        assertTrue(descriptor == newWikiDescriptor);
     }
 }

@@ -298,6 +298,13 @@
             <excludes>
               <exclude>**/gwt/**/client/**/*.java</exclude>
             </excludes>
+            <systemProperties>
+              <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
+              <property>
+                <name>screenshotDirectory</name>
+                <value>${basedir}/target/screenshots</value>
+              </property>
+            </systemProperties>
           </configuration>
         </plugin>
         <plugin>

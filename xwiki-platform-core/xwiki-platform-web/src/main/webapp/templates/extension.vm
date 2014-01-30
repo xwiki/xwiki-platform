@@ -1108,8 +1108,10 @@ $status##
 
 #macro (getInstalledExtension $_extension $namespace $installedExtension)
   #set ($features = [])
-  #set ($discard = $features.addAll($_extension.features))
-  #set ($discard = $features.add($_extension.id.id))
+  #if ($_extension)
+    #set ($discard = $features.addAll($_extension.features))
+    #set ($discard = $features.add($_extension.id.id))
+  #end
   #set ($discard = $collectionstool.reverse($features))
   #set ($return = $NULL)
   #foreach ($feature in $features)

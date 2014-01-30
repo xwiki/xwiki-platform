@@ -159,7 +159,7 @@ public class WikiUserFromXEMMigrationTest
 
         // Verify the old workspace object has been removed and the descriptor saved
         verify(oldDescriptorDocument).removeXObject(oldObject);
-        verify(xwiki, times(1)).saveDocument(oldDescriptorDocument, "Remove the old WorkspaceManager.WorkspaceClass" +
+        verify(xwiki, times(1)).saveDocument(oldDescriptorDocument, "[UPGRADE] Remove the old WorkspaceManager.WorkspaceClass" +
                 " object.", xcontext);
 
         // Verify the candidacy has been upgraded

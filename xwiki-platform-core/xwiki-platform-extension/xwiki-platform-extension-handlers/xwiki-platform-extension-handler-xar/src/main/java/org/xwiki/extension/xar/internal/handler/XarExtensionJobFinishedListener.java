@@ -46,7 +46,7 @@ import org.xwiki.job.event.JobFinishedEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
-import org.xwiki.xar.internal.XarEntry;
+import org.xwiki.xar.XarEntry;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -145,9 +145,17 @@ public class XarExtensionJobFinishedListener implements EventListener
 
                         CleanPagesQuestion question = new CleanPagesQuestion(pagesToDelete);
 
+                        Map<DocumentReference, Boolean> pages = question.getPages();
+
+                        // Remove pages which are in the next XAR packages
+                        for (DocumentReference previousReference : pagesToDelete) {
+                            if (xarExtensionPlan.containsNewPage(previousReference)) {
+                                pages.remove(previousReference);
+                            }
+                        }
+
                         // Deal with conflicts before sending the question
 
-                        Map<DocumentReference, Boolean> pages = question.getPages();
                         for (Map.Entry<DocumentReference, Boolean> entry : pages.entrySet()) {
                             DocumentReference reference = entry.getKey();
 
@@ -242,7 +250,7 @@ public class XarExtensionJobFinishedListener implements EventListener
         configuration.setUser(XarExtensionHandler.getRequestUserReference(XarExtensionHandler.PROPERTY_USERREFERENCE,
             request));
         configuration.setWiki(wiki);
-        configuration.setLogEnabled(true);
+        configuration.setVerbose(request.isVerbose());
         configuration.setSkipMandatorytDocuments(true);
 
         return configuration;

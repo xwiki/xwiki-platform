@@ -59,6 +59,17 @@ public class KeyWithIVParameters implements SymmetricCipherParameters
     /**
      * Initialize parameters.
      * @param key the key.
+     * @param ivSize the size of the initialization vector to randomize.
+     * @param random the random source.
+     */
+    public KeyWithIVParameters(byte[] key, int ivSize, SecureRandom random)
+    {
+        this(new KeyParameter(key), ivSize, random);
+    }
+
+    /**
+     * Initialize parameters.
+     * @param key the key.
      * @param ivSize the size of the initialization vector to randomize using a new default SecureRandom.
      */
     public KeyWithIVParameters(KeyParameter key, int ivSize)

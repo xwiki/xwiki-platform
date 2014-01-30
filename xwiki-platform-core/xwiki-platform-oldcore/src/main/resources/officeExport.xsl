@@ -61,7 +61,7 @@
       <xsl:apply-templates select="@*|node()" />
     </xsl:copy>
     <!-- Write the table of contents after the last child -->
-    <xsl:for-each select="//*[@id = 'xwikimaincontainer']/*[local-name() = 'h1' or local-name() = 'h2' or local-name() = 'h3']">
+    <xsl:for-each select="//*[@id = 'xwikicontent']/*[local-name() = 'h1' or local-name() = 'h2' or local-name() = 'h3']">
       <!-- Transforming the flat headings structure into an hierarchical structure based on nested ordered lists is hard 
         to do with XSLT 1.0 (a complete solution would have to generate empty list items when heading levels are missing: when there 
         is a level 3 heading after a level 1 heading). A solution using XSLT 2.0 is described here http://www.xmlplease.com/tocxhtml 

@@ -45,58 +45,135 @@ public class PBKDF2Parameters extends KeyDerivationFunctionParameters
     /**
      * Initialise parameters with default values.
      *
-     * Salt and iteration count are randomized.
+     * Salt of {@value #SALT_DEFAULT_SIZE} bytes is randomized and iteration count is randomized
+     * (between {@value #DEFAULT_MIN_ITER} and ({@value #DEFAULT_MIN_ITER} + {@value #DEFAULT_ITER_RANGE})).
+     * SHA-1 algorithm is used for the key derivation pseudo random function.
      */
     public PBKDF2Parameters() {
         this(-1);
     }
 
     /**
+     * Initialise parameters with default values.
+     *
+     * Salt of {@value #SALT_DEFAULT_SIZE} bytes is randomized and iteration count is randomized
+     * (between {@value #DEFAULT_MIN_ITER} and ({@value #DEFAULT_MIN_ITER} + {@value #DEFAULT_ITER_RANGE})).
+     * SHA-1 algorithm is used for the key derivation pseudo random function.
+     *
+     * @param random a random source to get randomized values.
+     */
+    public PBKDF2Parameters(SecureRandom random) {
+        this(-1, random);
+    }
+
+    /**
      * Initialise parameters with default or random values and the given pseudo random function.
+     *
+     * Salt of {@value #SALT_DEFAULT_SIZE} bytes is randomized and iteration count is randomized
+     * (between {@value #DEFAULT_MIN_ITER} and ({@value #DEFAULT_MIN_ITER} + {@value #DEFAULT_ITER_RANGE})).
      *
      * @param prf a pseudo random function hint.
      */
     public PBKDF2Parameters(String prf) {
-        this(-1, getRandomIterationCount(), getRandomSalt(), prf);
+        this(-1, getRandomIterationCount(PRND), getRandomSalt(PRND), prf);
+    }
+
+    /**
+     * Initialise parameters with default or random values and the given pseudo random function.
+     *
+     * @param prf a pseudo random function hint.
+     * @param random a random source to get randomized values.
+     */
+    public PBKDF2Parameters(String prf, SecureRandom random) {
+        this(-1, getRandomIterationCount(random), getRandomSalt(random), prf);
     }
 
     /**
      * Initialise parameters with a key length and default randomized values.
      *
-     * Salt and iteration count are randomized.
+     * Salt of {@value #SALT_DEFAULT_SIZE} bytes is randomized and iteration count is randomized
+     * (between {@value #DEFAULT_MIN_ITER} and ({@value #DEFAULT_MIN_ITER} + {@value #DEFAULT_ITER_RANGE})).
+     * SHA-1 algorithm is used for the key derivation pseudo random function.
      *
      * @param keySize Size of key to be generated in bytes. A negative value means that the key length should be
      *                smartly deducted from the context of use.
      *
      */
     public PBKDF2Parameters(int keySize) {
-        this(keySize, getRandomIterationCount(), getRandomSalt(), null);
+        this(keySize, getRandomIterationCount(PRND), getRandomSalt(PRND), null);
+    }
+
+    /**
+     * Initialise parameters with a key length and default randomized values.
+     *
+     * Salt of {@value #SALT_DEFAULT_SIZE} bytes is randomized and iteration count is randomized
+     * (between {@value #DEFAULT_MIN_ITER} and ({@value #DEFAULT_MIN_ITER} + {@value #DEFAULT_ITER_RANGE})).
+     * SHA-1 algorithm is used for the key derivation pseudo random function.
+     *
+     * @param keySize Size of key to be generated in bytes. A negative value means that the key length should be
+     *                smartly deducted from the context of use.
+     * @param random a random source to get randomized values.
+     */
+    public PBKDF2Parameters(int keySize, SecureRandom random) {
+        this(keySize, getRandomIterationCount(random), getRandomSalt(random), null);
     }
 
     /**
      * Initialise parameters with a key length, a pseudo random function and default randomized values.
      *
-     * Salt and iteration count are randomized.
+     * Salt of {@value #SALT_DEFAULT_SIZE} bytes is randomized and iteration count is randomized
+     * (between {@value #DEFAULT_MIN_ITER} and ({@value #DEFAULT_MIN_ITER} + {@value #DEFAULT_ITER_RANGE})).
      *
      * @param keySize Size of key to be generated in bytes. A negative value means that the key length should be
      *                smartly deducted from the context of use.
      * @param prf a pseudo random function hint.
      */
     public PBKDF2Parameters(int keySize, String prf) {
-        this(keySize, getRandomIterationCount(), getRandomSalt(), null);
+        this(keySize, getRandomIterationCount(PRND), getRandomSalt(PRND), null);
+    }
+
+    /**
+     * Initialise parameters with a key length, a pseudo random function and default randomized values.
+     *
+     * Salt of {@value #SALT_DEFAULT_SIZE} bytes is randomized and iteration count is randomized
+     * (between {@value #DEFAULT_MIN_ITER} and ({@value #DEFAULT_MIN_ITER} + {@value #DEFAULT_ITER_RANGE})).
+     *
+     * @param keySize Size of key to be generated in bytes. A negative value means that the key length should be
+     *                smartly deducted from the context of use.
+     * @param prf a pseudo random function hint.
+     * @param random a random source to get randomized values.
+     */
+    public PBKDF2Parameters(int keySize, String prf, SecureRandom random) {
+        this(keySize, getRandomIterationCount(random), getRandomSalt(random), null);
     }
 
     /**
      * Initialise parameters with a key length, fixed iteration count and a randomized salt.
      *
      * Salt of {@value #SALT_DEFAULT_SIZE} bytes is randomized.
+     * SHA-1 algorithm is used for the key derivation pseudo random function.
      *
      * @param keySize Size of key to be generated in bytes. A negative value means that the key length should be
      *                smartly deducted from the context of use.
      * @param iterationCount the number of iterations the "mixing" function is to be applied for.
      */
     public PBKDF2Parameters(int keySize, int iterationCount) {
-        this(keySize, iterationCount, getRandomSalt(), null);
+        this(keySize, iterationCount, getRandomSalt(PRND), null);
+    }
+
+    /**
+     * Initialise parameters with a key length, fixed iteration count and a randomized salt.
+     *
+     * Salt of {@value #SALT_DEFAULT_SIZE} bytes is randomized.
+     * SHA-1 algorithm is used for the key derivation pseudo random function.
+     *
+     * @param keySize Size of key to be generated in bytes. A negative value means that the key length should be
+     *                smartly deducted from the context of use.
+     * @param iterationCount the number of iterations the "mixing" function is to be applied for.
+     * @param random a random source to get randomized values.
+     */
+    public PBKDF2Parameters(int keySize, int iterationCount, SecureRandom random) {
+        this(keySize, iterationCount, getRandomSalt(random), null);
     }
 
     /**
@@ -110,7 +187,22 @@ public class PBKDF2Parameters extends KeyDerivationFunctionParameters
      * @param prf a pseudo random function hint.
      */
     public PBKDF2Parameters(int keySize, int iterationCount, String prf) {
-        this(keySize, iterationCount, getRandomSalt(), prf);
+        this(keySize, iterationCount, getRandomSalt(PRND), prf);
+    }
+
+    /**
+     * Initialise parameters with a key length, fixed iteration count, a pseudo random function and a randomized salt.
+     *
+     * Salt of {@value #SALT_DEFAULT_SIZE} bytes is randomized.
+     *
+     * @param keySize Size of key to be generated in bytes. A negative value means that the key length should be
+     *                smartly deducted from the context of use.
+     * @param iterationCount the number of iterations the "mixing" function is to be applied for.
+     * @param prf a pseudo random function hint.
+     * @param random a random source to get randomized values.
+     */
+    public PBKDF2Parameters(int keySize, int iterationCount, String prf, SecureRandom random) {
+        this(keySize, iterationCount, getRandomSalt(random), prf);
     }
 
     /**
@@ -118,13 +210,30 @@ public class PBKDF2Parameters extends KeyDerivationFunctionParameters
      *
      * Iteration count is randomized
      * (between {@value #DEFAULT_MIN_ITER} and ({@value #DEFAULT_MIN_ITER} + {@value #DEFAULT_ITER_RANGE})).
+     * SHA-1 algorithm is used for the key derivation pseudo random function.
      *
      * @param keySize Size of key to be generated in bytes. A negative value means that the key length should be
      *                smartly deducted from the context of use.
      * @param salt the salt to be mixed with the password.
      */
     public PBKDF2Parameters(int keySize, byte[] salt) {
-        this(keySize, getRandomIterationCount(), salt, null);
+        this(keySize, getRandomIterationCount(PRND), salt, null);
+    }
+
+    /**
+     * Initialise parameters with a key length, a salt and a randomized iteration count.
+     *
+     * Iteration count is randomized
+     * (between {@value #DEFAULT_MIN_ITER} and ({@value #DEFAULT_MIN_ITER} + {@value #DEFAULT_ITER_RANGE})).
+     * SHA-1 algorithm is used for the key derivation pseudo random function.
+     *
+     * @param keySize Size of key to be generated in bytes. A negative value means that the key length should be
+     *                smartly deducted from the context of use.
+     * @param salt the salt to be mixed with the password.
+     * @param random a random source to get randomized values.
+     */
+    public PBKDF2Parameters(int keySize, byte[] salt, SecureRandom random) {
+        this(keySize, getRandomIterationCount(random), salt, null);
     }
 
     /**
@@ -139,7 +248,23 @@ public class PBKDF2Parameters extends KeyDerivationFunctionParameters
      * @param prf a pseudo random function hint.
      */
     public PBKDF2Parameters(int keySize, byte[] salt, String prf) {
-        this(keySize, getRandomIterationCount(), salt, prf);
+        this(keySize, getRandomIterationCount(PRND), salt, prf);
+    }
+
+    /**
+     * Initialise parameters with a key length, a salt, a pseudo random function and a randomized iteration count.
+     *
+     * Iteration count is randomized
+     * (between {@value #DEFAULT_MIN_ITER} and ({@value #DEFAULT_MIN_ITER} + {@value #DEFAULT_ITER_RANGE})).
+     *
+     * @param keySize Size of key to be generated in bytes. A negative value means that the key length should be
+     *                smartly deducted from the context of use.
+     * @param salt the salt to be mixed with the password.
+     * @param prf a pseudo random function hint.
+     * @param random a random source to get randomized values.
+     */
+    public PBKDF2Parameters(int keySize, byte[] salt, String prf, SecureRandom random) {
+        this(keySize, getRandomIterationCount(random), salt, prf);
     }
 
     /**
@@ -170,15 +295,15 @@ public class PBKDF2Parameters extends KeyDerivationFunctionParameters
         this.prf = prf;
     }
 
-    private static int getRandomIterationCount()
+    private static int getRandomIterationCount(SecureRandom random)
     {
-        return PRND.nextInt(DEFAULT_ITER_RANGE) + DEFAULT_MIN_ITER;
+        return random.nextInt(DEFAULT_ITER_RANGE) + DEFAULT_MIN_ITER;
     }
 
-    private static byte[] getRandomSalt()
+    private static byte[] getRandomSalt(SecureRandom random)
     {
         byte[] salt = new byte[SALT_DEFAULT_SIZE];
-        PRND.nextBytes(salt);
+        random.nextBytes(salt);
         return salt;
     }
 

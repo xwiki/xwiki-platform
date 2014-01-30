@@ -459,33 +459,44 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
         File contentFile = this.confluencePackage.getAttachmentFile(pageId, originalRevisionId, version);
 
         FilterEventParameters attachmentParameters = new FilterEventParameters();
-        attachmentParameters.put(WikiAttachmentFilter.PARAMETER_CONTENT_TYPE,
-            attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENT_TYPE));
-        attachmentParameters.put(WikiAttachmentFilter.PARAMETER_CREATION_AUTHOR,
-            attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_CREATION_AUTHOR));
-        try {
-            attachmentParameters
-                .put(WikiAttachmentFilter.PARAMETER_CREATION_DATE, this.confluencePackage.getDate(attachmentProperties,
-                    ConfluenceXMLPackage.KEY_ATTACHMENT_CREATION_DATE));
-        } catch (ParseException e) {
-            if (this.properties.isVerbose()) {
-                this.logger.error("Failed to parse date", e);
+        if (attachmentProperties.containsKey(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENT_TYPE)) {
+            attachmentParameters.put(WikiAttachmentFilter.PARAMETER_CONTENT_TYPE,
+                attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENT_TYPE));
+        }
+        if (attachmentProperties.containsKey(ConfluenceXMLPackage.KEY_ATTACHMENT_CREATION_AUTHOR)) {
+            attachmentParameters.put(WikiAttachmentFilter.PARAMETER_CREATION_AUTHOR,
+                attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_CREATION_AUTHOR));
+        }
+        if (attachmentProperties.containsKey(ConfluenceXMLPackage.KEY_ATTACHMENT_CREATION_DATE)) {
+            try {
+                attachmentParameters.put(WikiAttachmentFilter.PARAMETER_CREATION_DATE, this.confluencePackage.getDate(
+                    attachmentProperties, ConfluenceXMLPackage.KEY_ATTACHMENT_CREATION_DATE));
+            } catch (ParseException e) {
+                if (this.properties.isVerbose()) {
+                    this.logger.error("Failed to parse date", e);
+                }
             }
         }
+
         attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION, String.valueOf(version));
-        attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR,
-            attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION_AUTHOR));
-        try {
-            attachmentParameters
-                .put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, this.confluencePackage.getDate(attachmentProperties,
-                    ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION_DATE));
-        } catch (ParseException e) {
-            if (this.properties.isVerbose()) {
-                this.logger.error("Failed to parse date", e);
+        if (attachmentProperties.containsKey(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION_AUTHOR)) {
+            attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR,
+                attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION_AUTHOR));
+        }
+        if (attachmentProperties.containsKey(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION_DATE)) {
+            try {
+                attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_DATE, this.confluencePackage.getDate(
+                    attachmentProperties, ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION_DATE));
+            } catch (ParseException e) {
+                if (this.properties.isVerbose()) {
+                    this.logger.error("Failed to parse date", e);
+                }
             }
         }
-        attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT,
-            attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION_COMMENT));
+        if (attachmentProperties.containsKey(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION_COMMENT)) {
+            attachmentParameters.put(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT,
+                attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION_COMMENT));
+        }
 
         // WikiAttachment
 

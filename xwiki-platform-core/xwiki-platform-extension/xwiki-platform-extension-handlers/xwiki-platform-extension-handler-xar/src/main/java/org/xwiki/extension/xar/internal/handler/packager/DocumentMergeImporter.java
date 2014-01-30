@@ -33,7 +33,7 @@ import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.xar.internal.XarEntry;
+import org.xwiki.xar.XarEntry;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
@@ -81,11 +81,6 @@ public class DocumentMergeImporter
         XWikiDocument currentDocument, XWikiDocument nextDocument, PackageConfiguration configuration) throws Exception
     {
         XarEntryMergeResult mergeResult = null;
-
-        if (configuration.isLogEnabled()) {
-            this.logger.info("Importing document [{}] in language [{}]...", nextDocument.getDocumentReference(),
-                nextDocument.getRealLocale());
-        }
 
         // Merge and save
         if (currentDocument != null && !currentDocument.isNew()) {

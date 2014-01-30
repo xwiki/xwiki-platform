@@ -1265,6 +1265,11 @@ ${Msz}Mb##
   #if("$!options.selectedColumn" != '') #set($selectedColumn = $options.selectedColumn) #end
   #if("$!options.callback" != '') #set($callback = $options.callback) #end
   #if("$!options.tagCloud" == '' || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
+  #if ($options.selectedTags && $options.selectedTags.size() > 0)
+    #set ($selectedTags = $options.selectedTags)
+  #else
+    #set ($selectedTags = [])
+  #end
   #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = "livetable_$divid") #end
   #if("$!options.topFilters" != '') #set($topfilters = $options.topFilters) #end
   #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
@@ -1472,27 +1477,30 @@ ${Msz}Mb##
   //<![CDATA[
 (function() {
   function startup() {
+    // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
     if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
-      // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
-    #if($callback)
-      window["$jsName"] = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{
-                           "maxPages":$maxPages
-                        ,"limit":$count
-       #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
-       #if($hasPageSize && "$!pageSizeBounds" != ''),"pageSizeBounds" : $pageSizeBounds#end
-              });
-    #else
-      window["$jsName"] = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix), {
-                           "maxPages":$maxPages
-                        ,"limit":$count
-       #if($hasTopFilters),"filterNodes" : [$("${divid}").down(".xwiki-livetable-display-filters"), $('${divid}-topfilters')]#end
-       #if($hasPageSize && "$!pageSizeBounds" != ''),"pageSizeBounds" : $pageSizeBounds#end
-              });
-    #end
-    #if($!hasPageSize)
-      document.observe("xwiki:livetable:${divid}:loadingEntries", function() { $('${divid}-pagesize').addClassName("hidden"); } );
-      document.observe("xwiki:livetable:${divid}:loadingComplete", function() { $('${divid}-pagesize').removeClassName("hidden"); } );
-    #end
+      #set ($liveTableParams = {
+        'maxPages': $maxPages,
+        'limit': $count,
+        'selectedTags': $selectedTags
+      })
+      #if ($hasTopFilters)
+        #set ($discard = $liveTableParams.put('filterNodes', ["$('$divid').down('.xwiki-livetable-display-filters')",
+          "$('${divid}-topfilters')"]))
+      #end
+      #if ($hasPageSize && "$!pageSizeBounds" != '')
+        #set ($discard = $liveTableParams.put('pageSizeBounds', $pageSizeBounds))
+      #end
+      #set ($callbackParam = "#livetablecallback($divid $collist $colprops $transprefix), ")
+      #if ($callback)
+        #set ($callbackParam = "$callback, ")
+      #end
+      window["$jsName"] = new XWiki.widgets.LiveTable("$dataurl", "${divid}",
+        $callbackParam$jsontool.serialize($liveTableParams));
+      #if ($hasPageSize)
+        document.observe("xwiki:livetable:${divid}:loadingEntries", function() { $('${divid}-pagesize').addClassName("hidden"); } );
+        document.observe("xwiki:livetable:${divid}:loadingComplete", function() { $('${divid}-pagesize').removeClassName("hidden"); } );
+      #end
       return true;
     }
     return false;
@@ -1993,7 +2001,12 @@ $xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {'forceSkinAction': true
 #if($requestErrors && $requestErrors.containsKey($fieldId))
 #set($fieldError = $requestErrors.get($fieldId))
 #if($fieldError)
-#set($ok = $parameters.put('convertInput', false))
+#set($ok = $parameters.put('inputURL', $editedDocument.getURL('edit', $escapetool.url({
+  'xpage': 'wysiwyginput',
+  'token': $services.csrf.token,
+  'key': $request.key,
+  'field': $fieldId
+}))))
 #error("${fieldId}: ${fieldError.message}")
 #set($ok = $requestErrors.remove($fieldId))
 #if($requestErrors.isEmpty())

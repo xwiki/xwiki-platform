@@ -30,12 +30,17 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
+/**
+ * Optional step to install sub-wikis default UI extensions.
+ * 
+ * @version $Id$
+ * @since 5.2RC1
+ */
 @Component
 @Named(WikisDefaultUIDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
@@ -47,10 +52,7 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
     private transient InstalledExtensionRepository installedRepository;
 
     @Inject
-    private transient WikiDescriptorManager wikiDescriptorManager;
-
-    @Inject
-    private Logger logger;
+    private transient Logger logger;
 
     public WikisDefaultUIDistributionStep()
     {
@@ -60,10 +62,12 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
     @Override
     public void prepare()
     {
-        if (getState() != State.CANCELED) {
+        if (getState() == null) {
             setState(State.COMPLETED);
 
-            if (this.distributionManager.getUpgradeMode() == UpgradeMode.ALLINONE) {
+            if (isMainWiki()) {
+                WikiDescriptorManager wikiDescriptorManager = this.wikiDescriptorManagerProvider.get();
+
                 Collection<WikiDescriptor> wikis;
                 try {
                     wikis = wikiDescriptorManager.getAll();
@@ -76,7 +80,7 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
                 ExtensionId wikiExtensionUI = this.distributionManager.getWikiUIExtensionId();
 
                 for (WikiDescriptor wiki : wikis) {
-                    if (!isMainWiki(wiki)) {
+                    if (!wikiDescriptorManager.getMainWikiId().equals(wiki.getId())) {
                         String namespace = "wiki:" + wiki.getId();
 
                         // Only if the UI is not already installed
@@ -93,10 +97,5 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
                 }
             }
         }
-    }
-
-    private boolean isMainWiki(WikiDescriptor wiki)
-    {
-        return wikiDescriptorManager.getMainWikiId().equals(wiki.getId());
     }
 }

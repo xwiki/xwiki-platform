@@ -181,4 +181,49 @@ public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiSt
         Assert.assertEquals(1, documentObject.getFieldList().size());
         Assert.assertEquals(1, documentObject.getIntValue("prop1"));
     }
+
+    @Test
+    public void testDocumentwithnumberversion() throws WikiStreamException, XWikiException, ParseException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        importFromXML("documentwithnumberversion", outputProperties);
+
+        XWikiDocument document =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+                this.oldcore.getXWikiContext());
+
+        Assert.assertFalse(document.isNew());
+
+        // Version
+
+        Assert.assertEquals("1.1", document.getVersion());
+    }
+
+    @Test
+    public void testDocumentwithattachmentwithoutdate() throws WikiStreamException, XWikiException, ParseException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        importFromXML("documentwithattachmentwithoutdate", outputProperties);
+
+        XWikiDocument document =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+                this.oldcore.getXWikiContext());
+
+        Assert.assertFalse(document.isNew());
+
+        // Attachment
+
+        Assert.assertEquals(1, document.getAttachmentList().size());
+        XWikiAttachment attachment = document.getAttachment("attachment.txt");
+        Assert.assertEquals("attachment.txt", attachment.getFilename());
+        Assert.assertEquals(10, attachment.getFilesize());
+        Assert.assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+            attachment.getContent(this.oldcore.getXWikiContext())));
+
+        Assert.assertNotNull(attachment.getDate());
+        Assert.assertEquals("1.1", attachment.getVersion());
+        Assert.assertEquals("", attachment.getComment());
+    }
 }

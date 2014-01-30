@@ -15,10 +15,14 @@ input.suggestGroups {
   color: transparent;
   /* Display the scope icon over the left border of the text input. */
   position: absolute;
+  /* Make sure the icon is not resized, because xforms and the object/class editors enforce the width of the input
+     elements (we use an input with type=image here) */
+  width: auto !important;
 }
 .suggestUsers.withScope, .suggestGroups.withScope {
-  /* Leave space for the scope icon. */
-  border-left-width: 25px;
+  /* Leave space for the scope icon. Make sure this rule is applied because xforms and the object/class editors apply a
+     custom border on their input elements. */
+  border-left-width: 25px !important;
 }
 ul.users {
   list-style-type: none;

@@ -11,7 +11,12 @@
   #set ($withPageBreaks = true)
 #end
 #if ($request.pages)
-  #foreach ($page in $request.getParameterValues('pages'))
+  #set ($pages = $request.getParameterValues('pages'))
+#else
+  #set ($pages = ["$doc.documentReference"])
+#end
+<div id="xwikicontent">
+  #foreach ($page in $pages)
     #set ($pageDoc = $xwiki.getDocument($page))
     $pageDoc.getRenderedContent()
     #if ($request.includechilds)
@@ -19,7 +24,7 @@
       #if (!$clevel)
         #set ($clevel = 0)
       #end
-      #includeChildren($page $withPageBreaks)
+      #includeChildren($pageDoc $withPageBreaks)
     #elseif ($request.includelinks)
       #set ($clevel = $mathtool.toInteger($request.includelinks))
       #if (!$clevel)
@@ -31,24 +36,7 @@
       #pagebreak()
     #end
   #end
-#else
-  <div id="xwikicontent">
-    $cdoc.getRenderedContent()
-  </div>
-  #if ($request.includechilds)
-    #set ($clevel = $mathtool.toInteger($request.includechilds))
-    #if (!$clevel)
-      #set ($clevel = 0)
-    #end
-    #includeChildren($cdoc $withPageBreaks)
-  #elseif ($request.includelinks)
-    #set ($clevel = $mathtool.toInteger($request.includelinks))
-    #if (!$clevel)
-      #set ($clevel = 0)
-    #end
-    #includeLinks($cdoc.fullName $withPageBreaks)
-  #end
-#end
+</div>
 #set($footnotes = "#putFootnotes()")
 $xwiki.renderText($footnotes, $doc)
 #if ("$!{request.comments}" == '1')

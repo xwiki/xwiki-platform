@@ -994,11 +994,12 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         StringBuffer searchHql = new StringBuffer();
         List<Object[]> results = new ArrayList<Object[]>();
 
-        searchHql.append("select year(act.date), month(act.date), day(act.date), act.page, max(act.date)"
+        searchHql.append("select year(act.date), month(act.date), day(act.date), act.page, max(act.date), act.wiki "
             + "from ActivityEventImpl as act");
         addHiddenEventsFilter(searchHql);
         addOptionalEventsFilter(searchHql, optionalWhereClause);
-        searchHql.append(" group by year(act.date), month(act.date), day(act.date), act.page order by 5 desc");
+        searchHql.append(" group by year(act.date), month(act.date), day(act.date), act.page, act.wiki "
+                + "order by 5 desc");
 
         String originalDatabase = context.getDatabase();
         try {
@@ -1006,7 +1007,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             List<Object[]> rawResults =
                 context.getWiki().getStore().search(searchHql.toString(), maxItems, startAt, parametersValues, context);
             for (Object[] rawResult : rawResults) {
-                results.add(new Object[] {rawResult[3], rawResult[4]});
+                results.add(new Object[] {rawResult[3], rawResult[4], rawResult[5]});
             }
         } catch (XWikiException e) {
             throw new ActivityStreamException(e);

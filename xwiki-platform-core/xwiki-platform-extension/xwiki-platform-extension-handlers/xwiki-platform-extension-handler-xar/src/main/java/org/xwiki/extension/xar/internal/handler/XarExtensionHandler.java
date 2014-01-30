@@ -53,10 +53,11 @@ import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
+import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.xar.internal.XarEntry;
-import org.xwiki.xar.internal.XarException;
+import org.xwiki.xar.XarEntry;
+import org.xwiki.xar.XarException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -88,6 +89,12 @@ public class XarExtensionHandler extends AbstractExtensionHandler
      * The identifier of the programming right.
      */
     private static final String RIGHTS_ADMIN = "admin";
+
+    private static final TranslationMarker LOG_EXTENSIONPLAN_BEGIN = new TranslationMarker(
+        "extension.xar.log.extensionplan.begin");
+
+    private static final TranslationMarker LOG_EXTENSIONPLAN_END = new TranslationMarker(
+        "extension.xar.log.extensionplan.end");
 
     @Inject
     private Packager packager;
@@ -125,7 +132,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         return null;
     }
 
-    private void initializePagesIndex() throws ExtensionException, XarException, IOException
+    private void initializePagesIndex(Request request) throws ExtensionException, XarException, IOException
     {
         ExecutionContext context = this.execution.getContext();
 
@@ -137,12 +144,16 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                     (XarExtensionPlan) context.getProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN);
 
                 if (xarPlan == null) {
-                    this.logger.info("Preparing XAR extension plan");
+                    if (request.isVerbose()) {
+                        this.logger.info(LOG_EXTENSIONPLAN_BEGIN, "Preparing XAR extension plan");
+                    }
 
                     context.setProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN, new XarExtensionPlan(plan,
                         this.xarRepository, this.localReposirory));
 
-                    this.logger.info("XAR extension plan ready");
+                    if (request.isVerbose()) {
+                        this.logger.info(LOG_EXTENSIONPLAN_END, "XAR extension plan ready");
+                    }
                 }
             }
         }
@@ -199,13 +210,14 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         throws InstallException
     {
         try {
-            initializePagesIndex();
+            initializePagesIndex(request);
         } catch (Exception e) {
             throw new InstallException("Failed to initialize extension plan index", e);
         }
 
         // import xar into wiki (add new version when the page already exists)
-        PackageConfiguration configuration = createPackageConfiguration(newLocalExtension, request, wiki, getXARExtensionPlan());
+        PackageConfiguration configuration =
+            createPackageConfiguration(newLocalExtension, request, wiki, getXARExtensionPlan());
         try {
             this.packager.importXAR("Install extensoin [" + newLocalExtension + "]", new File(newLocalExtension
                 .getFile().getAbsolutePath()), configuration);
@@ -219,7 +231,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         throws UninstallException
     {
         try {
-            initializePagesIndex();
+            initializePagesIndex(request);
         } catch (Exception e) {
             throw new UninstallException("Failed to initialize extension plan index", e);
         }
@@ -275,7 +287,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         configuration.setInteractive(request.isInteractive());
         configuration.setUser(getRequestUserReference(PROPERTY_USERREFERENCE, request));
         configuration.setWiki(wiki);
-        configuration.setLogEnabled(true);
+        configuration.setVerbose(request.isVerbose());
         configuration.setSkipMandatorytDocuments(true);
         configuration.setXarExtensionPlan(xarExtensionPlan);
 
@@ -298,7 +310,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             if (nextXAREntriesOnRoot != null) {
                 for (Map.Entry<XarEntry, LocalExtension> entry : nextXAREntriesOnRoot.entrySet()) {
                     if (entry.getValue() == extension) {
-                        entriesToImport.add(entry.getKey().getName());
+                        entriesToImport.add(entry.getKey().getEntryName());
                     }
                 }
             }
@@ -306,7 +318,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             if (nextXAREntriesOnWiki != null) {
                 for (Map.Entry<XarEntry, LocalExtension> entry : nextXAREntriesOnWiki.entrySet()) {
                     if (entry.getValue() == extension) {
-                        entriesToImport.add(entry.getKey().getName());
+                        entriesToImport.add(entry.getKey().getEntryName());
                     }
                 }
             }

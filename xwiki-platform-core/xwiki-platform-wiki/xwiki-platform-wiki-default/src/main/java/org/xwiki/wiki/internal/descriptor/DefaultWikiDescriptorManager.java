@@ -38,6 +38,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Default implementation for {@link WikiDescriptorManager}.
@@ -76,7 +77,9 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
                 // Extract the Wiki
                 DefaultWikiDescriptor descriptor = buildDescriptorFromDocument(document);
                 // Add it to the result list
-                result.add(descriptor);
+                if (descriptor != null) {
+                    result.add(descriptor);
+                }
             }
         } catch (Exception e) {
             throw new WikiManagerException("Failed to locate XWiki.XWikiServerClass documents", e);
@@ -161,11 +164,14 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
 
     private DefaultWikiDescriptor buildDescriptorFromDocument(XWikiDocument document)
     {
-        DefaultWikiDescriptor descriptor = wikiDescriptorBuilder.buildDescriptorObject(
-                document.getXObjects(DefaultWikiDescriptor.SERVER_CLASS), document);
-        // Add to the cache
-        if (descriptor != null) {
-            cache.add(descriptor);
+        DefaultWikiDescriptor descriptor = null;
+        List<BaseObject> serverClassObjects = document.getXObjects(DefaultWikiDescriptor.SERVER_CLASS);
+        if (serverClassObjects != null) {
+            descriptor = wikiDescriptorBuilder.buildDescriptorObject(serverClassObjects, document);
+            // Add to the cache
+            if (descriptor != null) {
+                cache.add(descriptor);
+            }
         }
         return descriptor;
     }

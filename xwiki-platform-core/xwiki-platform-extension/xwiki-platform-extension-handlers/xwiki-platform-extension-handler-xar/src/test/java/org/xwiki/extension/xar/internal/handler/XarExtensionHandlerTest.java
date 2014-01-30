@@ -624,6 +624,7 @@ public class XarExtensionHandlerTest
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "samespace", "samepage"),
                 getXWikiContext());
 
+        Assert.assertFalse("Document samespace has been removed from the database", samepage.isNew());
         Assert.assertEquals("Wrong versions", "1.1", samepage.getVersion());
 
         // space.page

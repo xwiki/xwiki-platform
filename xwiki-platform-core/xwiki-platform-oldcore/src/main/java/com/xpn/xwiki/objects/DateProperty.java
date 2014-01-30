@@ -84,7 +84,7 @@ public class DateProperty extends BaseProperty implements Cloneable
     {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((value == null) ? 0 : value.hashCode());
+        result = prime * result + ((this.value == null) ? 0 : this.value.hashCode());
         return result;
     }
 

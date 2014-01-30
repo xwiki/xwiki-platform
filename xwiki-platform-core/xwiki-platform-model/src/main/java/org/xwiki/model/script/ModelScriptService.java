@@ -19,6 +19,8 @@
  */
 package org.xwiki.model.script;
 
+import java.util.Locale;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -35,6 +37,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReferenceTree;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
@@ -89,6 +92,19 @@ public class ModelScriptService implements ScriptService
     public DocumentReference createDocumentReference(String wiki, String space, String page)
     {
         return createDocumentReference(wiki, space, page, DEFAULT_RESOLVER_HINT);
+    }
+
+    /**
+     * Create a new reference with the passed {@link Locale}.
+     * 
+     * @param reference the reference (with or without locale)
+     * @param locale the locale of the new reference
+     * @return the typed Document Reference object or null if no Resolver with the passed hint could be found
+     * @since 5.4RC1
+     */
+    public DocumentReference createDocumentReference(DocumentReference reference, Locale locale)
+    {
+        return new DocumentReference(reference, locale);
     }
 
     /**
@@ -450,5 +466,31 @@ public class ModelScriptService implements ScriptService
         } catch (ComponentLookupException ex) {
             return null;
         }
+    }
+
+    /**
+     * Convert passed references to a tree of references.
+     * 
+     * @param references the references
+     * @return the references as a tree
+     * @since 5.4RC1
+     */
+    @Unstable
+    public EntityReferenceTree toTree(Iterable< ? extends EntityReference> references)
+    {
+        return new EntityReferenceTree(references);
+    }
+
+    /**
+     * Convert passed references to a tree of references.
+     * 
+     * @param references the references
+     * @return the references as a tree
+     * @since 5.4RC1
+     */
+    @Unstable
+    public EntityReferenceTree toTree(EntityReference... references)
+    {
+        return new EntityReferenceTree(references);
     }
 }

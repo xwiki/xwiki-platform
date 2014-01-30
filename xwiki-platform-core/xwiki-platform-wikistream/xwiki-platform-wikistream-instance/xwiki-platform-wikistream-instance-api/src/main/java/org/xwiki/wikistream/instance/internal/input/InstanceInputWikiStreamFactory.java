@@ -66,7 +66,7 @@ public class InstanceInputWikiStreamFactory extends
     {
         super(WikiStreamType.XWIKI_INSTANCE);
 
-        setName("XWiki instance output stream");
+        setName("XWiki instance input stream");
         setDescription("Generates wiki events from XWiki instance.");
     }
 

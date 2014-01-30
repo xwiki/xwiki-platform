@@ -30,7 +30,7 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class DefaultWikiStreamProperties implements WikiStreamProperties
 {
-    private boolean verbose;
+    private boolean verbose = true;
 
     @Override
     public boolean isVerbose()

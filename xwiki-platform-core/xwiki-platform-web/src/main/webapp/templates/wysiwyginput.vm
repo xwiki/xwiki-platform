@@ -47,12 +47,19 @@ function fireContentLoad(contentLoadTriggerId) {
 // ]]>
 </script>
 </head>
-#if($request.method.equalsIgnoreCase('post') && $services.csrf.isTokenValid($request.token))
-#if($request.getParameterMap().containsKey('source'))
-#set($content = $services.wysiwyg.toAnnotatedXHTML($request.source, $tdoc.getSyntax().toIdString()))
-#elseif($request.getParameterMap().containsKey('html'))
-#set($content = $services.wysiwyg.parseAndRender($request.html, $tdoc.getSyntax().toIdString()))
-#end
+#if ($request.method.equalsIgnoreCase('post') && $services.csrf.isTokenValid($request.token))
+  #set ($content = $NULL)
+  #if ($request.key && $request.field)
+    #set ($conversionFilterOutput = $request.session.getAttribute('com.xpn.xwiki.wysiwyg.server.converter.output'))
+    #set ($content = $conversionFilterOutput.get($request.key).remove($request.field))
+  #end
+  #if (!$content)
+    #if ($request.getParameterMap().containsKey('source'))
+      #set ($content = $services.wysiwyg.toAnnotatedXHTML($request.source, $tdoc.getSyntax().toIdString()))
+    #elseif ($request.getParameterMap().containsKey('html'))
+      #set ($content = $services.wysiwyg.parseAndRender($request.html, $tdoc.getSyntax().toIdString()))
+    #end
+  #end
 #end
 <body id="body" class="main">$!content<script id="__contentLoadTrigger" type="text/javascript"><!--
 fireContentLoad('__contentLoadTrigger')

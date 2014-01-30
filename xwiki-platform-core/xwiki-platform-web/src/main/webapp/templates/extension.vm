@@ -100,13 +100,14 @@
       #extensionActionButton('hideDetails' true 'visibilityAction')
     #else
       ## The given extension is displayed alone.
-      #em_linkButton($xback 'extensions.actions.back')
+      #em_linkButton($xback 'extensions.actions.back' 'extension-link')
     #end
   #else
     ## The given extension is displayed in a list of extensions.
     #extensionActionButton('showDetails' true)
-    <input type="hidden" name="xback" value="$escapetool.xml($xback)" />
   #end
+  ## Make sure the URL to get back is preserved when we submit an extension action.
+  <input type="hidden" name="xback" value="$escapetool.xml($xback)" />
 #end
 
 #macro (displayExtensionActionButtons_jobTriggers $extension)
@@ -134,7 +135,7 @@
   #if ($extensionStatus.startsWith('installed'))
     ## This extension can be uninstalled.
     ## The given extension object could be an instance of LocalExtension so make sure we use an InstalledExtension instance.
-    #set ($installedExtension = $services.extension.installed.getInstalledExtension($extension.id.id, $extensionNamespace))
+    #getInstalledExtension($extension $extensionNamespace $installedExtension)
     #extensionActionButtons($installedExtension 'uninstall' true)
   #elseif ($extensionStatus == 'remote')
     ## Installable extension.
@@ -151,7 +152,7 @@
   #elseif ($extensionStatus.startsWith('remote-installed'))
     ## An extension that can be either upgraded or downgraded.
     ## Compare this version with the version that is currently installed to determine which button to display.
-    #set ($installedExtension = $services.extension.installed.getInstalledExtension($extension.id.id, $extensionNamespace))
+    #getInstalledExtension($extension $extensionNamespace $installedExtension)
     #if ($extension.id.version.compareTo($installedExtension.id.version) > 0)
       #extensionActionButtons($installedExtension 'upgrade')
     #else
@@ -712,7 +713,7 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (getBackwardDependencies $extension $return)
-  #set ($installedExtension = $services.extension.installed.getInstalledExtension($extension.id.id, $extensionNamespace))
+  #getInstalledExtension($extension $extensionNamespace $installedExtension)
   #if ($installedExtension.isInstalled($NULL))
     ## The extension is installed in the root namespace so it can have backward dependencies on multiple namespaces.
     #set ($backwardDependencies = $services.extension.installed.getBackwardDependencies($installedExtension.id))
@@ -954,8 +955,13 @@ Caused by: #printThrowable($throwable.cause true)
 #end
 
 #macro (repairXarExtension $extensionId $extensionVersion)
-  #set ($discard = $services.xarextension.repairInstalledExtension($extensionId, $extensionVersion, $xcontext.database))
-  #handleExtensionJobStartFailure('extensions.install.error.repairXarFailure' $services.xarextension)
+  #if ($extensionNamespace.startsWith('wiki:'))
+    #set ($wikiName = $extensionNamespace.substring(5))
+  #else
+    #set ($wikiName = $xcontext.database)
+  #end
+  #set ($discard = $services.extension.xar.repairInstalledExtension($extensionId, $extensionVersion, $wikiName))
+  #handleExtensionJobStartFailure('extensions.install.error.repairXarFailure' $services.extension.xar)
 #end
 
 #macro (handleExtensionJobStartFailure $errorMessageKey $scriptService)
@@ -1001,7 +1007,7 @@ Caused by: #printThrowable($throwable.cause true)
       ## Check if a different version of this extension is installed or is a core dependency.
       #set ($currentVersion = $services.extension.core.getCoreExtension($extension.id.id))
       #if (!$currentVersion)
-        #set ($currentVersion = $services.extension.installed.getInstalledExtension($extension.id.id, $extensionNamespace))
+        #getInstalledExtension($extension $extensionNamespace $currentVersion)
       #end
       #if ($currentVersion)
         #set ($repoId = $currentVersion.repository.descriptor.id)
@@ -1063,7 +1069,9 @@ $status##
     #set ($targetVersion = $_jobStatus.request.extensions.get(0).version)
     #if (!$targetVersion)
       ## Some jobs don't require the extension version. Let's determine the currently available version.
-      #set ($targetVersion = $services.extension.installed.getInstalledExtension($extensionId, $extensionNamespace).id.version)
+      #set ($_extension = $services.extension.resolve($extensionId, $extensionVersion))
+      #getInstalledExtension($_extension $extensionNamespace $installedExtension)
+      #set ($targetVersion = $installedExtension.id.version)
     #end
     #if ($targetVersion && $extensionVersion != $targetVersion.value)
       #set ($_jobStatus = $NULL)
@@ -1076,7 +1084,9 @@ $status##
     #set ($targetVersion = $_plan.request.extensions.get(0).version)
     #if (!$targetVersion)
       ## Some jobs don't require the extension version. Let's determine the currently available version.
-      #set ($targetVersion = $services.extension.installed.getInstalledExtension($extensionId, $extensionNamespace).id.version)
+      #set ($_extension = $services.extension.resolve($extensionId, $extensionVersion))
+      #getInstalledExtension($_extension $extensionNamespace $installedExtension)
+      #set ($targetVersion = $installedExtension.id.version)
     #end
     #if ($targetVersion && $extensionVersion != $targetVersion.value)
       #set ($_plan = $NULL)
@@ -1094,6 +1104,22 @@ $status##
   #else
     #setVariable ("$return" $_plan)
   #end
+#end
+
+#macro (getInstalledExtension $_extension $namespace $installedExtension)
+  #set ($features = [])
+  #set ($discard = $features.addAll($_extension.features))
+  #set ($discard = $features.add($_extension.id.id))
+  #set ($discard = $collectionstool.reverse($features))
+  #set ($return = $NULL)
+  #foreach ($feature in $features)
+    #set ($return = $services.extension.installed.getInstalledExtension($feature, $namespace))
+    #if ($return)
+      #break
+    #end
+  #end
+  #set ($installedExtension = $NULL)
+  #setVariable("$installedExtension" $return)
 #end
 
 #macro (getExtensionURL $extensionId $extensionVersion $extraParams)
@@ -1249,7 +1275,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #foreach ($firstLevelNode in $plan.tree)
       #set ($planAction = $firstLevelNode.action)
       #set ($status = $NULL)
-      #set ($installedVersion = $services.extension.installed.getInstalledExtension($planAction.extension.id.id, $planAction.namespace))
+      #getInstalledExtension($planAction.extension $planAction.namespace $installedVersion)
       #if (!$installedVersion.isValid($planAction.namespace))
         #set ($status = $invalid)
       ## Check if the latest version has been installed after the upgrade plan was created.

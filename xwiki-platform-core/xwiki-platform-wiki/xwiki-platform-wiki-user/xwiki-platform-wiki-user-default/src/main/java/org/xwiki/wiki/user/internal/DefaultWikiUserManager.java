@@ -125,12 +125,23 @@ public class DefaultWikiUserManager implements WikiUserManager
     }
 
     private void saveGroupDocument(XWikiDocument document, String message) throws WikiUserManagerException {
+        // Get the XWiki objects
+        XWikiContext xcontext = xcontextProvider.get();
+        XWiki xwiki = xcontext.getWiki();
+
         // The document should be hidden
         document.setHidden(true);
 
+        // The document must have a creator
+        if (document.getCreatorReference() == null) {
+            document.setCreatorReference(xcontext.getUserReference());
+        }
+        // The document must have an author
+        if (document.getAuthorReference() == null) {
+            document.setAuthorReference(xcontext.getUserReference());
+        }
+
         // Save the document
-        XWikiContext xcontext = xcontextProvider.get();
-        XWiki xwiki = xcontext.getWiki();
         try {
             xwiki.saveDocument(document, message, xcontext);
         } catch (XWikiException e) {

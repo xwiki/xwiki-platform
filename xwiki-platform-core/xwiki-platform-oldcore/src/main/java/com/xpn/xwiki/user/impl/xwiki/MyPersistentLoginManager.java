@@ -65,6 +65,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private static final String FIELD_SEPARATOR = ":";
 
     /**
+     * The string used to prefix cookie domain to conform to RFC 2109.
+     */
+    private static final String COOKIE_DOT_PFX = ".";
+
+    /**
      * Log4J logger object to log messages in this class.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(MyPersistentLoginManager.class);
@@ -115,10 +120,25 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     }
 
     /**
+     * Ensure cookie domains are prefixed with a dot to conform to RFC 2109.
+     *
+     * @param domain a cookie domain.
+     * @return a conform cookie domain.
+     */
+    private String conformCookieDomain(String domain)
+    {
+        if (domain != null && !domain.startsWith(COOKIE_DOT_PFX)) {
+            return COOKIE_DOT_PFX.concat(domain);
+        } else {
+            return domain;
+        }
+    }
+
+    /**
      * Setter for the {@link #cookieDomains} parameter.
      * 
      * @param cdlist The new value for {@link #cookieDomains}. The list is processed, so that any value not starting
-     *            with a dot is prefixed with one, to respect the cookie RFC.
+     *               with a dot is prefixed with one, to respect the RFC 2109.
      * @see #cookieDomains
      */
     public void setCookieDomains(String[] cdlist)
@@ -126,11 +146,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         if (cdlist != null && cdlist.length > 0) {
             this.cookieDomains = new String[cdlist.length];
             for (int i = 0; i < cdlist.length; ++i) {
-                if (cdlist[i] != null && !cdlist[i].startsWith(".")) {
-                    this.cookieDomains[i] = ".".concat(cdlist[i]);
-                } else {
-                    this.cookieDomains[i] = cdlist[i];
-                }
+                this.cookieDomains[i] = conformCookieDomain(cdlist[i]);
             }
         } else {
             this.cookieDomains = null;
@@ -301,7 +317,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     /**
      * Compute the actual domain the cookie is supposed to be set for. Search through the list of generalized domains
      * for a partial match. If no match is found, then no specific domain is used, which means that the cookie will be
-     * valid only for the requested domain.
+     * valid only for the requested host.
      * 
      * @param request The servlet request.
      * @return The configured domain generalization that matches the request, or null if no match is found.
@@ -310,10 +326,13 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         String cookieDomain = null;
         if (this.cookieDomains != null) {
-            String servername = request.getServerName();
-            for (int i = 0; i < this.cookieDomains.length; i++) {
-                if (servername.indexOf(this.cookieDomains[i]) != -1) {
-                    cookieDomain = this.cookieDomains[i];
+            // Conform the server name like we conform cookie domain by prefixing with a dot.
+            // This will ensure both localhost.localdomain and any.localhost.localdomain will match
+            // the same cookie domain.
+            String servername = conformCookieDomain(request.getServerName());
+            for (String domain : this.cookieDomains) {
+                if (servername.endsWith(domain)) {
+                    cookieDomain = domain;
                     break;
                 }
             }

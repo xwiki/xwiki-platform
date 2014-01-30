@@ -144,18 +144,14 @@ public class XWikiDocumentLocaleEventGenerator extends
             revisionParameters.put(WikiDocumentFilter.PARAMETER_VALIDATIONSCRIPT, document.getValidationScript());
         }
         revisionParameters.put(WikiDocumentFilter.PARAMETER_SYNTAX, document.getSyntax());
-        if (document.isHidden()) {
-            revisionParameters.put(WikiDocumentFilter.PARAMETER_HIDDEN, document.isHidden());
-        }
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_HIDDEN, document.isHidden());
 
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, document.getAuthor());
         if (!document.getComment().isEmpty()) {
             revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, document.getComment());
         }
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_DATE, document.getDate());
-        if (document.isMinorEdit()) {
-            revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_MINOR, document.isMinorEdit());
-        }
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_MINOR, document.isMinorEdit());
 
         revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, document.getContentAuthor());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT_DATE, document.getContentUpdateDate());

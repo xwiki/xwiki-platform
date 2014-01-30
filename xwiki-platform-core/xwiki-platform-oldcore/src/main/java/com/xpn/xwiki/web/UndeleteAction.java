@@ -51,10 +51,9 @@ public class UndeleteAction extends XWikiAction
         if (doc.isNew() && xwiki.hasRecycleBin(context)) {
             String sindex = request.getParameter("id");
             long index = Long.parseLong(sindex);
-            XWikiDocument newdoc = xwiki.getRecycleBinStore().restoreFromRecycleBin(doc, index, context, true);
-            xwiki.saveDocument(newdoc, "Restored from recycle bin", context);
-            xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
+            xwiki.restoreFromRecycleBin(doc, index, "Restored from recycle bin", context);
         }
+
         sendRedirect(response, doc.getURL("view", context));
         return false;
     }

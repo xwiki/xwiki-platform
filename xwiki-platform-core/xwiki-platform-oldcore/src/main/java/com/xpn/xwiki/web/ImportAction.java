@@ -44,8 +44,8 @@ import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
-import org.xwiki.xar.internal.XarException;
-import org.xwiki.xar.internal.XarPackage;
+import org.xwiki.xar.XarException;
+import org.xwiki.xar.XarPackage;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -123,153 +123,12 @@ public class ImportAction extends XWikiAction
     private String importPackage(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
         throws IOException, XWikiException, WikiStreamException
     {
-        PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
-
         String all = request.get("all");
         if (!"1".equals(all)) {
-            String[] pages = request.getParameterValues("pages");
-
             if (context.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 0) == 1) {
-                XARInputProperties xarProperties = new XARInputProperties();
-                DocumentInstanceOutputProperties instanceProperties = new DocumentInstanceOutputProperties();
-
-                if (pages != null) {
-                    EntityReferenceSet entities = new EntityReferenceSet();
-
-                    EntityReferenceResolver<String> resolver =
-                        Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
-
-                    for (String pageName : pages) {
-                        String language = Util.normalizeLanguage(request.get("language_" + pageName));
-                        String actionName = "action_" + pageName;
-                        if (!StringUtils.isBlank(language)) {
-                            actionName += ("_" + language);
-                        }
-                        String defaultAction = request.get(actionName);
-                        int iAction;
-                        if (StringUtils.isBlank(defaultAction)) {
-                            iAction = DocumentInfo.ACTION_OVERWRITE;
-                        } else {
-                            try {
-                                iAction = Integer.parseInt(defaultAction);
-                            } catch (Exception e) {
-                                iAction = DocumentInfo.ACTION_SKIP;
-                            }
-                        }
-
-                        String docName = pageName.replaceAll(":[^:]*$", "");
-                        if (iAction == DocumentInfo.ACTION_SKIP) {
-                            entities.excludes(new LocalDocumentReference(
-                                resolver.resolve(docName, EntityType.DOCUMENT), LocaleUtils.toLocale(language)));
-                        }
-                    }
-
-                    xarProperties.setEntities(entities);
-                }
-
-                // Set the appropriate strategy to handle versions
-                if (StringUtils.equals(request.getParameter("historyStrategy"), "reset")) {
-                    instanceProperties.setPreviousDeleted(true);
-                    instanceProperties.setVersionPreserved(false);
-                    xarProperties.setWithHistory(false);
-                } else if (StringUtils.equals(request.getParameter("historyStrategy"), "replace")) {
-                    instanceProperties.setPreviousDeleted(true);
-                    instanceProperties.setVersionPreserved(true);
-                    xarProperties.setWithHistory(true);
-                } else {
-                    instanceProperties.setPreviousDeleted(false);
-                    instanceProperties.setVersionPreserved(false);
-                    xarProperties.setWithHistory(false);
-                }
-
-                // Set the backup pack option
-                if (StringUtils.equals(request.getParameter("importAsBackup"), "true")) {
-                    instanceProperties.setAuthorPreserved(true);
-                } else {
-                    instanceProperties.setAuthorPreserved(false);
-                }
-
-                BeanInputWikiStreamFactory<XARInputProperties> xarWikiStreamFactory =
-                    Utils.getComponent((Type) InputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_11.serialize());
-                BeanInputWikiStream<XARInputProperties> xarWikiStream =
-                    xarWikiStreamFactory.createInputWikiStream(xarProperties);
-
-                BeanOutputWikiStreamFactory<InstanceOutputProperties> instanceWikiStreamFactory =
-                    Utils.getComponent((Type) OutputWikiStreamFactory.class, WikiStreamType.XWIKI_INSTANCE.serialize());
-                BeanOutputWikiStream<InstanceOutputProperties> instanceWikiStream =
-                    instanceWikiStreamFactory.createOutputWikiStream(instanceProperties);
-
-                // Notify all the listeners about import
-                ObservationManager observation = Utils.getComponent(ObservationManager.class);
-
-                observation.notify(new XARImportingEvent(), null, context);
-
-                InputStream source = packFile.getContentInputStream(context);
-                xarProperties.setSource(new DefaultInputStreamInputSource(source));
-
-                try {
-                    xarWikiStream.read(instanceWikiStream);
-                } finally {
-                    source.close();
-
-                    observation.notify(new XARImportedEvent(), null, context);
-                }
+                importPackageWikiStream(packFile, request, context);
             } else {
-                importer.Import(packFile.getContentInputStream(context));
-                if (pages != null) {
-                    List<DocumentInfoAPI> filelist = importer.getFiles();
-                    for (DocumentInfoAPI dia : filelist) {
-                        dia.setAction(DocumentInfo.ACTION_SKIP);
-                    }
-
-                    for (String pageName : pages) {
-                        String language = Util.normalizeLanguage(request.get("language_" + pageName));
-                        String actionName = "action_" + pageName;
-                        if (!StringUtils.isBlank(language)) {
-                            actionName += ("_" + language);
-                        }
-                        String defaultAction = request.get(actionName);
-                        int iAction;
-                        if (StringUtils.isBlank(defaultAction)) {
-                            iAction = DocumentInfo.ACTION_OVERWRITE;
-                        } else {
-                            try {
-                                iAction = Integer.parseInt(defaultAction);
-                            } catch (Exception e) {
-                                iAction = DocumentInfo.ACTION_SKIP;
-                            }
-                        }
-
-                        String docName = pageName.replaceAll(":[^:]*$", "");
-                        if (language == null) {
-                            importer.setDocumentAction(docName, iAction);
-                        } else {
-                            importer.setDocumentAction(docName, language, iAction);
-                        }
-                    }
-                }
-
-                // Set the appropriate strategy to handle versions
-                if (StringUtils.equals(request.getParameter("historyStrategy"), "reset")) {
-                    importer.setPreserveVersion(false);
-                    importer.setWithVersions(false);
-                } else if (StringUtils.equals(request.getParameter("historyStrategy"), "replace")) {
-                    importer.setPreserveVersion(false);
-                    importer.setWithVersions(true);
-                } else {
-                    importer.setPreserveVersion(true);
-                    importer.setWithVersions(false);
-                }
-
-                // Set the backup pack option
-                if (StringUtils.equals(request.getParameter("importAsBackup"), "true")) {
-                    importer.setBackupPack(true);
-                } else {
-                    importer.setBackupPack(false);
-                }
-
-                // Import files
-                importer.install();
+                importPackageOld(packFile, request, context);
             }
 
             if (!StringUtils.isBlank(request.getParameter("ajax"))) {
@@ -283,5 +142,160 @@ public class ImportAction extends XWikiAction
         }
 
         return null;
+    }
+
+    private void importPackageOld(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
+        throws IOException, XWikiException, WikiStreamException
+    {
+        PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
+
+        String[] pages = request.getParameterValues("pages");
+
+        importer.Import(packFile.getContentInputStream(context));
+        if (pages != null) {
+            List<DocumentInfoAPI> filelist = importer.getFiles();
+            for (DocumentInfoAPI dia : filelist) {
+                dia.setAction(DocumentInfo.ACTION_SKIP);
+            }
+
+            for (String pageName : pages) {
+                String language = Util.normalizeLanguage(request.get("language_" + pageName));
+                String actionName = "action_" + pageName;
+                if (!StringUtils.isBlank(language)) {
+                    actionName += ("_" + language);
+                }
+                String defaultAction = request.get(actionName);
+                int iAction;
+                if (StringUtils.isBlank(defaultAction)) {
+                    iAction = DocumentInfo.ACTION_OVERWRITE;
+                } else {
+                    try {
+                        iAction = Integer.parseInt(defaultAction);
+                    } catch (Exception e) {
+                        iAction = DocumentInfo.ACTION_SKIP;
+                    }
+                }
+
+                String docName = pageName.replaceAll(":[^:]*$", "");
+                if (language == null) {
+                    importer.setDocumentAction(docName, iAction);
+                } else {
+                    importer.setDocumentAction(docName, language, iAction);
+                }
+            }
+        }
+
+        // Set the appropriate strategy to handle versions
+        if (StringUtils.equals(request.getParameter("historyStrategy"), "reset")) {
+            importer.setPreserveVersion(false);
+            importer.setWithVersions(false);
+        } else if (StringUtils.equals(request.getParameter("historyStrategy"), "replace")) {
+            importer.setPreserveVersion(false);
+            importer.setWithVersions(true);
+        } else {
+            importer.setPreserveVersion(true);
+            importer.setWithVersions(false);
+        }
+
+        // Set the backup pack option
+        if (StringUtils.equals(request.getParameter("importAsBackup"), "true")) {
+            importer.setBackupPack(true);
+        } else {
+            importer.setBackupPack(false);
+        }
+
+        // Import files
+        importer.install();
+    }
+
+    private void importPackageWikiStream(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
+        throws IOException, XWikiException, WikiStreamException
+    {
+        String[] pages = request.getParameterValues("pages");
+
+        XARInputProperties xarProperties = new XARInputProperties();
+        DocumentInstanceOutputProperties instanceProperties = new DocumentInstanceOutputProperties();
+
+        if (pages != null) {
+            EntityReferenceSet entities = new EntityReferenceSet();
+
+            EntityReferenceResolver<String> resolver =
+                Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
+
+            for (String pageName : pages) {
+                String language = Util.normalizeLanguage(request.get("language_" + pageName));
+                String actionName = "action_" + pageName;
+                if (!StringUtils.isBlank(language)) {
+                    actionName += ("_" + language);
+                }
+                String defaultAction = request.get(actionName);
+                int iAction;
+                if (StringUtils.isBlank(defaultAction)) {
+                    iAction = DocumentInfo.ACTION_OVERWRITE;
+                } else {
+                    try {
+                        iAction = Integer.parseInt(defaultAction);
+                    } catch (Exception e) {
+                        iAction = DocumentInfo.ACTION_SKIP;
+                    }
+                }
+
+                String docName = pageName.replaceAll(":[^:]*$", "");
+                if (iAction == DocumentInfo.ACTION_SKIP) {
+                    entities.excludes(new LocalDocumentReference(resolver.resolve(docName, EntityType.DOCUMENT),
+                        LocaleUtils.toLocale(language)));
+                }
+            }
+
+            xarProperties.setEntities(entities);
+        }
+
+        // Set the appropriate strategy to handle versions
+        if (StringUtils.equals(request.getParameter("historyStrategy"), "reset")) {
+            instanceProperties.setPreviousDeleted(true);
+            instanceProperties.setVersionPreserved(false);
+            xarProperties.setWithHistory(false);
+        } else if (StringUtils.equals(request.getParameter("historyStrategy"), "replace")) {
+            instanceProperties.setPreviousDeleted(true);
+            instanceProperties.setVersionPreserved(true);
+            xarProperties.setWithHistory(true);
+        } else {
+            instanceProperties.setPreviousDeleted(false);
+            instanceProperties.setVersionPreserved(false);
+            xarProperties.setWithHistory(false);
+        }
+
+        // Set the backup pack option
+        if (StringUtils.equals(request.getParameter("importAsBackup"), "true")) {
+            instanceProperties.setAuthorPreserved(true);
+        } else {
+            instanceProperties.setAuthorPreserved(false);
+        }
+
+        BeanInputWikiStreamFactory<XARInputProperties> xarWikiStreamFactory =
+            Utils.getComponent((Type) InputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_11.serialize());
+        BeanInputWikiStream<XARInputProperties> xarWikiStream =
+            xarWikiStreamFactory.createInputWikiStream(xarProperties);
+
+        BeanOutputWikiStreamFactory<InstanceOutputProperties> instanceWikiStreamFactory =
+            Utils.getComponent((Type) OutputWikiStreamFactory.class, WikiStreamType.XWIKI_INSTANCE.serialize());
+        BeanOutputWikiStream<InstanceOutputProperties> instanceWikiStream =
+            instanceWikiStreamFactory.createOutputWikiStream(instanceProperties);
+
+        // Notify all the listeners about import
+        ObservationManager observation = Utils.getComponent(ObservationManager.class);
+
+        observation.notify(new XARImportingEvent(), null, context);
+
+        InputStream source = packFile.getContentInputStream(context);
+        xarProperties.setSource(new DefaultInputStreamInputSource(source));
+
+        try {
+            xarWikiStream.read(instanceWikiStream.getFilter());
+        } finally {
+            source.close();
+
+            observation.notify(new XARImportedEvent(), null, context);
+        }
     }
 }

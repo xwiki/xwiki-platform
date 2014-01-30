@@ -82,6 +82,9 @@
     #set ($steps = $services.distribution.jobStatus.steps)
     ## Ignore the welcome step.
     #set ($steps = $steps.subList(1, $steps.size()))
+    ## Ignore the report step
+    #set($lastElement = $steps.size() - 1)
+    #set ($steps = $steps.subList(0, $lastElement))
     <ul class="steps">
       #foreach ($step in $steps)
         <li>

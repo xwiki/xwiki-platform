@@ -32,7 +32,6 @@ import org.bouncycastle.asn1.cryptopro.CryptoProObjectIdentifiers;
 import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.ua.UAObjectIdentifiers;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
@@ -92,8 +91,6 @@ public class DefaultKeyFactory extends AbstractBcKeyFactory
             hint = "ElGamal";
         } else if (algId.equals(CryptoProObjectIdentifiers.gostR3410_94)) {
             hint = "GOST3410";
-        } else if (algId.equals(UAObjectIdentifiers.dstu4145le) || algId.equals(UAObjectIdentifiers.dstu4145be)) {
-            hint = "DSTU";
         }
 
         if (hint == null) {

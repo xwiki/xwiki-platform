@@ -81,6 +81,8 @@ public class XWikiAttachment implements Cloneable
 
     public XWikiAttachment(XWikiDocument doc, String filename)
     {
+        this();
+
         setDoc(doc);
         setFilename(filename);
     }
@@ -561,7 +563,7 @@ public class XWikiAttachment implements Cloneable
     }
 
     /**
-     * Retrive the content of this attachment as an input stream.
+     * Retrieve the content of this attachment as an input stream.
      * 
      * @param context current XWikiContext
      * @return an InputStream to consume for receiving the content of this attachment

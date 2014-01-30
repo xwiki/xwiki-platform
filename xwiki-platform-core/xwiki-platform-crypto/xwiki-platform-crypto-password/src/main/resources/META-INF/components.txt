@@ -9,3 +9,4 @@ org.xwiki.crypto.password.internal.pbe.factory.BcPBES2DesEdeCipherFactory
 org.xwiki.crypto.password.internal.pbe.factory.BcPBES2Rc2CipherFactory
 org.xwiki.crypto.password.internal.pbe.factory.BcPBES2Rc5b64CipherFactory
 org.xwiki.crypto.password.internal.pbe.factory.BcPBES2Rc5b128CipherFactory
+org.xwiki.crypto.password.internal.DefaultPrivateKeyPasswordBasedEncryptor

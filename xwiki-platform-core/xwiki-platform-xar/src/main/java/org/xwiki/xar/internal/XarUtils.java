@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.xar.XarException;
 import org.xwiki.xar.internal.model.XarDocumentModel;
 import org.xwiki.xml.stax.StAXUtils;
 

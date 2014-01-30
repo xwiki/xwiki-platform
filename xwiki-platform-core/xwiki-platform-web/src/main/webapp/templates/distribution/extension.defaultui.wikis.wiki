@@ -5,6 +5,7 @@
 ## register the Velocity macros from the parsed template. The only solution we found is to use #evaluate with #include
 ## but unfortunately this doesn't allow the template to be overridden from the skin.
 #evaluate("#include('extension.vm')")
+#evaluate("#include('distribution/macros.vm')")
 {{/velocity}}
 
 {{velocity}}
@@ -15,7 +16,6 @@
   ## We use HTML here because definition lists don't support block content in wiki syntax (XRENDERING-233).
   {{html}}
   <dl>
-  #set ($showCompleteStepButton = true)
   #foreach ($wikiName in $xwiki.wikiNames)
     ## The main wiki is handled in the first step.
     #if ($wikiName != $xcontext.mainWikiName)
@@ -25,23 +25,25 @@
       #set ($extensionNamespace = "wiki:$wikiName")
       <dt>#displayExtensionNamespace($extensionNamespace)</dt>
       <dd>
-        #if ($extension)
-          #displayExtension($extension)
-          #if ($extensionStatus != 'installed')
-            #set ($showCompleteStepButton = false)
+        #maybeRepairPreviousUI($wikiName $extension)
+        <div class="recommendedUI">
+          #if ($extension)
+            #displayExtension($extension)
+          #else
+            <div class="box infomessage">
+              $services.localization.render('extensions.advancedSearch.noResults',
+              ["<strong>$!escapetool.xml($extensionId.id)</strong>",
+              "<strong>$!escapetool.xml($extensionId.version)</strong>"])
+            </div>
           #end
-        #else
-          <div class="box infomessage">
-            $services.localization.render('extensions.advancedSearch.noResults',
-            ["<strong>$!escapetool.xml($extensionId.id)</strong>",
-            "<strong>$!escapetool.xml($extensionId.version)</strong>"])
-          </div>
-          #set ($showCompleteStepButton = false)
-        #end
+        </div>
       </dd>
     #end
   #end
   </dl>
   {{/html}}
+  ## It's not mandatory to upgrade all the wikis in this step because the upgrade can be performed later by accessing
+  ## each wiki separately.
+  #set ($showCompleteStepButton = true)
 #end
 {{/velocity}}

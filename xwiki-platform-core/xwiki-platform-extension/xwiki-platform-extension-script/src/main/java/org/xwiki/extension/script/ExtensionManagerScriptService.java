@@ -338,6 +338,10 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         installRequest.setInteractive(true);
         installRequest.setProperty(PROPERTY_JOB_TYPE, InstallJob.JOBTYPE);
 
+        // Provide informations on what started the job
+        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getDatabase());
+        installRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
+
         return installRequest;
     }
 
@@ -399,6 +403,10 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         if (StringUtils.isNotBlank(namespace)) {
             installRequest.addNamespace(namespace);
         }
+
+        // Provide informations on what started the job
+        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getDatabase());
+        installRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
 
         setRightsProperties(installRequest);
 
@@ -511,6 +519,10 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
             uninstallRequest.addNamespace(namespace);
         }
 
+        // Provide informations on what started the job
+        uninstallRequest.setProperty("context.wiki", this.xcontextProvider.get().getDatabase());
+        uninstallRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
+
         uninstallRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
         XWikiDocument callerDocument = getCallerDocument();
         if (callerDocument != null) {
@@ -584,6 +596,10 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
             uninstallRequest.addNamespace(namespace);
         }
 
+        // Provide informations on what started the job
+        uninstallRequest.setProperty("context.wiki", this.xcontextProvider.get().getDatabase());
+        uninstallRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
+
         uninstallRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
         XWikiDocument callerDocument = getCallerDocument();
         if (callerDocument != null) {
@@ -615,6 +631,10 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, namespace));
         installRequest.addNamespace(namespace);
 
+        // Provide informations on what started the job
+        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getDatabase());
+        installRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
+
         return installRequest;
     }
 
@@ -622,6 +642,10 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         InstallRequest installRequest = new InstallRequest();
         installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, null));
+
+        // Provide informations on what started the job
+        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getDatabase());
+        installRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
 
         return installRequest;
     }

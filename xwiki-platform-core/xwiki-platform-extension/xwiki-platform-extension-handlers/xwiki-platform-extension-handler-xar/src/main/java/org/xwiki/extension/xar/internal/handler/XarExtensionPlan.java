@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionException;
+import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.job.plan.ExtensionPlan;
@@ -43,9 +44,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.xar.internal.XarEntry;
-import org.xwiki.xar.internal.XarException;
-import org.xwiki.xar.internal.XarPackage;
+import org.xwiki.xar.XarEntry;
+import org.xwiki.xar.XarException;
+import org.xwiki.xar.XarPackage;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -64,6 +65,9 @@ public class XarExtensionPlan implements Closeable
 
     public final Map<String, Map<XarEntry, XarExtensionPlanEntry>> previousXAREntries;
 
+    /**
+     * Map<namespace, >
+     */
     public final Map<String, Map<XarEntry, LocalExtension>> nextXAREntries;
 
     public XarExtensionPlan(ExtensionPlan plan, InstalledExtensionRepository xarRepository,
@@ -71,6 +75,8 @@ public class XarExtensionPlan implements Closeable
     {
         this.previousXAREntries = new HashMap<String, Map<XarEntry, XarExtensionPlanEntry>>();
         this.nextXAREntries = new HashMap<String, Map<XarEntry, LocalExtension>>();
+
+        Map<ExtensionId, XarExtensionPlanEntry> planEntry = new HashMap<ExtensionId, XarExtensionPlanEntry>();
 
         for (ExtensionPlanAction action : plan.getActions()) {
             if (action.getExtension().getType().equals(XarExtensionHandler.TYPE)) {
@@ -80,6 +86,13 @@ public class XarExtensionPlan implements Closeable
                     if (previousExtension != null) {
                         XarInstalledExtension previousXARExtension =
                             (XarInstalledExtension) xarRepository.getInstalledExtension(previousExtension.getId());
+
+                        XarExtensionPlanEntry xarPlanEntry = planEntry.get(previousXARExtension.getId());
+                        if (xarPlanEntry == null) {
+                            xarPlanEntry =
+                                new XarExtensionPlanEntry(previousXARExtension, previousXARExtension.getXarPackage());
+                            planEntry.put(previousXARExtension.getId(), xarPlanEntry);
+                        }
 
                         for (XarEntry entry : previousXARExtension.getXarPackage().getEntries()) {
                             String wiki;
@@ -93,7 +106,7 @@ public class XarExtensionPlan implements Closeable
                                 pages = new HashMap<XarEntry, XarExtensionPlanEntry>();
                                 this.previousXAREntries.put(wiki, pages);
                             }
-                            pages.put(entry, new XarExtensionPlanEntry(previousXARExtension));
+                            pages.put(entry, xarPlanEntry);
                         }
                     }
                 }
@@ -163,6 +176,52 @@ public class XarExtensionPlan implements Closeable
         return planEntry;
     }
 
+    public XarInstalledExtension getPreviousXarExtension(DocumentReference documentReference)
+    {
+        String wiki = documentReference.getWikiReference().getName();
+        LocalDocumentReference localDocumentReference = new LocalDocumentReference(documentReference);
+
+        return getPreviousXarExtension(wiki, localDocumentReference);
+    }
+
+    public XarInstalledExtension getPreviousXarExtension(String wiki, LocalDocumentReference localDocumentReference)
+    {
+        XarExtensionPlanEntry entry = getPreviousXarExtensionPlanEntry(wiki, localDocumentReference);
+
+        return entry != null ? entry.extension : null;
+    }
+
+    public LocalExtension getNextXarExtension(DocumentReference documentReference)
+    {
+        WikiReference wikiReference = documentReference.getWikiReference();
+        LocalDocumentReference localDocumentReference = new LocalDocumentReference(documentReference);
+
+        return getNextXarExtension(wikiReference.getName(), localDocumentReference);
+    }
+
+    public LocalExtension getNextXarExtension(String wiki, LocalDocumentReference localDocumentReference)
+    {
+        XarEntry xarEntry = new XarEntry(localDocumentReference);
+
+        LocalExtension nextExtension = null;
+
+        Map<XarEntry, LocalExtension> wikiEntry = this.nextXAREntries.get(wiki);
+
+        if (wikiEntry != null) {
+            nextExtension = wikiEntry.get(xarEntry);
+        }
+
+        if (nextExtension == null) {
+            wikiEntry = this.nextXAREntries.get(null);
+
+            if (wikiEntry != null) {
+                nextExtension = wikiEntry.get(xarEntry);
+            }
+        }
+
+        return nextExtension;
+    }
+
     public XWikiDocument getPreviousXWikiDocument(DocumentReference documentReference, Packager packager)
         throws WikiStreamException, ComponentLookupException, IOException
     {
@@ -189,5 +248,18 @@ public class XarExtensionPlan implements Closeable
                 entry.close();
             }
         }
+    }
+
+    public boolean containsNewPage(DocumentReference documentReference)
+    {
+        WikiReference wikiReference = documentReference.getWikiReference();
+        LocalDocumentReference localDocumentReference = new LocalDocumentReference(documentReference);
+
+        return containsNewPage(wikiReference, localDocumentReference);
+    }
+
+    public boolean containsNewPage(WikiReference wikiReference, LocalDocumentReference localDocumentReference)
+    {
+        return getNextXarExtension(wikiReference.getName(), localDocumentReference) != null;
     }
 }

@@ -39,6 +39,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.xar.internal.handler.XarExtensionPlan;
+import org.xwiki.logging.marker.BeginTranslationMarker;
+import org.xwiki.logging.marker.EndTranslationMarker;
+import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -54,8 +57,8 @@ import org.xwiki.wikistream.internal.input.BeanInputWikiStream;
 import org.xwiki.wikistream.internal.input.DefaultInputStreamInputSource;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
-import org.xwiki.xar.internal.XarEntry;
-import org.xwiki.xar.internal.XarFile;
+import org.xwiki.xar.XarEntry;
+import org.xwiki.xar.XarFile;
 import org.xwiki.xar.internal.model.XarModel;
 
 import com.xpn.xwiki.XWikiContext;
@@ -75,6 +78,21 @@ import com.xpn.xwiki.internal.event.XARImportingEvent;
 @Singleton
 public class Packager
 {
+    private static final BeginTranslationMarker LOG_INSTALLDOCUMENT_BEGIN = new BeginTranslationMarker(
+        "extension.xar.log.install.document.begin");
+
+    private static final EndTranslationMarker LOG_INSTALLDOCUMENT_SUCCESS_END = new EndTranslationMarker(
+        "extension.xar.log.install.document.success.end");
+
+    private static final EndTranslationMarker LOG_INSTALLDOCUMENT_FAILURE_END = new EndTranslationMarker(
+        "extension.xar.log.install.document.failure.end");
+
+    private static final TranslationMarker LOG_DELETEDDOCUMENT = new TranslationMarker(
+        "extension.xar.log.delete.document");
+
+    private static final TranslationMarker LOG_DELETEDDOCUMENT_FAILURE = new TranslationMarker(
+        "extension.xar.log.delete.document.failure");
+
     @Inject
     private ComponentManager componentManager;
 
@@ -196,20 +214,25 @@ public class Packager
             previousDocument = null;
         }
 
+        if (configuration.isVerbose()) {
+            this.logger.info(LOG_INSTALLDOCUMENT_BEGIN, "Installing document [{}]",
+                nextDocument.getDocumentReferenceWithLocale());
+        }
+
         try {
             XarEntryMergeResult entityMergeResult =
                 this.importer.saveDocument(comment, previousDocument, currentDocument, nextDocument, configuration);
 
-            if (configuration.isLogEnabled()) {
-                this.logger.info("Successfully imported document [{}] in language [{}]",
-                    nextDocument.getDocumentReference(), nextDocument.getRealLocale());
+            if (configuration.isVerbose()) {
+                this.logger.info(LOG_INSTALLDOCUMENT_SUCCESS_END, "Done installing document [{}]",
+                    nextDocument.getDocumentReferenceWithLocale());
             }
 
             return entityMergeResult;
         } catch (Exception e) {
-            if (configuration.isLogEnabled()) {
-                this.logger.info("Failed to import document [{}] in language [{}]",
-                    nextDocument.getDocumentReference(), nextDocument.getRealLocale());
+            if (configuration.isVerbose()) {
+                this.logger.error(LOG_INSTALLDOCUMENT_FAILURE_END, "Failed to install document [{}]",
+                    nextDocument.getDocumentReferenceWithLocale(), e);
             }
         }
 
@@ -237,10 +260,9 @@ public class Packager
         for (XarEntry xarEntry : entries) {
             // Only delete what should be deleted.
             if (configuration.getEntriesToImport() == null
-                || configuration.getEntriesToImport().contains(xarEntry.getName())) {
+                || configuration.getEntriesToImport().contains(xarEntry.getEntryName())) {
                 DocumentReference documentReference =
-                    new DocumentReference(this.resolver.resolve(xarEntry.getReference(), wikiReference), xarEntry
-                        .getReference().getLocale());
+                    new DocumentReference(this.resolver.resolve(xarEntry, wikiReference), xarEntry.getLocale());
 
                 if (!configuration.isSkipMandatorytDocuments() || !isMandatoryDocument(documentReference)) {
                     deleteDocument(documentReference, configuration);
@@ -254,16 +276,23 @@ public class Packager
         XWikiContext xcontext = this.xcontextProvider.get();
 
         try {
+            // Make sure to have an expected context as much as possible
+            if (configuration.getUserReference() != null) {
+                xcontext.setUserReference(configuration.getUserReference());
+            }
+
             XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
 
             if (!document.isNew()) {
                 xcontext.getWiki().deleteDocument(document, xcontext);
 
-                this.logger.info("Successfully deleted document [{}] in language [{}]",
-                    document.getDocumentReference(), document.getRealLocale());
+                if (configuration.isVerbose()) {
+                    this.logger.info(LOG_DELETEDDOCUMENT, "Deleted document [{}]",
+                        document.getDocumentReferenceWithLocale());
+                }
             }
         } catch (XWikiException e) {
-            this.logger.error("Failed to delete document [{}]", documentReference, e);
+            this.logger.error(LOG_DELETEDDOCUMENT_FAILURE, "Failed to delete document [{}]", documentReference, e);
         }
     }
 
@@ -277,7 +306,7 @@ public class Packager
     {
         XarEntry realEntry = xarFile.getEntry(documentReference);
         if (realEntry != null) {
-            InputStream stream = xarFile.getInputStream(realEntry.getReference());
+            InputStream stream = xarFile.getInputStream(realEntry);
 
             try {
                 return getXWikiDocument(stream, wikiReference);
@@ -340,8 +369,8 @@ public class Packager
         for (XarEntry xarEntry : pages) {
             // Only delete what should be deleted.
             if (configuration.getEntriesToImport() == null
-                || configuration.getEntriesToImport().contains(xarEntry.getName())) {
-                DocumentReference documentReference = new DocumentReference(xarEntry.getReference(), wikiReference);
+                || configuration.getEntriesToImport().contains(xarEntry.getEntryName())) {
+                DocumentReference documentReference = new DocumentReference(xarEntry, wikiReference);
 
                 if (!configuration.isSkipMandatorytDocuments() || !isMandatoryDocument(documentReference)) {
                     documents.add(documentReference);

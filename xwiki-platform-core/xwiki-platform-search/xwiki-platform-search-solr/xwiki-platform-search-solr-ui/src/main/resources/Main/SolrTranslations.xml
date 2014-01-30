@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
 
 <xwikidoc version="1.1">
   <web>Main</web>
@@ -62,29 +81,6 @@ solr.result.mediaType=File of type {0}
 solr.result.uploadedBy=Uploaded by {0} on {1} ({2})
 solr.result.highlightAll=Highlight all matches
 
-solr.filter.title=Advanced Options
-solr.filter.hint=Select predefined filters that will be applied on your query.
-solr.filter.toggle=Toggle the search filter
-solr.filterBy.wiki=Wiki
-solr.filterBy.wiki.all=All wikis
-solr.filterBy.type=Result type
-solr.filterBy.type.all=All result types
-solr.filterBy.type.document=Document
-solr.filterBy.type.attachment=Attachment
-solr.filterBy.type.object=Object
-solr.filterBy.type.object_property=Object property
-solr.filterBy.language=Language
-solr.filterBy.language.all=All languages
-solr.filterBy.space=Space
-solr.filterBy.fileType=Attachment media type
-solr.filterBy.fileType.all=All media types
-solr.filterBy.fileType.image=Image
-solr.filterBy.fileType.audio=Audio
-solr.filterBy.fileType.video=Video
-solr.filterBy.fileType.text=Text
-solr.filter.queryBoost.label=Query boost
-solr.filter.queryBoost.hint=Allows to modify the relevance of certain fields e.g. title^1.2 name^2.0 author^1.0 doccontent^0.5
-
 solr.facets.title=Refine your search
 solr.facets.hint=Select a category and activate filters on the current results
 solr.facets.resetAll=Reset all
@@ -92,6 +88,31 @@ solr.facets.expandAll=Expand all
 solr.facets.collapseAll=Collapse all
 solr.facets.emptyValue=Empty Value
 solr.facets.moreValues={0} more
+
+solr.filterBy.type.document=Document
+solr.filterBy.type.attachment=Attachment
+solr.filterBy.type.object=Object
+solr.filterBy.type.object_property=Object property
+
+solr.filterBy.fileType.image=Image
+solr.filterBy.fileType.audio=Audio
+solr.filterBy.fileType.video=Video
+solr.filterBy.fileType.text=Text
+solr.filterBy.fileType.office=Office
+solr.filterBy.fileType.word=Word
+solr.filterBy.fileType.presentation=Presentation
+solr.filterBy.fileType.spreadsheet=Spreadsheet
+solr.filterBy.fileType.archive=Archive
+solr.filterBy.fileType.font=Font
+solr.filterBy.fileType.other=Other
+solr.facet.fileType.text.plain=Plain Text
+solr.facet.fileType.text.javascript=JavaScript
+solr.facet.fileType.text.java-source=Java Source
+solr.facet.fileType.text.sh=Shell Script
+solr.facet.fileType.image.icon=Icon
+solr.facet.fileType.archive.java-archive=JAR
+solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.other.octet-stream=Binary Data
 
 solr.facet.date.today=Today
 solr.facet.date.last7Days=Last 7 days
@@ -104,6 +125,15 @@ solr.facet.date.between=From {0} to {1}
 solr.facet.date.after=After {0}
 solr.facet.date.before=Before {0}
 solr.facet.date.any=Any date
+
+solr.facet.size.tiny=Tiny
+solr.facet.size.small=Small
+solr.facet.size.medium=Medium
+solr.facet.size.large=Large
+solr.facet.size.between=Between {0} and {1}
+solr.facet.size.lessThan=Less than {0}
+solr.facet.size.moreThan=More than {0}
+solr.facet.size.any=Any size
 
 solr.field.type=Result type
 solr.field.locale=Language
@@ -130,7 +160,7 @@ solr.field.filename=Attachment Name
 solr.field.attcontent=Attachment Content
 solr.field.comment=Comments
 solr.field.objcontent=Objects
-solr.field.mimetype=Media Type
+solr.field.mimetype=File Type
 solr.field.attauthor=Uploaded By
 solr.field.attdate=Upload Date
 solr.field.attsize=File Size</content>

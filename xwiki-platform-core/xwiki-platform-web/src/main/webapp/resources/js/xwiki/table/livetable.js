@@ -19,14 +19,13 @@ XWiki.widgets.LiveTable = Class.create({
     * <ul>
     * <li>"limit" the maximum number of row entries in the table</li>
     * <li>"maxPages" the maximum number of pages to display at the same time in the pagination section.</li>
+    * <li>"selectedTags" the list of tags that should be selected initially in the tag cloud</li>
     * </ul>
     * @todo Make this a valid ARIA table: http://www.w3.org/TR/aria-role/#structural
     */
   initialize: function(url, domNodeName, handler, options)
   {
-    if (!options) {
-      var options = {};
-    }
+    options = options || {};
 
     // id of the root element that encloses this livetable
     this.domNodeName = domNodeName;
@@ -54,10 +53,6 @@ XWiki.widgets.LiveTable = Class.create({
 
      // Array of nodes under which a page size control will be displayed
     this.pageSizeNodes = options.pageSizeNodes || $(this.domNodeName).select(".xwiki-livetable-pagesize");
-
-    if (typeof options == "undefined") {
-       options = {};
-    }
 
     this.action = options.action || "view"; // FIXME check if this can be removed safely.
 
@@ -98,9 +93,9 @@ XWiki.widgets.LiveTable = Class.create({
       });
     }
 
-    if ($(domNodeName + "-tagcloud"))
-    {
-       this.tagCloud = new LiveTableTagCloud(this, domNodeName + "-tagcloud");
+    if ($(domNodeName + "-tagcloud")) {
+      this.tags = options.selectedTags;
+      this.tagCloud = new LiveTableTagCloud(this, domNodeName + "-tagcloud");
     }
     this.loadingStatus = $(this.domNodeName + '-ajax-loader') || $('ajax-loader');
     this.limitsDisplay = $(this.domNodeName + '-limits') || new Element("div");
@@ -1009,6 +1004,10 @@ var LiveTableTagCloud = Class.create({
       this.table = table;
       this.domNode = $(domNodeName);
       this.cloudFilter = false;
+      this.selectedTags = {};
+      for (var i = 0; i < table.tags.size(); i++) {
+        this.selectedTags[table.tags[i]] = {};
+      }
       if (typeof tags == "array") {
          this.tags = tags;
          if (tags.length > 0) {

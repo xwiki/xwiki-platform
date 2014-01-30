@@ -47,7 +47,7 @@ public class UserInstanceOutputWikiStreamTest extends AbstractInstanceWikiStream
     {
         UserInstanceOutputProperties outputProperties = new UserInstanceOutputProperties();
 
-        outputProperties.setPreserveVersion(true);
+        outputProperties.setVersionPreserved(true);
 
         importFromXML("user1", outputProperties);
 

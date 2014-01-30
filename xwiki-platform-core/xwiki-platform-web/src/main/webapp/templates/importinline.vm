@@ -71,10 +71,8 @@
         ##
         #set($attach = $doc.getAttachment($request.file))
         #if($attach)
-          #set($packager = $xwiki.package)
-          #set($ok = $packager.importPackageFromByteArray($attach.content))
-          #set($json = $packager.toJSON())
-          #if(!$ok)
+          #set($package = $services.xar.getXarPackage($attach.contentInputStream, true))
+          #if(!$package)
             #error("There was an error reading the file ${escapetool.xml(${request.file})}. $!xcontext.import_error")
           #else
           <div class="legend">$services.localization.render('core.importer.availableDocuments')</div>
@@ -84,28 +82,28 @@
                 <span class="label">$services.localization.render('core.importer.package')</span>
                 <span class="filename">$attach.filename</span>
               </div>
-              #if("$!packager.name" != '')
+              #if("$!package.packageName" != '')
               <div>
                 <span class="label">$services.localization.render('core.importer.package.description')</span>
-                <span class="name">$packager.name</span>
+                <span class="name">$package.packageName</span>
               </div>
               #end
-              #if("$!packager.version" != '')
+              #if("$!package.packageVersion" != '')
               <div>
                 <span class="label">$services.localization.render('core.importer.package.version')</span>
-                <span class="version">$packager.version</span>
+                <span class="version">$package.packageVersion</span>
               </div>
               #end
-              #if("$!packager.authorName" != '')
+              #if("$!package.packageAuthor" != '')
               <div>
                 <span class="label">$services.localization.render('core.importer.package.author')</span>
-                <span class="author">$packager.getAuthorName()</span>
+                <span class="author">$package.packageAuthor</span>
               </div>
               #end
-              #if("$!packager.licence" != '')
+              #if("$!package.packageLicense" != '')
               <div>
                 <span class="label">$services.localization.render('core.importer.package.licence')</span>
-                <span class="licence">$packager.licence</span>
+                <span class="licence">$package.packageLicense</span>
               </div>
               #end
             </div>
@@ -118,11 +116,12 @@
                 <div id="package">
                   <ul class="xlist package">
                     <li>
-                      ## This hidden input ensures that if no page is selected, the 'pages' parameter is still passsed, thus skipping all the documents in the xar
+                      ## This hidden input ensures that if no page is selected, the 'pages' parameter is still passed, thus skipping all the documents in the xar
                       <input type='hidden' name='pages' value=''/>
                     </li>
                     ## List each page in the package
-                    #foreach($space in $sorttool.sort($json.get('files').keySet()))
+                    #foreach($spaceNode in $services.model.toTree($package.entries).children)
+                    #set($space = $spaceNode.reference.name)
                     <li class="xitem xunderline">
                       <div class="xitemcontainer">
                       <div class="spacename">$space</div>
@@ -130,18 +129,19 @@
                       <div class="pages">
                       <ul class="xlist pages">
                       ## List each document in the current space
-                      #foreach($document in $sorttool.sort($json.get('files').get($space).keySet()))
-                        ## List each version of the current document
-                        #foreach($version in $json.get('files').get($space).get($document))
+                      #foreach($pageNode in $spaceNode.children)
+                        #set($document = $pageNode.reference.name)
+                        ## List each locale of the current document
+                        #foreach($locale in $pageNode.locales)
                         <li class="xitem xhighlight">
                           <div class="xitemcontainer xpagecontainer">
                             <span class="checkbox">
                               <input type="checkbox" name="pages"
-                                    value="${version.fullName}#if("$!version.language" != ''):${version.language}#end" checked />
+                                    value="${escapetool.xml($services.model.serialize($locale, 'local'))}#if("$!locale.locale" != ''):${locale.locale}#end" checked />
                             </span>
                             <span class="documentName">
-                              <input type="hidden" name="$!{escapetool.xml($version.fullName)}:$!{escapetool.xml($version.language)}" value="$!{escapetool.xml($version.language)}" />
-                              $document #if("$!version.language" != '') - $version.language #end
+                              <input type="hidden" name="$!{escapetool.xml($services.model.serialize($locale, 'local'))}:$!{escapetool.xml($locale.locale)}" value="$!{escapetool.xml($locale.locale)}" />
+                              $document #if("$!locale.locale" != '') - $locale.locale #end
                             </span>
                             <div class="clearfloats"></div>
                           </div>
@@ -169,7 +169,8 @@
                      $services.localization.render('core.importer.resetHistory')
                   </div>
                 </div>
-                #if($packager.hasBackupPackImportRights())
+                ## TODO: replace with a new API to introduce (impossible to safely test right on a different wiki from velocity without PR)
+                #if($xwiki.package.hasBackupPackImportRights())
                 <div class="importOption">
                   <input type="checkbox" name="importAsBackup" value="true" #if($packager.isBackupPack())checked="checked"#end/>
                   $services.localization.render('core.importer.importAsBackup')

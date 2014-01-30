@@ -1551,6 +1551,23 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         Assert.assertTrue(document.equalsData(otherDocument));
     }
 
+    public void testEqualsAttachments() throws XWikiException
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        XWikiDocument otherDocument = document.clone();
+
+        XWikiAttachment attachment = document.addAttachment("file", new byte[] {1, 2}, getContext());
+        XWikiAttachment otherAttachment = otherDocument.addAttachment("file", new byte[] {1, 2}, getContext());
+
+        Assert.assertTrue(document.equals(otherDocument));
+        Assert.assertTrue(document.equalsData(otherDocument));
+
+        otherAttachment.setContent(new byte[] {1, 2, 3});
+
+        Assert.assertFalse(document.equals(otherDocument));
+        Assert.assertFalse(document.equalsData(otherDocument));
+    }
+
     public void testContentDirtyWhenAttachmenListChanges()
     {
         XWikiDocument document = new XWikiDocument();

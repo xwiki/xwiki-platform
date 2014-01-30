@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.manager.ComponentManager;
@@ -49,6 +50,7 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 public abstract class AbstractDistributionStep implements DistributionStep
 {
@@ -81,6 +83,9 @@ public abstract class AbstractDistributionStep implements DistributionStep
      */
     @Inject
     protected transient DistributionManager distributionManager;
+
+    @Inject
+    protected transient Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
 
     protected transient DistributionJob distributionJob;
 
@@ -139,6 +144,11 @@ public abstract class AbstractDistributionStep implements DistributionStep
     protected String getWiki()
     {
         return this.distributionJob.getRequest().getWiki();
+    }
+
+    protected boolean isMainWiki()
+    {
+        return this.wikiDescriptorManagerProvider.get().getMainWikiId().equals(getWiki());
     }
 
     protected String getNamespace()

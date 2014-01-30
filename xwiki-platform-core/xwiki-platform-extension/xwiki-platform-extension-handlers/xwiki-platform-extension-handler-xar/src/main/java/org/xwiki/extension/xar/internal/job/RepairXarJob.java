@@ -35,6 +35,7 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.internal.AbstractExtensionJob;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.LocalExtensionRepository;
@@ -42,6 +43,8 @@ import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.job.Request;
 import org.xwiki.job.internal.DefaultJobStatus;
+import org.xwiki.logging.marker.BeginTranslationMarker;
+import org.xwiki.logging.marker.EndTranslationMarker;
 
 /**
  * Make sure the provided XAR extension properly is registered in the installed extensions index.
@@ -57,6 +60,17 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
      * The id of the job.
      */
     public static final String JOBTYPE = "repairxar";
+
+    private static final BeginTranslationMarker LOG_REPAIR_BEGIN = new BeginTranslationMarker(
+        "extension.xar.log.repair.begin");
+
+    private static final BeginTranslationMarker LOG_REPAIR_NAMESPACE_BEGIN = new BeginTranslationMarker(
+        "extension.xar.log.repair.begin.namespace");
+
+    private static final EndTranslationMarker LOG_REPAIR_END = new EndTranslationMarker("extension.xar.log.repair.end");
+
+    private static final EndTranslationMarker LOG_REPAIR_END_NAMESPACE = new EndTranslationMarker(
+        "extension.xar.log.repair.end.namespace");
 
     /**
      * Used to resolve extensions to install.
@@ -75,6 +89,9 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
      */
     @Inject
     private LocalExtensionRepository localRepository;
+
+    @Inject
+    private CoreExtensionRepository coreRepository;
 
     @Override
     public String getType()
@@ -167,12 +184,20 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
      */
     private void repairExtension(ExtensionId extensionId, String namespace, boolean dependency) throws InstallException
     {
-        this.logger.info("Repairing extension [{}] on namespace [{}]", extensionId, namespace);
-
         if (this.installedRepository.getInstalledExtension(extensionId.getId(), namespace) != null) {
-            this.logger.info("Extension [{}] already installed on namespace [{}]", extensionId.getId(), namespace);
+            this.logger.debug("Extension [{}] already installed on namespace [{}]", extensionId.getId(), namespace);
 
             return;
+        }
+
+        if (getRequest().isVerbose()) {
+            if (namespace != null) {
+                this.logger.info(LOG_REPAIR_NAMESPACE_BEGIN, "Repairing XAR extension [{}] on namespace [{}]",
+                    extensionId, namespace);
+            } else {
+                this.logger.info(LOG_REPAIR_BEGIN, "Repairing XAR extension [{}] on all namespaces", extensionId,
+                    namespace);
+            }
         }
 
         notifyPushLevelProgress(2);
@@ -186,6 +211,16 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
                 repairExtension(localExtension, namespace, dependency);
             }
         } finally {
+            if (getRequest().isVerbose()) {
+                if (namespace != null) {
+                    this.logger.info(LOG_REPAIR_END_NAMESPACE, "Done repairing XAR extension [{}] on namespace [{}]",
+                        extensionId, namespace);
+                } else {
+                    this.logger.info(LOG_REPAIR_END, "Done repairing XAR extension [{}] on all namespaces",
+                        extensionId, namespace);
+                }
+            }
+
             notifyPopLevelProgress();
         }
     }
@@ -228,8 +263,6 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
         } finally {
             notifyPopLevelProgress();
         }
-
-        this.logger.info("Successfully Repaired extension [{}] on namespace [{}]", localExtension.getId(), namespace);
     }
 
     /**
@@ -238,16 +271,20 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
      */
     private void repairDependency(ExtensionDependency extensionDependency, String namespace)
     {
-        if (extensionDependency.getVersionConstraint().getVersion() == null) {
-            this.logger.warn("Can't repair extension dependency [{}] with version range ([{}])"
-                + " since there is no way to know what has been installed", extensionDependency.getId(),
-                extensionDependency.getVersionConstraint());
-        } else {
-            try {
-                repairExtension(new ExtensionId(extensionDependency.getId(), extensionDependency.getVersionConstraint()
-                    .getVersion()), namespace, true);
-            } catch (InstallException e) {
-                this.logger.warn("Failed to repair dependency [{}]", extensionDependency, e);
+        // Skip core extensions
+        if (this.coreRepository.getCoreExtension(extensionDependency.getId()) == null) {
+            if (extensionDependency.getVersionConstraint().getVersion() == null) {
+                this.logger.warn("Can't repair extension dependency [{}] with version range ([{}])"
+                    + " since there is no way to know what has been installed", extensionDependency.getId(),
+                    extensionDependency.getVersionConstraint());
+
+            } else {
+                try {
+                    repairExtension(new ExtensionId(extensionDependency.getId(), extensionDependency
+                        .getVersionConstraint().getVersion()), namespace, true);
+                } catch (InstallException e) {
+                    this.logger.warn("Failed to repair dependency [{}]", extensionDependency, e);
+                }
             }
         }
     }

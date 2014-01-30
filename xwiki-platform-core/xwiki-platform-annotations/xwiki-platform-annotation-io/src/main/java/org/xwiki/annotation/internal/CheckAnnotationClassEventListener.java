@@ -45,6 +45,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * When the wiki is initialized or the configuration document is updated, make sure that the configured annotation class
@@ -180,6 +181,16 @@ public class CheckAnnotationClassEventListener implements EventListener
                 annotationClass.addTextAreaField(Annotation.ORIGINAL_SELECTION_FIELD, "Original Selection", 40, 5);
             needsUpdate |= annotationClass.addTextField(Annotation.TARGET_FIELD, "Target", 30);
             needsUpdate |= annotationClass.addTextField(Annotation.STATE_FIELD, "State", 30);
+
+            // Set creator and author if they're not set already
+            if (annotationClassDocument.getCreatorReference() == null) {
+                needsUpdate = true;
+                annotationClassDocument.setCreator(XWikiRightService.SUPERADMIN_USER);
+            }
+            if (annotationClassDocument.getAuthorReference() == null) {
+                needsUpdate = true;
+                annotationClassDocument.setAuthorReference(annotationClassDocument.getCreatorReference());
+            }
 
             if (needsUpdate) {
                 deprecatedContext.getWiki().saveDocument(annotationClassDocument,

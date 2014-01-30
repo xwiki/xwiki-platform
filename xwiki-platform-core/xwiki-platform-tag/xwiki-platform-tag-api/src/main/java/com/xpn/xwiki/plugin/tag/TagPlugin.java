@@ -64,6 +64,11 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public static final String TAG_CLASS = "XWiki.TagClass";
 
     /**
+     * Where clause for space filtering.
+     */
+    public static final String WHERE_CLAUSE_SPACE = "doc.space = ?";
+
+    /**
      * XWiki property of XWiki.TagClass storing tags.
      */
     public static final String TAG_PROPERTY = "tags";
@@ -174,7 +179,20 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     public Map<String, Integer> getTagCount(XWikiContext context) throws XWikiException
     {
-        return this.getTagCountForQuery(null, null, context);
+        return getTagCountForQuery(null, null, context);
+    }
+
+    /**
+     * Get cardinality map of tags within the wiki.
+     *
+     * @param context XWiki context.
+     * @param allDocuments specify if we should retrieve all the translations of the documents that contain the tag
+     * @return map of tags (alphabetical order) with their occurences counts.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     */
+    public Map<String, Integer> getTagCount(boolean allDocuments, XWikiContext context) throws XWikiException
+    {
+        return getTagCountForQuery(null, null, allDocuments, context);
     }
 
     /**
@@ -189,9 +207,28 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public Map<String, Integer> getTagCount(String space, XWikiContext context) throws XWikiException
     {
         if (!StringUtils.isBlank(space)) {
-            return getTagCountForQuery("", "doc.space = ?", Collections.singletonList(space), context);
+            return getTagCountForQuery("", WHERE_CLAUSE_SPACE, Collections.singletonList(space), context);
         }
         return getTagCount(context);
+    }
+
+    /**
+     * Get cardinality map of tags for a specific wiki space.
+     *
+     * @param space the wiki space to get tags from. If blank, return tags for the whole wiki.
+     * @param allDocuments specify if we should retrieve all the translations of the documents that contain the tag
+     * @param context XWiki context.
+     * @return map of tags (alphabetical order) with their occurrences counts.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 1.2
+     */
+    public Map<String, Integer> getTagCount(String space, boolean allDocuments, XWikiContext context)
+        throws XWikiException
+    {
+        if (!StringUtils.isBlank(space)) {
+            return getTagCountForQuery("", WHERE_CLAUSE_SPACE, Collections.singletonList(space), allDocuments, context);
+        }
+        return getTagCount(allDocuments, context);
     }
 
     /**
@@ -209,6 +246,25 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         throws XWikiException
     {
         return getTagCountForQuery(fromHql, whereHql, null, context);
+    }
+
+    /**
+     * Get cardinality map of tags matching a hql query.
+     *
+     * @param fromHql the <code>from</code> fragment of the hql query
+     * @param whereHql the <code>where</code> fragment of the hql query
+     * @param allDocuments specify if we should retrieve all the translations of the documents that contain the tag
+     * @param context XWiki context.
+     * @return map of tags (alphabetical order) with their occurrences counts.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 1.2
+     * @see TagPluginApi#getTagCountForQuery(String, String, boolean)
+     */
+    public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, boolean allDocuments,
+            XWikiContext context)
+        throws XWikiException
+    {
+        return getTagCountForQuery(fromHql, whereHql, null, allDocuments, context);
     }
 
     /**
@@ -230,6 +286,26 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     }
 
     /**
+     * Get cardinality map of tags matching a parameterized hql query.
+     *
+     * @param fromHql the <code>from</code> fragment of the hql query
+     * @param whereHql the <code>where</code> fragment of the hql query
+     * @param parameterValues list of parameter values for the query
+     * @param allDocuments specify if we should retrieve all the translations of the documents that contain the tag
+     * @param context XWiki context.
+     * @return map of tags (alphabetical order) with their occurrences counts.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 1.18
+     * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
+     */
+    public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List<?> parameterValues,
+            boolean allDocuments,
+            XWikiContext context) throws XWikiException
+    {
+        return TagQueryUtils.getTagCountForQuery(fromHql, whereHql, parameterValues, allDocuments, context);
+    }
+
+    /**
      * Get documents with the given tags.
      *
      * @param tag a list of tags to match.
@@ -240,6 +316,21 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public List<String> getDocumentsWithTag(String tag, XWikiContext context) throws XWikiException
     {
         return TagQueryUtils.getDocumentsWithTag(tag, context);
+    }
+
+    /**
+     * Get documents with the given tags.
+     *
+     * @param tag a list of tags to match.
+     * @param context XWiki context.
+     * @param allDocuments specify if we should retrieve all the translations of the documents that contain the tag
+     * @return list of docNames.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     */
+    public List<String> getDocumentsWithTag(String tag, boolean allDocuments, XWikiContext context)
+        throws XWikiException
+    {
+        return TagQueryUtils.getDocumentsWithTag(tag, allDocuments, context);
     }
 
     /**

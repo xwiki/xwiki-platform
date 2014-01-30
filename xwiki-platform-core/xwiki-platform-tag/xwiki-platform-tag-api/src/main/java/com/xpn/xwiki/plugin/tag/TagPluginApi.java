@@ -80,6 +80,17 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     }
 
     /**
+     * Get cardinality map of tags within the wiki.
+     * @param allDocuments specify if we should retrieve all the translations of the documents that contain the tag
+     * @return map of tags with their occurences counts.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     */
+    public Map<String, Integer> getTagCount(boolean allDocuments) throws XWikiException
+    {
+        return this.getProtectedPlugin().getTagCount(allDocuments, this.context);
+    }
+
+    /**
      * Get cardinality map of tags for a specific wiki space.
      * 
      * @param space the space to get tags in
@@ -90,6 +101,20 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     public Map<String, Integer> getTagCount(String space) throws XWikiException
     {
         return this.getProtectedPlugin().getTagCount(space, this.context);
+    }
+
+    /**
+     * Get cardinality map of tags for a specific wiki space.
+     *
+     * @param space the space to get tags in
+     * @param allDocuments specify if we should retrieve all the translations of the documents that contain the tag
+     * @return map of tags with their occurences counts
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 1.2
+     */
+    public Map<String, Integer> getTagCount(String space, boolean allDocuments) throws XWikiException
+    {
+        return this.getProtectedPlugin().getTagCount(space, allDocuments, this.context);
     }
 
     /**
@@ -123,6 +148,38 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     }
 
     /**
+     * Get cardinality map of tags matching an hql query. Examples of usage:
+     * <ul>
+     * <li>
+     * <code>
+     * $xwiki.tag.getTagCountForQuery("","doc.creator='XWiki.JohnDoe'")
+     * </code> will return the cardinality map of tags for documents created by user XWiki.JohnDoe</li>
+     * <li>
+     * <code>
+     * $xwiki.tag.getTagCountForQuery(", BaseObject as obj",
+     *    "obj.name=doc.fullName and obj.className='Blog.BlogPostClass'")
+     * </code> will return the cardinality map of tags associated to blog post documents</li>
+     * <li>
+     * <code>
+     * $xwiki.tag.getTagCountForQuery("", "")
+     * </code> will return all tags within the wiki</li>
+     * </ul>
+     *
+     * @param from the from fragment of the query
+     * @param where the where fragment from the query
+     * @param allDocuments specify if we should retrieve all the translations of the documents that contain the tag
+     * @return map of tags with their occurrences counts
+     * @throws XWikiException if search query fails (possible failures: DB access problems, incorrect query fragments).
+     * @since 1.2
+     * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List, boolean)
+     */
+    public Map<String, Integer> getTagCountForQuery(String from, String where, boolean allDocuments)
+        throws XWikiException
+    {
+        return getTagCountForQuery(from, where, null, allDocuments);
+    }
+
+    /**
      * Get cardinality map of tags matching an hql query (parametrized version). Example of usage:
      * <ul>
      * <li>
@@ -145,6 +202,30 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     }
 
     /**
+     * Get cardinality map of tags matching an hql query (parametrized version). Example of usage:
+     * <ul>
+     * <li>
+     * <code>
+     * $xwiki.tag.getTagCountForQuery("", "doc.creator = ?", ["$!{request.creator}"])
+     * </code> will return the cardinality map of tags for documents created by user-provided creator name</li>
+     * </ul>
+     *
+     * @param from the from fragment of the query
+     * @param where the parameterized where fragment from the query
+     * @param parameterValues list of parameter values for the query
+     * @param allDocuments specify if we should retrieve all the translations of the documents that contain the tag
+     * @return map of tags with their occurrences counts
+     * @throws XWikiException if search query fails (possible failures: DB access problems, incorrect query fragments).
+     * @since 1.18
+     */
+    public Map<String, Integer> getTagCountForQuery(String from, String where, List<?> parameterValues,
+            boolean allDocuments)
+        throws XWikiException
+    {
+        return this.getProtectedPlugin().getTagCountForQuery(from, where, parameterValues, allDocuments, this.context);
+    }
+
+    /**
      * Get all the documents containing the given tag.
      * 
      * @param tag tag to match.
@@ -154,6 +235,19 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     public List<String> getDocumentsWithTag(String tag) throws XWikiException
     {
         return this.getProtectedPlugin().getDocumentsWithTag(tag, this.context);
+    }
+
+    /**
+     * Get all the documents containing the given tag.
+     *
+     * @param tag tag to match.
+     * @param allDocuments specify if we should retrieve all the translations of the documents that contain the tag
+     * @return list of pages.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     */
+    public List<String> getDocumentsWithTag(String tag, boolean allDocuments) throws XWikiException
+    {
+        return this.getProtectedPlugin().getDocumentsWithTag(tag, allDocuments, this.context);
     }
 
     /**

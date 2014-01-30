@@ -49,6 +49,11 @@ public final class TagQueryUtils
     public static final String HIDDEN_QUERYFILTER_HINT = "hidden";
 
     /**
+     * Hint of the "currentlanguage" QueryFilter.
+     */
+    public static final String CURRENTLANGUAGE_QUERYFILTER_HINT = "currentlanguage";
+
+    /**
      * Utility class, private constructor.
      */
     private TagQueryUtils()
@@ -96,7 +101,27 @@ public final class TagQueryUtils
      * @since 1.18
      * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
      */
-    public static Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List< ? > parameterValues,
+    public static Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List<?> parameterValues,
+            XWikiContext context) throws XWikiException
+    {
+        return getTagCountForQuery(fromHql, whereHql, parameterValues, false, context);
+    }
+
+    /**
+     * Get cardinality map of tags matching a parameterized hql query.
+     *
+     * @param fromHql the <code>from</code> fragment of the hql query
+     * @param whereHql the <code>where</code> fragment of the hql query
+     * @param parameterValues list of parameter values for the query
+     * @param allDocuments specify if we should retrieve all the translations of the documents that contain the tag
+     * @param context XWiki context.
+     * @return map of tags (alphabetical order) with their occurrences counts.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 1.18
+     * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
+     */
+    public static Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List<?> parameterValues,
+            boolean allDocuments,
             XWikiContext context) throws XWikiException
     {
         List<String> results = null;
@@ -125,6 +150,11 @@ public final class TagQueryUtils
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
             query.bindValues((List<Object>) params);
             query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, HIDDEN_QUERYFILTER_HINT));
+
+            if (!allDocuments) {
+                query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, CURRENTLANGUAGE_QUERYFILTER_HINT));
+            }
+
             results = query.execute();
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -166,22 +196,43 @@ public final class TagQueryUtils
      */
     public static List<String> getDocumentsWithTag(String tag, XWikiContext context) throws XWikiException
     {
+        return getDocumentsWithTag(tag, false, context);
+    }
+
+    /**
+     * Get documents with the given tags.
+     *
+     * @param tag a list of tags to match.
+     * @param context XWiki context.
+     * @param allDocuments specify if we should retrieve all the translations of the documents that contain the tag
+     * @return list of docNames.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     */
+    public static List<String> getDocumentsWithTag(String tag, boolean allDocuments, XWikiContext context)
+        throws XWikiException
+    {
         List<String> results;
         List<Object> parameters = new ArrayList<Object>();
         parameters.add(TagPlugin.TAG_CLASS);
         parameters.add(tag);
         String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item where obj.className=? and "
-            + "obj.name=doc.fullName and obj.id=prop.id.id and prop.id.name='tags' and lower(item)=lower(?) order by "
-            + "doc.fullName";
+                +
+                "obj.name=doc.fullName and obj.id=prop.id.id and prop.id.name='tags' and lower(item)=lower(?) order by "
+                + "doc.fullName";
 
         try {
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
             query.bindValues(parameters);
-            query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, HIDDEN_QUERYFILTER_HINT));
+            query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, HIDDEN_QUERYFILTER_HINT));
+
+            if (!allDocuments) {
+                query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, CURRENTLANGUAGE_QUERYFILTER_HINT));
+            }
+
             results = query.execute();
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
-                String.format("Failed to search for document with tag [%s]", tag), e);
+                    String.format("Failed to search for document with tag [%s]", tag), e);
         }
 
         return results;

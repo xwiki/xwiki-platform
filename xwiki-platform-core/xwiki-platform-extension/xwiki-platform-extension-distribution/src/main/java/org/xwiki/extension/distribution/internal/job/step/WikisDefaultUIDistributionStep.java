@@ -52,7 +52,7 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
     private transient InstalledExtensionRepository installedRepository;
 
     @Inject
-    private Logger logger;
+    private transient Logger logger;
 
     public WikisDefaultUIDistributionStep()
     {
@@ -62,7 +62,7 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
     @Override
     public void prepare()
     {
-        if (getState() != State.CANCELED) {
+        if (getState() == null) {
             setState(State.COMPLETED);
 
             if (isMainWiki()) {

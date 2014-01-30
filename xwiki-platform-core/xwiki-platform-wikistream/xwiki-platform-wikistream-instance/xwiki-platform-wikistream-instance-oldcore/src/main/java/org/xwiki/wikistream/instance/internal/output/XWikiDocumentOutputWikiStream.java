@@ -24,12 +24,14 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -78,6 +80,8 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
 {
+    private static final Pattern VALID_VERSION = Pattern.compile("\\d*\\.\\d*");
+
     @Inject
     private FilterDescriptorManager filterManager;
 
@@ -301,7 +305,15 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
             }
         }
 
-        this.document.setVersion(version);
+        if (version != null) {
+            if (VALID_VERSION.matcher(version).matches()) {
+                this.document.setVersion(version);
+            } else if (NumberUtils.isDigits(version)) {
+                this.document.setVersion(version + ".1");
+            } else {
+                // TODO: log something, probably a warning
+            }
+        }
 
         this.document.setDate(getDate(WikiDocumentFilter.PARAMETER_REVISION_DATE, parameters, new Date()));
         this.document.setComment(getString(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, parameters, ""));
@@ -372,10 +384,19 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
 
         if (this.properties == null || this.properties.isVersionPreserved()) {
             if (parameters.containsKey(WikiAttachmentFilter.PARAMETER_REVISION)) {
-                attachment.setVersion(getString(WikiAttachmentFilter.PARAMETER_REVISION, parameters, null));
+                String version = getString(WikiAttachmentFilter.PARAMETER_REVISION, parameters, null);
+                if (version != null) {
+                    if (VALID_VERSION.matcher(version).matches()) {
+                        attachment.setVersion(version);
+                    } else if (NumberUtils.isDigits(version)) {
+                        attachment.setVersion(version + ".1");
+                    } else {
+                        // TODO: log something, probably a warning
+                    }
+                }
             }
-            attachment.setComment(getString(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, parameters, null));
-            attachment.setDate(getDate(WikiAttachmentFilter.PARAMETER_REVISION_DATE, parameters, null));
+            attachment.setComment(getString(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, parameters, ""));
+            attachment.setDate(getDate(WikiAttachmentFilter.PARAMETER_REVISION_DATE, parameters, new Date()));
 
             String revisions = getString(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS, parameters, null);
             if (revisions != null) {

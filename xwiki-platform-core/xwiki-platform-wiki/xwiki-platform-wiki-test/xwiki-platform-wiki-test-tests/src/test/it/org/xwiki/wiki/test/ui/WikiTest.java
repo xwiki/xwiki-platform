@@ -106,13 +106,6 @@ public class WikiTest extends AbstractTest
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();
         CreateWikiPageStepProvisioning createWikiPageStepProvisioning = createWikiPageStepUser.createWithTemplate();
         assertEquals("The system is provisioning the wiki.", createWikiPageStepProvisioning.getStepTitle());
-        // Wait during the provisioning step
-        long timeout = System.currentTimeMillis() + 5000;
-        while (!createWikiPageStepProvisioning.isFinalizeButtonEnabled() && System.currentTimeMillis() < timeout) {
-            Thread.sleep(100);
-        }
-        // Verify that the provisioning step is over
-        assertTrue(createWikiPageStepProvisioning.isFinalizeButtonEnabled());
         // Finalize
         WikiHomePage wikiHomePage = createWikiPageStepProvisioning.finalizeCreation();
 

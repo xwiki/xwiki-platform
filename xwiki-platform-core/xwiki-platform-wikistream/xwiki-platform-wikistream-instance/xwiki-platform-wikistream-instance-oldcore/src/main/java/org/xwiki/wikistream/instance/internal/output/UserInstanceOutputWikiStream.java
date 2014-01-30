@@ -230,7 +230,7 @@ public class UserInstanceOutputWikiStream extends AbstractBeanOutputWikiStream<U
             userDocument.setContentAuthorReference(userDocument.getDocumentReference());
 
             // Dates
-            if (this.properties.isPreserveVersion()) {
+            if (this.properties.isVersionPreserved()) {
                 if (parameters.containsKey(UserFilter.PARAMETER_CREATION_DATE)) {
                     userDocument.setCreationDate(getDate(UserFilter.PARAMETER_CREATION_DATE, parameters, new Date()));
                 }

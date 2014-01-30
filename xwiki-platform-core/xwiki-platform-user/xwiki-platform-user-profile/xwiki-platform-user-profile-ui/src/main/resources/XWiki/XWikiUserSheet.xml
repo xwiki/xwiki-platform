@@ -34,7 +34,7 @@
   <date>1385071571000</date>
   <contentUpdateDate>1385071571000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render('platform.core.profile.title', ["$!doc.getValue('first_name') $!doc.getValue('last_name')"])</title>
+  <title>#set($userName="$!doc.getValue('first_name') $!doc.getValue('last_name')")#if($userName==' ')#set($userName=$doc.name)#{end}$services.localization.render('platform.core.profile.title', [$userName])</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>

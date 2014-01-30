@@ -77,7 +77,7 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
                 throw new WikiStreamException("Failed to get input stream", e);
             }
 
-            boolean iszip;
+            Boolean iszip;
             try {
                 iszip = isZip(stream);
             } catch (IOException e) {
@@ -90,10 +90,10 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
                 }
             }
 
-            if (iszip) {
-                readXAR(filter, proxyFilter);
-            } else {
+            if (iszip == Boolean.FALSE) {
                 readDocument(filter, proxyFilter);
+            } else {
+                readXAR(filter, proxyFilter);
             }
         } else {
             throw new WikiStreamException(
@@ -130,11 +130,11 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
         }
     }
 
-    private boolean isZip(InputStream stream) throws IOException
+    private Boolean isZip(InputStream stream) throws IOException
     {
         if (!stream.markSupported()) {
             // ZIP by default
-            return false;
+            return null;
         }
 
         final byte[] signature = new byte[12];

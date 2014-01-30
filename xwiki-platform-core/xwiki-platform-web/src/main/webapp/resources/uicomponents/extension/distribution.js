@@ -59,8 +59,8 @@ var AbstractExtensionListStep = Class.create({
     // Listen to DOM changes to catch when the list of extensions is reloaded.
     document.observe('xwiki:dom:updated', function(event) {
       event.memo.elements.each(function(element) {
-        // Update the step buttons only if the updated element contains extensions.
-        element.down('.extension-item') && this._updateStepButtons();
+        // Update the step buttons if the updated element contains extensions or if it represents the extension updater.
+        (element.down('.extension-item') || element.id == 'extensionUpdater') && this._updateStepButtons();
       }.bind(this));
     }.bindAsEventListener(this));
   },

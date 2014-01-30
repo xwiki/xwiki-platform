@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import java.util.regex.Pattern;
+
 import org.apache.ecs.xhtml.textarea;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -38,6 +40,11 @@ import com.xpn.xwiki.web.Utils;
 public class TextAreaClass extends StringClass
 {
     private static final String XCLASSNAME = "textarea";
+
+    /**
+     * Internal standard for new line ending is <code>\n</code>.
+     */
+    private final static Pattern CONTENT_LINEENDING = Pattern.compile("\r\n|\r");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TextAreaClass.class);
 
@@ -61,6 +68,15 @@ public class TextAreaClass extends StringClass
         property.setName(getName());
 
         return property;
+    }
+
+    @Override
+    public BaseProperty fromString(String value)
+    {
+        // Internal standard is \n for newlines
+        String properValue = CONTENT_LINEENDING.matcher(value).replaceAll("\n");
+
+        return super.fromString(properValue);
     }
 
     public int getRows()

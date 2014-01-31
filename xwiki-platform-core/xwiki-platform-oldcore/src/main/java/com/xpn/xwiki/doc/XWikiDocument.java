@@ -3156,19 +3156,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         this.fromCache = fromCache;
     }
-    
-    /**
-     * Flushes rendering cache of document (anynchronous)
-     * 
-     * @return true on success, false on null rendering cache
-     */
-    public boolean flushCache(){    	
-    	if(getRenderingCache() != null){
-    		this.renderingCache.flushCache(true);
-    		return true;
-    	}
-    	return false;
-    }
 
     public void readDocMetaFromForm(EditForm eform, XWikiContext context) throws XWikiException
     {

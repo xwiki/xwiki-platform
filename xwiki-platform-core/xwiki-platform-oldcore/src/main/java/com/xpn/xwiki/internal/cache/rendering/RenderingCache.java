@@ -32,14 +32,7 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Role
 public interface RenderingCache
-{	
-	/**
-	 * Set flush cache indicator
-	 * 
-	 * @param flush true/false
-	 */
-	void flushCache(boolean flush);
-	
+{
     /**
      * The stored result of the rendering of the provided source.
      * 

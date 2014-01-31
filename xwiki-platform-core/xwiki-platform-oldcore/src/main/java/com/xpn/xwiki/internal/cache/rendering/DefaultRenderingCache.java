@@ -68,12 +68,6 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     private static final String PARAMETER_REFRESH = "refresh";
 
     /**
-     * Flush cache indicator
-     * @see DefaultRenderingCache#getRenderedContent(DocumentReference, String, XWikiContext)
-     */
-    private boolean flushCache = false;
-    
-    /**
      * Configuration of the rendering cache.
      */
     @Inject
@@ -110,8 +104,8 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     public String getRenderedContent(DocumentReference documentReference, String source, XWikiContext context)
     {
         String renderedContent = null;
-        
-        if (!this.flushCache && this.configuration.isCached(documentReference)) {
+
+        if (this.configuration.isCached(documentReference)) {
             String refresh = context.getRequest() != null ? context.getRequest().getParameter(PARAMETER_REFRESH) : null;
 
             if (!"1".equals(refresh)) {
@@ -124,7 +118,6 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
             }
         }
 
-        this.flushCache = false;
         return renderedContent;
     }
 
@@ -243,9 +236,4 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
         }
         return sb.toString();
     }
-
-	@Override
-	public void flushCache(boolean flush) {		
-		this.flushCache = flush;
-	}
 }

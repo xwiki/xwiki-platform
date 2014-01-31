@@ -32,7 +32,7 @@ public class EditForm extends XWikiForm
     /**
      * Internal standard for new line ending is <code>\n</code>.
      */
-    private final static Pattern CONTENT_LINEENDING = Pattern.compile("\r\n|\r");
+    private final static Pattern CONTENT_LINEENDING = Pattern.compile("\r\n?");
 
     // ---- Form fields -------------------------------------------------
     private String content;

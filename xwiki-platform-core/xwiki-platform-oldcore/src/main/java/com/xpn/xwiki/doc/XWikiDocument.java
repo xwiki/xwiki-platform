@@ -408,6 +408,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     // Caching
     private boolean fromCache = false;
 
+    public boolean flushCache = false;
+    
     private List<BaseObject> xObjectsToRemove = new ArrayList<BaseObject>();
 
     private List<XWikiAttachmentToRemove> attachmentsToRemove = new ArrayList<XWikiAttachmentToRemove>();
@@ -3157,6 +3159,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         this.fromCache = fromCache;
     }
 
+    /**
+     * Flushes cache for this document (on document load)
+     * 
+     * @return true
+     */
+    public boolean flushCache(){
+    	this.flushCache = true;
+    	return true;
+    }
+    
     public void readDocMetaFromForm(EditForm eform, XWikiContext context) throws XWikiException
     {
         String defaultLanguage = eform.getDefaultLanguage();

@@ -37,6 +37,8 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.cache.DocumentCache;
 import com.xpn.xwiki.internal.cache.rendering.CachedItem.UsedExtension;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
@@ -104,8 +106,15 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     public String getRenderedContent(DocumentReference documentReference, String source, XWikiContext context)
     {
         String renderedContent = null;
-
-        if (this.configuration.isCached(documentReference)) {
+        boolean flushCache = false;
+        
+        try{
+        	XWikiDocument tdoc = context.getWiki().getDocument(documentReference, context);
+        	flushCache = tdoc.flushCache;
+        	tdoc.flushCache = false;
+        }catch(XWikiException e){}
+        
+        if (!flushCache && this.configuration.isCached(documentReference)) {
             String refresh = context.getRequest() != null ? context.getRequest().getParameter(PARAMETER_REFRESH) : null;
 
             if (!"1".equals(refresh)) {

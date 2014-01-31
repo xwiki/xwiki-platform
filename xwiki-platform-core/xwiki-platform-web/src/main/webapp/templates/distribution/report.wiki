@@ -125,9 +125,9 @@
       </ul>
     </div>
     {{/html}}
+  #else
+    {{translation key="platform.extension.distributionWizard.reportStepDocumentsNoChange"/}}
   #end
-#else
-  {{translation key="platform.extension.distributionWizard.reportStepDocumentsNoChange"/}} 
 #end
 {{/velocity}}
 

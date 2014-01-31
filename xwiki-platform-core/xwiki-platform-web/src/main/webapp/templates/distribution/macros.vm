@@ -132,6 +132,7 @@
 #end
 
 #macro (maybeRepairPreviousUI $wiki $recommendedUIExtension)
+  #if (!$recommendedUIExtension)#break#end
   #getExtensionJobStatus($recommendedUIExtension.id.id $recommendedUIExtension.id.version.value $recommendedUIJobStatus)
   #getInstalledExtension($recommendedUIExtension "wiki:$wiki" $installedVersion)
   #if (!$installedVersion && (!$recommendedUIJobStatus || $recommendedUIJobStatus.state == 'FINISHED'))

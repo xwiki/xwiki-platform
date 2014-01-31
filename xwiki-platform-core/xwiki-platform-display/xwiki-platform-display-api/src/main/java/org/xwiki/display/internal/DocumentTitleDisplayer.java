@@ -63,6 +63,10 @@ public class DocumentTitleDisplayer extends AbstractDocumentTitleDisplayer
     @Override
     protected XDOM extractTitleFromContent(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
+        // Note: Ideally we should apply transformations on the document's returned XDOM here since macros could
+        // generate headings for example or some other transformations could modify headings. However we don't do this
+        // at the moment since it would be too costly to do so. In the future we will even probably remove the feature
+        // of generating the title from the content.
         List<HeaderBlock> blocks =
             document.getXDOM().getBlocks(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
         if (!blocks.isEmpty()) {

@@ -46,7 +46,7 @@
     <dependency>
       <groupId>org.jruby</groupId>
       <artifactId>jruby</artifactId>
-      <version>1.6.3</version>
+      <version>1.7.10</version>
     </dependency>
 
     <!-- Testing dependencies -->

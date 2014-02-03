@@ -62,7 +62,7 @@ public class BcRsaSsaPssSignerFactoryTest extends AbstractRsaSignerFactoryTest
     }
 
     @Test
-    public void defaultSignatureVerificationTest() throws Exception
+    public void testDefaultSignatureVerification() throws Exception
     {
         testSignatureVerification(
             factory.getInstance(true, privateKey),
@@ -71,7 +71,7 @@ public class BcRsaSsaPssSignerFactoryTest extends AbstractRsaSignerFactoryTest
     }
 
     @Test
-    public void sha224SignatureVerificationTest() throws Exception
+    public void testSha224SignatureVerification() throws Exception
     {
         testSignatureVerification(
             factory.getInstance(true, new PssSignerParameters(privateKey,"SHA-224", -1)),
@@ -80,7 +80,7 @@ public class BcRsaSsaPssSignerFactoryTest extends AbstractRsaSignerFactoryTest
     }
 
     @Test
-    public void sha256SignatureVerificationTest() throws Exception
+    public void testSha256SignatureVerification() throws Exception
     {
         testSignatureVerification(
             factory.getInstance(true, new PssSignerParameters(privateKey, "SHA-256", -1)),
@@ -89,7 +89,7 @@ public class BcRsaSsaPssSignerFactoryTest extends AbstractRsaSignerFactoryTest
     }
 
     @Test
-    public void sha384SignatureVerificationTest() throws Exception
+    public void testSha384SignatureVerification() throws Exception
     {
         testSignatureVerification(
             factory.getInstance(true, new PssSignerParameters(privateKey,"SHA-384", -1)),
@@ -98,7 +98,7 @@ public class BcRsaSsaPssSignerFactoryTest extends AbstractRsaSignerFactoryTest
     }
 
     @Test
-    public void sha512SignatureVerificationTest() throws Exception
+    public void testSha512SignatureVerification() throws Exception
     {
         testSignatureVerification(
             factory.getInstance(true, new PssSignerParameters(privateKey,"SHA-512", -1)),
@@ -107,7 +107,7 @@ public class BcRsaSsaPssSignerFactoryTest extends AbstractRsaSignerFactoryTest
     }
 
     @Test
-    public void encodedDefaultSignatureVerificationTest() throws Exception
+    public void testEncodedDefaultSignatureVerification() throws Exception
     {
         Signer signer = factory.getInstance(true, privateKey);
         Signer verifier = factory.getInstance(false, publicKey, signer.getEncoded());
@@ -116,7 +116,7 @@ public class BcRsaSsaPssSignerFactoryTest extends AbstractRsaSignerFactoryTest
     }
 
     @Test
-    public void encodedSha224SignatureVerificationTest() throws Exception
+    public void testEncodedSha224SignatureVerification() throws Exception
     {
         Signer signer = factory.getInstance(true, new PssSignerParameters(privateKey,"SHA-224", -1));
         Signer verifier = factory.getInstance(false, publicKey, signer.getEncoded());
@@ -125,7 +125,7 @@ public class BcRsaSsaPssSignerFactoryTest extends AbstractRsaSignerFactoryTest
     }
 
     @Test
-    public void encodedSha256SignatureVerificationTest() throws Exception
+    public void testEncodedSha256SignatureVerification() throws Exception
     {
         Signer signer = factory.getInstance(true, new PssSignerParameters(privateKey,"SHA-256", -1));
         Signer verifier = factory.getInstance(false, publicKey, signer.getEncoded());
@@ -134,7 +134,7 @@ public class BcRsaSsaPssSignerFactoryTest extends AbstractRsaSignerFactoryTest
     }
 
     @Test
-    public void encodedSha384SignatureVerificationTest() throws Exception
+    public void testEncodedSha384SignatureVerification() throws Exception
     {
         Signer signer = factory.getInstance(true, new PssSignerParameters(privateKey,"SHA-384", -1));
         Signer verifier = factory.getInstance(false, publicKey, signer.getEncoded());
@@ -143,7 +143,7 @@ public class BcRsaSsaPssSignerFactoryTest extends AbstractRsaSignerFactoryTest
     }
 
     @Test
-    public void encodedSha512SignatureVerificationTest() throws Exception
+    public void testEncodedSha512SignatureVerification() throws Exception
     {
         Signer signer = factory.getInstance(true, new PssSignerParameters(privateKey,"SHA-512", -1));
         Signer verifier = factory.getInstance(false, publicKey, signer.getEncoded());
@@ -161,7 +161,7 @@ public class BcRsaSsaPssSignerFactoryTest extends AbstractRsaSignerFactoryTest
     }
 
     @Test
-    public void progressiveSignatureVerificationTest() throws Exception
+    public void testProgressiveSignatureVerification() throws Exception
     {
         Signer signer = factory.getInstance(true, privateKey);
         progressiveUpdateSignature(signer, text, 17);
@@ -175,7 +175,7 @@ public class BcRsaSsaPssSignerFactoryTest extends AbstractRsaSignerFactoryTest
     }
 
     @Test
-    public void partialBufferVerificationTest() throws Exception
+    public void testPartialBufferVerification() throws Exception
     {
         Signer signer = factory.getInstance(true, privateKey);
 

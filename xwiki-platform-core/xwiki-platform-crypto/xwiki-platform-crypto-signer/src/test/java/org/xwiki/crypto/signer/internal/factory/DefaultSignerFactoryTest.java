@@ -103,43 +103,43 @@ public class DefaultSignerFactoryTest extends AbstractRsaSignerFactoryTest
     }
 
     @Test
-    public void pssSignatureVerificationTest() throws Exception
+    public void testPssSignatureVerification() throws Exception
     {
         test(mockerPss);
     }
 
     @Test
-    public void sha1SignatureVerificationTest() throws Exception
+    public void testSha1SignatureVerification() throws Exception
     {
         test(mockerSha1);
     }
 
     @Test
-    public void sha224SignatureVerificationTest() throws Exception
+    public void testSha224SignatureVerification() throws Exception
     {
         test(mockerSha224);
     }
 
     @Test
-    public void sha256SignatureVerificationTest() throws Exception
+    public void testSha256SignatureVerification() throws Exception
     {
         test(mockerSha256);
     }
 
     @Test
-    public void sha384SignatureVerificationTest() throws Exception
+    public void testSha384SignatureVerification() throws Exception
     {
         test(mockerSha384);
     }
 
     @Test
-    public void sha512SignatureVerificationTest() throws Exception
+    public void testSha512SignatureVerification() throws Exception
     {
         test(mockerSha512);
     }
 
     @Test
-    public void md5SignatureVerificationTest() throws Exception
+    public void testMd5SignatureVerification() throws Exception
     {
         test(mockerMD5);
     }

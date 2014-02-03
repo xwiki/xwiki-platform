@@ -30,7 +30,7 @@
   <name>XWiki Platform - Cryptographic Services - Signer API</name>
   <description>Provides integrity using signature</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Cryptographic Services for Integrity</xwiki.extension.name>
   </properties>

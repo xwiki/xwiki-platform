@@ -32,7 +32,7 @@ import org.xwiki.crypto.signer.internal.BcSigner;
  * @version $Id$
  * @since 5.4RC1
  */
-public abstract class AbstractBcSignerFactory extends AbstractSignerFactory
+public abstract class AbstractBcSignerFactory extends AbstractSignerFactory implements BcSignerFactory
 {
     /**
      * @return a new native bouncy castle instance of a signer.
@@ -46,23 +46,40 @@ public abstract class AbstractBcSignerFactory extends AbstractSignerFactory
      */
     protected abstract AlgorithmIdentifier getSignerAlgorithmIdentifier(AsymmetricCipherParameters parameters);
 
-    @Override
-    public Signer getInstance(boolean forSigning, CipherParameters parameters)
+    protected AsymmetricCipherParameters getCipherParameters(CipherParameters parameters)
     {
         if (!(parameters instanceof AsymmetricCipherParameters)) {
             throw new IllegalArgumentException("Unexpected parameters received for signer: "
                 + parameters.getClass().getName());
         }
 
+        return (AsymmetricCipherParameters) parameters;
+    }
+
+    @Override
+    public Signer getInstance(boolean forSigning, CipherParameters parameters)
+    {
         return new BcSigner(getSignerInstance((AsymmetricCipherParameters) parameters), forSigning,
-            getBcCipherParameter((AsymmetricCipherParameters) parameters),
+            getBcCipherParameter(getCipherParameters(parameters)),
             getSignerAlgorithmName(), getSignerAlgorithmIdentifier((AsymmetricCipherParameters) parameters));
     }
 
     @Override
     public Signer getInstance(boolean forSigning, CipherParameters parameters, byte[] encoded)
     {
-        throw new UnsupportedOperationException("This signer does not support to be created from encoded parameters");
+        return getInstance(forSigning, parameters, AlgorithmIdentifier.getInstance(encoded));
+    }
+
+    @Override
+    public Signer getInstance(boolean forSigning, CipherParameters parameters, AlgorithmIdentifier algId)
+    {
+        if (!algId.getAlgorithm().equals(
+            getSignerAlgorithmIdentifier(getCipherParameters(parameters)).getAlgorithm())) {
+            throw new IllegalArgumentException("Incompatible algorithm for this signer: "
+                + algId.getAlgorithm().getId());
+        }
+
+        return getInstance(forSigning, parameters);
     }
 
     /**

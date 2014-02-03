@@ -77,6 +77,13 @@ public class BcSigner implements org.xwiki.crypto.signer.Signer
         return signerAlgorithm;
     }
 
+    /**
+     * @return this signer algorithm identifier.
+     */
+    public AlgorithmIdentifier getSignerAlgorithmIdentifier() {
+        return signerAlgorithmIdentifier;
+    }
+
     @Override
     public boolean isForSigning()
     {

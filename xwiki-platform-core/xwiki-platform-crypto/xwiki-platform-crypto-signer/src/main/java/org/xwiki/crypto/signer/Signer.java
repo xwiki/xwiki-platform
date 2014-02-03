@@ -95,7 +95,7 @@ public interface Signer
      * Upon finish, this method resets this signer.
      *
      * @return a buffer with the signature.
-     * @throws java.security.GeneralSecurityException if this signing algorithm is unable to proceed properly.
+     * @throws GeneralSecurityException if this signing algorithm is unable to proceed properly.
      */
     byte[] generate() throws GeneralSecurityException;
 
@@ -141,7 +141,7 @@ public interface Signer
      *
      * @param signature to be verified.
      * @return true if signatures are equals.
-     * @throws java.security.GeneralSecurityException if this signing algorithm is unable to proceed properly.
+     * @throws GeneralSecurityException if this signing algorithm is unable to proceed properly.
      */
     boolean verify(byte[] signature) throws GeneralSecurityException;
 

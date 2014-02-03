@@ -19,6 +19,8 @@
  */
 package org.xwiki.crypto.signer.internal.factory;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -38,7 +40,7 @@ import org.xwiki.crypto.signer.SignerFactory;
  */
 @Component
 @Singleton
-public class DefaultSignerFactory extends AbstractSignerFactory
+public class DefaultSignerFactory extends AbstractSignerFactory implements BcSignerFactory
 {
     @Inject
     private ComponentManager manager;
@@ -52,8 +54,24 @@ public class DefaultSignerFactory extends AbstractSignerFactory
     @Override
     public Signer getInstance(boolean forSigning, CipherParameters parameters, byte[] encoded)
     {
-        AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(encoded);
-        return getFactory(algId.getAlgorithm().getId()).getInstance(forSigning, parameters);
+        return getInstance(forSigning, parameters, AlgorithmIdentifier.getInstance(encoded));
+    }
+
+    @Override
+    public Signer getInstance(boolean forSigning, CipherParameters parameters, AlgorithmIdentifier algId)
+    {
+        SignerFactory factory = getFactory(algId.getAlgorithm().getId());
+
+        if (factory instanceof BcSignerFactory) {
+            return ((BcSignerFactory) factory).getInstance(forSigning, parameters, algId);
+        }
+
+        try {
+            return factory.getInstance(forSigning, parameters, algId.getEncoded());
+        } catch (IOException e) {
+            // Unlikely
+            throw new IllegalArgumentException("Unable to encode algorithm identifier.");
+        }
     }
 
     protected SignerFactory getFactory(String hint)

@@ -58,9 +58,13 @@ public class BcRsaSsaPssSignerFactory extends AbstractBcPssSignerFactory
     }
 
     @Override
-    public Signer getInstance(boolean forSigning, CipherParameters parameters, byte[] encoded)
+    public Signer getInstance(boolean forSigning, CipherParameters parameters, AlgorithmIdentifier algId)
     {
-        AlgorithmIdentifier algId = AlgorithmIdentifier.getInstance(encoded);
+        if (!algId.getAlgorithm().equals(PKCSObjectIdentifiers.id_RSASSA_PSS)) {
+            throw new IllegalArgumentException("Incompatible algorithm for this signer: "
+                + algId.getAlgorithm().getId());
+        }
+
         ASN1Encodable algParams = algId.getParameters();
 
         if (DERNull.INSTANCE.equals(algParams)) {

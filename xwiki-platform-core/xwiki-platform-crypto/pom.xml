@@ -46,6 +46,7 @@
     <module>xwiki-platform-crypto-common</module>
     <module>xwiki-platform-crypto-cipher</module>
     <module>xwiki-platform-crypto-password</module>
+    <module>xwiki-platform-crypto-pkix</module>
     <module>xwiki-platform-crypto-script</module>
     <module>xwiki-platform-crypto-signer</module>
   </modules>

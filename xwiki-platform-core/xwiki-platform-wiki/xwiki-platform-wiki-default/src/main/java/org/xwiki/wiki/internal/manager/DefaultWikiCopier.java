@@ -78,7 +78,7 @@ public class DefaultWikiCopier implements WikiCopier
         XWiki xwiki = context.getWiki();
 
         try {
-            Query query = queryManager.createQuery("select doc.fullName from Document as doc", Query.XWQL);
+            Query query = queryManager.createQuery("select distinct doc.fullName from Document as doc", Query.XWQL);
             query.setWiki(fromWikiId);
             List<String> documentFullnames = query.execute();
 

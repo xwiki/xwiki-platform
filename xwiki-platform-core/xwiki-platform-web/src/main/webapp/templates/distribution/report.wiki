@@ -20,7 +20,7 @@
       #end
     #elseif ($request.get('documentaction_rollback.x'))
       #if ($request.previousVersion)
-        #set($actionDocument = $services.model.resolve($request.document))
+        #set($actionDocument = $xwiki.getDocument($request.document))
         #if ($actionDocument.isNew())
           ## We hope it's not been deleted and created several times (and we also hope recycle bin hasn't been skipped)
           #set($void = $xwiki.xWiki.restoreFromRecycleBin($actionDocument.document, 'Restored from recycle bin', $xcontext.context))

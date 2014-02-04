@@ -28,7 +28,7 @@
           ## TODO: also make sure it's the rigth version and if not rollback it to the right version
         #else
           #set($void = $xwiki.xWiki.rollback($actionDocument.document, $request.previousVersion, $xcontext.context))
-          {{info}}$services.localization.render('platform.extension.distributionWizard.reportStepDocumentRollbackedSuccess', "**${request.document}**", "**${request.previousVersion}**"){{/info}}
+          {{info}}$services.localization.render('platform.extension.distributionWizard.reportStepDocumentRollbackedSuccess', ["**${request.document}**", "**${request.previousVersion}**"]){{/info}}
         #end
       #end
     #end
@@ -46,7 +46,7 @@
       <input type="hidden" name="document" value="$services.model.serialize($status.reference)"/>
       <input type="hidden" name="document_locale" value="$!{status.reference.locale}"/>
       #if ($status.previousVersion)
-        <input type="hidden" name="previousVersion" value="$services.model.serialize($status.previousVersion)"/>
+        <input type="hidden" name="previousVersion" value="$status.previousVersion"/>
       #end
 
       #if ($status.action.toString() != 'DELETED')<input type="image" src="$deletedIconSrc" name="documentaction_delete" alt="delete">#end

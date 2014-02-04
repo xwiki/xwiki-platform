@@ -181,6 +181,7 @@ public class Api
      *
      * @param xattach The internal XWikiAttachment object
      * @return The public api Attachment object
+     * @since 5.0M2
      */
     @Unstable
     protected Attachment convert(XWikiAttachment xattach)
@@ -193,6 +194,7 @@ public class Api
      *
      * @param xattaches The List of XWikiAttachment objects
      * @return A List of Attachment objects
+     * @since 5.0M2
      */
     @Unstable
     protected List<Attachment> convertAttachments(List<XWikiAttachment> xattaches)

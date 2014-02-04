@@ -391,7 +391,10 @@
  */
 XWiki.ProvisioningBar = Class.create({
   initialize : function () {
-    this._callRefresh.bind(this).delay(1);
+    // We run the progress bar only if the &lt;div id="ui-progress"&gt; exists
+    if ($('ui-progress')) {
+      this._callRefresh.bind(this).delay(1);
+    }
   },
   _callRefresh : function () {
     // Document URL
@@ -409,8 +412,15 @@ XWiki.ProvisioningBar = Class.create({
   _refresh : function (status) {
     if (status.status == 'FINISHED') {
       $('ui-progress').addClassName('hidden');
-      $('successMessage').removeClassName('hidden');
-      $('finalize').removeClassName('hidden');
+      // We need to know if we have error
+      if (status.error.length &gt; 0) {
+        $('errorMessage').removeClassName('hidden');
+        $('cleanUp').removeClassName('hidden');
+      } else {
+        // Success
+        $('successMessage').removeClassName('hidden');
+        $('finalize').removeClassName('hidden');
+      }
     }
     else {
       var progress = status.progress;
@@ -736,6 +746,8 @@ return XWiki;
   #elseif($request.step == 'finalize')
     #set($wikiDescriptor = $services.wiki.getById($request.wikiId))
     #setMembers($wikiDescriptor)
+  #elseif($request.step == 'cleanUp')
+    #cleanUp()
   #else
     ## Default step
     #stepType()
@@ -769,7 +781,7 @@ return XWiki;
 ##
 ## Display the wizard footer
 ##################################
-#macro(wizardFooter $prev $next $create $finalize)
+#macro(wizardFooter $prev $next $create $finalize $finalizeHidden $cleanUp $cleanupHidden)
   &lt;div class="wizard-footer buttons"&gt;
     #if("$!prev" !='')
       &lt;span class="buttonwrapper left"&gt;      
@@ -788,7 +800,12 @@ return XWiki;
     #end
     #if("$!finalize" != '')
       &lt;span class="buttonwrapper"&gt;
-        &lt;button value="finalize" title="Finalize" name="step" id="finalize" class="button hidden"&gt;$finalize&lt;/button&gt;
+        &lt;button value="finalize" title="Finalize" name="step" id="finalize" class="button #if($finalizeHidden)hidden#end"&gt;$finalize&lt;/button&gt;
+      &lt;/span&gt;
+    #end
+    #if("$!cleanUp" != '')
+      &lt;span class="buttonwrapper"&gt;
+        &lt;button value="cleanUp" title="Clean Up" name="step" id="cleanUp" class="button #if($cleanupHidden)hidden#end"&gt;$cleanUp&lt;/button&gt;
       &lt;/span&gt;
     #end
   &lt;/div&gt;
@@ -1156,21 +1173,28 @@ return XWiki;
 ## the wiki provisioning
 ##################################
 #macro(templateProvisioning $wikiDescriptor)
-  #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
-
+  #set ($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
+  #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $wikiDescriptor.id])
+  #set ($status = $services.wiki.template.getWikiProvisioningJobStatus($jobId))
+  #set ($errors = $status.log.getLogs('ERROR'))
+  #set ($hasError = ($errors.size() &gt; 0))
+  
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
     #addMembersAsHiddenInput()
     &lt;input type="hidden" name="membershipType" value="$!escapetool.xml($request.getParameter('membershipType'))" /&gt;
     &lt;input type="hidden" name="userScope" value="$!escapetool.xml($request.userScope)" /&gt;
     &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($wikiDescriptor.id)" /&gt;
+    &lt;input type="hidden" name="csrf" id="csrf" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
     #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.provisioning'))
     &lt;div class="wizard-body"&gt;
+      #if ($status.state == "RUNNING")
       &lt;div class="ui-progress" id="ui-progress"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.provisioning.wait')
         &lt;div class="ui-progress-background"&gt;
           #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $wikiDescriptor.id])
-          #set ($percent = $services.wiki.template.getWikiProvisioningJobStatus($jobId).progress.offset)
+          #set ($status = $services.wiki.template.getWikiProvisioningJobStatus($jobId))
+          #set ($percent = $status.progress.offset)
           ## There is no progress information if the job was scheduled but hasn't started yet.
           #if (!$percent)
             #set ($percent = 0)
@@ -1179,14 +1203,76 @@ return XWiki;
           &lt;div class="ui-progress-bar green" style="width:${percent}%" id="template-progress-bar"&gt;&lt;/div&gt;
         &lt;/div&gt;
       &lt;/div&gt;
-      &lt;p class="successmessage box hidden" id="successMessage"&gt;
-      $services.localization.render('platform.wiki.create.wizard.step.provisioning.complete')
+      #end
+      &lt;p class="successmessage box #if($hasError || $status.state == 'RUNNING')hidden#end" id="successMessage"&gt;
+        $services.localization.render('platform.wiki.create.wizard.step.provisioning.complete')
+      &lt;/p&gt;
+      &lt;p class="errormessage box #if(!$hasError || $status.state == 'RUNNING')hidden#end" id="errorMessage"&gt;
+        #set($wikiURL = $xwiki.getURL($wikiDescriptor.mainPageReference))
+        $services.localization.render('platform.wiki.create.wizard.step.provisioning.error', ["&lt;a href='$wikiURL'&gt;$!escapetool.xml($wikiDescriptor.id)&lt;/a&gt;"])
       &lt;/p&gt;
     &lt;/div&gt;
-    #wizardFooter('', '', '', $services.localization.render('platform.wiki.create.wizard.step.provisioning.finalize'))
+    #if($status.state == "FINISHED")
+      #set($finalizeHidden = $hasError)
+      #set($cleanUpHidden = !$hasError)
+    #else
+      #set($finalizeHidden = true)
+      #set($cleanUpHidden = true)
+    #end
+    #wizardFooter('', '', '', $services.localization.render('platform.wiki.create.wizard.step.provisioning.finalize'), $finalizeHidden, $services.localization.render('platform.wiki.create.wizard.step.provisioning.cleanUp'), $cleanUpHidden)
     &lt;/form&gt;
   {{/html}}
 
 #end
-{{/velocity}}</content>
-</xwikidoc>
+##################################
+##           CLEAN UP
+##
+## Delete the wiki if errors has occured
+##################################
+#macro(cleanUp)
+  #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
+  #if("$!request.deleteOk" == '')
+    #if ($services.csrf.isTokenValid($request.csrf))
+      #set($wikiId = $request.wikiId)
+      #set($ok = $services.wiki.deleteWiki($wikiId))
+      $response.sendRedirect($doc.getURL('view', "step=cleanUp&amp;deleteOk=$ok&amp;wikiId=$wikiId"))
+    #else
+      {{html}}
+        #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.cleaningUp'))
+        &lt;form action="$doc.getURL()" method="post"&gt;
+        &lt;div class="wizard-body"&gt;
+          &lt;p&gt;$services.localization.render('platform.wiki.create.wizard.step.cleaningUp.confirmmessage', ["&lt;strong&gt;$request.wikiId&lt;/strong&gt;"])&lt;/p&gt;
+          &lt;input type="hidden" name="csrf" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
+          &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($request.wikiId)" /&gt;
+          &lt;div class="wizard-footer buttons"&gt;
+            &lt;span class="buttonwrapper"&gt;
+              &lt;button value="cleanUp" title="Confirm" name="step" id="cleanUp" class="button"&gt;$services.localization.render('platform.wiki.create.wizard.step.cleaningUp.confirm')&lt;/button&gt;
+            &lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/form&gt;
+       {{/html}}
+    #end
+  #else
+    #set($wikiId = $request.wikiId)
+
+    {{html}}
+      #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.cleaningUp'))
+      &lt;div class="wizard-body"&gt;
+        #if($request.deleteOk)
+          &lt;p class="successmessage box"&gt;
+            $services.localization.render('platform.wiki.create.wizard.step.cleaningup.success', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"])
+          &lt;/p&gt;
+        #else
+          &lt;p class="errormessage box"&gt;
+            $services.localization.render('platform.wiki.create.wizard.step.cleaningup.error', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"])
+          &lt;/p&gt;
+        #end
+      &lt;/div&gt;
+      &lt;/form&gt;
+    {{/html}}
+
+  #end
+#end
+{{/velocity}}
+</content></xwikidoc>

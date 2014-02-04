@@ -395,6 +395,10 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
                 new WikiDistributionJobStatus(sourceStatus, this.observationManagerProvider.get(),
                     this.loggerManagerProvider.get());
 
+            DistributionRequest request = targetStatus.getRequest();
+            request.setId(getWikiJobId(targetWiki));
+            request.setWiki(targetWiki);
+
             this.jobStatusStorage.store(targetStatus);
         }
     }

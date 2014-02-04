@@ -19,6 +19,7 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -73,7 +74,7 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
         this.previousDistributionExtensionUi = status.previousDistributionExtensionUi;
         this.distributionExtension = status.distributionExtension;
         this.distributionExtensionUi = status.distributionExtensionUi;
-        this.stepList = status.stepList;
+        this.stepList = new ArrayList<DistributionStep>(status.stepList);
     }
 
     public DistributionJobStatus(R request, ObservationManager observationManager, LoggerManager loggerManager,

@@ -27,6 +27,7 @@ import org.xwiki.wikistream.WikiStreamException;
  * Used to indicate that the parsed entity should be skipped.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 @Unstable
 public class SkipEntityException extends WikiStreamException

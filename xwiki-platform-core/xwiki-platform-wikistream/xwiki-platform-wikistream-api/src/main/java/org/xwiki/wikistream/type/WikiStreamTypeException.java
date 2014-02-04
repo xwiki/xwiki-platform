@@ -26,6 +26,7 @@ import org.xwiki.wikistream.WikiStreamException;
  * Encapsulates WikiType and WikiStream type based errors.
  * 
  * @version $Id$
+ * @since 5.2M2
  */
 @Unstable
 public class WikiStreamTypeException extends WikiStreamException

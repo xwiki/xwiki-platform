@@ -142,11 +142,13 @@
     **{{translation key="platform.wiki.currentwiki.panel.information.description.label"/}}**
     $wikiDescription
   #end
-  ----
   ## Join/Leave
   #if ($isGuest)
+    ----
     {{translation key="platform.wiki.currentwiki.joinNeedToLogin"/}}
-  #else
+  #elseif("$!xcontext.userReference.wikiReference.name" == "$!services.wiki.mainWikiId")
+    ----
+    ## The user is global
     #set ($hasOwner = ($wiki.ownerId.equals($currentUser)))
     #set ($currentUserIsMember = $services.wiki.user.isMember($currentUser, $currentWiki))
     #if (!$currentUserIsMember)
@@ -159,7 +161,7 @@
             #set ($existingInvitationOrRequest = $invitation)
           #end
         #end
-      #end      
+      #end
       #set ($existingRequests = $services.wiki.user.getAllRequests($currentWiki))
       #foreach ($existingRequest in $existingRequests)
         #if ($existingRequest.userId == $currentUser &amp;&amp; $existingRequest.status == 'PENDING')

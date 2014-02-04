@@ -49,7 +49,12 @@
   #set($wikiId = $request.wikiId)
   #set($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $wikiId])
   #set($status = $services.wiki.template.getWikiProvisioningJobStatus($jobId))
-  #set($map = {'wikiId':$wikiId, 'progress':$status.progress.offset, 'status':$status.state})
+  #set($errors = $status.log.getLogs('ERROR'))
+  #set($errorMessage = "")
+  #if($errors.size() &gt; 0)
+    #set($errorMessage = $errors[0].getFormattedMessage())
+  #end
+  #set($map = {'wikiId':$wikiId, 'progress':$status.progress.offset, 'status':$status.state, 'error':$errorMessage})
   $jsontool.serialize($map)
 #end
 {{/velocity}}</content>

@@ -29,6 +29,7 @@ import org.xwiki.stability.Unstable;
  * RC5 is a registered trademark of RSA Security.
  *
  * @version $Id$
+ * @since 5.4M1
  */
 @Unstable
 public class RC5KeyParameters extends KeyParameter

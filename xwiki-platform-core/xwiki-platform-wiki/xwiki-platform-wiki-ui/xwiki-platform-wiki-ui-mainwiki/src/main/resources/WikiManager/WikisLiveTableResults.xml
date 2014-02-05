@@ -48,13 +48,19 @@
 #set($from =  "")
 #set($extra = "")
 #set($params = [])
-#if("$!request.space" != '')
-  #set($extra = "${extra} and doc.space = ?")
-  #set($discard = $params.add("$request.space"))
+## Restrict to the list of wiki I can see
+#set ($extra = "${extra} and doc.name IN (")
+#set ($separator = "")
+#foreach ($wiki in $services.wiki.getAll())
+  ## XWiki.XWikiComments is a mandatory document that it must exists and we should have acces to it
+  #set ($testPageReference = $services.model.createDocumentReference($wiki.id, 'XWiki', 'XWikiComments'))
+  #if ($xwiki.checkAccess($testPageReference, 'view') || ($services.wiki.user.getUserScope($wiki.id)!='LOCAL_ONLY' &amp;&amp; $services.wiki.user.getMembershipType($wiki.id) != 'INVITE'))
+    #set ($extra = "${extra}${separator}'XWikiServer${stringtool.capitalize($wiki.id)}'")
+    #set ($separator = ",")
+  #end
 #end
-#if("$!request.orphaned" == '1')
-  #set($extra = "${extra} and doc.parent='' and doc.name&lt;&gt;'WebHome'")
-#end
+#set ($extra = "${extra})")
+## Restrict to templates only
 #if("$!request.onlyTemplates" == '1')
   #set($from = "${from}, BaseObject objTemplate, IntegerProperty propTemplate")
   #set($extra = "${extra} AND doc.fullName = objTemplate.name AND objTemplate.className='WikiManager.WikiTemplateClass' AND objTemplate.id = propTemplate.id AND propTemplate.name='iswikitemplate' AND propTemplate.value='1'")

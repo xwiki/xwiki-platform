@@ -154,12 +154,13 @@
   <content>{{velocity}}
 ## Load the User Picker style for the wiki owner column.
 #set($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
-#set($columns = ['wikiprettyname', 'description', 'owner', 'membershipType'])
+#set($columns = ['wikiprettyname', 'description', 'owner', 'doc.creationDate', 'membershipType'])
 #set($columnsProperties = {
     'wikiprettyname' : { 'type' : 'text', 'link' : 'field' },
     'description' : { 'type' : 'text' , 'size' : 50, 'html' : 'true' },
     'owner' : { 'type' : 'text', 'size' : 10, 'html' : 'true' },
-    'membershipType' : { 'sortable': false, 'filterable': false}
+    'membershipType' : { 'sortable': false, 'filterable': false},
+    'doc.creationDate' : { 'type' : 'date', 'size' : 10, 'html' : 'false' }
 })
 #set($options = {
    'className' : 'XWiki.XWikiServerClass',

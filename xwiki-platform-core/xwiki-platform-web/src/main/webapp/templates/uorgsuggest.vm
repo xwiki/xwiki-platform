@@ -12,7 +12,7 @@ $response.setContentType("text/xml")
   #set ($wikiReference = $doc.documentReference.wikiReference)
 #end
 #if ($request.uorg == 'user')
-  #set ($statement = 'from doc.object(XWiki.XWikiUsers) as user where lower(doc.name) like :input or lower(user.first_name) like :input or lower(user.last_name) like :input order by user.first_name, user.last_name')
+  #set ($statement = "from doc.object(XWiki.XWikiUsers) as user where lower(doc.name) like :input or concat(concat(lower(user.first_name), ' '), lower(user.last_name)) like :input order by user.first_name, user.last_name")
   #set ($query = $services.query.xwql($statement).setWiki($wikiReference.name))
   #set ($discard = $query.setOffset(0).setLimit(10).bindValue('input', "%$input%"))
   #foreach($user in $query.execute())

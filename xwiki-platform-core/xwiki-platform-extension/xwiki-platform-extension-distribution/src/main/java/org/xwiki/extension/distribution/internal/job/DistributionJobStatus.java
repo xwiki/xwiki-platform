@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
@@ -68,7 +69,7 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
     public DistributionJobStatus(DistributionJobStatus<R> status, ObservationManager observationManager,
         LoggerManager loggerManager)
     {
-        super(status.getRequest(), observationManager, loggerManager, false);
+        super(ObjectUtils.cloneIfPossible(status.getRequest()), observationManager, loggerManager, false);
 
         this.previousDistributionExtension = status.previousDistributionExtension;
         this.previousDistributionExtensionUi = status.previousDistributionExtensionUi;

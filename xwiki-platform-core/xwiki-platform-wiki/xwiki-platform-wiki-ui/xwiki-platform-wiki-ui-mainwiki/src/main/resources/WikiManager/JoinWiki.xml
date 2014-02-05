@@ -51,7 +51,7 @@
   #end
 #end
 #set ($wikiId = $request.wikiId)
-#set ($confirm = $request.confirm)
+#set ($form_token = $request.form_token)
 ##
 #if ("$!wikiId" == '')
   {{error}}{{translation key="platform.wiki.error.oneParameterNotSpecified" parameters="wikiId"/}}{{/error}}
@@ -103,7 +103,7 @@
       #if ($existingInvitation)
         ##
         ## An invitation exists.
-        #if ($request.acceptInvitation || $request.rejectInvitation)
+        #if (($request.acceptInvitation || $request.rejectInvitation) &amp;&amp; $services.csrf.isTokenValid($form_token))
           ##
           ## The user decided whether to accept or to reject the invitation.
           #set ($notificationMessage = $services.localization.render('platform.wiki.users.invitation.userAcceptedNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, ${wikiName}, $wikiId]))
@@ -125,12 +125,19 @@
           #end
           {{/success}}
         #else
+          #if("$!form_token" != '')
+
+             {{warning}}
+               {{translation key="platform.wiki.csrf.error" /}}
+             {{/warning}}
+
+          #end
           ##
           ## User can decide if to accept or reject the invitation.
           {{html wiki='true'}}
           $services.localization.render('platform.wiki.users.invitation.title', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
 
-          &lt;form class='xform third' method='GET'&gt;
+          &lt;form class='xform third' method='post'&gt;
             &lt;dl&gt;
             #if ("$!existingInvitation.get('reviewerComment').getValue()" != '')
               &lt;dt&gt;
@@ -151,7 +158,8 @@
                 &lt;input type='submit' name='rejectInvitation' value="$services.localization.render('platform.wiki.users.invitation.reject.label')" class='button'/&gt;
                 &lt;a href="$backUrl" class='button secondary'&gt;{{translation key="platform.wiki.users.invitation.postpone.label"/}}&lt;/a&gt;
               &lt;/span&gt;
-              &lt;input type='hidden' name='wikiId' value="$!wikiId"/&gt;
+              &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
+              &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
             &lt;/dl&gt;
           &lt;/form&gt;
           {{/html}}
@@ -177,14 +185,27 @@
             ## Request already exists.
             ##
             {{info}}$services.localization.render('platform.wiki.users.join.request.pendingRequestExists', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/info}}
-          #elseif ("$!confirm" != '1')
+          #elseif (!$services.csrf.isTokenValid($form_token))
             ## User wants to cancel existing request.
             ##
-            #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
+            #if("$!form_token" != '')
+
+              {{warning}}
+               {{translation key="platform.wiki.csrf.error" /}}
+              {{/warning}}
+
+            #end
             {{box}}
               $services.localization.render('platform.wiki.users.join.request.cancelConfirmation', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
               ((({{html}}
-                &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.wiki.users.join.request.cancelYes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.users.join.request.cancelNo')&lt;/a&gt;&lt;/span&gt;
+                &lt;form action="$doc.getURL()" method="post"&gt;
+                  &lt;fieldset&gt;
+                    &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
+                    &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
+                    &lt;input type="hidden" name="cancelJoinRequest" value="1" /&gt;
+                    &lt;span class="buttonwrapper"&gt;&lt;button class="button"&gt;$services.localization.render('platform.wiki.users.join.request.cancelYes')&lt;/button&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.users.join.request.cancelNo')&lt;/a&gt;&lt;/span&gt;
+                  &lt;/fieldset&gt;
+                &lt;/form&gt;
               {{/html}})))
             {{/box}}
           #else
@@ -197,9 +218,17 @@
               #printException($services.wiki.user.lastException.message)
             #end
           #end
-        #elseif ("$!confirm" != '1')
+        #elseif (!$services.csrf.isTokenValid($form_token))
           ## Join request.
           ##
+          #if("$!form_token" != '')
+
+           {{warning}}
+             {{translation key="platform.wiki.csrf.error" /}}
+           {{/warning}}
+
+          #end
+        
           {{html wiki='true'}}
             $services.localization.render('platform.wiki.users.join.request.hint', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
 
@@ -217,7 +246,7 @@
                 &lt;/span&gt;
                 &lt;input type='hidden' name='wikiId' value="$!wikiId"/&gt;
                 &lt;input type='hidden' name='requestJoin' value="$!request.requestJoin"/&gt;
-                &lt;input type='hidden' name='confirm' value="1"/&gt;
+                &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
               &lt;/dl&gt;
             &lt;/form&gt;
           {{/html}}
@@ -238,14 +267,26 @@
       #else
         ## Open membership as default.
         ##
-        #if ("$!confirm" != '1')
+        #if (!$services.csrf.isTokenValid($form_token))
           ## Open join.
           ##
-          #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
+          #if("$!form_token" != '')
+
+           {{warning}}
+             {{translation key="platform.wiki.csrf.error" /}}
+           {{/warning}}
+
+          #end
           {{box}}
             $services.localization.render('platform.wiki.users.join.confirmation', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
             ((({{html}}
-              &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.wiki.users.join.yes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.users.join.no')&lt;/a&gt;&lt;/span&gt;
+              &lt;form action="$doc.getURL()" method="post"&gt;
+                &lt;fieldset&gt;
+                  &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
+                  &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
+                  &lt;span class="buttonwrapper"&gt;&lt;button class="button"&gt;$services.localization.render('platform.wiki.users.join.yes')&lt;/button&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.users.join.no')&lt;/a&gt;&lt;/span&gt;
+                &lt;/fieldset&gt;
+              &lt;/form&gt;
             {{/html}})))
           {{/box}}
         #else

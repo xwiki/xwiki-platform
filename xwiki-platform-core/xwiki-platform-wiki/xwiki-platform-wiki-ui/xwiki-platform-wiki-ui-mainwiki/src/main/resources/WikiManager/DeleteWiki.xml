@@ -52,7 +52,7 @@
 #end
 ##
 #set ($wikiId = $request.wikiId)
-#set ($confirm = $request.confirm)
+#set ($form_token = $request.form_token)
 ##
 #if ("$!wikiId" == '')
   {{error}}{{translation key="platform.wiki.error.oneParameterNotSpecified" parameters="wikiId"/}}{{/error}}
@@ -75,17 +75,30 @@
     #if (!$services.wiki.canDeleteWiki($currentUser, $wikiId))
       {{error}}The user #if($xcontext.user != 'XWiki.XWikiGuest')[[$currentUser]]#{else}$xcontext.user#end is not allowed to delete the wiki [[$wikiId&gt;&gt;$wikiMainPage]].{{/error}}
     #else
-      #if ("$!confirm" != 1)
+      #if (!$services.csrf.isTokenValid($form_token))
         #set ($browseDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'WebHome'))
         #set ($backUrl = $xwiki.getURL($browseDocumentReference))
-        #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
+        #if("$!form_token" != '')
+
+           {{warning}}
+             {{translation key="platform.wiki.csrf.error" /}}
+           {{/warning}}
+
+        #end
         {{box}}
           $services.localization.render('platform.wiki.delete.confirmation', ['[[', $wikiId, "&gt;&gt;$wikiMainPage]]"])
           ((({{html}}
-            &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.wiki.delete.confirmation.yes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.delete.confirmation.no')&lt;/a&gt;&lt;/span&gt;
+            &lt;form action="$doc.getURL()" method="post"&gt;
+              &lt;fieldset&gt;
+                &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
+                &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
+                &lt;span class="buttonwrapper"&gt;&lt;button class="button"&gt;$services.localization.render('platform.wiki.delete.confirmation.yes')&lt;/button&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.delete.confirmation.no')&lt;/a&gt;&lt;/span&gt;
+              &lt;/fieldset&gt;
+            &lt;/form&gt;
           {{/html}})))
         {{/box}}
       #else
+        ## The form_token is valid
         #set ($temp = $services.wiki.deleteWiki($wikiId))
         #if ($services.wiki.lastException)
           #printException($services.wiki.lastException)

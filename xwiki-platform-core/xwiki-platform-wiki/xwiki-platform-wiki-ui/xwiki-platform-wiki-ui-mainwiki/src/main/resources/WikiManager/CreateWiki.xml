@@ -947,6 +947,7 @@ return XWiki;
         &lt;input type="hidden" name="description" value="$!escapetool.xml($request.getParameter('description'))" /&gt;
         &lt;input type="hidden" name="template" value="$!escapetool.xml($request.template)" /&gt;
         &lt;input type="hidden" name="set_as_template" value="$!escapetool.xml($request.set_as_template)" /&gt;
+        &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
         #userPicker_import(true)
         ### WIZARD FIRST HALF ###
         &lt;div class="half"&gt;
@@ -1088,36 +1089,45 @@ return XWiki;
 ## The final step that eventually create the wiki
 ##################################
 #macro(create)
-  #set($fromTemplate = false)
-  #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
-    ## check if the wiki is already in creation
-    #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $request.wikiname])
-    #if("$!services.wiki.template.getWikiProvisioningJobStatus($jobId)" == '')
-      #set($discard = $services.wiki.template.createWikiFromTemplate($request.wikiname, $request.wikiname, $request.template, $request.ownerId, true))
-    #end
-    #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
-    #set($fromTemplate = true)
-  #else
-    #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $request.wikiname, $request.ownerId, true))
-  #end
-  #if (!$wikiDescriptor)
-
-    {{error}}$services.localization.render('platform.wiki.create.error', [$request.wikiname, $services.wiki.lastException]){{/error}}
-
-  #else
-    ## Set the pretty name
-    #set ($discard = $wikiDescriptor.setPrettyName($request.wikiprettyname))
-    #set ($discard = $wikiDescriptor.setDescription($request.description))
-    #set ($discard = $services.wiki.saveDescriptor($wikiDescriptor))
-    ## Set the template value
-    #if("$!request.set_as_template" != '')
-      #set ($discard = $services.wiki.template.setTemplate($wikiDescriptor.id, true))
-    #end
-    #if($fromTemplate)
-      #templateProvisioning($wikiDescriptor)
+  #if ($services.csrf.isTokenValid($request.form_token))
+    #set($fromTemplate = false)
+    #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
+      ## check if the wiki is already in creation
+      #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $request.wikiname])
+      #if("$!services.wiki.template.getWikiProvisioningJobStatus($jobId)" == '')
+        #set($discard = $services.wiki.template.createWikiFromTemplate($request.wikiname, $request.wikiname, $request.template, $request.ownerId, true))
+      #end
+      #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
+      #set($fromTemplate = true)
     #else
-      #setMembers($wikiDescriptor)
+      #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $request.wikiname, $request.ownerId, true))
     #end
+    #if (!$wikiDescriptor)
+
+      {{error}}$services.localization.render('platform.wiki.create.error', [$request.wikiname, $services.wiki.lastException]){{/error}}
+
+    #else
+      ## Set the pretty name
+      #set ($discard = $wikiDescriptor.setPrettyName($request.wikiprettyname))
+      #set ($discard = $wikiDescriptor.setDescription($request.description))
+      #set ($discard = $services.wiki.saveDescriptor($wikiDescriptor))
+      ## Set the template value
+      #if("$!request.set_as_template" != '')
+        #set ($discard = $services.wiki.template.setTemplate($wikiDescriptor.id, true))
+      #end
+      #if($fromTemplate)
+        #templateProvisioning($wikiDescriptor)
+      #else
+        #setMembers($wikiDescriptor)
+      #end
+    #end
+  #else
+
+    {{warning}}
+      {{translation key="platform.wiki.csrf.error" /}}
+    {{/warning}}
+    
+    #stepMembers()
   #end
 #end
 ##################################

@@ -371,8 +371,6 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Lots of refactoring in WikiStream -->
-            <exclude>org/xwiki/wikistream/**</exclude>
           </excludes>
         </configuration>
       </plugin>

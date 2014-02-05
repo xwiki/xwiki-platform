@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-url</artifactId>
-    <version>5.2.4-SNAPSHOT</version>
+    <version>5.2.4</version>
   </parent>
   <artifactId>xwiki-platform-url-standard</artifactId>
   <name>XWiki Platform - URL - Standard Implementation</name>

@@ -43,17 +43,25 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>Updates the wiki user configuration by using values from the request.
+  <content>{{velocity}}
+#if($services.csrf.isTokenValid($request.form_token))
+  #set($userConfRef = $services.model.createDocumentReference('', 'WikiManager', 'WikiUserConfiguration'))
+  #set($userConfDoc = $xwiki.getDocument($userConfRef))
+  #set($discard = $userConfDoc.updateObjectFromRequest("WikiManager.WikiUserClass"))
+  #set($discard = $userConfDoc.save())
+  #if($request.xredirect)
+    $response.sendRedirect($request.xredirect)
+  #end
+#elseif("$!request.form_token" != '')
 
-The 'xredirect' parameter is also accepted, currently used in the administration section of a wiki.
+    {{warning}}
+      {{translation key="platform.wiki.csrf.error" /}}
+    {{/warning}}
 
-{{velocity}}
-#set($userConfRef = $services.model.createDocumentReference('', 'WikiManager', 'WikiUserConfiguration'))
-#set($userConfDoc = $xwiki.getDocument($userConfRef))
-#set($discard = $userConfDoc.updateObjectFromRequest("WikiManager.WikiUserClass"))
-#set($discard = $userConfDoc.save())
-#if($request.xredirect)
-  $response.sendRedirect($request.xredirect)
+#else
+  Updates the wiki user configuration by using values from the request.
+
+  The 'xredirect' parameter is also accepted, currently used in the administration section of a wiki.
 #end
 {{/velocity}}</content>
 </xwikidoc>

@@ -856,7 +856,7 @@ $xwiki.ssx.use('Main.Activity')##
     #if ("$!services.wiki" != '' &amp;&amp; $services.wiki.mainWikiId == $services.wiki.currentWikiId)
       #set ($allWikis = $services.wiki.getAll())
       #foreach ($wiki in $allWikis)
-        #if ($xwiki.hasAccess($wiki.mainPageReference, 'view'))
+        #if ($xwiki.checkAccess($wiki.mainPageReference, 'view'))
           $aWikis.add($wiki.id)
         #end
       #end

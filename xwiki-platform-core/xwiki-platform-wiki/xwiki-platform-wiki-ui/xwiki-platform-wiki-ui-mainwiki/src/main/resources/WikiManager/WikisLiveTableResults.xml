@@ -54,7 +54,7 @@
 #foreach ($wiki in $services.wiki.getAll())
   ## XWiki.XWikiComments is a mandatory document that it must exists and we should have acces to it
   #set ($testPageReference = $services.model.createDocumentReference($wiki.id, 'XWiki', 'XWikiComments'))
-  #if ($xwiki.checkAccess($testPageReference, 'view') || ($services.wiki.user.getUserScope($wiki.id)!='LOCAL_ONLY' &amp;&amp; $services.wiki.user.getMembershipType($wiki.id) != 'INVITE'))
+  #if ($xwiki.hasAccess($testPageReference, 'view') || ($services.wiki.user.getUserScope($wiki.id)!='LOCAL_ONLY' &amp;&amp; $services.wiki.user.getMembershipType($wiki.id) != 'INVITE'))
     #set ($extra = "${extra}${separator}'XWikiServer${stringtool.capitalize($wiki.id)}'")
     #set ($separator = ",")
   #end

@@ -74,6 +74,8 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
     @Inject
     private XWikiDocumentOutputWikiStream documentListener;
 
+    private boolean documentDeleted;
+
     @Override
     protected Object createFilter() throws WikiStreamException
     {
@@ -99,7 +101,7 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
     @Override
     public void beginWikiDocument(String arg0, FilterEventParameters arg1) throws WikiStreamException
     {
-        // Nothing to do
+        this.documentDeleted = false;
     }
 
     @Override
@@ -140,8 +142,9 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
             if (document.isNew()) {
                 document = inputDocument;
             } else {
-                if (this.properties.isPreviousDeleted()) {
+                if (this.properties.isPreviousDeleted() && !this.documentDeleted) {
                     xcontext.getWiki().deleteDocument(document, xcontext);
+                    this.documentDeleted = true;
                     document = inputDocument;
                 } else {
                     document.loadAttachmentsContent(xcontext);

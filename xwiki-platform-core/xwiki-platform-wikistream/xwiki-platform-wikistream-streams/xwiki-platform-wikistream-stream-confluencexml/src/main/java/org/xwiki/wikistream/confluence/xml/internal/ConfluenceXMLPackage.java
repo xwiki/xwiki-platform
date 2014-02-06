@@ -373,6 +373,8 @@ public class ConfluenceXMLPackage
 
             if (elementName.equals("id")) {
                 id = Integer.valueOf(xmlReader.getElementText());
+
+                properties.setProperty("id", id);
             } else if (elementName.equals("property")) {
                 String propertyName = xmlReader.getAttributeValue(null, "name");
 

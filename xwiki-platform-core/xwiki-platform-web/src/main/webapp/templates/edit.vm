@@ -60,7 +60,11 @@
   #template("xwikivars.vm")
   #template("layoutvars.vm")
   #template("htmlheader.vm")
-  #template("menuview.vm")
+  #if($displayMainMenu)
+    <div id="menuview">
+      #template("menuview.vm")
+    </div>
+  #end
   #template("header.vm")
   #if($editor == 'wiki' || $editor == 'wysiwyg')
     <form id="edit" method="post" action="$doc.getURL('preview')" class="withLock">

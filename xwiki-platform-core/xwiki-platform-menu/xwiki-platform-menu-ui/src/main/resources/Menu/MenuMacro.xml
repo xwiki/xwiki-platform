@@ -297,7 +297,7 @@ $xwiki.getDocument('MenuTemplate').content
 
 /* Horizontal Menu */
 
-.menu-horizontal {
+.menu.menu-horizontal {
   #css3_backgroundLinearGradient({
     'to': 'bottom',
     'colors': [
@@ -379,6 +379,10 @@ $xwiki.getDocument('MenuTemplate').content
 }
 
 /* Vertical Menu */
+
+.menu.menu-vertical {
+  color: inherit;
+}
 
 .menu.menu-vertical ul {
   margin-top: .3em;

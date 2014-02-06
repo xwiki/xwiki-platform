@@ -25,6 +25,10 @@
             <p>
               <parameters>
                 <entry>
+                  <string>title</string>
+                  <string></string>
+                </entry>
+                <entry>
                   <string>syntax</string>
                   <org.xwiki.rendering.syntax.Syntax>
                     <type>
@@ -43,6 +47,10 @@
                   <string>XWiki.author</string>
                 </entry>
                 <entry>
+                  <string>revision_comment</string>
+                  <string></string>
+                </entry>
+                <entry>
                   <string>revision_date</string>
                   <date>2000-01-01 00:00:00.0 UTC</date>
                 </entry>
@@ -57,6 +65,10 @@
                 <entry>
                   <string>content_date</string>
                   <date>2013-11-04 16:40:05.0 UTC</date>
+                </entry>
+                <entry>
+                  <string>content</string>
+                  <string></string>
                 </entry>
               </parameters>
             </p>

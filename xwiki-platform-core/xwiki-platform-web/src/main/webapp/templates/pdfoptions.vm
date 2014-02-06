@@ -18,7 +18,7 @@
   <div id="mainContentArea">
     <div id="document-title"><h1>$services.localization.render('core.export.pdf.options.title')</h1></div>
     ## Submit using POST method to preserve the query string parameters of the action URL.
-    <form id="pdfExportOptions" method="post" class="xform half" action="$doc.getURL('export', $request.getQueryString())">
+    <form id="pdfExportOptions" method="post" class="xform half" action="$doc.getURL('export', $request.qs)">
       <div class="hidden">
         <input type="hidden" name="format" value="pdf" />
       </div>
@@ -89,7 +89,7 @@
       </dl>
       <div class="buttons">
         <span class="buttonwrapper"><input type="submit" value="$services.localization.render('export')" class="button" /></span>
-        <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL('view', $request.getQueryString())">$services.localization.render('cancel')</a></span>
+        <span class="buttonwrapper"><a class="secondary button" href="$doc.getURL('view', $request.qs)">$services.localization.render('cancel')</a></span>
       </div>
     </form>
     <div class="clearfloats"></div>

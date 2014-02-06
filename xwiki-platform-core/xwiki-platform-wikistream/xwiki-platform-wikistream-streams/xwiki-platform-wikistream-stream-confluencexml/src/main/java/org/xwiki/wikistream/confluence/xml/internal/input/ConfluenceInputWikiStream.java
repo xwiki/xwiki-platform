@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.text.ParseException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -432,23 +433,42 @@ public class ConfluenceInputWikiStream extends AbstractBeanInputWikiStream<Confl
         }
 
         // Attachments
+        Map<String, PropertiesConfiguration> pageAttachments = new LinkedHashMap<String, PropertiesConfiguration>();
         for (int attachmentId : this.confluencePackage.getAttachments(pageId)) {
-            readAttachment(pageId, attachmentId, filter, proxyFilter);
+            PropertiesConfiguration attachmentProperties;
+            try {
+                attachmentProperties = this.confluencePackage.getAttachmentProperties(pageId, attachmentId);
+            } catch (ConfigurationException e) {
+                throw new WikiStreamException("Failed to get attachment properties", e);
+            }
+
+            String attachmentName = attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_NAME);
+
+            PropertiesConfiguration currentAttachmentProperties = pageAttachments.get(attachmentName);
+            if (currentAttachmentProperties != null) {
+                int version = attachmentProperties.getInt(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION);
+                int currentVersion = currentAttachmentProperties.getInt(ConfluenceXMLPackage.KEY_ATTACHMENT_REVISION);
+
+                if (version > currentVersion) {
+                    pageAttachments.put(attachmentName, attachmentProperties);
+                }
+            } else {
+                pageAttachments.put(attachmentName, attachmentProperties);
+            }
+        }
+
+        for (PropertiesConfiguration attachmentProperties : pageAttachments.values()) {
+            readAttachment(pageId, attachmentProperties, filter, proxyFilter);
         }
 
         // < WikiDocumentRevision
         proxyFilter.endWikiDocumentRevision(revision, documentRevisionParameters);
     }
 
-    private void readAttachment(int pageId, int attachmentId, Object filter, ConfluenceFilter proxyFilter)
-        throws WikiStreamException
+    private void readAttachment(int pageId, PropertiesConfiguration attachmentProperties,
+        Object filter, ConfluenceFilter proxyFilter) throws WikiStreamException
     {
-        PropertiesConfiguration attachmentProperties;
-        try {
-            attachmentProperties = this.confluencePackage.getAttachmentProperties(pageId, attachmentId);
-        } catch (ConfigurationException e) {
-            throw new WikiStreamException("Failed to get attachment properties", e);
-        }
+        int attachmentId = attachmentProperties.getInt("id");
 
         String attachmentName = attachmentProperties.getString(ConfluenceXMLPackage.KEY_ATTACHMENT_NAME);
         long attachmentSize = attachmentProperties.getLong(ConfluenceXMLPackage.KEY_ATTACHMENT_CONTENT_SIZE);

@@ -72,10 +72,16 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         List<WikiDescriptor> result = new ArrayList<WikiDescriptor>();
 
         try {
-            List<XWikiDocument> documents = descriptorDocumentHelper.getAllXWikiServerClassDocument();
-            for (XWikiDocument document : documents) {
-                // Extract the Wiki
-                DefaultWikiDescriptor descriptor = buildDescriptorFromDocument(document);
+            List<String> documents = descriptorDocumentHelper.getAllXWikiServerClassDocumentNames();
+            for (String document : documents) {
+                // Get the wiki id from the name of the document
+                String wikiId = descriptorDocumentHelper.getWikiIdFromDocumentFullname(document);
+                // Get if from the cache
+                DefaultWikiDescriptor descriptor = cache.getFromId(wikiId);
+                if (descriptor == null) {
+                    // Build the descriptor
+                    descriptor = buildDescriptorFromDocument(document);
+                }
                 // Add it to the result list
                 if (descriptor != null) {
                     result.add(descriptor);

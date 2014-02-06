@@ -20,29 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Panels</web>
   <name>PanelClass</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.XWikiClasses</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1391689862000</creationDate>
+  <parent>XWiki.XWikiClasses</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1252454400000</creationDate>
-  <date>1252454400000</date>
-  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <date>1391690743000</date>
+  <contentUpdateDate>1391690735000</contentUpdateDate>
   <version>1.1</version>
   <title>Panel Class</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
-  <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>{{include document="XWiki.ClassSheet"/}}</content>
   <class>
     <name>Panels.PanelClass</name>
     <customClass/>
@@ -116,5 +112,36 @@
       <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
     </type>
   </class>
-  <content>{{include document="XWiki.ClassSheet"/}}</content>
+  <object>
+    <name>Panels.PanelClass</name>
+    <number>0</number>
+    <className>XWiki.ClassSheetBinding</className>
+    <guid>dda0f85d-948e-40f9-ae29-796862d30d4d</guid>
+    <class>
+      <name>XWiki.ClassSheetBinding</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <sheet>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sheet</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Sheet</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </sheet>
+    </class>
+    <property>
+      <sheet>Panels.PanelSheet</sheet>
+    </property>
+  </object>
 </xwikidoc>

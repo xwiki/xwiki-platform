@@ -1613,11 +1613,12 @@ return XWiki;
 }(XWiki || {}));
 
 document.observe('xwiki:dom:loaded', function() {
-  // if the action on the current document is not view, don't load annotations
-  if (XWiki.contextaction != 'view') {
+  // Load the annotations only in view mode, if the document content is displayed
+  // (the document content is not displayed when viewer=history for instance).
+  if (XWiki.contextaction != 'view' || !$('xwikicontent')) {
     return;
   }
-  
+
   #if ($annotationHighlightByDefault &amp;&amp; $annotationHighlightByDefault != 0)
     var displayHighlight = true;
   #else

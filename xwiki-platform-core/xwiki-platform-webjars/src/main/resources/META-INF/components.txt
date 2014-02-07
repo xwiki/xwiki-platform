@@ -1,0 +1,2 @@
+org.xwiki.webjars.internal.WebJarsAction
+org.xwiki.webjars.script.WebJarsScriptService

@@ -366,6 +366,24 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/resource/EntityResource</className>
+              <method>java.lang.String getAction()</method>
+              <justification>Resource module is still a young API. Moved to Resource.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/resource/EntityResource</className>
+              <method>void setAction(java.lang.String)</method>
+              <justification>Resource module is still a young API. Moved to Resource.</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/resource/Resource</className>
+              <method>org.xwiki.resource.ResourceAction getAction()</method>
+              <justification>Resource module is still a young API. Moved from EntityResource</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
@@ -386,6 +404,7 @@
   </build>
   <modules>
     <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-action</module>
     <module>xwiki-platform-activeinstalls</module>
     <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
@@ -462,6 +481,7 @@
     <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webdav</module>
+    <module>xwiki-platform-webjars</module>
     <module>xwiki-platform-wiki</module>
     <module>xwiki-platform-wikistream</module>
     <module>xwiki-platform-wiki-manager</module>

@@ -178,7 +178,7 @@ public class ExtendedURLEntityResourceFactoryTest
         ExtendedURL url = new ExtendedURL(new URL(testURL));
         EntityResource entityResource = this.mocker.getComponentUnderTest().createResource(url, Collections.EMPTY_MAP);
 
-        assertEquals(expectedAction, entityResource.getAction());
+        assertEquals(expectedAction, entityResource.getAction().getName());
         assertEquals(returnedReference, entityResource.getEntityReference());
 
         return entityResource;

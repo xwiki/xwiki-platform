@@ -39,6 +39,12 @@ public interface Resource
     ResourceType getType();
 
     /**
+     * @return the action requested on this resource (e.g. "view", "download", etc). Note that We're not using a typed
+     *         object since the action name can be anything and corresponds to an Action Component role hint.
+     */
+    ResourceAction getAction();
+
+    /**
      * @param name the name of the parameter to add
      * @param value the value of the parameter to add. If null then no value is added.
      */

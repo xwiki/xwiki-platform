@@ -38,7 +38,7 @@ import org.xwiki.resource.Resource;
 import org.xwiki.resource.ResourceAction;
 
 @Component
-@Named("webajrs")
+@Named("webjars")
 public class WebJarsAction extends AbstractAction
 {
     public static final String WEBJARS_RESOURCE_PREFIX = "META-INF/resources/webjars/";

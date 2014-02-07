@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<!-- Used by DefaultAuthorizationManagerIntegrationTest#testDocumentCreator() -->
 <wikis>
   <wiki name="wiki" mainWiki="true" alt="any wiki">
       <user name="userA" />

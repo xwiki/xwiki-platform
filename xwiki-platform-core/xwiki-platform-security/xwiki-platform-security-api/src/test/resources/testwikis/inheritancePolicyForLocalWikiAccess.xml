@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!-- Used by XWikiSecurityAuthorizationTest#testInheritancePolicyForLocalWikiAccess() -->
+<!-- Used by DefaultAuthorizationManagerIntegrationTest#testInheritancePolicyForLocalWikiAccess() -->
 <wikis>
   <wiki name="wiki" mainWiki="true" />
   <wiki name="wikiAllowA" alt="a subwiki allowing full access to userA" owner="wiki:XWiki.Admin">

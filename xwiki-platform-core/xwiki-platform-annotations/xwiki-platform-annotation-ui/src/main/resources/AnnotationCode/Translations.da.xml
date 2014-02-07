@@ -24,7 +24,7 @@
   <web>AnnotationCode</web>
   <name>Translations</name>
   <language>da</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>AnnotationCode.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>

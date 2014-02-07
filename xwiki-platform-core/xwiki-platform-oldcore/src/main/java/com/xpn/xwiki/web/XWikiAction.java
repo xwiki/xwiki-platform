@@ -37,6 +37,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.action.ActionManager;
 import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.container.Container;
@@ -48,6 +49,8 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.resource.Resource;
+import org.xwiki.resource.ResourceManager;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -287,6 +290,21 @@ public abstract class XWikiAction extends Action
                     monitor.endTimer("prenotify");
                 }
 
+                // Call the Actions
+
+                // First call the new Actions, implemented as components
+                try {
+                    ActionManager actionManager = Utils.getComponent(ActionManager.class);
+                    Resource resource = Utils.getComponent(ResourceManager.class).getResource();
+                    if (actionManager.execute(resource)) {
+                        return null;
+                    }
+                } catch (Throwable e) {
+                    LOGGER.error("Failed to call Action for [{}]" + context.getAction() + "]", e);
+                }
+
+                // Then call the old Actions for backward compatibility (and because a lot of them have not been
+                // migrated to new Actions yet).
                 String renderResult = null;
                 XWikiDocument doc = context.getDoc();
                 docName = doc.getFullName();

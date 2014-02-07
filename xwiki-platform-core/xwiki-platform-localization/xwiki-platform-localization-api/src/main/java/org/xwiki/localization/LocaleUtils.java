@@ -72,4 +72,23 @@ public class LocaleUtils extends org.apache.commons.lang3.LocaleUtils
 
         return org.apache.commons.lang3.LocaleUtils.toLocale(str);
     }
+
+    /**
+     * Same as {@link #toLocale(String)} but it never throws an exception. It returns the passed fallback locale in case
+     * the given string locale has an invalid format.
+     * 
+     * @param str the locale string to convert, null returns null
+     * @param fallback the locale to return as fallback in case the given locale string has an invalid format
+     * @return a Locale, null if null input
+     * @see #toLocale(String)
+     * @since 6.0M1
+     */
+    public static Locale toLocale(String str, Locale fallback)
+    {
+        try {
+            return toLocale(str);
+        } catch (Exception e) {
+            return fallback;
+        }
+    }
 }

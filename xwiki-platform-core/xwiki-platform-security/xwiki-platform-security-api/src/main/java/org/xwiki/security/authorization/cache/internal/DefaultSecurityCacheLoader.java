@@ -266,9 +266,13 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             // Store a shadow entry for a global user/group involved in a local wiki
             securityCache.add(new DefaultSecurityShadowEntry(user, entityWiki), userGroups);
         } else {
-            // If not yet in the cache, retrieve associated rules store the user/group in the cache
-            if (securityCache.get(user) == null) {
+            SecurityRuleEntry entry = securityCache.get(user);
+            if (entry == null) {
+                // If not yet in the cache, retrieve associated rules store the user/group in the cache
                 loadUserEntry(user, userGroups);
+            } else {
+                // Else, ensure that the entry has all the groups appropriately linked to it in the cache
+                securityCache.add(entry, userGroups);
             }
         }
     }

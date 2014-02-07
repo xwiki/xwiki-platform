@@ -44,10 +44,12 @@ import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
 import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.UserSecurityReference;
+import org.xwiki.security.authorization.cache.SecurityCache;
 import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
 import org.xwiki.security.authorization.cache.internal.DefaultSecurityCache;
 import org.xwiki.security.authorization.cache.internal.DefaultSecurityCacheLoader;
 import org.xwiki.security.authorization.cache.internal.TestCache;
+import org.xwiki.security.authorization.internal.AbstractSecurityRuleEntry;
 import org.xwiki.security.authorization.internal.DefaultAuthorizationSettler;
 import org.xwiki.security.authorization.testwikis.SecureTestEntity;
 import org.xwiki.security.authorization.testwikis.TestAccessRule;
@@ -63,6 +65,7 @@ import org.xwiki.test.LogRule;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.annotation.ComponentList;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
@@ -71,6 +74,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.xwiki.security.authorization.Right.ADMIN;
 import static org.xwiki.security.authorization.Right.COMMENT;
+import static org.xwiki.security.authorization.Right.CREATE_WIKI;
 import static org.xwiki.security.authorization.Right.CREATOR;
 import static org.xwiki.security.authorization.Right.DELETE;
 import static org.xwiki.security.authorization.Right.EDIT;
@@ -80,7 +84,6 @@ import static org.xwiki.security.authorization.Right.PROGRAM;
 import static org.xwiki.security.authorization.Right.REGISTER;
 import static org.xwiki.security.authorization.Right.VIEW;
 import static org.xwiki.security.authorization.Right.values;
-import static org.xwiki.security.authorization.Right.CREATE_WIKI;
 
 /**
  * Test XWiki Authorization policy against the authentication module.
@@ -322,13 +325,49 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
                         }
                     }
 
+                    // This mock should be barely comparable for #testLoadUserInAnotherWikiAfterUserDoc()
+                    /*
                     SecurityRuleEntry accessEntry = mock(SecurityRuleEntry.class,
                         String.format("Rule entry for %s containing %d rules", reference.toString(), mockedRules.size()));
                     when(accessEntry.getReference()).thenReturn(reference);
                     when(accessEntry.isEmpty()).thenReturn(mockedRules.isEmpty());
                     when(accessEntry.getRules()).thenReturn(mockedRules);
+                    */
 
-                    return accessEntry;
+                    return new AbstractSecurityRuleEntry()
+                    {
+                        @Override
+                        public Collection<SecurityRule> getRules()
+                        {
+                            return mockedRules;
+                        }
+
+                        @Override
+                        public SecurityReference getReference()
+                        {
+                            return reference;
+                        }
+
+                        public String toString()
+                        {
+                            return String.format("Rule entry for %s containing %d rules", reference.toString(), mockedRules.size());
+                        }
+
+                        @Override
+                        public boolean equals(Object object)
+                        {
+                            if (object == this) {
+                                return true;
+                            }
+                            if (!(object instanceof SecurityRuleEntry)) {
+                                return false;
+                            }
+                            SecurityRuleEntry other = (SecurityRuleEntry) object;
+
+                            return compareReferenceNullSafe(other.getReference(), reference)
+                                && other.getRules().size() == mockedRules.size();
+                        }
+                    };
                 }
             }
         );
@@ -579,5 +618,64 @@ public class DefaultAuthorizationManagerIntegrationTest extends AbstractAuthoriz
             assertThat("checkAccess should throw access denied exception without any cause when access is denied",
                 e.getCause(), nullValue());
         }
+    }
+
+    @Test
+    public void testLoadUserAfterUserDoc() throws Exception
+    {
+        initialiseWikiMock("loadUserAfterUserDoc");
+
+        // Check access to the userA document => introduce the userA as a simple document into the cache
+        authorizationManager.checkAccess(VIEW, getXUser("userB"), getXUser("userA"));
+
+        // Check access of userA to the userB document => it prove userA is in groupA and has access
+        authorizationManager.checkAccess(VIEW, getXUser("userA"), getXUser("userB"));
+
+        SecurityCache securityCache = componentManager.getInstance(SecurityCache.class);
+
+        // a userA entry is in the cache
+        assertThat(securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA"))), notNullValue());
+
+        // remove group A from the cache => this should also remove all members of groupA
+        securityCache.remove(securityReferenceFactory.newUserReference(getXUser("groupA")));
+
+        // check that userA was seen as a member of groupA by the cache => implies document userA is now a user
+        assertThat(securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA"))), nullValue());
+    }
+
+    @Test
+    public void testLoadUserInAnotherWikiAfterUserDoc() throws Exception
+    {
+        initialiseWikiMock("loadUserAfterUserDoc");
+
+        // Check access to the userA document => introduce the userA as a simple document into the cache
+        authorizationManager.checkAccess(VIEW, getXUser("userB"), getXUser("userA"));
+
+        // Check access of userA to the userB document => it prove userA is in groupA and has access
+        authorizationManager.checkAccess(VIEW, getXUser("userA"), getDoc("any document", "any space", "subwiki"));
+
+        // Check access of userA to the userB document => it prove userA is in groupA and has access
+        authorizationManager.checkAccess(VIEW, getXUser("userA"), getXUser("userB"));
+
+        SecurityCache securityCache = componentManager.getInstance(SecurityCache.class);
+
+        // a userA entry is in the cache
+        assertThat(securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA"))), notNullValue());
+
+        // a userA accessEntry is still in the cache for the document in the subwiki
+        assertThat(securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA")),
+            securityReferenceFactory.newEntityReference(getDoc("any document", "any space", "subwiki"))),
+            notNullValue());
+
+        // remove group A from the cache => this should also remove all members of groupA
+        securityCache.remove(securityReferenceFactory.newUserReference(getXUser("groupA")));
+
+        // check that userA was seen as a member of groupA by the cache => implies document userA is now a user
+        assertThat(securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA"))), nullValue());
+
+        // check that the shadow userA has also been affected
+        assertThat(securityCache.get(securityReferenceFactory.newUserReference(getXUser("userA")),
+            securityReferenceFactory.newEntityReference(getDoc("any document", "any space", "subwiki"))),
+            nullValue());
     }
 }

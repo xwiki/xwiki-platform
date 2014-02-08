@@ -27,10 +27,22 @@ import org.xwiki.action.ActionChain;
 import org.xwiki.action.ActionException;
 import org.xwiki.resource.Resource;
 
+/**
+ * Default chain implementation using a Stack.
+ *
+ * @version $Id$
+ * @since 6.0M1
+ */
 public class DefaultActionChain implements ActionChain
 {
+    /**
+     * Contains all remaining Actions to execute with Actions on top executing first.
+     */
     private Stack<Action> actionStack;
 
+    /**
+     * @param orderedActions the sorted list of Action to execute
+     */
     public DefaultActionChain(Collection<Action> orderedActions)
     {
         this.actionStack = new Stack<Action>();

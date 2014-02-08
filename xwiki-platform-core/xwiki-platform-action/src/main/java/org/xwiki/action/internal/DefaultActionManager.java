@@ -32,6 +32,12 @@ import org.xwiki.action.ActionException;
 import org.xwiki.action.ActionManager;
 import org.xwiki.resource.Resource;
 
+/**
+ * For any passed Resource, find the correct {@link Action} to execute by sorting them by priority.
+ *
+ * @version $Id$
+ * @since 6.0M1
+ */
 public class DefaultActionManager implements ActionManager
 {
     @Inject
@@ -43,9 +49,10 @@ public class DefaultActionManager implements ActionManager
         boolean result;
 
         // Look for an Action supporting the action located in the passed Resource object.
+        // TODO: Use caching to avoid having to sort all Actions at every call.
         Set<Action> orderedActions = new TreeSet<Action>();
         for (Action action : this.actionProvider.get()) {
-            if (action.getSupportedResourceActions().contains(resource.getAction())) {
+            if (action.getSupportedActionIds().contains(resource.getActionId())) {
                 orderedActions.add(action);
             }
         }
@@ -54,7 +61,7 @@ public class DefaultActionManager implements ActionManager
             // Create the Action chain
             ActionChain chain = new DefaultActionChain(orderedActions);
 
-            // Call the first action
+            // Call the first Action
             chain.executeNext(resource);
 
             result = true;

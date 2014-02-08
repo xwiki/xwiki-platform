@@ -27,8 +27,8 @@ import javax.inject.Provider;
 import org.junit.*;
 import org.xwiki.action.internal.DefaultActionManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.resource.ActionId;
 import org.xwiki.resource.Resource;
-import org.xwiki.resource.ResourceAction;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.mockito.Mockito.*;
@@ -50,11 +50,11 @@ public class ActionManagerTest
     {
         // First Action component will lower priority
         Action viewAction = mock(Action.class, "action1");
-        when(viewAction.getSupportedResourceActions()).thenReturn(Arrays.asList(ResourceAction.VIEW));
+        when(viewAction.getSupportedActionIds()).thenReturn(Arrays.asList(ActionId.VIEW));
 
         // Second Action component will higher priority so that it's executed first
         Action beforeViewAction = mock(Action.class, "action2");
-        when(beforeViewAction.getSupportedResourceActions()).thenReturn(Arrays.asList(ResourceAction.VIEW));
+        when(beforeViewAction.getSupportedActionIds()).thenReturn(Arrays.asList(ActionId.VIEW));
         // We return 1 to mean that the second action has a higher priority than the first action
         when(beforeViewAction.compareTo(viewAction)).thenReturn(1);
 
@@ -64,7 +64,7 @@ public class ActionManagerTest
         when(actionComponents.get()).thenReturn(Arrays.asList(viewAction, beforeViewAction));
 
         Resource resource = mock(Resource.class);
-        when(resource.getAction()).thenReturn(ResourceAction.VIEW);
+        when(resource.getActionId()).thenReturn(ActionId.VIEW);
 
         this.componentManager.getComponentUnderTest().execute(resource);
 

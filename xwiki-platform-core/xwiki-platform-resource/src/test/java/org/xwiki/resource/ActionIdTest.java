@@ -17,27 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.action;
+package org.xwiki.resource;
 
-import org.xwiki.resource.Resource;
-import org.xwiki.stability.Unstable;
+import org.junit.*;
+
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
- * Allows calling the next {@link org.xwiki.action.Action} in the chain. An instance of this class is passed to
- * {@link Action#execute(org.xwiki.resource.Resource, ActionChain)} and it's up to the Action implementation to
- * decide if it wants to stop the execution chain or not.
+ * Unit tests for {@link ActionId}.
  *
- * @version $Id$
+ * @version
+ *
  * @since 6.0M1
  */
-@Unstable
-public interface ActionChain
+public class ActionIdTest
 {
-    /**
-     * Executes the next Action in the chain.
-     *
-     * @param resource the Resource on which to execute the Action
-     * @throws ActionException if an error happens during the Action execution
-     */
-    void executeNext(Resource resource) throws ActionException;
+    @Test
+    public void equalsAndHashCode()
+    {
+        ActionId id1 = new ActionId("id");
+        ActionId id2 = new ActionId("id");
+        assertEquals(id1.hashCode(), id2.hashCode());
+        assertEquals(id1, id2);
+        assertEquals(id1.getId(), id2.getId());
+    }
+
+    @Test
+    public void fromString()
+    {
+        ActionId id = ActionId.fromString("view");
+        assertEquals(ActionId.VIEW, id);
+    }
 }

@@ -22,8 +22,8 @@ package org.xwiki.action;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.resource.ActionId;
 import org.xwiki.resource.Resource;
-import org.xwiki.resource.ResourceAction;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -36,9 +36,26 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public interface Action extends Comparable<Action>
 {
+    /**
+     * The priority of execution relative to the other Actions. The lowest values have the highest priorities and
+     * execute first. For example a Action with a priority of 100 will execute before one with a priority of 500.
+     *
+     * @return the execution priority
+     */
     int getPriority();
 
-    List<ResourceAction> getSupportedResourceActions();
+    /**
+     * @return the list of Action Ids supported by this Action
+     */
+    List<ActionId> getSupportedActionIds();
 
+    /**
+     * Executes the Action on the passed Resource.
+     *
+     * @param resource the Resource on which to execute the Action
+     * @param chain the Action execution chain, needed to tell the next Action in the chain to execute (similar to the
+     *        Filter Chain in the Servlet API)
+     * @throws ActionException if an error happens during the Action execution
+     */
     void execute(Resource resource, ActionChain chain) throws ActionException;
 }

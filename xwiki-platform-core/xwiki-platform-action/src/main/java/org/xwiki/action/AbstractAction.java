@@ -39,7 +39,7 @@ public abstract class AbstractAction implements Action
     }
 
     /**
-     * @param priority the action priority to use (lower means execute before others)
+     * @param priority the Action priority to use (lower means execute before others), see {@link #getPriority()}
      */
     public void setPriority(int priority)
     {

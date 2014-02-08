@@ -17,27 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.action;
+package org.xwiki.webjars.internal;
 
-import org.xwiki.resource.Resource;
-import org.xwiki.stability.Unstable;
-
-/**
- * Allows calling the next {@link org.xwiki.action.Action} in the chain. An instance of this class is passed to
- * {@link Action#execute(org.xwiki.resource.Resource, ActionChain)} and it's up to the Action implementation to
- * decide if it wants to stop the execution chain or not.
- *
- * @version $Id$
- * @since 6.0M1
- */
-@Unstable
-public interface ActionChain
+public class TestableWebJarsAction extends WebJarsAction
 {
-    /**
-     * Executes the next Action in the chain.
-     *
-     * @param resource the Resource on which to execute the Action
-     * @throws ActionException if an error happens during the Action execution
-     */
-    void executeNext(Resource resource) throws ActionException;
+    private ClassLoader classLoader;
+
+    @Override
+    protected ClassLoader getClassLoader()
+    {
+        return this.classLoader;
+    }
+
+    public void setClassLoader(ClassLoader classLoader)
+    {
+        this.classLoader = classLoader;
+    }
 }

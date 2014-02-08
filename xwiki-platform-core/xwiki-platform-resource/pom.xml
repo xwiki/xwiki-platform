@@ -32,6 +32,7 @@
   <packaging>jar</packaging>
   <description>An abstraction of a XWiki URI (Entity, Template, Skin, etc)</description>
   <properties>
+    <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Resource API</xwiki.extension.name>
   </properties>

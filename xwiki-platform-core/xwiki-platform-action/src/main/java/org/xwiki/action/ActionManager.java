@@ -36,9 +36,9 @@ public interface ActionManager
     /**
      * Executes a passed {@link org.xwiki.resource.Resource}.
      *
-     * @param resource the resource and action to handle
+     * @param resource the Resource to execute
      * @return true if the Resource was handled by an {@link org.xwiki.action.Action} or false otherwise
-     * @throws ActionException if an error happened during the execution of the action
+     * @throws ActionException if an error happened during the execution of the Action
      */
     boolean execute(Resource resource) throws ActionException;
 }

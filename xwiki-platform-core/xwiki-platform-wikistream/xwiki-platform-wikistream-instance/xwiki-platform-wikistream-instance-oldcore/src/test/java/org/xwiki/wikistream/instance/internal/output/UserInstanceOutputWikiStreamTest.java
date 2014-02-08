@@ -134,4 +134,39 @@ public class UserInstanceOutputWikiStreamTest extends AbstractInstanceWikiStream
         groupMemberObject0 = groupDocument.getXObject(GROUP_CLASS, 0);
         Assert.assertEquals("", groupMemberObject0.getStringValue("member"));
     }
+
+    @Test
+    public void testImportUserWithoutWiki() throws WikiStreamException, XWikiException, ParseException
+    {
+        UserInstanceOutputProperties outputProperties = new UserInstanceOutputProperties();
+
+        outputProperties.setVersionPreserved(true);
+
+        importFromXML("userwithoutwiki", outputProperties);
+
+        // XWiki.user
+
+        XWikiDocument userDocument =
+            this.oldcore.getMockXWiki().getDocument(
+                new DocumentReference("wiki", "XWiki", "user"),
+                this.oldcore.getXWikiContext());
+
+        Assert.assertFalse(userDocument.isNew());
+
+        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "user"), userDocument.getCreatorReference());
+        Assert.assertEquals(toDate("2000-01-10 00:00:00.0 UTC"), userDocument.getCreationDate());
+        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "user"), userDocument.getAuthorReference());
+        Assert.assertEquals(toDate("2000-01-11 00:00:00.0 UTC"), userDocument.getDate());
+        Assert.assertEquals(toDate("2000-01-11 00:00:00.0 UTC"), userDocument.getContentUpdateDate());
+        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "user"), userDocument.getContentAuthorReference());
+        Assert.assertEquals(false, userDocument.isMinorEdit());
+        Assert.assertEquals("Import", userDocument.getComment());
+
+        BaseObject userObject = userDocument.getXObject(USER_CLASS);
+        Assert.assertEquals(0, userObject.getNumber());
+        Assert.assertEquals("user1 first name", userObject.getStringValue("first_name"));
+        Assert.assertEquals("user1 last name", userObject.getStringValue("last_name"));
+        Assert.assertEquals("user1@email.ext", userObject.getStringValue("email"));
+        Assert.assertEquals(1, userObject.getIntValue("active"));
+    }
 }

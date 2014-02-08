@@ -29,7 +29,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
@@ -131,9 +130,7 @@ public class XWikiDocumentLocaleEventGenerator extends
         if (document.getRelativeParentReference() != null) {
             revisionParameters.put(WikiDocumentFilter.PARAMETER_PARENT, document.getRelativeParentReference());
         }
-        if (!document.getTitle().isEmpty()) {
-            revisionParameters.put(WikiDocumentFilter.PARAMETER_TITLE, document.getTitle());
-        }
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_TITLE, document.getTitle());
         if (!document.getCustomClass().isEmpty()) {
             revisionParameters.put(WikiDocumentFilter.PARAMETER_CUSTOMCLASS, document.getCustomClass());
         }
@@ -147,27 +144,23 @@ public class XWikiDocumentLocaleEventGenerator extends
         revisionParameters.put(WikiDocumentFilter.PARAMETER_HIDDEN, document.isHidden());
 
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, document.getAuthor());
-        if (!document.getComment().isEmpty()) {
-            revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, document.getComment());
-        }
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_COMMENT, document.getComment());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_DATE, document.getDate());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_REVISION_MINOR, document.isMinorEdit());
 
         revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, document.getContentAuthor());
         revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT_DATE, document.getContentUpdateDate());
-        if (StringUtils.isNotEmpty(document.getContent())) {
-            revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT, document.getContent());
+        revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT, document.getContent());
 
-            if (properties.isWithWikiDocumentContentHTML()) {
-                try {
-                    XWikiContext xcontext = this.xcontextProvider.get();
+        if (properties.isWithWikiDocumentContentHTML()) {
+            try {
+                XWikiContext xcontext = this.xcontextProvider.get();
 
-                    revisionParameters.put(WikiDocumentFilter.PARAMETER_CONTENT_HTML,
-                        document.getRenderedContent(xcontext));
-                } catch (XWikiException e) {
-                    this.logger.error("Failed to render content of document [{}] as HTML",
-                        document.getDocumentReference(), e);
-                }
+                revisionParameters
+                    .put(WikiDocumentFilter.PARAMETER_CONTENT_HTML, document.getRenderedContent(xcontext));
+            } catch (XWikiException e) {
+                this.logger.error("Failed to render content of document [{}] as HTML", document.getDocumentReference(),
+                    e);
             }
         }
 

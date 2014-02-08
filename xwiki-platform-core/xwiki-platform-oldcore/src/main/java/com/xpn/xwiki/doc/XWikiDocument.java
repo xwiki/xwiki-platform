@@ -5540,16 +5540,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public void setLanguage(String language)
     {
-        String cleanedLanguage = Util.normalizeLanguage(language);
-
-        Locale locale;
-        try {
-            locale = LocaleUtils.toLocale(cleanedLanguage);
-        } catch (Exception e) {
-            locale = Locale.ROOT;
-        }
-
-        setLocale(locale);
+        setLocale(LocaleUtils.toLocale(Util.normalizeLanguage(language), Locale.ROOT));
     }
 
     /**
@@ -5587,14 +5578,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public void setDefaultLanguage(String defaultLanguage)
     {
-        Locale locale;
-        try {
-            locale = LocaleUtils.toLocale(defaultLanguage);
-        } catch (Exception e) {
-            locale = Locale.ROOT;
-        }
-
-        setDefaultLocale(locale);
+        setDefaultLocale(LocaleUtils.toLocale(defaultLanguage, Locale.ROOT));
     }
 
     public Locale getDefaultLocale()
@@ -5654,14 +5638,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public XWikiDocument getTranslatedDocument(String language, XWikiContext context) throws XWikiException
     {
-        Locale locale;
-        try {
-            locale = LocaleUtils.toLocale(language);
-        } catch (Exception e) {
-            locale = Locale.ROOT;
-        }
-
-        return getTranslatedDocument(locale, context);
+        return getTranslatedDocument(LocaleUtils.toLocale(language, Locale.ROOT), context);
     }
 
     /**

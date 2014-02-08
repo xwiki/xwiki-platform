@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!-- Used by XWikiSecurityAuthorizationTest#testInheritancePolicyForNoAdminFarmAccess() -->
+<!-- Used by DefaultAuthorizationManagerIntegrationTest#testInheritancePolicyForNoAdminFarmAccess() -->
 <wikis>
   <wiki name="wiki" mainWiki="true" alt="main wiki allowing all but admin access to userA">
     <user name="userA" />

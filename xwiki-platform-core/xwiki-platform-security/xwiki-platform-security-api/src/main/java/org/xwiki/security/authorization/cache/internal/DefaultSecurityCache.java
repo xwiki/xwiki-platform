@@ -267,24 +267,62 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
                     this.parents.add(parent);
                     parent.addChild(this);
                 }
-                for (GroupSecurityReference group : groups) {
-                    if (group.equals(parentReference)) {
-                        continue;
-                    }
-                    SecurityCacheEntry parent = (entry instanceof SecurityShadowEntry && group.isGlobal())
-                        ? DefaultSecurityCache.this.getShadowEntry(group,
-                            ((SecurityShadowEntry) entry).getWikiReference())
-                        : DefaultSecurityCache.this.getEntry(group);
-                    if (parent == null) {
-                        throw new ParentEntryEvictedException();
-                    }
-                    this.parents.add(parent);
-                    parent.addChild(this);
-                }
+                addParentGroups(groups, parentReference);
                 logNewEntry();
             } else {
                 this.parents = null;
                 logNewEntry();
+            }
+        }
+
+        /**
+         * Add provided groups as parent of this entry, excluding the main parent reference.
+         *
+         * @param groups the list of groups to add.
+         * @param parentReference the main parent reference to exclude.
+         * @throws ParentEntryEvictedException if the parents required are no more available in the cache.
+         */
+        private void addParentGroups(Collection<GroupSecurityReference> groups,
+            SecurityReference parentReference) throws ParentEntryEvictedException
+        {
+            for (GroupSecurityReference group : groups) {
+                if (group.equals(parentReference)) {
+                    continue;
+                }
+                SecurityCacheEntry parent = (entry instanceof SecurityShadowEntry && group.isGlobal())
+                    ? DefaultSecurityCache.this.getShadowEntry(group,
+                        ((SecurityShadowEntry) entry).getWikiReference())
+                    : DefaultSecurityCache.this.getEntry(group);
+                if (parent == null) {
+                    throw new ParentEntryEvictedException();
+                }
+                this.parents.add(parent);
+                parent.addChild(this);
+            }
+        }
+
+        /**
+         * Update an existing cached security rule entry with parents groups if it does not have any already.
+         *
+         * @param groups the groups to be added to this entry, if null or empty nothing will be done.
+         * @throws ParentEntryEvictedException if one of the groups has been evicted from the cache.
+         */
+        void updateParentGroups(Collection<GroupSecurityReference> groups)
+            throws ParentEntryEvictedException
+        {
+            if (groups == null || groups.isEmpty() || !(entry instanceof SecurityRuleEntry)) {
+                // No group or not an appropriate entry, do nothing.
+                return;
+            }
+
+            if (this.parents == null) {
+                this.parents = new ArrayList<SecurityCacheEntry>(groups.size());
+                addParentGroups(groups, null);
+            } else if (this.parents.size() == 1) {
+                SecurityCacheEntry parent = this.parents.iterator().next();
+                this.parents = new ArrayList<SecurityCacheEntry>(groups.size() + 1);
+                this.parents.add(parent);
+                addParentGroups(groups, parent.entry.getReference());
             }
         }
 
@@ -515,13 +553,25 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
      */
     private boolean isAlreadyInserted(String key, SecurityEntry entry) throws ConflictingInsertionException
     {
+        try {
+            return isAlreadyInserted(key, entry, null);
+        } catch (ParentEntryEvictedException e) {
+            // Impossible to reach
+            return true;
+        }
+    }
+
+    private boolean isAlreadyInserted(String key, SecurityEntry entry, Collection<GroupSecurityReference> groups)
+        throws ConflictingInsertionException, ParentEntryEvictedException
+    {
         SecurityCacheEntry oldEntry = cache.get(key);
         if (oldEntry != null) {
             if (!oldEntry.getEntry().equals(entry)) {
                 // Another thread have inserted an entry which is different from this entry!
                 throw new ConflictingInsertionException();               
             }
-            // Another thread have already inserted this entry.
+            // Another thread have already inserted this entry, or it is a user/group that may be incomplete
+            oldEntry.updateParentGroups(groups);
             return true;
         }
         // The slot is available
@@ -567,7 +617,7 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
 
         writeLock.lock();
         try {
-            if (isAlreadyInserted(key, entry)) {
+            if (isAlreadyInserted(key, entry, groups)) {
                 return;
             }
             cache.set(key, newSecurityCacheEntry(entry, groups));

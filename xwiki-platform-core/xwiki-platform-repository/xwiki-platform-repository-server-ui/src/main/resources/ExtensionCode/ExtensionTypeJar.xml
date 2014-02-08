@@ -103,7 +103,9 @@
       <id>jar</id>
     </property>
     <property>
-      <installation>Put the jar file into ##WEB-INF/lib## folder and restart XWiki.</installation>
+      <installation>We recommend using the [[Extension Manager>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Extension+Manager+Application]] to install this extension (Make sure that the text "Installable with the Extension Manager" is displayed at the top right location on this page to know if this extension can be installed with the Extension Manager).
+
+You can also use the manual method which involves dropping the JAR file into the ##WEB-INF/lib## folder and restarting XWiki.</installation>
     </property>
     <property>
       <name>JAR</name>

@@ -103,7 +103,11 @@
       <id>xar</id>
     </property>
     <property>
-      <installation>1. Log in the wiki with a user having Administration rights
+      <installation>We recommend using the [[Extension Manager>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Extension+Manager+Application]] to install this extension (Make sure that the text "Installable with the Extension Manager" is displayed at the top right location on this page to know if this extension can be installed with the Extension Manager).
+
+You can also use the following manual method, which is useful if this extension cannot be installed with the Extension Manager or if you're using an old version of XWiki that doesn't have the Extension Manager:
+
+1. Log in the wiki with a user having Administration rights
 1. Go to the Administration page and select the Import category
 1. Follow the on-screen instructions to upload the downloaded XAR
 1. Click on the uploaded XAR and follow the instructions</installation>

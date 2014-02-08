@@ -31,6 +31,9 @@
   <name>XWiki Platform - Webjars Support</name>
   <packaging>jar</packaging>
   <description>Adds support for packaging JS files using WebJars</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>commons-io</groupId>
@@ -55,6 +58,12 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

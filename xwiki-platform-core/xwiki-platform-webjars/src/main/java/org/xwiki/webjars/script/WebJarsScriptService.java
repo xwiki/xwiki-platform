@@ -29,6 +29,12 @@ import org.xwiki.script.service.ScriptService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
+/**
+ * Make it easy to use WebJars in scripts. For example it can compute an XWiki WebJars URL.
+ *
+ * @version $Id$
+ * @since 6.0M1
+ */
 @Component
 @Named("webjars")
 public class WebJarsScriptService implements ScriptService
@@ -37,8 +43,15 @@ public class WebJarsScriptService implements ScriptService
      * @todo finish implementing URL serialization in the URL module to avoid this dependency on oldcore.
      */
     @Inject
-    public Execution execution;
+    private Execution execution;
 
+    /**
+     * Compute an XWiki WebJAR URL
+     * (of the form {@code http://server/bin/webjars/resource/path?value=(resource name)}.
+     *
+     * @param resourceName the resource asked (eg {@code angular/2.1.11/angular.js"})
+     * @return the computed URL
+     */
     public String url(String resourceName)
     {
         XWikiContext xcontext = getXWikiContext();
@@ -49,7 +62,7 @@ public class WebJarsScriptService implements ScriptService
             xcontext);
     }
 
-    public XWikiContext getXWikiContext()
+    private XWikiContext getXWikiContext()
     {
         XWikiContext xwikiContext =
             (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);

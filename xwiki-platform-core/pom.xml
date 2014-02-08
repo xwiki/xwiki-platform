@@ -381,8 +381,14 @@
             <difference>
               <differenceType>7012</differenceType>
               <className>org/xwiki/resource/Resource</className>
-              <method>org.xwiki.resource.ResourceAction getAction()</method>
+              <method>org.xwiki.resource.ActionId getActionId()</method>
               <justification>Resource module is still a young API. Moved from EntityResource</justification>
+            </difference>
+            <difference>
+              <differenceType>7004</differenceType>
+              <className>org/xwiki/resource/EntityResource</className>
+              <method>EntityResource(org.xwiki.model.reference.EntityReference)</method>
+              <justification>Resource module is still a young API. Added constructor parameter to EntityResource</justification>
             </difference>
           </ignored>
           <excludes>

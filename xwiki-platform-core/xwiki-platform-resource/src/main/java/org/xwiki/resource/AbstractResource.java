@@ -42,9 +42,9 @@ public abstract class AbstractResource implements Resource
     private ResourceType type;
 
     /**
-     * @see #getAction()
+     * @see #getActionId()
      */
-    private ResourceAction action;
+    private ActionId actionId;
 
     /**
      * @see #getParameters()
@@ -74,17 +74,17 @@ public abstract class AbstractResource implements Resource
     }
 
     @Override
-    public ResourceAction getAction()
+    public ActionId getActionId()
     {
-        return this.action;
+        return this.actionId;
     }
 
     /**
-     * @param action see {@link #getAction()}
+     * @param action see {@link #getActionId()}
      */
-    public void setAction(ResourceAction action)
+    public void setActionId(ActionId action)
     {
-        this.action = action;
+        this.actionId = action;
     }
 
     @Override

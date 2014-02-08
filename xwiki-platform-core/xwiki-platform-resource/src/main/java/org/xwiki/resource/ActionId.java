@@ -23,43 +23,61 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * Represents the action to be done on a Resource (eg "view", "delete", "get", etc).
+ * Represents the action to be executed on a Resource (eg "view", "delete", "get", etc).
  *
  * @version $Id$
  * @since 6.0M1
  */
-public class ResourceAction
+public class ActionId
 {
-    public static final ResourceAction VIEW = new ResourceAction("view");
+    /**
+     * The View Action Id.
+     */
+    public static final ActionId VIEW = new ActionId("view");
 
-    private String name;
+    /**
+     * The action id (e.g. "view", "download", etc).
+     */
+    private String id;
 
-    public static ResourceAction fromString(String name)
+    /**
+     * @param id see {@link #getId()}
+     */
+    public ActionId(String id)
     {
-        return new ResourceAction(name);
+        this.id = id;
     }
 
-    public ResourceAction(String name)
+    /**
+     * Converts a string to an {@link ActionId} instance.
+     *
+     * @param id see {@link #getId()}
+     * @return the object representing the Action id passed as a string
+     */
+    public static ActionId fromString(String id)
     {
-        this.name = name;
+        return new ActionId(id);
     }
 
-    public String getName()
+    /**
+     * @return the technical id of the action
+     */
+    public String getId()
     {
-        return this.name;
+        return this.id;
     }
 
     @Override
     public String toString()
     {
-        return getName();
+        return getId();
     }
 
     @Override
     public int hashCode()
     {
         return new HashCodeBuilder(13, 7)
-            .append(getName())
+            .append(getId())
             .toHashCode();
     }
 
@@ -75,9 +93,9 @@ public class ResourceAction
         if (object.getClass() != getClass()) {
             return false;
         }
-        ResourceAction rhs = (ResourceAction) object;
+        ActionId rhs = (ActionId) object;
         return new EqualsBuilder()
-            .append(getName(), rhs.getName())
+            .append(getId(), rhs.getId())
             .isEquals();
     }
 }

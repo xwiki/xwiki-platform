@@ -33,23 +33,46 @@ import org.xwiki.action.ActionChain;
 import org.xwiki.action.ActionException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
+import org.xwiki.resource.ActionId;
 import org.xwiki.resource.EntityResource;
 import org.xwiki.resource.Resource;
-import org.xwiki.resource.ResourceAction;
 
+/**
+ * Handles {@code webjars} action.
+ * <p>
+ * At the moment we're mapping calls to the "webjars" URL as an EntityResource.
+ * In the future it would be cleaner to register some new URL factory instead of reusing the format for Entity
+ * Resources. Since we're reusing it we're going to do the following mapping:
+ * <code>
+ *   http://server/bin/webjars/resource/path?value=(resource name)
+ * </code>
+ * (for example: http://localhost:8080/bin/webjars/resource/path?value=angularjs/1.1.5/angular.js)
+ * So this means that the resource name will be parsed as a query string "value" parameter (with a fixed space of
+ * "resource" and a fixed page name of "path").
+ * </p>
+ *
+ * @version $Id$
+ * @since 6.0M1
+ */
 @Component
 @Named("webjars")
 public class WebJarsAction extends AbstractAction
 {
-    public static final String WEBJARS_RESOURCE_PREFIX = "META-INF/resources/webjars/";
+    /**
+     * The WebJars Action Id.
+     */
+    public static final ActionId WEBJARS = new ActionId("webjars");
 
-    public static final ResourceAction WEBJARS = new ResourceAction("webjars");
+    /**
+     * Prefix for locating JS resources in the classloader.
+     */
+    private static final String WEBJARS_RESOURCE_PREFIX = "META-INF/resources/webjars/";
 
     @Inject
     private Container container;
 
     @Override
-    public List<ResourceAction> getSupportedResourceActions()
+    public List<ActionId> getSupportedActionIds()
     {
         return Arrays.asList(WEBJARS);
     }
@@ -57,22 +80,11 @@ public class WebJarsAction extends AbstractAction
     @Override
     public void execute(Resource resource, ActionChain chain) throws ActionException
     {
-        // At the moment we're mapping calls to the "webjars" URL as an EntityResource. In the future it would be
-        // cleaner to register some new URL factory instead of reusing the format for Entity Resources.
-        // Since we're reusing it we're going to do the following mapping:
-        //   http://server/bin/webjars/resource/path?value=<encoded resource name>
-        //   (for example: http://localhost:8080/bin/webjars/resource/path?value=angularjs/1.1.5/angular.js)
-        // So this means that the resource name will be parsed as a query string "value" parameter
-        // (with a fixed space of "resource" and a fixed page name of "path")
         EntityResource entityResource = (EntityResource) resource;
         String resourceName = entityResource.getParameterValue("value");
         String resourcePath = String.format("%s%s", WEBJARS_RESOURCE_PREFIX, resourceName);
 
-        // Load the resource from the context class loader in order to support webjars located in XWiki Extensions
-        // loaded by the Extension Manager.
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-
-        InputStream resourceStream = classLoader.getResourceAsStream(resourcePath);
+        InputStream resourceStream = getClassLoader().getResourceAsStream(resourcePath);
 
         if (resourceStream != null) {
             try {
@@ -83,5 +95,15 @@ public class WebJarsAction extends AbstractAction
                 IOUtils.closeQuietly(resourceStream);
             }
         }
+    }
+
+    /**
+     * @return the Class Loader from which to look for WebJars resources
+     */
+    protected ClassLoader getClassLoader()
+    {
+        // Load the resource from the context class loader in order to support webjars located in XWiki Extensions
+        // loaded by the Extension Manager.
+        return Thread.currentThread().getContextClassLoader();
     }
 }

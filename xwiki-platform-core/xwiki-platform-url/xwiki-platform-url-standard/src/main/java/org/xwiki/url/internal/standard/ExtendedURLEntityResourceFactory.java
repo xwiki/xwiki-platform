@@ -34,8 +34,8 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.resource.ActionId;
 import org.xwiki.resource.EntityResource;
-import org.xwiki.resource.ResourceAction;
 import org.xwiki.resource.ResourceCreationException;
 import org.xwiki.resource.ResourceFactory;
 import org.xwiki.resource.UnsupportedResourceException;
@@ -125,8 +125,8 @@ public class ExtendedURLEntityResourceFactory implements ResourceFactory<Extende
             }
         }
 
-        entityURL = new EntityResource(buildEntityReference(wikiReference, spaceName, pageName, attachmentName));
-        entityURL.setAction(ResourceAction.fromString(action));
+        entityURL = new EntityResource(buildEntityReference(wikiReference, spaceName, pageName, attachmentName),
+            ActionId.fromString(action));
 
         copyParameters(url, entityURL);
 

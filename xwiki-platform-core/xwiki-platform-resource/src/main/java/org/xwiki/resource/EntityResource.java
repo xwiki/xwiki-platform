@@ -50,11 +50,13 @@ public class EntityResource extends AbstractResource
 
     /**
      * @param entityReference the entity reference being wrapped
+     * @param actionId the instance representing the technical Action id (e.g. View, Download, etc)
      */
-    public EntityResource(EntityReference entityReference)
+    public EntityResource(EntityReference entityReference, ActionId actionId)
     {
         super(ResourceType.ENTITY);
         setEntityReference(entityReference);
+        setActionId(actionId);
     }
 
     /**

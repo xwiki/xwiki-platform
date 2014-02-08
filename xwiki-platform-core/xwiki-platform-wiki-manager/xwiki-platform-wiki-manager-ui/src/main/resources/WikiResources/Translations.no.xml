@@ -24,7 +24,7 @@
   <web>WikiResources</web>
   <name>Translations</name>
   <language>no</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>WikiResources.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>

@@ -24,7 +24,7 @@
   <web>WikiManager</web>
   <name>Translations</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <parent>WikiManager.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>

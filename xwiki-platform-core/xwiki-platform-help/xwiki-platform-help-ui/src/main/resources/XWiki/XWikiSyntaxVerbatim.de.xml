@@ -24,7 +24,7 @@
   <web>XWiki</web>
   <name>XWikiSyntaxVerbatim</name>
   <language>de</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>XWiki.XWikiSyntax</parent>
   <creator>xwiki:XWiki.Admin</creator>

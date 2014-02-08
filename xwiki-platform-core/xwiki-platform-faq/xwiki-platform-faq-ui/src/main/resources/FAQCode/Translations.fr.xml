@@ -24,7 +24,7 @@
   <web>FAQCode</web>
   <name>Translations</name>
   <language>fr</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>FAQCode.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>

@@ -24,7 +24,7 @@
   <web>XAppResources</web>
   <name>Translations</name>
   <language>gl</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>XAppResources.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>

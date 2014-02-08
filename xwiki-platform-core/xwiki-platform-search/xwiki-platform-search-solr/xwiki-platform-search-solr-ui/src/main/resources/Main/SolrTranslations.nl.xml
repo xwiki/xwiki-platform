@@ -24,7 +24,7 @@
   <web>Main</web>
   <name>SolrTranslations</name>
   <language>nl</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>Main.SolrSearch</parent>
   <creator>xwiki:XWiki.Admin</creator>

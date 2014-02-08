@@ -1286,4 +1286,5 @@ return XWiki;
   #end
 #end
 {{/velocity}}
-</content></xwikidoc>
+</content>
+</xwikidoc>

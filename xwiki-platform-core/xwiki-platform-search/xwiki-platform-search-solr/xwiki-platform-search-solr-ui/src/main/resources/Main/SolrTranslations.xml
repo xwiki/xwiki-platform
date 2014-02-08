@@ -24,7 +24,7 @@
   <web>Main</web>
   <name>SolrTranslations</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1385047506000</creationDate>

@@ -24,7 +24,7 @@
   <web>Sandbox</web>
   <name>WebHome</name>
   <language>pt_BR</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>

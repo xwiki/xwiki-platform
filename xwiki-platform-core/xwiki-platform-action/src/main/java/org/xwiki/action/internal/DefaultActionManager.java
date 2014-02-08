@@ -24,12 +24,14 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
+import javax.inject.Named;
 
 import org.xwiki.action.Action;
 import org.xwiki.action.ActionChain;
 import org.xwiki.action.ActionException;
 import org.xwiki.action.ActionManager;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.resource.Resource;
 
 /**
@@ -40,8 +42,13 @@ import org.xwiki.resource.Resource;
  */
 public class DefaultActionManager implements ActionManager
 {
+    /**
+     * Used to lookup Action components. We use the Context Component Manager so that Extensions can contribute
+     * Actions.
+     */
     @Inject
-    private Provider<List<Action>> actionProvider;
+    @Named("context")
+    private ComponentManager contextComponentManager;
 
     @Override
     public boolean execute(Resource resource) throws ActionException
@@ -51,7 +58,7 @@ public class DefaultActionManager implements ActionManager
         // Look for an Action supporting the action located in the passed Resource object.
         // TODO: Use caching to avoid having to sort all Actions at every call.
         Set<Action> orderedActions = new TreeSet<Action>();
-        for (Action action : this.actionProvider.get()) {
+        for (Action action : getActions()) {
             if (action.getSupportedActionIds().contains(resource.getActionId())) {
                 orderedActions.add(action);
             }
@@ -71,5 +78,14 @@ public class DefaultActionManager implements ActionManager
         }
 
         return result;
+    }
+
+    private List<Action> getActions() throws ActionException
+    {
+        try {
+            return this.contextComponentManager.getInstanceList(Action.class);
+        } catch (ComponentLookupException e) {
+            throw new ActionException("Failed to locate Action components", e);
+        }
     }
 }

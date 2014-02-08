@@ -17,16 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.action;
+package org.xwiki.action.internal;
 
 import java.util.Arrays;
-import java.util.List;
-
-import javax.inject.Provider;
 
 import org.junit.*;
-import org.xwiki.action.internal.DefaultActionManager;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.action.Action;
+import org.xwiki.action.ActionChain;
+import org.xwiki.action.ActionManager;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.resource.ActionId;
 import org.xwiki.resource.Resource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -34,12 +33,12 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link org.xwiki.action.ActionManager}.
+ * Unit tests for {@link org.xwiki.action.internal.DefaultActionManager}.
  *
  * @version $Id$
  * @since 6.0M1
  */
-public class ActionManagerTest
+public class DefaultActionManagerTest
 {
     @Rule
     public MockitoComponentMockingRule<ActionManager> componentManager =
@@ -58,10 +57,9 @@ public class ActionManagerTest
         // We return 1 to mean that the second action has a higher priority than the first action
         when(beforeViewAction.compareTo(viewAction)).thenReturn(1);
 
-        Provider<List<Action>> actionComponents = this.componentManager.getInstance(
-            new DefaultParameterizedType(null, Provider.class,
-                new DefaultParameterizedType(null, List.class, Action.class)));
-        when(actionComponents.get()).thenReturn(Arrays.asList(viewAction, beforeViewAction));
+        ComponentManager contextComponentManager = this.componentManager.getInstance(ComponentManager.class, "context");
+        when(contextComponentManager.<Action>getInstanceList(Action.class)).thenReturn(
+            Arrays.asList(viewAction, beforeViewAction));
 
         Resource resource = mock(Resource.class);
         when(resource.getActionId()).thenReturn(ActionId.VIEW);

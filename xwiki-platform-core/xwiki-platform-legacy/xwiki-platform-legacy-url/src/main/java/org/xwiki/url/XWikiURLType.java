@@ -19,8 +19,6 @@
  */
 package org.xwiki.url;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents a type of XWiki URL (URL to an Entity, URL to a skin file, etc).
  *

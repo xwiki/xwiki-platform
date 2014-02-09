@@ -22,7 +22,6 @@ package org.xwiki.url;
 import java.util.Locale;
 
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a XWiki URL pointing to an Entity (Document, Attachment, etc).

@@ -35,7 +35,6 @@ import org.joda.time.DateTime;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.git.GitManager;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Various APIs to make it easy to perform Git commands from within scripts.

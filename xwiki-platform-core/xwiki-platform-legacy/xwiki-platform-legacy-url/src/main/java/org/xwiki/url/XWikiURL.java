@@ -29,7 +29,6 @@ import org.xwiki.stability.Unstable;
  *
  * @version $Id$
  */
-@Unstable
 public interface XWikiURL
 {
     /**

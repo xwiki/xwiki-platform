@@ -30,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 2.3M1
  */
-@Unstable
 public class XWikiEntityURL extends AbstractXWikiURL
 {
     // Note: We're not using a typed object since the action name can be anything and corresponds to an Action

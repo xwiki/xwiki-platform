@@ -33,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 2.0M1
  */
-@Unstable
 public abstract class AbstractXWikiURL implements XWikiURL
 {
     /**

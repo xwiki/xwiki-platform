@@ -27,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 2.0M1
  */
-@Unstable
 public enum XWikiURLType
 {
     ENTITY, SKIN, TEMPLATE, RESOURCE

@@ -305,7 +305,7 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
             }
         }
 
-        if (version != null) {
+        if (version != null && this.properties.isVersionPreserved()) {
             if (VALID_VERSION.matcher(version).matches()) {
                 this.document.setVersion(version);
             } else if (NumberUtils.isDigits(version)) {

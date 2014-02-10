@@ -331,6 +331,7 @@ public class Packager
         // Input
         XARInputProperties xarProperties = new XARInputProperties();
         xarProperties.setForceDocument(true);
+        xarProperties.setWithHistory(false);
         xarProperties.setSource(new DefaultInputStreamInputSource(stream));
         BeanInputWikiStream<XARInputProperties> xarWikiStream =
             ((BeanInputWikiStreamFactory<XARInputProperties>) this.xarWikiStreamFactory)

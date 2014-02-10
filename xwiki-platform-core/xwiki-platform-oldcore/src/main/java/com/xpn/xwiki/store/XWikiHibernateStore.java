@@ -563,6 +563,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     // Let's make sure we save the archive if we have one
                     // This is especially needed if we load a document from XML
                     if (context.getWiki().hasVersioning(context)) {
+                        context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
                         context.getWiki().getVersioningStore()
                             .saveXWikiDocArchive(doc.getDocumentArchive(), false, context);
                     }

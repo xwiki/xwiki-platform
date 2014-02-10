@@ -556,11 +556,11 @@ public class XWikiLDAPUtils
 
                 // Not a valid filter, try as uid
                 List<XWikiLDAPSearchAttribute> searchAttributeList =
-                    searchUserAttributesByUid(userOrGroup, new String[] {LDAP_FIELD_DN, getUidAttributeName()});
+                    searchUserAttributesByUid(userOrGroup, new String[] {LDAP_FIELD_DN});
 
                 if (searchAttributeList != null && !searchAttributeList.isEmpty()) {
                     String dn = searchAttributeList.get(0).value;
-                    isGroup = getGroupMembers(dn, memberMap, subgroups, searchAttributeList, context);
+                    isGroup = getGroupMembers(dn, memberMap, subgroups, context);
                 }
             }
         }

@@ -111,9 +111,11 @@ public final class XWikiLDAPConfig
         DEFAULT_GROUP_CLASSES.add("dynamicGroup".toLowerCase());
         DEFAULT_GROUP_CLASSES.add("dynamicGroupAux".toLowerCase());
         DEFAULT_GROUP_CLASSES.add("groupWiseDistributionList".toLowerCase());
+        DEFAULT_GROUP_CLASSES.add("posixGroup".toLowerCase());
 
         DEFAULT_GROUP_MEMBERFIELDS.add("member".toLowerCase());
         DEFAULT_GROUP_MEMBERFIELDS.add("uniqueMember".toLowerCase());
+        DEFAULT_GROUP_MEMBERFIELDS.add("memberUid".toLowerCase());
     }
 
     /**

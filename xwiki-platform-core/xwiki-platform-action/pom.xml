@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>API to execute Resources</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.88</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.83</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Action API</xwiki.extension.name>
   </properties>

@@ -23,14 +23,29 @@ import java.util.HashMap;
 
 import org.xwiki.properties.RawProperties;
 import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.WikiStreamProperties;
 
 /**
  * @version $Id$
  * @since 5.3RC1
  */
 @Unstable
-public class InstanceOutputProperties extends HashMap<String, Object> implements RawProperties
+public class InstanceOutputProperties extends HashMap<String, Object> implements RawProperties, WikiStreamProperties
 {
+    @Override
+    public boolean isVerbose()
+    {
+        Boolean verbose = (Boolean) get(PROPNAME_VERBOSE);
+
+        return verbose == Boolean.FALSE ? false : true;
+    }
+
+    @Override
+    public void setVerbose(boolean verbose)
+    {
+        put(PROPNAME_VERBOSE, verbose);
+    }
+
     @Override
     public void set(String propertyName, Object value)
     {

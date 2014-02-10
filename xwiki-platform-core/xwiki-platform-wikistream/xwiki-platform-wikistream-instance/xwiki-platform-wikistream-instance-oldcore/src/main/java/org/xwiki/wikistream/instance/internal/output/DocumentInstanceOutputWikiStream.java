@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -74,6 +75,9 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
     @Inject
     private XWikiDocumentOutputWikiStream documentListener;
 
+    @Inject
+    private Logger logger;
+
     private boolean documentDeleted;
 
     @Override
@@ -95,7 +99,7 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
 
         this.documentListener.setProperties(properties);
     }
-    
+
     // Events
 
     @Override
@@ -177,6 +181,10 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
                 xcontext.getWiki().saveDocument(document, document.getComment(), document.isMinorEdit(), xcontext);
             } else {
                 xcontext.getWiki().saveDocument(document, this.properties.getSaveComment(), xcontext);
+            }
+
+            if (this.properties.isVerbose()) {
+                this.logger.info("Saved document [{}]", document.getDocumentReferenceWithLocale());
             }
         } catch (Exception e) {
             throw new WikiStreamException("Failed to save document", e);

@@ -33,6 +33,13 @@ import org.xwiki.stability.Unstable;
 public interface WikiStreamProperties
 {
     /**
+     * The {@link String} name of the <code>verbose</code> property.
+     * 
+     * @since 6.0M1
+     */
+    String PROPNAME_VERBOSE = "verbose";
+
+    /**
      * @return true if the stream should log details of what is happening
      */
     @PropertyName("Verbose")

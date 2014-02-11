@@ -110,9 +110,7 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
 
     private Locale currentLocale;
 
-    private Date currentCreationDate;
-
-    private String currentCreationAuthor;
+    private FilterEventParameters currentLocaleParameters;
 
     private Locale currentDefaultLocale;
 
@@ -256,18 +254,14 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
     public void beginWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws WikiStreamException
     {
         this.currentLocale = locale;
-
-        this.currentCreationDate = getDate(WikiDocumentFilter.PARAMETER_CREATION_DATE, parameters, null);
-        this.currentCreationAuthor = getString(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, parameters, null);
+        this.currentLocaleParameters = parameters;
     }
 
     @Override
     public void endWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws WikiStreamException
     {
         this.currentLocale = null;
-
-        this.currentCreationDate = null;
-        this.currentCreationAuthor = null;
+        this.currentLocaleParameters = null;
     }
 
     @Override
@@ -277,8 +271,10 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
             new XWikiDocument(this.entityResolver.resolve(this.currentEntityReference, this.properties != null
                 ? this.properties.getDefaultReference() : null));
 
-        this.document.setCreationDate(this.currentCreationDate);
-        this.document.setCreator(this.currentCreationAuthor);
+        this.document.setCreationDate(getDate(WikiDocumentFilter.PARAMETER_CREATION_DATE, this.currentLocaleParameters,
+            null));
+        this.document.setCreator(getString(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, this.currentLocaleParameters,
+            null));
         this.document.setDefaultLocale(this.currentDefaultLocale);
 
         this.document.setSyntax(getSyntax(WikiDocumentFilter.PARAMETER_SYNTAX, parameters, null));
@@ -296,7 +292,8 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
         this.document.setAuthor(getString(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
         this.document.setContentAuthor(getString(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters, null));
 
-        String revisions = getString(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS, parameters, null);
+        String revisions =
+            getString(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS, this.currentLocaleParameters, null);
         if (revisions != null) {
             try {
                 this.document.setDocumentArchive(revisions);

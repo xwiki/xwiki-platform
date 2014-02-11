@@ -171,10 +171,20 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
                 document.setContentAuthorReference(xcontext.getUserReference());
             }
 
-            // Versions and save document
+            // Save history
+            if (document.isNew() && document.getDocumentArchive() != null) {
+                // we need to force the saving the document archive
+                if (document.getDocumentArchive() != null) {
+                    xcontext.getWiki().getVersioningStore()
+                        .saveXWikiDocArchive(document.getDocumentArchive(xcontext), true, xcontext);
+                }
+            }
 
             // Don't preserve version or history if we don't delete the previous document
-            if (document.isNew() && this.properties.isVersionPreserved()) {
+            if (document.isNew() && (this.properties.isAuthorPreserved() || this.properties.isVersionPreserved())) {
+                // Make sure version is set
+                document.setVersion(document.getVersion());
+
                 document.setMetaDataDirty(false);
                 document.setContentDirty(false);
 

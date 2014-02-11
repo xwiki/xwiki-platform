@@ -96,11 +96,10 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     private WikiStreamXMLStreamWriter writer;
 
     private Map<String, String> currentObjectProperties;
-    
+
     /**
-     * the size of the chunks used when attachments are streamed.
-     * As the attachment data is base64 encoded in the process, this size must be a multiple of three
-     * to prevent padding between the chunks; see XWIKI-9830
+     * the size of the chunks used when attachments are streamed. As the attachment data is base64 encoded in the
+     * process, this size must be a multiple of three to prevent padding between the chunks; see XWIKI-9830
      */
     private static final int ATTACHMENT_BUFFER_CHUNK_SIZE = 4095;
 
@@ -507,8 +506,10 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.writer.writeStartElement(name);
 
         try {
-            this.propertySerializerManager.getPropertySerializer(this.currentObjectProperties.get(name)).write(
-                this.writer.getWriter(), value);
+            if (value != null) {
+                this.propertySerializerManager.getPropertySerializer(this.currentObjectProperties.get(name)).write(
+                    this.writer.getWriter(), value);
+            }
         } catch (Exception e) {
             throw new WikiStreamException("Failed to write property value", e);
         }

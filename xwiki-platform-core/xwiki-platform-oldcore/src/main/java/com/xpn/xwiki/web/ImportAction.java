@@ -214,7 +214,9 @@ public class ImportAction extends XWikiAction
         String[] pages = request.getParameterValues("pages");
 
         XARInputProperties xarProperties = new XARInputProperties();
+        xarProperties.setVerbose(false);
         DocumentInstanceOutputProperties instanceProperties = new DocumentInstanceOutputProperties();
+        instanceProperties.setVerbose(false);
 
         if (pages != null) {
             EntityReferenceSet entities = new EntityReferenceSet();

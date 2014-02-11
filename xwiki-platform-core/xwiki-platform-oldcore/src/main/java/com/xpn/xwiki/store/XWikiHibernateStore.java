@@ -573,6 +573,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     try {
                         if (context.getWiki().hasVersioning(context)) {
                             doc.getDocumentArchive(context);
+                            context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
                         }
                     } catch (XWikiException e) {
                         // this is a non critical error

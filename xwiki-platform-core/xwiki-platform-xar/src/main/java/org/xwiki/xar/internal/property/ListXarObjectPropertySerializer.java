@@ -95,7 +95,7 @@ public class ListXarObjectPropertySerializer implements XarObjectPropertySeriali
                     writer.writeEndElement();
                 }
             }
-        } else {
+        } else if (value != null) {
             writer.writeCharacters(value.toString());
         }
     }

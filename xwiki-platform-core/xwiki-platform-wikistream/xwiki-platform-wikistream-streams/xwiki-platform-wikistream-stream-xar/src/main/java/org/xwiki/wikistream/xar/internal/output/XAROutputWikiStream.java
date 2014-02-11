@@ -506,10 +506,8 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
         this.writer.writeStartElement(name);
 
         try {
-            if (value != null) {
-                this.propertySerializerManager.getPropertySerializer(this.currentObjectProperties.get(name)).write(
-                    this.writer.getWriter(), value);
-            }
+            this.propertySerializerManager.getPropertySerializer(this.currentObjectProperties.get(name)).write(
+                this.writer.getWriter(), value);
         } catch (Exception e) {
             throw new WikiStreamException("Failed to write property value", e);
         }

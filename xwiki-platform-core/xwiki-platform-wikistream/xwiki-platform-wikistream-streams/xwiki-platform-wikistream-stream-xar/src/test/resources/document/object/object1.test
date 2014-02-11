@@ -21,6 +21,9 @@
       <booleanproperty2>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </booleanproperty2>
+      <booleanproperty3>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </booleanproperty3>
       <listproperty1>
         <multiSelect>0</multiSelect>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
@@ -50,6 +53,9 @@
     </property>
     <property>
       <booleanproperty2>1</booleanproperty2>
+    </property>
+    <property>
+      <booleanproperty3></booleanproperty3>
     </property>
     <property>
       <listproperty1> value </listproperty1>
@@ -109,6 +115,7 @@
           <wikiClass>
             <wikiClassProperty name="booleanproperty1" type="com.xpn.xwiki.objects.classes.BooleanClass"></wikiClassProperty>
             <wikiClassProperty name="booleanproperty2" type="com.xpn.xwiki.objects.classes.BooleanClass"></wikiClassProperty>
+            <wikiClassProperty name="booleanproperty3" type="com.xpn.xwiki.objects.classes.BooleanClass"></wikiClassProperty>
             <wikiClassProperty name="listproperty1" type="com.xpn.xwiki.objects.classes.StaticListClass">
               <wikiClassPropertyField name="multiSelect" value="0"></wikiClassPropertyField>
             </wikiClassProperty>
@@ -128,6 +135,7 @@
           </wikiClass>
           <wikiObjectProperty name="booleanproperty1" value="0"></wikiObjectProperty>
           <wikiObjectProperty name="booleanproperty2" value="1"></wikiObjectProperty>
+          <wikiObjectProperty name="booleanproperty3" value=""></wikiObjectProperty>
           <wikiObjectProperty name="listproperty1" value=" value "></wikiObjectProperty>
           <wikiObjectProperty name="listproperty2">
             <p>

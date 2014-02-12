@@ -57,6 +57,7 @@ import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.slf4j.Logger;
+import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
@@ -560,10 +561,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 doc.setMetaDataDirty(false);
             } else {
                 if (doc.getDocumentArchive() != null) {
+                    // A custom document archive has been provided, we assume it's right
+                    // (we also assume it's custom but that's another matter...)
                     // Let's make sure we save the archive if we have one
                     // This is especially needed if we load a document from XML
                     if (context.getWiki().hasVersioning(context)) {
-                        context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
                         context.getWiki().getVersioningStore()
                             .saveXWikiDocArchive(doc.getDocumentArchive(), false, context);
                     }
@@ -573,7 +575,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     try {
                         if (context.getWiki().hasVersioning(context)) {
                             doc.getDocumentArchive(context);
-                            context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
+                            if (!containsVersion(doc, doc.getRCSVersion(), context)) {
+                                context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
+                            }
                         }
                     } catch (XWikiException e) {
                         // this is a non critical error
@@ -775,6 +779,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 monitor.endTimer("hibernate");
             }
         }
+    }
+
+    private boolean containsVersion(XWikiDocument doc, Version targetversion, XWikiContext context)
+        throws XWikiException
+    {
+        for (Version version : doc.getRevisions(context)) {
+            if (version.equals(targetversion)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override

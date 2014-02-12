@@ -568,6 +568,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     if (context.getWiki().hasVersioning(context)) {
                         context.getWiki().getVersioningStore()
                             .saveXWikiDocArchive(doc.getDocumentArchive(), false, context);
+
+                        // If the version does not exist it means it's a new version so add it to the history
+                        if (!containsVersion(doc, doc.getRCSVersion(), context)) {
+                            context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
+                        }
                     }
                 } else {
                     // Make sure the getArchive call has been made once
@@ -575,6 +580,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     try {
                         if (context.getWiki().hasVersioning(context)) {
                             doc.getDocumentArchive(context);
+
+                            // If the version does not exist it means it's a new version so register it in the history
                             if (!containsVersion(doc, doc.getRCSVersion(), context)) {
                                 context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
                             }

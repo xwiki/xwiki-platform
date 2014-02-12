@@ -57,18 +57,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>clirr-maven-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <!-- change a return type in WikiManagerScriptService (from boolean to Boolean) -->
-            <exclude>**/WikiManagerScriptService**</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

@@ -103,4 +103,17 @@ public class WikiDescriptorDocumentHelperTest
         assertEquals(returnedDocument, document);
     }
 
+    @Test
+    public void getWikiIdFromDocumentFullname() throws Exception
+    {
+        String result = mocker.getComponentUnderTest().getWikiIdFromDocumentFullname("XWiki.XWikiServerSubwiki");
+        assertEquals("subwiki", result);
+
+        result = mocker.getComponentUnderTest().getWikiIdFromDocumentFullname("XWiki.XWikiServerXWikiServer");
+        assertEquals("xwikiserver", result);
+
+        result = mocker.getComponentUnderTest().getWikiIdFromDocumentFullname("XWiki.XWikiServerAbbc");
+        assertEquals("abbc", result);
+    }
+
 }

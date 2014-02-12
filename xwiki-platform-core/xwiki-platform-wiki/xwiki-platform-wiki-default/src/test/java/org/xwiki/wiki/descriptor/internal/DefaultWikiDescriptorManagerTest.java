@@ -50,6 +50,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -192,8 +193,17 @@ public class DefaultWikiDescriptorManagerTest
         XWikiDocument document1 = mock(XWikiDocument.class);
         XWikiDocument document2 = mock(XWikiDocument.class);
 
+        DefaultWikiDescriptor descriptor3 = new DefaultWikiDescriptor("wikiid3", "wikialias3");
+
         // Get documents
-        when(descriptorDocumentHelper.getAllXWikiServerClassDocument()).thenReturn(Arrays.asList(document1, document2));
+        when(descriptorDocumentHelper.getAllXWikiServerClassDocumentNames()).thenReturn(
+                Arrays.asList("XWiki.XWikiServerWikiid1", "XWiki.XWikiServerWikiid2", "XWiki.XWikiServerWikiid3"));
+        when(descriptorDocumentHelper.getWikiIdFromDocumentFullname("XWiki.XWikiServerWikiid1")).thenReturn("wikiid1");
+        when(descriptorDocumentHelper.getWikiIdFromDocumentFullname("XWiki.XWikiServerWikiid2")).thenReturn("wikiid2");
+        when(descriptorDocumentHelper.getWikiIdFromDocumentFullname("XWiki.XWikiServerWikiid3")).thenReturn("wikiid3");
+        when(cache.getFromId("wikiid3")).thenReturn(descriptor3);
+        when(descriptorDocumentHelper.getDocumentFromWikiId("wikiid1")).thenReturn(document1);
+        when(descriptorDocumentHelper.getDocumentFromWikiId("wikiid2")).thenReturn(document2);
 
         // Get all XWiki.XWikiServerClass XObjects to pass to the Wiki Descriptor Builder
         List<BaseObject> baseObjects = Arrays.asList(mock(BaseObject.class));
@@ -207,11 +217,15 @@ public class DefaultWikiDescriptorManagerTest
                 thenReturn(descriptor1, descriptor2);
 
         Collection<WikiDescriptor> descriptors = this.mocker.getComponentUnderTest().getAll();
-        assertEquals(2, descriptors.size());
+        assertEquals(3, descriptors.size());
 
-        // Verify all descriptors were put in cache
+        // Verify that XWiki.XWikiServerWikiid3 has not be loaded
+        verify(descriptorDocumentHelper, never()).getDocumentFromWikiId("wikiid3");
+
+        // Verify all descriptors were put in cache except those which was already there
         verify(cache).add(descriptor1);
         verify(cache).add(descriptor2);
+        verify(cache, never()).add(descriptor3);
     }
 
     @Test

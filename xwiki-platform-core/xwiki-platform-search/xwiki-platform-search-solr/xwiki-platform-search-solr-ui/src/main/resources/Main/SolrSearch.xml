@@ -45,7 +45,7 @@
   <content>{{velocity output='false'}}
 #set ($defaultDateFormat = 'yyyy/MM/dd HH:mm')
 #set ($iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-#set ($rangePattern = $regextool.compile('^\[(.+) TO (.+)\]$'))
+#set ($rangePattern = $regextool.compile('^[\[{](.+) TO (.+)[\]}]$'))
 #set ($wildcardPattern = $regextool.compile('^\(.*\*.*\)$'))
 #set ($facetPaginationStep = 5)
 
@@ -382,28 +382,33 @@
   ## Build the list of date intervals.
   ##
   ## 1. Predefined date intervals.
-  #set ($now = $xwiki.jodatime.dateTime)
+  ## We use the start of the day as point of reference instead of the current precise date &amp; time in order for the date
+  ## facet to be properly cached (during that day). Otherwise, if we use NOW in a filter range query then a new cache
+  ## entry is generated for each search request because NOW is expanded to the actual date &amp; time in the filter query.
+  ## See http://searchhub.org/2012/02/23/date-math-now-and-filter-queries/ for details.
+  #set ($startOfToday = $xwiki.jodatime.dateTime.withTimeAtStartOfDay())
   ## Solr indexes the dates in UTC timezone.
   #set ($utcTimezone = $xwiki.jodatime.getTimezone(0))
-  #set ($now = $now.toDateTime($utcTimezone))
+  #set ($startOfToday = $startOfToday.toDateTime($utcTimezone))
+  #set ($startOfTomorrow = $startOfToday.plusDays(1))
   #set ($intervals = [
     {
       'label': $services.localization.render('solr.facet.date.today'),
-      'start': $now.withTimeAtStartOfDay(),
-      'end'  : $now,
-      'name' : '[NOW/DAY TO NOW]',
+      'start': $startOfToday,
+      'end'  : $startOfTomorrow,
+      'name' : '[NOW/DAY TO NOW/DAY+1DAY}',
       'count': 0
     }, {
       'label': $services.localization.render('solr.facet.date.last7Days'),
-      'start': $now.minusDays(7),
-      'end'  : $now,
-      'name' : '[NOW-7DAYS TO NOW]',
+      'start': $startOfToday.minusDays(7),
+      'end'  : $startOfTomorrow,
+      'name' : '[NOW/DAY-7DAYS TO NOW/DAY+1DAY}',
       'count': 0
     }, {
       'label': $services.localization.render('solr.facet.date.last30Days'),
-      'start': $now.minusDays(30),
-      'end'  : $now,
-      'name' : '[NOW-30DAYS TO NOW]',
+      'start': $startOfToday.minusDays(30),
+      'end'  : $startOfTomorrow,
+      'name' : '[NOW/DAY-30DAYS TO NOW/DAY+1DAY}',
       'count': 0
     }
   ])
@@ -451,8 +456,8 @@
   #foreach ($facetValue in $facetValues)
     #set ($dateValue = $iso8601Formatter.parseDateTime($facetValue.name))
     #foreach ($interval in $intervals)
-      #if ((!$interval.start || $dateValue.isAfter($interval.start))
-          &amp;&amp; (!$interval.end || $dateValue.isBefore($interval.end)))
+      #if ((!$interval.start || $dateValue.compareTo($interval.start) &gt;= 0)
+          &amp;&amp; (!$interval.end || $dateValue.compareTo($interval.end) &lt; 0))
         #set ($discard = $interval.put('count', $mathtool.add($interval.count, $facetValue.count)))
       #end
     #end
@@ -1395,7 +1400,7 @@ $value##
   ## Convert the given dates.
   #convertDateFormat($request.startDate $configuredDateFormat $dateParser $datePrinter $startDate)
   #convertDateFormat($request.endDate $configuredDateFormat $dateParser $datePrinter $endDate)
-  #set ($interval = "[$startDate TO $endDate]")
+  #set ($interval = "[$startDate TO $endDate}")
   #set ($xredirect = $request.xredirect.replaceFirst(
     "\b$regextool.quote($escapetool.url($request.facet))=[^&amp;$escapetool.d]*",
     $escapetool.url({

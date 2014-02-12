@@ -315,7 +315,28 @@
 
 #macro (displaySearchFacetValues_locale $facetValues)
   #set ($currentLocale = $services.localization.currentLocale)
+  #retainMatchedRequestValues()
   #displaySearchFacetValues_default($facetValues)
+#end
+
+#**
+ * If the facet has values specified on the request then keep only those that are included in the list of matched facet
+ * values. Don't use this macro for date or range facets because in this case the values specified on the request are
+ * never found as is in the list of facet values (e.g. a range will match multiple facet values). This macro ensures
+ * that the URL to select/unselect a facet value doesn't keep unmatched values (otherwise the URL will have values that
+ * you cannot remove using the facet UI).
+ *#
+#macro (retainMatchedRequestValues)
+  #if ($facetRequestValues)
+    #set ($matchedValues = [])
+    #foreach ($facetValue in $facetValues)
+      #set ($discard = $matchedValues.add($facetValue.name))
+    #end
+    #set ($matchedRequestValues = [])
+    #set ($discard = $matchedRequestValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
+    #set ($discard = $matchedRequestValues.retainAll($matchedValues))
+    #set ($facetRequestValues = $matchedRequestValues)
+  #end
 #end
 
 #macro (displaySearchFacetValue_locale $facetPrettyValue)
@@ -1238,7 +1259,10 @@
   ## * the entities that don't support translations (attachments, objects) but which are bound to an entity
   ##     (document) whose default language is the current language
   ## * the entities that don't have a language set (e.g. documents that are translated with translation keys)
-  #set ($filters = {'locales': [$xcontext.language]})
+  #set ($filters = {})
+  ## Uncomment the following line of code if you want to search by default also in the default translation of documents
+  ## that are not translated in the current locale. See the discussion on XWIKI-9977.
+  ##set ($discard = $filters.put('locales', [$xcontext.language]))
   #if (!$xcontext.isMainWiki())
     ## Subwikis search by default in their content only.
     #set ($discard = $filters.put('wiki', [$xcontext.database]))
@@ -1430,7 +1454,8 @@ $value##
   ## Redirect using the default search filters
   #extendQueryString($url {
     'r': 1,
-    'f_type': 'DOCUMENT'
+    'f_type': 'DOCUMENT',
+    'f_locale': [$xcontext.language, '']
   })
   $response.sendRedirect($url)
 #end

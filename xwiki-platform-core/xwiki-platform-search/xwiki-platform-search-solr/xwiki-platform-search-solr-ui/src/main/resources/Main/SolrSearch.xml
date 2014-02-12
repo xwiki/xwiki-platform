@@ -1260,8 +1260,11 @@
   ##     (document) whose default language is the current language
   ## * the entities that don't have a language set (e.g. documents that are translated with translation keys)
   #set ($filters = {})
-  ## Uncomment the following line of code if you want to search by default also in the default translation of documents
-  ## that are not translated in the current locale. See the discussion on XWIKI-9977.
+  ## Uncomment the following line of code if you want to search by default also in:
+  ## * the default translation of documents that are not translated in the current locale
+  ## * the "xx" translation if the current locale "xx_YY" doesn't have a translation available
+  ##   (e.g. "pt" when "pt_BR" is not available)
+  ## See the discussion on XWIKI-9977.
   ##set ($discard = $filters.put('locales', [$xcontext.language]))
   #if (!$xcontext.isMainWiki())
     ## Subwikis search by default in their content only.

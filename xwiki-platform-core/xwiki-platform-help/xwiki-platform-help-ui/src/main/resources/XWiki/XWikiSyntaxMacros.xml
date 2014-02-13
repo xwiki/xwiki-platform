@@ -150,15 +150,18 @@ java content
 
 === 2.0 Macros ===
 
-There is only one kind of macro in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}, which is called by the syntax: ##{{{{{macroname param1="value1" ... paramN="valueN"}}}}}##
+There is only one kind of macro in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}, which is called by the syntax: ##{{{{{macroname param1="value1" ... paramN="valueN"}}...{{/macroname}}}}}##. For macros without content there's a short notation: ##{{{{{macroname param1="value1" ... paramN="valueN"/}}}}}##
 
 |=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
-|Rendering Macro|(((
+|Rendering Macro with a content|(((
 {{{{{code language="java"}}
 System.out.println("Hello World!");
 {{/code}
 }}}
 )))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
+|Rendering Macro without content|(((
+{{{{{include reference="Space.Page"/}}}}}
+)))|The referenced page is included in the current page
 
 {{info}}
 Radeox macros cannot be used in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}. Thus they have been rewritten as Rendering macros.

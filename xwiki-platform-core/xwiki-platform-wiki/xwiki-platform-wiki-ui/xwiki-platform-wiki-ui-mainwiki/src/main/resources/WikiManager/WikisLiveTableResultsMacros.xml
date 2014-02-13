@@ -204,7 +204,7 @@
       #gridresult_buildColumnJSON($colname $row)
     #end
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
-    #if($itemUserScope == 'LOCAL_ONLY')
+    #if($itemUserScope == 'LOCAL_ONLY' || $wikiId == $services.wiki.mainWikiId)
       #set($discard = $row.put('membershipType', $services.localization.render("platform.wiki.browse.emptyvalue")))
     #else
       #set($discard = $row.put('membershipType', $services.localization.render("WikiManager.WikiUserClass_membershipType_${itemMembershipType.name().toLowerCase()}")))

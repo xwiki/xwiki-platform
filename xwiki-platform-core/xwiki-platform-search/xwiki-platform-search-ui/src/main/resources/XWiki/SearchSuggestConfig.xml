@@ -1337,7 +1337,8 @@
       <name>platform.search.suggestSourceDocumentName</name>
     </property>
     <property>
-      <query>type:DOCUMENT AND (title:(__INPUT__*) OR name:(__INPUT__*) OR name_exact:(__INPUT__*))</query>
+      <query>fq=type:DOCUMENT
+qf=title^2 name</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -1485,7 +1486,8 @@
       <name>platform.search.suggestSourceDocumentContent</name>
     </property>
     <property>
-      <query>type:DOCUMENT AND (doccontent:(__INPUT__*) OR doccontentraw:(__INPUT__*))</query>
+      <query>fq=type:DOCUMENT
+qf=doccontent^2 doccontentraw</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -1633,7 +1635,8 @@
       <name>platform.search.suggestSourceAttachmentName</name>
     </property>
     <property>
-      <query>type:ATTACHMENT AND filename:(__INPUT__*)</query>
+      <query>fq=type:ATTACHMENT
+qf=filename</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -1781,7 +1784,8 @@
       <name>platform.search.suggestSourceAttachmentContent</name>
     </property>
     <property>
-      <query>type:ATTACHMENT AND attcontent:(__INPUT__*)</query>
+      <query>fq=type:ATTACHMENT
+qf=attcontent</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -1929,7 +1933,9 @@
       <name>platform.search.suggestSourceBlogPost</name>
     </property>
     <property>
-      <query>type:OBJECT AND class:Blog.BlogPostClass AND objcontent:(__INPUT__*)</query>
+      <query>fq=type:DOCUMENT
+fq=class:Blog.BlogPostClass
+qf=object.Blog.BlogPostClass</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -2077,7 +2083,9 @@
       <name>platform.search.suggestSourceUsers</name>
     </property>
     <property>
-      <query>type:OBJECT AND class:XWiki.XWikiUsers AND objcontent:(__INPUT__*)</query>
+      <query>fq=type:DOCUMENT
+fq=class:XWiki.XWikiUsers
+qf=property.XWiki.XWikiUsers.last_name^10 property.XWiki.XWikiUsers.first_name^5 name^2.5 object.XWiki.XWikiUsers</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>
@@ -2225,7 +2233,10 @@
       <name>platform.search.suggestSourceWikis</name>
     </property>
     <property>
-      <query>class:XWiki.XWikiServerClass AND propertyname:wikiprettyname AND propertyvalue__:(__INPUT__*)</query>
+      <query>fq=type:DOCUMENT
+fq=hidden:true
+fq=class:XWiki.XWikiServerClass
+qf=property.XWiki.XWikiServerClass.wikiprettyname</query>
     </property>
     <property>
       <resultsNumber>3</resultsNumber>

@@ -39,38 +39,23 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#set ($queryString = "$!request.query")
-#set ($input = "$!request.input")
-#if ($queryString != '' &amp;&amp; $input != '')
-  #set ($queryString = $queryString.replaceAll('__INPUT__', $input))
-  #set ($limit = $mathtool.toInteger($request.nb))
-  #if (!$limit)
-    #set ($limit = 3)
-  #end
-  #set ($query = $services.query.createQuery($queryString, 'solr'))
-  #set ($discard = $query.setLimit($limit))
-  #set ($queryFilter = "{!q.op=AND} locales:""$!xcontext.language""")
-  #if (!$xcontext.isMainWiki())
-    ## Subwikis search by default in their content only.
-    #set ($queryFilter = "$queryFilter wiki:$xcontext.database")
-  #end
-  #if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
-    #set ($queryFilter = "$queryFilter hidden:false")
-  #end
-  #set ($discard = $query.bindValue('fq', $queryFilter))
+  <content>{{include reference="XWiki.SuggestSolrMacros" /}}
+
+{{velocity}}
+#if ("$!request.query" != '' &amp;&amp; "$!request.input" != '')
+  #getSearchSuggestResults($results)
   #set ($discard = $response.setContentType('text/xml'))
   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
   &lt;results&gt;
-    #foreach ($result in $query.execute()[0].results)
+    #foreach ($result in $results)
       #set ($documentReference = $services.model.createDocumentReference($result.wiki, $result.space, $result.name))
       #set ($document = $xwiki.getDocument($documentReference))
       #set ($translatedDocument = $document.getTranslatedDocument($result.locale))
       #set ($title = $translatedDocument.plainTitle)
       #set ($url = $document.getURL())
       #if ($result.type == 'ATTACHMENT')
-        #set ($title = $result.filename)
-        #set ($url = $document.getAttachmentURL($result.filename))
+        #set ($title = $result.filename.get(0))
+        #set ($url = $document.getAttachmentURL($title))
       #elseif ($result.type == 'DOCUMENT' &amp;&amp; $result.locale != '' &amp;&amp; $xcontext.language != $result.locale)
         #set ($url = $document.getURL('view', "language=$result.locale"))
       #end

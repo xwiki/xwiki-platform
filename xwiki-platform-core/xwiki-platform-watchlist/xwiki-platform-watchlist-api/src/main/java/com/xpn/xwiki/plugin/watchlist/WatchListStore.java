@@ -440,7 +440,7 @@ public class WatchListStore implements EventListener
                 currentElement.append(watchedItems.substring(previousPos, newPos));
                 elements.add(currentElement.toString());
                 currentElement.setLength(0);
-            } else {
+            } else if (newPos > previousPos) {
                 currentElement.append(watchedItems.substring(previousPos, newPos - 1)).append(WATCHLIST_ELEMENT_SEP);
             }
             previousPos = newPos + 1;
@@ -529,7 +529,7 @@ public class WatchListStore implements EventListener
      * @param type type of the element to remove
      * @param context Context of the request
      * @return True if the element was in list and has been removed, false if the element was'nt in the list
-     * @throws XWikiException If the WatchList Object cannot be retreived or if the user's profile cannot be saved
+     * @throws XWikiException If the WatchList Object cannot be retrieved or if the user's profile cannot be saved
      */
     public boolean removeWatchedElement(String user, String watchedElement, ElementType type, XWikiContext context)
         throws XWikiException

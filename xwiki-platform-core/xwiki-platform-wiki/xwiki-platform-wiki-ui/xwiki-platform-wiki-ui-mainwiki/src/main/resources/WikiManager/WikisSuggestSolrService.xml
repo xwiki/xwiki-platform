@@ -39,22 +39,15 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#set ($queryStmt = "$!request.query")
-#set ($input = "$!request.input")
-#if ($queryStmt != '' &amp;&amp; $input != '')
-  #set ($queryStmt = $queryStmt.replaceAll('__INPUT__', $input))
-  #set ($limit = $mathtool.toInteger($request.nb))
-  #if (!$limit)
-    #set ($limit = 3)
-  #end
-  ## We look for documents having an object of type XWiki.XWikiServerClass.
-  #set ($query = $services.query.createQuery($queryStmt, 'solr'))
-  #set ($discard = $query.setLimit($limit))
+  <content>{{include reference="XWiki.SuggestSolrMacros" /}}
+
+{{velocity}}
+#if ("$!request.query" != '' &amp;&amp; "$!request.input" != '')
+  #getSearchSuggestResults($results)
   #set ($discard = $response.setContentType('text/xml'))
   &lt;?xml version="1.0" encoding="UTF-8"?&gt;
   &lt;results&gt;
-    #foreach ($result in $query.execute()[0].results)
+    #foreach ($result in $results)
       #set ($documentReference = $services.model.createDocumentReference($result.wiki, $result.space, $result.name))
       #set ($wikiId = $result.name.replaceAll('XWikiServer', '').toLowerCase())
       #set ($wikiDescriptor = $services.wiki.getById($wikiId))
@@ -76,7 +69,7 @@
     * [[$doc.getExternalURL('get', $escapetool.url({
         'outputSyntax': 'plain',
         'query': 'class:XWiki.XWikiServerClass AND propertyname:wikiprettyname AND propertyvalue__:__INPUT__*',
-        'input': 'work'
+        'input': 'home'
       }))]]
   {{/info}}
 #end

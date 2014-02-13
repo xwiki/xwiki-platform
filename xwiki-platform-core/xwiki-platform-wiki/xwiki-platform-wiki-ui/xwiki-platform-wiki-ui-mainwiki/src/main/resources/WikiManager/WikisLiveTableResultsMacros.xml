@@ -46,8 +46,135 @@
   <content>{{include reference="XWiki.LiveTableResultsMacros" /}}
 {{velocity output="false"}}
 #*
-* We override the following macro from XWiki.LiveTableResultsMacros to disable the filter on hidden documents.
-* Ths should be removed when XWIKI-9739 will be fixed.
+* We override the following macro from XWiki.LiveTableResultsMacros to disable the filter on XWikiServerTemplate.
+* This should be removed when http://jira.xwiki.org/browse/XWIKI-10010 is fixed.
+*#
+#macro(gridresultwithfilter_buildQuery $className $collist $filterfrom $filterwhere $filterParams)
+  ## Additional columns, should *not* contain parameters, all added column names must be filtered
+  #set($fromSql = '')
+  ## parametrized filter part of the query
+  #set($whereSql = '')
+  ## list of parameters to use with $whereSql
+  #set($whereParams = [])
+  #set($class = $xwiki.getDocument($className).getxWikiClass())
+  ##
+  ## Add the columns needed for the actual data
+  ##
+  #set($tablelist = [])
+  #foreach($colname in $collist)
+    #livetable_addColumnToQuery($colname)
+  #end
+  ##
+  ## Tag filtering
+  ##
+  #if($request.tag)
+    #set($fromSql = "${fromSql} , BaseObject as tobject, DBStringListProperty as tagprop")
+    #set($whereSql = "${whereSql} and tobject.className='XWiki.TagClass' and tobject.name=doc.fullName and tobject.id=tagprop.id.id and tagprop.id.name='tags' and (")
+    #foreach($tag in $request.getParameterValues('tag'))
+      #if($velocityCount &gt; 1) #set($whereSql = "${whereSql} and ") #end
+      ## Tags are case insensitive but they are stored unchanged which means we have to normalize them when performing
+      ## a query. Unfortunately there's no simple way to match multiple tags (AND operator). If we join the list of
+      ## tags in the FROM clause then we match at least one of the tags (OR operator). The only remaining option is to
+      ## check that the list of tags contains each of the desired tags. HQL doesn't help us to lower-case the entire
+      ## list of tags so we use an inner select for this.
+      #set($whereSql = "${whereSql} lower(?) in (select lower(tag) from tagprop.list tag)")
+      #set($discard = $whereParams.add("${tag}"))
+    #end
+    #set($whereSql = "${whereSql})")
+  #end
+  ##
+  ##
+  ## Order
+  ##
+  #set($order = "$!request.sort")
+  #if($order != '')
+    #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
+    #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
+      #set($orderDirection = 'desc')
+    #end
+    #if($order == 'description')
+      #set($tableAlias = 'dtable')
+    #else
+      #set($tableAlias = $order)
+    #end
+    ## only safe version should be used in SQL queries
+    #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
+    ##
+    #if($order.startsWith('doc.'))
+      #set($orderSql = " order by ${safe_tableAlias.replace('_','.')} ${orderDirection}")
+    #elseif($tablelist.contains($tableAlias))
+      #set ($multiselect = "$!{class.get($order).getProperty('multiSelect').getValue()}")
+      #if ($multiselect != '1')
+        #set ($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+      #end
+    #elseif($order == 'averagevote')
+      #livetable_getTableName($order)
+      #set($fromSql = "${fromSql}, BaseObject as objratings, ${tableName} ${safe_tableAlias}")
+      #set($whereSql = "${whereSql} and doc.fullName=objratings.name and objratings.className='XWiki.AverageRatingsClass' and objratings.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
+      #set($discard = $whereParams.add("${order}"))
+      #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+    #else
+      #set($multiselect = $class.get($order).getProperty('multiSelect').getValue())
+      #if("$multiselect" != '1')
+        #livetable_getTableName($order)
+        #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
+        #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
+        #set($discard = $whereParams.add("${order}"))
+        #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+      #end
+    #end
+  #end
+  ##
+  ##
+  ## Compute the final queries
+  ##
+  #set($sqlParams = [])
+  #set($tagsMatchingParams = [])
+  #set($allMatchingParams = [])
+  #if("$!className" != '')
+    ## Class query
+    ######## WIKI UI MAINWIKI CUSTOMIZATION #########
+    #set($countSql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName &lt;&gt; ? $!whereSql $!filterwhere")
+    #set($discard = $sqlParams.addAll(["${className}", "${className}Template"]))
+    #set($discard = $sqlParams.addAll($whereParams))
+    ##
+    #set($tagsMatchingFiltersFrom = ", BaseObject as obj $!fromSql $!filterfrom")
+    #set($tagsMatchingFiltersWhere = "obj.name=doc.fullName and obj.className = ? and doc.fullName &lt;&gt; ? $!whereSql $!filterwhere")
+    #set($discard = $tagsMatchingParams.addAll(["${className}", "${className}Template"]))
+    #set($discard = $tagsMatchingParams.addAll($whereParams))
+    ##
+    #set($allMatchingTagsFrom = ", BaseObject as obj $!filterfrom")
+    #set($allMatchingTagsWhere = "obj.name=doc.fullName and obj.className = ? and doc.fullName &lt;&gt; ? $!filterwhere")
+    #set($discard = $allMatchingParams.addAll(["${className}", "${className}Template"]))
+    #################################################
+    ##
+    #if($filterParams)
+      #set($discard = $sqlParams.addAll($filterParams))
+      #set($discard = $tagsMatchingParams.addAll($filterParams))
+      #set($discard = $allMatchingParams.addAll($filterParams))
+    #end
+  #else
+    ## Document query
+    #set($countSql = "$!fromSql $!filterfrom where 1=1 $!whereSql $!filterwhere")
+    #set($discard = $sqlParams.addAll($whereParams))
+    ##
+    #set($tagsMatchingFiltersFrom = "$!fromSql $!filterfrom")
+    #set($tagsMatchingFiltersWhere = "1=1 $!whereSql $!filterwhere")
+    #set($discard = $tagsMatchingParams.addAll($whereParams))
+    ##
+    #set($allMatchingTagsFrom = "$!filterfrom")
+    #set($allMatchingTagsWhere = "1=1 $!filterwhere")
+    ##
+    #if($filterParams)
+      #set($discard = $sqlParams.addAll($filterParams))
+      #set($discard = $tagsMatchingParams.addAll($filterParams))
+      #set($discard = $allMatchingParams.addAll($filterParams))
+    #end
+  #end
+  #set($sql = "$countSql $!{orderSql}")
+#end
+#*
+* We override the following macro from XWiki.LiveTableResultsMacros to disable the filter on hidden documents and to display wiki ui properties with a custom code
 *#
 #macro(gridresult_buildRowsJSON $map)
   #set($offset = $mathtool.toInteger($request.get('offset')))

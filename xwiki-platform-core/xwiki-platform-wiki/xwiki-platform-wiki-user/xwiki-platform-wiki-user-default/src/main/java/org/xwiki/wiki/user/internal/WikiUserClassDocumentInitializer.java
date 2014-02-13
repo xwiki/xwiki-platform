@@ -135,6 +135,13 @@ public class WikiUserClassDocumentInitializer extends AbstractMandatoryDocumentI
             needsUpdate = true;
         }
 
+        // Mark this document as Wiki Class.
+        if (document.isNew()) {
+            needsUpdate |= setClassDocumentFields(document, "Wiki User Class");
+            document.setContent(document.getContent() + "\n\nClass that represents the wiki configuration"
+                    + " about users.");
+        }
+
         return needsUpdate;
     }
 }

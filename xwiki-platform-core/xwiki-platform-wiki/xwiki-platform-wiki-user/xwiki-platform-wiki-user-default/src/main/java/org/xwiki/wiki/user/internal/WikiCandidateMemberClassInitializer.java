@@ -182,6 +182,13 @@ public class WikiCandidateMemberClassInitializer extends AbstractMandatoryDocume
             needsUpdate = true;
         }
 
+        // Mark this document as Wiki Class.
+        if (document.isNew()) {
+            needsUpdate |= setClassDocumentFields(document, "Wiki Candidate Member Class");
+            document.setContent(document.getContent() + "\n\nClass that represents a candidacy to become a member "
+                    + "of the wiki.");
+        }
+
         return needsUpdate;
     }
 }

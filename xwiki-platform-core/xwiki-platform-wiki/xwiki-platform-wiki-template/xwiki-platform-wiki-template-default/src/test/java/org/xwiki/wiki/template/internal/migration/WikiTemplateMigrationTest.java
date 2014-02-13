@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
  * Test class for {@link WikiTemplateMigration}.
  *
  * @since 5.4RC1
- * @version $Id :$
+ * @version $Id$
  */
 public class WikiTemplateMigrationTest
 {

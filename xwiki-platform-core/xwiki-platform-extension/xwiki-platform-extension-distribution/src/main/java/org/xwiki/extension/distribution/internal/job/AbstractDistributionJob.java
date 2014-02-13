@@ -94,8 +94,8 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
                 && previousStatus.getDistributionExtension() != null
                 && !ObjectUtils.equals(previousStatus.getDistributionExtension(),
                     this.distributionManager.getDistributionExtension())) {
-                status.setDistributionExtension(previousStatus.getDistributionExtension());
-                status.setDistributionExtensionUI(previousStatus.getDistributionExtensionUI());
+                status.setPreviousDistributionExtension(previousStatus.getDistributionExtension());
+                status.setPreviousDistributionExtensionUI(previousStatus.getDistributionExtensionUI());
             }
 
             status.setDistributionExtension(this.distributionManager.getDistributionExtension().getId());

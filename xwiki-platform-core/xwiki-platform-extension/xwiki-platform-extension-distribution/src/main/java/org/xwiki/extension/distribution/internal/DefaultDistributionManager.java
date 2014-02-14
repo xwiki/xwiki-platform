@@ -278,7 +278,15 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     @Override
     public DistributionState getFarmDistributionState()
     {
-        return getDistributionState(getPreviousFarmJobStatus());
+        FarmDistributionJobStatus previousStatus = null;
+
+        try {
+            previousStatus = getPreviousFarmJobStatus();
+        } catch (Exception e) {
+            this.logger.error("Failed to load previous status", e);
+        }
+
+        return getDistributionState(previousStatus);
     }
 
     @Override

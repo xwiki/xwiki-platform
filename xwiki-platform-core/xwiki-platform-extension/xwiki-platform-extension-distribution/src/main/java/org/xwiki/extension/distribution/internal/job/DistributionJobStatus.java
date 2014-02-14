@@ -75,7 +75,9 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
         this.previousDistributionExtensionUi = status.previousDistributionExtensionUi;
         this.distributionExtension = status.distributionExtension;
         this.distributionExtensionUi = status.distributionExtensionUi;
-        this.stepList = new ArrayList<DistributionStep>(status.stepList);
+        this.stepList =
+            status.stepList != null ? new ArrayList<DistributionStep>(status.stepList)
+                : new ArrayList<DistributionStep>();
     }
 
     public DistributionJobStatus(R request, ObservationManager observationManager, LoggerManager loggerManager,

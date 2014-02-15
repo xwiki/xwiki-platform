@@ -97,21 +97,30 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
             this.logger.info("Using Solr home directory: {}", solrHome);
 
             // Initialize the SOLR back-end using an embedded server.
-            CoreContainer.Initializer initializer = new CoreContainer.Initializer();
-            CoreContainer initializedContainer = initializer.initialize();
-            if (initializedContainer.getCores().size() == 0) {
-                throw new SolrServerException(
-                    "Failed to initialize the Solr core. Please check the configuration and log messages");
-            }
-
-            this.container = initializedContainer;
-            this.server = new EmbeddedSolrServer(container, "");
+            this.container = createCoreContainer();
+            // If we get here then there is at least one core found. We there are more, we use the first one.
+            String coreName = this.container.getCores().iterator().next().getName();
+            this.server = new EmbeddedSolrServer(container, coreName);
 
             this.logger.info("Started embedded Solr server.");
         } catch (Exception e) {
             throw new InitializationException(String.format(
                 "Failed to initialize the solr embedded server with home directory set to '%s'", solrHome), e);
         }
+    }
+
+    private CoreContainer createCoreContainer() throws SolrServerException
+    {
+        CoreContainer coreContainer = new CoreContainer();
+        coreContainer.load();
+        if (coreContainer.getCores().size() == 0) {
+            throw new SolrServerException("Failed to initialize the Solr core. "
+                + "Please check the configuration and log messages.");
+        } else if (coreContainer.getCores().size() > 1) {
+            this.logger.warn("Multiple Solr cores detected: [{}]. Using the first one.",
+                StringUtils.join(coreContainer.getCoreNames(), ", "));
+        }
+        return coreContainer;
     }
 
     @Override

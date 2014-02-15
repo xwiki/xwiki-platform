@@ -16,4 +16,16 @@
  limitations under the License.
 -->
 
-<solr/>
+<schema name="xwiki" version="1.5">
+  <fields>
+    <field name="_version_" type="long" indexed="true" stored="true"/>
+    <field name="id" type="string" indexed="true" stored="true" required="true" />
+    <dynamicField name="*" type="ignored" multiValued="true" />
+  </fields>
+  <uniqueKey>id</uniqueKey>
+  <types>
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" />
+    <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
+    <fieldtype name="ignored" stored="false" indexed="false" multiValued="true" class="solr.StrField" />
+ </types>
+</schema>

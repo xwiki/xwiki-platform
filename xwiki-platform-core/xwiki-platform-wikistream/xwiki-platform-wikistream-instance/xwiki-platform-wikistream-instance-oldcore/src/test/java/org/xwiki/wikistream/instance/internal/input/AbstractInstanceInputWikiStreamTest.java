@@ -156,6 +156,7 @@ public class AbstractInstanceInputWikiStreamTest extends AbstractInstanceWikiStr
     {
         if (instanceProperties == null) {
             instanceProperties = new InstanceInputProperties();
+            instanceProperties.setVerbose(false);
         }
 
         URL url = getClass().getResource("/" + resource + ".xml");

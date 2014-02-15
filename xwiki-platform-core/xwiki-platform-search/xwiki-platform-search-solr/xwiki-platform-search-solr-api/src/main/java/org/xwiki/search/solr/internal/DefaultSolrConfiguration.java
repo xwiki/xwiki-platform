@@ -75,9 +75,9 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public static final String[] HOME_DIRECTORY_FILE_NAMES = {"solr.xml"};
 
     /**
-     * The package containing the solr configuration.
+     * The package containing the Solr core configuration files.
      */
-    public static final String HOME_DIRECTORY_CONF_PACKAGE = "solr.conf";
+    public static final String HOME_DIRECTORY_CORE_PACKAGE = "solr.xwiki";
 
     /**
      * The prefix of the solr resources.
@@ -145,12 +145,11 @@ public class DefaultSolrConfiguration implements SolrConfiguration
             result.put(file, this.getClass().getResource(String.format(CLASSPATH_LOCATION_PREFIX, file)));
         }
 
-        // Conf directory
-        Set<URL> solrConfigurationResourcess = ClasspathHelper.forPackage(HOME_DIRECTORY_CONF_PACKAGE);
+        // Core directory
+        Set<URL> solrCoreResourcess = ClasspathHelper.forPackage(HOME_DIRECTORY_CORE_PACKAGE);
         Reflections reflections =
-            new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner())
-                .setUrls(solrConfigurationResourcess)
-                .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(HOME_DIRECTORY_CONF_PACKAGE))));
+            new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner()).setUrls(solrCoreResourcess)
+                .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(HOME_DIRECTORY_CORE_PACKAGE))));
 
         for (String resource : reflections.getResources(Predicates.<String> alwaysTrue())) {
             URL resourceURL = getClass().getResource("/" + resource);

@@ -289,12 +289,17 @@ public class AbstractInstanceWikiStreamTest
 
     protected void importFromXML(String resource) throws WikiStreamException
     {
-        importFromXML(resource, new InstanceOutputProperties());
+        importFromXML(resource, null);
     }
 
     protected void importFromXML(String resource, InstanceOutputProperties instanceProperties)
         throws WikiStreamException
     {
+        if (instanceProperties == null) {
+            instanceProperties = new InstanceOutputProperties();
+            instanceProperties.setVerbose(false);
+        }
+
         OutputWikiStream outputWikiStream = this.outputWikiStreamFactory.createOutputWikiStream(instanceProperties);
 
         URL url = getClass().getResource("/" + resource + ".xml");

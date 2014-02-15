@@ -39,6 +39,11 @@ public interface Resource
     ResourceType getType();
 
     /**
+     * @return the action id requested on this resource (e.g. View, Download, Edit, etc)
+     */
+    ActionId getActionId();
+
+    /**
      * @param name the name of the parameter to add
      * @param value the value of the parameter to add. If null then no value is added.
      */

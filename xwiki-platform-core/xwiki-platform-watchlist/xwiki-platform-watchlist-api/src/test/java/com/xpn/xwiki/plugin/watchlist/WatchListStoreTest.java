@@ -39,27 +39,40 @@ import static org.mockito.Mockito.*;
  */
 public class WatchListStoreTest
 {
-    @Test
-    public void addWatchedElementWhenCommaInElement() throws Exception
-    {
-        BaseObject watchListObject = mock(BaseObject.class);
-        when(watchListObject.getLargeStringValue("documents")).thenReturn("one");
+    private static final String TEST_USERDOC_NAME = "userspace.userpage";
 
-        XWikiDocument userDocument = mock(XWikiDocument.class);
+    // common test objects: the watchlist, its user and a context to fetch the user from
+    private BaseObject watchListObject;
+    private XWikiDocument userDocument;
+    private XWikiContext xcontext;
+    
+    @Before
+    public void setUpUserWithWatchList() throws Exception {
+        watchListObject = mock(BaseObject.class);
+
+        userDocument = mock(XWikiDocument.class);
         when(userDocument.isNew()).thenReturn(false);
         when(userDocument.getObject("XWiki.XWikiUsers")).thenReturn(mock(BaseObject.class));
         when(userDocument.getObject("XWiki.WatchListClass")).thenReturn(watchListObject);
 
         com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
-        when(xwiki.getDocument(eq("userspace.userpage"), any(XWikiContext.class))).thenReturn(userDocument);
-
-        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xwiki.getDocument(eq(TEST_USERDOC_NAME), any(XWikiContext.class))).thenReturn(userDocument);
+ 
+        xcontext = mock(XWikiContext.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
         when(xcontext.getDatabase()).thenReturn("wiki");
+
+    }
+    
+    @Test
+    public void addWatchedElementWhenCommaInElement() throws Exception
+    {
+        when(watchListObject.getLargeStringValue("documents")).thenReturn("one");
+
         when(xcontext.getMessageTool()).thenReturn(mock(XWikiMessageTool.class));
 
         WatchListStore store = new WatchListStore();
-        store.addWatchedElement("userspace.userpage", "space.element,with,comma", WatchListStore.ElementType.DOCUMENT,
+        store.addWatchedElement(TEST_USERDOC_NAME, "space.element,with,comma", WatchListStore.ElementType.DOCUMENT,
             xcontext);
 
         // Test is here, we verify the new watched element is added properly with commas escaped.
@@ -70,26 +83,27 @@ public class WatchListStoreTest
     @Test
     public void getWatchedElementsWhenCommasInElements() throws Exception
     {
-        BaseObject watchListObject = mock(BaseObject.class);
         when(watchListObject.getLargeStringValue("documents")).thenReturn("space.element\\,with\\,comma,other\\,comma");
-
-        XWikiDocument userDocument = mock(XWikiDocument.class);
-        when(userDocument.isNew()).thenReturn(false);
-        when(userDocument.getObject("XWiki.XWikiUsers")).thenReturn(mock(BaseObject.class));
-        when(userDocument.getObject("XWiki.WatchListClass")).thenReturn(watchListObject);
-
-        com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
-        when(xwiki.getDocument(eq("userspace.userpage"), any(XWikiContext.class))).thenReturn(userDocument);
-
-        XWikiContext xcontext = mock(XWikiContext.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
 
         WatchListStore store = new WatchListStore();
         List<String> elements =
-            store.getWatchedElements("userspace.userpage", WatchListStore.ElementType.DOCUMENT, xcontext);
+            store.getWatchedElements(TEST_USERDOC_NAME, WatchListStore.ElementType.DOCUMENT, xcontext);
 
         assertEquals(2, elements.size());
         assertEquals("space.element,with,comma", elements.get(0));
         assertEquals("other,comma", elements.get(1));
+    }
+    
+    @Test
+    public void watchedElementsCanStartWithEmptyElement() throws Exception 
+    {
+        final String testDocRef = "wiki:some.other\\.doc";
+        when(watchListObject.getLargeStringValue("documents")).thenReturn(","+testDocRef);
+
+        WatchListStore store = new WatchListStore();
+        List<String> elements =
+            store.getWatchedElements(TEST_USERDOC_NAME, WatchListStore.ElementType.DOCUMENT, xcontext);
+        assertEquals(1, elements.size());
+        assertEquals(testDocRef, elements.get(0));
     }
 }

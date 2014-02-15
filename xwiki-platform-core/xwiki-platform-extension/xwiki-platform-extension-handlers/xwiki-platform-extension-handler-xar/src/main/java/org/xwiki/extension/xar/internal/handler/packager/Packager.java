@@ -324,6 +324,8 @@ public class Packager
         // Output
         DocumentInstanceOutputProperties documentProperties = new DocumentInstanceOutputProperties();
         documentProperties.setDefaultReference(wikiReference);
+        documentProperties.setVersionPreserved(false);
+        documentProperties.setAuthorPreserved(true);
         XWikiDocumentOutputWikiStream documentFilter =
             this.componentManager.getInstance(XWikiDocumentOutputWikiStream.class);
         documentFilter.setProperties(documentProperties);
@@ -331,6 +333,7 @@ public class Packager
         // Input
         XARInputProperties xarProperties = new XARInputProperties();
         xarProperties.setForceDocument(true);
+        xarProperties.setWithHistory(false);
         xarProperties.setSource(new DefaultInputStreamInputSource(stream));
         BeanInputWikiStream<XARInputProperties> xarWikiStream =
             ((BeanInputWikiStreamFactory<XARInputProperties>) this.xarWikiStreamFactory)

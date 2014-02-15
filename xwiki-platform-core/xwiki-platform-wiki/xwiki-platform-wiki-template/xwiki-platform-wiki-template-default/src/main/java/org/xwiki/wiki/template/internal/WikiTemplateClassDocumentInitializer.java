@@ -104,6 +104,13 @@ public class WikiTemplateClassDocumentInitializer extends AbstractMandatoryDocum
             needsUpdate = true;
         }
 
+        // Mark this document as Wiki Class.
+        if (document.isNew()) {
+            needsUpdate |= setClassDocumentFields(document, "Wiki Template Class");
+            document.setContent(document.getContent() + "\n\nClass that represents the wiki descriptor property group"
+                    + " for the template feature.");
+        }
+
         return needsUpdate;
     }
 }

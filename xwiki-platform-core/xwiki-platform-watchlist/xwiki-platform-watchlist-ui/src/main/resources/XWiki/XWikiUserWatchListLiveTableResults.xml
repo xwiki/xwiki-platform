@@ -56,17 +56,19 @@
   #if ("$!wiki" != '')
     #set ($wikiHomeDocRef = $services.model.createDocumentReference($wiki, '', '', 'default'))
     #set ($wikiHomeDoc = $xwiki.getDocument($wikiHomeDocRef))
-    #set ($discard = $elements.add({
-      'id'        : $wiki,
-      'type'      : 'wiki',
-      'wikiName'  : "#getWikiPrettyName($wiki)",
-      'wikiUrl'   : $wikiHomeDoc.getURL(),
-      'spaceName' : $services.localization.render('watchlist.table.allspaces'),
-      'spaceUrl'  : '',
-      'pageName'  : $services.localization.render('watchlist.table.alldocuments'),
-      'pageUrl'   : '',
-      'deleteUrl' : $wikiHomeDoc.getURL('view', 'xpage=watch&amp;do=removewiki')
-    }))
+    #if (!$wikiHomeDoc.isNew())
+      #set ($discard = $elements.add({
+        'id'        : $wiki,
+        'type'      : 'wiki',
+        'wikiName'  : "#getWikiPrettyName($wiki)",
+        'wikiUrl'   : $wikiHomeDoc.getURL(),
+        'spaceName' : $services.localization.render('watchlist.table.allspaces'),
+        'spaceUrl'  : '',
+        'pageName'  : $services.localization.render('watchlist.table.alldocuments'),
+        'pageUrl'   : '',
+        'deleteUrl' : $wikiHomeDoc.getURL('view', 'xpage=watch&amp;do=removewiki')
+      }))
+    #end
   #end
 #end
 ## Spaces
@@ -78,17 +80,19 @@
     #set ($spaceHomeDocRef = $services.model.createDocumentReference($wiki, $spaceRef.name, '', 'default'))
     #set ($wikiHomeDoc = $xwiki.getDocument($wikiHomeDocRef))
     #set ($spaceHomeDoc = $xwiki.getDocument($spaceHomeDocRef))
-    #set ($discard = $elements.add({
-      'id'        : $spaceRef.name,
-      'type'      : 'space',
-      'wikiName'  : "#getWikiPrettyName($wiki)",
-      'wikiUrl'   : $wikiHomeDoc.getURL(),
-      'spaceName' : $spaceRef.name,
-      'spaceUrl'  : $spaceHomeDoc.getURL(),
-      'pageName'  : $services.localization.render('watchlist.table.alldocuments'),
-      'pageUrl'   : '',
-      'deleteUrl' : $spaceHomeDoc.getURL('view', 'xpage=watch&amp;do=removespace')
-    }))
+    #if (!$spaceHomeDoc.isNew())
+      #set ($discard = $elements.add({
+        'id'        : $spaceRef.name,
+        'type'      : 'space',
+        'wikiName'  : "#getWikiPrettyName($wiki)",
+        'wikiUrl'   : $wikiHomeDoc.getURL(),
+        'spaceName' : $spaceRef.name,
+        'spaceUrl'  : $spaceHomeDoc.getURL(),
+        'pageName'  : $services.localization.render('watchlist.table.alldocuments'),
+        'pageUrl'   : '',
+        'deleteUrl' : $spaceHomeDoc.getURL('view', 'xpage=watch&amp;do=removespace')
+      }))
+    #end
   #end
 #end
 ## Pages
@@ -102,17 +106,19 @@
     #set ($wikiHomeDoc = $xwiki.getDocument($wikiHomeDocRef))
     #set ($spaceHomeDoc = $xwiki.getDocument($spaceHomeDocRef))
     #set ($pageDoc = $xwiki.getDocument($pageRef))
-    #set ($discard = $elements.add({
-      'id'        : $page,
-      'type'      : 'page',
-      'wikiName'  : "#getWikiPrettyName($wiki)",
-      'wikiUrl'   : $wikiHomeDoc.getURL(),
-      'spaceName' : $spaceName,
-      'spaceUrl'  : $spaceHomeDoc.getURL(),
-      'pageName'  : $pageRef.name,
-      'pageUrl'   : $pageDoc.getURL(),
-      'deleteUrl' : $pageDoc.getURL('view', 'xpage=watch&amp;do=removedocument')
-    }))
+    #if (!$pageDoc.isNew())
+      #set ($discard = $elements.add({
+        'id'        : $page,
+        'type'      : 'page',
+        'wikiName'  : "#getWikiPrettyName($wiki)",
+        'wikiUrl'   : $wikiHomeDoc.getURL(),
+        'spaceName' : $spaceName,
+        'spaceUrl'  : $spaceHomeDoc.getURL(),
+        'pageName'  : $pageRef.name,
+        'pageUrl'   : $pageDoc.getURL(),
+        'deleteUrl' : $pageDoc.getURL('view', 'xpage=watch&amp;do=removedocument')
+       }))
+    #end
   #end
 #end
 ##

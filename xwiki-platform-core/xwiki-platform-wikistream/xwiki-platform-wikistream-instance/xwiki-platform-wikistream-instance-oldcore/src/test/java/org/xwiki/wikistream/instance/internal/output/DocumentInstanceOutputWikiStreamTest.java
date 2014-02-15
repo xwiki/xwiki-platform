@@ -58,6 +58,7 @@ public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiSt
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
         outputProperties.setVersionPreserved(true);
+        outputProperties.setVerbose(false);
 
         importFromXML("document1", outputProperties);
 
@@ -159,6 +160,8 @@ public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiSt
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
+        outputProperties.setVerbose(false);
+
         importFromXML("documentwithunexistingobjectproperty", outputProperties);
 
         XWikiDocument document =
@@ -187,6 +190,8 @@ public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiSt
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
+        outputProperties.setVerbose(false);
+
         importFromXML("documentwithnumberversion", outputProperties);
 
         XWikiDocument document =
@@ -204,6 +209,8 @@ public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiSt
     public void testDocumentwithattachmentwithoutdate() throws WikiStreamException, XWikiException, ParseException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVerbose(false);
 
         importFromXML("documentwithattachmentwithoutdate", outputProperties);
 

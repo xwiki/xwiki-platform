@@ -4499,7 +4499,7 @@ public class XWiki implements EventListener
             Resource resource = this.resourceManager.getResource();
             if (resource instanceof EntityResource) {
                 EntityResource entityResource = (EntityResource) resource;
-                String action = entityResource.getAction();
+                String action = entityResource.getActionId().getId();
                 if ((request.getParameter("topic") != null) && (action.equals("edit") || action.equals("inline"))) {
                     reference = this.currentMixedDocumentReferenceResolver.resolve(request.getParameter("topic"));
                 } else {

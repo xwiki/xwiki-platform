@@ -22,14 +22,11 @@ package org.xwiki.url;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents a XWiki URL.
  *
  * @version $Id$
  */
-@Unstable
 public interface XWikiURL
 {
     /**

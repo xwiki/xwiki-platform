@@ -56,16 +56,26 @@
       <artifactId>woodstox-core-asl</artifactId>
       <exclusions>
         <!-- Already part of Java SE 6 -->
-      	<exclusion>
-      	  <artifactId>stax-api</artifactId>
-      	  <groupId>javax.xml.stream</groupId>
-      	</exclusion>
+        <exclusion>
+          <artifactId>stax-api</artifactId>
+          <groupId>javax.xml.stream</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <!-- Embedded Solr instance. -->
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
+    </dependency>
+    <!-- Solr core depends on a different version of Restlet (than our Rest module) which we exclude and thus we need to
+      pull the right version here. -->
+    <dependency>
+      <groupId>org.restlet.jse</groupId>
+      <artifactId>org.restlet</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.restlet.jee</groupId>
+      <artifactId>org.restlet.ext.servlet</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.solr</groupId>

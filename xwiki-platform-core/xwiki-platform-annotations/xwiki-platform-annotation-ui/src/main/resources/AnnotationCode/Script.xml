@@ -20,30 +20,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>AnnotationCode</web>
   <name>Script</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>AnnotationCode.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1391621055000</creationDate>
+  <parent>AnnotationCode.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1264864355000</creationDate>
-  <date>1299875556000</date>
-  <contentUpdateDate>1299875556000</contentUpdateDate>
+  <date>1391781566000</date>
+  <contentUpdateDate>1391621055000</contentUpdateDate>
   <version>1.1</version>
-  <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
-  <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>
+</content>
   <object>
+    <name>AnnotationCode.Script</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>046e135f-7fed-40ec-a51d-c01ec1ac25e6</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -115,10 +115,6 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>AnnotationCode.Script</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>046e135f-7fed-40ec-a51d-c01ec1ac25e6</guid>
     <property>
       <cache/>
     </property>
@@ -514,6 +510,10 @@ return XWiki;
     </property>
   </object>
   <object>
+    <name>AnnotationCode.Script</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>f380ccb0-3533-4b3b-b257-184223ca7bdd</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -585,10 +585,6 @@ return XWiki;
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>AnnotationCode.Script</name>
-    <number>1</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>f380ccb0-3533-4b3b-b257-184223ca7bdd</guid>
     <property>
       <cache/>
     </property>
@@ -1617,11 +1613,12 @@ return XWiki;
 }(XWiki || {}));
 
 document.observe('xwiki:dom:loaded', function() {
-  // if the action on the current document is not view, don't load annotations
-  if (XWiki.contextaction != 'view') {
+  // Load the annotations only in view mode, if the document content is displayed
+  // (the document content is not displayed when viewer=history for instance).
+  if (XWiki.contextaction != 'view' || !$('xwikicontent')) {
     return;
   }
-  
+
   #if ($annotationHighlightByDefault &amp;&amp; $annotationHighlightByDefault != 0)
     var displayHighlight = true;
   #else
@@ -1662,6 +1659,10 @@ document.observe('xwiki:dom:loaded', function() {
     </property>
   </object>
   <object>
+    <name>AnnotationCode.Script</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>f9d89256-0497-45b2-982b-2129a93901fb</guid>
     <class>
       <name>XWiki.RequiredRightClass</name>
       <customClass/>
@@ -1692,14 +1693,8 @@ document.observe('xwiki:dom:loaded', function() {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </level>
     </class>
-    <name>AnnotationCode.Script</name>
-    <number>0</number>
-    <className>XWiki.RequiredRightClass</className>
-    <guid>f9d89256-0497-45b2-982b-2129a93901fb</guid>
     <property>
       <level>programming</level>
     </property>
   </object>
-  <content>
-</content>
 </xwikidoc>

@@ -26,6 +26,7 @@ import org.xwiki.properties.RawProperties;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.stability.Unstable;
+import org.xwiki.wikistream.WikiStreamProperties;
 
 /**
  * The properties passed to the instance input wiki stream.
@@ -36,9 +37,9 @@ import org.xwiki.stability.Unstable;
  * @since 5.3RC1
  */
 @Unstable
-public class InstanceInputProperties extends HashMap<String, Object> implements RawProperties
+public class InstanceInputProperties extends HashMap<String, Object> implements RawProperties, WikiStreamProperties
 {
-    private static final String PROP_ENTITIES = "entities";
+    private static final String PROPNAME_ENTITIES = "entities";
 
     /**
      * @return The entities to generate events from
@@ -47,7 +48,7 @@ public class InstanceInputProperties extends HashMap<String, Object> implements 
     @PropertyDescription("The entities to generate events from")
     public EntityReferenceSet getEntities()
     {
-        return (EntityReferenceSet) get(PROP_ENTITIES);
+        return (EntityReferenceSet) get(PROPNAME_ENTITIES);
     }
 
     /**
@@ -55,7 +56,21 @@ public class InstanceInputProperties extends HashMap<String, Object> implements 
      */
     public void setEntities(EntityReferenceSet entities)
     {
-        put(PROP_ENTITIES, entities);
+        put(PROPNAME_ENTITIES, entities);
+    }
+
+    @Override
+    public boolean isVerbose()
+    {
+        Boolean verbose = (Boolean) get(PROPNAME_VERBOSE);
+
+        return verbose == Boolean.FALSE ? false : true;
+    }
+
+    @Override
+    public void setVerbose(boolean verbose)
+    {
+        put(PROPNAME_VERBOSE, verbose);
     }
 
     @Override

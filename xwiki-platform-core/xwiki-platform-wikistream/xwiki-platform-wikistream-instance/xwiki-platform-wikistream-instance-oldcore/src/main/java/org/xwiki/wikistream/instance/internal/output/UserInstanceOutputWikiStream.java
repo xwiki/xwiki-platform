@@ -39,9 +39,11 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.filter.user.UserFilter;
@@ -68,6 +70,10 @@ public class UserInstanceOutputWikiStream extends AbstractBeanOutputWikiStream<U
     @Inject
     @Named("relative")
     private EntityReferenceResolver<String> relativeResolver;
+
+    @Inject
+    @Named("current")
+    private EntityReferenceValueProvider referenceProvider;
 
     @Inject
     private EntityReferenceSerializer<String> serializer;
@@ -126,9 +132,20 @@ public class UserInstanceOutputWikiStream extends AbstractBeanOutputWikiStream<U
         return get(boolean.class, key, parameters, def);
     }
 
+    private String getCurrentWiki()
+    {
+        String wiki = this.currentWiki;
+
+        if (wiki == null) {
+            wiki = this.referenceProvider.getDefaultValue(EntityType.WIKI);
+        }
+
+        return wiki;
+    }
+    
     private DocumentReference getUserDocumentReference(String id)
     {
-        return new DocumentReference(this.currentWiki, DEFAULT_SPACE.getName(), id);
+        return new DocumentReference(getCurrentWiki(), DEFAULT_SPACE.getName(), id);
     }
 
     private XWikiDocument getUserDocument(String id) throws XWikiException
@@ -140,7 +157,7 @@ public class UserInstanceOutputWikiStream extends AbstractBeanOutputWikiStream<U
 
     private DocumentReference getGroupDocumentReference(String id)
     {
-        return new DocumentReference(this.currentWiki, DEFAULT_SPACE.getName(), id);
+        return new DocumentReference(getCurrentWiki(), DEFAULT_SPACE.getName(), id);
     }
 
     private XWikiDocument getGroupDocument(String id) throws XWikiException

@@ -19,7 +19,6 @@
  */
 package org.xwiki.url.internal.standard;
 
-import org.xwiki.stability.Unstable;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.url.internal.ExtendedURL;
 
@@ -30,7 +29,6 @@ import org.xwiki.url.internal.ExtendedURL;
  * @version $Id$
  * @since 5.1M1
  */
-@Unstable
 public class URLParsingState
 {
     /**

@@ -437,11 +437,11 @@ xwiki.authentication.ldap.base_DN=
 
 #-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
 #-# The potential LDAP groups classes. Separated by commas.
-# xwiki.authentication.ldap.group_classes=group,groupOfNames,groupOfUniqueNames,dynamicGroup,dynamicGroupAux,groupWiseDistributionList
+# xwiki.authentication.ldap.group_classes=group,groupOfNames,groupOfUniqueNames,dynamicGroup,dynamicGroupAux,groupWiseDistributionList,posixGroup,apple-group
 
 #-# [Since 1.5M1, XWikiLDAPAuthServiceImpl]
 #-# The potential names of the LDAP groups fields containings the members. Separated by commas. 
-# xwiki.authentication.ldap.group_memberfields=member,uniqueMember
+# xwiki.authentication.ldap.group_memberfields=member,uniqueMember,memberUid
 
 #-# retrieve the following fields from LDAP and store them in the XWiki user object (xwiki-attribute=ldap-attribute)
 xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,email=mail

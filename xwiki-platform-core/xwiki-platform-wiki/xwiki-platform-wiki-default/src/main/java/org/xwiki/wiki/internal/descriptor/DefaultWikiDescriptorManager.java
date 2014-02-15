@@ -70,12 +70,19 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         // the cache and thus it might not scale if there were a very large number of wikis.
 
         List<WikiDescriptor> result = new ArrayList<WikiDescriptor>();
-
         try {
-            List<XWikiDocument> documents = descriptorDocumentHelper.getAllXWikiServerClassDocument();
-            for (XWikiDocument document : documents) {
-                // Extract the Wiki
-                DefaultWikiDescriptor descriptor = buildDescriptorFromDocument(document);
+            List<String> documentNames = descriptorDocumentHelper.getAllXWikiServerClassDocumentNames();
+            for (String documentName : documentNames) {
+                // Get the id
+                String wikiId = descriptorDocumentHelper.getWikiIdFromDocumentFullname(documentName);
+                // Get the descriptor from the cache
+                DefaultWikiDescriptor descriptor = cache.getFromId(wikiId);
+                if (descriptor == null) {
+                    // Get the document
+                    XWikiDocument document = descriptorDocumentHelper.getDocumentFromWikiId(wikiId);
+                    // Extract the Wiki
+                    descriptor = buildDescriptorFromDocument(document);
+                }
                 // Add it to the result list
                 if (descriptor != null) {
                     result.add(descriptor);

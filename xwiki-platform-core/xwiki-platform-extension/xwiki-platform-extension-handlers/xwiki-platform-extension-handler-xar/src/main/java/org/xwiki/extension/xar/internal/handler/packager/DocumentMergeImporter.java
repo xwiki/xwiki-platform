@@ -313,19 +313,11 @@ public class DocumentMergeImporter
                     }
                 }
             }
-        }
 
-        // Set version and dates
-        if (!currentDocument.isNew()) {
-            currentDocument.setMinorEdit(false);
-            currentDocument.incrementVersion();
-            Date ndate = new Date();
-            document.setDate(ndate);
-            document.setContentUpdateDate(ndate);
+            // Make sure to keep the content author we want
+            currentDocument.setContentDirty(false);
+            currentDocument.setContentUpdateDate(new Date());
         }
-
-        currentDocument.setMetaDataDirty(false);
-        currentDocument.setContentDirty(false);
 
         saveDocumentSetContextUser(currentDocument, comment);
     }

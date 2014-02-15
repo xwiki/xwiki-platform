@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -44,7 +45,7 @@
   <content>{{velocity output='false'}}
 #set ($defaultDateFormat = 'yyyy/MM/dd HH:mm')
 #set ($iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-#set ($rangePattern = $regextool.compile('^\[(.+) TO (.+)\]$'))
+#set ($rangePattern = $regextool.compile('^[\[{](.+) TO (.+)[\]}]$'))
 #set ($wildcardPattern = $regextool.compile('^\(.*\*.*\)$'))
 #set ($facetPaginationStep = 5)
 
@@ -314,7 +315,28 @@
 
 #macro (displaySearchFacetValues_locale $facetValues)
   #set ($currentLocale = $services.localization.currentLocale)
+  #retainMatchedRequestValues()
   #displaySearchFacetValues_default($facetValues)
+#end
+
+#**
+ * If the facet has values specified on the request then keep only those that are included in the list of matched facet
+ * values. Don't use this macro for date or range facets because in this case the values specified on the request are
+ * never found as is in the list of facet values (e.g. a range will match multiple facet values). This macro ensures
+ * that the URL to select/unselect a facet value doesn't keep unmatched values (otherwise the URL will have values that
+ * you cannot remove using the facet UI).
+ *#
+#macro (retainMatchedRequestValues)
+  #if ($facetRequestValues)
+    #set ($matchedValues = [])
+    #foreach ($facetValue in $facetValues)
+      #set ($discard = $matchedValues.add($facetValue.name))
+    #end
+    #set ($matchedRequestValues = [])
+    #set ($discard = $matchedRequestValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
+    #set ($discard = $matchedRequestValues.retainAll($matchedValues))
+    #set ($facetRequestValues = $matchedRequestValues)
+  #end
 #end
 
 #macro (displaySearchFacetValue_locale $facetPrettyValue)
@@ -360,28 +382,33 @@
   ## Build the list of date intervals.
   ##
   ## 1. Predefined date intervals.
-  #set ($now = $xwiki.jodatime.dateTime)
+  ## We use the start of the day as point of reference instead of the current precise date &amp; time in order for the date
+  ## facet to be properly cached (during that day). Otherwise, if we use NOW in a filter range query then a new cache
+  ## entry is generated for each search request because NOW is expanded to the actual date &amp; time in the filter query.
+  ## See http://searchhub.org/2012/02/23/date-math-now-and-filter-queries/ for details.
+  #set ($startOfToday = $xwiki.jodatime.dateTime.withTimeAtStartOfDay())
   ## Solr indexes the dates in UTC timezone.
   #set ($utcTimezone = $xwiki.jodatime.getTimezone(0))
-  #set ($now = $now.toDateTime($utcTimezone))
+  #set ($startOfToday = $startOfToday.toDateTime($utcTimezone))
+  #set ($startOfTomorrow = $startOfToday.plusDays(1))
   #set ($intervals = [
     {
       'label': $services.localization.render('solr.facet.date.today'),
-      'start': $now.withTimeAtStartOfDay(),
-      'end'  : $now,
-      'name' : '[NOW/DAY TO NOW]',
+      'start': $startOfToday,
+      'end'  : $startOfTomorrow,
+      'name' : '[NOW/DAY TO NOW/DAY+1DAY}',
       'count': 0
     }, {
       'label': $services.localization.render('solr.facet.date.last7Days'),
-      'start': $now.minusDays(7),
-      'end'  : $now,
-      'name' : '[NOW-7DAYS TO NOW]',
+      'start': $startOfToday.minusDays(7),
+      'end'  : $startOfTomorrow,
+      'name' : '[NOW/DAY-7DAYS TO NOW/DAY+1DAY}',
       'count': 0
     }, {
       'label': $services.localization.render('solr.facet.date.last30Days'),
-      'start': $now.minusDays(30),
-      'end'  : $now,
-      'name' : '[NOW-30DAYS TO NOW]',
+      'start': $startOfToday.minusDays(30),
+      'end'  : $startOfTomorrow,
+      'name' : '[NOW/DAY-30DAYS TO NOW/DAY+1DAY}',
       'count': 0
     }
   ])
@@ -429,8 +456,8 @@
   #foreach ($facetValue in $facetValues)
     #set ($dateValue = $iso8601Formatter.parseDateTime($facetValue.name))
     #foreach ($interval in $intervals)
-      #if ((!$interval.start || $dateValue.isAfter($interval.start))
-          &amp;&amp; (!$interval.end || $dateValue.isBefore($interval.end)))
+      #if ((!$interval.start || $dateValue.compareTo($interval.start) &gt;= 0)
+          &amp;&amp; (!$interval.end || $dateValue.compareTo($interval.end) &lt; 0))
         #set ($discard = $interval.put('count', $mathtool.add($interval.count, $facetValue.count)))
       #end
     #end
@@ -1237,7 +1264,13 @@
   ## * the entities that don't support translations (attachments, objects) but which are bound to an entity
   ##     (document) whose default language is the current language
   ## * the entities that don't have a language set (e.g. documents that are translated with translation keys)
-  #set ($filters = {'locales': [$xcontext.language]})
+  #set ($filters = {})
+  ## Uncomment the following line of code if you want to search by default also in:
+  ## * the default translation of documents that are not translated in the current locale
+  ## * the "xx" translation if the current locale "xx_YY" doesn't have a translation available
+  ##   (e.g. "pt" when "pt_BR" is not available)
+  ## See the discussion on XWIKI-9977.
+  ##set ($discard = $filters.put('locales', [$xcontext.language]))
   #if (!$xcontext.isMainWiki())
     ## Subwikis search by default in their content only.
     #set ($discard = $filters.put('wiki', [$xcontext.database]))
@@ -1367,7 +1400,7 @@ $value##
   ## Convert the given dates.
   #convertDateFormat($request.startDate $configuredDateFormat $dateParser $datePrinter $startDate)
   #convertDateFormat($request.endDate $configuredDateFormat $dateParser $datePrinter $endDate)
-  #set ($interval = "[$startDate TO $endDate]")
+  #set ($interval = "[$startDate TO $endDate}")
   #set ($xredirect = $request.xredirect.replaceFirst(
     "\b$regextool.quote($escapetool.url($request.facet))=[^&amp;$escapetool.d]*",
     $escapetool.url({
@@ -1429,7 +1462,8 @@ $value##
   ## Redirect using the default search filters
   #extendQueryString($url {
     'r': 1,
-    'f_type': 'DOCUMENT'
+    'f_type': 'DOCUMENT',
+    'f_locale': [$xcontext.language, '']
   })
   $response.sendRedirect($url)
 #end

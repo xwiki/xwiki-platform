@@ -39,11 +39,6 @@ public class EntityResource extends AbstractResource
     private static final String REVISION_PARAMETER_NAME = "rev";
 
     /**
-     * @see #getAction()
-     */
-    private String action;
-
-    /**
      * @see #getEntityReference()
      */
     private EntityReference entityReference;
@@ -55,28 +50,13 @@ public class EntityResource extends AbstractResource
 
     /**
      * @param entityReference the entity reference being wrapped
+     * @param actionId the instance representing the technical Action id (e.g. View, Download, etc)
      */
-    public EntityResource(EntityReference entityReference)
+    public EntityResource(EntityReference entityReference, ActionId actionId)
     {
         super(ResourceType.ENTITY);
         setEntityReference(entityReference);
-    }
-
-    /**
-     * @return the action requested on this resource (e.g. "view", "download", etc). Note that We're not using a typed
-     *         object since the action name can be anything and corresponds to an Action Component role hint.
-     */
-    public String getAction()
-    {
-        return this.action;
-    }
-
-    /**
-     * @param action see {@link #getAction()}
-     */
-    public void setAction(String action)
-    {
-        this.action = action;
+        setActionId(actionId);
     }
 
     /**

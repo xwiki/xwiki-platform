@@ -25,15 +25,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Base XWikiURL implementation common to all extending classes. Manages XWiki URL parameters.
  *
  * @version $Id$
  * @since 2.0M1
  */
-@Unstable
 public abstract class AbstractXWikiURL implements XWikiURL
 {
     /**

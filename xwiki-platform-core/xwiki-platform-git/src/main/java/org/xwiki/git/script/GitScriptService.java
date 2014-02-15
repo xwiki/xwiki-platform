@@ -35,7 +35,6 @@ import org.joda.time.DateTime;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.git.GitManager;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Various APIs to make it easy to perform Git commands from within scripts.
@@ -61,7 +60,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named("git")
 @Singleton
-@Unstable
 public class GitScriptService implements ScriptService
 {
     @Inject
@@ -86,6 +84,7 @@ public class GitScriptService implements ScriptService
      *
      * @param repositories the list of repositories in which to look for authors
      * @return the list of authors who have ever contributed code in the passed repository
+     * @since 5.3M2
      */
     public Set<PersonIdent> findAuthors(Repository... repositories)
     {
@@ -98,6 +97,7 @@ public class GitScriptService implements ScriptService
      * @param sinceDays the number of days to look back in the past or look from the beginning if set to 0
      * @param repositories the list of repositories in which to look for commits
      * @return the author commit activity
+     * @since 5.3M2
      */
     public UserCommitActivity[] countAuthorCommits(int sinceDays, Repository... repositories)
     {
@@ -110,6 +110,7 @@ public class GitScriptService implements ScriptService
      * @param sinceDays the number of days to look back in the past or look from the beginning if set to 0
      * @param repositories the list of repositories in which to look for commits
      * @return the author commit activity
+     * @since 5.3M2
      */
     public UserCommitActivity[] countAuthorCommits(int sinceDays, List<Repository> repositories)
     {

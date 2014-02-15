@@ -19,15 +19,12 @@
  */
 package org.xwiki.url;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents a type of XWiki URL (URL to an Entity, URL to a skin file, etc).
  *
  * @version $Id$
  * @since 2.0M1
  */
-@Unstable
 public enum XWikiURLType
 {
     ENTITY, SKIN, TEMPLATE, RESOURCE

@@ -42,6 +42,11 @@ public abstract class AbstractResource implements Resource
     private ResourceType type;
 
     /**
+     * @see #getActionId()
+     */
+    private ActionId actionId;
+
+    /**
      * @see #getParameters()
      */
     private Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
@@ -66,6 +71,20 @@ public abstract class AbstractResource implements Resource
     public void setType(ResourceType type)
     {
         this.type = type;
+    }
+
+    @Override
+    public ActionId getActionId()
+    {
+        return this.actionId;
+    }
+
+    /**
+     * @param action see {@link #getActionId()}
+     */
+    public void setActionId(ActionId action)
+    {
+        this.actionId = action;
     }
 
     @Override

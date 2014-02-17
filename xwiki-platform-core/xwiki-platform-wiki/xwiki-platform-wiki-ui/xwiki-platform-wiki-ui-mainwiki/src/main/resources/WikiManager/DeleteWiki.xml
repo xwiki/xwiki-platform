@@ -99,7 +99,7 @@
               &lt;fieldset&gt;
                 &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
                 &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
-                &lt;span class="buttonwrapper"&gt;&lt;button class="button"&gt;$services.localization.render('platform.wiki.delete.confirmation.yes')&lt;/button&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.delete.confirmation.no')&lt;/a&gt;&lt;/span&gt;
+                &lt;span class="buttonwrapper"&gt;&lt;button class="button" id="confirmButton"&gt;$services.localization.render('platform.wiki.delete.confirmation.yes')&lt;/button&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.delete.confirmation.no')&lt;/a&gt;&lt;/span&gt;
               &lt;/fieldset&gt;
             &lt;/form&gt;
           {{/html}})))

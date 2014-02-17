@@ -19,30 +19,30 @@
  */
 package org.xwiki.wiki.test.ui;
 
-import java.util.List;
-
 import org.junit.Rule;
 import org.junit.Test;
-import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.wiki.test.po.CreateWikiPage;
 import org.xwiki.wiki.test.po.CreateWikiPageStepProvisioning;
 import org.xwiki.wiki.test.po.CreateWikiPageStepUser;
+import org.xwiki.wiki.test.po.DeleteWikiPage;
 import org.xwiki.wiki.test.po.WikiHomePage;
 import org.xwiki.wiki.test.po.WikiIndexPage;
+import org.xwiki.wiki.test.po.WikiLink;
 
+import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * UI tests for the Wiki application.
+ * UI tests for the wiki templates feature of the Wiki application.
  *
  * @version $Id$
- * @since 5.4RC1
+ * @since 6.0M1
  */
-public class WikiTest extends AbstractTest
+public class WikiTemplateTest extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule superAdminAuthenticationRule =
@@ -55,7 +55,8 @@ public class WikiTest extends AbstractTest
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
         CreateWikiPage createWikiPage = wikiIndexPage.createWiki();
         createWikiPage.setPrettyName("My new template");
-
+        String wikiName = createWikiPage.getComputedName();
+        assertEquals("mynewtemplate", wikiName);
         createWikiPage.setDescription("This is the template I do for the tests");
         createWikiPage.setIsTemplate(true);
 
@@ -77,19 +78,29 @@ public class WikiTest extends AbstractTest
 
         // Verify the wiki is in the wiki index page.
         wikiIndexPage = WikiIndexPage.gotoPage();
-        // Wait for the livetable to generate ajax requests
-        Thread.sleep(500);
-        List<WebElement> wikiPrettyNames = wikiIndexPage.getWikiPrettyNames();
-        boolean found = false;
-        for (WebElement webElement : wikiPrettyNames) {
-            if (webElement.getText().equals("My new template")) {
-                found = true;
-                assertTrue(webElement.getAttribute("href").endsWith("/xwiki/wiki/mynewtemplate/view/Main/WebHome"));
-                break;
-            }
+        WikiLink wikiLink = wikiIndexPage.getWikiLink("My new template");
+        if (wikiLink == null) {
+            throw new Exception("The wiki [My new template] is not in the wiki index.");
         }
-        assertTrue(found);
+        assertTrue(wikiLink.getURL().endsWith("/xwiki/wiki/mynewtemplate/view/Main/WebHome"));
 
+    }
+
+    public void deleteTemplateWiki() throws Exception
+    {
+        // Go to the template wiki
+        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
+        WikiLink templateWikiLink = wikiIndexPage.getWikiLink("My new template");
+        if (templateWikiLink == null) {
+            throw new Exception("The wiki [My new template] is not in the wiki index.");
+        }
+        WikiHomePage wikiHomePage = templateWikiLink.click();
+        // Delete the wiki
+        DeleteWikiPage deleteWikiPage = wikiHomePage.deleteWiki().confirm();
+        assertTrue(deleteWikiPage.hasSuccessMessage());
+        // Verify the wiki has been deleted
+        wikiIndexPage = WikiIndexPage.gotoPage();
+        assertNull(wikiIndexPage.getWikiLink("My new template"));
     }
 
     @Test
@@ -100,6 +111,8 @@ public class WikiTest extends AbstractTest
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
         CreateWikiPage createWikiPage = wikiIndexPage.createWiki();
         createWikiPage.setPrettyName("My new wiki");
+        String wikiName = createWikiPage.getComputedName();
+        assertEquals("mynewwiki", wikiName);
         createWikiPage.setTemplate("mynewtemplate");
         createWikiPage.setIsTemplate(false);
         createWikiPage.setDescription("My first wiki");
@@ -113,5 +126,18 @@ public class WikiTest extends AbstractTest
         wikiHomePage.edit();
         WikiEditPage wikiEditPage = new WikiEditPage();
         assertEquals(wikiEditPage.getContent(), TEMPLATE_CONTENT);
+
+        // Delete the wiki
+        wikiEditPage.clickCancel();
+        DeleteWikiPage deleteWikiPage = wikiHomePage.deleteWiki();
+        deleteWikiPage = deleteWikiPage.confirm();
+        assertTrue(deleteWikiPage.hasSuccessMessage());
+
+        // Verify the wiki has been deleted
+        wikiIndexPage = WikiIndexPage.gotoPage();
+        assertNull(wikiIndexPage.getWikiLink("My new wiki"));
+
+        // Delete the template wiki
+        deleteTemplateWiki();
     }
 }

@@ -64,7 +64,16 @@ public class CreateWikiPage extends ExtendedViewPage
 
     public String getName()
     {
-        return wikiNameField.getText();
+        return wikiNameField.getAttribute("value");
+    }
+
+    /**
+     * @since 6.0M1
+     */
+    public String getComputedName()
+    {
+        waitUntilElementHasNonEmptyAttributeValue(By.name("wikiname"), "value");
+        return getName();
     }
 
     public void setDescription(String description)

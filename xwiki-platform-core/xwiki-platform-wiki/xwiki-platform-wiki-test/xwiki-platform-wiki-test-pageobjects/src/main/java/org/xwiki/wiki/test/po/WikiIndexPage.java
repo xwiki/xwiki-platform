@@ -19,8 +19,10 @@
  */
 package org.xwiki.wiki.test.po;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -40,10 +42,13 @@ public class WikiIndexPage extends ExtendedViewPage
     /**
      * Opens the home page.
      */
-    public static WikiIndexPage gotoPage()
+    public static WikiIndexPage gotoPage() throws InterruptedException
     {
         getUtil().gotoPage(getSpace(), getPage());
-        return new WikiIndexPage();
+        // Wait for the livetable to generate ajax requests
+        WikiIndexPage indexPage = new WikiIndexPage();
+        indexPage.waitUntilElementIsVisible(By.id("wikis"));
+        return indexPage;
     }
 
     public static String getSpace()
@@ -56,8 +61,26 @@ public class WikiIndexPage extends ExtendedViewPage
         return "WebHome";
     }
 
-    public List<WebElement> getWikiPrettyNames()
+    public List<WikiLink> getWikiPrettyNames()
     {
-        return wikiPrettyNames;
+        List<WikiLink> list = new ArrayList<>();
+        for (WebElement prettyName : wikiPrettyNames) {
+            list.add(new WikiLink(prettyName));
+        }
+        return list;
+    }
+
+    /**
+     * @since 6.0M1
+     */
+    public WikiLink getWikiLink(String wikiName)
+    {
+        for (WikiLink link : getWikiPrettyNames()) {
+            if (link.getWikiName().equals(wikiName)) {
+                return link;
+            }
+        }
+        // We have not found the wiki in the list
+        return null;
     }
 }

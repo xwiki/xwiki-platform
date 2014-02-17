@@ -72,9 +72,15 @@
   #else
     #set ($currentUser = "${services.wiki.mainWikiId}:${xcontext.user}")
     #set ($wikiMainPage = $wiki.mainPageReference)
+    #set ($wikiMainPageLinkStart = '')
+    #set ($wikiMainPageLinkEnd = '')
+    #if ($xwiki.exists($wikiMainPage))
+      #set ($wikiMainPageLinkStart = '[[')
+      #set ($wikiMainPageLinkEnd = "&gt;&gt;${wikiMainPage}]]")
+    #end
     ##
     #if (!$services.wiki.canDeleteWiki($currentUser, $wikiId))
-      {{error}}The user #if($xcontext.user != 'XWiki.XWikiGuest')[[$currentUser]]#{else}$xcontext.user#end is not allowed to delete the wiki [[$wikiId&gt;&gt;$wikiMainPage]].{{/error}}
+      {{error}}The user #if($xcontext.user != 'XWiki.XWikiGuest')[[$currentUser]]#{else}$xcontext.user#end is not allowed to delete the wiki ${wikiMainPageLinkStart}${wikiId}${wikiMainPageLinkEnd}.{{/error}}
     #else
       #if (!$services.csrf.isTokenValid($form_token))
         #set ($browseDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'WebHome'))
@@ -87,7 +93,7 @@
 
         #end
         {{box}}
-          $services.localization.render('platform.wiki.delete.confirmation', ['[[', $wikiId, "&gt;&gt;$wikiMainPage]]"])
+          $services.localization.render('platform.wiki.delete.confirmation', [$wikiMainPageLinkStart, $wikiId, $wikiMainPageLinkEnd])
           ((({{html}}
             &lt;form action="$doc.getURL()" method="post"&gt;
               &lt;fieldset&gt;

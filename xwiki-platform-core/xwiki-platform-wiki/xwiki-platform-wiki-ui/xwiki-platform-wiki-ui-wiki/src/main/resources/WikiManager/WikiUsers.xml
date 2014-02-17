@@ -454,7 +454,6 @@
 #if ("$!wikiPrettyName" == '')
   #set ($wikiPrettyName = $wiki.id)
 #end
-#set ($wikiMainPage = $wiki.mainPageReference)
 ## Operation are enabled if the user is admin and the form_token is valid
 #if ($hasAdmin &amp;&amp; $services.csrf.isTokenValid($request.form_token))
   #if ($request.acceptUser || $request.rejectUser)

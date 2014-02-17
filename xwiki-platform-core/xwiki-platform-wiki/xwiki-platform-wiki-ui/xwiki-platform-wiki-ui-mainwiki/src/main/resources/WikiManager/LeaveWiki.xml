@@ -67,12 +67,18 @@
     #end
     #set ($currentUser = "${xcontext.mainWikiName}:${xcontext.user}")
     #set ($wikiMainPage = $wiki.mainPageReference)
+    #set ($wikiMainPageLinkStart = '')
+    #set ($wikiMainPageLinkEnd = '')
+    #if ($xwiki.exists($wikiMainPage))
+      #set ($wikiMainPageLinkStart = '[[')
+      #set ($wikiMainPageLinkEnd = "&gt;&gt;${wikiMainPage}]]")
+    #end
     ##
     #set ($members = $services.wiki.user.getMembers($wikiId))
     #if (!$members || !$members.contains($currentUser))
-      {{error}}$services.localization.render('platform.wiki.users.userNotMemberOfWiki', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/error}}
+      {{error}}$services.localization.render('platform.wiki.users.userNotMemberOfWiki', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/error}}
     #elseif ($wiki.ownerId == $currentUser)
-      {{error}}$services.localization.render('platform.wiki.users.leave.error.userIsOwner', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/error}}
+      {{error}}$services.localization.render('platform.wiki.users.leave.error.userIsOwner', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/error}}
     #else
       #if (!$services.csrf.isTokenValid($form_token))
         #set ($browseDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'WebHome'))
@@ -85,7 +91,7 @@
 
         #end
         {{box}}
-          $services.localization.render('platform.wiki.users.leave.confirmation', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+          $services.localization.render('platform.wiki.users.leave.confirmation', [$wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
           ((({{html}}
             &lt;form action="$doc.getURL()" method="post"&gt;
               &lt;fieldset&gt;
@@ -99,7 +105,7 @@
       #else
         #set ($result = $services.wiki.user.leave($currentUser, $wikiId))
         #if ($result)
-          {{success}}$services.localization.render('platform.wiki.users.leave.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
+          {{success}}$services.localization.render('platform.wiki.users.leave.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/success}}
         #else
           #printException($services.wiki.user.lastException.message)
         #end

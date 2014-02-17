@@ -61,6 +61,12 @@
   ##
   #set ($wiki = $services.wiki.getById($wikiId))
   #set ($wikiMainPage = $wiki.mainPageReference)
+  #set ($wikiMainPageLinkStart = '')
+  #set ($wikiMainPageLinkEnd = '')
+  #if ($xwiki.exists($wikiMainPage))
+    #set ($wikiMainPageLinkStart = '[[')
+    #set ($wikiMainPageLinkEnd = "&gt;&gt;${wikiMainPage}]]")
+  #end
   ##
   #if ("$!wiki" == '')
     #if ("$!{services.wiki.lastException}" != '')
@@ -77,7 +83,7 @@
     ##
     #set ($members = $services.wiki.user.getMembers($wikiId))
     #if ($members &amp;&amp; $members.contains($currentUser))
-      {{info}}$services.localization.render('platform.wiki.users.userAlreadyMemberOfWiki', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/info}}
+      {{info}}$services.localization.render('platform.wiki.users.userAlreadyMemberOfWiki', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/info}}
     #elseif ($currentUser == 'xwiki:XWiki.XWikiGuest')
       #set ($loginDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'XWiki', 'XWikiLogin'))
       #set ($loginDocument = $xwiki.getDocument($loginDocumentReference))
@@ -120,9 +126,9 @@
           ## Display the proper success info.
           {{success}}
           #if ($request.acceptInvitation)
-            $services.localization.render('platform.wiki.users.invitation.userAcceptedSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+            $services.localization.render('platform.wiki.users.invitation.userAcceptedSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
           #else
-            $services.localization.render('platform.wiki.users.invitation.userRejectedSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+            $services.localization.render('platform.wiki.users.invitation.userRejectedSuccess', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
           #end
           {{/success}}
         #else
@@ -136,7 +142,7 @@
           ##
           ## User can decide if to accept or reject the invitation.
           {{html wiki='true'}}
-          $services.localization.render('platform.wiki.users.invitation.title', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+          $services.localization.render('platform.wiki.users.invitation.title', [$wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
 
           &lt;form class='xform third' method='post'&gt;
             &lt;dl&gt;
@@ -185,7 +191,7 @@
           #if ("$!{request.cancelJoinRequest}" != '1')
             ## Request already exists.
             ##
-            {{info}}$services.localization.render('platform.wiki.users.join.request.pendingRequestExists', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/info}}
+            {{info}}$services.localization.render('platform.wiki.users.join.request.pendingRequestExists', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/info}}
           #elseif (!$services.csrf.isTokenValid($form_token))
             ## User wants to cancel existing request.
             ##
@@ -197,7 +203,7 @@
 
             #end
             {{box}}
-              $services.localization.render('platform.wiki.users.join.request.cancelConfirmation', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+              $services.localization.render('platform.wiki.users.join.request.cancelConfirmation', [$wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
               ((({{html}}
                 &lt;form action="$doc.getURL()" method="post"&gt;
                   &lt;fieldset&gt;
@@ -214,7 +220,7 @@
             ##
             #set ($result = $services.wiki.user.cancelCandidacy($pendingRequest))
             #if ($result)
-              {{success}}$services.localization.render('platform.wiki.users.join.request.cancelSuccess',  ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
+              {{success}}$services.localization.render('platform.wiki.users.join.request.cancelSuccess',  ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/success}}
             #else
               #printException($services.wiki.user.lastException.message)
             #end
@@ -231,7 +237,7 @@
           #end
         
           {{html wiki='true'}}
-            $services.localization.render('platform.wiki.users.join.request.hint', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+            $services.localization.render('platform.wiki.users.join.request.hint', [$wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
 
             &lt;form class='xform third' method='GET'&gt;
               &lt;dl&gt;
@@ -260,7 +266,7 @@
             #set ($wikiAdminGroupReference = $services.model.createDocumentReference($wikiId, 'XWiki', 'XWikiAdminGroup'))
             #set ($notificationMessage = $services.localization.render('platform.wiki.users.join.request.saveNotification', [${xwiki.getUserName($currentUser, false)}, $currentUser, $wikiName, $wikiId]))
             #set ($discard = $services.messageStream.postMessageToGroup($notificationMessage, $wikiAdminGroupReference))
-            {{success}}$services.localization.render('platform.wiki.users.join.request.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
+            {{success}}$services.localization.render('platform.wiki.users.join.request.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/success}}
           #else
             #printException($services.wiki.user.lastException.message)
           #end
@@ -279,7 +285,7 @@
 
           #end
           {{box}}
-            $services.localization.render('platform.wiki.users.join.confirmation', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
+            $services.localization.render('platform.wiki.users.join.confirmation', [$wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
             ((({{html}}
               &lt;form action="$doc.getURL()" method="post"&gt;
                 &lt;fieldset&gt;
@@ -295,7 +301,7 @@
           ##
           #set ($result = $services.wiki.user.join($currentUser, $wikiId))
           #if ($result)
-            {{success}}$services.localization.render('platform.wiki.users.join.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
+            {{success}}$services.localization.render('platform.wiki.users.join.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/success}}
           #else
             #printException($services.wiki.user.lastException.message)
           #end

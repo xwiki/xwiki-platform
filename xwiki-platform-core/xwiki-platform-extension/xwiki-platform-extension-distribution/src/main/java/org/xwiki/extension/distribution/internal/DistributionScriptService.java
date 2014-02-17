@@ -180,14 +180,27 @@ public class DistributionScriptService implements ScriptService
     }
 
     /**
-     * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
+     * @return the previous status of the distribution job for the current wiki (e.g. from last time the distribution
+     *         was upgraded)
      */
     public DistributionJobStatus< ? > getPreviousJobStatus()
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.isMainWiki() ? this.distributionManager.getPreviousFarmJobStatus() : this.distributionManager
-            .getPreviousWikiJobStatus(xcontext.getDatabase());
+        return getPreviousJobStatus(xcontext.getDatabase());
+    }
+
+    /**
+     * @param wiki the wiki for which to retrieve the previous status of the distribution job
+     * @return the previous status of the distribution job for the specified wiki (e.g. from last time the distribution
+     *         was upgraded)
+     */
+    public DistributionJobStatus< ? > getPreviousJobStatus(String wiki)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki(wiki) ? this.distributionManager.getPreviousFarmJobStatus()
+            : this.distributionManager.getPreviousWikiJobStatus(wiki);
     }
 
     /**

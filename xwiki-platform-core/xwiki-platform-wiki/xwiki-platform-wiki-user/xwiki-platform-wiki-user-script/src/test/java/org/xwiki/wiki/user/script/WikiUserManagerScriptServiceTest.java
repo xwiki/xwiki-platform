@@ -47,15 +47,16 @@ import org.xwiki.wiki.user.WikiUserManagerException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -530,4 +531,81 @@ public class WikiUserManagerScriptServiceTest
         assertFalse(result.contains(candidacies.get(1)));
     }
 
+    @Test
+    public void join() throws Exception
+    {
+        String userId = "mainWiki:XWiki.User";
+        String wikiId = "wikiId";
+        boolean result = this.mocker.getComponentUnderTest().join(userId, wikiId);
+        assertTrue(result);
+
+        verify(wikiUserManager).join(userId, wikiId);
+    }
+
+    @Test
+    public void joinWhenUserIsNotCurrentUser() throws Exception
+    {
+        String userId = "mainWiki:XWiki.User2";
+        String wikiId = "wikiId";
+        boolean result = this.mocker.getComponentUnderTest().join(userId, wikiId);
+        assertFalse(result);
+        assertEquals("User [mainWiki:XWiki.User] cannot call $services.wiki.user.join() with an other userId.",
+                this.mocker.getComponentUnderTest().getLastError().getMessage());
+
+        verify(wikiUserManager, never()).join(userId, wikiId);
+    }
+
+    @Test
+    public void joinWhenError() throws Exception
+    {
+        String userId = "mainWiki:XWiki.User";
+        String wikiId = "wikiId";
+
+        WikiUserManagerException exception = new WikiUserManagerException("error in wikiUserManager#join()");
+        doThrow(exception).when(wikiUserManager).join(userId, wikiId);
+
+        boolean result = this.mocker.getComponentUnderTest().join(userId, wikiId);
+        assertFalse(result);
+
+        assertEquals(exception, this.mocker.getComponentUnderTest().getLastError());
+    }
+
+    @Test
+    public void leave() throws Exception
+    {
+        String userId = "mainWiki:XWiki.User";
+        String wikiId = "wikiId";
+        boolean result = this.mocker.getComponentUnderTest().leave(userId, wikiId);
+        assertTrue(result);
+
+        verify(wikiUserManager).leave(userId, wikiId);
+    }
+
+    @Test
+    public void leaveWhenUserIsNotCurrentUser() throws Exception
+    {
+        String userId = "mainWiki:XWiki.User2";
+        String wikiId = "wikiId";
+        boolean result = this.mocker.getComponentUnderTest().leave(userId, wikiId);
+        assertFalse(result);
+        assertEquals("User [mainWiki:XWiki.User] cannot call $services.wiki.user.leave() with an other userId.",
+                this.mocker.getComponentUnderTest().getLastError().getMessage());
+
+        verify(wikiUserManager, never()).leave(userId, wikiId);
+    }
+
+    @Test
+    public void leaveWhenError() throws Exception
+    {
+        String userId = "mainWiki:XWiki.User";
+        String wikiId = "wikiId";
+
+        WikiUserManagerException exception = new WikiUserManagerException("error in wikiUserManager#leave()");
+        doThrow(exception).when(wikiUserManager).leave(userId, wikiId);
+
+        boolean result = this.mocker.getComponentUnderTest().leave(userId, wikiId);
+        assertFalse(result);
+
+        assertEquals(exception, this.mocker.getComponentUnderTest().getLastError());
+    }
 }

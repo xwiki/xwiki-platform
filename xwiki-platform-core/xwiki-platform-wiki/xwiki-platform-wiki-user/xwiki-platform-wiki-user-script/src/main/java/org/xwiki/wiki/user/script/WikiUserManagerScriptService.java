@@ -433,7 +433,8 @@ public class WikiUserManagerScriptService implements ScriptService
         XWikiContext xcontext = xcontextProvider.get();
         String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
         if (!userId.equals(currentUser)) {
-            //TODO
+            setLastError(new WikiUserManagerException(String.format("User [%s] cannot call "
+                    + "$services.wiki.user.join() with an other userId.", currentUser)));
             return false;
         }
 
@@ -459,7 +460,8 @@ public class WikiUserManagerScriptService implements ScriptService
         XWikiContext xcontext = xcontextProvider.get();
         String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
         if (!userId.equals(currentUser)) {
-            //TODO
+            setLastError(new WikiUserManagerException(String.format("User [%s] cannot call $services.wiki.user.leave()"
+                    + " with an other userId.", currentUser)));
             return false;
         }
 

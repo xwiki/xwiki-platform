@@ -490,7 +490,6 @@
     <module>xwiki-platform-webjars</module>
     <module>xwiki-platform-wiki</module>
     <module>xwiki-platform-wikistream</module>
-    <module>xwiki-platform-wiki-manager</module>
     <module>xwiki-platform-wysiwyg</module>
     <module>xwiki-platform-xar</module>
     <module>xwiki-platform-xml</module>

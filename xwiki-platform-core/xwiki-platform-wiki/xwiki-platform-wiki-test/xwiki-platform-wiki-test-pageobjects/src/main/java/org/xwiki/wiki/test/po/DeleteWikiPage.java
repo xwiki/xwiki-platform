@@ -20,43 +20,28 @@
 package org.xwiki.wiki.test.po;
 
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
 
-public class ExtendedViewPage extends ViewPage
+/**
+ * @since 6.0M1
+ */
+public class DeleteWikiPage extends ExtendedViewPage
 {
-    @FindBy(id = "tmCreateWiki")
-    private WebElement createWikiMenuLink;
+    @FindBy(id = "confirmButton")
+    private WebElement confirmButton;
 
-    @FindBy(id = "tmWiki")
-    private WebElement wikiMenu;
+    @FindBy(xpath = "//*[@id=\"xwikicontent\"]/div[@class=\"box successmessage\"]")
+    private WebElement successMessage;
 
-    @FindBy(id = "tmDeleteWiki")
-    private WebElement deleteWikiMenuLink;
-
-    public CreateWikiPage createWiki()
+    public DeleteWikiPage confirm()
     {
-        moveToCreateMenu();
-        this.createWikiMenuLink.click();
-        return new CreateWikiPage();
-    }
-
-    /**
-     * @since 6.0M1
-     */
-    public void moveToWikiMenu()
-    {
-        new Actions(getDriver()).moveToElement(wikiMenu).perform();
-    }
-
-    /**
-     * @since 6.0M1
-     */
-    public DeleteWikiPage deleteWiki()
-    {
-        moveToWikiMenu();
-        this.deleteWikiMenuLink.click();
+        confirmButton.click();
         return new DeleteWikiPage();
     }
+
+    public boolean hasSuccessMessage()
+    {
+        return successMessage.isDisplayed();
+    }
+
 }

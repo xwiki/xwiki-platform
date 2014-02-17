@@ -190,6 +190,32 @@ public class BaseElement
     }
 
     /**
+     * Waits until the given element has a non-empty value for an attribute.
+     *
+     * @param locator the element to wait on
+     * @param attributeName the name of the attribute to check
+     */
+    public void waitUntilElementHasNonEmptyAttributeValue(final By locator, final String attributeName)
+    {
+        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                try {
+                    WebElement element = driver.findElement(locator);
+                    return !element.getAttribute(attributeName).isEmpty();
+                } catch (NotFoundException e) {
+                    return false;
+                } catch (StaleElementReferenceException e) {
+                    // The element was removed from DOM in the meantime
+                    return false;
+                }
+            }
+        });
+    }
+
+    /**
      * Waits until the given element has a certain value for an attribute.
      * 
      * @param locator the element to wait on
@@ -247,7 +273,7 @@ public class BaseElement
 
     /**
      * Waits until the given element has a certain value as its inner text.
-     * 
+     *
      * @param locator the element to wait on
      * @param expectedValue the content value to wait for
      * @since 3.2M3

@@ -20,43 +20,32 @@
 package org.xwiki.wiki.test.po;
 
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
 
-public class ExtendedViewPage extends ViewPage
+/**
+ * @since 6.0M1
+ */
+public class WikiLink
 {
-    @FindBy(id = "tmCreateWiki")
-    private WebElement createWikiMenuLink;
+    private WebElement element;
 
-    @FindBy(id = "tmWiki")
-    private WebElement wikiMenu;
-
-    @FindBy(id = "tmDeleteWiki")
-    private WebElement deleteWikiMenuLink;
-
-    public CreateWikiPage createWiki()
+    public WikiLink(WebElement element)
     {
-        moveToCreateMenu();
-        this.createWikiMenuLink.click();
-        return new CreateWikiPage();
+        this.element = element;
     }
 
-    /**
-     * @since 6.0M1
-     */
-    public void moveToWikiMenu()
+    public String getWikiName()
     {
-        new Actions(getDriver()).moveToElement(wikiMenu).perform();
+        return element.getText();
     }
 
-    /**
-     * @since 6.0M1
-     */
-    public DeleteWikiPage deleteWiki()
+    public String getURL()
     {
-        moveToWikiMenu();
-        this.deleteWikiMenuLink.click();
-        return new DeleteWikiPage();
+        return element.getAttribute("href");
+    }
+
+    public WikiHomePage click()
+    {
+        element.click();
+        return new WikiHomePage();
     }
 }

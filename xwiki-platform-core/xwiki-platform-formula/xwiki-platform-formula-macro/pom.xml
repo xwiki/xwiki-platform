@@ -30,7 +30,7 @@
   </parent>
   <artifactId>xwiki-platform-formula-macro</artifactId>
   <name>XWiki Platform - Formula - Macro</name>
-  <description>Macro for displaying mathematical formulae</description>
+  <description>Inserts a mathematical formula</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.55</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->

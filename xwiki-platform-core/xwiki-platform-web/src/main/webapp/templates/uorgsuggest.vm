@@ -21,7 +21,8 @@ $response.setContentType("text/xml")
 
 #macro (displayResult $result)
   #set ($reference = $services.model.resolveDocument($result, $wikiReference))
-  #set ($stringReference = $services.model.serialize($reference, 'default'))
+  ## Make sure we use relative references as much as possible. See XWIKI-10046.
+  #set ($stringReference = $services.model.serialize($reference, 'compactwiki'))
   #getUserAvatarURL($reference $avatarURL 30)
   #if ($request.uorg == 'user')
     ## The string returned by XWiki#getUserName() is XML encoded.

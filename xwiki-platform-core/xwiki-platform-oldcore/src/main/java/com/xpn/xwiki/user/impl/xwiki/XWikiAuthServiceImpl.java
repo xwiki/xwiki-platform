@@ -580,6 +580,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         // XWiki uses contextPath in the wrong way, putting a / at the end, and not at the start. Fix this here.
         if (contextPath.endsWith("/") && !contextPath.startsWith("/")) {
             contextPath = "/" + StringUtils.chop(contextPath);
+        } else if ("/".equals(contextPath)) {
+            contextPath = "";
         }
 
         // URLFactory.getURL applies Util.escapeURL, which might convert the contextPath into an %NN escaped string.

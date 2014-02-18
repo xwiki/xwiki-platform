@@ -118,6 +118,8 @@ var XWiki = (function (XWiki) {
         for (var i = 0; i < suggestions.length; i++) {
           if (this.matchesSelectedValue(values[index], suggestions[i])) {
             found = true;
+            // Make sure the selected value is kept as is (submitting without changes must preserve the previous value).
+            suggestions[i].value = values[index];
             this.addItem(suggestions[i]);
             return;
           }

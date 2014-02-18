@@ -111,6 +111,7 @@ var XWiki = (function (XWiki) {
     var sourceIndex = 0;
     this.input.value = values[index];
     this.suggest.doAjaxRequests(-1, {
+      parameters: {'exactMatch': true},
       onSuccess: function(response) {
         if (found) return;
         var suggestions = this.suggest.parseResponse(response, this.suggest.sources[sourceIndex]) || [];

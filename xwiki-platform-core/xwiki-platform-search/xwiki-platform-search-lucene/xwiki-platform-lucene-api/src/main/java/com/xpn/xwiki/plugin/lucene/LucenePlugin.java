@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
@@ -565,7 +566,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
         } catch (IOException e) {
             needInitialRebuild = true;
             LOGGER.warn("Failed to determine if the index exists: [{}]. Trying to recreate the index..",
-                e.getMessage());
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         IndexRebuilder indexRebuilder = new IndexRebuilder(indexUpdater, context);

@@ -19,6 +19,12 @@
  */
 package org.xwiki.activeinstalls.internal.client;
 
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
+import io.searchbox.core.Index;
+import io.searchbox.indices.CreateIndex;
+import io.searchbox.indices.mapping.PutMapping;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +34,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import net.sf.json.JSONObject;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -35,17 +43,10 @@ import org.xwiki.activeinstalls.internal.JestClientManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.DistributionManager;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.version.Version;
 import org.xwiki.instance.InstanceIdManager;
-
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Index;
-import io.searchbox.indices.CreateIndex;
-import io.searchbox.indices.mapping.PutMapping;
-import net.sf.json.JSONObject;
 
 /**
  * Default implementation using the Jest API to connect to a remote Elastic Search instance.
@@ -88,7 +89,7 @@ public class DefaultPingSender implements PingSender
     private InstanceIdManager instanceIdManager;
 
     @Inject
-    private DistributionManager distributionManager;
+    private CoreExtensionRepository coreExtensionRepository;
 
     @Override
     public void sendPing() throws Exception
@@ -137,7 +138,7 @@ public class DefaultPingSender implements PingSender
         jsonMap.put("date", DATE_FORMATTER.print(new Date().getTime()));
 
         // Send distribution version if it exists (in case some distribution doesn't expose any information).
-        CoreExtension distributionExtension = this.distributionManager.getDistributionExtension();
+        CoreExtension distributionExtension = this.coreExtensionRepository.getEnvironmentExtension();
         if (distributionExtension != null) {
             String distributionId = distributionExtension.getId().getId();
             if (distributionId != null) {

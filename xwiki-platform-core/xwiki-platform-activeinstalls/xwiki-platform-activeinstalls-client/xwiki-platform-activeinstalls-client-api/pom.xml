@@ -38,6 +38,11 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-instance</artifactId>
       <version>${project.version}</version>
@@ -45,11 +50,6 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-activeinstalls-common</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-extension-distribution</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -19,30 +19,36 @@
  */
 package org.xwiki.activeinstalls.internal.client;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import io.searchbox.Action;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
+import io.searchbox.core.Index;
+
 import java.util.Collections;
 import java.util.UUID;
 
-import org.junit.*;
+import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
+
+import org.junit.Rule;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.activeinstalls.internal.JestClientManager;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.DistributionManager;
+import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.instance.InstanceId;
 import org.xwiki.instance.InstanceIdManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import io.searchbox.Action;
-import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
-import io.searchbox.core.Index;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link DefaultPingSender}.
@@ -78,11 +84,11 @@ public class DefaultPingSenderTest
         JestClientManager jestManager = this.mocker.getInstance(JestClientManager.class);
         when(jestManager.getClient()).thenReturn(client);
 
-        ExtensionId distributionExtensionId = new ExtensionId("distributionextensionid", "2.0");
-        CoreExtension distributionExtension = mock(CoreExtension.class);
-        when(distributionExtension.getId()).thenReturn(distributionExtensionId);
-        DistributionManager distributionManager = this.mocker.getInstance(DistributionManager.class);
-        when(distributionManager.getDistributionExtension()).thenReturn(distributionExtension);
+        ExtensionId environmentExtensionId = new ExtensionId("environmentextensionid", "2.0");
+        CoreExtension environmentExtension = mock(CoreExtension.class);
+        when(environmentExtension.getId()).thenReturn(environmentExtensionId);
+        CoreExtensionRepository CoreExtensionRepository = this.mocker.getInstance(CoreExtensionRepository.class);
+        when(CoreExtensionRepository.getEnvironmentExtension()).thenReturn(environmentExtension);
 
         this.mocker.getComponentUnderTest().sendPing();
 

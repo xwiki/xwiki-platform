@@ -196,7 +196,7 @@ public class Document extends Api
     }
 
     /**
-     * return the name of a document. for exemple if the fullName of a document is "MySpace.Mydoc", the name is MyDoc.
+     * return the name of a document. for example if the fullName of a document is "MySpace.Mydoc", the name is MyDoc.
      * 
      * @return the name of the document
      */
@@ -228,7 +228,7 @@ public class Document extends Api
     }
 
     /**
-     * Get the name of the space of the document for exemple if the fullName of a document is "MySpace.Mydoc", the name
+     * Get the name of the space of the document for example if the fullName of a document is "MySpace.Mydoc", the name
      * is MySpace.
      * 
      * @return The name of the space of the document.

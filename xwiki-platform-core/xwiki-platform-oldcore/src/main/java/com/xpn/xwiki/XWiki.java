@@ -4152,7 +4152,7 @@ public class XWiki implements EventListener
 
         try {
             context.setDatabase(sourceWiki);
-            List<String> list = getStore().search(sql, 0, 0, context);
+            List<String> list = getStore().search(sql, 0, 0, parameters, context);
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Copying " + list.size() + " documents from wiki " + sourceWiki + " to wiki " + targetWiki);
             }

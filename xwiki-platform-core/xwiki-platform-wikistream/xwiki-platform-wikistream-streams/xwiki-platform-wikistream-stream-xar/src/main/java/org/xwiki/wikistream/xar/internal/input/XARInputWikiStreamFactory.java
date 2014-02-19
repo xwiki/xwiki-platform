@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
-import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
 
 /**
@@ -38,7 +37,7 @@ import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
 @Component
 @Named(XARWikiStreamUtils.ROLEHINT)
 @Singleton
-public class XARInputWikiStreamFactory extends AbstractBeanInputWikiStreamFactory<XARInputProperties, XARFilter>
+public class XARInputWikiStreamFactory extends AbstractBeanInputWikiStreamFactory<XARInputProperties, XARInputFilter>
 {
     public XARInputWikiStreamFactory()
     {

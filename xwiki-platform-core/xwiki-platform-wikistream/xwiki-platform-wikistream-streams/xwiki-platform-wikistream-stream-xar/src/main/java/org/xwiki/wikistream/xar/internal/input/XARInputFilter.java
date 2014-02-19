@@ -17,39 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.test.integration;
+package org.xwiki.wikistream.xar.internal.input;
 
-import java.util.HashMap;
-
-import org.xwiki.wikistream.utils.WikiStreamConstants;
+import org.xwiki.wikistream.filter.extension.ExtensionFilter;
+import org.xwiki.wikistream.xar.internal.XARFilter;
 
 /**
+ * All events supported by XAR input module.
  * 
  * @version $Id$
- * @since 5.2M2
+ * @since 6.0M1
  */
-public class InputTestConfiguration extends HashMap<String, String> implements Cloneable
+public interface XARInputFilter extends XARFilter, ExtensionFilter
 {
-    public final String typeId;
 
-    public final String buffer;
-
-    public InputTestConfiguration(String typeId, String buffer)
-    {
-        this.typeId = typeId;
-        this.buffer = buffer;
-    }
-
-    public InputTestConfiguration(InputTestConfiguration other)
-    {
-        super(other);
-
-        this.typeId = other.typeId;
-        this.buffer = other.buffer;
-    }
-
-    public void setEncoding(String encoding)
-    {
-        put(WikiStreamConstants.PROPERTY_ENCODING, encoding);
-    }
 }

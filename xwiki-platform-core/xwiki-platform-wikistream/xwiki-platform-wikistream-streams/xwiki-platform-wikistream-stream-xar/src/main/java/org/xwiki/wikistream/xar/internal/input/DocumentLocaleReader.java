@@ -46,7 +46,6 @@ import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.wikistream.xar.internal.XARAttachmentModel;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
 import org.xwiki.wikistream.xar.internal.XARDocumentModel;
-import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARObjectModel;
 import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
 import org.xwiki.wikistream.xar.internal.input.AttachmentReader.WikiAttachment;
@@ -143,7 +142,7 @@ public class DocumentLocaleReader extends AbstractReader
         return !this.sentBeginWikiSpace && (force || this.properties.getEntities() == null);
     }
 
-    private void sendBeginWikiSpace(XARFilter proxyFilter, boolean force) throws WikiStreamException
+    private void sendBeginWikiSpace(XARInputFilter proxyFilter, boolean force) throws WikiStreamException
     {
         if (canSendBeginWikiSpace(force)) {
             proxyFilter.beginWikiSpace(this.currentSpace, this.currentSpaceParameters);
@@ -151,7 +150,7 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void sendEndWikiSpace(XARFilter proxyFilter) throws WikiStreamException
+    private void sendEndWikiSpace(XARInputFilter proxyFilter) throws WikiStreamException
     {
         proxyFilter.endWikiSpace(this.currentSpace, this.currentSpaceParameters);
         this.sentBeginWikiSpace = false;
@@ -166,7 +165,7 @@ public class DocumentLocaleReader extends AbstractReader
                 .getEntities() == null));
     }
 
-    private void sendBeginWikiDocument(XARFilter proxyFilter, boolean force) throws WikiStreamException
+    private void sendBeginWikiDocument(XARInputFilter proxyFilter, boolean force) throws WikiStreamException
     {
         sendBeginWikiSpace(proxyFilter, force);
 
@@ -178,7 +177,7 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void sendEndWikiDocument(XARFilter proxyFilter) throws WikiStreamException
+    private void sendEndWikiDocument(XARInputFilter proxyFilter) throws WikiStreamException
     {
         sendBeginWikiDocument(proxyFilter, true);
         sendEndWikiDocumentLocale(proxyFilter);
@@ -195,7 +194,7 @@ public class DocumentLocaleReader extends AbstractReader
                 .size()));
     }
 
-    private void sendBeginWikiDocumentLocale(XARFilter proxyFilter, boolean force) throws WikiStreamException
+    private void sendBeginWikiDocumentLocale(XARInputFilter proxyFilter, boolean force) throws WikiStreamException
     {
         if (force || (this.currentSpace != null && this.currentDocument != null && this.currentDocumentLocale != null)) {
             LocalDocumentReference reference =
@@ -218,7 +217,7 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void sendEndWikiDocumentLocale(XARFilter proxyFilter) throws WikiStreamException
+    private void sendEndWikiDocumentLocale(XARInputFilter proxyFilter) throws WikiStreamException
     {
         sendBeginWikiDocumentLocale(proxyFilter, true);
         sendEndWikiDocumentRevision(proxyFilter);
@@ -235,7 +234,7 @@ public class DocumentLocaleReader extends AbstractReader
                 .size()));
     }
 
-    private void sendBeginWikiDocumentRevision(XARFilter proxyFilter, boolean force) throws WikiStreamException
+    private void sendBeginWikiDocumentRevision(XARInputFilter proxyFilter, boolean force) throws WikiStreamException
     {
         sendBeginWikiDocumentLocale(proxyFilter, force);
 
@@ -245,7 +244,7 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void sendEndWikiDocumentRevision(XARFilter proxyFilter) throws WikiStreamException
+    private void sendEndWikiDocumentRevision(XARInputFilter proxyFilter) throws WikiStreamException
     {
         sendBeginWikiDocumentRevision(proxyFilter, true);
 
@@ -253,7 +252,7 @@ public class DocumentLocaleReader extends AbstractReader
         this.sentBeginWikiDocumentRevision = false;
     }
 
-    public void read(Object filter, XARFilter proxyFilter) throws XMLStreamException, IOException, WikiStreamException,
+    public void read(Object filter, XARInputFilter proxyFilter) throws XMLStreamException, IOException, WikiStreamException,
         ParseException
     {
         XMLStreamReader xmlReader = XMLInputWikiStreamUtils.createXMLStreamReader(this.properties);
@@ -265,7 +264,7 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    public void read(InputStream stream, Object filter, XARFilter proxyFilter) throws XMLStreamException, IOException,
+    public void read(InputStream stream, Object filter, XARInputFilter proxyFilter) throws XMLStreamException, IOException,
         WikiStreamException, ParseException
     {
         XMLStreamReader xmlReader =
@@ -275,7 +274,7 @@ public class DocumentLocaleReader extends AbstractReader
         read(xmlReader, filter, proxyFilter);
     }
 
-    public void read(XMLStreamReader xmlReader, Object filter, XARFilter proxyFilter) throws XMLStreamException,
+    public void read(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter) throws XMLStreamException,
         IOException, WikiStreamException, ParseException
     {
         reset();
@@ -289,7 +288,7 @@ public class DocumentLocaleReader extends AbstractReader
         readDocument(xmlReader, filter, proxyFilter);
     }
 
-    private void readDocument(XMLStreamReader xmlReader, Object filter, XARFilter proxyFilter)
+    private void readDocument(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
         throws XMLStreamException, WikiStreamException, ParseException, IOException
     {
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
@@ -365,7 +364,7 @@ public class DocumentLocaleReader extends AbstractReader
         sendEndWikiDocument(proxyFilter);
     }
 
-    private void readObject(XMLStreamReader xmlReader, Object filter, XARFilter proxyFilter) throws XMLStreamException,
+    private void readObject(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter) throws XMLStreamException,
         WikiStreamException, IOException, ParseException
     {
         sendBeginWikiDocumentRevision(proxyFilter, false);
@@ -379,7 +378,7 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void readClass(XMLStreamReader xmlReader, Object filter, XARFilter proxyFilter) throws XMLStreamException,
+    private void readClass(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter) throws XMLStreamException,
         WikiStreamException, IOException, ParseException
     {
         sendBeginWikiDocumentRevision(proxyFilter, false);
@@ -391,7 +390,7 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void readAttachment(XMLStreamReader xmlReader, Object filter, XARFilter proxyFilter)
+    private void readAttachment(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
         throws XMLStreamException, WikiStreamException, ParseException
     {
         sendBeginWikiDocumentRevision(proxyFilter, false);
@@ -405,7 +404,7 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void sendWikiClass(XARFilter proxyFilter) throws WikiStreamException
+    private void sendWikiClass(XARInputFilter proxyFilter) throws WikiStreamException
     {
         if (this.currentClass != null && !this.currentClass.isEmpty()) {
             this.currentClass.send(proxyFilter);
@@ -413,14 +412,14 @@ public class DocumentLocaleReader extends AbstractReader
         }
     }
 
-    private void sendWikiObjects(XARFilter proxyFilter) throws WikiStreamException
+    private void sendWikiObjects(XARInputFilter proxyFilter) throws WikiStreamException
     {
         while (this.currentObjects.size() > 0) {
             this.currentObjects.poll().send(proxyFilter);
         }
     }
 
-    private void sendWikiAttachments(XARFilter proxyFilter) throws WikiStreamException
+    private void sendWikiAttachments(XARInputFilter proxyFilter) throws WikiStreamException
     {
         while (this.currentAttachments.size() > 0) {
             this.currentAttachments.poll().send(proxyFilter);

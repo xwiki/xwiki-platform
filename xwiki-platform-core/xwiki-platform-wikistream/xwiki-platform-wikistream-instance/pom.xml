@@ -34,6 +34,7 @@
     <module>xwiki-platform-wikistream-instance-api</module>
     <module>xwiki-platform-wikistream-instance-document</module>
     <module>xwiki-platform-wikistream-instance-oldcore</module>
+    <module>xwiki-platform-wikistream-instance-extension</module>
     <module>xwiki-platform-wikistream-instance-script</module>
   </modules>
 </project>

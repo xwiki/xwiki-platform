@@ -33,7 +33,6 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.model.filter.WikiObjectFilter;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
-import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARObjectModel;
 import org.xwiki.wikistream.xar.internal.XARObjectPropertyModel;
 import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
@@ -63,7 +62,7 @@ public class WikiObjectReader extends AbstractReader implements XARXMLReader<Wik
 
         private List<WikiObjectProperty> properties = new ArrayList<WikiObjectProperty>();
 
-        public void send(XARFilter proxyFilter) throws WikiStreamException
+        public void send(XARInputFilter proxyFilter) throws WikiStreamException
         {
             String name = null;
 
@@ -100,7 +99,7 @@ public class WikiObjectReader extends AbstractReader implements XARXMLReader<Wik
 
         public FilterEventParameters parameters = new FilterEventParameters();
 
-        public void send(XARFilter proxyFilter) throws WikiStreamException
+        public void send(XARInputFilter proxyFilter) throws WikiStreamException
         {
             proxyFilter.onWikiObjectProperty(this.name, this.value, this.parameters);
         }

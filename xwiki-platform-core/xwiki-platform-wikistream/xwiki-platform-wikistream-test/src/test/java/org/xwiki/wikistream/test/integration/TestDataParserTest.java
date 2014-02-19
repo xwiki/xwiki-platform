@@ -1,3 +1,8 @@
+package org.xwiki.wikistream.test.integration;
+import org.junit.Assert;
+import org.junit.Test;
+import org.xwiki.wikistream.test.integration.TestDataParser;
+
 /*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -17,39 +22,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.test.integration;
 
-import java.util.HashMap;
-
-import org.xwiki.wikistream.utils.WikiStreamConstants;
-
-/**
- * 
- * @version $Id$
- * @since 5.2M2
- */
-public class InputTestConfiguration extends HashMap<String, String> implements Cloneable
+public class TestDataParserTest
 {
-    public final String typeId;
-
-    public final String buffer;
-
-    public InputTestConfiguration(String typeId, String buffer)
+    @Test
+    public void testInterpret()
     {
-        this.typeId = typeId;
-        this.buffer = buffer;
-    }
+        System.setProperty("key", "value");
 
-    public InputTestConfiguration(InputTestConfiguration other)
-    {
-        super(other);
-
-        this.typeId = other.typeId;
-        this.buffer = other.buffer;
-    }
-
-    public void setEncoding(String encoding)
-    {
-        put(WikiStreamConstants.PROPERTY_ENCODING, encoding);
+        Assert.assertEquals("test", TestDataParser.interpret("test"));
+        Assert.assertEquals("value", TestDataParser.interpret("${{{key}}}"));
+        Assert.assertEquals("testvaluetest", TestDataParser.interpret("test${{{key}}}test"));
+        Assert.assertEquals("test${{{key}}}", TestDataParser.interpret("test\\${{{key}}}"));
     }
 }

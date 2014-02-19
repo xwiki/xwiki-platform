@@ -31,7 +31,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.xar.internal.XARClassModel;
-import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
 import org.xwiki.wikistream.xar.internal.input.ClassPropertyReader.WikiClassProperty;
 
@@ -54,7 +53,7 @@ public class ClassReader extends AbstractReader implements XARXMLReader<ClassRea
 
         public Map<String, WikiClassProperty> properties = new LinkedHashMap<String, WikiClassProperty>();
 
-        public void send(XARFilter proxyFilter) throws WikiStreamException
+        public void send(XARInputFilter proxyFilter) throws WikiStreamException
         {
             proxyFilter.beginWikiClass(this.parameters);
 

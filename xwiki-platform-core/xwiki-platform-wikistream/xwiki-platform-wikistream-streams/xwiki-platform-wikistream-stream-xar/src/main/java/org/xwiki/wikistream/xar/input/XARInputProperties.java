@@ -50,6 +50,11 @@ public class XARInputProperties extends XMLInputProperties
     private boolean forceDocument;
 
     /**
+     * @see #isWithExtension()
+     */
+    private boolean withExtension = true;
+
+    /**
      * @return The entities to take into account or skip
      */
     @PropertyName("Entities")
@@ -101,5 +106,25 @@ public class XARInputProperties extends XMLInputProperties
     public void setForceDocument(boolean forceDocument)
     {
         this.forceDocument = forceDocument;
+    }
+
+    /**
+     * @return true indicates if extension event should be generated if possible
+     * @since 6.0M1
+     */
+    @PropertyName("Indicates if extension event should be generated if possible")
+    @PropertyDescription("Indicates if extension event should be generated if possible")
+    public boolean isWithExtension()
+    {
+        return this.withExtension;
+    }
+
+    /**
+     * @param withExtension indicates if extension event should be generated if possible
+     * @since 6.0M1
+     */
+    public void setWithExtension(boolean withExtension)
+    {
+        this.withExtension = withExtension;
     }
 }

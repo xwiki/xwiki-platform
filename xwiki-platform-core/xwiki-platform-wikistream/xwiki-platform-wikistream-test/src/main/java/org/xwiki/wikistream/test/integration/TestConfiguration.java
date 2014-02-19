@@ -28,8 +28,10 @@ import java.util.Map;
  */
 public class TestConfiguration
 {
+    public String resourceName;
+
     public String name;
-    
+
     public Map<String, String> configuration;
 
     public InputTestConfiguration inputConfiguration;

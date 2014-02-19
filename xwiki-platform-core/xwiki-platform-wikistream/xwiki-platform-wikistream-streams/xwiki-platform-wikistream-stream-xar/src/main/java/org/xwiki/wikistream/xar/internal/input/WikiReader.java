@@ -30,11 +30,11 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.input.InputStreamInputSource;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
-import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.xar.XarPackage;
 import org.xwiki.xar.internal.model.XarModel;
 
@@ -65,7 +65,7 @@ public class WikiReader
         return this.xarPackage;
     }
 
-    public void read(Object filter, XARFilter proxyFilter) throws XMLStreamException, IOException, WikiStreamException
+    public void read(Object filter, XARInputFilter proxyFilter) throws XMLStreamException, IOException, WikiStreamException
     {
         InputStream stream;
 
@@ -84,13 +84,16 @@ public class WikiReader
                 this.documentReader.getCurrentSpaceParameters());
         }
 
-        // TODO: send extension event
+        // Send extension event
         if (this.xarPackage.getPackageExtensionId() != null) {
-
+            proxyFilter.beginExtension(this.xarPackage.getPackageExtensionId(), this.xarPackage.getPackageVersion(),
+                FilterEventParameters.EMPTY);
+            proxyFilter.endExtension(this.xarPackage.getPackageExtensionId(), this.xarPackage.getPackageVersion(),
+                FilterEventParameters.EMPTY);
         }
     }
 
-    public void read(InputStream stream, Object filter, XARFilter proxyFilter) throws XMLStreamException, IOException,
+    public void read(InputStream stream, Object filter, XARInputFilter proxyFilter) throws XMLStreamException, IOException,
         WikiStreamException
     {
         ZipArchiveInputStream zis = new ZipArchiveInputStream(stream, "UTF-8", false);

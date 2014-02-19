@@ -77,6 +77,8 @@ public class TestDataGenerator
             for (ExpectTestConfiguration expectConfiguration : data.expects) {
                 TestConfiguration testConfiguration = new TestConfiguration();
 
+                testConfiguration.resourceName = data.resourceName;
+
                 testConfiguration.configuration = data.configuration;
 
                 // Input

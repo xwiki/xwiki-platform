@@ -36,7 +36,6 @@ import org.xwiki.wikistream.input.InputStreamInputSource;
 import org.xwiki.wikistream.input.ReaderInputSource;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
-import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
 import org.xwiki.wikistream.xml.input.SourceInputSource;
 
@@ -47,7 +46,7 @@ import org.xwiki.wikistream.xml.input.SourceInputSource;
 @Component
 @Named(XARWikiStreamUtils.ROLEHINT)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProperties, XARFilter>
+public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProperties, XARInputFilter>
 {
     @Inject
     private Provider<WikiReader> wikiReaderProvider;
@@ -62,7 +61,7 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
     }
 
     @Override
-    protected void read(Object filter, XARFilter proxyFilter) throws WikiStreamException
+    protected void read(Object filter, XARInputFilter proxyFilter) throws WikiStreamException
     {
         InputSource inputSource = this.properties.getSource();
 
@@ -101,7 +100,7 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
         }
     }
 
-    private void readXAR(Object filter, XARFilter proxyFilter) throws WikiStreamException
+    private void readXAR(Object filter, XARInputFilter proxyFilter) throws WikiStreamException
     {
         WikiReader wikiReader = this.wikiReaderProvider.get();
         wikiReader.setProperties(this.properties);
@@ -113,7 +112,7 @@ public class XARInputWikiStream extends AbstractBeanInputWikiStream<XARInputProp
         }
     }
 
-    protected void readDocument(Object filter, XARFilter proxyFilter) throws WikiStreamException
+    protected void readDocument(Object filter, XARInputFilter proxyFilter) throws WikiStreamException
     {
         DocumentLocaleReader documentReader = documentLocaleReaderProvider.get();
         documentReader.setProperties(this.properties);

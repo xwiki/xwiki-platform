@@ -26,6 +26,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.wikistream.input.InputSource;
@@ -50,6 +52,38 @@ import org.xwiki.wikistream.utils.WikiStreamConstants;
  */
 public class TestDataParser
 {
+    private static final Pattern PATTERN_VARIABLE = Pattern.compile("(\\\\)?(\\$\\{\\{\\{(.*)\\}\\}\\})");
+
+    public static String interpret(String source)
+    {
+        StringBuilder result = new StringBuilder();
+
+        Matcher matcher = PATTERN_VARIABLE.matcher(source);
+
+        int current = 0;
+        while (matcher.find()) {
+            if (matcher.group(1) == null) {
+                String var = matcher.group(3);
+
+                String value = System.getProperty(var);
+                if (value != null) {
+                    result.append(source, current, matcher.start());
+                    result.append(value);
+                    current = matcher.end();
+                }
+            } else {
+                result.append(source, current, matcher.start());
+                current = matcher.start(2);
+            }
+        }
+
+        if (current < source.length()) {
+            result.append(source, current, source.length());
+        }
+
+        return result.toString();
+    }
+
     public TestResourceData parse(InputStream source, String resourceName) throws IOException
     {
         TestResourceData data = new TestResourceData();
@@ -151,19 +185,6 @@ public class TestDataParser
         inputConfiguration.setEncoding("UTF-8");
 
         inputConfiguration.putAll(configuration);
-
-        InputSource source;
-        String expectPath = configuration.get(WikiStreamConstants.PROPERTY_SOURCE);
-        if (expectPath == null) {
-            source = new StringInputSource(buffer.toString());
-        } else {
-            if (!expectPath.startsWith("/")) {
-                expectPath = StringUtils.substringBeforeLast(data.resourceName, "/") + '/' + expectPath;
-            }
-
-            source = new DefaultURLInputSource(getClass().getResource(expectPath));
-        }
-        inputConfiguration.put(WikiStreamConstants.PROPERTY_SOURCE, source);
 
         data.inputs.add(inputConfiguration);
     }

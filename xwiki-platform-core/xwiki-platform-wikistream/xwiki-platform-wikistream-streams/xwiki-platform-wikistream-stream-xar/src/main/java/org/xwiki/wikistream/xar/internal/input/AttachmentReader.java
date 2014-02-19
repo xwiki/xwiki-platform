@@ -30,7 +30,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.xar.internal.XARAttachmentModel;
-import org.xwiki.wikistream.xar.internal.XARFilter;
 import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils.EventParameter;
 
 /**
@@ -49,7 +48,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
 
         public FilterEventParameters parameters = new FilterEventParameters();
 
-        public void send(XARFilter proxyFilter) throws WikiStreamException
+        public void send(XARInputFilter proxyFilter) throws WikiStreamException
         {
             proxyFilter.onWikiAttachment(this.name, new ByteArrayInputStream(this.content),
                 Long.valueOf(this.content.length), this.parameters);

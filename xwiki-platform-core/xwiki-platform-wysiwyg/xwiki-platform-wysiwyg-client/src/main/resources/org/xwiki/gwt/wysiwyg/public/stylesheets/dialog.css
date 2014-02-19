@@ -16,24 +16,10 @@
   opacity: .5;
   z-index: 1000;
 }
-/* start IE opacity setting */
 .gwt-PopupPanelGlass {
   /* This is for IE8. We need to quote the property value because the equal sign is not valid inside a CSS property value. */
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
 }
-
-*+html .gwt-PopupPanelGlass {
-  /* This is for IE7, which doesn't accept the quoted value but fortunately understands the escape syntax. */
-  filter: alpha(opacity\=50);
-  /* Unicode escape works too. */
-  /*filter: alpha(opacity\003d 50);*/
-}
-
-* html .gwt-PopupPanelGlass {
-  /* This is for IE6, which doesn't understand the escaped equal sign (not even the unicode escape) but fortunately accepts the quoted value. */
-  filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
-}
-/* end IE opacity setting */
 
 .xDialogBox {
   padding: 3px;

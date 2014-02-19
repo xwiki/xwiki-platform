@@ -32,8 +32,8 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <gwt.version>2.5.1</gwt.version>
-    <gwt.maven.plugin.version>2.5.1</gwt.maven.plugin.version>
+    <gwt.version>2.6.0</gwt.version>
+    <gwt.maven.plugin.version>2.6.0</gwt.maven.plugin.version>
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
@@ -389,6 +389,22 @@
               <className>org/xwiki/resource/EntityResource</className>
               <method>EntityResource(org.xwiki.model.reference.EntityReference)</method>
               <justification>Resource module is still a young API. Added constructor parameter to EntityResource</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>org/xwiki/gwt/wysiwyg/client/WysiwygEditorApi</className>
+              <method>com.google.gwt.user.client.Element getPlainTextArea()</method>
+              <to>com.google.gwt.dom.client.Element</to>
+              <justification>com.google.gwt.user.client.Element has been deprecated in GWT 2.6. WysiwygEditorApi is not a
+                Java API anyway.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>org/xwiki/gwt/wysiwyg/client/WysiwygEditorApi</className>
+              <method>com.google.gwt.user.client.Element getRichTextArea()</method>
+              <to>com.google.gwt.dom.client.Element</to>
+              <justification>com.google.gwt.user.client.Element has been deprecated in GWT 2.6. WysiwygEditorApi is not a
+                Java API anyway.</justification>
             </difference>
           </ignored>
           <excludes>

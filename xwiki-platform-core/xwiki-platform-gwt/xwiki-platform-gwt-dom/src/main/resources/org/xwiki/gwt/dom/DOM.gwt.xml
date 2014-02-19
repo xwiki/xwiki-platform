@@ -39,10 +39,7 @@
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IEOldSelectionManager">
     <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager" />
-    <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
-    </any>
+    <when-property-is name="user.agent" value="ie8" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.opera.OperaSelectionManager">
@@ -62,10 +59,7 @@
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IEOldDOMUtils">
     <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils" />
-    <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
-    </any>
+    <when-property-is name="user.agent" value="ie8" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.webkit.WebKitDOMUtils">
@@ -80,11 +74,8 @@
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IERangeTest.IEOldTestRangeFactory">
     <when-type-is class="org.xwiki.gwt.dom.client.internal.ie.IERangeTest.TestRangeFactory" />
-    <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
-      <!-- ie9 implements the Selection & Range API -->
-    </any>
+    <when-property-is name="user.agent" value="ie8" />
+    <!-- ie9 implements the Selection & Range API -->
   </replace-with>
 
   <!-- FloatProperty -->
@@ -94,10 +85,7 @@
 
   <replace-with class="org.xwiki.gwt.dom.client.Style.IEOldFloatProperty">
     <when-type-is class="org.xwiki.gwt.dom.client.Style.FloatProperty" />
-    <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
-      <!-- ie9 supports cssFloat style property -->
-    </any>
+    <when-property-is name="user.agent" value="ie8" />
+    <!-- ie9 supports cssFloat style property -->
   </replace-with>
 </module>

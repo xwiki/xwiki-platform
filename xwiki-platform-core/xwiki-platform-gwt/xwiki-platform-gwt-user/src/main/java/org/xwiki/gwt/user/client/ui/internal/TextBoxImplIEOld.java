@@ -19,7 +19,8 @@
  */
 package org.xwiki.gwt.user.client.ui.internal;
 
-import com.google.gwt.user.client.Element;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.user.client.ui.impl.TextBoxImpl;
 
 /**
  * Extends the text box implementation provided by GWT for IE with the ability to access and modify the selection
@@ -27,7 +28,7 @@ import com.google.gwt.user.client.Element;
  * 
  * @version $Id$
  */
-public class TextBoxImplIE6 extends com.google.gwt.user.client.ui.impl.TextBoxImplIE6
+public class TextBoxImplIEOld extends TextBoxImpl
 {
     /**
      * The name of the property that preserves the selection length.
@@ -100,12 +101,12 @@ public class TextBoxImplIE6 extends com.google.gwt.user.client.ui.impl.TextBoxIm
         var self = this;
         // Restore the selection before the element is focused.
         element.attachEvent('onbeforeactivate', function(event) {
-            self.@org.xwiki.gwt.user.client.ui.internal.TextBoxImplIE6::restoreSelection(Lcom/google/gwt/user/client/Element;)(element);
+            self.@org.xwiki.gwt.user.client.ui.internal.TextBoxImplIEOld::restoreSelection(Lcom/google/gwt/dom/client/Element;)(element);
         });
 
         // Save the selection before the element loses the focus.
         element.attachEvent('onbeforedeactivate', function(event) {
-            self.@org.xwiki.gwt.user.client.ui.internal.TextBoxImplIE6::saveSelection(Lcom/google/gwt/user/client/Element;)(element);
+            self.@org.xwiki.gwt.user.client.ui.internal.TextBoxImplIEOld::saveSelection(Lcom/google/gwt/dom/client/Element;)(element);
         });
     }-*/;
 

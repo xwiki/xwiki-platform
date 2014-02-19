@@ -31,6 +31,10 @@
   <description>The Common GWT API XWiki JAR</description>
   <dependencies>
     <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-servlet</artifactId>
     </dependency>

@@ -22,6 +22,11 @@
 <module>
   <inherits name='com.google.gwt.dom.DOM' />
 
+  <!-- Add support for IE11 permutation. Remove this hack when GWT will support this by default. -->
+  <extend-property name="user.agent" values="ie11" fallback-value="gecko1_8" />
+  <property-provider name="user.agent" generator="org.xwiki.gwt.useragent.rebind.UserAgentPropertyGenerator" />
+  <set-configuration-property name="user.agent.runtimeWarning" value="false" />
+
   <!-- SelectionManager -->
   <replace-with class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager">
     <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager" />
@@ -34,7 +39,10 @@
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IESelectionManager">
     <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager" />
-    <when-property-is name="user.agent" value="ie9" />
+    <any>
+      <when-property-is name="user.agent" value="ie9" />
+      <when-property-is name="user.agent" value="ie11" />
+    </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IEOldSelectionManager">
@@ -83,7 +91,7 @@
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <!-- ie9 implements the Selection & Range API -->
+      <!-- ie9+ implements the Selection & Range API -->
     </any>
   </replace-with>
 
@@ -97,7 +105,7 @@
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <!-- ie9 supports cssFloat style property -->
+      <!-- ie9+ supports cssFloat style property -->
     </any>
   </replace-with>
 </module>

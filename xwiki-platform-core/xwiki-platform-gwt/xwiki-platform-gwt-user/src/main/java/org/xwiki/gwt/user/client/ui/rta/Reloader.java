@@ -218,8 +218,7 @@ public class Reloader implements RequestCallback, LoadHandler
             parent.appendChild(newIFrame);
         }
 
-        // Don't let the in-line frame load to prevent the browser from recording a new history entry. We use DOMUtils
-        // because only static references to overlay types are allowed from JSNI.
+        // Don't let the in-line frame load to prevent the browser from recording a new history entry.
         newIFrame.getContentWindow().stop();
 
         // onAttach sets the listener only the first time it is called. See RichTextArea#onAttach() for details.

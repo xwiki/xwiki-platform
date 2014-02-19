@@ -42,7 +42,10 @@
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplMozilla">
     <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
-    <when-property-is name="user.agent" value="gecko1_8" />
+    <any>
+      <when-property-is name="user.agent" value="gecko1_8" />
+      <when-property-is name="user.agent" value="ie11" />
+    </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplSafari">
@@ -71,7 +74,10 @@
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.IEBehaviorAdjuster">
     <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster" />
-    <when-property-is name="user.agent" value="ie9" />
+    <any>
+      <when-property-is name="user.agent" value="ie9" />
+      <when-property-is name="user.agent" value="ie11" />
+    </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.IEOldBehaviorAdjuster">
@@ -92,7 +98,7 @@
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <!-- ie9 fires the unload event when the in-line frame is detached -->
+      <!-- ie9+ fires the unload event when the in-line frame is detached -->
     </any>
   </replace-with>
 
@@ -143,7 +149,7 @@
     <any>
       <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
-      <!-- TODO: Check if the standard implementation works fine in IE9 -->
+      <!-- TODO: Check if the standard implementation works fine in IE9+ -->
     </any>
   </replace-with>
 </module>

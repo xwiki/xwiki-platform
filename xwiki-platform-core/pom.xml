@@ -406,6 +406,12 @@
               <justification>com.google.gwt.user.client.Element has been deprecated in GWT 2.6. WysiwygEditorApi is not a
                 Java API anyway.</justification>
             </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/gwt/dom/client/DOMUtils</className>
+              <method>void stop(org.xwiki.gwt.dom.client.Window)</method>
+              <justification>This method is available on the Window object.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

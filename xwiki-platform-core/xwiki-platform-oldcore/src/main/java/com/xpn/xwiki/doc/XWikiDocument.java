@@ -3784,33 +3784,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Convert a {@link Document} into an XML string. You should prefer
-     * {@link #toXML(OutputStream, boolean, boolean, boolean, boolean, XWikiContext)} or
-     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, boolean, boolean, XWikiContext)} when
-     * possible to avoid memory load.
-     * 
-     * @param doc the {@link Document} to convert to a String
-     * @param context current XWikiContext
-     * @return an XML representation of the {@link Document}
-     * @deprecated this method has nothing to do here and is apparently unused
-     */
-    @Deprecated
-    public String toXML(Document doc, XWikiContext context)
-    {
-        String encoding = context.getWiki().getEncoding();
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        try {
-            XMLWriter wr = new XMLWriter(os, new OutputFormat("", true, encoding));
-            wr.write(doc);
-            return os.toString(encoding);
-        } catch (IOException e) {
-            LOGGER.error("Exception while doc.toXML", e);
-            return "";
-        }
-    }
-
-    /**
      * Retrieve the document in the current context language as an XML string. The rendrered document content and all
      * XObjects are included. Document attachments and archived versions are excluded. You should prefer
      * toXML(OutputStream, true, true, false, false, XWikiContext)} or toXML(com.xpn.xwiki.util.XMLWriter, true, true,

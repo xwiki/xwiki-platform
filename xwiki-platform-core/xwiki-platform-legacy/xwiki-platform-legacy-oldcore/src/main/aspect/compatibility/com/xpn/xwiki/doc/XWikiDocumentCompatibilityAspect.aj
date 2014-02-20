@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -28,6 +31,8 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.dom4j.Document;
+import org.dom4j.io.OutputFormat;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
@@ -41,6 +46,7 @@ import org.xwiki.rendering.transformation.TransformationManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
+import com.xpn.xwiki.internal.xml.XMLWriter;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -312,5 +318,32 @@ public aspect XWikiDocumentCompatibilityAspect
         }
 
         return "";
+    }
+
+    /**
+     * Convert a {@link Document} into an XML string. You should prefer
+     * {@link #toXML(OutputStream, boolean, boolean, boolean, boolean, XWikiContext)} or
+     * {@link #toXML(com.xpn.xwiki.internal.xml.XMLWriter, boolean, boolean, boolean, boolean, XWikiContext)} when
+     * possible to avoid memory load.
+     * 
+     * @param doc the {@link Document} to convert to a String
+     * @param context current XWikiContext
+     * @return an XML representation of the {@link Document}
+     * @deprecated this method has nothing to do here and is apparently unused
+     */
+    @Deprecated
+    public String XWikiDocument.toXML(Document doc, XWikiContext context)
+    {
+        String encoding = context.getWiki().getEncoding();
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try {
+            XMLWriter wr = new XMLWriter(os, new OutputFormat("", true, encoding));
+            wr.write(doc);
+            return os.toString(encoding);
+        } catch (IOException e) {
+            LOGGER.error("Exception while doc.toXML", e);
+            return "";
+        }
     }
 }

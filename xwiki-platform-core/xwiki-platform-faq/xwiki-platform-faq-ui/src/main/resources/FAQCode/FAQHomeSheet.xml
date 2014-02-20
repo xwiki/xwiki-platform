@@ -72,11 +72,14 @@
     {{html}}
     &lt;form action="$xwiki.getURL('FAQ.FAQSearch')"&gt;
       &lt;div&gt;
-      ## Both Lucene and SOLR searches obey the $request.space param
+      ## Lucene search needs the $request.space param
+      ## SOLR search needs the $request.f_space param
       &lt;input type="hidden" name="space" value="${faqSpace}" /&gt;
-      ## Lucene needs a $request.wikinames param while SOLR requires a $request.wiki one
-      &lt;input type="hidden" name="wiki" value="${xcontext.database}" /&gt;
+      &lt;input type="hidden" name="f_space" value="${faqSpace}" /&gt;
+      ## Lucene search needs the $request.wikinames param
+      ## SOLR search needs the $request.f_wiki param
       &lt;input type="hidden" name="wikinames" value="${xcontext.database}" /&gt;
+      &lt;input type="hidden" name="f_wiki" value="${xcontext.database}" /&gt;
       ## Both Lucene and SOLR searches obey the $request.text param
       &lt;input type="text" name="text" value="$services.localization.render('platform.faq.search.questionHint')" size="25" class="withTip" /&gt;
       &lt;span class="buttonwrapper"&gt;

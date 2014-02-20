@@ -65,12 +65,12 @@
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-core</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parsers</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -95,9 +95,9 @@
             <artifactId>bcmail-jdk15</artifactId>
           </exclusion>
           <!-- Tika triggers the wrong asm artifact so we have to take care of that ourself -->
-      	  <exclusion>
-      	    <artifactId>asm-debug-all</artifactId>
-      	    <groupId>org.ow2.asm</groupId>
+          <exclusion>
+            <artifactId>asm-debug-all</artifactId>
+            <groupId>org.ow2.asm</groupId>
           </exclusion>
         </exclusions>
       </dependency>

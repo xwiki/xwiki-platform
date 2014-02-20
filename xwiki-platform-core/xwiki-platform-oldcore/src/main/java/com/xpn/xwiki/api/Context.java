@@ -232,6 +232,8 @@ public class Context extends Api
      * @see #getInterfaceLanguage()
      * @deprecated since 6.0M1, use {@link #getLocale()} instead
      */
+    // TODO: fully deprecate it when XE won't use it anymore
+    //@Deprecated
     public String getLanguage()
     {
         return getXWikiContext().getLanguage();
@@ -260,6 +262,8 @@ public class Context extends Api
      * @see #getLanguage()
      * @deprecated since 6.0M1, use {@link #getInterfaceLocale()} instead
      */
+    // TODO: fully deprecate it when XE won't use it anymore
+    //@Deprecated
     public String getInterfaceLanguage()
     {
         return getXWikiContext().getInterfaceLanguage();

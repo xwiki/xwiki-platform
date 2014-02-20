@@ -31,9 +31,7 @@ import org.xwiki.model.reference.EntityReference;
  * 
  * @version $Id$
  * @since 2.2M1
- * @deprecated {@link DefaultStringEntityReferenceSerializer} should be used instead
  */
-@Deprecated
 @Component("local")
 public class LocalStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
 {

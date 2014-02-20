@@ -48,9 +48,6 @@
 ## NOTE: We can't defer the SmartClient loading because it uses document.write() to load stylesheets in IE.
 $xwiki.jsfx.use('js/smartclient/initsc.js', {'forceSkinAction' : true, 'defer' : false})
 $xwiki.jsfx.use('js/smartclient/modules/ISC_Core.js', {'defer' : false})
-## TODO: remove this line
-## when http://forums.smartclient.com/showthread.php?t=3097 will be fixed
-$xwiki.jsfx.use('js/smartclient/overwritesc.js', {'defer' : false})
 $xwiki.jsfx.use('js/smartclient/modules/ISC_Foundation.js', {'defer' : false})
 $xwiki.jsfx.use('js/smartclient/modules/ISC_Containers.js', {'defer' : false})
 $xwiki.jsfx.use('js/smartclient/modules/ISC_Grids.js', {'defer' : false})

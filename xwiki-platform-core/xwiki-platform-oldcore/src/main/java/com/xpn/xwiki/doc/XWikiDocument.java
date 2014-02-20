@@ -2596,15 +2596,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #cloneXObjects(XWikiDocument)} instead
-     */
-    @Deprecated
-    public void clonexWikiObjects(XWikiDocument templatedoc)
-    {
-        cloneXObjects(templatedoc);
-    }
-
-    /**
      * @since 2.2M1
      */
     public DocumentReference getTemplateDocumentReference()
@@ -4565,40 +4556,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void clearAttachmentsToRemove()
     {
         this.attachmentsToRemove.clear();
-    }
-
-    /**
-     * @deprecated since 5.2M1 use {@link #removeAttachment(XWikiAttachment)} instead
-     */
-    @Deprecated
-    public void deleteAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
-    {
-        deleteAttachment(attachment, true, context);
-    }
-
-    /**
-     * @deprecated since 5.2M1 use {@link #removeAttachment(XWikiAttachment)} instead
-     */
-    @Deprecated
-    public void deleteAttachment(XWikiAttachment attachment, boolean toRecycleBin, XWikiContext context)
-        throws XWikiException
-    {
-        deleteAttachment(attachment, true, toRecycleBin, context);
-    }
-
-    /**
-     * @deprecated since 5.2M1 use {@link #removeAttachment(XWikiAttachment)} instead
-     */
-    @Deprecated
-    private void deleteAttachment(XWikiAttachment attachment, boolean saveDocument, boolean toRecycleBin,
-        XWikiContext context) throws XWikiException
-    {
-        removeAttachment(attachment);
-
-        if (saveDocument) {
-            // Save the document
-            context.getWiki().saveDocument(this, "Deleted attachment [" + attachment.getFilename() + "]", context);
-        }
     }
 
     /**

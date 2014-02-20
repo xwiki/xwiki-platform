@@ -346,4 +346,13 @@ public aspect XWikiDocumentCompatibilityAspect
             return "";
         }
     }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #cloneXObjects(XWikiDocument)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.clonexWikiObjects(XWikiDocument templatedoc)
+    {
+        cloneXObjects(templatedoc);
+    }
 }

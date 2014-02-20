@@ -339,7 +339,12 @@ public class XWikiDavContext
     {
         try {
             // Delete the current attachment
-            attachment.getDoc().deleteAttachment(attachment, xwikiContext);
+            XWikiDocument document = attachment.getDoc();
+            document.removeAttachment(attachment);
+            this.xwikiContext.getWiki().saveDocument(
+                document,
+                "Move attachment [" + attachment.getFilename() + "] to document ["
+                    + destinationDoc.getDocumentReference() + "]", this.xwikiContext);
             // Rename the (in memory) attachment.
             attachment.setFilename(newAttachmentName);
             // Add the attachment to destination doc.
@@ -362,7 +367,11 @@ public class XWikiDavContext
     public void deleteAttachment(XWikiAttachment attachment) throws DavException
     {
         try {
-            attachment.getDoc().deleteAttachment(attachment, xwikiContext);
+            XWikiDocument document = attachment.getDoc();
+
+            document.removeAttachment(attachment);
+            this.xwikiContext.getWiki().saveDocument(document, "Deleted attachment [" + attachment.getFilename() + "]",
+                this.xwikiContext);
         } catch (XWikiException ex) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
         }

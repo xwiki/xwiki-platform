@@ -59,6 +59,7 @@ import org.xwiki.wikistream.model.filter.WikiClassFilter;
 import org.xwiki.wikistream.model.filter.WikiDocumentFilter;
 import org.xwiki.wikistream.model.filter.WikiObjectFilter;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -99,6 +100,9 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     private DocumentInstanceOutputProperties properties;
 
@@ -543,11 +547,28 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
         this.currentXObjectClass = null;
     }
 
+    private BaseClass getCurrentXClass() throws WikiStreamException
+    {
+        if (this.currentXObjectClass == null) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+            if (xcontext != null) {
+                try {
+                    return xcontext.getWiki().getXClass(this.currentXObject.getXClassReference(), xcontext);
+                } catch (XWikiException e) {
+                    throw new WikiStreamException("Unexpected error when trying to get class ["
+                        + this.currentXObject.getXClassReference() + "]", e);
+                }
+            }
+        }
+
+        return this.currentXObjectClass;
+    }
+
     @Override
     public void onWikiObjectProperty(String name, Object value, FilterEventParameters parameters)
         throws WikiStreamException
     {
-        PropertyClassInterface propertyclass = (PropertyClassInterface) this.currentXObjectClass.safeget(name);
+        PropertyClassInterface propertyclass = (PropertyClassInterface) getCurrentXClass().safeget(name);
 
         if (propertyclass != null) {
             // Bulletproofing using PropertyClassInterface#fromString when a String is passed (in case it's not really a

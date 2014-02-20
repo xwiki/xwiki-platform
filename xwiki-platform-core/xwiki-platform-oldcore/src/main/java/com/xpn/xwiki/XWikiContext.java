@@ -121,7 +121,7 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private static final String LANGUAGE_KEY = "language";
 
-    private String interfaceLanguage;
+    private Locale interfaceLocale;
 
     private int mode;
 
@@ -489,6 +489,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @param locale the current locale
      */
+    @Deprecated
     public void setLocale(Locale locale)
     {
         this.locale = locale;
@@ -500,14 +501,32 @@ public class XWikiContext extends Hashtable<Object, Object>
         }
     }
 
+    /**
+     * @deprecated since 6.0M1, use {@link #getInterfaceLocale()} instead
+     */
+     @Deprecated
     public String getInterfaceLanguage()
     {
-        return this.interfaceLanguage;
+      return this.interfaceLocale != null ? this.interfaceLocale.toString() : null;
     }
 
+    public Locale getInterfaceLocale()
+    {
+        return this.interfaceLocale;
+    }
+
+    /**
+     * @deprecated since 6.0M1, use {@link #setInterfaceLanguage(String)} instead
+     */
+     @Deprecated
     public void setInterfaceLanguage(String interfaceLanguage)
     {
-        this.interfaceLanguage = interfaceLanguage;
+        setInterfaceLocale(LocaleUtils.toLocale(Util.normalizeLanguage(interfaceLanguage)));
+    }
+
+    public void setInterfaceLocale(Locale interfaceLocale)
+    {
+        this.interfaceLocale = interfaceLocale;
     }
 
     public int getMode()

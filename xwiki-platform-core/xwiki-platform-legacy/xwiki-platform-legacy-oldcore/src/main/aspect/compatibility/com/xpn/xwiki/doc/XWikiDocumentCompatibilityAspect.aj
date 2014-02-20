@@ -355,4 +355,38 @@ public aspect XWikiDocumentCompatibilityAspect
     {
         cloneXObjects(templatedoc);
     }
+    
+    /**
+     * @deprecated since 5.2M1 use {@link #removeAttachment(XWikiAttachment)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.deleteAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
+    {
+        deleteAttachment(attachment, true, context);
+    }
+
+    /**
+     * @deprecated since 5.2M1 use {@link #removeAttachment(XWikiAttachment)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.deleteAttachment(XWikiAttachment attachment, boolean toRecycleBin, XWikiContext context)
+        throws XWikiException
+    {
+        deleteAttachment(attachment, true, toRecycleBin, context);
+    }
+
+    /**
+     * @deprecated since 5.2M1 use {@link #removeAttachment(XWikiAttachment)} instead
+     */
+    @Deprecated
+    private void XWikiDocument.deleteAttachment(XWikiAttachment attachment, boolean saveDocument, boolean toRecycleBin,
+        XWikiContext context) throws XWikiException
+    {
+        removeAttachment(attachment, toRecycleBin);
+
+        if (saveDocument) {
+            // Save the document
+            context.getWiki().saveDocument(this, "Deleted attachment [" + attachment.getFilename() + "]", context);
+        }
+    }
 }

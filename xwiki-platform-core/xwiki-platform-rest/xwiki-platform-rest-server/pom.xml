@@ -77,6 +77,24 @@
       </exclusions>
     </dependency>
     <dependency>
+      <!-- We need Jackson for a proper JSON representation of our REST resources.
+        See XWIKI-9136: Rest API JSON does not retrieve inherited fields -->
+      <groupId>org.restlet.jse</groupId>
+      <artifactId>org.restlet.ext.jackson</artifactId>
+      <version>${restlet.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- We need a JAXB converter for XML representation because we model our REST resources using JAXB. Jackson (see
+        above) has a module that understands JAXB annotations but the output of the Restlet Jackson converter is not very
+        good (missing XML declaration and namespace, attributes serialized as elements) so we prefer to use a dedicated
+        JAXB converter for XML representation. -->
+      <groupId>org.restlet.jse</groupId>
+      <artifactId>org.restlet.ext.jaxb</artifactId>
+      <version>${restlet.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-rest-model</artifactId>
       <version>${project.version}</version>

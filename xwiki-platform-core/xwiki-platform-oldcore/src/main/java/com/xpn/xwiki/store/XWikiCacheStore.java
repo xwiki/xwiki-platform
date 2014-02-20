@@ -31,6 +31,7 @@ import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.model.reference.DocumentReference;
@@ -126,7 +127,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
     @Override
     public void initCache(int capacity, int pageExistCacheCapacity, XWikiContext context) throws XWikiException
     {
-        CacheFactory cacheFactory = context.getWiki().getCacheFactory();
+        CacheManager cacheManager = Utils.getComponent(CacheManager.class);
 
         try {
             CacheConfiguration cacheConfiguration = new CacheConfiguration();
@@ -135,7 +136,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
             lru.setMaxEntries(capacity);
             cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-            Cache<XWikiDocument> pageCache = cacheFactory.newCache(cacheConfiguration);
+            Cache<XWikiDocument> pageCache = cacheManager.createNewCache(cacheConfiguration);
             setCache(pageCache);
 
             cacheConfiguration = new CacheConfiguration();
@@ -144,7 +145,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
             lru.setMaxEntries(pageExistCacheCapacity);
             cacheConfiguration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-            Cache<Boolean> pageExistcache = cacheFactory.newCache(cacheConfiguration);
+            Cache<Boolean> pageExistcache = cacheManager.createNewCache(cacheConfiguration);
             setPageExistCache(pageExistcache);
         } catch (CacheException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,

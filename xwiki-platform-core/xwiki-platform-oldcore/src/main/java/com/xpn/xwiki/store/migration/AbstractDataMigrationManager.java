@@ -296,13 +296,14 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      */
     protected boolean isVirtualMode()
     {
-        return getXWikiContext().getWiki().isVirtualMode();
+        return true;
     }
 
     /**
      * @return list of virtual database names
      * @throws DataMigrationException on error
      */
+    @Deprecated
     protected List<String> getVirtualWikisDatabaseNames() throws DataMigrationException
     {
         try {

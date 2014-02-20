@@ -1578,30 +1578,6 @@ public class XWiki implements EventListener
         return getStore().search(sql, nb, start, whereParams, context);
     }
 
-    /**
-     * Checks if the wiki is running in test mode.
-     * 
-     * @return {@code true} if the wiki is running Cactus tests, {@code false} otherwise
-     * @deprecated No longer used.
-     */
-    @Deprecated
-    public boolean isTest()
-    {
-        return this.test;
-    }
-
-    /**
-     * Marks that the wiki is running in test mode.
-     * 
-     * @param test whether tests are being executed
-     * @deprecated No longer used.
-     */
-    @Deprecated
-    public void setTest(boolean test)
-    {
-        this.test = test;
-    }
-
     public String parseContent(String content, XWikiContext context)
     {
         String parsedContent;
@@ -3568,20 +3544,6 @@ public class XWiki implements EventListener
         return getRightService().checkAccess(action, doc, context);
     }
 
-    /**
-     * @deprecated replaced by {@link #include(String topic, boolean isForm, XWikiContext context)}
-     * @param topic
-     * @param context
-     * @param isForm
-     * @return
-     * @throws XWikiException
-     */
-    @Deprecated
-    public String include(String topic, XWikiContext context, boolean isForm) throws XWikiException
-    {
-        return include(topic, isForm, context);
-    }
-
     public String include(String topic, boolean isForm, XWikiContext context) throws XWikiException
     {
         String database = null, incdatabase = null;
@@ -4435,17 +4397,6 @@ public class XWiki implements EventListener
         return "1".equals(getXWikiPreference("multilingual", "0", context));
     }
 
-    /**
-     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2. Use
-     *             {@link #getVirtualWikisDatabaseNames(XWikiContext)} to get the list of wikis if needed.
-     * @return true for multi-wiki/false for mono-wiki
-     */
-    @Deprecated
-    public boolean isVirtualMode()
-    {
-        return true;
-    }
-
     public boolean isLDAP()
     {
         return "1".equals(Param("xwiki.authentication.ldap"));
@@ -5219,58 +5170,6 @@ public class XWiki implements EventListener
         }
 
         return null;
-    }
-
-    /**
-     * @return the cache factory.
-     * @since 1.5M2.
-     * @deprecated Since 1.7M1, use {@link CacheManager} component instead using {@link Utils#getComponent(Class)}
-     */
-    @Deprecated
-    public CacheFactory getCacheFactory()
-    {
-        CacheFactory cacheFactory;
-
-        String cacheHint = Param("xwiki.cache.cachefactory.hint", null);
-
-        if (StringUtils.isEmpty(cacheHint) || Utils.getComponent(CacheFactory.class, cacheHint) == null) {
-            CacheManager cacheManager = Utils.getComponent(CacheManager.class);
-            try {
-                cacheFactory = cacheManager.getCacheFactory();
-            } catch (ComponentLookupException e) {
-                throw new RuntimeException("Failed to get cache factory component", e);
-            }
-        } else {
-            cacheFactory = Utils.getComponent(CacheFactory.class, cacheHint);
-        }
-
-        return cacheFactory;
-    }
-
-    /**
-     * @return the cache factory creating local caches.
-     * @since 1.5M2.
-     * @deprecated Since 1.7M1, use {@link CacheManager} component instead using {@link Utils#getComponent(Class)}
-     */
-    @Deprecated
-    public CacheFactory getLocalCacheFactory()
-    {
-        CacheFactory localCacheFactory;
-
-        String localCacheHint = Param("xwiki.cache.cachefactory.local.hint", null);
-
-        if (StringUtils.isEmpty(localCacheHint) || Utils.getComponent(CacheFactory.class, localCacheHint) == null) {
-            CacheManager cacheManager = Utils.getComponent(CacheManager.class);
-            try {
-                localCacheFactory = cacheManager.getLocalCacheFactory();
-            } catch (ComponentLookupException e) {
-                throw new RuntimeException("Failed to get local cache factory component", e);
-            }
-        } else {
-            localCacheFactory = Utils.getComponent(CacheFactory.class, localCacheHint);
-        }
-
-        return localCacheFactory;
     }
 
     public int getHttpTimeout(XWikiContext context)
@@ -6105,15 +6004,6 @@ public class XWiki implements EventListener
         return ("1".equals(context.getWiki().Param("xwiki.store.versioning", "1")));
     }
 
-    /**
-     * @deprecated since 2.3M1 use {@link #hasVersioning(XWikiContext)} instead
-     */
-    @Deprecated
-    public boolean hasVersioning(String fullName, XWikiContext context)
-    {
-        return hasVersioning(context);
-    }
-
     public boolean hasAttachmentVersioning(XWikiContext context)
     {
         return ("1".equals(context.getWiki().Param("xwiki.store.attachment.versioning", "1")));
@@ -6517,42 +6407,6 @@ public class XWiki implements EventListener
     public String getName()
     {
         return "xwiki-core";
-    }
-
-    /**
-     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it using
-     *             the {@code $services.localization} binding, see {@code LocalizationScriptService}
-     */
-    @Deprecated
-    public String parseMessage(XWikiContext context)
-    {
-        String message = (String) context.get("message");
-        if (message == null) {
-            return null;
-        }
-
-        return parseMessage(message, context);
-    }
-
-    /**
-     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it using
-     *             the {@code $services.localization} binding, see {@code LocalizationScriptService}
-     */
-    @Deprecated
-    public String parseMessage(String id, XWikiContext context)
-    {
-        XWikiMessageTool msg = context.getMessageTool();
-
-        List<?> parameters = (List<?>) context.get("messageParameters");
-
-        String translatedMessage;
-        if (parameters != null) {
-            translatedMessage = msg.get(id, parameters);
-        } else {
-            translatedMessage = msg.get(id);
-        }
-
-        return parseContent(translatedMessage, context);
     }
 
     /**

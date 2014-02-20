@@ -647,13 +647,10 @@ public class XWikiHibernateBaseStore implements Initializable
      * @param context the XWiki context.
      * @return true if multi-wiki, false otherwise.
      */
+    @Deprecated
     protected boolean isVirtual(XWikiContext context)
     {
-        if ((context == null) || (context.getWiki() == null)) {
-            return true;
-        }
-
-        return context.getWiki().isVirtualMode();
+        return true;
     }
 
     /**

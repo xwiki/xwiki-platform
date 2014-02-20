@@ -30,8 +30,11 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.syntax.Syntax;
@@ -98,7 +101,18 @@ public privileged aspect XWikiCompatibilityAspect
     @Deprecated
     public boolean XWiki.isVirtual()
     {
-        return this.isVirtualMode();
+        return isVirtualMode();
+    }
+
+    /**
+     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2. Use
+     *             {@link #getVirtualWikisDatabaseNames(XWikiContext)} to get the list of wikis if needed.
+     * @return true for multi-wiki/false for mono-wiki
+     */
+    @Deprecated
+    public boolean XWiki.isVirtualMode()
+    {
+        return true;
     }
 
     /**
@@ -947,5 +961,140 @@ public privileged aspect XWikiCompatibilityAspect
         throws XWikiException
     {
         this.protectUserPage(fullwikiname, userRights, doc, context);
+    }
+
+    /**
+     * @return the cache factory.
+     * @since 1.5M2.
+     * @deprecated Since 1.7M1, use {@link CacheManager} component instead using {@link Utils#getComponent(Class)}
+     */
+    @Deprecated
+    public CacheFactory XWiki.getCacheFactory()
+    {
+        CacheFactory cacheFactory;
+
+        String cacheHint = Param("xwiki.cache.cachefactory.hint", null);
+
+        if (StringUtils.isEmpty(cacheHint) || Utils.getComponent(CacheFactory.class, cacheHint) == null) {
+            CacheManager cacheManager = Utils.getComponent(CacheManager.class);
+            try {
+                cacheFactory = cacheManager.getCacheFactory();
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException("Failed to get cache factory component", e);
+            }
+        } else {
+            cacheFactory = Utils.getComponent(CacheFactory.class, cacheHint);
+        }
+
+        return cacheFactory;
+    }
+
+    /**
+     * @return the cache factory creating local caches.
+     * @since 1.5M2.
+     * @deprecated Since 1.7M1, use {@link CacheManager} component instead using {@link Utils#getComponent(Class)}
+     */
+    @Deprecated
+    public CacheFactory XWiki.getLocalCacheFactory()
+    {
+        CacheFactory localCacheFactory;
+
+        String localCacheHint = Param("xwiki.cache.cachefactory.local.hint", null);
+
+        if (StringUtils.isEmpty(localCacheHint) || Utils.getComponent(CacheFactory.class, localCacheHint) == null) {
+            CacheManager cacheManager = Utils.getComponent(CacheManager.class);
+            try {
+                localCacheFactory = cacheManager.getLocalCacheFactory();
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException("Failed to get local cache factory component", e);
+            }
+        } else {
+            localCacheFactory = Utils.getComponent(CacheFactory.class, localCacheHint);
+        }
+
+        return localCacheFactory;
+    }
+
+    /**
+     * @deprecated since 2.3M1 use {@link #hasVersioning(XWikiContext)} instead
+     */
+    @Deprecated
+    public boolean XWiki.hasVersioning(String fullName, XWikiContext context)
+    {
+        return hasVersioning(context);
+    }
+
+    /**
+     * @deprecated replaced by {@link #include(String topic, boolean isForm, XWikiContext context)}
+     * @param topic
+     * @param context
+     * @param isForm
+     * @return
+     * @throws XWikiException
+     */
+    @Deprecated
+    public String XWiki.include(String topic, XWikiContext context, boolean isForm) throws XWikiException
+    {
+        return include(topic, isForm, context);
+    }
+    
+    /**
+     * Checks if the wiki is running in test mode.
+     * 
+     * @return {@code true} if the wiki is running Cactus tests, {@code false} otherwise
+     * @deprecated No longer used.
+     */
+    @Deprecated
+    public boolean XWiki.isTest()
+    {
+        return this.test;
+    }
+
+    /**
+     * Marks that the wiki is running in test mode.
+     * 
+     * @param test whether tests are being executed
+     * @deprecated No longer used.
+     */
+    @Deprecated
+    public void XWiki.setTest(boolean test)
+    {
+        this.test = test;
+    }
+
+    /**
+     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it using
+     *             the {@code $services.localization} binding, see {@code LocalizationScriptService}
+     */
+    @Deprecated
+    public String XWiki.parseMessage(XWikiContext context)
+    {
+        String message = (String) context.get("message");
+        if (message == null) {
+            return null;
+        }
+
+        return parseMessage(message, context);
+    }
+
+    /**
+     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it using
+     *             the {@code $services.localization} binding, see {@code LocalizationScriptService}
+     */
+    @Deprecated
+    public String XWiki.parseMessage(String id, XWikiContext context)
+    {
+        XWikiMessageTool msg = context.getMessageTool();
+
+        List<?> parameters = (List<?>) context.get("messageParameters");
+
+        String translatedMessage;
+        if (parameters != null) {
+            translatedMessage = msg.get(id, parameters);
+        } else {
+            translatedMessage = msg.get(id);
+        }
+
+        return parseContent(translatedMessage, context);
     }
 }

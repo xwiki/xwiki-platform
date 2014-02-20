@@ -319,8 +319,6 @@ public class LegacyTestWiki extends AbstractTestWiki
                             return getDocument(spaceName, documentName);
                         }
                     });
-                    allowing(xwiki).isVirtualMode();
-                    will(returnValue(true));
                 }
             });
         }

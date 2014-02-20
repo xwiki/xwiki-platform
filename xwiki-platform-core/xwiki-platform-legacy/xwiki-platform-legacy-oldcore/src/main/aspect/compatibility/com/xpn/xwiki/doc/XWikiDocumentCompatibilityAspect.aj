@@ -33,7 +33,10 @@ import java.util.regex.Pattern;
 
 import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -58,8 +61,8 @@ import com.xpn.xwiki.web.Utils;
  *
  * @version $Id$
  */
-public aspect XWikiDocumentCompatibilityAspect
-{   
+privileged public aspect XWikiDocumentCompatibilityAspect
+{
     /**
      * @deprecated since 3.0M3 use {@code Syntax.XWIKI_1_0} instead
      */
@@ -387,6 +390,23 @@ public aspect XWikiDocumentCompatibilityAspect
         if (saveDocument) {
             // Save the document
             context.getWiki().saveDocument(this, "Deleted attachment [" + attachment.getFilename() + "]", context);
+        }
+    }
+
+    /**
+     * Convert a full document reference into the proper relative document reference (wiki part is removed if it's the
+     * same as document wiki) to store as parent.
+     * 
+     * @deprecated since 2.2.3 use {@link #setParentReference(org.xwiki.model.reference.EntityReference)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.setParentReference(DocumentReference parentReference)
+    {
+        if (parentReference != null) {
+            setParent(serializeReference(parentReference, this.compactWikiEntityReferenceSerializer,
+                getDocumentReference()));
+        } else {
+            setParentReference((EntityReference) null);
         }
     }
 }

@@ -885,23 +885,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
-     * Convert a full document reference into the proper relative document reference (wiki part is removed if it's the
-     * same as document wiki) to store as parent.
-     * 
-     * @deprecated since 2.2.3 use {@link #setParentReference(org.xwiki.model.reference.EntityReference)} instead
-     */
-    @Deprecated
-    public void setParentReference(DocumentReference parentReference)
-    {
-        if (parentReference != null) {
-            setParent(serializeReference(parentReference, this.compactWikiEntityReferenceSerializer,
-                getDocumentReference()));
-        } else {
-            setParentReference((EntityReference) null);
-        }
-    }
-
-    /**
      * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
      * 
      * @param parent the reference of the parent relative to the document
@@ -3354,7 +3337,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
                     // If the parent is not set in the current document set the template parent as the parent.
                     if (getParentReference() == null) {
-                        setParentReference(templatedoc.getParentReference());
+                        setParentReference(templatedoc.getRelativeParentReference());
                     }
 
                     if (isNew()) {
@@ -6054,10 +6037,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (childDocumentReferences != null) {
             for (DocumentReference childDocumentReference : childDocumentReferences) {
                 XWikiDocument childDocument = xwiki.getDocument(childDocumentReference, context);
-                childDocument.setParentReference(newDocumentReference);
+                String compactReference = this.compactEntityReferenceSerializer.serialize(newDocumentReference);
+                childDocument.setParent(compactReference);
                 String saveMessage =
-                    context.getMessageTool().get("core.comment.renameParent",
-                        Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
+                    context.getMessageTool().get("core.comment.renameParent", Arrays.asList(compactReference));
                 childDocument.setAuthorReference(context.getUserReference());
                 xwiki.saveDocument(childDocument, saveMessage, true, context);
             }

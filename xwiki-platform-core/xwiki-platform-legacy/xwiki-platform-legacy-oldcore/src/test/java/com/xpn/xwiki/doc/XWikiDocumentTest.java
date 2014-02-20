@@ -33,7 +33,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.junit.Assert;
-
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
@@ -313,5 +312,13 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setContent("content not in section\n");
 
         assertEquals("", this.document.extractTitle());
+    }
+
+    public void testSetAbsoluteParentReference()
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
+
+        doc.setParentReference(new DocumentReference("docwiki", "docspace", "docpage2"));
+        assertEquals("docspace.docpage2", doc.getParent());
     }
 }

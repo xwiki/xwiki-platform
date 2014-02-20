@@ -50,6 +50,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -80,6 +81,14 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      */
     @Inject
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    /**
+     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
+     * wiki).
+     */
+    @Inject
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
     private XWikiContext getContext()
     {
@@ -239,9 +248,11 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
-        doc.setParentReference(parentReference);
-        saveDocument(doc, String.format("Changed document parent to [%s].",
-            this.defaultEntityReferenceSerializer.serialize(parentReference)), true);
+        doc.setParent(this.compactWikiEntityReferenceSerializer.serialize(parentReference, doc.getDocumentReference()));
+        saveDocument(
+            doc,
+            String.format("Changed document parent to [%s].",
+                this.defaultEntityReferenceSerializer.serialize(parentReference)), true);
     }
 
     @Override

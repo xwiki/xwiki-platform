@@ -1,3 +1,9 @@
+###############################################################
+## Contains various standard Velocity macros automatically
+## loaded and usable everywhere (in Velocity).
+## 
+## Note that if you modify that file you will need to restart.
+###############################################################
 ##
 ## #template("name.vm")
 ## Searches for the given velocity template and interprets it.

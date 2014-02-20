@@ -412,6 +412,18 @@
               <method>void stop(org.xwiki.gwt.dom.client.Window)</method>
               <justification>This method is available on the Window object.</justification>
             </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/rendering/macro/include/IncludeMacroParameters</className>
+              <method>java.lang.String getDocument()</method>
+              <justification>Not a breakage, moved to legacy</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/rendering/macro/include/IncludeMacroParameters</className>
+              <method>void setDocument(java.lang.String)</method>
+              <justification>Not a breakage, moved to legacy</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

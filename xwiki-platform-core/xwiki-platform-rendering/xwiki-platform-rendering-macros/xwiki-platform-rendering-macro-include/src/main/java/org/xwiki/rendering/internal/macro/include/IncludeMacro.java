@@ -138,7 +138,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         throws MacroExecutionException
     {
         // Step 1: Perform checks.
-        if (parameters.getReference() == null && parameters.getDocument() == null) {
+        if (parameters.getReference() == null && parameters.getReference() == null) {
             throw new MacroExecutionException(
                 "You must specify a 'reference' parameter pointing to the entity to include.");
         }

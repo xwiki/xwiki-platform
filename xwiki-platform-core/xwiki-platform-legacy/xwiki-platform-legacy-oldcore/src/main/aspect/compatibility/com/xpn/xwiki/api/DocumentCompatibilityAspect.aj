@@ -19,6 +19,9 @@
  */
 package compatibility.com.xpn.xwiki.api;
 
+import java.util.List;
+
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 
@@ -36,5 +39,36 @@ public privileged aspect DocumentCompatibilityAspect
     public DocumentStats Document.getCurrentMonthWebStats(String action)
     {
         return this.getCurrentMonthSpaceStats(action);
+    }
+
+    /**
+     * Get the name of the space of the document for example if the fullName of a document is "MySpace.Mydoc", the name
+     * is MySpace.
+     * 
+     * @return The name of the space of the document.
+     * @deprecated use {@link #getSpace()} instead of this function.
+     */
+    @Deprecated
+    public String Document.getWeb()
+    {
+        return this.doc.getSpace();
+    }
+
+    /**
+     * @deprecated use {@link #rename(String)} instead
+     */
+    @Deprecated
+    public void Document.renameDocument(String newDocumentName) throws XWikiException
+    {
+        rename(newDocumentName);
+    }
+
+    /**
+     * @deprecated use {@link #rename(String, java.util.List)} instead
+     */
+    @Deprecated
+    public void Document.renameDocument(String newDocumentName, List<String> backlinkDocumentNames) throws XWikiException
+    {
+        rename(newDocumentName, backlinkDocumentNames);
     }
 }

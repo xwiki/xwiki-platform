@@ -2335,6 +2335,13 @@ input#tags {
   /* Fix double scrollbar in IE7&8 */
   overflow: hidden !important;
 }
+/* Fix tree layout on IE11. Remove when SmartGWT adds support for IE11. */
+.listGrid table.treeCell > colgroup > col:last-of-type,
+.listGrid table.treeCellOver > colgroup > col:last-of-type,
+.listGrid table.treeCellSelected > colgroup > col:last-of-type,
+.listGrid table.treeCellSelectedOver > colgroup > col:last-of-type {
+  width: 100%;
+}
 
 /* -----------------------YUI Trees----------------------*/
 .ygtvitem table {

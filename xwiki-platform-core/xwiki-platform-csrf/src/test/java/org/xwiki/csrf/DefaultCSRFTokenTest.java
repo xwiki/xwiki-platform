@@ -97,8 +97,8 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockDocumentAccessBridge).getCurrentUser();
-                will(returnValue("XWiki.Admin"));
+                allowing(mockDocumentAccessBridge).getCurrentUserReference();
+                will(returnValue(new DocumentReference("mainWiki", "XWiki", "Admin")));
                 allowing(mockDocumentAccessBridge).getDocumentURL(with(aNonNull(DocumentReference.class)),
                     with("view"), with(returnValue), with(aNull(String.class)));
                 will(returnValue);

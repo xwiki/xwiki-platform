@@ -70,7 +70,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     private static final String RESUBMIT_TEMPLATE = "resubmit";
 
     /** Token storage (one token per user). */
-    private final ConcurrentMap<String, String> tokens = new ConcurrentHashMap<String, String>();
+    private final ConcurrentMap<DocumentReference, String> tokens = new ConcurrentHashMap<DocumentReference, String>();
 
     /** Random number generator. */
     private SecureRandom random;
@@ -126,7 +126,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     @Override
     public String getToken()
     {
-        String key = getTokenKey();
+        DocumentReference key = getTokenKey();
         String token = this.tokens.get(key);
         if (token != null) {
             return token;
@@ -237,8 +237,8 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
      * 
      * @return key for the token map
      */
-    private String getTokenKey()
+    private DocumentReference getTokenKey()
     {
-        return this.docBridge.getCurrentUser();
+        return this.docBridge.getCurrentUserReference();
     }
 }

@@ -32,6 +32,7 @@ import java.util.TreeMap;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
@@ -903,5 +904,131 @@ public privileged aspect XWikiCompatibilityAspect
     public String XWiki.parseMessage()
     {
         return this.xwiki.parseMessage(getXWikiContext());
+    }
+
+    /**
+     * API allowing to count the total number of documents that would be returned by a query.
+     * 
+     * @param wheresql Query to use, similar to the ones accepted by {@link #searchDocuments(String)}. If possible, it
+     *            should not contain <code>order by</code> or <code>group</code> clauses, since this kind of queries are
+     *            not portable.
+     * @return The number of documents that matched the query.
+     * @throws XWikiException if there was a problem executing the query.
+     * @deprecated use query service instead
+     */
+    @Deprecated
+    public int XWiki.countDocuments(String wheresql) throws XWikiException
+    {
+        return this.xwiki.getStore().countDocuments(wheresql, getXWikiContext());
+    }
+
+    /**
+     * API allowing to count the total number of documents that would be returned by a parameterized query.
+     * 
+     * @param parameterizedWhereClause the parameterized query to use, similar to the ones accepted by
+     *            {@link #searchDocuments(String, List)}. If possible, it should not contain <code>order by</code> or
+     *            <code>group</code> clauses, since this kind of queries are not portable.
+     * @param parameterValues The parameter values that replace the question marks.
+     * @return The number of documents that matched the query.
+     * @throws XWikiException if there was a problem executing the query.
+     * @deprecated use query service instead
+     */
+    @Deprecated
+    public int XWiki.countDocuments(String parameterizedWhereClause, List< ? > parameterValues) throws XWikiException
+    {
+        return this.xwiki.getStore().countDocuments(parameterizedWhereClause, parameterValues, getXWikiContext());
+    }
+    
+
+    /**
+     * Privileged API allowing to run a search on the database returning a list of data This search is send to the store
+     * engine (Hibernate HQL, JCR XPATH or other).
+     * 
+     * @param wheresql Query to be run (HQL, XPath)
+     * @return A list of rows (Object[])
+     * @throws XWikiException
+     * @deprecated use query service instead
+     */
+    @Deprecated
+    public <T> List<T> XWiki.search(String wheresql) throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return this.xwiki.search(wheresql, getXWikiContext());
+        }
+
+        return Collections.emptyList();
+    }
+
+    /**
+     * Privileged API allowing to run a search on the database returning a list of data. The HQL where clause uses
+     * parameters (question marks) instead of values, and the actual values are passed in the parameters list. This
+     * allows generating a query which will automatically encode the passed values (like escaping single quotes). This
+     * API is recommended to be used over the other similar methods where the values are passed inside the where clause
+     * and for which manual encoding/escaping is needed to avoid SQL injections or bad queries.
+     * 
+     * @param parameterizedWhereClause query to be run (HQL)
+     * @param parameterValues the where clause values that replace the question marks
+     * @return a list of rows, where each row has either the selected data type ({@link XWikiDocument}, {@code String},
+     *         {@code Integer}, etc.), or {@code Object[]} if more than one column was selected
+     * @throws XWikiException
+     * @deprecated use query service instead
+     */
+    @Deprecated
+    public <T> List<T> XWiki.search(String parameterizedWhereClause, List< ? > parameterValues) throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return this.xwiki.getStore().search(parameterizedWhereClause, 0, 0, parameterValues, getXWikiContext());
+        }
+
+        return Collections.emptyList();
+    }
+
+    /**
+     * Privileged API allowing to run a search on the database returning a list of data. This search is sent to the
+     * store engine (Hibernate HQL, JCR XPATH or other)
+     * 
+     * @param wheresql Query to be run (HQL, XPath)
+     * @param nb return only 'nb' rows
+     * @param start skip the 'start' first elements
+     * @return A list of rows (Object[])
+     * @throws XWikiException
+     * @deprecated use query service instead
+     */
+    @Deprecated
+    public <T> List<T> XWiki.search(String wheresql, int nb, int start) throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return this.xwiki.search(wheresql, nb, start, getXWikiContext());
+        }
+
+        return Collections.emptyList();
+    }
+
+    /**
+     * Privileged API allowing to run a search on the database returning a list of data. The HQL where clause uses
+     * parameters (question marks) instead of values, and the actual values are passed in the paremeters list. This
+     * allows generating a query which will automatically encode the passed values (like escaping single quotes). This
+     * API is recommended to be used over the other similar methods where the values are passed inside the where clause
+     * and for which manual encoding/escaping is needed to avoid sql injections or bad queries.
+     * 
+     * @param parameterizedWhereClause query to be run (HQL)
+     * @param maxResults maximum number of results to return; if 0 all results are returned
+     * @param startOffset skip the first N results; if 0 no items are skipped
+     * @param parameterValues the where clause values that replace the question marks
+     * @return a list of rows, where each row has either the selected data type ({@link XWikiDocument}, {@code String},
+     *         {@code Integer}, etc.), or {@code Object[]} if more than one column was selected
+     * @throws XWikiException
+     * @deprecated use query service instead
+     */
+    @Deprecated
+    public <T> List<T> XWiki.search(String parameterizedWhereClause, int maxResults, int startOffset,
+        List< ? > parameterValues) throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return this.xwiki.getStore().search(parameterizedWhereClause, maxResults, startOffset, parameterValues,
+                getXWikiContext());
+        }
+
+        return Collections.emptyList();
     }
 }

@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -759,8 +760,9 @@ public class Utils
      */
     public static XWikiContext getContext()
     {
-        ExecutionContext ec = getComponent(Execution.class).getContext();
-        return (XWikiContext) ec.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        Provider<XWikiContext> xcontextProvider = getComponent(XWikiContext.TYPE_PROVIDER);
+
+        return xcontextProvider != null ? xcontextProvider.get() : null;
     }
 
     /**

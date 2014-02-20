@@ -70,10 +70,6 @@ public class ActivityStreamException extends XWikiException
      */
     public ActivityStreamException(XWikiException e)
     {
-        setModule(e.getModule());
-        setCode(e.getCode());
-        setException(e.getException());
-        setArgs(e.getArgs());
-        setMessage(e.getMessage());
+        super(e.getModule(), e.getCode(), e.getMessage(), e.getCause(), e.getArgs());
     }
 }

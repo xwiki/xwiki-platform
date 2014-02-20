@@ -148,9 +148,10 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         checkRecursiveInclusion(context.getCurrentMacroBlock(), includedReference);
 
         if (!this.documentAccessBridge.isDocumentViewable(includedReference)) {
-            throw new MacroExecutionException("Current user [" + this.documentAccessBridge.getCurrentUser()
-                + "] doesn't have view rights on document ["
-                + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]");
+            throw new MacroExecutionException(String.format(
+                "Current user [%s] doesn't have view rights on document [%s]",
+                this.documentAccessBridge.getCurrentUserReference(),
+                this.defaultEntityReferenceSerializer.serialize(includedReference)));
         }
 
         Context parametersContext = parameters.getContext();

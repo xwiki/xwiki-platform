@@ -2893,19 +2893,4 @@ public class XWiki extends Api
     {
         return this.xwiki.getCurrentContentSyntaxId(getXWikiContext());
     }
-
-    /**
-     * API to parse the message being stored in the Context. A message can be an error message or an information message
-     * either as text or as a message ID pointing to ApplicationResources. The message is also parse for velocity
-     * scripts
-     * 
-     * @return Final message
-     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it
-     *             using the {@code $services.localization} binding, see {@code LocalizationScriptService}
-     */
-    @Deprecated
-    public String parseMessage()
-    {
-        return this.xwiki.parseMessage(getXWikiContext());
-    }
 }

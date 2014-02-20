@@ -613,15 +613,6 @@ public class XWikiContext extends Hashtable<Object, Object>
         return null;
     }
 
-    /**
-     * @deprecated never made any sense since the context database can change any time
-     */
-    @Deprecated
-    public void setWikiServer(XWikiDocument doc)
-    {
-        // Cannot do anything
-    }
-
     public XWikiDocument getWikiServer()
     {
         String currentWiki = getDatabase();

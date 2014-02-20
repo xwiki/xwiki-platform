@@ -20,8 +20,10 @@
 package compatibility.com.xpn.xwiki;
  
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.objects.classes.BaseClass;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -124,5 +126,14 @@ public privileged aspect XWikiContextCompatibilityAspect
     public void XWikiContext.setUser(String user, boolean main)
     {
         this.setUserInternal(user, main);
+    }
+
+    /**
+     * @deprecated never made any sense since the context database can change any time
+     */
+    @Deprecated
+    public void XWikiContext.setWikiServer(XWikiDocument doc)
+    {
+        // Cannot do anything
     }
 }

@@ -55,7 +55,7 @@ public class ObjectPropertyResourceImpl extends XWikiResource implements ObjectP
             Document doc = documentInfo.getDocument();
 
             XWikiDocument xwikiDocument = Utils.getXWiki(componentManager)
-                    .getDocument(doc.getPrefixedFullName(), Utils.getXWikiContext(componentManager));
+                    .getDocument(doc.getDocumentReference(), Utils.getXWikiContext(componentManager));
 
             com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
             if (baseObject == null) {
@@ -98,7 +98,7 @@ public class ObjectPropertyResourceImpl extends XWikiResource implements ObjectP
             }
 
             XWikiDocument xwikiDocument = Utils.getXWiki(componentManager)
-                    .getDocument(doc.getPrefixedFullName(), Utils.getXWikiContext(componentManager));
+                    .getDocument(doc.getDocumentReference(), Utils.getXWikiContext(componentManager));
 
             com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
             if (baseObject == null) {

@@ -29,7 +29,6 @@ import org.restlet.data.Form;
 import org.restlet.engine.http.header.HeaderConstants;
 import org.restlet.security.ChallengeAuthenticator;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rest.internal.Constants;
 import org.xwiki.rest.internal.resources.BrowserAuthenticationResource;
 
 import com.xpn.xwiki.XWiki;

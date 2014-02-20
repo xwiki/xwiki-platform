@@ -19,6 +19,9 @@
  */
 package org.xwiki.rest.internal.resources;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Formatter;
@@ -289,7 +292,7 @@ public class BaseAttachmentsResource extends XWikiResource
         boolean alreadyExisting = false;
 
         XWikiDocument xwikiDocument =
-                Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
                         Utils.getXWikiContext(componentManager));
         XWikiAttachment xwikiAttachment = xwikiDocument.getAttachment(attachmentName);
         if (xwikiAttachment == null) {
@@ -299,7 +302,14 @@ public class BaseAttachmentsResource extends XWikiResource
             alreadyExisting = true;
         }
 
-        xwikiAttachment.setContent(content);
+        InputStream inputStream = new ByteArrayInputStream(content);
+
+        try {
+            xwikiAttachment.setContent(inputStream);
+        } catch(IOException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
+                "Failed to store the attachment content.", e);
+        }
         xwikiAttachment.setAuthor(Utils.getXWikiUser(componentManager));
         xwikiAttachment.setFilename(attachmentName);
         xwikiAttachment.setDoc(xwikiDocument);

@@ -98,7 +98,7 @@ public class ObjectsResourceImpl extends BaseObjectsResource implements ObjectsR
             }
 
             XWikiDocument xwikiDocument = Utils.getXWiki(componentManager)
-                    .getDocument(doc.getPrefixedFullName(), Utils.getXWikiContext(componentManager));
+                    .getDocument(doc.getDocumentReference(), Utils.getXWikiContext(componentManager));
 
             int objectNumber =
                     xwikiDocument.createNewObject(object.getClassName(), Utils.getXWikiContext(componentManager));

@@ -308,7 +308,8 @@ public class BaseAttachmentsResource extends XWikiResource
             xwikiAttachment.setContent(inputStream);
         } catch(IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
-                "Failed to store the attachment content.", e);
+                String.format("Failed to store the content of attachment [%s] in document [%s].",
+                        attachmentName, doc.getPrefixedFullName()), e);
         }
         xwikiAttachment.setAuthor(Utils.getXWikiUser(componentManager));
         xwikiAttachment.setFilename(attachmentName);

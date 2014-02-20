@@ -1141,17 +1141,6 @@ public class XWiki extends Api
     }
 
     /**
-     * API to check if wiki is in multi-wiki mode (virtual)
-     * 
-     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
-     * @return true for multi-wiki/false for mono-wiki
-     */
-    public boolean isVirtualMode()
-    {
-        return this.xwiki.isVirtualMode();
-    }
-
-    /**
      * @return the list of all wiki names, including the main wiki, corresponding to the available wiki descriptors.
      *         Example: the descriptor for the wiki <i>wikiname</i> is a document in the main wiki, named
      *         <i>XWiki.XWikiServerWikiname</i>, containing an XWiki.XWikiServerClass object.
@@ -1795,21 +1784,6 @@ public class XWiki extends Api
     }
 
     /**
-     * API to access the current starts for the Wiki for a specific action It retrieves the number of times the action
-     * was performed for the whole wiki The statistics module need to be activated (xwiki.stats=1 in xwiki.cfg)
-     * 
-     * @param action action for which to retrieve statistics (view/save/download)
-     * @return A DocumentStats object with number of actions performed, unique visitors, number of visits
-     * @deprecated use {@link #getStatsService()} instead
-     */
-    @Deprecated
-    public DocumentStats getCurrentMonthXWikiStats(String action)
-    {
-        return getXWikiContext().getWiki().getStatsService(getXWikiContext())
-            .getDocMonthStats("", action, new Date(), getXWikiContext());
-    }
-
-    /**
      * API to retrieve a viewable referer text for a referer Referers are URL where users have clicked on a link to an
      * XWiki page Search engine referer URLs are transformed to a nicer view (Google: search query string) For other URL
      * the http:// part is stripped
@@ -1842,19 +1816,6 @@ public class XWiki extends Api
         } catch (Exception e) {
             return this.xwiki.getRefererText(referer, getXWikiContext());
         }
-    }
-
-    /**
-     * Deprecated API which was retrieving the SQL to represent the fullName Document field depending on the database
-     * used This is not needed anymore and returns 'doc.fullName' for all databases
-     * 
-     * @deprecated
-     * @return "doc.fullName"
-     */
-    @Deprecated
-    public String getFullNameSQL()
-    {
-        return this.xwiki.getFullNameSQL();
     }
 
     /**
@@ -2637,16 +2598,6 @@ public class XWiki extends Api
     public List<String> getConfiguredSyntaxes()
     {
         return this.xwiki.getConfiguredSyntaxes();
-    }
-
-    /**
-     * @return secure {@link QueryManager} for execute queries to store.
-     * @deprecated since XE 2.4M2 use the Query Manager Script Service
-     */
-    @Deprecated
-    public QueryManager getQueryManager()
-    {
-        return Utils.getComponent(QueryManager.class, "secure");
     }
 
     /**

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.xwiki.query.QueryManager;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiException;
@@ -36,6 +37,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
+import com.xpn.xwiki.stats.impl.DocumentStats;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
@@ -1030,5 +1033,55 @@ public privileged aspect XWikiCompatibilityAspect
         }
 
         return Collections.emptyList();
+    }
+
+    /**
+     * Deprecated API which was retrieving the SQL to represent the fullName Document field depending on the database
+     * used This is not needed anymore and returns 'doc.fullName' for all databases
+     * 
+     * @deprecated
+     * @return "doc.fullName"
+     */
+    @Deprecated
+    public String XWiki.getFullNameSQL()
+    {
+        return this.xwiki.getFullNameSQL();
+    }
+
+    /**
+     * @return secure {@link QueryManager} for execute queries to store.
+     * @deprecated since XE 2.4M2 use the Query Manager Script Service
+     */
+    @Deprecated
+    public QueryManager XWiki.getQueryManager()
+    {
+        return Utils.getComponent(QueryManager.class, "secure");
+    }
+
+    /**
+     * API to check if wiki is in multi-wiki mode (virtual)
+     * 
+     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
+     * @return true for multi-wiki/false for mono-wiki
+     */
+    @Deprecated
+    public boolean XWiki.isVirtualMode()
+    {
+        return this.xwiki.isVirtualMode();
+    }
+
+    /**
+     * API to access the current starts for the Wiki for a specific action It retrieves the number of times the action
+     * was performed for the whole wiki The statistics module need to be activated (xwiki.stats=1 in xwiki.cfg)
+     * 
+     * @param action action for which to retrieve statistics (view/save/download)
+     * @return A DocumentStats object with number of actions performed, unique visitors, number of visits
+     * @deprecated use {@link #getStatsService()} instead
+     */
+    @Deprecated
+    public DocumentStats XWiki.getCurrentMonthXWikiStats(String action)
+    {
+        return getXWikiContext().getWiki().getStatsService(getXWikiContext())
+            .getDocMonthStats("", action, new Date(), getXWikiContext());
     }
 }

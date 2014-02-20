@@ -33,8 +33,6 @@ import java.util.regex.Pattern;
 
 import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;

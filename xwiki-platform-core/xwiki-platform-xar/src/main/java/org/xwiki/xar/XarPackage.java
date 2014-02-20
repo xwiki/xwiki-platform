@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
 
@@ -42,7 +43,6 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.input.CloseShieldInputStream;
-import org.apache.commons.lang3.ObjectUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -365,7 +365,7 @@ public class XarPackage
             for (XarEntry entry : this.entries.values()) {
                 writer.writeStartElement(XarModel.ELEMENT_FILES_FILES);
                 writer.writeAttribute(XarModel.ATTRIBUTE_DEFAULTACTION, String.valueOf(entry.getDefaultAction()));
-                writer.writeAttribute(XarModel.ATTRIBUTE_LOCALE, ObjectUtils.toString(entry.getLocale(), ""));
+                writer.writeAttribute(XarModel.ATTRIBUTE_LOCALE, Objects.toString(entry.getLocale(), ""));
                 writer.writeCharacters(TOSTRING_SERIALIZER.serialize(entry));
                 writer.writeEndElement();
             }

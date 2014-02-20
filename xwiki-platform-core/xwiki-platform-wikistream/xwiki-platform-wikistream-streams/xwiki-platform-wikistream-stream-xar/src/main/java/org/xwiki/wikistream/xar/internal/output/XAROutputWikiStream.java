@@ -25,13 +25,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -111,7 +111,7 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
 
     public String toString(Object obj)
     {
-        return ObjectUtils.toString(obj, null);
+        return Objects.toString(obj, null);
     }
 
     public String toString(Date date)

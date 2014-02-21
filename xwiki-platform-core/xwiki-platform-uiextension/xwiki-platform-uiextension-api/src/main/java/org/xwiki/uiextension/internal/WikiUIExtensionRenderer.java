@@ -127,7 +127,7 @@ public class WikiUIExtensionRenderer
             // Put the UIX context in the XWiki context
             getXWikiContext().put(WikiUIExtension.CONTEXT_UIX_KEY, uixContext);
 
-            // Tranform the macros
+            // Transform the macros
             TransformationContext transformationContext = new TransformationContext(xdom, xdoc.getSyntax());
             transformationContext.setId(roleHint);
             macroTransformation.transform(transformedXDOM, transformationContext);

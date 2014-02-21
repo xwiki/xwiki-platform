@@ -1412,7 +1412,7 @@ XWiki.Annotation = Class.create({
 
   registerShortcuts : function(annotationShorcuts, method) {
     var eventType = 'keypress';
-    if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
+    if (Prototype.Browser.IE || Prototype.Browser.WebKit || browser.isIE11up) {
       eventType = 'keyup';
     }
     for (var i = 0; i &lt; annotationShorcuts.size(); ++i) {

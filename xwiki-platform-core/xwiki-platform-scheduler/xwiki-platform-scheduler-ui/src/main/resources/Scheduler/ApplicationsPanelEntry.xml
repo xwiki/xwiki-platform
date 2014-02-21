@@ -123,11 +123,9 @@
       <name>platform.scheduler.schedulerApplication</name>
     </property>
     <property>
-      <parameters>#if ($hasAdmin)
-label=$services.localization.render('scheduler.applicationsPanelEntryLabel')
+      <parameters>label=$services.localization.render('scheduler.applicationsPanelEntryLabel')
 target=Scheduler.WebHome
-icon=icon:clock
-#end</parameters>
+icon=icon:clock</parameters>
     </property>
     <property>
       <scope>wiki</scope>

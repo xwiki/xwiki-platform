@@ -123,11 +123,9 @@
       <name>platform.stats.statsApplication</name>
     </property>
     <property>
-      <parameters>#if ($hasAdmin)
-label=$services.localization.render('stats.applicationsPanelEntryLabel')
+      <parameters>label=$services.localization.render('stats.applicationsPanelEntryLabel')
 target=Stats.WebHome
-icon=icon:chart_bar
-#end</parameters>
+icon=icon:chart_bar</parameters>
     </property>
     <property>
       <scope>wiki</scope>

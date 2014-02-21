@@ -1124,7 +1124,7 @@ shortcut = {
 
 /**
  * Browser Detect
- * Version: 2.1.6
+ * Version: 2.1.6 (modified to add support for IE11+ detection)
  * URL: http://dithered.chadlindstrom.ca/javascript/browser_detect/index.html
  * License: http://creativecommons.org/licenses/by/1.0/
  * Author: Chris Nott (chris[at]dithered[dot]com)
@@ -1221,6 +1221,9 @@ function BrowserDetect() {
     this.isIE6up = (this.isIE && this.versionMajor >= 6);
 
     this.isIE4xMac = (this.isIE4x && this.isMac);
+
+    var trident = /trident\/(\d+)/.exec(ua);
+    this.isIE11up = trident && parseInt(trident[1]) >= 7;
 }
 var browser = new BrowserDetect();
 

@@ -161,10 +161,13 @@ input[type="text"], input[type="password"] {
 ::-webkit-input-placeholder {
   color: $theme.textSecondaryColor !important;
 }
-:-moz-placeholder {
+::-moz-placeholder {
   color: $theme.textSecondaryColor !important;
 }
 :-ms-placeholder {
+  color: $theme.textSecondaryColor !important;
+}
+:placeholder-shown {
   color: $theme.textSecondaryColor !important;
 }
 /* For browsers that don't support the placeholder attribute. */

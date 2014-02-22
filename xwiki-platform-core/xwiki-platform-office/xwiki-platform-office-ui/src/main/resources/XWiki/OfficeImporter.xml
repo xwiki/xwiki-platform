@@ -277,8 +277,6 @@
     <property>
       <code>.office_importer_box {
   border-radius: 10px;
-  -moz-border-radius: 10px;
-  -webkit-border-radius: 10px;
   background-color: #EEE;
   height: auto!important;
   padding: 0;

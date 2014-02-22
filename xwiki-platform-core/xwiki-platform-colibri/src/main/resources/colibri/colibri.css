@@ -1128,12 +1128,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
   background-position:  10px 3px;
   ## We don't use the #css3_backgroundIconAndLinearGradient macro because IE8 will accept the background-image property with multiple images, although it will fail to correctly interpret it
-  #foreach ($prefix in ['-webkit-'])
-    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(to top, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
-  #end
-  #foreach ($prefix in ['-moz-', '-o-', ''])
-    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(bottom, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
-  #end
+  background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, linear-gradient(to top, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
 }
 
 .actionmenu .tmWiki {

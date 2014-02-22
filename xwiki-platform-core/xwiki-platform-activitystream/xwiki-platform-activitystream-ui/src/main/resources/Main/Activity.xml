@@ -378,12 +378,6 @@ document.observe('xwiki:dom:loaded', function() {
     </property>
     <property>
       <code>#template('colorThemeInit.vm')
-#macro (__css3 $rule)
-  -moz-${rule};
-  -webkit-${rule};
-  ${rule};
-#end
-
 .rssURL{
   padding-top: 5px;
   text-align: right;
@@ -621,12 +615,12 @@ h1:hover .toolFilter .toolExpand {
 
 /** CSS 3**/
 .activitySnapshot .activityActionAvatar {
-  #__css3('border-radius: 10px 10px 0 10px')
-  #__css3('box-shadow: -1px 1px 1px rgba(128, 128, 128, 0.6)')
+  border-radius: 10px 10px 0 10px;
+  box-shadow: -1px 1px 1px rgba(128, 128, 128, 0.6);
 }
 
 .activitySnapshot img {
-  #__css3('box-shadow: 0 0 2px 1px rgba(128, 128, 128, 0.6)')
+  box-shadow: 0 0 2px 1px rgba(128, 128, 128, 0.6);
 }
 
 /** IE6, IE7 **/

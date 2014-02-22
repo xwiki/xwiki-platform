@@ -645,8 +645,6 @@ span#avatarUpload {
   background: url("$xwiki.getSkinFile('icons/silk/picture_edit.png')") no-repeat center center $theme.pageContentBackgroundColor !important;
   border: 0 none !important;
   border-bottom-left-radius: 8px;
-  -moz-border-radius-bottomleft: 8px;
-  -webkit-border-bottom-left-radius: 8px;
   height: 18px;
   position: absolute;
   right: 0;

@@ -78,6 +78,11 @@
       'end'  : $startOfTomorrow,
       'name' : '[NOW/DAY-30DAYS TO NOW/DAY+1DAY}',
       'count': 0
+    }, {
+      'label': $services.localization.render('solr.facet.date.olderThan30Days'),
+      'end'  : $startOfToday.minusDays(30),
+      'name' : '[* TO NOW/DAY-30DAYS}',
+      'count': 0
     }
   ])
   ## 2. Date intervals specified on the request.

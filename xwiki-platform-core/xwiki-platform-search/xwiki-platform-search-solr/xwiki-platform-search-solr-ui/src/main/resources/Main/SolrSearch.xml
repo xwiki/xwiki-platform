@@ -629,15 +629,11 @@
   ## In order to support multi-select faceting we need to exclude the corresponding filters when faceting.
   ## See http://wiki.apache.org/solr/SimpleFacetParameters#Multi-Select_Faceting_and_LocalParams
   #set ($facetFieldsWithFilterExcludes = [])
-  ## Not all facets support multiple selection:
-  ## * we use different query fields for different result types so the number of matches for the type facet changes when
-  ##   a result type is selected/unselected.
-  ## * date facets have ranges that intersect and so multiple selection doesn't make sense
-  ##   (e.g. 'Today' is included in 'Last 7 days' so it doesn't make sense to select both)
-  #set ($facetFieldsWithSingleSelection = ['type', 'date', 'creationdate', 'attdate'])
   #foreach ($facet in $facetFields)
     #set ($excludeTaggedFilter = '')
-    #if (!$facetFieldsWithSingleSelection.contains($facet))
+    ## The type facet doesn't support multiple selection because we use different query fields for different result
+    ## types so the number of matches for the type facet changes when a result type is selected/unselected.
+    #if ($facet != 'type')
       #set ($excludeTaggedFilter = "{!ex=$facet}")
     #end
     #set ($discard = $facetFieldsWithFilterExcludes.add("$excludeTaggedFilter$facet"))

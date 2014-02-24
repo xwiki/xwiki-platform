@@ -32,6 +32,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -365,7 +366,7 @@ public class ModelScriptService implements ScriptService
      *            "wiki:space.page^object.property" format and with special characters escaped where required)
      * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an object
      *            property reference relative to another entity reference
-     * @return the corresponding typed {@link ObjectReference} object (resolved using the
+     * @return the corresponding typed {@link ObjectPropertyReference} object (resolved using the
      *         {@value #DEFAULT_RESOLVER_HINT} resolver)
      * @since 3.2M3
      */
@@ -381,7 +382,7 @@ public class ModelScriptService implements ScriptService
      *            space or no page)
      * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve an object
      *            property reference relative to another entity reference
-     * @return the corresponding typed {@link ObjectReference} object
+     * @return the corresponding typed {@link ObjectPropertyReference} object
      * @since 3.2M3
      */
     public ObjectPropertyReference resolveObjectProperty(String stringRepresentation, String hint, Object... parameters)
@@ -390,6 +391,42 @@ public class ModelScriptService implements ScriptService
             EntityReferenceResolver<String> resolver =
                 this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
             return new ObjectPropertyReference(resolver.resolve(stringRepresentation, EntityType.OBJECT_PROPERTY,
+                parameters));
+        } catch (ComponentLookupException e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param stringRepresentation a class property reference specified as {@link String} (using the
+     *            "wiki:Space.Class^property" format and with special characters escaped where required)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve a class
+     *            property reference relative to another entity reference
+     * @return the corresponding typed {@link ClassPropertyReference} object (resolved using the
+     *         {@value #DEFAULT_RESOLVER_HINT} resolver)
+     * @since 5.4.2, 6.0M1
+     */
+    public ClassPropertyReference resolveClassProperty(String stringRepresentation, Object... parameters)
+    {
+        return resolveClassProperty(stringRepresentation, DEFAULT_RESOLVER_HINT, parameters);
+    }
+
+    /**
+     * @param stringRepresentation a class property reference specified as {@link String} (using the
+     *            "wiki:Space.Class^property" format and with special characters escaped where required)
+     * @param hint the hint of the resolver to use in case any part of the reference is missing (no wiki specified, no
+     *            space or no page)
+     * @param parameters extra parameters to pass to the resolver; you can use these parameters to resolve a class
+     *            property reference relative to another entity reference
+     * @return the corresponding typed {@link ClassPropertyReference} object
+     * @since 5.4.2, 6.0M1
+     */
+    public ClassPropertyReference resolveClassProperty(String stringRepresentation, String hint, Object... parameters)
+    {
+        try {
+            EntityReferenceResolver<String> resolver =
+                this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, hint);
+            return new ClassPropertyReference(resolver.resolve(stringRepresentation, EntityType.CLASS_PROPERTY,
                 parameters));
         } catch (ComponentLookupException e) {
             return null;

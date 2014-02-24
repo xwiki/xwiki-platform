@@ -30,24 +30,24 @@
   <creationDate>1384924669000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1384924669000</date>
   <contentUpdateDate>1384924669000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity output='false'}}
-#set ($defaultDateFormat = 'yyyy/MM/dd HH:mm')
-#set ($iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'")
-#set ($rangePattern = $regextool.compile('^\[(.+) TO (.+)\]$'))
+  <content>{{velocity}}
+#if (!$solrConfig)
+  {{include reference="Main.SolrSearchConfig" /}}
+#end
+{{/velocity}}
+
+{{velocity output='false'}}
+#set ($rangePattern = $regextool.compile('^[\[{](.+) TO (.+)[\]}]$'))
 #set ($wildcardPattern = $regextool.compile('^\(.*\*.*\)$'))
-#set ($facetPaginationStep = 5)
 
 #macro (displaySearchForm)
   {{html}}
@@ -164,61 +164,83 @@
     #set ($facetValuesLimit = $request.getParameter("l_$facetField.name"))
     (% class="search-facet#if ($facetRequestValues || $facetValuesLimit) expanded#end" %)(((
       {{html}}
-      #set ($facetPrettyNameKey = "solr.field.$facetField.name")
-      #if ($services.localization.get($facetPrettyNameKey))
-        #set ($facetPrettyName = $services.localization.render($facetPrettyNameKey))
-      #else
-        #set ($facetPrettyName = $facetField.name)
-      #end
-      &lt;div class="search-facet-header"&gt;$escapetool.xml($facetPrettyName)&lt;/div&gt; 
-      &lt;div class="search-facet-body"&gt;
-        #displaySearchFacetValues($facetValues)
-      &lt;/div&gt;
+      #displaySearchFacetHeader($facetField)
+      #displaySearchFacetBody($facetField)
       {{/html}}
     )))
   #end
 #end
 
-#set ($customSearchFacetValuesDisplayer = {
-  'type': 'type',
-  'wiki': 'wiki',
-  'locale': 'locale',
-  'author': 'user',
-  'creator': 'user',
-  'attauthor': 'user',
-  'date': 'date',
-  'creationdate': 'date',
-  'attdate': 'date',
-  'attsize': 'size',
-  'mimetype': 'mediaType'
-})
-
-#macro (displaySearchFacetValues $facetValues)
-  #set ($displayer = $customSearchFacetValuesDisplayer.get($facetField.name))
-  #if (!$displayer)
-    #set ($displayer = 'default')
+#macro (displaySearchFacetHeader $facetField)
+  #set ($facetPrettyNameKey = "solr.field.$facetField.name")
+  #if ($services.localization.get($facetPrettyNameKey))
+    #set ($facetPrettyName = $services.localization.render($facetPrettyNameKey))
+  #elseif ($facetField.name.startsWith('property.'))
+    ## Display the translated property pretty name.
+    ## Remove the 'property.' prefix and the data type suffix.
+    #set ($stringReference = $stringtool.substringBeforeLast($facetField.name.substring(9), '_'))
+    ## Note that the class property reference is resolved relative to the current wiki. This means the class must be
+    ## available on the wiki where the search is performed.
+    #set ($classPropertyReference = $services.model.resolveClassProperty($stringReference, 'solr'))
+    #set ($classDocument = $xwiki.getDocument($classPropertyReference.parent))
+    #set ($property = $classDocument.xWikiClass.get($classPropertyReference.name))
+    #set ($facetPrettyName = $property.translatedPrettyName)
+    #if ("$!facetPrettyName" == '')
+      #set ($facetPrettyName = $classPropertyReference.name)
+    #end
+  #else
+    #set ($facetPrettyName = $facetField.name)
   #end
-  #evaluate("${escapetool.h}displaySearchFacetValues_${displayer}(${escapetool.d}facetValues)")
+  &lt;div class="search-facet-header"&gt;$escapetool.xml($facetPrettyName)&lt;/div&gt; 
 #end
 
-#macro (displaySearchFacetValues_default $facetValues $customQueryStringParameters)
+#macro (displaySearchFacetBody $facetField)
+  &lt;div class="search-facet-body"&gt;
+    #set ($facetDisplayer = $solrConfig.facetDisplayers.get($facetField.name))
+    #if (!$facetDisplayer &amp;&amp; $facetField.name.startsWith('property.'))
+      ## Choose a facet displayer based on the property type.
+      ## Remove the 'property.' prefix and the data type suffix.
+      #set ($stringReference = $stringtool.substringBeforeLast($facetField.name.substring(9), '_'))
+      ## Note that the class property reference is resolved relative to the current wiki. This means the class must be
+      ## available on the wiki where the search is performed.
+      #set ($classPropertyReference = $services.model.resolveClassProperty($stringReference, 'solr'))
+      #set ($classDocument = $xwiki.getDocument($classPropertyReference.parent))
+      #set ($property = $classDocument.xWikiClass.get($classPropertyReference.name))
+      ## We rely on configuration instead of using a naming convention like "Main.Solr${property.classType}Facet"
+      ## because most of the property types don't need a custom facet displayer.
+      #set ($facetDisplayer = $solrConfig.facetDisplayersByPropertyType.get($property.classType))
+    #end
+    #if ($facetDisplayer)
+      #set ($facetDisplayer = $xwiki.getDocument($facetDisplayer))
+      #if ("$!facetDisplayer.content" != '')
+        $!doc.getRenderedContent($facetDisplayer.content, $facetDisplayer.syntax.toIdString(), 'xhtml/1.0')
+      #else
+        #displaySearchFacetValues($facetValues)
+      #end
+    #else
+      #displaySearchFacetValues($facetValues)
+    #end
+  &lt;/div&gt;
+#end
+
+#macro (displaySearchFacetValues $facetValues $customQueryStringParameters $customValueDisplayer)
   &lt;ul&gt;
-    #displaySearchFacetValuesLimited($facetValues $customQueryStringParameters)
+    #displaySearchFacetValuesLimited($facetValues $customQueryStringParameters $customValueDisplayer)
   &lt;/ul&gt;
 #end
 
-#macro (displaySearchFacetValuesLimited $facetValues $customQueryStringParameters)
+#macro (displaySearchFacetValuesLimited $facetValues $customQueryStringParameters $customValueDisplayer)
   #set ($limitRequestParameter = "l_$facetField.name")
   #set ($limit = $mathtool.toInteger($request.getParameter($limitRequestParameter)))
   #if ("$!limit" == '')
-    #set ($limit = $facetPaginationStep)
+    #set ($limit = $solrConfig.facetPaginationStep)
   #end
   #set ($limit = $mathtool.max($mathtool.min($limit, $facetValues.size()), 0))
   #foreach ($facetValue in $facetValues)
     #if ($foreach.index &lt; $limit)
-      &lt;li&gt;#displaySearchFacetValue($facetValue $customQueryStringParameters)&lt;/li&gt;
+      &lt;li&gt;#displaySearchFacetValue($facetValue $customQueryStringParameters $customValueDisplayer)&lt;/li&gt;
     #else
-      #extendQueryString($url {$limitRequestParameter: [$mathtool.add($limit, $facetPaginationStep)]})
+      #extendQueryString($url {$limitRequestParameter: [$mathtool.add($limit, $solrConfig.facetPaginationStep)]})
       &lt;li&gt;&lt;a href="$url" class="more"&gt;&amp;hellip; $escapetool.xml($services.localization.render(
         'solr.facets.moreValues', [$mathtool.sub($facetValues.size(), $limit)]))&lt;/a&gt;&lt;/li&gt;
       #break
@@ -226,7 +248,7 @@
   #end
 #end
 
-#macro (displaySearchFacetValue $facetValue $customQueryStringParameters)
+#macro (displaySearchFacetValue $facetValue $customQueryStringParameters $customValueDisplayer)
   #set ($selectedValues = [])
   #if ($facetRequestValues)
     #set ($discard = $selectedValues.addAll($facetRequestValues.subList(0, $facetRequestValues.size())))
@@ -252,71 +274,13 @@
     #else
       #set ($facetPrettyValue = $facetValue.name)
     #end
-    #set ($displayer = $customSearchFacetValueDisplayer.get($facetField.name))
-    #if (!$displayer)
-      #set ($displayer = 'default')
+    #if ($customValueDisplayer)
+      #evaluate("${escapetool.h}${customValueDisplayer}(${escapetool.d}facetPrettyValue)")
+    #else
+      $escapetool.xml($facetPrettyValue)
     #end
-    #evaluate("${escapetool.h}displaySearchFacetValue_${displayer}(${escapetool.d}facetPrettyValue)")
   &lt;/a&gt;
   &lt;div class="clearfloats"&gt;&lt;/div&gt;
-#end
-
-#set ($customSearchFacetValueDisplayer = {
-  'type': 'type',
-  'wiki': 'wiki',
-  'locale': 'locale',
-  'author': 'user',
-  'creator': 'user',
-  'attauthor': 'user',
-  'date': 'date',
-  'creationdate': 'date',
-  'attdate': 'date',
-  'class': 'class',
-  'attsize': 'size',
-  'mimetype': 'mediaType'
-})
-
-#macro (displaySearchFacetValue_default $facetPrettyValue)
-  $escapetool.xml($facetPrettyValue)
-#end
-
-#macro (displaySearchFacetValues_type $facetValues)
-  ## We have to reset the sort when the result type selection changes because the sort fields depend on the selected
-  ## result type.
-  #displaySearchFacetValues_default($facetValues {'sort': [], 'sortOrder': []})
-#end
-
-#macro (displaySearchFacetValue_type $type)
-  $escapetool.xml($services.localization.render("solr.filterBy.type.$type.toLowerCase()"))
-#end
-
-#macro (displaySearchFacetValues_wiki $facetValues)
-  #set ($actualFacetValues = $facetValues)
-  ## If the list of wikis that are searchable from the main wiki is restricted then we need to hide some values.
-  #if ($wikisSearchableFromMainWiki &amp;&amp; $xcontext.isMainWiki() &amp;&amp; !$facetRequestValues)
-    #set ($actualFacetValues = [])
-    #foreach ($facetValue in $facetValues)
-      #if ($wikisSearchableFromMainWiki.contains($facetValue.name))
-        #set ($discard = $actualFacetValues.add($facetValue))
-      #end
-    #end
-  #end
-  ## We need to reset the sort because the available sort fields depend on the selected result type.
-  #displaySearchFacetValues_default($actualFacetValues)
-#end
-
-#macro (displaySearchFacetValue_wiki $wikiName)
-  #set ($wikiPrettyName = $services.wiki.getById($wikiName).prettyName)
-  #if ("$!wikiPrettyName.trim()" == '')
-    #set ($wikiPrettyName = $wikiName)
-  #end
-  $escapetool.xml($wikiPrettyName)
-#end
-
-#macro (displaySearchFacetValues_locale $facetValues)
-  #set ($currentLocale = $services.localization.currentLocale)
-  #retainMatchedRequestValues()
-  #displaySearchFacetValues_default($facetValues)
 #end
 
 #**
@@ -339,562 +303,8 @@
   #end
 #end
 
-#macro (displaySearchFacetValue_locale $facetPrettyValue)
-  #if ($facetValue.name == $facetPrettyValue)
-    #set ($locale = $services.localization.toLocale($facetValue.name))
-    $escapetool.xml($locale.getDisplayName($currentLocale))
-  #else
-    $escapetool.xml($facetPrettyValue)
-    #set ($hint = $escapetool.xml($services.localization.render('solr.field.locale.emptyValue.hint')))
-    &lt;img src="$xwiki.getSkinFile('/icons/silk/information.png')" alt="$hint" title="$hint" class="icon" /&gt;
-  #end
-#end
-
-#macro (displaySearchFacetValues_user $facetValues)
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
-  &lt;ul class="users"&gt;
-    #displaySearchFacetValuesLimited($facetValues)
-  &lt;/ul&gt;
-#end
-
-#macro (displaySearchFacetValue_user $user)
-  #set ($userReference = $services.model.resolveDocument($user))
-  ## The string returned by XWiki#getUserName() is XML encoded.
-  #set ($userName = $xwiki.getUserName($user, false))
-  &lt;span class="user"&gt;
-    &lt;span class="user-avatar-wrapper"&gt;
-      #getUserAvatarURL($userReference $avatarURL 30)
-      &lt;img src="$escapetool.xml($avatarURL.url)" class="icon" alt="$userName" /&gt;
-    &lt;/span&gt;
-    &lt;span class="user-name"&gt;$userName&lt;/span&gt;
-    &lt;span&gt;
-      &lt;span class="user-alias"&gt;$escapetool.xml($userReference.name)&lt;/span&gt;
-      ## Display the wiki only for local users.
-      #if ($userReference.wikiReference.name != $xcontext.getMainWikiName())
-        &lt;span class="user-wiki"&gt;$escapetool.xml($userReference.wikiReference.name)&lt;/span&gt;
-      #end
-    &lt;/span&gt;
-  &lt;/span&gt;
-#end
-
-#macro (displaySearchFacetValues_date $facetValues)
-  ##
-  ## Build the list of date intervals.
-  ##
-  ## 1. Predefined date intervals.
-  #set ($now = $xwiki.jodatime.dateTime)
-  ## Solr indexes the dates in UTC timezone.
-  #set ($utcTimezone = $xwiki.jodatime.getTimezone(0))
-  #set ($now = $now.toDateTime($utcTimezone))
-  #set ($intervals = [
-    {
-      'label': $services.localization.render('solr.facet.date.today'),
-      'start': $now.withTimeAtStartOfDay(),
-      'end'  : $now,
-      'name' : '[NOW/DAY TO NOW]',
-      'count': 0
-    }, {
-      'label': $services.localization.render('solr.facet.date.last7Days'),
-      'start': $now.minusDays(7),
-      'end'  : $now,
-      'name' : '[NOW-7DAYS TO NOW]',
-      'count': 0
-    }, {
-      'label': $services.localization.render('solr.facet.date.last30Days'),
-      'start': $now.minusDays(30),
-      'end'  : $now,
-      'name' : '[NOW-30DAYS TO NOW]',
-      'count': 0
-    }
-  ])
-  ## 2. Date intervals specified on the request.
-  #set ($iso8601Formatter = $xwiki.jodatime.getDateTimeFormatterForPattern($iso8601DateFormat))
-  #set ($iso8601Formatter = $iso8601Formatter.withZone($utcTimezone))
-  #if ($facetRequestValues)
-    #set ($selectedIntervals = [])
-    #foreach ($selectedValue in $facetRequestValues)
-      ## Determine if the value/range is custom.
-      #set ($custom = true)
-      #foreach ($interval in $intervals)
-        #if ($interval.name == $selectedValue)
-          #set ($discard = $selectedIntervals.add($interval))
-          #set ($custom = false)
-          #break
-        #end
-      #end
-      #if ($custom)
-        #set ($rangeMatcher = $rangePattern.matcher($selectedValue))
-        #if ($rangeMatcher.matches())
-          #set ($range = [$rangeMatcher.group(1), $rangeMatcher.group(2)])
-          #foreach ($point in $range)
-            #if ($point == '*')
-              #set ($point = $NULL)
-            #else
-              #set ($point = $iso8601Formatter.parseDateTime($point))
-            #end
-            #set ($discard = $range.set($foreach.index, $point))
-          #end
-          #set ($discard = $selectedIntervals.add({
-            'start': $range.get(0),
-            'end'  : $range.get(1),
-            'name' : $selectedValue,
-            'count': 0
-          }))
-        #end
-      #end
-    #end
-    #set ($intervals = $selectedIntervals)
-  #end
-  ##
-  ## Count matches for each date interval.
-  ##
-  #foreach ($facetValue in $facetValues)
-    #set ($dateValue = $iso8601Formatter.parseDateTime($facetValue.name))
-    #foreach ($interval in $intervals)
-      #if ((!$interval.start || $dateValue.isAfter($interval.start))
-          &amp;&amp; (!$interval.end || $dateValue.isBefore($interval.end)))
-        #set ($discard = $interval.put('count', $mathtool.add($interval.count, $facetValue.count)))
-      #end
-    #end
-  #end
-  ## Filter the unselected date intervals that don't have matches.
-  #if (!$facetRequestValues)
-    #set ($intervalsWithMatches = [])
-    #foreach ($interval in $intervals)
-      #if ($interval.count &gt; 0)
-        #set ($discard = $intervalsWithMatches.add($interval))
-      #end
-    #end
-    #set ($intervals = $intervalsWithMatches)
-  #end
-  ##
-  ## Display date intervals.
-  ##
-  &lt;ul&gt;
-    #foreach ($facetValue in $intervals)
-      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
-    #end
-    #if (!$facetRequestValues)
-      ## Allow users to specify a custom interval.
-      &lt;li class="customDateInterval"&gt;
-        #displaySearchFacetValue_customDateInterval()
-      &lt;/li&gt;
-    #end
-  &lt;/ul&gt;
-#end
-
-#macro (displaySearchFacetValue_customDateInterval)
-  ## A simple date picker widget.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js', true))
-  ## Used to parse and serialize the selected date using the specified date format.
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js', true))
-  ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
-  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
-  &lt;form action="$doc.getURL('get')"&gt;
-    &lt;div class="hidden"&gt;
-      ## Reset the pagination because the number of results can change when a facet is applied.
-      #extendQueryString($url {
-        $facetRequestParameter: ['[* TO *]'],
-        'firstIndex': [],
-        'timezoneOffset': []
-      })
-      &lt;input type="hidden" name="xredirect" value="$escapetool.xml($url)" /&gt;
-      &lt;input type="hidden" name="facet" value="$escapetool.xml($facetRequestParameter)" /&gt;
-    &lt;/div&gt;
-    &lt;div class="itemName"&gt;$escapetool.xml($services.localization.render('solr.facet.date.customInterval'))&lt;/div&gt;
-    &lt;dl&gt;
-      &lt;dt class="hidden"&gt;
-        &lt;label for="$escapetool.xml($facetRequestParameter)_startDate"&gt;
-          $escapetool.xml($services.localization.render('solr.facet.date.start'))
-        &lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;input type="text" id="$escapetool.xml($facetRequestParameter)_startDate" name="startDate"
-          value="$escapetool.xml($services.localization.render('solr.facet.date.start'))"
-          class="datetime withTip" title="$escapetool.xml($dateFormat)" /&gt;
-      &lt;/dd&gt;
-      &lt;dt class="hidden"&gt;
-        &lt;label for="$escapetool.xml($facetRequestParameter)_endDate"&gt;
-          $escapetool.xml($services.localization.render('solr.facet.date.end'))
-        &lt;/label&gt;
-      &lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;input type="text" id="$escapetool.xml($facetRequestParameter)_endDate" name="endDate"
-          value="$escapetool.xml($services.localization.render('solr.facet.date.end'))"
-          class="datetime withTip" title="$escapetool.xml($dateFormat)" /&gt;
-      &lt;/dt&gt;
-    &lt;/dl&gt;
-    &lt;div&gt;
-      &lt;span class="buttonwrapper"&gt;
-        &lt;input type="submit" class="button" value="$escapetool.xml($services.localization.render(
-          'solr.facet.date.applyCustomInterval'))" /&gt;
-      &lt;/span&gt;
-    &lt;/div&gt;
-  &lt;/form&gt;
-#end
-
-#macro (displaySearchFacetValue_date $facetPrettyValue)
-  #if ($facetValue.label)
-    $escapetool.xml($facetValue.label)
-  #elseif ($facetValue.start || $facetValue.end)
-    ## Compute the client timezone.
-    #set ($timezoneOffsetInMinutes = $mathtool.toInteger($request.timezoneOffset))
-    #set ($offsetHours = $timezoneOffsetInMinutes / 60)
-    #set ($offsetMinutes = $mathtool.abs($timezoneOffsetInMinutes) % 60)
-    #set ($clientTimezone = $xwiki.jodatime.getTimezone($offsetHours, $offsetMinutes))
-    ## Obtain a date printer.
-    #set ($configuredDateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
-    #set ($datePrinter = $xwiki.jodatime.getDateTimeFormatterForPattern($configuredDateFormat))
-    #set ($datePrinter = $datePrinter.withLocale($services.localization.currentLocale).withZone($clientTimezone))
-    ## Display the custom interval.
-    #if (!$facetValue.start)
-      $escapetool.xml($services.localization.render('solr.facet.date.before',
-        [$datePrinter.print($facetValue.end)]))
-    #elseif (!$facetValue.end)
-      $escapetool.xml($services.localization.render('solr.facet.date.after',
-        [$datePrinter.print($facetValue.start)]))
-    #else
-      $services.localization.render('solr.facet.date.between',
-        ["$datePrinter.print($facetValue.start)&lt;br/&gt;", $datePrinter.print($facetValue.end)])
-    #end
-  #else
-    $escapetool.xml($services.localization.render('solr.facet.date.any'))
-  #end
-#end
-
-#macro (displaySearchFacetValue_class $classFullName)
-  #set ($classReference = $services.model.resolveDocument($classFullName, 'default'))
-  #set ($hint = $services.localization.render('solr.field.class.definedBy',
-    [$classReference.lastSpaceReference.name, $classReference.name]))
-  #set ($classPrettyName = $stringtool.removeEnd($classReference.name, 'Class'))
-  #set ($translationKey = "solr.field.class.$classPrettyName")
-  #if ($services.localization.get($translationKey))
-    #set ($classPrettyName = $services.localization.render('$translationKey'))
-  #else
-    ## Some of the default classes have names starting with 'XWiki'.
-    #set ($classPrettyName = $stringtool.removeStart($classPrettyName, 'XWiki'))
-    #set ($classPrettyName = $stringtool.join($stringtool.splitByCharacterTypeCamelCase($classPrettyName), ' '))
-    ## Make sure we don't have isolated upper case letters.
-    #set ($classPrettyName = $classPrettyName.replaceAll('(^| )([\p{Lu}]) ', '$1$2'))
-  #end
-  &lt;span title="$escapetool.xml($hint)"&gt;$escapetool.xml($classPrettyName)&lt;/span&gt;
-#end
-
-#macro (displaySearchFacetValues_size $facetValues)
-  ##
-  ## Predefined size intervals, specified in bytes.
-  ##
-  #set ($intervals = [
-    {
-      'id': 'tiny',
-      'end': 10240
-    }, {
-      'id': 'small',
-      'start': 10240,
-      'end': 512000
-    }, {
-      'id': 'medium',
-      'start': 512000,
-      'end': 5242880
-    }, {
-      'id': 'large',
-      'start': 5242880
-    }
-  ])
-  #foreach ($interval in $intervals)
-    #set ($start = $interval.start)
-    #set ($end = $interval.end)
-    #if (!$start)
-      #set ($start = '*')
-      #set ($hint = $services.localization.render('solr.facet.size.lessThan', ["#dynamicsize($end)"]))
-    #elseif (!$end)
-      #set ($end = '*')
-      #set ($hint = $services.localization.render('solr.facet.size.moreThan', ["#dynamicsize($start)"]))
-    #else
-      #set ($hint = $services.localization.render('solr.facet.size.between', ["#dynamicsize($start)", "#dynamicsize($end)"]))
-    #end
-    #set ($discard = $interval.putAll({
-      'label': $services.localization.render("solr.facet.size.$interval.id"),
-      'hint': $hint,
-      'name': "[$start TO $end]",
-      'count': 0
-    }))
-  #end
-  ##
-  ## Add custom size intervals specified on the request.
-  ##
-  #foreach ($selectedValue in $facetRequestValues)
-    ## Determine if the value/range is custom.
-    #set ($custom = true)
-    #foreach ($interval in $intervals)
-      #if ($interval.name == $selectedValue)
-        #set ($custom = false)
-        #break
-      #end
-    #end
-    #if ($custom)
-      #set ($rangeMatcher = $rangePattern.matcher($selectedValue))
-      #if ($rangeMatcher.matches())
-        #set ($discard = $intervals.add({
-          'start': $mathtool.toInteger($rangeMatcher.group(1)),
-          'end'  : $mathtool.toInteger($rangeMatcher.group(2)),
-          'name' : $selectedValue,
-          'count': 0
-        }))
-      #end
-    #end
-  #end
-  ##
-  ## Count matches for each date interval.
-  ##
-  #foreach ($facetValue in $facetValues)
-    #set ($size = $mathtool.toInteger($facetValue.name))
-    #foreach ($interval in $intervals)
-      #if ((!$interval.start || $interval.start &lt;= $size)
-          &amp;&amp; (!$interval.end || $size &lt; $interval.end))
-        #set ($discard = $interval.put('count', $mathtool.add($interval.count, $facetValue.count)))
-      #end
-    #end
-  #end
-  ## Filter the size intervals that don't have matches.
-  #set ($intervalsWithMatches = [])
-  #foreach ($interval in $intervals)
-    #if ($interval.count &gt; 0 || $facetRequestValues.contains($interval.name))
-      #set ($discard = $intervalsWithMatches.add($interval))
-    #end
-  #end
-  ## Make sure we sort the intervals based on the number of matches.
-  #set ($intervals = $sorttool.sort($intervalsWithMatches, 'count:desc'))
-  ##
-  ## Display the size intervals.
-  ##
-  &lt;ul&gt;
-    #foreach ($facetValue in $intervals)
-      &lt;li&gt;#displaySearchFacetValue($facetValue)&lt;/li&gt;
-    #end
-  &lt;/ul&gt;
-#end
-
-#macro (displaySearchFacetValue_size $sizeInterval)
-  #if ($facetValue.label)
-    &lt;span title="$escapetool.xml($facetValue.hint)"&gt;$escapetool.xml($facetValue.label)&lt;/span&gt;
-  #elseif ($facetValue.start || $facetValue.end)
-    ## Display the custom interval.
-    #if (!$facetValue.start)
-      $escapetool.xml($services.localization.render('solr.facet.size.lessThan',
-        ["#dynamicsize($facetValue.end)"]))
-    #elseif (!$facetValue.end)
-      $escapetool.xml($services.localization.render('solr.facet.size.moreThan',
-        ["#dynamicsize($facetValue.start)"]))
-    #else
-      $services.localization.render('solr.facet.size.between',
-        ["#dynamicsize($facetValue.start)", "#dynamicsize($facetValue.end)"])
-    #end
-  #else
-    $escapetool.xml($services.localization.render('solr.facet.size.any'))
-  #end
-#end
-
-#macro (displaySearchFacetValues_mediaType $facetValues)
-  #set ($categoryMap = {
-    'text': ['text/', 'application/xml', 'application/javascript', 'application/ecmascript',
-      'application/json', 'application/x-sh', '+xml'],
-    'image': ['image/'],
-    'office': ['application/pdf', 'application/postscript', 'application/msword', 'application/vnd.ms-',
-      'application/vnd.oasis.opendocument.', 'application/vnd.openxmlformats-officedocument.'],
-    'archive': ['application/zip', 'application/x-gzip', 'application/x-bzip', 'application/x-tar',
-      'application/x-gtar', 'application/vnd.xara', '-archive', '-compressed', '-package', '+zip'],
-    'audio': ['audio/'],
-    'video': ['video/'],
-    'font': ['application/font-', 'application/x-font-']
-  })
-  #groupMediaTypes($facetValues $categoryMap true)
-  ## We also need to group some technical media types inside a category.
-  #set ($subcategoryMap = {
-    'office': {
-      'word': ['application/msword', 'application/vnd.ms-word.', 'application/vnd.oasis.opendocument.text',
-        'application/vnd.openxmlformats-officedocument.word'],
-      'presentation': ['application/vnd.ms-powerpoint', 'application/vnd.oasis.opendocument.presentation',
-        'application/vnd.openxmlformats-officedocument.presentation'],
-      'spreadsheet': ['application/vnd.ms-excel', 'application/vnd.oasis.opendocument.spreadsheet',
-        'application/vnd.openxmlformats-officedocument.spreadsheet']
-    }
-  })
-  #foreach ($facetValue in $facetValues)
-    #set ($subcategories = $subcategoryMap.get($facetValue.id))
-    #if ($subcategories)
-      #groupMediaTypes($facetValue.mediaTypesWithCounts $subcategories)
-      ## Update the list of media types to be able to unselect all subcategories when a category is selected.
-      #set ($discard = $facetValue.mediaTypes.clear())
-      #foreach ($mediaType in $facetValue.mediaTypesWithCounts)
-        #set ($discard = $facetValue.mediaTypes.add($mediaType.name))
-      #end
-    #end
-  #end
-  #displayMediaTypesWithPagination($facetValues)
-#end
-
-#macro (groupMediaTypes $mediaTypes $groups $groupRemainingMediaTypes)
-  #set ($matchedGroups = [])
-  #set ($groupedMediaTypes = [])
-  #foreach ($entry in $groups.entrySet())
-    #set ($group = {
-      'id': $entry.key,
-      'count': 0,
-      'mediaTypes': [],
-      'mediaTypesWithCounts': []
-    })
-    #foreach ($mediaType in $mediaTypes)
-      ## See if this media type is included in this group.
-      #foreach ($pattern in $entry.value)
-        #if ($mediaType.name == $pattern || $mediaType.name.startsWith($pattern) || $mediaType.name.endsWith($pattern))
-          #set ($group.count = $group.count + $mediaType.count)
-          #set ($discard = $group.mediaTypes.add($mediaType.name))
-          #set ($discard = $group.mediaTypesWithCounts.add($mediaType))
-          #set ($discard = $groupedMediaTypes.add($mediaType))
-          #break
-        #end
-      #end
-    #end
-    #if ($group.count &gt; 0)
-      ## Compute the filter value.
-      #joinMediaTypes($entry.value $escapedFilterValue)
-      #set ($discard = $group.put('name', $escapedFilterValue))
-      #set ($discard = $matchedGroups.add($group))
-    #end
-  #end
-  #set ($discard = $mediaTypes.removeAll($groupedMediaTypes))
-  #if ($groupRemainingMediaTypes &amp;&amp; $mediaTypes.size() &gt; 0)
-    #set ($other = {
-      'id': 'other',
-      'count': 0,
-      'mediaTypes': [],
-      'mediaTypesWithCounts': []
-    })
-    #set ($discard = $other.mediaTypesWithCounts.addAll($mediaTypes))
-    #foreach ($mediaType in $mediaTypes)
-      #set ($other.count = $other.count + $mediaType.count)
-      #set ($discard = $other.mediaTypes.add($mediaType.name))
-    #end
-    #joinMediaTypes($other.mediaTypes $escapedFilterValue)
-    #set ($discard = $other.put('name', $escapedFilterValue))
-    #set ($discard = $mediaTypes.clear())
-    #set ($discard = $mediaTypes.add($other))
-  #end
-  #set ($discard = $mediaTypes.addAll($matchedGroups))
-  ## Sort the media type groups based on the number of matches.
-  ## Note that the sort tool doesn't change the passed list.
-  #set ($sortedMediaTypes = $sorttool.sort($mediaTypes, 'count:desc'))
-  #set ($discard = $mediaTypes.clear())
-  #set ($discard = $mediaTypes.addAll($sortedMediaTypes))
-#end
-
-#macro (joinMediaTypes $mediaTypes $return)
-  #set ($escapedMediaTypes = [])
-  #foreach ($mediaType in $mediaTypes)
-    ## Escape the characters that have special meaning in the filter query.
-    #set ($escapedMediaType = $mediaType.replaceAll('([/.+\-])', '\\$1'))
-    #if ($mediaType.indexOf('/') &gt; 0)
-      ## Prefix.
-      #set ($escapedMediaType = "$escapedMediaType*")
-    #else
-      ## Suffix.
-      #set ($escapedMediaType = "*$escapedMediaType")
-    #end
-    #set ($discard = $escapedMediaTypes.add($escapedMediaType))
-  #end
-  #set ($return = $NULL)
-  #setVariable("$return" "($stringtool.join($escapedMediaTypes, ' '))")
-#end
-
-#macro (displayMediaTypesWithPagination $categories)
-  #set ($limitRequestParameter = "l_$facetField.name")
-  #set ($categoryLimit = $mathtool.toInteger($request.getParameter($limitRequestParameter)))
-  #if ("$!categoryLimit" == '')
-    #set ($categoryLimit = $facetPaginationStep)
-  #end
-  #set ($categoryLimit = $mathtool.max($mathtool.min($categoryLimit, $categories.size()), 0))
-  &lt;ul class="mediaTypes"&gt;
-    #foreach ($category in $categories)
-      #if ($foreach.index &lt; $categoryLimit)
-        &lt;li&gt;
-          ## Backup the selected values to be able to restore them afterwards.
-          #set ($facetRequestValuesBackup = $facetRequestValues)
-          ## When an entire category is selected we need to remove the values that were selected from that category.
-          #set ($facetRequestValues = [])
-          #if ($facetRequestValuesBackup)
-            #set ($discard = $facetRequestValues.addAll($facetRequestValuesBackup.subList(0,
-              $facetRequestValuesBackup.size())))
-            #set ($discard = $facetRequestValues.removeAll($category.mediaTypes))
-          #end
-          &lt;div class="mediaTypeCategory"&gt;#displaySearchFacetValue($category)&lt;/div&gt;
-          ## When a media type is selected, it's category should be unselected.
-          #set ($facetRequestValues = [])
-          #if ($facetRequestValuesBackup)
-            #set ($discard = $facetRequestValues.addAll($facetRequestValuesBackup.subList(0,
-              $facetRequestValuesBackup.size())))
-            #set ($discard = $facetRequestValues.remove($category.name))
-          #end
-          &lt;ul&gt;#displaySearchFacetValuesLimited($category.mediaTypesWithCounts)&lt;/ul&gt;
-          ## Restore the selected values.
-          #set ($facetRequestValues = $facetRequestValuesBackup)
-        &lt;/li&gt;
-      #else
-        #extendQueryString($url {$limitRequestParameter: [$mathtool.add($categoryLimit, $facetPaginationStep)]})
-        &lt;li&gt;&lt;a href="$url" class="more"&gt;&amp;hellip; $escapetool.xml($services.localization.render(
-          'solr.facets.moreValues', [$mathtool.sub($categories.size(), $categoryLimit)]))&lt;/a&gt;&lt;/li&gt;
-        #break
-      #end
-    #end
-  &lt;/ul&gt;
-#end
-
-#macro (displaySearchFacetValue_mediaType $mediaType)
-  #if ($facetValue.id)
-    ## A media type category.
-    $services.localization.render("solr.filterBy.fileType.$facetValue.id")
-  #else
-    #set ($prettyName = $stringtool.substringAfter($mediaType, '/'))
-    ## Fonts have a dedicated category so we can remove the 'x-font-' prefix.
-    #set ($prettyName = $stringtool.removeStart($prettyName, 'x-font-'))
-    ## Non-standard media type, i.e. not registered with the Internet Assigned Numbers Authority (IANA).
-    #set ($prettyName = $stringtool.removeStart($prettyName, 'x-'))
-    ## Vendor specific media type.
-    #set ($prettyName = $stringtool.removeStart($prettyName, 'vnd.'))
-    ## Many media types end with '+xml' or something similar. Let's remove this part.
-    #set ($prettyName = $stringtool.substringBeforeLast($prettyName, '+'))
-    ## Attempt to translate the pretty name.
-    #set ($translationKey = "solr.facet.fileType.${category.id}.$prettyName")
-    #if ($services.localization.get($translationKey))
-      #set ($prettyName = $services.localization.render($translationKey))
-    #elseif ($prettyName.length() &lt; 5)
-      ## Probably a file extension (or acronym).
-      #set ($prettyName = $prettyName.toUpperCase())
-    #end
-    &lt;span title="$mediaType"&gt;$prettyName&lt;/span&gt;
-  #end
-#end
-
 #macro (displaySearchResultsSort)
-  #set ($defaultSortOrderByEntityType = {
-    'DOCUMENT': {
-      'score': 'desc',
-      'title_sort': 'asc',
-      'date': 'desc',
-      'author_display_sort': 'asc'
-    },
-    'ATTACHMENT': {
-      'score': 'desc',
-      'filename_sort': 'asc',
-      'attsize_sort': 'asc',
-      'attdate_sort': 'desc',
-      'attauthor_display_sort': 'asc'
-    }
-  })
-  #set ($defaultSortOrder = $defaultSortOrderByEntityType.get($type))
+  #set ($defaultSortOrder = $solrConfig.sortFields.get($type))
   #if (!$defaultSortOrder)
     #set ($defaultSortOrder = {'score': 'desc'})
   #end
@@ -1205,18 +615,8 @@
 
 #macro (setQueryFields $query)
   ## Specify which index fields are matched when a free text search is performed.
-  #set ($defaultBoost = {
-    'DOCUMENT': 'title^10.0 name^10.0
-                 doccontent^2.0
-                 objcontent^0.4 filename^0.4 attcontent^0.4 doccontentraw^0.4
-                 author_display^0.08 creator_display^0.08
-                 comment^0.016 attauthor_display^0.016 space^0.016',
-    'ATTACHMENT': 'filename^5.0 attcontent attauthor_display^0.2',
-    'OBJECT': 'objcontent',
-    'OBJECT_PROPERTY': 'propertyvalue'
-  })
   #if ($boost == '')
-    #set ($boost = $defaultBoost.get($type))
+    #set ($boost = $solrConfig.queryFields.get($type))
   #end
   #if ("$!boost" != '')
     #set ($discard = $query.bindValue('qf', $boost))
@@ -1225,8 +625,7 @@
 
 #macro (setFacetFields $query)
   ## The facets are displayed in this order so keep the most important facets first.
-  #set ($facetFields = ['type', 'wiki', 'space_exact', 'locale', 'author', 'creator', 'date',
-    'creationdate', 'class', 'name_exact', 'mimetype', 'attauthor', 'attdate', 'attsize'])
+  #set ($facetFields = $solrConfig.facetFields)
   ## In order to support multi-select faceting we need to exclude the corresponding filters when faceting.
   ## See http://wiki.apache.org/solr/SimpleFacetParameters#Multi-Select_Faceting_and_LocalParams
   #set ($facetFieldsWithFilterExcludes = [])
@@ -1269,9 +668,9 @@
   #if (!$xcontext.isMainWiki())
     ## Subwikis search by default in their content only.
     #set ($discard = $filters.put('wiki', [$xcontext.database]))
-  #elseif ($wikisSearchableFromMainWiki)
+  #elseif ($solrConfig.wikisSearchableFromMainWiki)
     ## The list of wikis that are searched by default can be configured.
-    #set ($discard = $filters.put('wiki', $wikisSearchableFromMainWiki))
+    #set ($discard = $filters.put('wiki', $solrConfig.wikisSearchableFromMainWiki))
   #end
   #if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
     #set ($discard = $filters.put('hidden', [false]))
@@ -1366,45 +765,6 @@ $value##
   #end
 #end
 
-#macro (convertDateFormat $dateString $inputFormat $dateParser $datePrinter $return)
-  ## We don't use the given date parser directly because it can throw IllegalArgumentException.
-  #set ($date = $datetool.toDate($inputFormat, $dateString, $services.localization.currentLocale))
-  #if ($date)
-    #set ($date = $datePrinter.print($dateParser.parseDateTime($dateString)))
-  #else
-    #set ($date = '*')
-  #end
-  #set ($return = $NULL)
-  #setVariable("$return" $date)
-#end
-
-#macro (handleCustomDateInterval)
-  ## Compute the client timezone.
-  #set ($timezoneOffsetInMinutes = $mathtool.toInteger($request.timezoneOffset))
-  #set ($offsetHours = $timezoneOffsetInMinutes / 60)
-  #set ($offsetMinutes = $mathtool.abs($timezoneOffsetInMinutes) % 60)
-  #set ($clientTimezone = $xwiki.jodatime.getTimezone($offsetHours, $offsetMinutes))
-  ## Obtain a date parser.
-  #set ($configuredDateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
-  #set ($dateParser = $xwiki.jodatime.getDateTimeFormatterForPattern($configuredDateFormat))
-  #set ($dateParser = $dateParser.withLocale($services.localization.currentLocale).withZone($clientTimezone))
-  ## Obtain a date printer (Solr indexes the dates in ISO8601 format with UTC timezone).
-  #set ($datePrinter = $xwiki.jodatime.getDateTimeFormatterForPattern($iso8601DateFormat))
-  #set ($utcTimezone = $xwiki.jodatime.getTimezone(0))
-  #set ($datePrinter = $datePrinter.withZone($utcTimezone))
-  ## Convert the given dates.
-  #convertDateFormat($request.startDate $configuredDateFormat $dateParser $datePrinter $startDate)
-  #convertDateFormat($request.endDate $configuredDateFormat $dateParser $datePrinter $endDate)
-  #set ($interval = "[$startDate TO $endDate]")
-  #set ($xredirect = $request.xredirect.replaceFirst(
-    "\b$regextool.quote($escapetool.url($request.facet))=[^&amp;$escapetool.d]*",
-    $escapetool.url({
-      $request.facet: $interval,
-      'timezoneOffset': $request.timezoneOffset
-    })))
-  $response.sendRedirect($xredirect)
-#end
-
 #macro (outputRSSFeed)
   ##
   ## Get the search results.
@@ -1449,8 +809,6 @@ $value##
 {{velocity}}
 #if ($request.media == 'rss')
   #outputRSSFeed()
-#elseif ($xcontext.action == 'get' &amp;&amp; "$!request.facet" != '' &amp;&amp; ($request.startDate || $request.endDate))
-  #handleCustomDateInterval()
 #elseif ("$!request.r" == '1')
   #displaySearchUI()
 #else
@@ -1602,6 +960,8 @@ $value##
       this.container.select('.search-facet-body a.itemName').each(function(facetValueAnchor) {
         var checkBox = new Element('input', {type: 'checkbox'});
         checkBox.checked = facetValueAnchor.hasClassName('selected');
+        // Add the 'checked' attribute so that it can be easily located with CSS.
+        checkBox.checked &amp;&amp; checkBox.setAttribute('checked', 'checked');
         checkBox.observe('click', facetValueAnchor.click.bind(facetValueAnchor));
         facetValueAnchor.insert({before: checkBox});
         // Remove the 'selected' class because the selected state is marked using the check box.
@@ -1638,63 +998,6 @@ $value##
     }
   });
 
-  var CustomDateIntervalBehavior = Class.create({
-    initialize: function(container) {
-      this.container = container;
-      var form = this.container.down('form');
-
-      // Note that we change the sign because Date#getTimezoneOffset() returns (UTC - local time)
-      // and we need (local time - UTC) on the server.
-      var timezoneOffset = new Element('input', {
-        type: 'hidden',
-        name: 'timezoneOffset',
-        value: -new Date().getTimezoneOffset()
-      });
-      form.down('div.hidden').insert(timezoneOffset);
-
-      var checkbox = new Element('input', {type: 'checkbox'});
-      checkbox.observe('click', function() {
-        form.toggle();
-      });
-
-      var label = new Element('label', {'class': 'itemName'});
-      label.insert(checkbox);
-      label.insert(form.down('.itemName').remove().innerHTML);
-      form.hide().insert({before: label});
-    },
-
-    _onToggle: function(event) {
-      var link = event.element();
-      var startDate = this.container.down('input.datetime');
-      var endDate = startDate.next('input.datetime');
-      // We change the sign because Date#getTimezoneOffset() returns (UTC - local time)
-      // and we need (local time - UTC) on the server.
-      var timezoneOffset = -new Date().getTimezoneOffset();
-      link.href = XWiki.currentDocument.getURL('get', Object.toQueryString({
-        facet: startDate.name,
-        startDate: startDate.value,
-        endDate: endDate.value,
-        timezoneOffset: timezoneOffset,
-        xredirect: link.readAttribute('href')
-      }));
-    }
-  });
-
-  var MediaTypeFacetBehavior = Class.create({
-    initialize: function(container) {
-      container.select('.mediaTypeCategory').each(function(category) {
-        var subtypes = category.next('ul');
-        var selected = category.down('.selected') || subtypes.down('.selected');
-        !selected &amp;&amp; category.addClassName('closed');
-        subtypes.toggle(selected);
-        category.down('.itemCount').observe('click', function(event) {
-          category.toggleClassName('closed');
-          subtypes.toggle();
-        });
-      });
-    }
-  });
-
   var SearchResultBehavior = Class.create({
     initialize: function(container) {
       this.container = container;
@@ -1719,16 +1022,8 @@ $value##
   });
 
   var init = function() {
-    $('body').select('.search-facet .mediaTypes').each(function(mediaTypeFacet) {
-      new MediaTypeFacetBehavior(mediaTypeFacet);
-    });
-
     var searchFacets = $('body').down('.search-facets');
     searchFacets &amp;&amp; new SearchFacetsBehavior(searchFacets);
-
-    $('body').select('.customDateInterval').each(function(customDateInterval) {
-      new CustomDateIntervalBehavior(customDateInterval);
-    });
 
     $('body').select('.search-result').each(function(searchResult) {
       new SearchResultBehavior(searchResult);
@@ -2169,65 +1464,6 @@ a.search-result-highlightAll:after {
 .search-facet-body .itemCount {
   float: right;
   padding: .1em 0;
-}
-
-/**
- * Date Facet
- */
-.search-facet-body .customDateInterval input {
-  margin-bottom: .3em;
-}
-.search-facet-body .customDateInterval .itemName {
-  cursor: pointer;
-  padding-left: 0;
-}
-.search-facet-body .customDateInterval form {
-  margin-top: .5em;
-}
-
-/**
- * User Facet
- */
-
-.users .itemName .user {
-  display: block;
-  margin: 0;
-}
-
-.users .itemName .user-name {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/**
- * Media Type Facet
- */
-.search-facet-body ul.mediaTypes ul {
-  margin-left: 1em;
-}
-
-/* Don't highlight the entire media type category. */
-.search-facet-body ul.mediaTypes &gt; li:hover {
-  background-color: transparent;
-}
-.search-facet-body .mediaTypeCategory:hover {
-  background-color: $theme.highlightColor;
-}
-
-.mediaTypeCategory .itemCount {
-  background: url("$doc.getAttachmentURL('light-grey-disclosure-arrow-down.png')") no-repeat scroll 100% 50% transparent;
-  cursor: pointer;
-  padding-right: 9px;
-}
-.mediaTypeCategory .itemCount:hover {
-  background-image: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-down.png')")
-}
-.mediaTypeCategory.closed .itemCount {
-  background-image: url("$doc.getAttachmentURL('light-grey-disclosure-arrow-left.png')")
-}
-.mediaTypeCategory.closed .itemCount:hover {
-  background-image: url("$doc.getAttachmentURL('dark-grey-disclosure-arrow-left.png')")
 }
 
 /**

@@ -88,6 +88,42 @@ $response.setContentType("text/xml")
   #end
   </results>
 #else ## if hibquery == "" and classnametosearch == ""
-  <?xml version="1.0" encoding="UTF-8"?>
-  <results type="0" />
+  ######################### DBListProperty query
+  #if($p.isRelationalStorage() && $p.isMultiSelect())
+    #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> ? and obj.className = ? and prop.id.id = obj.id and prop.id.name = ? and lower(list) like ?")
+    #set($queryResult = $xwiki.search($query, 30, 0, [${templatename}, ${classname}, ${fieldname}, "%${input}%"]))
+    #set($results = $queryResult.toArray())
+    <?xml version="1.0" encoding="UTF-8"?>
+    <results type="3">
+    #foreach($res in $results)
+      <rs id="$velocityCount" info="">$!{escapetool.xml($res)}</rs>
+    #end
+    </results>
+  ######################### StringListProperty query
+  #elseif($p.isMultiSelect())
+    #set($query = "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> ? and obj.className = ? and prop.id.id = obj.id and prop.name = ? and lower(prop.textValue) like ?")
+    #set($queryResult = $xwiki.search($query, 30, 0, [${templatename}, ${classname}, ${fieldname}, "%${input}%"]))
+    #set($results = $queryResult.toArray())
+    <?xml version="1.0" encoding="UTF-8"?>
+    <results type="5">
+    #foreach($res in $results)
+      #set($list = $p.getListFromString($res, $sep, false))
+      #set($list = $list.toArray())
+      #foreach($word in $list)
+          <rs id="$velocityCount" info="">$!{escapetool.xml($word)}</rs>
+       #end
+     #end
+    </results>
+  ######################### StringProperty query
+  #else
+    #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.className = ? and obj.name <> ? and prop.id.id = obj.id and prop.id.name = ? and lower(prop.value) like ?")
+    #set($queryResult = $xwiki.search($query.toString(), 30, 0, [${classname}, ${templatename}, ${fieldname}, "%${input}%"]))
+    #set($results = $queryResult.toArray())
+    <?xml version="1.0" encoding="UTF-8"?>
+    <results type="8">
+    #foreach($res in $results)
+      <rs id="$velocityCount" info="">$!{escapetool.xml($res)}</rs>
+     #end
+    </results>
+   #end
 #end ## if hibquery != "" and classnametosearch != ""

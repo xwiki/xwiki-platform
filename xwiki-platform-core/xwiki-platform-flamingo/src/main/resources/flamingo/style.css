@@ -1,0 +1,2 @@
+@import "$xwiki.getSkinFile('css/microformats.css')";
+@import "$xwiki.getSkinFile('flamingo.css', true)#if ("$!{request.colorTheme}" != '')?colorTheme=${request.colorTheme}#end";

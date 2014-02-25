@@ -6,6 +6,8 @@ $response.setContentType("text/xml")
 #set($secCol = "$!{request.get('secCol')}")
 #set($templatename = $classname + 'Template')
 #set($p = $xwiki.getDocument($classname).getxWikiClass().get($fieldname).getPropertyClass())
+#set($classnametosearch = $!{p.getCustomMappingMap()['classname']})
+#set($propnametosearch = $!{p.getCustomMappingMap()['idField']})
 #set($hibquery = "$!p.getSql()")
 ##
 ## Determine what was the input. If the property accepts multiple values and has separators, then
@@ -34,14 +36,14 @@ $response.setContentType("text/xml")
   #end
   #set($whereidx = $hibquery.toLowerCase().indexOf("where"))
   #if($whereidx < 0)
-    #set($like = " where lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like ?")
+    #set($like = " where lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like '%${input}%'")
     #set($hibquery = $hibquery.concat($like))
   #else
     #set($whereidx = $whereidx + 5)
-    #set($like = " lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like ? and")
+    #set($like = " lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like '%${input}%' and")
     #set($hibquery = "${hibquery.substring(0, $whereidx)}${like}${hibquery.substring($whereidx)}")
   #end
-  #set($results = $xwiki.search($hibquery, 30, 0, ["%${input}%"]))
+  #set($results = $services.query.hql($hibquery).setLimit(30).setOffset(0).execute())
   <?xml version="1.0" encoding="UTF-8"?>
   <results type="${resultsType}">
   #foreach($res in $results)
@@ -55,47 +57,37 @@ $response.setContentType("text/xml")
       #end
     #end
     #if(($info != '-') && ($rs != '-'))
-      <rs id="" info="$!{escapetool.xml($info)}">$!{escapetool.xml($rs)}</rs>
+      <rs id="$velocityCount" info="$!{escapetool.xml($info)}">$!{escapetool.xml($rs)}</rs>
     #end
   #end
   </results>
-#else ## hibquery == ""
-  ######################### DBListProperty query
-  #if($p.isRelationalStorage() && $p.isMultiSelect())
-    #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> ? and obj.className = ? and prop.id.id = obj.id and prop.id.name = ? and lower(list) like ?")
-    #set($queryResult = $xwiki.search($query, 30, 0, [${templatename}, ${classname}, ${fieldname}, "%${input}%"]))
-    #set($results = $queryResult.toArray())
-    <?xml version="1.0" encoding="UTF-8"?>
-    <results type="3">
-    #foreach($res in $results)
-      <rs id="$velocityCount" info="">$!{escapetool.xml($res)}</rs>
-    #end
-    </results>
-  ######################### StringListProperty query
-  #elseif($p.isMultiSelect())
-    #set($query = "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> ? and obj.className = ? and prop.id.id = obj.id and prop.name = ? and lower(prop.textValue) like ?")
-    #set($queryResult = $xwiki.search($query, 30, 0, [${templatename}, ${classname}, ${fieldname}, "%${input}%"]))
-    #set($results = $queryResult.toArray())
-    <?xml version="1.0" encoding="UTF-8"?>
-    <results type="5">
-    #foreach($res in $results)
-      #set($list = $p.getListFromString($res, $sep, false))
-      #set($list = $list.toArray())
-      #foreach($word in $list)
-          <rs id="$velocityCount" info="">$!{escapetool.xml($word)}</rs>
+#elseif(!$classnametosearch.isEmpty()) ## hibquery == ""
+  #if(!$propnametosearch.isEmpty())
+    #set($query = "select distinct doc.fullName, obj.$propnametosearch from Document doc, doc.object($classnametosearch) as obj where lower(obj.$propnametosearch) like '%${input}%'")
+    #set($resultsType = "6")
+  #else ## if propnametosearch == ""
+    #set($query = "select distinct doc.fullName, doc.fullName from Document doc, doc.object($classnametosearch) as obj where lower(doc.fullName) like '%${input}%'")
+    #set($resultsType = "7")
+  #end ## if propnametosearch != ""
+  #set($results = $services.query.xwql($query).execute())
+  <?xml version="1.0" encoding="UTF-8"?>
+  <results type="${resultsType}">
+  #foreach($res in $results)
+    #set($info = '')
+    #set($rs = $res)
+    #foreach($r in $res)
+      #if($velocityCount == 1)
+        #set($info = $r)
+      #elseif($velocityCount == 2)
+        #set($rs = $r)
       #end
     #end
-    </results>
-  ######################### StringProperty query
-  #else
-    #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.className = ? and obj.name <> ? and prop.id.id = obj.id and prop.id.name = ? and lower(prop.value) like ?")
-    #set($queryResult = $xwiki.search($query.toString(), 30, 0, [${classname}, ${templatename}, ${fieldname}, "%${input}%"]))
-    #set($results = $queryResult.toArray())
-    <?xml version="1.0" encoding="UTF-8"?>
-    <results type="8">
-    #foreach($res in $results)
-      <rs id="$velocityCount" info="">$!{escapetool.xml($res)}</rs>
+    #if(($info != '-') && ($rs != '-'))
+      <rs id="$velocityCount" info="$!{escapetool.xml($info)}">$!{escapetool.xml($rs)}</rs>
     #end
-    </results>
   #end
-#end ## if hibquery
+  </results>
+#else ## if hibquery == "" and classnametosearch == ""
+  <?xml version="1.0" encoding="UTF-8"?>
+  <results type="0" />
+#end ## if hibquery != "" and classnametosearch != ""

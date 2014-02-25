@@ -66,8 +66,13 @@
       'attauthor_display_sort': 'asc'
     }
   },
+  'filterQuery': [],
   'facetFields': ['type', 'wiki', 'space_exact', 'locale', 'author', 'creator', 'date',
     'creationdate', 'class', 'name_exact', 'mimetype', 'attauthor', 'attdate', 'attsize'],
+  'facetQuery': {
+    'type': 'DOCUMENT',
+    'locale': [$xcontext.language, '']
+  },
   'facetDisplayers': {
     'type': 'Main.SolrTypeFacet',
     'wiki': 'Main.SolrWikiFacet',

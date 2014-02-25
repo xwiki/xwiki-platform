@@ -171,19 +171,25 @@
   #end
 #end
 
+#macro (getXClassProperty $solrFieldName $property $classPropertyReference)
+  ## Remove the 'property.' prefix and the data type suffix.
+  #set ($stringReference = $stringtool.substringBeforeLast($solrFieldName.substring(9), '_'))
+  ## Note that the class property reference is resolved relative to the current wiki. This means the class must be
+  ## available on the wiki where the search is performed.
+  #set ($classPropertyReference = $NULL)
+  #setVariable("$classPropertyReference" $services.model.resolveClassProperty($stringReference, 'solr'))
+  #set ($classDocument = $xwiki.getDocument($classPropertyReference.parent))
+  #set ($property = $NULL)
+  #setVariable("$property" $classDocument.xWikiClass.get($classPropertyReference.name))
+#end
+
 #macro (displaySearchFacetHeader $facetField)
   #set ($facetPrettyNameKey = "solr.field.$facetField.name")
   #if ($services.localization.get($facetPrettyNameKey))
     #set ($facetPrettyName = $services.localization.render($facetPrettyNameKey))
   #elseif ($facetField.name.startsWith('property.'))
     ## Display the translated property pretty name.
-    ## Remove the 'property.' prefix and the data type suffix.
-    #set ($stringReference = $stringtool.substringBeforeLast($facetField.name.substring(9), '_'))
-    ## Note that the class property reference is resolved relative to the current wiki. This means the class must be
-    ## available on the wiki where the search is performed.
-    #set ($classPropertyReference = $services.model.resolveClassProperty($stringReference, 'solr'))
-    #set ($classDocument = $xwiki.getDocument($classPropertyReference.parent))
-    #set ($property = $classDocument.xWikiClass.get($classPropertyReference.name))
+    #getXClassProperty($facetField.name $property $classPropertyReference)
     #set ($facetPrettyName = $property.translatedPrettyName)
     #if ("$!facetPrettyName" == '')
       #set ($facetPrettyName = $classPropertyReference.name)
@@ -199,13 +205,7 @@
     #set ($facetDisplayer = $solrConfig.facetDisplayers.get($facetField.name))
     #if (!$facetDisplayer &amp;&amp; $facetField.name.startsWith('property.'))
       ## Choose a facet displayer based on the property type.
-      ## Remove the 'property.' prefix and the data type suffix.
-      #set ($stringReference = $stringtool.substringBeforeLast($facetField.name.substring(9), '_'))
-      ## Note that the class property reference is resolved relative to the current wiki. This means the class must be
-      ## available on the wiki where the search is performed.
-      #set ($classPropertyReference = $services.model.resolveClassProperty($stringReference, 'solr'))
-      #set ($classDocument = $xwiki.getDocument($classPropertyReference.parent))
-      #set ($property = $classDocument.xWikiClass.get($classPropertyReference.name))
+      #getXClassProperty($facetField.name $property)
       ## We rely on configuration instead of using a naming convention like "Main.Solr${property.classType}Facet"
       ## because most of the property types don't need a custom facet displayer.
       #set ($facetDisplayer = $solrConfig.facetDisplayersByPropertyType.get($property.classType))
@@ -497,6 +497,13 @@
         &lt;dt&gt;
           #if ($services.localization.get("solr.field.$entry.field"))
             $services.localization.render("solr.field.$entry.field")
+          #elseif ($entry.field.startsWith('property.'))
+            #getXClassProperty($entry.field $property $classPropertyReference)
+            #set ($propertyPrettyName = $property.translatedPrettyName)
+            #if ("$!propertyPrettyName" == '')
+              #set ($propertyPrettyName = $classPropertyReference.name)
+            #end
+            $propertyPrettyName
           #else
             $entry.field
           #end
@@ -644,32 +651,25 @@
 #macro (setFilterQuery $query)
   ##
   ## Collect the query filters.
-  ## Filter the search results based on the current language. The following results are kept:
-  ## * the translations in the current language, for those entities that support translations (e.g. a document
-  ##     translation in the current language)
-  ## * the translations in the supported/available languages, for those entities whose default language is the
-  ##     current language (e.g. if a document has French as default language and the list of supported languages
-  ##     is ['en', 'fr', 'ro'] then English an Romanian translations are included if they exist and the current
-  ##     language is French)
-  ## * the entities that don't support translations (attachments, objects) but which are bound to an entity
-  ##     (document) whose default language is the current language
-  ## * the entities that don't have a language set (e.g. documents that are translated with translation keys)
   #set ($filters = {})
-  ## Uncomment the following line of code if you want to search by default also in:
-  ## * the default translation of documents that are not translated in the current locale
-  ## * the "xx" translation if the current locale "xx_YY" doesn't have a translation available
-  ##   (e.g. "pt" when "pt_BR" is not available)
-  ## See the discussion on XWIKI-9977.
-  ##set ($discard = $filters.put('locales', [$xcontext.language]))
-  #if (!$xcontext.isMainWiki())
-    ## Subwikis search by default in their content only.
-    #set ($discard = $filters.put('wiki', [$xcontext.database]))
-  #elseif ($solrConfig.wikisSearchableFromMainWiki)
-    ## The list of wikis that are searched by default can be configured.
-    #set ($discard = $filters.put('wiki', $solrConfig.wikisSearchableFromMainWiki))
-  #end
-  #if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
-    #set ($discard = $filters.put('hidden', [false]))
+  ## Add the default filters if not specified in the configuration.
+  #if (!$solrConfig.filterQuery || $solrConfig.filterQuery.isEmpty())
+    ## Uncomment the following line of code if you want to search by default also in:
+    ## * the default translation of documents that are not translated in the current locale
+    ## * the "xx" translation if the current locale "xx_YY" doesn't have a translation available
+    ##   (e.g. "pt" when "pt_BR" is not available)
+    ## See the discussion on XWIKI-9977.
+    ##set ($discard = $filters.put('locales', [$xcontext.language]))
+    #if (!$xcontext.isMainWiki())
+      ## Subwikis search by default in their content only.
+      #set ($discard = $filters.put('wiki', [$xcontext.database]))
+    #elseif ($solrConfig.wikisSearchableFromMainWiki)
+      ## The list of wikis that are searched by default can be configured.
+      #set ($discard = $filters.put('wiki', $solrConfig.wikisSearchableFromMainWiki))
+    #end
+    #if ($xwiki.getUserPreference('displayHiddenDocuments') != 1)
+      #set ($discard = $filters.put('hidden', [false]))
+    #end
   #end
   ## Add the facets.
   #foreach ($parameter in $request.parameterMap.entrySet())
@@ -684,6 +684,9 @@
   ##
   ## Build the filter query.
   #set ($filterQuery = [])
+  #if ($solrConfig.filterQuery)
+    #set ($discard = $filterQuery.addAll($solrConfig.filterQuery))
+  #end
   #foreach ($filter in $filters.entrySet())
     ## Use OR between different values of the same filter/facet.
     ## Tag the filter so that we can exclude it when faceting in order to support multi-select faceting.
@@ -805,15 +808,17 @@ $value##
 {{velocity}}
 #if ($request.media == 'rss')
   #outputRSSFeed()
-#elseif ("$!request.r" == '1')
+#elseif ("$!request.r" == '1' || $solrConfig.facetQuery.isEmpty())
   #displaySearchUI()
 #else
-  ## Redirect using the default search filters
-  #extendQueryString($url {
-    'r': 1,
-    'f_type': 'DOCUMENT',
-    'f_locale': [$xcontext.language, '']
-  })
+  ## Redirect using preselected facet values.
+  #set ($extraParams = {})
+  #foreach ($entry in $solrConfig.facetQuery.entrySet())
+    #set ($discard = $extraParams.put("f_$entry.key", $entry.value))
+  #end
+  ## Prevent redirect loop.
+  #set ($extraParams.r = 1)
+  #extendQueryString($url $extraParams)
   $response.sendRedirect($url)
 #end
 {{/velocity}}</content>
@@ -1277,6 +1282,7 @@ blockquote.search-result-highlight {
 dl.search-result-highlights &gt; dt {
   color: $theme.textSecondaryColor;
   font-weight: normal;
+  text-transform: capitalize;
 }
 
 dl.search-result-highlights.preview dt,

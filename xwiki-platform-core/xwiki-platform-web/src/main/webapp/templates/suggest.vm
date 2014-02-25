@@ -40,10 +40,10 @@ $response.setContentType("text/xml")
     #set($hibquery = $hibquery.concat($like))
   #else
     #set($whereidx = $whereidx + 5)
-    #set($like = " lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like '%${input}%' and")
+    #set($like = " lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like :userinput and")
     #set($hibquery = "${hibquery.substring(0, $whereidx)}${like}${hibquery.substring($whereidx)}")
   #end
-  #set($results = $services.query.hql($hibquery).setLimit(30).setOffset(0).execute())
+  #set($results = $services.query.hql($hibquery).setLimit(30).setOffset(0).bindValue('userinput', "%${input}%").execute())
   <?xml version="1.0" encoding="UTF-8"?>
   <results type="${resultsType}">
   #foreach($res in $results)
@@ -63,13 +63,13 @@ $response.setContentType("text/xml")
   </results>
 #elseif(!$classnametosearch.isEmpty()) ## hibquery == ""
   #if(!$propnametosearch.isEmpty())
-    #set($query = "select distinct doc.fullName, obj.$propnametosearch from Document doc, doc.object($classnametosearch) as obj where lower(obj.$propnametosearch) like '%${input}%'")
+    #set($query = "select distinct doc.fullName, obj.$propnametosearch from Document doc, doc.object($classnametosearch) as obj where lower(obj.$propnametosearch) like :userinput")
     #set($resultsType = "6")
   #else ## if propnametosearch == ""
-    #set($query = "select distinct doc.fullName, doc.fullName from Document doc, doc.object($classnametosearch) as obj where lower(doc.fullName) like '%${input}%'")
+    #set($query = "select distinct doc.fullName, doc.fullName from Document doc, doc.object($classnametosearch) as obj where lower(doc.fullName) like :userinput")
     #set($resultsType = "7")
   #end ## if propnametosearch != ""
-  #set($results = $services.query.xwql($query).execute())
+  #set($results = $services.query.xwql($query).setLimit(30).setOffset(0).bindValue('userinput', "%${input}%").execute())
   <?xml version="1.0" encoding="UTF-8"?>
   <results type="${resultsType}">
   #foreach($res in $results)

@@ -36,7 +36,7 @@ $response.setContentType("text/xml")
   #end
   #set($whereidx = $hibquery.toLowerCase().indexOf("where"))
   #if($whereidx < 0)
-    #set($like = " where lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like '%${input}%'")
+    #set($like = " where lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like :userinput")
     #set($hibquery = $hibquery.concat($like))
   #else
     #set($whereidx = $whereidx + 5)
@@ -90,8 +90,8 @@ $response.setContentType("text/xml")
 #else ## if hibquery == "" and classnametosearch == ""
   ######################### DBListProperty query
   #if($p.isRelationalStorage() && $p.isMultiSelect())
-    #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> ? and obj.className = ? and prop.id.id = obj.id and prop.id.name = ? and lower(list) like ?")
-    #set($queryResult = $xwiki.search($query, 30, 0, [${templatename}, ${classname}, ${fieldname}, "%${input}%"]))
+    #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.id.name = :fieldname and lower(list) like :userinput")
+	#set($queryResult = $services.query.hql($query).setLimit(30).setOffset(0).bindValue(':templatename', ${templatename}).bindValue(':classname', ${classname}).bindValue(':fieldname', ${fieldname}).bindValue('userinput', "%${input}%").execute())
     #set($results = $queryResult.toArray())
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="3">
@@ -101,8 +101,8 @@ $response.setContentType("text/xml")
     </results>
   ######################### StringListProperty query
   #elseif($p.isMultiSelect())
-    #set($query = "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> ? and obj.className = ? and prop.id.id = obj.id and prop.name = ? and lower(prop.textValue) like ?")
-    #set($queryResult = $xwiki.search($query, 30, 0, [${templatename}, ${classname}, ${fieldname}, "%${input}%"]))
+    #set($query = "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.name = :fieldname and lower(prop.textValue) like :userinput")
+	#set($queryResult = $services.query.hql($query).setLimit(30).setOffset(0).bindValue(':templatename', ${templatename}).bindValue(':classname', ${classname}).bindValue(':fieldname', ${fieldname}).bindValue('userinput', "%${input}%").execute())
     #set($results = $queryResult.toArray())
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="5">
@@ -116,8 +116,8 @@ $response.setContentType("text/xml")
     </results>
   ######################### StringProperty query
   #else
-    #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.className = ? and obj.name <> ? and prop.id.id = obj.id and prop.id.name = ? and lower(prop.value) like ?")
-    #set($queryResult = $xwiki.search($query.toString(), 30, 0, [${classname}, ${templatename}, ${fieldname}, "%${input}%"]))
+    #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.id.name = :fieldname and lower(prop.value) like :userinput")
+	#set($queryResult = $services.query.hql($query).setLimit(30).setOffset(0).bindValue(':templatename', ${templatename}).bindValue(':classname', ${classname}).bindValue(':fieldname', ${fieldname}).bindValue('userinput', "%${input}%").execute())
     #set($results = $queryResult.toArray())
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="8">

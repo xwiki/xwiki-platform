@@ -52,23 +52,6 @@ $response.setContentType("text/xml")
   #set($queryChain = $queryChain.setLimit(30))
   #set($queryChain = $queryChain.setOffset(0))
   #set($results = $queryChain.execute())
-  <?xml version="1.0" encoding="UTF-8"?>
-  <results type="${resultsType}">
-  #foreach($res in $results)
-    #set($info = '')
-    #set($rs = $res)
-    #foreach($r in $res)
-      #if(${foreach.count} == 1)
-        #set($info = $r)
-      #elseif(${foreach.count} == 2)
-        #set($rs = $r)
-      #end
-    #end
-    #if(($info != '-') && ($rs != '-'))
-      <rs id="${foreach.count}" info="$!{escapetool.xml($info)}">$!{escapetool.xml($rs)}</rs>
-    #end
-  #end
-  </results>
 #elseif(!$classnametosearch.isEmpty()) ## hibquery == ""
   #if(!$propnametosearch.isEmpty())
     #set($query = "select distinct doc.fullName, obj.$propnametosearch from Document doc, doc.object($classnametosearch) as obj where lower(obj.$propnametosearch) like :userinput")
@@ -86,23 +69,6 @@ $response.setContentType("text/xml")
   #set($queryChain = $queryChain.setLimit(30))
   #set($queryChain = $queryChain.setOffset(0))
   #set($results = $queryChain.execute())
-  <?xml version="1.0" encoding="UTF-8"?>
-  <results type="${resultsType}">
-  #foreach($res in $results)
-    #set($info = '')
-    #set($rs = $res)
-    #foreach($r in $res)
-      #if(${foreach.count} == 1)
-        #set($info = $r)
-      #elseif(${foreach.count} == 2)
-        #set($rs = $r)
-      #end
-    #end
-    #if(($info != '-') && ($rs != '-'))
-      <rs id="${velocityCount}" info="$!{escapetool.xml($info)}">$!{escapetool.xml($rs)}</rs>
-    #end
-  #end
-  </results>
 #else ## if hibquery == "" and classnametosearch == ""
   #set($bindValues = {})
   #set($discard = $bindValues.put('templatename', ${templatename}))
@@ -120,12 +86,7 @@ $response.setContentType("text/xml")
     #set($queryChain = $queryChain.setOffset(0))
     #set($queryResult = $queryChain.execute())
     #set($results = $queryResult.toArray())
-    <?xml version="1.0" encoding="UTF-8"?>
-    <results type="3">
-    #foreach($res in $results)
-      <rs id="$velocityCount" info="">$!{escapetool.xml($res)}</rs>
-    #end
-    </results>
+    #set($resultsType = "3")
   ######################### StringListProperty query
   #elseif($p.isMultiSelect())
     #set($query = "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.name = :fieldname and lower(prop.textValue) like :userinput")
@@ -137,16 +98,16 @@ $response.setContentType("text/xml")
     #set($queryChain = $queryChain.setOffset(0))
     #set($queryResult = $queryChain.execute())
     #set($results = $queryResult.toArray())
-    <?xml version="1.0" encoding="UTF-8"?>
-    <results type="5">
+    #set($finalList = [])
     #foreach($res in $results)
-      #set($list = $p.getListFromString($res, $sep, false))
+      #set($list = $p.getListFromString($res, '|', false))
       #set($list = $list.toArray())
-      #foreach($word in $list)
-          <rs id="$velocityCount" info="">$!{escapetool.xml($word)}</rs>
-       #end
-     #end
-    </results>
+      #foreach($e in $list)
+        #set($discard = $finalList.add($e))
+      #end
+    #end
+    #set($results = $finalList)
+    #set($resultsType = "5")
   ######################### StringProperty query
   #else
     #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.id.name = :fieldname and lower(prop.value) like :userinput")
@@ -158,11 +119,24 @@ $response.setContentType("text/xml")
     #set($queryChain = $queryChain.setOffset(0))
     #set($queryResult = $queryChain.execute())
     #set($results = $queryResult.toArray())
-    <?xml version="1.0" encoding="UTF-8"?>
-    <results type="8">
-    #foreach($res in $results)
-      <rs id="$velocityCount" info="">$!{escapetool.xml($res)}</rs>
-     #end
-    </results>
-   #end
+    #set($resultsType = "8")
+ #end
 #end ## if hibquery != "" and classnametosearch != ""
+##### Printing the XML file
+<?xml version="1.0" encoding="UTF-8"?>
+<results type="${resultsType}">
+#foreach($res in $results)
+  #set($info = '')
+  #set($rs = $res)
+  #foreach($r in $res)
+    #if(${foreach.count} == 1)
+      #set($info = $r)
+    #elseif(${foreach.count} == 2)
+      #set($rs = $r)
+    #end
+  #end
+  #if(($info != '-') && ($rs != '-'))
+    <rs id="${foreach.count}" info="$!{escapetool.xml($info)}">$!{escapetool.xml($rs)}</rs>
+  #end
+#end
+</results>

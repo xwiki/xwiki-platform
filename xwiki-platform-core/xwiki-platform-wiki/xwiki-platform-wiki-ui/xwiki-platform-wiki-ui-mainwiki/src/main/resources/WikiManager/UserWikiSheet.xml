@@ -20,30 +20,84 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>WikiManager</web>
   <name>UserWikiSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.XWikiUserSheet</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1392888654000</creationDate>
+  <parent>XWiki.XWikiUserSheet</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1303477252000</creationDate>
-  <date>1303892649000</date>
-  <contentUpdateDate>1303892649000</contentUpdateDate>
+  <date>1393434253000</date>
+  <contentUpdateDate>1393434253000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity}}
+#set ($obj = $doc.getObject('XWiki.XWikiUsers'))
+#if (!$obj)
+= {{translation key="xe.admin.users.sheet"/}} =
+
+{{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}
+#else
+  #set($temp = $xwiki.ssx.use('WikiManager.UserWikiSheet'))
+  #set($temp = $xwiki.jsx.use('WikiManager.UserWikiSheet'))
+  #set($temp = $doc.use($obj))
+  #set ($currentUser = $xcontext.user)
+  #if (!$currentUser.startsWith("${services.wiki.mainWikiId}:"))
+    #set ($currentUser = "${services.wiki.mainWikiId}:${currentUser}")
+  #end
+  #set($documentUser = $doc.prefixedFullName)
+  #set($isMyProfile = ($currentUser == $documentUser))
+  {{html clean='false' wiki='false'}}
+  &lt;div class='half column'&gt;
+    &lt;div class='profile-section highlighted-profile-section'&gt;
+      &lt;h1&gt;$services.localization.render('platform.wiki.users.profile.joinedwikis.label')&lt;/h1&gt;
+      #set ($joinedWikis = [])
+      #set ($wikis = $services.wiki.getAll())
+      #foreach ($wiki in $wikis)
+        #if($services.wiki.user.isMember($currentUser, $wiki.id))
+          #set($temp = $joinedWikis.add($wiki))
+        #end
+      #end
+      #if ($joinedWikis.size() == 0)
+        &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki')#{else}$services.localization.render('platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki')#end&lt;/span&gt;
+      #else
+        &lt;ul id='wikis'&gt;
+        #foreach ($wiki in $joinedWikis)
+          &lt;li id='$wiki.id'&gt;
+            &lt;span class='wikiHomepage'&gt;&lt;a href='$xwiki.getURL($wiki.mainPageReference)'&gt;$wiki.prettyName&lt;/a&gt;&lt;/span&gt;
+            &lt;span class='wikiActivity'&gt;&lt;a href='$doc.getURL('view', "category=wikis&amp;amp;wikiName=$wiki.id")'&gt;$services.localization.render('platform.wiki.users.profile.activity.show') &amp;#187;&lt;/a&gt;&lt;/span&gt;
+          &lt;/li&gt;
+        #end
+        &lt;/ul&gt;
+      #end
+    &lt;/div&gt;
+  &lt;/div&gt;
+  {{/html}}
+  {{html clean='false' wiki='true'}}
+  &lt;div id='wikiActivity' class='half column'&gt;
+    &lt;div id='wikiActivityColumn'&gt;
+    #if("$!request.wikiName" != '')
+      {{include reference="WikiManager.WikiActivityServiceCode" /}}
+    #end
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
+  {{/html}}                       
+#end## User object exists
+{{/velocity}}</content>
   <object>
+    <name>WikiManager.UserWikiSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>80a56ef7-cc1d-4206-a749-9066de3e32df</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -115,10 +169,6 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManager.UserWikiSheet</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>80a56ef7-cc1d-4206-a749-9066de3e32df</guid>
     <property>
       <cache>forbid</cache>
     </property>
@@ -194,6 +244,10 @@ return XWiki;
     </property>
   </object>
   <object>
+    <name>WikiManager.UserWikiSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>a20d3a8b-f13e-4d73-8dc4-3e6fb45ddc5f</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -265,10 +319,6 @@ return XWiki;
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>WikiManager.UserWikiSheet</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>a20d3a8b-f13e-4d73-8dc4-3e6fb45ddc5f</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -314,58 +364,4 @@ return XWiki;
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{velocity}}
-#set ($obj = $doc.getObject('XWiki.XWikiUsers'))
-#if (!$obj)
-= {{translation key="xe.admin.users.sheet"/}} =
-
-{{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}
-#else
-  #set($temp = $xwiki.ssx.use('WikiManager.UserWikiSheet'))
-  #set($temp = $xwiki.jsx.use('WikiManager.UserWikiSheet'))
-  #set($temp = $doc.use($obj))
-  #set ($currentUser = $xcontext.user)
-  #if (!$currentUser.startsWith("${services.wiki.mainWikiId}:"))
-    #set ($currentUser = "${services.wiki.mainWikiId}:${currentUser}")
-  #end
-  #set($documentUser = $doc.prefixedFullName)
-  #set($isMyProfile = ($currentUser == $documentUser))
-  {{html clean='false' wiki='false'}}
-  &lt;div class='half column'&gt;
-    &lt;div class='profile-section highlighted-profile-section'&gt;
-      &lt;h1&gt;$services.localization.render('platform.wiki.users.profile.joinedwikis.label')&lt;/h1&gt;
-      #set ($joinedWikis = [])
-      #set ($wikis = $services.wiki.getAll())
-      #foreach ($wiki in $wikis)
-        #if($services.wiki.user.isMember($currentUser, $wiki.id))
-          #set($temp = $joinedWikis.add($wiki))
-        #end
-      #end
-      #if ($joinedWikis.size() == 0)
-        &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki')#{else}$services.localization.render('platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki')#end&lt;/span&gt;
-      #else
-        &lt;ul id='wikis'&gt;
-        #foreach ($wiki in $joinedWikis)
-          &lt;li id='$wiki.id'&gt;
-            &lt;span class='wikiHomepage'&gt;&lt;a href='$xwiki.getURL($wiki.mainPageReference)'&gt;$wiki.prettyName&lt;/a&gt;&lt;/span&gt;
-            &lt;span class='wikiActivity'&gt;&lt;a href='$doc.getURL('view', "category=wikis&amp;amp;wikiName=$wiki.id")'&gt;$services.localization.render('platform.wiki.users.profile.activity.show') &amp;#187;&lt;/a&gt;&lt;/span&gt;
-          &lt;/li&gt;
-        #end
-        &lt;/ul&gt;
-      #end
-    &lt;/div&gt;
-  &lt;/div&gt;
-  {{/html}}
-  {{html clean='false' wiki='true'}}
-  &lt;div id='wikiActivity' class='half column'&gt;
-    &lt;div id='wikiActivityColumn'&gt;
-    #if("$!request.wikiName" != '')
-      {{include reference="WikiManager.WikiActivityServiceCode" /}}
-    #end
-    &lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-  {{/html}}                       
-#end## User object exists
-{{/velocity}}</content>
 </xwikidoc>

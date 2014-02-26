@@ -55,7 +55,7 @@
   #end
   #set($documentUser = $doc.prefixedFullName)
   #set($isMyProfile = ($currentUser == $documentUser))
-  {{html clean='false' wiki='false'}}
+  {{html clean='false'}}
   &lt;div class='half column'&gt;
     &lt;div class='profile-section highlighted-profile-section'&gt;
       &lt;h1&gt;$services.localization.render('platform.wiki.users.profile.joinedwikis.label')&lt;/h1&gt;
@@ -81,6 +81,7 @@
     &lt;/div&gt;
   &lt;/div&gt;
   {{/html}}
+
   {{html clean='false' wiki='true'}}
   &lt;div id='wikiActivity' class='half column'&gt;
     &lt;div id='wikiActivityColumn'&gt;
@@ -90,7 +91,7 @@
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-  {{/html}}                       
+  {{/html}}
 #end## User object exists
 {{/velocity}}</content>
   <object>

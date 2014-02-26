@@ -40,7 +40,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
-#set ($solrConfig = {
+#set ($__defaultSolrConfig = {
   'queryFields': {
     'DOCUMENT': 'title^10.0 name^10.0
                  doccontent^2.0
@@ -140,5 +140,11 @@
   },
   'wikisSearchableFromMainWiki': $wikisSearchableFromMainWiki
 })
+
+#if ($solrConfig)
+  ## Merge the provided configuration with the default configuration.
+  #set ($discard = $__defaultSolrConfig.putAll($solrConfig))
+#end
+#set ($solrConfig = $__defaultSolrConfig)
 {{/velocity}}</content>
 </xwikidoc>

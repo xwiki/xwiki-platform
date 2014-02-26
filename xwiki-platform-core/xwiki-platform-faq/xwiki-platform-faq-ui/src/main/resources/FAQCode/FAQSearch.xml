@@ -41,26 +41,19 @@
   <hidden>true</hidden>
   <content>{{include reference="XWiki.SearchCode"/}}
 
-{{velocity}}
-##
-## Customize the Solr Search UI.
-##
-#if ($searchEngine == 'solr')
-  ## Create the configuration object.
-  {{include reference="Main.SolrSearchConfig"/}}
-#end
-{{/velocity}}
 {{velocity output="false"}}
-#if ($solrConfig)
-  ## Overwrite some configuration parameters.
-  #set ($solrConfig.queryFields = 'title^3 property.FAQCode.FAQClass.answer')
-  #set ($solrConfig.filterQuery = [
-    'type:DOCUMENT',
-    "wiki:$xcontext.database",
-    "space_exact:$doc.space",
-    'class:FAQCode.FAQClass'
-  ])
-  #set ($solrConfig.facetFields = ['creator', 'creationdate', 'author', 'date', 'mimetype', 'attauthor', 'attdate', 'attsize'])
+#if ($searchEngine == 'solr')
+  ## Customize the Solr Search UI for the FAQ application.
+  #set ($solrConfig = {
+    'queryFields': 'title^3 property.FAQCode.FAQClass.answer',
+    'facetFields': ['creator', 'creationdate', 'author', 'date', 'mimetype', 'attauthor', 'attdate', 'attsize'],
+    'filterQuery': [
+      'type:DOCUMENT',
+      "wiki:$xcontext.database",
+      "space_exact:$doc.space",
+      'class:FAQCode.FAQClass'
+    ]
+  })
 #end
 {{/velocity}}
 

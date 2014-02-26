@@ -43,7 +43,15 @@ $response.setContentType("text/xml")
     #set($like = " lower("+ $likeCol.replaceAll("[^a-zA-Z0-9_.]", "") + ") like :userinput and")
     #set($hibquery = "${hibquery.substring(0, $whereidx)}${like}${hibquery.substring($whereidx)}")
   #end
-  #set($results = $services.query.hql($hibquery).setLimit(30).setOffset(0).bindValue('userinput', "%${input}%").execute())
+  #set($bindValues = {})
+  #set($discard = $bindValues.put('userinput', "%${input}%"))
+  #set($queryChain = $services.query.hql($hibquery))
+  #foreach($key in $bindValues.keySet())
+    #set($queryChain = $queryChain.bindValue($key, $bindValues[$key]))
+  #end
+  #set($queryChain = $queryChain.setLimit(30))
+  #set($queryChain = $queryChain.setOffset(0))
+  #set($results = $queryChain.execute())
   <?xml version="1.0" encoding="UTF-8"?>
   <results type="${resultsType}">
   #foreach($res in $results)
@@ -69,7 +77,15 @@ $response.setContentType("text/xml")
     #set($query = "select distinct doc.fullName, doc.fullName from Document doc, doc.object($classnametosearch) as obj where lower(doc.fullName) like :userinput")
     #set($resultsType = "7")
   #end ## if propnametosearch != ""
-  #set($results = $services.query.xwql($query).setLimit(30).setOffset(0).bindValue('userinput', "%${input}%").execute())
+  #set($bindValues = {})
+  #set($discard = $bindValues.put('userinput', "%${input}%"))
+  #set($queryChain = $services.query.xwql($query))
+  #foreach($key in $bindValues.keySet())
+    #set($queryChain = $queryChain.bindValue($key, $bindValues[$key]))
+  #end
+  #set($queryChain = $queryChain.setLimit(30))
+  #set($queryChain = $queryChain.setOffset(0))
+  #set($results = $queryChain.execute())
   <?xml version="1.0" encoding="UTF-8"?>
   <results type="${resultsType}">
   #foreach($res in $results)
@@ -88,10 +104,21 @@ $response.setContentType("text/xml")
   #end
   </results>
 #else ## if hibquery == "" and classnametosearch == ""
+  #set($bindValues = {})
+  #set($discard = $bindValues.put('templatename', ${templatename}))
+  #set($discard = $bindValues.put('classname', ${classname}))
+  #set($discard = $bindValues.put('fieldname', ${fieldname}))
+  #set($discard = $bindValues.put('userinput', "%${input}%"))
   ######################### DBListProperty query
   #if($p.isRelationalStorage() && $p.isMultiSelect())
     #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.id.name = :fieldname and lower(list) like :userinput")
-	#set($queryResult = $services.query.hql($query).setLimit(30).setOffset(0).bindValue(':templatename', ${templatename}).bindValue(':classname', ${classname}).bindValue(':fieldname', ${fieldname}).bindValue('userinput', "%${input}%").execute())
+    #set($queryChain = $services.query.hql($query))
+    #foreach($key in $bindValues.keySet())
+      #set($queryChain = $queryChain.bindValue($key, $bindValues[$key]))
+    #end
+    #set($queryChain = $queryChain.setLimit(30))
+    #set($queryChain = $queryChain.setOffset(0))
+    #set($queryResult = $queryChain.execute())
     #set($results = $queryResult.toArray())
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="3">
@@ -102,7 +129,13 @@ $response.setContentType("text/xml")
   ######################### StringListProperty query
   #elseif($p.isMultiSelect())
     #set($query = "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.name = :fieldname and lower(prop.textValue) like :userinput")
-	#set($queryResult = $services.query.hql($query).setLimit(30).setOffset(0).bindValue(':templatename', ${templatename}).bindValue(':classname', ${classname}).bindValue(':fieldname', ${fieldname}).bindValue('userinput', "%${input}%").execute())
+    #set($queryChain = $services.query.hql($query))
+    #foreach($key in $bindValues.keySet())
+      #set($queryChain = $queryChain.bindValue($key, $bindValues[$key]))
+    #end
+    #set($queryChain = $queryChain.setLimit(30))
+    #set($queryChain = $queryChain.setOffset(0))
+    #set($queryResult = $queryChain.execute())
     #set($results = $queryResult.toArray())
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="5">
@@ -117,7 +150,13 @@ $response.setContentType("text/xml")
   ######################### StringProperty query
   #else
     #set($query = "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.name <> :templatename and obj.className = :classname and prop.id.id = obj.id and prop.id.name = :fieldname and lower(prop.value) like :userinput")
-	#set($queryResult = $services.query.hql($query).setLimit(30).setOffset(0).bindValue(':templatename', ${templatename}).bindValue(':classname', ${classname}).bindValue(':fieldname', ${fieldname}).bindValue('userinput', "%${input}%").execute())
+    #set($queryChain = $services.query.hql($query))
+    #foreach($key in $bindValues.keySet())
+      #set($queryChain = $queryChain.bindValue($key, $bindValues[$key]))
+    #end
+    #set($queryChain = $queryChain.setLimit(30))
+    #set($queryChain = $queryChain.setOffset(0))
+    #set($queryResult = $queryChain.execute())
     #set($results = $queryResult.toArray())
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="8">

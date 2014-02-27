@@ -72,6 +72,9 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     /** Token storage (one token per user). */
     private final ConcurrentMap<DocumentReference, String> tokens = new ConcurrentHashMap<DocumentReference, String>();
 
+    /** Token for guest user. */
+    private String guestToken;
+
     /** Random number generator. */
     private SecureRandom random;
 
@@ -127,6 +130,15 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     public String getToken()
     {
         DocumentReference key = getTokenKey();
+        // Handle the case where the current user is Guest
+        if (key == null) {
+            if (guestToken == null) {
+                guestToken = newToken();
+            }
+            return guestToken;
+        }
+
+        // Get the token if it has already been created
         String token = this.tokens.get(key);
         if (token != null) {
             return token;
@@ -135,16 +147,20 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         // create fresh token if needed
         synchronized (this.tokens) {
             if (!this.tokens.containsKey(key)) {
-                byte[] bytes = new byte[TOKEN_LENGTH];
-                this.random.nextBytes(bytes);
-                // Base64 encoded token can contain __ or -- which breaks the layout (see XWIKI-5996). Replacing them
-                // with x reduces randomness a bit, but it seems that other special characters are either used in XWiki
-                // syntax or not URL-safe
-                token = Base64.encodeBase64URLSafeString(bytes).replaceAll("[_=+-]", "x");
-                this.tokens.put(key, token);
+                this.tokens.put(key, newToken());
             }
             return this.tokens.get(key);
         }
+    }
+
+    private String newToken()
+    {
+        byte[] bytes = new byte[TOKEN_LENGTH];
+        this.random.nextBytes(bytes);
+        // Base64 encoded token can contain __ or -- which breaks the layout (see XWIKI-5996). Replacing them
+        // with x reduces randomness a bit, but it seems that other special characters are either used in XWiki
+        // syntax or not URL-safe
+        return Base64.encodeBase64URLSafeString(bytes).replaceAll("[_=+-]", "x");
     }
 
     @Override
@@ -233,7 +249,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     }
 
     /**
-     * Get the token map key for the current user. Constructs a string from user name.
+     * Get the token map key for the current user.
      * 
      * @return key for the token map
      */

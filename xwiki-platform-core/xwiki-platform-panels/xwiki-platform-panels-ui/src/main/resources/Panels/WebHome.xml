@@ -45,7 +45,6 @@
 {{include reference="Panels.CreatePanel"/}}
 #end
 = $services.localization.render('panels.available') =
-
 #set($columns = ["name", "description", "type", "category", '_actions'])
 #set($columnsProperties = {
   "name" : { "type" : "text", "link" : "view" },

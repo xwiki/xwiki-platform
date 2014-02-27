@@ -19,7 +19,10 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
+import static junit.framework.Assert.*;
+
 import java.io.File;
+import java.util.Date;
 import java.util.Locale;
 
 import javax.script.SimpleScriptContext;
@@ -53,10 +56,6 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletContext;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-
 /**
  * Unit tests for {@link LucenePlugin}. with different Analyzer
  */
@@ -64,7 +63,10 @@ import static junit.framework.Assert.assertTrue;
 @AllComponents
 public class LuceneAnalyzerTest extends AbstractMockingComponentTestCase<ExecutionContextManager>
 {
-    private final static String INDEXDIR = System.getProperty("java.io.tmpdir") + File.separator + "luceneanalyzertest";
+    /**
+     * Make sure the index folder is not reused.
+     */
+    private final static String INDEXDIR = "target" + File.separator + "luceneAnalyzerTest-" + new Date().getTime();
 
     private XWikiDocument document;
 

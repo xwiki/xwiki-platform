@@ -1,3 +1,0 @@
-org.xwiki.crypto.pkix.internal.extension.DefaultX509ExtensionBuilder
-org.xwiki.crypto.pkix.internal.X509CertificateFactory
-org.xwiki.crypto.pkix.internal.X509CertificateGeneratorFactory

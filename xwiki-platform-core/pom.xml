@@ -107,21 +107,6 @@
         <artifactId>asm</artifactId>
         <version>4.1</version>
       </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk15on</artifactId>
-        <version>1.49</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpkix-jdk15on</artifactId>
-        <version>1.49</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcmail-jdk15on</artifactId>
-        <version>1.49</version>
-      </dependency>
       <!-- Rome is used in rss macro and feed api modules and in Tika -->
       <dependency>
         <groupId>rome</groupId>

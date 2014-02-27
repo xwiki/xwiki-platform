@@ -31,23 +31,7 @@
   <name>XWiki Platform - Cryptographic Services</name>
   <description>XWiki Platform - Cryptographic Services</description>
   <packaging>pom</packaging>
-  <dependencies>
-    <!-- The core cryptography engine, used everywhere -->
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpkix-jdk15on</artifactId>
-    </dependency>
-  </dependencies>
   <modules>
-    <module>xwiki-platform-crypto-common</module>
-    <module>xwiki-platform-crypto-cipher</module>
-    <module>xwiki-platform-crypto-password</module>
-    <module>xwiki-platform-crypto-pkix</module>
     <module>xwiki-platform-crypto-script</module>
-    <module>xwiki-platform-crypto-signer</module>
   </modules>
 </project>

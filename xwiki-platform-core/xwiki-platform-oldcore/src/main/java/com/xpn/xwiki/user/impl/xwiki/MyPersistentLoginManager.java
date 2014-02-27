@@ -19,6 +19,10 @@
  */
 package com.xpn.xwiki.user.impl.xwiki;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -27,6 +31,10 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +45,9 @@ import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.environment.Environment;
+
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Class responsible for remembering the login information between requests. It uses (encrypted) cookies for this. The
@@ -59,6 +70,27 @@ import org.slf4j.LoggerFactory;
  */
 public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 {
+    /**
+     * Just for information
+     */
+    protected String encryptionAlgorithm = "AES";
+    protected String encryptionMode = "CBC";
+    
+    /**
+     * Use the environment component in order to get the wiki permanent directory where the encryptions keys should be stored
+     */
+    private Environment environment = Utils.getComponent(Environment.class);
+    
+    /**
+     * Name of the cookie containing the initiation vector for the username.
+     */
+    private static final String COOKIE_USERNAME_IV = "usernameiv";
+    
+    /**
+     * Name of the cookie containing the initiation vector for the password. 
+     */
+    private static final String COOKIE_PASSWORD_IV = "passwordiv";
+    
     /**
      * The string used to separate the fields in the hashed validation message.
      */
@@ -108,7 +140,23 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * The prefix that should be used for cookie names.
      */
     protected String cookiePrefix = "";
+    
+    /**
+     * Name of the file where the encryption keys are stored.
+     */
+    protected String encryptionKeyFileName = "AuthenticationEncryptionKey.txt";
+    
+    /**
+     * Password protecting the keystore.
+     */
+    protected String keystorePassword = "";
+    
+    /**
+     * Password protecting the encryption key.
+     */
+    protected String encryptionKeyProtection = "";
 
+    
     /**
      * Default constructor. The configuration is done outside, in
      * {@link XWikiAuthServiceImpl#getAuthenticator(com.xpn.xwiki.XWikiContext)}, so no parameters are needed at this
@@ -183,6 +231,36 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         }
         addCookie(response, cookie);
     }
+    
+    /**
+     * Set the password protecting the key store
+     * 
+     * @param keyStorePassword Value of the password
+     */
+    public void setKeyStorePassword(String keyStorePassword)
+    {
+        this.keystorePassword = keyStorePassword;
+    }
+    
+    /**
+     * Set the name of the file where the encryption key is stored
+     * 
+     * @param encryptionFileName Name of the file where the key is stored
+     */
+    public void setEncryptionFile(String encryptionFileName)
+    {
+        this.encryptionKeyFileName = encryptionFileName;
+    }
+    
+    /**
+     * Set the password protecting the encryption key
+     * 
+     * @param encryptionKeyProtection Password protecting the encryptionKey
+     */
+    public void setEncryptionKeyProtection(String encryptionKeyProtection)
+    {
+        this.encryptionKeyProtection = encryptionKeyProtection;
+    }
 
     /**
      * Remember a specific login using cookies.
@@ -195,11 +273,18 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     @Override
     public void rememberLogin(HttpServletRequest request, HttpServletResponse response, String username, String password)
     {
+        String ivUsername = "";
         String protectedUsername = username;
+        String ivPassword = "";
         String protectedPassword = password;
         if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
-            protectedUsername = encryptText(protectedUsername);
-            protectedPassword = encryptText(protectedPassword);
+            String[] encryptedUsername = encryptText(protectedUsername);
+            String[] encryptedPassword = encryptText(protectedPassword);
+            ivUsername = encryptedUsername[0];
+            protectedUsername = encryptedUsername[1];
+            ivPassword = encryptedPassword[0];
+            protectedPassword = encryptedPassword[1];
+                
             if (protectedUsername == null || protectedPassword == null) {
                 LOGGER.error("ERROR!!");
                 LOGGER.error("There was a problem encrypting the username or password!!");
@@ -217,10 +302,18 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         // Username
         Cookie usernameCookie = new Cookie(getCookiePrefix() + COOKIE_USERNAME, protectedUsername);
         setupCookie(usernameCookie, sessionCookie, cookieDomain, response);
+        
+        //Username initation vector
+        Cookie usernameIVCookie = new Cookie(getCookiePrefix() + COOKIE_USERNAME_IV, ivUsername);
+        setupCookie(usernameIVCookie, sessionCookie, cookieDomain, response);
 
         // Password
         Cookie passwdCookie = new Cookie(getCookiePrefix() + COOKIE_PASSWORD, protectedPassword);
         setupCookie(passwdCookie, sessionCookie, cookieDomain, response);
+        
+        //Password initiation vector
+        Cookie passwordIVCookie = new Cookie(getCookiePrefix() + COOKIE_PASSWORD_IV, ivPassword);
+        setupCookie(passwordIVCookie, sessionCookie, cookieDomain, response);
 
         // Remember me
         Cookie rememberCookie = new Cookie(getCookiePrefix() + COOKIE_REMEMBERME, !sessionCookie + "");
@@ -362,27 +455,29 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             }
             return null;
         }
-        MessageDigest md5 = null;
-        StringBuffer sbValueBeforeMD5 = new StringBuffer();
+        MessageDigest sha = null;
+        String valueBeforeSHA = "";
+        String valueAfterSHA = "";
+        StringBuilder sbValueBeforeSHA = new StringBuilder();
 
         try {
-            md5 = MessageDigest.getInstance("MD5");
+            sha = MessageDigest.getInstance("SHA-512");
 
-            sbValueBeforeMD5.append(username);
-            sbValueBeforeMD5.append(FIELD_SEPARATOR);
-            sbValueBeforeMD5.append(password.toString());
-            sbValueBeforeMD5.append(FIELD_SEPARATOR);
+            sbValueBeforeSHA.append(username);
+            sbValueBeforeSHA.append(FIELD_SEPARATOR);
+            sbValueBeforeSHA.append(password.toString());
+            sbValueBeforeSHA.append(FIELD_SEPARATOR);
             if (isTrue(this.useIP)) {
-                sbValueBeforeMD5.append(clientIP.toString());
-                sbValueBeforeMD5.append(FIELD_SEPARATOR);
+                sbValueBeforeSHA.append(clientIP.toString());
+                sbValueBeforeSHA.append(FIELD_SEPARATOR);
             }
-            sbValueBeforeMD5.append(this.validationKey.toString());
+            sbValueBeforeSHA.append(this.validationKey.toString());
 
-            this.valueBeforeMD5 = sbValueBeforeMD5.toString();
-            md5.update(this.valueBeforeMD5.getBytes());
+            valueBeforeSHA = sbValueBeforeSHA.toString();
+            sha.update(valueBeforeSHA.getBytes());
 
-            byte[] array = md5.digest();
-            StringBuffer sb = new StringBuffer();
+            byte[] array = sha.digest();
+            StringBuilder sb = new StringBuilder();
             for (int j = 0; j < array.length; ++j) {
                 int b = array[j] & 0xFF;
                 if (b < 0x10) {
@@ -390,12 +485,12 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 }
                 sb.append(Integer.toHexString(b));
             }
-            this.valueAfterMD5 = sb.toString();
+            valueAfterSHA = sb.toString();
         } catch (Exception e) {
             LOGGER.error("Failed to get [" + MessageDigest.class.getName() + "] instance", e);
         }
 
-        return this.valueAfterMD5;
+        return valueAfterSHA;
     }
 
     /**
@@ -406,25 +501,29 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * @return clearText, encrypted.
      * @todo Optimize this code by creating the Cipher only once.
      */
-    public String encryptText(String clearText)
+    public String[] encryptText(String clearText)
     {
         try {
-            Cipher c1 = Cipher.getInstance(this.cipherParameters);
-            if (this.secretKey != null) {
-                c1.init(Cipher.ENCRYPT_MODE, this.secretKey);
+            Cipher c1 = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            SecretKeySpec encryptionKey = getEncryptionKey();
+            if (encryptionKey != null) {
+                c1.init(Cipher.ENCRYPT_MODE, encryptionKey);
+                IvParameterSpec iv = c1.getParameters().getParameterSpec(IvParameterSpec.class);
+                byte[] ivBytes = iv.getIV();
                 byte[] clearTextBytes;
                 clearTextBytes = clearText.getBytes();
                 byte[] encryptedText = c1.doFinal(clearTextBytes);
                 String encryptedEncodedText = new String(Base64.encodeBase64(encryptedText));
+                String ivParameters = new String(Base64.encodeBase64(ivBytes));
                 // Since the cookie spec does not allow = in the cookie value, it must be replaced
                 // with something else. Bas64 does not use _, and it is allowed in cookies, so
                 // we're using that instead of =. In decryptText the reverse operation is perfomed.
                 // See XWIKI-2211
-                return encryptedEncodedText.replaceAll("=", "_");
+                String[] couple = {ivParameters.replaceAll("=", "_"), encryptedEncodedText.replaceAll("=", "_")};
+                return couple;
             }
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error("ERROR! >> SecretKey not generated...");
-                LOGGER.error("you are REQUIRED to specify the encryptionKey in xwiki.cfg");
             }
         } catch (Exception e) {
             if (LOGGER.isErrorEnabled()) {
@@ -445,7 +544,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         ((SecurityRequestWrapper) request).setUserPrincipal(null);
         removeCookie(request, response, getCookiePrefix() + COOKIE_USERNAME);
+        removeCookie(request, response, getCookiePrefix() + COOKIE_USERNAME_IV);
         removeCookie(request, response, getCookiePrefix() + COOKIE_PASSWORD);
+        removeCookie(request, response, getCookiePrefix() + COOKIE_PASSWORD_IV);
         removeCookie(request, response, getCookiePrefix() + COOKIE_REMEMBERME);
         removeCookie(request, response, getCookiePrefix() + COOKIE_VALIDATION);
         return;
@@ -567,11 +668,12 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     public String getRememberedUsername(HttpServletRequest request, HttpServletResponse response)
     {
         String username = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME, DEFAULT_VALUE);
+        String usernameIV = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME_IV, DEFAULT_VALUE);
 
         if (!username.equals(DEFAULT_VALUE)) {
             if (checkValidation(request, response)) {
                 if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
-                    username = decryptText(username);
+                    username = decryptText(username, usernameIV);
                 }
                 return username;
             }
@@ -591,10 +693,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     public String getRememberedPassword(HttpServletRequest request, HttpServletResponse response)
     {
         String password = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD, DEFAULT_VALUE);
+        String ivPassword = getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD_IV, DEFAULT_VALUE);
         if (!password.equals(DEFAULT_VALUE)) {
             if (checkValidation(request, response)) {
                 if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_ENCRYPTION)) {
-                    password = decryptText(password);
+                    password = decryptText(password, ivPassword);
                 }
                 return password;
             }
@@ -618,7 +721,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * @param encryptedText The encrypted value.
      * @return encryptedText, decrypted
      */
-    private String decryptText(String encryptedText)
+    private String decryptText(String encryptedText, String ivString)
     {
         try {
             // Since the cookie spec does not allow = in the cookie value, it must be replaced
@@ -628,13 +731,15 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             // See XWIKI-2211
             byte[] decodedEncryptedText =
                 Base64.decodeBase64(encryptedText.replaceAll("_", "=").getBytes("ISO-8859-1"));
-            Cipher c1 = Cipher.getInstance(this.cipherParameters);
-            c1.init(Cipher.DECRYPT_MODE, this.secretKey);
+            Cipher c1 = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            byte[] ivBytes = Base64.decodeBase64(ivString.replaceAll("_", "=").getBytes("ISO-8859-1"));
+            IvParameterSpec iv = new IvParameterSpec(ivBytes);
+            c1.init(Cipher.DECRYPT_MODE, getEncryptionKey(), iv);
             byte[] decryptedText = c1.doFinal(decodedEncryptedText);
             String decryptedTextString = new String(decryptedText);
             return decryptedTextString;
         } catch (Exception e) {
-            LOGGER.error("Error decypting text: " + encryptedText, e);
+            LOGGER.error("Error decrypting text: " + encryptedText, e);
             return null;
         }
     }
@@ -678,5 +783,130 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     public String getCookiePrefix()
     {
         return this.cookiePrefix;
+    }
+    
+    private SecretKeySpec getEncryptionKey()
+    {
+        try
+        {
+            KeyStore ks = KeyStore.getInstance("JCEKS");
+            char[] password = this.keystorePassword.toCharArray();
+            File file = this.getEncryptionFile();
+            //If the file doesn't exist yet let's create it and generate and store there the encryption key
+            if(!file.exists())
+            {
+                ks = initiateStore(ks, password, file);
+            }
+            else
+                ks.load(new FileInputStream(file), password);
+            return retrieveEncryptionKey(ks);
+        }
+        catch (Exception e)
+        {
+            LOGGER.warn("Cannot retrieve encryption key : " + e.getMessage());
+            return null;
+        }
+    }
+    
+    private synchronized KeyStore initiateStore(KeyStore ks, char[] password, File file) throws Exception
+    {
+        if(file.exists())
+        {
+            //If the file already exists, it means another thread created it in the meanwhile
+            ks.load(new FileInputStream(file), password);
+            return ks;
+        }
+        LOGGER.debug("The encryption file doesn't exist yet");
+        ks.load(null, password);
+        storeEncryptionKey(ks);
+        return ks;
+    }
+    
+    /**
+     *  Get the file where the encryption key is supposed to be stored. 
+     *  
+     *  @return The file where the encryption key is stored
+     *  */
+    private File getEncryptionFile()
+    {
+        File permDir = environment.getPermanentDirectory();
+        String path = permDir.getAbsolutePath() + File.separator + this.encryptionKeyFileName;
+        File encryptionFile = new File(path) ;
+        return encryptionFile ;
+    }
+    
+    
+    /**
+     * Store a randomly generated encryption key in a keystore.
+     * 
+     * @param ks Keystore where the key should be kept
+     */
+    private void storeEncryptionKey(KeyStore ks)
+    {
+        try
+        {
+            SecretKeySpec encryptionKey = generateRandomKey();
+            String storePassword = this.keystorePassword;
+            String protection = this.encryptionKeyProtection;
+            SecretKeySpec key = encryptionKey;
+            KeyStore.SecretKeyEntry skEntry =
+                new KeyStore.SecretKeyEntry(key);
+            ks.setEntry("encryptionKey", skEntry, 
+                new KeyStore.PasswordProtection(protection.toCharArray()));
+            File file = this.getEncryptionFile();
+            if(!file.exists())
+            {
+                file.createNewFile();
+            }
+            FileOutputStream fos = new FileOutputStream(file);
+            ks.store(fos, storePassword.toCharArray());
+        }
+        catch(Exception e)
+        {
+            LOGGER.warn("Exception encountered while trying to store the key : " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Retrieve the encryption key.
+     * 
+     * @param ks Keystore where the key is stored
+     * @return encryption key
+     */
+    private SecretKeySpec retrieveEncryptionKey(KeyStore ks)
+    {
+        String protection = this.encryptionKeyProtection;
+        try
+        {
+            KeyStore.SecretKeyEntry pkEntry = (KeyStore.SecretKeyEntry)
+                ks.getEntry("encryptionKey", new KeyStore.PasswordProtection(protection.toCharArray()));
+            SecretKeySpec mySecretKey = (SecretKeySpec) pkEntry.getSecretKey();
+            return mySecretKey;
+        }
+        catch(Exception e)
+        {
+            LOGGER.warn("Exception encountered while trying to retrieve the encryption key : " + e.getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Generates a random encryption key.
+     * 
+     * @return the encryption key as a string
+     */
+    private SecretKeySpec generateRandomKey()
+    {
+        try{
+            KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+            keyGenerator.init(128);
+            SecretKey key = keyGenerator.generateKey();
+            return (SecretKeySpec) key;
+        }
+        catch(Exception e)
+        {
+            LOGGER.warn("Exception encountered while generating the encryption key : " + e.getMessage());
+            return null;
+        }
     }
 }

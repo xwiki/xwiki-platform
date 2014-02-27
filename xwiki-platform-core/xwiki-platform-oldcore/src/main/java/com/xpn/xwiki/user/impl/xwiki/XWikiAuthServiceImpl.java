@@ -178,24 +178,20 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                     persistent.setUseIP(xwiki.Param("xwiki.authentication.useip"));
                 }
 
-                if (xwiki.Param("xwiki.authentication.encryptionalgorithm") != null) {
-                    persistent.setEncryptionAlgorithm(xwiki.Param("xwiki.authentication.encryptionalgorithm"));
-                }
-
-                if (xwiki.Param("xwiki.authentication.encryptionmode") != null) {
-                    persistent.setEncryptionMode(xwiki.Param("xwiki.authentication.encryptionmode"));
-                }
-
-                if (xwiki.Param("xwiki.authentication.encryptionpadding") != null) {
-                    persistent.setEncryptionPadding(xwiki.Param("xwiki.authentication.encryptionpadding"));
-                }
-
                 if (xwiki.Param("xwiki.authentication.validationKey") != null) {
                     persistent.setValidationKey(xwiki.Param("xwiki.authentication.validationKey"));
                 }
-
-                if (xwiki.Param("xwiki.authentication.encryptionKey") != null) {
-                    persistent.setEncryptionKey(xwiki.Param("xwiki.authentication.encryptionKey"));
+                
+                if (xwiki.Param("xwiki.authentication.encryptionFileName") != null) {
+                    persistent.setEncryptionFile(xwiki.Param("xwiki.authentication.encryptionFileName"));
+                }
+                
+                if (xwiki.Param("xwiki.authentication.keyStorePassword") != null) {
+                    persistent.setKeyStorePassword(xwiki.Param("xwiki.authentication.keyStorePassword"));
+                }
+                
+                if (xwiki.Param("xwiki.authentication.encryptionKeyProtection") != null) {
+                    persistent.setEncryptionKeyProtection(xwiki.Param("xwiki.authentication.encryptionKeyProtection"));
                 }
 
                 sconfig.setPersistentLoginManager(persistent);

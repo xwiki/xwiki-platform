@@ -195,6 +195,9 @@
       #displayCategoriesHierarchyRecursive($tree $item $mathtool.add($level, 1) $displayMethod)
     #end
   #end
+  #if($displayMethod == "selectable")
+    &lt;input type="hidden" name="${blogPostClassname}_$!{entryObj.number}_category" value="" /&gt;
+  #end
 #end
 ##
 ##

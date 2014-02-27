@@ -59,7 +59,8 @@
    "selectedColumn":"name",
    "defaultOrder":"asc",
    "translationPrefix" : "panels.",
-   "rowCount": 30
+   "rowCount": 30,
+   "queryFilters": "currentlanguage"
 })
 #livetable("panels" $columns $columnsProperties $options)
 {{/velocity}}

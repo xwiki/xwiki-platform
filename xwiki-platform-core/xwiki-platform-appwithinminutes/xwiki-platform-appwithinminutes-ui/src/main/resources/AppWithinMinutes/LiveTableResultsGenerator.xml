@@ -51,7 +51,7 @@
 ${escapetool.d}services.localization.use('document', '$translationsName.replace("'", "''")')
 {{/velocity}}
 
-{{include document="XWiki.LiveTableResults" /}}##
+{{include reference="XWiki.LiveTableResults" /}}##
 }}}
 {{/velocity}}</content>
 </xwikidoc>

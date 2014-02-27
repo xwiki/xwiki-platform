@@ -232,7 +232,7 @@
 &lt;form id="$formId" method="post" action="$formAction" class="xform half"&gt;
 {{/html}}
 
-{{include document="XWiki.SearchSuggestConfig" context="new" /}}
+{{include reference="XWiki.SearchSuggestConfig" context="new" /}}
 
 {{html clean=false}}
   ## We add in a redirect field to prevent the user from being carried away when they save if they don't have JavaScript.

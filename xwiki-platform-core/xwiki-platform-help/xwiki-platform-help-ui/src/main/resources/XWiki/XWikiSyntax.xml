@@ -204,7 +204,7 @@ $syntaxMenu.add($cat)
     (% class="sectionheader" %)
     $heading $section.name $heading
 
-    {{include document="XWiki.XWikiSyntax${section.id}" section="H${displayVersion}${section.id}"/}}
+    {{include reference="XWiki.XWikiSyntax${section.id}" section="H${displayVersion}${section.id}"/}}
   #end
 #end
 
@@ -314,7 +314,7 @@ $xwiki.get('ssx').use($doc.getFullName())##
         #set ($displayVersion = $crtSection.maxSyntax)
       #end
       #set ($subHeading = '==')
-      {{include document="XWiki.XWikiSyntax${crtSection.id}" section="H${displayVersion}${crtSection.id}"/}}
+      {{include reference="XWiki.XWikiSyntax${crtSection.id}" section="H${displayVersion}${crtSection.id}"/}}
   #end
   ))) ## syntax-page-content
 {{/velocity}}</content>

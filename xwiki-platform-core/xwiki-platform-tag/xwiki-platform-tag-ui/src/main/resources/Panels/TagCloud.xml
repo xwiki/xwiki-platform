@@ -149,7 +149,7 @@
     <property>
       <content>{{velocity}}
 #panelheader($services.localization.render('xe.panels.tagcloud.title'))
-{{include document="XWiki.TagCloud"/}}
+{{include reference="XWiki.TagCloud"/}}
 #panelfooter()
 {{/velocity}}</content>
     </property>
@@ -163,5 +163,5 @@
       <type>view</type>
     </property>
   </object>
-  <content>{{include document="Panels.PanelSheet"/}}</content>
+  <content></content>
 </xwikidoc>

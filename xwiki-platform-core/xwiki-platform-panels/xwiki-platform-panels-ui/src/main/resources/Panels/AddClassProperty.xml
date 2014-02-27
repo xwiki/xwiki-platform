@@ -159,5 +159,5 @@
       <type>edit</type>
     </property>
   </object>
-  <content>{{include document="Panels.PanelSheet"/}}</content>
+  <content></content>
 </xwikidoc>

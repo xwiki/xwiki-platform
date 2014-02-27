@@ -43,9 +43,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="Blog.BlogCode"/}}
+  <content>{{include reference="Blog.BlogCode"/}}
 
-{{include document="Blog.CategoriesCode"/}}
+{{include reference="Blog.CategoriesCode"/}}
 
 {{velocity}}
 {{html clean="false" wiki="true"}}

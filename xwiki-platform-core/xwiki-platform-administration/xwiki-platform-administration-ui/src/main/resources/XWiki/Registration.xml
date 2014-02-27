@@ -282,7 +282,7 @@
   #set($fieldMandatoryStar = { 'class' : 'xRequired'})
   ##
   #*
-   * You may include this document in other documents using {{include document="XWiki.Registration"/}}
+   * You may include this document in other documents using {{include reference="XWiki.Registration"/}}
    * To specify that the user is invited and should be allowed to register even if Guest does not have permission to
    * register, set $invited to true. NOTE: The including script must have programming permission to do this.
    *

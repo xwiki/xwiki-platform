@@ -17,37 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.include;
+package compatibility.org.xwiki.rendering.macro.include;
 
-import org.xwiki.properties.annotation.PropertyDescription;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 
 /**
- * Legacy code for {@link IncludeMacroParameters}.
+ * Legacy code for {@link IncludeMacro}.
  *
  * @version $Id$
  * @since 6.0M1
  */
-public privileged aspect IncludeMacroParametersCompatibilityAspect
+public privileged aspect IncludeMacroCompatibilityAspect
 {
-    /**
-     * @param document the name of the document to include.
-     * @deprecated since 3.4M1 use {@link #setReference(String)} instead
-     */
-    @PropertyDescription("the name of the document to include")
-    @Deprecated
-    public void IncludeMacroParameters.setDocument(String document)
+    @Around("call(* org.xwiki.rendering.internal.macro.include.IncludeMacro.execute(..)) && args(parameters)")
+    public Object aroundExecute(ProceedingJoinPoint joinPoint, IncludeMacroParameters parameters) throws Throwable
     {
-        this.reference = document;
+        // Step 1: Perform legacy checks.
+        if (parameters.getDocument() == null) {
+            throw new MacroExecutionException(
+                "You must specify a 'reference' parameter pointing to the entity to include.");
+        }
+        return joinPoint.proceed(joinPoint.getArgs());
     }
-
-    /**
-     * @return the name of the document to include.
-     * @deprecated since 3.4M1 use {@link #getReference()} instead
-     */
-    @Deprecated
-    public String IncludeMacroParameters.getDocument()
-    {
-        return this.reference;
-    }
-
 }

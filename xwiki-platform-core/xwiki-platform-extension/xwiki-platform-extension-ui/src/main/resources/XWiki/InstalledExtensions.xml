@@ -205,5 +205,5 @@ RU5ErkJggg==
 #set ($selectedRepositoryId = 'installed')
 {{/velocity}}
 
-{{include document="AddExtensions" /}}</content>
+{{include reference="AddExtensions" /}}</content>
 </xwikidoc>

@@ -397,7 +397,7 @@ hXM4h3N4m+L/A2hc4Ov9lvelAAAAAElFTkSuQmCC
     <className>XWiki.ConfigurableClass</className>
     <guid>73f7eae5-ce0c-43fa-9282-1a379803a375</guid>
     <property>
-      <codeToExecute>{{include document='XWiki.GoogleAnalyticsCode' /}}</codeToExecute>
+      <codeToExecute>{{include reference='XWiki.GoogleAnalyticsCode' /}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>

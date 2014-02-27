@@ -48,5 +48,5 @@
 ## You should use DatabaseSearch page now
 {{/velocity}}
 
-{{include document="DatabaseSearch" /}}</content>
+{{include reference="DatabaseSearch" /}}</content>
 </xwikidoc>

@@ -116,5 +116,5 @@ You can also use the following manual method, which is useful if this extension 
       <name>XAR</name>
     </property>
   </object>
-  <content>{{include document="ExtensionTypeSheet"/}}</content>
+  <content>{{include reference="ExtensionTypeSheet"/}}</content>
 </xwikidoc>

@@ -111,5 +111,5 @@ You can also use the manual method which involves dropping the JAR file into the
       <name>JAR</name>
     </property>
   </object>
-  <content>{{include document="ExtensionTypeSheet"/}}</content>
+  <content>{{include reference="ExtensionTypeSheet"/}}</content>
 </xwikidoc>

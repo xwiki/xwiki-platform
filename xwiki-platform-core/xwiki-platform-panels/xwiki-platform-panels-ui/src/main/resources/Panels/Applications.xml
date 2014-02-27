@@ -417,5 +417,5 @@ div.applicationPanelMoreContainer li a {
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{include document="Panels.PanelSheet"/}}</content>
+  <content></content>
 </xwikidoc>

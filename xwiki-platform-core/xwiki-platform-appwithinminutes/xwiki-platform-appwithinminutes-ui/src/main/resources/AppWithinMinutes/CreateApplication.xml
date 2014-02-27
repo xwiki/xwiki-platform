@@ -352,7 +352,7 @@ return XWiki;
       <use>currentPage</use>
     </property>
   </object>
-  <content>{{include document="AppWithinMinutes.WizardStep"/}}
+  <content>{{include reference="AppWithinMinutes.WizardStep"/}}
 
 {{velocity output="false"}}
 #macro(showStep)

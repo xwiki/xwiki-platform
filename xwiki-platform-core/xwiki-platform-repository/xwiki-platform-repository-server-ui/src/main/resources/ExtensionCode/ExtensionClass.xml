@@ -54,7 +54,7 @@
     <validationScript/>
     <authors>
       <cache>0</cache>
-      <customDisplay>{{include document="ExtensionCode.ExtensionAuthorsDisplayer"/}}</customDisplay>
+      <customDisplay>{{include reference="ExtensionCode.ExtensionAuthorsDisplayer"/}}</customDisplay>
       <disabled>0</disabled>
       <displayType>input</displayType>
       <multiSelect>1</multiSelect>
@@ -321,5 +321,5 @@
       <sheet>ExtensionCode.ExtensionSheet</sheet>
     </property>
   </object>
-  <content>{{include document="XWiki.ClassSheet"/}}</content>
+  <content>{{include reference="XWiki.ClassSheet"/}}</content>
 </xwikidoc>

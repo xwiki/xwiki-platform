@@ -3468,7 +3468,7 @@ document.observe('xwiki:dom:loaded', function() {
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{include document="XWiki.ConfigurableClassMacros" /}}
+  <content>{{include reference="XWiki.ConfigurableClassMacros" /}}
 
 {{velocity output="false"}}
 #if ($request.xaction == 'switchContext')
@@ -3805,19 +3805,19 @@ document.observe('xwiki:dom:loaded', function() {
         #if("$!{request.editmode}" == 'inline' &amp;&amp; $xwiki.exists($section))
           $xcontext.setDisplayMode('edit')##
 
-          {{html clean="false"}}{{include document="XWiki.AdminInlineSheet" /}}{{/html}}
+          {{html clean="false"}}{{include reference="XWiki.AdminInlineSheet" /}}{{/html}}
         #else
           #if($xwiki.exists("XWiki.Admin${section}Sheet"))
             ## Custom XE administration section
 
-            {{include document="XWiki.Admin${section}Sheet" /}}
+            {{include reference="XWiki.Admin${section}Sheet" /}}
 
           #elseif($xwiki.exists($section))
             {{html clean="false"}}#includeForm($section){{/html}}
           #end
         #end
         #if ($crtSection.configurable)
-          {{include document="XWiki.ConfigurableClass" /}}
+          {{include reference="XWiki.ConfigurableClass" /}}
         #end
       ))) ## admin-page-content
     #end

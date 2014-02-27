@@ -295,7 +295,7 @@
       <use>currentPage</use>
     </property>
   </object>
-  <content>{{include document="ExtensionCode.RepositoryCode"/}}
+  <content>{{include reference="ExtensionCode.RepositoryCode"/}}
 
 {{velocity output="false"}}
 #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')

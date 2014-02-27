@@ -528,7 +528,7 @@ $xwiki.jsx.use($paneldoc.fullName)##
 
 {{velocity}}
 #if ("$!request.action" != 'convertSyntax')
-  {{include document="Panels.PanelSheet"/}}
+  {{include reference="Panels.PanelSheet"/}}
 #end
 {{/velocity}}</content>
 </xwikidoc>

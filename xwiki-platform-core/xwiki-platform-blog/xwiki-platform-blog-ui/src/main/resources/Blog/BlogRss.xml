@@ -43,7 +43,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="Blog.RssCode"/}}
+  <content>{{include reference="Blog.RssCode"/}}
 
 {{velocity filter="none"}}
 #if("$!{request.xpage}" == 'plain' || "$!{request.xpage}" == 'rdf')

@@ -42,7 +42,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="Blog.BlogParameters"/}}
+  <content>{{include reference="Blog.BlogParameters"/}}
 
 {{velocity output="false"}}
 ##
@@ -60,7 +60,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param blogDoc the XDocument holding the blog definition object.
  *###
 #macro(printBlog $blogDoc)
-  {{include document='Blog.CreatePost'/}}
+  {{include reference='Blog.CreatePost'/}}
   #getBlogEntries($blogDoc $entries)
   #displayBlog($entries 'index' true true)
   #displayNavigationLinks($blogDoc)

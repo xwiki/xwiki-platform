@@ -285,7 +285,7 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
     <className>XWiki.ConfigurableClass</className>
     <guid>301d32cd-cf2a-4b9a-b2c6-182f3c04eeac</guid>
     <property>
-      <codeToExecute>{{include document="XWiki.SearchAdmin"/}}</codeToExecute>
+      <codeToExecute>{{include reference="XWiki.SearchAdmin"/}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>
@@ -309,7 +309,7 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
       <propertiesToShow/>
     </property>
   </object>
-  <content>{{include document='XWiki.SearchCode' /}}
+  <content>{{include reference='XWiki.SearchCode' /}}
 
 (% id='Hsearch.admin.configuration.title' %)
 = {{velocity}}$services.localization.render('search.admin.configuration.title'){{/velocity}} =
@@ -354,7 +354,7 @@ q3n9C1M5CmQytaHRAAAAAElFTkSuQmCC
     = $searchAdminDoc.displayTitle =
 
     ## Use context='new' in the include so that we can use PR.
-    {{include document="$searchAdminPage" context='new'}}
+    {{include reference="$searchAdminPage" context='new'}}
   #end
 #end
 {{/velocity}}</content>

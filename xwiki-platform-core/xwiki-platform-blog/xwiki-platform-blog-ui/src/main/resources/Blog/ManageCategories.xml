@@ -714,7 +714,7 @@ input.category-name-input {
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{include document="Blog.CategoriesCode"/}}
+  <content>{{include reference="Blog.CategoriesCode"/}}
 
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}

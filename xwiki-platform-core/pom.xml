@@ -409,6 +409,30 @@
               <method>void setDocument(java.lang.String)</method>
               <justification>Not a breakage, moved to legacy</justification>
             </difference>
+
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWiki</className>
+              <method>org.xwiki.url.XWikiEntityURL ajc$interMethodDispatch2$com_xpn_xwiki_XWikiCompatibilityAspect$buildEntityURLFromPathSegments(org.xwiki.model.reference.WikiReference, java.util.List)</method>
+              <justification>AspectJ craps</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWiki</className>
+              <method> void ajc$interMethodDispatch2$com_xpn_xwiki_XWikiCompatibilityAspect$ensureVirtualWikiMapExists()</method>
+              <justification>AspectJ craps</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/XWiki</className>
+              <method>org.xwiki.model.reference.DocumentReference ajc$interMethodDispatch2$com_xpn_xwiki_XWikiCompatibilityAspect$findWikiServer(java.lang.String, com.xpn.xwiki.XWikiContext)</method>
+              <justification>AspectJ craps</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/XWikiCompatibilityAspect</className>
+              <justification>Wrong package</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

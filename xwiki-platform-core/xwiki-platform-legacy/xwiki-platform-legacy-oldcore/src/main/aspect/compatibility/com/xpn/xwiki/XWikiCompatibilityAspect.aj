@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package compatibility.com.xpn.xwiki;
+package com.xpn.xwiki;
 
 import java.io.UnsupportedEncodingException;
 import java.io.File;
@@ -46,9 +46,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.url.XWikiEntityURL;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.api.internal.XWikiCacheServiceStub;

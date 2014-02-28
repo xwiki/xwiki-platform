@@ -48,6 +48,11 @@
           <groupId>org.codehaus.woodstox</groupId>
           <artifactId>wstx-asl</artifactId>
         </exclusion>
+        <!-- XWiki uses SLF4J for logging. -->
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <!-- Solr is using an old version of Woodstox but we need the newer version which is used by our Cache module -->
@@ -82,10 +87,10 @@
       <artifactId>solr-cell</artifactId>
       <version>${solr.version}</version>
       <exclusions>
-        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+        <!-- XWiki uses SLF4J for logging. -->
         <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

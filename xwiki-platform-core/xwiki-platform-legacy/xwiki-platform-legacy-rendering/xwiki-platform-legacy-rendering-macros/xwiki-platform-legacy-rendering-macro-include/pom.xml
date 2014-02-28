@@ -23,7 +23,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-legacy</artifactId>
+    <artifactId>xwiki-platform-legacy-rendering-macros</artifactId>
     <version>6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-rendering-macro-include</artifactId>

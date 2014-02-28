@@ -45,6 +45,11 @@
 {{include reference="Panels.CreatePanel"/}}
 #end
 = $services.localization.render('panels.available') =
+#if ($hasAdmin)
+  {{box}}
+    [[image:icon:wand]] $services.localization.render('xe.panels.customize') [[$services.localization.render('panelwizard.panelwizard')&gt;&gt;Panels.PanelWizard]].
+  {{/box}}
+#end
 #set($columns = ["name", "description", "type", "category", '_actions'])
 #set($columnsProperties = {
   "name" : { "type" : "text", "link" : "view" },

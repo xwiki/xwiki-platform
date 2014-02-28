@@ -1154,7 +1154,7 @@ $value##
 }
 
 .search-form .search-query {
-  background: transparent url("/xwiki/resources/icons/xwiki/search.png") left center no-repeat;
+  background: transparent url("$xwiki.getSkinFile('icons/xwiki/search.png')") left center no-repeat;
   border: 2px solid $theme.borderColor;
   padding-left: 18px;
   padding-right: 20px;
@@ -1229,16 +1229,16 @@ a.sort-item.active, a.sort-item.active:hover {
   background: none no-repeat scroll left .4em transparent;
 }
 .search-result.type-document {
-  background-image: url("/xwiki/resources/icons/silk/page_white_text.png");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')");
 }
 .search-result.type-object {
-  background-image: url("/xwiki/resources/icons/silk/page_white_gear.png");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_gear.png')");
 }
 .search-result.type-object_property {
-  background-image: url("/xwiki/resources/icons/silk/page_white_key.png");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_key.png')");
 }
 .search-result.type-attachment {
-  background-image: url("/xwiki/resources/icons/silk/attach.png");
+  background-image: url("$xwiki.getSkinFile('icons/silk/attach.png')");
 }
 
 .search-result-title {

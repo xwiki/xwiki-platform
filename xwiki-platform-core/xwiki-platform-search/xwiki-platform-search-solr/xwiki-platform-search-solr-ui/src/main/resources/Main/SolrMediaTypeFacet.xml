@@ -204,7 +204,9 @@
 {{/velocity}}
 
 {{velocity}}
-{{html}}#displaySearchFacetValues_mediaType($facetValues){{/html}}
+#if ($facetValues)
+  {{html}}#displaySearchFacetValues_mediaType($facetValues){{/html}}
+#end
 {{/velocity}}</content>
   <object>
     <name>Main.SolrMediaTypeFacet</name>

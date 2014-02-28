@@ -286,7 +286,7 @@
 {{velocity}}
 #if ($xcontext.action == 'get' &amp;&amp; "$!request.facet" != '' &amp;&amp; ($request.startDate || $request.endDate))
   #handleCustomDateInterval()
-#else
+#elseif ($facetValues)
   {{html}}#displaySearchFacetValues_date($facetValues){{/html}}
 #end
 {{/velocity}}</content>

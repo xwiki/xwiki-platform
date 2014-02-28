@@ -131,7 +131,7 @@
 #panelheader($services.localization.render('panels.applications.title'))
 #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))
   #set($params = $uix.getParameters())
-  #if($"$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
+  #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
 (% class="applicationsPanel" %)
 * [[image:$params.icon $params.label&gt;&gt;$params.target]]
   #end
@@ -148,7 +148,7 @@
 (% class="applicationsPanel" %)
 #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications.more', {'sortByParameter' : 'label'}))
   #set($params = $uix.getParameters())
-  #if($"$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '')
+  #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '')
 (% class="applicationsPanel" %)
 * [[image:$params.icon $params.label&gt;&gt;$params.target]]
   #end

@@ -141,5 +141,5 @@ $services.localization.render('xe.panels.welcome.xwiki')
       <type>view</type>
     </property>
   </object>
-  <content></content>
+  <content/>
 </xwikidoc>

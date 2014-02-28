@@ -141,5 +141,5 @@ $services.localization.render('welcometoobjecteditor')
       <type>edit</type>
     </property>
   </object>
-  <content></content>
+  <content/>
 </xwikidoc>

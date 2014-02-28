@@ -188,5 +188,5 @@ document.observe('xwiki:dom:loaded', function() {
       <type>view</type>
     </property>
   </object>
-  <content></content>
+  <content/>
 </xwikidoc>

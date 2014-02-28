@@ -173,5 +173,5 @@ $services.localization.render('helponsyntax') {{html clean="false"}}&lt;a href="
       <type>edit</type>
     </property>
   </object>
-  <content></content>
+  <content/>
 </xwikidoc>

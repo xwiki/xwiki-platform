@@ -58,7 +58,7 @@ public privileged aspect XWikiCompatibilityAspect
     /**
      * Capture the api.XWiki constructor so that we can initialize this.util.
      */
-    private pointcut xwikiCreation(XWiki x): this(x) && execution( public XWiki.new(..) );
+    private pointcut xwikiCreation(XWiki x): this(x) && execution( public com.xpn.xwiki.api.XWiki.new(..) );
 
     after(XWiki x): xwikiCreation(x)
     {

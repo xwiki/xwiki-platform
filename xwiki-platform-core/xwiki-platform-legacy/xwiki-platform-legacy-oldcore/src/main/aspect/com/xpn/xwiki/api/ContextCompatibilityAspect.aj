@@ -17,29 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package compatibility.org.xwiki.rendering.macro.include;
+package com.xpn.xwiki.api;
 
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.include.IncludeMacroParameters;
+import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.util.Util;
 
 /**
- * Legacy code for {@link IncludeMacro}.
- *
+ * Add a backward compatibility layer to the {@link Context} class.
+ * 
  * @version $Id$
- * @since 6.0M1
  */
-public privileged aspect IncludeMacroCompatibilityAspect
+public privileged aspect ContextCompatibilityAspect
 {
-    @Around("call(* org.xwiki.rendering.internal.macro.include.IncludeMacro.execute(..)) && args(parameters)")
-    public Object aroundExecute(ProceedingJoinPoint joinPoint, IncludeMacroParameters parameters) throws Throwable
+    /**
+     * @return true it's main wiki's context, false otherwise.
+     * @deprecated replaced by {@link Context#isMainWiki()} since 1.4M1.
+     */
+    @Deprecated
+    public boolean Context.isVirtual()
     {
-        // Step 1: Perform legacy checks.
-        if (parameters.getDocument() == null) {
-            throw new MacroExecutionException(
-                "You must specify a 'reference' parameter pointing to the entity to include.");
-        }
-        return joinPoint.proceed(joinPoint.getArgs());
+        return !this.isMainWiki();
+    }
+
+    /**
+     * Returns an instance of the {@link com.xpn.xwiki.util.Util} class.
+     * 
+     * @return an instance of the {@link com.xpn.xwiki.util.Util} class
+     * @see Util
+     * @deprecated since 2.6M1 the functions provided by Util are internal, please do not use them.
+     */
+    @Deprecated
+    public Util Context.getUtil()
+    {
+        return this.context.getUtil();
     }
 }

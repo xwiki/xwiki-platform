@@ -17,24 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package compatibility.com.xpn.xwiki.api;
+package org.xwiki.rendering.macro.include;
 
-import com.xpn.xwiki.api.Api;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 
 /**
- * Add a backward compatibility layer to the {@link Api} class.
- * 
+ * Legacy code for {@link IncludeMacro}.
+ *
  * @version $Id$
+ * @since 6.0M1
  */
-public privileged aspect ApiCompatibilityAspect
+public privileged aspect IncludeMacroCompatibilityAspect
 {
-    /**
-     * @return true if the current user has the Programming right or false otherwise
-     * @deprecated use {@link Api#hasProgrammingRights()} instead
-     */
-    @Deprecated
-    public boolean Api.checkProgrammingRights()
+    @Around("call(* org.xwiki.rendering.internal.macro.include.IncludeMacro.execute(..)) && args(parameters)")
+    public Object aroundExecute(ProceedingJoinPoint joinPoint, IncludeMacroParameters parameters) throws Throwable
     {
-        return this.hasProgrammingRights();
+        // Step 1: Perform legacy checks.
+        if (parameters.getDocument() == null) {
+            throw new MacroExecutionException(
+                "You must specify a 'reference' parameter pointing to the entity to include.");
+        }
+        return joinPoint.proceed(joinPoint.getArgs());
     }
 }

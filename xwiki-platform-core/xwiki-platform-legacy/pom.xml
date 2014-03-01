@@ -87,9 +87,6 @@
               <goals>
                 <goal>compile</goal>
               </goals>
-              <configuration>
-                <aspectDirectory>src/main/aspect/compatibility</aspectDirectory>
-              </configuration>
             </execution>
           </executions>
         </plugin>

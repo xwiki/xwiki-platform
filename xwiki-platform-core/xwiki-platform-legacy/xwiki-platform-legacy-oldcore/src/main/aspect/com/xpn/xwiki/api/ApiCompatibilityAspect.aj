@@ -17,38 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package compatibility.com.xpn.xwiki.api;
+package com.xpn.xwiki.api;
 
-import com.xpn.xwiki.api.Context;
-import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.api.Api;
 
 /**
- * Add a backward compatibility layer to the {@link Context} class.
+ * Add a backward compatibility layer to the {@link Api} class.
  * 
  * @version $Id$
  */
-public privileged aspect ContextCompatibilityAspect
+public privileged aspect ApiCompatibilityAspect
 {
     /**
-     * @return true it's main wiki's context, false otherwise.
-     * @deprecated replaced by {@link Context#isMainWiki()} since 1.4M1.
+     * @return true if the current user has the Programming right or false otherwise
+     * @deprecated use {@link Api#hasProgrammingRights()} instead
      */
     @Deprecated
-    public boolean Context.isVirtual()
+    public boolean Api.checkProgrammingRights()
     {
-        return !this.isMainWiki();
-    }
-
-    /**
-     * Returns an instance of the {@link com.xpn.xwiki.util.Util} class.
-     * 
-     * @return an instance of the {@link com.xpn.xwiki.util.Util} class
-     * @see Util
-     * @deprecated since 2.6M1 the functions provided by Util are internal, please do not use them.
-     */
-    @Deprecated
-    public Util Context.getUtil()
-    {
-        return this.context.getUtil();
+        return this.hasProgrammingRights();
     }
 }

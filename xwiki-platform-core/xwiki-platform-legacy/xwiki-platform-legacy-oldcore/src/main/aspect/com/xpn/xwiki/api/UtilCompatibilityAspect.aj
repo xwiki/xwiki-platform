@@ -17,8 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package compatibility.com.xpn.xwiki.api;
+package com.xpn.xwiki.api;
 
+import java.lang.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -161,7 +162,7 @@ public privileged aspect UtilCompatibilityAspect
      * @return the object as a {@link Number}, or {@code null}
      * @since 1.3 Milestone 2
      * @deprecated use {@code $mathtool.toNumber($string)}
-     *             ({@link org.apache.velocity.tools.generic.MathTool#toNumber(Object)})
+     *             ({@link org.apache.velocity.tools.generic.MathTool#toNumber(java.lang.Object)})
      */
     @Deprecated
     public Number Util.toNumber(java.lang.Object object)
@@ -180,7 +181,7 @@ public privileged aspect UtilCompatibilityAspect
      * @return the parsed long or zero if the string is not a valid long number
      * @since 1.3 Milestone 2
      * @deprecated use {@code $mathtool.toNumber($string).longValue()}
-     *             ({@link org.apache.velocity.tools.generic.MathTool#toNumber(Object)})
+     *             ({@link org.apache.velocity.tools.generic.MathTool#toNumber(java.lang.Object)})
      */
     @Deprecated
     public long Util.parseLong(String str)
@@ -199,7 +200,7 @@ public privileged aspect UtilCompatibilityAspect
      * @return the parsed integer or zero if the string is not a valid integer number
      * @since 1.3 Milestone 2
      * @deprecated use {@code $mathtool.toInteger($string)}
-     *             ({@link org.apache.velocity.tools.generic.MathTool#toInteger(Object)})
+     *             ({@link org.apache.velocity.tools.generic.MathTool#toInteger(java.lang.Object)})
      */
     @Deprecated
     public int Util.parseInt(String str)
@@ -218,7 +219,7 @@ public privileged aspect UtilCompatibilityAspect
      * @return the parsed integer or zero if the string is not a valid integer number
      * @since 1.3 Milestone 2
      * @deprecated use {@code $mathtool.toInteger($string)}
-     *             ({@link org.apache.velocity.tools.generic.MathTool#toInteger(Object)})
+     *             ({@link org.apache.velocity.tools.generic.MathTool#toInteger(java.lang.Object)})
      */
     @Deprecated
     public Integer Util.parseInteger(String str)
@@ -233,7 +234,7 @@ public privileged aspect UtilCompatibilityAspect
      * @return the parsed float or zero if the string is not a valid float number
      * @since 1.3 Milestone 2
      * @deprecated use {@code $mathtool.toDouble($string).floatValue()}
-     *             ({@link org.apache.velocity.tools.generic.MathTool#toDouble(Object)})
+     *             ({@link org.apache.velocity.tools.generic.MathTool#toDouble(java.lang.Object)})
      */
     @Deprecated
     public float Util.parseFloat(String str)
@@ -252,7 +253,7 @@ public privileged aspect UtilCompatibilityAspect
      * @return the parsed double or zero if the string is not a valid double number
      * @since 1.3 Milestone 2
      * @deprecated use {@code $mathtool.toDouble($string)}
-     *             ({@link org.apache.velocity.tools.generic.MathTool#toDouble(Object)})
+     *             ({@link org.apache.velocity.tools.generic.MathTool#toDouble(java.lang.Object)})
      */
     @Deprecated
     public double Util.parseDouble(String str)
@@ -273,7 +274,7 @@ public privileged aspect UtilCompatibilityAspect
      * @since 1.3 Milestone 2
      * @deprecated values should be passed as positional parameters, not concatenated in the query; see
      *             {@link XWiki#searchDocuments(String, List)}; if escaping SQL is really needed, use {@code
-     *             $escapetool.sql($string)} ({@link org.xwiki.velocity.tools.EscapeTool#sql(Object)})
+     *             $escapetool.sql($string)} ({@link org.xwiki.velocity.tools.EscapeTool#sql(java.lang.Object)})
      */
     @Deprecated
     public String Util.escapeSQL(String text)
@@ -289,7 +290,7 @@ public privileged aspect UtilCompatibilityAspect
      * @return the sum of the two parameters
      * @since 1.3 Milestone 2
      * @deprecated use {@code $mathtool.add($n1, $n2)}
-     *             ({@link org.apache.velocity.tools.generic.MathTool#add(Object, Object)})
+     *             ({@link org.apache.velocity.tools.generic.MathTool#add(java.lang.Object, java.lang.Object)})
      */
     @Deprecated
     public int Util.add(int a, int b)
@@ -305,7 +306,7 @@ public privileged aspect UtilCompatibilityAspect
      * @return the sum of the two parameters
      * @since 1.3 Milestone 2
      * @deprecated use {@code $mathtool.add($n1, $n2)}
-     *             ({@link org.apache.velocity.tools.generic.MathTool#add(Object, Object)})
+     *             ({@link org.apache.velocity.tools.generic.MathTool#add(java.lang.Object, java.lang.Object)})
      */
     @Deprecated
     public long Util.add(long a, long b)
@@ -369,7 +370,7 @@ public privileged aspect UtilCompatibilityAspect
      * @return encoded text
      * @since 1.3 Milestone 2
      * @see #decodeURI(String)
-     * @deprecated use {@code $escapetool.url($string)} ({@link org.xwiki.velocity.tools.EscapeTool#url(Object)})
+     * @deprecated use {@code $escapetool.url($string)} ({@link org.xwiki.velocity.tools.EscapeTool#url(java.lang.Object)})
      */
     @Deprecated
     public String Util.encodeURI(String text)

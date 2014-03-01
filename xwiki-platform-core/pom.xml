@@ -409,30 +409,51 @@
               <method>void setDocument(java.lang.String)</method>
               <justification>Not a breakage, moved to legacy</justification>
             </difference>
-
+            <!-- START: Due to removal of "compatibility" directory in legacy aspects directory structure -->
             <difference>
               <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/XWiki</className>
-              <method>org.xwiki.url.XWikiEntityURL ajc$interMethodDispatch2$com_xpn_xwiki_XWikiCompatibilityAspect$buildEntityURLFromPathSegments(org.xwiki.model.reference.WikiReference, java.util.List)</method>
-              <justification>AspectJ craps</justification>
+              <className>com/xpn/xwiki/XWikiContext</className>
+              <method>void ajc$privMethod$compatibility_com_xpn_xwiki_XWikiContextCompatibilityAspect$com_xpn_xwiki_XWikiContext$setUserInternal(java.lang.String, boolean)</method>
+              <justification>Removed wrong "compatibility" package</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/XWiki</className>
-              <method> void ajc$interMethodDispatch2$com_xpn_xwiki_XWikiCompatibilityAspect$ensureVirtualWikiMapExists()</method>
-              <justification>AspectJ craps</justification>
+              <className>com/xpn/xwiki/api/Api</className>
+              <method>com.xpn.xwiki.XWikiContext ajc$get$context(com.xpn.xwiki.api.Api)</method>
+              <justification>Removed wrong "compatibility" package</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/XWiki</className>
-              <method>org.xwiki.model.reference.DocumentReference ajc$interMethodDispatch2$com_xpn_xwiki_XWikiCompatibilityAspect$findWikiServer(java.lang.String, com.xpn.xwiki.XWikiContext)</method>
-              <justification>AspectJ craps</justification>
+              <className>com/xpn/xwiki/api/Api</className>
+              <method>void ajc$set$context(com.xpn.xwiki.api.Api, com.xpn.xwiki.XWikiContext)</method>
+              <justification>Removed wrong "compatibility" package</justification>
             </difference>
             <difference>
               <differenceType>8001</differenceType>
-              <className>com/xpn/xwiki/XWikiCompatibilityAspect</className>
-              <justification>Wrong package</justification>
+              <className>compatibility/com/xpn/xwiki/XWikiContextCompatibilityAspect</className>
+              <justification>Removed wrong "compatibility" package</justification>
             </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>compatibility/com/xpn/xwiki/api/ApiCompatibilityAspect</className>
+              <justification>Removed wrong "compatibility" package</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>compatibility/com/xpn/xwiki/api/ContextCompatibilityAspect</className>
+              <justification>Removed wrong "compatibility" package</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>compatibility/com/xpn/xwiki/api/DocumentCompatibilityAspect</className>
+              <justification>Removed wrong "compatibility" package</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>compatibility/com/xpn/xwiki/api/UtilCompatibilityAspect</className>
+              <justification>Removed wrong "compatibility" package</justification>
+            </difference>
+            <!-- END: Due to removal of "compatibility" directory in legacy aspects directory structure -->
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

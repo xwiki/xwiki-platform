@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>XWikiUserWatchListSheet</name>
   <language/>
@@ -89,75 +89,18 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
     &lt;/div&gt;
   &lt;/div&gt;
   #if ($xcontext.action == 'view')
-    ## The live table display doesn't adapt when the available width is limited so we need to ensure this column takes
-    ## at least half of the container width (unlike the rest of the columns). The result is that this column will be
-    ## displayed below the previous one when the page width is reduced.
+    ## The live table display of the watchlist entries doesn't adapt i.e. in case of long page names
+    ## when the available width is limited so we need to ensure this column takes at least half of the container width
+    ## (unlike the rest of the columns). The result is that this column will be displayed below the previous one when
+    ## the page width is reduced.
     &lt;div class="min-half column"&gt;
       &lt;div class="watchlistRss"&gt;
         &lt;h1&gt;$services.localization.render('watchlist.staytuned.rss')&lt;/h1&gt;
         &lt;a id="watchlistRssLink" rel="_blank" href="$xwiki.getURL('XWiki.WatchListRss', 'view', 'xpage=plain&amp;amp;outputSyntax=plain')"&gt;$services.localization.render('watchlist.staytuned.rss.info')&lt;/a&gt;
       &lt;/div&gt;
-    #end
-    #if ($xcontext.action == 'view')
-      &lt;div class="watchlistElements"&gt;
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
-        #set($collist = ["type", "wiki","space", "document", "actions"])
-        #set($colprops = { 
-                  "type": { "sortable":false },
-                  "wiki": { "sortable":false },
-                  "space": { "sortable":false },
-                  "document": { "sortable":false }})
-        #set($options = { "resultPage" : "XWiki.XWikiUserWatchListLiveTableResults",
-                  "rowCount": 10,
-                  "description": "This table lists all watched elements.",
-                  "translationPrefix": "watchlist.table.",
-                  "callback": "function (row, i, table) {
-                                  var tr = new Element('tr');
-                                  tr.insert(new Element('td').insert(new Element('span').addClassName(row.type + 'WatchlistType')));
-                                  tr.insert(new Element('td').insert(new Element('a', { href : row.wikiUrl}).update(row.wikiName)));
-                                  if (row.spaceUrl != '') {
-                                    tr.insert(new Element('td').insert(new Element('a', { href : row.spaceUrl}).update(row.spaceName)));
-                                  } else {
-                                    tr.insert(new Element('td').update(row.spaceName));
-                                  }
-                                  if (row.pageUrl != '') {
-                                    tr.insert(new Element('td').insert(new Element('a', { href : row.pageUrl}).update(row.pageName)));
-                                  } else {
-                                    tr.insert(new Element('td').update(row.pageName));
-                                  }
-                                  var deleteLink = new Element('a', {
-                                    href : row.deleteUrl,
-                                    title : '$escapetool.javascript($services.localization.render('platform.core.profile.watchlist.unwatch'))'
-                                  });
-                                  deleteLink.insert(new Element('img', {
-                                    'src' : '${xwiki.getSkinFile('icons/silk/cross.png')}'
-                                  }));
-                                  deleteLink.observe('click', function(event) {
-                                    Event.stop(event);
-                                    if (row.deleteUrl.indexOf('/') == 0) {
-                                      // DeleteURL is from the same domain
-                                      var surl = row.deleteUrl;
-                                      var myAjax = new Ajax.Request(
-                                        surl,
-                                        {
-                                          method: 'get',
-                                          onComplete: function(transport) {
-                                            this.clearCache();
-                                            this.showRows(this.currentOffset, this.limit);
-                                          }.bind(this)
-                                        }
-                                      );
-                                    } else {
-                                      // DeleteURL is from another domain, which prevents an AJAX request to be used here. We make a browser request and use xredirect to come back to the current page.
-                                      var separator = (row.deleteUrl.indexOf('?') == -1) ? '?' : '&amp;';
-                                      window.location = row.deleteUrl + separator + 'xredirect=' + window.location;
-                                    }
-                                  }.bind(this));
-                                  tr.insert(new Element('td').insert(deleteLink));
-                                  return tr;
-                               }" })
-          #livetable("mywatchlist" $collist $colprops $options)
-      &lt;/div&gt;
+
+      {{watchlist /}}
+
     &lt;/div&gt;
   #end
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;

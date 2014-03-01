@@ -564,24 +564,6 @@ div.editProfileCategory a {
   font-weight: bold;
 }
 
-span.wikiWatchlistType, span.spaceWatchlistType, span.pageWatchlistType {
-  width: 16px;
-  height: 16px;
-  display: block;
-}
-
-span.wikiWatchlistType {
-  background: url("$xwiki.getSkinFile('icons/silk/world.png')") no-repeat;
-}
-
-span.spaceWatchlistType {
-  background: url("$xwiki.getSkinFile('icons/silk/folder.png')") no-repeat;
-}
-
-span.pageWatchlistType {
-  background: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')") no-repeat;
-}
-
 span#avatarUpload {
   display:block;
   width:$tabswidth;

@@ -119,7 +119,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>.watchlistElements {
+      <code>.watchlistContainer {
   overflow-x: auto;
 }
 
@@ -267,10 +267,10 @@ span.pageWatchlistType {
     </class>
     <property>
       <code>{{velocity html="true"}}
-{{html wiki="true"}}
+#if (!$isGuest)
 $xwiki.ssx.use("XWiki.WatchListMacro")
-&lt;div class="watchlistElements"&gt;
-  &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
+{{html wiki="true"}}
+&lt;div class="watchlistContainer"&gt;
   #set($collist = ["type", "wiki","space", "document", "actions"])
   #set($colprops = { 
       "type": { "sortable":false },
@@ -328,10 +328,10 @@ $xwiki.ssx.use("XWiki.WatchListMacro")
                       tr.insert(new Element('td').insert(deleteLink));
                       return tr;
                    }" })
-    #livetable("mywatchlist" $collist $colprops $options)
+  #livetable("mywatchlist" $collist $colprops $options)
 &lt;/div&gt;
-    &lt;/div&gt;
 {{/html}}
+#end
 {{/velocity}}</code>
     </property>
     <property>

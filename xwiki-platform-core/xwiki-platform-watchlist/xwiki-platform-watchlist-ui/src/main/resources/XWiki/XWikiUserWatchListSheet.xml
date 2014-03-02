@@ -26,19 +26,15 @@
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>XWiki.XWikiUserSheet</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1264167993000</creationDate>
+  <parent>XWiki.XWikiUserSheet</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1303989085000</date>
   <contentUpdateDate>1303989085000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
@@ -98,9 +94,12 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
         &lt;h1&gt;$services.localization.render('watchlist.staytuned.rss')&lt;/h1&gt;
         &lt;a id="watchlistRssLink" rel="_blank" href="$xwiki.getURL('XWiki.WatchListRss', 'view', 'xpage=plain&amp;amp;outputSyntax=plain')"&gt;$services.localization.render('watchlist.staytuned.rss.info')&lt;/a&gt;
       &lt;/div&gt;
+      &lt;div class="watchlistElements"&gt;
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
 
-      {{watchlist /}}
+        {{watchlist /}}
 
+      &lt;/div&gt;
     &lt;/div&gt;
   #end
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;

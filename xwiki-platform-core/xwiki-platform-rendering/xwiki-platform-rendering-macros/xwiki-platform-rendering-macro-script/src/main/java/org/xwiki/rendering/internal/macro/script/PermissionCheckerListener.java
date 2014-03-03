@@ -48,11 +48,6 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 @Singleton
 public class PermissionCheckerListener extends AbstractScriptCheckerListener
 {
-    /**
-     * Message sent when the permission to execute the script is refused.
-     */
-    private static final String CANCEL_MESSAGE = "You don't have the right to execute this script";
-
     /** Used to find the type of a Macro defined by a Macro Marker block. */
     @Inject
     private MacroManager macroManager;
@@ -82,7 +77,8 @@ public class PermissionCheckerListener extends AbstractScriptCheckerListener
             MacroPermissionPolicy mpp =
                 this.componentManager.getInstance(MacroPermissionPolicy.class, currentMacroId.getId());
             if (!mpp.hasPermission(parameters, context)) {
-                event.cancel(CANCEL_MESSAGE);
+                event.cancel(
+                    String.format("You don't have the right to execute the script macro [%s]", currentMacroId));
             }
         } catch (ComponentLookupException e) {
             // Policy not found for macro, check permission using backward compatibility check
@@ -107,9 +103,10 @@ public class PermissionCheckerListener extends AbstractScriptCheckerListener
                 // no special permission needed
                 return;
             }
-            // with not protected script engine, we are testing if the current dcument's author has "programming" right
+            // with not protected script engine, we are testing if the current document's author has "programming" right
             if (!this.documentAccessBridge.hasProgrammingRights()) {
-                event.cancel(CANCEL_MESSAGE);
+                event.cancel(
+                    String.format("You need Programming Rights to execute the script macro [%s]", macroId.getId()));
             }
         } catch (MacroLookupException exception) {
             // should not happen, this method was called from that macro

@@ -103,7 +103,7 @@ public class SecurityTest extends AbstractComponentTestCase
             macro.execute(parameters, "new Integer(0)", context);
             Assert.fail("Should have thrown an exception here!");
         } catch (MacroExecutionException expected) {
-            Assert.assertEquals("You don't have the right to execute this script", expected.getMessage());
+            Assert.assertEquals("You don't have the right to execute the script macro [groovy]", expected.getMessage());
         }
     }
 

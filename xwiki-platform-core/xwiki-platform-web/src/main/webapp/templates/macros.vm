@@ -1280,6 +1280,11 @@ ${Msz}Mb##
   #if("$!options.topFilters" != '') #set($topfilters = $options.topFilters) #end
   #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
   #if("$!options.pageSizeBounds" != '') #set($pageSizeBounds = $options.pageSizeBounds) #end
+  #if("$!options.queryFilters" != '')
+    #set ($queryFilters = $!options.queryFilters)
+  #else
+    #set ($queryFilters = 'currentlanguage,hidden')
+  #end
   #set($classname = "$!options.className")
   ##
   ## Columns informations
@@ -1305,7 +1310,8 @@ ${Msz}Mb##
       'outputSyntax': 'plain',
       'transprefix': $transprefix,
       'classname': $classname,
-      'collist': $stringtool.join($dataColumns, ',')
+      'collist': $stringtool.join($dataColumns, ','),
+      'queryFilters': $queryFilters
     })
     #set ($discard = $parameters.putAll($classParams))
     #set ($resultPage = $options.resultPage)

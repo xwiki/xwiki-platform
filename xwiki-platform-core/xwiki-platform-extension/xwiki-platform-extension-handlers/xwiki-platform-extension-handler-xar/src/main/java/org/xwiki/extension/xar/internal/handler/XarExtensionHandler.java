@@ -219,7 +219,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         PackageConfiguration configuration =
             createPackageConfiguration(newLocalExtension, request, wiki, getXARExtensionPlan());
         try {
-            this.packager.importXAR("Install extensoin [" + newLocalExtension + "]", new File(newLocalExtension
+            this.packager.importXAR("Install extension [" + newLocalExtension + "]", new File(newLocalExtension
                 .getFile().getAbsolutePath()), configuration);
         } catch (Exception e) {
             throw new InstallException("Failed to import xar for extension [" + newLocalExtension + "]", e);

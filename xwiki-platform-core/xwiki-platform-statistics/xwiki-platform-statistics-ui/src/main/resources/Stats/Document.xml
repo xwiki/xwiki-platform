@@ -43,7 +43,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="Stats.Macros" /}}
+  <content>{{include reference="Stats.Macros" /}}
 
 {{velocity}}
 {{html wiki="true"}}

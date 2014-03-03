@@ -46,5 +46,5 @@
 $services.localization.use('document', 'Menu.MenuTranslations')
 {{/velocity}}
 
-{{include document="XWiki.LiveTableResults" /}}</content>
+{{include reference="XWiki.LiveTableResults" /}}</content>
 </xwikidoc>

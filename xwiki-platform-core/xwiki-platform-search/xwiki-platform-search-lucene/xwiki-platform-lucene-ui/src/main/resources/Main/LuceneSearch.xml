@@ -254,7 +254,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
         #set ($list = $results)
         #set ($isScored = true)
 
-        {{include document="XWiki.Results"/}}
+        {{include reference="XWiki.Results"/}}
       #end
       ## -----------------
       ## Pagination (bottom)

@@ -43,9 +43,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>{{include document="ExtensionCode.RepositoryCode"/}}
+  <content>{{include reference="ExtensionCode.RepositoryCode"/}}
 
-{{include document="ExtensionCode.CreateExtension"/}}
+{{include reference="ExtensionCode.CreateExtension"/}}
 
 (% class="centered" %) (((
 

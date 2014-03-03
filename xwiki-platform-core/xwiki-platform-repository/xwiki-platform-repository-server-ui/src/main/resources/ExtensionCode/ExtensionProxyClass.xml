@@ -106,5 +106,5 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </repositoryURI>
   </class>
-  <content>{{include document="XWiki.ClassSheet"/}}</content>
+  <content>{{include reference="XWiki.ClassSheet"/}}</content>
 </xwikidoc>

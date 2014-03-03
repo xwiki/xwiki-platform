@@ -739,7 +739,7 @@ return XWiki;
 
 {{velocity}}
 #if("$!request.wizard" == 'true')
-  {{include document="AppWithinMinutes.WizardStep" /}}
+  {{include reference="AppWithinMinutes.WizardStep" /}}
 #end
 {{/velocity}}
 

@@ -166,7 +166,7 @@
     <className>XWiki.ConfigurableClass</className>
     <guid>f78447aa-c069-4be9-b1e2-62d083f7bd8a</guid>
     <property>
-      <codeToExecute>{{include document="XWiki.AdminLdapSheet" /}}</codeToExecute>
+      <codeToExecute>{{include reference="XWiki.AdminLdapSheet" /}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>
@@ -689,7 +689,7 @@ $services.localization.render('platform.ldap.ldapAuthenticationIsNotEnabledWarni
 
 = {{velocity}}$services.localization.render('platform.ldap.adminHeadingConfiguration'){{/velocity}} =
 
-{{include document="XWiki.AdminFieldsDisplaySheet" /}}
+{{include reference="XWiki.AdminFieldsDisplaySheet" /}}
 
 = {{velocity}}$services.localization.render('platform.ldap.adminHeadingMiscellaneous'){{/velocity}} =
 

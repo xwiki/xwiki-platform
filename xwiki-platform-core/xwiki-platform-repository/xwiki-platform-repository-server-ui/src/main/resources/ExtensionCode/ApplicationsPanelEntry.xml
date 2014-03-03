@@ -111,5 +111,5 @@ target=Extension.WebHome
 icon=icon:plugin</parameters>
     </property>
   </object>
-  <content>{{include document="XWiki.UIExtensionSheet" /}}</content>
+  <content>{{include reference="XWiki.UIExtensionSheet" /}}</content>
 </xwikidoc>

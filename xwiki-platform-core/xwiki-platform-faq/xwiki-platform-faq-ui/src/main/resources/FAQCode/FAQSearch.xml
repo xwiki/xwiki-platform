@@ -41,30 +41,19 @@
   <hidden>true</hidden>
   <content>{{include reference="XWiki.SearchCode"/}}
 
-{{velocity}}
-##
-## Customize the Solr Search UI.
-##
-#if ($searchEngine == 'solr')
-  ## Create the configuration object.
-  {{include reference="Main.SolrSearchConfig"/}}
-#end
-{{/velocity}}
 {{velocity output="false"}}
-#if ($solrConfig)
-  ## Overwrite some configuration parameters.
-  ## We don't use the Result Type facet because the result type is specified in the filter query below so we set the
-  ## query and sort fields for all result types.
-  #set ($discard = $solrConfig.queryFields.put($NULL, 'title^3 property.FAQCode.FAQClass.answer'))
-  #set ($discard = $solrConfig.sortFields.put($NULL, $solrConfig.sortFields.DOCUMENT))
-  #set ($solrConfig.filterQuery = [
-    'type:DOCUMENT',
-    "wiki:$xcontext.database",
-    "space_exact:$doc.space",
-    'class:FAQCode.FAQClass'
-  ])
-  #set ($solrConfig.facetFields = ['creator', 'creationdate', 'author', 'date', 'mimetype', 'attauthor', 'attdate', 'attsize'])
-  #set ($solrConfig.facetQuery = {})
+#if ($searchEngine == 'solr')
+  ## Customize the Solr Search UI for the FAQ application.
+  #set ($solrConfig = {
+    'queryFields': 'title^3 property.FAQCode.FAQClass.answer',
+    'facetFields': ['creator', 'creationdate', 'author', 'date', 'mimetype', 'attauthor', 'attdate', 'attsize'],
+    'filterQuery': [
+      'type:DOCUMENT',
+      "wiki:$xcontext.database",
+      "space_exact:$doc.space",
+      'class:FAQCode.FAQClass'
+    ]
+  })
 #end
 {{/velocity}}
 

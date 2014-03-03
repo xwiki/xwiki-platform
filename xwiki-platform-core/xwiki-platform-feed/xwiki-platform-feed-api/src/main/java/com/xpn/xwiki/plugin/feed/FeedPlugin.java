@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.rendering.converter.ConversionException;
@@ -197,7 +198,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             lru.setTimeToLive(this.refreshPeriod);
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-            this.feedCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
+            CacheManager cacheManager = Utils.getComponent(CacheManager.class);
+            this.feedCache = cacheManager.createNewLocalCache(configuration);
         } catch (CacheException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
                 "Failed to create cache");

@@ -23,7 +23,7 @@ import org.openqa.selenium.By;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
- * Represents actions for the Panels.Appications panel.
+ * Represents actions for the Panels.Applications panel.
  *
  * @version $Id$
  * @since 4.3M2

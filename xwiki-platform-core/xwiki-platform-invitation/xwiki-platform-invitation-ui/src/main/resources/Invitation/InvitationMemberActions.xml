@@ -122,9 +122,9 @@
       <users/>
     </property>
   </object>
-  <content>{{include document="Invitation.InvitationCommon" /}}
+  <content>{{include reference="Invitation.InvitationCommon" /}}
 
-{{include document="Invitation.InvitationMembersCommon" /}}
+{{include reference="Invitation.InvitationMembersCommon" /}}
 
 {{velocity}}
 #*

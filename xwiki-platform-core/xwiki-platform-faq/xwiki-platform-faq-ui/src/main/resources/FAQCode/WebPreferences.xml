@@ -1222,5 +1222,5 @@
     <className>XWiki.XWikiPreferences</className>
     <guid>91bd9bfd-8bfc-421d-8905-ec36242c0c49</guid>
   </object>
-  <content>{{include document="XWiki.AdminSheet"/}}</content>
+  <content>{{include reference="XWiki.AdminSheet"/}}</content>
 </xwikidoc>

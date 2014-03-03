@@ -262,7 +262,7 @@ $xwiki.ssfx.use("uicomponents/search/search.css", true)##
     {{{$xwiki.feed.getFeedOutput($feed, $xwiki.getXWikiPreference('feed_type', 'rss_2.0'))}}}
   #else
 
-    {{include document="XWiki.Results"/}}
+    {{include reference="XWiki.Results"/}}
 
     #if($selectedSpace == '')
       #set($rssURL = $xwiki.getURL($doc.fullName, 'view', "xpage=plain&amp;amp;outputSyntax=plain&amp;amp;text=${utext}" ))

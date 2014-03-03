@@ -167,7 +167,7 @@
 
 {{comment}}Call the default user directory data source that we have just enhanced.{{/comment}}
 
-{{include document='XWiki.UserDirectoryLivetableResults' /}}
+{{include reference='XWiki.UserDirectoryLivetableResults' /}}
 
 {{velocity output='false'}}
 ##

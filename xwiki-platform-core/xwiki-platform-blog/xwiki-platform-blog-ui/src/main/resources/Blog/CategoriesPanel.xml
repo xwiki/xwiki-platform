@@ -125,7 +125,7 @@
       <category>Information</category>
     </property>
     <property>
-      <content>{{include document="Blog.CategoriesCode"/}}
+      <content>{{include reference="Blog.CategoriesCode"/}}
 
 {{velocity}}
 #panelheader($services.localization.render('xe.blog.categories.paneltitle'))
@@ -149,5 +149,5 @@
       <type>view</type>
     </property>
   </object>
-  <content>{{include document="Panels.PanelSheet"/}}</content>
+  <content></content>
 </xwikidoc>

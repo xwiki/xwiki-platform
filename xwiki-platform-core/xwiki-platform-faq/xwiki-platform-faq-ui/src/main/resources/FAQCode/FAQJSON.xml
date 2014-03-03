@@ -43,7 +43,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="XWiki.LiveTableResultsMacros" /}}
+  <content>{{include reference="XWiki.LiveTableResultsMacros" /}}
 {{velocity wiki="false"}}
 #gridresultwithfilter($request.classname $request.collist.split(",") "" " and doc.fullName&lt;&gt;'FAQCode.FAQTemplate' and doc.space='$!request.space'")
 {{/velocity}}</content>

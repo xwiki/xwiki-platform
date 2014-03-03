@@ -43,7 +43,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="Blog.BlogCode"/}}
+  <content>{{include reference="Blog.BlogCode"/}}
 
 {{velocity output="false"}}
 ##

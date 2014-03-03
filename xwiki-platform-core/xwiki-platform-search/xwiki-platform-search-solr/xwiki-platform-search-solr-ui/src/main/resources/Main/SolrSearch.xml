@@ -39,11 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#if (!$solrConfig)
-  {{include reference="Main.SolrSearchConfig" /}}
-#end
-{{/velocity}}
+  <content>{{include reference="Main.SolrSearchConfig" /}}
 
 {{velocity output='false'}}
 #set ($rangePattern = $regextool.compile('^[\[{](.+) TO (.+)[\]}]$'))
@@ -623,7 +619,14 @@
 #macro (setQueryFields $query)
   ## Specify which index fields are matched when a free text search is performed.
   #if ($boost == '')
-    #set ($boost = $solrConfig.queryFields.get($type))
+    #if ($solrConfig.queryFields.substring(0, 0) == '')
+      ## If the value of the 'queryFields' parameter is a string then it means that the same query fields are used for
+      ## all result types.
+      #set ($boost = $solrConfig.queryFields)
+    #else
+      ## There are different query fields for each result type.
+      #set ($boost = $solrConfig.queryFields.get($type))
+    #end
   #end
   #if ("$!boost" != '')
     #set ($discard = $query.bindValue('qf', $boost))
@@ -736,6 +739,14 @@ $value##
   #set ($type = $request.getParameterValues('f_type'))
   #if ($type &amp;&amp; $type.size() == 1)
     #set ($type = $type.get(0))
+  #else
+    ## Extract the result type from the filter query, if specified.
+    #foreach ($item in $solrConfig.filterQuery)
+      #if ($item.startsWith('type:'))
+        #set ($type = $item.substring(5))
+        #break
+      #end
+    #end
   #end
 #end
 
@@ -806,6 +817,8 @@ $value##
 {{/velocity}}
 
 {{velocity}}
+## Preselect facet values only for the facets that are enabled.
+#set ($discard = $solrConfig.facetQuery.keySet().retainAll($solrConfig.facetFields))
 #if ($request.media == 'rss')
   #outputRSSFeed()
 #elseif ("$!request.r" == '1' || $solrConfig.facetQuery.isEmpty())
@@ -1141,7 +1154,7 @@ $value##
 }
 
 .search-form .search-query {
-  background: transparent url("/xwiki/resources/icons/xwiki/search.png") left center no-repeat;
+  background: transparent url("$xwiki.getSkinFile('icons/xwiki/search.png')") left center no-repeat;
   border: 2px solid $theme.borderColor;
   padding-left: 18px;
   padding-right: 20px;
@@ -1216,16 +1229,16 @@ a.sort-item.active, a.sort-item.active:hover {
   background: none no-repeat scroll left .4em transparent;
 }
 .search-result.type-document {
-  background-image: url("/xwiki/resources/icons/silk/page_white_text.png");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')");
 }
 .search-result.type-object {
-  background-image: url("/xwiki/resources/icons/silk/page_white_gear.png");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_gear.png')");
 }
 .search-result.type-object_property {
-  background-image: url("/xwiki/resources/icons/silk/page_white_key.png");
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_key.png')");
 }
 .search-result.type-attachment {
-  background-image: url("/xwiki/resources/icons/silk/attach.png");
+  background-image: url("$xwiki.getSkinFile('icons/silk/attach.png')");
 }
 
 .search-result-title {

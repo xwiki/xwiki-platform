@@ -190,7 +190,7 @@ ${escapetool.h}livetable('#escapeSingleQuotes($shortName)' ${escapetool.d}column
 #set ($isLiveTableResultsRequest = $xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
 ## We do the include separately because the wiki syntax is evaluated after the Velocity code.
 #if ($isLiveTableResultsRequest)
-  {{include document="XWiki.LiveTableResultsMacros" /}}
+  {{include reference="XWiki.LiveTableResultsMacros" /}}
 #end
 {{/velocity}}{{velocity wiki="false"}}
 ## Old applications need custom live table results just because they don't have a document translation bundle generated.

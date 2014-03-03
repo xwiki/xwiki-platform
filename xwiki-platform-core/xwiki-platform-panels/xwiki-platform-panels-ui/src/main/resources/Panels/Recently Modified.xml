@@ -151,5 +151,5 @@
       <type>view</type>
     </property>
   </object>
-  <content>{{include document="Panels.PanelSheet"/}}</content>
+  <content/>
 </xwikidoc>

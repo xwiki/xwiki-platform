@@ -43,11 +43,11 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="XWiki.SearchCode"/}}
+  <content>{{include reference="XWiki.SearchCode"/}}
 
 {{velocity}}
 #set($allwikinamelist = ["extensions"])
-{{include document="$searchPage"/}}
+{{include reference="$searchPage"/}}
 {{/velocity}}
 </content>
 </xwikidoc>

@@ -191,5 +191,5 @@ document.observe('xwiki:dom:loaded', function() {
       <type>edit</type>
     </property>
   </object>
-  <content>{{include document="Panels.PanelSheet"/}}</content>
+  <content/>
 </xwikidoc>

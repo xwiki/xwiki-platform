@@ -74,7 +74,7 @@
       <action>view</action>
     </property>
   </object>
-  <content>{{include document="Blog.CategoriesCode"/}}
+  <content>{{include reference="Blog.CategoriesCode"/}}
 
 {{velocity}}
 {{html wiki=true}}
@@ -85,7 +85,7 @@
   = Category: #getCategoryName($doc) ($totalEntries posts) [[#toolImage('feed' '[RSS]')&gt;&gt;Blog.CategoryRss||queryString="xpage=plain&amp;category=$escapetool.url($doc.fullName)" title="RSS"]] =
   ## Keep testing the inline action for backward compatibility with older categories.
   #if ($xcontext.action != 'edit' &amp;&amp; $xcontext.action != 'inline')
-    {{include document="Blog.CreatePost"/}}
+    {{include reference="Blog.CreatePost"/}}
 
     #getCategoriesHierarchy($doc.space $tree)
     #if ("$!tree.get($doc.fullName)" != '')

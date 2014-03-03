@@ -124,7 +124,7 @@
       <category>Navigation</category>
     </property>
     <property>
-      <content>{{include document="Blog.BlogCode"/}}
+      <content>{{include reference="Blog.BlogCode"/}}
 
 {{velocity}}
 #getBlogEntriesBaseQuery($query)
@@ -152,5 +152,5 @@
       <type>view</type>
     </property>
   </object>
-  <content>{{include document="Panels.PanelSheet"/}}</content>
+  <content></content>
 </xwikidoc>

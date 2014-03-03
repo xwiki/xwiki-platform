@@ -43,7 +43,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="ExtensionCode.RepositoryCode"/}}
+  <content>{{include reference="ExtensionCode.RepositoryCode"/}}
 
 Imports an Extension coming from another Extension Repository into the current wiki.
 

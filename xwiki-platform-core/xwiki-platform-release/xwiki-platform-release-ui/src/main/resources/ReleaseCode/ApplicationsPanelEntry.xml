@@ -127,5 +127,5 @@ target=Release.WebHome
 icon=icon:tick</parameters>
     </property>
   </object>
-  <content>{{include document="XWiki.UIExtensionSheet" /}}</content>
+  <content>{{include reference="XWiki.UIExtensionSheet" /}}</content>
 </xwikidoc>

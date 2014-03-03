@@ -2173,7 +2173,7 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
 -------------------------------------------------------------- */
 
 /* ----------------Message Macro-------------------------*/
-span.errormessage, span.warningmessage, span.infomessage, span.plainmessage {
+span.errormessage, span.warningmessage, span.infomessage, span.plainmessage, span.successmessage {
   background-position: 2px center;
   overflow: visible;
   padding: 0 2px 0 22px;

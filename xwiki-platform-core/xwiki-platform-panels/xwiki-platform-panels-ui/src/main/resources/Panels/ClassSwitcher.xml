@@ -281,5 +281,5 @@ $xwiki.jsx.use('Panels.ClassSwitcher')##
       <type>edit</type>
     </property>
   </object>
-  <content>{{include document="Panels.PanelSheet"/}}</content>
+  <content/>
 </xwikidoc>

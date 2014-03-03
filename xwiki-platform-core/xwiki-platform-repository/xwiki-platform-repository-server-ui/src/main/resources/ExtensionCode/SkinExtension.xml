@@ -236,7 +236,6 @@ div.extension-link {
   padding: 0 1em 0.5em;
   min-height: 100px;
   vertical-align: top;
-  width: 350px;
 }
 
 .extension-link form {

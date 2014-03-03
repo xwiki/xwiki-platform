@@ -20,62 +20,53 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Panels</web>
   <name>WebHome</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1392919497000</creationDate>
+  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1252454400000</creationDate>
-  <date>1252454400000</date>
-  <contentUpdateDate>1252454400000</contentUpdateDate>
+  <date>1393442369000</date>
+  <contentUpdateDate>1393442369000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.panels')</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
 #if($hasAdmin)
-
 = $services.localization.render('xe.panels.create') =
-
-{{include document="Panels.CreatePanel"/}}
-
+{{include reference="Panels.CreatePanel"/}}
 #end
-= $services.localization.render('xe.panels.viewer') =
-
-#set ($searchResults = $services.query.xwql('from doc.object(Panels.PanelClass) as panel where doc.fullName&lt;&gt;?1 order by doc.name').bindValue(1, 'Panels.PanelTemplate').execute())
-#foreach ($item in $searchResults)
-  #set ($pdoc = $xwiki.getDocument($item))
-  #set ($obj = $pdoc.getObject("Panels.PanelClass"))
-  #if ($obj.getProperty('type').value == 'view')
-* [[$item]] #if ($hasAdmin)[ [[$services.localization.render('edit')&gt;&gt;path:$pdoc.getURL('inline')]] [[$services.localization.render('delete')&gt;&gt;path:$pdoc.getURL('delete')]] ]#end: $obj.description
-  #end
-#end
-
+= $services.localization.render('panels.available') =
 #if ($hasAdmin)
-{{box}}
-[[image:icon:wand]] $services.localization.render('xe.panels.customize') [[$services.localization.render('panelwizard.panelwizard')&gt;&gt;Panels.PanelWizard]].
-{{/box}}
-
+  {{box}}
+    [[image:icon:wand]] $services.localization.render('xe.panels.customize') [[$services.localization.render('panelwizard.panelwizard')&gt;&gt;Panels.PanelWizard]].
+  {{/box}}
 #end
-= $services.localization.render('xe.panels.editor') =
-
-#foreach ($item in $searchResults)
-  #set ($pdoc = $xwiki.getDocument($item))
-  #set ($obj = $pdoc.getObject('Panels.PanelClass'))
-  #if ($obj.getProperty('type').value == 'edit')
-* [[$item]] #if ($hasAdmin)[ [[$services.localization.render('edit')&gt;&gt;path:$pdoc.getURL('inline')]] [[$services.localization.render('delete')&gt;&gt;path:$pdoc.getURL('delete')]] ]#end: $obj.description
-  #end
-#end
-{{/velocity}}</content>
+#set($columns = ["name", "description", "type", "category", '_actions'])
+#set($columnsProperties = {
+  "name" : { "type" : "text", "link" : "view" },
+  "description" : { "type" : "text", "html" : "true" },
+  "type" : { "type" : "list" },
+  "category" : { "type" : "list" },
+  '_actions': {'html': true, 'sortable': false, 'actions': ['edit', 'delete']}
+})
+#set($options = { 
+   "className":"Panels.PanelClass",
+   "selectedColumn":"name",
+   "defaultOrder":"asc",
+   "translationPrefix" : "panels.",
+   "rowCount": 30,
+   "queryFilters": "currentlanguage"
+})
+#livetable("panels" $columns $columnsProperties $options)
+{{/velocity}}
+</content>
 </xwikidoc>

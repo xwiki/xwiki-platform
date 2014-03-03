@@ -146,5 +146,5 @@ $services.localization.render('xe.panels.rights.explanation')
       <type>edit</type>
     </property>
   </object>
-  <content>{{include document="Panels.PanelSheet"/}}</content>
+  <content/>
 </xwikidoc>

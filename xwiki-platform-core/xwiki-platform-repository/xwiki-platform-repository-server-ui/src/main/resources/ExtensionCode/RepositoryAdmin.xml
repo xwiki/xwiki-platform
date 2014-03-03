@@ -166,7 +166,7 @@
     <className>XWiki.ConfigurableClass</className>
     <guid>a492d502-039d-4473-858b-85ad1718a4c8</guid>
     <property>
-      <codeToExecute>{{include document="ExtensionCode.RepositoryAdmin"/}}</codeToExecute>
+      <codeToExecute>{{include reference="ExtensionCode.RepositoryAdmin"/}}</codeToExecute>
     </property>
     <property>
       <configurationClass/>
@@ -190,7 +190,7 @@
       <propertiesToShow/>
     </property>
   </object>
-  <content>{{include document="ExtensionCode.RepositoryCode"/}}
+  <content>{{include reference="ExtensionCode.RepositoryCode"/}}
 
 {{velocity output="false"}}
 ## Create the configuration object if it does not exists

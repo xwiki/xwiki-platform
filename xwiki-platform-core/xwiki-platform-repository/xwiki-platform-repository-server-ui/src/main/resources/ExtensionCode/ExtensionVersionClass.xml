@@ -103,5 +103,5 @@
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </version>
   </class>
-  <content>{{include document="XWiki.ClassSheet"/}}</content>
+  <content>{{include reference="XWiki.ClassSheet"/}}</content>
 </xwikidoc>

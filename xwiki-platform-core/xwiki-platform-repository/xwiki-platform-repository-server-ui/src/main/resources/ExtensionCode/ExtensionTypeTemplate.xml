@@ -109,5 +109,5 @@
       <name/>
     </property>
   </object>
-  <content>{{include document="ExtensionCode.ExtensionTypeSheet"/}}</content>
+  <content>{{include reference="ExtensionCode.ExtensionTypeSheet"/}}</content>
 </xwikidoc>

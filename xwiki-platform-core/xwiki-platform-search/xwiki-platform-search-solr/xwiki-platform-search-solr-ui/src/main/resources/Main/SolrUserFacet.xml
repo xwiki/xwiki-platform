@@ -59,13 +59,15 @@
     &lt;/span&gt;
   &lt;/span&gt;
 #end
-#set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
-#set ($discard = $xwiki.ssx.use('Main.SolrUserFacet'))
-{{html}}
-&lt;ul class="users"&gt;
-  #displaySearchFacetValuesLimited($facetValues {} 'displaySearchFacetValue_user')
-&lt;/ul&gt;
-{{/html}}
+#if ($facetValues)
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
+  #set ($discard = $xwiki.ssx.use('Main.SolrUserFacet'))
+  {{html}}
+  &lt;ul class="users"&gt;
+    #displaySearchFacetValuesLimited($facetValues {} 'displaySearchFacetValue_user')
+  &lt;/ul&gt;
+  {{/html}}
+#end
 {{/velocity}}</content>
   <object>
     <name>Main.SolrUserFacet</name>

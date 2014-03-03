@@ -174,5 +174,5 @@ if (botManager &amp;&amp; !botManager.isStarted()) {
       <status>None</status>
     </property>
   </object>
-  <content>{{include document="XWiki.SchedulerJobSheet"/}}</content>
+  <content>{{include reference="XWiki.SchedulerJobSheet"/}}</content>
 </xwikidoc>

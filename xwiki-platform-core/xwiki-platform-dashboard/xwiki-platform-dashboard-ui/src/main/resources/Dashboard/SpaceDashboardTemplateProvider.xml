@@ -166,6 +166,6 @@
       <type>space</type>
     </property>
   </object>
-  <content>{{include document="XWiki.TemplateProviderSheet"/}}
+  <content>{{include reference="XWiki.TemplateProviderSheet"/}}
 </content>
 </xwikidoc>

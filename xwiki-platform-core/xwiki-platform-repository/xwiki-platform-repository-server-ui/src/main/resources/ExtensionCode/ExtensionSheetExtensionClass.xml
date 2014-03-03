@@ -154,5 +154,5 @@
       <sheet>ExtensionCode.ExtensionSheetExtensionSheet</sheet>
     </property>
   </object>
-  <content>{{include document="XWiki.ClassSheet"/}}</content>
+  <content>{{include reference="XWiki.ClassSheet"/}}</content>
 </xwikidoc>

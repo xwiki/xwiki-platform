@@ -208,5 +208,5 @@ KBfuuaQu/iwAAAAASUVORK5CYII=
 #set ($selectedRepositoryId = 'core')
 {{/velocity}}
 
-{{include document="AddExtensions" /}}</content>
+{{include reference="AddExtensions" /}}</content>
 </xwikidoc>

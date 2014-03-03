@@ -41,7 +41,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Wiki UI Extension renderer.
+ * Parse the UI Extension content as an XDOM, cache it and when asked, apply Rendering Transformations on the XDOM
+ * and return the modified XDOM.
  *
  * @version $Id$
  * @since 5.0M1

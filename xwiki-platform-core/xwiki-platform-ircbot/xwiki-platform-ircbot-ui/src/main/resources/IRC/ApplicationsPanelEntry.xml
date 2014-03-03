@@ -111,5 +111,5 @@ target=IRC.WebHome
 icon=icon:group_edit</parameters>
     </property>
   </object>
-  <content>{{include document="XWiki.UIExtensionSheet" /}}</content>
+  <content>{{include reference="XWiki.UIExtensionSheet" /}}</content>
 </xwikidoc>

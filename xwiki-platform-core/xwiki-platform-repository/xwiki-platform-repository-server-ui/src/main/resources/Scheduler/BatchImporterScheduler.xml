@@ -174,5 +174,5 @@ for (extension in extensions)
       <status>None</status>
     </property>
   </object>
-  <content>{{include document="XWiki.SchedulerJobSheet"/}}</content>
+  <content>{{include reference="XWiki.SchedulerJobSheet"/}}</content>
 </xwikidoc>

@@ -122,7 +122,7 @@
       <users>XWiki.XWikiGuest</users>
     </property>
   </object>
-  <content>{{include document="Invitation.InvitationCommon" /}}
+  <content>{{include reference="Invitation.InvitationCommon" /}}
 
 {{velocity}}
 #*
@@ -254,7 +254,7 @@
           $emailContainer.saveAsAuthor($services.localization.render('xe.invitation.doAction.accept.saveComment'))
         #end
         #set($invited = true)
-        {{include document="XWiki.Registration"/}}
+        {{include reference="XWiki.Registration"/}}
       #end
     #end
   #elseif($action == 'decline')

@@ -22,6 +22,7 @@ package org.xwiki.panels.test.ui;
 import org.junit.*;
 import org.xwiki.administration.test.po.AdministrablePage;
 import org.xwiki.administration.test.po.PageElementsAdministrationSectionPage;
+import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.panels.test.po.PageWithPanels;
 import org.xwiki.panels.test.po.PanelEditPage;
 import org.xwiki.panels.test.po.PanelsHomePage;
@@ -42,6 +43,26 @@ public class PanelTest extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+
+    @Test
+    public void verifyApplicationsPanelEntry()
+    {
+        // Navigate to the Panels app by clicking in the Application Panel.
+        // This verifies that the Panels application is registered in the Applications Panel.
+        // It also verifies that the Translation is registered properly.
+        ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
+        ViewPage vp = applicationPanel.clickApplication("Panels");
+
+        // Verify we're on the right page!
+        Assert.assertEquals(PanelsHomePage.getSpace(), vp.getMetaDataValue("space"));
+        Assert.assertEquals(PanelsHomePage.getPage(), vp.getMetaDataValue("page"));
+
+        // Now log out to verify that the Panels entry is not displayed for non admin users
+        vp.logout();
+        // Navigate again to the Application Panels page to perform the verification
+        applicationPanel = ApplicationsPanel.gotoPage();
+        Assert.assertFalse(applicationPanel.containsApplication("Panels"));
+    }
 
     /**
      * @see "XWIKI-8591: Cannot use a panel with a name containing spaces"

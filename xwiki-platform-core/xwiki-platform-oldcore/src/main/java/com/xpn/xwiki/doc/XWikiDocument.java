@@ -6501,7 +6501,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 return "inline";
             }
         } else {
-            // Algorithm: look in all include macro and for all document included check if one of them
+            // Algorithm: look in all include macros and for all document included check if one of them
             // has an EditModeClass object attached to it, or a SheetClass object (deprecated since 3.1M2) attached to
             // it. If so then the edit mode is inline.
 
@@ -6509,11 +6509,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // TODO: Is there a good way not to hardcode the macro name? The macro itself shouldn't know
             // its own name since it's a deployment time concern.
             for (Block macroBlock : getXDOM().getBlocks(new MacroBlockMatcher("include"), Axes.CHILD)) {
-                String documentName = macroBlock.getParameter("document");
-                if (documentName != null) {
+                // Find the document reference to include by checking the macro's "reference" parameter.
+                // For backward-compatibility we also check for a "document" parameter since this is the parameter name
+                // that was used prior to XWiki 3.4M1 when the "reference" one was introduced and thus when the
+                // "document" one was deprecated.
+                String includedDocumentReference = macroBlock.getParameter("reference");
+                if (includedDocumentReference == null) {
+                    includedDocumentReference = macroBlock.getParameter("document");
+                }
+                if (includedDocumentReference != null) {
                     // Resolve the document name into a valid Reference
                     DocumentReference documentReference =
-                        this.currentMixedDocumentReferenceResolver.resolve(documentName);
+                        this.currentMixedDocumentReferenceResolver.resolve(includedDocumentReference);
                     XWikiDocument includedDocument = xwiki.getDocument(documentReference, context);
                     if (!includedDocument.isNew()) {
                         // get the edit mode object, first the new class and then the deprecated class if new class

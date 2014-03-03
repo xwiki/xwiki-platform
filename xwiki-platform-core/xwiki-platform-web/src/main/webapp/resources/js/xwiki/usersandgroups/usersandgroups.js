@@ -368,7 +368,7 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
   var allows = row.allows;
   var denys = row.denys;
 
-  var saveUrl = window.docviewurl + "?xpage=saverights&clsname=" + table.json.clsname + "&fullname=" + row.fullname + "&uorg=" + uorg;
+  var saveUrl = window.docviewurl + "?xpage=saverights&clsname=" + table.json.clsname + "&fullname=" + encodeURIComponent(row.fullname) + "&uorg=" + uorg;
   if (form_token != undefined) {
       saveUrl += "&form_token=" + form_token;
   }

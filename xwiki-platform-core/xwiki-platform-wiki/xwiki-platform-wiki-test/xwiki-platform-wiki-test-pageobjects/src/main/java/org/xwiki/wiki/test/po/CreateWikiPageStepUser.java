@@ -39,14 +39,12 @@ public class CreateWikiPageStepUser extends ExtendedViewPage
     public WikiHomePage createWithoutTemplate()
     {
         createButton.click();
-        waitUntilPageIsLoaded();
         return new WikiHomePage();
     }
 
     public CreateWikiPageStepProvisioning createWithTemplate()
     {
         createButton.click();
-        waitUntilPageIsLoaded();
         return new CreateWikiPageStepProvisioning();
     }
 

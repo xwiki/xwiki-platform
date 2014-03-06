@@ -19,6 +19,8 @@
  */
 package org.xwiki.wiki.test.ui;
 
+import static org.junit.Assert.*;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
@@ -31,10 +33,6 @@ import org.xwiki.wiki.test.po.DeleteWikiPage;
 import org.xwiki.wiki.test.po.WikiHomePage;
 import org.xwiki.wiki.test.po.WikiIndexPage;
 import org.xwiki.wiki.test.po.WikiLink;
-
-import static junit.framework.Assert.assertNull;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * UI tests for the wiki templates feature of the Wiki application.
@@ -77,7 +75,7 @@ public class WikiTemplateTest extends AbstractTest
         assertTrue(createWikiPage2.getTemplateList().contains("mynewtemplate"));
 
         // Verify the wiki is in the wiki index page.
-        wikiIndexPage = WikiIndexPage.gotoPage();
+        wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
         WikiLink wikiLink = wikiIndexPage.getWikiLink("My new template");
         if (wikiLink == null) {
             throw new Exception("The wiki [My new template] is not in the wiki index.");
@@ -89,7 +87,7 @@ public class WikiTemplateTest extends AbstractTest
     public void deleteTemplateWiki() throws Exception
     {
         // Go to the template wiki
-        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
+        WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
         WikiLink templateWikiLink = wikiIndexPage.getWikiLink("My new template");
         if (templateWikiLink == null) {
             throw new Exception("The wiki [My new template] is not in the wiki index.");
@@ -99,7 +97,7 @@ public class WikiTemplateTest extends AbstractTest
         DeleteWikiPage deleteWikiPage = wikiHomePage.deleteWiki().confirm();
         assertTrue(deleteWikiPage.hasSuccessMessage());
         // Verify the wiki has been deleted
-        wikiIndexPage = WikiIndexPage.gotoPage();
+        wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
         assertNull(wikiIndexPage.getWikiLink("My new template"));
     }
 
@@ -134,7 +132,7 @@ public class WikiTemplateTest extends AbstractTest
         assertTrue(deleteWikiPage.hasSuccessMessage());
 
         // Verify the wiki has been deleted
-        wikiIndexPage = WikiIndexPage.gotoPage();
+        wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
         assertNull(wikiIndexPage.getWikiLink("My new wiki"));
 
         // Delete the template wiki

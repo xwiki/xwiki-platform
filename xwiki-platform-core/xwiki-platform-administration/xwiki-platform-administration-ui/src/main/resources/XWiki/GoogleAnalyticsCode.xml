@@ -616,14 +616,14 @@ hXM4h3N4m+L/A2hc4Ov9lvelAAAAAElFTkSuQmCC
 &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform half"&gt;
 	&lt;dl&gt;
 		&lt;dt&gt;
-			&lt;label for="analytics_method"&gt;$!methodPropertyClass.prettyName&lt;/label&gt;
+			&lt;label for="analytics_method"&gt;$!methodPropertyClass.translatedPrettyName&lt;/label&gt;
 			&lt;span class="xHint"&gt;$services.localization.render('admin.analytics.method.description', 'xhtml/1.0')&lt;/span&gt;
 		&lt;/dt&gt;
 		&lt;dd&gt;
 			$analyticsConfigDoc.displayEdit($methodPropertyClass, 'analytics_', $analyticsObj)
 		&lt;/dd&gt;
 		&lt;dt&gt;
-			&lt;label for="analytics_account"&gt;$!accountPropertyClass.prettyName&lt;/label&gt;
+			&lt;label for="analytics_account"&gt;$!accountPropertyClass.translatedPrettyName&lt;/label&gt;
 			&lt;span class="xHint"&gt;$services.localization.render('admin.analytics.account.description', 'xhtml/1.0')&lt;/span&gt;
 		&lt;/dt&gt;
 		&lt;dd&gt;

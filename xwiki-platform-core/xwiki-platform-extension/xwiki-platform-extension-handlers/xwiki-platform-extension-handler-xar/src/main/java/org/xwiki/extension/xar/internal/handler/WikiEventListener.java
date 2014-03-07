@@ -108,7 +108,7 @@ public class WikiEventListener extends AbstractEventListener
                 InstalledExtension installedDependency =
                     this.installedRepository.getInstalledExtension(dependency.getId(), sourceNamespace);
                 if (installedDependency != null) {
-                    copyInstalledExtension(installedExtension, sourceNamespace, targetNamespace);
+                    copyInstalledExtension(installedDependency, sourceNamespace, targetNamespace);
                 }
             }
 

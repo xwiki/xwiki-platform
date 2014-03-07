@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.event.WikiCopiedEvent;
+import org.xwiki.extension.DefaultExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
@@ -33,6 +34,7 @@ import org.xwiki.extension.repository.LocalExtensionRepository;
 import org.xwiki.extension.repository.internal.local.DefaultLocalExtensionRepository;
 import org.xwiki.extension.test.EmptyExtension;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
+import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.annotation.AllComponents;
 
@@ -50,6 +52,8 @@ public class WikiCopiedEventListenerTest
 
     private LocalExtension localExtension1;
 
+    private LocalExtension localExtensionDependency1;
+
     @Before
     public void setUp() throws Exception
     {
@@ -62,20 +66,29 @@ public class WikiCopiedEventListenerTest
 
         // Extensions
 
-        this.localExtension1 =
-            this.localExtensionRepository.storeExtension(new EmptyExtension(new ExtensionId("id", "version"), "xar"));
+        EmptyExtension extension = new EmptyExtension(new ExtensionId("id", "version"), "xar");
+        EmptyExtension extensionDependency = new EmptyExtension(new ExtensionId("dependency", "version"), "xar");
+        extension.addDependency(new DefaultExtensionDependency(extensionDependency.getId().getId(),
+            new DefaultVersionConstraint(null, extensionDependency.getId().getVersion())));
+
+        this.localExtensionDependency1 = this.localExtensionRepository.storeExtension(extensionDependency);
+        this.localExtension1 = this.localExtensionRepository.storeExtension(extension);
     }
 
     @Test
     public void testCopyOneExtension() throws InstallException
     {
+        InstalledExtension extensionDependency1 =
+            this.installedExtensionRepository.installExtension(this.localExtensionDependency1, "wiki:source", false);
         InstalledExtension extension1 =
             this.installedExtensionRepository.installExtension(this.localExtension1, "wiki:source", false);
 
         Assert.assertFalse(extension1.isInstalled("wiki:target"));
+        Assert.assertFalse(extensionDependency1.isInstalled("wiki:target"));
 
         this.observation.notify(new WikiCopiedEvent("source", "target"), null, null);
 
         Assert.assertTrue(extension1.isInstalled("wiki:target"));
+        Assert.assertTrue(extensionDependency1.isInstalled("wiki:target"));
     }
 }

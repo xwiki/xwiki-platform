@@ -63,7 +63,8 @@ public class MergeConflictPane extends BaseElement
      */
     public Select getVersionToKeepSelect()
     {
-        return new Select(versionToKeepSelect);
+        // We use a custom implementation because the drop down list remains open some times when we select an option.
+        return new org.xwiki.test.ui.po.Select(versionToKeepSelect);
     }
 
     /**

@@ -21,6 +21,7 @@ package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -142,7 +143,11 @@ public class BasePage extends BaseElement
      */
     protected void clickContentMenuTopEntry(String id)
     {
-        // Hover the top (floating) content menu bar.
+        // The content menu bar is floating when the page is scrolled, but it is hidden. What's visible is a 'handle'
+        // that is implemented using :after CSS pseudo element. The user has to hover this handle in order to view the
+        // content menu. Unfortunately Selenium cannot interact with pseudo elements so the solution is to scroll the
+        // page up to the top and then hover the menu.
+        contentMenuBar.sendKeys(Keys.HOME);
         new Actions(getDriver()).moveToElement(contentMenuBar).perform();
         getDriver().findElement(By.xpath("//div[@id='" + id + "']//strong")).click();
     }
@@ -154,7 +159,9 @@ public class BasePage extends BaseElement
      */
     protected void clickContentMenuEditSubMenuEntry(String id)
     {
-        // Hover the top (floating) content menu bar then the edit menu.
+        // See #clickContentMenuTopEntry(String) above for the reason.
+        contentMenuBar.sendKeys(Keys.HOME);
+        // Hover the top content menu bar then the edit menu.
         new Actions(getDriver()).moveToElement(contentMenuBar).moveToElement(editMenu).perform();
         getDriver().findElement(By.xpath("//a[@id='" + id + "']")).click();
     }

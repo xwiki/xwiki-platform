@@ -4,7 +4,8 @@ html, body {
   background-image: none !important;
   color: $theme.textColor !important;
   height: auto !important;
-  min-height: 0 !important;
+  /* Selenium fails to type into the empty body if it's not visible. Set the minimum height as the line height. */
+  min-height: 1.4em !important;
   min-width: 0 !important;
   overflow: visible !important;
   padding: 0 !important;

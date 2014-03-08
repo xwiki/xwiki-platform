@@ -47,6 +47,10 @@ XWiki.widgets.LiveTable = Class.create({
        || $(options.filtersNode)  // Deprecated option (kept for backward compatibility)
        || $(domNodeName).down(".xwiki-livetable-display-filters") // Default filter node when none precised
     ].flatten().compact();
+    if (this.filtersNodes.length > 0 && typeof this.filtersNodes[0] === 'string') {
+      // Workaround for XWIKI-10131
+      this.filtersNodes = this.filtersNodes.collect(function(item) { return eval(item); });
+    }
 
     // Array of nodes under which pagination for this livetable will be displayed.
     this.paginationNodes = options.paginationNodes || $(this.domNodeName).select(".xwiki-livetable-pagination");

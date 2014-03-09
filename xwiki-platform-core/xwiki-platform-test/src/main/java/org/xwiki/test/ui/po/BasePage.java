@@ -21,7 +21,6 @@ package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
@@ -100,6 +99,12 @@ public class BasePage extends BaseElement
     @FindBy(id = "tmSpace")
     private WebElement spaceMenu;
 
+    /**
+     * Used to scroll the page to the top before accessing the floating menu.
+     */
+    @FindBy(id = "companylogo")
+    protected WebElement logo;
+
     public String getPageTitle()
     {
         return getDriver().getTitle();
@@ -146,9 +151,8 @@ public class BasePage extends BaseElement
         // The content menu bar is floating when the page is scrolled, but it is hidden. What's visible is a 'handle'
         // that is implemented using :after CSS pseudo element. The user has to hover this handle in order to view the
         // content menu. Unfortunately Selenium cannot interact with pseudo elements so the solution is to scroll the
-        // page up to the top and then hover the menu.
-        contentMenuBar.sendKeys(Keys.HOME);
-        new Actions(getDriver()).moveToElement(contentMenuBar).perform();
+        // page up to the top and then hover the menu. We scroll the page by moving the mouse over the logo image.
+        new Actions(getDriver()).moveToElement(logo).moveToElement(contentMenuBar).perform();
         getDriver().findElement(By.xpath("//div[@id='" + id + "']//strong")).click();
     }
 
@@ -159,10 +163,9 @@ public class BasePage extends BaseElement
      */
     protected void clickContentMenuEditSubMenuEntry(String id)
     {
-        // See #clickContentMenuTopEntry(String) above for the reason.
-        contentMenuBar.sendKeys(Keys.HOME);
-        // Hover the top content menu bar then the edit menu.
-        new Actions(getDriver()).moveToElement(contentMenuBar).moveToElement(editMenu).perform();
+        // Scroll the page to the top by moving the mouse over the logo image (see #clickContentMenuTopEntry(String) for
+        // the reason), hover the top content menu bar then the edit menu.
+        new Actions(getDriver()).moveToElement(logo).moveToElement(contentMenuBar).moveToElement(editMenu).perform();
         getDriver().findElement(By.xpath("//a[@id='" + id + "']")).click();
     }
 

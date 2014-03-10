@@ -55,7 +55,7 @@ public class WikiIndexPage extends ExtendedViewPage
 
     public List<WikiLink> getWikiPrettyNames()
     {
-        List<WikiLink> list = new ArrayList<>();
+        List<WikiLink> list = new ArrayList<WikiLink>();
         for (WebElement prettyName : wikiPrettyNames) {
             list.add(new WikiLink(prettyName));
         }

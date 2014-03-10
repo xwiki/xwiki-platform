@@ -94,7 +94,7 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
             // Start embedded Solr server.
             this.logger.info("Starting embedded Solr server...");
             System.setProperty(SOLR_HOME_SYSTEM_PROPERTY, solrHome);
-            this.logger.info("Using Solr home directory: {}", solrHome);
+            this.logger.info("Using Solr home directory: [{}]", solrHome);
 
             // Initialize the SOLR back-end using an embedded server.
             this.container = createCoreContainer();
@@ -105,7 +105,7 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
             this.logger.info("Started embedded Solr server.");
         } catch (Exception e) {
             throw new InitializationException(String.format(
-                "Failed to initialize the solr embedded server with home directory set to '%s'", solrHome), e);
+                "Failed to initialize the Solr embedded server with home directory set to [%s]", solrHome), e);
         }
     }
 
@@ -160,14 +160,14 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
             // Exists but is unusable.
             if (!solrHomeDirectory.isDirectory() || !solrHomeDirectory.canWrite() || !solrHomeDirectory.canRead()) {
                 throw new IllegalArgumentException(String.format(
-                    "The given path '%s' must be a readable and writable directory", solrHomeDirectory));
+                    "The given path [%s] must be a readable and writable directory", solrHomeDirectory));
             }
         } else {
             // Create the home directory
             if (!solrHomeDirectory.mkdirs()) {
                 // Does not exist and can not be created.
                 throw new IllegalArgumentException(String.format(
-                    "The given path '%s' could not be created due to insufficient filesystem permissions",
+                    "The given path [%s] could not be created due to insufficient filesystem permissions",
                     solrHomeDirectory));
             }
 

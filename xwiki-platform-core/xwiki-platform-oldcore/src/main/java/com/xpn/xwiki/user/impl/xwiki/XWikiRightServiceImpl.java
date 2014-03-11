@@ -136,6 +136,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             actionMap.put("undelete", "undelete");
             actionMap.put("reset", "delete");
             actionMap.put("commentadd", "comment");
+            actionMap.put("commentsave", "comment");
             actionMap.put("register", "register");
             actionMap.put("redirect", "view");
             actionMap.put("admin", "admin");

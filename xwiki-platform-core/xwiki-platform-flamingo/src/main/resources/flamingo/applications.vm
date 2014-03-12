@@ -1,0 +1,32 @@
+###
+### Applications panel
+###
+###
+###
+<div class="applicationsPanel col-xs-12 col-md-1">
+<ul class="nav nav-pills nav-stacked">
+  <li class="active"><a href="$xwiki.getURL('Main.WebHome')" class="applicationItem">Home</a></li>
+#foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))
+  #set($params = $uix.getParameters())
+  #if("$!params.icon" != '' && "$!params.label" != '' && "$!params.target" != '' && $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
+    <li><a href="$xwiki.getURL($params.target)" class="applicationItem">$params.label</a></li>##<img src="$params.icon" />
+  #end
+#end
+</ul>
+</div>
+###if($xwiki.hasWikiAdminRights())
+##<div class="applicationsPanel" >
+##<ul>* [[image:icon:add $services.localization.render('panels.applications.more')>>XWiki.XWikiPreferences||class="applicationPanelMoreButton" queryString="editor=globaladmin&section=XWiki.AddExtensions"]]
+
+##(% class="applicationPanelMoreContainer hidden" %)(((
+##(% class="applicationsPanel" %)
+###foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications.more', {'sortByParameter' : 'label'}))
+##  #set($params = $uix.getParameters())
+##  #if($"$!params.icon" != '' && "$!params.label" != '' && "$!params.target" != '')
+##(% class="applicationsPanel" %)
+##* [[image:$params.icon $params.label>>$params.target]]
+##  #end
+###end
+##)))
+###end
+###panelfooter()

@@ -1,0 +1,53 @@
+###
+### Main "view" template
+###
+### General wrapper for view actions
+###
+#if ($services.distribution.jobStatus && $services.distribution.jobStatus.state.name() != 'FINISHED' && $services.distribution.canDisplayDistributionWizard())
+  $response.sendRedirect($xwiki.getURL('XWiki.Distribution', 'distribution', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
+#elseif ($request.getParameter("raw").equals("1"))
+  #template("code.vm")
+#else
+  #template("startpage.vm")
+  #template("applications.vm")
+  
+  #if("$!viewer" == '')
+    #set($viewer = $request.getParameter('viewer'))
+  #end
+  #if("$!viewer" == '')
+    #set($viewer = 'content')
+  #end
+  
+  #set($gridCSS = "col-xs-12")
+  #if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
+    #set($gridCSS = "${gridCSS} col-md-push-2")
+    #if($showRightPanels == "1" || $request.getParameter("forceRightPanels"))
+      #set($gridCSS = "${gridCSS} col-md-7")
+    #else
+      #set($gridCSS = "${gridCSS} col-md-9")
+    #end
+  #else
+    #if($showRightPanels == "1" || $request.getParameter("forceRightPanels"))
+      #set($gridCSS = "${gridCSS} col-md-9")
+    #else
+      #set($gridCSS = "${gridCSS} col-md-11")
+    #end
+  #end
+      
+  
+  <div class="main layoutsubsection $gridCSS">
+  <div id="mainContentArea">
+  #template("hierarchy.vm")
+  #if($viewer == 'content')
+    #template("contentview.vm")
+  #else
+    #template("${viewer}.vm")
+  #end
+  <div class="clearfloats"></div>
+  </div>## mainContentArea
+  #if($viewer == 'content' && $displayDocExtra)
+    #template("docextra.vm")
+  #end
+  </div>## main
+  #template("endpage.vm")
+#end

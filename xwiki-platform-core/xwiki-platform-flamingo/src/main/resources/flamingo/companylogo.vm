@@ -1,0 +1,6 @@
+################################
+##       COMPANY LOGO
+################################
+<a href="$!xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))" title="Home" rel="home" class="navbar-brand">
+  <img src="$!xwiki.getSkinFile('logo.png')" alt="Wiki Logo"/>
+</a>

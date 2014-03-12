@@ -1,0 +1,12 @@
+    </div>## contentcolumn
+#template("leftpanels.vm")
+  </div>## leftsidecolumns
+#template("rightpanels.vm")
+
+</div> ## class="container-fluid">
+
+<div class="clearfloats"></div>
+  </div>## contentcontainerinner
+</div>## contentcontainer
+#template("footer.vm")
+#template("htmlfooter.vm")

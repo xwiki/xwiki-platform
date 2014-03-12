@@ -1,2 +1,44 @@
 @import "$xwiki.getSkinFile('css/microformats.css')";
 @import "$xwiki.getSkinFile('flamingo.css', true)#if ("$!{request.colorTheme}" != '')?colorTheme=${request.colorTheme}#end";
+
+.main{
+  background-color: #FFF;
+  box-shadow: 0px 1px 2px #CFD3D4;
+}
+
+
+#menuContent{
+/*  background-color: #EEE;
+  border: 1px solid #E5E5E5;
+  border-radius: 4px;*/
+}
+
+.applicationsPanel ul li a{
+  background-image: url('http://www.webappers.com/wp-content/themes/webappers3/images/menu_home_sprites.png');
+  background-position: center -28px;
+  background-repeat: no-repeat;
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  padding-bottom: 10px;
+  padding-top: 47px;
+  text-align: center;
+  text-decoration: none;
+}
+
+@media (min-width: 400px) and (max-width: 992px) {
+  /* Mobile phones on landscapes: appBar entries displayed as columns */
+  .applicationsPanel {
+    clear: both;
+    margin-bottom: 3em;
+  }
+  .applicationsPanel .nav li{
+    display: inline-block;
+    margin: 1% !important;
+    width: 30%;
+  }
+  .applicationsPanel .nav li {
+    border: 1px dashed #CFD3D4;
+  }
+}
+

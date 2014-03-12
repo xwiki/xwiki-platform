@@ -11,9 +11,7 @@
 #else
 <div class="minwidthd"></div>
 #end
-#template("companylogo.vm")
   <div id="globallinks">
-    #template("quicksearch.vm")
 #if ($displayLanguageChoice && $xwiki.isMultiLingual())
   <span class="glink" id="headerlanguages">
   #set($defaultLanguage = "$!{doc.getDefaultLanguage()}")

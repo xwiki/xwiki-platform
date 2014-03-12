@@ -1,0 +1,34 @@
+## Integrate bootstrap
+<link href="$xwiki.getSkinFile('uicomponents/bootstrap3/bootstrap.css')" rel="stylesheet" type="text/css" media="all" />
+#template('colorThemeInit.vm')
+## The default stylesheet configuration option allows to override the default style.css CSS
+#set ($defaultstyle = $xwiki.getSpacePreference('stylesheet'))
+#if ($defaultstyle == '')
+  #set ($defaultstyle = "style.css")
+#end
+#set ($defaultStyleURL = $xwiki.getSkinFile($defaultstyle, true))
+<link href="${defaultStyleURL}#if ($themeDoc)?colorTheme=$!{themeDocFullName}#end" rel="stylesheet" type="text/css" media="all" />
+<link href="$xwiki.getSkinFile('print.css', true)#if ($themeDoc)?colorTheme=$!{themeDocFullName}#end" rel="stylesheet" type="text/css" media="#if ($printss)all#{else}print#{end}" />
+#set ($a11y = "$!{request.getCookie('a11y').getValue()}")
+#if ($a11y == '')
+  #set ($a11y = "$!{xwiki.getUserPreference('accessibility')}")
+#end
+#if ($a11y == '1')
+  <link href="$xwiki.getSkinFile('css/accessibility.css', true)" rel="stylesheet" type="text/css" media="all" />
+#end
+## The stylesheets configuration option allows to override the alternate stylesheets
+## style1.css, style2.css and style3.css
+#set ($stylesheets = $xwiki.getSpacePreference('stylesheets'))
+#if ($stylesheets != '')
+  #foreach ($stylesheet in $stylesheets.split(','))
+    #if (!$stylesheet.equalsIgnoreCase($defaultstyle))
+      <link href="$xwiki.getSkinFile($stylesheet, true)" rel="alternate stylesheet" type="text/css" title="Alternate StyleSheet ${velocityCount}" />
+    #end
+  #end
+#end
+## IE specific stylesheets
+<!--[if IE]>
+  <link href="$xwiki.getSkinFile('ie-all.css', true)#if ($themeDoc)?colorTheme=$!{themeDocFullName}#end" rel="stylesheet" type="text/css" />
+<![endif]-->
+## Hook for inserting CSS skin extensions
+#styleSheetExtensionHooks

@@ -6,6 +6,9 @@
 ## - and the user has the right to create a wiki
 ## - and the wiki application has been installed.
 ## (in the future the last condition will be removed since we will use the Distribution Wizard for wiki creation)
+#set ($isWikiAPIAvailable = ("!$services.wiki" != '') && ("!$services.wiki.user" != ''))
+#set ($WikiManagerMainDocReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'WebHome'))
+#set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
 #set ($displayCreateWiki = $isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki)
 #set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $hasComment || $displayCreateWiki)
 #if ($displayCreateSubmenu)

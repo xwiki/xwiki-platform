@@ -19,7 +19,7 @@
  */
 package org.xwiki.search.solr.internal;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.net.URL;
@@ -123,5 +123,4 @@ public class EmbeddedSolrInstanceInitializationTest
         Assert.assertTrue(new File(configDirectory, core.getSchemaResource()).exists());
         Assert.assertTrue(new File(configDirectory, core.getConfigResource()).exists());
     }
-
 }

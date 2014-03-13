@@ -19,7 +19,7 @@
  */
 package org.xwiki.search.solr.internal;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.net.URL;
@@ -120,5 +120,4 @@ public class EmbeddedSolrInstanceInitializationTest
         Assert.assertTrue(new File(new File(container.getSolrHome(), DefaultSolrConfiguration.CONF_DIRECTORY),
             "solrconfig.xml").exists());
     }
-
 }

@@ -336,8 +336,8 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
         Query selectQuery = queries[1];
 
         // We need the count query only to be able to display the job progress.
-        long documentCount = (long) countQuery.setWiki(wiki).execute().get(0);
-        notifyPushLevelProgress((int) documentCount);
+        Long documentCount = (Long) countQuery.setWiki(wiki).execute().get(0);
+        notifyPushLevelProgress(documentCount.intValue());
 
         SolrInstance solrInstance = this.solrInstanceProvider.get();
         selectQuery.setWiki(wiki).setLimit(LIMIT).setOffset(0);

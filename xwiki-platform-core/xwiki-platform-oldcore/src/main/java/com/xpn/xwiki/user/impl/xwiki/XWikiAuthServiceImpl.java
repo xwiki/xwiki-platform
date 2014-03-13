@@ -589,6 +589,15 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         contextPath = Util.escapeURL(contextPath);
 
         String urlPrefix = url.getProtocol() + "://" + url.getAuthority() + contextPath;
-        return StringUtils.removeStart(url.toExternalForm(), urlPrefix);
+
+        // Since the passed URL has been potentially modified by HttpServletResponse.encodeURL() we also need to call
+        // encodeURL on urlPrefix to have a matching result.
+        String encodedUrlPrefix = context.getResponse().encodeURL(urlPrefix);
+        // Remove a potential jsessionid in the URL
+        encodedUrlPrefix = encodedUrlPrefix.replaceAll(";jsessionid=.*?(?=\\?|$)", "");
+        // Also remove any query string that might have been added by an outbound URL rewrite rule
+        encodedUrlPrefix = StringUtils.substringBeforeLast(encodedUrlPrefix, "?");
+
+        return StringUtils.removeStart(url.toExternalForm(), encodedUrlPrefix);
     }
 }

@@ -20,18 +20,18 @@
 }
 
 .container-columns .column {
-  width: 100%;
-  padding-right: 0;
-  padding-left: 0;
+  float: left;
+  width: $computedColumnWidth%;
+  padding-right: $columnPadding%;
+  padding-left: $columnPadding%;
 }
 
 /* Responsiveness, upon the same limit than Twitter Bootstrap (768px) */
-@media (min-width: 768px) {
+@media (max-width: 768px) {
   .container-columns .column {
-    float: left;
-    width: $computedColumnWidth%;
-    padding-right: $columnPadding%;
-    padding-left: $columnPadding%;
+    width: 100%;
+    padding-right: 0;
+    padding-left: 0;
   }
 }
 

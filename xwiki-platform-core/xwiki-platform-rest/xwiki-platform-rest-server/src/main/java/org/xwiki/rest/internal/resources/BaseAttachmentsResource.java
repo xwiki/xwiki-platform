@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Formatter;
@@ -27,8 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -121,8 +120,8 @@ public class BaseAttachmentsResource extends XWikiResource
 
             /* Build the query */
             Formatter f = new Formatter();
-            f.format(
-                    "select doc.space, doc.name, doc.version, attachment from XWikiDocument as doc, XWikiAttachment as attachment where (attachment.docId=doc.id ");
+            f.format("select doc.space, doc.name, doc.version, attachment from XWikiDocument as doc,"
+                + " XWikiAttachment as attachment where (attachment.docId=doc.id ");
 
             if (filters.keySet().size() > 0) {
                 for (String param : filters.keySet()) {
@@ -225,21 +224,18 @@ public class BaseAttachmentsResource extends XWikiResource
                     attachment.setXwikiRelativeUrl(Utils.getXWikiContext(componentManager).getURLFactory()
                             .getURL(absoluteUrl, Utils.getXWikiContext(componentManager)));
 
-                    String baseUri = uriInfo.getBaseUri().toString();
-
-                    String pageUri =
-                            UriBuilder.fromUri(baseUri).path(PageResource.class).build(wikiName, pageSpace, pageName)
-                                    .toString();
+                    URI pageUri =
+                        Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, pageSpace, pageName);
                     Link pageLink = objectFactory.createLink();
-                    pageLink.setHref(pageUri);
+                    pageLink.setHref(pageUri.toString());
                     pageLink.setRel(Relations.PAGE);
                     attachment.getLinks().add(pageLink);
 
-                    String attachmentUri =
-                            UriBuilder.fromUri(baseUri).path(AttachmentResource.class)
-                                    .build(wikiName, pageSpace, pageName, xwikiAttachment.getFilename()).toString();
+                    URI attachmentUri =
+                        Utils.createURI(uriInfo.getBaseUri(), AttachmentResource.class, wikiName, pageSpace, pageName,
+                            xwikiAttachment.getFilename());
                     Link attachmentLink = objectFactory.createLink();
-                    attachmentLink.setHref(attachmentUri);
+                    attachmentLink.setHref(attachmentUri.toString());
                     attachmentLink.setRel(Relations.ATTACHMENT_DATA);
                     attachment.getLinks().add(attachmentLink);
 

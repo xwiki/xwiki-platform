@@ -37,14 +37,14 @@ import org.xwiki.component.util.DefaultParameterizedType;
 public interface DocumentReferenceResolver<T>
 {
     /**
-     * Type instance for EntityReferenceResolver<String>.
+     * Type instance for DocumentReferenceResolver<String>.
      * 
      * @since 4.0M1
      */
     ParameterizedType TYPE_STRING = new DefaultParameterizedType(null, DocumentReferenceResolver.class, String.class);
 
     /**
-     * Type instance for EntityReferenceResolver<EntityReference>.
+     * Type instance for DocumentReferenceResolver<EntityReference>.
      * 
      * @since 4.0M1
      */

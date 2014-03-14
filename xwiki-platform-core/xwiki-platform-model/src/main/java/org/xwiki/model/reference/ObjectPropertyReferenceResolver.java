@@ -37,7 +37,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 public interface ObjectPropertyReferenceResolver<T>
 {
     /**
-     * Type instance for EntityReferenceResolver<String>.
+     * Type instance for ObjectPropertyReferenceResolver<String>.
      * 
      * @since 4.0M1
      */
@@ -45,7 +45,7 @@ public interface ObjectPropertyReferenceResolver<T>
         String.class);
 
     /**
-     * Type instance for EntityReferenceResolver<EntityReference>.
+     * Type instance for ObjectPropertyReferenceResolver<EntityReference>.
      * 
      * @since 4.0M1
      */

@@ -24,6 +24,11 @@ set JETTY_PORT=8080
 set JETTY_STOP_PORT=8079
 set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
 
+REM Get javaw.exe from the latest properly installed JRE
+for /f tokens^=2^ delims^=^" %%i in ('reg query HKEY_CLASSES_ROOT\jarfile\shell\open\command /ve') do set JAVAW_PATH=%%i
+set JAVA_PATH=%JAVAW_PATH:\javaw.exe=%\java.exe
+if "%JAVA_PATH%"=="" set JAVA_PATH=java
+
 REM Location where XWiki stores generated data and where database files are.
 set XWIKI_DATA_DIR=${xwikiDataDir}
 set XWIKI_OPTS=%XWIKI_OPTS% -Dxwiki.data.dir=%XWIKI_DATA_DIR%
@@ -56,4 +61,4 @@ REM Note that setting this value too high can leave your server vulnerable to de
 REM service attacks.
 set XWIKI_OPTS=%XWIKI_OPTS% -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1000000
 
-java %XWIKI_OPTS% %3 %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar
+"%JAVA_PATH%" %XWIKI_OPTS% %3 %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -32,11 +31,10 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1359103531000</creationDate>
-  <date>1360061093000</date>
-  <contentUpdateDate>1360061093000</contentUpdateDate>
+  <date>1390400269000</date>
+  <contentUpdateDate>1370326706000</contentUpdateDate>
   <version>1.1</version>
   <title>BatchImporterScheduler</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -164,14 +162,26 @@
       <jobName>Batch importer scheduler</jobName>
     </property>
     <property>
-      <script>def extensions = services.query.xwql("select extension.id, proxy.repositoryId, proxy.autoUpdate from Document doc, doc.object(ExtensionCode.ExtensionProxyClass) as proxy, doc.object(ExtensionCode.ExtensionClass) as extension where proxy.autoUpdate=1").execute()
+      <script>def logger = org.slf4j.LoggerFactory.getLogger('org.xwiki.Scheduler.BatchImporterScheduler')
+
+logger.info('Starting extensions batch import')
+
+def extensions = services.query.xwql("select extension.id, proxy.repositoryId, proxy.autoUpdate from Document doc, doc.object(ExtensionCode.ExtensionProxyClass) as proxy, doc.object(ExtensionCode.ExtensionClass) as extension where proxy.autoUpdate=1").execute()
 for (extension in extensions)
 {
-  services.repository.importExtension(extension[0], extension[1])
-}</script>
+  logger.info('Importing extension [{}] on repository [{}]', extension[0], extension[1])
+
+  try {
+    services.repository.importExtension(extension[0], extension[1])
+  } catch (Exception e) {
+    logger.error('Failed to import extension [{}]', extension[0], e)
+  }
+}
+
+logger.info('Extensions batch import is finished')</script>
     </property>
     <property>
-      <status>None</status>
+      <status>Normal</status>
     </property>
   </object>
   <content>{{include document="XWiki.SchedulerJobSheet"/}}</content>

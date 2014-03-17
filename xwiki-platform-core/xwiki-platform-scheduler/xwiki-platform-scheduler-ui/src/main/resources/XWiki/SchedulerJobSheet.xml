@@ -90,7 +90,7 @@ $!doc.display('cron')
 #if($xcontext.action=="inline")
 $!doc.display("script")
 #elseif($xcontext.action=="view" &amp;&amp; "$!job.getProperty('script').value" !="")
-{{code language="java"}}
+{{code language="groovy"}}
 $job.getProperty('script').value
 {{/code}}
 #end

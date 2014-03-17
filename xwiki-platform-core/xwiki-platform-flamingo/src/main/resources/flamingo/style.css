@@ -438,15 +438,15 @@ h6 .small,
 }
 h1,
 .h1 {
-  font-size: 36px;
+  font-size: 28px;
 }
 h2,
 .h2 {
-  font-size: 30px;
+  font-size: 23px;
 }
 h3,
 .h3 {
-  font-size: 24px;
+  font-size: 21px;
 }
 h4,
 .h4 {
@@ -6099,7 +6099,7 @@ ul.xlist li.create a {
   color: inherit;
   margin-top: 20px;
   margin-bottom: 10px;
-  font-size: 36px;
+  font-size: 28px;
   height: auto;
 }
 #xwikidoctitleinput small,

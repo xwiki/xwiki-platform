@@ -7,7 +7,7 @@
   <div class="applicationsPanel col-xs-12 col-md-1">
   <ul class="nav nav-pills nav-stacked">
     <li class="active">
-      <p><img src="/xwiki/resources/icons/silk/house.png"></p>
+      <p><img src="/xwiki/resources/icons/silk/house.png" /></p>
       <p><a href="$xwiki.getURL('Main.WebHome')" class="applicationItem">Home</a></p>
     </li>
   #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))

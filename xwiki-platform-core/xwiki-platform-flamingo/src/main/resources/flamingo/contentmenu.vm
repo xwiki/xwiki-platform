@@ -47,6 +47,10 @@
   #end
 #end
 ##
+## Create menu
+##
+#template("menus/create.vm")
+##
 ## Actions menu
 ##
 #if(!$doc.isNew())

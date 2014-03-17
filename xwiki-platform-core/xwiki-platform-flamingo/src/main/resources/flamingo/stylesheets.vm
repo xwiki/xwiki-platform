@@ -1,5 +1,3 @@
-## Integrate bootstrap
-<link href="$xwiki.getSkinFile('uicomponents/bootstrap3/bootstrap.css')" rel="stylesheet" type="text/css" media="all" />
 #template('colorThemeInit.vm')
 ## The default stylesheet configuration option allows to override the default style.css CSS
 #set ($defaultstyle = $xwiki.getSpacePreference('stylesheet'))

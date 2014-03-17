@@ -27,24 +27,29 @@
 ## ----------------------------
 ## Display the title
 ## ----------------------------
-<div class="row xcontent">
-  <div id="document-title" class="col-xs-12"><h1>$titleToDisplay</h1></div>
-  <div id="xdocAuthors">
-##    <div class="xdocCreation">  Creation
-##      $services.localization.render('core.footer.creation', [$xwiki.getUserName($doc.creator), $xwiki.formatDate($doc.creationDate)])<br/>
-##      #if($tdoc.realLanguage != $doc.realLanguage)
-##        $services.localization.render('core.footer.translationCreation', [$tdoc.realLanguage, $xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])<br/>
-##      #end
-##    </div>
-    <div class="xdocLastModification col-xs-12"> ## Last modification
-      $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+<div class="xcontent">
+  <div class="col-xs-12 col-md-7 row">
+    <div id="document-title" class="col-xs-12"><h1>$titleToDisplay</h1></div>
+    <div id="xdocAuthors">
+  ##    <div class="xdocCreation">  Creation
+  ##      $services.localization.render('core.footer.creation', [$xwiki.getUserName($doc.creator), $xwiki.formatDate($doc.creationDate)])<br/>
+  ##      #if($tdoc.realLanguage != $doc.realLanguage)
+  ##        $services.localization.render('core.footer.translationCreation', [$tdoc.realLanguage, $xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])<br/>
+  ##      #end
+  ##    </div>
+      <div class="xdocLastModification col-xs-12"> ## Last modification
+        $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+      </div>
     </div>
   </div>
   #if($displayContentMenu)
-    <div class="col-xs-12">
+    <div class="col-xs-12 col-md-5">
       #template("contentmenu.vm")
     </div>
   #end
+  <div class="col-xs-12">
+    <hr/>
+  </div>
   ## --------------------------------------------------------------------------
   ## Drop permissions as they are no longer needed. This allows us not to have
   ## to review the code below for security holes since nothing bad can happen.

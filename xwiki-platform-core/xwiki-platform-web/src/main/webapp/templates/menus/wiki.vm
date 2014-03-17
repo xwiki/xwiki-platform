@@ -17,7 +17,7 @@
 ## The wiki menu is available if:
 ## - OR WikiManager is not installed
 ## - OR the wiki is not the home
-#if(!$isWikiUIAvailable || !$xcontext.isMainWiki())
+#if(!$isWikiUIAvailable || !$xcontext.isMainWiki() || $request.getParameter("forceWikiMenu"))
   #if($displayHomeMenu)
     #xwikitopmenuseparator()
   #end

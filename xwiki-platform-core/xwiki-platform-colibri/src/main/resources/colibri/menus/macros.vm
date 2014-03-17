@@ -86,6 +86,20 @@
 #end
 
 ###
+###    Create Menu entry
+###
+#macro(xwikicreatemenuentrystart $actionurl $linktext $id $class)
+  #xwikitopmenuentrystart($actionurl $linktext $id $class)
+#end
+
+###
+###    Create Menu entry end
+###
+#macro(xwikicreatemenuentryend)
+  #xwikitopmenuentryend()
+#end
+
+###
 ###    Menu subitem entry
 ###
 ### Generate a submenu entry

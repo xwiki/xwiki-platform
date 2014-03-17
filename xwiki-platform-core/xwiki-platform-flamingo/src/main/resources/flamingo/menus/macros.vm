@@ -160,7 +160,7 @@
 
 #macro(xwikibuttonentrystart $actionurl $linktext $id $class $icon)
   <div class="btn-group">
-    <button type="button" class="btn $class dropdown-toggle" data-toggle="dropdown">#glyphicon($icon) $linktext <span class="caret"></span>
+    <button type="button" class="btn $class dropdown-toggle" data-toggle="dropdown" id="$id">#glyphicon($icon) $linktext <span class="caret"></span>
     </button>
     <ul class="dropdown-menu" role="menu">
 #end
@@ -178,4 +178,18 @@
 #macro(xwikibuttonentryend $actionurl $linktext $id $class $icon)
     </ul>
   </div>
+#end
+
+###
+###    Create Menu entry
+###
+#macro(xwikicreatemenuentrystart $actionurl $linktext $id $class $icon)
+  #xwikibuttonentrystart($actionurl $linktext $id "btn-success ${class}" $icon)
+#end
+
+###
+###    Create Menu entry end
+###
+#macro(xwikicreatemenuentryend)
+  #xwikibuttonentryend()
 #end

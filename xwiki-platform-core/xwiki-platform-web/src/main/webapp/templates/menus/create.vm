@@ -12,7 +12,7 @@
 #set ($displayCreateWiki = $isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki)
 #set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $hasComment || $displayCreateWiki)
 #if ($displayCreateSubmenu)
-  #xwikitopmenuentrystart('' $services.localization.render('core.menu.create') 'tmCreate' 'hasIcon')
+  #xwikicreatemenuentrystart('' $services.localization.render('core.menu.create') 'tmCreate' 'hasIcon' 'plus')
   #set ($hasPreviousMenuSection = false)
   #if ($displayCreateWiki)
     #set ($createWikiDocReference = $services.model.createDocumentReference('xwiki', 'WikiManager', 'CreateWiki'))
@@ -23,18 +23,18 @@
     #if ($hasPreviousMenuSection)
       #submenuseparator()
     #end
-    #submenuitem("$doc.getURL('create', 'tocreate=space')" $services.localization.render('core.menu.create.space') 'tmCreateSpace', '')
+    #submenuitem("$doc.getURL('create', 'tocreate=space')" $services.localization.render('core.menu.create.space') 'tmCreateSpace', '', 'folder-open')
     #set ($hasPreviousMenuSection = true)
   #end
   #if ($hasCreatePage)
     #if ($hasPreviousMenuSection)
       #submenuseparator()
     #end
-    #submenuitem("$doc.getURL('create')" $services.localization.render('core.menu.create.page') 'tmCreatePage', '')
+    #submenuitem("$doc.getURL('create')" $services.localization.render('core.menu.create.page') 'tmCreatePage', '', 'file')
     ## Only display the Office Importer menu action if the Office Importer application is installed
     #set ($officeImporterMainDocument = $xwiki.getDocument('XWiki.OfficeImporter'))
     #if ("$!{officeImporterMainDocument.isNew()}" == 'false')
-      #submenuitem($officeImporterMainDocument.getURL('view', "&amp;parent=$!{escapetool.url($doc.fullName)}") $services.localization.render('core.menu.create.pageFromOffice') 'tmCreatePageFromOffice', '')
+      #submenuitem($officeImporterMainDocument.getURL('view', "&amp;parent=$!{escapetool.url($doc.fullName)}") $services.localization.render('core.menu.create.pageFromOffice') 'tmCreatePageFromOffice', '', 'import')
     #end
     #set ($hasPreviousMenuSection = true)
   #end
@@ -42,7 +42,7 @@
     #submenuseparator()
   #end
   #if ($hasComment && $showcomments && !$doc.isNew())
-    #submenuitem("$doc.getURL('view', 'viewer=comments')" $services.localization.render('core.menu.create.comment') 'tmCreateComment', '')
+    #submenuitem("$doc.getURL('view', 'viewer=comments')" $services.localization.render('core.menu.create.comment') 'tmCreateComment', '', 'comment')
     <script type="text/javascript">
       //<![CDATA[
         document.observe('xwiki:dom:loaded', function() {
@@ -57,7 +57,7 @@
     #set ($hasPreviousMenuSection = true)
   #end
   #if ($hasEdit && $showattachments && !$doc.isNew())
-    #submenuitem("$doc.getURL('view', 'viewer=attachments')" $services.localization.render('core.menu.create.attachment') 'tmCreateAttachment', '')
+    #submenuitem("$doc.getURL('view', 'viewer=attachments')" $services.localization.render('core.menu.create.attachment') 'tmCreateAttachment', '', 'paperclip')
     <script type="text/javascript">
       //<![CDATA[
         document.observe('xwiki:dom:loaded', function() {
@@ -71,5 +71,5 @@
     </script>
     #set ($hasPreviousMenuSection = true)
   #end
-  #xwikitopmenuentryend()
+  #xwikicreatemenuentryend()
 #end

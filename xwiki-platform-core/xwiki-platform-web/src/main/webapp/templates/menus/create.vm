@@ -16,7 +16,7 @@
   #set ($hasPreviousMenuSection = false)
   #if ($displayCreateWiki)
     #set ($createWikiDocReference = $services.model.createDocumentReference('xwiki', 'WikiManager', 'CreateWiki'))
-    #submenuitem("$xwiki.getURL($createWikiDocReference)" $services.localization.render('core.menu.create.wiki') 'tmCreateWiki', '')
+    #submenuitem("$xwiki.getURL($createWikiDocReference)" $services.localization.render('core.menu.create.wiki') 'tmCreateWiki', '', 'globe')
     #set ($hasPreviousMenuSection = true)
   #end
   #if ($hasCreateSpace)

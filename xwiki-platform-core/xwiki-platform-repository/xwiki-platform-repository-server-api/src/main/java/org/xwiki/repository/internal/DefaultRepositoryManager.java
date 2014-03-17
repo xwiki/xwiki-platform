@@ -723,8 +723,10 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         // Name
         needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_NAME, extension.getName());
 
-        // Summary
-        needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, extension.getSummary());
+        // Summary (truncated to 255 in case it's too long, TODO: should probably be handled at a lower level)
+        needSave |=
+            update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY,
+                StringUtils.substring(extension.getSummary(), 0, 255));
 
         // Website
         /*

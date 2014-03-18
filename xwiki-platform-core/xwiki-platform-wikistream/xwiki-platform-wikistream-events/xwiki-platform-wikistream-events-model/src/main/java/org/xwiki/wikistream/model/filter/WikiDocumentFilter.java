@@ -21,6 +21,8 @@ package org.xwiki.wikistream.model.filter;
 
 import java.util.Locale;
 
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.annotation.Default;
 import org.xwiki.filter.annotation.Name;
@@ -36,6 +38,48 @@ import org.xwiki.wikistream.WikiStreamException;
 @Unstable
 public interface WikiDocumentFilter
 {
+    // Log
+
+    /**
+     * Mark a log as a document save notification. First log parameter has to be the
+     * {@link org.xwiki.model.reference.DocumentReference}.
+     * 
+     * @since 6.0M1
+     */
+    Marker LOG_DOCUMENT_CREATED = MarkerFactory.getMarker("wikistream.document.created");
+
+    /**
+     * Mark a log as a document save notification. First log parameter has to be the
+     * {@link org.xwiki.model.reference.DocumentReference}.
+     * 
+     * @since 6.0M1
+     */
+    Marker LOG_DOCUMENT_UPDATED = MarkerFactory.getMarker("wikistream.document.updated");
+
+    /**
+     * Mark a log as a document delete notification. First log parameter has to be the
+     * {@link org.xwiki.model.reference.DocumentReference}.
+     * 
+     * @since 6.0M1
+     */
+    Marker LOG_DOCUMENT_DELETED = MarkerFactory.getMarker("wikistream.document.deleted");
+
+    /**
+     * Mark a log as a document skipped notification. First log parameter has to be the
+     * {@link org.xwiki.model.reference.DocumentReference}.
+     * 
+     * @since 6.0M1
+     */
+    Marker LOG_DOCUMENT_SKIPPED = MarkerFactory.getMarker("wikistream.document.skipped");
+
+    /**
+     * Mark a log as a document error notification. First log parameter has to be the
+     * {@link org.xwiki.model.reference.DocumentReference}.
+     * 
+     * @since 6.0M1
+     */
+    Marker LOG_DOCUMENT_ERROR = MarkerFactory.getMarker("wikistream.document.error");
+
     // Properties
 
     /**

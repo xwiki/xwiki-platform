@@ -33,6 +33,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.FilterDescriptorManager;
 import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -54,6 +55,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStream<DocumentInstanceOutputProperties>
     implements WikiDocumentFilter
 {
+    private static final TranslationMarker LOG_DOCUMENT_CREATED = new TranslationMarker(
+        "wikistream.instance.log.document.created", WikiDocumentFilter.LOG_DOCUMENT_CREATED);
+
+    private static final TranslationMarker LOG_DOCUMENT_UPDATED = new TranslationMarker(
+        "wikistream.instance.log.document.updated", WikiDocumentFilter.LOG_DOCUMENT_UPDATED);
+
     @Inject
     private FilterDescriptorManager filterManager;
 
@@ -143,6 +150,8 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
             XWikiDocument document =
                 xcontext.getWiki().getDocument(inputDocument.getDocumentReferenceWithLocale(), xcontext);
 
+            boolean isNew = document.isNew();
+
             if (document.isNew()) {
                 document = inputDocument;
             } else {
@@ -194,7 +203,13 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
             }
 
             if (this.properties.isVerbose()) {
-                this.logger.info("Saved document [{}]", document.getDocumentReferenceWithLocale());
+                if (isNew) {
+                    this.logger.info(LOG_DOCUMENT_CREATED, "Created document [{}]",
+                        document.getDocumentReferenceWithLocale());
+                } else {
+                    this.logger.info(LOG_DOCUMENT_UPDATED, "Updated document [{}]",
+                        document.getDocumentReferenceWithLocale());
+                }
             }
         } catch (Exception e) {
             throw new WikiStreamException("Failed to save document", e);

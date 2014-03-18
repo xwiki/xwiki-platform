@@ -27,13 +27,17 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.input.InputSource;
 import org.xwiki.wikistream.input.InputStreamInputSource;
+import org.xwiki.wikistream.model.filter.WikiDocumentFilter;
 import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.xar.XarPackage;
 import org.xwiki.xar.internal.model.XarModel;
@@ -46,8 +50,20 @@ import org.xwiki.xar.internal.model.XarModel;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class WikiReader
 {
+    private static final TranslationMarker LOG_DOCUMENT_SKIPPED = new TranslationMarker(
+        "wikistream.xar.log.document.skipped", WikiDocumentFilter.LOG_DOCUMENT_SKIPPED);
+
+    private static final TranslationMarker LOG_DOCUMENT_FAILREAD = new TranslationMarker(
+        "wikistream.xar.log.document.failread", WikiDocumentFilter.LOG_DOCUMENT_ERROR);
+
+    private static final TranslationMarker LOG_DESCRIPTOR_FAILREAD = new TranslationMarker(
+        "wikistream.xar.log.descriptor.failread");
+
     @Inject
     private DocumentLocaleReader documentReader;
+
+    @Inject
+    private Logger logger;
 
     private XARInputProperties properties;
 
@@ -65,7 +81,8 @@ public class WikiReader
         return this.xarPackage;
     }
 
-    public void read(Object filter, XARInputFilter proxyFilter) throws XMLStreamException, IOException, WikiStreamException
+    public void read(Object filter, XARInputFilter proxyFilter) throws XMLStreamException, IOException,
+        WikiStreamException
     {
         InputStream stream;
 
@@ -93,8 +110,8 @@ public class WikiReader
         }
     }
 
-    public void read(InputStream stream, Object filter, XARInputFilter proxyFilter) throws XMLStreamException, IOException,
-        WikiStreamException
+    public void read(InputStream stream, Object filter, XARInputFilter proxyFilter) throws XMLStreamException,
+        IOException, WikiStreamException
     {
         ZipArchiveInputStream zis = new ZipArchiveInputStream(stream, "UTF-8", false);
 
@@ -108,16 +125,23 @@ public class WikiReader
                 try {
                     this.xarPackage.readDescriptor(zis);
                 } catch (Exception e) {
-                    // TODO: LOG warning
+                    if (this.properties.isVerbose()) {
+                        this.logger.warn(LOG_DESCRIPTOR_FAILREAD, "Failed to read XAR descriptor from entry [{}]: {}",
+                            entry.getName(), ExceptionUtils.getRootCauseMessage(e));
+                    }
                 }
             } else {
                 try {
                     this.documentReader.read(zis, filter, proxyFilter);
                 } catch (SkipEntityException skip) {
-                    // TODO: put it in some status
+                    if (this.properties.isVerbose()) {
+                        this.logger.info(LOG_DOCUMENT_SKIPPED, "Skipped document [{}]", skip.getEntityReference());
+                    }
                 } catch (Exception e) {
-                    throw new WikiStreamException(String.format("Failed to read XAR XML document from entry [%s]",
-                        entry.getName()), e);
+                    if (this.properties.isVerbose()) {
+                        this.logger.warn(LOG_DOCUMENT_FAILREAD, "Failed to read XAR XML document from entry [{}]: {}",
+                            entry.getName(), ExceptionUtils.getRootCauseMessage(e));
+                    }
                 }
             }
         }

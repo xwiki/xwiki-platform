@@ -23,12 +23,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MediaType;
+import org.slf4j.Marker;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.LogQueue;
+import org.xwiki.logging.LoggerManager;
+import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.event.LoggerListener;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.ObservationManager;
@@ -40,6 +49,7 @@ import org.xwiki.wikistream.instance.output.InstanceOutputProperties;
 import org.xwiki.wikistream.internal.input.BeanInputWikiStream;
 import org.xwiki.wikistream.internal.input.DefaultInputStreamInputSource;
 import org.xwiki.wikistream.internal.output.BeanOutputWikiStream;
+import org.xwiki.wikistream.model.filter.WikiDocumentFilter;
 import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
@@ -144,6 +154,37 @@ public class ImportAction extends XWikiAction
         return null;
     }
 
+    private String getLanguage(String pageName, XWikiRequest request)
+    {
+        return Util.normalizeLanguage(request.get("language_" + pageName));
+    }
+
+    private int getAction(String pageName, String language, XWikiRequest request)
+    {
+        String actionName = "action_" + pageName;
+        if (!StringUtils.isBlank(language)) {
+            actionName += ("_" + language);
+        }
+        String defaultAction = request.get(actionName);
+        int iAction;
+        if (StringUtils.isBlank(defaultAction)) {
+            iAction = DocumentInfo.ACTION_OVERWRITE;
+        } else {
+            try {
+                iAction = Integer.parseInt(defaultAction);
+            } catch (Exception e) {
+                iAction = DocumentInfo.ACTION_SKIP;
+            }
+        }
+
+        return iAction;
+    }
+
+    private String getDocName(String pageName)
+    {
+        return pageName.replaceAll(":[^:]*$", "");
+    }
+
     private void importPackageOld(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
         throws IOException, XWikiException, WikiStreamException
     {
@@ -153,30 +194,18 @@ public class ImportAction extends XWikiAction
 
         importer.Import(packFile.getContentInputStream(context));
         if (pages != null) {
+            // Skip document by default
             List<DocumentInfoAPI> filelist = importer.getFiles();
             for (DocumentInfoAPI dia : filelist) {
                 dia.setAction(DocumentInfo.ACTION_SKIP);
             }
 
+            // Indicate with documents to import
             for (String pageName : pages) {
-                String language = Util.normalizeLanguage(request.get("language_" + pageName));
-                String actionName = "action_" + pageName;
-                if (!StringUtils.isBlank(language)) {
-                    actionName += ("_" + language);
-                }
-                String defaultAction = request.get(actionName);
-                int iAction;
-                if (StringUtils.isBlank(defaultAction)) {
-                    iAction = DocumentInfo.ACTION_OVERWRITE;
-                } else {
-                    try {
-                        iAction = Integer.parseInt(defaultAction);
-                    } catch (Exception e) {
-                        iAction = DocumentInfo.ACTION_SKIP;
-                    }
-                }
+                String language = getLanguage(pageName, request);
+                int iAction = getAction(pageName, language, request);
 
-                String docName = pageName.replaceAll(":[^:]*$", "");
+                String docName = getDocName(pageName);
                 if (language == null) {
                     importer.setDocumentAction(docName, iAction);
                 } else {
@@ -214,9 +243,7 @@ public class ImportAction extends XWikiAction
         String[] pages = request.getParameterValues("pages");
 
         XARInputProperties xarProperties = new XARInputProperties();
-        xarProperties.setVerbose(false);
         DocumentInstanceOutputProperties instanceProperties = new DocumentInstanceOutputProperties();
-        instanceProperties.setVerbose(false);
 
         if (pages != null) {
             EntityReferenceSet entities = new EntityReferenceSet();
@@ -225,26 +252,12 @@ public class ImportAction extends XWikiAction
                 Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
 
             for (String pageName : pages) {
-                String language = Util.normalizeLanguage(request.get("language_" + pageName));
-                String actionName = "action_" + pageName;
-                if (!StringUtils.isBlank(language)) {
-                    actionName += ("_" + language);
-                }
-                String defaultAction = request.get(actionName);
-                int iAction;
-                if (StringUtils.isBlank(defaultAction)) {
-                    iAction = DocumentInfo.ACTION_OVERWRITE;
-                } else {
-                    try {
-                        iAction = Integer.parseInt(defaultAction);
-                    } catch (Exception e) {
-                        iAction = DocumentInfo.ACTION_SKIP;
-                    }
-                }
+                String language = getLanguage(pageName, request);
+                int iAction = getAction(pageName, language, request);
 
-                String docName = pageName.replaceAll(":[^:]*$", "");
-                if (iAction == DocumentInfo.ACTION_SKIP) {
-                    entities.excludes(new LocalDocumentReference(resolver.resolve(docName, EntityType.DOCUMENT),
+                String docName = getDocName(pageName);
+                if (iAction == DocumentInfo.ACTION_OVERWRITE) {
+                    entities.includes(new LocalDocumentReference(resolver.resolve(docName, EntityType.DOCUMENT),
                         LocaleUtils.toLocale(language)));
                 }
             }
@@ -287,17 +300,56 @@ public class ImportAction extends XWikiAction
         // Notify all the listeners about import
         ObservationManager observation = Utils.getComponent(ObservationManager.class);
 
-        observation.notify(new XARImportingEvent(), null, context);
-
         InputStream source = packFile.getContentInputStream(context);
         xarProperties.setSource(new DefaultInputStreamInputSource(source));
+
+        // Setup log
+        xarProperties.setVerbose(true);
+        instanceProperties.setVerbose(true);
+        LoggerManager loggerManager = Utils.getComponent(LoggerManager.class);
+        LogQueue logger = new LogQueue();
+        if (loggerManager != null) {
+            // Isolate log
+            loggerManager.pushLogListener(new LoggerListener(UUID.randomUUID().toString(), logger));
+        }
+
+        observation.notify(new XARImportingEvent(), null, context);
 
         try {
             xarWikiStream.read(instanceWikiStream.getFilter());
         } finally {
+            // Stop isolating log
+            loggerManager.popLogListener();
+
+            // Close the input source
             source.close();
 
             observation.notify(new XARImportedEvent(), null, context);
         }
+
+        // Generate import report
+        // Emulate old packager report (for retro compatibility)
+        PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
+        if (logger.containLogsFrom(LogLevel.ERROR)) {
+            context.put("install_status", DocumentInfo.INSTALL_ERROR);
+        } else {
+            context.put("install_status", DocumentInfo.INSTALL_OK);
+        }
+        EntityReferenceSerializer<String> serializer =
+            Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        for (LogEvent log : logger) {
+            Marker marker = log.getMarker();
+            if (marker != null) {
+                if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_CREATED.getName())
+                    || marker.contains(WikiDocumentFilter.LOG_DOCUMENT_UPDATED.getName())) {
+                    importer.getInstalled().add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
+                } else if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED.getName())) {
+                    importer.getSkipped().add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
+                } else if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_ERROR.getName())) {
+                    importer.getErrors().add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
+                }
+            }
+        }
+
     }
 }

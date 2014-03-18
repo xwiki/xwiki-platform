@@ -26,12 +26,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.FilterEventParameters;
+import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -42,6 +44,7 @@ import org.xwiki.wikistream.instance.internal.InstanceFilter;
 import org.xwiki.wikistream.instance.internal.InstanceModel;
 import org.xwiki.wikistream.instance.internal.InstanceUtils;
 import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
+import org.xwiki.wikistream.model.filter.WikiDocumentFilter;
 
 /**
  * @version $Id$
@@ -52,12 +55,18 @@ import org.xwiki.wikistream.internal.input.AbstractBeanInputWikiStream;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<InstanceInputProperties, InstanceFilter>
 {
+    private static final TranslationMarker LOG_DOCUMENT_SKIPPED = new TranslationMarker(
+        "wikistream.instance.log.document.skipped", WikiDocumentFilter.LOG_DOCUMENT_SKIPPED);
+
     @Inject
     private InstanceModel instanceModel;
 
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManager;
+
+    @Inject
+    private Logger logger;
 
     private List<InstanceInputEventGenerator> eventGenerators;
 
@@ -175,6 +184,11 @@ public class InstanceInputWikiStream extends AbstractBeanInputWikiStream<Instanc
         for (String documentName : this.instanceModel.getDocuments(wiki, space)) {
             if (isDocumentEnabled(wiki, space, documentName)) {
                 writeDocument(documentName, filter, proxyFilter);
+            } else {
+                if (this.properties.isVerbose()) {
+                    this.logger.info(LOG_DOCUMENT_SKIPPED, "Skipped document [{}]", new DocumentReference(wiki, space,
+                        documentName));
+                }
             }
         }
 

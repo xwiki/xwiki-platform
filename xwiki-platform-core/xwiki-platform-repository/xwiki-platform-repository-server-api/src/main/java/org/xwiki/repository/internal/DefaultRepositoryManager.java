@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -102,6 +103,8 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
     private static final List<Event> EVENTS = Arrays.<Event> asList(new XObjectPropertyAddedEvent(
         XWIKIPREFERENCE_PROPERTY_REFERENCE), new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
         new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
+
+    private static final Pattern PATTERN_NEWLINE = Pattern.compile("[\n\r]");
 
     /**
      * Get the reference of the class in the current wiki.
@@ -723,10 +726,8 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         // Name
         needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_NAME, extension.getName());
 
-        // Summary (truncated to 255 in case it's too long, TODO: should probably be handled at a lower level)
-        needSave |=
-            update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY,
-                StringUtils.substring(extension.getSummary(), 0, 255));
+        // Summary
+        needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, getSummary(extension));
 
         // Website
         /*
@@ -736,8 +737,8 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
         // Description
         if (StringUtils.isEmpty(getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION,
-            (String) null)) && StringUtils.isNotEmpty(extension.getDescription())) {
-            extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION, extension.getDescription(), xcontext);
+            (String) null))) {
+            extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION, getDescription(extension), xcontext);
             needSave = true;
         }
 
@@ -759,6 +760,47 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
                 new ArrayList<String>(extension.getFeatures()));
 
         return needSave;
+    }
+
+    private String getSummary(Extension extension)
+    {
+        String summary = extension.getSummary();
+        if (summary != null) {
+            // Extract first not blank line
+            Matcher matcher = PATTERN_NEWLINE.matcher(summary);
+            int previousIndex = 0;
+            while (matcher.find()) {
+                int index = matcher.start();
+                String str = summary.substring(previousIndex, index);
+                if (StringUtils.isNotBlank(str)) {
+                    summary = str.trim();
+                    break;
+                }
+            }
+            // truncated to 255 in case it's too long, TODO: should probably be handled at a lower level)
+            if (summary.length() > 255) {
+                summary = summary.substring(0, 255);
+            }
+        } else {
+            summary = "";
+        }
+
+        return summary;
+    }
+
+    private String getDescription(Extension extension)
+    {
+        String description;
+
+        if (extension.getDescription() != null) {
+            description = extension.getDescription();
+        } else if (extension.getSummary() != null) {
+            description = extension.getSummary();
+        } else {
+            description = "";
+        }
+
+        return description;
     }
 
     private boolean updateAuthors(BaseObject extensionObject, Collection<ExtensionAuthor> authors)

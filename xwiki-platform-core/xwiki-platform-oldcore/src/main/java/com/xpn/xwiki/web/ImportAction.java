@@ -116,17 +116,17 @@ public class ImportAction extends XWikiAction
         response.setContentType(MediaType.APPLICATION_XML.toString());
         response.setCharacterEncoding(encoding);
 
-        if (xcontext.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 0) == 1) {
-            XarPackage xarPackage = new XarPackage(packFile.getContentInputStream(xcontext));
-
-            xarPackage.write(response.getOutputStream(), encoding);
-        } else {
+        if (xcontext.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 1) == 0) {
             PackageAPI importer = ((PackageAPI) xcontext.getWiki().getPluginApi("package", xcontext));
             importer.Import(packFile.getContentInputStream(xcontext));
             String xml = importer.toXml();
             byte[] result = xml.getBytes(encoding);
             response.setContentLength(result.length);
             response.getOutputStream().write(result);
+        } else {
+            XarPackage xarPackage = new XarPackage(packFile.getContentInputStream(xcontext));
+
+            xarPackage.write(response.getOutputStream(), encoding);
         }
     }
 
@@ -135,10 +135,10 @@ public class ImportAction extends XWikiAction
     {
         String all = request.get("all");
         if (!"1".equals(all)) {
-            if (context.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 0) == 1) {
-                importPackageWikiStream(packFile, request, context);
-            } else {
+            if (context.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 1) == 0) {
                 importPackageOld(packFile, request, context);
+            } else {
+                importPackageWikiStream(packFile, request, context);
             }
 
             if (!StringUtils.isBlank(request.getParameter("ajax"))) {

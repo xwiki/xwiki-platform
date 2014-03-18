@@ -48,7 +48,7 @@ public class DistributionInitializerListener implements EventListener
      * The list of events to listen to.
      */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationReadyEvent(),
-        new ActionExecutingEvent("view"));
+        new ActionExecutingEvent("view"), new ActionExecutingEvent("distribution"));
 
     /**
      * The component used to get information about the current distribution.

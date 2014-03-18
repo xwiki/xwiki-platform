@@ -244,6 +244,7 @@ public class ImportAction extends XWikiAction
 
         XARInputProperties xarProperties = new XARInputProperties();
         DocumentInstanceOutputProperties instanceProperties = new DocumentInstanceOutputProperties();
+        instanceProperties.setSaveComment("Imported from XAR");
 
         if (pages != null) {
             EntityReferenceSet entities = new EntityReferenceSet();

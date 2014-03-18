@@ -8,13 +8,13 @@
     #set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
     #if ($pdoc)
       #set ($pdocurl = $pdoc.getURL('view'))
-      #set ($nstring = "<li><a href='$pdocurl'>$escapetool.xml(${pdoc.getPlainTitle()})</a></li><li>$result</li>")
+      #set ($nstring = "<li><a href='$pdocurl'>$escapetool.xml(${pdoc.getPlainTitle()})</a></li>$result")
       #set ($level = $level + 1)
       #computeHierarchy($pdoc $nstring $level)
     #else
       ## No access to the parent document
       <li><a href='$xwiki.getURL($parent)'>$escapetool.xml(${parent})</a></li>
-      <li>$result</li>
+      $result
     #end
   #else
     $result
@@ -25,9 +25,9 @@
     <ol id="hierarchy" class="breadcrumb">
     #if ($doc.fullName != 'Main.WebHome')
       #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
-        #computeHierarchy($doc "<a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getPlainTitle())</a>" 0)
+        #computeHierarchy($doc "<li><a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getPlainTitle())</a><li>" 0)
       #else
-        #computeHierarchy($doc "<span class='current'>$escapetool.xml($tdoc.getPlainTitle())</span>" 0)
+        #computeHierarchy($doc "<li><span class='current'>$escapetool.xml($tdoc.getPlainTitle())</span></li>" 0)
       #end
     #end
     </ol>

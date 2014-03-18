@@ -1,4 +1,4 @@
-<div id="menuContent" class="navbar-default pull-right">
+<div id="menuContent" class="pull-right">
 ##<div class="gradientfilterIE"></div>
 ##<div class="componentcontainer">
 ##<strong id="xwikicontentmenutitle" class="hidden">$services.localization.render('core.menu.content.title')</strong>

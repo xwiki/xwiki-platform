@@ -82,7 +82,7 @@
     #set($linkName = $linkWords.get(1))
     #set($linkTitle = "${linkWords.get(0)}: ${linkWords.get(1)}")
   #end
-  <li class="dropdown">
+  <li class="dropdown text-left">
       <a href="$actionurl" id="$id" class="dropdown-toggle $!class" data-toggle="dropdown" title="$linkTitle">#glyphicon($icon) $linkName <b class="caret"></b></a>
         <ul class="dropdown-menu">
 #end
@@ -159,14 +159,14 @@
 #end
 
 #macro(xwikibuttonentrystart $actionurl $linktext $id $class $icon)
-  <div class="btn-group">
+  <div class="btn-group text-left">
     <button type="button" class="btn $!class dropdown-toggle" data-toggle="dropdown" id="$id">#glyphicon($icon) $linktext <span class="caret"></span>
     </button>
     <ul class="dropdown-menu" role="menu">
 #end
 
 #macro(xwikisplitbuttonentrystart $actionurl $linktext $id $class $icon)
-  <div class="btn-group">
+  <div class="btn-group text-left">
     <a href="$actionurl" class="btn $!class">#glyphicon($icon) $linktext</a>
     <button type="button" class="btn $!class dropdown-toggle" data-toggle="dropdown">
       <span class="caret"></span>

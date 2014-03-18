@@ -1,16 +1,14 @@
-// ----------------------------------------------------------------------------
-//                      Flamingo LESS file
-//                        ----------------
 //
-// Use LESS to compile it to style.css
-// ----------------------------------------------------------------------------
+// Flamingo main LESS file
+// --------------------------------------------------
 
 // Imports ====================================================================
 @import "bootstrap/bootstrap.less"; // Bootstrap
-@import "xwiki-variables.less";
+@import "xwiki-variables.less"; // Bootstrap variables overrided by flamingo
 @import "xwiki-common.less";
 @import "xwiki-mapping.less";
 @import "attachments.less";
+@import "comments.less";
 @import "xlist.less";
 
 // Classes ====================================================================
@@ -66,3 +64,14 @@
   padding: 10px;
 }
 
+#menuContent{
+  .text-right();
+  
+  .btn-group {
+    margin: 2px 0;
+  }
+}
+
+#AddComment {
+  padding: 0;
+}

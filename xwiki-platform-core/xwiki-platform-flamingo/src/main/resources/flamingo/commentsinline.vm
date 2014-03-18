@@ -25,10 +25,7 @@
  *
  *###
 ##
-## These are used when this page is accessed directly but are useless when the page is pulled in with ajax using 
-## bin/view/Space/Page?xpage=xpart&vm=commentsinline.vm
 $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
-##$xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##---------------------------------------------------------------------
 ## Set some 'global' variables
@@ -157,9 +154,9 @@ $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'l
           <a class="edit btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$xredirect")" title="$services.localization.render('core.viewers.comments.edit')">#glyphicon('pencil')</a>
         #end
       #end
-      <a class="btn btn-default btn-xs permalink" rel="nofollow" href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.permalink')">#glyphicon('link')</a>
+      <a class="permalink btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.permalink')">#glyphicon('link')</a>
       #if ($hasAdmin || (!$isGuest && $hasEdit && $comment.author == $xcontext.user))
-        <a class="btn btn-default btn-xs" rel="nofollow" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$xredirect")" title="$services.localization.render('core.viewers.comments.delete')">#glyphicon('remove')</a>
+        <a class="delete btn btn-default btn-xs " rel="nofollow" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$xredirect")" title="$services.localization.render('core.viewers.comments.delete')">#glyphicon('remove')</a>
       #end
       </div>## btn-group
     </div>## commentheader
@@ -174,15 +171,15 @@ $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'l
 ##
 #macro(displayCommentForm)
   #if($xwiki.hasAccessLevel('comment'))
-    <form action="$doc.getURL('commentadd', "xpage=view&amp;viewer=comments#commentform")" method="post" id="AddComment">
-      <fieldset class="expanded col-xs-12" id="commentform">
-        <legend>$services.localization.render('core.viewers.comments.add.title')</legend>
+    <form action="$doc.getURL('commentadd', "xpage=view&amp;viewer=comments#commentform")" method="post" id="AddComment" class="col-xs-12">
+      <fieldset id="commentform">
+        <legend class="sr-only">$services.localization.render('core.viewers.comments.add.title')</legend>
         <div class="commentavatar">#mediumUserAvatar($xcontext.user)</div>
         #if($xcontext.user != 'XWiki.XWikiGuest')
-          <label>$services.localization.render('core.viewers.comments.add.guestName.prompt') $xwiki.getUserName($xcontext.user)</label>
+          <label>$xwiki.getUserName($xcontext.user) says:</label>
           <input type="hidden" name="${xCommentClass}_author" value="$xcontext.user"/>
         #else
-          <label for="${xCommentClass}_author">$services.localization.render('core.viewers.comments.add.guestName.prompt') <input type="text" id="${xCommentClass}_author" name="${xCommentClass}_author" value="$author" maxlength="255" /></label>
+          <label for="${xCommentClass}_author"><input type="text" id="${xCommentClass}_author" name="${xCommentClass}_author" value="$author" maxlength="255" /> says:</label>
           <strong><a href='$xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$escapetool.url($xwiki.relativeRequestURL)")'>$services.localization.render('login')</a></strong>
         #end
         ## CSRF prevention

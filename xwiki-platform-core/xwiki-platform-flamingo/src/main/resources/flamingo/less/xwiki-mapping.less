@@ -82,6 +82,14 @@ input.button, .buttonwrapper button, .buttonwrapper a {
   display: inline-block; // Making buttons and links look the same
 }
 
+a.button{
+  .btn;
+}
+
+a.secondary{
+  .btn-default;
+}
+
 // Tables =====================================================================
 
 table:extend(.table all) {}
@@ -280,16 +288,17 @@ input[type="text"].empty {
 // Vertical Menus =============================================================
 
 .vertical-menu {
-  ul { 
-    .text-smaller;
+  margin: 10px 0;
+  ul {
     margin-left: 0;
     .list-group;
     li {
       display: block;
       .group {
         .list-group-item;
-        padding: 0;
         background-color: @navbar-default-bg;
+        background-repeat: no-repeat;
+        padding: 5px 30px;
         &:hover, &.current-group {
           background-color: @navbar-inverse-bg;
           & a {
@@ -317,11 +326,17 @@ input[type="text"].empty {
           }
           a {
             display: block;
+            padding: 10px;
+            margin-top: -5px;
             color: @list-group-link-color;
             &:hover,
             &:focus {
               text-decoration: none;
               background-color: @list-group-hover-bg;
+            }
+            &:before {
+              margin: 0 5px;
+              content: "";
             }
           }
         }

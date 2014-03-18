@@ -176,7 +176,7 @@ $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'l
         <legend class="sr-only">$services.localization.render('core.viewers.comments.add.title')</legend>
         <div class="commentavatar">#mediumUserAvatar($xcontext.user)</div>
         #if($xcontext.user != 'XWiki.XWikiGuest')
-          <label>$xwiki.getUserName($xcontext.user) says:</label>
+          <label>$xwiki.getUserName($xcontext.user) $services.localization.render('core.viewers.comments.add.says')</label>
           <input type="hidden" name="${xCommentClass}_author" value="$xcontext.user"/>
         #else
           <label for="${xCommentClass}_author"><input type="text" id="${xCommentClass}_author" name="${xCommentClass}_author" value="$author" maxlength="255" /> says:</label>

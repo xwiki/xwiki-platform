@@ -37,6 +37,7 @@
   </properties>
   <build>
     <plugins>
+      <!-- LESS compilation -->
       <plugin>
         <groupId>org.lesscss</groupId>
         <artifactId>lesscss-maven-plugin</artifactId>
@@ -45,7 +46,6 @@
           <lessJs>${project.basedir}/src/main/resources/flamingo/less/less-1.7.0.min.js</lessJs>
           <sourceDirectory>${project.basedir}/src/main/resources/flamingo/less</sourceDirectory>
           <outputDirectory>${project.basedir}/target/less</outputDirectory>
-          <compress>true</compress>
           <includes>
             <include>style.less</include>
           </includes>
@@ -58,6 +58,26 @@
           </execution>
         </executions>
       </plugin>
+      <!-- CSS files compression -->
+      <plugin>
+        <groupId>net.alchim31.maven</groupId>
+        <artifactId>yuicompressor-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compress</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <sourceDirectory>${project.basedir}/target/less</sourceDirectory>
+          <outputDirectory>${project.basedir}/target/less</outputDirectory>
+          <excludes>
+            <exclude>**/less/**</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <!-- Assembly -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>

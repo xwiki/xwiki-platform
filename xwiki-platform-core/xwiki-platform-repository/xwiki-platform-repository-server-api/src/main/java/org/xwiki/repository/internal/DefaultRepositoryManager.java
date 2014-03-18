@@ -691,12 +691,14 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         }
 
         needSave |=
-            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYID, repository.getId().getId());
+            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYID, repository.getDescriptor()
+                .getId());
         needSave |=
-            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYTYPE, repository.getId().getType());
+            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYTYPE, repository.getDescriptor()
+                .getType());
         needSave |=
-            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYURI, repository.getId().getURI()
-                .toString());
+            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYURI, repository.getDescriptor()
+                .getURI().toString());
 
         if (needSave) {
             document.setAuthorReference(xcontext.getUserReference());
@@ -705,10 +707,9 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
                 document.setCreatorReference(xcontext.getUserReference());
             }
 
-            xcontext.getWiki()
-                .saveDocument(document,
-                    "Imported extension [" + extensionId + "] from repository [" + repository.getId() + "]", true,
-                    xcontext);
+            xcontext.getWiki().saveDocument(document,
+                "Imported extension [" + extensionId + "] from repository [" + repository.getDescriptor() + "]", true,
+                xcontext);
         }
 
         return document.getDocumentReference();
@@ -953,7 +954,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         // Download
         ExtensionResourceReference resource =
             new ExtensionResourceReference(extension.getId().getId(), extension.getId().getVersion().getValue(),
-                extension.getRepository().getId().getId());
+                extension.getRepository().getDescriptor().getId());
         String download = this.resourceReferenceSerializer.serialize(resource);
         needSave |= update(versionObject, XWikiRepositoryModel.PROP_VERSION_DOWNLOAD, download);
 

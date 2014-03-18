@@ -1,0 +1,176 @@
+// Override the default comments.css file
+/* Thread */
+.commentthread fieldset {
+  border: none;
+  margin: 0 !important;
+  padding: 0 0 8px 0;
+}
+ul.commentreplies, .reply {
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+}
+.reply {
+  list-style-type: none;
+  padding-left: 60px;
+}
+.reply form.reply {
+  padding-left: 0;
+}
+.commentthread .reply {
+  padding-left: 35px;
+}
+* html .reply {
+  /* Strange things happen in IE if this is missing: the width of a comment is larger and the layout is broken. */
+  border-top: 1px solid $theme.pageContentBackgroundColor;
+}
+*+html .xwikicomment {
+  border-top: 1px solid $theme.pageContentBackgroundColor;
+}
+/* Comment */
+.xwikicomment {
+  border: 0 none;   /* Overriding toucan */
+  padding: 0 0 8px; /* Overriding toucan */
+}
+.xwikicomment:target {
+  background: $theme.highlightColor;
+}
+* html .xwikicomment {
+  /* Pick-a-boo IE6 bugfix */
+  position: relative;
+}
+.commentavatar {
+  display: inline; /* IE6 bugfix */
+  float: left;
+  margin-left: -60px;
+  padding-top: 5px;
+  position: relative; /* IE6 bugfix */
+  text-align: center;
+  width: 50px;
+}
+.commentthread .commentavatar {
+  margin-left: -35px;
+  width: 30px;
+}
+.commentavatar img {
+  max-width: 50px;
+  max-height: 50px;
+}
+.commentthread .commentavatar img {
+  max-width: 30px;
+  max-height: 30px;
+}
+/* max-width is not supported in IE6 */
+* html .commentavatar img {
+  width: 50px;
+}
+* html .commentthread .commentavatar img {
+  width: 30px;
+}
+.commentheader {
+  border-bottom: 1px dotted $theme.borderColor;
+  color: $theme.textSecondaryColor;
+  margin: 0;        /* Overriding toucan */
+  padding: 2px 0;   /* Overriding toucan */
+}
+.commentheader:hover {
+  background-color: $theme.highlightColor;
+}
+.commentauthor {
+  font-size: 1em; /* Overriding toucan */
+}
+.commentdate {
+  font-size: 80%;
+}
+.commentcontent {
+  border: none;       /* Overriding toucan */
+  margin: 0;
+  padding: 0 36px 0 0;
+  text-align: justify;
+}
+/* Comment "toolbox": delete, reply */
+.commenttools {
+  display: block;
+  float: right;
+  margin-top: -1.2em;
+}
+/* Form */
+#AddComment fieldset {
+  padding-left: 60px;
+}
+.commentthread #AddComment fieldset {
+  padding-left: 35px;
+}
+#AddComment label {
+  color: $theme.textSecondaryColor;
+  font-weight: 400;
+}
+#AddComment legend {
+  font-size: 1em;
+  margin-left: -60px;
+}
+.commentthread #AddComment legend {
+  display: none;     /* For replies, don't display the legend, because it is unnecessary and does not integrate well. */
+}
+.commentthread #AddComment {
+  border-top: none;  /*For replies, don't display the separation line (same reason as above). */
+}
+#AddComment .commentcontainer {
+  padding: 4px 0;
+}
+#AddComment .commentcontainer label {
+  display: none;
+}
+#AddComment .commentcontainer textarea {
+  resize: vertical;
+  width: 100%;
+}
+* html #AddComment .commentcontainer textarea {
+  /* fix for IE6 */
+  width: 98%;
+}
+*+html #AddComment .commentcontainer textarea {
+  /* fix for IE7 */
+  width: 98%;
+}
+/* Permalink box */
+.permalinkBox .xdialog-box-confirmation .question {
+  background-image: url("$xwiki.getSkinFile('icons/silk/link.png')");
+  padding-left: 0;
+  text-indent: 22px;
+}
+/* The message that appears in the place of a comment deleted with ajax */
+div.notification {
+  background-color: $theme.highlightColor;
+  border: 1px solid $theme.borderColor;
+  font-size: 80%;
+  font-style: italic;
+  margin: 4px 0;
+  padding: 2px 32px;
+}
+/* For fixing strange looking background color and corner image in albatross: */
+#xwikidata #commentscontent {
+  background: transparent;
+}
+.commentPreview {
+  border: 1px dotted $theme.borderColor;
+  background: $theme.backgroundSecondaryColor;
+}
+form.edit-xcomment .commentcontent {
+  padding: 0;
+}
+form.edit-xcomment .commentPreview {
+  padding: 0 36px 0 32px;
+}
+form.edit-xcomment .commentcontent textarea {
+  width: 100%;
+}
+* html form.edit-xcomment .commentcontent textarea {
+  /* fix for IE6 */
+  width: 98%;
+}
+*+html form.edit-xcomment .commentcontent textarea {
+  /* fix for IE7 */
+  width: 98%;
+}
+

@@ -70,7 +70,7 @@ var AbstractExtensionListStep = Class.create({
     if (!stepButtons) return;
     stepButtons = stepButtons.select('button');
     // Disable the step buttons if there is any extension loading.
-    if (this.container.down('.extension-item.extension-item-loading') || this.container.down('.extension-log-item-loading')) {
+    if (this.container.down('.extension-item.extension-item-loading') || this.container.down('.job-log-item-loading')) {
       // Disable all step buttons.
       stepButtons.invoke('disable');
       this._disable && this._disable();

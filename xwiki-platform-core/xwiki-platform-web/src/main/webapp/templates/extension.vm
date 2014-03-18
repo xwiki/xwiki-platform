@@ -409,7 +409,7 @@ $namespace##
 #macro (displayExtensionDetails_dependencies_upstream $extension)
   #if ($extension.dependencies.size() > 0)
     <p>$services.localization.render('extensions.info.dependencies.directDependencies', [$extension.dependencies.size()])</p>
-    <ul>
+    <ul class="dependencies">
       #foreach ($dependency in $extension.dependencies)
         <li>#displayDependency($dependency $extensionNamespace)</li>
       #end
@@ -420,7 +420,7 @@ $namespace##
 #macro (displayExtensionDetails_dependencies_downstream $backwardDependencies)
   #if ($backwardDependencies.size() > 0)
     <p>$services.localization.render('extensions.info.dependencies.backwardDependencies', [$backwardDependencies.size()])</p>
-    <ul>
+    <ul class="dependencies">
       #foreach ($namespace in $backwardDependencies.entrySet())
         #foreach ($dependency in $namespace.value)
           <li>#displayDependency($dependency $namespace.key)</li>
@@ -464,7 +464,7 @@ $namespace##
   #if ($isExtensionPlan)
     #displayExtensionPlan($jobStatus)
   #else
-    #printStatusLog($jobStatus)
+    #displayJobStatusLog($jobStatus)
   #end
 #end
 
@@ -505,7 +505,7 @@ $namespace##
     #foreach($entry in $extensionsByAction.entrySet())
       #if (!$entry.value.isEmpty())
         <p>$services.localization.render("extensions.install.list.${entry.key.toLowerCase()}")</p>
-        <ul>
+        <ul class="dependencies">
           #foreach ($planAction in $entry.value)
             <li>#displayDependency($planAction.extension $planAction.namespace)</li>
           #end
@@ -515,16 +515,33 @@ $namespace##
   #end
 #end
 
+#macro (displayJobStatusLog $status)
+  <dl class="xform">
+    ## Collapse the job log if the job is waiting for user input (leave more space for the job question).
+    <dt>
+      <label class="collapsible#if ($status.state == 'WAITING') collapsed#end">
+        #set ($jobType = $status.request.getProperty('job.type'))
+        #set ($translationKey = "extensions.info.jobLog.$jobType")
+        #if (!$services.localization.get($translationKey))
+          #set ($translationKey = 'extensions.info.jobLog')
+        #end
+        $services.localization.render($translationKey)
+      </label>
+    </dt>
+    <dd>#printStatusLog($status)</dd>
+  </dl>
+#end
+
 #macro (printStatusLog $status)
   #if ($status.log.size() > 0)
-  <ul>
+  <ul class="job-log">
   #foreach ($log in $status.log)
     #set ($logLevel = $log.level.toString().toLowerCase())
     #if (!$foreach.hasNext && $status.state != 'FINISHED')
       ## Display the last log item as loading if the job is in progress.
       #set ($logLevel = 'loading')
     #end
-    <li class="extension-log-item extension-log-item-$logLevel">
+    <li class="job-log-item job-log-item-$logLevel">
       #if ($log.throwable)
         #set ($message = "#getThrowableRootCauseMessage($log.throwable)")
         #if ("$!message.trim()" != '')

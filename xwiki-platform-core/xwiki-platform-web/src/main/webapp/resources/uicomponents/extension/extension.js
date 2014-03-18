@@ -299,7 +299,7 @@ XWiki.ExtensionBehaviour = Class.create({
       var progressMenu = new Element('a', {href: '#' + progressSectionAnchor}).update(progressMenuLabel);
       this._enhanceMenuItemBehaviour(progressMenu);
       this.container.down('.innerMenu').insert(new Element('li').insert(progressMenu));
-    } else if (progressSection.down('.extension-log-item-loading')) {
+    } else if (progressSection.down('.job-log-item-loading')) {
       // Just hide the question that has been answered if there is any progress item loading.
       progressSection.down('.extension-question').hide();
     } else {
@@ -469,8 +469,8 @@ XWiki.ExtensionBehaviour = Class.create({
    * Enhances the behaviour of the Progress section within the extension details.
    */
   _enhanceProgressBehaviour : function() {
-    // Toggle stacktrace display in extension log.
-    this.container.select('.extension-log-item').each(function (logItem) {
+    // Toggle stacktrace display in job log.
+    this.container.select('.job-log-item').each(function (logItem) {
       var stacktrace = logItem.down('.stacktrace');
       if (stacktrace) {
         // Hide the stacktrace by default.
@@ -485,11 +485,22 @@ XWiki.ExtensionBehaviour = Class.create({
     });
     // Scroll the progress log to the end if it has a loading item.
     // TODO: Preserve the scroll position if the user scrolls through the log.
-    var loadingLogItem = this.container.down('.extension-log-item-loading');
+    var loadingLogItem = this.container.down('.job-log-item-loading');
     if (loadingLogItem) {
       var log = loadingLogItem.up();
       log.scrollTop = log.scrollHeight;
     }
+    // Make the job log collapsible. This is useful when the job is waiting for user input because it leaves more space
+    // for the job question.
+    this.container.select('.xform label.collapsible').each(function(collapsibleLabel) {
+      if (collapsibleLabel.hasClassName('collapsed')) {
+        collapsibleLabel.up('dt').next('dd').hide();
+      }
+      collapsibleLabel.observe('click', function () {
+        collapsibleLabel.toggleClassName('collapsed');
+        collapsibleLabel.up('dt').next('dd').toggle();
+      });
+    });
   },
 
   /**
@@ -644,7 +655,7 @@ XWiki.ExtensionUpdaterBehaviour = Class.create({
         // TODO: Preserve the scroll position if the user scrolls through the log.
         this.container.childElements().each(function(child) {
           if (child.hasClassName('extension-body-progress')) {
-            var loadingLogItem = child.down('.extension-log-item-loading');
+            var loadingLogItem = child.down('.job-log-item-loading');
             if (loadingLogItem) {
               var log = loadingLogItem.up();
               log.scrollTop = log.scrollHeight;

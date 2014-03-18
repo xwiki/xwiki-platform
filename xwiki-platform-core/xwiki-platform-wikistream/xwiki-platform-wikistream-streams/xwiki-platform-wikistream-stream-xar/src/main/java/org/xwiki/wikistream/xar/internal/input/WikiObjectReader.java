@@ -81,7 +81,9 @@ public class WikiObjectReader extends AbstractReader implements XARXMLReader<Wik
 
             proxyFilter.beginWikiObject(name, this.parameters);
 
-            this.wikiClass.send(proxyFilter);
+            if (this.wikiClass != null) {
+                this.wikiClass.send(proxyFilter);
+            }
 
             for (WikiObjectProperty property : this.properties) {
                 property.send(proxyFilter);
@@ -142,8 +144,12 @@ public class WikiObjectReader extends AbstractReader implements XARXMLReader<Wik
         property.name = xmlReader.getLocalName();
 
         String type;
-        WikiClassProperty classProperty = wikiClass.properties.get(property.name);
-        type = classProperty != null ? classProperty.type : null;
+        if (wikiClass != null) {
+            WikiClassProperty classProperty = wikiClass.properties.get(property.name);
+            type = classProperty != null ? classProperty.type : null;
+        } else {
+            type = null;
+        }
 
         try {
             property.value = this.propertySerializerManager.getPropertySerializer(type).read(xmlReader);

@@ -664,6 +664,13 @@ Caused by: #printThrowable($throwable.cause true)
 
 #macro (displayExtensionDetails_progressQuestion $extension $jobStatus)
   #set ($question = $jobStatus.question)
+  #set ($questionType = $question.getClass().getName())
+  #if ($questionType.endsWith('.ConflictQuestion'))
+    #displayExtensionDetails_mergeConflictQuestion($question)
+  #end
+#end
+
+#macro (displayExtensionDetails_mergeConflictQuestion $question)
   <dl>
     <dt>
       <label>$services.localization.render('extensions.upgrade.mergeConflict.label')</label>
@@ -688,11 +695,18 @@ Caused by: #printThrowable($throwable.cause true)
       #end
       </select>
     </dd>
+    <dt>
+      <label>
+        <input type="checkbox" name="autoResolve" value="true" />
+        $services.localization.render('extensions.upgrade.mergeConflict.autoResolve')
+      </label>
+      <span class="xHint">$services.localization.render('extensions.upgrade.mergeConflict.autoResolve.hint')</span>
+    </dt>
   </dl>
-  #displayExtensionDetails_progressChanges($question)
+  #displayExtensionDetails_mergeConflictChanges($question)
 #end
 
-#macro (displayExtensionDetails_progressChanges $question)
+#macro (displayExtensionDetails_mergeConflictChanges $question)
   <h3 class="extension-diff-title">$services.localization.render('extensions.upgrade.mergeConflict.changes.title',
     ["<a href=""$xwiki.getURL($question.currentDocument.documentReference)"">$question.currentDocument</a>"])</h3>
   <div class="extension-diff-options">
@@ -947,9 +961,11 @@ Caused by: #printThrowable($throwable.cause true)
     #end
   #elseif ($jobState == 'WAITING')
     ## Continue an interactive extension job using the data submitted by the user.
-    #if ($jobType == 'install')
+    #set ($questionType = $jobStatus.question.getClass().getName())
+    #if ($questionType.endsWith('.ConflictQuestion'))
       ## A merge conflict occurred during installation.
       #set ($discard = $jobStatus.question.setGlobalAction($request.versionToKeep))
+      #set ($discard = $jobStatus.question.setAlways($request.autoResolve.equals('true')))
     #end
     #set ($discard = $jobStatus.answered())
   #end

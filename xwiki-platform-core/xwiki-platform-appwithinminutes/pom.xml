@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-appwithinminutes</artifactId>
   <name>XWiki Platform - App Within Minutes</name>
   <packaging>pom</packaging>
-  <description>An XWiki application that allows end users to use XWiki's powerful structured data management to make collaborative web applications with as little steps as possible. The focus is on solving most common use cases when creating applications. We are not trying to include all types of features (like notifications, complex fields or workflows). These can be added by programmers.</description>
+  <description>Create collaborative web applications within minutes, based on XWiki's powerful structured data management system</description>
   <modules>
     <module>xwiki-platform-appwithinminutes-ui</module>
   </modules>

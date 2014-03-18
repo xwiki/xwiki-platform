@@ -38,6 +38,27 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.lesscss</groupId>
+        <artifactId>lesscss-maven-plugin</artifactId>
+        <version>1.3.3</version>
+        <configuration>
+          <lessJs>${project.basedir}/src/main/resources/flamingo/less/less-1.7.0.min.js</lessJs>
+          <sourceDirectory>${project.basedir}/src/main/resources/flamingo/less</sourceDirectory>
+          <outputDirectory>${project.basedir}/target/less</outputDirectory>
+          <compress>true</compress>
+          <includes>
+            <include>style.less</include>
+          </includes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>

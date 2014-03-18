@@ -113,22 +113,25 @@ dl.extension-metadata > dd > ul {
   margin: 0;
 }
 
-.extension-body-dependencies ul, .extension-body-progress > ul {
+ul.dependencies, ul.job-log {
   border-top: 1px dotted #E8E8E8;
   list-style-type: none;
-  margin: 0;
+  margin: .5em 0 0;
+  /* This should accommodate 10 items */
+  max-height: 230px;
+  overflow: auto;
 }
-.extension-body-dependencies li:hover, .extension-body-progress > ul li:hover {
+ul.dependencies li:hover, ul.job-log li:hover {
   background-color: $theme.highlightColor;
 }
-.dependency-item, .extension-log-item {
+.dependency-item, .job-log-item {
   background: transparent none no-repeat left;
   border-bottom: 1px dotted #E8E8E8;
   border-right: 7px solid $theme.pageContentBackgroundColor;
   padding: 0.3em 0 0.3em 20px;
   position: relative;
 }
-.dependency-item, .extension-log-item > div {
+.dependency-item, .job-log-item > div {
   line-height: 1.4em;
 }
 .extension-item-core .extension-title, .extension-item-remote-core .extension-title,
@@ -184,32 +187,26 @@ dl.extension-metadata > dd > ul {
   width: auto;
 }
 
-.extension-body-progress > ul {
-  margin-top: .5em;
-  /* This should accommodate 10 items */
-  max-height: 230px;
-  overflow: auto;
-}
-.extension-log-item {
+.job-log-item {
   background-position: left .3em;
 }
-.extension-log-item-info {
+.job-log-item-info {
   background-image: url("$xwiki.getSkinFile('icons/silk/information.png')");
   color: $theme.notificationInfoColor;
 }
-.extension-log-item-loading {
+.job-log-item-loading {
   background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
   color: $theme.notificationInfoColor;
 }
-.extension-log-item-warn {
+.job-log-item-warn {
   background-image: url("$xwiki.getSkinFile('icons/silk/error.png')");
   color: $theme.notificationWarningColor;
 }
-.extension-log-item-error {
+.job-log-item-error {
   background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.png')");
   color: $theme.notificationErrorColor;
 }
-.extension-log-item .stacktrace {
+.job-log-item .stacktrace {
   white-space: pre-wrap;
 }
 
@@ -408,4 +405,19 @@ dl.extension-metadata > dd > ul {
   color: $theme.textSecondaryColor;
   font-size: smaller;
   margin: 0.3em 0;
+}
+
+.xform label.collapsible {
+  cursor: pointer;
+}
+.xform label.collapsible:before {
+  color: $theme.textSecondaryColor;
+  content: "\25BC";
+  margin: 0 .5em 0 -1.5em;
+}
+.xform label.collapsible:hover:before {
+  color: $theme.textColor;
+}
+.xform label.collapsible.collapsed:before {
+  content: "\25B6";
 }

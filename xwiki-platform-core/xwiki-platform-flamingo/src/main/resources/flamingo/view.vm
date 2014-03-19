@@ -19,21 +19,18 @@
   #end
   
   #set($gridCSS = "col-xs-12")
-  #if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
-    #set($gridCSS = "${gridCSS} col-md-push-2")
-    #if($showRightPanels == "1" || $request.getParameter("forceRightPanels"))
-      #set($gridCSS = "${gridCSS} col-md-7")
-    #else
-      #set($gridCSS = "${gridCSS} col-md-9")
-    #end
-  #else
-    #if($showRightPanels == "1" || $request.getParameter("forceRightPanels"))
-      #set($gridCSS = "${gridCSS} col-md-9")
-    #else
-      #set($gridCSS = "${gridCSS} col-md-11")
-    #end
+  #set($columnsNumber = 12)
+  #if($showApplicationPanel)
+    #set($columnsNumber = $columnsNumber - 1)
   #end
-      
+  #if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
+    #set($columnsNumber = $columnsNumber - 2)
+    #set($gridCSS = "${gridCSS} col-md-push-2")
+  #end
+  #if($showRightPanels == "1" || $request.getParameter("forceRightPanels"))
+    #set($columnsNumber = $columnsNumber - 2)
+  #end
+  #set($gridCSS = "${gridCSS} col-md-${columnsNumber}")
   
   <div class="main layoutsubsection $gridCSS">
   <div id="mainContentArea">

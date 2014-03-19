@@ -1,0 +1,7 @@
+#set($showApplicationPanel = true)
+#if ($request.xpage == "print")
+  #set($showApplicationPanel = false)
+  #set($showLeftPanels = false)
+  #set($showRightPanels = false)
+  #set($displayContentMenu = false)
+#end

@@ -1,0 +1,2402 @@
+###############################################################
+## Contains various standard Velocity macros automatically
+## loaded and usable everywhere (in Velocity).
+## 
+## Note that if you modify that file you will need to restart.
+###############################################################
+##
+## #template("name.vm")
+## Searches for the given velocity template and interprets it.
+## Only the velocity parser is executed on the file.
+## The template is searched in the following locations, in this order:
+## - as a property of the XWikiSkins object attached to the current skin document
+## - as an attachment to the current skin document
+## - as a file in the directory corresponding to the current skin
+## - the above 3 locations corresponding to the base skin
+## - the above 3 locations corresponding to the default skin
+## - as a file in the /templates/ directory
+##
+#macro(template $tname)
+$xwiki.parseTemplate($tname)
+#end
+##
+##
+## #renderTemplate("name.vm")
+## Searches for the given velocity template and renders it.
+## The template is searched in the following locations, in this order:
+## - as a property of the XWikiSkins object attached to the current skin document
+## - as an attachment to the current skin document
+## - as a file in the directory corresponding to the current skin
+## - the above 3 locations corresponding to the base skin
+## - the above 3 locations corresponding to the default skin
+## - as a file in the /templates/ directory
+##
+#macro(renderTemplate $tname )
+$xwiki.renderTemplate($tname)
+#end
+##
+##
+## #includeTopic("Space.Document")
+## Includes another fully rendered document inside the current response.
+## The topic is interpreted and rendered exactly as if it were viewed in a separate response,
+## meaning that the $doc variable will point to the included document. The resulting string is
+## wrapped with {pre}...{/pre}, in order to prevent double-rendering.
+## The platform prevents recursive includes.
+## This macro is useful for creating composite documents from smaller parts, or the other way around,
+## splitting a large document into smaller distinct chunks which can be edited in parallel.
+##
+#macro(includeTopic $topic)
+$xwiki.includeTopic($topic)
+#end
+##
+##
+## #includeMacros("Space.Document")
+## Includes the content of another document as velocity macros. Because of the way the velocity
+## engine works, trying to place macros in another document and including it with another method
+## will not have the expected result. Other than making the macros available, it works just as
+## #includeForm($topic)
+##
+#macro(includeMacros $topic)
+$xwiki.includeForm($topic)
+#end
+##
+##
+## #includeForm("Space.Document")
+## Includes another fully rendered document inside the current response.
+## The included content is interpreted and rendered in the current context, meaning that $doc will
+## point to the current document (the includer), and not the included one. The resulting string is
+## wrapped with {pre}...{/pre}, in order to prevent double-rendering.
+## The platform prevents recursive includes.
+## This macro is the core of the document-template-sheet functionality of XWiki, where a document
+## has an XObject attached to it, its content consists of the "#includeForm('Some.Sheet')" statement,
+## and the sheet works just as if it were actually inside the document's content.
+##
+#macro(includeForm $topic)
+$xwiki.includeForm($topic)
+#end
+##
+##
+## #includeInContext("Some.Document")
+## Alias for #includeForm
+##
+#macro(includeInContext $topic)
+$xwiki.includeForm($topic)
+#end
+##
+##
+## #includeServlet("/xwiki/bin/view/Some/Document?params")
+## Invokes on the server another servlet corresponding to the passed URL, and returns the output.
+## This is done using standard servlet mechanisms (javax.servlet.RequestDispatcher#include).
+##
+#macro(includeServlet $url)
+<!-- including $url -->
+$xwiki.invokeServletAndReturnAsString($url)
+<!-- included $url -->
+#end
+##
+##
+##
+##
+## #skype("skypeId")
+## Displays the status for the given Skype id
+##
+## @Deprecated
+#macro(skype $id)
+<a href="skype:${id}?call"><img width="182" height="44" src="http://mystatus.skype.com/bigclassic/${id}" style="border: none;"></a>
+#end
+##
+##
+## #yahoo("yahooId")
+## Displays the status for the given Yahoo! id
+##
+## @Deprecated
+#macro(yahoo $id)
+<img border="0" src="http://opi.yahoo.com/online?u=${id}&amp;m=g&amp;t=1" alt="yahoo $id" />
+#end
+## #sign("XWiki.Username")
+## Displays a "signature", a link to the user's profile page.
+##
+#macro(sign $username)
+#if($username.indexOf(".")==-1)
+#set($username = "XWiki.${username}")
+#end
+#if($xwiki.exists("$username"))
+$xwiki.getUserName("$username")
+#else
+$xwiki.getUserName("xwiki:${username}")
+#end
+#end
+
+#macro(includeHelp $pagename)
+  #if($xwiki.exists("xwiki:XWiki.${pagename}"))
+    $xwiki.includeForm("xwiki:XWiki.${pagename}",false)
+  #else
+    #if($xwiki.exists("XWiki.${pagename}"))
+      $xwiki.includeForm("XWiki.${pagename}",false)
+    #end
+  #end
+#end
+
+#macro(toc $pinit $pmax $pnumbered)
+#set($init = $pinit)
+#set($max = $pmax)
+#set($numbered = $pnumbered)
+ #set ($int = 0)
+ #set ($boolean = false)
+ #if ($init == "")
+  #set ($init = 2)
+ #else
+  #set ($init = $int.valueOf($init))
+ #end
+ #if ($max == "")
+  #set ($max = 6)
+ #else
+  #set ($max = $int.valueOf($max))
+ #end
+ #if ($numbered == "")
+  #set ($numbered = false)
+ #else
+  #set ($numbered = $boolean.valueOf($numbered))
+ #end
+ #set ($tocData = ${tdoc.getTOC($init, $max, $numbered)})
+ #set ($xcontext.tocData = $tocData)
+ #set ($lastLevel = $init - 1)
+ #set ($depth = 0)
+ #set ($openeditem = true)
+<div class="toc">
+ #foreach ($tocEntry in $tocData.entrySet())
+  #set ($level = $tocEntry.value.level)
+  #if ($level > $lastLevel)
+   #set ($to = $lastLevel + 1)
+   #set ($iter = [$level .. $to])
+   #foreach ($n in $iter)
+    #if($openeditem)
+      #set($openeditem = false)
+    #else
+<li>
+    #end
+<ul class="tocLevel">
+    #set ($depth = $depth + 1)
+   #end
+  #elseif ($level < $lastLevel)
+   #set ($to = $level + 1)
+   #set ($iter = [$lastLevel .. $to])
+</li>
+   #foreach ($n in $iter)
+</ul>
+</li>
+    #set ($depth = $depth - 1)
+   #end
+  #else
+</li>
+  #end
+ <li class="tocEntry"><a href="#$tocEntry.key">$!tocEntry.value.numbering $xwiki.parseContent($tocEntry.value.text)</a>
+  #set ($lastLevel = $level)
+  #set($openeditem = true)
+ #end
+ #if ($depth > 0)
+  #set ($levels = [1 .. $depth])
+  #foreach($level in $levels)
+ </li>
+</ul>#end
+ #end
+</div>
+#end
+
+
+###
+###    Separator
+###
+### Insert a span containing a |
+###
+#macro(sep)
+<span class="separator"> | </span>
+#end
+
+
+###
+###    useravatar
+###
+### Display the avatar of a user, or a standard image if the user has no avatar
+###
+### @param username The name of the user whose avatar will be displayed
+###
+#macro(getUserAvatarURL $userName $return $size)
+  #set ($specified = false)
+  #set ($profileDoc = $xwiki.getDocument($userName))
+  #if ($profileDoc.getObject('XWiki.XWikiGroups'))
+    #set ($url = $xwiki.getSkinFile('icons/xwiki/noavatargroup.png', true))
+  #else
+    #set ($url = $xwiki.getSkinFile('icons/xwiki/noavatar.png', true))
+  #end
+  #if ($profileDoc && !$profileDoc.isNew() && $profileDoc.attachmentList.size() > 0)
+    #set ($profileObj = $profileDoc.getObject('XWiki.XWikiUsers', 0))
+    #set ($avatarFileName = $profileObj.getProperty('avatar').value)
+    #if ("$!avatarFileName" != '')
+      #set ($avatarAttachment = $profileDoc.getAttachment($avatarFileName))
+    #elseif ($profileDoc.getObject('XWiki.XWikiGroups'))
+      ## Look for the first image attachment.
+      #foreach ($attachment in $profileDoc.attachmentList)
+        #if ($attachment.isImage())
+          #set ($avatarAttachment = $attachment)
+          #break
+        #end
+      #end
+    #end
+    #if ($avatarAttachment && $avatarAttachment.isImage())
+      #set ($queryString = '')
+      #if ($size > 0)
+        #set ($queryString = "width=$size&height=$size&keepAspectRatio=true")
+      #end
+      #set ($url = $profileDoc.getAttachmentURL($avatarAttachment.filename, 'download', $queryString))
+      #set ($specified = true)
+    #end
+  #end
+  #set ($return = $NULL)
+  #setVariable ("$return" {'url': $url, 'specified': $specified})
+#end
+#macro(resizedUserAvatar $username $size)
+  #if(!$picturelist)
+    #set($picturelist = {})
+  #end
+  #if(!$picturelist.containsKey("${username}--${size}"))
+    #getUserAvatarURL($username $avatarURL $size)
+    #if ($avatarURL.specified)
+      #set ($picture = "<img src='")
+      #set ($picture = $picture.concat($escapetool.xml($avatarURL.url)))
+      #set ($picture = $picture.concat("' alt='"))
+      #set ($picture = $picture.concat(${xwiki.getUserName($username, false)}))
+      #set ($picture = $picture.concat("' title='"))
+      #set ($picture = $picture.concat(${xwiki.getUserName($username, false)}))
+      #set ($picture = $picture.concat("'/>"))
+    #else
+      #set ($picture = "<img class='avatar avatar_${escapetool.xml(${size})}' src='")
+      #set ($picture = $picture.concat($avatarURL.url))
+      #set ($picture = $picture.concat("' alt='${xwiki.getUserName($username, false)}' title='${xwiki.getUserName($username, false)}'/>"))
+    #end
+    #set ($discard = $!picturelist.put("${username}--${size}", $picture))
+  #end
+  $picturelist.get("${username}--${size}")##
+#end
+#macro(largeUserAvatar $username)
+  #resizedUserAvatar($username 120)
+#end
+#macro(mediumUserAvatar $username)
+  #resizedUserAvatar($username 50)
+#end
+#macro(smallUserAvatar $username)
+  #resizedUserAvatar($username 30)
+#end
+###
+###    useravatar
+###
+### Display the avatar of a user, or a standard image if the user has no avatar
+###
+### @param username The name of the user whose avatar will be displayed
+###
+#macro(useravatar $username)
+  #resizedUserAvatar($username 0)
+#end
+
+###
+###    mimetypeimg
+###
+### Display an icon according to the mimetype
+###
+### @param mime The reported mimetype of the file
+### @param fname The name of the file
+###
+#macro(mimetypeimg $mime $fname)
+  #set($idx = $fname.lastIndexOf('.'))
+  #set($idx = $idx + 1)
+  #if(($idx != 0) && ($idx != -1))
+    #set($ext = $fname.substring($idx))
+  #else
+    #set($ext = '')
+  #end
+  ## Map mimetypes to their corresponding icons
+  #if(!$mimetypeMap)
+    #set($mimetypeMap = {})
+    ## images
+    #set($discard = $mimetypeMap.put('image/svg+xml',                      ['vector', 'svg']))
+    #set($discard = $mimetypeMap.put('application/svg+xml',                ['vector', 'svg']))
+    #set($discard = $mimetypeMap.put('image/svg',                          ['vector', 'svg']))
+    #set($discard = $mimetypeMap.put('image/svg+xml',                      ['vector', 'svg']))
+    #set($discard = $mimetypeMap.put('image/',                             ['picture', 'image']))
+    ## text
+    #set($discard = $mimetypeMap.put('text/html',                          ['html', 'html']))
+    #set($discard = $mimetypeMap.put('text/css',                           ['css', 'css']))
+    #set($discard = $mimetypeMap.put('text/',                              ['page_white_text', 'text']))
+    ## documents
+    #set($discard = $mimetypeMap.put('application/xml',                    ['page_white_code', 'xml']))
+    #set($discard = $mimetypeMap.put('application/pdf',                    ['page_white_acrobat', 'pdf']))
+    #set($discard = $mimetypeMap.put('application/postscript',             ['page_red', 'ps']))
+    #set($discard = $mimetypeMap.put('application/msword',                 ['page_white_word', 'document']))
+    #set($discard = $mimetypeMap.put('application/powerpoint',             ['page_white_powerpoint', 'presentation']))
+    #set($discard = $mimetypeMap.put('application/vnd.ms-powerpoint',      ['page_white_powerpoint', 'presentation']))
+    #set($discard = $mimetypeMap.put('application/vnd.oasis.opendocument', ['page', 'office']))
+    #set($discard = $mimetypeMap.put('application/x-shockwave-flash',      ['page_white_flash', 'flash']))
+    ## archives
+    #set($discard = $mimetypeMap.put('application/x-tar',                  ['page_white_compressed', 'tar']))
+    #set($discard = $mimetypeMap.put('application/x-gzip',                 ['page_white_compressed', 'gz']))
+    #set($discard = $mimetypeMap.put('application/x-gtar',                 ['page_white_compressed', 'gz']))
+    #set($discard = $mimetypeMap.put('application/zip',                    ['page_white_zip', 'zip']))
+    #set($discard = $mimetypeMap.put('application/java-archive',           ['cup', 'jar']))
+    #set($discard = $mimetypeMap.put('audio/',                             ['music', 'audio']))
+    #set($discard = $mimetypeMap.put('video/',                             ['film', 'video']))
+  #end
+  #if(!$extensionMap)
+    ## Map extensions to their corresponding icons
+    #set($extensionMap = {})
+    ## media
+    #set($discard = $extensionMap.put('ogg',      ['music', 'audio']))
+    #set($discard = $extensionMap.put('flac',     ['music', 'audio']))
+    #set($discard = $extensionMap.put('ogv',      ['film', 'video']))
+    #set($discard = $extensionMap.put('mk',       ['film', 'video']))
+    #set($discard = $extensionMap.put('avi',      ['film', 'video']))
+    #set($discard = $extensionMap.put('divx',     ['film', 'video']))
+    #set($discard = $extensionMap.put('mov',      ['film', 'video']))
+    #set($discard = $extensionMap.put('flv',      ['page_white_flash', 'flash']))
+    #set($discard = $extensionMap.put('fla',      ['page_white_flash', 'flash']))
+    #set($discard = $extensionMap.put('swf',      ['page_white_flash', 'flash']))
+    ## office
+    #set($discard = $extensionMap.put('ppt',      ['page', 'presentation']))
+    #set($discard = $extensionMap.put('odp',      ['page', 'presentation']))
+    #set($discard = $extensionMap.put('doc',      ['page', 'document']))
+    #set($discard = $extensionMap.put('odf',      ['page', 'document']))
+    #set($discard = $extensionMap.put('ods',      ['page', 'spreadsheet']))
+    #set($discard = $extensionMap.put('xls',      ['page_white_excel', 'spreadsheet']))
+    #set($discard = $extensionMap.put('odt',      ['page', 'odt']))
+    #set($discard = $extensionMap.put('sxw',      ['page', 'office']))
+    #set($discard = $extensionMap.put('stw',      ['page', 'office']))
+    ## archives
+    #set($discard = $extensionMap.put('bz',       ['page_white_compressed', 'bz']))
+    #set($discard = $extensionMap.put('bz2',      ['page_white_compressed', 'bz']))
+    #set($discard = $extensionMap.put('tbz',      ['page_white_compressed', 'bz']))
+    #set($discard = $extensionMap.put('gz',       ['page_white_compressed', 'gz']))
+    #set($discard = $extensionMap.put('tgz',      ['page_white_compressed', 'gz']))
+    #set($discard = $extensionMap.put('rar',      ['page_white_compressed', 'rar']))
+    #set($discard = $extensionMap.put('7z',       ['page_white_zip', 'zip']))
+    ## development
+    #set($discard = $extensionMap.put('sql',      ['database', 'sql']))
+    #set($discard = $extensionMap.put('php',      ['page_white_php', 'php']))
+    #set($discard = $extensionMap.put('c',        ['page_white_c', 'c']))
+    #set($discard = $extensionMap.put('cpp',      ['page_white_cplusplus', 'cpp']))
+    #set($discard = $extensionMap.put('c++',      ['page_white_cplusplus', 'cpp']))
+    #set($discard = $extensionMap.put('cs',       ['page_white_csharp', 'cs']))
+    #set($discard = $extensionMap.put('h',        ['page_white_h', 'h']))
+    #set($discard = $extensionMap.put('ruby',     ['page_white_ruby', 'ruby']))
+    #set($discard = $extensionMap.put('java',     ['page_white_cup', 'java']))
+    #set($discard = $extensionMap.put('js',       ['script', 'js']))
+    #set($discard = $extensionMap.put('csproj',   ['page_white_visualstudio', 'vs']))
+    #set($discard = $extensionMap.put('sln',      ['page_white_visualstudio', 'vs']))
+    #set($discard = $extensionMap.put('res',      ['page_white_visualstudio', 'vs']))
+    ## data
+    #set($discard = $extensionMap.put('ics',      ['date', 'calendar']))
+    #set($discard = $extensionMap.put('eml',      ['email', 'email']))
+    #set($discard = $extensionMap.put('vcf',      ['vcard', 'vcard']))
+    #set($discard = $extensionMap.put('vcard',    ['vcard', 'vcard']))
+    ## executables
+    #set($discard = $extensionMap.put('exe',      ['cog', 'exe']))
+    #set($discard = $extensionMap.put('bat',      ['application_xp_terminal', 'script']))
+    #set($discard = $extensionMap.put('sh',      ['application_xp_terminal', 'script']))
+  #end
+  #if($mimetypeMap.containsKey($mime))
+    #set ($image = $mimetypeMap.get($mime).get(0))
+    #set ($text = $mimetypeMap.get($mime).get(1))
+  #elseif ($extensionMap.containsKey($ext))
+    #set ($image = $extensionMap.get($ext).get(0))
+    #set ($text = $extensionMap.get($ext).get(1))
+  #else
+    #set ($mimetypePrefix = $mime.indexOf('/'))
+    #set ($mimetypePrefix = $mimetypePrefix + 1)
+    #set ($mimetypePrefix = $mime.substring(0, $mimetypePrefix))
+    #if ($mimetypeMap.containsKey($mimetypePrefix))
+      #set ($image = $mimetypeMap.get($mimetypePrefix).get(0))
+      #set ($text = $mimetypeMap.get($mimetypePrefix).get(1))
+    #else
+      #set ($image = 'page_white')
+      #set ($text = 'attachment')
+    #end
+  #end
+  <img src="${xwiki.getSkinFile("icons/silk/${image}.png")}" alt="${services.localization.render("core.viewers.attachments.mime.${text}")}" title="${services.localization.render("core.viewers.attachments.mime.${text}")}"/>
+#end
+###
+###    packName
+###
+### Display a shorter version of a string
+###
+### @param name The processed string
+###
+#macro(packName $name)
+#if(!$maxnamelength)
+#set($maxnamelength = 25)
+#end
+#set($idx = $name.lastIndexOf("."))
+#if(($idx != 0) && ($idx != -1))
+#set($ext = $name.substring($idx))
+#else
+#set($ext = "")
+#set($idx = $name.length())
+#end
+#set($fname = $name.substring(0, $idx))
+#if($fname.length() > $maxnamelength)$fname.substring(0, $maxnamelength)~$ext#else$name#end
+#end
+
+#macro(xwikiobjectfield $fielddoc $fieldname $fieldtext $action)
+<div class="xmblabel">$fieldtext</div>
+<div class="xmbfield">
+#if($fieldname!="")
+$fielddoc.display($fieldname, $action)
+#end
+</div>
+#end
+
+##
+## Formats a date according to the ISO8601 standard
+##
+#macro(formatdateISO $date)
+#set($tz = $xwiki.formatDate($date, "Z"))
+#set($tz = "${tz.substring(0, 3)}:${tz.substring(3)}")
+$xwiki.formatDate($date, "yyyy-MM-dd")T$xwiki.formatDate($date, "HH:mm:ss")$tz#end
+
+##
+## Formats a username like a fn (hCard microformat)
+##
+#macro(userfn $username)
+#set($fn = $xwiki.getUserName($username))
+#if($fn.indexOf("<a") >= 0)
+#set($fn = $fn.replaceAll("<a", '<a class="url fn"'))
+#else
+#set($fn = "<span class='fn'>$fn</span>")
+#end
+$fn
+#end
+
+###
+###
+### Macros for "foot notes"
+###
+### TODO:
+###       Make Radeox macros
+###       Support in wysiwyg
+###
+###
+#macro(footnote $text)
+#if(!$page_footnotes)
+#set($page_footnotes = [])
+#set($footnote_group_id = 1)
+#end
+#set($discard = $page_footnotes.add($text))
+#set($processedText = $text.replaceAll('[*~<>_-]', ''))
+#set($footnote_id = $page_footnotes.size())
+<sup class="footnoteRef" id="footnoteref_${footnote_group_id}_${footnote_id}"><a href="#footnote_${footnote_group_id}_${footnote_id}" title="$services.localization.render('core.footnotes.gotofootnote', [${footnote_id}]): {pre}$processedText{/pre}">$footnote_id</a></sup>#end
+##
+##
+##
+#macro(putFootnotes)
+#if($page_footnotes && ($page_footnotes.size() > 0))
+<ol class="footnotes">
+#foreach($footnote in $page_footnotes)
+<li id="footnote_${footnote_group_id}_${velocityCount}">
+ <a class="footnoteBackRef" title="$services.localization.render('core.footnotes.backtoref')" href="#footnoteref_${footnote_group_id}_${velocityCount}">^</a>
+  $footnote</li>
+#end
+</ol>
+#set($discard = $page_footnotes.clear())
+#set($footnote_group_id = $footnote_group_id + 1)
+#end
+#end
+##
+##  Generate navigation links for paged documents. It will use the URL parameters "ipp" to forward
+## the number of items per page, and "page" to indicate a certain page. The actual range (in items,
+## not in pages) can be computer using #preparePagedViewParams. The macro does not print anything
+## if only one page exists and $alwaysDisplay is not set to true. Does not alter any variables.
+##
+## @param itemsPerPage The number of items per page, will be forwarded in the links to other pages.
+## @param totalPages The total number of pages, starting at 1.
+## @param currentPageNumber The currently displayed page, starting at 1.
+## @param additionalQueryParams Query string fragment that should be put in the links. Should not
+##        start or end with ? or &
+## @param alwaysDisplay Force display of the links, even if there is only one page in total.
+##
+#macro(printPagedViewLinks $itemsPerPage $totalPages $currentPageNumber $additionalQueryParams $alwaysDisplay)
+  ## Only display if there are more than 1 pages or we explicitely require it.
+  #if(($totalPages > 1) || $alwaysDisplay)
+    <div class="pagedNavigation">
+    #if($currentPageNumber > 1)
+      #set($currentPageNumber = $currentPageNumber - 1)
+      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=1&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$services.localization.render('web.paging.firstPage')</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${currentPageNumber}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$services.localization.render('web.paging.previousPage')</a></span>
+      #set($currentPageNumber = $currentPageNumber + 1)
+    #else
+      <span class="pagedLink inactive">$services.localization.render('web.paging.firstPage')</span>
+      <span class="pagedLink inactive">$services.localization.render('web.paging.previousPage')</span>
+    #end
+    <span class="pagedStatus">$services.localization.render('web.paging.pageNumberOf', [$currentPageNumber, $totalPages])</span>
+    #if($currentPageNumber < $totalPages)
+      #set($currentPageNumber = $currentPageNumber + 1)
+      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${currentPageNumber}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$services.localization.render('web.paging.nextPage')</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($xcontext.action, "page=${totalPages}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$services.localization.render('web.paging.lastPage')</a></span>
+      #set($currentPageNumber = $currentPageNumber - 1)
+    #else
+      <span class="pagedLink inactive">$services.localization.render('web.paging.nextPage')</span>
+      <span class="pagedLink inactive">$services.localization.render('web.paging.lastPage')</span>
+    #end
+    </div>
+  #end
+#end
+##
+##
+##  Used together with #printPagedViewLinks, computes the range of items to show and the
+## variables used by #printPagedViewLinks, $currentPageNumber, $itemsPerPage, $totalPages.
+##
+## @param totalItems The total number of items that need to be displayed.
+## @param defaultItemsPerPage The default number of items per page, if no override is found in the
+##        URL. If 0, then display all items.
+## @sets startAt The first item to display (inclusive).
+## @sets endAt The last item to display (exclusive).
+## @sets itemsPerPage The requested number of items per page.
+## @sets totalPages The total number of pages according to the requested number of items per page
+##        and total items. Starts at 1.
+## @sets currentPageNumber The current page displayed. If the requested page is not available (out
+##        of range), then it will be corrected to a valid number. Starts at 1.
+##
+#macro(preparePagedViewParams $totalItems $defaultItemsPerPage)
+  ## Reuse existing variable, in case it is manually overriden somewhere else
+  #if(!$itemsPerPage)
+    #if($request.ipp)
+      #set($itemsPerPage = $mathtool.toInteger($request.ipp))
+    #else
+      #set($itemsPerPage = $defaultItemsPerPage)
+    #end
+  #end
+  ## Page numbers start at 1 outside this macro, but for internal computations we use 0-indexed values.
+  #set($currentPageNumber = $mathtool.toInteger($request.page) - 1)
+  #if(!$currentPageNumber || $currentPageNumber < 0)
+    #set($currentPageNumber = 0)
+  #end
+  ## The first item to show. Must be >= 0.
+  #set($startAt = $itemsPerPage * $currentPageNumber)
+  #if($startAt < 0)
+    #set($startAt = 0)
+  #end
+  ## The last item to show (exclusive). Must be <= total number of items.
+  #set($endAt = $itemsPerPage * ($currentPageNumber + 1))
+  #if(($endAt > $totalItems) || ($itemsPerPage == 0))
+    #set($endAt = $totalItems)
+  #end
+  ## Never show the items after the last one... They don't exist!
+  #if($startAt >= $endAt)
+    #set($startAt = $endAt - 1)
+  #end
+  ## Compute the total number of pages.
+  #if($itemsPerPage == 0)
+    #set($totalPages = 1)
+  #else
+    #set($totalPages = ($totalItems - 1) / $itemsPerPage + 1)
+  #end
+  ## The requested page might not be available, so correct it to correspond to the displayed items.
+  #set($currentPageNumber = $startAt / $itemsPerPage + 1)
+#end
+##
+##
+## Macro to set a page break used in print, pdf and rtf mode
+##
+#macro(pagebreak)
+<p style="page-break-before: always;" />
+#end
+##
+##
+## Macro to include children of a page
+##
+#set($clevel = 1)
+
+#**
+ * Macro to include children at multiple levels. The children are rendered in the generated output. The number of nested levels to
+ * render is defined in a global variable called "$clevel".
+ *
+ * @param $page the document whose children should be rendered; preferably a Document object, but a document name works as well
+ * @param $withPageBreaks a boolean indicating whether a page break should be generated before each new child document
+ *###
+#macro(includeChildren $page $withPageBreaks)
+  #if ($clevel && $clevel > 0)
+    #if ("$!page.fullName" == '')
+      ## Not a Document, probably a String (document name)
+      ## Make it backwards compatible with older versions of the macro
+      #set ($page = $xwiki.getDocument($page))
+    #end
+    #foreach ($childDocName in $page.children)
+      #set ($childDoc = $xwiki.getDocument($childDocName))
+      #if ($childDoc && !$blacklistedSpaces.contains($childDoc.getSpace()))
+        #if ($withPageBreaks)
+          #pagebreak()
+        #end
+        $childDoc.getRenderedContent()
+        #set ($clevel = $clevel - 1)
+        #includeChildren($childDoc $withPageBreaks)
+        #set ($clevel = $clevel + 1)
+      #end
+    #end
+  #end
+#end
+
+##
+## Macro to include linked pages at multiple levels
+#macro(includeLinks $page $withPageBreaks)
+ #if($clevel && $clevel!=0)
+  #set($pageDoc = $xwiki.getDocument($page))
+  #foreach($child in $pageDoc.getLinks())
+    #set($childDocName = $child.getLink())
+    #set($childDoc = $xwiki.getDocument($childDocName))
+    #if(($childDoc)&&($childDoc.getSpace()!="Panels")&&($childDoc.getSpace()!="XWiki"))
+     #if($withPageBreaks)
+     #pagebreak()
+     #end
+     $childDoc.getRenderedContent()
+     #set($clevel = $xwiki.add($clevel,-1))
+     #includeLinks($childDocName $withPageBreaks)
+     #set($clevel = $xwiki.add($clevel,1))
+    #end
+  #end
+ #end
+#end
+
+###
+###    Panel header
+###
+### Generate the starting html code for a panel
+###
+### @param title The panel caption title
+###
+#macro(panelheader $title)
+## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
+## the Panels selectively using CSS.
+#set ($specialClassAttribute = '')
+#if ($paneldoc)
+  #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
+#end
+#if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
+<div class="panel expanded $!specialClassAttribute">
+<h1 class="xwikipaneltitle">$title</h1>
+<div class="xwikipanelcontents">
+#else
+(% class="panel expanded $specialClassAttribute" %)(((
+{{html}}<h1 class="xwikipaneltitle">$title</h1>{{/html}}
+(% class="xwikipanelcontents" %)(((
+#end
+#end
+
+#macro(panelhiddenheader $title)
+## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
+## the Panels selectively using CSS.
+#set ($specialClassAttribute = '')
+#if ($paneldoc && $paneldoc != '')
+  #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
+#end
+#if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
+<div class="panel expanded $!specialClassAttribute">
+<h1 class="xwikipaneltitle hidden">$title</h1>
+<div class="xwikipanelcontents">
+#else
+(% class="panel expanded $specialClassAttribute" %)(((
+{{html}}<h1 class="xwikipaneltitle hidden">$title</h1>{{/html}}
+(% class="xwikipanelcontents" %)(((
+#end
+#end
+
+#macro(largepanelheader $title)
+## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
+## the Panels selectively using CSS.
+#set ($specialClassAttribute = '')
+#if ($paneldoc && $paneldoc != '')
+  #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
+#end
+#if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
+<div class="large panel $expanded $!specialClassAttribute">
+<h1 class="xwikipaneltitle">$title</h1>
+<div class="xwikipanelcontents">
+#else
+(% class="large panel expanded $!specialClassAttribute" %)(((
+{{html}}<h1 class="xwikipaneltitle">$title</h1>{{/html}}
+(% class="xwikipanelcontents" %)(((
+#end
+#end
+
+###
+###    Panel footer
+###
+### Generate the ending html code for a panel
+###
+#macro(panelfooter)
+#if ($paneldoc.syntax.toIdString() == 'xwiki/1.0')
+</div>
+</div>
+#else
+)))
+)))
+#end
+#end
+
+###
+###    Display Panel
+###
+### Extract and display the panel code from the panel object
+###
+### @Deprecated
+#macro(displaypanel $name)
+  #set ($paneldoc = $xwiki.getDocument($name))
+  #if ($paneldoc)
+    #set ($pobj = $paneldoc.getObject('Panels.PanelClass'))
+    #if ($pobj)
+      $!doc.display('content', 'view', $pobj)
+    #end
+  #end
+#end
+
+#macro(displayPropName $prop)
+#if($services.localization.render("${class.getName()}_${prop.name}") == "${class.getName()}_${prop.name}")
+$prop.prettyName#else
+$services.localization.render($prop.name)#end
+#end
+
+###
+###    Display Panel content
+###
+###
+#macro(displaypanelcontent $doc $obj)
+$doc.display("content", $obj)
+#end
+
+###
+###    Message box
+###
+#macro(xwikimessageboxstart $title $message)
+    <div class="centered">
+    <fieldset class="xwikimessage">
+      <legend><span>$title</span></legend>
+      <p class="xwikimessage">$message</p>
+#end
+#macro(xwikimessageboxend)
+    </fieldset>
+    </div>
+#end
+
+#macro(xwikimessagebox $title $message $urlyes $urlno $msgyes $msgno)
+#xwikimessageboxstart($title $message)
+      <div class="buttons"><a href="$urlyes" class="buttonwrapper"><input type="button" class="button" value="$msgyes" onclick="location='$urlyes'; return false;"/></a><a href="$urlno" class="buttonwrapper"><input type="button" class="button" value="$msgno" onclick="location='$urlno'; return false;"/></a></div>
+#xwikimessageboxend()
+#end
+
+#macro(xwikimessageboxfield $fielddoc $fieldname $fieldtext $html)
+<div class="xmblabel">$fieldtext</div>
+<div class="xmbfield">
+#if($fieldname!="")
+$fielddoc.display($fieldname, "edit")
+#end
+#if($html!="")
+$html
+#end
+</div>
+#end
+
+#macro(xwikimessageboxsubmit $submittext)
+<div class="xmbbutton">
+<input type="submit" value="$submittext" />
+</div>
+#end
+
+
+###
+###    message
+###
+
+#macro(warning $text)
+<div class="warningmessage"><span class="messagetype">$services.localization.render('warning'): </span>$text</div>
+#end
+
+#macro(error $text)
+<div class="errormessage"><span class="messagetype">$services.localization.render('error'): </span>$text</div>
+#end
+
+#macro(info $text)
+<div class="infomessage">$text</div>
+#end
+
+#macro(message $text)
+<div class="plainmessage">$text</div>
+#end
+
+#macro (floatingbox $text)
+<div class="floatinginfobox">$text</div>
+#end
+
+#macro (startfloatingbox)
+<div class="floatinginfobox">
+#end
+
+#macro (endfloatingbox)
+</div>
+#end
+
+###
+###    Display in page panels layout
+###
+###
+#macro(displayPanelLayout $nbcolumns $panelNameList)
+  <div class="panellayoutcontainer-${nbcolumns}col">
+    #set($lastColumnId = ($nbcolumns - 1))
+    #foreach($colId in [0..$lastColumnId])
+      <div class="panellayoutcol">
+        #foreach($panelName in $panelNameList)
+          #if($panelName && ($panelName != "") && (((($velocityCount - 1) + $nbcolumns) % $nbcolumns) == $colId))
+            #displaypanel($panelName)
+          #end
+        #end
+      </div>
+    #end
+  </div>
+#end
+
+#**
+ * Displays a public google calendar with all buttons and displays
+ * The size of the display is 800x600
+ *
+ * This macro displays the public part of the calendar specified. However if the visiting user is logged in in Google Calendar and has rights to the private part of the calendar then the information will be displayed.
+ *
+ * @param id ID of the google account to display the calendar for
+ *#
+#macro(googlecal $id)
+{pre}
+<iframe src="http://www.google.com/calendar/embed?height=600&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=${id.replaceAll("@","%40")}&amp;color=%232952A3" style=" border-width:0 " width="800" height="600" frameborder="0" scrolling="no"></iframe>
+{/pre}
+#end
+
+#**
+ * Displays a public google calendar with all buttons and displays and a custom size
+ *
+ * @param id ID of the google account to display the calendar for
+ * @param width Width of the calendar
+ * @param height Height of the calendar
+ *#
+#macro(googlecalsize $id $width $height)
+#if($width=="")
+#set($width = "800")
+#end
+#if($height=="")
+#set($height = "600")
+#end
+{pre}
+<iframe src="http://www.google.com/calendar/embed?height=${height}&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=${id.replaceAll("@","%40")}&amp;color=%232952A3" style=" border-width:0 " width="${width}" height="${height}" frameborder="0" scrolling="no"></iframe>
+{/pre}
+#end
+
+#**
+ * Displays a private google calendar with all buttons
+ *
+ * @param id ID of the google account to display the calendar for
+ * @param token Private token giving access to the Calendar. This token is 32 chars long and can be retrieved in the "Agenda Details" when accessing your "Private URL" of your calendar. You should use this parameter with care as it will display all your calendar events to anybody that can access the page in which you use this macro
+ *#
+#macro(googlecalprivate $id $token)
+{pre}
+<iframe src="http://www.google.com/calendar/embed?pvttk=${token}&amp;height=600&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=${id.replaceAll("@","%40")}&amp;color=%232952A3" style=" border-width:0 " width="800" height="600" frameborder="0" scrolling="no"></iframe>
+{/pre}
+#end
+
+#**
+ * Displays a private google calendar with all buttons
+ *
+ * @param id ID of the google account to display the calendar for
+ * @param token Private token giving access to the Calendar. This token is 32 chars long and can be retrieved in the "Agenda Details" when accessing your "Private URL" of your calendar. You should use this parameter with care as it will display all your calendar events to anybody that can access the page in which you use this macro
+ * @param width Width of the calendar
+ * @param height Height of the calendar
+ *#
+#macro(googlecalprivatesize $id $token $width $height)
+#if($width=="")
+#set($width = "800")
+#end
+#if($height=="")
+#set($height = "600")
+#end
+{pre}
+<iframe src="http://www.google.com/calendar/embed?pvttk=${token}&amp;height=${height}&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=${id.replaceAll("@","%40")}&amp;color=%232952A3" style=" border-width:0 " width="${width}" height="${height}" frameborder="0" scrolling="no"></iframe>
+{/pre}
+#end
+
+#**
+ * Displays a public or private google calendar with a wide range of settings
+ * You can check the effect of these settings using the Google Calendar Embed Helper
+ * http://www.google.com/calendar/embedhelper
+ *
+ * @param id ID of the google account to display the calendar for
+ * @param token Private token giving access to the Calendar. This token is 32 chars long and can be retrieved in the "Agenda Details" when accessing your "Private URL" of your calendar. You should use this parameter with care as it will display all your calendar events to anybody that can access the page in which you use this macro
+ * @param width Width of the calendar
+ * @param height Height of the calendar
+ * @param showTitle 0 to not show the title
+ * @param showNav 0 to not show the navigation buttons allowing to switch to previous/next week or month
+ * @param showDate 0 to not show the current period displayed
+ * @param showPrint 0 to not show the print button
+ * @param showTabs 0 to not show the tabs allowing to switch between MONTH,WEEK,AGENDA mode
+ * @param showCalendars 0 to not show the calendars list drop down button
+ * @param showTz Show a message saying the timezone of the dates/hours
+ * @param mode Default mode to display (empty is Month display, WEEK is Week dispaly, AGENDA is the event display)
+ * @param language Language to display in (en,fr,de,..)
+ * @param bgcolor Background color of the calendar in the form #255455
+ * @param color Color of the events in the form #234567
+ * @param ctz Timezone in which to display the calendar. Leave empty for default calendar Timezone
+ * @param border Border in pixels (1,2,3)
+ *#
+#macro(googlecalcustom $id $token $width $height $showTitle $showNav $showDate $showPrint $showTabs $showCalendars $showTz $mode $language $bgcolor $color $ctz $border)
+#if($width=="")
+#set($width = "800")
+#end
+#if($height=="")
+#set($height = "600")
+#end
+#if($color!="")
+#set($color = $color.replaceAll("#","%23"))
+#else
+#set($color = "%232952A3")
+#end
+#if($bgcolor!="")
+#set($bgcolor = $bgcolor.replaceAll("#","%23"))
+#else
+#set($bgcolor = "%232952A3")
+#end
+{pre}
+<iframe src="//www.google.com/calendar/embed?showTitle=${showTitle}&amp;showNav=${showNav}&amp;showDate=${showDate}&amp;showPrint=${showPrint}&amp;showTabs=${showTabs}&amp;showCalendars=${showCalendars}&amp;showTz=${showTz}&amp;mode=${mode}&amp;height=${height}&amp;wkst=2&amp;hl=${language}&amp;bgcolor=${bgcolor}&amp;src=${id.replaceAll("@","%40")}&amp;color=${color}&amp;ctz=${ctz}" style=" border:solid ${border}px #777 " width="${width}" height="${height}" frameborder="0" scrolling="no"></iframe>
+{/pre}
+#end
+#**
+ * Displays a list of documents.
+ * Only documents that the current user is allowed to view will be displayed.
+ *
+ * @param docNames list of document names.
+ * @param displaySpaces true to group documents by space.
+ * @param blacklistedSpaces spaces to exclude from the list.
+ *#
+#macro(displayDocumentList $docNames $displaySpaces $blacklistedSpaces)
+  #set($documentList = [])
+  #foreach($docName in $docNames)
+    #if($xwiki.hasAccessLevel("view", $xcontext.user, $docName))
+      #set($document = $xwiki.getDocument($docName).getTranslatedDocument())
+      #if(!$blacklistedSpaces.contains($document.getSpace()))
+        #set($discard = $documentList.add($document))
+      #end
+    #end
+  #end
+  #if($documentList.size() > 0)
+    #set($previousSpace = "")
+    <ul class="xlist">
+      #foreach($document in $documentList)
+        #if ($document.getSpace() != $previousSpace && $displaySpaces)
+          #if($velocityCount > 1) </ul></div></li> #end ## Close previous space item if needed
+          <li class="xitem space"><div class="xitemcontainer">${escapetool.xml($document.getSpace())}<ul class="xlist"> ## Open new space item
+          #set($previousSpace = $document.getSpace())
+        #end
+        <li class="xitem page"><div class="xitemcontainer"><a href="$document.getURL()">${escapetool.xml($document.getPlainTitle())}</a></div></li>
+      #end
+      #if($displaySpaces)
+        </ul></div></li> ## Close last space item
+      #end
+    </ul>
+  #end
+#end
+#**
+ * Set a variable from request parameters.
+ * If the parameter is not present in the request, set it to the default value.
+ *
+ * Note that request parameters will be cast to the type of the defaultValue.
+ * Handled types: ArrayList, Boolean, Integer, Float, Long, Double.
+ *
+ * @param variable the variable to set.
+ * @param parameterName name of the parameter to look for in the request.
+ * @param defaultValue if the parameter is not set in the HTTP request, the variable is assigned this value.
+ * @deprecated since Velocity 1.7 (XWiki 3.0) it is no longer possible to use macros this way.
+ *     Setting $variable will not be observed outside the macro unless the actual parameter is also called $variable.
+ *     Use #readVariableFromRequest instead.
+ *###
+#macro(setVariableFromRequest $variable $parameterName $defaultValue)
+  ## Trick: when null, "$variable" will print the actual parameter name, so "$abc" if the macro was called with $abc as a parameter.
+  ## Use this hack to extract the actual parameter name, and use #evaluate to set it.
+  #set ($variable = $NULL)
+  #set ($varName = "$variable")
+  #readVariableFromRequest($varName $parameterName $defaultValue)
+#end
+##
+##
+##
+#**
+ * Set a variable from request parameters.
+ * If the parameter is not present in the request, set it to the default value.
+ *
+ * Note that request parameters will be cast to the type of the defaultValue.
+ * Handled types: ArrayList, Boolean, Integer, Float, Long, Double.
+ *
+ * @param resultVariableName the name of the variable to set, a String; when the macro returns, a variable named that way will be created with the output value
+ * @param parameterName name of the parameter to look for in the request.
+ * @param defaultValue if the parameter is not set in the HTTP request, the variable is assigned this value.
+ *###
+#macro(readVariableFromRequest $resultVariableName $parameterName $defaultValue)
+  ## Try to get the variable value from HTTP request.
+  #if ($defaultValue.class == 'class java.util.ArrayList')
+    #set ($result = [])
+    #foreach ($param in $request.getParameterValues($parameterName))
+      #set ($discard = $result.add($param))
+    #end
+    #if ($result.size() == 0)
+      #set ($discard = $result.addAll($defaultValue))
+    #end
+  #else
+    #set ($result = $request.getParameter("${parameterName}"))
+    #if ("$!result" != '')
+      #if ($defaultValue.class == 'class java.lang.Boolean')
+        #set ($result = $util.parseBoolean($result))
+      #elseif ($defaultValue.class == 'class java.lang.Integer')
+        #set ($result = $mathtool.toInteger($result))
+      #elseif ($defaultValue.class == 'class java.lang.Float')
+        #set ($result = $mathtool.toNumber($result).floatValue())
+      #elseif ($defaultValue.class == 'class java.lang.Long')
+        #set ($result = $mathtool.toNumber($result).longValue())
+      #elseif ($defaultValue.class == 'class java.lang.Double')
+        #set ($result = $mathtool.toDouble($result))
+      #end
+    #end
+    #if ("$!result" == '')
+      #set ($result = $defaultValue)
+    #end
+  #end
+  #setVariable($resultVariableName $result)
+#end
+##
+##
+##
+#**
+ * Assign a value to a variable, given by its name. The purpose of this macro is to emulate call by macro expansion,
+ * which was available in velocity versions up to 1.6, but was removed in 1.7.
+ *
+ * @param variableName the name of the variable to set, a String; when the macro returns, a variable named that way will be created with the output value
+ * @param value the value to assign
+ *###
+#macro(setVariable $variableName $value)
+## Only do this if the variable name is really a valid variable name
+#if ($variableName.matches('[a-zA-Z_][a-zA-Z0-9_-]*'))
+#evaluate("${escapetool.h}set(${escapetool.d}${variableName}=${escapetool.d}value)")
+#elseif ($variableName.matches('\$[a-zA-Z_][a-zA-Z0-9_-]*'))
+#evaluate("${escapetool.h}set(${variableName}=${escapetool.d}value)")
+#end
+#end
+##
+##
+##
+#**
+ * Displays a submit button, i.e. an <tt>input</tt> element with <tt>type=submit</tt>.
+ * For styling purposes, the button is wrapped in a span element.
+ * @param name The value of the <tt>name</tt> attribute
+ * @param shortcut The keyboard shortcut for this button. The value will be displayed
+ *        as the title of the element. The actual shortcut is attached elsewhere, in
+ *        the javascript code.
+ * @param value The value of the <tt>value</tt> attribute, i.e. the text displayed on
+ *        the button.
+ *#
+#macro(submitButton $name $shortcut $value)
+<span class="buttonwrapper"><input class="button" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$shortcut"#end value="$value"/></span>
+#end
+#**
+ * Displays a submit button for the editor. This macro calls submitButton,
+ * composing all its parameters based on the action's identifier and the
+ * identifier of the corresponding localized resources.
+ * @param action The identifier of the button's action.
+ * @param resourceIdentifier The key used to identify the localized resources.
+ *#
+#macro(editActionButton $action $resourceIdentifier)
+#submitButton("action_${action}", $services.localization.render("core.shortcuts.edit.${resourceIdentifier}"), $services.localization.render($resourceIdentifier))
+#end
+
+#**
+ * Display a human-readable file size
+ *
+ * @param $size the size in bytes to display in a human readable format
+ *#
+#macro(dynamicsize $sz)
+#if($sz < 1024)
+$sz bytes##
+#else
+#set($ksz = $mathtool.div($sz, 1024))
+#set($ksz = $mathtool.roundTo(1, $ksz))
+#if($ksz < 1024)
+${ksz}kb##
+#else
+#set($Msz = $mathtool.div($sz, 1048576))
+#set($Msz = $mathtool.roundTo(1, $Msz))
+${Msz}Mb##
+#end##
+#end##
+#end
+
+#**
+ * AJAX Live table that displays XWiki data.
+ *
+ * Example of usage, in syntax 2.0:
+ * <code>
+ * {{velocity}}
+ * #set($columns = [ "_avatar", "first_name", "last_name", "email"])
+ * #set($columnsProperties = {
+ *                  "first_name" : { "type" : "text" , "size" : 10, "link" : "view"},
+ *                  "last_name" : { "type" : "text" , "size" : 10, "link" : "view"},
+ *                  "email" : { "type" : "text" , "size" : 20, "link" : "editor"},
+ *                  "_avatar" : { "type" : "none" , "size" : 20, "link" : "none", "html" : "true", "sortable":false }
+ *                })
+ * #set($options = {  "className":"XWiki.XWikiUsers",
+ *                    "translationPrefix" : "platform.index.",
+ *                    "tagCloud" : true,
+ *                    "rowCount": 15,
+ *                    "javascriptName" : "MyModule.myTable",
+ *                    "description: "The description of this table here", })
+ * #livetable("userstable" $columns $columnsProperties $options)
+ * {{/velocity}}
+ * </code>
+ *
+ * @param divid the id of the table div
+ * @param collist the column list
+ * @param colprops the columns properties
+ * @param options the livetable options.
+ *#
+#macro(livetable $divid $collist $colprops $options)
+## Do not indent:
+#if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0")
+
+
+{{html}}
+#else {pre} #end
+  ##
+  ## SX deps.
+  ##
+  #set($ok = $xwiki.jsfx.use('js/xwiki/table/livetable.js', true))
+  #set($ok = $xwiki.ssfx.use('js/xwiki/table/livetable.css', true))
+  ##
+  ## Options / defaults
+  ##
+  #if("$!options.translationPrefix" != '') #set($transprefix = $options.translationPrefix) #else #set($transprefix = '') #end
+  #if("$!options.selectedColumn" != '')  #set($selectedColumn = $options.selectedColumn) #end
+  #if("$!options.defaultOrder" == 'desc') #set($defaultOrder = 'desc') #else #set($defaultOrder = 'asc') #end
+  #if("$!options.rowCount" != '') #set($count = $options.rowCount) #else #set($count = 15) #end
+  #if("$!options.maxPages" != '') #set($maxPages = $options.maxPages) #else #set($maxPages = 10) #end
+  #if("$!options.selectedColumn" != '') #set($selectedColumn = $options.selectedColumn) #end
+  #if("$!options.callback" != '') #set($callback = $options.callback) #end
+  #if("$!options.tagCloud" == '' || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
+  #if ($options.selectedTags && $options.selectedTags.size() > 0)
+    #set ($selectedTags = $options.selectedTags)
+  #else
+    #set ($selectedTags = [])
+  #end
+  #if("$!options.javascriptName" != '') #set($jsName = $options.javascriptName) #else #set($jsName = "livetable_$divid") #end
+  #if("$!options.topFilters" != '') #set($topfilters = $options.topFilters) #end
+  #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
+  #if("$!options.pageSizeBounds" != '') #set($pageSizeBounds = $options.pageSizeBounds) #end
+  #if("$!options.queryFilters" != '')
+    #set ($queryFilters = $!options.queryFilters)
+  #else
+    #set ($queryFilters = 'currentlanguage,hidden')
+  #end
+  #set($classname = "$!options.className")
+  ##
+  ## Columns informations
+  ##
+  #set ($dataColumns = [])
+  #set ($classParams = {})
+  #foreach($colname in $collist)
+    #if("$!selectedColumn" == '' && !$colname.startsWith('_'))
+      #set($selectedColumn = $colname)
+    #end
+    #if($colname != '_actions')
+      #set ($discard = $dataColumns.add($colname))
+      #set($propClassName = "$!{colprops.get($colname).get('class')}")
+      #if($propClassName != '')
+        #set ($discard = $classParams.put("${colname}_class", $propClassName))
+      #end
+    #end
+  #end
+  #if("$!options.url" != '')
+    #set($dataurl = $options.url)
+  #else
+    #set ($parameters = {
+      'outputSyntax': 'plain',
+      'transprefix': $transprefix,
+      'classname': $classname,
+      'collist': $stringtool.join($dataColumns, ','),
+      'queryFilters': $queryFilters
+    })
+    #set ($discard = $parameters.putAll($classParams))
+    #set ($resultPage = $options.resultPage)
+    #if ("$!resultPage" == '')
+      #set ($resultPage = 'XWiki.LiveTableResults')
+    #end
+    #set ($dataurl = $xwiki.getURL($resultPage, 'get', "$escapetool.url($parameters)&$!options.extraParams"))
+  #end
+  ##
+  ## HTML Table
+  ##
+<div class="xwiki-livetable-container">
+  #if("$!topfilters" !='') #set($hasTopFilters = true) #else #set($hasTopFilters = false) #end
+  #if($tagcloud || $hasTopFilters)
+  <div class="tipfilters">
+  #end
+  #if($hasTopFilters)
+  <div id="${divid}-topfilters" class="xwiki-livetable-topfilters-tip #if($tagcloud)splitted#end">
+    <div>
+      <div class="xwiki-livetable-topfilters-container">
+      $topfilters
+      </div>
+      <div class="tippointer">
+        <div></div>
+      </div>
+    </div>
+  </div>
+  #end
+  #if($tagcloud)
+    #set($discard = $xwiki.ssx.use('XWiki.TagCloud'))
+    <div id="${divid}-tagcloud" class="xwiki-livetable-tagcloud-tip hidden #if($hasTopFilters)splitted#end">
+      <div>
+        <div class="xwiki-livetable-tagcloud-container">
+          <h2>$services.localization.render('platform.livetable.tagsHelp')
+            <span>$services.localization.render('platform.livetable.tagsHelpCancel')</span>
+          </h2>
+          <div class="xwiki-livetable-tagcloud"></div>
+        </div>
+        <div class="tippointer">
+          <div></div>
+        </div>
+      </div>
+    </div>
+  #end
+  #if($tagcloud || $hasTopFilters)
+  </div>
+  #end
+  <table id="${divid}" class="xwiki-livetable"#if("$!options.description" != '') summary="$options.description"#end>
+    <tr>
+      <td class="xwiki-livetable-pagination">
+        <span id="${divid}-limits" class="xwiki-livetable-limits"></span>
+  #if($hasPageSize)
+        <span id="${divid}-pagesize" class="xwiki-livetable-pagesize">
+            <span>$services.localization.render('platform.livetable.pagesizeLabel')</span>
+            <span class="xwiki-livetable-pagesize-content" ></span>
+        </span>
+  #end
+        <span id="${divid}-ajax-loader" class="xwiki-livetable-loader hidden">
+          <img src="$xwiki.getSkinFile('icons/xwiki/ajax-loader-large.gif')" alt="$services.localization.render('platform.livetable.loading')" title="" />
+        </span>
+        <span class="controlPagination">
+          <a title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPagePrevTitle')</span></a>
+          <a title="$services.localization.render('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPageNextTitle')</span></a>
+        </span>
+        <span class="pagination">
+          <span class="xwiki-livetable-pagination-text">$services.localization.render('platform.livetable.paginationPage')</span>
+          <span class="xwiki-livetable-pagination-content" ></span>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td class="xwiki-livetable-display-container">
+        <table class="xwiki-livetable-display">
+          <thead class="xwiki-livetable-display-header">
+            <tr>
+            #set($columnCount = 0)
+            #foreach($colname in $collist)
+              #set($colprop = $colprops.get($colname))
+              #if(("$!colprop.filterable" == '' || $colprop.filterable != false) && "$!colname" != '_actions')
+                #set($isFilterable = true)
+              #else
+                #set($isFilterable = false)
+              #end
+              #if(("$!colprop.sortable" == '' || $colprop.sortable != false) && "$!colname" != '_actions')
+                #set($isSortable = true)
+              #else
+                #set($isSortable = false)
+              #end
+              ## Determine the name to be displayed in the column header. Strategy is as following :
+              ## - If defined the displayName passed as a column option wins
+              ## - If not, and if a i18n prefix has been passed, we use the localization tool with the prefix + the column name
+              ## - Finally, we fall back on the column name
+              #if("$!colprop.displayName" != '')
+                #set($displayName = $colprop.displayName)
+              #elseif($transprefix != '')
+                #set($displayName = $services.localization.render("${transprefix}${colname}"))
+              #else
+                #set($displayName = $colname)
+              #end
+              <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end#if ($colname == '_avatar') avatar#end" scope="col">
+                #if($isSortable)<a rel="${colname}">#end
+                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${divid}-filter-${velocityCount}">#end
+                $displayName
+                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))</label>#end
+                #if($isSortable)</a>#end
+                #set($columnCount = $mathtool.add($columnCount, 1))
+              </th>
+            #end
+            </tr>
+            <tr class="xwiki-livetable-display-filters">
+            #foreach($colname in $collist)
+              #set($colprop = $colprops.get($colname))
+              #if(("$!colprop.filterable" == '' || $colprop.filterable != false) && "$!colname" != '_actions')
+                #set($isFilterable = true)
+              #else
+                #set($isFilterable = false)
+              #end
+              #if("$!colprop.type" == 'list' && $isFilterable)
+                <td class="xwiki-livetable-display-header-filter">
+                #if($colprop.get('class'))
+                  #set($propClassName = $colprop.get('class'))
+                #else
+                  #set($propClassName = $classname)
+                #end
+                #set($class = $xwiki.getDocument($propClassName).getxWikiClass())
+                #set($list = '')
+                #set($list = $class.get($colname).getListValues())
+                <select id="xwiki-livetable-${divid}-filter-${velocityCount}" name='${colname}'><option value=''>$services.localization.render('platform.livetable.selectAll')</option>
+                #set($map = $class.get($colname).getMapValues())
+                #foreach($listitem in $list)
+                  #set ($l10n_key = "${propClassName}_${colname}_${listitem}")
+                  #set ($l10n_value = $services.localization.render($l10n_key))
+                  #if ($l10n_value == $l10n_key)
+                    #set ($l10n_value = $map.get($listitem).getValue())
+                  #end
+                  <option value="$listitem">$l10n_value</option>
+                #end
+                </select>
+                </td>
+              #elseif(("$!colprop.type" == 'text' || "$!colprop.type" == 'number') && $isFilterable)
+                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("!$colprop.size" != '') size="${colprop.size}" title="$services.localization.render('platform.livetable.filtersTitle', [$services.localization.render("${transprefix}${colname}")])"#end /></td>
+              #elseif("$!colprop.type" == 'hidden')
+              #elseif($colname != '_actions' || $hasAdmin)
+              <td class="xwiki-livetable-display-header-filter"></td>
+              #end
+            #end
+            </tr>
+            <tr class="xwiki-livetable-initial-message">
+              <td colspan="${columnCount}">
+                <div class="warningmessage">$services.localization.render('platform.livetable.environmentCannotLoadTableMessage')</div>
+              </td>
+            </tr>
+          </thead>
+          <tbody id="${divid}-display" class="xwiki-livetable-display-body"><tr><td>&nbsp;</td></tr></tbody>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td class="xwiki-livetable-pagination">
+        <span class="controlPagination">
+          <a title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPagePrevTitle')</span></a>
+          <a title="$services.localization.render('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPageNextTitle')</span></a>
+        </span>
+        <span class="pagination">
+          <span class="xwiki-livetable-pagination-text">$services.localization.render('platform.livetable.paginationPage')</span>
+          <span class="xwiki-livetable-pagination-content" ></span>
+        </span>
+      </td>
+    </tr>
+  </table>
+  <div id="${divid}-inaccessible-docs" class="hidden">
+    #info($services.localization.render('rightsmanager.documentrequireviewrights'))
+  </div>
+  <script type="text/javascript">
+  //<![CDATA[
+(function() {
+  function startup() {
+    // Make sure the Livetable widgets exists (It does not in the WYSIWYG for example).
+    if (XWiki && XWiki.widgets && XWiki.widgets.LiveTable) {
+      #set ($liveTableParams = {
+        'maxPages': $maxPages,
+        'limit': $count,
+        'selectedTags': $selectedTags
+      })
+      #if ($hasTopFilters)
+        #set ($discard = $liveTableParams.put('filterNodes', ["$('$divid').down('.xwiki-livetable-display-filters')",
+          "$('${divid}-topfilters')"]))
+      #end
+      #if ($hasPageSize && "$!pageSizeBounds" != '')
+        #set ($discard = $liveTableParams.put('pageSizeBounds', $pageSizeBounds))
+      #end
+      #set ($callbackParam = "#livetablecallback($divid $collist $colprops $transprefix), ")
+      #if ($callback)
+        #set ($callbackParam = "$callback, ")
+      #end
+      window["$jsName"] = new XWiki.widgets.LiveTable("$dataurl", "${divid}",
+        $callbackParam$jsontool.serialize($liveTableParams));
+      #if ($hasPageSize)
+        document.observe("xwiki:livetable:${divid}:loadingEntries", function() { $('${divid}-pagesize').addClassName("hidden"); } );
+        document.observe("xwiki:livetable:${divid}:loadingComplete", function() { $('${divid}-pagesize').removeClassName("hidden"); } );
+      #end
+      return true;
+    }
+    return false;
+  }
+  // Initialize liveTable
+  (XWiki && XWiki.isInitialized && startup()) || document.observe('xwiki:livetable:loading', startup);
+})();
+   //]]>
+  </script>
+</div> ## xwiki-livetable-container
+  #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
+
+#else {/pre} #end
+#end
+
+#**
+ * Internal macro - Used by the livetable macro to generate a JavaScript anonymous function
+ * that is passed to the LiveTable object constructor. This is function is dynamically written
+ * according to columns properties passed to the livetable macro.
+ *
+ * @param collist the list of columns
+ * @param colprops the columns properties
+ * @param transprefix the translation prefix
+ *
+ * @internal
+ *#
+#macro(livetablecallback $divid $collist $colprops $transprefix)
+function (row, i, table) {
+  // This callback method code has been generated from velocity.
+  var tr = new Element("tr");
+  if (row["doc_viewable"]) {
+  #foreach($colname in $collist)
+    #set($colprop = $colprops.get($colname))
+    // $colname
+    #if("$!colprop.type"!="hidden")
+      #if($colname.indexOf("doc.")==0)
+        #set($jscolname = $colname.replaceAll("doc.", "doc_"))
+      #else
+        #set($jscolname = $colname)
+      #end
+      ## Is the td element bound to a link ?
+      #if("$!colprop.link" != "" && "$!colname" != "_actions")
+        #set($tdClass = "${jscolname} link$!{colprop.link} type$!{colprop.type}")
+        var td = new Element("td", {'class':"$tdClass"});
+        var link = #if("$!colprop.link" != "editor") new Element("a"); #else new Element("span"); #end
+        ## Automatic: the link url is in JSON results, with key column name + "_url"
+        #if("$!colprop.link"=="auto")
+          link.href = (row["${jscolname}_url"]=="") ? row["doc_url"] : row["${jscolname}_url"];
+        #elseif($colprop.link=="field")
+          if (row["${jscolname}_url"] != "") {
+            link.href = row["${jscolname}_url"];
+          }
+        ## Property editor
+        #elseif($colprop.link=="editor")
+          #if($colprop.get("class"))
+            #set($propClassName = $colprop.get("class"))
+          #else
+            #set($propClassName = $className)
+          #end
+          td.observe("click", function(event){
+            var tag = event.element().down("span");
+            if (!tag)
+             tag = event.element();
+            editProperty(row["doc_fullName"], "${propClassName}", "${colname}", function(value) { tag.innerHTML = value});
+          });
+        ## Author
+        #elseif($colprop.link == "author")
+          link.href = row["doc_author_url"];
+        ## Space URL
+        #elseif($colprop.link == "space")
+          link.href = row["doc_space_url"];
+        ## Wiki URL
+        #elseif($colprop.link == "wiki")
+          link.href = row["doc_wiki_url"];
+        #else
+          link.href = row["doc_url"];
+        #end
+        #if($colprop.html && $colprop.html==true)
+          link.innerHTML = row["${jscolname}"];
+        #else
+          row["${jscolname}"] != undefined && link.update((row["${jscolname}"] + '').escapeHTML());
+        #end
+        td.appendChild(link);
+        tr.appendChild(td);
+      #elseif("$colname" == "_actions")
+        var adminActions = ['admin', 'rename', 'rights'];
+        var td = new Element("td", {'class' : 'actions'});
+        #foreach($action in $colprop.get("actions"))
+          if (row["doc_has${action}"] || '${action}' == 'view' || (row["doc_has${action}"] === undefined && (row["doc_hasadmin"] || adminActions.indexOf('${action}') < 0))) {
+            #if($velocityCount > 1)
+              td.insert(" ");
+            #end
+            #if($transprefix != '' && $services.localization.render("${transprefix}_actions.${action}") != "${transprefix}_actions.${action}")
+              #set($text = $services.localization.render("${transprefix}_actions.${action}"))
+            #elseif($services.localization.render("platform.livetable._actions.${action}") != "platform.livetable._actions.${action}")
+              #set($text = $services.localization.render("platform.livetable._actions.${action}"))
+            #else
+              #set($text = "$action")
+            #end
+            var link = new Element("a", {"href": row["doc_${action}_url"], "class":"action action${action}"}).update("$text");
+            #if("$!colprop.ajaxActions.get($action)" == 'true')
+              link.observe('click', function(event) {
+                event.stop();
+                new Ajax.Request(this.href, {
+                  onSuccess : function() {
+                    $colprop.actionCallbacks.get($action)
+                  }
+                });
+              }.bindAsEventListener(link));
+            #end
+            td.insert(link);
+          }
+        #end
+        tr.appendChild(td);
+      #else
+        #set($tdClass = "${jscolname} link$!{colprop.link} type$!{colprop.type}")
+        var fieldel = new Element("td", {'class':"$tdClass"});
+        #if($colprop.html && $colprop.html==true)
+          fieldel.innerHTML = row["${jscolname}"];
+        #else
+          row["${jscolname}"] != undefined && fieldel.update((row["${jscolname}"] + '').escapeHTML());
+        #end
+        tr.appendChild(fieldel);
+      #end
+    #end
+  #end
+  } else {
+    var documentReference = XWiki.Model.resolve(row['doc_fullName'] || '', XWiki.EntityType.DOCUMENT);
+    var pageName = documentReference.name;
+    var spaceName = documentReference.parent ? documentReference.parent.name : '';
+    #foreach($colname in $collist)
+      // $colname
+      #set($colprop = $colprops.get($colname))
+      #if("$!colprop.type"!="hidden")
+        #if($colname.indexOf("doc.")==0)
+         #set($jscolname = $colname.replaceAll("doc.", "doc_"))
+        #else
+         #set($jscolname = $colname)
+        #end
+        #if($jscolname == "doc_name")
+          tr.insert(new Element("td").update(pageName + "*"));
+        #elseif($jscolname == "doc_space")
+          tr.insert(new Element("td").update(spaceName));
+        #else
+          tr.insert(new Element("td").update(" "));
+        #end
+      #end
+    #end
+    $('${divid}-inaccessible-docs').removeClassName('hidden');
+  }
+  return tr;
+}
+#end
+##
+##
+#**
+ * Pagination 2.0
+ *
+ * Displays a generic pagination widget for browsing a collection of items.
+ * The macro is responsible for displaying browsing links, and does not involve the actual display of the browsed items.
+ *
+ * @param parameters A map of parameters:
+ * <dl>
+ *   <dt>url</dt>
+ *   <dd>The base url of the document displaying the collection.</dd>
+ *   <dd>Default: $doc.getURL('view')</dd>
+ *   <dt>totalItems</dt>
+ *   <dd>The total number number of items in the collection.</dd>
+ *   <dd>Default: none, this parameter is mandatory.</dd>
+ *   <dt>defaultItemsPerPage</dt>
+ *   <dd>The number of items per page. This value is overwritten by the request parameter "perPage", if it exists and
+ *       has a valid positive integer value.</dd>
+ *   <dd>Default: 20</dd>
+ *   <dt>position</dt>
+ *   <dd>The placement of the pagination widget. Supported values: "top", "bottom". The bottom widget only displays
+ *       pages, while the top widget also provides a information about the item range on the current page.</dd>
+ *   <dd>Default: top</dd>
+ *   <dt>itemParamName</dt>
+ *   <dd>The name of the request parameter for the index of the first displayed item.</dd>
+ *   <dd>Default: firstIndex</dd>
+ *   <dt>itemsPerPageParamName</dt>
+ *   <dd>The name of the request parameter for the number of items displayed on a page.</dd>
+ *   <dd>Default: perPage</dd>
+ *   <dt>noSx</dt>
+ *   <dd>Do not force to use the pagination Skin Extension</dd>
+ *   <dd>Default: false</dd>
+ *   <dt>hash</dt>
+ *   <dd>An optional URL hash to be appended to all pagination links generated by this macro.</dd>
+ *   <dd>Default: none</dd>
+ * </dl>
+ *#
+#macro(pagination $parameters)
+  #if(!$parameters.noSx)
+  $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
+  #end
+  #if("$!{parameters.url}" == '')
+    #set($parameters.url = $doc.getURL('view'))
+  #end
+  #if(!$parameters.url.contains('?'))
+    #set($parameters.url = "${parameters.url}?")
+  #end
+  #if($parameters.position != 'bottom')
+    #set($parameters.position = 'top')
+  #end
+  #paginationPrepareParams($parameters)
+  #paginationDisplay($parameters)
+#end
+#**
+ * Pagination : request parameters preparation
+ *
+ * Used internally by the pagination macro. Retrieves pagination parameter values from the request:
+ * "firstIndex" = the index of the first displayed item; "perPage" = number of items per page
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationPrepareParams $parameters)
+  ## Setting some defaults
+  #if("$!{parameters.itemParamName}" == '')
+    #set($parameters.itemParamName = 'firstIndex')
+  #end
+  #if("$!{parameters.itemsPerPageParamName}" == '')
+    #set($parameters.itemsPerPageParamName = 'perPage')
+  #end
+  ## Adding the hash sign to the hash parameter if it is not present already
+  #if("$!{parameters.hash}" != '' && !$parameters.hash.startsWith($escapetool.H))
+    #set($parameters.hash = "${escapetool.H}${parameters.hash}")
+  #end
+  ## Get starting item number from request
+  #set ($parameters.firstItem = "$!{request.get($parameters.itemParamName)}")
+  #set ($parameters.firstItem = $mathtool.toInteger($parameters.firstItem))
+  #if (!$parameters.firstItem)
+    #set ($parameters.firstItem = 0)
+  #end
+  ## Get number of items per page from request
+  #if (!$parameters.defaultItemsPerPage || $mathtool.toInteger($parameters.defaultItemsPerPage) <= 0)
+    #set ($parameters.defaultItemsPerPage = 20)
+  #end
+  #set ($parameters.itemsPerPage = "$!{request.get($parameters.itemsPerPageParamName)}")
+  #set ($parameters.itemsPerPage = $mathtool.toInteger($parameters.itemsPerPage))
+  #if (!$parameters.itemsPerPage || $parameters.itemsPerPage <= 0)
+    #set ($parameters.itemsPerPage = $parameters.defaultItemsPerPage)
+  #end
+#end
+#**
+ * Pagination : display the pagination widget after all parameters have been computed
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationDisplay $parameters)
+  #set($parameters.pageCount = ($parameters.totalItems + $parameters.itemsPerPage - 1) / $parameters.itemsPerPage)
+  #if($parameters.firstItem >= $parameters.totalItems)
+    #set($parameters.firstItem = ($parameters.pageCount - 1) * $parameters.itemsPerPage)
+  #elseif($parameters.firstItem < 0)
+    #set($parameters.firstItem = 0)
+  #end
+  #set($parameters.crtPage = $parameters.firstItem / $parameters.itemsPerPage)
+  ## Make firstItem a multiple of itemsPerPage
+  #set($parameters.firstItem = $parameters.crtPage * $parameters.itemsPerPage)
+  #set($parameters.lastPage = $parameters.pageCount - 1)
+  <div class="paginationFilter">
+    #if($parameters.position == 'top')
+      #paginationResultsRange($parameters)
+    #end
+    #if($parameters.totalItems > 0)
+      #if($parameters.controlsAround == true)
+        #paginationControlLeft($parameters)
+        #paginationPages($parameters)
+        #paginationControlRight($parameters)
+      #else
+        #paginationControl($parameters)
+        #paginationPages($parameters)
+      #end
+    #end
+  </div>
+#end
+#**
+ * Pagination : display links for browsing pages
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationPages $parameters)
+## $url $crtPage $itemsPerPage $lastPage $pageCount $itemParamName $itemsPerPageParamName)
+  #set($contextLeft  = 4)
+  #set($contextRight = 4)
+  #set($contextWidth = $contextLeft + 1 + $contextRight)
+  #if($parameters.pageCount <= $contextWidth)
+    #set($contextFirstPage = 0)
+    #set($contextLastPage = $parameters.pageCount - 1)
+  #else
+    #set($contextFirstPage = $parameters.crtPage - $contextLeft)
+    #set($contextLastPage = $parameters.crtPage + $contextRight)
+    #if($contextFirstPage < 0)
+      #set($contextFirstPage = 0)
+    #end
+    #if($contextLastPage >= $parameters.pageCount)
+      #set($contextLastPage = $parameters.pageCount - 1)
+    #end
+    #if($contextLastPage < $contextWidth)
+      #set($contextLastPage = $contextWidth - 1)
+    #end
+    #if($contextFirstPage > $parameters.pageCount - $contextWidth)
+      #set($contextFirstPage = $parameters.pageCount - $contextWidth)
+    #end
+  #end
+  <span class="pagination">$services.localization.render('platform.livetable.paginationPage')
+  #if($contextFirstPage != 0)
+    #paginationPageLink(0 $parameters)
+  #end
+  #if($contextFirstPage > 1) ... #end
+  #foreach ($i in [$contextFirstPage .. $contextLastPage])
+    #paginationPageLink($i $parameters)
+  #end
+  #if($parameters.lastPage - $contextLastPage > 1) ... #end
+  #if($contextLastPage != $parameters.lastPage)
+    #paginationPageLink($parameters.lastPage $parameters)
+  #end
+  </span>
+#end
+#**
+ * Pagination : display the link to a certain page (indicated by $pageNumber)
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationPageLink $pageNumber $parameters)
+  #set($firstItem = $pageNumber * $parameters.itemsPerPage)
+  #set($displayedPageNumber = $pageNumber + 1)
+  #if($pageNumber == $parameters.crtPage)
+  <span class="currentPage">$displayedPageNumber</span>
+  #else
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$services.localization.render('platform.livetable.paginationPageTitle', [$displayedPageNumber])">$displayedPageNumber</a>
+  #end
+#end
+#**
+ * Pagination : display prev / next links
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationControl $parameters)
+  <span class="controlPagination">
+  #paginationControlLeft($parameters)
+  #paginationControlRight($parameters)
+  </span>
+#end
+#**
+ * Pagination : display prev link
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationControlLeft $parameters)
+  #if($parameters.crtPage > 0)
+    #set($prevPage = $parameters.crtPage - 1)
+    #set($firstItem = $prevPage * $parameters.itemsPerPage)
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination">$services.localization.render('platform.livetable.paginationPagePrevious')</a>
+  #else
+    <span class="noPrevPagination"> </span>
+  #end
+#end
+#**
+ * Pagination : display next link
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationControlRight $parameters)
+  #if($parameters.crtPage < $parameters.lastPage)
+    #set($nextPage = $parameters.crtPage + 1)
+    #set($firstItem = $nextPage * $parameters.itemsPerPage)
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end$!{parameters.hash}" title="$services.localization.render('platform.livetable.paginationPageNextTitle')" class="nextPagination">$services.localization.render('platform.livetable.paginationPageNext')</a>
+  #else
+    <span class="noNextPagination"> </span>
+  #end
+#end
+#**
+ * Pagination : message informing the user which items are being displayed on the current page (Results i - j of N)
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationResultsRange $parameters)
+  #set($from = $parameters.firstItem + 1)
+  #set($to =   $parameters.firstItem + $parameters.itemsPerPage)
+  #if ($to > $parameters.totalItems)
+    #set($to = $parameters.totalItems)
+  #end
+  <span class="resultsNo">
+  #if($parameters.totalItems == 0)
+    <span class='currentResultsNo'>$services.localization.render('platform.livetable.paginationResultsNone')</span>
+  #elseif($parameters.totalItems == 1)
+    <span class='currentResultsNo'>$services.localization.render('platform.livetable.paginationResultsOne')</span>
+  #elseif($from == $parameters.totalItems)
+    $services.localization.render('platform.livetable.paginationResultsSingle', [$from, $parameters.totalItems])
+  #else
+    $services.localization.render('platform.livetable.paginationResultsMany', [$from, $to, $parameters.totalItems])
+  #end
+  </span>
+#end
+
+#**
+  * Hides the element that will be replaced by the WYSIWYG editor and shows the loading animation instead.
+  *
+  * @param $fieldId identifies the form field that will be replaced by the WYSIWYG editor
+  *#
+#macro(wysiwyg_hide $fieldId)
+<script type="text/javascript">
+//<![CDATA[
+(function() {
+  var field = document.getElementById('$!{fieldId}');
+  if (field) {
+    // Hide the element that will be wrapped by the WYSIWYG editor.
+    field.style.visibility = 'hidden';
+    // Show the loading animation.
+    var loading = document.createElement('span');
+    loading.className = 'loading';
+    loading.style.display = 'block';
+    loading.style.position = 'absolute';
+    loading.style.width = field.offsetWidth + 'px';
+    loading.style.height = field.offsetHeight + 'px';
+    field.parentNode.insertBefore(loading, field);
+    var removeLoadingAnimation = function() {
+      // Remove the loading animation after the editor code has been loaded or if it can't be loaded.
+      var callback = function() {
+        loading.parentNode.removeChild(loading);
+      };
+      if (typeof Wysiwyg == 'object' && Wysiwyg) {
+        Wysiwyg.onModuleLoad(callback);
+      } else {
+        field.style.visibility = 'visible';
+        callback();
+      }
+      return true;
+    };
+    (XWiki.domIsLoaded && removeLoadingAnimation()) || document.observe('xwiki:dom:loaded', removeLoadingAnimation);
+  }
+})(XWiki || {});
+//]]>
+</script>
+#end
+
+#**
+  * Imports the JavaScript files required by the WYSIWYG editor.
+  *
+  * @param $lazy {@code true} to download the WYSIWYG code only when it is needed, {@code false} to download it when the page is loaded
+  *#
+#macro(wysiwyg_import $lazy)
+## SmartClient (used by the XWikiExplorer)
+## NOTE: We can't defer the SmartClient loading because it uses document.write() to load stylesheets in IE.
+$xwiki.jsfx.use("js/smartclient/initsc.js", {'forceSkinAction': true, 'defer': false})
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Core.js", {'defer': false})
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Foundation.js", {'defer': false})
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Containers.js", {'defer': false})
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Grids.js", {'defer': false})
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Forms.js", {'defer': false})
+$xwiki.jsfx.use("js/smartclient/modules/ISC_DataBinding.js", {'defer': false})
+$xwiki.jsfx.use("js/smartclient/skins/Enterprise/load_skin.js", {'defer': false})
+## XWikiExplorer (used by the link plug-in)
+$xwiki.jsfx.use("js/xwiki/xwikiexplorer/xwikiexplorer.js", true)
+## WYSIWYG
+$xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {'forceSkinAction': true, 'lazy': $lazy})
+#end
+
+#**
+  * Displays the ConversionFilter error for the specified field, if any. The ConversionFilter is executed before the
+  * SaveAction and converts the HTML output of all the WYSIWYG editors to the corresponding storage syntax. If the
+  * ConversionFilter catches any exception during the convesion then it redirects the request back preventing the user
+  * from loosing unsaved changes and allowing us to display the exception.
+  *
+  * @param $parameters WYSIWYG editor configuration parameter map including the id of the field for which to display the
+  *                    conversion errors
+  *#
+#macro(wysiwyg_displayConversionError $parameters)
+#set($fieldId = $parameters.hookId)
+#if("$!{request.key}" != "")
+#set($sessionErrors = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.server.converter.errors"))
+#if($sessionErrors && $sessionErrors.containsKey($request.key))
+#set($requestErrors = $sessionErrors.get($request.key))
+#if($requestErrors && $requestErrors.containsKey($fieldId))
+#set($fieldError = $requestErrors.get($fieldId))
+#if($fieldError)
+#set($ok = $parameters.put('inputURL', $editedDocument.getURL('edit', $escapetool.url({
+  'xpage': 'wysiwyginput',
+  'token': $services.csrf.token,
+  'key': $request.key,
+  'field': $fieldId
+}))))
+#error("${fieldId}: ${fieldError.message}")
+#set($ok = $requestErrors.remove($fieldId))
+#if($requestErrors.isEmpty())
+#set($ok = $sessionErrors.remove($request.key))
+#end
+#end
+#end
+#end
+#end
+#end
+
+#**
+  * Creates the input hidden whose value will be used to cache the state of the WYSIWYG editor in order to preserve it
+  * when the user navigates away from the edit page and restore it when the user comes back.
+  *
+  * @param $parameters WYSIWYG editor configuration parameter map to put the cache id in
+  *#
+#macro(wysiwyg_createCache $parameters)
+#set($ok = $parameters.put('cacheId', "wysiwygCache$!{util.generateRandomString(4)}"))
+## HACK: We use a text input hidden through CSS instead of a hidden input because Chrome doesn't cache hidden inputs.
+## See http://code.google.com/p/chromium/issues/detail?id=105362
+<label for="$!{parameters.cacheId}" class="hidden"><input type="text" id="$!{parameters.cacheId}"/></label>
+#end
+
+#**
+  * Writes the WYSIWYG configuration parameters to a JavaScript variable.
+  *
+  * @param $jsVarName the name of the JavaScript variable to write the WYSIWYG configuration parameter to
+  * @param $parameters WYSIWYG editor configuration parameters
+  *#
+#macro(wysiwyg_writeConfig $jsVarName $parameters)
+<script type="text/javascript">
+//<![CDATA[
+var $jsVarName = {
+#set($separator = '')
+#foreach($entry in $parameters.entrySet())
+#if($entry.value || "$!entry.value" != '')
+  ${separator}$entry.key: '$!{escapetool.javascript($entry.value)}'
+#set($separator = ',')
+#end
+#end
+};
+//]]>
+</script>
+#end
+
+#**
+  * Stores the WYSIWYG configuration in a map of (parameter, value) pairs.
+  *
+  * @param $parameters the map of parameters where the WYSIWYG configuration will be stored
+  * @param $editedDocument the document being edited
+  * @param $fieldId identifies the form field to be replaced by the WYSIWYG editor
+  * @param $full {@code true} to use a fully-fledged editor, {@code false} to use the compact editor
+  *#
+#macro(wysiwyg_storeConfig $parameters $editedDocument $fieldId $full)
+#if(!$parameters.containsKey('hookId'))
+  #set($ok = $parameters.put('hookId', $fieldId))
+#end
+#set($ok = $parameters.put('syntax', $editedDocument.syntax.toIdString()))
+#set($ok = $parameters.put('convertInput', true))
+#set($ok = $parameters.put('inputURL', $editedDocument.getURL('edit', "xpage=wysiwyginput&token=${services.csrf.getToken()}")))
+#if($full)
+  #set($ok = $parameters.put('displayTabs', $services.wysiwyg.config.isSourceEditorEnabled()))
+  #if($parameters.displayTabs)
+    #set($ok = $parameters.put('defaultEditor', 'wysiwyg'))
+  #end
+#end
+#set($ok = $parameters.put('plugins', $services.wysiwyg.config.getPlugins()))
+#set($ok = $parameters.put('menu', $services.wysiwyg.config.getMenuBar()))
+#set($ok = $parameters.put('toolbar', $services.wysiwyg.config.getToolBar()))
+#if ("$!services.wysiwyg.config.isPasteContentCleanedAutomatically()" == 'false')
+  #set ($ok = $parameters.put('cleanPaste', 'false'))
+#end
+#if("$!services.wysiwyg.config.isAttachmentSelectionLimited()" == 'true')
+  #set($ok = $parameters.put('linkfiles', 'currentpage'))
+#end
+#set($ok = $parameters.put('allowExternalImages', $services.wysiwyg.config.areExternalImagesAllowed()))
+#if("$!services.wysiwyg.config.isImageSelectionLimited()" == 'true')
+  #set($ok = $parameters.put('insertimages', 'currentpage'))
+#end
+#set($ok = $parameters.put('colors', $services.wysiwyg.config.getColorPalette()))
+#set($ok = $parameters.put('colorsPerRow', $services.wysiwyg.config.getColorsPerRow()))
+#set($ok = $parameters.put('fontNames', $services.wysiwyg.config.getFontNames()))
+#set($ok = $parameters.put('fontSizes', $services.wysiwyg.config.getFontSizes()))
+#set($ok = $parameters.put('styleNames', $services.wysiwyg.config.getStyleNames()))
+#set($ok = $parameters.put('historySize', $services.wysiwyg.config.getHistorySize()))
+#set($ok = $parameters.put('wiki', $editedDocument.wiki))
+#set($ok = $parameters.put('space', $editedDocument.space))
+#set($ok = $parameters.put('page', $editedDocument.name))
+#if("$!{services.officemanager.serverState}" == 'Connected')
+  #set($ok = $parameters.put('openofficeServerConnected', 'true'))
+#end
+#if($full && $request.sync)
+  #set($ok = $parameters.put('syncPage', $editedDocument.fullName))
+  #if("$!{request.reset}" != '')
+    #set($ok = $parameters.put('syncReset', $request.reset))
+  #end
+#end
+#if("$!request.debug" != '')
+  #set($ok = $parameters.put('debug', $request.debug))
+#end
+#end
+
+#**
+  * Creates a new WYSIWYG editor instance using the given configuration parameters.
+  *
+  * @param $parameters WYSIWYG editor configuration parameters
+  *#
+#macro(wysiwyg_createEditor $parameters)
+#set($jsVarName = "wysiwygConfig${util.generateRandomString(4)}")
+#wysiwyg_writeConfig($jsVarName $parameters)
+<script type="text/javascript">
+//<![CDATA[
+(function() {
+  var init = function() {
+    // Fail safe if the editor can't be loaded.
+    var editorCanBeLoaded = typeof Wysiwyg == 'object' && Wysiwyg;
+    editorCanBeLoaded && Wysiwyg.onModuleLoad(function() {
+      new WysiwygEditor($jsVarName);
+      $jsVarName = undefined;
+    });
+    return editorCanBeLoaded;
+  };
+  (XWiki.domIsLoaded && init()) || document.observe('xwiki:dom:loaded', init);
+})(XWiki || {});
+//]]>
+</script>
+#end
+
+#**
+  * Loads the GWT-based WYSIWYG editor for the specified object property. The special "content" document property is
+  * also supported.
+  *
+  * @param $editedDocument the document whose objects are being edited
+  * @param $propertyIds A comma separated list of property identifiers. An example of a property identifier is "XWiki.ArticleClass_0_content".
+  * @param $full {@code true} to use a fully-fledged editor, {@code false} to use a compact editor
+  *#
+#macro(wysiwyg_editProperty $editedDocument $propertyId $full)
+#set($parameters = {})
+#wysiwyg_storeConfig($parameters $editedDocument $propertyId $full)
+#wysiwyg_editPropertyCustom($editedDocument $parameters)
+#end
+
+#**
+  * Loads the GWT-based WYSIWYG editor for the specified object property, using the given configuration parameters. The
+  * special "content" document property is also supported.
+  *
+  * @param $editedDocument the document whose objects are being edited
+  * @param $parameters WYSIWYG editor configuration parameters
+  *#
+#macro(wysiwyg_editPropertyCustom $editedDocument $parameters)
+## Hide the plain text area.
+#wysiwyg_hide($parameters.hookId)
+## Import required JavaScript files (lazy=false).
+#wysiwyg_import(false)
+## Display conversion errors, if present.
+#wysiwyg_displayConversionError($parameters)
+## Create the cache.
+#wysiwyg_createCache($parameters)
+## Create the editor UI.
+#wysiwyg_createEditor($parameters)
+#end
+
+#**
+  * Loads the GWT-based WYSIWYG editor for the specified object properties, using the default configuration.
+  *
+  * @param $editedDocument the document whose objects are being edited
+  * @param $propertyIds A comma separated list of property identifiers. An example of a property identifier is "XWiki.ArticleClass_0_content".
+  * @param $full {@code true} to use a fully-fledged editor, {@code false} to use a compact editor
+  *#
+#macro(wysiwyg_editProperties $editedDocument $propertyIds $full)
+#set($parameters = {})
+#wysiwyg_storeConfig($parameters $editedDocument '' $full)
+#wysiwyg_editPropertiesCustom($editedDocument $propertyIds $parameters)
+#end
+
+#**
+  * Loads the GWT-based WYSIWYG editor for the specified object properties, using the given configuration parameters.
+  *
+  * @param $editedDocument the document whose objects are being edited
+  * @param $propertyIds A comma separated list of property identifiers. An example of a property identifier is "XWiki.ArticleClass_0_content".
+  * @param $parameters WYSIWYG editor configuration parameters
+  *#
+#macro(wysiwyg_editPropertiesCustom $editedDocument $propertyIds $parameters)
+#set($instanceParameters = {})
+#set($ok = $instanceParameters.putAll($parameters))
+#set($propertyIds = "$!propertyIds")
+#foreach($propertyId in $propertyIds.split(","))
+#set($ok = $instanceParameters.put('hookId', $propertyId))
+#wysiwyg_editPropertyCustom($editedDocument $instanceParameters)
+#end
+#end
+
+#**
+ * Generates a vertical menu from an object describing the categories
+ *
+ * Expected format of the object:
+ * menu = vector of items
+ * item = map with the following fields:
+ *        'id'       : mandatory
+ *        'name'     : the text displayed for the corresponding menu item;
+ *                     optional, defaults to
+ *                     $services.localization.render("$!{translationPrefix}${item.id}")
+ *        'url'      : the "action" of the menu item; optional, defaults to #
+ *        'cssClass' : a specific css class for the menu item for custom
+ *                     styling; optional, defaults to ''
+ *        'children' : vector of items, allowing to recursively define submenus
+ *
+ * @param $menu the menu object, in the format described above
+ * @param $options a map of options, where the following entries are currently used:
+ *        'translationPrefix' :  the translation prefix added to the id of each
+ *                     item, in order to generate the name; ignored for items whose
+ *                     name is specified
+ *        'crtItemId': identifier of the current menu item (for differential styling)
+ *        'cssClass' : specific css class for this menu
+ *#
+#macro(verticalNavigation $menu $options)
+(% class="vertical-menu $!{options.cssClass}" %)(((
+  #foreach ($item in $menu)
+    #verticalNavigationItem($item '*' $options)
+  #end
+)))
+#end
+
+#**
+ * Generates a vertical menu item from an object (a map)
+ *
+ * Expected format:
+ * item = map with the following fields:
+ *        'id'       : mandatory
+ *        'name'     : the text displayed for the corresponding menu item;
+ *                     optional, defaults to
+ *                     $services.localization.render("$!{translationPrefix}${item.id}")
+ *        'url'      : the "action" of the menu item; optional
+ *        'cssClass' : a specific css class for the menu item for custom
+ *                     styling; optional, defaults to ''
+ *        'children' : vector of items, allowing to recursively define submenus
+ *
+ * @param $item the menu item object, in the format described above
+ * @param $level the current level of the item, of the form '\*+'; the number of
+ *        stars indicates the depth of the item in the menu
+ * @param $options a map of options, where the following entries are currently used:
+ *        'translationPrefix' :  the translation prefix added to the id of each
+ *                     item, in order to generate the name; ignored for items whose
+ *                     name is specified
+ *        'crtItemId': identifier of the current menu item (for differential styling)
+ *#
+#macro(verticalNavigationItem $item $level $options)
+  #set ($class = "$!{item.cssClass}")
+  #set ($hasChildren = ($item.children && $item.children.size() > 0))
+  #if ($hasChildren)
+    #set ($class = "$class group")
+  #end
+  #if ($options.crtItemId == $item.id)
+    #set ($class = "$class current")
+    #if ($hasChildren)
+      #set ($class = "$class current-group")
+    #end
+  #end
+  #set ($class = $class.trim())
+  #set ($name = "$!{item.name}")
+  #if ($name == '')
+    #set ($name = $services.localization.render("$!{options.translationPrefix}${item.id}"))
+  #end
+  $level (% id="vertical-menu-${item.id}" class="${class}" %){{html}}<a #if ("$!{item.url}" != '')href="$item.url"#{end}>$name</a>{{/html}}
+  #if ($hasChildren)
+    #foreach ($child in $item.children)
+      #verticalNavigationItem($child $level.concat('*') $options)
+    #end
+  #end
+#end
+
+#**
+ * Sets a gradient-based styling for CSS backgrounds
+ *
+ *
+ * @param $icon the path to an additional icon image
+ * @param $gradientData a map of gradients, where the following entries are currently used:
+ *        'angle' :  an angle of direction for the gradient
+ *        'colors':  a list of maps of color-stops for the gradient, where the following entries are currently used: 
+ *                'color'    : color value
+ *                'position' : stop position for the color (between 0% and 100% or a lenght)
+ *#
+#macro (css3_backgroundIconAndLinearGradient $icon $gradientData)
+  ## Older color themes don't have values defined for the gradients, so we'll use a simple background-color instead
+  #set ($validColors = 0)
+  #set ($validColor = '')
+  #foreach ($colorEntry in $gradientData.colors)
+    #if ("$!{colorEntry.color}" != '')
+      #set ($validColors = $validColors + 1)
+      #set ($validColor = $colorEntry.color)
+    #end
+  #end
+  #if ($validColors <= 1)
+    #if ("$!{icon}" != '')
+      background-image: ${icon};
+    #end
+    #if ("$!{validColor}" != '')
+      background-color: ${validColor};
+    #end
+    #break($macro)
+  #end
+  #set ($colors = '')
+  #set ($position = '')
+  #if ($gradientData.angle)
+    #if ($stringtool.indexOfAny($gradientData.angle, 'top', 'right', 'bottom', 'left') != -1)
+      #set ($position = "to $!{gradientData.angle}")
+    #else
+      #set ($position = "$!{gradientData.angle}")
+    #end
+  #elseif ($gradientData.to)
+    #set ($position = "to $!{gradientData.to}")
+  #end
+  #foreach ($colorEntry in $gradientData.colors)
+    #set ($colors = "$!{colors}, $!{colorEntry.color} $!{colorEntry.position}")
+  #end
+  #if ("$!{colors}" != '' && "$!{position}" == '')
+    #set ($colors = $colors.substring(2))
+  #end
+  background-image:#if ("$!{icon}" != '') $icon,#end linear-gradient($!{position}$!{colors});
+#end
+##
+##
+##
+#macro (css3_backgroundLinearGradient $gradientData)
+  #css3_backgroundIconAndLinearGradient ('' $gradientData)
+#end
+
+#**
+ * Macro that displays a gradient specific to IE browsers (IE6-IE9)
+ *
+ * @param $startColor initial color for a gradient, format #AARRGGBB, range from #FF000000 to #FFFFFFFF
+ * @param $endColor final color for the gradient
+ *#
+#macro (css_filterGradient $startColor $endColor)
+  #if (("$!{startColor}" != '') && ("$!{endColor}" != ''))
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=${startColor}, endColorstr=${endColor},GradientType=0 );
+  #end
+#end
+
+#**
+ * Macro that adds the prefixes for box-sizing CSS property that alters the default CSS box model used to calculate widths and heights of elements
+ *
+ *
+ * @param $value should take the following values: content-box | padding-box | border-box
+ *#
+#macro (css3_boxSizing $value)
+  #if ("$!{value}" != '')
+    #set ($browserVariants = ['-moz-', ''])
+    #foreach ($bvar in $browserVariants)
+      ${bvar}box-sizing: $value;
+    #end
+  #end
+#end
+
+#**
+ * Macro for text-shadow CSS property that adds shadows to text
+ *
+ *
+ * @param $offsetX shadow's horizontal offset value from the text
+ * @param $offsetY shadow's vertical offset value from the text
+ * @param $blurRadius the blur radius value of the text-shadow
+ * @param $color the color of the text-shadow
+ *#
+#macro (css_textShadow $offsetX $offsetY $blurRadius $color)
+  ## In order to ensure consistency across browsers and also to accommodate old ColorThemes that might not have gradientColor defined, we test the existence of $color param
+  #if (("$!{offsetX}" != '') && ("$!{offsetY}" != '') && ("$!{color}" != ''))
+    text-shadow: ${offsetX} ${offsetY} ${blurRadius} ${color};
+  #end
+#end
+
+#**
+ * Transforms the given string to an XML name by filtering all the characters that are not allowed in an XML name. If
+ * the given string contains only invalid characters then the result is the empty string.
+ *
+ * @param $string the string to be transformed to an XML name
+ *#
+#macro(toXMLName $string)
+## Keep only Unicode letters and digits plus the hyphen and the underscore characters.
+#set($string = $string.replaceAll('[^\p{L}\p{N}_\-]+', ''))
+## Make sure the string doesn't start with a number or the hyphen character.
+#set($string = $string.replaceAll('^[\p{N}\-]+', ''))
+$string##
+#end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the UserPicker.
+ *
+ * @param $sortable whether the list of selected users should be sortable or not
+ *#
+#macro(userPicker_import $sortable)
+  #if ($sortable)
+    ## Needed for sorting the selected values.
+    #set ($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
+  #end
+  ## Needed for displaying a list of suggestions based on the user input (included by default).
+  ##set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true))
+  ##set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggest.js', true))
+  ## Needed for managing the selected values. In single selection mode the value selected from the list of suggestions
+  ## overwrites the previously selected value.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/suggestPicker.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPicker.js', true))
+  ## The actual user picker. Provides a custom display for the user suggestions and selected users.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/userpicker/userPicker.js', true))
+#end
+
+#**
+ * Displays the given title (i.e. the title of the sheet) if the condition is true. Otherwise displays the title of the
+ * current document (i.e. the document the sheet is applied to). If the condition is not specified then it checks if the
+ * current document is a sheet by looking for an object of type 'XWiki.SheetDescriptorClass'. You can pass a traslation
+ * key for the sheet title. This macro makes sure the document title is not displayed recursively.
+ *
+ * @param $title the sheet title, you can pass a translation key
+ * @param $condition optional condition, whether to display the sheet title or the document title
+ *#
+#macro (sheetTitle $title $condition)
+## NOTE: Don't format the code because spaces are preserved in document title.
+#if (!$condition && "$!condition" == '')##
+## Undefined condition. Use the default condition.
+#set ($condition = $doc.getObject('XWiki.SheetDescriptorClass'))
+#end##
+##
+#if ($condition)##
+## Display the sheet title.
+$services.localization.render($title)##
+##
+#elseif (!$sheetTitle_displayingDocumentTitle)##
+## Display the document title without going through the sheet and preventing recursion.
+#set ($sheetTitle_displayingDocumentTitle = true)
+$services.display.title($doc, {'displayerHint': 'default'})##
+#set ($sheetTitle_displayingDocumentTitle = false)
+##
+#else##
+Recursive title display detected!##
+#end##
+#end
+
+#**
+ * Outputs the skin extension hooks, for both Stylesheet and JavaScript extensions. This is useful when the HTML response
+ * of an AJAX request needs to pull some CSS and JavaScript resources. The code that makes the AJAX request should move
+ * the 'includes' (i.e. the link and script tags) to the head of the HTML page after receiving the HTML response.
+ *#
+#macro (skinExtensionHooks)
+  #styleSheetExtensionHooks
+  #javaScriptExtensionHooks
+#end
+
+#**
+ * Hook for inserting CSS skin extensions.
+ *#
+#macro (styleSheetExtensionHooks)
+  ## - Skin JAR extension hook. Placed first to allow other skin extensions to override it.
+  <!-- com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin -->
+  <!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin -->
+  <!-- com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin -->
+#end
+
+#**
+ * Hooks for inserting JavaScript skin extensions.
+ *#
+#macro (javaScriptExtensionHooks)
+  ## - Skin JAR extension hook. Placed first to allow other skin extensions to override it.
+  <!-- com.xpn.xwiki.plugin.skinx.JsResourceSkinExtensionPlugin -->
+  ## - Skin file extension hook.
+  <!-- com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin -->
+  ## - Skin extension hook
+  <!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
+#end

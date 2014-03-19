@@ -28,7 +28,7 @@
 ## Display the title
 ## ----------------------------
 <div class="xcontent">
-  <div class="col-xs-12 col-md-7 row">
+  <div class="col-xs-12 #if($displayContentMenu)col-md-7#end row">
     <div id="document-title" class="col-xs-12"><h1>$titleToDisplay</h1></div>
     <div id="xdocAuthors">
   ##    <div class="xdocCreation">  Creation
@@ -44,7 +44,7 @@
   </div>
   #if($displayContentMenu)
     <div class="col-xs-12 col-md-5">
-      #template("contentmenu.vm")
+      #template("menus/content.vm")
     </div>
   #end
   <div class="col-xs-12">

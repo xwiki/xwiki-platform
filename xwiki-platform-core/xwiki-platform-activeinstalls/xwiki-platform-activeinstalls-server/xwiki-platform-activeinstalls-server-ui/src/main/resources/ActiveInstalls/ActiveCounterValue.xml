@@ -46,6 +46,12 @@
 #set ($now = $xwiki.jodatime.dateTime)
 #set ($threshold = $now.plusDays(-2))
 #set ($formatted = $xwiki.jodatime.getISODateTimeFormatter().print($threshold))
-$services.activeinstalls.getInstallCount("date:[$formatted TO *] AND -distributionVersion:*SNAPSHOT  AND distributionId:""org.xwiki.enterprise:xwiki-enterprise-web""")
+#set ($query = "date:[$formatted TO *]")
+#if ("$!request.query" != '')
+  #set ($query = "$query AND $!request.query")
+#else
+  #set ($query = "$query AND -distributionVersion:*SNAPSHOT AND distributionId:""org.xwiki.enterprise:xwiki-enterprise-web""")
+#end
+$services.activeinstalls.getInstallCount($query)
 {{/velocity}}</content>
 </xwikidoc>

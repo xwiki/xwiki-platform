@@ -43,6 +43,11 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-$services.activeinstalls.getInstallCount("-distributionVersion:*SNAPSHOT AND distributionId:""org.xwiki.enterprise:xwiki-enterprise-web""")
+#if ("$!request.query" != '')
+  #set ($query = $!request.query)
+#else
+  #set ($query = "-distributionVersion:*SNAPSHOT AND distributionId:""org.xwiki.enterprise:xwiki-enterprise-web""")
+#end
+$services.activeinstalls.getInstallCount($query)
 {{/velocity}}</content>
 </xwikidoc>

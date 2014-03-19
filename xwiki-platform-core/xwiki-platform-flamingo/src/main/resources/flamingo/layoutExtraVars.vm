@@ -5,3 +5,17 @@
   #set($showRightPanels = false)
   #set($displayContentMenu = false)
 #end
+
+#set($mainGridCSS = "col-xs-12")
+#set($columnsNumber = 12)
+#if($showApplicationPanel)
+  #set($columnsNumber = $columnsNumber - 1)
+#end
+#if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
+  #set($columnsNumber = $columnsNumber - 2)
+  #set($mainGridCSS = "${mainGridCSS} col-md-push-2")
+#end
+#if($showRightPanels == "1" || $request.getParameter("forceRightPanels"))
+  #set($columnsNumber = $columnsNumber - 2)
+#end
+#set($mainGridCSS = "${mainGridCSS} col-md-${columnsNumber}")

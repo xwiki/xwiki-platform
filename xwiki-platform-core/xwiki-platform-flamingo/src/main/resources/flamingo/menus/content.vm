@@ -1,0 +1,85 @@
+<div id="menuContent" class="pull-right">
+##<div class="gradientfilterIE"></div>
+##<div class="componentcontainer">
+##<strong id="xwikicontentmenutitle" class="hidden">$services.localization.render('core.menu.content.title')</strong>
+##<div class="rightmenu">
+##</div>
+##<div class="leftmenu">
+#if($hasEdit && !$isReadOnly)
+  ## Compute the default edit mode
+  #set($editaction = $doc.getDefaultEditMode())
+  ##
+  ## Edit menu
+  ##
+  #if($isAdvancedUser)
+    #xwikisplitbuttonentrystart($doc.getURL($editaction, $!languageparams) $services.localization.render('core.menu.edit') 'tmEdit' 'btn-primary' 'pencil')
+      #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wiki") $services.localization.render('core.menu.edit.wiki') 'tmEditWiki', '', 'wrench')
+      ## Check if the WYSIWYG supports the current document's syntax and if so add a menu entry to edit the current
+      ## document with the WYSIWYG editor.
+      #if ($services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()) || $tdoc.syntax.toIdString() == 'xwiki/1.0')
+        #submenuitem($doc.getURL('edit', "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=wysiwyg") $services.localization.render('core.menu.edit.wysiwyg') 'tmEditWysiwyg', '', 'pencil')
+      #end
+      #submenuitem($doc.getURL($editaction, "$!{languageparams}#if ($languageparams != '')&amp;#{end}editor=inline") $services.localization.render('core.menu.edit.inline') 'tmEditInline', '', 'list-alt')
+      #submenuseparator()
+      #submenuitem($doc.getURL('edit', 'editor=rights') $services.localization.render('core.menu.edit.rights') 'tmEditRights', '', 'hdd')
+      #submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'hdd')
+      #submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'hdd')
+    #xwikibuttonentryend()
+  #else ## !isAdvanced
+    #xwikibutton($doc.getURL($editaction, $!languageparams) $services.localization.render('core.menu.edit') 'tmEdit', 'btn-primary', 'pencil')
+  #end
+  #if($keyboardShortcutsEnabled)
+    <script type="text/javascript">
+    //<![CDATA[
+      shortcut.add("$services.localization.render('core.shortcuts.view.edit')",function() { location.href=$('tmEdit').down('a').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      #if($isAdvancedUser)
+        shortcut.add("$services.localization.render('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.inline')",function() { location.href=$('tmEditInline').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.rights')",function() { location.href=$('tmEditRights').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        shortcut.add("$services.localization.render('core.shortcuts.view.objects')",function() { location.href=$('tmEditObject').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        #if($hasAdmin)
+          shortcut.add("$services.localization.render('core.shortcuts.view.class')",function() { location.href=$('tmEditClass').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        #end
+      #end
+    //]]>
+    </script>
+  #end
+#end
+##
+## Create menu
+##
+#template("menus/create.vm")
+##
+## Actions menu
+##
+#if(!$doc.isNew())
+  #xwikibuttonentrystart('' $services.localization.render('core.menu.moreactions') 'tmMoreActions' '' 'cog')
+    #submenuitem($doc.getURL('view', "xpage=print&amp;$!escapetool.html($request.getQueryString())") $services.localization.render('core.menu.preview') 'tmPrintPreview', '', 'print')
+    #submenuitem($doc.getURL('view', "viewer=code") $services.localization.render('core.menu.view.source') 'tmViewSource', 'btn-default', 'search')
+    #submenuitem('' $services.localization.render('core.menu.export') 'tmExport', '', 'download-alt')
+    
+    ## ----------------------------
+    ## Display the shortcuts
+    ## ----------------------------
+    #if($displayShortcuts)
+      #submenuseparator()
+      #template("shortcuts.vm")
+    #end
+
+    
+    
+  #xwikibuttonentryend()
+  #if ($keyboardShortcutsEnabled)
+    <script type="text/javascript">
+    //<![CDATA[
+      shortcut.add("$services.localization.render('core.shortcuts.view.code')", function() {
+        location.href = $('tmViewSource').href;
+      }, {'type': 'keypress', 'propagate': false, 'disable_in_input': true });
+    //]]>
+    </script>
+  #end
+#end
+##</div>
+##</div>
+</div>

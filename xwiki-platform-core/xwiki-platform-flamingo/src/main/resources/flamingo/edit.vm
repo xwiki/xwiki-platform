@@ -9,6 +9,7 @@
 ##
 #if($tdoc.getLocked() && "$!request.get('force')" == '')
   #template("startpage.vm")
+  #template("applications.vm")
   <div class="main layoutsubsection">
    <div id="mainContentArea">
     ##
@@ -44,6 +45,7 @@
   #if($editor == 'inline')
     ## The inline editor uses the view layout, unlike the rest of the editors.
     #template('startpage.vm')
+    #template("applications.vm")
     #template('editinline.vm')
     #template('endpage.vm')
   #else
@@ -66,8 +68,9 @@
     </div>
   #end
   #template("header.vm")
+  #template("applications.vm")
   #if($editor == 'wiki' || $editor == 'wysiwyg')
-    <form id="edit" method="post" action="$doc.getURL('preview')" class="withLock">
+    <form id="edit" method="post" action="$doc.getURL('preview')" class="withLock form-horizontal">
     <div class="hidden">
     ## CSRF prevention
     <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -85,11 +88,11 @@
   ##################
   <div id="xwikieditor" class="layoutsection">
   <div id="xwikieditorinner">
-  <div class="leftsidecolumns">
+  <div class="leftsidecolumns $mainGridCSS main">
   <div id="editcolumn" class="editor editor-${editor}">
   <div class="alleditcontent">
   <div id="editmenu" class="actionmenu">
-  #template("editmenu.vm")
+  ##template("editmenu.vm")
   </div>
   <div id="mainEditArea">
   #template("hierarchy.vm")
@@ -126,10 +129,10 @@
   </div> ## mainEditArea
   </div> ## alleditcontent
   </div> ## editcolumn
-  <div class="clearfloats"></div>
+  <div class="clearfix"></div>
   </div> ## leftsidecolumns
   #template("editpanels.vm")
-  <div class="clearfloats"></div>
+  <div class="clearfix"></div>
   </div> ## xwikieditorinner
   </div> ## xwikieditor
   ##

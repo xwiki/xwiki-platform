@@ -1,0 +1,31 @@
+#set($formname = "edit")
+#set($saveaction = "save")
+#set($previewenabled = true)
+#set($xredirect = "$!{escapetool.xml($request.getParameter('xredirect'))}")
+<div>
+<div class="hidden">
+<input type="hidden" name="template" value="$!{escapetool.xml($request.template)}" />
+#if($request.section && $request.section!="")
+ #set($xcontinue=$doc.getURL("edit", "editor=wiki&amp;section=$!{escapetool.xml($request.section)}"))
+#else
+ #set($xcontinue=$doc.getURL("edit", "editor=wiki"))
+#end
+<input type="hidden" name="xcontinue" value="$xcontinue"/>
+<input type="hidden" name="xredirect" value="$!xredirect" />
+<input type="hidden" name="language" value="$!tdoc.realLanguage" />
+</div> ## hidden
+<div id="xwikitext">
+<div id="xwikieditcontent">
+<div id="xwikieditcontentinner">
+#template("simpleedittoolbar.vm")
+$xwiki.getTextArea($tdoc.content)
+</div></div> ## xwikieditcontent
+</div> ## xwikitext
+</div> ## noname
+<div class="bottombuttons">#template("editactions.vm")</div>
+## Insert JS and CSS needed for the fullscreen edit feature
+$xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
+$xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)
+## Autosave feature
+$xwiki.jsfx.use('js/xwiki/editors/autosave.js', true)
+$xwiki.ssfx.use('js/xwiki/editors/autosave.css', true)

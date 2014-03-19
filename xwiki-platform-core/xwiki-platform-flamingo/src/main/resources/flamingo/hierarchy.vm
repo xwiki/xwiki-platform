@@ -25,7 +25,7 @@
     <ol id="hierarchy" class="breadcrumb">
     #if ($doc.fullName != 'Main.WebHome')
       #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
-        #computeHierarchy($doc "<li><a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getPlainTitle())</a><li>" 0)
+        #computeHierarchy($doc "<li><a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getPlainTitle())</a></li>" 0)
       #else
         #computeHierarchy($doc "<li class='active'>$escapetool.xml($tdoc.getPlainTitle())</li>" 0)
       #end

@@ -50,11 +50,21 @@ public class ActiveInstallsTest extends AbstractGuestTest
         }
 
         // Navigate to the Active Installs Counter Value page to verify that the ping has been received
-        ViewPage vp  = getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue");
+        getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue", "view", "query=*");
+        ViewPage vp  = new ViewPage();
+        assertEquals("1", vp.getContent());
+
+        // The default query doesn't show SNAPSHOT versions and thus we expect 0
+        vp = getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue");
         assertEquals("0", vp.getContent());
 
         // Navigate to the Total Installs Counter Value page to verify that the ping has been received
-        vp  = getUtil().gotoPage("ActiveInstalls", "TotalCounterValue");
+        getUtil().gotoPage("ActiveInstalls", "TotalCounterValue", "view", "query=*");
+        vp = new ViewPage();
         assertEquals("1", vp.getContent());
+
+        // The default query doesn't show SNAPSHOT versions and thus we expect 0
+        vp = getUtil().gotoPage("ActiveInstalls", "TotalCounterValue");
+        assertEquals("0", vp.getContent());
     }
 }

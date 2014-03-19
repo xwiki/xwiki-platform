@@ -24,7 +24,7 @@
     #set ($discard = $docextralinks.add(['attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(), 'paperclip']))
   #end
   #if($viewer != 'history' && $showhistory)
-    #set ($discard = $docextralinks.add(['history', $services.localization.render('docextra.history'), -1, 'film']))
+    #set ($discard = $docextralinks.add(['history', $services.localization.render('docextra.history'), -1, 'time']))
   #end
   #if($viewer != 'information' && $showinformation)
     #set ($discard = $docextralinks.add(['information', $services.localization.render('docextra.information'), -1, 'info-sign']))

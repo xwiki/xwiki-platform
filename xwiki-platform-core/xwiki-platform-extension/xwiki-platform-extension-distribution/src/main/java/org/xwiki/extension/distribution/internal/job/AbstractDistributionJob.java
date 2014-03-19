@@ -31,6 +31,7 @@ import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
 import org.xwiki.extension.distribution.internal.job.step.ReportDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.internal.AbstractJob;
 
 /**
@@ -165,7 +166,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
                     DistributionQuestion question = new DistributionQuestion(step);
 
                     // Waiting to start
-                    this.readyCondition.signalAll();
+                    signalReady();
                     getStatus().ask(question);
 
                     if (question.getAction() != null) {
@@ -199,12 +200,39 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
     }
 
     @Override
+    protected void jobFinished(Throwable exception)
+    {
+        super.jobFinished(exception);
+
+        signalReady();
+    }
+
+    private void signalReady()
+    {
+        this.lock.lock();
+
+        try {
+            this.readyCondition.signalAll();
+        } finally {
+            this.lock.unlock();
+        }
+    }
+
+    @Override
     public void awaitReady()
     {
-        try {
-            this.readyCondition.await();
-        } catch (InterruptedException e) {
-            this.logger.warn("The distribution job has been interrupted");
+        if (getStatus() == null || getStatus().getState() != JobStatus.State.FINISHED) {
+            try {
+                this.lock.lockInterruptibly();
+
+                try {
+                    this.readyCondition.await();
+                } finally {
+                    this.lock.unlock();
+                }
+            } catch (InterruptedException e) {
+                this.logger.warn("The distribution job has been interrupted");
+            }
         }
     }
 }

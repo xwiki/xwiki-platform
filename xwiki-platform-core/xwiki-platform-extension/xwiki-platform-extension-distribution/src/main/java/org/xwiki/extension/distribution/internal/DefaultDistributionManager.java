@@ -212,6 +212,9 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             distributionJobThread.setName("Farm distribution initialization");
             distributionJobThread.start();
 
+            // Wait until the job is ready (or finished)
+            this.farmDistributionJob.awaitReady();
+
             return this.farmDistributionJob;
         } catch (ComponentLookupException e) {
             this.logger.error("Failed to create farm distribution job", e);
@@ -259,6 +262,9 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             distributionJobThread.setDaemon(true);
             distributionJobThread.setName("Distribution initialization of wiki [" + wiki + "]");
             distributionJobThread.start();
+
+            // Wait until the job is ready (or finished)
+            this.farmDistributionJob.awaitReady();
 
             return wikiJob;
         } catch (ComponentLookupException e) {

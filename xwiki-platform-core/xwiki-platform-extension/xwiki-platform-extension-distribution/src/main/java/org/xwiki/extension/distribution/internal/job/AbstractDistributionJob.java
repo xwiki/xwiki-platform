@@ -20,6 +20,7 @@
 package org.xwiki.extension.distribution.internal.job;
 
 import java.util.List;
+import java.util.concurrent.locks.Condition;
 
 import javax.inject.Inject;
 
@@ -44,6 +45,11 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
      */
     @Inject
     protected DistributionManager distributionManager;
+
+    /**
+     * Condition to wait for ready state.
+     */
+    protected final Condition readyCondition = lock.newCondition();
 
     @Override
     public String getType()
@@ -159,6 +165,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
                     DistributionQuestion question = new DistributionQuestion(step);
 
                     // Waiting to start
+                    this.readyCondition.signalAll();
                     getStatus().ask(question);
 
                     if (question.getAction() != null) {
@@ -189,5 +196,15 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
     public DistributionStep getCurrentStep()
     {
         return getStatus().getCurrentStep();
+    }
+
+    @Override
+    public void awaitReady()
+    {
+        try {
+            this.readyCondition.await();
+        } catch (InterruptedException e) {
+            this.logger.warn("The distribution job has been interrupted");
+        }
     }
 }

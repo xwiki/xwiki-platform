@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.descriptor.internal;
+package org.xwiki.wiki.internal.manager;
 
 import javax.inject.Provider;
 
@@ -36,10 +36,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
-import org.xwiki.wiki.internal.manager.DefaultWikiManager;
-import org.xwiki.wiki.internal.manager.WikiCopier;
-import org.xwiki.wiki.internal.manager.WikiCreator;
-import org.xwiki.wiki.internal.manager.WikiDeleter;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
@@ -58,7 +54,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link org.xwiki.wiki.internal.manager.DefaultWikiManager}.
  *
  * @version $Id$
- * @since 5.3M2
+ * @since 6.0M1
  */
 public class DefaultWikiManagerTest
 {

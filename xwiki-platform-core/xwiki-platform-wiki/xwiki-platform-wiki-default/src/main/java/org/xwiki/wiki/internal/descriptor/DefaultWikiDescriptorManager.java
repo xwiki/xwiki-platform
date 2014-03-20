@@ -43,7 +43,7 @@ import com.xpn.xwiki.objects.BaseObject;
 /**
  * Default implementation for {@link WikiDescriptorManager}.
  * @version $Id$
- * @since 5.3M2
+ * @since 6.0M1
  */
 @Component
 @Singleton
@@ -173,7 +173,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
     {
         DefaultWikiDescriptor descriptor = null;
         List<BaseObject> serverClassObjects = document.getXObjects(DefaultWikiDescriptor.SERVER_CLASS);
-        if (serverClassObjects != null) {
+        if (serverClassObjects != null && !serverClassObjects.isEmpty()) {
             descriptor = wikiDescriptorBuilder.buildDescriptorObject(serverClassObjects, document);
             // Add to the cache
             if (descriptor != null) {

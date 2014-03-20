@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.descriptor.internal;
+package org.xwiki.wiki.internal.descriptor.document;
 
 import javax.inject.Provider;
 
@@ -30,7 +30,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-import org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -46,9 +45,9 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper}.
  *
  * @version $Id$
- * @since 5.3M2
+ * @since 6.0M1
  */
-public class WikiDescriptorDocumentHelperTest
+public class DefaultWikiDescriptorDocumentHelperTest
 {
     @Rule
     public org.xwiki.test.mockito.MockitoComponentMockingRule<DefaultWikiDescriptorDocumentHelper> mocker =

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wiki.descriptor.internal;
+package org.xwiki.wiki.internal.manager;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,7 +28,6 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
-import org.xwiki.wiki.internal.manager.DefaultWikiDescriptorCache;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -39,7 +38,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link org.xwiki.wiki.internal.manager.DefaultWikiDescriptorCache}.
  *
  * @version $Id$
- * @since 5.3M2
+ * @since 6.0M1
  */
 public class DefaultWikiDescriptorCacheTest
 {

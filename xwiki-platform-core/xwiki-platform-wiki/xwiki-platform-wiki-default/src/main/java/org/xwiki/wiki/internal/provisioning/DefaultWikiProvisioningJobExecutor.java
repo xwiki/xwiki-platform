@@ -45,7 +45,7 @@ import org.xwiki.wiki.provisioning.WikiProvisioningJobRequest;
 /**
  * Default implementation for {@link org.xwiki.wiki.provisioning.WikiProvisioningJobExecutor}.
  *
- * @since 5.3M2
+ * @since 6.0M1
  * @version $Id$
  */
 @Component
@@ -111,12 +111,7 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
     @Override
     public WikiProvisioningJob getJob(List<String> jobId) throws WikiProvisioningJobException
     {
-        try {
-            WikiProvisioningJob job = jobs.get(jobId);
-            return job;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new WikiProvisioningJobException(
-                    String.format("There is no job corresponding to the jobId [%d].", jobId), e);
-        }
+        WikiProvisioningJob job = jobs.get(jobId);
+        return job;
     }
 }

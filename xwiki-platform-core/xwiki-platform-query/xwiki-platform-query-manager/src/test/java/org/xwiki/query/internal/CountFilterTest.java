@@ -25,50 +25,35 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.collections.ListUtils;
-import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryFilter;
-import org.xwiki.test.ComponentManagerRule;
-import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.jmock.JMockRule;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Tests for {@link CountFilter}
  *
  * @version $Id$
  */
-@ComponentList({
-    CountFilter.class
-})
 public class CountFilterTest
 {
     @Rule
-    public final ComponentManagerRule componentManager = new ComponentManagerRule();
-
-    @Rule
-    public final JMockRule jmock = new JMockRule();
+    public MockitoComponentMockingRule<CountFilter> mocker = new MockitoComponentMockingRule(CountFilter.class);
 
     private CountFilter filter;
 
     @Before
     public void configure() throws Exception
     {
-        jmock.checking(new Expectations() {{
-            ignoring(any(Logger.class)).method("debug");
-        }});
-
-        this.filter = componentManager.getInstance(QueryFilter.class, "count");
+        this.filter = mocker.getComponentUnderTest();
     }
 
     @Test
     public void filterSelectStatement() throws Exception
     {
         assertEquals("select count(doc.fullName) from XWikiDocument doc",
-                filter.filterStatement("select doc.fullName from XWikiDocument doc", Query.HQL));
+            filter.filterStatement("select doc.fullName from XWikiDocument doc", Query.HQL));
     }
 
     @Test
@@ -82,65 +67,69 @@ public class CountFilterTest
     public void filterSelectDistinctStatement() throws Exception
     {
         assertEquals("select count(distinct doc.fullName) from XWikiDocument doc",
-                filter.filterStatement("select distinct doc.fullName from XWikiDocument doc", Query.HQL));
+            filter.filterStatement("select distinct doc.fullName from XWikiDocument doc", Query.HQL));
     }
 
     @Test
     public void filterSelectWithAsStatement() throws Exception
     {
         assertEquals("select count(doc.fullName) from XWikiDocument as doc",
-                filter.filterStatement("select doc.fullName from XWikiDocument as doc", Query.HQL));
+            filter.filterStatement("select doc.fullName from XWikiDocument as doc", Query.HQL));
     }
 
     @Test
     public void filterSelectStatementWithMismatchingDocAlias() throws Exception
     {
         assertEquals("select mydoc.fullName from XWikiDocument mydoc",
-                filter.filterStatement("select mydoc.fullName from XWikiDocument mydoc", Query.HQL));
+            filter.filterStatement("select mydoc.fullName from XWikiDocument mydoc", Query.HQL));
     }
 
     @Test
     public void filterStatementWhenStatementAlreadyContainsCount() throws Exception
     {
         assertEquals("select count(distinct doc.fullName) from XWikiDocument doc",
-                filter.filterStatement("select count(distinct doc.fullName) from XWikiDocument doc", Query.HQL));
+            filter.filterStatement("select count(distinct doc.fullName) from XWikiDocument doc", Query.HQL));
     }
 
     @Test
     public void filterStatementWhenStatementContainsOrderBy() throws Exception
     {
         assertEquals("select count(doc.fullName) from XWikiDocument doc ",
-                filter.filterStatement("select doc.fullName from XWikiDocument doc order by doc.name", Query.HQL));
+            filter.filterStatement("select doc.fullName from XWikiDocument doc order by doc.name", Query.HQL));
     }
 
     @Test
     public void filterStatementWhenStatementContainsOrderByAndGroupBy() throws Exception
     {
         assertEquals("select count(doc.fullName) from XWikiDocument doc group by doc.web",
-                filter.filterStatement("select doc.fullName from XWikiDocument doc order by doc.name group by doc.web",
-                    Query.HQL));
+            filter.filterStatement("select doc.fullName from XWikiDocument doc order by doc.name group by doc.web",
+                Query.HQL)
+        );
     }
 
     @Test
     public void filterStatementWhenStatementContainsDistinct() throws Exception
     {
         assertEquals("select count(distinct doc.fullName) from XWikiDocument doc",
-                filter.filterStatement("select distinct doc.fullName from XWikiDocument doc", Query.HQL));
+            filter.filterStatement("select distinct doc.fullName from XWikiDocument doc", Query.HQL));
     }
 
     @Test
     public void filterStatementWhenStatementContainsMultipleColumns() throws Exception
     {
         assertEquals("select count(doc.fullName) from XWikiDocument doc group by doc.web",
-                filter.filterStatement("select doc.fullName, doc.name, doc.space from XWikiDocument doc order by doc.name group by doc.web",
-                    Query.HQL));
+            filter.filterStatement(
+                "select doc.fullName, doc.name, doc.space from XWikiDocument doc order by doc.name group by doc.web",
+                Query.HQL)
+        );
     }
 
     @Test
     public void getSelectColumns()
     {
         String[] columns = { "doc.fullName", "doc.name", "doc.space" };
-        List<String> result = filter.getSelectColumns("select doc.fullName, doc.name, doc.space from XWikiDocument doc");
+        List<String> result =
+            filter.getSelectColumns("select doc.fullName, doc.name, doc.space from XWikiDocument doc");
 
         assertEquals(Arrays.asList(columns), result);
     }
@@ -149,7 +138,8 @@ public class CountFilterTest
     public void getSelectColumnsWithAdditionalSpaces()
     {
         String[] columns = { "doc.fullName", "doc.name", "doc.space" };
-        List<String> result = filter.getSelectColumns("select  doc.fullName  , doc.name ,   doc.space from XWikiDocument doc");
+        List<String> result =
+            filter.getSelectColumns("select  doc.fullName  , doc.name ,   doc.space from XWikiDocument doc");
 
         assertEquals(Arrays.asList(columns), result);
     }
@@ -209,5 +199,4 @@ public class CountFilterTest
 
         assertEquals(Arrays.asList(columns), result);
     }
-
 }

@@ -24,6 +24,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
@@ -51,14 +52,16 @@ public class DefaultWikiDescriptorCacheTest
 
     private Cache<WikiDescriptor> wikiIdCache;
 
-    private CacheFactory cacheFactory;
+    private CacheManager cacheManager;
 
     @Before
     public void setUp() throws Exception
     {
         wikiAliasCache = mock(Cache.class);
         wikiIdCache = mock(Cache.class);
-        cacheFactory = this.mocker.getInstance(CacheFactory.class);
+        cacheManager = this.mocker.getInstance(CacheManager.class);
+        CacheFactory cacheFactory = mock(CacheFactory.class);
+        when(cacheManager.getCacheFactory()).thenReturn(cacheFactory);
         when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
                 wikiIdCache);
     }

@@ -50,6 +50,8 @@ import org.xwiki.instance.InstanceId;
 import org.xwiki.instance.InstanceIdManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.google.gson.Gson;
+
 /**
  * Unit tests for {@link DefaultPingSender}.
  *
@@ -77,7 +79,7 @@ public class DefaultPingSenderTest
         when(repository.getInstalledExtensions()).thenReturn(Collections.singletonList(extension));
 
         JestClient client = mock(JestClient.class);
-        JestResult result = new JestResult();
+        JestResult result = new JestResult(new Gson());
         result.setSucceeded(true);
         when(client.execute(any(Action.class))).thenReturn(result);
 
@@ -95,7 +97,7 @@ public class DefaultPingSenderTest
         // Real test is here, we verify the data sent to the server.
         ArgumentCaptor<Index> index = ArgumentCaptor.forClass(Index.class);
         verify(client, times(3)).execute(index.capture());
-        String jsonString = index.getValue().getData().toString();
+        String jsonString = index.getValue().getData(new Gson()).toString();
         JSONObject json = (JSONObject) JSONSerializer.toJSON(jsonString);
         assertEquals("1.0", json.getString("formatVersion"));
         assertNotNull(json.getString("date"));

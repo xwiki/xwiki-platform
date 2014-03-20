@@ -52,10 +52,10 @@
       <artifactId>xwiki-commons-script</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <!-- Test Dependencies -->
     <dependency>
       <groupId>com.github.tlrx</groupId>
       <artifactId>elasticsearch-test</artifactId>
-      <version>0.0.10</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

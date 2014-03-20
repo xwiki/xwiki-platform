@@ -45,4 +45,16 @@
       </modules>
     </profile>
   </profiles>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.github.tlrx</groupId>
+        <artifactId>elasticsearch-test</artifactId>
+        <!-- We use a custom patched XWiki version because the latest version doesn't support ES 1.0.1 which we need.
+             See https://github.com/tlrx/elasticsearch-test/pull/35 -->
+        <version>1.0.1-xwiki</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>

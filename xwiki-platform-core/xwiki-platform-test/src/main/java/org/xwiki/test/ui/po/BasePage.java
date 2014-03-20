@@ -99,6 +99,12 @@ public class BasePage extends BaseElement
     @FindBy(id = "tmSpace")
     private WebElement spaceMenu;
 
+    @FindBy(id = "tmMainWiki")
+    private WebElement mainWikiMenu;
+    
+    @FindBy(id = "tmWatchWiki")
+    private WebElement watchWikiLink;
+    
     /**
      * Used to scroll the page to the top before accessing the floating menu.
      */
@@ -402,6 +408,15 @@ public class BasePage extends BaseElement
     {
         new Actions(getDriver()).moveToElement(spaceMenu).perform();
         this.watchSpaceLink.click();
+    }
+
+    /**
+     * @since 6.0M1
+     */
+    public void watchMainWiki()
+    {
+        new Actions(getDriver()).moveToElement(mainWikiMenu).perform();
+        this.watchWikiLink.click();
     }
 
     /**

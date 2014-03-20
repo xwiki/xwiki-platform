@@ -19,10 +19,8 @@
  */
 package org.xwiki.watchlist.test.po;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.user.test.po.AbstractUserProfilePage;
 import org.xwiki.watchlist.test.po.editor.WatchlistPreferencesEditPage;
 
@@ -45,6 +43,8 @@ public class WatchlistUserProfilePage extends AbstractUserProfilePage
     @FindBy(xpath = "//div[@class='watchlistManagement']/dl[1]/dd[2]")
     private WebElement automaticwatch;
 
+    private WatchlistMacro watchlistMacro = new WatchlistMacro();
+    
     public static WatchlistUserProfilePage gotoPage(String username)
     {
         WatchlistUserProfilePage page = new WatchlistUserProfilePage(username);
@@ -73,48 +73,15 @@ public class WatchlistUserProfilePage extends AbstractUserProfilePage
         return this.automaticwatch.getText();
     }
 
-    public LiveTableElement getWatchList()
-    {
-        LiveTableElement liveTableElement = new LiveTableElement("mywatchlist");
-        liveTableElement.waitUntilReady();
-
-        return liveTableElement;
-    }
-
-    /**
-     * Unregister a document or a space from the watchlist.
-     * 
-     * @param space the space name, can't be null
-     * @param page the page name, if null the methods tries to unregister a space
-     * @return true if something has been unregistered, false otherwise
-     */
-    public boolean unWatch(String space, String page)
-    {
-        return false;
-    }
-
-    public boolean isWatched(String space, String page)
-    {
-        // Make sure the livetable is loaded
-        getWatchList();
-
-        // TODO: only looks in the first livetable page currently
-        // TODO: move a generic version of that in LiveTableElement
-        return getUtil().hasElement(
-            By.xpath("//tbody[@id='mywatchlist-display']/tr/td/a[@href='/xwiki/bin/view/" + space + "/" + page + "']"));
-    }
-
-    public boolean isWatched(String space)
-    {
-        // TODO: only looks in the first livetable page currently
-        // TODO: move a generic version of that in LiveTableElement
-        return getUtil().hasElement(
-            By.xpath("//tbody[@id='mywatchlist-display']/tr/td/a[@href='/xwiki/bin/view/" + space + "/WebHome']"));
-    }
-
     public WatchlistPreferencesEditPage editPreferences()
     {
         this.editPreferences.click();
         return new WatchlistPreferencesEditPage();
     }
+    
+    public WatchlistMacro getWatchlistMacro()
+    {
+        return this.watchlistMacro;
+    }
+
 }

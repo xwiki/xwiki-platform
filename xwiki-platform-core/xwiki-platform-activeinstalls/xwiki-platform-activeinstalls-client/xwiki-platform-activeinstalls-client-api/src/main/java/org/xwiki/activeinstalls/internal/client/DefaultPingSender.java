@@ -133,7 +133,7 @@ public class DefaultPingSender implements PingSender
 
     private String constructJSON()
     {
-        Map jsonMap = new HashMap();
+        Map<String, Object> jsonMap = new HashMap();
         jsonMap.put("formatVersion", LATEST_FORMAT_VERSION);
         jsonMap.put("date", DATE_FORMATTER.print(new Date().getTime()));
 

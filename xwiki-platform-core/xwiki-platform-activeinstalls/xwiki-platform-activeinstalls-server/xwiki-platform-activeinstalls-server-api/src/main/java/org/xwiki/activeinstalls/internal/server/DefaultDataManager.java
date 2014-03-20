@@ -43,31 +43,46 @@ import net.sf.json.JSONObject;
 @Singleton
 public class DefaultDataManager implements DataManager
 {
+    /**
+     * JSON property name for a query.
+     */
+    private static final String JSON_QUERY_NAME = "query";
+
     @Inject
     private JestClientManager jestClientManager;
 
     @Override
     public long getInstallCount(String query) throws Exception
     {
-        Map queryMap = new HashMap();
-        queryMap.put("query", query);
+        Map<String, Object> queryMap = new HashMap();
+        queryMap.put(JSON_QUERY_NAME, query);
 
         // This allows to write queries such as: -distributionVersion:*SNAPSHOT
         queryMap.put("lowercase_expanded_terms", false);
 
-        Map jsonMap = new HashMap();
-        jsonMap.put("query_string", JSONObject.fromObject(queryMap));
+        Map<String, Object> queryStringMap = new HashMap();
+        queryStringMap.put("query_string", JSONObject.fromObject(queryMap));
+
+        Map<String, Object> jsonMap = new HashMap();
+        jsonMap.put(JSON_QUERY_NAME, JSONObject.fromObject(queryStringMap));
 
         return executeCount(JSONObject.fromObject(jsonMap).toString());
     }
 
     private long executeCount(String query) throws Exception
     {
-        Count count = new Count.Builder(query)
+        Count count = new Count.Builder()
+            .query(query)
             .addIndex("installs")
             .addType("install")
             .build();
         JestResult result = this.jestClientManager.getClient().execute(count);
+
+        if (!result.isSucceeded()) {
+            throw new Exception(String.format("Error while executing Count query [%s]: [%s], Reason: [%s]", query,
+                result.getErrorMessage(), result.getJsonString()));
+        }
+
         return ((Double) result.getValue("count")).longValue();
     }
 }

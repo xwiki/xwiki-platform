@@ -48,6 +48,17 @@
 #else
   #set ($query = "-distributionVersion:*SNAPSHOT AND distributionId:""org.xwiki.enterprise:xwiki-enterprise-web""")
 #end
-$services.activeinstalls.getInstallCount($query)
+#set ($result = $services.activeinstalls.getInstallCount($query))
+## If there's an error and the "xpage=plain" URL parameter is not passed (ie it's not called by the Counter widget) then display the error if any. Otherwise display the invalid numeric result.
+#if ($result == -1)
+  #set ($errorText = $!services.activeinstalls.lastError)
+  #if ("$!request.xpage" != 'plain')
+    {{error}}{{{$errorText}}}{{/error}}
+  #else
+    0
+  #end
+#else
+  $result
+#end
 {{/velocity}}</content>
 </xwikidoc>

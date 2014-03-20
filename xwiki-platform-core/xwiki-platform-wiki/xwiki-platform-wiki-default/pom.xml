@@ -32,7 +32,7 @@
   <description>XWiki Platform - Wiki - Default Implementation</description>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.37</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.41</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

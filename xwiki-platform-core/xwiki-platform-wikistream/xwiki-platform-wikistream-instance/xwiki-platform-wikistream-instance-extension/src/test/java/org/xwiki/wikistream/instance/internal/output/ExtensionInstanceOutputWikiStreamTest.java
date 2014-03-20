@@ -27,7 +27,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.AdditionalMatchers;
 import org.mockito.Mockito;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;

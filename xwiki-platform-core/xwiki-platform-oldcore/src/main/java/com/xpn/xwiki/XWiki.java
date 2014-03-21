@@ -94,9 +94,8 @@ import org.xwiki.bridge.event.WikiCopiedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.CacheManager;
-import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.classloader.ClassLoaderManager;
+import org.xwiki.classloader.NamespaceURLClassLoader;
 import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -4677,7 +4676,20 @@ public class XWiki implements EventListener
                 }
 
                 try {
-                    this.authService = (XWikiAuthService) Class.forName(authClass).newInstance();
+                    // Get the current ClassLoader
+                    ClassLoaderManager clManager = Utils.getComponent(ClassLoaderManager.class);
+                    ClassLoader classloader = null;
+                    if (clManager != null) {
+                        classloader = clManager.getURLClassLoader("wiki:xwiki", false);
+                    }
+
+                    // Get the class
+                    if (classloader != null) {
+                        this.authService = (XWikiAuthService) Class.forName(authClass, true, classloader).newInstance();
+                    } else {
+                        this.authService = (XWikiAuthService) Class.forName(authClass).newInstance();
+                    }
+
                     LOGGER.debug("Initialized AuthService using Relfection.");
                 } catch (Exception e) {
                     LOGGER.warn("Failed to initialize AuthService " + authClass

@@ -99,8 +99,8 @@ public class BasePage extends BaseElement
     @FindBy(id = "tmSpace")
     private WebElement spaceMenu;
 
-    @FindBy(id = "tmMainWiki")
-    private WebElement mainWikiMenu;
+    @FindBy(id = "tmWiki")
+    private WebElement wikiMenu;
     
     @FindBy(id = "tmWatchWiki")
     private WebElement watchWikiLink;
@@ -413,9 +413,9 @@ public class BasePage extends BaseElement
     /**
      * @since 6.0M1
      */
-    public void watchMainWiki()
+    public void watchWiki()
     {
-        new Actions(getDriver()).moveToElement(mainWikiMenu).perform();
+        new Actions(getDriver()).moveToElement(wikiMenu).perform();
         this.watchWikiLink.click();
     }
 

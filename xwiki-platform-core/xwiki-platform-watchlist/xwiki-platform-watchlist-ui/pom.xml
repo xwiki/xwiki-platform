@@ -44,12 +44,28 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-     <!-- Needed in order to display the wiki pretty name. -->
+    <!-- Needed in order to display the wiki pretty name. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+    <!-- Needed to have the user profile page to get to the watchlist section. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-profile-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
+    </dependency>
+    <!-- Needed to have the scheduler to trigger watchlist mails. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-scheduler-ui</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+      <type>xar</type>
     </dependency>
   </dependencies>
 </project>

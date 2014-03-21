@@ -20,11 +20,10 @@
 package org.xwiki.watchlist.test.ui;
 
 import org.junit.runner.RunWith;
-import org.xwiki.test.integration.XWikiExecutorSuite;
 import org.xwiki.test.ui.PageObjectSuite;
 
 /**
- * Runs all functional tests found in the classpath.
+ * Start/stop XWiki only once while running all functional tests
  *
  * @version $Id$
  * @since 5.4RC1

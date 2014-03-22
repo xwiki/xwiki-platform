@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -33,8 +32,9 @@
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1391701797000</date>
   <contentUpdateDate>1391701797000</contentUpdateDate>
-  <comment/>
   <version>1.1</version>
+  <title/>
+  <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
@@ -65,7 +65,7 @@
       'spaceUrl'  : '',
       'pageName'  : $services.localization.render('watchlist.table.alldocuments'),
       'pageUrl'   : '',
-      'deleteUrl' : $wikiHomeDoc.getURL('view', 'xpage=watch&amp;do=removewiki')
+      'deleteUrl' : $doc.getURL('view', "xpage=watch&amp;do=removewiki&amp;reference=${escapetool.url($wiki)}")
     }))
   #end
 #end
@@ -87,7 +87,7 @@
       'spaceUrl'  : $spaceHomeDoc.getURL(),
       'pageName'  : $services.localization.render('watchlist.table.alldocuments'),
       'pageUrl'   : '',
-      'deleteUrl' : $spaceHomeDoc.getURL('view', 'xpage=watch&amp;do=removespace')
+      'deleteUrl' : $doc.getURL('view', "xpage=watch&amp;do=removespace&amp;reference=${escapetool.url($space)}")
     }))
   #end
 #end
@@ -111,7 +111,7 @@
       'spaceUrl'  : $spaceHomeDoc.getURL(),
       'pageName'  : $pageRef.name,
       'pageUrl'   : $pageDoc.getURL(),
-      'deleteUrl' : $pageDoc.getURL('view', 'xpage=watch&amp;do=removedocument')
+      'deleteUrl' : $doc.getURL('view', "xpage=watch&amp;do=removedocument&amp;reference=${escapetool.url($pageRef)}")
     }))
   #end
 #end

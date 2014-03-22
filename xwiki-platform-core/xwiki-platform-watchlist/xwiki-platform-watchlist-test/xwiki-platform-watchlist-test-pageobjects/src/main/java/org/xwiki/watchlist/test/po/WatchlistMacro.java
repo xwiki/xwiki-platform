@@ -37,9 +37,10 @@ public class WatchlistMacro extends BaseElement
 
     /**
      * a formatter to create a XPath expression to a "remove from watchlist" link. The arguments to pass to this
-     * formatter are: space name, page name and removal action.
+     * formatter are: removal action and reference to removed.
      */
-    private static final String WATCHLIST_REMOVE_BUTTON_PATTERN = "//tbody[@id='mywatchlist-display']/tr/td/a[@href='/xwiki/bin/view/%s/%s?xpage=watch&do=%s']";
+    private static final String WATCHLIST_REMOVE_BUTTON_PATTERN_CSS 
+    	= "tbody#mywatchlist-display>tr>td>a[href$='?xpage=watch&do=%s&reference=%s']";
 
     public LiveTableElement getWatchList() {
         LiveTableElement liveTableElement = new LiveTableElement("mywatchlist");
@@ -90,11 +91,11 @@ public class WatchlistMacro extends BaseElement
     private By removeLink(String space, String page) {
         By removeLink;
         if (space == null) {
-            removeLink = By.xpath(String.format(WATCHLIST_REMOVE_BUTTON_PATTERN, "Main", "WebHome", "removewiki"));
+            removeLink = By.cssSelector(String.format(WATCHLIST_REMOVE_BUTTON_PATTERN_CSS, "removewiki", "xwiki" ));
         } else if (page == null) {
-            removeLink = By.xpath(String.format(WATCHLIST_REMOVE_BUTTON_PATTERN, space, "WebHome", "removespace"));
+            removeLink = By.cssSelector(String.format(WATCHLIST_REMOVE_BUTTON_PATTERN_CSS, "removespace", "xwiki%3A"+space));
         } else {
-            removeLink = By.xpath(String.format(WATCHLIST_REMOVE_BUTTON_PATTERN, space, page, "removedocument"));
+            removeLink = By.cssSelector(String.format(WATCHLIST_REMOVE_BUTTON_PATTERN_CSS, "removedocument", "xwiki%3A"+space+'.'+ page ));
         }
         return removeLink;
     }

@@ -78,8 +78,15 @@ public class WatchListStoreTest
         // Test is here, we verify the new watched element is added properly with commas escaped.
         verify(userDocument).setLargeStringValue("XWiki.WatchListClass", "documents",
             "one,wiki:space.element\\,with\\,comma");
-    }
 
+        // Test that the element is still in the list after another one is added
+        when(watchListObject.getLargeStringValue("documents")).thenReturn("one,wiki:space.element\\,with\\,comma");
+        store.addWatchedElement(TEST_USERDOC_NAME, "space.anotherPage", WatchListStore.ElementType.DOCUMENT,
+                xcontext);
+        verify(userDocument).setLargeStringValue("XWiki.WatchListClass", "documents",
+                "one,wiki:space.element\\,with\\,comma,wiki:space.anotherPage");
+    }
+    
     @Test
     public void getWatchedElementsWhenCommasInElements() throws Exception
     {

@@ -449,6 +449,30 @@ public class WatchListStore implements EventListener
         elements.add(currentElement.toString());
         return elements;
     }
+    
+    /**
+     * the inverse to {@link #unescapeList(String)}
+     * @param watchedItems the list of watched items, each unescaped
+     * @return a string comma separated, escaped items 
+     */
+    private String escapeList(List<String> watchedItems)
+    {
+        if (watchedItems == null || watchedItems.isEmpty()) {
+            return StringUtils.EMPTY;
+        }
+        StringBuilder currentElement = new StringBuilder();
+        boolean empty = true;
+        for (String item : watchedItems) {
+            if (!empty) {
+                currentElement.append(WATCHLIST_ELEMENT_SEP);
+            }
+            // Escape the element to watch in case it contains the WATCHLIST_ELEMENT_SEP separator
+            String escapedItem = item.replaceAll(WATCHLIST_ELEMENT_SEP, "\\\\" + WATCHLIST_ELEMENT_SEP);
+            currentElement.append(escapedItem);
+            empty = false;
+        }
+        return currentElement.toString();
+    }
 
     /**
      * Is the element watched by the given user.
@@ -512,10 +536,7 @@ public class WatchListStore implements EventListener
         // Copy the list of watched elements because it could be unmodifiable.
         List<String> watchedElements = new ArrayList<String>(getWatchedElements(user, type, context));
 
-        // Escape the element to watch in case it contains the WIKI_SPACE_SEP separator
-        String escapedElementToWatch = elementToWatch.replaceAll(WATCHLIST_ELEMENT_SEP, "\\\\" + WATCHLIST_ELEMENT_SEP);
-
-        watchedElements.add(escapedElementToWatch);
+        watchedElements.add(elementToWatch);
 
         setWatchListElementsProperty(user, type, watchedElements, context);
         return true;
@@ -607,7 +628,7 @@ public class WatchListStore implements EventListener
     {
         XWikiDocument userDocument = context.getWiki().getDocument(user, context);
         userDocument.setLargeStringValue(WATCHLIST_CLASS, getWatchListClassPropertyForType(type),
-            StringUtils.join(elements, WATCHLIST_ELEMENT_SEP));
+            escapeList(elements));
         userDocument.isMinorEdit();
         context.getWiki().saveDocument(userDocument, context.getMessageTool().get("watchlist.save.object"), true,
             context);

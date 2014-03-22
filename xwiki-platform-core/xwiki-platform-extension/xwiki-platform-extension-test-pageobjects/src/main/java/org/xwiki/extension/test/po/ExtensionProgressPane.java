@@ -73,7 +73,7 @@ public class ExtensionProgressPane extends BaseElement
     {
         List<LogItemPane> log = new ArrayList<LogItemPane>();
         for (WebElement element : getUtil().findElementsWithoutWaiting(getDriver(), container,
-            By.className("extension-log-item"))) {
+            By.className("job-log-item"))) {
             log.add(new LogItemPane(element));
         }
         return log;

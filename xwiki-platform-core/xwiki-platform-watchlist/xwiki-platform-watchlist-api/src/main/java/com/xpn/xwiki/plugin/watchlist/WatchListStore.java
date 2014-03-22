@@ -451,7 +451,7 @@ public class WatchListStore implements EventListener
     }
     
     /**
-     * the inverse to {@link #unescapeList(String)}
+     * the inverse to {@link #unescapeList(String)}.
      * @param watchedItems the list of watched items, each unescaped
      * @return a string comma separated, escaped items 
      */

@@ -28,7 +28,7 @@
         #maybeRepairPreviousUI($wikiName $extension)
         <div class="recommendedUI">
           #if ($extension)
-            #displayExtension($extension)
+            #displayExtensionAndUpdateStepButtons($extension)
           #else
             <div class="box infomessage">
               $services.localization.render('extensions.advancedSearch.noResults',

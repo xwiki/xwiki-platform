@@ -21,7 +21,7 @@
       {{warning}}{{translation key="platform.extension.distributionWizard.uiStepInternetAccessWarning"/}}{{/warning}}
 
       ## Allow the user to install, upgrade or downgrade the UI.
-      {{html}}#displayExtension($distributionUIExtension){{/html}}
+      {{html}}#displayExtensionAndUpdateStepButtons($distributionUIExtension){{/html}}
     #else
       {{info}}$services.localization.render('extensions.advancedSearch.noResults',
         ["**$!escapetool.xml($distributionUIId.id)**", "**$!escapetool.xml($distributionUIId.version)**"]){{/info}}

@@ -109,6 +109,12 @@
   </form>
 #end
 
+#macro (displayExtensionAndUpdateStepButtons $extension)
+  #set ($jobStatus = $NULL)
+  #displayExtension($extension)
+  #set ($disableStepButtons = $disableStepButtons || $jobStatus.state == 'RUNNING' || $jobStatus.state == 'WAITING')
+#end
+
 #macro (repairPreviousUI $wiki $recommendedUIExtension $documentCount)
   #set ($previousUI = $NULL)
   #if ($request.previousUIId && $request.previousUIVersion && $wiki == $request.wiki)
@@ -127,7 +133,7 @@
     ## TODO: Find a better way to 'force' the repair XAR extension button.
     #set ($showRepairXARButton = true)
     ## Wrap the extension in a DIV so that its bottom border is displayed.
-    <div>#displayExtension($previousUI)</div>
+    <div>#displayExtensionAndUpdateStepButtons($previousUI)</div>
   #end
 #end
 

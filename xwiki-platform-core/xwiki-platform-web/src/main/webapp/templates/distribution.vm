@@ -115,19 +115,23 @@
     ## Normally we shouldn't generate the buttons that are not supposed to be visible but we want to simplify the
     ## JavaScript code and to avoid duplicating the HTML by adding the buttons dynamically.
     <span class="buttonwrapper#if (!$showCompleteStepButton) hidden#end">
-      <button type="submit" name="action" value="COMPLETE_STEP">
+      <button type="submit" name="action" value="COMPLETE_STEP"#if ($disableStepButtons) disabled="disabled"#end>
         $services.localization.render('platform.extension.distributionWizard.continueLabel')
       </button>
     </span>
     <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
       <button class="secondary" type="submit" name="action" value="SKIP#if(!$canCloseWizard)_STEP#end"
-        title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.skipHint'))">
-        $services.localization.render('platform.extension.distributionWizard.skipLabel')</button>
+          title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.skipHint'))"
+          #if ($disableStepButtons) disabled="disabled"#end>
+        $services.localization.render('platform.extension.distributionWizard.skipLabel')
+      </button>
     </span>
     <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
       <button class="secondary" type="submit" name="action" value="CANCEL#if(!$canCloseWizard)_STEP#end"
-        title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.cancelHint'))">
-        $services.localization.render('platform.extension.distributionWizard.cancelLabel')</button>
+          title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.cancelHint'))"
+          #if ($disableStepButtons) disabled="disabled"#end>
+        $services.localization.render('platform.extension.distributionWizard.cancelLabel')
+      </button>
     </span>
   </div>
 #end

@@ -73,7 +73,7 @@ require.config({
   ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
   paths: {
     'jquery': "$xwiki.getSkinFile('js/amd/')jquery",
-    'bootstrap': "$xwiki.getSkinFile('uicomponents/bootstrap3/')bootstrap"
+    'bootstrap': "$services.webjars.url('bootstrap/3.1.1/js/bootstrap.js')"
   },
   shim: {
     'bootstrap' : ['jquery']

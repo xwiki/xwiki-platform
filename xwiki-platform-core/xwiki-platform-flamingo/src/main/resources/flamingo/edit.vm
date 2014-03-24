@@ -70,7 +70,7 @@
   #template("header.vm")
   #template("applications.vm")
   #if($editor == 'wiki' || $editor == 'wysiwyg')
-    <form id="edit" method="post" action="$doc.getURL('preview')" class="withLock form-horizontal">
+    <form id="edit" method="post" action="$doc.getURL('preview')" class="withLock form">
     <div class="hidden">
     ## CSRF prevention
     <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
@@ -91,15 +91,21 @@
   <div class="leftsidecolumns $mainGridCSS main">
   <div id="editcolumn" class="editor editor-${editor}">
   <div class="alleditcontent">
-  <div id="editmenu" class="actionmenu">
-  ##template("editmenu.vm")
-  </div>
   <div id="mainEditArea">
   #template("hierarchy.vm")
   #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)
-    #template('editmeta.vm')
+    <div id="editMeta" class="col-xs-12 col-md-7">
+      #template('editmeta.vm')
+    </div>
   #end
-  #template("edit${editor}.vm")
+  #if($displayContentMenu)
+    <div class="col-xs-12 col-md-5">
+      #template("menus/content.vm")
+    </div>
+  #end
+  <div class="col-xs-12">
+    #template("edit${editor}.vm")
+  </div>
   ## This javascript must be placed here since it uses velocity variables set in the template above.
   <script type="text/javascript">
     //<![CDATA[

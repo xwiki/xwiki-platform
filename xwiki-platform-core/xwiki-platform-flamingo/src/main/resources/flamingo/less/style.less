@@ -62,6 +62,10 @@
   padding: 10px;
 }
 
+#AddComment {
+  padding: 0;
+}
+
 #menuContent{
   .text-right();
   
@@ -100,10 +104,6 @@ table{
   width: 20px;
 }
 
-#AddComment {
-  padding: 0;
-}
-
 .wiki-code{
   width: 100%;
 }
@@ -136,5 +136,43 @@ textarea#content{
   .make-xs-column(9);
 }
 
+/* ---------------------Edit meta tools --------------------------*/
+#editcolumn{
+  .bottombuttons{
+    .buttons{
+      margin: 10px 0;
+    }
+  }
+  
+  .edit-meta-tools{
+    .pull-right();
+    margin-right: 5px;
+  }
+  .edit-meta-tools a {
+      display: block;
+      width: 16px;
+      height: 16px;
+      overflow: hidden;
+      text-indent: -9999px;
+      background: none no-repeat scroll left top transparent;
+      margin-left: 4px;
+  }
+  .edit-meta-tools a.edit-parent {
+    background-image: url("$xwiki.getSkinFile('icons/xwiki/parent_edit.gif')");
+  }
+  .edit-meta-tools a.hide-edit-parent {
+    background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
+  }
 
+  #mainEditArea #parentinput, #mainContentArea #parentinput {
+    display: none;
+  }
 
+  #mainEditArea #parentinput.active, #mainContentArea #parentinput.active {
+    display: block;
+  }
+
+  #editMeta input{
+    width: 100%;
+  }
+}

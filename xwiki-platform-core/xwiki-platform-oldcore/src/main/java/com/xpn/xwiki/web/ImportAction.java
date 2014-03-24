@@ -318,6 +318,9 @@ public class ImportAction extends XWikiAction
 
         try {
             xarWikiStream.read(instanceWikiStream.getFilter());
+
+            xarWikiStream.close();
+            instanceWikiStream.close();
         } finally {
             // Stop isolating log
             loggerManager.popLogListener();

@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.internal.output;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
@@ -42,5 +43,11 @@ public class StringWriterOutputTarget extends AbstractWriterOutputTarget
     protected Writer openWriter()
     {
         return new StringWriter();
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        // Useless
     }
 }

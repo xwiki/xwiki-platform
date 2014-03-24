@@ -176,6 +176,9 @@ public class AbstractInstanceInputWikiStreamTest extends AbstractInstanceWikiStr
 
         inputWikiStream.read(outputWikiStream.getFilter());
 
+        inputWikiStream.close();
+        outputWikiStream.close();
+
         Assert.assertEquals(expected, writer.getBuffer().toString());
     }
 

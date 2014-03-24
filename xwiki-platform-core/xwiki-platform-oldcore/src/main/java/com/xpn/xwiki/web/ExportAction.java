@@ -317,6 +317,9 @@ public class ExportAction extends XWikiAction
 
             inputWikiStream.read(outputWikiStream.getFilter());
 
+            inputWikiStream.close();
+            outputWikiStream.close();
+
             // Flush
             response.getOutputStream().flush();
 

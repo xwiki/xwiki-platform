@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.instance.internal.output;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.text.ParseException;
@@ -115,6 +116,17 @@ public class ExtensionInstanceOutputWikiStreamTest
         InputWikiStream inputWikiStream = this.xmlInputWikiStreamFactory.createInputWikiStream(properties);
 
         inputWikiStream.read(outputWikiStream.getFilter());
+
+        try {
+            inputWikiStream.close();
+        } catch (IOException e) {
+            throw new WikiStreamException("Failed to close input wiki stream", e);
+        }
+        try {
+            outputWikiStream.close();
+        } catch (IOException e) {
+            throw new WikiStreamException("Failed to close output wiki stream", e);
+        }
     }
 
     // tests

@@ -107,6 +107,10 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     public void close() throws IOException
     {
         this.properties.getTarget().close();
+
+        if (this.wikiWriter != null) {
+            this.wikiWriter.close();
+        }
     }
 
     public String toString(Object obj)
@@ -155,7 +159,11 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     @Override
     public void endWiki(String name, FilterEventParameters parameters) throws WikiStreamException
     {
-        this.wikiWriter.close();
+        try {
+            this.wikiWriter.close();
+        } catch (IOException e) {
+            throw new WikiStreamException("Failed to close XAR writer", e);
+        }
 
         this.wikiWriter = null;
     }

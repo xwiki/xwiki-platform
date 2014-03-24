@@ -80,5 +80,8 @@ public class WikiStreamConverterJob extends
         // Convert
 
         inputWikiStream.read(outputWikiStream.getFilter());
+
+        inputWikiStream.close();
+        outputWikiStream.close();
     }
 }

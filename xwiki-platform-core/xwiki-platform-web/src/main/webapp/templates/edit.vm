@@ -88,9 +88,11 @@
   <div class="leftsidecolumns">
   <div id="editcolumn" class="editor editor-${editor}">
   <div class="alleditcontent">
-  <div id="editmenu" class="actionmenu">
-  #template("editmenu.vm")
-  </div>
+  #if($displayContentMenu)
+    <div id="editmenu" class="actionmenu">
+      #template("editmenu.vm")
+    </div>
+  #end
   <div id="mainEditArea">
   #template("hierarchy.vm")
   #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)

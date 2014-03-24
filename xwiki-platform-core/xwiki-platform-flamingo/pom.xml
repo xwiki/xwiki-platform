@@ -36,6 +36,13 @@
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <dependencies>
+    <!-- WebJars -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars</artifactId>
+      <version>${platform.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>

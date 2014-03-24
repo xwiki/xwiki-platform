@@ -321,17 +321,6 @@ function init() {
     new PreviousUIForm(previousUIForm);
   });
 
-  // Enhance the tree of documents.
-  $('body').select('.expandable .parent').each(function(parent) {
-    var toggle = function() {
-      parent.toggleClassName("collapsed");
-      parent.next().toggle();
-    };
-    parent.observe('click', toggle);
-    // The tree is initially collapsed.
-    toggle();
-  });
-
   $('extension.defaultui') && new XWiki.DefaultUIStep();
   $('extension.defaultui.wikis') && new WikisStep();
   $('extension.outdatedextensions') && new XWiki.OutdatedExtensionsStep();

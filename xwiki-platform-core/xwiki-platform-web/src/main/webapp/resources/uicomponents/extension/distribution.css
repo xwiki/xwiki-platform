@@ -54,63 +54,25 @@
   list-style-position: inside;
   margin-top: 1.5em;
 }
-#documents ul.documents {
-  background-color: $theme.pageContentBackgroundColor;
+#report .document-tree {
   border: 1px dotted $theme.borderColor;
-  margin: 0 0 1em 0 !important;
-  padding: 3px !important;
-  width: 98%;
+  padding: .3em;
 }
-ul.documents li.xitem div.xitemcontainer {
-  text-indent: 0;
+#report .collapsible.document-tree {
+  padding-left: 1.3em;
 }
-ul.documents li.xitem div.xitemcontainer .parent:before {
-  content: '\229F';
-  display: inline-block;
-  font-size: 16px;
-  font-weight: 400;
-  height: 16px;
-  margin-right: 20px;
-  text-align: center;
-  width: 16px;
+.document-tree .node form.actions {
+  display: inline;
 }
-ul.documents li.xitem div.xitemcontainer .parent.collapsed:before {
-  content: '\229E'
+.document-tree .node form.actions .icon {
+  padding: 0;
 }
-ul.package li.collapsed div.xitemcontainer {
-  display: none;
+.document-tree .created.document.node, .document-tree .created.locale.node {
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_add.png')")
 }
-ul.documents li.xitem div.xitemcontainer .parent {
-  cursor: pointer;
+.document-tree .deleted.document.node, .document-tree .deleted.locale.node {
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_delete.png')")
 }
-ul.documents li.xitem div.xitemcontainer div.wikiname {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/world.png')") no-repeat scroll 18px .1em;
-  font-weight: bold;
-}
-ul.documents li.xitem div.xitemcontainer div.spacename {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/folder.png')") no-repeat scroll 18px .1em;
-  font-weight: bold;
-}
-ul.documents div.documentname {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/page_white.png')") no-repeat scroll 18px .1em;
-}
-ul.documents span.documentname {
-  padding-left: 40px;
-}
-ul.documents span.documentname.created {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/page_white_add.png')") no-repeat scroll 18px .1em;
-}
-ul.documents span.documentname.deleted {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/page_white_delete.png')") no-repeat scroll 18px .1em;
-}
-ul.documents span.documentname.modified {
-  background: transparent url("$xwiki.getSkinFile('icons/silk/page_white_edit.png')") no-repeat scroll 18px .1em;
-}
-ul.documents .documentactions {
-  float:right;
-  height: 16px;
-  text-align: top;
-}
-ul.documents .buttonwrapper {
-    margin: 0px 0px 0px 5px;
+.document-tree .modified.document.node, .document-tree .modified.locale.node {
+  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_edit.png')")
 }

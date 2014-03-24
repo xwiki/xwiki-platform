@@ -41,16 +41,20 @@
   #set($rollbackIconSrc = $escapetool.xml($xwiki.getSkinFile('icons/silk/arrow_undo.png')))
 
   #macro(displayReportPageActions, $status)
-      ## TODO: use ajax instead if JS is enabled
-      <form class="documentactions" method="post">
+    ## TODO: use ajax instead if JS is enabled
+    <form class="actions" method="post">
       <input type="hidden" name="document" value="$services.model.serialize($status.reference)"/>
       <input type="hidden" name="document_locale" value="$!{status.reference.locale}"/>
       #if ($status.previousVersion)
         <input type="hidden" name="previousVersion" value="$status.previousVersion"/>
       #end
 
-      #if ($status.action.toString() != 'DELETED')<input type="image" src="$deletedIconSrc" name="documentaction_delete" alt="delete">#end
-      #if ($status.previousVersion)<input type="image" src="$rollbackIconSrc" alt="rollback" name="documentaction_rollback" alt="rollback">#end
+      #if ($status.action.toString() != 'DELETED')
+        <input type="image" class="icon" src="$deletedIconSrc" name="documentaction_delete" alt="delete" />
+      #end
+      #if ($status.previousVersion)
+        <input type="image" class="icon" src="$rollbackIconSrc" name="documentaction_rollback" alt="rollback" />
+      #end
     </form>
   #end
 {{/velocity}}
@@ -65,65 +69,56 @@
 
   #if (!$modifiedWikis.isEmpty())
     {{html}}
-    <div id="documents">
-      <ul class="xlist documents expandable">
-      #foreach($wiki in $sorttool.sort($modifiedWikis.keySet()))
-        <li class="xitem">
-          <div class="xitemcontainer">
-            <div class="parent wikiname">$wiki</div>
-            <ul class="xlist">
+    #set ($currentLocale = $services.localization.currentLocale)
+    <ul class="collapsible document-tree">
+      #foreach ($wiki in $sorttool.sort($modifiedWikis.keySet()))
+        <li>
+          #set ($wikiPrettyName = $services.wiki.getById($wiki).prettyName)
+          #if ("$!wikiPrettyName.trim()" == '')
+            #set ($wikiPrettyName = $wiki)
+          #end
+          <div class="wiki node">$escapetool.xml($wikiPrettyName)</div>
+          <ul>
             ## TODO: add support for sub-spaces
-            #foreach($space in $modifiedWikis.get($wiki).keySet())
-              <li class="xitem">
-                <div class="xitemcontainer">
-                  <div class="parent spacename">$space</div>
-                  <ul class="xlist">
-                  ## List each document in the space
-                  #foreach($page in $modifiedWikis.get($wiki).get($space).keySet())
+            #foreach ($space in $modifiedWikis.get($wiki).keySet())
+              <li class="collapsed">
+                <div class="space node">$escapetool.xml($space)</div>
+                <ul>
+                  ## List each document in the space.
+                  #foreach ($page in $modifiedWikis.get($wiki).get($space).keySet())
                     ## List each locale of the document
-                    #set($locales = $modifiedWikis.get($wiki).get($space).get($page))
-                    #set($rootLocale = $locales.get(''))
+                    #set ($locales = $modifiedWikis.get($wiki).get($space).get($page))
+                    #set ($rootLocale = $locales.get(''))
                     #if ($locales.size() == 1)
-                      <li class="xitem xhighlight">
-                        <div class="xitemcontainer xpagecontainer">
-                          <span class="documentname $rootLocale.action.toString().toLowerCase()">$page</span> #displayReportPageActions($rootLocale)
-                        </div>
+                      <li class="$!rootLocale.action.toString().toLowerCase() document node">$escapetool.xml($page)
+                        #displayReportPageActions($rootLocale)
                       </li>
                     #else
-                      <li class="xitem">
-                      <div class="xitemcontainer">
-                        <div class="parent documentname $rootLocale.action.toString().toLowerCase()">$page</div>
-                        <ul class="xlist">
-                        #foreach($document in $modifiedWikis.get($wiki).get($space).get($page).values())
-                          <li class="xitem xhighlight">
-                            <div class="xitemcontainer xpagecontainer">
-                              <span class="documentname $document.action.toString().toLowerCase()">
-                                #if ("$!{document.reference.locale}" == '')
-                                  $services.localization.render('platform.extension.distributionWizard.reportStepDocumentsDefaultLanguage')
-                                #else
-                                  $document.reference.locale
-                                #end
-                              </span>
-
+                      <li class="collapsed">
+                        <div class="document node">$escapetool.xml($page)</div>
+                        <ul>
+                          #foreach ($document in $modifiedWikis.get($wiki).get($space).get($page).values())
+                            #if ("$!document.reference.locale" == '')
+                              #set ($locale = $services.localization.render(
+                                'platform.extension.distributionWizard.reportStepDocumentsDefaultLanguage'))
+                            #else
+                              #set ($locale = $document.reference.locale.getDisplayName($currentLocale))
+                            #end
+                            <li class="$!document.action.toString().toLowerCase() locale node">$escapetool.xml($locale)
                               #displayReportPageActions($document)
-                            </div>
-                          </li>
-                        #end
+                            </li>
+                          #end
                         </ul>
-                      </div>
                       </li>
                     #end
                   #end
-                  </ul>
-                </div>
+                </ul>
               </li>
             #end
-            </ul>
-          </div>
+          </ul>
         </li>
       #end
-      </ul>
-    </div>
+    </ul>
     {{/html}}
   #else
     {{translation key="platform.extension.distributionWizard.reportStepDocumentsNoChange"/}}

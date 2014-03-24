@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.xar.internal.output;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -38,7 +39,7 @@ import org.xwiki.xar.XarPackage;
  * @version $Id$
  * @since 5.2M2
  */
-public class XARWikiWriter
+public class XARWikiWriter implements Closeable
 {
     private final String name;
 
@@ -131,16 +132,16 @@ public class XARWikiWriter
         }
     }
 
-    public void close() throws WikiStreamException
+    public void close() throws IOException
     {
         // Add package.xml descriptor
-        writePackage();
+        try {
+            writePackage();
+        } catch (WikiStreamException e) {
+            throw new IOException("Failed to write package", e);
+        }
 
         // Close zip stream
-        try {
-            this.zipStream.close();
-        } catch (IOException e) {
-            throw new WikiStreamException("Failed to close zip output stream", e);
-        }
+        this.zipStream.close();
     }
 }

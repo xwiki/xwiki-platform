@@ -292,6 +292,9 @@ public class ImportAction extends XWikiAction
 
         try {
             xarWikiStream.read(instanceWikiStream.getFilter());
+
+            xarWikiStream.close();
+            instanceWikiStream.close();
         } finally {
             source.close();
 

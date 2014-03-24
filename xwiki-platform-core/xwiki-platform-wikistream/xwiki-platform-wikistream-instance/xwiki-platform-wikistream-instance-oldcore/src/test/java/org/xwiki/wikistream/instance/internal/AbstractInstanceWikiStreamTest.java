@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.instance.internal;
 
+import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -305,6 +306,17 @@ public class AbstractInstanceWikiStreamTest
         InputWikiStream inputWikiStream = this.xmlInputWikiStreamFactory.createInputWikiStream(properties);
 
         inputWikiStream.read(outputWikiStream.getFilter());
+
+        try {
+            inputWikiStream.close();
+        } catch (IOException e) {
+            throw new WikiStreamException("Failed to close input wiki stream", e);
+        }
+        try {
+            outputWikiStream.close();
+        } catch (IOException e) {
+            throw new WikiStreamException("Failed to close output wiki stream", e);
+        }
     }
 
     protected Date toDate(String date) throws ParseException

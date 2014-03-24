@@ -340,6 +340,8 @@ public class Packager
         // Convert
         xarWikiStream.read(documentFilter);
 
+        xarWikiStream.close();
+
         return documentFilter.getDocument();
     }
 

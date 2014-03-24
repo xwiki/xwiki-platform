@@ -89,4 +89,13 @@ public class ExtensionProgressPane extends BaseElement
         }
         return null;
     }
+
+    /**
+     * @return the confirmation to delete the unused wiki pages after uninstalling or upgrading a XAR extension
+     */
+    public UnusedPagesPane getUnusedPages()
+    {
+        return new UnusedPagesPane(getUtil().findElementWithoutWaiting(getDriver(), container,
+            By.className("extension-question")));
+    }
 }

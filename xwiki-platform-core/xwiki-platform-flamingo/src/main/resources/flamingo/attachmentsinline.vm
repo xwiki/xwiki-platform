@@ -1,6 +1,7 @@
 $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
 $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)
 $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
+$xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
 ###
 ### List document attachments
 ###

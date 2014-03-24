@@ -18,6 +18,7 @@
   #set ($docextras = [])
   #if ($showcomments)
     $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
+    $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #set ($discard = $docextras.add(['Comments', 'comments', $services.localization.render('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'commentsinline.vm', $services.localization.render('core.shortcuts.view.comments')]))
   #end
   #if ($showannotations)
@@ -33,6 +34,7 @@
     $xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
     $xwiki.ssfx.use('uicomponents/widgets/upload.css', true)
     $xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
+    $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
     ### Support attachment sorting
     #set ($sortAttachmentsBy = "$!{request.sortAttachmentsBy}")
     #if ($sortAttachmentsBy != '')

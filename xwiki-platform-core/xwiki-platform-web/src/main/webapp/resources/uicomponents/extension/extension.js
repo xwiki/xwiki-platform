@@ -729,8 +729,7 @@ require(['jquery'], function($) {
         .find('input[type="checkbox"]');
       var total = checkboxes.length;
       var selectedCount = checkboxes.filter(':checked').length;
-      var message = "$escapetool.javascript($services.localization.render('extensions.uninstall.cleanPages.selectedCount',
-        ['__selectedCount__', '__total__']))";
+      var message = "$escapetool.javascript($services.localization.render('extensions.uninstall.cleanPages.selectedCount', ['__selectedCount__', '__total__']))";
       $(this).text(message.replace('__selectedCount__', selectedCount).replace('__total__', total));
       // Select the parent if there is at least one descendant selected. Unselect it otherwise.
       $(this).next().prop('checked', selectedCount > 0);

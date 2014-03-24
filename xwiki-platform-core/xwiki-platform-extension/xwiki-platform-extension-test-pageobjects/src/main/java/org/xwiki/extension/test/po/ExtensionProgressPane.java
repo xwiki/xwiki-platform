@@ -58,6 +58,15 @@ public class ExtensionProgressPane extends BaseElement
     }
 
     /**
+     * @return the element that displays the job log label, which is also used to collapse / expand the job log
+     */
+    public WebElement getJobLogLabel()
+    {
+        String xpath = "//*[@class = 'job-log']/parent::dd/preceding-sibling::dt[last()]/label";
+        return getUtil().findElementWithoutWaiting(getDriver(), container, By.xpath(xpath));
+    }
+
+    /**
      * @return the lines of job log
      */
     public List<LogItemPane> getJobLog()

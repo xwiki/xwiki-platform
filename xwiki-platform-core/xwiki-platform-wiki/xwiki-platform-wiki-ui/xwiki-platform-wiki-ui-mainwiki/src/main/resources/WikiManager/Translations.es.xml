@@ -44,6 +44,8 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language es generated from http://www.l10n.xwiki.org
+platform.wiki.browse._actions=Acciones
+platform.wiki.browse._actions.delete=Borrar
 platform.wiki.create.error.wikiname.databasealreadyexists=Ya existe una base de datos con ese identificador
 platform.wiki.create.error.wikiname.empty=El identificador no puede estar vacío
 platform.wiki.create.error.wikiname.wikialreadyexists=Este identificador ya está en uso

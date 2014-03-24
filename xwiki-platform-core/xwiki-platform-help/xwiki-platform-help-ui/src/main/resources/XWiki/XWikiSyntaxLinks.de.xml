@@ -50,7 +50,6 @@
 {{comment}}please do not translate the sub headlines{{/comment}}
 === 1.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Funktion|=XWiki Syntax 1.0|=(% style="width:20%" %)Ergebnis
 |Link zu Seite im aktuellen Bereich|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
 |Link mit Linktext|{{{[Linktext&gt;WebHome]}}}|[[Linktext&gt;&gt;WebHome]]
@@ -97,7 +96,6 @@ Das vollständige Format eines Links ist **##[Linktext {&gt; oder |}] (Ressource
 
 === 2.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Funktion|=XWiki Syntax 2.0|=(% style="width:20%" %)Ergebnis
 |Link zu Seite im aktuellen Bereich|{{{[[WebHome]]}}}|[[WebHome]]
 |Link mit Linktext|(((
@@ -152,9 +150,7 @@ Das vollständige Format eines Links ist **##[Linktext&gt;&gt;] (Ressource) [@in
 
 === 2.1 Links ===
 
-(% style="overflow:hidden;word-wrap:break-word" %)
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Funktion|=XWiki Syntax 2.1|=(% style="width:20%" %)Ergebnis
+|=Funktion|=XWiki Syntax 2.1|=Ergebnis
 |Link zu Seite im aktuellen Bereich|{{{[[WebHome]]}}}|[[WebHome]]
 |Link mit Linktext|(((
 {{{[[Linktext&gt;&gt;WebHome]]}}}

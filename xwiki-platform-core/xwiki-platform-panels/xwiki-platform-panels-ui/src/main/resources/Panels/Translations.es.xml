@@ -21,21 +21,21 @@
 -->
 
 <xwikidoc>
-  <web>Main</web>
-  <name>SolrTranslations</name>
+  <web>Panels</web>
+  <name>Translations</name>
   <language>es</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
-  <parent>Main.SolrSearch</parent>
+  <parent>Panels.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1385047506000</creationDate>
-  <date>1385298756000</date>
-  <contentUpdateDate>1385298756000</contentUpdateDate>
+  <creationDate>1393442253000</creationDate>
+  <date>1393442321000</date>
+  <contentUpdateDate>1393442321000</contentUpdateDate>
   <version>1.1</version>
-  <title>Solr Search Translations</title>
+  <title/>
   <template/>
   <defaultTemplate/>
   <validationScript/>
@@ -44,21 +44,6 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language es generated from http://www.l10n.xwiki.org
-solr.admin.indexing.action.label=Acción
-solr.admin.status.title=Estado
-solr.facets.collapseAll=Contraer todo
-solr.facets.expandAll=Expandir Todo
-solr.field.creator_display=Creador
-solr.filterBy.fileType.image=Imagen
-solr.filterBy.fileType.text=Texto
-solr.filterBy.type.attachment=Adjunto
-solr.filterBy.type.document=Documento
-solr.filterBy.type.object=Objeto
-solr.result.location=Ubicado en {0} » {1} » {2}
-solr.sortBy=Ordenar por\:
-solr.sortBy.author_display_sort=Último Autor
-solr.sortBy.date=Fecha
-solr.sortBy.score=Relevancia
-solr.sortBy.title_sort=Título
+panels._actions=Acciones
 </content>
 </xwikidoc>

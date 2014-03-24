@@ -514,6 +514,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
         UninstallRequest uninstallRequest = new UninstallRequest();
         uninstallRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, extensionId.getId(), namespace));
+        uninstallRequest.setInteractive(true);
         uninstallRequest.addExtension(extensionId);
         if (StringUtils.isNotBlank(namespace)) {
             uninstallRequest.addNamespace(namespace);

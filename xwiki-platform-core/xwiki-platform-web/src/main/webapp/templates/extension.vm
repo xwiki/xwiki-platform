@@ -649,6 +649,8 @@ Caused by: #printThrowable($throwable.cause true)
   #set ($questionType = $question.getClass().getName())
   #if ($questionType.endsWith('.ConflictQuestion'))
     #displayExtensionDetails_mergeConflictQuestion($question)
+  #elseif ($questionType.endsWith('.CleanPagesQuestion'))
+    #displayExtensionDetails_cleanPagesQuestion($question)
   #end
 #end
 
@@ -740,6 +742,81 @@ Caused by: #printThrowable($throwable.cause true)
       #set ($headingLevel = 4)
       #template('changesdoc.vm')
     </div>
+  #end
+#end
+
+#macro (displayExtensionDetails_cleanPagesQuestion $question)
+  <dl>
+    <dt>
+      <label>$escapetool.xml($services.localization.render('extensions.uninstall.cleanPages.label'))</label>
+      <span class="xHint">$escapetool.xml($services.localization.render('extensions.uninstall.cleanPages.hint'))</span>
+    </dt>
+    <dd>
+      #set ($entityReferenceTree = $services.model.toTree($question.pages.keySet()))
+      #displayDocumentTree($entityReferenceTree $question.pages)
+    </dd>
+  </dl>
+#end
+
+#macro (displayDocumentTree $entityReferenceTree $mapOfSelectedDocuments)
+  #set ($currentLocale = $services.localization.currentLocale)
+  #displayDocumentTreeNode($entityReferenceTree $mapOfSelectedDocuments)
+#end
+
+#macro (displayDocumentTreeNode $node $mapOfSelectedDocuments)
+  #if ($node.reference)
+    #set ($nodeLabel = $node.reference.name)
+    #if ("$node.reference.type" == 'WIKI')
+      #set ($wikiPrettyName = $services.wiki.getById($node.reference.name).prettyName)
+      #if ("$!wikiPrettyName.trim()" != '')
+        #set ($nodeLabel = $wikiPrettyName)
+      #end
+    #end
+    <div class="$!node.reference.type.toString().toLowerCase() node">$escapetool.xml($nodeLabel)
+      #if ("$node.reference.type" == 'DOCUMENT')
+        ## Currently there's no string representation of a document reference with parameters (such as locale) that can
+        ## be resolved so we need to submit a set of (document reference without locale, locale) pairs.
+        #set ($name = $escapetool.xml($services.model.serialize($node.reference, 'default')))
+        ## We don't display the locale child nodes if there is only one locale. We display just the document node.
+        #if ($node.locales && $node.locales.size() == 1)
+          #set ($documentReference = $node.locales.iterator().next())
+          #if ("$!documentReference.locale" != '')
+            ## Display the locale if it's not the default one.
+            <span class="locale">$escapetool.xml($documentReference.locale.getDisplayName($currentLocale))</span>
+          #end
+          <span class="actions">
+            <input type="checkbox" name="$name" value="$escapetool.xml("$!documentReference.locale")"
+              #if ($mapOfSelectedDocuments.get($documentReference)) checked="checked"#end />
+          </span>
+        #end
+      #end
+    </div>
+  #end
+  #if ($node.children && $node.children.size() > 0)
+    <ul#if (!$node.reference) class="collapsible selectable document-tree"#end>
+      #foreach ($child in $node.children)
+        <li#if ("$!child.reference.type" == 'DOCUMENT') class="collapsed"#end>
+          #displayDocumentTreeNode($child $mapOfSelectedDocuments)
+        </li>
+      #end
+    </ul>
+  #elseif ($node.locales && $node.locales.size() > 1)
+    <ul>
+      #foreach ($documentReference in $node.locales)
+        #if ("$!documentReference.locale" == '')
+          #set ($locale = $services.localization.render(
+            'platform.extension.distributionWizard.reportStepDocumentsDefaultLanguage'))
+        #else
+          #set ($locale = $documentReference.locale.getDisplayName($currentLocale))
+        #end
+        <li class="locale node">$escapetool.xml($locale)
+          <span class="actions">
+            <input type="checkbox" name="$name" value="$escapetool.xml("$!documentReference.locale")"
+              #if ($mapOfSelectedDocuments.get($documentReference)) checked="checked"#end />
+          </span>
+        </li>
+      #end
+    </ul>
   #end
 #end
 
@@ -948,6 +1025,15 @@ Caused by: #printThrowable($throwable.cause true)
       ## A merge conflict occurred during installation.
       #set ($discard = $jobStatus.question.setGlobalAction($request.versionToKeep))
       #set ($discard = $jobStatus.question.setAlways($request.autoResolve.equals('true')))
+    #elseif ($questionType.endsWith('.CleanPagesQuestion'))
+      #foreach ($entry in $jobStatus.question.pages.entrySet())
+        ## Currently there's no string representation of a document reference with parameters (such as locale) that can
+        ## be resolved so what has been submitted is a set of (document reference without locale, locale) pairs.
+        #set ($stringReferenceWithoutLocale = $services.model.serialize($entry.key, 'default'))
+        #set ($localesToDelete = $request.getParameterValues($stringReferenceWithoutLocale))
+        #set ($delete = $localesToDelete && $localesToDelete.contains($entry.key.locale.toString()))
+        #set ($discard = $entry.setValue($delete))
+      #end
     #end
     #set ($discard = $jobStatus.answered())
   #end

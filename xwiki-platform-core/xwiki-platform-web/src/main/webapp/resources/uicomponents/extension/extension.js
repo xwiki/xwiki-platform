@@ -710,3 +710,52 @@ document.observe('xwiki:dom:updated', enhanceExtensions);
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
+
+// Document Tree
+require(['jquery'], function($) {
+  var enhanceDocumentTree = function() {
+    var tree = this;
+
+    // Collapse / Expand tree nodes.
+    var toggleCollapsed = function(event) {
+      if ($(event.target).closest('.actions', this).length == 0) {
+        $(this).parent('li').toggleClass('collapsed');
+      }
+    };
+
+    // Update the number of selected documents.
+    var updateSelectedCount = function() {
+      var checkboxes = $(this).closest('.node', tree).next('ul').find('.node').not('.parent')
+        .find('input[type="checkbox"]');
+      var total = checkboxes.length;
+      var selectedCount = checkboxes.filter(':checked').length;
+      var message = "$escapetool.javascript($services.localization.render('extensions.uninstall.cleanPages.selectedCount',
+        ['__selectedCount__', '__total__']))";
+      $(this).text(message.replace('__selectedCount__', selectedCount).replace('__total__', total));
+      // Select the parent if there is at least one descendant selected. Unselect it otherwise.
+      $(this).next().prop('checked', selectedCount > 0);
+    };
+
+    // Check / uncheck all descendant nodes.
+    var toggleSelection = function() {
+      $(this).closest('.node', tree).next('ul').find('input[type="checkbox"]').prop('checked', $(this).prop('checked'));
+    };
+
+    var parents = $(this).find('ul').prev('.node').addClass('parent');
+    $(this).hasClass('collapsible') && parents.click(toggleCollapsed);
+    if ($(this).hasClass('selectable')) {
+      parents.append('<span class="actions"><input type="checkbox"/></span>');
+      parents.find('.actions input[type="checkbox"]').click(toggleSelection).before('<span class="selectedCount"/>')
+        .prev('.selectedCount').each(updateSelectedCount);
+      $(this).find('input[type="checkbox"]').click(function() {
+        $(tree).find('.selectedCount').each(updateSelectedCount);
+      });
+    }
+  };
+
+  $('.document-tree').each(enhanceDocumentTree);
+  // Catch the custom event sent with Prototype.js
+  document.observe('xwiki:dom:updated', function(event) {
+    $(event.memo.elements).find('.document-tree').each(enhanceDocumentTree);
+  });
+})

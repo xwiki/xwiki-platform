@@ -1,0 +1,62 @@
+//
+// FORMS
+// --------------------------------------------------
+
+textarea, select, input[type="text"], input[type="password"] {
+  &:extend(.form-control all);
+  display: inline-block;
+  width: auto;
+}
+
+select.input-sm, input[type="text"].input-sm, input[type="password"].input-sm {
+  .input-sm;
+}
+
+select.input-lg, input[type="text"].input-lg, input[type="password"].input-lg {
+  .input-lg;
+}
+
+input[type="radio"]:extend(.radio all), 
+input[type="checkbox"]:extend(.checkbox all) {
+  display: inline-block;
+  margin-right: (@padding-base-horizontal / 2);
+}
+
+textarea {
+  height: auto;
+  max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
+}
+
+.placeholder(@color: @text-muted);
+
+/* For browsers that don't support the placeholder attribute. */
+input[type="text"].empty {
+  .text-muted;
+}
+
+.xform {
+  input[type="text"], input[type="password"], select, textarea {
+    width: 100%;
+  }
+  dl {
+    dt {
+      margin-top: floor(@font-size-base * 1.4);
+      &:first-of-type {
+        margin-top: 0;
+      }
+    }
+  }
+  .xHint, .xRequired {
+    .text-muted-smaller;
+    font-weight: 400;
+  }
+  .xHint {
+    display: block;
+  }
+  .xErrorMsg {
+    color: @state-danger-text;
+  }
+  .xErrorField {
+    border-color: @state-danger-bg;
+  }
+}

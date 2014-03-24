@@ -1,0 +1,58 @@
+//
+// General
+// --------------------------------------------------
+
+// Local Mixins ===============================================================
+
+.text-smaller {
+  font-size: floor(@font-size-base * 0.9);
+}
+
+.text-muted-smaller {
+  .text-muted;
+  .text-smaller;
+}
+
+// Classes ====================================================================
+
+.clearfloats:extend(.clearfix all) {}
+
+.centered {
+  .text-center;
+}
+
+.separator, .itemCount {
+  .text-muted;
+}
+
+.noitems {
+  .text-muted-smaller;
+}
+
+// Containers =================================================================
+
+#mainContentArea, #mainEditArea, 
+#xdocFooter, #docextrapanes {
+  background: @body-bg;
+}
+
+.main{
+  background-color: #FFF;
+  box-shadow: 0px 1px 2px #CFD3D4;
+  padding: 10px;
+}
+
+#menuContent{
+  .text-right();  
+  .btn-group {
+    margin: 2px 0;
+  }
+}
+
+// Tables =====================================================================
+table:extend(.table all) {}
+
+table{
+  .table;
+}
+

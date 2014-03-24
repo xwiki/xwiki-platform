@@ -1,20 +1,76 @@
-// This file contains values and classes specific to XWiki (http://www.xwiki.org)
-// XWiki-Common: common selectors that are used by any theme
-// ----------------------------------------------------------------------------
+//
+// Misc
+// --------------------------------------------------
 
-// Local Variables ============================================================
-
-@border-width: 1px;
-
-// Local Mixins ===============================================================
-
-.text-smaller {
-  font-size: floor(@font-size-base * 0.9);
+// Logo =======================================================================
+.navbar-brand{
+  img{
+    margin-top: -4px;
+  }
 }
 
-.text-muted-smaller {
-  .text-muted;
-  .text-smaller;
+// Left menu2 =================================================================
+.leftmenu2{
+  background-color: #F0F0EE; 
+  padding: 5px;
+  a {
+    img {
+      margin: 2px;
+    }
+  }
+}
+
+// Search =====================================================================
+.globalsearch {
+  .globalsearchinput {
+    min-width: 180px;
+    width: 100%;
+  }
+  input.button {
+    margin: 0 @padding-base-horizontal 0 -(@padding-base-horizontal + 16px);
+  }
+}
+
+// Tabbar =====================================================================
+
+.xwikitabbar { // Used by: AllDocs, DocExtra
+  .nav;
+  .nav-tabs;
+  margin: 0;
+}
+
+// Labels =====================================================================
+
+.language {
+  &-translation, 
+  &-default {
+    .label;
+    .label-default;
+    font-weight: 400;
+  }
+  &-default {
+    font-style: italic;
+  }
+  &-current {
+    .label-primary;
+    font-weight: 700;
+  }
+}
+
+// XDialogs ===================================================================
+
+.xdialog-content{
+  .buttonwrapper{
+    input.button{
+      margin: 2px;
+    }
+  }
+}
+
+// Wiki Code =================================================================
+
+.wiki-code{
+  width: 100%;
 }
 
 // Typography =================================================================
@@ -36,37 +92,6 @@ ul.xlist li.create a {
 
 .accordionTabTitleBar h1 { // Used by: Administration - Panel Wizard
   font-size: @font-size-base;
-}
-
-// Forms ======================================================================
-
-.label label { // Used by: Profile. Reset Bootstraps .label class
-  color: @text-color;
-}
-
-// Borders ====================================================================
-
-.actionmenu .submenu {
-  .border-bottom-radius(@border-radius-base);
-}
-
-// Containers =================================================================
-
-#mainContentArea, #mainEditArea, 
-#xdocFooter, #docextrapanes {
-  background: @body-bg;
-}
-
-// Elements ===================================================================
-
-.globalsearch {
-  .globalsearchinput {
-    min-width: 180px;
-    width: 100%;
-  }
-  input.button {
-    margin: 0 @padding-base-horizontal 0 -(@padding-base-horizontal + 16px);
-  }
 }
 
 // Bugs =======================================================================

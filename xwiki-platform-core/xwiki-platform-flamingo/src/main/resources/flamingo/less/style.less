@@ -4,175 +4,24 @@
 
 // Imports ====================================================================
 @import "bootstrap/bootstrap.less"; // Bootstrap
-@import "xwiki-variables.less"; // Bootstrap variables overrided by flamingo
-@import "xwiki-common.less";
-@import "xwiki-mapping.less";
+@import "variables.less"; // Bootstrap variables overrided by flamingo
+@import "action-menus.less";
+@import "admin.less";
+@import "application-panel.less";
+@import "buttons.less";
+@import "comments.less";
+@import "edit.less";
+@import "forms.less";
+@import "general.less";
+@import "grid.less";
+@import "headers.less";
+@import "messages.less";
+@import "misc.less";
+@import "vertical-menus.less";
 @import "xlist.less";
 
-// Classes ====================================================================
 
-.main{
-  background-color: #FFF;
-  box-shadow: 0px 1px 2px #CFD3D4;
-  padding: 10px;
-}
 
-.applicationsPanel{
-  ul li {
-    a{
-      //  background-image: url('http://www.webappers.com/wp-content/themes/webappers3/images/menu_home_sprites.png');
-      //  background-position: center -28px;
-      //  background-repeat: no-repeat;
-        display: block;
-        font-size: 12px;
-        font-weight: bold;
-        padding-bottom: 10px;
-        padding-top: 47px;
-        text-align: center;
-        text-decoration: none;
-    }
-    
-    img{
-      position: absolute;
-      margin: 20px 0 0 30px;
-    }
-  }
-} 
 
-@media (min-width: 400px) and (max-width: 992px) {
-  // Mobile phones on landscapes: appBar entries displayed as columns
-  .applicationsPanel {
-    clear: both;
-    margin-bottom: 3em;
-    
-    .nav li{
-      display: inline-block;
-      margin: 1% !important;
-      width: 30%;
-      border: 1px dashed #CFD3D4;
-    }
-  }
-}
 
-.commentavatar img {
-  border-radius: 5px;
-}
 
-#commentscontent{
-  padding: 10px;
-}
-
-#AddComment {
-  padding: 0;
-}
-
-#menuContent{
-  .text-right();
-  
-  .btn-group {
-    margin: 2px 0;
-  }
-}
-
-/* -----------------------Tables-------------------------*/
-table{
-  .table;
-}
-
-/* ---------------------Headers--------------------------*/
-.edit_section {
-  display: block;
-  height: 24px;
-  line-height: 24px;
-  margin: -@font-size-h1 0 0;
-  overflow: hidden;
-  position: relative;
-  visibility:hidden;
-}
-
-.edit_section a, .edit_section span {
-  background: transparent url("$xwiki.getSkinFile('icons/xwiki/edit-section.png')") no-repeat left top;
-  height: 20px;
-  margin: 0;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  right: 0;
-  text-indent: -1000em;
-  top: 0;
-  visibility:visible;
-  width: 20px;
-}
-
-.wiki-code{
-  width: 100%;
-}
-
-.navbar-brand{
-  img{
-    margin-top: -4px;
-  }
-}
-
-textarea#content{
-  width: 100%;
-}
-
-.leftmenu2{
-  background-color: #F0F0EE; 
-  padding: 5px;
-  a {
-    img {
-      margin: 2px;
-    }
-  }
-}
-
-.admin-menu{
-  .make-xs-column(3);
-}
-
-.admin-category, .admin-page-content{
-  .make-xs-column(9);
-}
-
-/* ---------------------Edit meta tools --------------------------*/
-#editcolumn{
-  .bottombuttons{
-    .buttons{
-      margin: 10px 0;
-    }
-  }
-  
-  .edit-meta-tools{
-    .pull-right();
-    margin-right: 5px;
-  }
-  .edit-meta-tools a {
-      display: block;
-      width: 16px;
-      height: 16px;
-      overflow: hidden;
-      text-indent: -9999px;
-      background: none no-repeat scroll left top transparent;
-      margin-left: 4px;
-  }
-  .edit-meta-tools a.edit-parent {
-    background-image: url("$xwiki.getSkinFile('icons/xwiki/parent_edit.gif')");
-  }
-  .edit-meta-tools a.hide-edit-parent {
-    background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
-  }
-
-  #mainEditArea #parentinput, #mainContentArea #parentinput {
-    display: none;
-  }
-
-  #mainEditArea #parentinput.active, #mainContentArea #parentinput.active {
-    display: block;
-  }
-
-  #editMeta input{
-    width: 100%;
-  }
-}

@@ -22,7 +22,6 @@ package org.xwiki.extension.distribution.internal.job.step;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +35,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.apache.commons.io.IOUtils;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
 import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
@@ -46,8 +44,8 @@ import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -70,7 +68,7 @@ public abstract class AbstractDistributionStep implements DistributionStep
     private static final Pattern FIRSTLINE = Pattern.compile("^.#syntax=(.*)$", Pattern.MULTILINE);
 
     @Inject
-    protected transient ComponentManager componentManager;
+    protected transient ContentParser parser;
 
     @Inject
     protected transient Environment environment;
@@ -195,8 +193,7 @@ public abstract class AbstractDistributionStep implements DistributionStep
         try {
             StringContent content = getStringContent();
 
-            Parser parser = this.componentManager.getInstance(Parser.class, content.syntax.toIdString());
-            xdom = parser.parse(new StringReader(content.content));
+            xdom = parser.parse(content.content, content.syntax);
         } catch (Throwable e) {
             xdom = generateError(e);
         }

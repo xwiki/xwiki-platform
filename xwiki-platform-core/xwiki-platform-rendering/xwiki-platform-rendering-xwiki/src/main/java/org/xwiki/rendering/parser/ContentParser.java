@@ -17,19 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.component.wiki.internal.bridge;
+package org.xwiki.rendering.parser;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
- * A bridge between Wiki Components and the rendering module.
+ * A bridge between platform and rendering from centralising parsing needs.
  *
  * @version $Id$
- * @since 4.3M2
+ * @since 6.0M2
  */
 @Role
 public interface ContentParser
@@ -37,22 +37,23 @@ public interface ContentParser
     /**
      * Parse content.
      *
-     * @param content the content to parse
-     * @param syntax the syntax in which the content is written
-     * @return the XDOM corresponding to the parsed content
-     * @throws WikiComponentException if the content can't be parsed
+     * @param content the content to parse.
+     * @param syntax the syntax in which the content is written.
+     * @return the XDOM corresponding to the parsed content.
+     * @throws ParseException when a parsing error occurs.
+     * @throws MissingParserException when no parser has been found.
      */
-    XDOM parse(String content, Syntax syntax) throws WikiComponentException;
+    XDOM parse(String content, Syntax syntax) throws ParseException, MissingParserException;
 
     /**
-     * Parse content.
+     * Parse content, and add source metadata.
      *
-     * @param content the content to parse
-     * @param syntax the syntax in which the content is written
+     * @param content the content to parse.
+     * @param syntax the syntax in which the content is written.
      * @param source the source entity (mostly a Document Reference) containing the parsed content.
-     * @return the XDOM corresponding to the parsed content
-     * @throws WikiComponentException if the content can't be parsed
-     * @since 6.0M2
+     * @return the XDOM corresponding to the parsed content with source metadata set to source.
+     * @throws ParseException when a parsing error occurs.
+     * @throws MissingParserException when no parser has been found.
      */
-    XDOM parse(String content, Syntax syntax, EntityReference source) throws WikiComponentException;
+    XDOM parse(String content, Syntax syntax, EntityReference source) throws ParseException, MissingParserException;
 }

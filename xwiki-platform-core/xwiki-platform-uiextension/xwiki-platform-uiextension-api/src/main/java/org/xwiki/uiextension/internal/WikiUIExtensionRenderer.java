@@ -27,11 +27,11 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
-import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -98,14 +98,14 @@ public class WikiUIExtensionRenderer
             this.macroTransformation = cm.<Transformation>getInstance(Transformation.class, "macro");
             ContentParser contentParser = cm.getInstance(ContentParser.class);
             XWikiDocument xdoc = getXWikiContext().getWiki().getDocument(documentReference, getXWikiContext());
-            this.xdom = contentParser.parse(content, xdoc.getSyntax());
+            this.xdom = contentParser.parse(content, xdoc.getSyntax(), documentReference);
             this.documentReference = documentReference;
         } catch (ComponentLookupException ex) {
             throw new WikiComponentException(
                 "Failed to get an instance for a component role required by Wiki Components.", ex);
-        } catch (Exception e) {
+        } catch (XWikiException e) {
             throw new WikiComponentException(String.format(
-                "Failed to retrieve document syntax for document [%s]", documentReference), e);
+                "Failed to retrieve document [%s]", documentReference), e);
         }
     }
 

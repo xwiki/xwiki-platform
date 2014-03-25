@@ -19,6 +19,7 @@
  */
 package org.xwiki.uiextension;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,9 +38,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import org.junit.Assert;
-
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -76,7 +74,7 @@ public class WikiUIExtensionRendererTest
         XWikiDocument xdoc = mock(XWikiDocument.class);
         XWiki xwiki = mock(XWiki.class);
 
-        when(contentParser.parse(eq(""), eq(Syntax.XWIKI_2_1))).thenReturn(xdom);
+        when(contentParser.parse("", Syntax.XWIKI_2_1, DOC_REF)).thenReturn(xdom);
         when(xdom.clone()).thenReturn(xdom);
         when(execution.getContext().getProperty("xwikicontext")).thenReturn(xcontext);
         when(xcontext.getWiki()).thenReturn(xwiki);

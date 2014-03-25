@@ -24,13 +24,14 @@ import java.util.Vector;
 
 import org.jmock.Expectations;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.wiki.internal.WikiComponentConstants;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.component.wiki.internal.bridge.DefaultWikiComponentBridge;
 import org.xwiki.component.wiki.internal.bridge.WikiComponentBridge;
-import org.xwiki.component.wiki.internal.WikiComponentConstants;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.internal.DefaultModelConfiguration;
@@ -44,8 +45,8 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 import com.xpn.xwiki.XWiki;
@@ -59,8 +60,6 @@ import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceR
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.Utils;
-
-import org.junit.Assert;
 
 @ComponentList({
     DefaultModelContext.class,
@@ -215,7 +214,7 @@ public class DefaultWikiComponentBridgeTest extends AbstractMockingComponentTest
                 will(returnValue("test"));
                 oneOf(componentDoc).getSyntax();
                 will(returnValue(Syntax.XWIKI_2_1));
-                oneOf(contentParser).parse("test", Syntax.XWIKI_2_1);
+                oneOf(contentParser).parse("test", Syntax.XWIKI_2_1, DOC_REFERENCE);
                 will(returnValue(xdom));
             }
         });

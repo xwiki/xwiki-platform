@@ -305,7 +305,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue("key=value=foo\nkey2=value2\ninvalid=\n\n=invalid"));
                 oneOf(extensionObject).getStringValue(SCOPE_PROPERTY);
                 will(returnValue("wiki"));
-                oneOf(contentParser).parse("content", Syntax.XWIKI_2_0);
+                oneOf(contentParser).parse("content", Syntax.XWIKI_2_0, DOC_REF);
                 will(returnValue(xdom));
                 oneOf(componentManager).getInstance(Transformation.class, "macro");
                 will(returnValue(transformation));

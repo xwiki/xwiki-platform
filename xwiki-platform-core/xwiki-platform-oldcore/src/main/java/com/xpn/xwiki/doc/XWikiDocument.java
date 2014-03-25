@@ -106,10 +106,12 @@ import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.MacroBlockMatcher;
+import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -7886,8 +7888,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void convertSyntax(Syntax targetSyntax, XWikiContext context) throws XWikiException
     {
         // convert content
-        String source = this.defaultEntityReferenceSerializer.serialize(getDocumentReference());
-        setContent(performSyntaxConversion(getContent(), source, getSyntaxId(), targetSyntax));
+        setContent(performSyntaxConversion(getContent(), getDocumentReference(), getSyntax(), targetSyntax));
 
         // convert objects
         Map<DocumentReference, List<BaseObject>> objectsByClass = getXObjects();
@@ -7902,8 +7903,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                             LargeStringProperty field = (LargeStringProperty) bobject.getField(textAreaClass.getName());
 
                             if (field != null) {
-                                field.setValue(performSyntaxConversion(field.getValue(), source, getSyntaxId(),
-                                    targetSyntax));
+                                field.setValue(performSyntaxConversion(field.getValue(), getDocumentReference(),
+                                    getSyntax(), targetSyntax));
                             }
                         }
                     }
@@ -8005,7 +8006,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException if an exception occurred during the conversion process
      * @since 2.4M2
      */
-    private static String performSyntaxConversion(String content, String source, String currentSyntaxId,
+    private static String performSyntaxConversion(String content, DocumentReference source, Syntax currentSyntaxId,
         Syntax targetSyntax) throws XWikiException
     {
         try {
@@ -8078,27 +8079,24 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private XDOM parseContent(String content) throws XWikiException
     {
-        return parseContent(getSyntaxId(), content,
-            this.defaultEntityReferenceSerializer.serialize(getDocumentReference()));
+        return parseContent(getSyntax(), content, getDocumentReference());
     }
 
     /**
      * @param source the reference to where the content comes from (eg document reference)
      */
-    private static XDOM parseContent(String syntaxId, String content, String source) throws XWikiException
+    private static XDOM parseContent(Syntax syntax, String content, DocumentReference source) throws XWikiException
     {
+        ContentParser parser = Utils.getComponent(ContentParser.class);
+
         try {
-            Parser parser = Utils.getComponent(Parser.class, syntaxId);
-            XDOM xdom = parser.parse(new StringReader(content));
-
-            // Set the source meta data so that transformations and renderers can handle relative links/images
-            // correctly.
-            xdom.getMetaData().addMetaData(MetaData.SOURCE, source);
-
-            return xdom;
+            return parser.parse(content, syntax, source);
+        } catch (MissingParserException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to find a parser for syntax [" + syntax.toIdString() + "]", e);
         } catch (ParseException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Failed to parse content of syntax [" + syntaxId + "]", e);
+                "Failed to parse content of syntax [" + syntax.toIdString() + "]", e);
         }
     }
 

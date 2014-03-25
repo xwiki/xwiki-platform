@@ -19,7 +19,6 @@
  */
 package org.xwiki.ircbot.internal.wiki;
 
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +29,6 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
@@ -39,8 +37,9 @@ import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.parser.MissingParserException;
+import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.transformation.Transformation;
 
@@ -92,6 +91,12 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
+     * Content parser used to parse the event handler content.
+     */
+    @Inject
+    private ContentParser parser;
+
+    /**
      * Provides APIs to easily access data stored in wiki pages.
      */
     @Inject
@@ -124,9 +129,8 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
 
                 XDOM eventScriptXDOM;
                 try {
-                    Parser parser = this.componentManager.getInstance(Parser.class, doc.getSyntax().toIdString());
-                    eventScriptXDOM = parser.parse(new StringReader(eventScript));
-                } catch (ComponentLookupException e) {
+                    eventScriptXDOM = parser.parse(eventScript, doc.getSyntax(), documentReference);
+                } catch (MissingParserException e) {
                     throw new IRCBotException(
                         String.format("Could not find a parser for the event content [%s]", eventName), e);
                 } catch (ParseException e) {

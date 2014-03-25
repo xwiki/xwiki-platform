@@ -128,7 +128,7 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
             for (BaseObject method : componentDocument.getObjects(METHOD_CLASS)) {
                 if (!StringUtils.isBlank(method.getStringValue(METHOD_NAME_FIELD))) {
                     handledMethods.put(method.getStringValue(METHOD_NAME_FIELD), renderingBridge.parse(
-                        method.getStringValue(METHOD_CODE_FIELD), this.getSyntax(reference)));
+                        method.getStringValue(METHOD_CODE_FIELD), this.getSyntax(reference), reference));
                 }
             }
         }

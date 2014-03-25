@@ -63,7 +63,11 @@
     {{menu type=""vertical collapsible open""}}{{include reference=""$doc.prefixedFullName"" /}}{{/menu}}
     ${escapetool.h}panelfooter()
     {{/velocity}}")
-  #set ($menuBar = "{{menu type=""horizontal fixedWidth""}}{{include reference=""$doc.prefixedFullName"" /}}{{/menu}}")
+  #set ($menuBar = "{{velocity}}
+    ${escapetool.h}if (${escapetool.d}xwiki.hasAccessLevel('view', ${escapetool.d}xcontext.user, '$doc.prefixedFullName'))
+      {{menu type=""horizontal fixedWidth""}}{{include reference=""$doc.prefixedFullName"" /}}{{/menu}}
+    ${escapetool.h}end
+    {{/velocity}}")
   #set ($extensionPoints = {
     'org.xwiki.platform.template.header.after': $menuBar,
     'platform.panels.rightPanels': $menuPanel,

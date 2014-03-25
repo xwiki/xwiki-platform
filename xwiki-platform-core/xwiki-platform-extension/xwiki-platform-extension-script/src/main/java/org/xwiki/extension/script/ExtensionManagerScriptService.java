@@ -40,6 +40,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.job.AbstractExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
 import org.xwiki.extension.job.internal.InstallJob;
@@ -338,10 +339,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         installRequest.setInteractive(true);
         installRequest.setProperty(PROPERTY_JOB_TYPE, InstallJob.JOBTYPE);
 
-        // Provide informations on what started the job
-        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getDatabase());
-        installRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
-
         return installRequest;
     }
 
@@ -415,13 +412,13 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         return installRequest;
     }
 
-    private void setRightsProperties(InstallRequest installRequest)
+    private void setRightsProperties(AbstractExtensionRequest extensionRequest)
     {
-        installRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
-        installRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
+        extensionRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
+        extensionRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
         XWikiDocument callerDocument = getCallerDocument();
         if (callerDocument != null) {
-            installRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
+            extensionRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
         }
     }
 
@@ -479,7 +476,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public Job uninstall(String id, String namespace)
     {
-        return uninstall(new ExtensionId(id, (Version) null), namespace);
+        return uninstall(createUninstallRequest(id, namespace));
     }
 
     /**
@@ -493,28 +490,73 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public Job uninstall(ExtensionId extensionId)
     {
-        return uninstall(extensionId, null);
+        return uninstall(createUninstallRequest(extensionId, null));
     }
 
     /**
-     * Adds a new job to the job queue to remove the specified extension from the specified namespace. If the namespace
-     * is {@code null} or blank and the extension version is specified the extension is removed from all namespaces.
+     * Adds a new job to the job queue to perform the given uninstall request.
      * <p>
      * This method requires programming rights.
      * 
-     * @param extensionId the id of the extension to remove
-     * @param namespace the namespace from where to remove the specified extension, {@code null} or blank string to
-     *            remove the extension from all namespaces
-     * @return the {@link Job} object which can be used to monitor the progress of the job, or {@code null} in case of
-     *         failure
+     * @param uninstallRequest the uninstall request to perform
+     * @return the {@link Job} object which can be used to monitor the progress of the uninstall process, or
+     *         {@code null} in case of failure
      */
-    private Job uninstall(ExtensionId extensionId, String namespace)
+    public Job uninstall(UninstallRequest uninstallRequest)
     {
         setError(null);
 
-        UninstallRequest uninstallRequest = new UninstallRequest();
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            // Make sure only PR user can remove the right checking or change the users
+            setRightsProperties(uninstallRequest);
+        }
+
+        Job job = null;
+        try {
+            job = this.jobManager.addJob(UninstallJob.JOBTYPE, uninstallRequest);
+        } catch (JobException e) {
+            setError(e);
+        }
+
+        return job;
+    }
+
+    /**
+     * Create an {@link UninstallRequest} instance based on passed parameters.
+     * 
+     * @param extensionId the identifier of the extension to uninstall
+     * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
+     *            extension will be uninstalled globally
+     * @return the {@link UninstallRequest}
+     */
+    public UninstallRequest createUninstallRequest(String id, String namespace)
+    {
+        return createUninstallRequest(new ExtensionId(id, (Version) null), namespace);
+    }
+
+    private UninstallRequest createUninstallRequest(ExtensionId extensionId, String namespace)
+    {
+        UninstallRequest uninstallRequest = createUninstallPlanRequest(extensionId, namespace);
+
         uninstallRequest.setId(getJobId(EXTENSIONACTION_JOBID_PREFIX, extensionId.getId(), namespace));
         uninstallRequest.setInteractive(true);
+        uninstallRequest.setProperty(PROPERTY_JOB_TYPE, UninstallJob.JOBTYPE);
+
+        return uninstallRequest;
+    }
+
+    /**
+     * Create an {@link UninstallRequest} instance based on passed parameters.
+     * 
+     * @param extensionId the identifier of the extension to uninstall
+     * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
+     *            extension will be uninstalled globally
+     * @return the {@link UninstallRequest}
+     */
+    private UninstallRequest createUninstallPlanRequest(ExtensionId extensionId, String namespace)
+    {
+        UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, extensionId.getId(), namespace));
         uninstallRequest.addExtension(extensionId);
         if (StringUtils.isNotBlank(namespace)) {
             uninstallRequest.addNamespace(namespace);
@@ -524,23 +566,11 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         uninstallRequest.setProperty("context.wiki", this.xcontextProvider.get().getDatabase());
         uninstallRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
 
-        uninstallRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
-        XWikiDocument callerDocument = getCallerDocument();
-        if (callerDocument != null) {
-            uninstallRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
-        }
+        setRightsProperties(uninstallRequest);
 
-        uninstallRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
-        uninstallRequest.setProperty(PROPERTY_JOB_TYPE, UninstallJob.JOBTYPE);
+        uninstallRequest.setProperty(PROPERTY_JOB_TYPE, UninstallPlanJob.JOBTYPE);
 
-        Job job = null;
-        try {
-            job = this.jobManager.addJob(UninstallJob.JOBTYPE, uninstallRequest);
-        } catch (Exception e) {
-            setError(e);
-        }
-
-        return job;
+        return uninstallRequest;
     }
 
     /**
@@ -556,7 +586,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public Job createUninstallPlan(String id, String namespace)
     {
-        return createUninstallPlan(new ExtensionId(id, (Version) null), namespace);
+        return createUninstallPlan(createUninstallPlanRequest(new ExtensionId(id, (Version) null), namespace));
     }
 
     /**
@@ -571,44 +601,26 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public Job createUninstallPlan(ExtensionId extensionId)
     {
-        return createUninstallPlan(extensionId, null);
+        return createUninstallPlan(createUninstallPlanRequest(extensionId, null));
     }
 
     /**
-     * Adds a new job to the job queue to remove the specified extension from the specified namespace. If the namespace
-     * is {@code null} or blank and the extension version is specified the extension is removed from all namespaces.
+     * Adds a new job to the job queue to perform the given uninstall plan request.
      * <p>
      * This method requires programming rights.
      * 
-     * @param extensionId the id of the extension for which to create the uninstall plan
-     * @param namespace the namespace from where the specified extension is going to be removed, {@code null} or blank
-     *            string if the extension is supposed to be removed from all namespaces
-     * @return the {@link Job} object which can be used to monitor the progress of the installation process, or
+     * @param uninstallRequest the uninstall plan request to perform
+     * @return the {@link Job} object which can be used to monitor the progress of the uninstall plan process, or
      *         {@code null} in case of failure
      */
-    private Job createUninstallPlan(ExtensionId extensionId, String namespace)
+    private Job createUninstallPlan(UninstallRequest uninstallRequest)
     {
         setError(null);
 
-        UninstallRequest uninstallRequest = new UninstallRequest();
-        uninstallRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, extensionId.getId(), namespace));
-        uninstallRequest.addExtension(extensionId);
-        if (StringUtils.isNotBlank(namespace)) {
-            uninstallRequest.addNamespace(namespace);
+        if (!this.documentAccessBridge.hasProgrammingRights()) {
+            // Make sure only PR user can remove the right checking or change the users
+            setRightsProperties(uninstallRequest);
         }
-
-        // Provide informations on what started the job
-        uninstallRequest.setProperty("context.wiki", this.xcontextProvider.get().getDatabase());
-        uninstallRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
-
-        uninstallRequest.setProperty(PROPERTY_USERREFERENCE, this.documentAccessBridge.getCurrentUserReference());
-        XWikiDocument callerDocument = getCallerDocument();
-        if (callerDocument != null) {
-            uninstallRequest.setProperty(PROPERTY_CALLERREFERENCE, callerDocument.getContentAuthorReference());
-        }
-
-        uninstallRequest.setProperty(PROPERTY_CHECKRIGHTS, true);
-        uninstallRequest.setProperty(PROPERTY_JOB_TYPE, UninstallPlanJob.JOBTYPE);
 
         Job job = null;
         try {

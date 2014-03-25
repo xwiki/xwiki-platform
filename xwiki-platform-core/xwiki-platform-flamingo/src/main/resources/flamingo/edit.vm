@@ -10,7 +10,7 @@
 #if($tdoc.getLocked() && "$!request.get('force')" == '')
   #template("startpage.vm")
   #template("applications.vm")
-  <div class="main layoutsubsection">
+  <div class="main layoutsubsection $mainGridCSS">
    <div id="mainContentArea">
     ##
     $response.setStatus(423)

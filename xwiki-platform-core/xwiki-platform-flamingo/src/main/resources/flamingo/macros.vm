@@ -772,13 +772,15 @@ $doc.display("content", $obj)
 ###    Message box
 ###
 #macro(xwikimessageboxstart $title $message)
-    <div class="centered">
-    <fieldset class="xwikimessage">
-      <legend><span>$title</span></legend>
-      <p class="xwikimessage">$message</p>
+    <div class="centered panel panel-default">
+     <div class="panel-heading">
+      <h3 class="panel-title">$title</h3>
+     </div>
+     <div class="panel-body">
+      <p>$message</p>
 #end
 #macro(xwikimessageboxend)
-    </fieldset>
+      </div>
     </div>
 #end
 

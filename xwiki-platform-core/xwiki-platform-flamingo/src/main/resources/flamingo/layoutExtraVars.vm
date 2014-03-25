@@ -6,16 +6,23 @@
   #set($displayContentMenu = false)
 #end
 
-#set($mainGridCSS = "col-xs-12")
+#if($xcontext.action == 'edit' && $request.editor != 'inline')
+  #set($showLeftPanels = '0')
+  #set($showRightPanels = '1')
+#end
+
+#set($mainGridCSS = 'col-xs-12')
 #set($columnsNumber = 12)
 #if($showApplicationPanel)
   #set($columnsNumber = $columnsNumber - 1)
 #end
-#if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
+
+#if($showLeftPanels == '1' || $request.getParameter('forceLeftPanels'))
   #set($columnsNumber = $columnsNumber - 2)
   #set($mainGridCSS = "${mainGridCSS} col-md-push-2")
 #end
-#if($showRightPanels == "1" || $request.getParameter("forceRightPanels"))
+
+#if($showRightPanels == '1' || $request.getParameter('forceRightPanels'))
   #set($columnsNumber = $columnsNumber - 2)
 #end
 #set($mainGridCSS = "${mainGridCSS} col-md-${columnsNumber}")

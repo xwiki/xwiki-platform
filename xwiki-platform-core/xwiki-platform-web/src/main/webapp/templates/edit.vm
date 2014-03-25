@@ -88,7 +88,7 @@
   <div class="leftsidecolumns">
   <div id="editcolumn" class="editor editor-${editor}">
   <div class="alleditcontent">
-  #if($displayContentMenu)
+  #if($displayEditMenu)
     <div id="editmenu" class="actionmenu">
       #template("editmenu.vm")
     </div>

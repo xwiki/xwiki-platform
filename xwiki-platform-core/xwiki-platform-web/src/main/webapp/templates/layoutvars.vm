@@ -84,6 +84,7 @@
 #end
 
 #set($displayContentMenu = true)
+#set($displayEditMenu = true)
 #set($displayMainMenu = true)
 #set($displayDocExtra = true)
 #set($displayShortcuts = true)

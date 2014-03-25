@@ -25,7 +25,10 @@
  *
  *###
 ##
+## These are used when this page is accessed directly but are useless when the page is pulled in with ajax using 
+## bin/view/Space/Page?xpage=xpart&vm=commentsinline.vm
 $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
+$xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##---------------------------------------------------------------------
 ## Set some 'global' variables

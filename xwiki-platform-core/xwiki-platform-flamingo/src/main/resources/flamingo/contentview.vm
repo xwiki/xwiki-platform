@@ -28,9 +28,9 @@
 ## Display the title
 ## ----------------------------
 <div class="xcontent">
-  <div class="col-xs-12 #if($displayContentMenu)col-md-7#end row">
-    <div id="document-title" class="col-xs-12"><h1>$titleToDisplay</h1></div>
-    <div id="xdocAuthors">
+  <div class="col-xs-12 #if($displayContentMenu)col-md-7#end">
+    <div id="document-title" class="col-xs-12 row"><h1>$titleToDisplay</h1></div>
+    <div id="xdocAuthors" class="row">
   ##    <div class="xdocCreation">  Creation
   ##      $services.localization.render('core.footer.creation', [$xwiki.getUserName($doc.creator), $xwiki.formatDate($doc.creationDate)])<br/>
   ##      #if($tdoc.realLanguage != $doc.realLanguage)

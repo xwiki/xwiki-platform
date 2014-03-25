@@ -38,17 +38,38 @@ input[type="text"].empty {
   input[type="text"], input[type="password"], select, textarea {
     width: 100%;
   }
+  input[type="radio"]{
+    min-height: auto;
+    margin: 0;
+    min-height: 10px;
+  }
   dl {
     dt {
       margin-top: floor(@font-size-base * 1.4);
       &:first-of-type {
         margin-top: 0;
       }
+      label{
+        color: #636B75;
+        font-size: 0.85em;
+        font-weight: 700;
+        margin-bottom: 0.3em;
+        text-transform: uppercase;
+      }
     }
+  }
+  label{
+    margin: 0;
+    display: block;
+    font-weight: normal;
+  }
+  .xRequired {
+    margin-left: 1ex;
   }
   .xHint, .xRequired {
     .text-muted-smaller;
     font-weight: 400;
+    text-transform: none;
   }
   .xHint {
     display: block;

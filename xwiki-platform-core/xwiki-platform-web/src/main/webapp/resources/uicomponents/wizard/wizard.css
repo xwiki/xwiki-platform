@@ -102,6 +102,9 @@
 .wizard-footer .buttonwrapper.left {
   left: 1em;
   position: absolute;
+}
+
+.skin-colibri wizard-footer .buttonwrapper.left{
   top: .1em;
 }
 

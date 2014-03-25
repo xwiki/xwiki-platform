@@ -1547,6 +1547,10 @@ document.observe('xwiki:dom:loaded', function() {
  * JS improvement for keeping the content menu visible on the screen when scrolling down.
  */
 document.observe("xwiki:dom:loaded", function() {
+  // Do it only for colibri
+  if (!$("body").hasClassName("skin-colibri")) {
+    return;
+  }
   var menu = $('contentmenu') || $('editmenu'); // Both for view and edit
   var content = $('mainContentArea') || $('mainEditArea'); // Both for view and edit
   if (menu && content) {

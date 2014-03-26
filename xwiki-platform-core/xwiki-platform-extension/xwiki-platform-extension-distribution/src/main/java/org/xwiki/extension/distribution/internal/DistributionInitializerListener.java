@@ -77,7 +77,10 @@ public class DistributionInitializerListener implements EventListener
             if (event instanceof ApplicationReadyEvent) {
                 this.distributionManager.startFarmJob();
             } else if (!((XWikiContext) arg2).isMainWiki()) {
-                startWikiJob(((XWikiContext) arg2).getDatabase());
+                String wiki = ((XWikiContext) arg2).getDatabase();
+                if (this.distributionManager.getWikiJob(wiki) == null) {
+                    startWikiJob(wiki);
+                }
             }
         }
     }

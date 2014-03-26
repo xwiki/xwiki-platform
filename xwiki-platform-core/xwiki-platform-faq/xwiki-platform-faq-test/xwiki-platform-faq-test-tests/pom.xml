@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-faq-test</artifactId>
-    <version>5.4.3-SNAPSHOT</version>
+    <version>5.4.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-faq-test-tests</artifactId>
   <name>XWiki Platform - FAQ - Tests - Functional Tests</name>

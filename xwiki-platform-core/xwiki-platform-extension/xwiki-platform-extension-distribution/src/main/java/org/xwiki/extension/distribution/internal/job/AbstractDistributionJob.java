@@ -221,7 +221,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
     @Override
     public void awaitReady()
     {
-        if (getStatus() == null || getStatus().getState() != JobStatus.State.FINISHED) {
+        if (getStatus() == null || getStatus().getState() == JobStatus.State.RUNNING) {
             try {
                 this.lock.lockInterruptibly();
 

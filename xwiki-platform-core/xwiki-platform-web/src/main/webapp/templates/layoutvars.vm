@@ -83,8 +83,8 @@
  #end
 #end
 
-#set($displayContentMenu = true)
-#set($displayEditMenu = true)
+#set($displayContentMenu = true) ## header bar of the content area in 'view' mode
+#set($displayEditMenu = true) ## header bar of the content area in 'edit' mode
 #set($displayMainMenu = true)
 #set($displayDocExtra = true)
 #set($displayShortcuts = true)

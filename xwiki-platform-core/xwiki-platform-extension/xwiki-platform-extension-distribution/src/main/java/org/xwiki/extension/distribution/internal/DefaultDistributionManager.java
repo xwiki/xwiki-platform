@@ -264,7 +264,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
             distributionJobThread.start();
 
             // Wait until the job is ready (or finished)
-            this.farmDistributionJob.awaitReady();
+            wikiJob.awaitReady();
 
             return wikiJob;
         } catch (ComponentLookupException e) {

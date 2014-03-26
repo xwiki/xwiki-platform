@@ -3251,7 +3251,7 @@ document.observe('xwiki:dom:loaded', function() {
 
 /*******************************************************/
 
-#admin-page-content {
+.skin-colibri #admin-page-content {
   margin-left: 15em;
 }
 

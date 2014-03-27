@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.instance.internal.input;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 
@@ -96,8 +97,10 @@ public class XWikiAttachmentEventGenerator extends
             content = attachment.getContentInputStream(xcontext);
             size = Long.valueOf(attachment.getFilesize());
         } catch (XWikiException e) {
-            throw new WikiStreamException(String.format("Failed to get content of attachment [%s]",
-                attachment.getReference()), e);
+            this.logger.error("Failed to get content of attachment [{}]", attachment.getReference(), e);
+
+            content = new ByteArrayInputStream(new byte[0]);
+            size = 0L;
         }
 
         // WikiAttachment

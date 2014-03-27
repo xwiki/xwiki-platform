@@ -194,10 +194,7 @@
         var wikiAlias = $('wikialias');
         if (wikiAlias) {
           var alias = filterWikiName(prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase());
-          var suffix = ".${services.wiki.aliasSuffix}";
-          if (suffix != '.') { 
-            alias += ".${services.wiki.aliasSuffix}";
-          }
+          alias += getAliasSuffix();
           wikiAlias.value = alias;
         }
       }
@@ -291,6 +288,19 @@
 
     return result;
   }
+  function getAliasSuffix() {
+    var suffix = "${services.wiki.aliasSuffix}";
+    if (suffix != "") {
+      suffix = "." + suffix;
+    } else {
+      // try to compute the suffix from the request URL
+      var hostname = window.location.hostname;
+      if (hostname != "localhost" &amp;&amp; !hostname.match(/[0-9]{1,3}(?:\.[0-9]{1,3}){3}/g)) {
+        suffix = hostname.substr(hostname.indexOf("."));
+      }
+    }
+    return suffix;
+}
 
   function userScopeChanged(){
     var value = $$('input:checked[type=radio][name=userScope]')[0].value

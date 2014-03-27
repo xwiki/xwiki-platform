@@ -1497,8 +1497,9 @@ ${Msz}Mb##
         'selectedTags': $selectedTags
       })
       #if ($hasTopFilters)
-        #set ($discard = $liveTableParams.put('filterNodes', ["$('$divid').down('.xwiki-livetable-display-filters')",
-          "$('${divid}-topfilters')"]))
+        // Specify the filter nodes using identifiers or CSS selectors.
+        #set ($discard = $liveTableParams.put('filterNodes', ["$escapetool.h$divid .xwiki-livetable-display-filters",
+          "${divid}-topfilters"]))
       #end
       #if ($hasPageSize && "$!pageSizeBounds" != '')
         #set ($discard = $liveTableParams.put('pageSizeBounds', $pageSizeBounds))

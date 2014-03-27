@@ -102,10 +102,12 @@ public class DocumentMergeImporter
                             // Indicate future author to whoever is going to answer the question
                             nextDocument.setCreatorReference(currentDocument.getCreatorReference());
                             DocumentReference userReference = configuration.getUserReference();
-                            nextDocument.setAuthorReference(userReference);
-                            nextDocument.setContentAuthorReference(userReference);
-                            for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
-                                attachment.setAuthor(nextDocument.getAuthor());
+                            if (userReference != null) {
+                                nextDocument.setAuthorReference(userReference);
+                                nextDocument.setContentAuthorReference(userReference);
+                                for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
+                                    attachment.setAuthor(nextDocument.getAuthor());
+                                }
                             }
 
                             documentToSave =

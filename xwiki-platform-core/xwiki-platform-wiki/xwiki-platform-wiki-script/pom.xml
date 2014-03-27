@@ -50,6 +50,11 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-standard</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Test Dependencies -->
     <dependency>
       <groupId>javax.servlet</groupId>

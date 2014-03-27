@@ -126,6 +126,7 @@
       <code>(function(){
 
   var domainnamesetted = false;
+  var aliassetted = false;
   var lastwikiname;
 
   ## Error messages
@@ -155,6 +156,11 @@
     var wikiName   = $('wikiname');
     wikiName.observe('change', wikiNameChanged);
     wikiName.observe('keyup', wikiNameChanged);
+    var alias      = $('wikialias');
+    if (alias) {
+      alias.observe('change', aliasChanged);
+      alias.observe('keyup', aliasChanged);
+    }
     if(prettyName.value.blank() || wikiName.value.blank()){
       $('wizard-next').disabled = true;
     }
@@ -184,6 +190,14 @@
         wikiName.value = prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
         validateWikiName();
       }
+      if(!aliassetted){
+        var wikiAlias = $('wikialias');
+        if (wikiAlias) {
+          var alias = filterWikiName(prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase());
+          alias += ".${services.wiki.aliasSuffix}";
+          wikiAlias.value = alias;
+        }
+      }
     }
   }
   /**
@@ -192,6 +206,12 @@
   function wikiNameChanged(event){
     domainnamesetted = true;
     validateWikiName();
+  }
+  /**
+   * Alias changed
+   */
+  function aliasChanged(event){
+    aliassetted = true;
   }
   /**
    * Validate the wiki name
@@ -863,6 +883,20 @@ return XWiki;
               &lt;/dd&gt;
             &lt;/dl&gt;
           &lt;/div&gt;
+          ### WIKI ALIAS ###
+          #if(!$services.wiki.isPathMode())
+            &lt;div&gt;
+              &lt;dl&gt;
+                &lt;dt&gt;
+                  &lt;label for="wikialias"&gt;$services.localization.render('platform.wiki.prop.wikialias')#required()&lt;/label&gt;
+                  &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikialias')&lt;/span&gt;
+                &lt;/dt&gt;
+                &lt;dd&gt;
+                  &lt;input size="40" id="wikialias" name="wikialias" type="text"  value="$!escapetool.xml($request.wikialias)"/&gt;
+                &lt;/dd&gt;
+              &lt;/dl&gt;
+            &lt;/div&gt;
+          #end
           ### DESCRIPTION ###
           &lt;div&gt;
             &lt;dl&gt;
@@ -945,6 +979,7 @@ return XWiki;
         ### FIRST STEP VALUES
         &lt;input type="hidden" name="wikiprettyname" value="$!escapetool.xml($request.getParameter('wikiprettyname'))" /&gt;
         &lt;input type="hidden" name="wikiname" value="$!escapetool.xml($request.wikiname)" /&gt;
+        &lt;input type="hidden" name="wikialias" value="$!escapetool.xml($request.wikialias)" /&gt;
         &lt;input type="hidden" name="description" value="$!escapetool.xml($request.getParameter('description'))" /&gt;
         &lt;input type="hidden" name="template" value="$!escapetool.xml($request.template)" /&gt;
         &lt;input type="hidden" name="set_as_template" value="$!escapetool.xml($request.set_as_template)" /&gt;
@@ -1091,17 +1126,21 @@ return XWiki;
 ##################################
 #macro(create)
   #if ($services.csrf.isTokenValid($request.form_token))
+    #set($wikialias = $request.wikialias)
+    #if("$!wikialias" == '')
+      #set($wikialias = $request.wikiname)
+    #end
     #set($fromTemplate = false)
     #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
       ## check if the wiki is already in creation
       #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $request.wikiname])
       #if("$!services.wiki.template.getWikiProvisioningJobStatus($jobId)" == '')
-        #set($discard = $services.wiki.template.createWikiFromTemplate($request.wikiname, $request.wikiname, $request.template, $request.ownerId, true))
+        #set($discard = $services.wiki.template.createWikiFromTemplate($request.wikiname, $wikialias, $request.template, $request.ownerId, true))
       #end
       #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
       #set($fromTemplate = true)
     #else
-      #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $request.wikiname, $request.ownerId, true))
+      #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $wikialias, $request.ownerId, true))
     #end
     #if (!$wikiDescriptor)
 

@@ -39,6 +39,8 @@ import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.url.internal.standard.StandardURLConfiguration;
+import org.xwiki.wiki.configuration.WikiConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManager;
@@ -79,6 +81,10 @@ public class WikiManagerScriptServiceTest
 
     private ScriptServiceManager scriptServiceManager;
 
+    private StandardURLConfiguration standardURLConfiguration;
+
+    private WikiConfiguration wikiConfiguration;
+
     private XWikiContext xcontext;
 
     private ExecutionContext executionContext;
@@ -96,6 +102,8 @@ public class WikiManagerScriptServiceTest
         scriptServiceManager = mocker.getInstance(ScriptServiceManager.class);
         entityReferenceSerializer = mocker.getInstance(new DefaultParameterizedType(null,
                 EntityReferenceSerializer.class, String.class));
+        standardURLConfiguration = mocker.getInstance(StandardURLConfiguration.class);
+        wikiConfiguration = mocker.getInstance(WikiConfiguration.class);
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
@@ -435,6 +443,23 @@ public class WikiManagerScriptServiceTest
 
         // The descriptor has been saved
         verify(wikiDescriptorManager).saveDescriptor(descriptor);
+    }
+
+    @Test
+    public void isPathMode() throws Exception
+    {
+        when(standardURLConfiguration.isPathBasedMultiWiki()).thenReturn(true);
+        assertTrue(mocker.getComponentUnderTest().isPathMode());
+
+        when(standardURLConfiguration.isPathBasedMultiWiki()).thenReturn(false);
+        assertFalse(mocker.getComponentUnderTest().isPathMode());
+    }
+
+    @Test
+    public void getAliasSuffix() throws Exception
+    {
+        when(wikiConfiguration.getAliasSuffix()).thenReturn("mysuffix.org");
+        assertEquals(mocker.getComponentUnderTest().getAliasSuffix(), "mysuffix.org");
     }
 
 }

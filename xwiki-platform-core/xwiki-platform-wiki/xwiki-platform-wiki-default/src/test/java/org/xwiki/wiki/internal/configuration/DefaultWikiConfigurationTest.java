@@ -19,13 +19,25 @@
  */
 package org.xwiki.wiki.internal.configuration;
 
+import java.net.MalformedURLException;
+
+import javax.inject.Provider;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.XWikiRequest;
+
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -42,17 +54,76 @@ public class DefaultWikiConfigurationTest
 
     private ConfigurationSource configuration;
 
+    private Provider<XWikiContext> xcontextProvider;
+
+    private XWikiContext context;
+
     @Before
     public void setUp() throws Exception
     {
         configuration = mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
+        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        context = mock(XWikiContext.class);
+        when(xcontextProvider.get()).thenReturn(context);
     }
 
     @Test
     public void getAliasSuffix() throws Exception
     {
-        when(configuration.getProperty("wiki.alias.suffix", "")).thenReturn("xwiki.org");
+        when(configuration.getProperty("wiki.alias.suffix")).thenReturn("xwiki.org");
         assertEquals("xwiki.org", mocker.getComponentUnderTest().getAliasSuffix());
+    }
+
+    @Test
+    public void getAliasSuffixWhenNoConfig() throws Exception
+    {
+        XWikiRequest request = mock(XWikiRequest.class);
+        when(context.getRequest()).thenReturn(request);
+        StringBuffer requestURL = new StringBuffer("http://www.xwiki.org/xwiki/bin/view/Main/WebHome");
+        when(request.getRequestURL()).thenReturn(requestURL);
+
+        assertEquals("xwiki.org", mocker.getComponentUnderTest().getAliasSuffix());
+
+        StringBuffer requestURL2 = new StringBuffer("http://www.xwiki.org:8080/xwiki/bin/view/Main/WebHome");
+        when(request.getRequestURL()).thenReturn(requestURL2);
+
+        assertEquals("xwiki.org", mocker.getComponentUnderTest().getAliasSuffix());
+    }
+
+    @Test
+    public void getAliasSuffixWhenIP() throws Exception
+    {
+        XWikiRequest request = mock(XWikiRequest.class);
+        when(context.getRequest()).thenReturn(request);
+        StringBuffer requestURL = new StringBuffer("http://127.0.0.1/xwiki/bin/view/Main/WebHome");
+        when(request.getRequestURL()).thenReturn(requestURL);
+
+        assertEquals("", mocker.getComponentUnderTest().getAliasSuffix());
+    }
+
+    @Test
+    public void getAliasSuffixWhenLocalhost() throws Exception
+    {
+        XWikiRequest request = mock(XWikiRequest.class);
+        when(context.getRequest()).thenReturn(request);
+        StringBuffer requestURL = new StringBuffer("http://localhost/xwiki/bin/view/Main/WebHome");
+        when(request.getRequestURL()).thenReturn(requestURL);
+
+        assertEquals("", mocker.getComponentUnderTest().getAliasSuffix());
+    }
+
+    @Test
+    public void getAliasSuffixWhenURLIsMalformed() throws Exception
+    {
+        XWikiRequest request = mock(XWikiRequest.class);
+        when(context.getRequest()).thenReturn(request);
+        StringBuffer requestURL = new StringBuffer("xwiki");
+        when(request.getRequestURL()).thenReturn(requestURL);
+
+        assertEquals("", mocker.getComponentUnderTest().getAliasSuffix());
+
+        verify(mocker.getMockedLogger()).error(eq("Failed to get the host name of the request."),
+                any(MalformedURLException.class));
     }
 
 }

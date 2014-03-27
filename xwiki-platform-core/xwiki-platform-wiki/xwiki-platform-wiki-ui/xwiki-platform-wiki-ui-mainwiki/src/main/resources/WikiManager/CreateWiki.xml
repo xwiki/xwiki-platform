@@ -125,9 +125,9 @@
     <property>
       <code>(function(){
 
-  var domainnamesetted = false;
-  var aliassetted = false;
-  var lastwikiname;
+  var isWikiNameSet = false;
+  var isAliasSet = false;
+  var lastWikiName;
 
   ## Error messages
   #set ($MSG_ERROR_WIKIALREADYEXISTS = "$services.localization.render('platform.wiki.create.error.wikiname.wikialreadyexists')")
@@ -185,16 +185,19 @@
       $('wikiprettynamevalidation').innerHTML = '';
       prettyName.removeClassName('xErrorField');
       // If the user has manually changed the wikiname, we don't generate it automaticaly anymore
-      if(!domainnamesetted){
+      if(!isWikiNameSet){
         var wikiName = $('wikiname');
         wikiName.value = prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
         validateWikiName();
       }
-      if(!aliassetted){
+      if(!isAliasSet){
         var wikiAlias = $('wikialias');
         if (wikiAlias) {
           var alias = filterWikiName(prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase());
-          alias += ".${services.wiki.aliasSuffix}";
+          var suffix = ".${services.wiki.aliasSuffix}";
+          if (suffix != '.') { 
+            alias += ".${services.wiki.aliasSuffix}";
+          }
           wikiAlias.value = alias;
         }
       }
@@ -204,14 +207,14 @@
    * Wiki name changed
    */
   function wikiNameChanged(event){
-    domainnamesetted = true;
+    isWikiNameSet = true;
     validateWikiName();
   }
   /**
    * Alias changed
    */
   function aliasChanged(event){
-    aliassetted = true;
+    isAliasSet = true;
   }
   /**
    * Validate the wiki name
@@ -224,10 +227,10 @@
       wikiNameElement.value = filteredWikiName;
       wikiname = filteredWikiName;
     }
-    if (lastwikiname == wikiname){
+    if (lastWikiName == wikiname){
       return;
     }
-    lastwikiname = wikiname;
+    lastWikiName = wikiname;
     if (wikiname &amp;&amp; !wikiname.blank()) {
       var surl = "$ISWIKINAMEAVAILABLE" + "?xpage=plain&amp;outputSyntax=plain&amp;ajax=1&amp;wikiname=" + escape(wikiname);
       surl += "&amp;form_token=$!{services.csrf.getToken()}";

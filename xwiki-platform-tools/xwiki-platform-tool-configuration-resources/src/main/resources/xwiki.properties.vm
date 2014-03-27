@@ -616,9 +616,10 @@ rendering.transformations = $xwikiRenderingTransformations
 
 #-# [Since 5.4.4]
 #-# Add a default suffix to the alias of a new wiki in the wiki creation wizard, only when the path mode is used
-#-# (see url.standard.multiwiki.isPathBased).
+#-# (see url.standard.multiwiki.isPathBased). If this value is empty, XWiki will try to compute it automatically from
+#-# request URL.
 #-#
-#-# eg: if wiki.alias.suffix is "xwiki.org" and the wiki name "playground"
+#-# eg: if wiki.alias.suffix is "xwiki.org" and the wiki name is "playground"
 #-#     then the computed alias will be: "playground.xwiki.org".
 #-#
 #-# The default is:

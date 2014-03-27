@@ -26,14 +26,15 @@ import org.xwiki.stability.Unstable;
  * Configuration options for the Wiki module.
  *
  * @version $Id$
- * @since 5.4.4M1
+ * @since 5.4.4
  */
 @Role
 @Unstable
 public interface WikiConfiguration
 {
     /**
-     * @return the default suffix to append to new wiki aliases.
+     * @return the suggested suffix to append to the alias of a new wiki, in the wiki creation wizard,
+     * when path mode is used.
      */
     String getAliasSuffix();
 }

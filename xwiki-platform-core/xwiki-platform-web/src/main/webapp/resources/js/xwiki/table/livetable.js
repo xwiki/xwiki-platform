@@ -50,7 +50,7 @@ XWiki.widgets.LiveTable = Class.create({
     ].flatten().compact();
     this.filtersNodes = this.filtersNodes.collect(function(item) {
       // If it's a String then the item must be either the identifier of an element or a CSS selector.
-      return typeof item === 'string' ? ($(item) || $(document.body).down(item)): item;
+      return typeof item === 'string' ? ($(item) || $(document.body).down(item)) : item;
     });
 
     // Array of nodes under which pagination for this livetable will be displayed.

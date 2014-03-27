@@ -200,9 +200,24 @@ public class PackageMojo extends AbstractMojo
      */
     private Map<String, String> contextPathMapping;
 
+    /**
+     * Indicate of the package mojo is used for tests. Among other things it means it's then possible to skip it using
+     * skipTetsts system property.
+     * 
+     * @parameter default-value="true"
+     * @since 6.0M2
+     */
+    private boolean test;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
+        if (isSkipExecution()) {
+            getLog().info("Skipping execution");
+
+            return;
+        }
+
         getLog().info("Using platform version: " + getXWikiPlatformVersion());
 
         // Step 1: Expand Jetty resources into the package output directory.
@@ -277,6 +292,22 @@ public class PackageMojo extends AbstractMojo
             String.format("Import XAR dependencies %s...", this.importUser == null ? "as a backup pack"
                 : "using user [" + this.importUser + "]"));
         importXARs(webInfDirectory);
+    }
+
+    protected boolean isSkipExecution()
+    {
+        return isSkipTests();
+    }
+
+    private boolean isSkipTests()
+    {
+        if (this.test) {
+            String property = System.getProperty("skipTests");
+
+            return property != null && Boolean.valueOf(property);
+        } else {
+            return false;
+        }
     }
 
     private void expandJettyDistribution() throws MojoExecutionException

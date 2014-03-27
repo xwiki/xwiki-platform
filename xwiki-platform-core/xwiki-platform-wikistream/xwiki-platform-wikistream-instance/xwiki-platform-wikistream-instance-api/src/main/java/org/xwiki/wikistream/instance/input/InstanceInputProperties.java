@@ -24,6 +24,7 @@ import java.util.HashMap;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.properties.RawProperties;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.stability.Unstable;
 
@@ -45,6 +46,8 @@ public class InstanceInputProperties extends HashMap<String, Object> implements 
      */
     @PropertyName("Entities")
     @PropertyDescription("The entities to generate events from")
+    // TODO: implement Converter for EntityReferenceSet
+    @PropertyHidden
     public EntityReferenceSet getEntities()
     {
         return (EntityReferenceSet) get(PROP_ENTITIES);

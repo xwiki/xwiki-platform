@@ -21,6 +21,7 @@ package org.xwiki.wikistream.xar.input;
 
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.xml.input.XMLInputProperties;
@@ -54,6 +55,8 @@ public class XARInputProperties extends XMLInputProperties
      */
     @PropertyName("Entities")
     @PropertyDescription("The entities to take into account or skip")
+    // TODO: implement Converter for EntityReferenceSet
+    @PropertyHidden
     public EntityReferenceSet getEntities()
     {
         return this.entities;

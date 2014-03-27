@@ -223,6 +223,7 @@ WikiManager.WikiUserClass_userScope_global_only=Only global users are available 
 WikiManager.WikiUserClass_userScope_local_and_global=Both global and local users are available in the wiki
 platform.wiki.prop.wikiname=Wiki Identifier
 platform.wiki.prop.wikiprettyname=Pretty Name
+platform.wiki.prop.wikialias=Alias
 platform.wiki.prop.description=Description
 platform.wiki.prop.owner=Owner
 platform.wiki.prop.membershipType.label=Membership Type
@@ -231,6 +232,7 @@ platform.wiki.prop.membershipType.hint=The way users can join this wiki.
 ## Wizard
 platform.wiki.create.wizard.desc.wikiname=The unique identifier of the new wiki.
 platform.wiki.create.wizard.desc.wikiprettyname=The display name of the wiki.
+platform.wiki.create.wizard.desc.wikialias=The domain name that will point to the wiki.
 platform.wiki.create.wizard.desc.newTemplateHint=Template to use for this new wiki (all documents will be cloned).
 platform.wiki.create.wizard.desc.description=A brief description of the wiki and its purpose.
 platform.wiki.create.wizard.desc.owner=A user who will have all the rights on the wiki.

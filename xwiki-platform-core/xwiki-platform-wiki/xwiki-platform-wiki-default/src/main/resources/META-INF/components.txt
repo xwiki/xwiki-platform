@@ -1,3 +1,4 @@
+org.xwiki.wiki.internal.configuration.DefaultWikiConfiguration
 org.xwiki.wiki.internal.descriptor.builder.DefaultWikiDescriptorBuilder
 org.xwiki.wiki.internal.descriptor.properties.DefaultWikiPropertyGroupManager
 org.xwiki.wiki.internal.descriptor.document.DefaultWikiDescriptorDocumentHelper

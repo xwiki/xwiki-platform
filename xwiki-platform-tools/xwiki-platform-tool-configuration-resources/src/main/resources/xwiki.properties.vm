@@ -610,4 +610,18 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is:
 # activeinstalls.pingURL=http://extensions.xwiki.org/activeinstalls
 
+#-------------------------------------------------------------------------------------
+# Wikis
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.4.4]
+#-# Add a default suffix to the alias of a new wiki in the wiki creation wizard, only when the path mode is used
+#-# (see url.standard.multiwiki.isPathBased).
+#-#
+#-# eg: if wiki.alias.suffix is "xwiki.org" and the wiki name "playground"
+#-#     then the computed alias will be: "playground.xwiki.org".
+#-#
+#-# The default is:
+# wiki.alias.suffix=
+
 $!xwikiPropertiesAdditionalProperties

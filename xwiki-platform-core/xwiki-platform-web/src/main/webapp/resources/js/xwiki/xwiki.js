@@ -1276,29 +1276,27 @@ XWiki.Document = Class.create({
 });
 
 /* Initialize the document URL factory, and create XWiki.currentDocument. */
-document.observe('xwiki:dom:loading', function() {
-  XWiki.Document.currentWiki = ($$("meta[name=wiki]").length > 0) ? $$("meta[name=wiki]")[0].content : (XWiki.currentWiki || "xwiki");
-  XWiki.Document.currentSpace = ($$("meta[name=space]").length > 0) ? $$("meta[name=space]")[0].content : (XWiki.currentSpace || "Main");
-  XWiki.Document.currentPage = ($$("meta[name=page]").length > 0) ? $$("meta[name=page]")[0].content : (XWiki.currentPage || "WebHome");
-  XWiki.Document.URLTemplate = "$xwiki.getURL('__space__.__page__', '__action__')";
-  XWiki.Document.RestURLTemplate = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/pages/__page__";
-  XWiki.Document.WikiSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";
-  XWiki.Document.SpaceSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/search";
-  XWiki.Document.getRestSearchURL = function(queryString, space, wiki) {
-    wiki = wiki || XWiki.Document.currentWiki;
-    var url;
-    if (space) {
-      url = XWiki.Document.SpaceSearchURLStub.replace("__wiki__", wiki).replace("__space__", space);
-    } else {
-      url = XWiki.Document.WikiSearchURLStub.replace("__wiki__", wiki);
-    }
-    if (queryString) {
-      url += "?" + queryString;
-    }
-    return url;
-  };
-  XWiki.currentDocument = new XWiki.Document();
-});
+XWiki.Document.currentWiki = ($$("meta[name=wiki]").length > 0) ? $$("meta[name=wiki]")[0].content : (XWiki.currentWiki || "xwiki");
+XWiki.Document.currentSpace = ($$("meta[name=space]").length > 0) ? $$("meta[name=space]")[0].content : (XWiki.currentSpace || "Main");
+XWiki.Document.currentPage = ($$("meta[name=page]").length > 0) ? $$("meta[name=page]")[0].content : (XWiki.currentPage || "WebHome");
+XWiki.Document.URLTemplate = "$xwiki.getURL('__space__.__page__', '__action__')";
+XWiki.Document.RestURLTemplate = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/pages/__page__";
+XWiki.Document.WikiSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";
+XWiki.Document.SpaceSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/search";
+XWiki.Document.getRestSearchURL = function(queryString, space, wiki) {
+  wiki = wiki || XWiki.Document.currentWiki;
+  var url;
+  if (space) {
+    url = XWiki.Document.SpaceSearchURLStub.replace("__wiki__", wiki).replace("__space__", space);
+  } else {
+    url = XWiki.Document.WikiSearchURLStub.replace("__wiki__", wiki);
+  }
+  if (queryString) {
+    url += "?" + queryString;
+  }
+  return url;
+};
+XWiki.currentDocument = new XWiki.Document();
 
 /**
  * Small JS improvement, which automatically hides and reinserts the default text for input fields, acting as a tip.

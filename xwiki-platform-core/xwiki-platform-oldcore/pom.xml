@@ -229,6 +229,10 @@
       <groupId>dom4j</groupId>
       <artifactId>dom4j</artifactId>
     </dependency>
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+    </dependency>
     <!-- Used to generate XHTML in Java (generally in object property displayer) -->
     <!-- TODO: We should drop ECS -->
     <dependency>

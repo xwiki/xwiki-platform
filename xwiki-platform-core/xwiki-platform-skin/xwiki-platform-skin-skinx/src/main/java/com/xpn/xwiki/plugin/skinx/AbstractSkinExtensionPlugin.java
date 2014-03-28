@@ -287,6 +287,10 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
             query.append("=");
             query.append(sanitize(parameter.getValue().toString()));
         }
+        // If the main page is requested unminified, also send unminified extensions
+        if ("false".equals(context.getRequest().getParameter("minify"))) {
+            query.append("&amp;minify=false");
+        }
         return query.toString();
     }
 

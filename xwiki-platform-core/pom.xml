@@ -220,6 +220,12 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- Used directly and indirectly in various projects. -->
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>2.3</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

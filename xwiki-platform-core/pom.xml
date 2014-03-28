@@ -158,13 +158,6 @@
         <groupId>xalan</groupId>
         <artifactId>xalan</artifactId>
         <version>2.7.1</version>
-        <exclusions>
-          <!-- Already part of Java SE 6 -->
-          <exclusion>
-            <artifactId>xml-apis</artifactId>
-            <groupId>xml-apis</groupId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <!-- Used by xwiki-platform-oldcore and xwiki-platform-captcha -->
       <dependency>
@@ -218,13 +211,6 @@
         <groupId>org.jfree</groupId>
         <artifactId>jfreechart</artifactId>
         <version>1.0.17</version>
-        <exclusions>
-          <!-- Already part of Java SE 6 -->
-          <exclusion>
-            <artifactId>xml-apis</artifactId>
-            <groupId>xml-apis</groupId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <!-- Used directly and indirectly in various projects. -->
       <dependency>

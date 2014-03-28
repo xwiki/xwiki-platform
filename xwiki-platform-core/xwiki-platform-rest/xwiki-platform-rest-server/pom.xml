@@ -74,6 +74,11 @@
           <groupId>javax.servlet</groupId>
           <artifactId>servlet-api</artifactId>
         </exclusion>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>jaxb-impl</artifactId>
+          <groupId>com.sun.xml.bind</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -93,6 +98,23 @@
       <artifactId>org.restlet.ext.jaxb</artifactId>
       <version>${restlet.version}</version>
       <scope>runtime</scope>
+      <exclusions>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>jaxb-api</artifactId>
+          <groupId>javax.xml.bind</groupId>
+        </exclusion>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>stax-api</artifactId>
+          <groupId>javax.xml.stream</groupId>
+        </exclusion>
+        <!-- Already part of Java SE 6 -->
+        <exclusion>
+          <artifactId>jaxb-impl</artifactId>
+          <groupId>com.sun.xml.bind</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

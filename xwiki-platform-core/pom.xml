@@ -158,6 +158,13 @@
         <groupId>xalan</groupId>
         <artifactId>xalan</artifactId>
         <version>2.7.1</version>
+        <exclusions>
+          <!-- Already part of Java SE 6 -->
+          <exclusion>
+            <artifactId>xml-apis</artifactId>
+            <groupId>xml-apis</groupId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- Used by xwiki-platform-oldcore and xwiki-platform-captcha -->
       <dependency>
@@ -207,16 +214,15 @@
         <artifactId>jta</artifactId>
         <version>1.1</version>
       </dependency>
-      <!-- Make sure we exclude iText which we don't need and which incidentally would bring a bad dependency version
-           on bcprov and bcmail for jdk14. -->
       <dependency>
         <groupId>org.jfree</groupId>
         <artifactId>jfreechart</artifactId>
         <version>1.0.17</version>
         <exclusions>
+          <!-- Already part of Java SE 6 -->
           <exclusion>
-            <groupId>com.lowagie</groupId>
-            <artifactId>itext</artifactId>
+            <artifactId>xml-apis</artifactId>
+            <groupId>xml-apis</groupId>
           </exclusion>
         </exclusions>
       </dependency>

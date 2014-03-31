@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -27,17 +26,14 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1383669570000</creationDate>
+  <creationDate>1395934584000</creationDate>
   <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1386945094000</date>
-  <contentUpdateDate>1386945094000</contentUpdateDate>
+  <date>1396260007000</date>
+  <contentUpdateDate>1396260007000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -64,9 +60,9 @@
       &lt;dd&gt;
         ## TODO: design a real framework to generate form by type
         #if (($descriptor.defaultValue || "$!descriptor.defaultValue" != '') &amp;&amp; ($descriptor.type.getName() == 'boolean' || $descriptor.type.getName() == 'int' || $descriptor.type.getName() == 'java.lang.String'))
-          &lt;input type="text" id="$descriptorId" name="$descriptorId" value="$descriptor.defaultValue"/&gt;
+          &lt;input type="text" id="$descriptorId" name="$descriptorId" value="#if($request.get($descriptorId))$request.get($descriptorId)#else$descriptor.defaultValue#end"/&gt;
         #else
-          &lt;input type="text" id="$descriptorId" name="$descriptorId"/&gt;
+          &lt;input type="text" id="$descriptorId" name="$descriptorId"#if($request.get($descriptorId))value="$request.get($descriptorId)"#end/&gt;
         #end
       &lt;/dd&gt;
     #end

@@ -19,6 +19,7 @@
  */
 package org.xwiki.wikistream.script;
 
+import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,7 +45,9 @@ import org.xwiki.wikistream.WikiStreamFactory;
 import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
 import org.xwiki.wikistream.internal.job.WikiStreamConverterJob;
+import org.xwiki.wikistream.internal.output.DefaultOutputStreamOutputTarget;
 import org.xwiki.wikistream.job.WikiStreamConverterJobRequest;
+import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
 
@@ -243,5 +246,13 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
     public OutputWikiStreamFactory getOutputWikiStreamFactory(WikiStreamType outputType)
     {
         return getInputWikiStreamFactory(OutputWikiStreamFactory.class, outputType);
+    }
+
+    /**
+     * @since 5.4.4, 6.0M2
+     */
+    public OutputStreamOutputTarget createOutputStreamOutputTarget(OutputStream stream, boolean autoclose)
+    {
+        return new DefaultOutputStreamOutputTarget(stream, autoclose);
     }
 }

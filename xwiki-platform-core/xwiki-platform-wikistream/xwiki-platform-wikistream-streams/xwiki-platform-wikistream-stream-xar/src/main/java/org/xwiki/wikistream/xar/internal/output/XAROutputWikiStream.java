@@ -106,11 +106,11 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     @Override
     public void close() throws IOException
     {
-        this.properties.getTarget().close();
-
         if (this.wikiWriter != null) {
             this.wikiWriter.close();
         }
+
+        this.properties.getTarget().close();
     }
 
     public String toString(Object obj)

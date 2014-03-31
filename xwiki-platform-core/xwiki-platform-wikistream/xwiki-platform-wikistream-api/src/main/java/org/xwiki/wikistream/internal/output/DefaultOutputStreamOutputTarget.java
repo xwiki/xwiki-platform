@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.xwiki.wikistream.output.OutputStreamOutputTarget;
+import org.xwiki.wikistream.output.OutputTarget;
 
 /**
  * @version $Id$
@@ -30,11 +31,33 @@ import org.xwiki.wikistream.output.OutputStreamOutputTarget;
  */
 public class DefaultOutputStreamOutputTarget implements OutputStreamOutputTarget
 {
+    private final boolean close;
+
     private final OutputStream outputStream;
 
+    /**
+     * Create an instance of {@link OutputStreamOutputTarget} returning the passed {@link OutputStream}.
+     * <p>
+     * The passed {@link OutputStream} is not closed when the {@link OutputTarget} is closed.
+     * 
+     * @param outputStream the {@link OutputStream}
+     */
     public DefaultOutputStreamOutputTarget(OutputStream outputStream)
     {
+        this(outputStream, false);
+    }
+
+    /**
+     * Create an instance of {@link OutputStreamOutputTarget} returning the passed {@link OutputStream}.
+     * 
+     * @param outputStream the {@link OutputStream}
+     * @param close indicate of the passer {@link OutputStream} should be closed when the {@link OutputTarget} is closed
+     * @since 5.4.4, 6.0M2
+     */
+    public DefaultOutputStreamOutputTarget(OutputStream outputStream, boolean close)
+    {
         this.outputStream = outputStream;
+        this.close = close;
     }
 
     @Override
@@ -51,7 +74,9 @@ public class DefaultOutputStreamOutputTarget implements OutputStreamOutputTarget
     @Override
     public void close() throws IOException
     {
-        // Closing the stream is the responsibility of the caller
+        if (this.close) {
+            this.outputStream.close();
+        }
     }
 
     @Override

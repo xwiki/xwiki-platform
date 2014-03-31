@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -27,17 +26,14 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1383640216000</creationDate>
+  <creationDate>1395934585000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1386947927000</date>
-  <contentUpdateDate>1386947927000</contentUpdateDate>
+  <date>1396270448000</date>
+  <contentUpdateDate>1396270435000</contentUpdateDate>
   <version>1.1</version>
   <title>WikiStream</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -88,13 +84,14 @@
 ## Set response output by default
 #if (!$outputProperties.target &amp;&amp; $services.wikistream.getOutputWikiStreamDescriptor($request.output).getPropertyDescriptor('target'))
   #set($targetStandardOutput = true)
-  #set($void = $outputProperties.put('target', $response.outputStream))
+  #set($void = $outputProperties.put('target', $services.wikistream.createOutputStreamOutputTarget($response.outputStream, true)))
 #end
 {{/velocity}}
 
 {{velocity}}
 #if ($request.convert)
   #if ($targetStandardOutput)
+    $response.setContentType('application/octet-stream')
     $response.setHeader('Content-Disposition', 'attachment; filename=target');
     $services.wikistream.startConvert($input, $inputProperties, $output, $outputProperties).join()
     $xcontext.setFinished(true)

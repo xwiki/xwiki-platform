@@ -822,7 +822,7 @@ $xwiki.ssx.use('Main.Activity')##
 #set ($now = $datetool.date)
 #set ($todayYear = $datetool.getYear($now))
 #set ($todayMonth = $datetool.getMonth($now) + 1)
-#set ($todayMidnight = $currentTime.toDateMidnight())
+#set ($todayMidnight = $currentTime.withTimeAtStartOfDay())
 #set ($yesterdayMidnight = $todayMidnight.minusDays(1))
 #end
 ##

@@ -141,7 +141,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #if ("$!commentSelection" != "")
     #set($isAnnotation = true)
   #end
-  <div id="xwikicomment_${comment.number}" class="xwikicomment col-xs-12  #if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
+  <div id="xwikicomment_${comment.number}" class="xwikicomment  #if($comment.getProperty('author').value == $doc.creator) commentByCreator#end#if($isAnnotation) annotation#end">
     <div class="commentavatar">#if("$!comment.replyto" == '')#mediumUserAvatar($comment.author)#{else}#smallUserAvatar($comment.author)#end</div>
     <div class="commentheader">
       <div>
@@ -174,7 +174,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 #macro(displayCommentForm)
   #if($xwiki.hasAccessLevel('comment'))
-    <form action="$doc.getURL('commentadd', "xpage=view&amp;viewer=comments#commentform")" method="post" id="AddComment" class="col-xs-12">
+    <form action="$doc.getURL('commentadd', "xpage=view&amp;viewer=comments#commentform")" method="post" id="AddComment">
       <fieldset id="commentform">
         <legend class="sr-only">$services.localization.render('core.viewers.comments.add.title')</legend>
         <div class="commentavatar">#mediumUserAvatar($xcontext.user)</div>

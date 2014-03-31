@@ -45,7 +45,6 @@
   #if($editor == 'inline')
     ## The inline editor uses the view layout, unlike the rest of the editors.
     #template('startpage.vm')
-    #template("applications.vm")
     #template('editinline.vm')
     #template('endpage.vm')
   #else

@@ -8,7 +8,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #set($force = $!request.get("force"))
 #set($allowDocEdit = !(($doc.getLocked()==true)&&(!$force)) )
 ##
-<div class="main layoutsubsection $mainGridCSS">
+<div class="main layoutsubsection row">
 <div id="mainContentArea">
 ## ----------------------------------------------------------------------------
 ## Start FORM at start of content area IF editing is allowed.

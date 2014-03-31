@@ -9,7 +9,6 @@
   #template("code.vm")
 #else
   #template("startpage.vm")
-  #template("applications.vm")
   
   #if("$!viewer" == '')
     #set($viewer = $request.getParameter('viewer'))
@@ -18,7 +17,7 @@
     #set($viewer = 'content')
   #end
   
-  <div class="main layoutsubsection $mainGridCSS">
+  <div class="main layoutsubsection row">
   <div id="mainContentArea">
   #template("hierarchy.vm")
   #if($viewer == 'content')

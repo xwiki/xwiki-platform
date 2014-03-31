@@ -646,6 +646,11 @@ div.pagelayoutoption:hover .lmleftcolumn,
       #end
       window.showLeftColumn = $showLeftPanels;
       window.showRightColumn = $showRightPanels;
+      #if ($showApplicationPanel)
+        window.showApplicationPanel = true;
+      #else
+        window.showApplicationPanel = false;
+      #end
       var obj = {div:'panellistaccordion', no:0, height:512};
       document.observe('xwiki:dom:loaded', function () {
         createAccordion(obj);

@@ -11,8 +11,9 @@
 <div class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end" id="contentcontainer">
 <div id="contentcontainerinner">
 <div class="leftsidecolumns">
+#template("applications.vm")
 #if($hidecolumns && ($!hidecolumns == 1))
-  <div id="contentcolumn" class="contenthidelefthideright">
+  <div id="contentcolumn" class="contenthidelefthideright $mainGridCSS">
 #else
-  <div id="contentcolumn"> ## class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end">
+  <div id="contentcolumn" class="$mainGridCSS"> ## class="content#if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end">
 #end

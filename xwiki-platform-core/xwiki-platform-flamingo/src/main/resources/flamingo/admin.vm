@@ -38,7 +38,6 @@
 ##  Start page
 ##-------------------------------------------------
 #template("startpage.vm")
-#template("applications.vm")
 ##-------------------------------------------------
 ## Include XWikiPreferences object
 ##-------------------------------------------------
@@ -54,7 +53,7 @@
 ##-----------------------------------------
 ##  Content (if empty wiki display Import)
 ##-----------------------------------------
-<div class="main layoutsubsection $mainGridCSS">
+<div class="main layoutsubsection row">
 <div id="mainContentArea">
 #set ($force = $!request.get('force'))
 #if (!$hasAdmin)

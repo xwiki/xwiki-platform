@@ -27,6 +27,7 @@ import java.util.Locale;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
+import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.wikistream.WikiStreamException;
 import org.xwiki.wikistream.output.FileOutputTarget;
@@ -61,7 +62,9 @@ public class XARWikiWriter implements Closeable
                 this.zipStream =
                     new ZipArchiveOutputStream(new File(((FileOutputTarget) target).getFile(), name + ".xar"));
             } else if (target instanceof OutputStreamOutputTarget) {
-                this.zipStream = new ZipArchiveOutputStream(((OutputStreamOutputTarget) target).getOutputStream());
+                this.zipStream =
+                    new ZipArchiveOutputStream(new CloseShieldOutputStream(
+                        ((OutputStreamOutputTarget) target).getOutputStream()));
             } else {
                 throw new WikiStreamException(String.format("Unsupported output target [%s]. Only [%s] is supported",
                     target, OutputStreamOutputTarget.class));

@@ -329,9 +329,21 @@ function start1() {
       }
     }
   }
+  
   window.activeWizardPage = document.getElementById("PanelListSection");
   window.activeWizardTab  = document.getElementById("firstwtab");
   document.getElementById("PageLayoutSection").style.display = "none";
+  
+  if(isFlamingo) {
+    var layoutCode = 0;
+    if (leftPanels.isVisible) {
+      layoutCode  += 1;
+    }
+    if (rightPanels.isVisible) {
+      layoutCode += 2;
+    }
+    changePreviewLayout(layoutMaquettes[layoutCode], layoutCode);
+  }
 }
 
 function attachDragHandler(el) {
@@ -431,21 +443,39 @@ function restorePanel(el, column) {
   column.appendChild(el);
 }
 
+function removeBootstrapClasses(element) {
+  var classNames = element.className.split(" ");
+  for (var i=0; i<classNames.length; ++i) {
+    var className = classNames[i];
+    if (className.startsWith("col-md")) {
+      element.removeClassName(className);
+    }
+  }
+}
+
 function changePreviewLayout(element, code) {
   document.getElementById("selectedoption").id = "";
   element.id = "selectedoption";
+  if (isFlamingo) {
+    removeBootstrapClasses(mainContent);
+  }
   switch (code) {
     case 0:
       //hide left; hide right;
       if (window.showLeftColumn == 1) {
         window.showLeftColumn = 0;
-        leftPanels.style.display = "none";
         releasePanels(leftPanels);
       }
       if (window.showRightColumn == 1) {
         window.showRightColumn = 0;
-        rightPanels.style.display = "none";
         releasePanels(rightPanels);
+      }
+      if (isFlamingo) {
+        if (window.showApplicationPanel) {
+          mainContent.addClassName("col-xs-11");
+        } else {
+          mainContent.addClassName("col-xs-12");
+        }
       }
       // mainContainer.className = "contenthidelefthideright";
       mainContainer.className = "hidelefthideright";
@@ -454,13 +484,18 @@ function changePreviewLayout(element, code) {
       //show left; hide right;
       if (window.showLeftColumn == 0) {
         window.showLeftColumn = 1;
-        leftPanels.style.display = "block";
         restorePanels(leftPanels);
       }
       if (window.showRightColumn == 1) {
         window.showRightColumn = 0;
-        rightPanels.style.display = "none";
         releasePanels(rightPanels);
+      }
+      if (isFlamingo) {
+        if (window.showApplicationPanel) {
+          mainContent.addClassName("col-md-9 col-md-push-2");
+        } else {
+          mainContent.addClassName("col-md-10 col-md-push-2");
+        }
       }
       // mainContainer.className = "contenthideright";
       mainContainer.className = "hideright";
@@ -469,13 +504,18 @@ function changePreviewLayout(element, code) {
       //hide left; show right;
       if (window.showLeftColumn == 1) {
         window.showLeftColumn = 0;
-        leftPanels.style.display = "none";
         releasePanels(leftPanels);
       }
       if (window.showRightColumn == 0) {
         window.showRightColumn = 1;
-        rightPanels.style.display = "block";
         restorePanels(rightPanels);
+      }
+      if (isFlamingo) {
+        if (window.showApplicationPanel) {
+          mainContent.addClassName("col-md-9");
+        } else {
+          mainContent.addClassName("col-md-10");
+        }
       }
       // mainContainer.className = "contenthideleft";
       mainContainer.className = "hideleft";
@@ -484,13 +524,18 @@ function changePreviewLayout(element, code) {
       //show left; show right;
       if (window.showLeftColumn == 0) {
         window.showLeftColumn = 1;
-        leftPanels.style.display = "block";
         restorePanels(leftPanels);
       }
       if (window.showRightColumn == 0) {
         window.showRightColumn = 1;
-        rightPanels.style.display = "block";
         restorePanels(rightPanels);
+      }
+      if (isFlamingo) {
+        if (window.showApplicationPanel) {
+          mainContent.addClassName("col-md-7 col-md-push-2")
+        } else {
+          mainContent.addClassName("col-md-8 col-md-push-2")
+        }
       }
       mainContainer.className = "content";
       break;
@@ -552,6 +597,8 @@ function panelEditorInit() {
   rightPanelsRight = rightPanelsLeft + rightPanels.offsetWidth;
   allpanelsLeft    = getX(allPanels);
   allpanelsTop     = getY(allPanels);
+  
+  isFlamingo = $("body").hasClassName("skin-flamingo");
 
   prevcolumn = allPanels;
 

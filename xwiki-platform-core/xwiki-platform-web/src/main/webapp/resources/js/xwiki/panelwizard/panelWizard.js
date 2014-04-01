@@ -459,6 +459,10 @@ function changePreviewLayout(element, code) {
   if (isFlamingo) {
     removeBootstrapClasses(mainContent);
   }
+  mainContainer.removeClassName("hidelefthideright");
+  mainContainer.removeClassName("hideright");
+  mainContainer.removeClassName("hideleft");
+  mainContainer.removeClassName("content");
   switch (code) {
     case 0:
       //hide left; hide right;
@@ -478,7 +482,7 @@ function changePreviewLayout(element, code) {
         }
       }
       // mainContainer.className = "contenthidelefthideright";
-      mainContainer.className = "hidelefthideright";
+      mainContainer.addClassName("hidelefthideright");
       break;
     case 1:
       //show left; hide right;
@@ -498,7 +502,7 @@ function changePreviewLayout(element, code) {
         }
       }
       // mainContainer.className = "contenthideright";
-      mainContainer.className = "hideright";
+      mainContainer.addClassName("hideright");
       break;
     case 2:
       //hide left; show right;
@@ -518,7 +522,7 @@ function changePreviewLayout(element, code) {
         }
       }
       // mainContainer.className = "contenthideleft";
-      mainContainer.className = "hideleft";
+      mainContainer.addClassName("hideleft");
       break;
     case 3:
       //show left; show right;
@@ -537,7 +541,7 @@ function changePreviewLayout(element, code) {
           mainContent.addClassName("col-md-8 col-md-push-2")
         }
       }
-      mainContainer.className = "content";
+      mainContainer.addClassName("content");
       break;
     default:
       // ignore
@@ -598,7 +602,7 @@ function panelEditorInit() {
   allpanelsLeft    = getX(allPanels);
   allpanelsTop     = getY(allPanels);
   
-  isFlamingo = $("body").hasClassName("skin-flamingo");
+  isFlamingo       = mainContainer.hasClassName("skin-flamingo");
 
   prevcolumn = allPanels;
 

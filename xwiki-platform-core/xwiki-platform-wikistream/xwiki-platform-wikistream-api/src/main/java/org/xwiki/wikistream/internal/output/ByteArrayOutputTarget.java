@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
@@ -36,6 +35,12 @@ public class ByteArrayOutputTarget extends AbstractOutputStreamOutputTarget
     protected OutputStream openStream() throws IOException
     {
         return new ByteArrayOutputStream();
+    }
+
+    @Override
+    public void close() throws IOException
+    {
+        // Useless
     }
 
     public byte[] toByteArray()

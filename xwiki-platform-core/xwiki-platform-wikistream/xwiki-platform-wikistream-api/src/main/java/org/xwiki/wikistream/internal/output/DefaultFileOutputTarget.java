@@ -25,15 +25,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.xwiki.wikistream.output.FileOutputTarget;
-import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
-public class DefaultFileOutputTarget extends AbstractOutputStreamOutputTarget implements FileOutputTarget,
-    OutputStreamOutputTarget
+public class DefaultFileOutputTarget extends AbstractOutputStreamOutputTarget implements FileOutputTarget
 {
     private File file;
 

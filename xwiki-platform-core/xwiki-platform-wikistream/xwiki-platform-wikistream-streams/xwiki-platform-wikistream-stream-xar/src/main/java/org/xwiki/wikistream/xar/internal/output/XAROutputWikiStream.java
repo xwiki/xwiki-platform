@@ -153,7 +153,9 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
     @Override
     public void beginWiki(String name, FilterEventParameters parameters) throws WikiStreamException
     {
-        this.wikiWriter = new XARWikiWriter(name, this.properties);
+        this.wikiWriter =
+            new XARWikiWriter(this.properties.getPackageName() != null ? this.properties.getPackageName() : name,
+                this.properties);
     }
 
     @Override
@@ -223,7 +225,7 @@ public class XAROutputWikiStream extends AbstractBeanOutputWikiStream<XAROutputP
             }
         }
 
-        this.writer.writeStartDocument();
+        this.writer.writeStartDocument(this.properties.getEncoding(), "1.0");
 
         this.writer.writeStartElement(XarDocumentModel.ELEMENT_DOCUMENT);
         this.writer.writeAttribute(XarDocumentModel.ATTRIBUTE_STREAMVERSION, "1.1");

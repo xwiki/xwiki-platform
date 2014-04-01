@@ -348,7 +348,7 @@ public class XarPackage
         writer = new IndentingXMLStreamWriter(writer);
 
         try {
-            writer.writeStartDocument();
+            writer.writeStartDocument(encoding, "1.0");
             writer.writeStartElement(XarModel.ELEMENT_PACKAGE);
 
             writer.writeStartElement(XarModel.ELEMENT_INFOS);
@@ -357,8 +357,9 @@ public class XarPackage
             writeElement(writer, XarModel.ELEMENT_INFOS_LICENSE, getPackageLicense());
             writeElement(writer, XarModel.ELEMENT_INFOS_AUTHOR, getPackageAuthor());
             writeElement(writer, XarModel.ELEMENT_INFOS_VERSION, getPackageVersion());
-            writeElement(writer, XarModel.ELEMENT_INFOS_ISBACKUPPACK, isPackageBackupPack() ? "1" : "0");
-            writeElement(writer, XarModel.ELEMENT_INFOS_ISPRESERVEVERSION, isPackagePreserveVersion() ? "1" : "0");
+            writeElement(writer, XarModel.ELEMENT_INFOS_ISBACKUPPACK, String.valueOf(isPackageBackupPack()));
+            writeElement(writer, XarModel.ELEMENT_INFOS_ISPRESERVEVERSION, String.valueOf(isPackagePreserveVersion()));
+            writeElement(writer, XarModel.ELEMENT_INFOS_EXTENSIONID, getPackageExtensionId());
             writer.writeEndElement();
 
             writer.writeStartElement(XarModel.ELEMENT_FILES);

@@ -468,10 +468,16 @@ function changePreviewLayout(element, code) {
       //hide left; hide right;
       if (window.showLeftColumn == 1) {
         window.showLeftColumn = 0;
+        if (!isFlamingo) {
+          leftPanels.style.display = "none";
+        }
         releasePanels(leftPanels);
       }
       if (window.showRightColumn == 1) {
         window.showRightColumn = 0;
+        if (!isFlamingo) {
+          rightPanels.style.display = "none";
+        }
         releasePanels(rightPanels);
       }
       if (isFlamingo) {
@@ -488,10 +494,16 @@ function changePreviewLayout(element, code) {
       //show left; hide right;
       if (window.showLeftColumn == 0) {
         window.showLeftColumn = 1;
+        if (!isFlamingo) {
+          leftPanels.style.display = "block";
+        }
         restorePanels(leftPanels);
       }
       if (window.showRightColumn == 1) {
         window.showRightColumn = 0;
+        if (!isFlamingo) {
+          rightPanels.style.display = "none";
+        }
         releasePanels(rightPanels);
       }
       if (isFlamingo) {
@@ -508,10 +520,16 @@ function changePreviewLayout(element, code) {
       //hide left; show right;
       if (window.showLeftColumn == 1) {
         window.showLeftColumn = 0;
+        if (!isFlamingo) {
+          leftPanels.style.display = "none";
+        }
         releasePanels(leftPanels);
       }
       if (window.showRightColumn == 0) {
         window.showRightColumn = 1;
+        if (!isFlamingo) {
+          rightPanels.style.display = "block";
+        }
         restorePanels(rightPanels);
       }
       if (isFlamingo) {
@@ -528,10 +546,16 @@ function changePreviewLayout(element, code) {
       //show left; show right;
       if (window.showLeftColumn == 0) {
         window.showLeftColumn = 1;
+        if (!isFlamingo) {
+          leftPanels.style.display = "block";
+        }
         restorePanels(leftPanels);
       }
       if (window.showRightColumn == 0) {
         window.showRightColumn = 1;
+        if (!isFlamingo) {
+          rightPanels.style.display = "block";
+        }
         restorePanels(rightPanels);
       }
       if (isFlamingo) {

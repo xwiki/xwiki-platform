@@ -3239,7 +3239,12 @@ document.observe('xwiki:dom:loaded', function() {
 }
 #change-context {
   float: right;
+}
+.skin-colibri #change-context {
   padding-top: 15px;
+}
+.skin-flamingo #change-context {
+  padding-top: 55px;
 }
 /* IE6 is very sick... */
 #change-context div {

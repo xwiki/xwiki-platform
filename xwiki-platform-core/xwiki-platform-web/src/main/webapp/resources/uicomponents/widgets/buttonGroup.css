@@ -5,7 +5,7 @@
   position: relative;
 }
 
-a.dropdown-toggle > span {
+#contentcontainer a.dropdown-toggle > span {
   /* Draw the down arrow/triangle using the border. */
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;

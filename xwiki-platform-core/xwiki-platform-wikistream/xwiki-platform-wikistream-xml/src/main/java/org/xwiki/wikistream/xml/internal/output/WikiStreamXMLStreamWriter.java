@@ -83,7 +83,7 @@ public class WikiStreamXMLStreamWriter
     //
 
     /**
-     * Write the XML Declaration. Defaults the XML version to 1.0, and the encoding to utf-8
+     * Write the XML Declaration. Defaults the XML version to 1.0, and the encoding to utf-8.
      * 
      * @throws WikiStreamException
      */
@@ -91,6 +91,22 @@ public class WikiStreamXMLStreamWriter
     {
         try {
             this.writer.writeStartDocument();
+        } catch (XMLStreamException e) {
+            throw new WikiStreamException("Failed to write start document", e);
+        }
+    }
+
+    /**
+     * Write the XML Declaration.
+     * 
+     * @param encoding the XML version
+     * @param version the XML encoding
+     * @throws WikiStreamException
+     */
+    public void writeStartDocument(String encoding, String version) throws WikiStreamException
+    {
+        try {
+            this.writer.writeStartDocument(encoding, version);
         } catch (XMLStreamException e) {
             throw new WikiStreamException("Failed to write start document", e);
         }

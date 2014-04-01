@@ -17,36 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.output;
+package org.xwiki.wikistream.test.internal;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
-import org.xwiki.wikistream.output.FileOutputTarget;
+import org.apache.commons.io.FileUtils;
+import org.junit.Assert;
 
 /**
  * @version $Id$
- * @since 5.2M2
+ * @since 6.0M2
  */
-public class DefaultFileOutputTarget extends AbstractOutputStreamOutputTarget implements FileOutputTarget
+public class DefaultFileAssertComparator implements FileAssertComparator
 {
-    private File file;
-
-    public DefaultFileOutputTarget(File file)
+    @Override
+    public void assertEquals(String message, File expected, File actual) throws IOException
     {
-        this.file = file;
-    }
+        byte[] expectedBytes = FileUtils.readFileToByteArray(expected);
+        byte[] actualBytes = FileUtils.readFileToByteArray(actual);
 
-    public File getFile()
-    {
-        return this.file;
+        Assert.assertArrayEquals(message, expectedBytes, actualBytes);
     }
 
     @Override
-    protected OutputStream openStream() throws IOException
+    public void assertEquals(String message, byte[] expected, byte[] actual)
     {
-        return new FileOutputStream(this.file);
+        Assert.assertArrayEquals(message, expected, actual);
     }
 }

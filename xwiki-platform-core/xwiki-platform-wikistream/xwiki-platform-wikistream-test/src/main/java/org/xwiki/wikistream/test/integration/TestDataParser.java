@@ -29,12 +29,6 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
-import org.xwiki.wikistream.input.InputSource;
-import org.xwiki.wikistream.internal.input.DefaultURLInputSource;
-import org.xwiki.wikistream.internal.input.StringInputSource;
-import org.xwiki.wikistream.utils.WikiStreamConstants;
-
 /**
  * Parses test data defined using the following syntax, shown with this example: {@code
  * .configuration <key=value>
@@ -191,36 +185,12 @@ public class TestDataParser
 
     private void addExpect(TestResourceData data, String typeId, StringBuilder buffer, Map<String, String> configuration)
     {
-        ExpectTestConfiguration expectTestConfiguration = new ExpectTestConfiguration();
-
-        // expect
-
-        InputSource expect;
-
-        String expectPath = configuration.get(WikiStreamConstants.PROPERTY_SOURCE);
-        if (expectPath == null) {
-            expect = new StringInputSource(buffer.toString());
-        } else {
-            if (!expectPath.startsWith("/")) {
-                expectPath = StringUtils.substringBeforeLast(data.resourceName, "/") + '/' + expectPath;
-            }
-
-            expect = new DefaultURLInputSource(getClass().getResource(expectPath));
-        }
-
-        expectTestConfiguration.expect = expect;
-
-        // output
-
-        OutputTestConfiguration outputConfiguration = new OutputTestConfiguration(typeId);
+        ExpectTestConfiguration expectTestConfiguration = new ExpectTestConfiguration(typeId, buffer.toString());
 
         // Default properties
-        outputConfiguration.setEncoding("UTF-8");
-        outputConfiguration.setFormat(true);
+        expectTestConfiguration.setEncoding("UTF-8");
 
-        outputConfiguration.putAll(configuration);
-
-        expectTestConfiguration.output = outputConfiguration;
+        expectTestConfiguration.putAll(configuration);
 
         data.expects.add(expectTestConfiguration);
     }

@@ -22,7 +22,6 @@ package org.xwiki.wikistream.xar;
 import java.io.File;
 import java.util.Date;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.xwiki.extension.test.ExtensionPackager;

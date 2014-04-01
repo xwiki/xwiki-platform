@@ -56,6 +56,10 @@
       <groupId>commons-configuration</groupId>
       <artifactId>commons-configuration</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.reflections</groupId>
@@ -78,7 +82,13 @@
               org/xwiki/wikistream/test/integration/TestDataParser.java,
               org/xwiki/wikistream/test/integration/TestResourceData.java,
               org/xwiki/wikistream/test/integration/WikiStreamTest.java,
-              org/xwiki/wikistream/test/integration/WikiStreamTestSuite.java
+              org/xwiki/wikistream/test/integration/WikiStreamTestSuite.java,
+              org/xwiki/wikistream/test/internal/DefaultFileAssertComparator.java,
+              org/xwiki/wikistream/test/internal/FileAssert.java,
+              org/xwiki/wikistream/test/internal/FileAssertComparator.java,
+              org/xwiki/wikistream/test/internal/StringFileAssertComparator.java,
+              org/xwiki/wikistream/test/internal/ZipFileAssert.java,
+              org/xwiki/wikistream/test/internal/ZIPFileAssertComparator.java
           </excludes>
         </configuration>
       </plugin>

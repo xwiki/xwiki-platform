@@ -17,36 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.wikistream.internal.output;
+package org.xwiki.wikistream.test.internal;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
-import org.xwiki.wikistream.output.FileOutputTarget;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 
 /**
  * @version $Id$
- * @since 5.2M2
+ * @since 6.0M2
  */
-public class DefaultFileOutputTarget extends AbstractOutputStreamOutputTarget implements FileOutputTarget
+public class StringFileAssertComparator implements FileAssertComparator
 {
-    private File file;
-
-    public DefaultFileOutputTarget(File file)
+    @Override
+    public void assertEquals(String message, File expected, File actual) throws IOException
     {
-        this.file = file;
-    }
+        String expectedString = FileUtils.readFileToString(expected, "UTF8");
+        String actualString = FileUtils.readFileToString(actual, "UTF8");
 
-    public File getFile()
-    {
-        return this.file;
+        Assert.assertEquals(message, expectedString, actualString);
     }
 
     @Override
-    protected OutputStream openStream() throws IOException
+    public void assertEquals(String message, byte[] expected, byte[] actual) throws IOException
     {
-        return new FileOutputStream(this.file);
+        String expectedString = IOUtils.toString(expected, "UTF8");
+        String actualString = IOUtils.toString(actual, "UTF8");
+
+        Assert.assertEquals(message, expectedString, actualString);
     }
 }

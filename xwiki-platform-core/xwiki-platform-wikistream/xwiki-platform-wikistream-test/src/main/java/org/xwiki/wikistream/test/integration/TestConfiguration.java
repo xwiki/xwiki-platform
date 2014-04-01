@@ -22,7 +22,6 @@ package org.xwiki.wikistream.test.integration;
 import java.util.Map;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */

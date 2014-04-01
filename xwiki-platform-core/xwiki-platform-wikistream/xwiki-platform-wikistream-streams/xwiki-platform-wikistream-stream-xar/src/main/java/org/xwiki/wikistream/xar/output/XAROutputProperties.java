@@ -74,6 +74,11 @@ public class XAROutputProperties extends XMLOutputProperties
     private boolean packageBackupPack;
 
     /**
+     * @see #getPackageExtensionId()
+     */
+    private String packageExtensionId;
+
+    /**
      * @return Indicate if all revisions related informations should be serialized
      */
     @PropertyName("Preserve revisions informations")
@@ -217,5 +222,23 @@ public class XAROutputProperties extends XMLOutputProperties
     public void setPackageBackupPack(boolean packageBackupPack)
     {
         this.packageBackupPack = packageBackupPack;
+    }
+
+    /**
+     * @return the id of the extension the XAR contains
+     */
+    @PropertyName("Extension id")
+    @PropertyDescription("The id of the extension the XAR contains")
+    public String getPackageExtensionId()
+    {
+        return this.packageExtensionId;
+    }
+
+    /**
+     * @param packageExtensionId the id of the extension the XAR contains
+     */
+    public void setPackageExtensionId(String packageExtensionId)
+    {
+        this.packageExtensionId = packageExtensionId;
     }
 }

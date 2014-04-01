@@ -55,6 +55,17 @@ public class XARWikiWriter implements Closeable
         this.name = name;
         this.xarProperties = xarProperties;
 
+        this.xarPackage = new XarPackage();
+
+        this.xarPackage.setPackageName(this.name);
+        this.xarPackage.setPackageDescription(xarProperties.getPackageDescription());
+        this.xarPackage.setPackageLicense(xarProperties.getPackageLicense());
+        this.xarPackage.setPackageAuthor(xarProperties.getPackageAuthor());
+        this.xarPackage.setPackageVersion(xarProperties.getPackageVersion());
+        this.xarPackage.setPackageBackupPack(xarProperties.isPackageBackupPack());
+        this.xarPackage.setPreserveVersion(xarProperties.isPreserveVersion());
+        this.xarPackage.setPackageExtensionId(xarProperties.getPackageExtensionId());
+
         OutputTarget target = this.xarProperties.getTarget();
 
         try {
@@ -129,7 +140,7 @@ public class XARWikiWriter implements Closeable
     private void writePackage() throws WikiStreamException
     {
         try {
-            this.xarPackage.write(this.zipStream, xarProperties.getEncoding());
+            this.xarPackage.write(this.zipStream, this.xarProperties.getEncoding());
         } catch (Exception e) {
             throw new WikiStreamException("Failed to write package.xml entry", e);
         }

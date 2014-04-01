@@ -19,27 +19,45 @@
  */
 package org.xwiki.wikistream.test.integration;
 
-import org.xwiki.wikistream.input.InputSource;
+import java.util.HashMap;
+
+import org.xwiki.wikistream.utils.WikiStreamConstants;
 
 /**
- * 
  * @version $Id$
  * @since 5.2M2
  */
-public class ExpectTestConfiguration
+public class ExpectTestConfiguration extends HashMap<String, String> implements Cloneable
 {
-    public InputSource expect;
+    public final String typeId;
 
-    public OutputTestConfiguration output;
+    public final String buffer;
 
-    public ExpectTestConfiguration()
+    /**
+     * @since 6.0M2
+     */
+    public ExpectTestConfiguration(String typeId, String buffer)
     {
-
+        this.typeId = typeId;
+        this.buffer = buffer;
     }
 
+    /**
+     * @since 6.0M2
+     */
     public ExpectTestConfiguration(ExpectTestConfiguration other)
     {
-        this.expect = other.expect;
-        this.output = new OutputTestConfiguration(other.output);
+        super(other);
+
+        this.typeId = other.typeId;
+        this.buffer = other.buffer;
+    }
+
+    /**
+     * @since 6.0M2
+     */
+    public void setEncoding(String encoding)
+    {
+        put(WikiStreamConstants.PROPERTY_ENCODING, encoding);
     }
 }

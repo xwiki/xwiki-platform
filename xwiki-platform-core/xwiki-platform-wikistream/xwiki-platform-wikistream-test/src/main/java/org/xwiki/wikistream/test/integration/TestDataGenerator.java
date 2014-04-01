@@ -29,9 +29,6 @@ import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
-import org.xwiki.wikistream.input.ReaderInputSource;
-import org.xwiki.wikistream.internal.output.ByteArrayOutputTarget;
-import org.xwiki.wikistream.internal.output.StringWriterOutputTarget;
 
 /**
  * Finds all test files in the current classloader, read them and return test data to represent them.
@@ -82,25 +79,14 @@ public class TestDataGenerator
                 testConfiguration.configuration = data.configuration;
 
                 // Input
-                // Clone because InputSource cannot be reused for several tests
                 testConfiguration.inputConfiguration = new InputTestConfiguration(inputConfiguration);
 
                 // Expect
-                // Clone because OutputTarget cannot be reused for several tests
                 testConfiguration.expectConfiguration = new ExpectTestConfiguration(expectConfiguration);
-                // If there is no custom output target, use the inline string
-                OutputTestConfiguration outputConfiguration = testConfiguration.expectConfiguration.output;
-                if (outputConfiguration.getTarget() == null) {
-                    if (testConfiguration.expectConfiguration.expect instanceof ReaderInputSource) {
-                        outputConfiguration.setTarget(new StringWriterOutputTarget());
-                    } else {
-                        outputConfiguration.setTarget(new ByteArrayOutputTarget());
-                    }
-                }
 
                 // Set test name
                 testConfiguration.name =
-                    computeTestName(testResourceName, inputConfiguration.typeId, expectConfiguration.output.typeId);
+                    computeTestName(testResourceName, inputConfiguration.typeId, expectConfiguration.typeId);
 
                 // Add the test to the list
                 result.add(testConfiguration);

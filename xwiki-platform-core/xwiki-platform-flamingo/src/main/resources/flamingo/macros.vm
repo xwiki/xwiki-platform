@@ -2404,3 +2404,39 @@ Recursive title display detected!##
   ## - Skin extension hook
   <!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
 #end
+
+#**
+ * Start a breadcrumb.
+ *
+ * Should be used in HTML.
+ *#
+#macro(breadcrumb_start)
+  <ol class="breadcrumb">
+#end
+
+#**
+ * End of a breadcrumb
+ *
+ * Should be used in HTML.
+ *#
+#macro(breadcrumb_end)
+  </ol>
+#end
+
+#**
+ * Display a line in the breadcrumb
+ *
+ * Should be used in HTML.
+ *#
+#macro(breadcrumb_line $link $title)
+  <li><a href="$link">$title</a></li>
+#end
+
+#**
+ * Display the current line in the breadcrumb
+ *
+ * Should be used in HTML.
+ *#
+#macro(breadcrumb_current_line $title)
+  <li class="active">$title</li>
+#end

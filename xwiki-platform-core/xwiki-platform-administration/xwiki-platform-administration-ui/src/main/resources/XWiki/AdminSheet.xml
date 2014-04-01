@@ -3538,21 +3538,6 @@ document.observe('xwiki:dom:loaded', function() {
 ])
 
 ##
-## Make some adjustments in case this is a workspace
-##
-#if ($services.workspace.isWorkspace($xcontext.database))
-  #foreach ($category in $adminMenu)
-    #if ($category.id == 'configuration')
-      $category.children.add(0, {'id' : 'XWiki.ManageWorkspace'})
-    #elseif ($category.id == 'usersgroups')
-      $category.children.remove({'id' : 'Users'})
-      $category.children.remove({'id' : 'Registration'})
-      $category.children.add(0, {'id' : 'XWiki.WorkspaceUsers'})
-    #end
-  #end
-#end
-
-##
 ## Fill in the list of custom applications to configure
 ##
 #findCustomSectionsToConfigure($adminMenu)
@@ -3782,8 +3767,34 @@ document.observe('xwiki:dom:loaded', function() {
     #set ($sectionName = $currentSpace)
   #end
 #admin_spaceSwitch()
-(% id="hierarchy" %)(((
-#if ($crtCategory){{html}}&lt;a href="${xwiki.getURL($currentDoc, $adminAction)}"&gt;$services.localization.render('admin.main.title')&lt;/a&gt;{{/html}}#{else}(% class="current" %){{translation key="admin.main.title"/}}(%%)#{end}#if ($crtCategory) (% class="separator" %)»(%%) #if ($crtSection){{html}}&lt;a href="${crtCategory.url}"&gt;${crtCategory.name}&lt;/a&gt;{{/html}}#{else}(% class="current" %)${crtCategory.name}(%%)#{end}#if ($crtSection) (% class="separator" %)»(%%) (% class="current" %)${crtSection.name}(%%)#end#end
+(% id="hierarchy" %)
+(((
+
+{{html}}
+#breadcrumb_start()
+  #if ($crtCategory)
+    #breadcrumb_line($xwiki.getURL($currentDoc, $adminAction), $services.localization.render('admin.main.title'))
+    ##&lt;li&gt;&lt;a href="${xwiki.getURL($currentDoc, $adminAction)}"&gt;$services.localization.render('admin.main.title')&lt;/a&gt;&lt;/li&gt;
+  #else
+    #breadcrumb_current_line($services.localization.render('admin.main.title'))
+    ##&lt;li class="active"&gt;$services.localization.render('admin.main.title')&lt;/li&gt;
+  #end
+  #if ($crtCategory)
+    #if ($crtSection)
+      #breadcrumb_line($crtCategory.url, $crtCategory.name)
+      ##&lt;li&gt;&lt;a href="$crtCategory.url"&gt;$crtCategory.name&lt;/a&gt;&lt;/li&gt;
+    #else
+      #breadcrumb_current_line($crtCategory.name)
+      ##&lt;li class="active"&gt;$crtCategory.name&lt;/li&gt;
+    #end
+    #if ($crtSection)
+      #breadcrumb_current_line($crtSection.name) 
+      ##&lt;li class="active"&gt;$crtSection.name&lt;/li&gt;
+    #end
+  #end
+#breadcrumb_end()
+{{/html}}
+
 )))
 (% id="document-title" %)(((
   = $services.localization.render('admin.section.title', [$sectionName]) =

@@ -95,8 +95,8 @@
 ### @param actionurl The URL this entry points to
 ### @param linktext The menu item text
 ###
-#macro(xwikitopmenuentry $actionurl $linktext $id $class $icon)
-  #submenuitem($actionurl $linktext $id $class $icon)
+#macro(xwikitopmenuentry $actionurl $linktext $id $class $icon $extraAttributes)
+  #submenuitem($actionurl $linktext $id $class $icon $extraAttributes)
 #end
 
 ###
@@ -107,7 +107,7 @@
 ### @param actionurl The URL this entry points to
 ### @param linktext The menu item text
 ###
-#macro(submenuitem $actionurl $linktext $linkid $class $icon)
+#macro(submenuitem $actionurl $linktext $linkid $class $icon $extraAttributes)
   #set($sep = '__SEPARATOR__')
   #set($linkName = $linktext)
   #set($linkTitle = $linktext) 
@@ -116,7 +116,7 @@
     #set($linkName = $linkWords.get(1))
     #set($linkTitle = "${linkWords.get(0)}: ${linkWords.get(1)}")
   #end
-  <li class="$!class"><a href="$actionurl" id="$!linkid" title="$linkTitle">#glyphicon($icon) $linkName</a></li>
+  <li class="$!class"><a href="$actionurl" id="$!linkid" title="$linkTitle" $extraAttributes>#glyphicon($icon) $linkName</a></li>
 #end
 
 ###

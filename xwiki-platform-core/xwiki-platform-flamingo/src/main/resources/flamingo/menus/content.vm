@@ -57,7 +57,8 @@
   #xwikibuttonentrystart('' $services.localization.render('core.menu.moreactions') 'tmMoreActions' '' 'cog')
     #submenuitem($doc.getURL('view', "xpage=print&amp;$!escapetool.html($request.getQueryString())") $services.localization.render('core.menu.preview') 'tmPrintPreview', '', 'print')
     #submenuitem($doc.getURL('view', "viewer=code") $services.localization.render('core.menu.view.source') 'tmViewSource', 'btn-default', 'search')
-    #submenuitem('' $services.localization.render('core.menu.export') 'tmExport', '', 'download-alt')
+    ## Export
+    #submenuitem('' $services.localization.render('core.menu.export') 'tmExport', '', 'download-alt', 'data-toggle="modal" data-target="#exportModal"')
     
     ## ----------------------------
     ## Display the shortcuts
@@ -66,10 +67,31 @@
       #submenuseparator()
       #template("shortcuts.vm")
     #end
-
-    
     
   #xwikibuttonentryend()
+  ## Export modal
+  <div class="modal fade text-left" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="exportModalLabel">$services.localization.render('core.menu.export')</h4>
+        </div>
+        <div class="modal-body">
+          <a href="$doc.getURL('view', "xpage=pdfoptions&amp;qs=$!escapetool.url($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.pdf')</a>
+          #if("$!{services.officemanager.serverState}" == "Connected")
+            <a href="$doc.getURL('export', "format=odt&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.odt')</a>
+          #end
+          <a href="$doc.getURL('export', "format=rtf&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.rtf')</a>
+          <a href="$doc.getURL('export', "format=html&amp;$!escapetool.html($request.getQueryString())")" class="btn btn-primary">$services.localization.render('core.menu.export.html')</a>
+          #if($hasAdmin && "$!xwiki.getPlugin('package')" != '')
+            <a href="$doc.getURL('export', "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($doc.fullName)&amp;$!docvariant")" class="btn btn-primary">$services.localization.render('core.menu.export.xar')</a>
+          #end
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
   #if ($keyboardShortcutsEnabled)
     <script type="text/javascript">
     //<![CDATA[

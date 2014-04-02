@@ -395,6 +395,10 @@ ul.dependencies li:hover, ul.job-log li:hover {
 .extensionUpdater > .extension-body-progress {
   display: block;
 }
+/* The font size is smaller and the text is not aligned with the pagination control icons. */
+.extensionUpdater .paginationFilter .resultsNo, .extensionUpdater .paginationFilter .pagination {
+  padding-top: .3em;
+}
 
 .xLabel {
   font-weight: 700;

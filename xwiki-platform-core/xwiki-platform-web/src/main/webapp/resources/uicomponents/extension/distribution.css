@@ -46,6 +46,9 @@
   padding: 1px 0 0 4px;
   position: absolute;
 }
+#extension\.defaultui\.wikis > .description {
+  margin-bottom: 1em;
+}
 #extension\.defaultui\.wikis form.extension-item {
   margin-top: .5em;
 }
@@ -53,6 +56,13 @@
   display: list-item;
   list-style-position: inside;
   margin-top: 1.5em;
+}
+#extension\.defaultui\.wikis > dl > dt:first-of-type {
+  margin-top: .5em;
+}
+/* The font size is smaller and the text is not aligned with the pagination control icons. */
+#distributionWizard .paginationFilter .resultsNo, #distributionWizard .paginationFilter .pagination {
+  padding-top: .3em;
 }
 #report .document-tree {
   border: 1px dotted $theme.borderColor;

@@ -1473,19 +1473,28 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
 #macro (getExtensionUpdaterPlan $_plan)
-  ## By default we return the upgrade plan for the current wiki.
-  #set ($namespace = $extensionNamespace)
+  #set ($localPlan = $extensionManager.getExtensionPlanJobStatus($NULL, $extensionNamespace))
   #if ($xcontext.isMainWiki())
-    ## We need the upgrade plan for the entire farm.
-    #set ($namespace = $NULL)
+    #set ($globalPlan = $extensionManager.getExtensionPlanJobStatus($NULL, $NULL))
+  #else
+    #set ($globalPlan = $NULL)
   #end
-  #set ($return = $extensionManager.getExtensionPlanJobStatus($null, $namespace))
   #set ($_plan = $NULL)
-  #setVariable("$_plan" $return)
+  #if (!$globalPlan)
+    #setVariable ("$_plan" $localPlan)
+  #elseif (!$localPlan)
+    #setVariable ("$_plan" $globalPlan)
+  ## Return the most recent one between the local plan and the global plan.
+  ## No start date means the plan was scheduled but hasn't started yet.
+  #elseif (!$localPlan.startDate || ($globalPlan.startDate && $localPlan.startDate.after($globalPlan.startDate)))
+    #setVariable ("$_plan" $localPlan)
+  #else
+    #setVariable ("$_plan" $globalPlan)
+  #end
 #end
 
-#macro(computeExtensionUpdaterPlan $_plan)
-  #if ($xcontext.isMainWiki())
+#macro(computeExtensionUpdaterPlan $_plan $globally)
+  #if ($globally && $xcontext.isMainWiki())
     ## Create the upgrade plan for the entire farm.
     #set ($upgradePlanJob = $extensionManager.createUpgradePlan())
   #else
@@ -1497,55 +1506,88 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #end
     #set ($upgradePlanJob = $extensionManager.createUpgradePlan($upgradePlanRequest))
   #end
-  #set ($lastError = $extensionManager.lastError)
-  #if ($lastError)
-    <div class="errormessage">
-      $services.localization.render('platform.extension.updater.createUpgradePlanFailure')
-      #printThrowable($lastError)
-    </div>
-  #else
-    #set ($_plan = $NULL)
-    #setVariable ("$_plan" $upgradePlanJob.status)
-  #end
+  #set ($_plan = $NULL)
+  #setVariable("$_plan" $upgradePlanJob.status)
 #end
 
-#macro (isExtensionUpdaterPlanOutdated $plan $_outdated)
-  ## Return true (outdated) if the plan is null.
-  #set ($return = "$!plan" == '' && $plan != '')
-  #if (!$return && $plan.state == 'FINISHED')
-    #set ($endDate = $xwiki.jodatime.getDateTime($plan.endDate.getTime()))
-    #set ($currentDate = $xwiki.jodatime.getDateTime())
-    #set ($duration = $xwiki.jodatime.getDuration($endDate, $currentDate))
-    ## The plan becomes outdated after one day.
-    #set ($return = $duration.standardDays > 0)
-  #end
-  #set ($_outdated = $NULL)
-  #setVariable("$_outdated" $return)
+#macro (displayExtensionUpdaterTrigger $plan)
+  <form action="" method="post">
+    <div class="hidden">
+      #if ($xcontext.action == 'view' || $xcontext.action == 'admin')
+        #set ($docAction = 'get')
+      #else
+        #set ($docAction = $xcontext.action)
+      #end
+      ## Compute the URL that will be used to submit the request asynchronously.
+      #if ("$!request.section" != '')
+        ## Administration section.
+        #set ($asyncURL = $xwiki.getURL($request.section, $docAction, $escapetool.url({
+          'section': $request.section
+        })))
+      #else
+        ## Stand-alone or Distribution Wizard.
+        #set ($asyncURL = $doc.getURL($docAction))
+      #end
+      <input type="hidden" name="asyncURL" value="$!escapetool.xml($asyncURL)" disabled="disabled" />
+      ## Redirect back to view mode after a POST request.
+      <input type="hidden" name="xredirect" value="$!escapetool.xml($xwiki.relativeRequestURL)" />
+    </div>
+    #set ($disabled = $plan && $plan.state != 'FINISHED')
+    <p class="buttons dynamic-button-group">
+      #if ($xcontext.isMainWiki() && $plan && !$plan.request.hasNamespaces())
+        ## The latest upgrade plan was computed for the entire farm so we display the global button first.
+        #displayExtensionUpdaterButton('checkForUpdatesGlobally' $disabled)
+      #end
+      #displayExtensionUpdaterButton('checkForUpdates' $disabled)
+      #if ($xcontext.isMainWiki() && (!$plan || $plan.request.hasNamespaces()))
+        ## On the main wiki we can also compute the upgrade plan for the entire farm.
+        #displayExtensionUpdaterButton('checkForUpdatesGlobally' $disabled)
+      #end
+    </p>
+  </form>
+#end
+
+#macro (displayExtensionUpdaterButton $value $disabled)
+  <span class="buttonwrapper">
+    <button name="action" value="$value"#if ($disabled) disabled="disabled"#end>
+      $escapetool.xml($services.localization.render("platform.extension.updater.$value"))
+    </button>
+  </span>
 #end
 
 #macro (extensionUpdater)
-  #if ("$!request.action" == '')
-    #getExtensionUpdaterPlan($plan)
-    #isExtensionUpdaterPlanOutdated($plan $outdated)
-    #if ($outdated)
-      ## There is no upgrade plan computed or the previously computed plan is outdated.
-      #computeExtensionUpdaterPlan($plan)
+  #set ($plan = $NULL)
+  #set ($error = $NULL)
+  #if ($request.action.startsWith('checkForUpdates'))
+    #computeExtensionUpdaterPlan($plan $request.action.equals('checkForUpdatesGlobally'))
+    #set ($error = $extensionManager.lastError)
+    #if ("$!request.xredirect" != '' && !$error)
+      #set ($discard = $response.sendRedirect($request.xredirect))
+      #break
     #end
-    <div id="extensionUpdater">
-      #if ($plan.state != 'FINISHED')
-        <div>$services.localization.render('platform.extension.updater.loading')</div>
-        #displayJobProgressBar($plan)
-        #displayExtensionUpdaterPlanStatus($plan)
-      #else
-        #displayExtensionUpdaterPlan($plan)
-        <div class="xHint"> $services.localization.render('platform.extension.updater.reloadHint',
-          ["<a class=""checkForUpdates""
-            href=""?action=checkForUpdates&section=$!escapetool.url($request.section)&xredirect=$escapetool.url($xwiki.relativeRequestURL)"">",
-          '</a>'])</div>
-      #end
-    </div>
-  #elseif ($request.action == 'checkForUpdates')
-    #computeExtensionUpdaterPlan()
-    $response.sendRedirect($request.xredirect)
   #end
+  #if (!$plan)
+    #getExtensionUpdaterPlan($plan)
+  #end
+  #if (!$isAjaxRequest)
+    #displayExtensionUpdaterTrigger($plan)
+  #end
+  <div class="extensionUpdater">
+    #if ($error)
+      <div class="errormessage">
+        $services.localization.render('platform.extension.updater.createUpgradePlanFailure')
+        #printThrowable($error)
+      </div>
+    #elseif ($plan.state == 'FINISHED')
+      <div class="xHint">
+        $escapetool.xml($services.localization.render('platform.extension.updater.lastCheckDate',
+          [$xwiki.formatDate($plan.endDate)]))
+      </div>
+      #displayExtensionUpdaterPlan($plan)
+    #elseif ($plan)
+      <div class="xHint">$services.localization.render('platform.extension.updater.loading')</div>
+      #displayJobProgressBar($plan)
+      #displayExtensionUpdaterPlanStatus($plan)
+    #end
+  </div>
 #end

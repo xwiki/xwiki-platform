@@ -389,10 +389,10 @@ ul.dependencies li:hover, ul.job-log li:hover {
   min-width: 100px;
 }
 
-#extensionUpdater > .ui-progress {
+.extensionUpdater > .ui-progress {
   margin-bottom: .5em;
 }
-#extensionUpdater > .extension-body-progress {
+.extensionUpdater > .extension-body-progress {
   display: block;
 }
 

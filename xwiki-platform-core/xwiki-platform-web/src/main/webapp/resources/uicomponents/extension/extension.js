@@ -624,72 +624,6 @@ XWiki.ExtensionSearchFormBehaviour = Class.create({
 });
 
 
-/**
- * Enhances the behaviour of the extension updater.
- */
-XWiki.ExtensionUpdaterBehaviour = Class.create({
-  initialize : function(container) {
-    this.container && this.container.remove();
-    this.container = container;
-
-    var checkForUpdatesLink = this.container.down('.checkForUpdates');
-    checkForUpdatesLink && checkForUpdatesLink.observe('click', this._onCheckForUpdates.bindAsEventListener(this));
-
-    this._maybeScheduleRefresh();
-  },
-
-  _maybeScheduleRefresh : function(timeout) {
-    this.container && this.container.childElements().any(function(child) {return child.hasClassName('ui-progress')})
-      && this._refresh.bind(this).delay(timeout || 1);
-  },
-
-  _refresh : function(parameters) {
-    parameters = parameters || {};
-    new Ajax.Request(this._getRefreshURL(), {
-      parameters: parameters,
-      onSuccess: function(response) {
-        this.container.addClassName('hidden').insert({after : response.responseText});
-        this.initialize(this.container.next());
-        document.fire('xwiki:dom:updated', {elements: [this.container]});
-        // Scroll the progress log to the end if it has a loading item.
-        // TODO: Preserve the scroll position if the user scrolls through the log.
-        this.container.childElements().each(function(child) {
-          if (child.hasClassName('extension-body-progress')) {
-            var loadingLogItem = child.down('.job-log-item-loading');
-            if (loadingLogItem) {
-              var log = loadingLogItem.up();
-              log.scrollTop = log.scrollHeight;
-            }
-          }
-        });
-      }.bind(this),
-      onFailure : this._maybeScheduleRefresh.bind(this, 10)
-    });
-  },
-
-  _getRefreshURL : function() {
-    var section = window.location.href.toQueryParams().section;
-    var document = XWiki.currentDocument;
-    var queryString;
-    if (section) {
-      var docRef = XWiki.getResource(section);
-      document = new XWiki.Document(docRef.name, docRef.space, docRef.wiki);
-      queryString = 'section=' + encodeURIComponent(section);
-    }
-    var action = XWiki.contextaction == 'view' || XWiki.contextaction == 'admin' ? 'get' : XWiki.contextaction;
-    return document.getURL(action, queryString);
-  },
-
-  _onCheckForUpdates : function(event) {
-    event.stop();
-    this._refresh({
-      'action': 'checkForUpdates',
-      'xredirect': this._getRefreshURL()
-    });
-  }
-});
-
-
 var enhanceExtensions = function(event) {
   ((event && event.memo.elements) || [$('body')]).each(function(element) {
     element.select('.extension-item').each(function(extension) {
@@ -698,7 +632,6 @@ var enhanceExtensions = function(event) {
   });
 };
 var init = function(event) {
-  $('extensionUpdater') && new XWiki.ExtensionUpdaterBehaviour($('extensionUpdater'));
   new XWiki.ExtensionSearchFormBehaviour();
   enhanceExtensions(event);
   return true;
@@ -711,7 +644,9 @@ document.observe('xwiki:dom:updated', enhanceExtensions);
 return XWiki;
 }(XWiki || {}));
 
+//
 // Document Tree
+//
 require(['jquery'], function($) {
   var enhanceDocumentTree = function() {
     var tree = this;
@@ -758,3 +693,63 @@ require(['jquery'], function($) {
     $(event.memo.elements).find('.document-tree').each(enhanceDocumentTree);
   });
 })
+
+//
+// Extension Updater
+//
+require(['jquery'], function($) {
+  var maybeScheduleRefresh = function(timeout) {
+    // this = .extensionUpdater
+    // Refresh if the upgrade plan job is running (if the progress bar is displayed).
+    if ($(this).children('.ui-progress').size() > 0) {
+      setTimeout($.proxy(refresh, this), timeout || 1000);
+    } else {
+      // Re-enable the buttons.
+      $(this).prev('form').find('button').prop('disabled', false);
+    }
+  };
+
+  var refresh = function(parameters) {
+    // this = .extensionUpdater
+    var url = $(this).prev('form').find('input[name=asyncURL]').prop('value');
+    $.post(url, parameters || {}, $.proxy(onRefresh, this))
+      // Wait 10s before trying again if the request has failed.
+      .fail($.proxy(maybeScheduleRefresh, this, 10000));
+  };
+
+  var onRefresh = function(data) {
+    // this = .extensionUpdater
+    var container = $(this).hide().after(data).next('.extensionUpdater');
+    $(this).remove();
+    container.each(maybeScheduleRefresh).each(function() {
+      // FIXME: We're using Prototype.js API for now to fire the event.
+      document.fire('xwiki:dom:updated', {elements: [this]});
+    });
+    container.children('.extension-body-progress').find('.job-log-item-loading').each(function() {
+      // Scroll the progress log to the end if it has a loading item.
+      // TODO: Preserve the scroll position if the user scrolls through the log.
+      this.parentNode.scrollTop = this.parentNode.scrollHeight;
+    });
+  }
+
+  var onCheckForUpdates = function(event) {
+    // this = button[name=checkForUpdates*]
+    // AJAX form submit.
+    event.preventDefault();
+    // Select this button if it is part of a drop down.
+    if ($(this).parent('.dropdown-menu').size() > 0) {
+      var dropDownToggle = $(this).closest('.button-group').children('.dropdown-toggle');
+      dropDownToggle.prev().insertAfter(this);
+      dropDownToggle.before(this);
+    }
+    // Disable the form while the upgrade plan is computed.
+    var form = $(this).closest('form');
+    form.find('button').prop('disabled', true);
+    // The actual form submit.
+    var params = {};
+    params[this.name] = this.value;
+    form.next('.extensionUpdater').each($.proxy(refresh, null, params));
+  };
+
+  $('.extensionUpdater').each(maybeScheduleRefresh).prev('form').find('button').click(onCheckForUpdates);
+});

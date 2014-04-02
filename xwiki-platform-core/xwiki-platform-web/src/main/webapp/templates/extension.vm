@@ -637,7 +637,7 @@ Caused by: #printThrowable($throwable.cause true)
       ## Assume the argument is a diff Delta.
       #set ($message = "$message@@ -$mathtool.add($argument.previous.index, 1),$argument.previous.size() +$mathtool.add($argument.next.index, 1),$argument.next.size() @@")
     #else
-      #set ($message = "$message$escapetool.xml($argument)")
+      #set ($message = "$message$!escapetool.xml($argument)")
     #end
   #end
   ## Add the last message element.

@@ -1475,7 +1475,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #macro (getExtensionUpdaterPlan $_plan)
   ## By default we return the upgrade plan for the current wiki.
   #set ($namespace = $extensionNamespace)
-  #if ($xcontext.isMainWiki() && $services.distribution.jobStatus.upgradeMode == 'ALLINONE')
+  #if ($xcontext.isMainWiki())
     ## We need the upgrade plan for the entire farm.
     #set ($namespace = $NULL)
   #end
@@ -1485,7 +1485,7 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
 #end
 
 #macro(computeExtensionUpdaterPlan $_plan)
-  #if ($xcontext.isMainWiki() && $services.distribution.jobStatus.upgradeMode == 'ALLINONE')
+  #if ($xcontext.isMainWiki())
     ## Create the upgrade plan for the entire farm.
     #set ($upgradePlanJob = $extensionManager.createUpgradePlan())
   #else

@@ -10,6 +10,7 @@
 {{velocity}}
 #if ("$!request.action" == '')
   ## Display the step.
+  #set ($discard = "#getExtensionUpdaterPlan($plan)")
   #if (!$isAjaxRequest)
     $services.localization.render('platform.extension.distributionWizard.extensionsStepDescription', [
       '[[', '>>http://platform.xwiki.org/xwiki/bin/view/Features/Applications]]',
@@ -18,32 +19,28 @@
       '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Component+Module]]',
       '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Script+Module#HScriptServices]]'])
 
+    {{html}}#displayExtensionUpdaterTrigger($plan){{/html}}
+
   #end
-  {{html}}
-  #getExtensionUpdaterPlan($plan)
-  #isExtensionUpdaterPlanOutdated($plan $outdated)
-  #if ($outdated)
-    ## There is no upgrade plan computed or the previously computed plan is outdated.
-    #computeExtensionUpdaterPlan($plan)
-  #end
-  {{/html}}
-  (% id="extensionUpdater" %)(((
-    #if ($plan.state != 'FINISHED')
+  (% class="extensionUpdater" %)(((
+    #if ($plan.state == 'FINISHED')
+      (% class="xHint" %)
+      $services.localization.render('platform.extension.updater.lastCheckDate',
+          [$xwiki.formatDate($plan.endDate)])
+
+      {{html}}#displayExtensionUpdaterPlan($plan){{/html}}
+      #set ($showCompleteStepButton = $invalid.isEmpty())
+    #elseif ($plan)
+      (% class="xHint" %)
       {{translation key="platform.extension.updater.loading"/}}
 
       {{html}}
       #displayJobProgressBar($plan)
       #displayExtensionUpdaterPlanStatus($plan)
       {{/html}}
-    #else
-      {{html}}#displayExtensionUpdaterPlan($plan){{/html}}
-      (% class="xHint" %)
-      $services.localization.render('platform.extension.updater.reloadHint', ['[[', ">>||class=""checkForUpdates""
-        queryString=""action=checkForUpdates&xredirect=$!escapetool.url($request.xredirect)""]]"])
-      #set ($showCompleteStepButton = $invalid.isEmpty())
     #end
   )))
-#elseif ($request.action == 'checkForUpdates')
-  #computeExtensionUpdaterPlan()
+#elseif ($request.action.startsWith('checkForUpdates'))
+  #computeExtensionUpdaterPlan($plan $request.action.equals('checkForUpdatesGlobally'))
 #end
 {{/velocity}}

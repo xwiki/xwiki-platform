@@ -1458,17 +1458,76 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
       $services.localization.render("platform.extension.updater.${key}ExtensionsLabel")
     </div>
   #end
+  ## Sort the extensions by namespace and by their name.
+  #set ($items = [])
   #foreach ($entry in $actionByNamespace.entrySet())
-    <div class="xHint">
-      $services.localization.render("platform.extension.updater.${key}ExtensionsHint",
-        ["#displayExtensionNamespace($entry.key)"])
-    </div>
-    <div class="${key}Extensions">
-      #foreach ($planAction in $entry.value)
-        #set ($extensionNamespace = $planAction.namespace)
-        #displayExtension($planAction.extension)
+    #foreach ($planAction in $entry.value)
+      #set ($namespace = $entry.key)
+      #set ($namespacePrettyName = $namespace)
+      #if ($stringtool.indexOf($namespace, ':') >= 0)
+        #set ($namespacePrettyName = $stringtool.substringAfter($namespace, ':'))
+        #if ($namespace.startsWith('wiki:'))
+          #set ($wikiPrettyName = $services.wiki.getById($namespacePrettyName).prettyName)
+          #if ("$!wikiPrettyName.trim()" != '')
+            #set ($namespacePrettyName = $wikiPrettyName)
+          #end
+        #end
       #end
+      #set ($extension = $planAction.extension)
+      #set ($extensionName = "#displayExtensionName($extension)")
+      #set ($discard = $items.add({
+        'namespace': $namespace,
+        'namespacePrettyName': "$!namespacePrettyName",
+        'extension': $extension,
+        'extensionName': $extensionName.trim()
+      }))
+    #end
+  #end
+  #set ($items = $sorttool.sort($items, ['namespacePrettyName', 'extensionName']))
+  ## Paginate the extensions.
+  #set ($hasPagination = false)
+  #set ($paginationParams = {
+    'defaultItemsPerPage': 5,
+    'itemParamName': "${key}FirstIndex",
+    'itemsPerPageParamName': "${key}PerPage"
+  })
+  #paginationPrepareParams($paginationParams)
+  #if ($items.size() > $paginationParams.itemsPerPage)
+    #set ($hasPagination = true)
+    #set ($paginationParams.totalItems = $items.size())
+    #set ($requestParams = {})
+    #set ($discard = $requestParams.putAll($request.getParameterMap()))
+    #set ($discard = $requestParams.remove($paginationParams.itemParamName))
+    #set ($discard = $requestParams.remove($paginationParams.itemsPerPageParamName))
+    #set ($paginationParams.url = $doc.getURL($xcontext.action, $escapetool.url($requestParams)))
+    #pagination($paginationParams)
+  #end
+  #set ($lastItem = $mathtool.min($items.size(), $mathtool.add($paginationParams.firstItem,
+    $paginationParams.itemsPerPage)))
+  #set ($items = $items.subList($paginationParams.firstItem, $lastItem))
+  #foreach ($item in $items)
+    #if ($foreach.index == 0 || $item.namespace != $extensionNamespace)
+      #if ($foreach.index > 0)
+        ## Close the previous group of extensions.
+        </div>
+      #end
+      ## Start a new group of extensions.
+      <div class="xHint">
+        $services.localization.render("platform.extension.updater.${key}ExtensionsHint",
+          ["#displayExtensionNamespace($item.namespace)"])
+      </div>
+      <div class="${key}Extensions">
+      #set ($extensionNamespace = $item.namespace)
+    #end
+    #displayExtension($item.extension)
+  #end
+  #if ($items.size() > 0)
+    ## Close the last group of extensions.
     </div>
+  #end
+  #if ($hasPagination)
+    #set ($paginationParams.position = 'bottom')
+    #pagination($paginationParams)
   #end
 #end
 

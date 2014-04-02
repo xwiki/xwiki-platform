@@ -33,6 +33,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
@@ -63,6 +64,9 @@ public class WikiMacroExecutionEventListener implements EventListener
      * The context key which is used to store the property to signify that permissions have been dropped.
      */
     private static final String DROPPED_PERMISSIONS_BACKUP = "wikimacro.backup.hasDroppedPermissions";
+
+    /** The context key which is used to store the original context document content author. */
+    private static final String CONTENT_AUTHOR_BACKUP = "wikimacro.backup.originalContentAuthor";
 
     /**
      * The events to match.
@@ -132,12 +136,16 @@ public class WikiMacroExecutionEventListener implements EventListener
         try {
             wikiMacroDocument = (XWikiDocument) this.documentAccessBridge.getDocument(wikiMacro.getDocumentReference());
 
-            // Set context document content author as macro author so that programming right is tested on the right
-            // user. It's cloned to make sure it not really modifying the real document but only do that for the
-            // current context.
-            contextDoc = contextDoc.clone();
-            contextDoc.setContentAuthorReference(wikiMacroDocument.getContentAuthorReference()); 
-            xwikiContext.setDoc(contextDoc);
+            // Set context document content author as macro author so that programming right is tested on the right user
+            @SuppressWarnings("unchecked")
+            Stack<DocumentReference> authorBackup =
+                (Stack<DocumentReference>) context.getProperty(CONTENT_AUTHOR_BACKUP);
+            if (authorBackup == null) {
+                authorBackup = new Stack<DocumentReference>();
+                context.setProperty(CONTENT_AUTHOR_BACKUP, authorBackup);
+            }
+            authorBackup.push(contextDoc.getContentAuthorReference());
+            contextDoc.setContentAuthorReference(wikiMacroDocument.getContentAuthorReference());
         } catch (Exception e) {
             Log.error("Failed to setup context before wiki macro execution");
         }
@@ -177,13 +185,14 @@ public class WikiMacroExecutionEventListener implements EventListener
         XWikiContext xwikiContext = (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
         XWikiDocument contextDoc = xwikiContext.getDoc();
 
-        // Restore context document
-        try {
-            contextDoc = (XWikiDocument) this.documentAccessBridge.getDocument(contextDoc.getDocumentReference());
-
-            xwikiContext.setDoc(contextDoc);
-        } catch (Exception e) {
-            Log.error("Failed to setup context after wiki macro execution");
+        // Restore context document's content author
+        @SuppressWarnings("unchecked")
+        Stack<DocumentReference> authorBackup =
+            (Stack<DocumentReference>) context.getProperty(CONTENT_AUTHOR_BACKUP);
+        if (authorBackup != null && !authorBackup.isEmpty()) {
+            contextDoc.setContentAuthorReference(authorBackup.pop());
+        } else {
+            this.logger.error("Can't find any backed up content author information in the execution context");
         }
 
         // Restore XWikiContext#dropPermission hack

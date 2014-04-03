@@ -20,30 +20,80 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>ExtensionCode</web>
   <name>ExtensionAuthorsDisplayer</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1320675067000</creationDate>
-  <date>1329835415000</date>
-  <contentUpdateDate>1329835415000</contentUpdateDate>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1396535825000</date>
+  <contentUpdateDate>1396535825000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
-  <hidden>true</hidden>
+  <hidden>false</hidden>
+  <content>{{velocity}}
+#if ($context.action == 'edit' || $context.action == 'inline')
+  #set($isEditMode = true)
+#else
+  #set($isViewMode = true)
+#end
+#set($name = "authors")
+#set($pageList = $doc.getValue($name))
+#if (!$pageList || $pageList == "")
+  #set($pageListValue = "")
+#else
+  #set($pageListValue = $pageList.join("|"))
+#end
+#set($pagePickerCounter = 100)
+#if ($isEditMode)
+  {{html clean="false"}}
+    $xwiki.jsx.use("ExtensionCode.ExtensionAuthorsDisplayer", { "defer" : false })
+    #set($script = $xwiki.getURL("ExtensionCode.ExtensionAuthorsSuggest", "get", "outputSyntax=plain"))
+    ## TODO: support disabled Javascript
+    &lt;input id="pagepicker-${pagePickerCounter}-suggest" type="text" name="search" value="" onfocus='suggest${pagePickerCounter}(this);' autocomplete='off' size='40' /&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;a href="#" id="action_addauthor" class="button" type="submit" onclick="addPage(${pagePickerCounter}, $('pagepicker-${pagePickerCounter}-suggest').value, $('pagepicker-${pagePickerCounter}-suggest').value);"&gt;Add&lt;/a&gt;&lt;/span&gt;
+    &lt;input id="pagepicker-${pagePickerCounter}-input" type="hidden" name="${prefix}${name}" value="$!pageListValue" /&gt;
+    &lt;ul id="pagepicker-${pagePickerCounter}-items" class="pagepicker-list"&gt;
+    &lt;/ul&gt;
+    &lt;script type="text/javascript"&gt;
+    // &lt;![CDATA[
+    function suggest${pagePickerCounter}(field) {
+      if (!field.suggest${pagePickerCounter}) {
+        field.suggest${pagePickerCounter} = new XWiki.widgets.Suggest(field, { script:"${script}&amp;", 
+                   varname:"input", seps:"|,", 
+                   callback: function(obj) {  
+                               addPage($pagePickerCounter, obj.info, obj.value);
+                               return false;
+                             }
+        });
+        field.suggest${pagePickerCounter}.options.timeout = 5000;
+      }
+    }
+    #if ($pageList)
+      #foreach($page in $pageList)
+        #set($pageTitle = $xwiki.getUserName($page, false))
+        addPage(${pagePickerCounter}, "$page", "$pageTitle");
+      #end
+    #end
+    // ]]&gt;
+    &lt;/script&gt;
+  {{/html}}
+#else
+  #foreach($page in $pageList)#if($velocityCount &gt; 1), #end#if($xwiki.exists($page))[[${xwiki.getUserName($page, false)}&gt;&gt;$page]]#else${xwiki.getUserName($page, false)}#end#end
+#end
+{{/velocity}}</content>
   <object>
+    <name>ExtensionCode.ExtensionAuthorsDisplayer</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>bdc76da2-2455-46bf-8ee4-d75882f2417e</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -115,10 +165,6 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>ExtensionCode.ExtensionAuthorsDisplayer</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>bdc76da2-2455-46bf-8ee4-d75882f2417e</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -189,55 +235,4 @@ function getPageList(nb) {
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{velocity}}
-#if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
-  #set($isEditMode = true)
-#else
-  #set($isViewMode = true)
-#end
-#set($name = "authors")
-#set($pageList = $doc.getValue($name))
-#if (!$pageList || $pageList == "")
-  #set($pageListValue = "")
-#else
-  #set($pageListValue = $pageList.join("|"))
-#end
-#set($pagePickerCounter = 100)
-#if ($isEditMode)
-  {{html clean="false"}}
-    $xwiki.jsx.use("ExtensionCode.ExtensionAuthorsDisplayer", { "defer" : false })
-    #set($script = $xwiki.getURL("ExtensionCode.ExtensionAuthorsSuggest", "get", "outputSyntax=plain"))
-    ## TODO: support disabled Javascript
-    &lt;input id="pagepicker-${pagePickerCounter}-suggest" type="text" name="search" value="" onfocus='suggest${pagePickerCounter}(this);' autocomplete='off' size='40' /&gt;
-    &lt;span class="buttonwrapper"&gt;&lt;a href="#" id="action_addauthor" class="button" type="submit" onclick="addPage(${pagePickerCounter}, $('pagepicker-${pagePickerCounter}-suggest').value, $('pagepicker-${pagePickerCounter}-suggest').value);"&gt;Add&lt;/a&gt;&lt;/span&gt;
-    &lt;input id="pagepicker-${pagePickerCounter}-input" type="hidden" name="${prefix}${name}" value="$!pageListValue" /&gt;
-    &lt;ul id="pagepicker-${pagePickerCounter}-items" class="pagepicker-list"&gt;
-    &lt;/ul&gt;
-    &lt;script type="text/javascript"&gt;
-    // &lt;![CDATA[
-    function suggest${pagePickerCounter}(field) {
-      if (!field.suggest${pagePickerCounter}) {
-        field.suggest${pagePickerCounter} = new XWiki.widgets.Suggest(field, { script:"${script}&amp;", 
-                   varname:"input", seps:"|,", 
-                   callback: function(obj) {  
-                               addPage($pagePickerCounter, obj.info, obj.value);
-                               return false;
-                             }
-        });
-        field.suggest${pagePickerCounter}.options.timeout = 5000;
-      }
-    }
-    #if ($pageList)
-      #foreach($page in $pageList)
-        #set($pageTitle = $xwiki.getUserName($page, false))
-        addPage(${pagePickerCounter}, "$page", "$pageTitle");
-      #end
-    #end
-    // ]]&gt;
-    &lt;/script&gt;
-  {{/html}}
-#else
-  #foreach($page in $pageList)#if($velocityCount &gt; 1), #end#if($xwiki.exists($page))[[${xwiki.getUserName($page, false)}&gt;&gt;$page]]#else${xwiki.getUserName($page, false)}#end#end
-#end
-{{/velocity}}</content>
 </xwikidoc>

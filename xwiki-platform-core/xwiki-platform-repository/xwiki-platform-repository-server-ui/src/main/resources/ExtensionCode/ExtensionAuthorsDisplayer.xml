@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -30,8 +29,8 @@
   <creationDate>1320675067000</creationDate>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1396535825000</date>
-  <contentUpdateDate>1396535825000</contentUpdateDate>
+  <date>1396535471000</date>
+  <contentUpdateDate>1396535471000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -78,7 +77,11 @@
     }
     #if ($pageList)
       #foreach($page in $pageList)
-        #set($pageTitle = $xwiki.getUserName($page, false))
+        #if ($xwiki.exists($page))
+          #set($pageTitle = $xwiki.getUserName($page, false))
+        #else
+          #set($pageTitle = $page)
+        #end
         addPage(${pagePickerCounter}, "$page", "$pageTitle");
       #end
     #end

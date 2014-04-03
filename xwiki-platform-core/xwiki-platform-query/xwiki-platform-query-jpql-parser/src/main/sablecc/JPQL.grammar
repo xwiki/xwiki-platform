@@ -350,7 +350,7 @@ functions_returning_numerics =
     {sqrt} sqrt lbr simple_arithmetic_expression rbr |
     {mod} mod lbr [dividend]:simple_arithmetic_expression comma [divisor]:simple_arithmetic_expression rbr |
     {size} size lbr path rbr |
-    {count} count_expression;
+    {agr} aggregate_expression;
 
 string_primary =
     {const} string_literal |

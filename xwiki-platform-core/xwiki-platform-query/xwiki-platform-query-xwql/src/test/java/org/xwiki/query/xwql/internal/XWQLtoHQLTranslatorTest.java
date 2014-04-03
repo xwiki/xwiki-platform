@@ -181,14 +181,58 @@ public class XWQLtoHQLTranslatorTest
     }
 
     @Test
-    public void testGroupByOrderByAndCount() throws Exception
+    public void testGroupByAndOrderBy() throws Exception
     {
-        assertTranslate("select obj.property, count(obj.property) from Document doc, "
-                + "doc.object(Some.Class) as obj group by obj.property order by count(obj.property)",
-                "select obj_property1.value , count ( obj_property1.value ) from XWikiDocument as doc , "
-                + "BaseObject as obj , StringProperty as obj_property1 WHERE 1=1  and doc.fullName=obj.name and "
-                + "obj.className='Some.Class' and obj_property1.id.id=obj.id and obj_property1.id.name='property' "
-                + "group by obj_property1.value order by count ( obj_property1.value )");
+        assertTranslate("select obj.property1, count(obj.property2) from Document doc, "
+                +   "doc.object(Some.Class) as obj group by obj.property1 order by count(obj.property2)",
+                    " select obj_property11.value , count ( obj_property22.value ) "
+                +   "from XWikiDocument as doc , BaseObject as obj , StringProperty as obj_property11, StringProperty as obj_property22 "
+                +   "WHERE 1=1  and doc.fullName=obj.name and obj.className='Some.Class' "
+                +   "and obj_property11.id.id=obj.id and obj_property11.id.name='property1' "
+                +   "and obj_property22.id.id=obj.id and obj_property22.id.name='property2' "
+                +   "group by obj_property11.value "
+                +   "order by count ( obj_property22.value )");
+
+        assertTranslate("select obj.property1, sum(obj.property2) from Document doc, "
+                +   "doc.object(Some.Class) as obj group by obj.property1 order by sum(obj.property2)",
+                    " select obj_property11.value , sum ( obj_property22.value ) "
+                +   "from XWikiDocument as doc , BaseObject as obj , StringProperty as obj_property11, StringProperty as obj_property22 "
+                +   "WHERE 1=1  and doc.fullName=obj.name and obj.className='Some.Class' "
+                +   "and obj_property11.id.id=obj.id and obj_property11.id.name='property1' "
+                +   "and obj_property22.id.id=obj.id and obj_property22.id.name='property2' "
+                +   "group by obj_property11.value "
+                +   "order by sum ( obj_property22.value )");
+
+        assertTranslate("select obj.property1, avg(obj.property2) from Document doc, "
+                +   "doc.object(Some.Class) as obj group by obj.property1 order by avg(obj.property2)",
+                    " select obj_property11.value , avg ( obj_property22.value ) "
+                +   "from XWikiDocument as doc , BaseObject as obj , StringProperty as obj_property11, StringProperty as obj_property22 "
+                +   "WHERE 1=1  and doc.fullName=obj.name and obj.className='Some.Class' "
+                +   "and obj_property11.id.id=obj.id and obj_property11.id.name='property1' "
+                +   "and obj_property22.id.id=obj.id and obj_property22.id.name='property2' "
+                +   "group by obj_property11.value "
+                +   "order by avg ( obj_property22.value )");
+
+        assertTranslate("select obj.property1, max(obj.property2) from Document doc, "
+                +   "doc.object(Some.Class) as obj group by obj.property1 order by max(obj.property2)",
+                    " select obj_property11.value , max ( obj_property22.value ) "
+                +   "from XWikiDocument as doc , BaseObject as obj , StringProperty as obj_property11, StringProperty as obj_property22 "
+                +   "WHERE 1=1  and doc.fullName=obj.name and obj.className='Some.Class' "
+                +   "and obj_property11.id.id=obj.id and obj_property11.id.name='property1' "
+                +   "and obj_property22.id.id=obj.id and obj_property22.id.name='property2' "
+                +   "group by obj_property11.value "
+                +   "order by max ( obj_property22.value )");
+
+        assertTranslate("select obj.property1, min(obj.property2) from Document doc, "
+                +   "doc.object(Some.Class) as obj group by obj.property1 order by min(obj.property2)",
+                    " select obj_property11.value , min ( obj_property22.value ) "
+                +   "from XWikiDocument as doc , BaseObject as obj , StringProperty as obj_property11, StringProperty as obj_property22 "
+                +   "WHERE 1=1  and doc.fullName=obj.name and obj.className='Some.Class' "
+                +   "and obj_property11.id.id=obj.id and obj_property11.id.name='property1' "
+                +   "and obj_property22.id.id=obj.id and obj_property22.id.name='property2' "
+                +   "group by obj_property11.value "
+                +   "order by min ( obj_property22.value )");
+
     }
 
     @Test

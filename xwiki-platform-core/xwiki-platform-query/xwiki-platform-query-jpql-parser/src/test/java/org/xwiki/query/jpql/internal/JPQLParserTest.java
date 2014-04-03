@@ -20,7 +20,6 @@
 package org.xwiki.query.jpql.internal;
 
 import junit.framework.TestCase;
-import org.xwiki.query.jpql.internal.JPQLParser;
 
 public class JPQLParserTest extends TestCase
 {
@@ -43,6 +42,10 @@ public class JPQLParserTest extends TestCase
         parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number");
         parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number desc");
         parser.parse("select doc from Document doc, doc.object(XWiki.XWikiGroups) as g order by g.number asc");
+
+        // Aggregate function in order by
+        parser.parse("select g.name, count(g.number) from Document doc, doc.object(XWiki.XWikiGroups) as g "
+                   + "group by g.name order by count(g.number)");
 
         // member of
         parser.parse("select a from A as a where :param member of a.prop");

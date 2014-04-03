@@ -1486,10 +1486,13 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
   #set ($items = $sorttool.sort($items, ['namespacePrettyName', 'extensionName']))
   ## Paginate the extensions.
   #set ($hasPagination = false)
+  ## We don't load the pagination CSS here (noSx:true) because the upgrade plan can be loaded through AJAX so
+  ## the Skin Extension hooks might not be available. We load the pagination CSS elsewhere.
   #set ($paginationParams = {
     'defaultItemsPerPage': 5,
     'itemParamName': "${key}FirstIndex",
-    'itemsPerPageParamName': "${key}PerPage"
+    'itemsPerPageParamName': "${key}PerPage",
+    'noSx': true
   })
   #paginationPrepareParams($paginationParams)
   #if ($items.size() > $paginationParams.itemsPerPage)
@@ -1629,6 +1632,8 @@ $doc.getURL($xcontext.action, $queryString.substring(1))##
     #getExtensionUpdaterPlan($plan)
   #end
   #if (!$isAjaxRequest)
+    ## The list of outdated/invalid extensions is paginated so we load the CSS here because the request is not AJAX.
+    #set ($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true))
     #displayExtensionUpdaterTrigger($plan)
   #end
   <div class="extensionUpdater">

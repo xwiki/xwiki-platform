@@ -12,6 +12,8 @@
   ## Display the step.
   #set ($discard = "#getExtensionUpdaterPlan($plan)")
   #if (!$isAjaxRequest)
+    ## The list of outdated/invalid extensions is paginated so we load the CSS here because the request is not AJAX.
+    #set ($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true))
     $services.localization.render('platform.extension.distributionWizard.extensionsStepDescription', [
       '[[', '>>http://platform.xwiki.org/xwiki/bin/view/Features/Applications]]',
       '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Macro+Bridge+Application]]',

@@ -19,8 +19,6 @@
  */
 package org.xwiki.query.xwql.internal;
 
-import static org.junit.Assert.fail;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jmock.Expectations;
 import org.junit.Before;
@@ -178,6 +176,17 @@ public class XWQLtoHQLTranslatorTest
                 "select doc.fullName from XWikiDocument as doc where 1 = 1 group by trim ( doc.space )");
         assertTranslate("where 1=1 group by abs(doc.elements)",
                 "select doc.fullName from XWikiDocument as doc where 1 = 1 group by abs ( doc.elements )");
+    }
+
+    @Test
+    public void testGroupByOrderByAndCount() throws Exception
+    {
+        assertTranslate("select obj.property, count(obj.property) from Document doc, "
+                + "doc.object(Some.Class) as obj group by obj.property order by count(obj.property)",
+                "select obj_property1.value , count ( obj_property1.value ) from XWikiDocument as doc , "
+                + "BaseObject as obj , StringProperty as obj_property1 WHERE 1=1  and doc.fullName=obj.name and "
+                + "obj.className='Some.Class' and obj_property1.id.id=obj.id and obj_property1.id.name='property' "
+                + "group by obj_property1.value order by count ( obj_property1.value )");
     }
 
     @Test

@@ -180,6 +180,9 @@ select_expression =
 
 aggregate_expression =
     {func} aggregate_func lbr distinct? path rbr |
+    {count} count_expression;
+
+count_expression =
     {count} count lbr distinct? count_arg rbr;
 
 count_arg =
@@ -346,7 +349,8 @@ functions_returning_numerics =
     {abs} abs lbr simple_arithmetic_expression rbr |
     {sqrt} sqrt lbr simple_arithmetic_expression rbr |
     {mod} mod lbr [dividend]:simple_arithmetic_expression comma [divisor]:simple_arithmetic_expression rbr |
-    {size} size lbr path rbr;
+    {size} size lbr path rbr |
+    {count} count_expression;
 
 string_primary =
     {const} string_literal |

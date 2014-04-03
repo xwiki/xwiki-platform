@@ -457,6 +457,8 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <!-- The JPQLParser generates source code and the grammar has changed a bit -->
+            <exclude>org/xwiki/query/jpql/**</exclude>
           </excludes>
         </configuration>
       </plugin>

@@ -28,6 +28,8 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.query.xwql.internal.hql.XWQLtoHQLTranslator;
 import org.xwiki.test.jmock.JMockRule;
 
+import static org.junit.Assert.fail;
+
 public class XWQLtoHQLTranslatorTest
 {
     @Rule

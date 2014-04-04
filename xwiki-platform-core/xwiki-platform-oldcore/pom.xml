@@ -58,12 +58,6 @@
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
 
-    <dependency>
-      <groupId>com.novell.ldap</groupId>
-      <artifactId>jldap</artifactId>
-      <version>4.3</version>
-    </dependency>
-
     <!-- We need to create a JIRA issue on the Maven project to upload these artifacts -->
     <dependency>
       <groupId>info.informatica</groupId>
@@ -781,10 +775,6 @@
               **/plugin/diff/DiffPluginApi.java,
               **/plugin/diff/DiffPlugin.java,
               **/plugin/graphviz/GraphVizMacro.java,
-              <!-- XWiki LDAP Utils has a fan out complexity of 21 that needs to be investigated and refactored. -->
-              **/plugin/ldap/XWikiLDAPUtils.java,
-              <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
-              **/plugin/ldap/XWikiLDAPConnection.java,
               **/plugin/mail/MailPluginApi.java,
               **/plugin/mail/MailPlugin.java,
               **/plugin/packaging/DocumentFilter.java,
@@ -905,8 +895,6 @@
               **/user/api/XWikiRightNotFoundException.java,
               **/user/api/XWikiRightService.java,
               **/user/api/XWikiUser.java,
-              **/user/impl/LDAP/LDAPProfileXClass.java,
-              **/user/impl/LDAP/XWikiLDAPAuthServiceImpl.java,
               **/user/impl/xwiki/AppServerTrustedAuthServiceImpl.java,
               **/user/impl/xwiki/GroovyAuthServiceImpl.java,
               **/user/impl/xwiki/MyBasicAuthenticator.java,

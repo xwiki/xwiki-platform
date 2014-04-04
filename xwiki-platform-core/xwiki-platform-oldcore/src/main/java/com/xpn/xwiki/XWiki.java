@@ -178,7 +178,6 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
@@ -4695,11 +4694,7 @@ public class XWiki implements EventListener
                     LOGGER.warn("Failed to initialize AuthService " + authClass
                         + " using Reflection, trying default implementations using 'new'.", e);
 
-                    if (isLDAP()) {
-                        this.authService = new XWikiLDAPAuthServiceImpl();
-                    } else {
-                        this.authService = new XWikiAuthServiceImpl();
-                    }
+                    this.authService = new XWikiAuthServiceImpl();
 
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Initialized AuthService " + this.authService.getClass().getName()

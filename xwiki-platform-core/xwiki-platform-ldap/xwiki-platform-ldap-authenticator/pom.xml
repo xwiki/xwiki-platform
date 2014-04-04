@@ -27,22 +27,21 @@
     <artifactId>xwiki-platform-ldap</artifactId>
     <version>6.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-ldap-api</artifactId>
-  <name>XWiki Platform - LDAP - API</name>
+  <artifactId>xwiki-platform-ldap-authenticator</artifactId>
+  <name>XWiki Platform - LDAP - Authenticator</name>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-ldap-authenticator</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
+    
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
+      <groupId>com.novell.ldap</groupId>
+      <artifactId>jldap</artifactId>
+      <version>4.3</version>
     </dependency>
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-    </dependency>
+    
   </dependencies>
   <build>
     <plugins>
@@ -50,6 +49,16 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+              <!-- XWiki LDAP Utils has a fan out complexity of 21 that needs to be investigated and refactored. -->
+              **/plugin/ldap/XWikiLDAPUtils.java,
+              <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
+              **/plugin/ldap/XWikiLDAPConnection.java,
+              **/user/impl/LDAP/LDAPProfileXClass.java,
+              **/user/impl/LDAP/XWikiLDAPAuthServiceImpl.java
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

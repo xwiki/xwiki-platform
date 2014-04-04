@@ -41,7 +41,15 @@
       <artifactId>jldap</artifactId>
       <version>4.3</version>
     </dependency>
-    
+
+    <!-- Testing dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

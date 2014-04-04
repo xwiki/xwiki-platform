@@ -24,15 +24,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-legacy</artifactId>
     <version>6.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-ldap</artifactId>
-  <name>XWiki Platform - LDAP - Parent POM</name>
+  <artifactId>xwiki-platform-legacy-ldap</artifactId>
+  <name>XWiki Platform - Legacy - LDAP - Parent POM</name>
   <packaging>pom</packaging>
+  <description>XWiki Platform - Legacy - LDAP - Parent POM</description>
   <modules>
-    <module>xwiki-platform-ldap-authenticator</module>
-    <module>xwiki-platform-ldap-api</module>
-    <module>xwiki-platform-ldap-ui</module>
+    <module>xwiki-platform-legacy-ldap-authenticator</module>
   </modules>
 </project>

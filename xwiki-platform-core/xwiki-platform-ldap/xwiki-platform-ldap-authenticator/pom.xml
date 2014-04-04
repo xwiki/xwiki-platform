@@ -29,6 +29,9 @@
   </parent>
   <artifactId>xwiki-platform-ldap-authenticator</artifactId>
   <name>XWiki Platform - LDAP - Authenticator</name>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.10</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -49,6 +52,16 @@
       <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
+    </dependency>
+    <!-- Used to mock XWiki class -->
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-legacy</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
     </dependency>
   </dependencies>
   <build>

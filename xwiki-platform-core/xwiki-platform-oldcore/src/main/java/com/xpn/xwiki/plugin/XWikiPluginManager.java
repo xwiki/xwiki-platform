@@ -82,11 +82,8 @@ public class XWikiPluginManager
             args[1] = className;
             args[2] = context;
             Class<XWikiPluginInterface> pluginClass =
-                (Class<XWikiPluginInterface>) Class.forName(
-                    className,
-                    true,
-                    Utils.getComponent(ClassLoaderManager.class).getURLClassLoader("wiki:" + context.getDatabase(),
-                        false));
+                (Class<XWikiPluginInterface>) Class.forName(className, true, Thread.currentThread()
+                    .getContextClassLoader());
             XWikiPluginInterface plugin = pluginClass.getConstructor(classes).newInstance(args);
             if (plugin != null) {
                 this.plugins.add(plugin.getName());

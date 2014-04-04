@@ -344,6 +344,7 @@ public class Context extends Api
      * 
      * @return The document reference for the current logged in user which made the request or <code>null</code> if
      *         there is no currently logged in user (anonymous/guest user).
+     * @since 3.2M3
      */
     public DocumentReference getUserReference()
     {

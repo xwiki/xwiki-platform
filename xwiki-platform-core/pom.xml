@@ -461,7 +461,7 @@
             <exclude>org/xwiki/query/jpql/**</exclude>
             <!-- New methods in WikiUserManager -->
             <exclude>org/xwiki/wiki/user/WikiUserManager</exclude>
-            <!-- Not a real breackage, LDAP moved in it's own module -->
+            <!-- Not a real breakage, LDAP moved in it's own module -->
             <exclude>com/xpn/xwiki/plugin/ldap/**</exclude>
             <exclude>com/xpn/xwiki/user/impl/LDAP/**</exclude>
           </excludes>

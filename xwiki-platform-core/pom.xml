@@ -452,6 +452,12 @@
               <justification>Removed wrong "compatibility" package</justification>
             </difference>
             <!-- END: Due to removal of "compatibility" directory in legacy aspects directory structure -->
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/model/reference/LocalDocumentReference</className>
+              <method>org.xwiki.model.reference.WikiReference getWikiReference()</method>
+              <justification>Does not make any sense. Unusable. Probably a wrong copy paste.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

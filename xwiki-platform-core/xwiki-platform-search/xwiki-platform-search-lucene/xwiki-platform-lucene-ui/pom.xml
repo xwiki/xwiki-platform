@@ -24,19 +24,25 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-search-lucene</artifactId>
     <version>6.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-search</artifactId>
-  <name>XWiki Platform - Search - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Search - Parent POM</description>
+  <artifactId>xwiki-platform-search-lucene-ui</artifactId>
+  <packaging>xar</packaging>
+  <name>XWiki Platform - Search - Lucene - UI</name>
+  <description>Allows searching on the wiki using Apache Lucene</description>
   <properties>
-    <lucene.version>4.7.1</lucene.version>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Lucene Search Application</xwiki.extension.name>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
-  <modules>
-    <module>xwiki-platform-search-lucene</module>
-    <module>xwiki-platform-search-solr</module>
-    <module>xwiki-platform-search-ui</module>
-  </modules>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-lucene-api</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

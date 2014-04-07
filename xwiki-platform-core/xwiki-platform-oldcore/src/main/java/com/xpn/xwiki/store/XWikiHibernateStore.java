@@ -1489,16 +1489,30 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             final Session session = this.getSession(context);
 
-            final Query query =
-                session
-                    .createQuery("select prop.name from BaseProperty as prop where prop.id.id = :id and prop.id.name= :name");
+            Query query = session.createQuery("select prop.classType from BaseProperty as prop "
+                + "where prop.id.id = :id and prop.id.name= :name");
             query.setLong("id", property.getId());
             query.setString("name", property.getName());
 
-            if (query.uniqueResult() == null) {
+            String oldClassType = (String) query.uniqueResult();
+            String newClassType = ((BaseProperty) property).getClassType();
+            if (oldClassType == null) {
                 session.save(property);
-            } else {
+            } else if (oldClassType.equals(newClassType)) {
                 session.update(property);
+            } else {
+                // The property type has changed. We cannot simply update its value because the new value and the old
+                // value are stored in different tables (we're using joined-subclass to map different property types).
+                // We must delete the old property value before saving the new one and for this we must load the old
+                // property from the table that corresponds to the old property type (we cannot delete and save the new
+                // property or delete a clone of the new property; loading the old property from the BaseProperty table
+                // doesn't work either).
+                query = session.createQuery("select prop from " + oldClassType
+                    + " as prop where prop.id.id = :id and prop.id.name= :name");
+                query.setLong("id", property.getId());
+                query.setString("name", property.getName());
+                session.delete(query.uniqueResult());
+                session.save(property);
             }
 
             ((BaseProperty) property).setValueDirty(false);

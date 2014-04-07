@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.fop.fo.properties.StringProperty;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -48,8 +49,11 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DoubleProperty;
 import com.xpn.xwiki.objects.IntegerProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
@@ -253,5 +257,62 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
 
         verify(session).createSQLQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery).executeUpdate();
+    }
+
+    /**
+     * Save an object that has a property whose type has changed.
+     * 
+     * @see "XWIKI-9716: Error while migrating SearchSuggestConfig page from 4.1.4 to 5.2.1 with DW"
+     */
+    @Test
+    public void saveObjectWithPropertyTypeChange() throws Exception
+    {
+        // The class must be local.
+        DocumentReference classReference = new DocumentReference("myWiki", "mySpace", "myClass");
+        when(context.getDatabase()).thenReturn(classReference.getWikiReference().getName());
+        BaseObject object = mock(BaseObject.class);
+        when(object.getXClassReference()).thenReturn(classReference);
+
+        // Query to check if the object exists already (save versus update).
+        when(context.get("hibsession")).thenReturn(session);
+        when(session.createQuery("select obj.id from BaseObject as obj where obj.id = :id")).thenReturn(
+            mock(Query.class));
+
+        // Save each object property.
+        String propertyName = "query";
+        long propertyId = 1234567890L;
+        when(object.getPropertyList()).thenReturn(Collections.singleton(propertyName));
+
+        // The property name must match the key in the property list.
+        BaseProperty property = mock(BaseProperty.class);
+        when(object.getField(propertyName)).thenReturn(property);
+        when(property.getId()).thenReturn(propertyId);
+        when(property.getName()).thenReturn(propertyName);
+        when(property.getClassType()).thenReturn(LargeStringProperty.class.getName());
+
+        Query oldClassTypeQuery = mock(Query.class);
+        when(session.createQuery("select prop.classType from BaseProperty as prop "
+            + "where prop.id.id = :id and prop.id.name= :name")).thenReturn(oldClassTypeQuery);
+        // The old value has a different type (String -> TextArea).
+        when(oldClassTypeQuery.uniqueResult()).thenReturn(StringProperty.class.getName());
+
+        // The old property must be loaded from the corresponding table.
+        Query oldPropertyQuery = mock(Query.class);
+        when(session.createQuery("select prop from " + StringProperty.class.getName()
+            + " as prop where prop.id.id = :id and prop.id.name= :name")).thenReturn(oldPropertyQuery);
+        BaseProperty oldProperty = mock(BaseProperty.class);
+        when(oldPropertyQuery.uniqueResult()).thenReturn(oldProperty);
+
+        store.saveXWikiCollection(object, context, false);
+
+        verify(oldClassTypeQuery).setLong("id", propertyId);
+        verify(oldClassTypeQuery).setString("name", propertyName);
+
+        verify(oldPropertyQuery).setLong("id", propertyId);
+        verify(oldPropertyQuery).setString("name", propertyName);
+
+        // Delete the old property value and then save the new one.
+        verify(session).delete(oldProperty);
+        verify(session).save(property);
     }
 }

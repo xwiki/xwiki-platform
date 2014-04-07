@@ -35,7 +35,6 @@
     <lucene.version>4.7.1</lucene.version>
   </properties>
   <modules>
-    <module>xwiki-platform-search-lucene</module>
     <module>xwiki-platform-search-solr</module>
     <module>xwiki-platform-search-ui</module>
   </modules>

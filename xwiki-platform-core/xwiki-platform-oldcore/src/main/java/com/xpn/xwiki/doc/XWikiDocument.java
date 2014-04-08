@@ -8396,49 +8396,56 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                             mergeResult.getLog().warn("Object [{}] already removed", previousObject.getReference());
                         }
                     } else if (previousObject != null && newObject != null) {
-                        if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
-                            if (propertyResult == null) {
-                                objectResult.addField(diff.getPropName(), newProperty);
-                                mergeResult.setModified(true);
-                            } else {
-                                // XXX: collision between DB and new: property to add but already exists in the DB
-                                mergeResult.getLog().error("Collision found on object property [{}]",
-                                    propertyResult.getReference());
-                            }
-                        } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
-                            if (propertyResult != null) {
-                                if (propertyResult.equals(previousProperty)) {
-                                    objectResult.removeField(diff.getPropName());
-                                    mergeResult.setModified(true);
-                                } else {
-                                    // XXX: collision between DB and new: supposed to be removed but the DB version is
-                                    // not the same as the previous version
-                                    mergeResult.getLog().error("Collision found on object property [{}]",
-                                        propertyResult.getReference());
-                                }
-                            } else {
-                                // Already removed from DB, lets assume the user is prescient
-                                mergeResult.getLog().warn("Object property [{}] already removed",
-                                    previousProperty.getReference());
-                            }
-                        } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
-                            if (propertyResult != null) {
-                                if (propertyResult.equals(previousProperty)) {
+                        if (objectResult != null) {
+                            if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
+                                if (propertyResult == null) {
                                     objectResult.addField(diff.getPropName(), newProperty);
                                     mergeResult.setModified(true);
                                 } else {
-                                    // Try to apply a 3 ways merge on the property
-                                    propertyResult.merge(previousProperty, newProperty, configuration, context,
-                                        mergeResult);
+                                    // XXX: collision between DB and new: property to add but already exists in the DB
+                                    mergeResult.getLog().error("Collision found on object property [{}]",
+                                        propertyResult.getReference());
                                 }
-                            } else {
-                                // XXX: collision between DB and new: property to modify but does not exists in DB
-                                // Lets assume it's a mistake to fix
-                                mergeResult.getLog().warn("Object [{}] does not exists", newProperty.getReference());
+                            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
+                                if (propertyResult != null) {
+                                    if (propertyResult.equals(previousProperty)) {
+                                        objectResult.removeField(diff.getPropName());
+                                        mergeResult.setModified(true);
+                                    } else {
+                                        // XXX: collision between DB and new: supposed to be removed but the DB version
+                                        // is
+                                        // not the same as the previous version
+                                        mergeResult.getLog().error("Collision found on object property [{}]",
+                                            propertyResult.getReference());
+                                    }
+                                } else {
+                                    // Already removed from DB, lets assume the user is prescient
+                                    mergeResult.getLog().warn("Object property [{}] already removed",
+                                        previousProperty.getReference());
+                                }
+                            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
+                                if (propertyResult != null) {
+                                    if (propertyResult.equals(previousProperty)) {
+                                        objectResult.addField(diff.getPropName(), newProperty);
+                                        mergeResult.setModified(true);
+                                    } else {
+                                        // Try to apply a 3 ways merge on the property
+                                        propertyResult.merge(previousProperty, newProperty, configuration, context,
+                                            mergeResult);
+                                    }
+                                } else {
+                                    // XXX: collision between DB and new: property to modify but does not exists in DB
+                                    // Lets assume it's a mistake to fix
+                                    mergeResult.getLog()
+                                        .warn("Object [{}] does not exists", newProperty.getReference());
 
-                                objectResult.addField(diff.getPropName(), newProperty);
-                                mergeResult.setModified(true);
+                                    objectResult.addField(diff.getPropName(), newProperty);
+                                    mergeResult.setModified(true);
+                                }
                             }
+                        } else {
+                            // Object expliitely removed from the DB, lets assume we don't care about the changes
+                            mergeResult.getLog().warn("Object [{}] already removed", previousObject.getReference());
                         }
                     }
                 }

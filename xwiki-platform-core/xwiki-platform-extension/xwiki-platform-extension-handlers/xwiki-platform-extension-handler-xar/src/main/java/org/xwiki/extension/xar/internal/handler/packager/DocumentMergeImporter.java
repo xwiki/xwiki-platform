@@ -140,8 +140,16 @@ public class DocumentMergeImporter
         MergeConfiguration mergeConfiguration = new MergeConfiguration();
         mergeConfiguration.setProvidedVersionsModifiables(true);
 
-        MergeResult documentMergeResult =
-            mergedDocument.merge(previousDocument, nextDocument, mergeConfiguration, xcontext);
+        MergeResult documentMergeResult;
+        try {
+            documentMergeResult = mergedDocument.merge(previousDocument, nextDocument, mergeConfiguration, xcontext);
+        } catch (Exception e) {
+            // Unexpected error, lets behave as if there was a conflict
+            documentMergeResult = new MergeResult();
+            documentMergeResult.getLog().error(
+                "Unexpected exception thrown. Usually means there is a bug in the merge.", e);
+            documentMergeResult.setModified(true);
+        }
 
         documentMergeResult.getLog().log(this.logger);
 

@@ -8331,7 +8331,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                 }
                             }
                         } else {
-                            // Object expliitely removed from the DB, lets assume we don't care about the changes
+                            // Object explitely removed from the DB, lets assume we don't care about the changes
                             mergeResult.getLog().warn("Object [{}] already removed", previousObject.getReference());
                         }
                     }

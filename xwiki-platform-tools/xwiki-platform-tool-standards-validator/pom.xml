@@ -31,7 +31,7 @@
   <name>XWiki Platform - Tools - Web Standards Validator</name>
   <description>XWiki Platform - Tools - Web Standard Validator</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.93</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.92</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -46,6 +46,11 @@
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
       <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>nu.validator.htmlparser</groupId>
+      <artifactId>htmlparser</artifactId>
+      <version>1.4</version>
     </dependency>
     <dependency>    
       <groupId>junit</groupId>

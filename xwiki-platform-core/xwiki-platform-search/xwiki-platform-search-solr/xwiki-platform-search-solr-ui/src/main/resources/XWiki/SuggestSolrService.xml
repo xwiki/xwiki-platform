@@ -41,7 +41,7 @@
   <hidden>true</hidden>
   <content>{{include reference="XWiki.SuggestSolrMacros" /}}
 
-{{velocity}}
+{{velocity wiki="false"}}
 #if ("$!request.query" != '' &amp;&amp; "$!request.input" != '')
   #getSearchSuggestResults($results)
   #set ($discard = $response.setContentType('text/xml'))
@@ -66,7 +66,11 @@
       &lt;rs id="$escapetool.xml($url)" info="$escapetool.xml($documentReference)"&gt;$escapetool.xml($title)&lt;/rs&gt;
     #end
   &lt;/results&gt;
-#else
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ("$!request.query" == '' || "$!request.input" == '')
   {{info}}
     This service provides search results for the search suggest UI component.
     Examples:

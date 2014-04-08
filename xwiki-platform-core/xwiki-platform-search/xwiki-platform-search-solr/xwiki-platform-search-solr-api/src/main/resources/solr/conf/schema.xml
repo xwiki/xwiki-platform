@@ -162,6 +162,8 @@
    <!-- In order to avoid joins we index attachment data on document rows (at the cost of duplicating information). -->
    <!-- The attachment file name. E.g. ['todo.txt', 'logo.png'] -->
    <field name="filename" type="text_filename" indexed="true" stored="true" multiValued="true" />
+   <!-- We also need to store the attachment file name verbatim for exact or prefix matching. -->
+   <field name="filename_exact" type="string" indexed="true" stored="false" multiValued="true" />
    <!-- The attachment media type. E.g. ['text/plain', 'image/png'] -->
    <field name="mimetype" type="string" indexed="true" stored="true" multiValued="true" />
    <!-- The user that uploaded the attachment. Used for faceting (exact matching). -->
@@ -312,6 +314,7 @@
   <copyField source="name" dest="name_exact"/>
   <copyField source="title_*" dest="title_sort"/>
   <copyField source="author_display" dest="author_display_sort"/>
+  <copyField source="filename" dest="filename_exact"/>
 
   <!-- Aliases -->
   <!-- Retro compatibility with old Lucene module fields names -->

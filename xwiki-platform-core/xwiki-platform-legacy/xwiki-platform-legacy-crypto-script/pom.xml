@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy</artifactId>
-    <version>5.4.4-SNAPSHOT</version>
+    <version>5.4.4</version>
   </parent>
   <artifactId>xwiki-platform-legacy-crypto-script</artifactId>
   <name>XWiki Platform - Cryptographic Services - Legacy API</name>

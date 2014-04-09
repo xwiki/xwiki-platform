@@ -17,26 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.observation.remote.converter;
+package org.xwiki.observation.remote.internal.converter;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.logging.event.LogEvent;
+import org.xwiki.observation.remote.LocalEventData;
+import org.xwiki.observation.remote.RemoteEventData;
+import org.xwiki.observation.remote.converter.AbstractEventConverter;
+import org.xwiki.observation.remote.converter.LocalEventConverter;
 
 /**
- * Base class for events converters. Provide a default priority.
+ * Make sure to skip {@link LogEvent}.
  * 
  * @version $Id$
- * @since 2.0M3
+ * @since 6.0RC1
  */
-public abstract class AbstractEventConverter implements LocalEventConverter, RemoteEventConverter
+@Component
+@Named("log")
+@Singleton
+public class LogEventConverter implements LocalEventConverter
 {
-    /**
-     * The default priority.
-     * 
-     * @since 6.0RC1
-     */
-    public static final int DEFAULT_PRIORITY = 1000;
-
     @Override
     public int getPriority()
     {
-        return DEFAULT_PRIORITY;
+        return AbstractEventConverter.DEFAULT_PRIORITY;
+    }
+
+    @Override
+    public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
+    {
+        return localEvent.getEvent() instanceof LogEvent;
     }
 }

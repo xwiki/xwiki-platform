@@ -81,6 +81,10 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
     @Named("wikistream")
     private JobManager jobManager;
 
+    @Inject
+    @Named(WikiStreamConverterJob.JOBTYPE)
+    private Provider<WikiStreamConverterJob> jobProvider;
+
     public ScriptService get(String id)
     {
         return this.scriptServiceManager.get(ROLEHINT + '.' + id);
@@ -101,6 +105,21 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
     public Job startConvert(WikiStreamType inputType, Map<String, Object> inputProperties, WikiStreamType outputType,
         Map<String, Object> outputProperties)
     {
+        return convert(inputType, inputProperties, outputType, outputProperties, true);
+    }
+
+    /**
+     * @since 6.0RC1, 5.4.5
+     */
+    public Job convert(WikiStreamType inputType, Map<String, Object> inputProperties, WikiStreamType outputType,
+        Map<String, Object> outputProperties)
+    {
+        return convert(inputType, inputProperties, outputType, outputProperties, false);
+    }
+
+    private Job convert(WikiStreamType inputType, Map<String, Object> inputProperties, WikiStreamType outputType,
+        Map<String, Object> outputProperties, boolean async)
+    {
         resetError();
 
         Job job = null;
@@ -111,7 +130,13 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
             WikiStreamConverterJobRequest request =
                 new WikiStreamConverterJobRequest(inputType, inputProperties, outputType, outputProperties);
 
-            job = this.jobManager.addJob(WikiStreamConverterJob.JOBTYPE, request);
+            if (async) {
+                job = this.jobManager.addJob(WikiStreamConverterJob.JOBTYPE, request);
+            } else {
+                job = this.jobProvider.get();
+                job.initialize(request);
+                job.run();
+            }
         } catch (Exception e) {
             setError(e);
         }

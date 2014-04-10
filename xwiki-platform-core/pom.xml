@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>5.4.4-SNAPSHOT</version>
+    <version>5.4.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -377,8 +377,6 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- New methods in WikiUserManager -->
-            <exclude>org/xwiki/wiki/user/WikiUserManager</exclude>WikiUserManagerScriptServiceTest
           </excludes>
         </configuration>
       </plugin>

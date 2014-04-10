@@ -26,12 +26,12 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1395934585000</creationDate>
+  <creationDate>1397121746000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1396270448000</date>
-  <contentUpdateDate>1396270435000</contentUpdateDate>
+  <date>1397125381000</date>
+  <contentUpdateDate>1397125381000</contentUpdateDate>
   <version>1.1</version>
   <title>WikiStream</title>
   <comment/>
@@ -93,10 +93,15 @@
   #if ($targetStandardOutput)
     $response.setContentType('application/octet-stream')
     $response.setHeader('Content-Disposition', 'attachment; filename=target');
-    $services.wikistream.startConvert($input, $inputProperties, $output, $outputProperties).join()
+    $services.wikistream.convert($input, $inputProperties, $output, $outputProperties)
     $xcontext.setFinished(true)
   #else
-    #if ($services.wikistream.startConvert($input, $inputProperties, $output, $outputProperties))
+    #if ($sourceStandardInput)
+      #set($job = $services.wikistream.convert($input, $inputProperties, $output, $outputProperties))
+    #else
+      #set($job = $services.wikistream.startConvert($input, $inputProperties, $output, $outputProperties))
+    #end
+    #if ($job)
       {{success}}Conversion started.{{/success}}
     #else
       #set ($lastError = $services.wikistream.lastError)

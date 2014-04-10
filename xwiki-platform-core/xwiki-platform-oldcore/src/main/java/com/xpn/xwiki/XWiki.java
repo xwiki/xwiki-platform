@@ -5519,7 +5519,7 @@ public class XWiki implements EventListener
     {
         String defaultPage = getXWikiPreference("defaultpage", "", context);
         if (StringUtils.isEmpty(defaultPage)) {
-            return Param("xwiki.defaultpage", DEFAULT_HOME_SPACE);
+            return Param("xwiki.defaultpage", DEFAULT_SPACE_HOMEPAGE);
         }
         return defaultPage;
     }

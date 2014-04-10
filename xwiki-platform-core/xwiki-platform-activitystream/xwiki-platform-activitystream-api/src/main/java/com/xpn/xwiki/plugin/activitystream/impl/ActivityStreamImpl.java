@@ -884,6 +884,10 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             } else if (event instanceof DocumentDeletedEvent) {
                 eventType = ActivityEventType.DELETE;
                 displayTitle = originalDoc.getRenderedTitle(Syntax.XHTML_1_0, context);
+                // When we receive a DELETE event, the given document is blank and does not have version & hidden tag
+                // properly set.
+                currentDoc.setVersion(originalDoc.getVersion());
+                currentDoc.setHidden(originalDoc.isHidden());
             } else if (event instanceof CommentAddedEvent) {
                 eventType = ActivityEventType.ADD_COMMENT;
                 displayTitle = currentDoc.getRenderedTitle(Syntax.XHTML_1_0, context);

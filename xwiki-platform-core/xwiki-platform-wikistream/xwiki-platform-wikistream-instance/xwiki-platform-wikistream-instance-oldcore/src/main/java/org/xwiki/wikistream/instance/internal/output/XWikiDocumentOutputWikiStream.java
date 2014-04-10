@@ -277,8 +277,10 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
 
         this.document.setCreationDate(getDate(WikiDocumentFilter.PARAMETER_CREATION_DATE, this.currentLocaleParameters,
             null));
-        this.document.setCreator(getString(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, this.currentLocaleParameters,
-            null));
+        if (this.currentLocaleParameters.containsKey(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR)) {
+            this.document.setCreator(getString(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR,
+                this.currentLocaleParameters, null));
+        }
         this.document.setDefaultLocale(this.currentDefaultLocale);
 
         this.document.setSyntax(getSyntax(WikiDocumentFilter.PARAMETER_SYNTAX, parameters, null));
@@ -293,7 +295,9 @@ public class XWikiDocumentOutputWikiStream implements XWikiDocumentFilter
         this.document.setHidden(getBoolean(WikiDocumentFilter.PARAMETER_HIDDEN, parameters, false));
 
         this.document.setMinorEdit(getBoolean(WikiDocumentFilter.PARAMETER_REVISION_MINOR, parameters, false));
-        this.document.setAuthor(getString(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
+        if (parameters.containsKey(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR)) {
+            this.document.setAuthor(getString(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
+        }
         this.document.setContentAuthor(getString(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR, parameters, null));
 
         String revisions =

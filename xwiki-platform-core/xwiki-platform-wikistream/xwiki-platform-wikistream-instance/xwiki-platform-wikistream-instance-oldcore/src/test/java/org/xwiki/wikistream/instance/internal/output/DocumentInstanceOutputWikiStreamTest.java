@@ -201,6 +201,30 @@ public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiSt
     }
 
     @Test
+    public void testDocumentwithoutauthorandcreator() throws WikiStreamException, XWikiException, ParseException
+    {
+        DocumentReference contextUser = new DocumentReference("wiki", "XWiki", "contextuser");
+        this.oldcore.getXWikiContext().setUserReference(contextUser);
+
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVerbose(false);
+        outputProperties.setAuthorPreserved(true);
+
+        importFromXML("documentwithnumberversion", outputProperties);
+
+        XWikiDocument document =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+                this.oldcore.getXWikiContext());
+
+        Assert.assertFalse(document.isNew());
+
+        Assert.assertEquals(contextUser, document.getCreatorReference());
+        Assert.assertEquals(contextUser, document.getAuthorReference());
+        Assert.assertEquals(contextUser, document.getContentAuthorReference());
+    }
+
+    @Test
     public void testDocumentwithattachmentwithoutdate() throws WikiStreamException, XWikiException, ParseException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();

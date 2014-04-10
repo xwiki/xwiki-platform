@@ -19,8 +19,6 @@
  */
 package org.xwiki.wiki.internal.manager;
 
-import java.text.MessageFormat;
-import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -38,17 +36,11 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin;
-import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPluginApi;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument;
-import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
 
 /**
  * Default implementation for {@link WikiCopier}.
@@ -94,7 +86,6 @@ public class DefaultWikiCopier implements WikiCopier
 
                 observationManager.notify(new StepProgressEvent(), this);
             }
-            handleAppDescriptors(fromWikiId, toWikiId);
 
             observationManager.notify(new PopLevelProgressEvent(), this);
         } catch (QueryException e) {
@@ -109,100 +100,5 @@ public class DefaultWikiCopier implements WikiCopier
     public void copyDeletedDocuments(String fromWikiId, String toWikiId) throws WikiManagerException
     {
         throw new WikiManagerException("This method is not implemented yet");
-    }
-
-    /**
-     * Get the documents for which copied document content will be replace by an #includeInContext(SourceDocument) or
-     * #includeTopic(SourceDocument) macro call.
-     *
-     * @param wiki the name of the wiki where to find the list of documents.
-     * @param context the XWiki context.
-     * @return a pair of list of documents names to include and list of documents names to link.
-     * @throws XWikiException error when getting Applications descriptors where searched documents are listed.
-     */
-    private Collection<String>[] getDocsNames(String wiki, XWikiContext context) throws XWikiException
-    {
-        Collection<String>[] docsNames = new Collection[2];
-
-        // Get applications manger
-        ApplicationManagerPluginApi appmanager = (ApplicationManagerPluginApi) context.getWiki().getPluginApi(
-                ApplicationManagerPlugin.PLUGIN_NAME, context);
-
-        if (appmanager == null) {
-            return null;
-        }
-
-        // //////////////////////////////////
-        // Get documents to include or link
-
-        String database = context.getDatabase();
-
-        try {
-            context.setDatabase(wiki);
-
-            XWikiApplication rootApp = appmanager.getRootApplication();
-
-            if (rootApp != null) {
-                docsNames[0] = rootApp.getDocsNameToInclude(true);
-                docsNames[1] = rootApp.getDocsNameToLink(true);
-            } else {
-                Collection<XWikiApplication> applications = appmanager.getApplicationDocumentList();
-                docsNames[0] = XWikiApplication.getDocsNameToInclude(applications);
-                docsNames[1] = XWikiApplication.getDocsNameToLink(applications);
-            }
-        } finally {
-            context.setDatabase(database);
-        }
-
-        return docsNames;
-    }
-
-    /**
-     * Take care of ApplicationManager descriptors "documents to include" and "documents to link".
-     *
-     * @param sourceWiki the wiki from where to copy documents and get lists of "document to link" and "documents to
-     *            copy".
-     * @param targetWiki targetWiki the wiki where to copy documents.
-     * @throws XWikiException
-     */
-    private void handleAppDescriptors(String sourceWiki, String targetWiki) throws XWikiException
-    {
-        XWikiContext context = xcontextProvider.get();
-        XWiki xwiki = context.getWiki();
-
-        String database = context.getDatabase();
-        try {
-            context.setDatabase(targetWiki);
-
-            Collection<String>[] docsNames = getDocsNames(sourceWiki, context);
-
-            if (docsNames != null) {
-                Object[] includeFormatParams = new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR, null};
-
-                // Replace documents contents to include
-                for (Object item : docsNames[0]) {
-                    String docFullName = (String) item;
-                    XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
-
-                    includeFormatParams[2] = docFullName;
-                    targetDoc.setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")", includeFormatParams));
-                    targetDoc.setSyntax(Syntax.XWIKI_1_0);
-                    xwiki.saveDocument(targetDoc, context);
-                }
-
-                // Replace documents contents to link
-                for (Object item : docsNames[1]) {
-                    String docFullName = (String) item;
-                    XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
-
-                    includeFormatParams[2] = docFullName;
-                    targetDoc.setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")", includeFormatParams));
-                    targetDoc.setSyntax(Syntax.XWIKI_1_0);
-                    xwiki.saveDocument(targetDoc, context);
-                }
-            }
-        } finally {
-            context.setDatabase(database);
-        }
     }
 }

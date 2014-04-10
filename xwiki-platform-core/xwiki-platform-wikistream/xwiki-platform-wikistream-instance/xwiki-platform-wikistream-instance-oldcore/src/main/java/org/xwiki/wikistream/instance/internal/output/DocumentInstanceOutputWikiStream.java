@@ -191,7 +191,7 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
 
             if (document.isNew() && !this.properties.isAuthorPreserved()
                 || !this.currentLocaleParameters.containsKey(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR)) {
-                document.setCreatorReference(xcontext.getUserReference());
+                document.setCreatorReference(document.getAuthorReference());
             }
 
             // Save history

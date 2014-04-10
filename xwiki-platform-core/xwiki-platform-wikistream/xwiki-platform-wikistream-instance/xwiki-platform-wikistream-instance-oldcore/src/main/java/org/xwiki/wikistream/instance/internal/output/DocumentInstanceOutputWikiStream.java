@@ -87,6 +87,8 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
 
     private boolean documentDeleted;
 
+    private FilterEventParameters currentLocaleParameters;
+
     @Override
     protected Object createFilter() throws WikiStreamException
     {
@@ -110,31 +112,31 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
     // Events
 
     @Override
-    public void beginWikiDocument(String arg0, FilterEventParameters arg1) throws WikiStreamException
+    public void beginWikiDocument(String name, FilterEventParameters parameters) throws WikiStreamException
     {
         this.documentDeleted = false;
     }
 
     @Override
-    public void endWikiDocument(String arg0, FilterEventParameters arg1) throws WikiStreamException
+    public void endWikiDocument(String name, FilterEventParameters parameters) throws WikiStreamException
     {
         // Nothing to do
     }
 
     @Override
-    public void beginWikiDocumentLocale(Locale arg0, FilterEventParameters arg1) throws WikiStreamException
+    public void beginWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws WikiStreamException
     {
-        // Nothing to do
+        this.currentLocaleParameters = parameters;
     }
 
     @Override
-    public void endWikiDocumentLocale(Locale arg0, FilterEventParameters arg1) throws WikiStreamException
+    public void endWikiDocumentLocale(Locale locale, FilterEventParameters parameters) throws WikiStreamException
     {
-        // Nothing to do
+        this.currentLocaleParameters = null;
     }
 
     @Override
-    public void beginWikiDocumentRevision(String arg0, FilterEventParameters arg1) throws WikiStreamException
+    public void beginWikiDocumentRevision(String version, FilterEventParameters parameters) throws WikiStreamException
     {
         // Nothing to do
     }
@@ -169,15 +171,27 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
 
             // Author
 
-            if (this.properties.isAuthorPreserved()) {
+            if (this.properties.isAuthorPreserved()
+                && parameters.containsKey(WikiDocumentFilter.PARAMETER_REVISION_AUTHOR)) {
                 document.setAuthorReference(inputDocument.getAuthorReference());
+            } else {
+                document.setAuthorReference(xcontext.getUserReference());
+            }
+
+            // Content author
+
+            if (this.properties.isAuthorPreserved()
+                && parameters.containsKey(WikiDocumentFilter.PARAMETER_CONTENT_AUTHOR)) {
                 document.setContentAuthorReference(inputDocument.getContentAuthorReference());
             } else {
-                if (document.isNew()) {
-                    document.setCreatorReference(xcontext.getUserReference());
-                }
-                document.setAuthorReference(xcontext.getUserReference());
-                document.setContentAuthorReference(xcontext.getUserReference());
+                document.setContentAuthorReference(document.getAuthorReference());
+            }
+
+            // Creator
+
+            if (document.isNew() && !this.properties.isAuthorPreserved()
+                || !this.currentLocaleParameters.containsKey(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR)) {
+                document.setCreatorReference(xcontext.getUserReference());
             }
 
             // Save history

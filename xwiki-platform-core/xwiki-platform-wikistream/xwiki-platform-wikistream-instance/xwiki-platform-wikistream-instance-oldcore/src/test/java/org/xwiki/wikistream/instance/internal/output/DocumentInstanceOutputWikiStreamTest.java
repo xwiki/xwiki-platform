@@ -208,7 +208,6 @@ public class DocumentInstanceOutputWikiStreamTest extends AbstractInstanceWikiSt
 
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
-        outputProperties.setVerbose(false);
         outputProperties.setAuthorPreserved(true);
 
         importFromXML("documentwithnumberversion", outputProperties);

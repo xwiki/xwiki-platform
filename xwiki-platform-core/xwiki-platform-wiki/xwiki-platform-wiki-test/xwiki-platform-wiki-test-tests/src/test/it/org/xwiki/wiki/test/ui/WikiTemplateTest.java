@@ -80,7 +80,7 @@ public class WikiTemplateTest extends AbstractTest
         if (wikiLink == null) {
             throw new Exception("The wiki [My new template] is not in the wiki index.");
         }
-        assertTrue(wikiLink.getURL().endsWith("/xwiki/wiki/mynewtemplate/view/Main/WebHome"));
+        assertTrue(wikiLink.getURL().endsWith("/xwiki/wiki/mynewtemplate/view/Main/"));
 
     }
 

@@ -359,14 +359,17 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         Assert.assertTrue(PARAMETERS_IGNORED, descriptionLength <= maxLength);
     }
     
-    public void testHTMLContentEncoding()
+    public void testPreviewContentEncoding()
     {
-        String snippet="<p>Test ê</p>";
-        String transformedHTML = SyndEntryDocumentSource.getHTMLPreview(snippet, 16);
+        String snippet = "<p>Test ê</p>";
+        String transformedHTML = SyndEntryDocumentSource.getHTMLPreview(snippet, 10);
         Assert.assertEquals(snippet, transformedHTML);
-        String transformedXML = SyndEntryDocumentSource.getXMLPreview(snippet, 16);
+        String transformedXML = SyndEntryDocumentSource.getXMLPreview(snippet, 10);
         Assert.assertEquals(snippet, transformedXML);
-        String transformedPlain = SyndEntryDocumentSource.getPlainPreview(snippet, 16);
-        Assert.assertEquals(snippet, transformedPlain);
+
+        String plainSnippet = " Test Text ê Rest ";
+        String previewExpected = "Test Text ê";
+        String transformedPlain = SyndEntryDocumentSource.getPlainPreview(plainSnippet, 12);
+        Assert.assertEquals(previewExpected, transformedPlain);
     }
 }

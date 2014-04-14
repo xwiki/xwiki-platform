@@ -25,7 +25,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -58,17 +57,7 @@ public class HTML5ValidatorTest
         validator.setDocument(getClass().getResourceAsStream("/html5-invalid.html"));
         List<ValidationError> errors = validator.validate();
         assertEquals(errors, validator.getErrors());
-        assertFalse(errors.isEmpty());
-
-        System.out.println("Errors for html5-invalid.html");
-        System.out.println("Number of errors: "+errors.size());
-        for (ValidationError error : errors) {
-            System.out.println(error);
-            System.out.println("Line: "+error.getLine()+", column: "+error.getColumn());
-        }
-        System.out.println("-------------------------------------------");
-
-
+        assertEquals(5, errors.size());
         validator.clear();
         assertTrue(validator.getErrors().isEmpty());
     }

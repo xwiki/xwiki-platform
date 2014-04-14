@@ -25,13 +25,9 @@ import java.util.List;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 import org.xwiki.validator.framework.XMLErrorHandler;
 
-import nu.validator.htmlparser.common.DoctypeExpectation;
-import nu.validator.htmlparser.common.Heuristics;
-import nu.validator.htmlparser.common.XmlViolationPolicy;
-import nu.validator.htmlparser.sax.HtmlParser;
+import nu.validator.validation.SimpleDocumentValidator;
 
 /**
  * Validate HTML5 code of the provided input.
@@ -58,30 +54,25 @@ public class HTML5Validator implements Validator
     public List<ValidationError> validate()
     {
         clear();
-        HtmlParser parser = new HtmlParser();
+
+        SimpleDocumentValidator validator = new SimpleDocumentValidator();
+
+        String schemaUrl = "http://s.validator.nu/html5-all.rnc";
+
         InputSource source = new InputSource(document);
-        parser.setContentHandler(new DefaultHandler());
-        parser.setErrorHandler(errorHandler);
-
-        parser.setCommentPolicy(XmlViolationPolicy.ALLOW);
-        parser.setContentNonXmlCharPolicy(XmlViolationPolicy.ALLOW);
-        parser.setContentSpacePolicy(XmlViolationPolicy.ALTER_INFOSET);
-        parser.setNamePolicy(XmlViolationPolicy.ALLOW);
-        parser.setStreamabilityViolationPolicy(XmlViolationPolicy.FATAL);
-        parser.setXmlnsPolicy(XmlViolationPolicy.ALTER_INFOSET);
-        parser.setMappingLangToXmlLang(true);
-        parser.setHtml4ModeCompatibleWithXhtml1Schemata(true);
-        parser.setDoctypeExpectation(DoctypeExpectation.HTML);
-        parser.setHeuristics(Heuristics.ALL);
-        parser.setNamePolicy(XmlViolationPolicy.ALLOW);
-        parser.setMappingLangToXmlLang(true);
-
+        validator = new SimpleDocumentValidator();
         try {
-            parser.parse(source);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            validator.setUpMainSchema(schemaUrl, errorHandler);
+            validator.setUpValidatorAndParsers(errorHandler, false, false);
+            validator.checkHtmlInputSource(source);
         } catch (SAXException e) {
             // Ignore - Let XMLErrorHandler handle it
+        } catch (SimpleDocumentValidator.SchemaReadException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         return errorHandler.getErrors();
     }

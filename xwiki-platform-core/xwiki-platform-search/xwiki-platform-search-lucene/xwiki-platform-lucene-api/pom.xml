@@ -103,12 +103,6 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-    <!-- Needed for ClassImposteriser for mocking oldcore classes -->
-    <dependency>
-      <groupId>org.jmock</groupId>
-      <artifactId>jmock-legacy</artifactId>
-      <scope>test</scope>
-    </dependency>
     <!-- For some tests we need to have the Servlet API JAR available -->
     <dependency>
       <groupId>javax.servlet</groupId>

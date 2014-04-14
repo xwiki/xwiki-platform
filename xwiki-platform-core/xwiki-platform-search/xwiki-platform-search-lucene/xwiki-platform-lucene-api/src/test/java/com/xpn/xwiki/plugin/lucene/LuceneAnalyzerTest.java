@@ -19,81 +19,63 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.util.Date;
 import java.util.Locale;
 
 import javax.script.SimpleScriptContext;
-import javax.servlet.ServletContext;
 
 import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.velocity.VelocityContext;
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.configuration.internal.MemoryConfigurationSource;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.context.internal.DefaultExecutionContextManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
 import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiServletContext;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 /**
  * Unit tests for {@link LucenePlugin}. with different Analyzer
  */
-@MockingRequirement(DefaultExecutionContextManager.class)
 @AllComponents
-public class LuceneAnalyzerTest extends AbstractMockingComponentTestCase<ExecutionContextManager>
+public class LuceneAnalyzerTest
 {
     /**
      * Make sure the index folder is not reused.
      */
     private final static String INDEXDIR = "target" + File.separator + "luceneAnalyzerTest-" + new Date().getTime();
 
+    @Rule
+    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+
     private XWikiDocument document;
-
-    private XWikiContext xwikiContext;
-
-    private XWiki xwiki;
 
     private MemoryConfigurationSource source;
 
     private LucenePlugin lucenePlugin;
 
-    @Override
     @Before
     public void setUp() throws Exception
     {
-        super.setUp();
-
         // create lucene index dir
         File f = new File(INDEXDIR);
         if (!f.exists()) {
             f.mkdirs();
         }
-
-        // Using ClassImposteriser to be able to mock classes like XWiki and XWikiDocument
-        getMockery().setImposteriser(ClassImposteriser.INSTANCE);
-
-        Utils.setComponentManager(getComponentManager());
 
         this.document = new XWikiDocument(new DocumentReference("xwiki", "space", "lucene analyzer test page"));
         this.document.setSyntax(Syntax.XWIKI_2_1);
@@ -103,75 +85,35 @@ public class LuceneAnalyzerTest extends AbstractMockingComponentTestCase<Executi
 
     private void prepareAndIndexWithAnalyzer(Class analyzer) throws Exception
     {
-        final Execution execution = getComponentManager().getInstance(Execution.class);
-        final ExecutionContext executionContext = new ExecutionContext();
-
-        this.xwiki = getMockery().mock(XWiki.class);
-
-        this.xwikiContext = new XWikiContext();
-        this.xwikiContext.setDatabase("xwiki");
-        this.xwikiContext.setWiki(this.xwiki);
-        ServletContext mockServletContext = getMockery().mock(ServletContext.class);
-        XWikiServletContext xwikiServletContext = new XWikiServletContext(mockServletContext);
-        this.xwikiContext.setEngineContext(xwikiServletContext);
-
-        final XWikiStoreInterface xwikiStore = getMockery().mock(XWikiStoreInterface.class);
-        final XWikiRightService rightService = getMockery().mock(XWikiRightService.class);
-
-        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.xwikiContext);
-        executionContext.setProperty(ScriptExecutionContextInitializer.SCRIPT_CONTEXT_ID, new SimpleScriptContext());
+        this.oldcore.getExecutionContext().setProperty(ScriptExecutionContextInitializer.SCRIPT_CONTEXT_ID,
+            new SimpleScriptContext());
         VelocityContext velocityContext = new VelocityContext();
-        executionContext.setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID, velocityContext);
+        this.oldcore.getExecutionContext().setProperty(VelocityExecutionContextInitializer.VELOCITY_CONTEXT_ID,
+            velocityContext);
         final String analyzerToTest = analyzer.getName();
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(execution).getContext();
-                will(returnValue(executionContext));
+        when(this.oldcore.getMockXWiki().Param("xwiki.plugins.lucene.indexdir")).thenReturn(INDEXDIR);
+        when(this.oldcore.getMockXWiki().ParamAsLong("xwiki.plugins.lucene.indexinterval", 30l)).thenReturn(1l);
+        when(this.oldcore.getMockXWiki().ParamAsLong("xwiki.plugins.lucene.maxQueueSize", 1000l)).thenReturn(1000l);
+        when(
+            this.oldcore.getMockXWiki().Param("xwiki.plugins.lucene.analyzer",
+                "org.apache.lucene.analysis.standard.StandardAnalyzer")).thenReturn(analyzerToTest);
 
-                allowing(xwiki).Param("xwiki.plugins.lucene.indexdir");
-                will(returnValue(INDEXDIR));
+        when(this.oldcore.getMockXWiki().getDocument(any(DocumentReference.class), any(XWikiContext.class)))
+            .thenReturn(document);
 
-                allowing(xwiki).ParamAsLong("xwiki.plugins.lucene.indexinterval", 30l);
-                will(returnValue(1l));
+        when(this.oldcore.getMockXWiki().getLanguagePreference(any(XWikiContext.class))).thenReturn("en");
+        when(this.oldcore.getMockStore().loadXWikiDoc(any(XWikiDocument.class), any(XWikiContext.class))).thenReturn(
+            document);
+        when(this.oldcore.getMockXWiki().exists(any(DocumentReference.class), any(XWikiContext.class)))
+            .thenReturn(true);
+        when(
+            this.oldcore.getMockRightService().hasAccessLevel(any(String.class), any(String.class), any(String.class),
+                any(XWikiContext.class))).thenReturn(true);
 
-                allowing(xwiki).ParamAsLong("xwiki.plugins.lucene.maxQueueSize", 1000l);
-                will(returnValue(1000l));
-
-                allowing(xwiki)
-                        .Param("xwiki.plugins.lucene.analyzer", "org.apache.lucene.analysis.standard.StandardAnalyzer");
-                will(returnValue(analyzerToTest));
-
-                ignoring(execution);
-
-                allowing(xwiki).getDocument(with(any(DocumentReference.class)), with((any(XWikiContext.class))));
-                will(returnValue(document));
-                allowing(xwiki).prepareResources(with(any(XWikiContext.class)));
-                allowing(xwiki).getLanguagePreference(with(any(XWikiContext.class)));
-                will(returnValue("en"));
-                allowing(xwiki).getStore();
-                will(returnValue(xwikiStore));
-
-                allowing(xwikiStore).loadXWikiDoc(with(any(XWikiDocument.class)), with(any(XWikiContext.class)));
-                will(returnValue(document));
-                ignoring(xwikiStore);
-                allowing(xwiki).exists(with(any(DocumentReference.class)), with(any(XWikiContext.class)));
-                will(returnValue(true));
-                allowing(xwiki).getRightService();
-                will(returnValue(rightService));
-
-                allowing(rightService)
-                        .hasAccessLevel(with(any(String.class)), with(any(String.class)), with(any(String.class)),
-                                with(any(XWikiContext.class)));
-                will(returnValue(true));
-                ignoring(xwiki);
-            }
-        });
-
-        lucenePlugin = new LucenePlugin("test", "test", this.xwikiContext);
-        lucenePlugin.init(this.xwikiContext);
-        lucenePlugin.queueDocument(this.document, this.xwikiContext);
+        this.lucenePlugin = new LucenePlugin("test", "test", this.oldcore.getXWikiContext());
+        this.lucenePlugin.init(this.oldcore.getXWikiContext());
+        this.lucenePlugin.queueDocument(this.document, this.oldcore.getXWikiContext());
 
         // wait for IndexUpdater-Thread to finish
         Thread.sleep(1000);
@@ -189,13 +131,14 @@ public class LuceneAnalyzerTest extends AbstractMockingComponentTestCase<Executi
         assertEquals(1, lucenePlugin.getLuceneDocCount());
         assertEquals(0, lucenePlugin.getQueueSize());
         String query = createQueryString("Paris");
-        SearchResults searchResults = lucenePlugin.getSearchResults(query, "", "xwiki", null, this.xwikiContext);
+        SearchResults searchResults =
+            lucenePlugin.getSearchResults(query, "", "xwiki", null, this.oldcore.getXWikiContext());
 
         assertFalse(searchResults.getResults().isEmpty());
         assertEquals(1, searchResults.getHitcount());
 
         query = createQueryString("München");
-        searchResults = lucenePlugin.getSearchResults(query, "", "xwiki", null, this.xwikiContext);
+        searchResults = lucenePlugin.getSearchResults(query, "", "xwiki", null, this.oldcore.getXWikiContext());
         assertFalse(searchResults.getResults().isEmpty());
         assertEquals(1, searchResults.getHitcount());
     }
@@ -208,28 +151,29 @@ public class LuceneAnalyzerTest extends AbstractMockingComponentTestCase<Executi
         assertEquals(0, lucenePlugin.getQueueSize());
 
         String query = createQueryString("Paris");
-        SearchResults searchResults = lucenePlugin.getSearchResults(query, "", "xwiki", null, this.xwikiContext);
+        SearchResults searchResults =
+            lucenePlugin.getSearchResults(query, "", "xwiki", null, this.oldcore.getXWikiContext());
         assertFalse(searchResults.getResults().isEmpty());
         assertEquals(1, searchResults.getHitcount());
 
         query = createQueryString("München");
-        searchResults = lucenePlugin.getSearchResults(query, "", "xwiki", null, this.xwikiContext);
+        searchResults = lucenePlugin.getSearchResults(query, "", "xwiki", null, this.oldcore.getXWikiContext());
         assertFalse(searchResults.getResults().isEmpty());
         assertEquals(1, searchResults.getHitcount());
 
         query = createQueryString("Munchen");
-        searchResults = lucenePlugin.getSearchResults(query, "", "xwiki", null, this.xwikiContext);
+        searchResults = lucenePlugin.getSearchResults(query, "", "xwiki", null, this.oldcore.getXWikiContext());
         assertFalse(searchResults.getResults().isEmpty());
         assertEquals(1, searchResults.getHitcount());
 
         query = createQueryString("Muenchen");
-        searchResults = lucenePlugin.getSearchResults(query, "", "xwiki", null, this.xwikiContext);
+        searchResults = lucenePlugin.getSearchResults(query, "", "xwiki", null, this.oldcore.getXWikiContext());
         assertFalse(searchResults.getResults().isEmpty());
         assertEquals(1, searchResults.getHitcount());
 
         // next search should return nothing
         query = createQueryString("Hamburg");
-        searchResults = lucenePlugin.getSearchResults(query, "", "xwiki", null, this.xwikiContext);
+        searchResults = lucenePlugin.getSearchResults(query, "", "xwiki", null, this.oldcore.getXWikiContext());
         assertTrue(searchResults.getResults().isEmpty());
     }
 }

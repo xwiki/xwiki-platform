@@ -27,6 +27,7 @@ import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 import org.mockito.Mockito;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -179,5 +180,13 @@ public class MockitoOldcoreRule implements MethodRule
     public XWikiStoreInterface getMockStore()
     {
         return this.mockStore;
+    }
+
+    /**
+     * @since 6.0RC1
+     */
+    public ExecutionContext getExecutionContext() throws ComponentLookupException
+    {
+        return this.componentManager.<Execution> getInstance(Execution.class).getContext();
     }
 }

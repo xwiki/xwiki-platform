@@ -253,13 +253,15 @@ public class ImportAction extends XWikiAction
                 Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
 
             for (String pageName : pages) {
-                String language = getLanguage(pageName, request);
-                int iAction = getAction(pageName, language, request);
+                if (StringUtils.isNotEmpty(pageName)) {
+                    String language = getLanguage(pageName, request);
+                    int iAction = getAction(pageName, language, request);
 
-                String docName = getDocName(pageName);
-                if (iAction == DocumentInfo.ACTION_OVERWRITE) {
-                    entities.includes(new LocalDocumentReference(resolver.resolve(docName, EntityType.DOCUMENT),
-                        LocaleUtils.toLocale(language)));
+                    String docName = getDocName(pageName);
+                    if (iAction == DocumentInfo.ACTION_OVERWRITE) {
+                        entities.includes(new LocalDocumentReference(resolver.resolve(docName, EntityType.DOCUMENT),
+                            LocaleUtils.toLocale(language)));
+                    }
                 }
             }
 

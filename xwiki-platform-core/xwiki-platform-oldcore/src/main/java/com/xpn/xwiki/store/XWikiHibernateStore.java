@@ -757,7 +757,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
 
             if (context.getWiki().hasBacklinks(context)) {
-                saveLinks(doc, context, true);
+                try {
+                    saveLinks(doc, context, true);
+                } catch (Exception e) {
+                    this.logger
+                        .error("Failed to save links for document [{}]", doc.getDocumentReferenceWithLocale(), e);
+                }
             }
 
             if (bTransaction) {

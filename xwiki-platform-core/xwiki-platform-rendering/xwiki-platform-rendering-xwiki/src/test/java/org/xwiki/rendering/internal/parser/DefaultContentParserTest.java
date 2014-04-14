@@ -19,6 +19,13 @@
  */
 package org.xwiki.rendering.internal.parser;
 
+import static org.hamcrest.CoreMatchers.any;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Mockito.when;
+
 import java.io.Reader;
 import java.util.Collections;
 
@@ -26,6 +33,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -35,14 +43,8 @@ import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import static org.hamcrest.CoreMatchers.any;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.parser.DefaultContentParser}.
@@ -50,6 +52,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.0M2
  */
+@ComponentList(ContextComponentManagerProvider.class)
 public class DefaultContentParserTest
 {
     @Rule

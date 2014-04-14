@@ -22,6 +22,8 @@ package org.xwiki.rendering.internal.parser;
 import java.io.StringReader;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -29,16 +31,16 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ContentParser;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Default implementation of {@link ContentParser}.
- *
+ * 
  * @version $Id$
  * @since 6.0M2
  */
@@ -47,7 +49,8 @@ import org.xwiki.rendering.syntax.Syntax;
 public class DefaultContentParser implements ContentParser
 {
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
     private EntityReferenceSerializer<String> serializer;
@@ -59,8 +62,8 @@ public class DefaultContentParser implements ContentParser
     }
 
     @Override
-    public XDOM parse(String content, Syntax syntax, EntityReference source)
-        throws ParseException, MissingParserException
+    public XDOM parse(String content, Syntax syntax, EntityReference source) throws ParseException,
+        MissingParserException
     {
         XDOM xdom = getParser(syntax).parse(new StringReader(content));
         if (source != null) {
@@ -71,7 +74,7 @@ public class DefaultContentParser implements ContentParser
 
     /**
      * Return a parser for the given syntax.
-     *
+     * 
      * @param syntax the syntax.
      * @return a parser.
      * @throws MissingParserException when no parser where found for the given syntax.
@@ -80,7 +83,7 @@ public class DefaultContentParser implements ContentParser
     private Parser getParser(Syntax syntax) throws MissingParserException
     {
         try {
-            return componentManager.getInstance(Parser.class, syntax.toIdString());
+            return this.componentManagerProvider.get().getInstance(Parser.class, syntax.toIdString());
         } catch (ComponentLookupException e) {
             throw new MissingParserException(syntax, e);
         }

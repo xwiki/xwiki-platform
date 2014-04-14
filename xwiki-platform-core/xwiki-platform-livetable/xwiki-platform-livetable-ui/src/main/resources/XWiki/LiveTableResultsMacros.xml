@@ -273,7 +273,7 @@
       #set($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
       #set($isTranslation = true)
     #else
-      #set($translatedDoc = $itemDoc)
+      #set($translatedDoc = $itemDoc.translatedDocument)
       #set($isTranslation = false)
     #end
     #set($fullname = $services.model.serialize($itemDoc.documentReference, 'default'))

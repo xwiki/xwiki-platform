@@ -60,7 +60,6 @@ public class HTML5Validator implements Validator
         String schemaUrl = "http://s.validator.nu/html5-all.rnc";
 
         InputSource source = new InputSource(document);
-        validator = new SimpleDocumentValidator();
         try {
             validator.setUpMainSchema(schemaUrl, errorHandler);
             validator.setUpValidatorAndParsers(errorHandler, false, false);

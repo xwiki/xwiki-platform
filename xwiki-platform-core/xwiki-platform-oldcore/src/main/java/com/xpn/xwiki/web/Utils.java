@@ -45,8 +45,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
@@ -70,7 +68,7 @@ public class Utils
      * The component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}. It is useful
      * for any non component code that need to initialize/access components.
      */
-    private static ComponentManager componentManager;
+    private static ComponentManager rootComponentManager;
 
     /**
      * Generate the response by parsing a velocity template and printing the result to the {@link XWikiResponse
@@ -113,8 +111,7 @@ public class Utils
         // "After using this method, the response should be considered to be committed and should not be written
         // to."
         if ((response instanceof XWikiServletResponse)
-            && ((XWikiServletResponse) response).getStatus() == HttpServletResponse.SC_FOUND)
-        {
+            && ((XWikiServletResponse) response).getStatus() == HttpServletResponse.SC_FOUND) {
             return;
         }
 
@@ -195,9 +192,8 @@ public class Utils
             // We only write if the caller has asked.
             // We also make sure to verify that there hasn't been a call to sendRedirect before since it would mean the
             // response has already been written to and we shouldn't try to write in it.
-            if (write && ((response instanceof XWikiServletResponse)
-                && ((XWikiServletResponse) response).getStatus() != HttpServletResponse.SC_FOUND))
-            {
+            if (write
+                && ((response instanceof XWikiServletResponse) && ((XWikiServletResponse) response).getStatus() != HttpServletResponse.SC_FOUND)) {
                 try {
                     try {
                         response.getOutputStream().write(content.getBytes(context.getWiki().getEncoding()));
@@ -626,22 +622,48 @@ public class Utils
     }
 
     /**
-     * @param componentManager the component manager used by {@link #getComponent(Class)} and
+     * @param componentManager the root component manager used by {@link #getComponent(Class)} and
      *            {@link #getComponent(Class, String)}
      */
     public static void setComponentManager(ComponentManager componentManager)
     {
-        Utils.componentManager = componentManager;
+        Utils.rootComponentManager = componentManager;
     }
 
     /**
-     * @return the component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}
-     * @deprecated starting with 4.1M2 use the Component Script Service instead
+     * @return the root component manager
+     * @deprecated last resort way of accessing the {@link ComponentManager}, make sure you cannot do it any other way
+     *             possible since it add a strong dependency to a static to your code
      */
     @Deprecated
     public static ComponentManager getComponentManager()
     {
-        return componentManager;
+        return rootComponentManager;
+    }
+
+    /**
+     * @return the contextual component manager used by {@link #getComponent(Class)} and
+     *         {@link #getComponent(Class, String)}
+     * @since 6.0RC1
+     * @deprecated last resort way of accessing the {@link ComponentManager}, make sure you cannot do it any other way
+     *             possible since it add a strong dependency to a static to your code
+     */
+    @Deprecated
+    public static ComponentManager getContextComponentManager()
+    {
+        ComponentManager contextComponentManager;
+
+        // Look for the Context Component Manager so that Macros can be registered for a specific user, for a
+        // specific wiki, etc. If it's not found use the Root Component Manager. This allows the Rendering module
+        // to work outside of XWiki when there's no notion of Execution Context and Wiki Model for example.
+        try {
+            contextComponentManager = rootComponentManager.getInstance(ComponentManager.class, "context");
+        } catch (ComponentLookupException e) {
+            // This means the Context CM doesn't exist, use the Root CM.
+            contextComponentManager = rootComponentManager;
+        }
+
+        return contextComponentManager;
     }
 
     /**
@@ -690,9 +712,9 @@ public class Utils
     {
         T component;
 
-        if (componentManager != null) {
+        if (rootComponentManager != null) {
             try {
-                component = componentManager.getInstance(roleType, roleHint);
+                component = rootComponentManager.getInstance(roleType, roleHint);
             } catch (ComponentLookupException e) {
                 throw new RuntimeException("Failed to load component for type [" + roleType + "] for hint [" + roleHint
                     + "]", e);
@@ -733,9 +755,9 @@ public class Utils
     public static <T> List<T> getComponentList(Class<T> role)
     {
         List<T> components;
-        if (componentManager != null) {
+        if (rootComponentManager != null) {
             try {
-                components = componentManager.getInstanceList(role);
+                components = rootComponentManager.getInstanceList(role);
             } catch (ComponentLookupException e) {
                 throw new RuntimeException("Failed to load components with role [" + role.getName() + "]", e);
             }

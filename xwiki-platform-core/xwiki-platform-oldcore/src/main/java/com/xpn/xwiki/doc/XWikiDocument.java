@@ -6069,7 +6069,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         XWikiDocument newDocument = xwiki.getDocument(newDocumentReference, context);
 
         // Step 4: Refactor the links contained in the document
-        if (Utils.getComponentManager().hasComponent(BlockRenderer.class, getSyntax().toIdString())) {
+        if (Utils.getContextComponentManager().hasComponent(BlockRenderer.class, getSyntax().toIdString())) {
             // Only support syntax for which a renderer is provided
             XDOM newDocumentXDOM = newDocument.getXDOM();
             List<LinkBlock> linkBlockList =
@@ -6136,7 +6136,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     getDocumentReference().getLastSpaceReference().getName());
 
             backlinkDocument.setContent((String) result.getModifiedContent());
-        } else if (Utils.getComponentManager().hasComponent(BlockRenderer.class,
+        } else if (Utils.getContextComponentManager().hasComponent(BlockRenderer.class,
             backlinkDocument.getSyntax().toIdString())) {
             backlinkDocument.refactorDocumentLinks(getDocumentReference(), newDocumentReference, context);
         }

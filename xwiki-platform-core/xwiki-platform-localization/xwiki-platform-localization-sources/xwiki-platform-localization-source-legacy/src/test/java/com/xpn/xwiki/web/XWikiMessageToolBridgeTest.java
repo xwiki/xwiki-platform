@@ -77,6 +77,8 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
+        Locale.setDefault(Locale.ROOT);
+
         this.mockXWiki = getMockery().mock(XWiki.class);
         getContext().setWiki(this.mockXWiki);
         getContext().setDatabase("xwiki");

@@ -49,7 +49,7 @@
     </dependency>
     <dependency>
       <groupId>nu.validator</groupId>
-      <artifactId>vnu</artifactId>
+      <artifactId>vnu-lite</artifactId>
       <version>20140222-xwiki</version>
     </dependency>
     <dependency>    

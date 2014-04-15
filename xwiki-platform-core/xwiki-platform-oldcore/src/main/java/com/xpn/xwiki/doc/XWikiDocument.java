@@ -3578,7 +3578,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         readDocMetaFromForm(eform, context);
         readTranslationMetaFromForm(eform, context);
         String objectPolicy = eform.getRequest().getParameter("objectPolicy");
-        if (objectPolicy.isEmpty() || objectPolicy.equals("oldCore")) {
+        if (objectPolicy == null || objectPolicy.isEmpty() || objectPolicy.equals("oldCore")) {
             readObjectsFromForm(eform, context);
         } else if (objectPolicy.equals("updateOrCreate")) {
             readObjectsFromFormUpdateOrCreate(eform, context);

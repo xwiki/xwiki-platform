@@ -579,6 +579,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * Used to identify the object policy in #readFromForm(EditForm, XWikiContext).
+     */
+    private String OBJECT_POLICY_KEY = "objectPolicy";
+    private String OBJECT_POLICY_OLDCORE = "oldCore";
+    private String OBJECT_POLICY_UPDATE_OR_CREATE = "updateOrCreate";
+
+    /**
      * @since 6.2
      */
     public XWikiDocument(DocumentReference reference, Locale locale)
@@ -3577,10 +3584,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         readDocMetaFromForm(eform, context);
         readTranslationMetaFromForm(eform, context);
-        String objectPolicy = eform.getRequest().getParameter("objectPolicy");
-        if (objectPolicy == null || objectPolicy.isEmpty() || objectPolicy.equals("oldCore")) {
+        String objectPolicy = eform.getRequest().getParameter(this.OBJECT_POLICY_KEY);
+        if (objectPolicy == null || objectPolicy.isEmpty() || objectPolicy.equals(this.OBJECT_POLICY_OLDCORE)) {
             readObjectsFromForm(eform, context);
-        } else if (objectPolicy.equals("updateOrCreate")) {
+        } else if (objectPolicy.equals(this.OBJECT_POLICY_UPDATE_OR_CREATE)) {
             readObjectsFromFormUpdateOrCreate(eform, context);
         }
     }

@@ -34,8 +34,12 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.velocity.VelocityContext;
+import org.jmock.Expectations;
 import org.jmock.Mock;
+import org.jmock.Mockery;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.junit.Assert;
@@ -67,7 +71,9 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -93,6 +99,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     private XWikiDocument document;
 
     private XWikiDocument translatedDocument;
+
+    private Mockery mockery = new Mockery();
 
     private Mock mockXWiki;
 
@@ -1622,5 +1630,82 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         Assert.assertEquals(template.getTitle(), target.getTitle());
         Assert.assertEquals(template.getSyntax(), target.getSyntax());
         Assert.assertEquals(template.getContent(), target.getContent());
+    }
+
+    /**
+     * Unit test for {@link XWikiDocument#readObjectsFromForm(EditForm, XWikiContext)}.
+     */
+    public void testReadObjectsFromForm() throws Exception
+    {
+        final HttpServletRequest request = mockery.mock(HttpServletRequest.class);
+        this.mockery.checking(new Expectations()
+        {
+            {
+                Map<String, String[]> parameters = new HashMap<String, String[]>();
+                String[] string1 = {"string1"};
+                parameters.put("Space.Page_0_string", string1);
+                String[] int1 = {"7"};
+                parameters.put("Space.Page_1_int", int1);
+                String[] string2 = {"string2"};
+                String[] int2 = {"13"};
+                parameters.put("Space.Page_2_string", string2);
+                parameters.put("Space.Page_2_int", int2);
+                parameters.put("Space.Page_42_string", string1);
+                parameters.put("Space.Page_42_int", int1);
+                allowing(request).getParameterMap();
+                will(returnValue(parameters));
+            }
+        });
+
+        EditForm eform = new EditForm();
+        eform.setRequest(request);
+        this.document.readObjectsFromForm(eform, this.getContext());
+
+        Assert.assertEquals(2, this.document.getXObjectSize(this.baseClass.getDocumentReference()));
+        Assert.assertEquals("string1", this.document.getXObject(this.baseClass.getDocumentReference(), 0)
+            .getStringValue("string"));
+        Assert.assertEquals(7, this.document.getXObject(this.baseClass.getDocumentReference(), 1).getIntValue("int"));
+        Assert.assertNull(this.document.getXObject(this.baseClass.getDocumentReference(), 2));
+        Assert.assertNull(this.document.getXObject(this.baseClass.getDocumentReference(), 42));
+    }
+
+    /**
+     * Unit test for {@link XWikiDocument#readObjectsFromFormUpdateOrCreate(EditForm, XWikiContext)}.
+     */
+    public void testReadObjectsFromFormUpdateOrCreate() throws Exception
+    {
+        final HttpServletRequest request = mockery.mock(HttpServletRequest.class);
+        this.mockery.checking(new Expectations()
+        {
+            {
+                Map<String, String[]> parameters = new HashMap<String, String[]>();
+                String[] string1 = {"string1"};
+                parameters.put("Space.Page_0_string", string1);
+                String[] int1 = {"7"};
+                parameters.put("Space.Page_1_int", int1);
+                String[] string2 = {"string2"};
+                String[] int2 = {"13"};
+                parameters.put("Space.Page_2_string", string2);
+                parameters.put("Space.Page_2_int", int2);
+                parameters.put("Space.Page_42_string", string1);
+                parameters.put("Space.Page_42_int", int1);
+                allowing(request).getParameterMap();
+                will(returnValue(parameters));
+            }
+        });
+
+        EditForm eform = new EditForm();
+        eform.setRequest(request);
+        this.document.readObjectsFromFormUpdateOrCreate(eform, this.getContext());
+
+        Assert.assertEquals(3, this.document.getXObjectSize(this.baseClass.getDocumentReference()));
+        Assert.assertEquals("string1", this.document.getXObject(this.baseClass.getDocumentReference(), 0)
+            .getStringValue("string"));
+        Assert.assertEquals(7, this.document.getXObject(this.baseClass.getDocumentReference(), 1).getIntValue("int"));
+        Assert.assertNotNull(this.document.getXObject(this.baseClass.getDocumentReference(), 2));
+        Assert.assertEquals("string2", this.document.getXObject(this.baseClass.getDocumentReference(), 2)
+            .getStringValue("string"));
+        Assert.assertEquals(13, this.document.getXObject(this.baseClass.getDocumentReference(), 2).getIntValue("int"));
+        Assert.assertNull(this.document.getXObject(this.baseClass.getDocumentReference(), 42));
     }
 }

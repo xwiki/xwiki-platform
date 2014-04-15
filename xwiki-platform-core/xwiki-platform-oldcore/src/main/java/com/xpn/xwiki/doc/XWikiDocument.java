@@ -3447,11 +3447,142 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
     }
 
+    /**
+     * Generate a map from the request parameters of the form '<spacename>.<classname>_<number>_<propertyname>' Keys of
+     * this map will be the reference '<spacename>.<classname>' to the Class (for example, 'XWiki.XWikiRights'), the
+     * content is a list where each element describe property for the object <number>. Element of the list is a map
+     * where key is <propertyname> and content is the array of corresponding values.
+     * 
+     * Example with a list of HTTP parameters:
+     * 
+     * * XWiki.XWikiRights_0_users=XWiki.Admin
+     * * XWiki.XWikiRights_0_users=XWiki.Me
+     * * XWiki.XWikiRights_0_groups=XWiki.XWikiAllGroup 
+     * * XWiki.XWikiUsers_1_name=Spirou
+     * 
+     * will result in the following map
+     * 
+     * {
+     *   "XWiki.XWikiRights": [
+     *     { // number:0
+     *       "users": [XWiki.Admin, XWiki.Me],
+     *       "groups": [XWiki.XWikiAllGroup]
+     *     }
+     *   ],
+     *   "XWiki.XWikiUsers": [
+     *     { // number:0
+     *       // Empty but exists because there is a number:1
+     *     },
+     *     { // number:1
+     *       "name": [Spirou]
+     *     }
+     *   ]
+     * }
+     * 
+     * @param request The input HTTP request that provides the parameters
+     * @return The map containing ordered data (see more details in the method's documentation)
+     */
+    /**
+     * @param request
+     * @return
+     */
+    private Map<String, List<Map<String, String[]>>> parseRequestUpdateOrCreate(XWikiRequest request)
+    {
+        Map<String, List<Map<String, String[]>>> result = new HashMap<String, List<Map<String, String[]>>>();
+        @SuppressWarnings("unchecked")
+        Map<String, String[]> allParameters = request.getParameterMap();
+        for (String parameter : allParameters.keySet()) {
+            String[] splitValues = parameter.split("_");
+            if (splitValues.length != 3) {
+                continue;
+            }
+            String objectName = splitValues[0];
+            Integer objectNumber;
+            try {
+                objectNumber = Integer.parseInt(splitValues[1]);
+            } catch (NumberFormatException e) {
+                continue;
+            }
+            String objectPropName = splitValues[2];
+            String[] objectPropValue = allParameters.get(parameter);
+            // Get the list of objects of type 'objectName'; create it if they don't exist
+            List<Map<String, String[]>> objectList;
+            if (result.containsKey(objectName)) {
+                objectList = result.get(objectName);
+            } else {
+                objectList = new ArrayList<Map<String, String[]>>();
+                result.put(objectName, objectList);
+            }
+            while (objectList.size() <= objectNumber) {
+                objectList.add(null);
+            }
+            // Get the property from the right object #objectNumber of type 'objectName'; create it if they don't exist
+            Map<String, String[]> prop;
+            if (objectList.get(objectNumber) != null) {
+                prop = objectList.get(objectNumber);
+            } else {
+                prop = new HashMap<String, String[]>();
+                objectList.set(objectNumber, prop);
+            }
+            prop.put(objectPropName, objectPropValue);
+        }
+        return result;
+    }
+
+    /**
+     * Create and/or update objects in a document given a list of HTTP parameters of the form
+     * '<spacename>.<classname>_<number>_<propertyname>'.
+     * 
+     * If the object already exists, the field is replace by the given value.
+     * If the object doesn't exist in the document, it is created then the property <propertyname> is initialized with the given value.
+     * 
+     * An object is only created if the given '<number>' is 'one-more' than the existing number of objects.
+     * For example, if the document already has 2 objects of type 'Space.Class', then it will create a new object only with 'Space.Class_2_prop=something'.
+     * Every other parameter like 'Space.Class_42_prop=foobar' for example, will be ignore.
+     * @param eform
+     * @param context
+     * @throws XWikiException
+     */
+    public void readObjectsFromFormUpdateOrCreate(EditForm eform, XWikiContext context) throws XWikiException
+    {
+        Map<String, List<Map<String, String[]>>> fromRequest = this.parseRequestUpdateOrCreate(eform.getRequest());
+        for (String objectName : fromRequest.keySet()) {
+            WikiReference wikiRef = this.getDocumentReference().getWikiReference();
+            SpaceReference spaceRef = new SpaceReference(objectName.split("\\.")[0], wikiRef);
+            DocumentReference objectRef = new DocumentReference(objectName.split("\\.")[1], spaceRef);
+            List<Map<String, String[]>> objectList = fromRequest.get(objectName);
+            List<BaseObject> newObjects = new ArrayList<BaseObject>();
+            for (int objectNumber = 0; objectNumber < objectList.size(); objectNumber++) {
+                BaseObject oldObject = this.getXObject(objectRef, objectNumber);
+                if (oldObject == null) {
+                    // Create the object only if it have been numbered one more than the existing objects
+                    if (objectList.get(objectNumber) != null && objectNumber == this.getXObjectSize(objectRef)) {
+                        oldObject = this.newXObject(objectRef, context);
+                    } else {
+                        break;
+                    }
+                }
+                BaseClass baseClass = oldObject.getXClass(context);
+                BaseObject newObject = (BaseObject) baseClass.fromMap(objectList.get(objectNumber), oldObject);
+                newObject.setNumber(oldObject.getNumber());
+                newObject.setGuid(oldObject.getGuid());
+                newObject.setOwnerDocument(this);
+                newObjects.add(newObject);
+            }
+            getXObjects().put(objectRef, newObjects);
+        }
+    }
+
     public void readFromForm(EditForm eform, XWikiContext context) throws XWikiException
     {
         readDocMetaFromForm(eform, context);
         readTranslationMetaFromForm(eform, context);
-        readObjectsFromForm(eform, context);
+        String objectPolicy = eform.getRequest().getParameter("objectPolicy");
+        if (objectPolicy.isEmpty() || objectPolicy.equals("oldCore")) {
+            readObjectsFromForm(eform, context);
+        } else if (objectPolicy.equals("updateOrCreate")) {
+            readObjectsFromFormUpdateOrCreate(eform, context);
+        }
     }
 
     public void readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException

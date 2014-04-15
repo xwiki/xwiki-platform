@@ -581,9 +581,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Used to identify the object policy in #readFromForm(EditForm, XWikiContext).
      */
-    private String OBJECT_POLICY_KEY = "objectPolicy";
-    private String OBJECT_POLICY_OLDCORE = "oldCore";
-    private String OBJECT_POLICY_UPDATE_OR_CREATE = "updateOrCreate";
+    private static final String OBJECT_POLICY_KEY = "objectPolicy";
+    private static final String OBJECT_POLICY_OLDCORE = "oldCore";
+    private static final String OBJECT_POLICY_UPDATE_OR_CREATE = "updateOrCreate";
 
     /**
      * @since 6.2

@@ -3489,10 +3489,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param request The input HTTP request that provides the parameters
      * @return The map containing ordered data (see more details in the method's documentation)
      */
-    /**
-     * @param request
-     * @return
-     */
     private Map<String, List<Map<String, String[]>>> parseRequestUpdateOrCreate(XWikiRequest request)
     {
         Map<String, List<Map<String, String[]>>> result = new HashMap<String, List<Map<String, String[]>>>();

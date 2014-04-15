@@ -260,7 +260,7 @@ function init() {
   form.addClassName('xform');
 
   // Remove the preview button.
-  form.down("input[name='action_preview']").up().remove();
+  form.down("input[name='action_preview']").remove();
 
   // Rename the save buttons.
   form.down("input[name='action_save']").name = 'xaction_save';
@@ -460,6 +460,7 @@ return XWiki;
   font-size: 90%;
   list-style: none outside none;
   margin: 0;
+  padding: 0;
 }
 
 #inline .hList li {

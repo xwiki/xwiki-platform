@@ -913,7 +913,7 @@ return XWiki;
     form.addClassName('xform');
 
     // Remove the preview button.
-    form.down("input[name='action_preview']").up().remove();
+    form.down("input[name='action_preview']").remove();
 
     // Rename the save buttons.
     form.down("input[name='action_save']").name = 'xaction_save';
@@ -1138,6 +1138,7 @@ return XWiki;
 
 #fields {
   margin: 0;
+  padding: 0;
 }
 
 #fields &gt; li {
@@ -1211,6 +1212,7 @@ return XWiki;
 
 #palette ul {
   margin: 0;
+  padding: 0;
 }
 
 #palette li {

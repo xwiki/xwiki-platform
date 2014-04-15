@@ -3549,30 +3549,30 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void readObjectsFromFormUpdateOrCreate(EditForm eform, XWikiContext context) throws XWikiException
     {
         Map<String, List<Map<String, String[]>>> fromRequest = this.parseRequestUpdateOrCreate(eform.getRequest());
-        for (String objectName : fromRequest.keySet()) {
+        for (String requestObjectName : fromRequest.keySet()) {
             WikiReference wikiRef = this.getDocumentReference().getWikiReference();
-            SpaceReference spaceRef = new SpaceReference(objectName.split("\\.")[0], wikiRef);
-            DocumentReference objectRef = new DocumentReference(objectName.split("\\.")[1], spaceRef);
-            List<Map<String, String[]>> objectList = fromRequest.get(objectName);
+            SpaceReference spaceRef = new SpaceReference(requestObjectName.split("\\.")[0], wikiRef);
+            DocumentReference requestObjectRef = new DocumentReference(requestObjectName.split("\\.")[1], spaceRef);
+            List<Map<String, String[]>> requestObjectList = fromRequest.get(requestObjectName);
             List<BaseObject> newObjects = new ArrayList<BaseObject>();
-            for (int objectNumber = 0; objectNumber < objectList.size(); objectNumber++) {
-                BaseObject oldObject = this.getXObject(objectRef, objectNumber);
+            for (int requestObjectNumber = 0; requestObjectNumber < requestObjectList.size(); requestObjectNumber++) {
+                BaseObject oldObject = this.getXObject(requestObjectRef, requestObjectNumber);
                 if (oldObject == null) {
-                    // Create the object only if it have been numbered one more than the existing objects
-                    if (objectList.get(objectNumber) != null && objectNumber == this.getXObjectSize(objectRef)) {
-                        oldObject = this.newXObject(objectRef, context);
+                    // Create the object only if it have been numbered one more than the number of existing objects
+                    if (requestObjectList.get(requestObjectNumber) != null && requestObjectNumber == this.getXObjectSize(requestObjectRef)) {
+                        oldObject = this.newXObject(requestObjectRef, context);
                     } else {
                         break;
                     }
                 }
                 BaseClass baseClass = oldObject.getXClass(context);
-                BaseObject newObject = (BaseObject) baseClass.fromMap(objectList.get(objectNumber), oldObject);
+                BaseObject newObject = (BaseObject) baseClass.fromMap(requestObjectList.get(requestObjectNumber), oldObject);
                 newObject.setNumber(oldObject.getNumber());
                 newObject.setGuid(oldObject.getGuid());
                 newObject.setOwnerDocument(this);
                 newObjects.add(newObject);
             }
-            getXObjects().put(objectRef, newObjects);
+            getXObjects().put(requestObjectRef, newObjects);
         }
     }
 

@@ -28,7 +28,6 @@ import com.xpn.xwiki.util.Util;
 
 public class EditForm extends XWikiForm
 {
-
     // ---- Form fields -------------------------------------------------
     private String content;
 
@@ -61,6 +60,8 @@ public class EditForm extends XWikiForm
     private String syntaxId;
 
     private String hidden;
+    
+    private ObjectPolicyType objectPolicy;
 
     @Override
     public void readRequest()
@@ -82,6 +83,7 @@ public class EditForm extends XWikiForm
         setMinorEdit(request.getParameter("minorEdit") != null);
         setSyntaxId(request.getParameter("syntaxId"));
         setHidden(request.getParameter("xhidden"));
+        setObjectPolicy(request.getParameter("objectPolicy"));
     }
 
     public void setTags(String[] parameter)
@@ -280,4 +282,16 @@ public class EditForm extends XWikiForm
         this.hidden = hidden;
     }
 
+    public ObjectPolicyType getObjectPolicy() {
+        return this.objectPolicy;
+    }
+
+    private void setObjectPolicy(ObjectPolicyType objectPolicy)
+    {
+        this.objectPolicy = objectPolicy;
+    }
+    private void setObjectPolicy(String objectPolicyName)
+    {
+        this.objectPolicy = ObjectPolicyType.forName(objectPolicyName);
+    }
 }

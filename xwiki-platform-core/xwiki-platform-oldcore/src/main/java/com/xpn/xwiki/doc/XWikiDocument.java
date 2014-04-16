@@ -172,6 +172,7 @@ import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.EditForm;
 import com.xpn.xwiki.web.ObjectAddForm;
+import com.xpn.xwiki.web.ObjectPolicyType;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
@@ -3594,10 +3595,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         readDocMetaFromForm(eform, context);
         readTranslationMetaFromForm(eform, context);
-        String objectPolicy = eform.getRequest().getParameter(this.OBJECT_POLICY_KEY);
-        if (objectPolicy == null || objectPolicy.isEmpty() || objectPolicy.equals(this.OBJECT_POLICY_UPDATE)) {
+        ObjectPolicyType objectPolicy = eform.getObjectPolicy();
+        if (objectPolicy == null || objectPolicy.equals(ObjectPolicyType.UPDATE)) {
             readObjectsFromForm(eform, context);
-        } else if (objectPolicy.equals(this.OBJECT_POLICY_UPDATE_OR_CREATE)) {
+        } else if (objectPolicy.equals(ObjectPolicyType.UPDATE_OR_CREATE)) {
             readObjectsFromFormUpdateOrCreate(eform, context);
         }
     }

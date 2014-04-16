@@ -582,7 +582,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Used to identify the object policy in #readFromForm(EditForm, XWikiContext).
      */
     private static final String OBJECT_POLICY_KEY = "objectPolicy";
+
     private static final String OBJECT_POLICY_UPDATE = "update";
+
     private static final String OBJECT_POLICY_UPDATE_OR_CREATE = "updateOrCreate";
 
     /**
@@ -3492,42 +3494,57 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     private Map<String, List<Map<String, String[]>>> parseRequestUpdateOrCreate(XWikiRequest request)
     {
         Map<String, List<Map<String, String[]>>> result = new HashMap<String, List<Map<String, String[]>>>();
+        Pattern pattern = Pattern.compile("(.+?)_([0-9]+)_(.+)");
         @SuppressWarnings("unchecked")
         Map<String, String[]> allParameters = request.getParameterMap();
         for (String parameter : allParameters.keySet()) {
-            String[] splitValues = parameter.split("_");
-            if (splitValues.length != 3) {
+            Matcher matcher = pattern.matcher(parameter);
+            if (matcher.matches() == false) {
                 continue;
             }
-            String objectName = splitValues[0];
-            Integer objectNumber;
+            String className;
+            String classNumberAsString;
+            Integer classNumber;
+            String classPropertyName;
+            XWikiContext xcontext = this.getXWikiContext();
+            className = matcher.group(1);
+            classNumberAsString = matcher.group(2);
+            classPropertyName = matcher.group(3);
             try {
-                objectNumber = Integer.parseInt(splitValues[1]);
-            } catch (NumberFormatException e) {
+                DocumentReference classRef = currentDocumentReferenceResolver.resolve(className);
+                BaseClass xClass = xcontext.getWiki().getDocument(classRef, xcontext).getXClass();
+                if (xClass == null) {
+                    continue;
+                }
+                classNumber = Integer.parseInt(classNumberAsString);
+                if(xClass.getPropertyList().contains(classPropertyName) == false) {
+                    continue;
+                }
+            } catch (Exception e) {
+                // If there is any error in the parsing of the parameter, just ignore it
                 continue;
             }
-            String objectPropName = splitValues[2];
-            String[] objectPropValue = allParameters.get(parameter);
+            String[] classPropertyValue = allParameters.get(parameter);
             // Get the list of objects of type 'objectName'; create it if they don't exist
             List<Map<String, String[]>> objectList;
-            if (result.containsKey(objectName)) {
-                objectList = result.get(objectName);
+            if (result.containsKey(className)) {
+                objectList = result.get(className);
             } else {
                 objectList = new ArrayList<Map<String, String[]>>();
-                result.put(objectName, objectList);
+                result.put(className, objectList);
             }
-            while (objectList.size() <= objectNumber) {
+            while (objectList.size() <= classNumber) {
                 objectList.add(null);
             }
             // Get the property from the right object #objectNumber of type 'objectName'; create it if they don't exist
             Map<String, String[]> prop;
-            if (objectList.get(objectNumber) != null) {
-                prop = objectList.get(objectNumber);
+            if (objectList.get(classNumber) != null) {
+                prop = objectList.get(classNumber);
             } else {
                 prop = new HashMap<String, String[]>();
-                objectList.set(objectNumber, prop);
+                objectList.set(classNumber, prop);
             }
-            prop.put(objectPropName, objectPropValue);
+            prop.put(classPropertyName, classPropertyValue);
         }
         return result;
     }
@@ -3542,6 +3559,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * An object is only created if the given '<number>' is 'one-more' than the existing number of objects.
      * For example, if the document already has 2 objects of type 'Space.Class', then it will create a new object only with 'Space.Class_2_prop=something'.
      * Every other parameter like 'Space.Class_42_prop=foobar' for example, will be ignore.
+     * 
      * @param eform
      * @param context
      * @throws XWikiException
@@ -3559,14 +3577,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 BaseObject oldObject = this.getXObject(requestObjectRef, requestObjectNumber);
                 if (oldObject == null) {
                     // Create the object only if it have been numbered one more than the number of existing objects
-                    if (requestObjectList.get(requestObjectNumber) != null && requestObjectNumber == this.getXObjectSize(requestObjectRef)) {
+                    if (requestObjectList.get(requestObjectNumber) != null
+                        && requestObjectNumber == this.getXObjectSize(requestObjectRef)) {
                         oldObject = this.newXObject(requestObjectRef, context);
                     } else {
                         break;
                     }
                 }
                 BaseClass baseClass = oldObject.getXClass(context);
-                BaseObject newObject = (BaseObject) baseClass.fromMap(requestObjectList.get(requestObjectNumber), oldObject);
+                BaseObject newObject =
+                    (BaseObject) baseClass.fromMap(requestObjectList.get(requestObjectNumber), oldObject);
                 newObject.setNumber(oldObject.getNumber());
                 newObject.setGuid(oldObject.getGuid());
                 newObject.setOwnerDocument(this);

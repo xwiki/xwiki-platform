@@ -3534,10 +3534,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 objectList.add(null);
             }
             // Get the property from the right object #objectNumber of type 'objectName'; create it if they don't exist
-            Map<String, String[]> object;
-            if (objectList.get(classNumber) != null) {
-                object = objectList.get(classNumber);
-            } else {
+            Map<String, String[]> object = objectList.get(classNumber);
+            if (objectList.get(classNumber) == null) {
                 object = new HashMap<String, String[]>();
                 objectList.set(classNumber, object);
             }

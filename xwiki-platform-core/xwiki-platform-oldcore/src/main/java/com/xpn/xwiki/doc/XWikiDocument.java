@@ -45,6 +45,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -3497,8 +3498,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         Pattern pattern = Pattern.compile("(.+?)_([0-9]+)_(.+)");
         @SuppressWarnings("unchecked")
         Map<String, String[]> allParameters = request.getParameterMap();
-        for (String parameter : allParameters.keySet()) {
-            Matcher matcher = pattern.matcher(parameter);
+        for (Entry<String, String[]> parameter : allParameters.entrySet()) {
+            Matcher matcher = pattern.matcher(parameter.getKey());
             if (matcher.matches() == false) {
                 continue;
             }
@@ -3511,8 +3512,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             classNumberAsString = matcher.group(2);
             classPropertyName = matcher.group(3);
             try {
-                DocumentReference classRef = currentDocumentReferenceResolver.resolve(className);
-                BaseClass xClass = xcontext.getWiki().getDocument(classRef, xcontext).getXClass();
+                DocumentReference classReference = currentDocumentReferenceResolver.resolve(className);
+                BaseClass xClass = xcontext.getWiki().getDocument(classReference, xcontext).getXClass();
                 if (xClass == null) {
                     continue;
                 }
@@ -3524,7 +3525,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 // If there is any error in the parsing of the parameter, just ignore it
                 continue;
             }
-            String[] classPropertyValue = allParameters.get(parameter);
             List<Map<String, String[]>> objectList = result.get(className);
             if (objectList == null) {
                 objectList = new ArrayList<Map<String, String[]>>();
@@ -3534,14 +3534,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 objectList.add(null);
             }
             // Get the property from the right object #objectNumber of type 'objectName'; create it if they don't exist
-            Map<String, String[]> prop;
+            Map<String, String[]> object;
             if (objectList.get(classNumber) != null) {
-                prop = objectList.get(classNumber);
+                object = objectList.get(classNumber);
             } else {
-                prop = new HashMap<String, String[]>();
-                objectList.set(classNumber, prop);
+                object = new HashMap<String, String[]>();
+                objectList.set(classNumber, object);
             }
-            prop.put(classPropertyName, classPropertyValue);
+            object.put(classPropertyName, parameter.getValue());
         }
         return result;
     }
@@ -3564,19 +3564,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void readObjectsFromFormUpdateOrCreate(EditForm eform, XWikiContext context) throws XWikiException
     {
         Map<String, List<Map<String, String[]>>> fromRequest = this.parseRequestUpdateOrCreate(eform.getRequest());
-        for (String requestObjectName : fromRequest.keySet()) {
+        for (Entry<String, List<Map<String, String[]>>> requestClassEntries : fromRequest.entrySet()) {
             WikiReference wikiRef = this.getDocumentReference().getWikiReference();
-            SpaceReference spaceRef = new SpaceReference(requestObjectName.split("\\.")[0], wikiRef);
-            DocumentReference requestObjectRef = new DocumentReference(requestObjectName.split("\\.")[1], spaceRef);
-            List<Map<String, String[]>> requestObjectList = fromRequest.get(requestObjectName);
+            DocumentReference requestClassReference = currentDocumentReferenceResolver.resolve(requestClassEntries.getKey(), wikiRef);
+            List<Map<String, String[]>> requestObjectList = requestClassEntries.getValue();
             List<BaseObject> newObjects = new ArrayList<BaseObject>();
             for (int requestObjectNumber = 0; requestObjectNumber < requestObjectList.size(); requestObjectNumber++) {
-                BaseObject oldObject = this.getXObject(requestObjectRef, requestObjectNumber);
+                BaseObject oldObject = this.getXObject(requestClassReference, requestObjectNumber);
                 if (oldObject == null) {
                     // Create the object only if it have been numbered one more than the number of existing objects
                     if (requestObjectList.get(requestObjectNumber) != null
-                        && requestObjectNumber == this.getXObjectSize(requestObjectRef)) {
-                        oldObject = this.newXObject(requestObjectRef, context);
+                        && requestObjectNumber == this.getXObjectSize(requestClassReference)) {
+                        oldObject = this.newXObject(requestClassReference, context);
                     } else {
                         break;
                     }
@@ -3589,7 +3588,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 newObject.setOwnerDocument(this);
                 newObjects.add(newObject);
             }
-            getXObjects().put(requestObjectRef, newObjects);
+            getXObjects().put(requestClassReference, newObjects);
         }
     }
 

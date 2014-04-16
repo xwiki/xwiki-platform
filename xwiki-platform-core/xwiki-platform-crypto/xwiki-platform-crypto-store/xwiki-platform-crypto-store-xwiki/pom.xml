@@ -43,9 +43,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-crypto-common</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-crypto-common</artifactId>
+      <version>${commons.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

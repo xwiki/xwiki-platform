@@ -582,7 +582,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Used to identify the object policy in #readFromForm(EditForm, XWikiContext).
      */
     private static final String OBJECT_POLICY_KEY = "objectPolicy";
-    private static final String OBJECT_POLICY_OLDCORE = "oldCore";
+    private static final String OBJECT_POLICY_UPDATE = "update";
     private static final String OBJECT_POLICY_UPDATE_OR_CREATE = "updateOrCreate";
 
     /**
@@ -3581,7 +3581,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         readDocMetaFromForm(eform, context);
         readTranslationMetaFromForm(eform, context);
         String objectPolicy = eform.getRequest().getParameter(this.OBJECT_POLICY_KEY);
-        if (objectPolicy == null || objectPolicy.isEmpty() || objectPolicy.equals(this.OBJECT_POLICY_OLDCORE)) {
+        if (objectPolicy == null || objectPolicy.isEmpty() || objectPolicy.equals(this.OBJECT_POLICY_UPDATE)) {
             readObjectsFromForm(eform, context);
         } else if (objectPolicy.equals(this.OBJECT_POLICY_UPDATE_OR_CREATE)) {
             readObjectsFromFormUpdateOrCreate(eform, context);

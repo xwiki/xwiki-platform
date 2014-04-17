@@ -523,13 +523,13 @@
   #set ($highlighting = $searchResponse.highlighting.get($searchResult.id))
   #set ($highlightingByLanguage = {})
   #foreach ($entry in $highlighting.entrySet())
-    ## Remove the language suffix (e.g. _en, _fr, _de) from the field name.
-    #set ($field = $stringtool.substringBefore($entry.key, '_'))
-    ## Extract the language.
-    #set ($language = $stringtool.substringAfter($entry.key, '_'))
-    #if ($language == $field)
-      ## No language.
-      #set ($language = '_')
+    ## Remove the language suffix (e.g. __, _en, _fr, _de) from the field name.
+    #set ($field = $stringtool.removeEnd($entry.key, '__'))
+    #set ($language = $stringtool.substringAfterLast($field, '_'))
+    #if ($services.localization.toLocale($language))
+      #set ($field = $stringtool.substringBeforeLast($field, '_'))
+    #else
+      #set ($language = '')
     #end
     #set ($matchesByLanguage = $highlightingByLanguage.get($field))
     #if (!$matchesByLanguage)
@@ -543,12 +543,7 @@
   ## Fields with a higher index will be displayed first. Fields that are not included will be displayed at the end.
   #set ($fieldPriority = ['filename', 'attcontent', 'objcontent', 'comment', 'propertyname', 'propertyvalue', 'title', 'doccontent'])
   #foreach ($entry in $highlightingByLanguage.entrySet())
-    #if ($searchResult.locale != '')
-      #set ($matches = $entry.value.get($searchResult.locale))
-    #else
-      ## No language.
-      #set ($matches = $entry.value.get('_'))
-    #end
+    #set ($matches = $entry.value.get($searchResult.locale))
     #if (!$matches)
       ## This should not happen but let's play safe.
       #set ($matches = $entry.value.entrySet().iterator().next().value)

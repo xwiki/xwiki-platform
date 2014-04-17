@@ -56,7 +56,7 @@ public enum ObjectPolicyType
      */
     public static ObjectPolicyType forName(String name) {
         for (ObjectPolicyType type : values()) {
-            if (name.equals(type.getName())) {
+            if (type.getName().equals(name)) {
                 return type;
             }
         }

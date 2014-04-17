@@ -202,7 +202,7 @@ rendering.macro.wikis.description=List all wikis
 
 ## LegacyWorkspaces macro
 rendering.macro.workspaces.name=Workspaces (Legacy)
-rendering.macroworkspaces.description=Deprecated macro that should not be used, here for compatibility reason. Please use the "wikis" macro instead.
+rendering.macro.workspaces.description=Deprecated macro that should not be used, here for compatibility reason. Please use the "wikis" macro instead.
 
 ## Browse
 platform.wiki.browse=Browse Wikis

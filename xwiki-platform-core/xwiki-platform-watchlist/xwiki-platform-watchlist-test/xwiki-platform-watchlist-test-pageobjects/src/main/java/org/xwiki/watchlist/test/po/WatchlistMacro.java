@@ -60,7 +60,7 @@ public class WatchlistMacro extends BaseElement
         return this.isWatched(space, null);
     }
 
-    public boolean isMainWikiWatched() {
+    public boolean isWikiWatched() {
         return this.isWatched(null, null);
     }
 

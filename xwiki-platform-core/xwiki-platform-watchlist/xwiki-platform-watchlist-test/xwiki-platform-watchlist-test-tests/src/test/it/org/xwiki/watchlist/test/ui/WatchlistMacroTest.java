@@ -57,7 +57,7 @@ public class WatchlistMacroTest extends AbstractTest
         Assert.assertTrue("Newly created page is not watched",
                 this.watchlistMacro.isWatched(this.testSpace, this.testPage));
         Assert.assertFalse("Newly created space is watched", this.watchlistMacro.isWatched(this.testSpace));
-        Assert.assertFalse("Complete wiki is watched", this.watchlistMacro.isMainWikiWatched());
+        Assert.assertFalse("Complete wiki is watched", this.watchlistMacro.isWikiWatched());
 
         testPageView.watchSpace();
         testPageView.watchWiki();
@@ -69,7 +69,7 @@ public class WatchlistMacroTest extends AbstractTest
         Assert.assertTrue("Newly created page is not watched",
                 this.watchlistMacro.isWatched(this.testSpace, this.testPage));
         Assert.assertTrue("Test space is not watched", this.watchlistMacro.isWatched(this.testSpace));
-        Assert.assertTrue("Complete wiki is not watched", this.watchlistMacro.isMainWikiWatched());
+        Assert.assertTrue("Complete wiki is not watched", this.watchlistMacro.isWikiWatched());
 
         this.watchlistMacro.unWatch(null, null);
         this.watchlistMacro.unWatch(this.testSpace, this.testPage);
@@ -81,7 +81,7 @@ public class WatchlistMacroTest extends AbstractTest
         Assert.assertFalse("Newly created page is still watched",
                 this.watchlistMacro.isWatched(this.testSpace, this.testPage));
         Assert.assertTrue("Test space is not watched", this.watchlistMacro.isWatched(this.testSpace));
-        Assert.assertFalse("Complete wiki is still watched", this.watchlistMacro.isMainWikiWatched());
+        Assert.assertFalse("Complete wiki is still watched", this.watchlistMacro.isWikiWatched());
 
         this.watchlistMacro.unWatch(this.testSpace, null);
 

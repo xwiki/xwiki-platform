@@ -146,6 +146,7 @@ solr.field.name_exact=Page
 solr.field.title=Title
 solr.field.author=Last Author
 solr.field.author_display=Last Author
+solr.field.creator=Creator
 solr.field.creator_display=Creator
 solr.field.date=Last Modification Date
 solr.field.creationdate=Creation Date

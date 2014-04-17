@@ -197,6 +197,13 @@ platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''
 
 ## Wiki macro
 platform.wiki.macro.noWikis=There are currently no wiki created (except the main one).
+rendering.macro.wikis.name=Wikis
+rendering.macro.wikis.description=List all wikis
+
+## LegacyWorkspaces macro
+platform.wiki.macro.noWikis=There are currently no wiki created (except the main one).
+rendering.macro.workspaces.name=Workspaces (Legacy)
+rendering.macroworkspaces.description=Deprecated macro that should not be used, here for compatibility reason. Please use the "wikis" macro instead.
 
 ## Browse
 platform.wiki.browse=Browse Wikis

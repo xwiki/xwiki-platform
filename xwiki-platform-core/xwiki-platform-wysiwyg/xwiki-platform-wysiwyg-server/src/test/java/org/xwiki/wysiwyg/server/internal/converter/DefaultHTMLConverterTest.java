@@ -19,20 +19,17 @@
  */
 package org.xwiki.wysiwyg.server.internal.converter;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
 import java.io.StringReader;
 import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
@@ -42,9 +39,17 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultHTMLConverter}.
@@ -59,6 +64,12 @@ public class DefaultHTMLConverterTest
     @Rule
     public MockitoComponentMockingRule<HTMLConverter> mocker = new MockitoComponentMockingRule<HTMLConverter>(
         DefaultHTMLConverter.class);
+
+    @AfterComponent
+    public void overideComponent() throws Exception
+    {
+        mocker.registerComponent(RenderingContext.class, mock(MutableRenderingContext.class));
+    }
 
     /**
      * Unit test for {@link DefaultHTMLConverter#fromHTML(String, String)}.
@@ -104,7 +115,9 @@ public class DefaultHTMLConverterTest
 
         // Verify that the macro transformations have been executed.
         Transformation macroTransformation = mocker.getInstance(Transformation.class, "macro");
-        verify(macroTransformation).transform(same(xdom), any(TransformationContext.class));
+        RenderingContext renderingContext = mocker.getInstance(RenderingContext.class);
+        verify((MutableRenderingContext)renderingContext).transformInContext(same(macroTransformation),
+            any(TransformationContext.class), same(xdom));
 
         // Verify the XDOM is rendered to Annotated XHTML.
         BlockRenderer xhtmlRenderer = mocker.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");
@@ -138,7 +151,10 @@ public class DefaultHTMLConverterTest
 
         // Verify that the macro transformations have been executed.
         Transformation macroTransformation = mocker.getInstance(Transformation.class, "macro");
-        verify(macroTransformation).transform(same(xdom), any(TransformationContext.class));
+        RenderingContext renderingContext = mocker.getInstance(RenderingContext.class);
+        verify((MutableRenderingContext)renderingContext).transformInContext(same(macroTransformation),
+            any(TransformationContext.class), same(xdom));
+
 
         // Verify the XDOM is rendered to Annotated XHTML.
         BlockRenderer xhtmlRenderer = mocker.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");

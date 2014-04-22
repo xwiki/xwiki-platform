@@ -53,7 +53,9 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
@@ -261,6 +263,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
     {
         final XWikiRightService rightService = getMockery().mock(XWikiRightService.class);
         final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class, "wiki");
+        final RenderingContext renderingContext = getMockery().mock(MutableRenderingContext.class);
         final Transformation transformation = getMockery().mock(Transformation.class, "macro");
         final ModelContext modelContext = getMockery().mock(ModelContext.class);
         final ContentParser contentParser = getMockery().mock(ContentParser.class);
@@ -307,6 +310,8 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue("wiki"));
                 oneOf(contentParser).parse("content", Syntax.XWIKI_2_0, DOC_REF);
                 will(returnValue(xdom));
+                oneOf(componentManager).getInstance(RenderingContext.class);
+                will(returnValue(renderingContext));
                 oneOf(componentManager).getInstance(Transformation.class, "macro");
                 will(returnValue(transformation));
                 oneOf(componentManager).getInstance(Execution.class);

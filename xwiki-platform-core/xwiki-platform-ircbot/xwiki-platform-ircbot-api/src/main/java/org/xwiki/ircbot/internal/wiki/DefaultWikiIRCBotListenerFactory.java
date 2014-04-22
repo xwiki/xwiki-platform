@@ -41,6 +41,7 @@ import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -67,6 +68,12 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
      */
     @Inject
     private Logger logger;
+
+    /**
+     * Used to update the rendering context.
+     */
+    @Inject
+    private RenderingContext renderingContext;
 
     /**
      * Used to execute the Bot Listener's event scripts.
@@ -149,7 +156,7 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
         // and renders its XDOM. The reason is that the XDOM might use privileged API that require some special rights
         // (like Programming Rights if it contains a Groovy macro for example).
         WikiIRCBotListener listener = new WikiIRCBotListener(botListenerData, events, doc.getSyntax(),
-            this.macroTransformation, this.plainTextBlockRenderer, this.ircModel,
+            renderingContext, this.macroTransformation, this.plainTextBlockRenderer, this.ircModel,
             this.ircModel.getXWikiContext().getUserReference());
 
         // Call Wiki Bot Listener initialization.

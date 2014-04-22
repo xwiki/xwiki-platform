@@ -30,10 +30,12 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 
@@ -45,6 +47,11 @@ import org.xwiki.rendering.transformation.TransformationContext;
  */
 public class OfficeMacroImporter
 {
+    /**
+     * Used to update the rendering context.
+     */
+    private final RenderingContext renderingContext;
+
     /**
      * The component used to execute the XDOM macro transformations before rendering to XHTML.
      * <p>
@@ -75,6 +82,7 @@ public class OfficeMacroImporter
     public OfficeMacroImporter(ComponentManager componentManager)
     {
         try {
+            renderingContext = componentManager.getInstance(RenderingContext.class);
             macroTransformation = componentManager.getInstance(Transformation.class, "macro");
             xhtmlRenderer = componentManager.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");
             entityReferenceSerializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
@@ -116,7 +124,7 @@ public class OfficeMacroImporter
     {
         TransformationContext txContext = new TransformationContext();
         txContext.setXDOM(xdom);
-        macroTransformation.transform(xdom, txContext);
+        ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext, xdom);
 
         WikiPrinter printer = new DefaultWikiPrinter();
         xhtmlRenderer.render(xdom, printer);

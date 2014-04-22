@@ -36,6 +36,7 @@ import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.script.NestedScriptMacroEnabled;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
@@ -47,6 +48,7 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionStartsEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 
@@ -222,7 +224,10 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
             // Perform internal macro transformations.
             TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
             txContext.setId(context.getId());
-            macroTransformation.transform(wikiMacroMarker, txContext);
+
+            RenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
+            ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext,
+                wikiMacroMarker);
 
             return extractResult(wikiMacroMarker.getChildren(), macroBinding, context);
         } catch (Exception ex) {

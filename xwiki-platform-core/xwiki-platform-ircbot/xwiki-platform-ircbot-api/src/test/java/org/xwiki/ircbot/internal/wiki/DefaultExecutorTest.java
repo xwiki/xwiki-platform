@@ -24,6 +24,7 @@ import java.util.Collections;
 
 import org.jmock.Expectations;
 import org.jmock.lib.legacy.ClassImposteriser;
+import org.junit.Assert;
 import org.junit.Test;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
@@ -38,14 +39,14 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.internal.transformation.macro.MacroErrorManager;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
-
-import org.junit.Assert;
 
 /**
  * Unit tests for {@link DefaultExecutor}.
@@ -69,12 +70,13 @@ public class DefaultExecutorTest extends AbstractComponentTestCase
     {
         final XDOM xdom = new XDOM(Collections.<Block>emptyList());
         Event event = createTestEvent();
+        final RenderingContext renderingContext = getMockery().mock(MutableRenderingContext.class);
         final Transformation macroTransformation = getMockery().mock(Transformation.class);
         final BlockRenderer plainTextRenderer = getComponentManager().getInstance(BlockRenderer.class, "plain/1.0");
 
         getMockery().checking(new Expectations()
         {{
-            oneOf(macroTransformation).transform(with(equal(xdom)), with(any(TransformationContext.class)));
+            oneOf((MutableRenderingContext) renderingContext).transformInContext(with(equal(macroTransformation)), with(any(TransformationContext.class)), with(equal(xdom)));
             // The XDOM is modified by the transformation; simulate it here so that it returns an empty XDOM
             xdom.addChild(new ParagraphBlock(Collections.<Block>emptyList()));
             // The test is here! We ensure that the bot isn't called and thus that no message is sent to the channel
@@ -82,7 +84,8 @@ public class DefaultExecutorTest extends AbstractComponentTestCase
         }});
 
         DefaultExecutor executor =
-            new DefaultExecutor(xdom, Syntax.XWIKI_2_1, event, macroTransformation, plainTextRenderer);
+            new DefaultExecutor(xdom, Syntax.XWIKI_2_1, event, renderingContext, macroTransformation, plainTextRenderer
+            );
         executor.execute();
     }
 
@@ -91,12 +94,13 @@ public class DefaultExecutorTest extends AbstractComponentTestCase
     {
         final XDOM xdom = new XDOM(Collections.<Block>emptyList());
         Event event = createTestEvent();
+        final RenderingContext renderingContext = getMockery().mock(MutableRenderingContext.class);
         final Transformation macroTransformation = getMockery().mock(Transformation.class);
         final BlockRenderer plainTextRenderer = getComponentManager().getInstance(BlockRenderer.class, "plain/1.0");
 
         getMockery().checking(new Expectations()
         {{
-            oneOf(macroTransformation).transform(with(equal(xdom)), with(any(TransformationContext.class)));
+            oneOf((MutableRenderingContext) renderingContext).transformInContext(with(equal(macroTransformation)), with(any(TransformationContext.class)), with(equal(xdom)));
             // The XDOM is modified by the transformation; simulate it here so that it returns a non empty XDOM
             xdom.addChild(new ParagraphBlock(Arrays.<Block>asList(new WordBlock("test"))));
             // The test is here!
@@ -104,7 +108,8 @@ public class DefaultExecutorTest extends AbstractComponentTestCase
         }});
 
         DefaultExecutor executor =
-            new DefaultExecutor(xdom, Syntax.XWIKI_2_1, event, macroTransformation, plainTextRenderer);
+            new DefaultExecutor(xdom, Syntax.XWIKI_2_1, event, renderingContext, macroTransformation, plainTextRenderer
+            );
         executor.execute();
     }
 
@@ -114,19 +119,21 @@ public class DefaultExecutorTest extends AbstractComponentTestCase
         final MacroBlock macroBlock = new MacroBlock("testmacro", Collections.<String, String>emptyMap(), false);
         final XDOM xdom = new XDOM(Arrays.<Block>asList(macroBlock));
         Event event = createTestEvent();
+        final RenderingContext renderingContext = getMockery().mock(MutableRenderingContext.class);
         final Transformation macroTransformation = getMockery().mock(Transformation.class);
         final BlockRenderer plainTextRenderer = getComponentManager().getInstance(BlockRenderer.class, "plain/1.0");
 
         getMockery().checking(new Expectations()
         {{
-            oneOf(macroTransformation).transform(with(equal(xdom)), with(any(TransformationContext.class)));
+            oneOf((MutableRenderingContext) renderingContext).transformInContext(with(equal(macroTransformation)), with(any(TransformationContext.class)), with(equal(xdom)));
             // The XDOM is modified by the transformation; simulate it here so that it returns a macro error
             MacroErrorManager macroErrorManager = new MacroErrorManager();
             macroErrorManager.generateError(macroBlock, "test message", "test description");
         }});
 
         DefaultExecutor executor =
-            new DefaultExecutor(xdom, Syntax.XWIKI_2_1, event, macroTransformation, plainTextRenderer);
+            new DefaultExecutor(xdom, Syntax.XWIKI_2_1, event, renderingContext, macroTransformation, plainTextRenderer
+            );
         try {
             executor.execute();
             Assert.fail("Should have raised an exception");

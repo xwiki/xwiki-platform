@@ -29,7 +29,9 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import org.xwiki.uiextension.internal.WikiUIExtensionRenderer;
@@ -44,6 +46,8 @@ import static org.mockito.Mockito.when;
 public class WikiUIExtensionRendererTest
 {
     private Execution execution;
+
+    private RenderingContext renderingContext;
 
     private Transformation macroTransformation;
 
@@ -61,6 +65,8 @@ public class WikiUIExtensionRendererTest
     {
         execution = cm.registerMockComponent(Execution.class);
         ExecutionContext executionContext = mock(ExecutionContext.class);
+        renderingContext = mock(MutableRenderingContext.class);
+        cm.registerComponent(RenderingContext.class, renderingContext);
         macroTransformation = cm.registerMockComponent(Transformation.class, "macro");
         contentParser = cm.registerMockComponent(ContentParser.class);
         when(execution.getContext()).thenReturn(executionContext);

@@ -68,3 +68,7 @@ set XWIKI_OPTS=%XWIKI_OPTS% -Dorg.eclipse.jetty.server.Request.maxFormContentSiz
 java %XWIKI_OPTS% %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar
 
 if %2==profiler set PATH=%OLD_PATH%
+
+REM Pause so that the command window used to run this script doesn't close automatically in case of problem
+REM (like when the JDK/JRE is not installed)
+PAUSE

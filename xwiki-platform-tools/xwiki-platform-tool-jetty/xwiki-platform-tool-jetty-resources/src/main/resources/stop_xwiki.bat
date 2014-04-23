@@ -32,3 +32,7 @@ IF NOT [%1]==[] set JETTY_STOP_PORT=%1
 set XWIKI_OPTS=-DSTOP.KEY=xwiki -DSTOP.PORT=%JETTY_STOP_PORT%
 
 "%JAVA_PATH%" %XWIKI_OPTS% -Djetty.home=%JETTY_HOME% -jar %JETTY_HOME%/start.jar --stop
+
+REM Pause so that the command window used to run this script doesn't close automatically in case of problem
+REM (like when the JDK/JRE is not installed)
+PAUSE

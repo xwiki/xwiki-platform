@@ -62,3 +62,7 @@ REM service attacks.
 set XWIKI_OPTS=%XWIKI_OPTS% -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1000000
 
 "%JAVA_PATH%" %XWIKI_OPTS% %3 %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar
+
+REM Pause so that the command window used to run this script doesn't close automatically in case of problem
+REM (like when the JDK/JRE is not installed)
+PAUSE

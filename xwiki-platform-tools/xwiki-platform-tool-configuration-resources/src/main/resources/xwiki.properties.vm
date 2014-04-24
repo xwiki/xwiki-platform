@@ -459,9 +459,12 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# And an example to add the XWiki Maven Snapshot Repository
 # extension.repositories=maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots
 #-#
-#-# The default is:
+#-# When not set the following is taken:
 # extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
 # extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/
+#-# 
+#-# To not have any repository enabled (including disabling default repositories) you can explicitly make this list empty:
+# extension.repositories=
 
 #-# [Since 2.5]
 #-# The directory where extensions are stored after being downloaded.

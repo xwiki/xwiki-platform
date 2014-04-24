@@ -22,7 +22,9 @@ package org.xwiki.watchlist.test.po;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.LiveTableElement;
 
@@ -36,11 +38,11 @@ public class WatchlistMacro extends BaseElement
 {
 
     /**
-     * a formatter to create a XPath expression to a "remove from watchlist" link. The arguments to pass to this
+     * a formatter to create a CSS expression to a "remove from watchlist" link. The arguments to pass to this
      * formatter are: removal action and reference to removed.
      */
     private static final String WATCHLIST_REMOVE_BUTTON_PATTERN_CSS 
-    	= "tbody#mywatchlist-display>tr>td>a[href$='?xpage=watch&do=%s&reference=%s']";
+        = "tbody#mywatchlist-display>tr>td>a[href$='?xpage=watch&do=%s&reference=%s']";
 
     public LiveTableElement getWatchList() {
         LiveTableElement liveTableElement = new LiveTableElement("mywatchlist");
@@ -52,8 +54,8 @@ public class WatchlistMacro extends BaseElement
     public boolean isWatched(String space, String page) {
         // Make sure the livetable is loaded
         getWatchList();
-
-        return getUtil().hasElement(removeLink(space, page));
+        
+        return !getUtil().findElementsWithoutWaiting(getDriver(), removeLink(space, page)).isEmpty();
     }
 
     public boolean isWatched(String space) {
@@ -62,6 +64,33 @@ public class WatchlistMacro extends BaseElement
 
     public boolean isWikiWatched() {
         return this.isWatched(null, null);
+    }
+
+    /** a helper class to find "remove"-links and wait for them to vanish */
+    private class ExpectNoRemoveLinks implements ExpectedCondition<Boolean>
+    {
+        private final String page;
+        private final String space;
+        private List<WebElement> links = null;
+
+        ExpectNoRemoveLinks(String space, String page) {
+            this.space = space;
+            this.page = page;
+        }
+
+        @Override
+        public Boolean apply(WebDriver input) {
+            getWatchList();
+            links = getDriver().findElements(removeLink(space, page));
+            return links.isEmpty();
+        }
+
+        public List<WebElement> getLinks() {
+            if (links == null) {
+                apply(getDriver());
+            }
+            return links;
+        }
     }
 
     /**
@@ -74,9 +103,7 @@ public class WatchlistMacro extends BaseElement
      * @return true if something has been unregistered, false otherwise
      */
     public boolean unWatch(String space, String page) {
-        getWatchList();
-
-        List<WebElement> links = getDriver().findElements(removeLink(space, page));
+        List<WebElement> links = new ExpectNoRemoveLinks(space, page).getLinks();
         if (links.isEmpty()) {
             return false;
         }
@@ -85,17 +112,20 @@ public class WatchlistMacro extends BaseElement
         // FIXME: now we should wait for the ajax call to finish and the livetable to reload
         // this would be easier if we get any feedback about removing items from the watchlist
         // waitForNotificationSuccessMessage(message);
+        // instead we wait for the remove link to vanish
+        getUtil().waitUntilCondition(new ExpectNoRemoveLinks(space, page));
+
         return true;
     }
 
     private By removeLink(String space, String page) {
         By removeLink;
         if (space == null) {
-            removeLink = By.cssSelector(String.format(WATCHLIST_REMOVE_BUTTON_PATTERN_CSS, "removewiki", "xwiki" ));
+            removeLink = By.cssSelector(String.format(WATCHLIST_REMOVE_BUTTON_PATTERN_CSS, "removewiki", "xwiki"));
         } else if (page == null) {
-            removeLink = By.cssSelector(String.format(WATCHLIST_REMOVE_BUTTON_PATTERN_CSS, "removespace", "xwiki%3A"+space));
+            removeLink = By.cssSelector(String.format(WATCHLIST_REMOVE_BUTTON_PATTERN_CSS, "removespace", "xwiki%3A" + space));
         } else {
-            removeLink = By.cssSelector(String.format(WATCHLIST_REMOVE_BUTTON_PATTERN_CSS, "removedocument", "xwiki%3A"+space+'.'+ page ));
+            removeLink = By.cssSelector(String.format(WATCHLIST_REMOVE_BUTTON_PATTERN_CSS, "removedocument", "xwiki%3A" + space + '.' + page));
         }
         return removeLink;
     }

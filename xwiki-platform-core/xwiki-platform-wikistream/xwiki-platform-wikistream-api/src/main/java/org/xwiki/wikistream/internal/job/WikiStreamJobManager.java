@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.job.internal.DefaultJobManager;
 
 /**
@@ -37,5 +38,9 @@ import org.xwiki.job.internal.DefaultJobManager;
 @Singleton
 public class WikiStreamJobManager extends DefaultJobManager
 {
-
+    @Override
+    public void initialize() throws InitializationException
+    {
+        initialize("WikiStream Job Manager daemon thread");
+    }
 }

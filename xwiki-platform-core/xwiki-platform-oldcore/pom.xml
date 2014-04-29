@@ -986,7 +986,7 @@
               **/stats/impl/xwiki/XWikiStatsReader.java
           </excludes>
           <resourceExcludes>
-              **/ApplicationResources*.properties
+              ApplicationResources*.properties
           </resourceExcludes>
         </configuration>
       </plugin>

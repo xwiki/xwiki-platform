@@ -452,7 +452,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             String sql = "select doc.fullName from XWikiDocument as doc where doc.fullName=:fullName";
             if (!doc.getLocale().equals(Locale.ROOT)) {
-                sql += " and doc.language=:locale";
+                sql += " and doc.language=:language";
             }
             if (monitor != null) {
                 monitor.setTimerDesc("hibernate", sql);

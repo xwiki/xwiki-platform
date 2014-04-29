@@ -28,6 +28,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.fop.fo.properties.StringProperty;
 import org.hibernate.FlushMode;
@@ -314,5 +315,43 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         // Delete the old property value and then save the new one.
         verify(session).delete(oldProperty);
         verify(session).save(property);
+    }
+
+    @Test
+    public void existsWithRootLocale() throws Exception
+    {
+        String fullName = "foo";
+        XWikiDocument doc = mock(XWikiDocument.class);
+        when(doc.getLocale()).thenReturn(Locale.ROOT);
+        when(doc.getFullName()).thenReturn(fullName);
+
+        Query query = mock(Query.class);
+        when(session.createQuery("select doc.fullName from XWikiDocument as doc where doc.fullName=:fullName"))
+            .thenReturn(query);
+        when(query.list()).thenReturn(Collections.singletonList(fullName));
+
+        assertTrue(store.exists(doc, context));
+
+        verify(query).setString("fullName", fullName);
+    }
+
+    @Test
+    public void existsWithNonRootLocale() throws Exception
+    {
+        String fullName = "bar";
+        XWikiDocument doc = mock(XWikiDocument.class);
+        when(doc.getLocale()).thenReturn(Locale.ENGLISH);
+        when(doc.getFullName()).thenReturn(fullName);
+
+        Query query = mock(Query.class);
+        String statement = "select doc.fullName from XWikiDocument as doc where doc.fullName=:fullName"
+            + " and doc.language=:language";
+        when(session.createQuery(statement)).thenReturn(query);
+        when(query.list()).thenReturn(Collections.singletonList(fullName));
+
+        assertTrue(store.exists(doc, context));
+
+        verify(query).setString("fullName", fullName);
+        verify(query).setString("language", Locale.ENGLISH.toString());
     }
 }

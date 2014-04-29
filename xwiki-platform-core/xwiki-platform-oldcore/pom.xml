@@ -983,9 +983,11 @@
               **/xmlrpc/XWikiXmlRpcURLFactory.java,
               **/xmlrpc/XWikiXmlRpcUser.java,
               <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
-              **/stats/impl/xwiki/XWikiStatsReader.java,
-              **/ApplicationResources*.properties
+              **/stats/impl/xwiki/XWikiStatsReader.java
           </excludes>
+          <resourceExcludes>
+              **/ApplicationResources*.properties
+          </resourceExcludes>
         </configuration>
       </plugin>
     </plugins>

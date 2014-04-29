@@ -17,37 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.activeinstalls.internal;
+package org.xwiki.activeinstalls.internal.client;
+
+import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
-
-import io.searchbox.client.JestClient;
 
 /**
- * Factory to get the {@link JestClient} instance to connect to the remote instance.
+ * Allows providing additional data in the ping sent to the server.
  *
  * @version $Id$
- * @since 5.2M2
+ * @since 6.1M1
  */
 @Role
-@Unstable
-public interface JestClientManager
+public interface PingDataProvider
 {
     /**
-     * The elastic search index we use to index pings.
+     * @return the ElasticSearch JSON data mapping, represented as a Map
      */
-    String INDEX = "installs";
+    Map<String, Object> provideMapping();
 
     /**
-     * The elastic search index type we use to index pings. The index is suffixed with a number corresponding to the
-     * version of our Elastic Search data model. The first data model was in an index named "install", the second one in
-     * "install2" and if we need a third model in the future, it'll go in "install3".
+     * @return the ElasticSearch JSON data, represented as a Map
      */
-    String TYPE = "install2";
-
-    /**
-     * @return the object to use to connect to the remote instance
-     */
-    JestClient getClient();
+    Map<String, Object> provideData();
 }

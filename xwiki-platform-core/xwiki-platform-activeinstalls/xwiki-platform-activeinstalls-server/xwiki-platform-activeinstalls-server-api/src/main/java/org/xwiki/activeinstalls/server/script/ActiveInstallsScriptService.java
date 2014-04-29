@@ -19,6 +19,9 @@
  */
 package org.xwiki.activeinstalls.server.script;
 
+import java.util.Collections;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -28,6 +31,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
+
+import com.google.gson.JsonObject;
 
 /**
  * Provides Scripting APIs for the Active Installs module.
@@ -59,26 +64,127 @@ public class ActiveInstallsScriptService implements ScriptService
     private DataManager dataManager;
 
     /**
-     * See {@link org.xwiki.activeinstalls.server.DataManager#getInstallCount(String)}.
+     * Executes a Count query for Active Installs.
      *
-     * @param query the query in Lucene syntax to match installs
-     * @return the number of matching installs or -1 if an error happened, in which case the error can be retrieved
-     *         with {@link #getLastError()}.
-     * @since 5.2RC1
+     * @param indexType the Elastic Search index type (e.g. "installs" or "installs2". Some XWiki instances may have
+     *        sent pings stored under a given index type while other instances may have used another index type (and
+     *        thus another data format). We use the index type to match a given data model. The Active Installs Client
+     *        module should be checked to understand the data model used.
+     * @param fullQuery the full Elastic Search query used to search for installs.
+     * @param parameters the ElasticSearch count parameters to use (see for example
+     *        <a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-count.html">
+     *        Count API</a>)
+     * @return the parsed JSON result coming from Elastic Search or null if an error happened, in which case the error
+     *         can be retrieved with {@link #getLastError()}.
+     * @since 6.1M1
      */
-    public long getInstallCount(String query)
+    public JsonObject countInstalls(String indexType, String fullQuery, Map<String, Object> parameters)
     {
         setError(null);
 
-        long result = -1;
+        JsonObject result;
 
         try {
-            result = this.dataManager.getInstallCount(query);
+            result = this.dataManager.countInstalls(indexType, fullQuery, parameters);
         } catch (Exception e) {
             setError(e);
+            result = null;
         }
 
         return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see #countInstalls(String, String, java.util.Map)
+     */
+    public JsonObject countInstalls(String indexType, String fullQuery)
+    {
+        return countInstalls(indexType, fullQuery, Collections.EMPTY_MAP);
+    }
+
+    /**
+     * Executes a Search query for Active Installs.
+     *
+     * @param indexType the Elastic Search index type (e.g. "installs" or "installs2". Some XWiki instances may have
+     *        sent pings stored under a given index type while other instances may have used another index type (and
+     *        thus another data format). We use the index type to match a given data model. The Active Installs Client
+     *        module should be checked to understand the data model used.
+     * @param fullQuery the full Elastic Search query used to search for installs. For example:
+     *        <p><pre><code>
+     *            {
+     *              "query" : {
+     *                "term": { "distributionVersion" : "5.2" }
+     *              }
+     *            }
+     *        </code></pre></p>
+     * @return the parsed JSON result coming from Elastic Search or null if an error happened, in which case the error
+     *         can be retrieved with {@link #getLastError()}. For example:
+     *        <p><pre><code>
+     *            {
+     *              "took": 97,
+     *              "timed_out": false,
+     *              "_shards": {
+     *                "total": 1,
+     *                "successful": 1,
+     *                "failed": 0
+     *              },
+     *              "hits": {
+     *                "total": 2,
+     *                "max_score": 1,
+     *                "hits": [
+     *                  {
+     *                    "_index": "installs",
+     *                    "_type": "install",
+     *                    "_id": "id1",
+     *                    "_score": 1,
+     *                    "_source": {
+     *                      "distributionVersion": "5.2",
+     *                      ...
+     *                    }
+     *                  },
+     *                  {
+     *                    "_index": "installs",
+     *                    "_type": "install",
+     *                    "_id": "id2",
+     *                    "_score": 0.625,
+     *                    "_source": {
+     *                      "distributionVersion": "5.2-SNAPSHOT",
+     *                      ...
+     *                    }
+     *                  }
+     *                ]
+     *              }
+     *            }
+     *        </code></pre></p>
+     * @param parameters the ElasticSearch search parameters to use (see for example
+     *        <a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-uri-request.html">
+     *        Search URI parameters</a>)
+     * @since 6.1M1
+     */
+    public JsonObject searchInstalls(String indexType, String fullQuery, Map<String, Object> parameters)
+    {
+        setError(null);
+
+        JsonObject result;
+
+        try {
+            result = this.dataManager.searchInstalls(indexType, fullQuery, parameters);
+        } catch (Exception e) {
+            setError(e);
+            result = null;
+        }
+
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see #searchInstalls(String, String, java.util.Map)
+     */
+    public JsonObject searchInstalls(String indexType, String fullQuery)
+    {
+        return searchInstalls(indexType, fullQuery, Collections.EMPTY_MAP);
     }
 
     // Error management

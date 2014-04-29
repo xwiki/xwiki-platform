@@ -21,6 +21,7 @@ package com.xpn.xwiki.store;
 
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
@@ -162,35 +163,64 @@ public class XWikiHibernateBaseStore implements Initializable
     }
 
     /**
-     * Retrieve the current database product name. If no current session is available, obtains a connection from the
-     * Hibernate connection provider attached to the current Session Factory.
+     * Retrieve metadata about the database used (name, version, etc).
+     * <p>
+     * Note that the database metadata is not cached and it's retrieved at each call. If all you need is the database
+     * product name you should use {@link #getDatabaseProductName()} instead, which is cached.
+     * </p>
+     *
+     * @return the database meta data or null if an error occurred
+     * @since 6.1M1
+     */
+    public DatabaseMetaData getDatabaseMetaData()
+    {
+        DatabaseMetaData result;
+        Connection connection = null;
+        // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
+        // See http://bit.ly/QAJXlr
+        ConnectionProvider connectionProvider =
+            ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
+        try {
+            connection = connectionProvider.getConnection();
+            result = connection.getMetaData();
+        } catch (SQLException ignored) {
+            result = null;
+        } finally {
+            if (connection != null) {
+                try {
+                    connectionProvider.closeConnection(connection);
+                } catch (SQLException ignored) {
+                    // Ignore
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Retrieve the current database product name.
+     * <p>
+     * Note that the database product name is cached for improved performances.
+     * </p>
      *
      * @return the database product name, see {@link DatabaseProduct}
      * @since 4.0M1
      */
     public DatabaseProduct getDatabaseProductName()
     {
-        Connection connection = null;
         DatabaseProduct product = this.databaseProduct;
 
         if (product == DatabaseProduct.UNKNOWN) {
-            // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
-            // See http://bit.ly/QAJXlr
-            ConnectionProvider connectionProvider =
-                ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
-            try {
-                connection = connectionProvider.getConnection();
-                product = DatabaseProduct.toProduct(connection.getMetaData().getDatabaseProductName());
-            } catch (SQLException ignored) {
-                // do not care, return UNKNOWN
-            } finally {
-                if (connection != null) {
-                    try {
-                        connectionProvider.closeConnection(connection);
-                    } catch (SQLException ignored) {
-                        // do not care, return UNKNOWN
-                    }
+            DatabaseMetaData metaData = getDatabaseMetaData();
+            if (metaData != null) {
+                try {
+                    product = DatabaseProduct.toProduct(metaData.getDatabaseProductName());
+                } catch (SQLException ignored) {
+                    // do not care, return UNKNOWN
                 }
+            } else {
+                // do not care, return UNKNOWN
             }
         }
 

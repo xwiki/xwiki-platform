@@ -19,6 +19,7 @@
  */
 package org.xwiki.activeinstalls.internal;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,11 +32,16 @@ import org.junit.*;
 import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
 import org.xwiki.activeinstalls.internal.server.DefaultDataManager;
 import org.xwiki.activeinstalls.server.DataManager;
+import org.xwiki.properties.internal.DefaultConverterManager;
+import org.xwiki.properties.internal.converter.ConvertUtilsConverter;
+import org.xwiki.properties.internal.converter.EnumConverter;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.github.tlrx.elasticsearch.test.EsSetup;
+import com.google.gson.JsonObject;
 
+import io.searchbox.params.Parameters;
 import net.sf.json.JSONObject;
 
 import static com.github.tlrx.elasticsearch.test.EsSetup.deleteAll;
@@ -51,7 +57,11 @@ import static org.mockito.Mockito.*;
  */
 @ComponentList({
     DefaultDataManager.class,
-    DefaultJestClientManager.class
+    DefaultJestClientManager.class,
+    DefaultConverterManager.class,
+    ConvertUtilsConverter.class,
+    EnumConverter.class
+
 })
 public class DefaultDataManagerTest
 {
@@ -73,7 +83,7 @@ public class DefaultDataManagerTest
     public void setUp() throws Exception
     {
         // Add index 1 (non snapshot version)
-        addIndex("id1", DATE_FORMATTER.print(new Date().getTime()), "5.2-milestone-2");
+        addIndex("id1", DATE_FORMATTER.print(new Date().getTime()), "5.2");
 
         // Add index 2 (date is one year earlier than index1 and version is SNAPSHOT)
         DateTime dt = new DateTime();
@@ -95,38 +105,59 @@ public class DefaultDataManagerTest
     }
 
     @Test
-    public void getInstallCountMatchingAll() throws Exception
+    public void searchInstallsMatchingAll() throws Exception
     {
         DataManager manager = this.componentManager.getInstance(DataManager.class);
-        String query = "*";
-        assertEquals(3, manager.getInstallCount(query));
+        String query = "{ \"query\" : { \"match_all\": { } } }";
+        JsonObject json = manager.searchInstalls("install", query, Collections.<String, Object>emptyMap());
+        assertEquals(3, json.getAsJsonObject("hits").getAsJsonPrimitive("total").getAsLong());
     }
 
     @Test
-    public void getInstallCountMatchingDate() throws Exception
+    public void searchInstallsMatchingVersion() throws Exception
+    {
+        DataManager manager = this.componentManager.getInstance(DataManager.class);
+        String query = "{ \"query\" : { \"term\": { \"distributionVersion\" : \"5.2\" } } }";
+        JsonObject json = manager.searchInstalls("install", query, Collections.<String, Object>emptyMap());
+        assertEquals(2, json.getAsJsonObject("hits").getAsJsonPrimitive("total").getAsLong());
+    }
+
+    @Test
+    public void searchInstallsMatchingVersionAndDate() throws Exception
     {
         DataManager manager = this.componentManager.getInstance(DataManager.class);
         DateTime dt = new DateTime();
         dt = dt.plusDays(-30);
-        String query = String.format("date:[%s TO *]",  DATE_FORMATTER.print(dt));
-        assertEquals(2, manager.getInstallCount(query));
+        String query = String.format("{ \"query\" : { \"query_string\": { \"query\" : \""
+            + "date:[%s TO *] AND distributionVersion:5.2\" } } }", DATE_FORMATTER.print(dt));
+        JsonObject json = manager.searchInstalls("install", query, Collections.<String, Object>emptyMap());
+        assertEquals(1, json.getAsJsonObject("hits").getAsJsonPrimitive("total").getAsLong());
+        assertEquals("5.2", json.getAsJsonObject("hits").getAsJsonArray("hits").get(0).getAsJsonObject()
+            .getAsJsonObject("_source").getAsJsonPrimitive("distributionVersion").getAsString());
     }
 
     @Test
-    public void getInstallCountMatchingDateAndVersion() throws Exception
+    public void searchInstallsExcludingSnapshotsAndUsingCountSearchType() throws Exception
     {
         DataManager manager = this.componentManager.getInstance(DataManager.class);
-        DateTime dt = new DateTime();
-        dt = dt.plusDays(-30);
-        String query = String.format(
-            "date:[%s TO *] AND distributionVersion:5.2-milestone-2", DATE_FORMATTER.print(dt));
-        assertEquals(1, manager.getInstallCount(query));
+        String query = "{ \"query\" : { \"query_string\": { \"query\" : \"-distributionVersion:*SNAPSHOT\" } } }";
+        JsonObject json = manager.searchInstalls("install", query,
+            Collections.<String, Object>singletonMap(Parameters.SEARCH_TYPE, "count"));
+        assertEquals(1, json.getAsJsonObject("hits").getAsJsonPrimitive("total").getAsLong());
+    }
 
+    @Test
+    public void countInstallsMatchingAll() throws Exception
+    {
+        DataManager manager = this.componentManager.getInstance(DataManager.class);
+        String query = "{ \"query\" : { \"match_all\": { } } }";
+        JsonObject json = manager.countInstalls("install", query, Collections.<String, Object>emptyMap());
+        assertEquals(3, json.getAsJsonPrimitive("count").getAsLong());
     }
 
     private void addIndex(String id, String date, String version)
     {
-        Map jsonMap = new HashMap();
+        Map<String, Object> jsonMap = new HashMap<>();
         jsonMap.put("date", date);
         jsonMap.put("distributionVersion", version);
         String json = JSONObject.fromObject(jsonMap).toString();

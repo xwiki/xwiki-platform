@@ -24,6 +24,7 @@ import org.xwiki.test.ui.AbstractGuestTest;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.Assert.*;
+import static com.github.tlrx.elasticsearch.test.EsSetup.*;
 
 /**
  * Verify the overall Active Installs feature.
@@ -49,6 +50,14 @@ public class ActiveInstallsTest extends AbstractGuestTest
             Thread.sleep(100L);
         }
 
+        // In order to verify backward compatibility with the previous Active Install format, we also add an index in
+        // the older format.
+/*
+        ElasticSearchRunner.esSetup.execute(
+            createIndex("installs")
+                .withMapping("install", fromClassPath("mapping.json"))
+                .withData(fromClassPath("data.json")));
+*/
         // Navigate to the Active Installs Counter Value page to verify that the ping has been received
         getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue", "view", "query=*");
         ViewPage vp  = new ViewPage();

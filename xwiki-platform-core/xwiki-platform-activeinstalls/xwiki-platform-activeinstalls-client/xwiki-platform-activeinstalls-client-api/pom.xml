@@ -52,5 +52,17 @@
       <artifactId>xwiki-platform-activeinstalls-common</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- We need to draw oldcore in order to be able to send the database name and version in the ping. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- We want to log the Servlet Container name/version in the ping -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 </project>

@@ -1,0 +1,33 @@
+{
+    "install": {
+        "properties": {
+            "formatVersion": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "date": {
+                "type": "date"
+            },
+            "distributionId": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "distributionVersion": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "extensions": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "version": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.store.hibernate.query;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
@@ -95,7 +96,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                     org.hibernate.Query hquery = createHibernateQuery(session, query);
                     populateParameters(hquery, query);
 
-                    List results = hquery.list();
+                    List<T> results = hquery.list();
                     if (query.getFilters() != null && !query.getFilters().isEmpty()) {
                         for (QueryFilter filter : query.getFilters()) {
                             results = filter.filterResults(results);
@@ -184,7 +185,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
             hquery.setMaxResults(query.getLimit());
         }
         for (Entry<String, Object> e : query.getNamedParameters().entrySet()) {
-            hquery.setParameter(e.getKey(), e.getValue());
+            setNamedParameter(hquery, e.getKey(), e.getValue());
         }
         if (query.getPositionalParameters().size() > 0) {
             int start = Collections.min(query.getPositionalParameters().keySet());
@@ -197,9 +198,27 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                 // jpql-style. "?index"
                 for (Entry<Integer, Object> e : query.getPositionalParameters().entrySet()) {
                     // hack. hibernate assume "?1" is named parameter, so use string "1".
-                    hquery.setParameter("" + e.getKey(), e.getValue());
+                    setNamedParameter(hquery, String.valueOf(e.getKey()), e.getValue());
                 }
             }
+        }
+    }
+
+    /**
+     * Sets the value of the specified named parameter, taking into account the type of the given value.
+     * 
+     * @param query the query to set the parameter for
+     * @param name the parameter name
+     * @param value the non-null parameter value
+     */
+    protected void setNamedParameter(org.hibernate.Query query, String name, Object value)
+    {
+        if (value instanceof Collection) {
+            query.setParameterList(name, (Collection< ? >) value);
+        } else if (value.getClass().isArray()) {
+            query.setParameterList(name, (Object[]) value);
+        } else {
+            query.setParameter(name, value);
         }
     }
 

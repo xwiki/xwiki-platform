@@ -19,45 +19,55 @@
  */
 package com.xpn.xwiki.store.hibernate.query;
 
-import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.hibernate.cfg.Configuration;
-import org.jmock.Expectations;
-import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.query.Query;
 import org.xwiki.query.QueryExecutor;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 
 /**
- * Tests for {@link HqlQueryExecutor}
+ * Unit tests for {@link HqlQueryExecutor}
  *
  * @version $Id$
  */
-@MockingRequirement(HqlQueryExecutor.class)
-public class HqlQueryExecutorTest extends AbstractMockingComponentTestCase<HqlQueryExecutor>
+public class HqlQueryExecutorTest
 {
-    private HqlQueryExecutor executor;
+    @Rule
+    public MockitoComponentMockingRule<QueryExecutor> mocker = new MockitoComponentMockingRule<QueryExecutor>(
+        HqlQueryExecutor.class);
 
-    HibernateSessionFactory sessionFactory;
+    /**
+     * The component under test.
+     */
+    private HqlQueryExecutor executor;
 
     @Before
     public void configure() throws Exception
     {
-        sessionFactory = getComponentManager().getInstance(HibernateSessionFactory.class);
+        HibernateSessionFactory sessionFactory = this.mocker.getInstance(HibernateSessionFactory.class);
+        when(sessionFactory.getConfiguration()).thenReturn(new Configuration());
 
-        getMockery().checking(new Expectations() {{
-            allowing(sessionFactory).getConfiguration();
-            will(returnValue(new Configuration()));
-        }});
-
-        this.executor = getComponentManager().getInstance(QueryExecutor.class, "hql");
+        this.executor = (HqlQueryExecutor) this.mocker.getComponentUnderTest();
     }
 
     @Test
     public void completeShortStatementStartingWithWhere()
     {
-        Assert.assertEquals("select doc.fullName from XWikiDocument doc where doc.author='XWiki.Admin'",
+        assertEquals("select doc.fullName from XWikiDocument doc where doc.author='XWiki.Admin'",
             executor.completeShortFormStatement("where doc.author='XWiki.Admin'"));
     }
 
@@ -65,7 +75,7 @@ public class HqlQueryExecutorTest extends AbstractMockingComponentTestCase<HqlQu
     @Test
     public void completeShortStatementStartingWithFrom()
     {
-        Assert.assertEquals("select doc.fullName from XWikiDocument doc , BaseObject obj where doc.fullName=obj.name "
+        assertEquals("select doc.fullName from XWikiDocument doc , BaseObject obj where doc.fullName=obj.name "
             + "and obj.className='XWiki.MyClass'", executor.completeShortFormStatement(", BaseObject obj where "
             + "doc.fullName=obj.name and obj.className='XWiki.MyClass'"));
     }
@@ -73,21 +83,80 @@ public class HqlQueryExecutorTest extends AbstractMockingComponentTestCase<HqlQu
     @Test
     public void completeShortStatementStartingWithOrderBy()
     {
-        Assert.assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
+        assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
             executor.completeShortFormStatement("order by doc.date desc"));
     }
 
     @Test
     public void completeShortStatementPassingAnAlreadyCompleteQuery()
     {
-        Assert.assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
+        assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
             executor.completeShortFormStatement("select doc.fullName from XWikiDocument doc order by doc.date desc"));
     }
 
     @Test
     public void completeShortStatementPassingAQueryOnSomethingElseThanADocument()
     {
-        Assert.assertEquals("select lock.docId from XWikiLock as lock ",
+        assertEquals("select lock.docId from XWikiLock as lock ",
             executor.completeShortFormStatement("select lock.docId from XWikiLock as lock "));
+    }
+
+    @Test
+    public void setNamedParameter()
+    {
+        org.hibernate.Query query = mock(org.hibernate.Query.class);
+        String name = "abc";
+        Date value = new Date();
+        executor.setNamedParameter(query, name, value);
+
+        verify(query).setParameter(name, value);
+    }
+
+    @Test
+    public void setNamedParameterList()
+    {
+        org.hibernate.Query query = mock(org.hibernate.Query.class);
+        String name = "foo";
+        List<String> value = Arrays.asList("one", "two", "three");
+        executor.setNamedParameter(query, name, value);
+
+        verify(query).setParameterList(name, value);
+    }
+
+    @Test
+    public void setNamedParameterArray()
+    {
+        org.hibernate.Query query = mock(org.hibernate.Query.class);
+        String name = "bar";
+        Integer[] value = new Integer[] {1, 2, 3};
+        executor.setNamedParameter(query, name, value);
+
+        verify(query).setParameterList(name, value);
+    }
+
+    @Test
+    public void populateParameters()
+    {
+        org.hibernate.Query hquery = mock(org.hibernate.Query.class);
+        Query query = mock(Query.class);
+
+        int offset = 13;
+        when(query.getOffset()).thenReturn(offset);
+
+        int limit = 7;
+        when(query.getLimit()).thenReturn(limit);
+
+        Map<String, Object> namedParameters = new HashMap<String, Object>();
+        namedParameters.put("alice", 10);
+        List<String> listValue = Collections.singletonList("yellow");
+        namedParameters.put("bob", listValue);
+        when(query.getNamedParameters()).thenReturn(namedParameters);
+
+        executor.populateParameters(hquery, query);
+
+        verify(hquery).setFirstResult(offset);
+        verify(hquery).setMaxResults(limit);
+        verify(hquery).setParameter("alice", 10);
+        verify(hquery).setParameterList("bob", listValue);
     }
 }

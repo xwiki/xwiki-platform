@@ -125,7 +125,8 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     protected String completeShortFormStatement(String statement)
     {
         String lcStatement = statement.toLowerCase().trim();
-        if (lcStatement.startsWith("where") || lcStatement.startsWith(",") || lcStatement.startsWith("order")) {
+        if (lcStatement.isEmpty() || lcStatement.startsWith(",") || lcStatement.startsWith("where ")
+            || lcStatement.startsWith("order by ")) {
             return "select doc.fullName from XWikiDocument doc " + statement.trim();
         }
 

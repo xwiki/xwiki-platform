@@ -55,6 +55,12 @@ public class HqlQueryExecutorTest extends AbstractMockingComponentTestCase<HqlQu
     }
 
     @Test
+    public void completeShortStatementWhenEmpty()
+    {
+        assertEquals("select doc.fullName from XWikiDocument doc ", executor.completeShortFormStatement(""));
+    }
+
+    @Test
     public void completeShortStatementStartingWithWhere()
     {
         Assert.assertEquals("select doc.fullName from XWikiDocument doc where doc.author='XWiki.Admin'",

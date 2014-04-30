@@ -65,6 +65,12 @@ public class HqlQueryExecutorTest
     }
 
     @Test
+    public void completeShortStatementWhenEmpty()
+    {
+        assertEquals("select doc.fullName from XWikiDocument doc ", executor.completeShortFormStatement(""));
+    }
+
+    @Test
     public void completeShortStatementStartingWithWhere()
     {
         assertEquals("select doc.fullName from XWikiDocument doc where doc.author='XWiki.Admin'",

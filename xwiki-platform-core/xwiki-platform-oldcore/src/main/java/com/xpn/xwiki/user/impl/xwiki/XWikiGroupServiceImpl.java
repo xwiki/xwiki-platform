@@ -55,6 +55,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.Util;
@@ -115,7 +116,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     /**
      * String between space and name in document full name.
      */
-    private static final String SAME_NAME_SEP = ".";
+    private static final String SPACE_NAME_SEP = ".";
 
     /**
      * Symbol use in HQL "like" command that means "all characters".
@@ -252,10 +253,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         boolean equals = false;
 
         if (memberWiki != null) {
-            equals |= currentMember.equals(memberWiki + WIKI_FULLNAME_SEP + memberName);
+            equals |= currentMember.equals(memberWiki + WIKI_FULLNAME_SEP + memberSpace + SPACE_NAME_SEP + memberName);
 
             if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
-                equals |= currentMember.equals(memberSpace + SAME_NAME_SEP + memberName);
+                equals |= currentMember.equals(memberSpace + SPACE_NAME_SEP + memberName);
             }
         }
 
@@ -263,7 +264,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             equals |= currentMember.equals(memberName);
 
             if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
-                equals |= currentMember.equals(memberSpace + SAME_NAME_SEP + memberName);
+                equals |= currentMember.equals(memberSpace + SPACE_NAME_SEP + memberName);
             }
         }
 
@@ -324,10 +325,11 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
                 parameterValues.add(HQLLIKE_ALL_SYMBOL + memberName + HQLLIKE_ALL_SYMBOL);
             } else {
-                parameterValues.add(HQLLIKE_ALL_SYMBOL + memberSpace + SAME_NAME_SEP + memberName + HQLLIKE_ALL_SYMBOL);
+                parameterValues.add(HQLLIKE_ALL_SYMBOL + memberSpace + SPACE_NAME_SEP + memberName + HQLLIKE_ALL_SYMBOL);
             }
         } else {
-            parameterValues.add(HQLLIKE_ALL_SYMBOL + memberWiki + WIKI_FULLNAME_SEP + memberName + HQLLIKE_ALL_SYMBOL);
+            parameterValues.add(HQLLIKE_ALL_SYMBOL + memberWiki + WIKI_FULLNAME_SEP + memberSpace + SPACE_NAME_SEP
+                + memberName + HQLLIKE_ALL_SYMBOL);
         }
 
         List<XWikiDocument> documentList =

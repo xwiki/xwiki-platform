@@ -19,39 +19,42 @@
  */
 package com.xpn.xwiki.store.hibernate.query;
 
-import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import org.hibernate.cfg.Configuration;
-import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.query.QueryExecutor;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 
 /**
  * Tests for {@link HqlQueryExecutor}
- *
+ * 
  * @version $Id$
  */
-@MockingRequirement(HqlQueryExecutor.class)
-public class HqlQueryExecutorTest extends AbstractMockingComponentTestCase<HqlQueryExecutor>
+public class HqlQueryExecutorTest
 {
-    private HqlQueryExecutor executor;
+    @Rule
+    public MockitoComponentMockingRule<QueryExecutor> mocker = new MockitoComponentMockingRule<QueryExecutor>(
+        HqlQueryExecutor.class);
 
-    HibernateSessionFactory sessionFactory;
+    /**
+     * The component under test.
+     */
+    private HqlQueryExecutor executor;
 
     @Before
     public void configure() throws Exception
     {
-        sessionFactory = getComponentManager().getInstance(HibernateSessionFactory.class);
+        HibernateSessionFactory sessionFactory = this.mocker.getInstance(HibernateSessionFactory.class);
+        when(sessionFactory.getConfiguration()).thenReturn(new Configuration());
 
-        getMockery().checking(new Expectations() {{
-            allowing(sessionFactory).getConfiguration();
-            will(returnValue(new Configuration()));
-        }});
-
-        this.executor = getComponentManager().getInstance(QueryExecutor.class, "hql");
+        this.executor = (HqlQueryExecutor) this.mocker.getComponentUnderTest();
     }
 
     @Test
@@ -63,15 +66,14 @@ public class HqlQueryExecutorTest extends AbstractMockingComponentTestCase<HqlQu
     @Test
     public void completeShortStatementStartingWithWhere()
     {
-        Assert.assertEquals("select doc.fullName from XWikiDocument doc where doc.author='XWiki.Admin'",
+        assertEquals("select doc.fullName from XWikiDocument doc where doc.author='XWiki.Admin'",
             executor.completeShortFormStatement("where doc.author='XWiki.Admin'"));
     }
-
 
     @Test
     public void completeShortStatementStartingWithFrom()
     {
-        Assert.assertEquals("select doc.fullName from XWikiDocument doc , BaseObject obj where doc.fullName=obj.name "
+        assertEquals("select doc.fullName from XWikiDocument doc , BaseObject obj where doc.fullName=obj.name "
             + "and obj.className='XWiki.MyClass'", executor.completeShortFormStatement(", BaseObject obj where "
             + "doc.fullName=obj.name and obj.className='XWiki.MyClass'"));
     }
@@ -79,14 +81,14 @@ public class HqlQueryExecutorTest extends AbstractMockingComponentTestCase<HqlQu
     @Test
     public void completeShortStatementStartingWithOrderBy()
     {
-        Assert.assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
+        assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
             executor.completeShortFormStatement("order by doc.date desc"));
     }
 
     @Test
     public void completeShortStatementPassingAnAlreadyCompleteQuery()
     {
-        Assert.assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
+        assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
             executor.completeShortFormStatement("select doc.fullName from XWikiDocument doc order by doc.date desc"));
     }
 

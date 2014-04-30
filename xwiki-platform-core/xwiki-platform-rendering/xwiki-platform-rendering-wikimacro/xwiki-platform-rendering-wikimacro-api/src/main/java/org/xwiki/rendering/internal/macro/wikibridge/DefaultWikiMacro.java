@@ -372,11 +372,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
     @Override
     public int compareTo(Macro< ? > macro)
     {
-        if (getPriority() != macro.getPriority()) {
-            return getPriority() - macro.getPriority();
-        }
-
-        return this.getClass().getSimpleName().compareTo(macro.getClass().getSimpleName());
+        return getPriority() - macro.getPriority();
     }
 
     @Override

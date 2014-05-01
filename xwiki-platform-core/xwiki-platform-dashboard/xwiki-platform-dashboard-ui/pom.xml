@@ -37,4 +37,12 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Dashboard Application</xwiki.extension.name>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-dashboard-macro</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

@@ -37,43 +37,63 @@ public class ActiveInstallsTest extends AbstractGuestTest
     @Test
     public void verifyPingIsSent() throws Exception
     {
-        // When XWiki was started by ElasticSearchRunner from AllTests, a page was checked to verify that the XWiki
-        // instance was up. This, in turn, triggered the send of an asynchronous ping to the ES instance (started prior
-        // to the XWiki start in ElasticSearchRunner).
-        //
-        // Since the ping may take some time to be sent to our ES instance, we wait till we have 1 index in ES or
-        // till the timeout expires.
-        long count = 0;
-        long time = System.currentTimeMillis();
-        while (count != 1 && (System.currentTimeMillis() - time) < 5000L) {
-            count = ElasticSearchRunner.esSetup.countAll();
-            Thread.sleep(100L);
+        // Note that we verify that the ES Runner has been initialized as this allows us to more easily debug the test
+        // by manually starting an XWiki instance and an ES instance prior to running this test (in this case we don't
+        // provision ES).
+        if (ElasticSearchRunner.esSetup != null) {
+            // When XWiki was started by ElasticSearchRunner from AllTests, a page was checked to verify that the XWiki
+            // instance was up. This, in turn, triggered the send of an asynchronous ping to the ES instance
+            // (started prior to the XWiki start in ElasticSearchRunner).
+            //
+            // Since the ping may take some time to be sent to our ES instance, we wait till we have 1 index in ES or
+            // till the timeout expires.
+            long count = 0;
+            long time = System.currentTimeMillis();
+            while (count != 1 && (System.currentTimeMillis() - time) < 5000L) {
+                count = ElasticSearchRunner.esSetup.countAll();
+                Thread.sleep(100L);
+            }
+
+            // In order to verify backward compatibility with the previous Active Install format, we also add an index
+            // in the older format.
+            ElasticSearchRunner.esSetup.execute(index("installs", "install", "156231f3-705b-44c6-afe3-e191bcc4b746")
+                .withSource("{ \"formatVersion\": \"1.0\", \"distributionVersion\": \"5.2\", "
+                    + "\"distributionId\": \"org.xwiki.enterprise:xwiki-enterprise-web\", "
+                    + "\"date\": \"2013-09-16T20:00:34.277Z\", \"extensions\": [ ] }"));
         }
 
-        // In order to verify backward compatibility with the previous Active Install format, we also add an index in
-        // the older format.
-/*
-        ElasticSearchRunner.esSetup.execute(
-            createIndex("installs")
-                .withMapping("install", fromClassPath("mapping.json"))
-                .withData(fromClassPath("data.json")));
-*/
         // Navigate to the Active Installs Counter Value page to verify that the ping has been received
-        getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue", "view", "query=*");
+        getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue2", "view",
+            "snapshots=true&distributionId=org.xwiki.platform:xwiki-platform-web");
         ViewPage vp  = new ViewPage();
         assertEquals("1", vp.getContent());
 
         // The default query doesn't show SNAPSHOT versions and thus we expect 0
-        vp = getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue");
+        getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue2", "view",
+            "distributionId=org.xwiki.platform:xwiki-platform-web");
+        vp  = new ViewPage();
+        assertEquals("0", vp.getContent());
+
+        // Also verify the Active Installs Counter for the old format
+        getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue1");
+        vp  = new ViewPage();
         assertEquals("0", vp.getContent());
 
         // Navigate to the Total Installs Counter Value page to verify that the ping has been received
-        getUtil().gotoPage("ActiveInstalls", "TotalCounterValue", "view", "query=*");
+        getUtil().gotoPage("ActiveInstalls", "TotalCounterValue2", "view",
+            "snapshots=true&distributionId=org.xwiki.platform:xwiki-platform-web");
         vp = new ViewPage();
         assertEquals("1", vp.getContent());
 
         // The default query doesn't show SNAPSHOT versions and thus we expect 0
-        vp = getUtil().gotoPage("ActiveInstalls", "TotalCounterValue");
+        getUtil().gotoPage("ActiveInstalls", "TotalCounterValue2", "view",
+            "distributionId=org.xwiki.platform:xwiki-platform-web");
+        vp = new ViewPage();
         assertEquals("0", vp.getContent());
+
+        // Also verify the Total Installs Counter for the old format
+        getUtil().gotoPage("ActiveInstalls", "TotalCounterValue1");
+        vp  = new ViewPage();
+        assertEquals("1", vp.getContent());
     }
 }

@@ -100,7 +100,7 @@ public class ActiveInstallsScriptService implements ScriptService
      */
     public JsonObject countInstalls(String indexType, String fullQuery)
     {
-        return countInstalls(indexType, fullQuery, Collections.EMPTY_MAP);
+        return countInstalls(indexType, fullQuery, Collections.<String, Object>emptyMap());
     }
 
     /**
@@ -184,7 +184,7 @@ public class ActiveInstallsScriptService implements ScriptService
      */
     public JsonObject searchInstalls(String indexType, String fullQuery)
     {
-        return searchInstalls(indexType, fullQuery, Collections.EMPTY_MAP);
+        return searchInstalls(indexType, fullQuery, Collections.<String, Object>emptyMap());
     }
 
     // Error management

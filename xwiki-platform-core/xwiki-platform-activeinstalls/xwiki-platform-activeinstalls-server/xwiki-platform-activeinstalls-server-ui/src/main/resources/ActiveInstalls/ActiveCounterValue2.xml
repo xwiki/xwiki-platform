@@ -22,69 +22,57 @@
 
 <xwikidoc>
   <web>ActiveInstalls</web>
-  <name>TotalCounterValue</name>
+  <name>ActiveCounterValue2</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>ActiveInstalls.Counter</parent>
+  <parent>ActiveInstalls.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1398443547000</creationDate>
-  <date>1398704673000</date>
-  <contentUpdateDate>1398704673000</contentUpdateDate>
+  <creationDate>1399018766000</creationDate>
+  <date>1399023269000</date>
+  <contentUpdateDate>1399023269000</contentUpdateDate>
   <version>1.1</version>
-  <title>Total Installs Counter Value</title>
+  <title>Active Installs Counter Value version 2</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>true</hidden>
+  <hidden>false</hidden>
   <content>{{velocity}}
-#set ($count = 0)
-##=========================
-## Old way, for XWiki 5.2M2+ till 6.0
-##=========================
-#set ($query = '
-{
-    "query" : {
-        "query_string" : {
-            "query" : "formatVersion:1.0 AND -distributionVersion:*SNAPSHOT AND distributionId:\"org.xwiki.enterprise:xwiki-enterprise-web\""
-        }
-    }
-}
-')
-#set ($result = $services.activeinstalls.searchInstalls("install", $query, {"search_type": "count"}))
-## If there's an error and the "xpage=plain" URL parameter is not passed (ie it's not called by the Counter widget) then display the error if any. Otherwise display the invalid numeric result.
-#if (!$result)
-  #set ($errorText = $!services.activeinstalls.lastError)
-  #if ("$!request.xpage" != 'plain')
-    {{error}}{{{$errorText}}}{{/error}}
-  #end
-#else
-  #set ($count = $mathtool.add($count, $result.getAsJsonObject("hits").getAsJsonPrimitive("total").getAsLong()))
-#end
 ##=========================
 ## New way for XWiki 6.1M1+
 ##=========================
-#set ($query = '
+#if ("$!request.snapshots" == '')
+  #set ($snapshotQueryFragment = ' AND -distributionVersion:*SNAPSHOT')
+#else
+  #set ($snapshotQueryFragment = '')
+#end
+#if ("$!request.distributionId" == '')
+  #set ($distributionId = 'org.xwiki.enterprise:xwiki-enterprise-web')
+#else
+  #set ($distributionId = $request.distributionId)
+#end
+#set ($query = "
 {
-   "query": {
-      "query_string": {
-         "query": "-distributionVersion:*SNAPSHOT AND distributionId:\"org.xwiki.enterprise:xwiki-enterprise-web\""
+   ""query"": {
+      ""query_string"": {
+         ""lowercase_expanded_terms"": false,
+         ""query"": ""_timestamp:[now-1d TO *] $snapshotQueryFragment AND distributionId:\""$distributionId\""""
       }
    },
-   "aggs": {
-      "instanceId_count": {
-         "cardinality": {
-            "field": "instanceId"
+   ""aggs"": {
+      ""instanceId_count"": {
+         ""cardinality"": {
+            ""field"": ""instanceId""
          }
       }
    }
 }
-')
+")
 #set ($result = $services.activeinstalls.searchInstalls("install2", $query, {"search_type": "count"}))
 ## If there's an error and the "xpage=plain" URL parameter is not passed (ie it's not called by the Counter widget) then display the error if any. Otherwise display the invalid numeric result.
 #if (!$result)
@@ -92,11 +80,10 @@
   #if ("$!request.xpage" != 'plain')
     {{error}}{{{$errorText}}}{{/error}}
   #else
-    #set ($count = 0)
+    0
   #end
 #else
-  #set ($count = $mathtool.add($count, $result.getAsJsonObject("aggregations").getAsJsonObject("instanceId_count").getAsJsonPrimitive("value").getAsLong()))
-  $count
+  $result.getAsJsonObject("aggregations").getAsJsonObject("instanceId_count").getAsJsonPrimitive("value").getAsLong()
 #end
 {{/velocity}}</content>
 </xwikidoc>

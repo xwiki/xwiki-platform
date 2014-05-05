@@ -20,14 +20,12 @@
 package org.xwiki.activeinstalls.internal.client;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.activeinstalls.internal.client.data.ServletContainerPingDataProvider;
-import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import net.sf.json.JSONObject;
@@ -60,15 +58,11 @@ public class ServletContainerPingDataProviderTest
     @Test
     public void provideData() throws Exception
     {
-        Container container = this.mocker.getInstance(Container.class);
-        ServletRequest servletRequest = mock(ServletRequest.class);
-        when(container.getRequest()).thenReturn(servletRequest);
-        HttpServletRequest httpServletRequest = mock(HttpServletRequest.class);
-        when(servletRequest.getHttpServletRequest()).thenReturn(httpServletRequest);
-        HttpSession session = mock(HttpSession.class);
-        when(httpServletRequest.getSession()).thenReturn(session);
+        ServletEnvironment servletEnvironment = mock(ServletEnvironment.class);
+        ReflectionUtils.setFieldValue(this.mocker.getComponentUnderTest(), "environment", servletEnvironment);
+
         ServletContext servletContext = mock(ServletContext.class);
-        when(session.getServletContext()).thenReturn(servletContext);
+        when(servletEnvironment.getServletContext()).thenReturn(servletContext);
         when(servletContext.getServerInfo()).thenReturn("Apache Tomcat/7.0.4 (optional text)");
 
         assertEquals("{\"servletContainerVersion\":\"7.0.4\",\"servletContainerName\":\"Apache Tomcat\"}",

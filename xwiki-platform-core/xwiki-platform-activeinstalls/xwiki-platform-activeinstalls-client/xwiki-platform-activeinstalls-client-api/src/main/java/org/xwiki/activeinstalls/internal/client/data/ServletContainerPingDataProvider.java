@@ -25,17 +25,14 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.activeinstalls.internal.client.PingDataProvider;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.container.Container;
-import org.xwiki.container.Request;
-import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 
 /**
  * Provide the Servlet Container's name and version.
@@ -55,8 +52,11 @@ public class ServletContainerPingDataProvider implements PingDataProvider
 
     private static final String PROPERTY_SERVLET_CONTAINER_VERSION = "servletContainerVersion";
 
+    /**
+     * Used to access the Servlet Context.
+     */
     @Inject
-    private Container container;
+    private Environment environment;
 
     @Inject
     private Logger logger;
@@ -79,12 +79,10 @@ public class ServletContainerPingDataProvider implements PingDataProvider
     public Map<String, Object> provideData()
     {
         Map<String, Object> jsonMap = new HashMap<>();
-        Request request = this.container.getRequest();
-        if (request instanceof ServletRequest) {
+        if (this.environment instanceof ServletEnvironment) {
+            ServletEnvironment servletEnvironment = (ServletEnvironment) this.environment;
             try {
-                HttpServletRequest httpServletRequest = ((ServletRequest) request).getHttpServletRequest();
-                HttpSession session = httpServletRequest.getSession();
-                ServletContext servletContext = session.getServletContext();
+                ServletContext servletContext = servletEnvironment.getServletContext();
                 // Format of getServerInfo() is "name/version (text)" where " (text)" is optional.
                 String serverInfo = servletContext.getServerInfo();
                 jsonMap.put(PROPERTY_SERVLET_CONTAINER_NAME,

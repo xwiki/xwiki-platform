@@ -95,5 +95,33 @@ public class ActiveInstallsTest extends AbstractGuestTest
         getUtil().gotoPage("ActiveInstalls", "TotalCounterValue1");
         vp  = new ViewPage();
         assertEquals("1", vp.getContent());
+
+        // Verify JavaVersion data
+        getUtil().gotoPage("ActiveInstalls", "JavaVersionsData", "view",
+            "snapshots=true&distributionId=org.xwiki.platform:xwiki-platform-web");
+        vp  = new ViewPage();
+        assertTrue("Got [" + vp.getContent() + "]",
+            vp.getContent().matches("Java Version Active Installs Count\\r?\\n1\\.[0-9_\\.]* 1"));
+
+        // Verify Databases data
+        getUtil().gotoPage("ActiveInstalls", "DatabasesData", "view",
+            "snapshots=true&distributionId=org.xwiki.platform:xwiki-platform-web");
+        vp  = new ViewPage();
+        assertTrue("Got [" + vp.getContent() + "]",
+            vp.getContent().matches("Database Active Installs Count\\r?\\nHSQL Database Engine 1"));
+
+        // Verify XWikiVersion data
+        getUtil().gotoPage("ActiveInstalls", "XWikiVersionsData", "view",
+            "snapshots=true&distributionId=org.xwiki.platform:xwiki-platform-web");
+        vp  = new ViewPage();
+        assertTrue("Got [" + vp.getContent() + "]",
+            vp.getContent().matches("XWiki Version Active Installs Count\\r?\\n[0-9]\\.[0-9].* 1"));
+
+        // Verify ServletContainers data
+        getUtil().gotoPage("ActiveInstalls", "ServletContainersData", "view",
+            "snapshots=true&distributionId=org.xwiki.platform:xwiki-platform-web");
+        vp  = new ViewPage();
+        assertTrue("Got [" + vp.getContent() + "]",
+            vp.getContent().matches("Servlet Container Active Installs Count\\r?\\njetty 1"));
     }
 }

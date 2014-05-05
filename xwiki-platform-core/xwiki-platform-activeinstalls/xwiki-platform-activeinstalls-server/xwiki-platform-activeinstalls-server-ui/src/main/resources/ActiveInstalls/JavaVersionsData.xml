@@ -22,20 +22,20 @@
 
 <xwikidoc>
   <web>ActiveInstalls</web>
-  <name>ActiveInstallsHistoryData</name>
+  <name>JavaVersionsData</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>ActiveInstalls.ActiveInstallsHistory</parent>
+  <parent>ActiveInstalls.JavaVersions</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1399018766000</creationDate>
-  <date>1399020386000</date>
-  <contentUpdateDate>1399020386000</contentUpdateDate>
+  <creationDate>1399301223000</creationDate>
+  <date>1399301239000</date>
+  <contentUpdateDate>1399301223000</contentUpdateDate>
   <version>1.1</version>
-  <title>Active Installs History Data</title>
+  <title>Active Installs Versions Data</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -43,32 +43,42 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($query = '
+#if ("$!request.snapshots" == '')
+  #set ($snapshotQueryFragment = ' AND -distributionVersion:*SNAPSHOT')
+#else
+  #set ($snapshotQueryFragment = '')
+#end
+#if ("$!request.distributionId" == '')
+  #set ($distributionId = 'org.xwiki.enterprise:xwiki-enterprise-web')
+#else
+  #set ($distributionId = $request.distributionId)
+#end
+#set ($query = "
 {
-     "query": {
-        "query_string": {
-           "query": "-distributionVersion:*SNAPSHOT AND distributionId:\"org.xwiki.enterprise:xwiki-enterprise-web\""
-        }
-     },
-    "aggs": {
-        "activeinstalls_over_time" : {
-            "date_histogram" : {
-                "field" : "_timestamp",
-                "interval" : "day"
+   ""query"": {
+       ""query_string"": {
+           ""lowercase_expanded_terms"": false,
+           ""query"": ""_timestamp:[now-1d TO *] $snapshotQueryFragment AND distributionId:\""$distributionId\""""
+       }
+   },
+   ""aggs"": {
+       ""versions"": {
+           ""terms"": {
+               ""field"": ""javaVersion""
             },
-            "aggs" : {
-                "instanceId_count" : {
-                    "cardinality" : {
-                        "field" : "instanceId"
+            ""aggs"": {
+                ""instanceId_count"": {
+                    ""cardinality"": {
+                        ""field"": ""instanceId""
                     }
                 }
             }
-        }
-    }
+       }
+   }
 }
-')
+")
 #set ($result = $services.activeinstalls.searchInstalls("install2", $query, {"search_type": "count"}))
-#set ($headingLine = "|=Date|=Active Installs Count")
+#set ($headingLine = "|=Java Version|=Active Installs Count")
 #if (!$result)
   #set ($errorText = $!services.activeinstalls.lastError)
   {{error}}{{{$errorText}}}{{/error}}
@@ -77,11 +87,11 @@
   $headingLine
 #else
   ## Generate table with data
-  #set ($jsonItems = $result.getAsJsonObject('aggregations').getAsJsonObject('activeinstalls_over_time').getAsJsonArray('buckets'))
+  #set ($jsonItems = $result.getAsJsonObject('aggregations').getAsJsonObject('versions').getAsJsonArray('buckets'))
   $headingLine
   #foreach ($jsonItem in $jsonItems)
-    #set ($date = $datetool.toDate($jsonItem.getAsJsonPrimitive('key').getAsLong()))
-    |$datetool.format('yyyy-MM-dd', $date)|$jsonItem.getAsJsonObject('instanceId_count').getAsJsonPrimitive('value').getAsLong()
+    #set ($version = $jsonItem.getAsJsonPrimitive('key').getAsString())
+    |$version|$jsonItem.getAsJsonObject('instanceId_count').getAsJsonPrimitive('value').getAsLong()
   #end
 #end
 {{/velocity}}</content>

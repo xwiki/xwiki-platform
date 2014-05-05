@@ -55,7 +55,7 @@ public class PageHistoryResourceImpl extends XWikiResource implements PageHistor
 
             String query = String.format("select doc.space, doc.name, rcs.id, rcs.date, rcs.author, rcs.comment"
                 + " from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId = doc.id and"
-                + " doc.space = :space and doc.name = :name and doc.language = :language"
+                + " doc.space = :space and doc.name = :name and (doc.language = :language or doc.language is null)"
                 + " order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s", order, order, order);
 
             List<Object> queryResult = null;

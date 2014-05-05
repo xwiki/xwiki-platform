@@ -449,7 +449,7 @@ Active Installs over time (since XWiki 6.1-milestone-1).
     <className>XWiki.GadgetClass</className>
     <guid>de9e5022-7d50-443c-b93a-d85b117b8347</guid>
     <property>
-      <content>{{include reference="ActiveInstalls.Versions"/}}
+      <content>{{include reference="ActiveInstalls.XWikiVersions"/}}
 
 Versions of XWiki used by Active Installs (since XWiki 6.1-milestone-1).
 </content>
@@ -515,7 +515,7 @@ Versions of XWiki used by Active Installs (since XWiki 6.1-milestone-1).
     <className>XWiki.GadgetClass</className>
     <guid>3a4cebf8-13d6-45a1-9f90-d8e04a75aa86</guid>
     <property>
-      <content>{{include reference="ActiveInstalls.XWikiVersions"/}}
+      <content>{{include reference="ActiveInstalls.JavaVersions"/}}
 
 Java versions used by by Active Installs (since XWiki 6.1-milestone-1).
 </content>

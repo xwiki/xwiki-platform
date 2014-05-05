@@ -53,6 +53,7 @@ public class PageHistoryResourceImpl extends XWikiResource implements PageHistor
         try {
             Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
+            // Note that the query is made to work with Oracle which treats empty strings as null.
             String query = String.format("select doc.space, doc.name, rcs.id, rcs.date, rcs.author, rcs.comment"
                 + " from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId = doc.id and"
                 + " doc.space = :space and doc.name = :name and (doc.language = '' or doc.language is null)"

@@ -451,6 +451,30 @@
               <className>compatibility/com/xpn/xwiki/api/UtilCompatibilityAspect</className>
               <justification>Removed wrong "compatibility" package</justification>
             </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/activeinstalls/server/DataManager</className>
+              <method>com.google.gson.JsonObject countInstalls(java.lang.String, java.lang.String, java.util.Map)</method>
+              <justification>Young API</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/activeinstalls/server/DataManager</className>
+              <method>com.google.gson.JsonObject searchInstalls(java.lang.String, java.lang.String, java.util.Map)</method>
+              <justification>Young API</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/activeinstalls/server/DataManager</className>
+              <method>long getInstallCount(java.lang.String)</method>
+              <justification>Young API</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/activeinstalls/server/script/ActiveInstallsScriptService</className>
+              <method>long getInstallCount(java.lang.String)</method>
+              <justification>Young API</justification>
+            </difference>
             <!-- END: Due to removal of "compatibility" directory in legacy aspects directory structure -->
             <difference>
               <differenceType>7002</differenceType>

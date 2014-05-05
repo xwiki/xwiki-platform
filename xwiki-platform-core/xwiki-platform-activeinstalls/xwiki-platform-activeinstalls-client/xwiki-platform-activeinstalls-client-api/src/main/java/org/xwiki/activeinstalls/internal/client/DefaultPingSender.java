@@ -19,34 +19,24 @@
  */
 package org.xwiki.activeinstalls.internal.client;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.xwiki.activeinstalls.internal.JestClientManager;
+import org.xwiki.component.annotation.Component;
+
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Index;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
-
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import net.sf.json.JSONObject;
-
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
-import org.xwiki.activeinstalls.internal.JestClientManager;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.CoreExtension;
-import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.repository.CoreExtensionRepository;
-import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.version.Version;
-import org.xwiki.instance.InstanceIdManager;
 
 /**
  * Default implementation using the Jest API to connect to a remote Elastic Search instance.
@@ -58,38 +48,11 @@ import org.xwiki.instance.InstanceIdManager;
 @Singleton
 public class DefaultPingSender implements PingSender
 {
-    /**
-     * The version of the JSON format used to send the ping data. This will allow us to modify the data we send and
-     * still have the server part be able to parse the results depending on the format used by the client side.
-     */
-    private static final String LATEST_FORMAT_VERSION = "1.0";
-
-    /**
-     * The elastic search index we use to index pings.
-     */
-    private static final String INDEX = "installs";
-
-    /**
-     * The elastic search index type we use to index pings.
-     */
-    private static final String TYPE = "install";
-
-    /**
-     * Formatter to format dates in a standard format.
-     */
-    private static final DateTimeFormatter DATE_FORMATTER = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
-
-    @Inject
-    private InstalledExtensionRepository extensionRepository;
-
     @Inject
     private JestClientManager jestClientManager;
 
     @Inject
-    private InstanceIdManager instanceIdManager;
-
-    @Inject
-    private CoreExtensionRepository coreExtensionRepository;
+    private Provider<List<PingDataProvider>> pingDataProviderProvider;
 
     @Override
     public void sendPing() throws Exception
@@ -97,18 +60,18 @@ public class DefaultPingSender implements PingSender
         JestClient client = this.jestClientManager.getClient();
 
         // Step 1: Create index (if already exists then it'll just be ignored)
-        client.execute(new CreateIndex.Builder(INDEX).build());
+        client.execute(new CreateIndex.Builder(JestClientManager.INDEX).build());
 
         // Step 2: Create a mapping so that we can search distribution versions containing hyphens (otherwise they
         // are removed by the default tokenizer/analyzer). If mapping already exists then it'll just be ignored.
-        PutMapping putMapping = new PutMapping.Builder(INDEX, TYPE, constructJSONMapping()).build();
+        PutMapping putMapping =
+            new PutMapping.Builder(JestClientManager.INDEX, JestClientManager.TYPE, constructJSONMapping()).build();
         client.execute(putMapping);
 
         // Step 3: Index the data
-        Index index = new Index.Builder(constructJSON())
-            .index(INDEX)
-            .type(TYPE)
-            .id(this.instanceIdManager.getInstanceId().toString())
+        Index index = new Index.Builder(constructIndexJSON())
+            .index(JestClientManager.INDEX)
+            .type(JestClientManager.TYPE)
             .build();
         JestResult result = client.execute(index);
 
@@ -119,50 +82,30 @@ public class DefaultPingSender implements PingSender
 
     private String constructJSONMapping()
     {
-        return "{ \"" + TYPE + "\" : { \"properties\" : { "
-            + "\"formatVersion\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"
-            + "\"date\" : {\"type\" : \"date\"},"
-            + "\"distributionId\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"
-            + "\"distributionVersion\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"
-            + "\"extensions\" : { \"properties\" : {"
-            + "\"id\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"},"
-            + "\"version\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"}"
-            + "} }"
-            + "} } }";
+        Map<String, Object> jsonMap = new HashMap<>();
+
+        Map<String, Object> timestampMap = new HashMap<>();
+        timestampMap.put("enabled", true);
+        timestampMap.put("store", true);
+
+        Map<String, Object> propertiesMap = new HashMap<>();
+        for (PingDataProvider pingDataProvider : this.pingDataProviderProvider.get()) {
+            propertiesMap.putAll(pingDataProvider.provideMapping());
+        }
+
+        jsonMap.put("_timestamp", timestampMap);
+        jsonMap.put("properties", propertiesMap);
+
+        return JSONObject.fromObject(Collections.singletonMap(JestClientManager.TYPE, jsonMap)).toString();
     }
 
-    private String constructJSON()
+    private String constructIndexJSON()
     {
-        Map<String, Object> jsonMap = new HashMap();
-        jsonMap.put("formatVersion", LATEST_FORMAT_VERSION);
-        jsonMap.put("date", DATE_FORMATTER.print(new Date().getTime()));
+        Map<String, Object> jsonMap = new HashMap<>();
 
-        // Send distribution version if it exists (in case some distribution doesn't expose any information).
-        CoreExtension distributionExtension = this.coreExtensionRepository.getEnvironmentExtension();
-        if (distributionExtension != null) {
-            String distributionId = distributionExtension.getId().getId();
-            if (distributionId != null) {
-                jsonMap.put("distributionId", distributionId);
-            }
-            Version distributionVersion = distributionExtension.getId().getVersion();
-            if (distributionVersion != null) {
-                jsonMap.put("distributionVersion", distributionVersion.toString());
-            }
+        for (PingDataProvider pingDataProvider : this.pingDataProviderProvider.get()) {
+            jsonMap.putAll(pingDataProvider.provideData());
         }
-
-        Collection<InstalledExtension> installedExtensions = this.extensionRepository.getInstalledExtensions();
-        JSONObject[] extensions = new JSONObject[installedExtensions.size()];
-        Iterator<InstalledExtension> it = installedExtensions.iterator();
-        int i = 0;
-        while (it.hasNext()) {
-            InstalledExtension extension = it.next();
-            Map extensionMap = new HashMap();
-            extensionMap.put("id", extension.getId().getId());
-            extensionMap.put("version", extension.getId().getVersion().toString());
-            extensions[i] = JSONObject.fromObject(extensionMap);
-            i++;
-        }
-        jsonMap.put("extensions", extensions);
 
         return JSONObject.fromObject(jsonMap).toString();
     }

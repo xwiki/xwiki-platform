@@ -1,0 +1,141 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.activeinstalls.internal.client.data;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.xwiki.activeinstalls.internal.JestClientManager;
+import org.xwiki.activeinstalls.internal.client.PingDataProvider;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.instance.InstanceIdManager;
+
+import io.searchbox.client.JestResult;
+import io.searchbox.core.Search;
+import io.searchbox.params.SearchType;
+import net.sf.json.JSONObject;
+
+/**
+ *  Provide the date of the first ping and the elapsed days since the first ping. We do that to make it simpler to
+ *  perform complex queries on the ping data later on (for example to be able to query the average duration an instance
+ *  is used: < 1 day, 2-7 days, 7-30 days, 30-365 days, > 365 days).
+ *
+ * @version $Id$
+ * @since 6.1M1
+ */
+@Component
+@Named("date")
+public class DatePingDataProvider implements PingDataProvider
+{
+    private static final String PROPERTY_FIRST_PING_DATE = "firstPingDate";
+
+    private static final String PROPERTY_SINCE_DAYS = "sinceDays";
+
+    private static final String PROPERTY_VALUE = "value";
+
+    private static final String PROPERTY_TYPE = "type";
+
+    private static final String PROPERTY_MIN = "min";
+
+    @Inject
+    private JestClientManager jestClientManager;
+
+    @Inject
+    private InstanceIdManager instanceIdManager;
+
+    @Inject
+    private Logger logger;
+
+    @Override
+    public Map<String, Object> provideMapping()
+    {
+        Map<String, Object> propertiesMap = new HashMap<>();
+        propertiesMap.put(PROPERTY_FIRST_PING_DATE, Collections.singletonMap(PROPERTY_TYPE, "date"));
+        propertiesMap.put(PROPERTY_SINCE_DAYS, Collections.singletonMap(PROPERTY_TYPE, "long"));
+        return propertiesMap;
+    }
+
+    @Override
+    public Map<String, Object> provideData()
+    {
+        Map<String, Object> jsonMap = new HashMap<>();
+        try {
+            String instanceId = this.instanceIdManager.getInstanceId().toString();
+            Search search = new Search.Builder(constructSearchJSON(instanceId))
+                .addIndex(JestClientManager.INDEX)
+                .addType(JestClientManager.TYPE)
+                .setSearchType(SearchType.COUNT)
+                .build();
+            JestResult result = this.jestClientManager.getClient().execute(search);
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> aggregationsMap = (Map<String, Object>) result.getValue("aggregations");
+            @SuppressWarnings("unchecked")
+            Map<String, Object> sinceDaysMap = (Map<String, Object>) aggregationsMap.get(PROPERTY_SINCE_DAYS);
+
+            // It's possible that this is the first ping and thus that sinceDays will be null.
+            Object sinceDaysObject = sinceDaysMap.get(PROPERTY_VALUE);
+            if (sinceDaysObject != null) {
+                long sinceDays = Math.round((double) sinceDaysObject / 86400000D);
+                jsonMap.put(PROPERTY_SINCE_DAYS, sinceDays);
+            }
+
+            // It's possible that this is the first ping and thus that firstPingDate will be null too.
+            @SuppressWarnings("unchecked")
+            Map<String, Object> firstPingDateMap = (Map<String, Object>) aggregationsMap.get(PROPERTY_FIRST_PING_DATE);
+            Object firstPingDateObject = firstPingDateMap.get(PROPERTY_VALUE);
+            if (firstPingDateObject != null) {
+                long firstPingDate = Math.round((double) firstPingDateObject);
+                jsonMap.put(PROPERTY_FIRST_PING_DATE, firstPingDate);
+            }
+        } catch (Exception e) {
+            // If this fails we just don't send this information but we still send the other piece of information.
+            // However we log a warning since it's a problem that needs to be seen and looked at.
+            this.logger.warn("Failed to compute the first ping date and the number of elapsed days since the first "
+                    + "ping. This information has not been added to the Active Installs ping data. Reason [{}]",
+                ExceptionUtils.getRootCauseMessage(e)
+            );
+        }
+        return jsonMap;
+    }
+
+    private String constructSearchJSON(String instanceId)
+    {
+        Map<String, Object> jsonMap = new HashMap<>();
+
+        jsonMap.put("query", Collections.singletonMap("term", Collections.singletonMap("instanceId", instanceId)));
+
+        Map<String, Object> aggsMap = new HashMap<>();
+        aggsMap.put(PROPERTY_SINCE_DAYS, Collections.singletonMap(PROPERTY_MIN,
+            Collections.singletonMap("script", "time() - doc['_timestamp'].value")));
+        aggsMap.put(PROPERTY_FIRST_PING_DATE, Collections.singletonMap(PROPERTY_MIN,
+            Collections.singletonMap("field", "_timestamp")));
+
+        jsonMap.put("aggs", aggsMap);
+
+        return JSONObject.fromObject(jsonMap).toString();
+    }
+}

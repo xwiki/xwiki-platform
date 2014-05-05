@@ -42,8 +42,7 @@
       com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
-      com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
-      com.xpn.xwiki.plugin.jodatime.JodaTimePlugin
+      com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin
     </xwikiCfgPlugins>
   </properties>
   <dependencies>

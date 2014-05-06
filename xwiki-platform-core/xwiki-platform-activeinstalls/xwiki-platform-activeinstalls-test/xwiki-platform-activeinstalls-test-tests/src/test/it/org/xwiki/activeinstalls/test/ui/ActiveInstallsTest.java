@@ -20,7 +20,8 @@
 package org.xwiki.activeinstalls.test.ui;
 
 import org.junit.*;
-import org.xwiki.test.ui.AbstractGuestTest;
+import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.Assert.*;
@@ -32,8 +33,11 @@ import static com.github.tlrx.elasticsearch.test.EsSetup.*;
  * @version $Id$
  * @since 5.2M2
  */
-public class ActiveInstallsTest extends AbstractGuestTest
+public class ActiveInstallsTest extends AbstractTest
 {
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+
     @Test
     public void verifyPingIsSent() throws Exception
     {
@@ -58,21 +62,35 @@ public class ActiveInstallsTest extends AbstractGuestTest
             // in the older format.
             ElasticSearchRunner.esSetup.execute(index("installs", "install", "156231f3-705b-44c6-afe3-e191bcc4b746")
                 .withSource("{ \"formatVersion\": \"1.0\", \"distributionVersion\": \"5.2\", "
-                    + "\"distributionId\": \"org.xwiki.enterprise:xwiki-enterprise-web\", "
+                    + "\"distributionId\": \"org.xwiki.platform:xwiki-platform-web\", "
                     + "\"date\": \"2013-09-16T20:00:34.277Z\", \"extensions\": [ ] }"));
         }
 
-        // Navigate to the Active Installs Counter Value page to verify that the ping has been received
-        getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue2", "view",
-            "snapshots=true&distributionId=org.xwiki.platform:xwiki-platform-web");
-        ViewPage vp  = new ViewPage();
-        assertEquals("1", vp.getContent());
+        // Configure the Active Installs feature to count "org.xwiki.platform:xwiki-platform-web" distribution ids.
+        getUtil().updateObject("ActiveInstalls", "ActiveInstallsConfig", "ActiveInstalls.ActiveInstallsConfig", 0,
+            "distributionId", "org.xwiki.platform:xwiki-platform-web");
+
+        // By default we don't show SNAPSHOTs, verify that!
 
         // The default query doesn't show SNAPSHOT versions and thus we expect 0
-        getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue2", "view",
-            "distributionId=org.xwiki.platform:xwiki-platform-web");
-        vp  = new ViewPage();
+        getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue2");
+        ViewPage vp  = new ViewPage();
         assertEquals("0", vp.getContent());
+
+        // The default query doesn't show SNAPSHOT versions and thus we expect 0
+        getUtil().gotoPage("ActiveInstalls", "TotalCounterValue2");
+        vp = new ViewPage();
+        assertEquals("0", vp.getContent());
+
+        // Configure the Active Installs feature to count SNAPSHOTs and to count
+        // "org.xwiki.platform:xwiki-platform-web" distribution ids.
+        getUtil().updateObject("ActiveInstalls", "ActiveInstallsConfig", "ActiveInstalls.ActiveInstallsConfig", 0,
+            "snapshots", true);
+
+        // Navigate to the Active Installs Counter Value page to verify that the ping has been received
+        getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue2");
+        vp  = new ViewPage();
+        assertEquals("1", vp.getContent());
 
         // Also verify the Active Installs Counter for the old format
         getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue1");
@@ -80,16 +98,9 @@ public class ActiveInstallsTest extends AbstractGuestTest
         assertEquals("0", vp.getContent());
 
         // Navigate to the Total Installs Counter Value page to verify that the ping has been received
-        getUtil().gotoPage("ActiveInstalls", "TotalCounterValue2", "view",
-            "snapshots=true&distributionId=org.xwiki.platform:xwiki-platform-web");
+        getUtil().gotoPage("ActiveInstalls", "TotalCounterValue2");
         vp = new ViewPage();
         assertEquals("1", vp.getContent());
-
-        // The default query doesn't show SNAPSHOT versions and thus we expect 0
-        getUtil().gotoPage("ActiveInstalls", "TotalCounterValue2", "view",
-            "distributionId=org.xwiki.platform:xwiki-platform-web");
-        vp = new ViewPage();
-        assertEquals("0", vp.getContent());
 
         // Also verify the Total Installs Counter for the old format
         getUtil().gotoPage("ActiveInstalls", "TotalCounterValue1");
@@ -97,29 +108,25 @@ public class ActiveInstallsTest extends AbstractGuestTest
         assertEquals("1", vp.getContent());
 
         // Verify JavaVersion data
-        getUtil().gotoPage("ActiveInstalls", "JavaVersionsData", "view",
-            "snapshots=true&distributionId=org.xwiki.platform:xwiki-platform-web");
+        getUtil().gotoPage("ActiveInstalls", "JavaVersionsData");
         vp  = new ViewPage();
         assertTrue("Got [" + vp.getContent() + "]",
             vp.getContent().matches("Java Version Active Installs Count\\r?\\n1\\.[0-9_\\.]* 1"));
 
         // Verify Databases data
-        getUtil().gotoPage("ActiveInstalls", "DatabasesData", "view",
-            "snapshots=true&distributionId=org.xwiki.platform:xwiki-platform-web");
+        getUtil().gotoPage("ActiveInstalls", "DatabasesData");
         vp  = new ViewPage();
         assertTrue("Got [" + vp.getContent() + "]",
             vp.getContent().matches("Database Active Installs Count\\r?\\nHSQL Database Engine 1"));
 
         // Verify XWikiVersion data
-        getUtil().gotoPage("ActiveInstalls", "XWikiVersionsData", "view",
-            "snapshots=true&distributionId=org.xwiki.platform:xwiki-platform-web");
+        getUtil().gotoPage("ActiveInstalls", "XWikiVersionsData");
         vp  = new ViewPage();
         assertTrue("Got [" + vp.getContent() + "]",
             vp.getContent().matches("XWiki Version Active Installs Count\\r?\\n[0-9]\\.[0-9].* 1"));
 
         // Verify ServletContainers data
-        getUtil().gotoPage("ActiveInstalls", "ServletContainersData", "view",
-            "snapshots=true&distributionId=org.xwiki.platform:xwiki-platform-web");
+        getUtil().gotoPage("ActiveInstalls", "ServletContainersData");
         vp  = new ViewPage();
         assertTrue("Got [" + vp.getContent() + "]",
             vp.getContent().matches("Servlet Container Active Installs Count\\r?\\njetty 1"));

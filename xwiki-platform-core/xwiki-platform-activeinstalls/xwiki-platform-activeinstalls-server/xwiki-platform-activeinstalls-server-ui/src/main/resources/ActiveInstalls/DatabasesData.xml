@@ -20,39 +20,27 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>ActiveInstalls</web>
   <name>DatabasesData</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>ActiveInstalls.Databases</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1399398031000</creationDate>
+  <parent>ActiveInstalls.Databases</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1399301617000</creationDate>
-  <date>1399302286000</date>
-  <contentUpdateDate>1399302286000</contentUpdateDate>
+  <date>1399401946000</date>
+  <contentUpdateDate>1399401946000</contentUpdateDate>
   <version>1.1</version>
   <title>Databases Data</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#if ("$!request.snapshots" == '')
-  #set ($snapshotQueryFragment = ' AND -distributionVersion:*SNAPSHOT')
-#else
-  #set ($snapshotQueryFragment = '')
-#end
-#if ("$!request.distributionId" == '')
-  #set ($distributionId = 'org.xwiki.enterprise:xwiki-enterprise-web')
-#else
-  #set ($distributionId = $request.distributionId)
-#end
+  <content>{{include reference="ActiveInstalls.QueryVariables"/}}
+{{velocity}}
 #set ($query = "
 {
    ""query"": {

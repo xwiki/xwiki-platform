@@ -43,30 +43,41 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($query = '
+#if ("$!request.snapshots" == '')
+  #set ($snapshotQueryFragment = ' AND -distributionVersion:*SNAPSHOT')
+#else
+  #set ($snapshotQueryFragment = '')
+#end
+#if ("$!request.distributionId" == '')
+  #set ($distributionId = 'org.xwiki.enterprise:xwiki-enterprise-web')
+#else
+  #set ($distributionId = $request.distributionId)
+#end
+#set ($query = "
 {
-     "query": {
-        "query_string": {
-           "query": "-distributionVersion:*SNAPSHOT AND distributionId:\"org.xwiki.enterprise:xwiki-enterprise-web\""
+     ""query"": {
+        ""query_string"": {
+           ""lowercase_expanded_terms"": false,
+           ""query"": ""distributionId:\""$distributionId\"" $snapshotQueryFragment""
         }
      },
-    "aggs": {
-        "activeinstalls_over_time" : {
-            "date_histogram" : {
-                "field" : "_timestamp",
-                "interval" : "day"
+    ""aggs"": {
+        ""activeinstalls_over_time"" : {
+            ""date_histogram"" : {
+                ""field"" : ""_timestamp"",
+                ""interval"" : ""day""
             },
-            "aggs" : {
-                "instanceId_count" : {
-                    "cardinality" : {
-                        "field" : "instanceId"
+            ""aggs"" : {
+                ""instanceId_count"" : {
+                    ""cardinality"" : {
+                        ""field"" : ""instanceId""
                     }
                 }
             }
         }
     }
 }
-')
+")
 #set ($result = $services.activeinstalls.searchInstalls("install2", $query, {"search_type": "count"}))
 #set ($headingLine = "|=Date|=Active Installs Count")
 #if (!$result)

@@ -27,8 +27,14 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class XWikiServletResponse implements XWikiResponse
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletResponse.class);
+
     private HttpServletResponse response;
 
     /**
@@ -63,6 +69,14 @@ public class XWikiServletResponse implements XWikiResponse
     @Override
     public void sendRedirect(String redirect) throws IOException
     {
+        if (StringUtils.isBlank(redirect)) {
+            // Nowhere to go to
+            return;
+        }
+        if (StringUtils.containsAny(redirect, '\r', '\n')) {
+            LOGGER.warn("Possible HTTP Response Splitting attack, attempting to redirect to [{}]", redirect);
+            return;
+        }
         this.httpStatus = SC_FOUND;
         this.response.sendRedirect(redirect);
     }

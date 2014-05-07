@@ -49,6 +49,11 @@
       <version>3.1.1</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>respond</artifactId>
+      <version>1.4.2</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

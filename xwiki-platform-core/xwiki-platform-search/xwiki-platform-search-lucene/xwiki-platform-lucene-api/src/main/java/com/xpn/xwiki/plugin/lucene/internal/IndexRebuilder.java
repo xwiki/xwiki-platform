@@ -209,7 +209,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             // context.setMainXWiki(this.context.getMainXWiki());
             // context.setURLFactory(this.context.getURLFactory());
             // context.setLanguage(this.context.getLanguage());
-            // context.setDatabase(this.context.getDatabase());
+            // context.setWikiId(this.context.getWikiId());
             // context.put("org.xwiki.component.manager.ComponentManager", this.context
             // .get("org.xwiki.component.manager.ComponentManager"));
             context = getContext();

@@ -559,7 +559,7 @@ public class Util
         }
 
         // This does not make sense
-        // context.setDatabase(context.getWiki().getDatabase());
+        // context.setWikiId(context.getWiki().getDatabase());
         if (name.indexOf(".") != -1) {
             return name;
         } else {

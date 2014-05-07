@@ -91,12 +91,12 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
                         // Users should be added in the main wiki
                         // if ldap is not configured for the virtual wiki
 
-                        String db = context.getDatabase();
+                        String db = context.getWikiId();
                         try {
                             // Switch to the main database in case of
                             // virtual and if not local LDAP configuration
                             if (StringUtils.isEmpty(context.getWiki().getXWikiPreference("ldap_server", context))) {
-                                context.setDatabase(context.getWiki().getDatabase());
+                                context.setWikiId(context.getWiki().getDatabase());
                             }
                             try {
                                 CreateUserFromLDAP(attributes, context);
@@ -105,7 +105,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
                             } catch (Exception e) {
                             }
                         } finally {
-                            context.setDatabase(db);
+                            context.setWikiId(db);
                         }
 
                         context.getWiki().flushCache(context);
@@ -197,17 +197,17 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
         if (!context.isMainWiki()) {
             if (principal == null) {
                 // Then we check in the main database
-                String db = context.getDatabase();
+                String db = context.getWikiId();
                 try {
-                    context.setDatabase(context.getMainXWiki());
+                    context.setWikiId(context.getMainXWiki());
                     try {
                         String user = findUser(susername, context);
                         if (user != null)
-                            principal = new SimplePrincipal(context.getDatabase() + ":" + user);
+                            principal = new SimplePrincipal(context.getWikiId() + ":" + user);
                     } catch (Exception e) {
                     }
                 } finally {
-                    context.setDatabase(db);
+                    context.setWikiId(db);
                 }
             }
         }
@@ -229,9 +229,9 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
             if (!context.isMainWiki()) {
                 if (DN == null || DN.length() == 0) {
                     // Then we check in the main database
-                    String db = context.getDatabase();
+                    String db = context.getWikiId();
                     try {
-                        context.setDatabase(context.getMainXWiki());
+                        context.setWikiId(context.getMainXWiki());
                         try {
                             String user = findUser(susername, context);
                             if (user != null && user.length() != 0)
@@ -239,7 +239,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl
                         } catch (Exception e) {
                         }
                     } finally {
-                        context.setDatabase(db);
+                        context.setWikiId(db);
                     }
                 }
             }

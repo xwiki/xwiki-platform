@@ -235,6 +235,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated since 6.1M1, use {@link #getWikiId()} instead
      */
+    @Deprecated
     public String getDatabase()
     {
         return getWikiId();
@@ -251,7 +252,6 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     /**
      * @param wikiId the current wiki id
-     * @since 6.1M1
      * @deprecated since 6.1M1, use {@link #setWikiId(String)} instead
      */
     @Deprecated
@@ -360,6 +360,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @deprecated since 6.1M1, use {@link #setOriginalWikiId(String)} instead
      */
+    @Deprecated
     public void setOriginalDatabase(String wikiId)
     {
         setOriginalWikiId(wikiId);

@@ -91,11 +91,11 @@ public class BaseSearchResult extends XWikiResource
             Boolean withPrettyNames)
             throws IllegalArgumentException, UriBuilderException, QueryException, XWikiException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         /* This try is just needed for executing the finally clause. */
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             List<SearchResult> result = new ArrayList<SearchResult>();
 
@@ -113,7 +113,7 @@ public class BaseSearchResult extends XWikiResource
 
             return result;
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 
@@ -134,7 +134,7 @@ public class BaseSearchResult extends XWikiResource
     {
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
 
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         /* This try is just needed for executing the finally clause. */
         try {
@@ -291,7 +291,7 @@ public class BaseSearchResult extends XWikiResource
 
             return result;
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 
@@ -308,7 +308,7 @@ public class BaseSearchResult extends XWikiResource
     {
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
 
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         /* This try is just needed for executing the finally clause. */
         try {
@@ -380,7 +380,7 @@ public class BaseSearchResult extends XWikiResource
 
             return result;
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 
@@ -402,7 +402,7 @@ public class BaseSearchResult extends XWikiResource
 
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
 
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         /* This try is just needed for executing the finally clause. */
         try {
@@ -536,7 +536,7 @@ public class BaseSearchResult extends XWikiResource
 
             return result;
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 
@@ -557,11 +557,11 @@ public class BaseSearchResult extends XWikiResource
             Boolean withPrettyNames, String className) throws QueryException, IllegalArgumentException,
             UriBuilderException, XWikiException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         /* This try is just needed for executing the finally clause. */
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             List<SearchResult> result = new ArrayList<SearchResult>();
 
@@ -587,7 +587,7 @@ public class BaseSearchResult extends XWikiResource
 
             return result;
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 
@@ -608,7 +608,7 @@ public class BaseSearchResult extends XWikiResource
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
         XWikiContext xwikiContext = Utils.getXWikiContext(componentManager);
 
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         /* This try is just needed for executing the finally clause. */
         try {
@@ -707,7 +707,7 @@ public class BaseSearchResult extends XWikiResource
 
             return result;
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 
@@ -729,7 +729,7 @@ public class BaseSearchResult extends XWikiResource
     {
         XWiki xwikiApi = Utils.getXWikiApi(componentManager);
 
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         /* This try is just needed for executing the finally clause. */
         try {
@@ -869,7 +869,7 @@ public class BaseSearchResult extends XWikiResource
 
             return result;
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 

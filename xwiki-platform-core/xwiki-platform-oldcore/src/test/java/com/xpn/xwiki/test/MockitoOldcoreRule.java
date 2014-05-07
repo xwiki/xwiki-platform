@@ -113,12 +113,12 @@ public class MockitoOldcoreRule implements MethodRule
 
         this.context = new XWikiContext();
 
-        this.context.setDatabase("xwiki");
+        this.context.setWikiId("xwiki");
         this.context.setMainXWiki("xwiki");
 
         this.mockXWiki = Mockito.mock(XWiki.class);
         getXWikiContext().setWiki(this.mockXWiki);
-        getXWikiContext().setDatabase("xwiki");
+        getXWikiContext().setWikiId("xwiki");
 
         this.mockStore = Mockito.mock(XWikiStoreInterface.class);
         this.mockRightService = Mockito.mock(XWikiRightService.class);

@@ -711,7 +711,7 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
         try {
             // First look into the current wiki
             String pageName = StringUtils.capitalize(propertyClassName) + "Displayer";
-            DocumentReference reference = new DocumentReference(context.getDatabase(), "XWiki", pageName);
+            DocumentReference reference = new DocumentReference(context.getWikiId(), "XWiki", pageName);
             if (context.getWiki().exists(reference, context)) {
                 LOGGER.debug("Found default custom displayer for property class name in local wiki: [{}]", pageName);
                 return DOCUMENT_DISPLAYER_IDENTIFIER_PREFIX + "XWiki." + pageName;

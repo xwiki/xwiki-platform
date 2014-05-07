@@ -228,7 +228,7 @@ public class XWikiCachingRightService implements XWikiRightService
             try {
                 XWikiUser user = context.getWiki().checkAuth(context);
                 if (user != null) {
-                    userReference = resolveUserName(user.getUser(), new WikiReference(context.getDatabase()));
+                    userReference = resolveUserName(user.getUser(), new WikiReference(context.getWikiId()));
                 }
             } catch (XWikiException e) {
                 LOGGER.error("Caught exception while authenticating user.", e);
@@ -333,7 +333,7 @@ public class XWikiCachingRightService implements XWikiRightService
     public boolean hasAccessLevel(String rightName, String username, String docname, XWikiContext context)
         throws XWikiException
     {
-        WikiReference wikiReference = new WikiReference(context.getDatabase());
+        WikiReference wikiReference = new WikiReference(context.getWikiId());
         DocumentReference document = resolveDocumentName(docname, wikiReference);
         LOGGER.debug("hasAccessLevel() resolved document named [{}] into reference [{}]", docname, document);
         DocumentReference user = resolveUserName(username, wikiReference);
@@ -371,7 +371,7 @@ public class XWikiCachingRightService implements XWikiRightService
             wiki = doc.getDocumentReference().getWikiReference();
         } else {
             user = context.getUserReference();
-            wiki = new WikiReference(context.getDatabase());
+            wiki = new WikiReference(context.getWikiId());
         }
 
         if (user != null && XWikiConstants.GUEST_USER.equals(user.getName())) {
@@ -406,7 +406,7 @@ public class XWikiCachingRightService implements XWikiRightService
     public boolean hasWikiAdminRights(XWikiContext context)
     {
         DocumentReference user = context.getUserReference();
-        WikiReference wiki = new WikiReference(context.getDatabase());
+        WikiReference wiki = new WikiReference(context.getWikiId());
 
         if (user != null && XWikiConstants.GUEST_USER.equals(user.getName())) {
             // Public users (not logged in) should be passed as null in the new API. It may happen that badly

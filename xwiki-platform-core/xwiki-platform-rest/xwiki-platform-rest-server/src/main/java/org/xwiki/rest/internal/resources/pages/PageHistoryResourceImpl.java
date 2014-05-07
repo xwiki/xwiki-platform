@@ -46,12 +46,12 @@ public class PageHistoryResourceImpl extends XWikiResource implements PageHistor
     public History getPageHistory(String wikiName, String spaceName, String pageName, Integer start, Integer number,
             String order, Boolean withPrettyNames) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         History history = new History();
 
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             // Note that the query is made to work with Oracle which treats empty strings as null.
             String query = String.format("select doc.space, doc.name, rcs.id, rcs.date, rcs.author, rcs.comment"
@@ -81,7 +81,7 @@ public class PageHistoryResourceImpl extends XWikiResource implements PageHistor
         } catch (QueryException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
 
         return history;

@@ -81,7 +81,7 @@ public class DefaultWikiService extends AbstractWikiService
             virtualWikiNamesList = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(getXWikiContext());
             // put the current, default database if nothing is inside
             if (virtualWikiNamesList.size() == 0) {
-                virtualWikiNamesList.add(getXWikiContext().getDatabase());
+                virtualWikiNamesList.add(getXWikiContext().getWikiId());
             }
             Collections.sort(virtualWikiNamesList);
         } catch (Exception e) {

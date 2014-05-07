@@ -260,7 +260,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             }
         }
 
-        if (context.getDatabase() == null || context.getDatabase().equalsIgnoreCase(memberWiki)) {
+        if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(memberWiki)) {
             equals |= currentMember.equals(memberName);
 
             if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
@@ -321,7 +321,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         where.append(" and prop.value like ?");
 
-        if (context.getDatabase() == null || context.getDatabase().equalsIgnoreCase(memberWiki)) {
+        if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(memberWiki)) {
             if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
                 parameterValues.add(HQLLIKE_ALL_SYMBOL + memberName + HQLLIKE_ALL_SYMBOL);
             } else {
@@ -700,9 +700,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         DocumentReference memberReference = this.currentMixedDocumentReferenceResolver.resolve(member);
 
-        String currentWiki = context.getDatabase();
+        String currentWiki = context.getWikiId();
         try {
-            context.setDatabase(memberReference.getWikiReference().getName());
+            context.setWikiId(memberReference.getWikiReference().getName());
 
             Collection<DocumentReference> groupReferences =
                 getAllGroupsReferencesForMember(memberReference, nb, start, context);
@@ -712,7 +712,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                 groupNames.add(this.localWikiEntityReferenceSerializer.serialize(groupReference));
             }
         } finally {
-            context.setDatabase(currentWiki);
+            context.setWikiId(currentWiki);
         }
 
         return groupNames;
@@ -726,7 +726,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         String prefixedFullName = this.entityReferenceSerializer.serialize(memberReference);
 
-        String key = context.getDatabase() + "/" + prefixedFullName;
+        String key = context.getWikiId() + "/" + prefixedFullName;
         synchronized (key) {
             if (this.memberGroupsCache == null) {
                 initCache(context);
@@ -743,7 +743,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                 List<String> groupNames;
                 try {
                     Query query;
-                    if (memberReference.getWikiReference().getName().equals(context.getDatabase())
+                    if (memberReference.getWikiReference().getName().equals(context.getWikiId())
                         || (memberReference.getLastSpaceReference().getName().equals("XWiki") && memberReference
                             .getName().equals(XWikiRightService.GUEST_USER))) {
                         query =
@@ -779,10 +779,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                 // If the 'XWiki.XWikiAllGroup' is implicit, all users/groups except XWikiGuest and XWikiAllGroup
                 // itself are part of it.
                 if (isAllGroupImplicit(context)
-                    && memberReference.getWikiReference().getName().equals(context.getDatabase())
+                    && memberReference.getWikiReference().getName().equals(context.getWikiId())
                     && !memberReference.getName().equals(XWikiRightService.GUEST_USER)) {
                     DocumentReference currentXWikiAllGroup =
-                        new DocumentReference(context.getDatabase(), "XWiki", XWikiRightService.ALLGROUP_GROUP);
+                        new DocumentReference(context.getWikiId(), "XWiki", XWikiRightService.ALLGROUP_GROUP);
 
                     if (!currentXWikiAllGroup.equals(memberReference)) {
                         groupReferences.add(currentXWikiAllGroup);

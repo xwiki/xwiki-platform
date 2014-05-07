@@ -76,9 +76,9 @@ public class ExtensionManagerScriptServiceTest
         Mockito.when(this.mockXWiki.getRightService()).thenReturn(this.mockRightService);
 
         this.xwikiBridge.getXWikiContext().setWiki(this.mockXWiki);
-        this.xwikiBridge.getXWikiContext().setDatabase("xwiki");
+        this.xwikiBridge.getXWikiContext().setWikiId("xwiki");
         this.contextUser =
-            new DocumentReference(this.xwikiBridge.getXWikiContext().getDatabase(), "XWiki", "ExtensionUser");
+            new DocumentReference(this.xwikiBridge.getXWikiContext().getWikiId(), "XWiki", "ExtensionUser");
 
         // classes
 

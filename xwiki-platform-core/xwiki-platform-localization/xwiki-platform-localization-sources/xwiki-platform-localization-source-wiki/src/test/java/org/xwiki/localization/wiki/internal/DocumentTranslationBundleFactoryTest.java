@@ -78,7 +78,7 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
 
         this.mockXWiki = getMockery().mock(XWiki.class);
         getContext().setWiki(this.mockXWiki);
-        getContext().setDatabase("xwiki");
+        getContext().setWikiId("xwiki");
 
         this.mockQuery = getMockery().mock(Query.class);
 
@@ -211,7 +211,7 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
 
         if (document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE) == null) {
             BaseObject translationObject = new BaseObject();
-            translationObject.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki",
+            translationObject.setXClassReference(new DocumentReference(getContext().getWikiId(), "XWiki",
                 "TranslationDocumentClass"));
             if (scope != null) {
                 translationObject
@@ -267,7 +267,7 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
     {
         assertTranslation("wiki.translation", null, Locale.ROOT);
 
-        addTranslation("wiki.translation", "Wiki translation", new DocumentReference(getContext().getDatabase(),
+        addTranslation("wiki.translation", "Wiki translation", new DocumentReference(getContext().getWikiId(),
             "space", "translation"), Locale.ROOT, Scope.WIKI);
 
         assertTranslation("wiki.translation", "Wiki translation", Locale.ROOT);
@@ -280,7 +280,7 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
         assertTranslation("wiki.translation", null, Locale.ROOT);
 
         DocumentReference translationDocument =
-            new DocumentReference(getContext().getDatabase(), "space", "translation");
+            new DocumentReference(getContext().getWikiId(), "space", "translation");
 
         addTranslation("wiki.translation", "Wiki translation", translationDocument, Locale.ROOT, Scope.ON_DEMAND);
 

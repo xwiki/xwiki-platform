@@ -101,7 +101,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     public void init(XWikiContext context)
     {
         try {
-            String initialDb = !context.getDatabase().equals("") ? context.getDatabase() : context.getMainXWiki();
+            String initialDb = !context.getWikiId().equals("") ? context.getWikiId() : context.getMainXWiki();
 
             List<String> wikiServers = new ArrayList<String>();
             try {
@@ -114,7 +114,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
             try {
                 for (String wikiName : new ArrayList<String>(wikiServers)) {
-                    context.setDatabase(wikiName);
+                    context.setWikiId(wikiName);
                     try {
                         updateSchedulerJobClass(context);
                     } catch (Exception e) {
@@ -125,7 +125,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                     }
                 }
             } finally {
-                context.setDatabase(initialDb);
+                context.setWikiId(initialDb);
             }
 
             // Before we start the thread ensure that Quartz will create daemon threads so that
@@ -142,11 +142,11 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             try {
                 // Iterate on all virtual wikis
                 for (String wikiName : wikiServers) {
-                    context.setDatabase(wikiName);
+                    context.setWikiId(wikiName);
                     restoreExistingJobs(context);
                 }
             } finally {
-                context.setDatabase(initialDb);
+                context.setWikiId(initialDb);
             }
         } catch (SchedulerException e) {
             LOGGER.error("Failed to start the scheduler", e);
@@ -190,17 +190,17 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             job.setStringValue("contextLang", cLang);
             jobNeedsUpdate = true;
         }
-        String iDb = context.getDatabase();
+        String iDb = context.getWikiId();
         String cDb = job.getStringValue("contextDatabase");
         if (cDb.equals("") || !cDb.equals(iDb)) {
-            cDb = context.getDatabase();
+            cDb = context.getWikiId();
             job.setStringValue("contextDatabase", cDb);
             jobNeedsUpdate = true;
         }
 
         if (jobNeedsUpdate) {
             try {
-                context.setDatabase(cDb);
+                context.setWikiId(cDb);
                 XWikiDocument jobHolder = context.getWiki().getDocument(job.getName(), context);
                 jobHolder.setMinorEdit(true);
                 context.getWiki().saveDocument(jobHolder, context);
@@ -209,7 +209,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                     SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_PREPARE_JOB_CONTEXT,
                     "Failed to prepare context for job with job name " + job.getStringValue("jobName"), e);
             } finally {
-                context.setDatabase(iDb);
+                context.setWikiId(iDb);
             }
         }
 
@@ -236,7 +236,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         // feed the dummy context
         scontext.setUser(cUser);
         scontext.setLanguage(cLang);
-        scontext.setDatabase(cDb);
+        scontext.setWikiId(cDb);
         scontext.setMainXWiki(context.getMainXWiki());
         if (scontext.getURL() == null) {
             try {
@@ -292,11 +292,11 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                     }
                 } catch (Exception e) {
                     LOGGER.error("Failed to restore job with in document [{}] and wiki [{}]", docReference,
-                        context.getDatabase(), e);
+                        context.getWikiId(), e);
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("Failed to restore existing scheduler jobs in wiki [{}]", context.getDatabase(), e);
+            LOGGER.error("Failed to restore existing scheduler jobs in wiki [{}]", context.getWikiId(), e);
         }
     }
 
@@ -604,7 +604,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
      */
     private String getObjectUniqueId(BaseObject object, XWikiContext context)
     {
-        return context.getDatabase() + ":" + object.getName() + "_" + object.getNumber();
+        return context.getWikiId() + ":" + object.getName() + "_" + object.getNumber();
     }
 
     private boolean setSchedulerClassesDocumentFields(XWikiDocument doc, String title)

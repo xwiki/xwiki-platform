@@ -75,7 +75,7 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
 
         this.context = new XWikiContext();
 
-        this.context.setDatabase("xwiki");
+        this.context.setWikiId("xwiki");
         this.context.setMainXWiki("xwiki");
 
         // We need to initialize the Component Manager so that the components can be looked up

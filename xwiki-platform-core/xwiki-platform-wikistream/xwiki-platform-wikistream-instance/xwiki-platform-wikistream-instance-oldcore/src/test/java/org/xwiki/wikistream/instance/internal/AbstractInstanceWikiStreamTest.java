@@ -90,7 +90,7 @@ public class AbstractInstanceWikiStreamTest
             this.oldcore.getMocker().getInstance(OutputWikiStreamFactory.class,
                 WikiStreamType.XWIKI_INSTANCE.serialize());
 
-        this.oldcore.getXWikiContext().setDatabase("wiki");
+        this.oldcore.getXWikiContext().setWikiId("wiki");
 
         // XWiki
 
@@ -242,7 +242,7 @@ public class AbstractInstanceWikiStreamTest
 
                     XWikiDocument userDocument =
                         oldcore.getMockXWiki().getDocument(
-                            new DocumentReference(USER_CLASS, new WikiReference(xcontext.getDatabase())), xcontext);
+                            new DocumentReference(USER_CLASS, new WikiReference(xcontext.getWikiId())), xcontext);
 
                     final BaseClass userClass = userDocument.getXClass();
 
@@ -273,7 +273,7 @@ public class AbstractInstanceWikiStreamTest
 
                     XWikiDocument groupDocument =
                         oldcore.getMockXWiki().getDocument(
-                            new DocumentReference(GROUP_CLASS, new WikiReference(xcontext.getDatabase())), xcontext);
+                            new DocumentReference(GROUP_CLASS, new WikiReference(xcontext.getWikiId())), xcontext);
 
                     final BaseClass groupClass = groupDocument.getXClass();
 

@@ -51,7 +51,7 @@ public class BaseObjectTest extends AbstractBridgedComponentTestCase
     @Test
     public void testSetName() throws Exception
     {
-        String database = getContext().getDatabase();
+        String database = getContext().getWikiId();
         BaseObject baseObject = new BaseObject();
 
         baseObject.setName("space.page");
@@ -64,13 +64,13 @@ public class BaseObjectTest extends AbstractBridgedComponentTestCase
     @Test
     public void testSetNameAloneWithChangingContext() throws Exception
     {
-        String database = getContext().getDatabase();
+        String database = getContext().getWikiId();
         BaseObject baseObject = new BaseObject();
 
         baseObject.setName("space.page");
 
         try {
-            getContext().setDatabase("otherwiki");
+            getContext().setWikiId("otherwiki");
 
             Assert.assertEquals(database, baseObject.getDocumentReference().getWikiReference().getName());
             Assert.assertEquals("space", baseObject.getDocumentReference().getLastSpaceReference().getName());
@@ -78,7 +78,7 @@ public class BaseObjectTest extends AbstractBridgedComponentTestCase
 
             baseObject.setName("otherspace.otherpage");
         } finally {
-            getContext().setDatabase(database);
+            getContext().setWikiId(database);
         }
 
         Assert.assertEquals(database, baseObject.getDocumentReference().getWikiReference().getName());
@@ -87,10 +87,10 @@ public class BaseObjectTest extends AbstractBridgedComponentTestCase
 
         baseObject = new BaseObject();
         try {
-            getContext().setDatabase("otherwiki");
+            getContext().setWikiId("otherwiki");
             baseObject.setName("space.page");
         } finally {
-            getContext().setDatabase(database);
+            getContext().setWikiId(database);
         }
 
         Assert.assertEquals("otherwiki", baseObject.getDocumentReference().getWikiReference().getName());

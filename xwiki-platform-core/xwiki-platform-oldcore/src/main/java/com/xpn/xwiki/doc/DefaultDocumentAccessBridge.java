@@ -765,7 +765,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public String getCurrentWiki()
     {
         XWikiContext xcontext = getContext();
-        return xcontext.getDatabase();
+        return xcontext.getWikiId();
     }
 
     /**

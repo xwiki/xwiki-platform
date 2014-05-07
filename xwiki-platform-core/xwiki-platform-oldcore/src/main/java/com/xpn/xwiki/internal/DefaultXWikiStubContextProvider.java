@@ -67,7 +67,7 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
 
         newContext.setUserReference(null);
         newContext.setLanguage(null);
-        newContext.setDatabase(context.getMainXWiki());
+        newContext.setWikiId(context.getMainXWiki());
 
         // Cleanup
         newContext.flushClassCache();

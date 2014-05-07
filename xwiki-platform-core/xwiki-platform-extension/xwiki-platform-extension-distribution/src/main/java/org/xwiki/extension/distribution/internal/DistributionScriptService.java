@@ -135,7 +135,7 @@ public class DistributionScriptService implements ScriptService
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return getState(xcontext.getDatabase());
+        return getState(xcontext.getWikiId());
     }
 
     /**
@@ -164,7 +164,7 @@ public class DistributionScriptService implements ScriptService
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return getUIExtensionId(xcontext.getDatabase());
+        return getUIExtensionId(xcontext.getWikiId());
     }
 
     /**
@@ -187,7 +187,7 @@ public class DistributionScriptService implements ScriptService
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return getPreviousJobStatus(xcontext.getDatabase());
+        return getPreviousJobStatus(xcontext.getWikiId());
     }
 
     /**
@@ -286,7 +286,7 @@ public class DistributionScriptService implements ScriptService
     public Map<DocumentReference, DocumentStatus> getModifiedDocuments()
     {
         return ((DocumentsModifiedDuringDistributionListener) this.modifiedDocumentsListener).getDocuments().get(
-            this.xcontextProvider.get().getDatabase());
+            this.xcontextProvider.get().getWikiId());
     }
 
     /**
@@ -297,7 +297,7 @@ public class DistributionScriptService implements ScriptService
     {
         Map<DocumentReference, DocumentStatus> documents =
             ((DocumentsModifiedDuringDistributionListener) this.modifiedDocumentsListener).getDocuments().get(
-                this.xcontextProvider.get().getDatabase());
+                this.xcontextProvider.get().getWikiId());
 
         Map<String, Map<String, Map<String, Map<String, DocumentStatus>>>> tree =
             new TreeMap<String, Map<String, Map<String, Map<String, DocumentStatus>>>>();

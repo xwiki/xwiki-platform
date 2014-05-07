@@ -85,7 +85,7 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
         } catch (ComponentLookupException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_MIGRATION,
-                String.format("Unable to reach the versioning store for database %s", getXWikiContext().getDatabase()),
+                String.format("Unable to reach the versioning store for database %s", getXWikiContext().getWikiId()),
                 e);
         }
     }

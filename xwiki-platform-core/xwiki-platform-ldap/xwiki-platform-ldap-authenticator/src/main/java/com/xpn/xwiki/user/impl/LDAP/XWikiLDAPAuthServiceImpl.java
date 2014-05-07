@@ -190,9 +190,9 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         // If local ldap failed, try global ldap
         if (principal == null && !context.isMainWiki()) {
             // Then we check in the main database
-            String db = context.getDatabase();
+            String db = context.getWikiId();
             try {
-                context.setDatabase(context.getMainXWiki());
+                context.setWikiId(context.getMainXWiki());
                 try {
                     principal = ldapAuthenticateInContext(ldapUid, validXWikiUserName, password, context, false);
                 } catch (Exception e) {
@@ -202,7 +202,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                     }
                 }
             } finally {
-                context.setDatabase(db);
+                context.setWikiId(db);
             }
         }
 
@@ -419,7 +419,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         if (local) {
             principal = new SimplePrincipal(userProfile.getFullName());
         } else {
-            principal = new SimplePrincipal(context.getDatabase() + ":" + userProfile.getFullName());
+            principal = new SimplePrincipal(context.getWikiId() + ":" + userProfile.getFullName());
         }
 
         // ////////////////////////////////////////////////////////////////////

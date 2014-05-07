@@ -56,7 +56,7 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
 
         BaseClass userClass = new BaseClass();
-        userClass.setDocumentReference(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiUsers"));
+        userClass.setDocumentReference(new DocumentReference(getContext().getWikiId(), "XWiki", "XWikiUsers"));
         userClass.addPasswordField("password", "Password", 10);
 
         this.mockXWiki.stubs().method("getUserClass").will(returnValue(userClass));
@@ -172,7 +172,7 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
         assertEquals("XWiki.Admin", principalLocal.getName());
 
         // Set the database name to local.
-        this.getContext().setDatabase("local");
+        this.getContext().setWikiId("local");
 
         // Finally run the test: Using xwiki:Xwiki.Admin should correctly authenticate the Admin user
         Principal principalVirtual = this.authService.authenticate("xwiki:XWiki.Admin", "admin", this.getContext());

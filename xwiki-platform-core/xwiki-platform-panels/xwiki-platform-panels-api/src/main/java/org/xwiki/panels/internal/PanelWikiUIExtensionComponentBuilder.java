@@ -96,7 +96,7 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiComponentBuilde
             List<Object[]> results = query.execute();
             for (Object[] result : results) {
                 references.add(
-                    new DocumentReference(getXWikiContext().getDatabase(), (String) result[0], (String) result[1]));
+                    new DocumentReference(getXWikiContext().getWikiId(), (String) result[0], (String) result[1]));
             }
         } catch (Exception e) {
             // Fail "silently"
@@ -110,7 +110,7 @@ public class PanelWikiUIExtensionComponentBuilder implements WikiComponentBuilde
     public List<WikiComponent> buildComponents(DocumentReference reference) throws WikiComponentException
     {
         List<WikiComponent> components = new ArrayList<WikiComponent>();
-        DocumentReference panelXClass = new DocumentReference(getXWikiContext().getDatabase(), "Panels", "PanelClass");
+        DocumentReference panelXClass = new DocumentReference(getXWikiContext().getWikiId(), "Panels", "PanelClass");
         String content = (String) documentAccessBridge.getProperty(reference, panelXClass, "content");
         Syntax syntax = null;
         DocumentReference authorReference;

@@ -373,7 +373,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     nbfeedsErrors++;
                 }
 
-                UpdateThread updateThread = this.updateThreads.get(context.getDatabase() + ":" + space);
+                UpdateThread updateThread = this.updateThreads.get(context.getWikiId() + ":" + space);
                 if (updateThread != null) {
                     updateThread.setNbLoadedFeeds(nbfeeds + updateThread.getNbLoadedFeeds());
                     updateThread.setNbLoadedFeedsErrors(nbfeedsErrors + updateThread.getNbLoadedFeedsErrors());
@@ -429,10 +429,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     public boolean startUpdateFeedsInSpace(String space, boolean fullContent, int scheduleTimer, XWikiContext context)
         throws XWikiException
     {
-        UpdateThread updateThread = this.updateThreads.get(context.getDatabase() + ":" + space);
+        UpdateThread updateThread = this.updateThreads.get(context.getWikiId() + ":" + space);
         if (updateThread == null) {
             updateThread = new UpdateThread(space, fullContent, scheduleTimer, this, context);
-            this.updateThreads.put(context.getDatabase() + ":" + space, updateThread);
+            this.updateThreads.put(context.getWikiId() + ":" + space, updateThread);
             Thread thread = new Thread(updateThread);
             thread.start();
             return true;
@@ -443,7 +443,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     public void stopUpdateFeedsInSpace(String space, XWikiContext context) throws XWikiException
     {
-        UpdateThread updateThread = this.updateThreads.get(context.getDatabase() + ":" + space);
+        UpdateThread updateThread = this.updateThreads.get(context.getWikiId() + ":" + space);
         if (updateThread != null) {
             updateThread.stopUpdate();
         }
@@ -453,14 +453,14 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     {
         // make sure the update thread is removed.
         // this is called by the update thread when the loop is last exited
-        if (thread == this.updateThreads.get(context.getDatabase() + ":" + space)) {
-            this.updateThreads.remove(context.getDatabase() + ":" + space);
+        if (thread == this.updateThreads.get(context.getWikiId() + ":" + space)) {
+            this.updateThreads.remove(context.getWikiId() + ":" + space);
         }
     }
 
     public UpdateThread getUpdateThread(String space, XWikiContext context)
     {
-        return this.updateThreads.get(context.getDatabase() + ":" + space);
+        return this.updateThreads.get(context.getWikiId() + ":" + space);
     }
 
     public Collection<String> getActiveUpdateThreads()

@@ -400,7 +400,7 @@ public class Utils
         context.setRequest(request);
         context.setResponse(response);
         context.setAction(action);
-        context.setDatabase(dbname);
+        context.setWikiId(dbname);
 
         int mode = 0;
         if (request instanceof XWikiServletRequest) {

@@ -292,10 +292,10 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         // Number of index entries processed
         int retval = 0;
 
-        String database = context.getDatabase();
+        String database = context.getWikiId();
 
         try {
-            context.setDatabase(wikiName);
+            context.setWikiId(wikiName);
 
             // If only not already indexed document has to be indexed create a Searcher to find out
             IndexSearcher searcher = this.onlyNew ? createSearcher(this.indexUpdater.getDirectory(), context) : null;
@@ -321,7 +321,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                 return -1;
             }
         } finally {
-            context.setDatabase(database);
+            context.setWikiId(database);
         }
 
         return retval;

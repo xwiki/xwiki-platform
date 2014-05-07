@@ -182,7 +182,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
             .will(returnValue(Arrays.asList("xwiki")));
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
-        getContext().setDatabase("wiki");
+        getContext().setWikiId("wiki");
     }
 
     public void testCreateIndex() throws IOException

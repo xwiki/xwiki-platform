@@ -4414,11 +4414,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public void saveAttachmentsContent(List<XWikiAttachment> attachments, XWikiContext context) throws XWikiException
     {
-        String database = context.getDatabase();
+        String database = context.getWikiId();
         try {
             // We might need to switch database to get the translated content
             if (getDatabase() != null) {
-                context.setDatabase(getDatabase());
+                context.setWikiId(getDatabase());
             }
 
             context.getWiki().getAttachmentStore().saveAttachmentsContent(attachments, this, true, context, true);
@@ -4427,7 +4427,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 "Out Of Memory Exception");
         } finally {
             if (database != null) {
-                context.setDatabase(database);
+                context.setWikiId(database);
             }
         }
     }
@@ -4440,12 +4440,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public void saveAttachmentContent(XWikiAttachment attachment, boolean updateParent, boolean transaction,
         XWikiContext context) throws XWikiException
     {
-        String currentWiki = context.getDatabase();
+        String currentWiki = context.getWikiId();
         try {
             // We might need to switch database to
             // get the translated content
             if (getDatabase() != null) {
-                context.setDatabase(getDatabase());
+                context.setWikiId(getDatabase());
             }
 
             // Save the attachment
@@ -4463,25 +4463,25 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 "Out Of Memory Exception");
         } finally {
             if (currentWiki != null) {
-                context.setDatabase(currentWiki);
+                context.setWikiId(currentWiki);
             }
         }
     }
 
     public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
-        String database = context.getDatabase();
+        String database = context.getWikiId();
         try {
             // We might need to switch database to
             // get the translated content
             if (getDatabase() != null) {
-                context.setDatabase(getDatabase());
+                context.setWikiId(getDatabase());
             }
 
             context.getWiki().getAttachmentStore().loadAttachmentContent(attachment, context, true);
         } finally {
             if (database != null) {
-                context.setDatabase(database);
+                context.setWikiId(database);
             }
         }
     }
@@ -4699,13 +4699,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         Set<String> pageNames;
 
         XWikiDocument contextDoc = context.getDoc();
-        String contextWiki = context.getDatabase();
+        String contextWiki = context.getWikiId();
 
         try {
             // Make sure the right document is used as context document
             context.setDoc(this);
             // Make sure the right wiki is used as context document
-            context.setDatabase(getDatabase());
+            context.setWikiId(getDatabase());
 
             if (is10Syntax()) {
                 pageNames = getUniqueLinkedPages10(context);
@@ -4746,7 +4746,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             }
         } finally {
             context.setDoc(contextDoc);
-            context.setDatabase(contextWiki);
+            context.setWikiId(contextWiki);
         }
 
         return pageNames;
@@ -8120,16 +8120,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         XWikiContext xcontext = getXWikiContext();
 
-        String originalWikiName = xcontext.getDatabase();
+        String originalWikiName = xcontext.getWikiId();
         XWikiDocument originalCurentDocument = xcontext.getDoc();
         try {
-            xcontext.setDatabase(defaultReference.getWikiReference().getName());
+            xcontext.setWikiId(defaultReference.getWikiReference().getName());
             xcontext.setDoc(new XWikiDocument(defaultReference));
 
             return serializer.serialize(reference);
         } finally {
             xcontext.setDoc(originalCurentDocument);
-            xcontext.setDatabase(originalWikiName);
+            xcontext.setWikiId(originalWikiName);
         }
     }
 

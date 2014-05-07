@@ -166,7 +166,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
     @Override
     public String getCurrentWikiId()
     {
-        return xcontextProvider.get().getDatabase();
+        return xcontextProvider.get().getWikiId();
     }
 
     private DefaultWikiDescriptor buildDescriptorFromDocument(XWikiDocument document)

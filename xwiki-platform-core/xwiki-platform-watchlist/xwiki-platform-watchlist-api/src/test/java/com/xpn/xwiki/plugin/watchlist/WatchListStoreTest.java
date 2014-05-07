@@ -60,7 +60,7 @@ public class WatchListStoreTest
  
         xcontext = mock(XWikiContext.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
-        when(xcontext.getDatabase()).thenReturn("wiki");
+        when(xcontext.getWikiId()).thenReturn("wiki");
 
     }
     

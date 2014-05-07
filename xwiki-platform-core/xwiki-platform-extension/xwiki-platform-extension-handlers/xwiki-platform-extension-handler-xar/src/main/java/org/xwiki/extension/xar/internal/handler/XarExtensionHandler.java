@@ -354,9 +354,9 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
         boolean hasAccess = true;
 
-        String currentWiki = xcontext.getDatabase();
+        String currentWiki = xcontext.getWikiId();
         try {
-            xcontext.setDatabase(wiki != null ? wiki : xcontext.getMainXWiki());
+            xcontext.setWikiId(wiki != null ? wiki : xcontext.getMainXWiki());
 
             if (request.getProperty(PROPERTY_CALLERREFERENCE) != null) {
                 String caller = getRequestUserString(PROPERTY_CALLERREFERENCE, request);
@@ -370,7 +370,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 }
             }
         } finally {
-            xcontext.setDatabase(currentWiki);
+            xcontext.setWikiId(currentWiki);
         }
 
         return hasAccess;

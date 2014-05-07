@@ -121,7 +121,7 @@ public class ExportAction extends XWikiAction
                     wikiName = pattern.substring(0, index);
                     pattern = pattern.substring(index + 1);
                 } else {
-                    wikiName = context.getDatabase();
+                    wikiName = context.getWikiId();
                 }
 
                 StringBuffer where;
@@ -146,7 +146,7 @@ public class ExportAction extends XWikiAction
                 params.add(pattern);
             }
 
-            String database = context.getDatabase();
+            String database = context.getWikiId();
             try {
                 for (Map.Entry<String, Object[]> entry : wikiQueries.entrySet()) {
                     String wikiName = entry.getKey();
@@ -155,7 +155,7 @@ public class ExportAction extends XWikiAction
                     @SuppressWarnings("unchecked")
                     List<String> params = (List<String>) query[1];
 
-                    context.setDatabase(wikiName);
+                    context.setWikiId(wikiName);
                     List<String> docsNames = context.getWiki().getStore().searchDocumentsNames(where, params, context);
                     for (String docName : docsNames) {
                         String pageReference = wikiName + XWikiDocument.DB_SPACE_SEP + docName;
@@ -166,7 +166,7 @@ public class ExportAction extends XWikiAction
                     }
                 }
             } finally {
-                context.setDatabase(database);
+                context.setWikiId(database);
             }
         }
 
@@ -266,7 +266,7 @@ public class ExportAction extends XWikiAction
             EntityReferenceSet entities = new EntityReferenceSet();
 
             if (all) {
-                entities.includes(new WikiReference(context.getDatabase()));
+                entities.includes(new WikiReference(context.getWikiId()));
             } else {
                 if (pages != null) {
                     DocumentReferenceResolver<String> resolver =

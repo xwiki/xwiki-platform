@@ -62,7 +62,7 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         
         this.context = new XWikiContext();
 
-        this.context.setDatabase("xwiki");
+        this.context.setWikiId("xwiki");
         this.context.setMainXWiki("xwiki");
 
         // Make sure response.encodeURL() calls don't fail

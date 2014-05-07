@@ -131,7 +131,7 @@ public class XWikiDavContext
 
             xwikiContext = Utils.prepareContext("", xwikiRequest, xwikiResponse, xwikiEngine);
             xwikiContext.setMode(XWikiContext.MODE_SERVLET);
-            xwikiContext.setDatabase("xwiki");
+            xwikiContext.setWikiId("xwiki");
 
             ServletContainerInitializer containerInitializer = Utils.getComponent(ServletContainerInitializer.class);
             containerInitializer.initializeRequest(xwikiContext.getRequest().getHttpServletRequest(), xwikiContext);

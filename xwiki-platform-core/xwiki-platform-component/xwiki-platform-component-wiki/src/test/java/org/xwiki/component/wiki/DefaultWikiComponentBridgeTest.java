@@ -105,7 +105,7 @@ public class DefaultWikiComponentBridgeTest extends AbstractMockingComponentTest
         this.xwiki = getMockery().mock(XWiki.class);
 
         this.xwikiContext = new XWikiContext();
-        this.xwikiContext.setDatabase("xwiki");
+        this.xwikiContext.setWikiId("xwiki");
         this.xwikiContext.setWiki(this.xwiki);
 
         context.setProperty("xwikicontext", this.xwikiContext);

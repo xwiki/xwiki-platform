@@ -357,7 +357,7 @@ public class DBListClass extends ListClass
         if (isCache()) {
             return this.cachedDBList;
         } else {
-            return (List<ListItem>) context.get(context.getDatabase() + ":" + getFieldFullName());
+            return (List<ListItem>) context.get(context.getWikiId() + ":" + getFieldFullName());
         }
     }
 
@@ -366,7 +366,7 @@ public class DBListClass extends ListClass
         if (isCache()) {
             this.cachedDBList = cachedDBList;
         } else {
-            context.put(context.getDatabase() + ":" + getFieldFullName(), cachedDBList);
+            context.put(context.getWikiId() + ":" + getFieldFullName(), cachedDBList);
         }
     }
 

@@ -99,13 +99,13 @@ public class BaseAttachmentsResource extends XWikiResource
     public Attachments getAttachments(String wikiName, String name, String page, String space, String author,
             String types, Integer start, Integer number, Boolean withPrettyNames) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         Attachments attachments = objectFactory.createAttachments();
 
         /* This try is just needed for executing the finally clause. */
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             Map<String, String> filters = new HashMap<String, String>();
             if (!name.equals("")) {
@@ -246,7 +246,7 @@ public class BaseAttachmentsResource extends XWikiResource
                 }
             }
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
 
         return attachments;

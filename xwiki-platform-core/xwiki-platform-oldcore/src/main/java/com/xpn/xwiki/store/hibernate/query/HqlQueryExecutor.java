@@ -82,10 +82,10 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Override
     public <T> List<T> execute(final Query query) throws QueryException
     {
-        String oldDatabase = getContext().getDatabase();
+        String oldDatabase = getContext().getWikiId();
         try {
             if (query.getWiki() != null) {
-                getContext().setDatabase(query.getWiki());
+                getContext().setWikiId(query.getWiki());
             }
             return getStore().executeRead(getContext(), new HibernateCallback<List<T>>()
             {
@@ -108,7 +108,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
         } catch (XWikiException e) {
             throw new QueryException("Exception while execute query", query, e);
         } finally {
-            getContext().setDatabase(oldDatabase);
+            getContext().setWikiId(oldDatabase);
         }
     }
 

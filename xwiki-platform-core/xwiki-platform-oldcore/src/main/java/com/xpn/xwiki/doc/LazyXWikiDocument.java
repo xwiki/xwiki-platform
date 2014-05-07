@@ -96,10 +96,10 @@ public class LazyXWikiDocument extends XWikiDocument
             XWikiDocument doc = new XWikiDocument(getDocumentReference());
             doc.setLocale(getLocale());
 
-            String currentWiki = context.getDatabase();
+            String currentWiki = context.getWikiId();
             try {
                 // Put context in document wiki
-                context.setDatabase(getDocumentReference().getWikiReference().getName());
+                context.setWikiId(getDocumentReference().getWikiReference().getName());
 
                 if (this.version == null) {
                     this.document = context.getWiki().getDocument(doc, context);
@@ -126,7 +126,7 @@ public class LazyXWikiDocument extends XWikiDocument
             } catch (XWikiException e) {
                 throw new RuntimeException("Failed to get document [" + this + "]", e);
             } finally {
-                context.setDatabase(currentWiki);
+                context.setWikiId(currentWiki);
             }
         }
 

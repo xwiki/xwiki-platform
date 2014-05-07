@@ -526,7 +526,7 @@ public class WatchListStore implements EventListener
         String elementToWatch = newWatchedElement;
 
         if (!ElementType.WIKI.equals(type) && !newWatchedElement.contains(WIKI_SPACE_SEP)) {
-            elementToWatch = context.getDatabase() + WIKI_SPACE_SEP + newWatchedElement;
+            elementToWatch = context.getWikiId() + WIKI_SPACE_SEP + newWatchedElement;
         }
 
         if (isWatched(elementToWatch, user, type, context)) {
@@ -558,7 +558,7 @@ public class WatchListStore implements EventListener
         String elementToRemove = watchedElement;
 
         if (!ElementType.WIKI.equals(type) && !watchedElement.contains(WIKI_SPACE_SEP)) {
-            elementToRemove = context.getDatabase() + WIKI_SPACE_SEP + watchedElement;
+            elementToRemove = context.getWikiId() + WIKI_SPACE_SEP + watchedElement;
         }
 
         if (!this.isWatched(elementToRemove, user, type, context)) {
@@ -656,12 +656,12 @@ public class WatchListStore implements EventListener
             LOGGER.error("error getting list of wiki servers", e);
         }
 
-        String oriDatabase = context.getDatabase();
+        String oriDatabase = context.getWikiId();
 
         try {
             for (String wiki : wikiServers) {
                 String wikiPrefix = wiki + WIKI_SPACE_SEP;
-                context.setDatabase(wiki);
+                context.setWikiId(wiki);
                 try {
                     List<String> upDocsInWiki =
                         context.getWiki().getStore().searchDocumentsNames(request, 0, 0, values, context);
@@ -674,7 +674,7 @@ public class WatchListStore implements EventListener
                 }
             }
         } finally {
-            context.setDatabase(oriDatabase);
+            context.setWikiId(oriDatabase);
         }
 
         return results;
@@ -728,7 +728,7 @@ public class WatchListStore implements EventListener
      */
     private void watchListObjectsEventHandler(XWikiDocument originalDoc, XWikiDocument currentDoc, XWikiContext context)
     {
-        String wiki = context.getDatabase();
+        String wiki = context.getWikiId();
         BaseObject originalWatchListObj = originalDoc.getObject(WATCHLIST_CLASS);
         BaseObject currentWatchListObj = currentDoc.getObject(WATCHLIST_CLASS);
 

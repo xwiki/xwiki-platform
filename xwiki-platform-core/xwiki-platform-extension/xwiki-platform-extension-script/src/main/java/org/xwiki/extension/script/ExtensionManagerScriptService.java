@@ -402,7 +402,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         }
 
         // Provide informations on what started the job
-        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getDatabase());
+        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getWikiId());
         installRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
 
         setRightsProperties(installRequest);
@@ -563,7 +563,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         }
 
         // Provide informations on what started the job
-        uninstallRequest.setProperty("context.wiki", this.xcontextProvider.get().getDatabase());
+        uninstallRequest.setProperty("context.wiki", this.xcontextProvider.get().getWikiId());
         uninstallRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
 
         setRightsProperties(uninstallRequest);
@@ -645,7 +645,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         installRequest.addNamespace(namespace);
 
         // Provide informations on what started the job
-        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getDatabase());
+        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getWikiId());
         installRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
 
         return installRequest;
@@ -657,7 +657,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         installRequest.setId(getJobId(EXTENSIONPLAN_JOBID_PREFIX, null, null));
 
         // Provide informations on what started the job
-        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getDatabase());
+        installRequest.setProperty("context.wiki", this.xcontextProvider.get().getWikiId());
         installRequest.setProperty("context.action", this.xcontextProvider.get().getAction());
 
         return installRequest;

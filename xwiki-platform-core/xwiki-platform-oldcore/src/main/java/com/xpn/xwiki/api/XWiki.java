@@ -665,14 +665,14 @@ public class XWiki extends Api
     public List<String> searchDocumentsNames(String wikiName, String parameterizedWhereClause, int maxResults,
         int startOffset, List< ? > parameterValues) throws XWikiException
     {
-        String database = this.context.getDatabase();
+        String database = this.context.getWikiId();
 
         try {
-            this.context.setDatabase(wikiName);
+            this.context.setWikiId(wikiName);
 
             return searchDocuments(parameterizedWhereClause, maxResults, startOffset, parameterValues);
         } finally {
-            this.context.setDatabase(database);
+            this.context.setWikiId(database);
         }
     }
 
@@ -2618,7 +2618,7 @@ public class XWiki extends Api
      */
     public String getServletPath()
     {
-        return this.xwiki.getServletPath(this.context.getDatabase(), this.context);
+        return this.xwiki.getServletPath(this.context.getWikiId(), this.context);
     }
 
     /**

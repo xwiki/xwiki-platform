@@ -162,7 +162,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         }
 
         if (event.getWiki() == null) {
-            event.setWiki(context.getDatabase());
+            event.setWiki(context.getWikiId());
         }
 
         if (event.getApplication() == null) {
@@ -311,8 +311,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
 
         if (useMainStore(context)) {
             // store event in the main database
-            String oriDatabase = context.getDatabase();
-            context.setDatabase(context.getMainXWiki());
+            String oriDatabase = context.getWikiId();
+            context.setWikiId(context.getMainXWiki());
             XWikiHibernateStore mainHibernateStore = context.getWiki().getHibernateStore();
             try {
                 mainHibernateStore.beginTransaction(context);
@@ -322,7 +322,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             } catch (XWikiException e) {
                 mainHibernateStore.endTransaction(context, false);
             } finally {
-                context.setDatabase(oriDatabase);
+                context.setWikiId(oriDatabase);
             }
         }
     }
@@ -439,8 +439,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             }
         } else if (useMainStore(context)) {
             // load event from the main database
-            String oriDatabase = context.getDatabase();
-            context.setDatabase(context.getMainXWiki());
+            String oriDatabase = context.getWikiId();
+            context.setWikiId(context.getMainXWiki());
             XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
             try {
                 if (bTransactionMutable) {
@@ -462,7 +462,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             } catch (Exception e) {
                 throw new ActivityStreamException();
             } finally {
-                context.setDatabase(oriDatabase);
+                context.setWikiId(oriDatabase);
                 try {
                     if (bTransactionMutable) {
                         hibstore.endTransaction(context, false, false);
@@ -481,16 +481,16 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     {
         boolean bTransaction = true;
         ActivityEventImpl evImpl = loadActivityEvent(event, true, context);
-        String oriDatabase = context.getDatabase();
+        String oriDatabase = context.getWikiId();
 
         if (useLocalStore(context)) {
             XWikiHibernateStore hibstore;
 
             // delete event from the local database
-            if (context.getDatabase().equals(event.getWiki())) {
+            if (context.getWikiId().equals(event.getWiki())) {
                 hibstore = context.getWiki().getHibernateStore();
             } else {
-                context.setDatabase(event.getWiki());
+                context.setWikiId(event.getWiki());
                 hibstore = context.getWiki().getHibernateStore();
             }
 
@@ -515,8 +515,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                     if (bTransaction) {
                         hibstore.endTransaction(context, false);
                     }
-                    if (context.getDatabase().equals(oriDatabase)) {
-                        context.setDatabase(oriDatabase);
+                    if (context.getWikiId().equals(oriDatabase)) {
+                        context.setWikiId(oriDatabase);
                     }
                 } catch (Exception e) {
                     // Do nothing.
@@ -526,7 +526,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
 
         if (useMainStore(context)) {
             // delete event from the main database
-            context.setDatabase(context.getMainXWiki());
+            context.setWikiId(context.getMainXWiki());
             XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
             try {
                 if (bTransaction) {
@@ -549,7 +549,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                     if (bTransaction) {
                         hibstore.endTransaction(context, false);
                     }
-                    context.setDatabase(oriDatabase);
+                    context.setWikiId(oriDatabase);
                 } catch (Exception e) {
                     // Do nothing
                 }
@@ -660,15 +660,15 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
 
         if (globalSearch) {
             // Search in the main database
-            String oriDatabase = context.getDatabase();
+            String oriDatabase = context.getWikiId();
             try {
-                context.setDatabase(context.getMainXWiki());
+                context.setWikiId(context.getMainXWiki());
                 results =
                     context.getWiki().getStore().search(searchHql.toString(), nb, start, parameterValues, context);
             } catch (XWikiException e) {
                 throw new ActivityStreamException(e);
             } finally {
-                context.setDatabase(oriDatabase);
+                context.setWikiId(oriDatabase);
             }
         } else {
             try {
@@ -860,7 +860,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         XWikiDocument currentDoc = (XWikiDocument) source;
         XWikiDocument originalDoc = currentDoc.getOriginalDocument();
         XWikiContext context = (XWikiContext) data;
-        String wiki = context.getDatabase();
+        String wiki = context.getWikiId();
         String msgPrefix = "activitystream.event.";
         String streamName = getStreamName(currentDoc.getSpace(), context);
 
@@ -970,15 +970,15 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         addOptionalEventsFilter(searchHql, optionalWhereClause);
         searchHql.append(" group by act.page order by 2 desc");
 
-        String originalDatabase = context.getDatabase();
+        String originalDatabase = context.getWikiId();
         try {
-            context.setDatabase(context.getMainXWiki());
+            context.setWikiId(context.getMainXWiki());
             results =
                 context.getWiki().getStore().search(searchHql.toString(), maxItems, startAt, parametersValues, context);
         } catch (XWikiException e) {
             throw new ActivityStreamException(e);
         } finally {
-            context.setDatabase(originalDatabase);
+            context.setWikiId(originalDatabase);
         }
 
         return results;
@@ -1005,9 +1005,9 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         searchHql.append(" group by year(act.date), month(act.date), day(act.date), act.page, act.wiki "
                 + "order by 5 desc");
 
-        String originalDatabase = context.getDatabase();
+        String originalDatabase = context.getWikiId();
         try {
-            context.setDatabase(context.getMainXWiki());
+            context.setWikiId(context.getMainXWiki());
             List<Object[]> rawResults =
                 context.getWiki().getStore().search(searchHql.toString(), maxItems, startAt, parametersValues, context);
             for (Object[] rawResult : rawResults) {
@@ -1016,7 +1016,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         } catch (XWikiException e) {
             throw new ActivityStreamException(e);
         } finally {
-            context.setDatabase(originalDatabase);
+            context.setWikiId(originalDatabase);
         }
 
         return results;

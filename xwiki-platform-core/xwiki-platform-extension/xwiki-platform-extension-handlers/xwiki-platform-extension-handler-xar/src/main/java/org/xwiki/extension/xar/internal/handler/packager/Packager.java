@@ -159,9 +159,9 @@ public class Packager
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        String currentWiki = xcontext.getDatabase();
+        String currentWiki = xcontext.getWikiId();
         try {
-            xcontext.setDatabase(wikiReference.getName());
+            xcontext.setWikiId(wikiReference.getName());
 
             this.observation.notify(new XARImportingEvent(), null, xcontext);
 
@@ -182,7 +182,7 @@ public class Packager
         } finally {
             this.observation.notify(new XARImportedEvent(), null, xcontext);
 
-            xcontext.setDatabase(currentWiki);
+            xcontext.setWikiId(currentWiki);
         }
 
         return mergeResult;

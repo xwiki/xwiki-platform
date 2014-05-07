@@ -1207,7 +1207,7 @@ public class XWikiLDAPUtils
         // Try default profile name (generally in the cache)
         XWikiDocument userProfile =
             context.getWiki().getDocument(
-                new DocumentReference(context.getDatabase(), XWIKI_USER_SPACE, validXWikiUserName), context);
+                new DocumentReference(context.getWikiId(), XWIKI_USER_SPACE, validXWikiUserName), context);
 
         if (!ldapUid.equalsIgnoreCase(ldapXClass.getUid(userProfile))) {
             // Search for existing profile with provided uid
@@ -1236,13 +1236,13 @@ public class XWikiLDAPUtils
         LDAPProfileXClass ldapXClass = new LDAPProfileXClass(context);
 
         DocumentReference userReference =
-            new DocumentReference(context.getDatabase(), XWIKI_USER_SPACE, validXWikiUserName);
+            new DocumentReference(context.getWikiId(), XWIKI_USER_SPACE, validXWikiUserName);
 
         // Check if the default profile document is available
         for (int i = 0; true; ++i) {
             if (i > 0) {
                 userReference =
-                    new DocumentReference(context.getDatabase(), XWIKI_USER_SPACE, validXWikiUserName + "_" + i);
+                    new DocumentReference(context.getWikiId(), XWIKI_USER_SPACE, validXWikiUserName + "_" + i);
             }
 
             XWikiDocument doc = context.getWiki().getDocument(userReference, context);

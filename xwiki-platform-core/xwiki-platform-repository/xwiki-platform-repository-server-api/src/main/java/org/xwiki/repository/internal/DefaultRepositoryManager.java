@@ -216,7 +216,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.getWiki().getDocument(new DocumentReference(xcontext.getDatabase(), space, name), xcontext);
+        return xcontext.getWiki().getDocument(new DocumentReference(xcontext.getWikiId(), space, name), xcontext);
     }
 
     @Override
@@ -238,7 +238,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
             if (!documentNames.isEmpty()) {
                 cachedDocumentReference =
-                    new DocumentReference[] {new DocumentReference(this.xcontextProvider.get().getDatabase(),
+                    new DocumentReference[] {new DocumentReference(this.xcontextProvider.get().getWikiId(),
                         (String) documentNames.get(0)[0], (String) documentNames.get(0)[1])};
             } else {
                 cachedDocumentReference = new DocumentReference[1];
@@ -596,12 +596,12 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
             // Create document
             document =
                 xcontext.getWiki().getDocument(
-                    new DocumentReference(xcontext.getDatabase(), "Extension", extension.getName()), xcontext);
+                    new DocumentReference(xcontext.getWikiId(), "Extension", extension.getName()), xcontext);
 
             for (int i = 1; !document.isNew(); ++i) {
                 document =
                     xcontext.getWiki().getDocument(
-                        new DocumentReference(xcontext.getDatabase(), "Extension", extension.getName() + ' ' + i),
+                        new DocumentReference(xcontext.getWikiId(), "Extension", extension.getName() + ' ' + i),
                         xcontext);
             }
 
@@ -821,7 +821,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        String authorId = resolveAuthorIdOnWiki(xcontext.getDatabase(), authorName, authorElements, xcontext);
+        String authorId = resolveAuthorIdOnWiki(xcontext.getWikiId(), authorName, authorElements, xcontext);
 
         if (authorId == null && !xcontext.isMainWiki()) {
             authorId = resolveAuthorIdOnWiki(xcontext.getMainXWiki(), authorName, authorElements, xcontext);
@@ -850,11 +850,11 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
             List<String> documentNames = query.execute();
 
             if (!documentNames.isEmpty()) {
-                String currentWiki = xcontext.getDatabase();
+                String currentWiki = xcontext.getWikiId();
                 try {
                     for (String documentName : documentNames) {
 
-                        xcontext.setDatabase(wiki);
+                        xcontext.setWikiId(wiki);
 
                         String userName = xcontext.getWiki().getUserName(documentName, null, false, xcontext);
 
@@ -863,7 +863,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
                         }
                     }
                 } finally {
-                    xcontext.setDatabase(currentWiki);
+                    xcontext.setWikiId(currentWiki);
                 }
             }
         } catch (QueryException e) {

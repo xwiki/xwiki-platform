@@ -399,7 +399,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         if (StringUtils.isBlank(extension.getWebsite())) {
             XWikiContext xcontext = getXWikiContext();
             extension.setWebsite(xcontext.getWiki().getURL(
-                new DocumentReference(xcontext.getDatabase(), (String) entry[1], (String) entry[0]), "view", xcontext));
+                new DocumentReference(xcontext.getWikiId(), (String) entry[1], (String) entry[0]), "view", xcontext));
         }
 
         // Authors

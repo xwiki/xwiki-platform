@@ -360,17 +360,17 @@ public class XWikiHibernateBaseStore implements Initializable
         if ((!force) && (context.getWiki() != null)
             && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema"))))
         {
-            LOGGER.debug("Schema update deactivated for wiki [{}]", context.getDatabase());
+            LOGGER.debug("Schema update deactivated for wiki [{}]", context.getWikiId());
             return;
         }
 
-        LOGGER.info("Updating schema for wiki [{}]...", context.getDatabase());
+        LOGGER.info("Updating schema for wiki [{}]...", context.getWikiId());
 
         try {
             String[] sql = getSchemaUpdateScript(getConfiguration(), context);
             updateSchema(sql, context);
         } finally {
-            LOGGER.info("Schema update for wiki [{}] done", context.getDatabase());
+            LOGGER.info("Schema update for wiki [{}] done", context.getWikiId());
         }
     }
 
@@ -457,7 +457,7 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public String getSchemaFromWikiName(XWikiContext context)
     {
-        return getSchemaFromWikiName(context.getDatabase(), context);
+        return getSchemaFromWikiName(context.getWikiId(), context);
     }
 
     /**
@@ -694,10 +694,10 @@ public class XWikiHibernateBaseStore implements Initializable
     {
         try {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Switch database to [{}]", context.getDatabase());
+                LOGGER.debug("Switch database to [{}]", context.getWikiId());
             }
 
-            if (context.getDatabase() != null) {
+            if (context.getWikiId() != null) {
                 String schemaName = getSchemaFromWikiName(context);
                 String escapedSchemaName = escapeSchema(schemaName, context);
 
@@ -716,13 +716,13 @@ public class XWikiHibernateBaseStore implements Initializable
                         session.connection().setCatalog(schemaName);
                     }
                 }
-                setCurrentDatabase(context, context.getDatabase());
+                setCurrentDatabase(context, context.getWikiId());
             }
 
             this.dataMigrationManager.checkDatabase();
         } catch (Exception e) {
             endTransaction(context, false); // close session with rollback to avoid further usage
-            Object[] args = {context.getDatabase()};
+            Object[] args = {context.getWikiId()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE,
                 "Exception while switching to database {0}", e, args);

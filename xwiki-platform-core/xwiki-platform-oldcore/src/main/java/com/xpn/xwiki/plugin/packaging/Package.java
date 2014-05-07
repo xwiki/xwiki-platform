@@ -708,7 +708,7 @@ public class Package
                 // Register the extension as installed
                 InstalledExtensionRepository installedRepository =
                     Utils.getComponent(InstalledExtensionRepository.class);
-                String namespace = "wiki:" + context.getDatabase();
+                String namespace = "wiki:" + context.getWikiId();
                 InstalledExtension installedExtension =
                     installedRepository.getInstalledExtension(localExtension.getId());
                 if (installedExtension == null || !installedExtension.isInstalled(namespace)) {
@@ -728,14 +728,14 @@ public class Package
      */
     private boolean isFarmAdmin(XWikiContext context)
     {
-        String wiki = context.getDatabase();
+        String wiki = context.getWikiId();
 
         try {
-            context.setDatabase(context.getMainXWiki());
+            context.setWikiId(context.getMainXWiki());
 
             return context.getWiki().getRightService().hasWikiAdminRights(context);
         } finally {
-            context.setDatabase(wiki);
+            context.setWikiId(wiki);
         }
     }
 

@@ -270,7 +270,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
     {
         // The class must be local.
         DocumentReference classReference = new DocumentReference("myWiki", "mySpace", "myClass");
-        when(context.getDatabase()).thenReturn(classReference.getWikiReference().getName());
+        when(context.getWikiId()).thenReturn(classReference.getWikiReference().getName());
         BaseObject object = mock(BaseObject.class);
         when(object.getXClassReference()).thenReturn(classReference);
 

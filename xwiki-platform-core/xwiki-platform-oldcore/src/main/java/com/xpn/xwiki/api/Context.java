@@ -135,7 +135,7 @@ public class Context extends Api
      */
     public String getDatabase()
     {
-        return getXWikiContext().getDatabase();
+        return getXWikiContext().getWikiId();
     }
 
     /**
@@ -158,7 +158,7 @@ public class Context extends Api
      */
     public String getOriginalDatabase()
     {
-        return getXWikiContext().getOriginalDatabase();
+        return getXWikiContext().getOriginalWikiId();
     }
 
     /**
@@ -171,7 +171,7 @@ public class Context extends Api
     public void setDatabase(String database)
     {
         if (hasProgrammingRights()) {
-            getXWikiContext().setDatabase(database);
+            getXWikiContext().setWikiId(database);
         }
     }
 

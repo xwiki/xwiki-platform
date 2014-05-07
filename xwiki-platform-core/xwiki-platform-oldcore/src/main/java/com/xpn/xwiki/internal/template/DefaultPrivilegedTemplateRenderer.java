@@ -98,7 +98,7 @@ public class DefaultPrivilegedTemplateRenderer implements PrivilegedTemplateRend
         // be delegated to the template, while automatically dropping the programming rights when rendering a document
         // which doesn't have programming rights.
         XWikiDocument document =
-            new XWikiDocument(new DocumentReference(context.getDatabase(),
+            new XWikiDocument(new DocumentReference(context.getWikiId(),
                               SUPERADMIN_REFERENCE.getLastSpaceReference().getName(), "Distribution"));
         document.setContentAuthorReference(SUPERADMIN_REFERENCE);
         document.setAuthorReference(SUPERADMIN_REFERENCE);

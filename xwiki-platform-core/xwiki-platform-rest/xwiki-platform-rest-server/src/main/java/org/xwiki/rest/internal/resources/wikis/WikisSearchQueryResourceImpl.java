@@ -42,7 +42,7 @@ public class WikisSearchQueryResourceImpl extends BaseSearchResult implements Wi
                 searchQuery(
                     query,
                     QueryType.LUCENE.toString(),
-                    getXWikiContext().getDatabase(),
+                    getXWikiContext().getWikiId(),
                     searchWikis,
                     Utils.getXWiki(componentManager).getRightService()
                         .hasProgrammingRights(Utils.getXWikiContext(componentManager)), orderField, order, distinct,

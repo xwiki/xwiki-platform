@@ -365,7 +365,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.isMainWiki() ? getFarmJob() : getWikiJob(xcontext.getDatabase());
+        return xcontext.isMainWiki() ? getFarmJob() : getWikiJob(xcontext.getWikiId());
     }
 
     @Override
@@ -377,7 +377,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
         if (currentUser != null) {
             return this.authorizationManager.hasAccess(Right.ADMIN, currentUser,
-                new WikiReference(xcontext.getDatabase()));
+                new WikiReference(xcontext.getWikiId()));
         }
 
         if (xcontext.isMainWiki()) {

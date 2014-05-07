@@ -57,7 +57,7 @@ public class ScriptWikiStreamConverterJob extends WikiStreamConverterJob impleme
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         if (xcontext != null) {
-            this.contextWiki = xcontext.getDatabase();
+            this.contextWiki = xcontext.getWikiId();
             this.contextUser = xcontext.getUserReference();
         }
     }
@@ -68,7 +68,7 @@ public class ScriptWikiStreamConverterJob extends WikiStreamConverterJob impleme
         // Set proper context wiki and user
         XWikiContext xcontext = this.xcontextProvider.get();
         if (xcontext != null) {
-            xcontext.setDatabase(this.contextWiki);
+            xcontext.setWikiId(this.contextWiki);
             xcontext.setUserReference(this.contextUser);
         }
 

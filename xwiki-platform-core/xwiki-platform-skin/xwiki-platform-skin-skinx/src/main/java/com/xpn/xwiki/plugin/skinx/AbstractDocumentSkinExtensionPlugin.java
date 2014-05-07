@@ -194,7 +194,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     {
         XWikiContext context = Utils.getContext();
         // Retrieve the current wiki name from the XWiki context
-        String currentWiki = StringUtils.defaultIfEmpty(context.getDatabase(), context.getMainXWiki());
+        String currentWiki = StringUtils.defaultIfEmpty(context.getWikiId(), context.getMainXWiki());
         // If we already have extensions defined for this wiki, we return them
         if (this.alwaysUsedExtensions.get(currentWiki) != null) {
             return this.alwaysUsedExtensions.get(currentWiki);

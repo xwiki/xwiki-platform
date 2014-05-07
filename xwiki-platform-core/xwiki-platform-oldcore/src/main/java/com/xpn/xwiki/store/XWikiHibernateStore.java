@@ -245,7 +245,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         boolean available;
 
         boolean bTransaction = true;
-        String database = context.getDatabase();
+        String database = context.getWikiId();
 
         try {
             bTransaction = beginTransaction(context);
@@ -257,7 +257,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 this.loggerManager.pushLogListener(null);
             }
 
-            context.setDatabase(wikiName);
+            context.setWikiId(wikiName);
             try {
                 setDatabase(session, context);
                 available = false;
@@ -271,7 +271,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CHECK_EXISTS_DATABASE,
                 "Exception while listing databases to search for {0}", e, args);
         } finally {
-            context.setDatabase(database);
+            context.setWikiId(database);
             try {
                 if (bTransaction) {
                     endTransaction(context, false);
@@ -292,7 +292,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public void createWiki(String wikiName, XWikiContext context) throws XWikiException
     {
         boolean bTransaction = true;
-        String database = context.getDatabase();
+        String database = context.getWikiId();
         Statement stmt = null;
         try {
             bTransaction = beginTransaction(context);
@@ -338,7 +338,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE, "Exception while create wiki database {0}",
                 e, args);
         } finally {
-            context.setDatabase(database);
+            context.setWikiId(database);
             try {
                 if (stmt != null) {
                     stmt.close();
@@ -358,7 +358,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public void deleteWiki(String wikiName, XWikiContext context) throws XWikiException
     {
         boolean bTransaction = true;
-        String database = context.getDatabase();
+        String database = context.getWikiId();
         Statement stmt = null;
         try {
             bTransaction = beginTransaction(context);
@@ -378,7 +378,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETE_DATABASE, "Exception while delete wiki database {0}",
                 e, args);
         } finally {
-            context.setDatabase(database);
+            context.setWikiId(database);
             try {
                 if (stmt != null) {
                     stmt.close();
@@ -500,7 +500,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             doc.setStore(this);
             // Make sure the database name is stored
-            doc.setDatabase(context.getDatabase());
+            doc.setDatabase(context.getWikiId());
 
             // If the comment is larger than the max size supported by the Storage, then abbreviate it
             String comment = doc.getComment();
@@ -832,7 +832,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             try {
                 session.load(doc, new Long(doc.getId()));
-                doc.setDatabase(context.getDatabase());
+                doc.setDatabase(context.getWikiId());
                 doc.setNew(false);
                 doc.setMostRecent(true);
                 // Fix for XWIKI-1651
@@ -876,7 +876,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                 EntityReference localGroupEntityReference = new EntityReference("XWikiGroups", EntityType.DOCUMENT,
                     new EntityReference("XWiki", EntityType.SPACE));
-                DocumentReference groupsDocumentReference = new DocumentReference(context.getDatabase(),
+                DocumentReference groupsDocumentReference = new DocumentReference(context.getWikiId(),
                     localGroupEntityReference.getParent().getName(), localGroupEntityReference.getName());
 
                 boolean hasGroups = false;
@@ -1060,7 +1060,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         DocumentReference xclass = object.getXClassReference();
         WikiReference wikiReference = xclass.getWikiReference();
-        String db = context.getDatabase();
+        String db = context.getWikiId();
         if (!wikiReference.getName().equals(db)) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT,
@@ -1861,12 +1861,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         if (!ctx.isMainWiki()
             && ctx.isMainWiki(ctx.getUserReference().getWikiReference().getName()))
         {
-            final String cdb = ctx.getDatabase();
+            final String cdb = ctx.getWikiId();
             try {
-                ctx.setDatabase(ctx.getMainXWiki());
+                ctx.setWikiId(ctx.getMainXWiki());
                 this.releaseAllLocksForCurrentUser(ctx);
             } finally {
-                ctx.setDatabase(cdb);
+                ctx.setWikiId(cdb);
             }
         }
     }
@@ -2438,7 +2438,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Construct a reference, using the current wiki as the wiki reference name. This is because the wiki
             // name is not stored in the database for document references.
             DocumentReference reference = new DocumentReference((String) result[1],
-                new SpaceReference((String) result[0], new WikiReference(context.getDatabase())));
+                new SpaceReference((String) result[0], new WikiReference(context.getWikiId())));
             documentReferences.add(reference);
         }
         return documentReferences;
@@ -2570,7 +2570,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         List<XWikiDocument> documents = new ArrayList<XWikiDocument>();
         for (Object[] result : documentDatas) {
             XWikiDocument doc =
-                new XWikiDocument(new DocumentReference(context.getDatabase(), (String) result[0], (String) result[1]));
+                new XWikiDocument(new DocumentReference(context.getWikiId(), (String) result[0], (String) result[1]));
             if (checkRight) {
                 if (!context.getWiki().getRightService()
                     .hasAccessLevel("view", context.getUser(), doc.getFullName(), context)) {

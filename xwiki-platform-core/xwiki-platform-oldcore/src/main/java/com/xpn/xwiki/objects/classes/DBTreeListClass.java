@@ -85,7 +85,7 @@ public class DBTreeListClass extends DBListClass
         } else {
             // Otherwise, to avoid re-computing the tree in case it is requested several times during the same request,
             // it is cached in the request context.
-            return (List<ListItem>) context.get(context.getDatabase() + ":" + getFieldFullName() + "-tree");
+            return (List<ListItem>) context.get(context.getWikiId() + ":" + getFieldFullName() + "-tree");
         }
     }
 
@@ -104,7 +104,7 @@ public class DBTreeListClass extends DBListClass
         } else {
             // Otherwise, to avoid re-computing the tree in case it is requested several times during the same request,
             // it is cached in the request context.
-            context.put(context.getDatabase() + ":" + getFieldFullName() + "-tree", cachedDBTreeList);
+            context.put(context.getWikiId() + ":" + getFieldFullName() + "-tree", cachedDBTreeList);
         }
     }
 

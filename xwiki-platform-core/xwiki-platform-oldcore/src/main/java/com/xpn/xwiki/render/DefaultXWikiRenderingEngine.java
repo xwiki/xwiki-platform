@@ -377,7 +377,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             qs = qs.replaceAll("refresh=1&?", "");
             qs = qs.replaceAll("&?refresh=1", "");
         }
-        String db = ((context == null) ? "xwiki" : context.getDatabase());
+        String db = ((context == null) ? "xwiki" : context.getWikiId());
         String cdoc =
             ((contentdoc == null) ? "" : contentdoc.getDatabase() + ":" + contentdoc.getFullName() + ":"
                 + contentdoc.getRealLanguage() + ":" + contentdoc.getVersion());

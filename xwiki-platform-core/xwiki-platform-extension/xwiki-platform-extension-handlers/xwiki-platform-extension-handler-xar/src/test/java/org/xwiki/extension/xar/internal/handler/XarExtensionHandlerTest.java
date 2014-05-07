@@ -97,7 +97,7 @@ public class XarExtensionHandlerTest
     {
         // mock
 
-        this.contextUser = new DocumentReference(getXWikiContext().getDatabase(), "XWiki", "ExtensionUser");
+        this.contextUser = new DocumentReference(getXWikiContext().getWikiId(), "XWiki", "ExtensionUser");
 
         this.localXarExtensiontId1 = new ExtensionId("test", "1.0");
         this.localXarExtensiontId2 = new ExtensionId("test", "2.0");

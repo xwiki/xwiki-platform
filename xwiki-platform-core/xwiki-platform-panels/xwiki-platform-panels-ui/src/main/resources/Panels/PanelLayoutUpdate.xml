@@ -73,17 +73,25 @@
   #set ($rightPanels = $request.rightPanels)
   #set ($showLeftPanels = $request.showLeftPanels)
   #set ($showRightPanels = $request.showRightPanels)
+  #set ($leftPanelsWidth = $request.leftPanelsWidth)
+  #set ($rightPanelsWidth = $request.rightPanelsWidth)
   #if ($leftPanels)
     #set ($discard = $prefsdoc.set('leftPanels', $leftPanels))
   #end
   #if ($showLeftPanels)
     #set ($discard = $prefsdoc.set('showLeftPanels', $showLeftPanels))
   #end
+  #if ($leftPanelsWidth)
+    #set ($discard = $prefsdoc.set('leftPanelsWidth', $leftPanelsWidth))
+  #end
   #if ($rightPanels)
     #set ($discard = $prefsdoc.set('rightPanels', $rightPanels))
   #end
   #if ($showRightPanels)
     #set ($discard = $prefsdoc.set('showRightPanels', $showRightPanels))
+  #end
+  #if ($rightPanelsWidth)
+    #set ($discard = $prefsdoc.set('rightPanelsWidth', $rightPanelsWidth))
   #end
   #if (${services.csrf.isTokenValid("$!{request.getParameter('form_token')}")})
     #set ($ok = $prefsdoc.save($services.localization.render('panelwizard.save.versionComment', true)))

@@ -143,6 +143,10 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);
         needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
         needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
+        needsUpdate |= bclass.addStaticListField("leftPanelsWidth", "Width of the left panel column",
+                "---|Small|Medium|Large");
+        needsUpdate |= bclass.addStaticListField("rightPanelsWidth", "Width of the right panel column",
+                "---|Small|Medium|Large");
         needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
         needsUpdate |= bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
 

@@ -734,6 +734,16 @@ div.pagelayoutoption:hover .lmleftcolumn,
           )))
         )))
       )))## pagelayoutoptions
+      ##
+      ## Panel widths
+      ##
+      (% class="xform third" %)
+      (((
+      ; {{translation key="XWiki.XWikiPreferences_leftPanelsWidth"/}}
+      : $doc.display('leftPanelsWidth', 'edit')
+      ; {{translation key="XWiki.XWikiPreferences_rightPanelsWidth"/}}
+      : $doc.display('rightPanelsWidth', 'edit')
+      )))
     )))## PageLayoutSection
   )))## xwikieditcontent
 

@@ -1,0 +1,192 @@
+//
+// LAYOUT
+// --------------------------------------------------
+#body{
+  // Both left and right panels are displayed
+  &.content{
+    // Left panels are small
+    &.panel-left-width-Small{
+      .main{
+        .make-md-column-push(1);
+      }
+      // Left panels are small and right panels are small
+      &.panel-right-width-Small{
+        .main{
+          .make-md-column(10);
+        }
+        #leftPanels{
+          .make-md-column-pull(10);
+        }
+      }
+      // Left panels are small and right panels are medium
+      &.panel-right-width-Medium{
+        .main{
+          .make-md-column(9);
+        }
+        #leftPanels{
+          .make-md-column-pull(9);
+        }
+      }
+      // Left panels are small and right panels are large
+      &.panel-right-width-Large{
+        .main{
+          .make-md-column(8);
+        }
+        #leftPanels{
+          .make-md-column-pull(8);
+        }
+      }
+    }
+    // Left panels are medium
+    &.panel-left-width-Medium{
+      .main{
+        .make-md-column-push(2);
+      }
+      // Left panels are medium and right panels are small
+      &.panel-right-width-Small{
+        .main{
+          .make-md-column(9);
+        }
+        #leftPanels{
+          .make-md-column-pull(9);
+        }
+      }
+      // Left panels are medium and right panels are medium
+      &.panel-right-width-Medium{
+        .main{
+          .make-md-column(8);
+        }
+        #leftPanels{
+          .make-md-column-pull(8);
+        }
+      }
+      // Left panels are medium and right panels are large
+      &.panel-right-width-Large{
+        .main{
+          .make-md-column(7);
+        }
+        #leftPanels{
+          .make-md-column-pull(7);
+        }
+      }
+    }
+    // // Left panels are large
+    &.panel-left-width-Large{
+      .main{
+        .make-md-column-push(3);
+      }
+      // Left panels are large and right panels are small
+      &.panel-right-width-Small{
+        .main{
+          .make-md-column(8);
+        }
+        #leftPanels{
+          .make-md-column-pull(8);
+        }
+      }
+      // Left panels are large and right panels are medium
+      &.panel-right-width-Medium{
+        .main{
+          .make-md-column(7);
+        }
+        #leftPanels{
+          .make-md-column-pull(7);
+        }
+      }
+      // Left panels are large and right panels are large
+      &.panel-right-width-Large{
+        .main{
+          .make-md-column(6);
+        }
+        #leftPanels{
+          .make-md-column-pull(6);
+        }
+      }
+    }
+  }
+  
+  // Only right panels
+  &.hideleft{
+    &.panel-right-width-Small{
+      .main{
+        .make-md-column(11);
+      }
+    }
+    &.panel-right-width-Medium{
+      .main{
+        .make-md-column(10);
+      }
+    }
+    &.panel-right-width-Large{
+      .main{
+        .make-md-column(9);
+      }
+    }
+  }
+
+  // Only left panels
+  &.hideright{
+    &.panel-left-width-Small{
+      .main{
+        .make-md-column(11);
+        .make-md-column-push(1);
+      }
+      #leftPanels{
+        .make-md-column-pull(11);
+      }
+    }
+    &.panel-left-width-Medium{
+      .main{
+        .make-md-column(10);
+        .make-md-column-push(2);
+      }
+      #leftPanels{
+        .make-md-column-pull(10);
+      }
+    }
+    &.panel-left-width-Large{
+      .main{
+        .make-md-column(9);
+        .make-md-column-push(3);
+      }
+      #leftPanels{
+        .make-md-column-pull(9);
+      }
+    }
+  }
+  
+  &.panel-left-width-Small{
+    #leftPanels{
+      .make-md-column(1);
+    }
+  }
+  &.panel-left-width-Medium{
+    #leftPanels{
+      .make-md-column(2);
+    }
+  }
+  &.panel-left-width-Large{
+    #leftPanels{
+      .make-md-column(3);
+    }
+  }
+  &.panel-right-width-Small{
+    #rightPanels, #editPanels{
+      .make-md-column(1);
+    }
+  }
+  &.panel-right-width-Medium{
+    #rightPanels, #editPanels{
+      .make-md-column(2);
+    }
+  }
+  &.panel-right-width-Large{
+    #rightPanels, #editPanels{
+      .make-md-column(3);
+    }
+  }
+}
+
+#leftPanels, #rightPanels{
+  .make-xs-column(12);
+}

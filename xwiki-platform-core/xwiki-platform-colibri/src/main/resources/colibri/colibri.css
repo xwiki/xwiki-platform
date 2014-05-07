@@ -489,24 +489,44 @@ th.avatar {
 }
 
 .main {
-  margin: 0 200px;
+  margin: 0;
   padding: 0 25px 25px;
 }
 
+.panel-left-width-Small .main{
+  margin-left: 100px;
+}
+
+.panel-left-width-Medium .main{
+  margin-left: 200px;
+}
+
+.panel-left-width-Large .main{
+  margin-left: 300px;
+}
+
+.panel-right-width-Small .main{
+  margin-right: 100px;
+}
+
+.panel-right-width-Medium .main{
+  margin-right: 200px;
+}
+
+.panel-right-width-Large .main{
+  margin-right: 300px;
+}
+
 #body.hideleft #contentcolumn .main {
-  margin: 0 200px 0 0;
+  margin-left: 0;
 }
 
 #body.hideright #contentcolumn .main {
-  margin: 0 0 0 200px;
+  margin-right: 0;
 }
 
 #body.hidelefthideright #contentcolumn .main {
   margin: 0;
-}
-
-#body.content #contentcolumn .main {
-  margin: 0 200px;
 }
 
 #mainContentArea, #mainEditArea  {
@@ -1631,25 +1651,69 @@ input.icon-button {
 -------------------------------------------------------------- */
 #rightPanels {
   float: right;
-  margin: 0 0 0 -220px;
-  width: 220px;
+  margin: 0 0 0 -380px;
 }
 
 #leftPanels {
   float: left;
   margin: 0 0 0 -100%;
+}
+
+.panel-left-width-Small #leftPanels{
+  width: 110px;
+}
+
+.panel-left-width-Small #leftPanels > .panel{
+  width: 90px;
+}
+
+.panel-left-width-Medium #leftPanels{
   width: 220px;
+}
+
+.panel-left-width-Medium #leftPanels > .panel{
+  width: 190px;
+}
+
+.panel-left-width-Large #leftPanels{
+  width: 330px;
+}
+
+.panel-left-width-Large #leftPanels > .panel{
+  width: 300px;
+}
+
+.panel-right-width-Small #rightPanels, .panel-right-width-Small #editPanels{
+  width: 110px;
+}
+
+.panel-right-width-Small #rightPanels > .panel, .panel-right-width-Small #editPanels > .panel{
+  width: 90px;
+}
+
+.panel-right-width-Medium #rightPanels, .panel-right-width-Medium #editPanels{
+  width: 220px;
+}
+
+.panel-right-width-Medium #rightPanels > .panel, .panel-right-width-Medium #editPanels > .panel{
+  width: 190px;
+}
+
+.panel-right-width-Large #rightPanels, .panel-right-width-Large #editPanels{
+  width: 330px;
+}
+
+.panel-right-width-Large #rightPanels > .panel, .panel-right-width-Large #editPanels > .panel{
+  width: 300px;
 }
 
 #editPanels {
   float: left;
   margin: 0 0 0 -220px;
-  width: 220px;
 }
 
 .panel {
   display: block;
-  width: 190px;
 }
 
 #leftPanels .panel {

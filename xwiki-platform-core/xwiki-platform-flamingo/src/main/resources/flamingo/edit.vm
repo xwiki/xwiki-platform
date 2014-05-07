@@ -9,8 +9,7 @@
 ##
 #if($tdoc.getLocked() && "$!request.get('force')" == '')
   #template("startpage.vm")
-  #template("applications.vm")
-  <div class="main layoutsubsection $mainGridCSS">
+  <div class="main layoutsubsection">
    <div id="mainContentArea">
     ##
     $response.setStatus(423)
@@ -67,7 +66,6 @@
     </div>
   #end
   #template("header.vm")
-  #template("applications.vm")
   #if($editor == 'wiki' || $editor == 'wysiwyg')
     <form id="edit" method="post" action="$doc.getURL('preview')" class="withLock form">
     <div class="hidden">
@@ -87,7 +85,7 @@
   ##################
   <div id="xwikieditor" class="layoutsection">
   <div id="xwikieditorinner">
-  <div class="leftsidecolumns $mainGridCSS main">
+  <div class="leftsidecolumns main">
   <div id="editcolumn" class="editor editor-${editor}">
   <div class="alleditcontent">
   <div id="mainEditArea">

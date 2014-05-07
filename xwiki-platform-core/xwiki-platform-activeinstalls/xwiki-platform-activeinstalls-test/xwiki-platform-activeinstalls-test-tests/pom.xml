@@ -60,6 +60,14 @@
       <scope>runtime</scope>
       <version>${project.version}</version>
     </dependency>
+    <!-- Add Panel deps which is optional in xwiki-platform-activeinstalls-server-ui in order to test registration
+         in the App panel -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -70,6 +78,18 @@
     <dependency>
       <groupId>com.github.tlrx</groupId>
       <artifactId>elasticsearch-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-activeinstalls-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-test-pageobjects</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

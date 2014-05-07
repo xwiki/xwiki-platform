@@ -20,6 +20,8 @@
 package org.xwiki.activeinstalls.test.ui;
 
 import org.junit.*;
+import org.xwiki.activeinstalls.test.po.ActiveInstallsHomePage;
+import org.xwiki.panels.test.po.ApplicationsPanel;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import org.xwiki.test.ui.po.ViewPage;
@@ -66,6 +68,16 @@ public class ActiveInstallsTest extends AbstractTest
                     + "\"date\": \"2013-09-16T20:00:34.277Z\", \"extensions\": [ ] }"));
         }
 
+        // Navigate to the ActiveInstalls app by clicking in the Application Panel.
+        // This verifies that the ActiveInstalls application is registered in the Applications Panel.
+        // It also verifies that the Translation is registered properly.
+        ApplicationsPanel applicationPanel = ApplicationsPanel.gotoPage();
+        ViewPage vp = applicationPanel.clickApplication("Active Installs");
+
+        // Verify we're on the right page!
+        Assert.assertEquals(ActiveInstallsHomePage.getSpace(), vp.getMetaDataValue("space"));
+        Assert.assertEquals(ActiveInstallsHomePage.getPage(), vp.getMetaDataValue("page"));
+
         // Configure the Active Installs feature to count "org.xwiki.platform:xwiki-platform-web" distribution ids.
         getUtil().updateObject("ActiveInstalls", "ActiveInstallsConfig", "ActiveInstalls.ActiveInstallsConfig", 0,
             "distributionId", "org.xwiki.platform:xwiki-platform-web");
@@ -74,7 +86,7 @@ public class ActiveInstallsTest extends AbstractTest
 
         // The default query doesn't show SNAPSHOT versions and thus we expect 0
         getUtil().gotoPage("ActiveInstalls", "ActiveCounterValue2");
-        ViewPage vp  = new ViewPage();
+        vp  = new ViewPage();
         assertEquals("0", vp.getContent());
 
         // The default query doesn't show SNAPSHOT versions and thus we expect 0

@@ -41,6 +41,7 @@
     <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager" />
     <any>
       <when-property-is name="user.agent" value="ie9" />
+      <when-property-is name="user.agent" value="ie10" />
       <when-property-is name="user.agent" value="ie11" />
     </any>
   </replace-with>
@@ -62,7 +63,10 @@
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IEDOMUtils">
     <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils" />
-    <when-property-is name="user.agent" value="ie9" />
+    <any>
+      <when-property-is name="user.agent" value="ie9" />
+      <when-property-is name="user.agent" value="ie10" />
+    </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IEOldDOMUtils">

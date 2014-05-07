@@ -205,6 +205,10 @@ var XWiki = (function (XWiki) {
   acceptAlreadyAddedItem : function (key) {
     var input = $(this.getInputId(key));
     if (input) {
+        if (this.list &&
+            !this.list.down("#" + this.getInputId(e).replace(/([ #;&,.+*~\':"!^$[\]()=>|\/])/g, "\\$1"))) {
+            return false;
+        }
       input.checked = true;
       this.notifySelectionChange(input.up('li') || input);
       return true;

@@ -119,6 +119,13 @@ public class Utils
         response.setContentType("text/html; charset=" + context.getWiki().getEncoding());
 
         String action = context.getAction();
+        long cacheSetting = context.getWiki().getXWikiPreferenceAsLong("headers_nocache", -1, context);
+        if (cacheSetting == -1) {
+            cacheSetting = context.getWiki().ParamAsLong("xwiki.httpheaders.cache", -1);
+        }
+        if (cacheSetting == -1) {
+            cacheSetting = 1;
+        }
         if ((!"download".equals(action)) && (!"skin".equals(action))) {
             if (context.getResponse() instanceof XWikiServletResponse) {
                 // Add a last modified to tell when the page was last updated
@@ -128,10 +135,18 @@ public class Utils
                     }
                 }
                 // Set a nocache to make sure the page is reloaded after an edit
-                if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context) != 0) {
+                if (cacheSetting == 1) {
                     response.setHeader("Pragma", "no-cache");
                     response.setHeader("Cache-Control", "no-cache");
+                } else if (cacheSetting == 2) {
+                    response.setHeader("Pragma", "no-cache");
+                    response.setHeader("Cache-Control", "max-age=0, no-cache, no-store");
+                } else if (cacheSetting == 3) {
+                    response.setHeader("Cache-Control", "private");
+                } else if (cacheSetting == 4) {
+                    response.setHeader("Cache-Control", "public");
                 }
+
                 // Set an expires in one month
                 long expires = context.getWiki().getXWikiPreferenceAsLong("headers_expires", -1, context);
                 if (expires == -1) {
@@ -144,7 +159,7 @@ public class Utils
 
         if (("download".equals(action)) || ("skin".equals(action))) {
             // Set a nocache to make sure these files are not cached by proxies
-            if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context) != 0) {
+            if (cacheSetting == 1 || cacheSetting == 2) {
                 response.setHeader("Cache-Control", "no-cache");
             }
         }

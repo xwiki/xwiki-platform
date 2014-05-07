@@ -54,6 +54,11 @@
       <artifactId>respond</artifactId>
       <version>1.4.2</version>
     </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>html5shiv</artifactId>
+      <version>3.7.0</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

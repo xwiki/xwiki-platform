@@ -68,6 +68,10 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/markerScript.js", false)" defer="defer"></script>
 ## Respond.js implements the CSS 3 media queries for IE8
 <script type="text/javascript" src="$services.webjars.url('respond/1.4.2/dest/respond.min.js')" defer="defer"></script>
+## HTML5Shiv enable the compatibility with IE8
+<!--[if lt IE 9]>
+  <script src="$services.webjars.url('html5shiv/3.7.0/html5shiv.min.js')"></script>
+<![endif]-->
 <script type="text/javascript">
 // <![CDATA[
 require.config({

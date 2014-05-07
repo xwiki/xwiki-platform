@@ -762,7 +762,7 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
         String database = getXWikiContext().getDatabase();
         if (!neededMigrations.isEmpty()) {
             logger.info(
-                "The following data migration(s) will be applied for database [{}] currently in version [{}]:",
+                "The following data migration(s) will be applied for wiki [{}] currently in version [{}]:",
                 database, curversion);
             for (XWikiMigration migration : neededMigrations) {
                 logger.info("  {} - {}{}", migration.dataMigration.getName(),

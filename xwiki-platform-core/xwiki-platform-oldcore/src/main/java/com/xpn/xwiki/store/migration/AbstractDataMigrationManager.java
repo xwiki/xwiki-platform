@@ -770,10 +770,10 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             }
         } else {
             if (curversion != null) {
-                logger.info("No data migration to apply for database [{}] currently in version [{}]",
+                logger.info("No data migration to apply for wiki [{}] currently in version [{}]",
                     database, curversion);
             } else {
-                logger.info("No data migration to apply for empty database [{}]",
+                logger.info("No data migration to apply for empty wiki [{}]",
                     database);
             }
         }

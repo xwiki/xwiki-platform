@@ -146,7 +146,7 @@
 #########################
 {{html clean="false"}}
   #if($xcontext.action == 'edit' || $xcontext.action == 'inline')
-    &lt;input type='hidden' name='category' value="$!{currentCategory}" /&gt;
+    &lt;input type='hidden' name='category' value="$!{escapetool.xml($currentCategory)}" /&gt;
   #end
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
   #if($request.get('xpage'))

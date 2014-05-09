@@ -486,8 +486,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private static Cookie getCookie(Cookie[] cookies, String cookieName)
     {
         if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
+            for (Cookie cookie : cookies) {
                 if (cookieName.equals(cookie.getName())) {
                     return (cookie);
                 }
@@ -542,8 +541,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         String value = defaultValue;
         if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
+            for (Cookie cookie : cookies) {
                 if (cookieName.equals(cookie.getName())) {
                     value = cookie.getValue();
                 }

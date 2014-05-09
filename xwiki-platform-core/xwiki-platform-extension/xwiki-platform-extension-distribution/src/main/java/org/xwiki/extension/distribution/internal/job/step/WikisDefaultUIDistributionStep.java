@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -50,6 +51,12 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
 
     @Inject
     private transient InstalledExtensionRepository installedRepository;
+
+    /**
+     * The component used to get information about the current distribution.
+     */
+    @Inject
+    protected transient DistributionManager distributionManager;
 
     @Inject
     private transient Logger logger;

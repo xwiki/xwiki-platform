@@ -95,7 +95,6 @@ import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.classloader.ClassLoaderManager;
-import org.xwiki.classloader.NamespaceURLClassLoader;
 import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -398,6 +397,10 @@ public class XWiki implements EventListener
                 synchronized (XWiki.class) {
                     xwiki = (XWiki) econtext.getAttribute(xwikiname);
                     if (xwiki == null) {
+                        // TODO: do all that in a job and display the progress in "initializing" template
+
+                        econtext.setAttribute("xwiki.init", true);
+
                         InputStream xwikicfgis = XWiki.readXWikiConfiguration(getConfigPath(), econtext, context);
                         xwiki = new XWiki(xwikicfgis, context, context.getEngineContext());
                         econtext.setAttribute(xwikiname, xwiki);
@@ -412,6 +415,7 @@ public class XWiki implements EventListener
                         Utils.<ObservationManager> getComponent((Type) ObservationManager.class).notify(
                             new ApplicationReadyEvent(), xwiki, context);
 
+                        econtext.setAttribute("xwiki.init", false);
                     }
                 }
             }
@@ -422,6 +426,11 @@ public class XWiki implements EventListener
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_INIT_FAILED,
                 "Could not initialize main XWiki context", e);
         }
+    }
+
+    public static boolean isInitializing(XWikiContext xcontext)
+    {
+        return Boolean.TRUE.equals(xcontext.getEngineContext().getAttribute("xwiki.init"));
     }
 
     /**

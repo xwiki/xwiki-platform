@@ -1,0 +1,16 @@
+##syntax=xwiki/2.1
+{{html clean="false"}}
+<html>
+  <head>
+    <title>XWiki is loading...</title>
+    <meta http-equiv="refresh" content="5">
+  </head>
+  <body>
+{{/html}}
+
+XWiki is initializing...
+
+{{html clean="false"}}
+  </body>
+</html>
+{{/html}}

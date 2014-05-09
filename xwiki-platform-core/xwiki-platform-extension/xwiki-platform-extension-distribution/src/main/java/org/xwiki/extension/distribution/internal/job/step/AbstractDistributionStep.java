@@ -19,68 +19,20 @@
  */
 package org.xwiki.extension.distribution.internal.job.step;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.commons.io.IOUtils;
-import org.xwiki.environment.Environment;
-import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.block.VerbatimBlock;
-import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.ContentParser;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import com.xpn.xwiki.internal.template.WikiTemplateRenderer;
 
 public abstract class AbstractDistributionStep implements DistributionStep
 {
-    protected class StringContent
-    {
-        public String content;
-
-        public Syntax syntax;
-
-        public StringContent(String content, Syntax syntax)
-        {
-            this.content = content;
-            this.syntax = syntax;
-        }
-    }
-
-    private static final Pattern FIRSTLINE = Pattern.compile("^.#syntax=(.*)$", Pattern.MULTILINE);
-
     @Inject
-    protected transient ContentParser parser;
-
-    @Inject
-    protected transient Environment environment;
-
-    @Inject
-    protected transient SyntaxFactory syntaxFactory;
-
-    /**
-     * The component used to get information about the current distribution.
-     */
-    @Inject
-    protected transient DistributionManager distributionManager;
+    protected transient WikiTemplateRenderer renderer;
 
     @Inject
     protected transient Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
@@ -161,69 +113,9 @@ public abstract class AbstractDistributionStep implements DistributionStep
         return "/templates/distribution/" + getId() + ".wiki";
     }
 
-    protected StringContent getStringContent() throws IOException, ParseException
-    {
-        InputStream stream = this.environment.getResourceAsStream(getTemplate());
-
-        String content;
-        try {
-            content = IOUtils.toString(stream, "UTF-8");
-        } finally {
-            IOUtils.closeQuietly(stream);
-        }
-
-        Matcher matcher = FIRSTLINE.matcher(content);
-
-        Syntax syntax;
-        if (matcher.find()) {
-            String syntaxString = matcher.group(1);
-            syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxString);
-            content = content.substring(matcher.end());
-        } else {
-            throw new ParseException("Distribution step template [" + getTemplate() + "] does not provide its syntax");
-        }
-
-        return new StringContent(content, syntax);
-    }
-
-    protected XDOM getXDOM()
-    {
-        XDOM xdom;
-
-        try {
-            StringContent content = getStringContent();
-
-            xdom = parser.parse(content.content, content.syntax);
-        } catch (Throwable e) {
-            xdom = generateError(e);
-        }
-
-        return xdom;
-    }
-
-    protected XDOM generateError(Throwable throwable)
-    {
-        List<Block> errorBlocks = new ArrayList<Block>();
-
-        // Add short message
-        Map<String, String> errorBlockParams = Collections.singletonMap("class", "xwikirenderingerror");
-        errorBlocks.add(new GroupBlock(Arrays.<Block> asList(new WordBlock("Failed to render step content")),
-            errorBlockParams));
-
-        // Add complete error
-        StringWriter writer = new StringWriter();
-        throwable.printStackTrace(new PrintWriter(writer));
-        Block descriptionBlock = new VerbatimBlock(writer.toString(), false);
-        Map<String, String> errorDescriptionBlockParams =
-            Collections.singletonMap("class", "xwikirenderingerrordescription hidden");
-        errorBlocks.add(new GroupBlock(Arrays.asList(descriptionBlock), errorDescriptionBlockParams));
-
-        return new XDOM(errorBlocks);
-    }
-
     @Override
     public Block render()
     {
-        return getXDOM();
+        return this.renderer.getXDOM(getTemplate());
     }
 }

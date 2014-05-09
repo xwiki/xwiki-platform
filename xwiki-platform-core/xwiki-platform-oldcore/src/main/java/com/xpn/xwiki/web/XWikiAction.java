@@ -441,6 +441,11 @@ public abstract class XWikiAction extends Action
         }
     }
 
+    protected boolean isInitializing(XWikiContext xcontext)
+    {
+        return XWiki.isInitializing(xcontext);
+    }
+
     protected XWikiContext initializeXWikiContext(ActionMapping mapping, ActionForm form, HttpServletRequest req,
         HttpServletResponse resp) throws XWikiException, ServletException
     {

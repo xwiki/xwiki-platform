@@ -21,9 +21,14 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
+import org.apache.struts.action.ActionForward;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.rendering.syntax.Syntax;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.template.WikiTemplateRenderer;
 
 /**
  * Action called when the request URL has the "/view/" string in its path (this is configured in
@@ -39,6 +44,35 @@ public class ViewAction extends XWikiAction
      * @todo need an enumerated class for actions.
      */
     public static final String VIEW_ACTION = "view";
+
+    @Override
+    public ActionForward execute(XWikiContext xcontext) throws Exception
+    {
+        // TODO: improve that to not even block the first request
+        if (isInitializing(xcontext)) {
+            // Display initialization template
+            renderInit(xcontext);
+
+            // Initialization template was displayed, stop here.
+            return null;
+        } else {
+            return super.execute(xcontext);
+        }
+    }
+
+    private void renderInit(XWikiContext xcontext) throws IOException, ComponentLookupException
+    {
+        String content =
+            Utils.getComponent(WikiTemplateRenderer.class).render("/templates/init.wiki", "init", Syntax.XHTML_1_0);
+
+        xcontext.getResponse().setStatus(503);
+        xcontext.getResponse().setContentType("text/html; charset=UTF-8");
+        xcontext.getResponse().setContentLength(content.length());
+        xcontext.getResponse().getWriter().write(content);
+        xcontext.getResponse().flushBuffer();
+
+        xcontext.setFinished(true);
+    }
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException

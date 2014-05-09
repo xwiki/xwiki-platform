@@ -2213,7 +2213,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
 &lt;form action="$targetAttachDocument.getURL('upload')" enctype="multipart/form-data" method="post" id="uploadAttachment" class="uploadAttachment xform"&gt;
   &lt;div class="gallery_upload_input"&gt;
     #if (${options.rawfilter} != '')
-      &lt;span class="xHint"&gt;$services.localization.render("${translationPrefix}.upload.hint", [${options.rawfilter}])&lt;/span&gt;
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render("${translationPrefix}.upload.hint", [${options.rawfilter}]))&lt;/span&gt;
     #end
     &lt;input type="file" name="filepath" id="attachfile" class="attachment" size="30" title="$!{escapetool.xml($options.rawfilter)}"/&gt;
     &lt;input type="hidden" name="xredirect" value="$xwiki.getDocument($attachmentPickerDocName).getURL('get', "xaction=postUpload&amp;amp;docAction=$!{escapetool.url($options.get('docAction'))}&amp;amp;targetdocname=$!{escapetool.url($targetAttachDocument.fullName)}&amp;amp;docname=$!{escapetool.url($targetDocument.fullName)}&amp;amp;fieldname=$!{escapetool.url($options.get('classname'))}_$!{escapetool.url($options.get('object'))}_$!{escapetool.url($options.get('property'))}&amp;amp;form_token=$!{services.csrf.getToken()}")" /&gt;

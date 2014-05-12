@@ -95,6 +95,10 @@ public class WebJarsAction extends AbstractAction
                 IOUtils.closeQuietly(resourceStream);
             }
         }
+
+        // Be a good citizen, continue the chain, in case some lower-priority action has something to do for this
+        // action id.
+        chain.executeNext(resource);
     }
 
     /**

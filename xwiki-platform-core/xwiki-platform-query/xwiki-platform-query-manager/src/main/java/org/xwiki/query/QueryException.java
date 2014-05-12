@@ -49,7 +49,11 @@ public class QueryException extends Exception
         if (query == null) {
             return super.getMessage();
         } else {
-            return super.getMessage() + ". Query statement = [" + query.getStatement() + "]";
+            if (query.isNamed()) {
+                return super.getMessage() + ". Named query = [" + query.getStatement() + "]";
+            } else {
+                return super.getMessage() + ". Query statement = [" + query.getStatement() + "]";
+            }
         }
     }
 }

@@ -236,6 +236,6 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      */
     protected XWikiContext getContext()
     {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 }

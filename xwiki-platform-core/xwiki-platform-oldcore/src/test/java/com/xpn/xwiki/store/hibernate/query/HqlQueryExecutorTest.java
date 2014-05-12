@@ -33,10 +33,16 @@ import org.hibernate.cfg.Configuration;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryExecutor;
+import org.xwiki.query.QueryException;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 
 /**
@@ -47,8 +53,8 @@ import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 public class HqlQueryExecutorTest
 {
     @Rule
-    public MockitoComponentMockingRule<QueryExecutor> mocker = new MockitoComponentMockingRule<QueryExecutor>(
-        HqlQueryExecutor.class);
+    public MockitoComponentMockingRule<HqlQueryExecutor> mocker =
+        new MockitoComponentMockingRule<>(HqlQueryExecutor.class);
 
     /**
      * The component under test.
@@ -61,7 +67,7 @@ public class HqlQueryExecutorTest
         HibernateSessionFactory sessionFactory = this.mocker.getInstance(HibernateSessionFactory.class);
         when(sessionFactory.getConfiguration()).thenReturn(new Configuration());
 
-        this.executor = (HqlQueryExecutor) this.mocker.getComponentUnderTest();
+        this.executor = this.mocker.getComponentUnderTest();
     }
 
     @Test
@@ -164,5 +170,40 @@ public class HqlQueryExecutorTest
         verify(hquery).setMaxResults(limit);
         verify(hquery).setParameter("alice", 10);
         verify(hquery).setParameterList("bob", listValue);
+    }
+
+    @Test
+    public void executeWhenStoreException() throws Exception
+    {
+        Query query = mock(Query.class);
+        when(query.isNamed()).thenReturn(false);
+        when(query.getStatement()).thenReturn("statement");
+
+        Execution execution = this.mocker.getInstance(Execution.class);
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+        when(execution.getContext()).thenReturn(executionContext);
+        XWikiContext xwikiContext = mock(XWikiContext.class);
+        when(executionContext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY)).thenReturn(xwikiContext);
+        when(xwikiContext.getWikiId()).thenReturn("currentwikid");
+
+        com.xpn.xwiki.XWiki xwiki = mock(com.xpn.xwiki.XWiki.class);
+        when(xwikiContext.getWiki()).thenReturn(xwiki);
+        XWikiHibernateStore store = mock(XWikiHibernateStore.class);
+        when(xwiki.getHibernateStore()).thenReturn(store);
+
+        XWikiException exception = mock(XWikiException.class);
+        when(exception.getMessage()).thenReturn("nestedmessage");
+
+        when(store.executeRead(any(XWikiContext.class), any(XWikiHibernateBaseStore.HibernateCallback.class)))
+            .thenThrow(exception);
+
+        try {
+            this.executor.execute(query);
+            fail("Should have thrown an exception here");
+        } catch (QueryException expected) {
+            assertEquals("Exception while executing query. Query statement = [statement]", expected.getMessage());
+            // Verify nested exception!
+            assertEquals("nestedmessage", expected.getCause().getMessage());
+        }
     }
 }

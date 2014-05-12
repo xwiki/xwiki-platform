@@ -106,7 +106,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                 }
             });
         } catch (XWikiException e) {
-            throw new QueryException("Exception while execute query", query, e);
+            throw new QueryException("Exception while executing query", query, e);
         } finally {
             getContext().setWikiId(oldDatabase);
         }

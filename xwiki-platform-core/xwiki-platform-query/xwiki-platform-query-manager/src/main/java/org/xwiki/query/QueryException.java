@@ -43,9 +43,6 @@ public class QueryException extends Exception
         this.query = query;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getMessage()
     {

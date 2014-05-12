@@ -443,10 +443,10 @@ public class XWikiExecutor
 
     private String getURL()
     {
-        // We use "xpage=plain" for 2 reasons:
+        // We use "get" action for 2 reasons:
         // 1) the page loads faster since it doesn't need to display the skin
         // 2) if the page doesn't exist it won't return a 404 HTTP Response code
-        return URL + ":" + getPort() + "/xwiki/bin/view/Main?xpage=plain";
+        return URL + ":" + getPort() + "/xwiki/bin/get/Main";
     }
 
     private String getDefaultStartCommand(int port, int stopPort, int rmiPort)

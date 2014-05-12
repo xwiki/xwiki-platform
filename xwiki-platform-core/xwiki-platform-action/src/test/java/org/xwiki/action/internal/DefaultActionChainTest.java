@@ -19,41 +19,27 @@
  */
 package org.xwiki.action.internal;
 
-import java.util.Collection;
-import java.util.Stack;
+import java.util.Collections;
 
+import org.junit.Test;
 import org.xwiki.action.Action;
-import org.xwiki.action.ActionChain;
-import org.xwiki.action.ActionException;
 import org.xwiki.resource.Resource;
 
+import static org.mockito.Mockito.mock;
+
 /**
- * Default chain implementation using a Stack.
+ * Unit tests for {@link org.xwiki.action.internal.DefaultActionChain}.
  *
  * @version $Id$
- * @since 6.0M1
+ * @since 6.1M1
  */
-public class DefaultActionChain implements ActionChain
+public class DefaultActionChainTest
 {
-    /**
-     * Contains all remaining Actions to execute with Actions on top executing first.
-     */
-    private Stack<Action> actionStack;
-
-    /**
-     * @param orderedActions the sorted list of Action to execute
-     */
-    public DefaultActionChain(Collection<Action> orderedActions)
+    @Test
+    public void executeNextWhenNoMoreAction() throws Exception
     {
-        this.actionStack = new Stack<>();
-        this.actionStack.addAll(orderedActions);
-    }
+        DefaultActionChain chain = new DefaultActionChain(Collections.<Action>emptyList());
 
-    @Override
-    public void executeNext(Resource resource) throws ActionException
-    {
-        if (!this.actionStack.isEmpty()) {
-            this.actionStack.pop().execute(resource, this);
-        }
+        chain.executeNext(mock(Resource.class));
     }
 }

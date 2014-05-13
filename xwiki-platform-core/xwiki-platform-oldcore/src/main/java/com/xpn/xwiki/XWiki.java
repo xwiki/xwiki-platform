@@ -81,7 +81,6 @@ import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentCreatingEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
@@ -97,6 +96,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
+import org.xwiki.job.Job;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -139,6 +139,7 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.internal.XWikiInitializerJob;
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectEvent;
@@ -366,6 +367,8 @@ public class XWiki implements EventListener
      */
     private Boolean hasBacklinks;
 
+    private static XWikiInitializerJob job;
+
     public static String getConfigPath() throws NamingException
     {
         if (configPath == null) {
@@ -385,42 +388,46 @@ public class XWiki implements EventListener
 
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException
     {
+        return getMainXWiki(true, context);
+    }
+
+    public static XWiki getMainXWiki(boolean wait, XWikiContext context) throws XWikiException
+    {
         String xwikiname = DEFAULT_MAIN_WIKI;
-        XWiki xwiki;
-        XWikiEngineContext econtext = context.getEngineContext();
 
         context.setMainXWiki(xwikiname);
 
+        XWiki xwiki;
+
         try {
+            XWikiEngineContext econtext = context.getEngineContext();
+
             xwiki = (XWiki) econtext.getAttribute(xwikiname);
             if (xwiki == null) {
+                // Start XWiki initialization
                 synchronized (XWiki.class) {
                     xwiki = (XWiki) econtext.getAttribute(xwikiname);
-                    if (xwiki == null) {
-                        // TODO: do all that in a job and display the progress in "initializing" template
+                    if (xwiki == null && job == null) {
+                        job = Utils.getComponent((Type) Job.class, XWikiInitializerJob.JOBTYPE);
 
-                        econtext.setAttribute("xwiki.init", true);
-
-                        InputStream xwikicfgis = XWiki.readXWikiConfiguration(getConfigPath(), econtext, context);
-                        xwiki = new XWiki(xwikicfgis, context, context.getEngineContext());
-                        econtext.setAttribute(xwikiname, xwiki);
-
-                        // initialize stub context here instead of during Execution context initialization because
-                        // during Execution context initialization, the XWikiContext is not fully initialized (does not
-                        // contains XWiki object) which make it unusable
+                        // "Pre-initialize" XWikiStubContextProvider so that XWiki initializer can find one
                         Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class)
                             .initialize(context);
 
-                        // Send Event to signal that the application is ready to service requests.
-                        Utils.<ObservationManager> getComponent((Type) ObservationManager.class).notify(
-                            new ApplicationReadyEvent(), xwiki, context);
-
-                        econtext.setAttribute("xwiki.init", false);
+                        if (job.getStatus() == null) {
+                            job.startAsync();
+                        }
                     }
+                }
+
+                // Wait until XWiki is initialized
+                if (wait) {
+                    job.join();
                 }
             }
 
             context.setWiki(xwiki);
+
             return xwiki;
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_INIT_FAILED,
@@ -434,60 +441,6 @@ public class XWiki implements EventListener
     }
 
     /**
-     * First try to find the configuration file pointed by the passed location as a file. If it does not exist or if the
-     * file cannot be read (for example if the security manager doesn't allow it), then try to load the file as a
-     * resource using the Servlet Context and failing that from teh classpath.
-     * 
-     * @param configurationLocation the location where the XWiki configuration file is located (either an absolute or
-     *            relative file path or a resource location)
-     * @return the stream containing the configuration data or null if not found
-     * @todo this code should be moved to a Configuration class proper
-     */
-    private static InputStream readXWikiConfiguration(String configurationLocation, XWikiEngineContext econtext,
-        XWikiContext context)
-    {
-        InputStream xwikicfgis = null;
-
-        // First try loading from a file.
-        File f = new File(configurationLocation);
-        try {
-            if (f.exists()) {
-                xwikicfgis = new FileInputStream(f);
-            }
-        } catch (Exception e) {
-            // Error loading the file. Most likely, the Security Manager prevented it.
-            // We'll try loading it as a resource below.
-            LOGGER.debug("Failed to load the file [" + configurationLocation + "] using direct "
-                + "file access. The error was [" + e.getMessage() + "]. Trying to load it "
-                + "as a resource using the Servlet Context...");
-        }
-        // Second, try loading it as a resource using the Servlet Context
-        if (xwikicfgis == null) {
-            xwikicfgis = econtext.getResourceAsStream(configurationLocation);
-            LOGGER.debug("Failed to load the file [" + configurationLocation + "] as a resource "
-                + "using the Servlet Context. Trying to load it as classpath resource...");
-        }
-
-        // Third, try loading it from the classloader used to load this current class
-        if (xwikicfgis == null) {
-            // TODO: Verify if checking on MODE_GWT is correct. I think we should only check for
-            // the debug mode and even for that we need to find some better way of doing it so
-            // that we don't have hardcoded code only for development debugging purposes.
-            if (context.getMode() == XWikiContext.MODE_GWT || context.getMode() == XWikiContext.MODE_GWT_DEBUG) {
-                xwikicfgis = XWiki.class.getClassLoader().getResourceAsStream("xwiki-gwt.cfg");
-            } else {
-                xwikicfgis = XWiki.class.getClassLoader().getResourceAsStream("xwiki.cfg");
-            }
-        }
-
-        LOGGER.debug("Failed to load the file [" + configurationLocation + "] using any method.");
-
-        // TODO: Should throw an exception instead of return null...
-
-        return xwikicfgis;
-    }
-
-    /**
      * Return the XWiki object (as in "the Wiki API") corresponding to the requested wiki.
      * 
      * @param context the current context
@@ -497,7 +450,27 @@ public class XWiki implements EventListener
      */
     public static XWiki getXWiki(XWikiContext context) throws XWikiException
     {
-        XWiki xwiki = getMainXWiki(context);
+        return getXWiki(true, context);
+    }
+
+    /**
+     * Return the XWiki object (as in "the Wiki API") corresponding to the requested wiki.
+     * <p>
+     * Unless <code>wait</code> is false the method return right away null if XWiki is not yet initialized.
+     * 
+     * @param wait wait until XWiki is initialized
+     * @param context the current context
+     * @return an XWiki object configured for the wiki corresponding to the current request
+     * @throws XWikiException if the requested URL does not correspond to a real wiki, or if there's an error in the
+     *             storage
+     */
+    public static XWiki getXWiki(boolean wait, XWikiContext context) throws XWikiException
+    {
+        XWiki xwiki = getMainXWiki(wait, context);
+
+        if (xwiki == null) {
+            return null;
+        }
 
         // Extract Entity Resource from URL and put it in the Execution Context
         EntityResource entityResource = initializeResourceFromURL(context);
@@ -515,8 +488,8 @@ public class XWiki implements EventListener
         try {
             descriptor = wikiDescriptorManager.getById(wikiId);
         } catch (WikiManagerException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_STORE_MISC,
-                String.format("Failed find wiki descriptor for wiki id [%s]", wikiId), e);
+            throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_STORE_MISC, String.format(
+                "Failed find wiki descriptor for wiki id [%s]", wikiId), e);
         }
         if (descriptor == null) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
@@ -547,14 +520,15 @@ public class XWiki implements EventListener
         URL url = context.getURL();
         EntityResource entityResource;
         try {
-            entityResource = (EntityResource) urlFactory.createResource(url,
-                Collections.<String, Object>singletonMap("ignorePrefix", context.getRequest().getContextPath()));
+            entityResource =
+                (EntityResource) urlFactory.createResource(url,
+                    Collections.<String, Object> singletonMap("ignorePrefix", context.getRequest().getContextPath()));
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
                 String.format("Failed to extract Entity Resource from URL [%s]", url), e);
         }
-        Utils.getComponent(Execution.class).getContext().setProperty(ResourceManager.RESOURCE_CONTEXT_PROPERTY,
-            entityResource);
+        Utils.getComponent(Execution.class).getContext()
+            .setProperty(ResourceManager.RESOURCE_CONTEXT_PROPERTY, entityResource);
 
         return entityResource;
     }
@@ -580,7 +554,7 @@ public class XWiki implements EventListener
         return callPrivateMethod(obj, methodName, null, null);
     }
 
-    public static Object callPrivateMethod(Object obj, String methodName, Class<?>[] classes, Object[] args)
+    public static Object callPrivateMethod(Object obj, String methodName, Class< ? >[] classes, Object[] args)
     {
         try {
             Method method = obj.getClass().getDeclaredMethod(methodName, classes);
@@ -988,7 +962,7 @@ public class XWiki implements EventListener
     {
         String storeclass = Param(param, defClass);
         try {
-            Class<?>[] classes = new Class<?>[] {XWikiContext.class};
+            Class< ? >[] classes = new Class< ? >[] {XWikiContext.class};
             Object[] args = new Object[] {context};
             Object result = Class.forName(storeclass).getConstructor(classes).newInstance(args);
             return result;
@@ -3306,7 +3280,7 @@ public class XWiki implements EventListener
      *         </ul>
      * @throws XWikiException failed to create the new user
      */
-    public int createUser(String userName, Map<String, ?> map, XWikiContext context) throws XWikiException
+    public int createUser(String userName, Map<String, ? > map, XWikiContext context) throws XWikiException
     {
         return createUser(userName, map, "edit", context);
     }
@@ -3324,7 +3298,7 @@ public class XWiki implements EventListener
      *         </ul>
      * @throws XWikiException failed to create the new user
      */
-    public int createUser(String userName, Map<String, ?> map, String userRights, XWikiContext context)
+    public int createUser(String userName, Map<String, ? > map, String userRights, XWikiContext context)
         throws XWikiException
     {
         BaseClass userClass = context.getWiki().getUserClass(context);
@@ -3348,7 +3322,7 @@ public class XWiki implements EventListener
      *             {@link #createUser(String, Map, EntityReference, String, Syntax, String, XWikiContext)} instead
      */
     @Deprecated
-    public int createUser(String userName, Map<String, ?> map, String parent, String content, String syntaxId,
+    public int createUser(String userName, Map<String, ? > map, String parent, String content, String syntaxId,
         String userRights, XWikiContext context) throws XWikiException
     {
         Syntax syntax;
@@ -3386,7 +3360,7 @@ public class XWiki implements EventListener
      *         </ul>
      * @throws XWikiException failed to create the new user
      */
-    public int createUser(String userName, Map<String, ?> map, EntityReference parentReference, String content,
+    public int createUser(String userName, Map<String, ? > map, EntityReference parentReference, String content,
         Syntax syntax, String userRights, XWikiContext context) throws XWikiException
     {
         BaseClass userClass = getUserClass(context);
@@ -4812,7 +4786,7 @@ public class XWiki implements EventListener
                             }
                             factoryService =
                                 (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
-                                    .getConstructor(new Class<?>[] {XWiki.class}).newInstance(new Object[] {this});
+                                    .getConstructor(new Class< ? >[] {XWiki.class}).newInstance(new Object[] {this});
                         } catch (Exception e) {
                             factoryService = null;
                             LOGGER.warn("Failed to initialize URLFactory Service [" + urlFactoryServiceClass + "]", e);
@@ -5332,7 +5306,7 @@ public class XWiki implements EventListener
 
     /**
      * API to list all non-hidden spaces in the current wiki.
-     *
+     * 
      * @return a list of string representing all non-hidden spaces (ie spaces that have non-hidden pages) for the
      *         current wiki
      * @throws XWikiException if something went wrong
@@ -5349,7 +5323,7 @@ public class XWiki implements EventListener
 
     /**
      * API to list all non-hidden documents in a space.
-     *
+     * 
      * @param spaceName the space for which to return all non-hidden documents
      * @return the list of document names (in the format {@code Space.Page}) for non-hidden documents in the specified
      *         space
@@ -6052,7 +6026,8 @@ public class XWiki implements EventListener
      * @throws XWikiException when failing to restore document
      * @since 5.4RC1
      */
-    public void restoreFromRecycleBin(final XWikiDocument doc, String comment, XWikiContext context) throws XWikiException
+    public void restoreFromRecycleBin(final XWikiDocument doc, String comment, XWikiContext context)
+        throws XWikiException
     {
         XWikiDeletedDocument[] deletedDocuments = getRecycleBinStore().getAllDeletedDocuments(doc, context, true);
         if (deletedDocuments != null && deletedDocuments.length > 0) {
@@ -6071,7 +6046,8 @@ public class XWiki implements EventListener
      * @throws XWikiException when failing to restore document
      * @since 5.4RC1
      */
-    public void restoreFromRecycleBin(final XWikiDocument doc, long index, String comment, XWikiContext context) throws XWikiException
+    public void restoreFromRecycleBin(final XWikiDocument doc, long index, String comment, XWikiContext context)
+        throws XWikiException
     {
         XWikiDocument newdoc = getRecycleBinStore().restoreFromRecycleBin(doc, index, context, true);
         saveDocument(newdoc, comment, context);
@@ -6461,7 +6437,7 @@ public class XWiki implements EventListener
      */
     @Unstable
     public List<XWikiAttachment> searchAttachments(String parametrizedSqlClause, boolean checkRight, int nb, int start,
-        List<?> parameterValues, XWikiContext context) throws XWikiException
+        List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         parametrizedSqlClause = parametrizedSqlClause.trim().replaceFirst("^and ", "").replaceFirst("^where ", "");
 
@@ -6517,7 +6493,7 @@ public class XWiki implements EventListener
      * @since 5.0M2
      */
     @Unstable
-    public int countAttachments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
+    public int countAttachments(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
         throws XWikiException
     {
         parametrizedSqlClause = parametrizedSqlClause.trim().replaceFirst("^and ", "").replaceFirst("^where ", "");

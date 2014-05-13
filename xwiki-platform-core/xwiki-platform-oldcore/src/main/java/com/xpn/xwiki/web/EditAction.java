@@ -43,6 +43,14 @@ public class EditAction extends XWikiAction
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);
 
+    /**
+     * Default constructor.
+     */
+    public EditAction()
+    {
+        this.waitForXWikiInitialization = false;
+    }
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

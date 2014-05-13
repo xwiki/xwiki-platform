@@ -43,6 +43,14 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class PreviewAction extends EditAction
 {
     /**
+     * Default constructor.
+     */
+    public PreviewAction()
+    {
+        this.waitForXWikiInitialization = false;
+    }
+
+    /**
      * Check if a certain action was selected by the user. This is needed in older skins, which don't make use of the
      * {@link ActionFilter}'s dispatcher functionality, but rely on detecting the submit button that was clicked.
      * 

@@ -1,5 +1,6 @@
 com.xpn.xwiki.DefaultSkinAccessBridge
 com.xpn.xwiki.doc.DefaultDocumentAccessBridge
+com.xpn.xwiki.internal.XWikiInitializerJob
 com.xpn.xwiki.internal.ComponentManagerBridgeEventListener
 com.xpn.xwiki.internal.DefaultCoreConfiguration
 com.xpn.xwiki.internal.DefaultMandatoryDocumentInitializerManager

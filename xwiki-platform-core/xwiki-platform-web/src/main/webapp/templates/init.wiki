@@ -3,12 +3,19 @@
 <html>
   <head>
     <title>XWiki is loading...</title>
-    <meta http-equiv="refresh" content="5">
+    <meta http-equiv="refresh" content="1">
   </head>
   <body>
 {{/html}}
 
-XWiki is initializing...
+{{velocity}}
+#set($percent = 0)
+#set($jobstatus = $xwiki.jobStatus)
+#if ($jobstatus)
+  #set($percent = $jobstatus.progress.offset * 100)
+#end
+XWiki is initializing ($percent%)...
+{{/velocity}}
 
 {{html clean="false"}}
   </body>

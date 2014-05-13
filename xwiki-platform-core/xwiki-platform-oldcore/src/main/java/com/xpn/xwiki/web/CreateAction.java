@@ -132,6 +132,14 @@ public class CreateAction extends XWikiAction
      */
     private static final String CURRENT_RESOLVER_HINT = "current";
 
+    /**
+     * Default constructor.
+     */
+    public CreateAction()
+    {
+        this.waitForXWikiInitialization = false;
+    }
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

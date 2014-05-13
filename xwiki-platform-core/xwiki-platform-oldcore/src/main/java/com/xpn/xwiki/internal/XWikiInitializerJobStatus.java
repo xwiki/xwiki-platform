@@ -17,34 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.web;
+package com.xpn.xwiki.internal;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.job.internal.AbstractJobStatus;
+import org.xwiki.logging.LoggerManager;
+import org.xwiki.observation.ObservationManager;
 
-public class ViewrevAction extends XWikiAction
+/**
+ * Used to expose {@link XWikiInitializerJob} status.
+ * @version $Id$
+ * @since 6.0M1
+ */
+public class XWikiInitializerJobStatus extends AbstractJobStatus<XWikiInitializerRequest>
 {
     /**
-     * Default constructor.
+     * @param request the request provided when started the job
+     * @param observationManager the observation manager component
+     * @param loggerManager the logger manager component
      */
-    public ViewrevAction()
+    public XWikiInitializerJobStatus(XWikiInitializerRequest request, ObservationManager observationManager,
+        LoggerManager loggerManager)
     {
-        this.waitForXWikiInitialization = false;
-    }
+        super(request, observationManager, loggerManager, false);
 
-    @Override
-    public String render(XWikiContext context) throws XWikiException
-    {
-        try {
-            handleRevision(context);
-        } catch (XWikiException e) {
-            if (e.getCode() == XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION) {
-                context.put("message", "revisiondoesnotexist");
-                return "exception";
-
-            } else
-                throw e;
-        }
-        return "view";
+        setIsolated(false);
     }
 }

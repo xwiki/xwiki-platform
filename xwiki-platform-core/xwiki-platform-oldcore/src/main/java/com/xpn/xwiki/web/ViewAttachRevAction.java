@@ -31,6 +31,14 @@ import com.xpn.xwiki.util.Util;
 
 public class ViewAttachRevAction extends XWikiAction
 {
+    /**
+     * Default constructor.
+     */
+    public ViewAttachRevAction()
+    {
+        this.waitForXWikiInitialization = false;
+    }
+
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

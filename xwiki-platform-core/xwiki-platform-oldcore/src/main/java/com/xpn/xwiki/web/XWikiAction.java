@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.action.ActionManager;
 import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
@@ -49,6 +50,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.resource.Resource;
 import org.xwiki.resource.ResourceManager;
 import org.xwiki.velocity.VelocityManager;
@@ -57,6 +59,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.template.WikiTemplateRenderer;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
@@ -106,6 +109,11 @@ public abstract class XWikiAction extends Action
         "download");
 
     /**
+     * Indicate if the action is blocked until XWiki is initialized.
+     */
+    protected boolean waitForXWikiInitialization = true;
+
+    /**
      * Handle server requests.
      * 
      * @param mapping The ActionMapping used to select this instance
@@ -153,7 +161,16 @@ public abstract class XWikiAction extends Action
 
             // Verify that the requested wiki exists
             try {
-                xwiki = XWiki.getXWiki(context);
+                xwiki = XWiki.getXWiki(this.waitForXWikiInitialization, context);
+
+                // If XWiki is still initializing display initialization template
+                if (xwiki == null) {
+                    // Display initialization template
+                    renderInit(context);
+
+                    // Initialization template has been displayed, stop here.
+                    return null;
+                }
             } catch (XWikiException e) {
                 // If the wiki asked by the user doesn't exist, then we first attempt to use any existing global
                 // redirects. If there are none, then we display the specific error template.
@@ -164,7 +181,8 @@ public abstract class XWikiAction extends Action
                     XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
                     context.setURLFactory(urlf);
 
-                    // Initialize the velocity context and its bindings so that it may be used in the velocity templates that we
+                    // Initialize the velocity context and its bindings so that it may be used in the velocity templates
+                    // that we
                     // are parsing below.
                     VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
                     VelocityContext vcontext = velocityManager.getVelocityContext();
@@ -186,10 +204,10 @@ public abstract class XWikiAction extends Action
                             // since we cannot set the non existing one as it would generate errors obviously...
                             EntityReferenceValueProvider valueProvider =
                                 Utils.getComponent(EntityReferenceValueProvider.class);
-                            xwiki.setPhonyDocument(new DocumentReference(
-                                valueProvider.getDefaultValue(EntityType.WIKI),
-                                valueProvider.getDefaultValue(EntityType.SPACE),
-                                valueProvider.getDefaultValue(EntityType.DOCUMENT)), context, vcontext);
+                            xwiki.setPhonyDocument(
+                                new DocumentReference(valueProvider.getDefaultValue(EntityType.WIKI), valueProvider
+                                    .getDefaultValue(EntityType.SPACE), valueProvider
+                                    .getDefaultValue(EntityType.DOCUMENT)), context, vcontext);
 
                             // Parse the error template
                             Utils.parseTemplate(context.getWiki().Param("xwiki.wiki_exception", "wikidoesnotexist"),
@@ -441,9 +459,18 @@ public abstract class XWikiAction extends Action
         }
     }
 
-    protected boolean isInitializing(XWikiContext xcontext)
+    private void renderInit(XWikiContext xcontext) throws IOException, ComponentLookupException
     {
-        return XWiki.isInitializing(xcontext);
+        String content =
+            Utils.getComponent(WikiTemplateRenderer.class).render("/templates/init.wiki", "init", Syntax.XHTML_1_0);
+
+        xcontext.getResponse().setStatus(503);
+        xcontext.getResponse().setContentType("text/html; charset=UTF-8");
+        xcontext.getResponse().setContentLength(content.length());
+        xcontext.getResponse().getWriter().write(content);
+        xcontext.getResponse().flushBuffer();
+
+        xcontext.setFinished(true);
     }
 
     protected XWikiContext initializeXWikiContext(ActionMapping mapping, ActionForm form, HttpServletRequest req,

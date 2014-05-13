@@ -100,6 +100,7 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
         }
 
         this.initialContext = newContext;
+
         this.logger.debug("Stub context initialized.");
     }
 

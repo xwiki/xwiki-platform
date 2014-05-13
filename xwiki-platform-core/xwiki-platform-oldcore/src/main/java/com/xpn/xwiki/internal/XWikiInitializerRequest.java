@@ -17,34 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.web;
+package com.xpn.xwiki.internal;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.job.AbstractRequest;
+import org.xwiki.job.Request;
 
-public class ViewrevAction extends XWikiAction
+/**
+ * Request to use with {@link XWikiInitializerJob}.
+ * 
+ * @version $Id$
+ * @since 6.1M1
+ */
+public class XWikiInitializerRequest extends AbstractRequest
 {
     /**
      * Default constructor.
      */
-    public ViewrevAction()
+    public XWikiInitializerRequest()
     {
-        this.waitForXWikiInitialization = false;
+        setId("xwiki");
+        setInteractive(false);
     }
 
-    @Override
-    public String render(XWikiContext context) throws XWikiException
+    /**
+     * @param request the request to copy
+     */
+    public XWikiInitializerRequest(Request request)
     {
-        try {
-            handleRevision(context);
-        } catch (XWikiException e) {
-            if (e.getCode() == XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION) {
-                context.put("message", "revisiondoesnotexist");
-                return "exception";
-
-            } else
-                throw e;
-        }
-        return "view";
+        super(request);
     }
 }

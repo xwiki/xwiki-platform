@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -44,6 +45,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.XWikiInitializerJob;
+import com.xpn.xwiki.internal.XWikiInitializerJobStatus;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Programming;
@@ -118,6 +121,13 @@ public class XWiki extends Api
         return null;
     }
 
+    public XWikiInitializerJobStatus getJobStatus()
+    {
+        XWikiInitializerJob job = Utils.getComponent((Type) Job.class, XWikiInitializerJob.JOBTYPE);
+
+        return job != null ? job.getStatus() : null;
+    }
+
     /**
      * @return XWiki's version in the format <code>(version).(SVN build number)</code>, or "Unknown version" if it
      *         failed to be retrieved
@@ -189,8 +199,8 @@ public class XWiki extends Api
     {
         try {
             XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getPrefixedFullName(),
-                getXWikiContext()) == false) {
+            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(),
+                doc.getPrefixedFullName(), getXWikiContext()) == false) {
                 return null;
             }
 
@@ -698,8 +708,8 @@ public class XWiki extends Api
 
     /**
      * Search attachments by passing HQL where clause values as parameters. See
-     * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses.
-     * You can specify properties of attach (the attachment) or doc (the document it is attached to)
+     * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses. You can specify
+     * properties of attach (the attachment) or doc (the document it is attached to)
      * 
      * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
@@ -714,14 +724,15 @@ public class XWiki extends Api
     public List<Attachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List< ? > parameterValues)
         throws XWikiException
     {
-        return convertAttachments(
-            this.xwiki.searchAttachments(parametrizedSqlClause, true, nb, start, parameterValues, this.context));
+        return convertAttachments(this.xwiki.searchAttachments(parametrizedSqlClause, true, nb, start, parameterValues,
+            this.context));
     }
 
     /**
      * Count attachments returned by a given parameterized query
-     *
-     * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL see: {@link #searchDocuments(String, int, int, List)}
+     * 
+     * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL see:
+     *            {@link #searchDocuments(String, int, int, List)}
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
      * @return int number of attachments found.
      * @throws XWikiException
@@ -729,8 +740,7 @@ public class XWiki extends Api
      * @since 5.0M2
      */
     @Unstable
-    public int countAttachments(String parametrizedSqlClause, List< ? > parameterValues)
-        throws XWikiException
+    public int countAttachments(String parametrizedSqlClause, List< ? > parameterValues) throws XWikiException
     {
         return this.xwiki.countAttachments(parametrizedSqlClause, parameterValues, this.context);
     }
@@ -1879,8 +1889,8 @@ public class XWiki extends Api
 
     /**
      * API to retrieve a text representing the user with the first name and last name of the user. With the link param
-     * set to false it will not link to the user page With the link param set to true, the link will link to the page
-     * on the wiki where the user was registered.
+     * set to false it will not link to the user page With the link param set to true, the link will link to the page on
+     * the wiki where the user was registered.
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param link false to not add an HTML link to the user profile
@@ -1892,10 +1902,10 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with a custom view With the link param set to false it will not
-     * link to the user page. With the link param set to true, the link will link to the page on the wiki where the
-     * user was registered. The formating is done using the format parameter which can contain velocity scripting
-     * and access all properties of the User profile using variables ($first_name $last_name $email $city)
+     * API to retrieve a text representing the user with a custom view With the link param set to false it will not link
+     * to the user page. With the link param set to true, the link will link to the page on the wiki where the user was
+     * registered. The formating is done using the format parameter which can contain velocity scripting and access all
+     * properties of the User profile using variables ($first_name $last_name $email $city)
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
@@ -1926,11 +1936,10 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with a custom view. The formating is done using the format
-     * parameter which can contain velocity scripting and access all properties of the User profile using variables
-     * ($first_name $last_name $email $city). With the link param set to false it will not link to the user page. With
-     * the link param set to true, the link will link to the page on the local wiki even if the user is registered on a
-     * different wiki.
+     * API to retrieve a text representing the user with a custom view. The formating is done using the format parameter
+     * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
+     * $last_name $email $city). With the link param set to false it will not link to the user page. With the link param
+     * set to true, the link will link to the page on the local wiki even if the user is registered on a different wiki.
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")

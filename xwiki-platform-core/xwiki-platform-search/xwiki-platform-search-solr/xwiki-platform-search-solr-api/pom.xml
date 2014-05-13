@@ -72,7 +72,7 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
       <exclusions>
-        <!-- Does not make any sense to have runtime or build dependency on servlet API. It's should be provided scope. -->
+        <!-- Does not make any sense to have runtime or build dependency on servlet API. It should be provided scope. -->
         <exclusion>
           <artifactId>javax.servlet</artifactId>
           <groupId>org.eclipse.jetty.orbit</groupId>

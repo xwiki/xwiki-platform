@@ -71,6 +71,13 @@
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
+      <exclusions>
+        <!-- Does not make any sense to have runtime or build dependency on servlet API. It's should be provided scope. -->
+        <exclusion>
+          <artifactId>javax.servlet</artifactId>
+          <groupId>org.eclipse.jetty.orbit</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- Solr core depends on a different version of Restlet (than our Rest module) which we exclude and thus we need to
       pull the right version here. -->

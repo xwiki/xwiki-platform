@@ -446,7 +446,7 @@ public class XWikiExecutor
         // We use "get" action for 2 reasons:
         // 1) the page loads faster since it doesn't need to display the skin
         // 2) if the page doesn't exist it won't return a 404 HTTP Response code
-        return URL + ":" + getPort() + "/xwiki/bin/get/Main";
+        return URL + ":" + getPort() + "/xwiki/bin/get/Main/";
     }
 
     private String getDefaultStartCommand(int port, int stopPort, int rmiPort)

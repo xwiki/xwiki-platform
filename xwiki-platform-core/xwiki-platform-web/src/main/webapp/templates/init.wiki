@@ -1,11 +1,31 @@
 ##syntax=xwiki/2.1
 {{html clean="false"}}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
   <head>
+    <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
     <title>XWiki is loading...</title>
-    <meta http-equiv="refresh" content="1">
+    <meta http-equiv="refresh" content="1"/>
+    <style type="text/css">
+      body{
+        background-color: gray;
+        font-family: sans-serif;
+        font-size: 87.5%;
+      }
+      #content{
+        margin: 1em auto;
+        width: 800px;
+        color: #4D4D4D;
+        border: 1px solid #E8E8E8;
+        background-color: #FFF;
+        border-radius: 4px;
+        box-shadow: 0px 0px 7px #E8E8E8;
+        padding: 1em;
+      }
+    </style>
   </head>
   <body>
+    <div id="content">
 {{/html}}
 
 {{velocity}}
@@ -18,6 +38,7 @@ XWiki is initializing ($percent%)...
 {{/velocity}}
 
 {{html clean="false"}}
+    </div>
   </body>
 </html>
 {{/html}}

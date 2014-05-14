@@ -28,7 +28,7 @@
     <version>6.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tag-ui</artifactId>
-  <name>XWiki Platform - Tag - Parent POM</name>
+  <name>XWiki Platform - Tag - UI</name>
   <packaging>xar</packaging>
   <description>Tag application for XWiki</description>
   <properties>

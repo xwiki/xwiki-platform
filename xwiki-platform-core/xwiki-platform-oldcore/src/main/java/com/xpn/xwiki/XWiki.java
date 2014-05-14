@@ -423,6 +423,7 @@ public class XWiki implements EventListener
                 // Wait until XWiki is initialized
                 if (wait) {
                     job.join();
+                    xwiki = (XWiki) econtext.getAttribute(xwikiname);
                 }
             }
 

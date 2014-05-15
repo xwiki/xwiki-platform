@@ -318,7 +318,7 @@ public abstract class XWikiAction extends Action
                         return null;
                     }
                 } catch (Throwable e) {
-                    LOGGER.error("Failed to call Action for [{}]" + context.getAction() + "]", e);
+                    LOGGER.error("Failed to call Action for [{}]", context.getAction(), e);
                 }
 
                 // Then call the old Actions for backward compatibility (and because a lot of them have not been

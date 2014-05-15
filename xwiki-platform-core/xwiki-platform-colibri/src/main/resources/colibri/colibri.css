@@ -2404,6 +2404,11 @@ input#tags {
 .listGrid table.treeCellSelectedOver > colgroup > col:last-of-type {
   width: 100%;
 }
+/* The tree overflows over the filter input and the vertical scroll bar doesn't work on IE11 (see XWIKI-10337). Note that
+   the 'gridBody' CSS class doesn't seem to be present on Firefox and Chrome so this should affect only IE. */
+.listGrid .gridBody {
+  overflow: hidden;
+}
 
 /* -----------------------YUI Trees----------------------*/
 .ygtvitem table {

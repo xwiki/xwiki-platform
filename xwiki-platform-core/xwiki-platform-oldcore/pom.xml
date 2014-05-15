@@ -290,6 +290,11 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
+        <!-- Useless here -->
+        <exclusion>
+          <groupId>org.apache.xmlgraphics</groupId>
+          <artifactId>batik-js</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>

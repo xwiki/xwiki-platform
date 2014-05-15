@@ -88,7 +88,7 @@ public class DefaultLESSSkinFileCompilerTest
 
     private void prepareMocksForCompilation() throws Exception
     {
-        when(xwiki.getSkin(xcontext)).thenReturn("flamingo");
+        when(xwiki.getBaseSkin(xcontext)).thenReturn("flamingo");
         when(engineContext.getRealPath("/skins/flamingo/less")).thenReturn("~/");
 
         FileInputStream is = new FileInputStream(getClass().getResource("/style2.less").getFile());

@@ -84,7 +84,7 @@ public class DefaultLESSSkinFileCompiler implements LESSSkinFileCompiler
 
         try {
             // First, get the skin directory
-            String path = "/skins/" + xwiki.getSkin(xcontext) +  "/less";
+            String path = "/skins/" + xwiki.getBaseSkin(xcontext) +  "/less";
             Path lessFilesPath = Paths.get(xwiki.getEngineContext().getRealPath(path));
             Path[] includePaths = {lessFilesPath};
 

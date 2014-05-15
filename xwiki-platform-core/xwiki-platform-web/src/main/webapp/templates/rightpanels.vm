@@ -2,7 +2,7 @@
 <div id="rightPanels" class="panels right"#if($showRightPanels != "1" && $request.getParameter("forceRightPanels")) style="display: none;"#end>
 #set($panelUixs = $services.uix.getExtensions('platform.panels.rightPanels'))
 ## Global Variable
-#set($xwikipanelwidth = $rightPanelsWidth)
+#set($xwikiPanelWidth = $rightPanelsWidth)
 #foreach($panelUix in $panelUixs)
   ## We need to set this because the panelheader macro used in panels needs it
   #set($paneldoc = $xwiki.getDocument($panelUix.getId()))

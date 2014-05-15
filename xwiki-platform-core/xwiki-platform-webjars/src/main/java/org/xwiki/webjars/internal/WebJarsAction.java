@@ -42,11 +42,12 @@ import org.xwiki.resource.Resource;
  * <p>
  * At the moment we're mapping calls to the "webjars" URL as an EntityResource.
  * In the future it would be cleaner to register some new URL factory instead of reusing the format for Entity
- * Resources. Since we're reusing it we're going to do the following mapping:
+ * Resources and have some URL of the type {@code http://server/context/webjars?resource=(resourceName)}.
+ * Since we don't have this now and we're using the Entity Resource URL format we're using the following URL format:
  * <code>
- *   http://server/bin/webjars/resource/path?value=(resource name)
+ *   http://server/context/bin/webjars/resource/path?value=(resource name)
  * </code>
- * (for example: http://localhost:8080/bin/webjars/resource/path?value=angularjs/1.1.5/angular.js)
+ * (for example: http://localhost:8080/xwiki/bin/webjars/resource/path?value=angularjs/1.1.5/angular.js)
  * So this means that the resource name will be parsed as a query string "value" parameter (with a fixed space of
  * "resource" and a fixed page name of "path").
  * </p>

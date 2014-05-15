@@ -1,0 +1,2 @@
+org.xwiki.lesscss.internal.DefaultLESSCompiler
+org.xwiki.lesscss.internal.DefaultLESSSkinFileCompiler

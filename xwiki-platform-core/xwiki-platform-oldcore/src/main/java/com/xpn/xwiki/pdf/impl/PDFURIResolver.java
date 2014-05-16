@@ -53,6 +53,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class PDFURIResolver implements URIResolver
 {
+    private static final String TEX_ACTION = "/tex/";
+
     /**
      * @see #PDFURIResolver(com.xpn.xwiki.XWikiContext)
      */
@@ -84,9 +86,9 @@ public class PDFURIResolver implements URIResolver
             // to remove this hack by introduce a proper Resource for generated image (say TemporaryResource),
             // implement a TemporaryResourceSerializer<URL> and introduce a ResourceLoader interface and have it
             // implemented for TemporaryResource...
-            if (href.contains("/tex/")) {
+            if (href.contains(TEX_ACTION)) {
                 // Note: See the comments in FormulaMacro to understand why we do a replace...
-                AttachmentReference reference = this.attachmentMap.get(href.replace("/tex/", "/download/"));
+                AttachmentReference reference = this.attachmentMap.get(href.replace(TEX_ACTION, "/download/"));
                 if (reference != null) {
                     // Get the generated image's input stream
                     ImageStorage storage = Utils.getComponent(ImageStorage.class);

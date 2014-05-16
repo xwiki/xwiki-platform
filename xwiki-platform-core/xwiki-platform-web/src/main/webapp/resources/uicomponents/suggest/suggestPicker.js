@@ -203,7 +203,7 @@ var XWiki = (function (XWiki) {
    * @return true if the item existed and has been re-enabled, false otherwise
    */
   acceptAlreadyAddedItem : function (key) {
-    var input = $(this.getInputId(key));
+    var input = this.list ? this.list.down('input[id="' + this.getInputId(key).replace(/[^a-zA-Z0-9_-]/g, '\\$&') + '"]') : $(this.getInputId(key));
     if (input) {
       input.checked = true;
       this.notifySelectionChange(input.up('li') || input);

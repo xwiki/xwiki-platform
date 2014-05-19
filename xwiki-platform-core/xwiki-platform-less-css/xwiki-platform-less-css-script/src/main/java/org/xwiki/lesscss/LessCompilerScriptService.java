@@ -34,7 +34,7 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * This script service provides a LESS preprocessor (http://lesscss.org/) for CSS generation.
  *
- * @since 6.1M2
+ * @since 6.1M1
  * @version $Id$
  */
 @Component

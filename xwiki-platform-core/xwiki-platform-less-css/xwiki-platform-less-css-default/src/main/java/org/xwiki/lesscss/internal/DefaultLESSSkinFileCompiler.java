@@ -41,7 +41,7 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * Default implementation for {@link org.xwiki.lesscss.LESSSkinFileCompiler}.
  *
- * @since 6.1M2
+ * @since 6.1M1
  * @version $Id$
  */
 @Component

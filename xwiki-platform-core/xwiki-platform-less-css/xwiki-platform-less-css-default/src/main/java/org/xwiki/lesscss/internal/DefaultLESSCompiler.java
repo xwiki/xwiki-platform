@@ -37,7 +37,7 @@ import de.sandroboehme.lesscss.LessException;
 /**
  * Default implementation of {@link LESSCompiler}.
  *
- * @since 6.1M2
+ * @since 6.1M1
  * @version $Id$
  */
 @Component

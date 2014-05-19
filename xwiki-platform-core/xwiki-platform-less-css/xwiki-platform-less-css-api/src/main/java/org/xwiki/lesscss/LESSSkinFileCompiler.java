@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  *
  * This component must cache the outputs of compilation in an instance of {@link org.xwiki.lesscss.LESSSkinFileCache}.
  *
- * @since 6.1M2
+ * @since 6.1M1
  * @version $Id$
  */
 @Role

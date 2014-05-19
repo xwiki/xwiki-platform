@@ -35,7 +35,7 @@ import org.xwiki.lesscss.LESSSkinFileCache;
 /**
  * Default implmentation for {@link org.xwiki.lesscss.LESSSkinFileCache}.
  *
- * @since 6.1M2
+ * @since 6.1M1
  * @version $Id$
  */
 @Component

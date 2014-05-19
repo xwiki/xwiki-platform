@@ -25,7 +25,7 @@ import org.xwiki.stability.Unstable;
 /**
  * Component to cache already computed LESS files contained in the skin.
  *
- * @since 6.1M2
+ * @since 6.1M1
  * @version $Id$
  */
 @Role

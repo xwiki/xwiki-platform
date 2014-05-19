@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
 /**
  * This component provides a LESS preprocessor (http://lesscss.org/) for CSS generation.
  *
- * @since 6.1M2
+ * @since 6.1M1
  * @version $Id$
  */
 @Role

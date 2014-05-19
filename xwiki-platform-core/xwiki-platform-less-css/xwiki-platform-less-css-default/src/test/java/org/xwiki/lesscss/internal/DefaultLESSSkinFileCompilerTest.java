@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
 /**
  * Test class for {@link org.xwiki.lesscss.internal.DefaultLESSSkinFileCompiler}.
  *
- * @since 6.1M2
+ * @since 6.1M1
  * @version $Id$
  */
 public class DefaultLESSSkinFileCompilerTest

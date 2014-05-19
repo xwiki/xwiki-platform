@@ -22,7 +22,7 @@ package org.xwiki.lesscss;
 /**
  * Exception related to the LESS preprocessor.
  *
- * @since 6.1M2
+ * @since 6.1M1
  * @version $Id$
  */
 public class LESSCompilerException extends Exception

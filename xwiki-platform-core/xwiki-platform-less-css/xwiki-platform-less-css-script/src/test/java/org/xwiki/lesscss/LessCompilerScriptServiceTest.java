@@ -41,6 +41,12 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Test class for {@link org.xwiki.lesscss.LessCompilerScriptService}.
+ *
+ * @since 6.1M1
+ * @version $Id$
+ */
 public class LessCompilerScriptServiceTest
 {
     @Rule

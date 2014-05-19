@@ -116,7 +116,7 @@ public class XWikiInitializerJob extends AbstractJob<XWikiInitializerRequest, XW
     {
         this.logger.info("Start XWiki initialization");
 
-        notifyPushLevelProgress(4);
+        this.progressManager.pushLevelProgress(2, this);
 
         try {
             String xwikiname = XWiki.DEFAULT_MAIN_WIKI;
@@ -126,22 +126,24 @@ public class XWikiInitializerJob extends AbstractJob<XWikiInitializerRequest, XW
 
             XWikiConfig xwikicfgis = readXWikiConfiguration(XWiki.getConfigPath(), econtext, xcontext);
 
-            notifyStepPropress();
-
             XWiki xwiki = new XWiki(xwikicfgis, xcontext, xcontext.getEngineContext(), true);
-            econtext.setAttribute(xwikiname, xwiki);
 
             // initialize stub context here instead of during Execution context initialization because
             // during Execution context initialization, the XWikiContext is not fully initialized (does not
             // contains XWiki object) which make it unusable
             this.stubContextProvider.initialize(xcontext);
 
+            this.progressManager.stepPropress(this);
+
             this.logger.info("XWiki initialization done");
 
             // Send Event to signal that the application is ready to service requests.
             this.observation.notify(new ApplicationReadyEvent(), xwiki, xcontext);
+
+            // Make XWiki class available to others (among other things it unlock page loading)
+            econtext.setAttribute(xwikiname, xwiki);
         } finally {
-            notifyPopLevelProgress();
+            this.progressManager.popLevelProgress(this);
         }
     }
 

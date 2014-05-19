@@ -97,6 +97,7 @@ import org.xwiki.classloader.ClassLoaderManager;
 import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.job.Job;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -410,11 +411,11 @@ public class XWiki implements EventListener
                     if (xwiki == null && job == null) {
                         job = Utils.getComponent((Type) Job.class, XWikiInitializerJob.JOBTYPE);
 
-                        // "Pre-initialize" XWikiStubContextProvider so that XWiki initializer can find one
-                        Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class)
-                            .initialize(context);
-
                         if (job.getStatus() == null) {
+                            // "Pre-initialize" XWikiStubContextProvider so that XWiki initializer can find one
+                            Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class)
+                                .initialize(context);
+
                             job.startAsync();
                         }
                     }
@@ -700,73 +701,91 @@ public class XWiki implements EventListener
     public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
         throws XWikiException
     {
-        setDatabase(context.getMainXWiki());
+        JobProgressManager progress = Utils.getComponent(JobProgressManager.class);
 
-        setEngineContext(engine_context);
-        context.setWiki(this);
+        progress.pushLevelProgress(5, this);
 
-        // Prepare the store
-        setConfig(config);
+        try {
+            setDatabase(context.getMainXWiki());
 
-        XWikiStoreInterface mainStore =
-            Utils.getComponent(XWikiStoreInterface.class, Param("xwiki.store.main.hint", "hibernate"));
+            setEngineContext(engine_context);
+            context.setWiki(this);
 
-        // Check if we need to use the cache store..
-        boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
-        if (!nocache) {
-            XWikiCacheStoreInterface cachestore = new XWikiCacheStore(mainStore, context);
-            setStore(cachestore);
-        } else {
-            setStore(mainStore);
+            // Prepare the store
+            setConfig(config);
+
+            XWikiStoreInterface mainStore =
+                Utils.getComponent(XWikiStoreInterface.class, Param("xwiki.store.main.hint", "hibernate"));
+
+            // Check if we need to use the cache store..
+            boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
+            if (!nocache) {
+                XWikiCacheStoreInterface cachestore = new XWikiCacheStore(mainStore, context);
+                setStore(cachestore);
+            } else {
+                setStore(mainStore);
+            }
+
+            setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
+                "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
+
+            setAttachmentStore(Utils.<XWikiAttachmentStoreInterface> getComponent(
+                (Type) XWikiAttachmentStoreInterface.class, Param("xwiki.store.attachment.hint", "hibernate")));
+
+            setVersioningStore(Utils.<XWikiVersioningStoreInterface> getComponent(
+                (Type) XWikiVersioningStoreInterface.class, Param("xwiki.store.versioning.hint", "hibernate")));
+
+            setAttachmentVersioningStore(Utils.<AttachmentVersioningStore> getComponent(
+                (Type) AttachmentVersioningStore.class,
+                hasAttachmentVersioning(context) ? Param("xwiki.store.attachment.versioning.hint", "hibernate")
+                    : "void"));
+
+            if (hasRecycleBin(context)) {
+                setRecycleBinStore(Utils.<XWikiRecycleBinStoreInterface> getComponent(
+                    (Type) XWikiRecycleBinStoreInterface.class, Param("xwiki.store.recyclebin.hint", "hibernate")));
+            }
+
+            if (hasAttachmentRecycleBin(context)) {
+                setAttachmentRecycleBinStore(Utils.<AttachmentRecycleBinStore> getComponent(
+                    (Type) AttachmentRecycleBinStore.class,
+                    Param("xwiki.store.attachment.recyclebin.hint", "hibernate")));
+            }
+
+            // "Pre-initialize" XWikiStubContextProvider so that rendering engine, plugins or listeners reacting to
+            // potential document changes can use it
+            Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class).initialize(context);
+
+            progress.stepPropress(this);
+
+            resetRenderingEngine(context);
+
+            progress.stepPropress(this);
+
+            // Prepare the Plugin Engine
+            preparePlugins(context);
+
+            progress.stepPropress(this);
+
+            // Make sure these classes exists
+            if (noupdate) {
+                initializeMandatoryClasses(context);
+                getStatsService(context);
+            }
+
+            progress.stepPropress(this);
+
+            String ro = Param("xwiki.readonly", "no");
+            this.isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
+
+            // Save the configured syntaxes
+            String syntaxes = Param("xwiki.rendering.syntaxes", "xwiki/1.0");
+            this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
+
+            ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
+            observationManager.addListener(this);
+        } finally {
+            progress.popLevelProgress(this);
         }
-
-        setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
-            "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
-
-        setAttachmentStore(Utils.<XWikiAttachmentStoreInterface> getComponent(
-            (Type) XWikiAttachmentStoreInterface.class, Param("xwiki.store.attachment.hint", "hibernate")));
-
-        setVersioningStore(Utils.<XWikiVersioningStoreInterface> getComponent(
-            (Type) XWikiVersioningStoreInterface.class, Param("xwiki.store.versioning.hint", "hibernate")));
-
-        setAttachmentVersioningStore(Utils.<AttachmentVersioningStore> getComponent(
-            (Type) AttachmentVersioningStore.class,
-            hasAttachmentVersioning(context) ? Param("xwiki.store.attachment.versioning.hint", "hibernate") : "void"));
-
-        if (hasRecycleBin(context)) {
-            setRecycleBinStore(Utils.<XWikiRecycleBinStoreInterface> getComponent(
-                (Type) XWikiRecycleBinStoreInterface.class, Param("xwiki.store.recyclebin.hint", "hibernate")));
-        }
-
-        if (hasAttachmentRecycleBin(context)) {
-            setAttachmentRecycleBinStore(Utils.<AttachmentRecycleBinStore> getComponent(
-                (Type) AttachmentRecycleBinStore.class, Param("xwiki.store.attachment.recyclebin.hint", "hibernate")));
-        }
-
-        // "Pre-initialize" XWikiStubContextProvider so that rendering engine, plugins or listeners reacting to
-        // potential document changes can use it
-        Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class).initialize(context);
-
-        resetRenderingEngine(context);
-
-        // Prepare the Plugin Engine
-        preparePlugins(context);
-
-        // Make sure these classes exists
-        if (noupdate) {
-            initializeMandatoryClasses(context);
-            getStatsService(context);
-        }
-
-        String ro = Param("xwiki.readonly", "no");
-        this.isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
-
-        // Save the configured syntaxes
-        String syntaxes = Param("xwiki.rendering.syntaxes", "xwiki/1.0");
-        this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
-
-        ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
-        observationManager.addListener(this);
     }
 
     /**

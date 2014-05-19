@@ -24,6 +24,10 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.velocity.VelocityManager;
@@ -36,13 +40,27 @@ import org.xwiki.velocity.VelocityManager;
  */
 @Component
 @Singleton
-public class XWikiRenderingContext extends DefaultRenderingContext
+public class XWikiRenderingContext extends DefaultRenderingContext implements Initializable
 {
     @Inject
-    private VelocityManager velocityManager;
+    private ComponentManager componentManager;
 
     @Inject
     private Logger logger;
+
+    private VelocityManager velocityManager;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        if (this.componentManager.hasComponent(VelocityManager.class)) {
+            try {
+                this.velocityManager = this.componentManager.getInstance(VelocityManager.class);
+            } catch (ComponentLookupException e) {
+                this.logger.warn("Failed to initialize VelocityManager, velocity cache won't be cleaned", e);
+            }
+        }
+    }
 
     @Override
     public void push(Transformation transformation, TransformationContext context)
@@ -68,28 +86,32 @@ public class XWikiRenderingContext extends DefaultRenderingContext
 
     private void openNamespace(String namespace)
     {
-        try {
-            // Mark that we're starting to use a different Velocity macro name-space.
-            velocityManager.getVelocityEngine().startedUsingMacroNamespace(namespace);
-            logger.debug("Started using velocity macro namespace [{}].", namespace);
-        } catch (Exception e) {
-            // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
-            // continue since it's not absolutely critical.
-            logger.warn("Failed to notify Velocity Macro cache for opening the [{}] namespace. Reason = [{}]",
-                namespace, e.getMessage());
+        if (this.velocityManager != null) {
+            try {
+                // Mark that we're starting to use a different Velocity macro name-space.
+                velocityManager.getVelocityEngine().startedUsingMacroNamespace(namespace);
+                logger.debug("Started using velocity macro namespace [{}].", namespace);
+            } catch (Exception e) {
+                // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
+                // continue since it's not absolutely critical.
+                logger.warn("Failed to notify Velocity Macro cache for opening the [{}] namespace. Reason = [{}]",
+                    namespace, e.getMessage());
+            }
         }
     }
 
     private void closeNamespace(String namespace)
     {
-        try {
-            velocityManager.getVelocityEngine().stoppedUsingMacroNamespace(namespace);
-            logger.debug("Stopped using velocity macro namespace [{}].", namespace);
-        } catch (Exception e) {
-            // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
-            // continue since it's not absolutely critical.
-            logger.warn("Failed to notify Velocity Macro cache for closing the [{}] namespace. Reason = [{}]",
-                namespace, e.getMessage());
+        if (this.velocityManager != null) {
+            try {
+                velocityManager.getVelocityEngine().stoppedUsingMacroNamespace(namespace);
+                logger.debug("Stopped using velocity macro namespace [{}].", namespace);
+            } catch (Exception e) {
+                // Failed to get the Velocity Engine and thus to clear Velocity Macro cache. Log this as a warning but
+                // continue since it's not absolutely critical.
+                logger.warn("Failed to notify Velocity Macro cache for closing the [{}] namespace. Reason = [{}]",
+                    namespace, e.getMessage());
+            }
         }
     }
 }

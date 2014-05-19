@@ -651,9 +651,20 @@ public class Utils
      *             possible since it add a strong dependency to a static to your code
      */
     @Deprecated
-    public static ComponentManager getComponentManager()
+    public static ComponentManager getRootComponentManager()
     {
         return rootComponentManager;
+    }
+
+    /**
+     * @return the contextual component manager used by {@link #getComponent(Class)} and
+     *         {@link #getComponent(Class, String)}
+     * @deprecated since 6.1M1, use {@link #getContextComponentManager()} instead
+     */
+    @Deprecated
+    public static ComponentManager getComponentManager()
+    {
+        return getContextComponentManager();
     }
 
     /**
@@ -727,9 +738,11 @@ public class Utils
     {
         T component;
 
-        if (rootComponentManager != null) {
+        ComponentManager componentManager = getContextComponentManager();
+
+        if (componentManager != null) {
             try {
-                component = rootComponentManager.getInstance(roleType, roleHint);
+                component = componentManager.getInstance(roleType, roleHint);
             } catch (ComponentLookupException e) {
                 throw new RuntimeException("Failed to load component for type [" + roleType + "] for hint [" + roleHint
                     + "]", e);
@@ -770,9 +783,12 @@ public class Utils
     public static <T> List<T> getComponentList(Class<T> role)
     {
         List<T> components;
-        if (rootComponentManager != null) {
+
+        ComponentManager componentManager = getContextComponentManager();
+
+        if (componentManager != null) {
             try {
-                components = rootComponentManager.getInstanceList(role);
+                components = componentManager.getInstanceList(role);
             } catch (ComponentLookupException e) {
                 throw new RuntimeException("Failed to load components with role [" + role.getName() + "]", e);
             }

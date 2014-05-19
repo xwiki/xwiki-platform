@@ -131,7 +131,7 @@ public abstract class AbstractPackager
      */
     public void disposeXWikiContext(XWikiContext xcontext) throws ComponentLookupException
     {
-        ComponentManager componentManager = Utils.getComponentManager();
+        ComponentManager componentManager = Utils.getRootComponentManager();
 
         // Remove ExecutionContext
         Execution execution = componentManager.getInstance(Execution.class);

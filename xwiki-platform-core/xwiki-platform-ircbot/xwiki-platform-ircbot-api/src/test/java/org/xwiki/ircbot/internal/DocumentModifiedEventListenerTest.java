@@ -19,13 +19,16 @@
  */
 package org.xwiki.ircbot.internal;
 
-import java.net.URL;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
-import org.jmock.Expectations;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.context.Execution;
@@ -35,236 +38,121 @@ import org.xwiki.ircbot.IRCBot;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiURLFactory;
-
-import org.junit.Assert;
 
 /**
  * Unit tests for {@link DocumentModifiedEventListener}.
- *
+ * 
  * @version $Id$
  * @since 4.0M2
  */
-@AllComponents
-@MockingRequirement(DocumentModifiedEventListener.class)
-public class DocumentModifiedEventListenerTest extends AbstractMockingComponentTestCase
+public class DocumentModifiedEventListenerTest
 {
-    private EventListener listener;
+    @Rule
+    public MockitoComponentMockingRule<EventListener> mocker = new MockitoComponentMockingRule<EventListener>(
+        DocumentModifiedEventListener.class);
+
+    private IRCBot bot;
+
+    private DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+
+    private DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
+
+    private XWikiDocument document;
+
+    private XWikiContext xcontext;
+
+    private DocumentModifiedEventListenerConfiguration configuration;
 
     @Before
     public void configure() throws Exception
     {
-        Utils.setComponentManager(getComponentManager());
+        bot = mocker.getInstance(IRCBot.class);
+        when(bot.isConnected()).thenReturn(true);
+        when(bot.getChannelsNames()).thenReturn(Collections.singleton("channel"));
 
-        this.listener = getComponentManager().getInstance(EventListener.class, "ircdocumentmodified");
+        configuration = mocker.getInstance(DocumentModifiedEventListenerConfiguration.class);
+        when(configuration.getExclusionPatterns()).thenReturn(Collections.<Pattern> emptyList());
+
+        Execution execution = mocker.getInstance(Execution.class);
+        when(execution.getContext()).thenReturn(new ExecutionContext());
+
+        EntityReferenceSerializer<String> serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        when(serializer.serialize(documentReference)).thenReturn("wiki:space.page");
+        when(serializer.serialize(userReference)).thenReturn("userwiki:userspace.userpage");
+
+        xcontext = mock(XWikiContext.class);
+        when(xcontext.getUserReference()).thenReturn(userReference);
+
+        document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getComment()).thenReturn("comment");
+        when(document.getExternalURL("view", null, xcontext)).thenReturn("http://someurl");
     }
 
     @Test
     public void onEventWhenBotNotStarted() throws Exception
     {
-        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
+        when(bot.isConnected()).thenReturn(false);
 
-        getMockery().checking(new Expectations()
-        {{
-            oneOf(bot).isConnected();
-            will(returnValue(false));
+        mocker.getComponentUnderTest().onEvent(null, null, null);
 
-            // The test is here, we verify that sendMessage is never called, i.e. that no message is sent to the IRC
-            // channel. Note that this statement is not needed, it's just here to make the test more explicit.
-            never(bot).sendMessage(with(any(String.class)), with(any(String.class)));
-        }});
-
-        this.listener.onEvent(null, null, null);
+        verify(bot, never()).sendMessage(anyString(), anyString());
     }
 
     @Test
     public void onEventWhenSourceIsNotAXWikiDocument() throws Exception
     {
-        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
+        mocker.getComponentUnderTest().onEvent(null, "not a XWiki Document instance, it's a String.class", null);
 
-        getMockery().checking(new Expectations()
-        {{
-            oneOf(bot).isConnected();
-            will(returnValue(true));
-
-            // The test is here, we verify that sendMessage is never called, i.e. that no message is sent to the IRC
-            // channel. Note that this statement is not needed, it's just here to make the test more explicit.
-            never(bot).sendMessage(with(any(String.class)), with(any(String.class)));
-        }});
-
-        this.listener.onEvent(null, "not a XWiki Document instance, it's a String.class", null);
+        verify(bot, never()).sendMessage(anyString(), anyString());
     }
 
     @Test
     public void onEventWhenDocumentCreatedAndNotExcluded() throws Exception
     {
-        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
-        final EntityReferenceSerializer<String> serializer =
-            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
-        final DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        final DocumentModifiedEventListenerConfiguration configuration =
-            getComponentManager().getInstance(DocumentModifiedEventListenerConfiguration.class);
-        final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
+        mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(documentReference), document, xcontext);
 
-        // We simulate an EC without any XAR started information
-        final Execution execution = getComponentManager().getInstance(Execution.class);
-        final ExecutionContext ec = new ExecutionContext();
-
-        Utils.setComponentManager(getComponentManager());
-        final XWikiContext xwikiContext = new XWikiContext();
-        final XWikiURLFactory factory = getMockery().mock(XWikiURLFactory.class);
-        xwikiContext.setURLFactory(factory);
-        xwikiContext.setUserReference(userReference);
-
-        getMockery().checking(new Expectations()
-        {{
-            oneOf(bot).isConnected();
-            will(returnValue(true));
-            oneOf(serializer).serialize(reference);
-            will(returnValue("wiki:space.page"));
-            oneOf(execution).getContext();
-            will(returnValue(ec));
-            oneOf(configuration).getExclusionPatterns();
-            will(returnValue(Collections.emptyList()));
-            oneOf(serializer).serialize(userReference);
-            will(returnValue("userwiki:userspace.userpage"));
-            oneOf(factory).createExternalURL("space", "page", "view", null, null, "wiki", xwikiContext);
-            will(returnValue(new URL("http://someurl")));
-            oneOf(bot).getChannelsNames();
-            will(returnValue(Collections.singleton("channel")));
-
-            // The test is here!
-            oneOf(bot).sendMessage("channel", "wiki:space.page was created by userwiki:userspace.userpage (comment) - "
-                + "http://someurl");
-        }});
-
-        XWikiDocument document = new XWikiDocument(reference);
-        document.setComment("comment");
-
-        this.listener.onEvent(new DocumentCreatedEvent(reference), document, xwikiContext);
+        verify(bot, times(1)).sendMessage("channel",
+            "wiki:space.page was created by userwiki:userspace.userpage (comment) - " + "http://someurl");
     }
 
     @Test
     public void onEventWhenDocumentCreatedAndGuestUser() throws Exception
     {
-        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
-        final EntityReferenceSerializer<String> serializer =
-                getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
-        final DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        final DocumentModifiedEventListenerConfiguration configuration =
-                getComponentManager().getInstance(DocumentModifiedEventListenerConfiguration.class);
+        when(xcontext.getUserReference()).thenReturn(null);
 
-        // We simulate an EC without any XAR started information
-        final Execution execution = getComponentManager().getInstance(Execution.class);
-        final ExecutionContext ec = new ExecutionContext();
+        mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(documentReference), document, xcontext);
 
-        Utils.setComponentManager(getComponentManager());
-        final XWikiContext xwikiContext = new XWikiContext();
-        final XWikiURLFactory factory = getMockery().mock(XWikiURLFactory.class);
-        xwikiContext.setURLFactory(factory);
-
-        getMockery().checking(new Expectations()
-        {{
-            oneOf(bot).isConnected();
-            will(returnValue(true));
-            oneOf(serializer).serialize(reference);
-            will(returnValue("wiki:space.page"));
-            oneOf(execution).getContext();
-            will(returnValue(ec));
-            oneOf(configuration).getExclusionPatterns();
-            will(returnValue(Collections.emptyList()));
-            oneOf(factory).createExternalURL("space", "page", "view", null, null, "wiki", xwikiContext);
-            will(returnValue(new URL("http://someurl")));
-            oneOf(bot).getChannelsNames();
-            will(returnValue(Collections.singleton("channel")));
-
-            // The test is here!
-            oneOf(bot).sendMessage("channel", "wiki:space.page was created by Guest (comment) - "
-                    + "http://someurl");
-        }});
-
-        XWikiDocument document = new XWikiDocument(reference);
-        document.setComment("comment");
-
-        this.listener.onEvent(new DocumentCreatedEvent(reference), document, xwikiContext);
+        verify(bot, times(1)).sendMessage("channel",
+            "wiki:space.page was created by Guest (comment) - " + "http://someurl");
     }
+
     @Test
     public void onEventWhenDocumentCreatedButExcluded() throws Exception
     {
-        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
-        final EntityReferenceSerializer<String> serializer =
-            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
-        final DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        final DocumentModifiedEventListenerConfiguration configuration =
-            getComponentManager().getInstance(DocumentModifiedEventListenerConfiguration.class);
+        when(configuration.getExclusionPatterns()).thenReturn(Arrays.asList(Pattern.compile(".*:space\\..*")));
 
-        // We simulate an EC without any XAR started information
-        final Execution execution = getComponentManager().getInstance(Execution.class);
-        final ExecutionContext ec = new ExecutionContext();
+        mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(documentReference), document, xcontext);
 
-        Utils.setComponentManager(getComponentManager());
-        final XWikiContext xwikiContext = new XWikiContext();
-
-        getMockery().checking(new Expectations()
-        {{
-            oneOf(bot).isConnected();
-                will(returnValue(true));
-            oneOf(serializer).serialize(reference);
-                will(returnValue("wiki:space.page"));
-            oneOf(configuration).getExclusionPatterns();
-                will(returnValue(Arrays.asList(Pattern.compile(".*:space\\..*"))));
-            oneOf(execution).getContext();
-                will(returnValue(ec));
-        }});
-
-        Utils.setComponentManager(getComponentManager());
-        XWikiDocument document = new XWikiDocument(reference);
-
-        this.listener.onEvent(new DocumentCreatedEvent(reference), document, xwikiContext);
+        verify(bot, never()).sendMessage(anyString(), anyString());
     }
 
     @Test
     public void onEventWhenXARImportStarted() throws Exception
     {
-        final DocumentReference reference = new DocumentReference("wiki", "space", "page");
-
-        final IRCBot bot = getComponentManager().getInstance(IRCBot.class);
-        final EntityReferenceSerializer<String> serializer =
-            getComponentManager().getInstance(EntityReferenceSerializer.TYPE_STRING);
-
         // We simulate an EC with XAR started information
-        final Execution execution = getComponentManager().getInstance(Execution.class);
-        final ExecutionContext ec = new ExecutionContext();
-        ec.setProperty(XARImportEventListener.XAR_IMPORT_COUNTER_KEY, 0L);
+        Execution execution = mocker.getInstance(Execution.class);
+        execution.getContext().setProperty(XARImportEventListener.XAR_IMPORT_COUNTER_KEY, 0L);
 
-        Utils.setComponentManager(getComponentManager());
-        final XWikiContext xwikiContext = new XWikiContext();
+        mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(documentReference), document, xcontext);
 
-        getMockery().checking(new Expectations()
-        {{
-            oneOf(bot).isConnected();
-                will(returnValue(true));
-            oneOf(serializer).serialize(reference);
-                will(returnValue("wiki:space.page"));
-            oneOf(execution).getContext();
-                will(returnValue(ec));
-
-            // The test is here, we verify that no message is sent to the IRC channel
-            never(bot).sendMessage(with(any(String.class)), with(any(String.class)));
-        }});
-
-        XWikiDocument document = new XWikiDocument(reference);
-
-        this.listener.onEvent(new DocumentCreatedEvent(reference), document, xwikiContext);
+        verify(bot, never()).sendMessage(anyString(), anyString());
 
         // We also verify that the XAR import counter is increased by one
-        Assert.assertEquals(1L, ec.getProperty(XARImportEventListener.XAR_IMPORT_COUNTER_KEY));
+        assertEquals(1L, execution.getContext().getProperty(XARImportEventListener.XAR_IMPORT_COUNTER_KEY));
     }
 }

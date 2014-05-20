@@ -156,8 +156,9 @@ public class XWikiDynamicMessageToolFactory implements ScriptService
   }
 }
 
-if (!Utils.getContextComponentManager().hasComponent(ScriptService.class, 'dynamicMessageToolFactory')) {
-  Utils.getRootComponentManager().registerComponent(new DefaultComponentDescriptor(implementation: XWikiDynamicMessageToolFactory.class, role: ScriptService.class, roleHint: 'dynamicMessageToolFactory'));
+if (!services.component.componentManager.hasComponent(ScriptService.class, 'dynamicMessageToolFactory')) {
+  def descriptor = new DefaultComponentDescriptor(implementation: XWikiDynamicMessageToolFactory.class, role: ScriptService.class, roleHint: 'dynamicMessageToolFactory');
+  services.component.getComponentManager("wiki:${xcontext.database}").registerComponent(descriptor);
 }
 {{/groovy}}</content>
 </xwikidoc>

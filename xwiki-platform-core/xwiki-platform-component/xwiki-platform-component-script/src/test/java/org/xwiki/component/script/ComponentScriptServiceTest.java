@@ -19,114 +19,132 @@
  */
 package org.xwiki.component.script;
 
-import org.jmock.Expectations;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.script.ComponentScriptService;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
-
-import org.junit.Assert;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
  * Unit tests for {@link org.xwiki.component.script.ComponentScriptService}.
- *
+ * 
  * @version $Id$
  * @since 4.1M2
  */
-@MockingRequirement(ComponentScriptService.class)
-public class ComponentScriptServiceTest extends AbstractMockingComponentTestCase
+public class ComponentScriptServiceTest
 {
-    private ComponentScriptService css;
-
+    /**
+     * Used to test component lookup.
+     */
     private interface SomeRole
     {
     }
 
+    @Rule
+    public MockitoComponentMockingRule<ComponentScriptService> mocker =
+        new MockitoComponentMockingRule<ComponentScriptService>(ComponentScriptService.class);
+
+    /**
+     * Used to check programming rights.
+     */
+    private DocumentAccessBridge dab;
+
+    /**
+     * The mock component manager used by the script service under test.
+     */
+    private ComponentManager contextComponentManager;
+
     @Before
     public void configure() throws Exception
     {
-        this.css = getComponentManager().getInstance(ScriptService.class, "component");
+        this.dab = this.mocker.getInstance(DocumentAccessBridge.class);
+        this.contextComponentManager = this.mocker.getInstance(ComponentManager.class, "context");
     }
 
     @Test
     public void getComponentManagerWhenNoProgrammingRights() throws Exception
     {
-        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations() {{
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(false));
-        }});
+        when(this.dab.hasProgrammingRights()).thenReturn(false);
 
-        Assert.assertNull(this.css.getComponentManager());
-    }
-
-    @Test
-    public void getComponentInstanceWithNoHintWhenNoProgrammingRights() throws Exception
-    {
-        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations() {{
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(false));
-        }});
-
-        Assert.assertNull(this.css.getInstance(SomeRole.class));
-    }
-
-    @Test
-    public void getComponentInstanceWithNoHintWhenProgrammingRights() throws Exception
-    {
-        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final ComponentManager cm = getComponentManager().getInstance(ComponentManager.class, "context");
-        getMockery().checking(new Expectations() {{
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(true));
-            oneOf(cm).getInstance(SomeRole.class);
-            will(returnValue(getMockery().mock(SomeRole.class)));
-        }});
-
-        Assert.assertTrue(this.css.getInstance(SomeRole.class) instanceof SomeRole);
-    }
-
-    @Test
-    public void getComponentInstanceWithHintWhenNoProgrammingRights() throws Exception
-    {
-        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations() {{
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(false));
-        }});
-
-        Assert.assertNull(this.css.getInstance(SomeRole.class, "hint"));
-    }
-
-    @Test
-    public void getComponentInstanceWithHintWhenProgrammingRights() throws Exception
-    {
-        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        final ComponentManager cm = getComponentManager().getInstance(ComponentManager.class, "context");
-        getMockery().checking(new Expectations() {{
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(true));
-            oneOf(cm).getInstance(SomeRole.class, "hint");
-            will(returnValue(getMockery().mock(SomeRole.class)));
-        }});
-
-        Assert.assertTrue(this.css.getInstance(SomeRole.class, "hint") instanceof SomeRole);
+        assertNull(this.mocker.getComponentUnderTest().getComponentManager());
     }
 
     @Test
     public void getComponentManagerWhenProgrammingRights() throws Exception
     {
-        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations() {{
-            oneOf(dab).hasProgrammingRights();
-            will(returnValue(true));
-        }});
+        when(this.dab.hasProgrammingRights()).thenReturn(true);
 
-        Assert.assertTrue(this.css.getComponentManager() instanceof ComponentManager);
+        assertEquals(this.contextComponentManager, this.mocker.getComponentUnderTest().getComponentManager());
+    }
+
+    @Test
+    public void getComponentManagerForNamespaceWhenNoProgrammingRights() throws Exception
+    {
+        when(this.dab.hasProgrammingRights()).thenReturn(false);
+
+        assertNull(this.mocker.getComponentUnderTest().getComponentManager("wiki:xwiki"));
+
+        ComponentManagerManager componentManagerManager = this.mocker.getInstance(ComponentManagerManager.class);
+        verify(componentManagerManager, never()).getComponentManager(anyString(), anyBoolean());
+    }
+
+    @Test
+    public void getComponentManagerForNamespaceWhenProgrammingRights() throws Exception
+    {
+        when(this.dab.hasProgrammingRights()).thenReturn(true);
+
+        ComponentManagerManager componentManagerManager = this.mocker.getInstance(ComponentManagerManager.class);
+        ComponentManager wikiComponentManager = mock(ComponentManager.class);
+        when(componentManagerManager.getComponentManager("wiki:chess", false)).thenReturn(wikiComponentManager);
+
+        assertEquals(wikiComponentManager, this.mocker.getComponentUnderTest().getComponentManager("wiki:chess"));
+    }
+
+    @Test
+    public void getComponentInstanceWithNoHintWhenNoProgrammingRights() throws Exception
+    {
+        when(this.dab.hasProgrammingRights()).thenReturn(false);
+
+        assertNull(this.mocker.getComponentUnderTest().getInstance(SomeRole.class));
+
+        verify(this.contextComponentManager, never()).getInstance(SomeRole.class);
+    }
+
+    @Test
+    public void getComponentInstanceWithNoHintWhenProgrammingRights() throws Exception
+    {
+        when(this.dab.hasProgrammingRights()).thenReturn(true);
+
+        SomeRole instance = mock(SomeRole.class);
+        when(this.contextComponentManager.getInstance(SomeRole.class)).thenReturn(instance);
+
+        assertEquals(instance, this.mocker.getComponentUnderTest().getInstance(SomeRole.class));
+    }
+
+    @Test
+    public void getComponentInstanceWithHintWhenNoProgrammingRights() throws Exception
+    {
+        when(this.dab.hasProgrammingRights()).thenReturn(false);
+
+        assertNull(this.mocker.getComponentUnderTest().getInstance(SomeRole.class, "hint"));
+
+        verify(this.contextComponentManager, never()).getInstance(SomeRole.class, "hint");
+    }
+
+    @Test
+    public void getComponentInstanceWithHintWhenProgrammingRights() throws Exception
+    {
+        when(this.dab.hasProgrammingRights()).thenReturn(true);
+
+        SomeRole instance = mock(SomeRole.class);
+        when(this.contextComponentManager.getInstance(SomeRole.class, "hint")).thenReturn(instance);
+
+        assertEquals(instance, this.mocker.getComponentUnderTest().getInstance(SomeRole.class, "hint"));
     }
 }

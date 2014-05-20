@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.script.service.ScriptService;
@@ -51,6 +52,12 @@ public class ComponentScriptService implements ScriptService
     private ComponentManager componentManager;
 
     /**
+     * Used to access the component manager corresponding to a specific namespace.
+     */
+    @Inject
+    private ComponentManagerManager componentManagerManager;
+
+    /**
      * Used to check for Programming Rights.
      */
     @Inject
@@ -62,6 +69,16 @@ public class ComponentScriptService implements ScriptService
     public ComponentManager getComponentManager()
     {
         return this.bridge.hasProgrammingRights() ? this.componentManager : null;
+    }
+
+    /**
+     * @param namespace a namespace
+     * @return the component manager associated with the specified namespace, if any, {@code null otherwise}
+     */
+    public ComponentManager getComponentManager(String namespace)
+    {
+        return this.bridge.hasProgrammingRights() ? this.componentManagerManager.getComponentManager(namespace, false)
+            : null;
     }
 
     /**

@@ -30,18 +30,10 @@
     <fileSet>
       <directory>${basedir}/src/main/resources</directory>
       <outputDirectory>/</outputDirectory>
-      <excludes>
-        <exclude>**/less/**</exclude>
-      </excludes>
     </fileSet>
     <!-- Add License/Notice files -->
     <fileSet>
       <directory>${basedir}/target/maven-shared-archive-resources/</directory>
-      <outputDirectory>flamingo</outputDirectory>
-    </fileSet>
-    <!-- Add compiled less files -->
-    <fileSet>
-      <directory>${basedir}/target/less/</directory>
       <outputDirectory>flamingo</outputDirectory>
     </fileSet>
   </fileSets>

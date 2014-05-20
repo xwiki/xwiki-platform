@@ -36,6 +36,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -108,7 +109,7 @@ public class LessCompilerScriptServiceTest
     }
 
     @Test
-    public void flushCacheWithRights() throws Exception
+    public void clearCacheWithRights() throws Exception
     {
         // Mocks
         XWikiDocument doc = mock(XWikiDocument.class);
@@ -121,14 +122,14 @@ public class LessCompilerScriptServiceTest
         when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(true);
 
         // Tests
-        assertTrue(mocker.getComponentUnderTest().flushCache());
+        assertTrue(mocker.getComponentUnderTest().clearCache());
 
         // Verify
-        verify(cache).flush();
+        verify(cache).clear();
     }
 
     @Test
-    public void flushCacheWithoutRights() throws Exception
+    public void clearCacheWithoutRights() throws Exception
     {
         // Mocks
         XWikiDocument doc = mock(XWikiDocument.class);
@@ -141,11 +142,50 @@ public class LessCompilerScriptServiceTest
         when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(false);
 
         // Tests
-        assertFalse(mocker.getComponentUnderTest().flushCache());
+        assertFalse(mocker.getComponentUnderTest().clearCache());
 
         // Verify
-        verify(cache, never()).flush();
+        verify(cache, never()).clear();
     }
 
+    @Test
+    public void clearCacheWithParamsWithRights() throws Exception
+    {
+        // Mocks
+        XWikiDocument doc = mock(XWikiDocument.class);
+        DocumentReference authorReference = new DocumentReference("wiki", "Space", "User");
+        when(xcontext.getDoc()).thenReturn(doc);
+        when(doc.getAuthorReference()).thenReturn(authorReference);
+        DocumentReference currentDocReference = new DocumentReference("wiki", "Space", "Page");
+        when(doc.getDocumentReference()).thenReturn(currentDocReference);
+
+        when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(true);
+
+        // Tests
+        assertTrue(mocker.getComponentUnderTest().clearCache("wiki", "colorTheme"));
+
+        // Verify
+        verify(cache).clear(eq("wiki"), eq("colorTheme"));
+    }
+
+    @Test
+    public void clearCacheWithParamsWithoutRights() throws Exception
+    {
+        // Mocks
+        XWikiDocument doc = mock(XWikiDocument.class);
+        DocumentReference authorReference = new DocumentReference("wiki", "Space", "User");
+        when(xcontext.getDoc()).thenReturn(doc);
+        when(doc.getAuthorReference()).thenReturn(authorReference);
+        DocumentReference currentDocReference = new DocumentReference("wiki", "Space", "Page");
+        when(doc.getDocumentReference()).thenReturn(currentDocReference);
+
+        when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(false);
+
+        // Tests
+        assertFalse(mocker.getComponentUnderTest().clearCache("wiki", "colorTheme"));
+
+        // Verify
+        verify(cache, never()).clear(eq("wiki"), eq("colorTheme"));
+    }
 
 }

@@ -33,21 +33,32 @@ import org.xwiki.stability.Unstable;
 public interface LESSSkinFileCache
 {
     /**
-     * Get a CSS from the name of the LESS source.
+     * Get a CSS from the name of the LESS source, the wiki ID and the name of the color theme.
      * @param fileName name of the LESS source
+     * @param wikiId id of the wiki
+     * @param colorTheme name of the color theme
      * @return the corresponding CSS
      */
-    String get(String fileName);
+    String get(String fileName, String wikiId, String colorTheme);
 
     /**
      * Add a CSS in the cache.
      * @param fileName name of the LESS source
+     * @param wikiId id of the wiki
+     * @param colorTheme name of the color theme
      * @param output the CSS to cache
      */
-    void set(String fileName, String output);
+    void set(String fileName, String wikiId, String colorTheme, String output);
 
     /**
      * Clear the cache.
      */
-    void flush();
+    void clear();
+
+    /**
+     * Clear all the cached files related to a wiki and a color theme.
+     * @param wikiId id of the wiki
+     * @param colorTheme name of the wiki
+     */
+    void clear(String wikiId, String colorTheme);
 }

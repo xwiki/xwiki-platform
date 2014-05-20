@@ -89,7 +89,7 @@ public class LessCompilerScriptService implements ScriptService
      * Remove every generated files from the XWiki cache. The script calling this method needs the programming rights.
      * @return true if the operation succeed
      */
-    public boolean flushCache()
+    public boolean clearCache()
     {
         XWikiContext xcontext = xcontextProvider.get();
 
@@ -99,7 +99,28 @@ public class LessCompilerScriptService implements ScriptService
             return false;
         }
 
-        cache.flush();
+        cache.clear();
+        return true;
+    }
+
+    /**
+     * Remove every generated files corresponding to a wiki and a color theme from the XWiki cache.
+     * The script calling this method needs the programming rights.
+     * @param wikiId id of the wiki
+     * @param colorTheme name of the color theme
+     * @return true if the operation succeed
+     */
+    public boolean clearCache(String wikiId, String colorTheme)
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+
+        // Check if the current script has the programing rights
+        if (!authorizationManager.hasAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
+                xcontext.getDoc().getDocumentReference())) {
+            return false;
+        }
+
+        cache.clear(wikiId, colorTheme);
         return true;
     }
 }

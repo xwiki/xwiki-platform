@@ -34,9 +34,11 @@ import org.xwiki.lesscss.LESSCompiler;
 import org.xwiki.lesscss.LESSCompilerException;
 import org.xwiki.lesscss.LESSSkinFileCache;
 import org.xwiki.lesscss.LESSSkinFileCompiler;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Default implementation for {@link org.xwiki.lesscss.LESSSkinFileCompiler}.
@@ -56,14 +58,23 @@ public class DefaultLESSSkinFileCompiler implements LESSSkinFileCompiler
     @Inject
     private LESSSkinFileCache cache;
 
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
     @Override
     public String compileSkinFile(String fileName, boolean force) throws LESSCompilerException
     {
         String result;
 
+        // Get information about the context
+        String wikiId = wikiDescriptorManager.getCurrentWikiId();
+        XWikiContext context = xcontextProvider.get();
+        XWikiRequest request = context.getRequest();
+        String colorTheme = request.getParameter("colorTheme");
+
         // Check if the result is in the cache
         if (!force) {
-            result = cache.get(fileName);
+            result = cache.get(fileName, wikiId, colorTheme);
             if (result != null) {
                 return result;
             }
@@ -71,7 +82,7 @@ public class DefaultLESSSkinFileCompiler implements LESSSkinFileCompiler
 
         // Either the result was in the cache or the force flag is set to true, we need to compile
         result = compile(fileName);
-        cache.set(fileName, result);
+        cache.set(fileName, wikiId, colorTheme, result);
 
         return result;
     }

@@ -19,7 +19,13 @@
  */
 package org.xwiki.lesscss.internal;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
@@ -33,12 +39,13 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.lesscss.LESSSkinFileCache;
 
 /**
- * Default implmentation for {@link org.xwiki.lesscss.LESSSkinFileCache}.
+ * Default implementation for {@link org.xwiki.lesscss.LESSSkinFileCache}.
  *
  * @since 6.1M1
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultLESSSkinFileCache implements LESSSkinFileCache, Initializable
 {
     /**
@@ -46,10 +53,20 @@ public class DefaultLESSSkinFileCache implements LESSSkinFileCache, Initializabl
      */
     public static final String LESS_FILES_CACHE_ID = "lesscss.skinfiles.cache";
 
+    private static final String CACHE_KEY_SEPARATOR = "_";
+
     @Inject
     private CacheManager cacheManager;
 
+    /**
+     * The cache that will store the files.
+     */
     private Cache<String> cache;
+
+    /**
+     * This map stores the list of the cached files keys corresponding to a couple of (wikiId, colorTheme).
+     */
+    private Map<String, List<String>> cachedFilesKeysMap = new HashMap<>();
 
     @Override
     public void initialize() throws InitializationException
@@ -65,20 +82,63 @@ public class DefaultLESSSkinFileCache implements LESSSkinFileCache, Initializabl
     }
 
     @Override
-    public String get(String fileName)
+    public String get(String fileName, String wikiId, String colorTheme)
     {
-        return cache.get(fileName);
+        return cache.get(getCacheKey(fileName, wikiId, colorTheme));
     }
 
     @Override
-    public void set(String fileName, String output)
+    public void set(String fileName, String wikiId, String colorTheme, String output)
     {
-        cache.set(fileName, output);
+        // Store the output in the cache
+        String cacheKey = getCacheKey(fileName, wikiId, colorTheme);
+        cache.set(cacheKey, output);
+
+        // Add the new key to cachedFilesKeysMap.
+        String mapKey = getMapKey(wikiId, colorTheme);
+        List<String> cachedFilesKeys = cachedFilesKeysMap.get(mapKey);
+        if (cachedFilesKeys == null) {
+            // if the list of cached files keys corresponding to the couple of (wikiId, colorTheme) does not exist,
+            // we create it
+            cachedFilesKeys = new ArrayList<>(1);
+            cachedFilesKeysMap.put(mapKey, cachedFilesKeys);
+        }
+        if (!cachedFilesKeys.contains(cacheKey)) {
+            cachedFilesKeys.add(cacheKey);
+        }
     }
 
     @Override
-    public void flush()
+    public void clear()
     {
         cache.removeAll();
+        cachedFilesKeysMap.clear();
+    }
+
+    @Override
+    public void clear(String wikiId, String colorTheme)
+    {
+        // Get the list of cached files keys corresponding to the couple (wikiId, colorTheme)
+        String mapKey = getMapKey(wikiId, colorTheme);
+        List<String> cachedFilesKeys = cachedFilesKeysMap.get(mapKey);
+        if (cachedFilesKeys == null) {
+            return;
+        }
+        // Remove all the cached files corresponding to the cached keys
+        for (String cachedFileKey : cachedFilesKeys) {
+            cache.remove(cachedFileKey);
+        }
+        // Remove the list of cached keys corresponding to the couple (wikiId, colorTheme)
+        cachedFilesKeysMap.remove(mapKey);
+    }
+
+    private String getCacheKey(String fileName, String wikiId, String colorTheme)
+    {
+        return wikiId + CACHE_KEY_SEPARATOR + colorTheme + CACHE_KEY_SEPARATOR + fileName;
+    }
+
+    private String getMapKey(String wikiId, String colorTheme)
+    {
+        return wikiId + CACHE_KEY_SEPARATOR + colorTheme;
     }
 }

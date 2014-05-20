@@ -33,10 +33,12 @@ import org.xwiki.lesscss.LESSCompiler;
 import org.xwiki.lesscss.LESSCompilerException;
 import org.xwiki.lesscss.LESSSkinFileCache;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiEngineContext;
+import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -64,6 +66,8 @@ public class DefaultLESSSkinFileCompilerTest
 
     private LESSSkinFileCache cache;
 
+    private WikiDescriptorManager wikiDescriptorManager;
+
     private Provider<XWikiContext> xcontextProvider;
 
     private XWikiContext xcontext;
@@ -76,6 +80,7 @@ public class DefaultLESSSkinFileCompilerTest
     public void setUp() throws Exception
     {
         lessCompiler = mocker.getInstance(LESSCompiler.class);
+        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         cache = mocker.getInstance(LESSSkinFileCache.class);
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
         xcontext = mock(XWikiContext.class);
@@ -84,6 +89,10 @@ public class DefaultLESSSkinFileCompilerTest
         when(xcontext.getWiki()).thenReturn(xwiki);
         engineContext = mock(XWikiEngineContext.class);
         when(xwiki.getEngineContext()).thenReturn(engineContext);
+        XWikiRequest request = mock(XWikiRequest.class);
+        when(xcontext.getRequest()).thenReturn(request);
+        when(request.getParameter("colorTheme")).thenReturn("myColorTheme");
+        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
     }
 
     private void prepareMocksForCompilation() throws Exception
@@ -111,15 +120,15 @@ public class DefaultLESSSkinFileCompilerTest
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", false));
 
         // Verify
-        verify(cache).get(eq("style2.less"));
-        verify(cache).set(eq("style2.less"), eq("OUTPUT"));
+        verify(cache).get(eq("style2.less"), eq("wikiId"), eq("myColorTheme"));
+        verify(cache).set(eq("style2.less"), eq("wikiId"), eq("myColorTheme"), eq("OUTPUT"));
     }
 
     @Test
     public void compileSkinFileWhenInCache() throws Exception
     {
         // Mock
-        when(cache.get("style2.less")).thenReturn("OUTPUT");
+        when(cache.get("style2.less", "wikiId", "myColorTheme")).thenReturn("OUTPUT");
 
         // Test
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", false));
@@ -133,14 +142,14 @@ public class DefaultLESSSkinFileCompilerTest
     public void compileSkinFileWhenInCacheButForce() throws Exception
     {
         // Mock
-        when(cache.get("style2.less")).thenReturn("OLD OUTPUT");
+        when(cache.get("style2.less", "wikiId" , "myColorTheme")).thenReturn("OLD OUTPUT");
         prepareMocksForCompilation();
 
         // Test
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", true));
 
         // Verify
-        verify(cache).set(eq("style2.less"), eq("OUTPUT"));
+        verify(cache).set(eq("style2.less"), eq("wikiId"), eq("myColorTheme"), eq("OUTPUT"));
     }
 
     @Test

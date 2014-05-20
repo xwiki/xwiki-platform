@@ -31,10 +31,8 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.LESSSkinFileCache;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 
@@ -42,25 +40,23 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Listener that clears the cache of compiled LESS Skin file when a color theme is changed.
+ * Listener that clears the cache of compiled LESS Skin file when a skin or a color theme is changed.
  *
  * @since 6.1M2
  * @version $Id$
  */
 @Component
-@Named("lessColorTheme")
+@Named("lessSkinColorTheme")
 @Singleton
-public class ColorThemeListener implements EventListener
+public class SkinAndColorThemeListener implements EventListener
 {
-    private static final EntityReference COLOR_THEME_CLASS = new EntityReference("ColorThemeClass", EntityType.DOCUMENT,
-            new EntityReference("ColorThemes", EntityType.SPACE));
+    private static final LocalDocumentReference COLOR_THEME_CLASS =
+            new LocalDocumentReference("ColorThemes", "ColorThemeClass");
+
+    private static final LocalDocumentReference SKIN_CLASS = new LocalDocumentReference("XWiki", "XWikiSkins");
 
     @Inject
     private LESSSkinFileCache lessSkinFileCache;
-
-    @Inject
-    @Named("local")
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Override
     public String getName()
@@ -82,8 +78,14 @@ public class ColorThemeListener implements EventListener
     {
         XWikiDocument document = (XWikiDocument) source;
 
-        List<BaseObject> serverClassObjects = document.getXObjects(COLOR_THEME_CLASS);
-        if (serverClassObjects != null && !serverClassObjects.isEmpty()) {
+        List<BaseObject> colorThemeObjects = document.getXObjects(COLOR_THEME_CLASS);
+        if (colorThemeObjects != null && !colorThemeObjects.isEmpty()) {
+            clearCache(document);
+            return;
+        }
+
+        List<BaseObject> skinObjects = document.getXObjects(SKIN_CLASS);
+        if (skinObjects != null && !skinObjects.isEmpty()) {
             clearCache(document);
         }
     }
@@ -92,10 +94,7 @@ public class ColorThemeListener implements EventListener
     {
         DocumentReference documentReference = document.getDocumentReference();
 
-        // ColorTheme name
-        String colorTheme = entityReferenceSerializer.serialize(documentReference);
-
         // Clear the cache for the specified wiki and color theme
-        lessSkinFileCache.clear(documentReference.getWikiReference().getName(), colorTheme);
+        lessSkinFileCache.clear(documentReference.getWikiReference().getName());
     }
 }

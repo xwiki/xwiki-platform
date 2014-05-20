@@ -33,10 +33,9 @@ import org.xwiki.lesscss.LESSSkinFileCache;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.event.Event;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -48,28 +47,22 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Test class for {@link org.xwiki.lesscss.internal.ColorThemeListener}.
+ * Test class for {@link SkinAndColorThemeListener}.
  *
  * @since 6.1M2
  * @version $Id$
  */
-public class ColorThemeListenerTest
+public class SkinAndColorThemeListenerTest
 {
     @Rule
-    public MockitoComponentMockingRule<ColorThemeListener> mocker =
-            new MockitoComponentMockingRule(ColorThemeListener.class);
+    public MockitoComponentMockingRule<SkinAndColorThemeListener> mocker =
+            new MockitoComponentMockingRule(SkinAndColorThemeListener.class);
 
     private LESSSkinFileCache lessSkinFileCache;
-
-    private WikiDescriptorManager wikiDescriptorManager;
-
-    private EntityReferenceSerializer<String> entityReferenceSerializer;
-
     @Before
     public void setUp() throws Exception
     {
         lessSkinFileCache = mocker.getInstance(LESSSkinFileCache.class);
-        entityReferenceSerializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
     }
 
     @Test
@@ -90,15 +83,14 @@ public class ColorThemeListenerTest
     }
 
     @Test
-    public void onEvent() throws Exception
+    public void onEventWhenColorThemeChanged() throws Exception
     {
         // Mocks
         Event event = mock(Event.class);
         XWikiDocument doc = mock(XWikiDocument.class);
         Object data = new Object();
 
-        EntityReference classReference = new EntityReference("ColorThemeClass", EntityType.DOCUMENT,
-                new EntityReference("ColorThemes", EntityType.SPACE));
+        EntityReference classReference = new LocalDocumentReference("ColorThemes", "ColorThemeClass");
         List<BaseObject> objects = new ArrayList<>();
         BaseObject object = mock(BaseObject.class);
         objects.add(object);
@@ -106,13 +98,36 @@ public class ColorThemeListenerTest
 
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         when(doc.getDocumentReference()).thenReturn(documentReference);
-        when(entityReferenceSerializer.serialize(documentReference)).thenReturn("space.page");
 
         // Test
         mocker.getComponentUnderTest().onEvent(event, doc, data);
 
         // Verify
-        verify(lessSkinFileCache).clear("wiki", "space.page");
+        verify(lessSkinFileCache).clear("wiki");
+    }
+
+    @Test
+    public void onEventWhenSkinChanged() throws Exception
+    {
+        // Mocks
+        Event event = mock(Event.class);
+        XWikiDocument doc = mock(XWikiDocument.class);
+        Object data = new Object();
+
+        EntityReference classReference = new LocalDocumentReference("XWiki", "XWikiSkins");
+        List<BaseObject> objects = new ArrayList<>();
+        BaseObject object = mock(BaseObject.class);
+        objects.add(object);
+        when(doc.getXObjects(classReference)).thenReturn(objects);
+
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        when(doc.getDocumentReference()).thenReturn(documentReference);
+
+        // Test
+        mocker.getComponentUnderTest().onEvent(event, doc, data);
+
+        // Verify
+        verify(lessSkinFileCache).clear("wiki");
     }
 
     @Test
@@ -132,6 +147,6 @@ public class ColorThemeListenerTest
         mocker.getComponentUnderTest().onEvent(event, doc, data);
 
         // Verify
-        verify(lessSkinFileCache, never()).clear("wikiId", "myColorTheme");
+        verify(lessSkinFileCache, never()).clear("wikiId");
     }
 }

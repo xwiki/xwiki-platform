@@ -162,10 +162,10 @@ public class LessCompilerScriptServiceTest
         when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(true);
 
         // Tests
-        assertTrue(mocker.getComponentUnderTest().clearCache("wiki", "colorTheme"));
+        assertTrue(mocker.getComponentUnderTest().clearCache("wiki"));
 
         // Verify
-        verify(cache).clear(eq("wiki"), eq("colorTheme"));
+        verify(cache).clear(eq("wiki"));
     }
 
     @Test
@@ -182,10 +182,10 @@ public class LessCompilerScriptServiceTest
         when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(false);
 
         // Tests
-        assertFalse(mocker.getComponentUnderTest().clearCache("wiki", "colorTheme"));
+        assertFalse(mocker.getComponentUnderTest().clearCache("wiki"));
 
         // Verify
-        verify(cache, never()).clear(eq("wiki"), eq("colorTheme"));
+        verify(cache, never()).clear(eq("wiki"));
     }
 
 }

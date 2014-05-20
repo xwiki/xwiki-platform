@@ -69,12 +69,13 @@ public class DefaultLESSSkinFileCompiler implements LESSSkinFileCompiler
         // Get information about the context
         String wikiId = wikiDescriptorManager.getCurrentWikiId();
         XWikiContext context = xcontextProvider.get();
+        String skin = context.getWiki().getSkin(context);
         XWikiRequest request = context.getRequest();
         String colorTheme = request.getParameter("colorTheme");
 
         // Check if the result is in the cache
         if (!force) {
-            result = cache.get(fileName, wikiId, colorTheme);
+            result = cache.get(fileName, wikiId, skin, colorTheme);
             if (result != null) {
                 return result;
             }
@@ -82,7 +83,7 @@ public class DefaultLESSSkinFileCompiler implements LESSSkinFileCompiler
 
         // Either the result was in the cache or the force flag is set to true, we need to compile
         result = compile(fileName);
-        cache.set(fileName, wikiId, colorTheme, result);
+        cache.set(fileName, wikiId, skin, colorTheme, result);
 
         return result;
     }

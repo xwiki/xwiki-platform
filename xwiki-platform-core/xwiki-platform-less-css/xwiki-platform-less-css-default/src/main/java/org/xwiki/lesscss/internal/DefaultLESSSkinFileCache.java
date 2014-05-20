@@ -64,7 +64,7 @@ public class DefaultLESSSkinFileCache implements LESSSkinFileCache, Initializabl
     private Cache<String> cache;
 
     /**
-     * This map stores the list of the cached files keys corresponding to a couple of (wikiId, colorTheme).
+     * This map stores the list of the cached files keys corresponding to a wiki.
      */
     private Map<String, List<String>> cachedFilesKeysMap = new HashMap<>();
 
@@ -82,26 +82,25 @@ public class DefaultLESSSkinFileCache implements LESSSkinFileCache, Initializabl
     }
 
     @Override
-    public String get(String fileName, String wikiId, String colorTheme)
+    public String get(String fileName, String wikiId, String skin, String colorTheme)
     {
-        return cache.get(getCacheKey(fileName, wikiId, colorTheme));
+        return cache.get(getCacheKey(fileName, wikiId, skin, colorTheme));
     }
 
     @Override
-    public void set(String fileName, String wikiId, String colorTheme, String output)
+    public void set(String fileName, String wikiId, String skin, String colorTheme, String output)
     {
         // Store the output in the cache
-        String cacheKey = getCacheKey(fileName, wikiId, colorTheme);
+        String cacheKey = getCacheKey(fileName, wikiId, skin, colorTheme);
         cache.set(cacheKey, output);
 
         // Add the new key to cachedFilesKeysMap.
-        String mapKey = getMapKey(wikiId, colorTheme);
-        List<String> cachedFilesKeys = cachedFilesKeysMap.get(mapKey);
+        List<String> cachedFilesKeys = cachedFilesKeysMap.get(wikiId);
         if (cachedFilesKeys == null) {
-            // if the list of cached files keys corresponding to the couple of (wikiId, colorTheme) does not exist,
+            // if the list of cached files keys corresponding to the wiki does not exist,
             // we create it
-            cachedFilesKeys = new ArrayList<>(1);
-            cachedFilesKeysMap.put(mapKey, cachedFilesKeys);
+            cachedFilesKeys = new ArrayList<>();
+            cachedFilesKeysMap.put(wikiId, cachedFilesKeys);
         }
         if (!cachedFilesKeys.contains(cacheKey)) {
             cachedFilesKeys.add(cacheKey);
@@ -116,11 +115,10 @@ public class DefaultLESSSkinFileCache implements LESSSkinFileCache, Initializabl
     }
 
     @Override
-    public void clear(String wikiId, String colorTheme)
+    public void clear(String wikiId)
     {
-        // Get the list of cached files keys corresponding to the couple (wikiId, colorTheme)
-        String mapKey = getMapKey(wikiId, colorTheme);
-        List<String> cachedFilesKeys = cachedFilesKeysMap.get(mapKey);
+        // Get the list of cached files keys corresponding to the wiki
+        List<String> cachedFilesKeys = cachedFilesKeysMap.get(wikiId);
         if (cachedFilesKeys == null) {
             return;
         }
@@ -128,17 +126,12 @@ public class DefaultLESSSkinFileCache implements LESSSkinFileCache, Initializabl
         for (String cachedFileKey : cachedFilesKeys) {
             cache.remove(cachedFileKey);
         }
-        // Remove the list of cached keys corresponding to the couple (wikiId, colorTheme)
-        cachedFilesKeysMap.remove(mapKey);
+        // Remove the list of cached keys corresponding to the wiki
+        cachedFilesKeysMap.remove(wikiId);
     }
 
-    private String getCacheKey(String fileName, String wikiId, String colorTheme)
+    private String getCacheKey(String fileName, String wikiId, String skin, String colorTheme)
     {
-        return wikiId + CACHE_KEY_SEPARATOR + colorTheme + CACHE_KEY_SEPARATOR + fileName;
-    }
-
-    private String getMapKey(String wikiId, String colorTheme)
-    {
-        return wikiId + CACHE_KEY_SEPARATOR + colorTheme;
+        return wikiId + CACHE_KEY_SEPARATOR + skin + CACHE_KEY_SEPARATOR + colorTheme + CACHE_KEY_SEPARATOR + fileName;
     }
 }

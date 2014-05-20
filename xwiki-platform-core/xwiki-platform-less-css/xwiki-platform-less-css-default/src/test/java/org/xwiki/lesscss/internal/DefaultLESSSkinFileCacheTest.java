@@ -67,10 +67,10 @@ public class DefaultLESSSkinFileCacheTest
     public void get() throws Exception
     {
         // Mock
-        when(cache.get("wikiId_colorTheme_file")).thenReturn("Expected output");
+        when(cache.get("wikiId_skin_colorTheme_file")).thenReturn("Expected output");
 
         // Test
-        String result = mocker.getComponentUnderTest().get("file", "wikiId", "colorTheme");
+        String result = mocker.getComponentUnderTest().get("file", "wikiId", "skin", "colorTheme");
 
         // Verify
         assertEquals("Expected output", result);
@@ -80,10 +80,10 @@ public class DefaultLESSSkinFileCacheTest
     public void set() throws Exception
     {
         // Test
-        mocker.getComponentUnderTest().set("file", "wikiId", "colorTheme", "css");
+        mocker.getComponentUnderTest().set("file", "wikiId", "skin", "colorTheme", "css");
 
         // Verify
-        verify(cache).set(eq("wikiId_colorTheme_file"), eq("css"));
+        verify(cache).set(eq("wikiId_skin_colorTheme_file"), eq("css"));
     }
 
     @Test
@@ -100,22 +100,22 @@ public class DefaultLESSSkinFileCacheTest
     public void clearWithParams() throws Exception
     {
         // Init
-        mocker.getComponentUnderTest().set("file1", "wiki1", "colorTheme1", "css1");
-        mocker.getComponentUnderTest().set("file1", "wiki1", "colorTheme1", "css1");
-        mocker.getComponentUnderTest().set("file2", "wiki2", "colorTheme2", "css2");
-        mocker.getComponentUnderTest().set("file3", "wiki1", "colorTheme1", "css3");
-        mocker.getComponentUnderTest().set("file3", "wiki1", "colorTheme2", "css4");
-        mocker.getComponentUnderTest().set("file3", "wiki2", "colorTheme1", "css5");
+
+        // Add the first one twice
+        mocker.getComponentUnderTest().set("file1", "wiki1", "skin1", "colorTheme1", "css1");
+        mocker.getComponentUnderTest().set("file1", "wiki1", "skin1", "colorTheme1", "css1");
+
+        // Others
+        mocker.getComponentUnderTest().set("file1", "wiki1", "skin2", "colorTheme1", "css2");
+        mocker.getComponentUnderTest().set("file1", "wiki2", "skin1", "colorTheme1", "css3");
 
         // Test
-        mocker.getComponentUnderTest().clear("wiki1", "colorTheme1");
+        mocker.getComponentUnderTest().clear("wiki1");
 
         // Verify
-        verify(cache, times(1)).remove("wiki1_colorTheme1_file1");
-        verify(cache).remove("wiki1_colorTheme1_file3");
-        verify(cache, never()).remove("wiki2_colorTheme2_file2");
-        verify(cache, never()).remove("wiki1_colorTheme2_file3");
-        verify(cache, never()).remove("wiki2_colorTheme1_file3");
+        verify(cache, times(1)).remove("wiki1_skin1_colorTheme1_file1");
+        verify(cache).remove("wiki1_skin2_colorTheme1_file1");
+        verify(cache, never()).remove("wiki2_skin1_colorTheme1_file1");
     }
 
 }

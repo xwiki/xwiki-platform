@@ -104,13 +104,12 @@ public class LessCompilerScriptService implements ScriptService
     }
 
     /**
-     * Remove every generated files corresponding to a wiki and a color theme from the XWiki cache.
+     * Remove every generated files corresponding to a wiki.
      * The script calling this method needs the programming rights.
      * @param wikiId id of the wiki
-     * @param colorTheme name of the color theme
      * @return true if the operation succeed
      */
-    public boolean clearCache(String wikiId, String colorTheme)
+    public boolean clearCache(String wikiId)
     {
         XWikiContext xcontext = xcontextProvider.get();
 
@@ -120,7 +119,7 @@ public class LessCompilerScriptService implements ScriptService
             return false;
         }
 
-        cache.clear(wikiId, colorTheme);
+        cache.clear(wikiId);
         return true;
     }
 }

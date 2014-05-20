@@ -93,6 +93,7 @@ public class DefaultLESSSkinFileCompilerTest
         when(xcontext.getRequest()).thenReturn(request);
         when(request.getParameter("colorTheme")).thenReturn("myColorTheme");
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
+        when(xwiki.getSkin(xcontext)).thenReturn("skin");
     }
 
     private void prepareMocksForCompilation() throws Exception
@@ -120,15 +121,15 @@ public class DefaultLESSSkinFileCompilerTest
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", false));
 
         // Verify
-        verify(cache).get(eq("style2.less"), eq("wikiId"), eq("myColorTheme"));
-        verify(cache).set(eq("style2.less"), eq("wikiId"), eq("myColorTheme"), eq("OUTPUT"));
+        verify(cache).get(eq("style2.less"), eq("wikiId"), eq("skin"), eq("myColorTheme"));
+        verify(cache).set(eq("style2.less"), eq("wikiId"), eq("skin"), eq("myColorTheme"), eq("OUTPUT"));
     }
 
     @Test
     public void compileSkinFileWhenInCache() throws Exception
     {
         // Mock
-        when(cache.get("style2.less", "wikiId", "myColorTheme")).thenReturn("OUTPUT");
+        when(cache.get("style2.less", "wikiId", "skin", "myColorTheme")).thenReturn("OUTPUT");
 
         // Test
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", false));
@@ -142,14 +143,14 @@ public class DefaultLESSSkinFileCompilerTest
     public void compileSkinFileWhenInCacheButForce() throws Exception
     {
         // Mock
-        when(cache.get("style2.less", "wikiId" , "myColorTheme")).thenReturn("OLD OUTPUT");
+        when(cache.get("style2.less", "wikiId", "skin", "myColorTheme")).thenReturn("OLD OUTPUT");
         prepareMocksForCompilation();
 
         // Test
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", true));
 
         // Verify
-        verify(cache).set(eq("style2.less"), eq("wikiId"), eq("myColorTheme"), eq("OUTPUT"));
+        verify(cache).set(eq("style2.less"), eq("wikiId"), eq("skin"), eq("myColorTheme"), eq("OUTPUT"));
     }
 
     @Test

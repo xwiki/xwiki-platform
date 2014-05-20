@@ -72,7 +72,16 @@ public class ComponentScriptService implements ScriptService
     }
 
     /**
-     * @param namespace a namespace
+     * Retrieves the component manager associated with a specific namespace. The namespace is generally of the form
+     * <code>prefix:subid</code> where <code>prefix</code> is used to find the proper factory. <code>:</code> can be
+     * escaped using <code>\</code> and <code>\</code> need to be escaped as well. There is a namespace for each
+     * document, space, wiki and user. E.g. 'wiki:drafts' is the namespace corresponding to the 'drafts' wiki.
+     * Namespaces can be nested in which case they inherit from the parent namespace. E.g. the component manager for a
+     * specific document has access to the components registered specifically for that document or for any of its
+     * namespace ancestors (space, wiki, root). The root (top level) component manager is returned if you pass
+     * {@code null}.
+     * 
+     * @param namespace a namespace or {@code null} for the root {@link ComponentManager}
      * @return the component manager associated with the specified namespace, if any, {@code null otherwise}
      */
     public ComponentManager getComponentManager(String namespace)

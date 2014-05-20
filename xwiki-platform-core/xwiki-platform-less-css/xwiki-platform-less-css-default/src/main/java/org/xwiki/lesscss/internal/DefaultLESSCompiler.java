@@ -61,6 +61,7 @@ public class DefaultLESSCompiler implements LESSCompiler, Initializable
         lessCompiler = new LessCompiler();
         lessCompiler.setLessJs(getClass().getResource(LESS_SOURCE_FILE));
         lessCompiler.setLesscJs(getClass().getResource(LESSC_SOURCE_FILE));
+        lessCompiler.setCompress(true);
         lessCompiler.init();
     }
 
@@ -88,6 +89,7 @@ public class DefaultLESSCompiler implements LESSCompiler, Initializable
             compiler = new LessCompiler(Arrays.<String>asList(paths.toString()));
             compiler.setLessJs(getClass().getResource(LESS_SOURCE_FILE));
             compiler.setLesscJs(getClass().getResource(LESSC_SOURCE_FILE));
+            compiler.setCompress(true);
             compiler.init();
         }
         try {

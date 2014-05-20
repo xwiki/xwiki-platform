@@ -100,6 +100,7 @@ public class DocumentModifiedEventListenerTest
 
         mocker.getComponentUnderTest().onEvent(null, null, null);
 
+        // Verify that no message is sent to the IRC channel
         verify(bot, never()).sendMessage(anyString(), anyString());
     }
 
@@ -108,6 +109,7 @@ public class DocumentModifiedEventListenerTest
     {
         mocker.getComponentUnderTest().onEvent(null, "not a XWiki Document instance, it's a String.class", null);
 
+        // Verify that no message is sent to the IRC channel
         verify(bot, never()).sendMessage(anyString(), anyString());
     }
 
@@ -138,6 +140,7 @@ public class DocumentModifiedEventListenerTest
 
         mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(documentReference), document, xcontext);
 
+        // Verify that no message is sent to the IRC channel
         verify(bot, never()).sendMessage(anyString(), anyString());
     }
 
@@ -150,6 +153,7 @@ public class DocumentModifiedEventListenerTest
 
         mocker.getComponentUnderTest().onEvent(new DocumentCreatedEvent(documentReference), document, xcontext);
 
+        // Verify that no message is sent to the IRC channel
         verify(bot, never()).sendMessage(anyString(), anyString());
 
         // We also verify that the XAR import counter is increased by one

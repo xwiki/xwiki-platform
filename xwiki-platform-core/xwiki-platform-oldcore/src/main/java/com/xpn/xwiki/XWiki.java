@@ -761,16 +761,16 @@ public class XWiki implements EventListener
 
             progress.stepPropress(this);
 
-            // Prepare the Plugin Engine
-            preparePlugins(context);
-
-            progress.stepPropress(this);
-
             // Make sure these classes exists
             if (noupdate) {
                 initializeMandatoryClasses(context);
                 getStatsService(context);
             }
+
+            progress.stepPropress(this);
+
+            // Prepare the Plugin Engine
+            preparePlugins(context);
 
             progress.stepPropress(this);
 

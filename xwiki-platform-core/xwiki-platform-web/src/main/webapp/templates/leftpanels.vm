@@ -12,3 +12,4 @@
 #end
 </div>
 #end
+#set($xwikiPanelWidth = "Medium")

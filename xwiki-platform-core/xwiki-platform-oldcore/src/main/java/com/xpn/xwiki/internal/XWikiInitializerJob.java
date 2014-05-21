@@ -124,9 +124,7 @@ public class XWikiInitializerJob extends AbstractJob<XWikiInitializerRequest, XW
             XWikiContext xcontext = this.xcontextProvider.get();
             XWikiEngineContext econtext = xcontext.getEngineContext();
 
-            XWikiConfig xwikicfgis = readXWikiConfiguration(XWiki.getConfigPath(), econtext, xcontext);
-
-            XWiki xwiki = new XWiki(xwikicfgis, xcontext, xcontext.getEngineContext(), true);
+            XWiki xwiki = new XWiki(xcontext, xcontext.getEngineContext(), true);
 
             // initialize stub context here instead of during Execution context initialization because
             // during Execution context initialization, the XWikiContext is not fully initialized (does not

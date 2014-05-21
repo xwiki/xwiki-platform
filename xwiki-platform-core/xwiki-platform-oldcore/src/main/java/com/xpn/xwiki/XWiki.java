@@ -358,15 +358,6 @@ public class XWiki implements EventListener
 
     private static XWikiInitializerJob job;
 
-    /**
-     * @deprecated since 6.1M2, use {@link XWikiCfgConfigurationSource#getConfigPath()} instead
-     */
-    @Deprecated
-    public static String getConfigPath() throws NamingException
-    {
-        return XWikiCfgConfigurationSource.getConfigPath();
-    }
-
     private static ConfigurationSource getConfiguration()
     {
         return Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
@@ -635,54 +626,28 @@ public class XWiki implements EventListener
 
     }
 
-    public XWiki(XWikiConfig config, XWikiContext context) throws XWikiException
+    public XWiki(XWikiContext context, XWikiEngineContext engine_context, boolean noupdate) throws XWikiException
     {
-        this(config, context, null, false);
+        initXWiki(context, engine_context, noupdate);
     }
 
-    public XWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
+    public XWiki(XWikiContext context) throws XWikiException
+    {
+        this(context, null, false);
+    }
+
+    public void initXWiki(XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
         throws XWikiException
     {
-        initXWiki(config, context, engine_context, noupdate);
-    }
-
-    /**
-     * @deprecated use {@link #XWiki(XWikiConfig, XWikiContext)} instead
-     */
-    @Deprecated
-    public XWiki(String xwikicfgpath, XWikiContext context) throws XWikiException
-    {
-        this(xwikicfgpath, context, null, false);
-    }
-
-    /**
-     * @deprecated use {@link #XWiki(XWikiConfig, XWikiContext, XWikiEngineContext, boolean)} instead
-     */
-    @Deprecated
-    public XWiki(String xwikicfgpath, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
-        throws XWikiException
-    {
-        try {
-            initXWiki(new XWikiConfig(new FileInputStream(xwikicfgpath)), context, engine_context, noupdate);
-        } catch (FileNotFoundException e) {
-            Object[] args = {xwikicfgpath};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
-                XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND, "Configuration file {0} not found", e, args);
-        }
-    }
-
-    /**
-     * @deprecated use {@link #XWiki(XWikiConfig, XWikiContext, XWikiEngineContext, boolean)} instead
-     */
-    @Deprecated
-    public XWiki(InputStream is, XWikiContext context, XWikiEngineContext engine_context) throws XWikiException
-    {
-        initXWiki(new XWikiConfig(is), context, engine_context, true);
+        initXWiki(null, context, engine_context, noupdate);
     }
 
     /**
      * Initialize all xwiki subsystems.
+     * 
+     * @deprecated since 6.1M2, use {@link #initXWiki(XWikiContext, XWikiEngineContext, boolean)} instead
      */
+    @Deprecated
     public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
         throws XWikiException
     {
@@ -6469,6 +6434,68 @@ public class XWiki implements EventListener
     }
 
     // Deprecated
+
+    /**
+     * @deprecated since 6.1M2, use {@link XWikiCfgConfigurationSource#getConfigPath()} instead
+     */
+    @Deprecated
+    public static String getConfigPath() throws NamingException
+    {
+        return XWikiCfgConfigurationSource.getConfigPath();
+    }
+
+    /**
+     * @deprecated since 6.1M3, use {@link #XWiki(XWikiContext)} instead
+     */
+    @Deprecated
+    public XWiki(XWikiConfig config, XWikiContext context) throws XWikiException
+    {
+        this(config, context, null, false);
+    }
+
+    /**
+     * @deprecated since 6.1M3, use {@link #XWiki(XWikiContext, XWikiEngineContext, boolean)} instead
+     */
+    @Deprecated
+    public XWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
+        throws XWikiException
+    {
+        initXWiki(config, context, engine_context, noupdate);
+    }
+
+    /**
+     * @deprecated use {@link #XWiki(XWikiContext)} instead
+     */
+    @Deprecated
+    public XWiki(String xwikicfgpath, XWikiContext context) throws XWikiException
+    {
+        this(xwikicfgpath, context, null, false);
+    }
+
+    /**
+     * @deprecated use {@link #XWiki(XWikiContext, XWikiEngineContext, boolean)} instead
+     */
+    @Deprecated
+    public XWiki(String xwikicfgpath, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate)
+        throws XWikiException
+    {
+        try {
+            initXWiki(new XWikiConfig(new FileInputStream(xwikicfgpath)), context, engine_context, noupdate);
+        } catch (FileNotFoundException e) {
+            Object[] args = {xwikicfgpath};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
+                XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND, "Configuration file {0} not found", e, args);
+        }
+    }
+
+    /**
+     * @deprecated use {@link #XWiki(XWikiContext, XWikiEngineContext, boolean)} instead
+     */
+    @Deprecated
+    public XWiki(InputStream is, XWikiContext context, XWikiEngineContext engine_context) throws XWikiException
+    {
+        initXWiki(new XWikiConfig(is), context, engine_context, true);
+    }
 
     /**
      * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead

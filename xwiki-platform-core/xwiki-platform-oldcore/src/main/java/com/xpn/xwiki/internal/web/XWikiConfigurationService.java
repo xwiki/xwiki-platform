@@ -27,6 +27,7 @@ import javax.servlet.ServletContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.configuration.ConfigurationSource;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -39,7 +40,9 @@ import com.xpn.xwiki.XWikiConfig;
  * 
  * @version $Id$
  * @since 1.9.1
+ * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
  */
+@Deprecated
 public class XWikiConfigurationService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiConfigurationService.class);

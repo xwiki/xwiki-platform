@@ -21,6 +21,7 @@ package com.xpn.xwiki;
 
 import java.io.UnsupportedEncodingException;
 import java.io.File;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -37,11 +38,13 @@ import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.environment.Environment;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.url.XWikiEntityURL;
@@ -79,6 +82,14 @@ public privileged aspect XWikiCompatibilityAspect
 
     private EntityReferenceResolver<EntityReference> XWiki.defaultReferenceEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.TYPE_REFERENCE);
+
+    private EntityReferenceSerializer<String> XWiki.localStringEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.TYPE_STRING, "local");
+
+    /**
+     * Used to get the temporary and permanent directory.
+     */
+    private Environment XWiki.environment = Utils.getComponent((Type) Environment.class);
 
     /**
      * Transform a text in a URL compatible text

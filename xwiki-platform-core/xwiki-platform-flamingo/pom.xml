@@ -28,9 +28,9 @@
     <version>6.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo</artifactId>
-  <name>XWiki Platform - Flamingo</name>
+  <name>Flamingo Skin</name>
   <packaging>pom</packaging>
-  <description>Flamingo Skin</description>
+  <description>Provide a fresh, responsive and modern skin for XWiki, based on Bootstrap.</description>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>

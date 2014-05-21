@@ -95,6 +95,7 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         environment.setServletContext(mockServletContext);
         getMockery().checking(new Expectations() {{
             allowing(mockServletContext).getResourceAsStream("/WEB-INF/cache/infinispan/config.xml");
+            allowing(mockServletContext).getResourceAsStream("/WEB-INF/xwiki.cfg");
             will(returnValue(null));
             allowing(mockServletContext).getAttribute("javax.servlet.context.tempdir");
                 will(returnValue(new File(System.getProperty("java.io.tmpdir"))));

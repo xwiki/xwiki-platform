@@ -36,6 +36,13 @@
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
   <dependencies>
+    <!-- LESS Module -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-less-css-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- WebJars -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

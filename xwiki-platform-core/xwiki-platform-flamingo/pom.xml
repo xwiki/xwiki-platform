@@ -28,12 +28,14 @@
     <version>6.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo</artifactId>
-  <name>Flamingo Skin</name>
+  <name>XWiki Platform - Flamingo</name>
   <packaging>pom</packaging>
   <description>Provide a fresh, responsive and modern skin for XWiki, based on Bootstrap.</description>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Name to display by the Extension Manager -->
+      <xwiki.extension.name>Flamingo Skin</xwiki.extension.name>
   </properties>
   <dependencies>
     <!-- LESS Module -->

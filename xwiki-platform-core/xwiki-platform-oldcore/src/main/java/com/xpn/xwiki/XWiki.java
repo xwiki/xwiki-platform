@@ -54,8 +54,6 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -94,8 +92,8 @@ import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.classloader.ClassLoaderManager;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
-import org.xwiki.environment.Environment;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -140,6 +138,8 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+import com.xpn.xwiki.internal.XWikiConfigDelegate;
 import com.xpn.xwiki.internal.XWikiInitializerJob;
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
@@ -217,9 +217,6 @@ public class XWiki implements EventListener
     /** The default encoding, and the internally used encoding when dealing with byte representation of strings. */
     public static final String DEFAULT_ENCODING = "UTF-8";
 
-    /** XWiki configuration loaded from xwiki.cfg. */
-    private XWikiConfig config;
-
     /** The main document storage. */
     private XWikiStoreInterface store;
 
@@ -296,7 +293,11 @@ public class XWiki implements EventListener
 
     private boolean isReadOnly = false;
 
-    public static final String CFG_ENV_NAME = "XWikiConfig";
+    /**
+     * @deprecated since 6.1M2, use {@link XWikiCfgConfigurationSource#CFG_ENV_NAME} instead
+     */
+    @Deprecated
+    public static final String CFG_ENV_NAME = XWikiCfgConfigurationSource.CFG_ENV_NAME;
 
     public static final String MACROS_FILE = "/templates/macros.txt";
 
@@ -310,11 +311,6 @@ public class XWiki implements EventListener
      */
     private static final String VERSION_FILE_PROPERTY = "version";
 
-    /*
-     * i don't like using static variables like, but this avoid making a JNDI lookup with each request ...
-     */
-    private static String configPath = null;
-
     /**
      * List of configured syntax ids.
      */
@@ -325,9 +321,6 @@ public class XWiki implements EventListener
      */
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer = Utils
         .getComponent(EntityReferenceSerializer.TYPE_STRING);
-
-    private EntityReferenceSerializer<String> localStringEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.TYPE_STRING, "local");
 
     private EntityReferenceValueProvider defaultEntityReferenceValueProvider = Utils
         .getComponent((Type) EntityReferenceValueProvider.class);
@@ -357,11 +350,6 @@ public class XWiki implements EventListener
     private ResourceManager resourceManager = Utils.getComponent((Type) ResourceManager.class);
 
     /**
-     * Used to get the temporary and permanent directory.
-     */
-    private Environment environment = Utils.getComponent((Type) Environment.class);
-
-    /**
      * Whether backlinks are enabled or not (cached for performance).
      * 
      * @since 3.2M2
@@ -370,21 +358,18 @@ public class XWiki implements EventListener
 
     private static XWikiInitializerJob job;
 
+    /**
+     * @deprecated since 6.1M2, use {@link XWikiCfgConfigurationSource#getConfigPath()} instead
+     */
+    @Deprecated
     public static String getConfigPath() throws NamingException
     {
-        if (configPath == null) {
-            try {
-                Context envContext = (Context) new InitialContext().lookup("java:comp/env");
-                configPath = (String) envContext.lookup(CFG_ENV_NAME);
-            } catch (Exception e) {
-                configPath = "/WEB-INF/xwiki.cfg";
-                LOGGER.debug("The xwiki.cfg file will be read from [" + configPath + "] because "
-                    + "its location couldn't be read from the JNDI [" + CFG_ENV_NAME + "] "
-                    + "variable in [java:comp/env].");
-            }
-        }
+        return XWikiCfgConfigurationSource.getConfigPath();
+    }
 
-        return configPath;
+    private static ConfigurationSource getConfiguration()
+    {
+        return Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
     }
 
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException
@@ -712,13 +697,16 @@ public class XWiki implements EventListener
             context.setWiki(this);
 
             // Prepare the store
-            setConfig(config);
+            if (config != null) {
+                setConfig(config);
+            }
 
             XWikiStoreInterface mainStore =
-                Utils.getComponent(XWikiStoreInterface.class, Param("xwiki.store.main.hint", "hibernate"));
+                Utils.getComponent(XWikiStoreInterface.class,
+                    getConfiguration().getProperty("xwiki.store.main.hint", "hibernate"));
 
             // Check if we need to use the cache store..
-            boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
+            boolean nocache = "0".equals(getConfiguration().getProperty("xwiki.store.cache", "1"));
             if (!nocache) {
                 XWikiCacheStoreInterface cachestore = new XWikiCacheStore(mainStore, context);
                 setStore(cachestore);
@@ -730,25 +718,27 @@ public class XWiki implements EventListener
                 "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
 
             setAttachmentStore(Utils.<XWikiAttachmentStoreInterface> getComponent(
-                (Type) XWikiAttachmentStoreInterface.class, Param("xwiki.store.attachment.hint", "hibernate")));
+                (Type) XWikiAttachmentStoreInterface.class,
+                getConfiguration().getProperty("xwiki.store.attachment.hint", "hibernate")));
 
             setVersioningStore(Utils.<XWikiVersioningStoreInterface> getComponent(
-                (Type) XWikiVersioningStoreInterface.class, Param("xwiki.store.versioning.hint", "hibernate")));
+                (Type) XWikiVersioningStoreInterface.class,
+                getConfiguration().getProperty("xwiki.store.versioning.hint", "hibernate")));
 
             setAttachmentVersioningStore(Utils.<AttachmentVersioningStore> getComponent(
-                (Type) AttachmentVersioningStore.class,
-                hasAttachmentVersioning(context) ? Param("xwiki.store.attachment.versioning.hint", "hibernate")
-                    : "void"));
+                (Type) AttachmentVersioningStore.class, hasAttachmentVersioning(context) ? getConfiguration()
+                    .getProperty("xwiki.store.attachment.versioning.hint", "hibernate") : "void"));
 
             if (hasRecycleBin(context)) {
                 setRecycleBinStore(Utils.<XWikiRecycleBinStoreInterface> getComponent(
-                    (Type) XWikiRecycleBinStoreInterface.class, Param("xwiki.store.recyclebin.hint", "hibernate")));
+                    (Type) XWikiRecycleBinStoreInterface.class,
+                    getConfiguration().getProperty("xwiki.store.recyclebin.hint", "hibernate")));
             }
 
             if (hasAttachmentRecycleBin(context)) {
                 setAttachmentRecycleBinStore(Utils.<AttachmentRecycleBinStore> getComponent(
                     (Type) AttachmentRecycleBinStore.class,
-                    Param("xwiki.store.attachment.recyclebin.hint", "hibernate")));
+                    getConfiguration().getProperty("xwiki.store.attachment.recyclebin.hint", "hibernate")));
             }
 
             // "Pre-initialize" XWikiStubContextProvider so that rendering engine, plugins or listeners reacting to
@@ -774,11 +764,11 @@ public class XWiki implements EventListener
 
             progress.stepPropress(this);
 
-            String ro = Param("xwiki.readonly", "no");
+            String ro = getConfiguration().getProperty("xwiki.readonly", "no");
             this.isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
 
             // Save the configured syntaxes
-            String syntaxes = Param("xwiki.rendering.syntaxes", "xwiki/1.0");
+            String syntaxes = getConfiguration().getProperty("xwiki.rendering.syntaxes", "xwiki/1.0");
             this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
 
             ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
@@ -980,7 +970,7 @@ public class XWiki implements EventListener
 
     protected Object createClassFromConfig(String param, String defClass, XWikiContext context) throws XWikiException
     {
-        String storeclass = Param(param, defClass);
+        String storeclass = getConfiguration().getProperty(param, defClass);
         try {
             Class< ? >[] classes = new Class< ? >[] {XWikiContext.class};
             Object[] args = new Object[] {context};
@@ -1007,7 +997,7 @@ public class XWiki implements EventListener
     private void preparePlugins(XWikiContext context)
     {
         setPluginManager(new XWikiPluginManager(getXWikiPreference("plugins", context), context));
-        String plugins = Param("xwiki.plugins", "");
+        String plugins = getConfiguration().getProperty("xwiki.plugins", "");
         if (!plugins.equals("")) {
             getPluginManager().addPlugins(StringUtils.split(plugins, " ,"), context);
         }
@@ -1128,24 +1118,14 @@ public class XWiki implements EventListener
         return false;
     }
 
-    public XWikiConfig getConfig()
-    {
-        return this.config;
-    }
-
     public String getRealPath(String path)
     {
         return getEngineContext().getRealPath(path);
     }
 
-    public String Param(String key)
-    {
-        return Param(key, null);
-    }
-
     public String ParamAsRealPath(String key)
     {
-        String param = Param(key);
+        String param = getConfiguration().getProperty(key);
         try {
             return getRealPath(param);
         } catch (Exception e) {
@@ -1163,7 +1143,7 @@ public class XWiki implements EventListener
         String path;
         File fpath;
 
-        path = Param(param);
+        path = getConfiguration().getProperty(param);
         if (path == null) {
             return null;
         }
@@ -1184,29 +1164,6 @@ public class XWiki implements EventListener
         } else {
         }
         return null;
-    }
-
-    public String Param(String key, String default_value)
-    {
-        if (getConfig() != null) {
-            return getConfig().getProperty(key, default_value);
-        }
-        return default_value;
-    }
-
-    public long ParamAsLong(String key)
-    {
-        String param = Param(key);
-        return Long.parseLong(param);
-    }
-
-    public long ParamAsLong(String key, long default_value)
-    {
-        try {
-            return ParamAsLong(key);
-        } catch (NumberFormatException e) {
-            return default_value;
-        }
     }
 
     public XWikiStoreInterface getStore()
@@ -1913,7 +1870,7 @@ public class XWiki implements EventListener
                 }
             }
             if (skin == null || skin.equals("")) {
-                skin = Param("xwiki.defaultskin");
+                skin = getConfiguration().getProperty("xwiki.defaultskin");
                 if (LOGGER.isDebugEnabled()) {
                     if (skin != null && !skin.equals("")) {
                         LOGGER.debug("Configured default skin in preferences: [" + skin + "]");
@@ -1936,7 +1893,7 @@ public class XWiki implements EventListener
             if (skin.indexOf('.') != -1) {
                 if (!getRightService().hasAccessLevel("view", context.getUser(), skin, context)) {
                     LOGGER.debug("Cannot access configured skin due to access rights, using the default skin.");
-                    skin = Param("xwiki.defaultskin", getDefaultBaseSkin(context));
+                    skin = getConfiguration().getProperty("xwiki.defaultskin", getDefaultBaseSkin(context));
                 }
             }
         } catch (XWikiException e) {
@@ -1984,9 +1941,9 @@ public class XWiki implements EventListener
 
     public String getDefaultBaseSkin(XWikiContext context)
     {
-        String defaultbaseskin = Param("xwiki.defaultbaseskin", "");
+        String defaultbaseskin = getConfiguration().getProperty("xwiki.defaultbaseskin", "");
         if (defaultbaseskin.equals("")) {
-            defaultbaseskin = Param("xwiki.defaultskin", "colibri");
+            defaultbaseskin = getConfiguration().getProperty("xwiki.defaultskin", "colibri");
         }
         return defaultbaseskin;
     }
@@ -2105,7 +2062,7 @@ public class XWiki implements EventListener
         } catch (Exception e) {
             LOGGER.debug("Exception while getting wiki preference [{}]", prefname, e);
         }
-        return Param(fallback_param, default_value);
+        return getConfiguration().getProperty(fallback_param, default_value);
     }
 
     public String getXWikiPreference(String prefname, String default_value, XWikiContext context)
@@ -2284,7 +2241,7 @@ public class XWiki implements EventListener
 
         // If the default language is preferred, and since the user didn't explicitly ask for a
         // language already, then use the default wiki language.
-        if (Param("xwiki.language.preferDefault", "0").equals("1")
+        if (getConfiguration().getProperty("xwiki.language.preferDefault", "0").equals("1")
             || getSpacePreference("preferDefaultLanguage", "0", context).equals("1")) {
             language = defaultLanguage;
             context.setLanguage(language);
@@ -2298,7 +2255,7 @@ public class XWiki implements EventListener
             if ((acceptHeader != null) && (!acceptHeader.equals(""))) {
                 List<String> acceptedLanguages = getAcceptedLanguages(context.getRequest());
                 // We can force one of the configured languages to be accepted
-                if (Param("xwiki.language.forceSupported", "0").equals("1")) {
+                if (getConfiguration().getProperty("xwiki.language.forceSupported", "0").equals("1")) {
                     List<String> available = Arrays.asList(getXWikiPreference("languages", context).split("[, |]"));
                     // Filter only configured languages
                     acceptedLanguages.retainAll(available);
@@ -2710,11 +2667,6 @@ public class XWiki implements EventListener
         this.pluginManager = pluginManager;
     }
 
-    public void setConfig(XWikiConfig config)
-    {
-        this.config = config;
-    }
-
     public void setStore(XWikiStoreInterface store)
     {
         this.store = store;
@@ -3002,7 +2954,8 @@ public class XWiki implements EventListener
                 return -8;
             }
             try {
-                if (!context.getUtil().match(this.Param("xwiki.validusername", "/^[a-zA-Z0-9_]+$/"), xwikiname)) {
+                if (!context.getUtil().match(
+                    getConfiguration().getProperty("xwiki.validusername", "/^[a-zA-Z0-9_]+$/"), xwikiname)) {
                     return -4;
                 }
             } catch (RuntimeException ex) {
@@ -3433,7 +3386,7 @@ public class XWiki implements EventListener
 
     public void setUserDefaultGroup(String fullwikiname, XWikiContext context) throws XWikiException
     {
-        String groupsPreference = Param("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
+        String groupsPreference = getConfiguration().getProperty("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
 
         if (groupsPreference != null) {
             String[] groups = groupsPreference.split(",");
@@ -3621,16 +3574,9 @@ public class XWiki implements EventListener
                     context.setWikiId(database);
                 }
 
-                // Allow including document in the XWiki Syntax 1.0 but also other syntaxes using the new rendering.
-                if (contentdoc.getSyntax().equals(Syntax.XWIKI_1_0)) {
-                    result =
-                        getRenderingEngine().renderText(contentdoc.getContent(), contentdoc,
-                            (XWikiDocument) context.get("doc"), context);
-                } else {
-                    // Note: the Script macro in the new rendering checks for programming rights for the document in
-                    // the xwiki context.
-                    result = getRenderedContent(contentdoc, (XWikiDocument) context.get("doc"), context);
-                }
+                // Note: the Script macro in the new rendering checks for programming rights for the document in
+                // the xwiki context.
+                result = getRenderedContent(contentdoc, (XWikiDocument) context.get("doc"), context);
             } else {
                 // We stay in the included document context
 
@@ -3699,8 +3645,7 @@ public class XWiki implements EventListener
 
     /**
      * Render content from the passed included document, setting the correct security doc (sdoc) and including doc
-     * (idoc). Note that this is needed for 2.0 syntax only since in 1.0 syntax the idoc and sdoc are set by
-     * {@link com.xpn.xwiki.render.XWikiRenderingEngine#renderText}.
+     * (idoc).
      * 
      * @since 2.2M2
      */
@@ -4183,7 +4128,7 @@ public class XWiki implements EventListener
 
     public String getEncoding()
     {
-        return Param("xwiki.encoding", "UTF-8");
+        return getConfiguration().getProperty("xwiki.encoding", "UTF-8");
     }
 
     public URL getServerURL(String database, XWikiContext context) throws MalformedURLException
@@ -4191,7 +4136,7 @@ public class XWiki implements EventListener
         String serverurl = null;
 
         // In virtual wiki path mode the server is the standard one
-        if ("1".equals(Param("xwiki.virtual.usepath", "1"))) {
+        if ("1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"))) {
             return null;
         }
 
@@ -4204,7 +4149,7 @@ public class XWiki implements EventListener
                 if (serverobject != null) {
                     String server = serverobject.getStringValue("server");
                     if (server != null) {
-                        String protocol = context.getWiki().Param("xwiki.url.protocol", null);
+                        String protocol = getConfiguration().getProperty("xwiki.url.protocol", null);
                         if (protocol == null) {
                             int iSecure = serverobject.getIntValue("secure", -1);
                             // Check the request object if the "secure" property is undefined.
@@ -4238,7 +4183,8 @@ public class XWiki implements EventListener
     public String getServletPath(String wikiName, XWikiContext context)
     {
         // unless we are in virtual wiki path mode we should return null
-        if (!context.getMainXWiki().equalsIgnoreCase(wikiName) && "1".equals(Param("xwiki.virtual.usepath", "1"))) {
+        if (!context.getMainXWiki().equalsIgnoreCase(wikiName)
+            && "1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"))) {
             String database = context.getWikiId();
             try {
                 context.setWikiId(context.getMainXWiki());
@@ -4255,7 +4201,7 @@ public class XWiki implements EventListener
             }
         }
 
-        String servletPath = Param("xwiki.servletpath", "");
+        String servletPath = getConfiguration().getProperty("xwiki.servletpath", "");
 
         if (context.getRequest() != null) {
             if (StringUtils.isEmpty(servletPath)) {
@@ -4263,7 +4209,7 @@ public class XWiki implements EventListener
                 if (currentServletpath != null && currentServletpath.startsWith("/bin")) {
                     servletPath = "bin/";
                 } else {
-                    servletPath = Param("xwiki.defaultservletpath", "bin/");
+                    servletPath = getConfiguration().getProperty("xwiki.defaultservletpath", "bin/");
                 }
             }
         }
@@ -4274,7 +4220,7 @@ public class XWiki implements EventListener
     public String getWebAppPath(XWikiContext context)
     {
         String path = context.getURL().getPath();
-        String contextPath = Param("xwiki.webapppath", "");
+        String contextPath = getConfiguration().getProperty("xwiki.webapppath", "");
         if (contextPath.equals("")) {
             try {
                 contextPath = context.getRequest().getContextPath();
@@ -4400,7 +4346,7 @@ public class XWiki implements EventListener
 
     public boolean isLDAP()
     {
-        return "1".equals(Param("xwiki.authentication.ldap"));
+        return "1".equals(getConfiguration().getProperty("xwiki.authentication.ldap"));
     }
 
     public int checkActive(XWikiContext context) throws XWikiException
@@ -4547,7 +4493,7 @@ public class XWiki implements EventListener
                 || ((action.equals("view") && doc.getFullName().equals("XWiki.AccountValidation")))) {
                 allow = true;
             } else {
-                String allowed = Param("xwiki.inactiveuser.allowedpages", "");
+                String allowed = getConfiguration().getProperty("xwiki.inactiveuser.allowedpages", "");
                 if (context.getAction().equals("view") && !allowed.equals("")) {
                     String[] allowedList = StringUtils.split(allowed, " ,");
                     for (String element : allowedList) {
@@ -4632,7 +4578,8 @@ public class XWiki implements EventListener
         synchronized (this.GROUP_SERVICE_LOCK) {
             if (this.groupService == null) {
                 String groupClass =
-                    Param("xwiki.authentication.groupclass", "com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl");
+                    getConfiguration().getProperty("xwiki.authentication.groupclass",
+                        "com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl");
 
                 try {
                     this.groupService = (XWikiGroupService) Class.forName(groupClass).newInstance();
@@ -4660,7 +4607,7 @@ public class XWiki implements EventListener
 
                 LOGGER.info("Initializing AuthService...");
 
-                String authClass = Param("xwiki.authentication.authclass");
+                String authClass = getConfiguration().getProperty("xwiki.authentication.authclass");
                 if (StringUtils.isNotEmpty(authClass)) {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("Using custom AuthClass " + authClass + ".");
@@ -4719,7 +4666,7 @@ public class XWiki implements EventListener
             if (this.rightService == null) {
                 LOGGER.info("Initializing RightService...");
 
-                String rightsClass = Param("xwiki.authentication.rightsclass");
+                String rightsClass = getConfiguration().getProperty("xwiki.authentication.rightsclass");
                 if (rightsClass != null && !rightsClass.equals(DEFAULT_RIGHT_SERVICE_CLASS)) {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.warn("Using custom Right Service [{}].", rightsClass);
@@ -4772,8 +4719,10 @@ public class XWiki implements EventListener
     {
         synchronized (this.STATS_SERVICE_LOCK) {
             if (this.statsService == null) {
-                if ("1".equals(Param("xwiki.stats", "1"))) {
-                    String storeClass = Param("xwiki.stats.class", "com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl");
+                if ("1".equals(getConfiguration().getProperty("xwiki.stats", "1"))) {
+                    String storeClass =
+                        getConfiguration().getProperty("xwiki.stats.class",
+                            "com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl");
                     try {
                         this.statsService = (XWikiStatsService) Class.forName(storeClass).newInstance();
                     } catch (Exception e) {
@@ -4798,7 +4747,7 @@ public class XWiki implements EventListener
 
                     XWikiURLFactoryService factoryService = null;
 
-                    String urlFactoryServiceClass = Param("xwiki.urlfactory.serviceclass");
+                    String urlFactoryServiceClass = getConfiguration().getProperty("xwiki.urlfactory.serviceclass");
                     if (urlFactoryServiceClass != null) {
                         try {
                             if (LOGGER.isDebugEnabled()) {
@@ -4999,7 +4948,7 @@ public class XWiki implements EventListener
             return false;
         }
 
-        return "1".equals(Param("xwiki.authentication.centralized", "0"));
+        return "1".equals(getConfiguration().getProperty("xwiki.authentication.centralized", "0"));
     }
 
     public String getLocalUserName(String user, XWikiContext context)
@@ -5090,7 +5039,7 @@ public class XWiki implements EventListener
         // GMT and not the system default.
         if (!ArrayUtils.contains(TimeZone.getAvailableIDs(), tz)) {
             String defaultTz = TimeZone.getDefault().getID();
-            return Param("xwiki.timezone", defaultTz);
+            return getConfiguration().getProperty("xwiki.timezone", defaultTz);
         } else {
             return tz;
         }
@@ -5133,7 +5082,7 @@ public class XWiki implements EventListener
         }
 
         if (adtype.equals("")) {
-            adtype = Param("xwiki.ad.type", "");
+            adtype = getConfiguration().getProperty("xwiki.ad.type", "");
         }
 
         return adtype;
@@ -5149,7 +5098,7 @@ public class XWiki implements EventListener
         }
 
         if (adclientid.equals("")) {
-            adclientid = Param("xwiki.ad.clientid", "");
+            adclientid = getConfiguration().getProperty("xwiki.ad.clientid", "");
         }
 
         if (adclientid.equals("")) {
@@ -5184,18 +5133,12 @@ public class XWiki implements EventListener
 
     public int getHttpTimeout(XWikiContext context)
     {
-        int defaulttimeout = 60000;
-        return (context == null) ? defaulttimeout : (int) context.getWiki().ParamAsLong("xwiki.http.timeout",
-            defaulttimeout);
+        return getConfiguration().getProperty("xwiki.http.timeout", 60000);
     }
 
     public String getHttpUserAgent(XWikiContext context)
     {
-        if (context != null) {
-            return context.getWiki().Param("xwiki.http.useragent", "XWikiBot/1.0");
-        } else {
-            return "XWikiBot/1.0";
-        }
+        return getConfiguration().getProperty("xwiki.http.useragent", "XWikiBot/1.0");
     }
 
     public String getURLContent(String surl, XWikiContext context) throws IOException
@@ -5461,19 +5404,19 @@ public class XWiki implements EventListener
 
     public boolean hasCustomMappings()
     {
-        return "1".equals(Param("xwiki.store.hibernate.custommapping", "1"));
+        return "1".equals(getConfiguration().getProperty("xwiki.store.hibernate.custommapping", "1"));
     }
 
     public boolean hasDynamicCustomMappings()
     {
-        return "1".equals(Param("xwiki.store.hibernate.custommapping.dynamic", "0"));
+        return "1".equals(getConfiguration().getProperty("xwiki.store.hibernate.custommapping.dynamic", "0"));
     }
 
     public String getDefaultSpace(XWikiContext context)
     {
         String defaultSpace = getXWikiPreference("defaultweb", "", context);
         if (StringUtils.isEmpty(defaultSpace)) {
-            return Param("xwiki.defaultweb", DEFAULT_HOME_SPACE);
+            return getConfiguration().getProperty("xwiki.defaultweb", DEFAULT_HOME_SPACE);
         }
         return defaultSpace;
     }
@@ -5489,7 +5432,7 @@ public class XWiki implements EventListener
             return false;
         }
 
-        return "1".equals(Param("xwiki.usedefaultweb", "0"));
+        return "1".equals(getConfiguration().getProperty("xwiki.usedefaultweb", "0"));
     }
 
     public boolean showViewAction(XWikiContext context)
@@ -5501,7 +5444,7 @@ public class XWiki implements EventListener
             return false;
         }
 
-        return "1".equals(Param("xwiki.showviewaction", "1"));
+        return "1".equals(getConfiguration().getProperty("xwiki.showviewaction", "1"));
     }
 
     public boolean useDefaultAction(XWikiContext context)
@@ -5515,14 +5458,14 @@ public class XWiki implements EventListener
             return false;
         }
 
-        return "1".equals(Param("xwiki.usedefaultaction", "0"));
+        return "1".equals(getConfiguration().getProperty("xwiki.usedefaultaction", "0"));
     }
 
     public String getDefaultPage(XWikiContext context)
     {
         String defaultPage = getXWikiPreference("defaultpage", "", context);
         if (StringUtils.isEmpty(defaultPage)) {
-            return Param("xwiki.defaultpage", DEFAULT_SPACE_HOMEPAGE);
+            return getConfiguration().getProperty("xwiki.defaultpage", DEFAULT_SPACE_HOMEPAGE);
         }
         return defaultPage;
     }
@@ -5538,7 +5481,7 @@ public class XWiki implements EventListener
             return false;
         }
 
-        return "1".equals(Param("xwiki.editcomment", "0"));
+        return "1".equals(getConfiguration().getProperty("xwiki.editcomment", "0"));
     }
 
     public boolean isEditCommentFieldHidden(XWikiContext context)
@@ -5552,7 +5495,7 @@ public class XWiki implements EventListener
             return false;
         }
 
-        return "1".equals(Param("xwiki.editcomment.hidden", "0"));
+        return "1".equals(getConfiguration().getProperty("xwiki.editcomment.hidden", "0"));
     }
 
     public boolean isEditCommentSuggested(XWikiContext context)
@@ -5566,7 +5509,7 @@ public class XWiki implements EventListener
             return false;
         }
 
-        return "1".equals(Param("xwiki.editcomment.suggested", "0"));
+        return "1".equals(getConfiguration().getProperty("xwiki.editcomment.suggested", "0"));
     }
 
     public boolean isEditCommentMandatory(XWikiContext context)
@@ -5580,7 +5523,7 @@ public class XWiki implements EventListener
             return false;
         }
 
-        return "1".equals(Param("xwiki.editcomment.mandatory", "0"));
+        return "1".equals(getConfiguration().getProperty("xwiki.editcomment.mandatory", "0"));
     }
 
     /**
@@ -5597,7 +5540,7 @@ public class XWiki implements EventListener
             return false;
         }
 
-        return "1".equals(Param("xwiki.minoredit", "1"));
+        return "1".equals(getConfiguration().getProperty("xwiki.minoredit", "1"));
     }
 
     /**
@@ -5606,7 +5549,7 @@ public class XWiki implements EventListener
      */
     public boolean hasRecycleBin(XWikiContext context)
     {
-        return "1".equals(Param("xwiki.recyclebin", "1"));
+        return "1".equals(getConfiguration().getProperty("xwiki.recyclebin", "1"));
     }
 
     /**
@@ -5617,7 +5560,7 @@ public class XWiki implements EventListener
      */
     public boolean hasAttachmentRecycleBin(XWikiContext context)
     {
-        return "1".equals(Param("storage.attachment.recyclebin", "1"));
+        return "1".equals(getConfiguration().getProperty("storage.attachment.recyclebin", "1"));
     }
 
     /**
@@ -5683,7 +5626,7 @@ public class XWiki implements EventListener
         }
 
         if (pref.equals("")) {
-            pref = Param("xwiki.editor", "");
+            pref = getConfiguration().getProperty("xwiki.editor", "");
         }
 
         return pref.toLowerCase();
@@ -5778,7 +5721,7 @@ public class XWiki implements EventListener
             return context.getWiki().getXWikiPreference("convertmail", "0", context);
         }
 
-        return context.getWiki().Param("xwiki.authentication.convertemail", "0");
+        return getConfiguration().getProperty("xwiki.authentication.convertemail", "0");
     }
 
     public String convertUsername(String username, XWikiContext context)
@@ -5807,7 +5750,7 @@ public class XWiki implements EventListener
 
     public boolean hasSectionEdit(XWikiContext context)
     {
-        return (context.getWiki().ParamAsLong("xwiki.section.edit", 0) == 1);
+        return getConfiguration().getProperty("xwiki.section.edit", 0) == 1;
     }
 
     /**
@@ -5816,7 +5759,7 @@ public class XWiki implements EventListener
      */
     public long getSectionEditingDepth()
     {
-        return ParamAsLong("xwiki.section.depth", 2);
+        return getConfiguration().getProperty("xwiki.section.depth", 2L);
     }
 
     public boolean hasCaptcha(XWikiContext context)
@@ -5826,7 +5769,7 @@ public class XWiki implements EventListener
 
     public String getWysiwygToolbars(XWikiContext context)
     {
-        return context.getWiki().Param("xwiki.wysiwyg.toolbars", "");
+        return getConfiguration().getProperty("xwiki.wysiwyg.toolbars", "");
     }
 
     public String clearName(String name, XWikiContext context)
@@ -6011,12 +5954,12 @@ public class XWiki implements EventListener
      */
     public boolean hasVersioning(XWikiContext context)
     {
-        return ("1".equals(context.getWiki().Param("xwiki.store.versioning", "1")));
+        return ("1".equals(getConfiguration().getProperty("xwiki.store.versioning", "1")));
     }
 
     public boolean hasAttachmentVersioning(XWikiContext context)
     {
-        return ("1".equals(context.getWiki().Param("xwiki.store.attachment.versioning", "1")));
+        return ("1".equals(getConfiguration().getProperty("xwiki.store.attachment.versioning", "1")));
     }
 
     public String getExternalAttachmentURL(String fullName, String filename, XWikiContext context)
@@ -6031,7 +5974,7 @@ public class XWiki implements EventListener
     {
         int max = getXWikiPreferenceAsInt("rights_maxrecursivespacechecks", -1, context);
         if (max == -1) {
-            return (int) ParamAsLong("xwiki.rights.maxrecursivespacechecks", 0);
+            return getConfiguration().getProperty("xwiki.rights.maxrecursivespacechecks", 0);
         } else {
             return max;
         }
@@ -6080,7 +6023,7 @@ public class XWiki implements EventListener
         // Let's clone rolledbackDoc since we might modify it
         XWikiDocument rolledbackDoc = getDocument(tdoc, rev, context).clone();
 
-        if ("1".equals(context.getWiki().Param("xwiki.store.rollbackattachmentwithdocuments", "1"))) {
+        if ("1".equals(getConfiguration().getProperty("xwiki.store.rollbackattachmentwithdocuments", "1"))) {
             // Attachment handling strategy:
             // - Two lists: Old Attachments, Current Attachments
             // Goals:
@@ -6350,7 +6293,7 @@ public class XWiki implements EventListener
      */
     public boolean isTitleInCompatibilityMode()
     {
-        return "1".equals(Param("xwiki.title.compatibility", "0"));
+        return "1".equals(getConfiguration().getProperty("xwiki.title.compatibility", "0"));
     }
 
     @Override
@@ -6370,7 +6313,7 @@ public class XWiki implements EventListener
             if ("backlinks".equals(modifiedProperty)) {
                 this.hasBacklinks =
                     doc.getXObject((ObjectReference) reference.getParent()).getIntValue("backlinks",
-                        (int) ParamAsLong("xwiki.backlinks", 0)) == 1;
+                        getConfiguration().getProperty("xwiki.backlinks", 0)) == 1;
             }
         } else if (event instanceof XObjectEvent) {
             onServerObjectEvent(event, doc, context);
@@ -6523,5 +6466,69 @@ public class XWiki implements EventListener
                 "select count(attach) from XWikiAttachment attach, XWikiDocument doc where "
                     + "attach.docId=doc.id and " + parametrizedSqlClause, 0, 0, parameterValues, context);
         return ((Number) l.get(0)).intValue();
+    }
+
+    // Deprecated
+
+    /**
+     * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
+     */
+    @Deprecated
+    public XWikiConfig getConfig()
+    {
+        return new XWikiConfigDelegate(getConfiguration());
+    }
+
+    /**
+     * @deprecated since 6.1M2
+     */
+    @Deprecated
+    public void setConfig(XWikiConfig config)
+    {
+        ConfigurationSource configuration = getConfiguration();
+
+        if (configuration instanceof XWikiCfgConfigurationSource) {
+            ((XWikiCfgConfigurationSource) configuration).set(config);
+        }
+    }
+
+    /**
+     * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
+     */
+    @Deprecated
+    public String Param(String key)
+    {
+        return Param(key, null);
+    }
+
+    /**
+     * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
+     */
+    @Deprecated
+    public String Param(String key, String default_value)
+    {
+        if (getConfiguration() != null) {
+            return getConfiguration().getProperty(key, default_value);
+        }
+
+        return default_value;
+    }
+
+    /**
+     * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
+     */
+    @Deprecated
+    public long ParamAsLong(String key)
+    {
+        return getConfiguration().getProperty(key, long.class);
+    }
+
+    /**
+     * @deprecated since 6.1M2, use {@link ConfigurationSource} component with hint <code>xwikicfg</code> instead
+     */
+    @Deprecated
+    public long ParamAsLong(String key, long default_value)
+    {
+        return getConfiguration().getProperty(key, default_value);
     }
 }

@@ -12,10 +12,7 @@ function debugwrite(sometext) {
 }
 
 function isPanel(el) {
-  if (el.className && ((el.className == "panel") || (el.className.indexOf("panel ") >=0) || (el.className.indexOf(" panel") >=0))) {
-     return true;
-  }
-  return false;
+  return el.hasClassName("panel");
 }
 
 function getX(el) {

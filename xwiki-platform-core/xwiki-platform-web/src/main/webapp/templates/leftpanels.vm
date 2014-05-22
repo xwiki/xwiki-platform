@@ -1,5 +1,5 @@
 #if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
-<div id="leftPanels" class="panels left"#if($showLeftPanels != "1" && $request.getParameter("forceLeftPanels")) style="display: none;"#end>
+<div id="leftPanels" class="panels left panel-width-$!{leftPanelsWidth}"#if($showLeftPanels != "1" && $request.getParameter("forceLeftPanels")) style="display: none;"#end>
 ## Global Variable
 #set($xwikiPanelWidth = $leftPanelsWidth)
 #set($panelUixs = $services.uix.getExtensions('platform.panels.leftPanels'))

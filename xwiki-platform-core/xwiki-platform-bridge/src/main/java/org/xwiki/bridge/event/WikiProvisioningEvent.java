@@ -24,6 +24,13 @@ import org.xwiki.observation.event.filter.EventFilter;
 
 /**
  * An event triggered just after a provisioning job is finished.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the wiki identifier as {@link String}</li>
+ * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
+ * </ul>
  *
  * @version $Id$
  * @since 5.3RC1

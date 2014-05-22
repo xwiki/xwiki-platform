@@ -412,7 +412,7 @@ div.applicationPanelMoreContainer li a {
   font-weight: bold;
 }
 
-.panel-width-Small .panel{
+.panel-width-Small .panel.Applications{
   background-color: transparent;
   border: 0;
   box-shadow: none;

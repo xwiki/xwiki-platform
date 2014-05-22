@@ -109,7 +109,7 @@ public class WatchlistUserProfilePage extends AbstractUserProfilePage
         // TODO: only looks in the first livetable page currently
         // TODO: move a generic version of that in LiveTableElement
         return getUtil().hasElement(
-            By.xpath("//tbody[@id='mywatchlist-display']/tr/td/a[@href='/xwiki/bin/view/" + space + "']"));
+            By.xpath("//tbody[@id='mywatchlist-display']/tr/td/a[@href='/xwiki/bin/view/" + space + "/']"));
     }
 
     public WatchlistPreferencesEditPage editPreferences()

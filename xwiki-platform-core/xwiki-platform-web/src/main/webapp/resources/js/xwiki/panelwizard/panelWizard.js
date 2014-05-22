@@ -12,7 +12,15 @@ function debugwrite(sometext) {
 }
 
 function isPanel(el) {
-  return el.hasClassName("panel");
+    if (el.className) {
+        var classes = el.className.split(" ");
+        for (var i=0; i<classes.length; ++i) {
+            if (classes[i] == "panel") {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 function getX(el) {

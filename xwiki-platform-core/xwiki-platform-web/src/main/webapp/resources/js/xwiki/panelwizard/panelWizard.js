@@ -556,11 +556,15 @@ function setPanelWidth() {
     var c = classesToRemove[i];
     mainContainer.removeClassName('panel-left-width-'+c);
     mainContainer.removeClassName('panel-right-width-'+c);
+    window.leftPanels.removeClassName('panel-width-'+c);
+    window.rightPanels.removeClassName('panel-width-'+c);
   }
   var leftPanelsWidth = leftPanelsWidthInput.value != '---' ? leftPanelsWidthInput.value : 'Medium';
   var rightPanelsWidth = rightPanelsWidthInput.value != '---' ? rightPanelsWidthInput.value : 'Medium';
   mainContainer.addClassName('panel-left-width-'+leftPanelsWidth);
   mainContainer.addClassName('panel-right-width-'+rightPanelsWidth);
+  window.leftPanels.addClassName('panel-width-'+leftPanelsWidth);
+  window.rightPanels.addClassName('panel-width-'+rightPanelsWidth);
 }
 
 //----------------------------------------------------------------

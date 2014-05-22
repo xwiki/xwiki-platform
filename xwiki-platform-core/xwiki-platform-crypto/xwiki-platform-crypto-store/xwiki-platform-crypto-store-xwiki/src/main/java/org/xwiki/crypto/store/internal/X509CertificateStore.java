@@ -29,8 +29,8 @@ import org.xwiki.crypto.pkix.CertificateProvider;
 import org.xwiki.crypto.pkix.params.CertifiedPublicKey;
 import org.xwiki.crypto.store.CertificateStore;
 import org.xwiki.crypto.store.CertificateStoreException;
+import org.xwiki.crypto.store.StoreReference;
 import org.xwiki.crypto.store.internal.query.X509CertificateQuery;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -40,7 +40,7 @@ import com.xpn.xwiki.XWikiException;
  * X509 implementation of {@link org.xwiki.crypto.store.CertificateStore}.
  *
  * @version $Id$
- * @since 6.0
+ * @since 6.1M1
  */
 @Component
 @Named("X509")
@@ -93,8 +93,13 @@ public class X509CertificateStore extends AbstractX509Store implements Certifica
      */
     public static final String CERTIFICATECLASS_PROP_CERTIFICATE = "certificate";
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param store an {@link org.xwiki.crypto.store.XWikiStoreReference} to a document reference or a space reference.
+     */
     @Override
-    public void store(EntityReference store, CertifiedPublicKey certificate) throws CertificateStoreException
+    public void store(StoreReference store, CertifiedPublicKey certificate) throws CertificateStoreException
     {
         XWikiContext context = getXWikiContext();
 
@@ -105,15 +110,25 @@ public class X509CertificateStore extends AbstractX509Store implements Certifica
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param store an {@link org.xwiki.crypto.store.XWikiStoreReference} to a document reference or a space reference.
+     */
     @Override
-    public CertificateProvider getCertificateProvider(EntityReference store) throws CertificateStoreException
+    public CertificateProvider getCertificateProvider(StoreReference store) throws CertificateStoreException
     {
         return new X509CertificateProvider(resolveStore(store), getCertificateFactory(), getEncoder(),
             getQueryManager());
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param store an {@link org.xwiki.crypto.store.XWikiStoreReference} to a document reference or a space reference.
+     */
     @Override
-    public Collection<CertifiedPublicKey> getAllCertificates(EntityReference store) throws CertificateStoreException
+    public Collection<CertifiedPublicKey> getAllCertificates(StoreReference store) throws CertificateStoreException
     {
         return new X509CertificateQuery(resolveStore(store), getCertificateFactory(), getEncoder(), getQueryManager())
             .getCertificates();

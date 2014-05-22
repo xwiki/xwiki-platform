@@ -38,9 +38,11 @@ import org.xwiki.crypto.pkix.params.x509certificate.DistinguishedName;
 import org.xwiki.crypto.pkix.params.x509certificate.X509CertifiedPublicKey;
 import org.xwiki.crypto.pkix.params.x509certificate.extension.X509Extensions;
 import org.xwiki.crypto.store.CertificateStore;
-import org.xwiki.crypto.store.internal.query.AbstractX509StoreQuery;
+import org.xwiki.crypto.store.StoreReference;
+import org.xwiki.crypto.store.XWikiStoreReference;
 import org.xwiki.crypto.store.internal.query.AbstractX509IssuerAndSerialQuery;
 import org.xwiki.crypto.store.internal.query.AbstractX509KeyIdentifierQuery;
+import org.xwiki.crypto.store.internal.query.AbstractX509StoreQuery;
 import org.xwiki.crypto.store.internal.query.AbstractX509SubjectQuery;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -93,8 +95,11 @@ public class X509CertificateStoreTest
     private static final String SPACE = "space";
     private static final String DOCUMENT = "document";
 
-    private static final LocalDocumentReference DOC_STORE_REF = new LocalDocumentReference("space", DOCUMENT);
-    private static final EntityReference SPACE_STORE_REF = new EntityReference(SPACE, EntityType.SPACE);
+    private static final LocalDocumentReference DOC_STORE_ENTREF = new LocalDocumentReference("space", DOCUMENT);
+    private static final EntityReference SPACE_STORE_ENTREF = new EntityReference(SPACE, EntityType.SPACE);
+
+    private static final StoreReference DOC_STORE_REF = new XWikiStoreReference(DOC_STORE_ENTREF);
+    private static final StoreReference SPACE_STORE_REF = new XWikiStoreReference(SPACE_STORE_ENTREF);
 
     protected static final String BIND_KEYID = getFieldValue(AbstractX509KeyIdentifierQuery.class, "KEYID");
     protected static final String BIND_ISSUER = getFieldValue(AbstractX509IssuerAndSerialQuery.class, "ISSUER");

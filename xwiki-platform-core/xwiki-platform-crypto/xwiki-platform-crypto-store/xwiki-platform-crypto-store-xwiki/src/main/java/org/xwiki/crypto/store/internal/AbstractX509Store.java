@@ -28,6 +28,8 @@ import org.xwiki.crypto.pkix.CertificateFactory;
 import org.xwiki.crypto.pkix.params.CertifiedPublicKey;
 import org.xwiki.crypto.pkix.params.x509certificate.X509CertifiedPublicKey;
 import org.xwiki.crypto.store.CertificateStoreException;
+import org.xwiki.crypto.store.StoreReference;
+import org.xwiki.crypto.store.XWikiStoreReference;
 import org.xwiki.crypto.store.internal.query.CertificateObjectReference;
 import org.xwiki.crypto.store.internal.query.X509CertificateReferenceIssuerAndSerialQuery;
 import org.xwiki.crypto.store.internal.query.X509CertificateReferenceKeyIdentifierQuery;
@@ -46,7 +48,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * Abstract base class for X509 stores.
  *
  * @version $Id$
- * @since 6.0
+ * @since 6.1M1
  */
 public abstract class AbstractX509Store
 {
@@ -131,7 +133,7 @@ public abstract class AbstractX509Store
      * @return the XWiki document to be saved where the object was updated or created.
      * @throws CertificateStoreException on error.
      */
-    protected XWikiDocument storeCertificate(EntityReference store, CertifiedPublicKey certificate,
+    protected XWikiDocument storeCertificate(StoreReference store, CertifiedPublicKey certificate,
         XWikiContext context) throws CertificateStoreException
     {
         if (!(certificate instanceof X509CertifiedPublicKey)) {
@@ -182,7 +184,7 @@ public abstract class AbstractX509Store
      * @return a reference to the XObject storing a matching certificate, or null if none were found.
      * @throws CertificateStoreException on error.
      */
-    protected CertificateObjectReference findCertificate(EntityReference store, X509CertifiedPublicKey publicKey)
+    protected CertificateObjectReference findCertificate(StoreReference store, X509CertifiedPublicKey publicKey)
         throws CertificateStoreException
     {
         byte[] keyId = publicKey.getSubjectKeyIdentifier();
@@ -210,7 +212,7 @@ public abstract class AbstractX509Store
      * @return the document corresponding to the certificate reference.
      * @throws XWikiException
      */
-    protected XWikiDocument getDocument(EntityReference store, CertificateObjectReference certRef, XWikiContext context)
+    protected XWikiDocument getDocument(StoreReference store, CertificateObjectReference certRef, XWikiContext context)
         throws XWikiException
     {
         XWikiDocument document;
@@ -227,9 +229,9 @@ public abstract class AbstractX509Store
      * @param store the store to be resolved.
      * @return a document reference.
      */
-    protected DocumentReference getDocumentReference(EntityReference store)
+    protected DocumentReference getDocumentReference(StoreReference store)
     {
-        return new DocumentReference(referenceResolver.resolve(store, EntityType.DOCUMENT));
+        return new DocumentReference(referenceResolver.resolve(getStoreReference(store), EntityType.DOCUMENT));
     }
 
     /**
@@ -240,14 +242,16 @@ public abstract class AbstractX509Store
      * @return a document reference to an appropriate document for storage.
      * @throws Exception on error.
      */
-    protected DocumentReference getDocumentReference(EntityReference store, X509CertifiedPublicKey publicKey)
+    protected DocumentReference getDocumentReference(StoreReference store, X509CertifiedPublicKey publicKey)
         throws Exception
     {
-        if (store.getType() == EntityType.DOCUMENT) {
+        EntityReference reference = getStoreReference(store);
+
+        if (reference.getType() == EntityType.DOCUMENT) {
             return getDocumentReference(store);
         }
         return new DocumentReference(referenceResolver.resolve(
-            new EntityReference(getCertIdentifier(publicKey), EntityType.DOCUMENT), EntityType.DOCUMENT, store));
+            new EntityReference(getCertIdentifier(publicKey), EntityType.DOCUMENT), EntityType.DOCUMENT, reference));
     }
 
     /**
@@ -274,12 +278,21 @@ public abstract class AbstractX509Store
      * @param store the store to be resolved.
      * @return a complete entity reference.
      */
-    protected EntityReference resolveStore(EntityReference store) {
-        if (store.getType() == EntityType.DOCUMENT) {
-            return referenceResolver.resolve(store, EntityType.DOCUMENT);
-        } else if (store.getType() == EntityType.SPACE) {
-            return referenceResolver.resolve(store, EntityType.SPACE);
+    protected EntityReference resolveStore(StoreReference store) {
+        EntityReference reference = getStoreReference(store);
+
+        if (reference.getType() == EntityType.DOCUMENT) {
+            return referenceResolver.resolve(reference, EntityType.DOCUMENT);
         }
-        throw new IllegalArgumentException("Certificates could only be stored into document or space.");
+
+        return referenceResolver.resolve(reference, EntityType.SPACE);
+    }
+
+    private EntityReference getStoreReference(StoreReference store) {
+        if (store instanceof XWikiStoreReference) {
+            return ((XWikiStoreReference) store).getReference();
+        }
+        throw new IllegalArgumentException("Unsupported store reference [" + store.getClass().getName()
+            + "] for this implementation.");
     }
 }

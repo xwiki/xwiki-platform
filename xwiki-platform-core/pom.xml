@@ -373,6 +373,26 @@
               <method>long getInstallCount(java.lang.String)</method>
               <justification>Young API</justification>
             </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>org/xwiki/crypto/store/CertificateStore</className>
+             <justification>Young API</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>org/xwiki/crypto/store/CertificateStoreException</className>
+              <justification>Young API</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>org/xwiki/crypto/store/KeyStore</className>
+              <justification>Young API</justification>
+            </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>org/xwiki/crypto/store/KeyStoreException</className>
+              <justification>Young API</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

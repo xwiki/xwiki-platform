@@ -34,8 +34,8 @@ import org.xwiki.crypto.pkix.params.x509certificate.X509CertifiedPublicKey;
 import org.xwiki.crypto.store.CertificateStoreException;
 import org.xwiki.crypto.store.KeyStore;
 import org.xwiki.crypto.store.KeyStoreException;
+import org.xwiki.crypto.store.StoreReference;
 import org.xwiki.crypto.store.internal.query.CertificateObjectReference;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -47,7 +47,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * X509 implementation of {@link org.xwiki.crypto.store.KeyStore}.
  *
  * @version $Id$
- * @since 6.0
+ * @since 6.1M1
  */
 @Component
 @Named("X509")
@@ -86,14 +86,32 @@ public class X509KeyStore extends AbstractX509Store implements KeyStore
     @Inject
     private AsymmetricKeyFactory keyFactory;
 
+    /**
+     * {@inheritDoc}
+     *
+     * The key will be stored in the same document as the certificate. If a document reference is used, this
+     * store could only contain one privateKey since no identifier are associated to a private key. They are linked
+     * to their certificate just by being in the same document as the certificate.
+     *
+     * @param store an {@link org.xwiki.crypto.store.XWikiStoreReference} to a document reference or a space reference.
+     */
     @Override
-    public void store(EntityReference store, CertifiedKeyPair keyPair) throws KeyStoreException
+    public void store(StoreReference store, CertifiedKeyPair keyPair) throws KeyStoreException
     {
         storeKeyPair(store, keyPair.getCertificate(), keyPair.getPrivateKey().getEncoded());
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * The key will be stored in the same document as the certificate. If a document reference is used, this
+     * store could only contain one privateKey since no identifier are associated to a private key. They are linked
+     * to their certificate just by being in the same document as the certificate.
+     *
+     * @param store an {@link org.xwiki.crypto.store.XWikiStoreReference} to a document reference or a space reference.
+     */
     @Override
-    public void store(EntityReference store, CertifiedKeyPair keyPair, byte[] password) throws KeyStoreException
+    public void store(StoreReference store, CertifiedKeyPair keyPair, byte[] password) throws KeyStoreException
     {
         byte[] key;
 
@@ -106,7 +124,7 @@ public class X509KeyStore extends AbstractX509Store implements KeyStore
         storeKeyPair(store, keyPair.getCertificate(), key);
     }
 
-    private void storeKeyPair(EntityReference store, CertifiedPublicKey certificate, byte[] privateKey)
+    private void storeKeyPair(StoreReference store, CertifiedPublicKey certificate, byte[] privateKey)
         throws KeyStoreException
     {
         XWikiContext context = getXWikiContext();
@@ -137,19 +155,29 @@ public class X509KeyStore extends AbstractX509Store implements KeyStore
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param store an {@link org.xwiki.crypto.store.XWikiStoreReference} to a document reference.
+     */
     @Override
-    public CertifiedKeyPair retrieve(EntityReference entity) throws KeyStoreException
+    public CertifiedKeyPair retrieve(StoreReference store) throws KeyStoreException
     {
-        return retrieve(entity, (byte[]) null);
+        return retrieve(store, (byte[]) null);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param store an {@link org.xwiki.crypto.store.XWikiStoreReference} to a document reference.
+     */
     @Override
-    public CertifiedKeyPair retrieve(EntityReference entity, byte[] password) throws KeyStoreException
+    public CertifiedKeyPair retrieve(StoreReference store, byte[] password) throws KeyStoreException
     {
         XWikiContext context = getXWikiContext();
 
         try {
-            XWikiDocument document = context.getWiki().getDocument(getDocumentReference(entity), context);
+            XWikiDocument document = context.getWiki().getDocument(getDocumentReference(store), context);
             BaseObject certObj = document.getXObject(X509CertificateStore.CERTIFICATECLASS);
             BaseObject pkObj = document.getXObject(PRIVATEKEYCLASS);
 
@@ -167,18 +195,28 @@ public class X509KeyStore extends AbstractX509Store implements KeyStore
                 return new CertifiedKeyPair(keyFactory.fromPKCS8(key), getCertificateFactory().decode(cert));
             }
         } catch (Exception e) {
-            throw new KeyStoreException("Failed to retrieved private key from [" + entity + "]");
+            throw new KeyStoreException("Failed to retrieved private key from [" + store + "]");
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param store an {@link org.xwiki.crypto.store.XWikiStoreReference} to a space reference.
+     */
     @Override
-    public CertifiedKeyPair retrieve(EntityReference store, CertifiedPublicKey publicKey) throws KeyStoreException
+    public CertifiedKeyPair retrieve(StoreReference store, CertifiedPublicKey publicKey) throws KeyStoreException
     {
         return retrieve(store, publicKey, null);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param store an {@link org.xwiki.crypto.store.XWikiStoreReference} to a space reference.
+     */
     @Override
-    public CertifiedKeyPair retrieve(EntityReference store, CertifiedPublicKey certificate, byte[] password)
+    public CertifiedKeyPair retrieve(StoreReference store, CertifiedPublicKey certificate, byte[] password)
         throws KeyStoreException
     {
         if (!(certificate instanceof X509CertifiedPublicKey)) {

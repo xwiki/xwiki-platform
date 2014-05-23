@@ -31,6 +31,7 @@ import org.xwiki.wikistream.instance.internal.AbstractInstanceWikiStreamTest;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
 
 /**
  * Validate {@link UserInstanceOutputWikiStream}.
@@ -69,7 +70,7 @@ public class UserInstanceOutputWikiStreamTest extends AbstractInstanceWikiStream
         Assert.assertEquals(false, userDocument.isMinorEdit());
         Assert.assertEquals("Import", userDocument.getComment());
 
-        BaseObject userObject = userDocument.getXObject(USER_CLASS);
+        BaseObject userObject = userDocument.getXObject(MockitoOldcoreRule.USER_CLASS);
         Assert.assertEquals(0, userObject.getNumber());
         Assert.assertEquals("user1 first name", userObject.getStringValue("first_name"));
         Assert.assertEquals("user1 last name", userObject.getStringValue("last_name"));
@@ -93,7 +94,7 @@ public class UserInstanceOutputWikiStreamTest extends AbstractInstanceWikiStream
         Assert.assertEquals(false, userDocument.isMinorEdit());
         Assert.assertEquals("Import", userDocument.getComment());
 
-        userObject = userDocument.getXObject(USER_CLASS);
+        userObject = userDocument.getXObject(MockitoOldcoreRule.USER_CLASS);
         Assert.assertEquals(0, userObject.getNumber());
         Assert.assertEquals("user2 first name", userObject.getStringValue("first_name"));
         Assert.assertEquals("user2 last name", userObject.getStringValue("last_name"));
@@ -108,9 +109,9 @@ public class UserInstanceOutputWikiStreamTest extends AbstractInstanceWikiStream
 
         Assert.assertFalse(groupDocument.isNew());
 
-        BaseObject groupMemberObject0 = groupDocument.getXObject(GROUP_CLASS, 0);
+        BaseObject groupMemberObject0 = groupDocument.getXObject(MockitoOldcoreRule.GROUP_CLASS, 0);
         Assert.assertEquals("XWiki.user1", groupMemberObject0.getStringValue("member"));
-        BaseObject groupMemberObject1 = groupDocument.getXObject(GROUP_CLASS, 1);
+        BaseObject groupMemberObject1 = groupDocument.getXObject(MockitoOldcoreRule.GROUP_CLASS, 1);
         Assert.assertEquals("XWiki.user2", groupMemberObject1.getStringValue("member"));
 
         // XWiki.group2
@@ -121,7 +122,7 @@ public class UserInstanceOutputWikiStreamTest extends AbstractInstanceWikiStream
 
         Assert.assertFalse(groupDocument.isNew());
 
-        groupMemberObject0 = groupDocument.getXObject(GROUP_CLASS, 0);
+        groupMemberObject0 = groupDocument.getXObject(MockitoOldcoreRule.GROUP_CLASS, 0);
         Assert.assertEquals("XWiki.group1", groupMemberObject0.getStringValue("member"));
 
         // XWiki.emptygroup
@@ -132,7 +133,7 @@ public class UserInstanceOutputWikiStreamTest extends AbstractInstanceWikiStream
 
         Assert.assertFalse(groupDocument.isNew());
 
-        groupMemberObject0 = groupDocument.getXObject(GROUP_CLASS, 0);
+        groupMemberObject0 = groupDocument.getXObject(MockitoOldcoreRule.GROUP_CLASS, 0);
         Assert.assertEquals("", groupMemberObject0.getStringValue("member"));
     }
 
@@ -164,7 +165,7 @@ public class UserInstanceOutputWikiStreamTest extends AbstractInstanceWikiStream
         Assert.assertEquals(false, userDocument.isMinorEdit());
         Assert.assertEquals("Import", userDocument.getComment());
 
-        BaseObject userObject = userDocument.getXObject(USER_CLASS);
+        BaseObject userObject = userDocument.getXObject(MockitoOldcoreRule.USER_CLASS);
         Assert.assertEquals(0, userObject.getNumber());
         Assert.assertEquals("user1 first name", userObject.getStringValue("first_name"));
         Assert.assertEquals("user1 last name", userObject.getStringValue("last_name"));

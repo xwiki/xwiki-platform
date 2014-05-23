@@ -87,7 +87,7 @@ public class AbstractInstanceInputWikiStreamTest extends AbstractInstanceWikiStr
             {
                 Set<String> wikis = new HashSet<String>();
 
-                for (DocumentReference reference : documents.keySet()) {
+                for (DocumentReference reference : oldcore.getDocuments().keySet()) {
                     wikis.add(reference.getWikiReference().getName());
                 }
 
@@ -107,7 +107,7 @@ public class AbstractInstanceInputWikiStreamTest extends AbstractInstanceWikiStr
 
                 Set<String> spaces = new HashSet<String>();
 
-                for (DocumentReference reference : documents.keySet()) {
+                for (DocumentReference reference : oldcore.getDocuments().keySet()) {
                     if (reference.getWikiReference().getName().equals(wiki)) {
                         spaces.add(reference.getLastSpaceReference().getName());
                     }
@@ -131,7 +131,7 @@ public class AbstractInstanceInputWikiStreamTest extends AbstractInstanceWikiStr
 
                     Set<String> docs = new HashSet<String>();
 
-                    for (DocumentReference reference : documents.keySet()) {
+                    for (DocumentReference reference : oldcore.getDocuments().keySet()) {
                         if (reference.getWikiReference().getName().equals(wiki)
                             && reference.getLastSpaceReference().getName().equals(space)) {
                             docs.add(reference.getName());

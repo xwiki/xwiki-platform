@@ -20,9 +20,7 @@
 package org.xwiki.localization.wiki.internal;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -34,6 +32,7 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
@@ -67,6 +66,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -97,6 +97,8 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
 
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentUpdatedEvent(),
         new DocumentDeletedEvent(), new DocumentCreatedEvent());
+
+    private static final List<Event> WIKIEVENTS = Arrays.<Event> asList(new WikiReadyEvent());
 
     @Inject
     @Named("context")
@@ -130,6 +132,9 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     private ComponentManagerManager cmManager;
 
     @Inject
+    private WikiDescriptorManager wikiManager;
+
+    @Inject
     private Logger logger;
 
     @Inject
@@ -146,7 +151,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
 
     private Cache<TranslationBundle> bundlesCache;
 
-    private EventListener listener = new EventListener()
+    private final EventListener listener = new EventListener()
     {
         @Override
         public void onEvent(Event event, Object arg1, Object arg2)
@@ -167,6 +172,27 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         }
     };
 
+    private final EventListener wikilistener = new EventListener()
+    {
+        @Override
+        public void onEvent(Event event, Object arg1, Object arg2)
+        {
+            loadTranslations(((WikiReadyEvent) event).getWikiId());
+        }
+
+        @Override
+        public String getName()
+        {
+            return "localization.wikiready";
+        }
+
+        @Override
+        public List<Event> getEvents()
+        {
+            return WIKIEVENTS;
+        }
+    };
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -179,32 +205,19 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
             this.logger.error("Failed to create cache [{}]", cacheConfiguration.getConfigurationId(), e);
         }
 
-        // Load existing translations
+        // Load existing translations from main wiki, wait for WikiReaderEvent for other wikis
 
-        XWikiContext xcontext = this.xcontextProvider.get();
+        loadTranslations(this.wikiManager.getMainWikiId());
 
-        Set<String> wikis;
-        try {
-            wikis = new HashSet<String>(xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext));
-        } catch (XWikiException e) {
-            this.logger.error("Failed to list existing wikis", e);
-            wikis = new HashSet<String>();
-        }
-
-        if (!wikis.contains(xcontext.getMainXWiki())) {
-            wikis.add(xcontext.getMainXWiki());
-        }
-
-        for (String wiki : wikis) {
-            loadTranslations(wiki, xcontext);
-        }
-
-        // Listener
+        // Listeners
         this.observation.addListener(this.listener);
+        this.observation.addListener(this.wikilistener);
     }
 
-    private void loadTranslations(String wiki, XWikiContext xcontext)
+    private void loadTranslations(String wiki)
     {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
         try {
             Query query =
                 this.queryManager.createQuery(String.format(
@@ -466,5 +479,6 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     public void dispose() throws ComponentLifecycleException
     {
         this.observation.removeListener(this.listener.getName());
+        this.observation.removeListener(this.wikilistener.getName());
     }
 }

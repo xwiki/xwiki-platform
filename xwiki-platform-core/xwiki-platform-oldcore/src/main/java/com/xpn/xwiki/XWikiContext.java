@@ -547,7 +547,6 @@ public class XWikiContext extends Hashtable<Object, Object>
     /**
      * @param locale the current locale
      */
-    @Deprecated
     public void setLocale(Locale locale)
     {
         this.locale = locale;

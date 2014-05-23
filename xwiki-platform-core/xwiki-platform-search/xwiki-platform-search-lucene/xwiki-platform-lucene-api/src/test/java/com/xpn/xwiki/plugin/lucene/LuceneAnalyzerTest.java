@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -37,7 +38,6 @@ import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
@@ -63,8 +63,6 @@ public class LuceneAnalyzerTest
     public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
 
     private XWikiDocument document;
-
-    private MemoryConfigurationSource source;
 
     private LucenePlugin lucenePlugin;
 
@@ -99,14 +97,12 @@ public class LuceneAnalyzerTest
             this.oldcore.getMockXWiki().Param("xwiki.plugins.lucene.analyzer",
                 "org.apache.lucene.analysis.standard.StandardAnalyzer")).thenReturn(analyzerToTest);
 
-        when(this.oldcore.getMockXWiki().getDocument(any(DocumentReference.class), any(XWikiContext.class)))
-            .thenReturn(document);
+        doReturn(document).when(this.oldcore.getMockXWiki()).getDocument(any(DocumentReference.class),
+            any(XWikiContext.class));
+        doReturn(true).when(this.oldcore.getMockXWiki()).exists(any(DocumentReference.class), any(XWikiContext.class));
+        
+        this.oldcore.getXWikiContext().setLocale(Locale.ENGLISH);
 
-        when(this.oldcore.getMockXWiki().getLanguagePreference(any(XWikiContext.class))).thenReturn("en");
-        when(this.oldcore.getMockStore().loadXWikiDoc(any(XWikiDocument.class), any(XWikiContext.class))).thenReturn(
-            document);
-        when(this.oldcore.getMockXWiki().exists(any(DocumentReference.class), any(XWikiContext.class)))
-            .thenReturn(true);
         when(
             this.oldcore.getMockRightService().hasAccessLevel(any(String.class), any(String.class), any(String.class),
                 any(XWikiContext.class))).thenReturn(true);

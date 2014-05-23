@@ -62,6 +62,10 @@ public class StandardURLResourceReferenceResolver implements ResourceReferenceRe
     @Inject
     private StandardURLConfiguration configuration;
 
+    @Inject
+    @Named("standard/bin")
+    private ResourceReferenceResolver<ExtendedURL> entityResourceReferenceResolver;
+
     /**
      * {@inheritDoc}
      *
@@ -104,9 +108,13 @@ public class StandardURLResourceReferenceResolver implements ResourceReferenceRe
                 resolver = this.componentManager.getInstance(
                     new DefaultParameterizedType(null, ResourceReferenceResolver.class, ExtendedURL.class), type);
             } catch (ComponentLookupException cle) {
-                throw new UnsupportedResourceReferenceException(
-                    String.format("Failed to find a Resolver for Resource Reference of type [%s] for URL [%s]", type,
-                        url), e);
+                // TODO: Fix this. In the future throw an exception as in:
+                // throw new UnsupportedResourceReferenceException(
+                //     String.format("Failed to find a Resolver for Resource Reference of type [%s] for URL [%s]", type,
+                //        url), e);
+                // However for now we need to ensure we always return something since in XWiki.getXWiki() we call this
+                // method and we use the returned EntityResourceReference to extract the wiki id!
+                resolver = this.entityResourceReferenceResolver;
             }
         }
 

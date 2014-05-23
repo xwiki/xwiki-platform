@@ -1,2 +1,2 @@
 org.xwiki.url.internal.DefaultURLConfiguration
-org.xwiki.url.internal.DefaultResourceFactory
+org.xwiki.url.internal.DefaultResourceReferenceResolver

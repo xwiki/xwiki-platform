@@ -44,7 +44,7 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.ObjectReferenceResolver;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.resource.ResourceManager;
+import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -101,7 +101,7 @@ public class XWikiMockitoTest
         mocker.registerMockComponent(EntityReferenceValueProvider.class);
         mocker.registerMockComponent(SyntaxFactory.class);
         mocker.registerMockComponent(PrivilegedTemplateRenderer.class);
-        mocker.registerMockComponent(ResourceManager.class);
+        mocker.registerMockComponent(ResourceReferenceManager.class);
         mocker.registerMockComponent(Environment.class);
         mocker.registerMockComponent(ObservationManager.class);
         mocker.registerMockComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);

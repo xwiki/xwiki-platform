@@ -21,6 +21,7 @@ package org.xwiki.webjars.script;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -37,6 +38,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
  */
 @Component
 @Named("webjars")
+@Singleton
 public class WebJarsScriptService implements ScriptService
 {
     /**

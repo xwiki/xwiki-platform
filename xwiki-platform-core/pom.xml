@@ -413,7 +413,6 @@
   </build>
   <modules>
     <!-- Sorted Alphabetically -->
-    <module>xwiki-platform-action</module>
     <module>xwiki-platform-activeinstalls</module>
     <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>

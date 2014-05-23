@@ -22,7 +22,7 @@ package org.xwiki.url.internal.standard;
 import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.url.internal.ExtendedURL;
+import org.xwiki.url.ExtendedURL;
 
 /**
  * Extracts the reference to the wiki pointed to by the specified {@link ExtendedURL} object.

@@ -1,1 +1,1 @@
-500:org.xwiki.webjars.internal.TestableWebJarsAction
+500:org.xwiki.webjars.internal.TestableWebJarsEntityResourceReferenceActionHandler

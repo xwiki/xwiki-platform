@@ -49,9 +49,6 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.url.XWikiEntityURL;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.api.internal.XWikiCacheServiceStub;
@@ -669,7 +666,7 @@ public privileged aspect XWikiCompatibilityAspect
 
     /**
      * @deprecated starting with 5.1M1 use {@code org.xwiki.url.XWikiURLFactory} instead and starting with 5.3M1 use
-     *             {@link ResourceFactory}
+     *             {@link ResourceFactory} and since 6.1M2 use {@link org.xwiki.resource.ResourceReferenceResolver}
      */
     @Deprecated
     public XWikiDocument XWiki.getDocumentFromPath(String path, XWikiContext context) throws XWikiException
@@ -680,7 +677,7 @@ public privileged aspect XWikiCompatibilityAspect
     /**
      * @since 2.3M1
      * @deprecated starting with 5.1M1 use {@code org.xwiki.url.XWikiURLFactory} instead and starting with 5.3M1 use
-     *             {@link ResourceFactory}
+     *             {@link ResourceFactory} and since 6.1M2 use {@link org.xwiki.resource.ResourceReferenceResolver}
      */
     @Deprecated
     public DocumentReference XWiki.getDocumentReferenceFromPath(String path, XWikiContext context)
@@ -720,7 +717,7 @@ public privileged aspect XWikiCompatibilityAspect
 
     /**
      * @deprecated starting with 5.1M1 use {@code org.xwiki.url.XWikiURLFactory} instead and starting with 5.3M1 use
-     *             {@link ResourceFactory}
+     *             {@link ResourceFactory} and since 6.1M2 use {@link org.xwiki.resource.ResourceReferenceResolver}
      */
     @Deprecated
     private XWikiEntityURL XWiki.buildEntityURLFromPathSegments(WikiReference wikiReference, List<String> pathSegments)
@@ -787,7 +784,8 @@ public privileged aspect XWikiCompatibilityAspect
      * @param context the context which contains the request
      * @return the name of the wiki that was requested
      * @throws XWikiException if problems occur
-     * @deprecated starting with 5.2M1 use {@link ResourceFactory} instead
+     * @deprecated starting with 5.2M1 use  use {@link ResourceFactory} instead and since 6.1M2 use
+     *             {@link org.xwiki.resource.ResourceReferenceResolver} instead
      */
     @Deprecated
     public String XWiki.getRequestWikiName(XWikiContext context) throws XWikiException

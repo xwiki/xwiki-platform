@@ -32,7 +32,9 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - URL - Parent POM</description>
   <modules>
+    <!-- Sorted Alphabetically -->
     <module>xwiki-platform-url-api</module>
+    <module>xwiki-platform-url-container</module>
     <module>xwiki-platform-url-standard</module>
   </modules>
 </project>

@@ -117,10 +117,10 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.resource.EntityResource;
-import org.xwiki.resource.Resource;
-import org.xwiki.resource.ResourceFactory;
-import org.xwiki.resource.ResourceManager;
+import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -347,7 +347,7 @@ public class XWiki implements EventListener
     private PrivilegedTemplateRenderer privilegedTemplateRenderer = Utils
         .getComponent(PrivilegedTemplateRenderer.class);
 
-    private ResourceManager resourceManager = Utils.getComponent((Type) ResourceManager.class);
+    private ResourceReferenceManager resourceReferenceManager = Utils.getComponent((Type) ResourceReferenceManager.class);
 
     /**
      * Whether backlinks are enabled or not (cached for performance).
@@ -451,10 +451,10 @@ public class XWiki implements EventListener
         }
 
         // Extract Entity Resource from URL and put it in the Execution Context
-        EntityResource entityResource = initializeResourceFromURL(context);
+        EntityResourceReference entityResourceReference = initializeResourceFromURL(context);
 
         // Get the wiki id
-        String wikiId = entityResource.getEntityReference().extractReference(EntityType.WIKI).getName();
+        String wikiId = entityResourceReference.getEntityReference().extractReference(EntityType.WIKI).getName();
         if (wikiId.equals(context.getMainXWiki())) {
             // The main wiki was requested.
             return xwiki;
@@ -488,27 +488,26 @@ public class XWiki implements EventListener
         return xwiki;
     }
 
-    private static EntityResource initializeResourceFromURL(XWikiContext context) throws XWikiException
+    private static EntityResourceReference initializeResourceFromURL(XWikiContext context) throws XWikiException
     {
         // Extract the Entity Resource from the URL
         // TODO: This code should be put in an ExecutionContextInitializer but we couldn't do yet since this code
         // requires that the XWiki object be initialized first (the line above). Thus we'll be able to to move it only
         // after the XWiki init is done also in an ExecutionContextInitializer (and with priorities).
-        ResourceFactory<URL, Resource> urlFactory = Utils.getComponent(ResourceFactory.TYPE_URL_RESOURCE);
+        ResourceReferenceResolver<URL> urlResolver = Utils.getComponent(ResourceReferenceResolver.TYPE_URL);
         URL url = context.getURL();
-        EntityResource entityResource;
+        EntityResourceReference entityResourceReference;
         try {
-            entityResource =
-                (EntityResource) urlFactory.createResource(url,
-                    Collections.<String, Object> singletonMap("ignorePrefix", context.getRequest().getContextPath()));
+            entityResourceReference = (EntityResourceReference) urlResolver.resolve(url,
+                Collections.<String, Object> singletonMap("ignorePrefix", context.getRequest().getContextPath()));
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
                 String.format("Failed to extract Entity Resource from URL [%s]", url), e);
         }
         Utils.getComponent(Execution.class).getContext()
-            .setProperty(ResourceManager.RESOURCE_CONTEXT_PROPERTY, entityResource);
+            .setProperty(ResourceReferenceManager.RESOURCE_CONTEXT_PROPERTY, entityResourceReference);
 
-        return entityResource;
+        return entityResourceReference;
     }
 
     public static URL getRequestURL(XWikiRequest request) throws XWikiException
@@ -4359,10 +4358,10 @@ public class XWiki implements EventListener
                 new DocumentReference(context.getWikiId(), context.getDoc().getDocumentReference()
                     .getLastSpaceReference().getName(), context.getDoc().getDocumentReference().getName());
         } else {
-            Resource resource = this.resourceManager.getResource();
-            if (resource instanceof EntityResource) {
-                EntityResource entityResource = (EntityResource) resource;
-                String action = entityResource.getActionId().getId();
+            ResourceReference resourceReference = this.resourceReferenceManager.getResourceReference();
+            if (resourceReference instanceof EntityResourceReference) {
+                EntityResourceReference entityResource = (EntityResourceReference) resourceReference;
+                String action = entityResource.getAction().getActionName();
                 if ((request.getParameter("topic") != null) && (action.equals("edit") || action.equals("inline"))) {
                     reference = this.currentMixedDocumentReferenceResolver.resolve(request.getParameter("topic"));
                 } else {
@@ -4372,7 +4371,8 @@ public class XWiki implements EventListener
             } else {
                 // TODO: Handle references not pointing to a document...
                 // Big problem we don't have an Entity URL!
-                throw new RuntimeException(String.format("Resource [%s] is not an Entity!", resource));
+                throw new RuntimeException(String.format("Resource Reference [%s] isn't an Entity Resource Reference!",
+                    resourceReference));
             }
         }
 

@@ -28,29 +28,11 @@
     <version>6.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-resource</artifactId>
-  <name>XWiki Platform - Resource API</name>
-  <packaging>jar</packaging>
+  <name>XWiki Platform - Resource - Parent POM</name>
+  <packaging>pom</packaging>
   <description>An abstraction of a XWiki URI (Entity, Template, Skin, etc)</description>
-  <properties>
-    <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Resource API</xwiki.extension.name>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-context</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-default</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>xwiki-platform-resource-api</module>
+    <module>xwiki-platform-resource-default</module>
+  </modules>
 </project>

@@ -32,14 +32,19 @@
   <packaging>jar</packaging>
   <description>Allows configuration of the URL scheme used by XWiki to parse/serialize URLs</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.67</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.57</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>URL API</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-configuration-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-resource</artifactId>
+      <artifactId>xwiki-platform-resource-api</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

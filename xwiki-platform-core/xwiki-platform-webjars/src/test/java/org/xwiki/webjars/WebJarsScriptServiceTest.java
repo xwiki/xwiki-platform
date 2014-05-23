@@ -28,7 +28,6 @@ import org.xwiki.webjars.script.WebJarsScriptService;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**

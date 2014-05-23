@@ -540,12 +540,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-resource</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-action</artifactId>
+      <artifactId>xwiki-platform-resource-default</artifactId>
       <version>${project.version}</version>
     </dependency>
 

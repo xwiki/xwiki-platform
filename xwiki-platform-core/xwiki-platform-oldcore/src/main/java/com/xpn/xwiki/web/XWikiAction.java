@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -37,10 +38,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.action.ActionManager;
 import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
@@ -51,8 +52,12 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.resource.Resource;
-import org.xwiki.resource.ResourceManager;
+import org.xwiki.resource.NotFoundResourceHandlerException;
+import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceHandler;
+import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.resource.ResourceType;
+import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -310,15 +315,21 @@ public abstract class XWikiAction extends Action
 
                 // Call the Actions
 
-                // First call the new Actions, implemented as components
+                // Call the new Entity Resource Reference Handler.
+                ResourceReferenceHandler entityResourceReferenceHandler = Utils.getComponent(
+                    new DefaultParameterizedType(null, ResourceReferenceHandler.class, ResourceType.class), "bin");
+                ResourceReference resourceReference =
+                    Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
                 try {
-                    ActionManager actionManager = Utils.getComponent(ActionManager.class);
-                    Resource resource = Utils.getComponent(ResourceManager.class).getResource();
-                    if (actionManager.execute(resource)) {
-                        return null;
-                    }
+                    entityResourceReferenceHandler.handle(resourceReference,
+                        new DefaultResourceReferenceHandlerChain(Collections.<ResourceReferenceHandler>emptyList()));
+                } catch (NotFoundResourceHandlerException e) {
+                    // No Entity Resource Action has been found. Don't do anything and let it go through
+                    // so that the old Action system kicks in...
                 } catch (Throwable e) {
-                    LOGGER.error("Failed to call Action for [{}]", context.getAction(), e);
+                    // Some real failure, log it since it's a problem but still allow the old Action system a chance
+                    // to do something...
+                    LOGGER.error("Failed to handle Action for Resource [{}]", resourceReference, e);
                 }
 
                 // Then call the old Actions for backward compatibility (and because a lot of them have not been

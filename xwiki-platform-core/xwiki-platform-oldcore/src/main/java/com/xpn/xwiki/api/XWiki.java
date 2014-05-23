@@ -1189,7 +1189,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to flush the cache of the Wiki installation This flushed the cache of all wikis, all plugins, all
+     * Privileged API to flush the cache of the Wiki installation This flushed the cache of all wikis, all plugins, all
      * renderers
      */
     public void flushCache()
@@ -1200,7 +1200,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to reset the rendenring engine This would restore the rendering engine evaluation loop and take
+     * Privileged API to reset the rendering engine This would restore the rendering engine evaluation loop and take
      * into account new configuration parameters
      */
     public void resetRenderingEngine()
@@ -1214,7 +1214,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to create a new user from the request This API is used by RegisterNewUser wiki page
+     * Privileged API to create a new user from the request This API is used by RegisterNewUser wiki page
      * 
      * @return true for success/false for failure
      * @throws XWikiException
@@ -1225,7 +1225,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to create a new user from the request This API is used by RegisterNewUser wiki page This version
+     * Privileged API to create a new user from the request This API is used by RegisterNewUser wiki page This version
      * sends a validation email to the user Configuration of validation email is in the XWiki Preferences
      * 
      * @param withValidation true to send the validationemail
@@ -1238,7 +1238,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to create a new user from the request This API is used by RegisterNewUser wiki page This version
+     * Privileged API to create a new user from the request This API is used by RegisterNewUser wiki page This version
      * sends a validation email to the user Configuration of validation email is in the XWiki Preferences
      * 
      * @param withValidation true to send the validation email
@@ -1274,7 +1274,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to validate the return code given by a user in response to an email validation email The
+     * Privileged API to validate the return code given by a user in response to an email validation email The
      * validation information are taken from the request object
      * 
      * @param withConfirmEmail true to send a account confirmation email/false to not send it
@@ -1287,7 +1287,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to add a user to the XWiki.XWikiAllGroup
+     * Privileged API to add a user to the XWiki.XWikiAllGroup
      * 
      * @param fullwikiname user name to add
      * @throws XWikiException
@@ -1300,7 +1300,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to send a confirmation email to a user
+     * Privileged API to send a confirmation email to a user
      * 
      * @param xwikiname user to send the email to
      * @param password password to put in the mail
@@ -1318,7 +1318,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to send a confirmation email to a user
+     * Privileged API to send a confirmation email to a user
      * 
      * @param xwikiname user to send the email to
      * @param password password to put in the mail

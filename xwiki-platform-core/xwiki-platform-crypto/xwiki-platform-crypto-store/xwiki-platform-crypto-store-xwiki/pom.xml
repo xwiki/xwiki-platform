@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Provides XWiki storage for cryptographic data</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.74</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>XWiki storage for cryptographic data</xwiki.extension.name>
   </properties>

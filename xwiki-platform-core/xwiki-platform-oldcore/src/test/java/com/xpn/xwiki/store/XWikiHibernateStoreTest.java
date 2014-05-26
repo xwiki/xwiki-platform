@@ -242,7 +242,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
     }
 
     @Test
-    public void createHibernateSequenceIfRequired() throws Exception
+    public void createHibernateSequenceIfRequiredWhenNotInUpdateCommands() throws Exception
     {
         Session session = mock(Session.class);
         SessionFactoryImplementor sessionFactory = mock(SessionFactoryImplementor.class);
@@ -254,10 +254,33 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
-        this.store.createHibernateSequenceIfRequired("schema", session);
+        this.store.createHibernateSequenceIfRequired(new String[] {}, "schema", session);
 
         verify(session).createSQLQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery).executeUpdate();
+    }
+
+    /**
+     * We verify that the sequence is not created if it's already in the update script.
+     */
+    @Test
+    public void createHibernateSequenceIfRequiredWhenInUpdateCommands() throws Exception
+    {
+        Session session = mock(Session.class);
+        SessionFactoryImplementor sessionFactory = mock(SessionFactoryImplementor.class);
+        Dialect dialect = mock(Dialect.class);
+        when(session.getSessionFactory()).thenReturn(sessionFactory);
+        when(sessionFactory.getDialect()).thenReturn(dialect);
+        when(dialect.getNativeIdentifierGeneratorClass()).thenReturn(SequenceGenerator.class);
+        SQLQuery sqlQuery = mock(SQLQuery.class);
+        when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
+        when(sqlQuery.executeUpdate()).thenReturn(0);
+
+        this.store.createHibernateSequenceIfRequired(
+            new String[] {"whatever", "create sequence schema.hibernate_sequence"}, "schema", session);
+
+        verify(session, never()).createSQLQuery("create sequence schema.hibernate_sequence");
+        verify(sqlQuery, never()).executeUpdate();
     }
 
     /**

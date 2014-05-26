@@ -40,24 +40,24 @@ public class LegacyStandardURLConfiguration extends DefaultStandardURLConfigurat
 {
     @Inject
     @Named("xwikicfg")
-    private ConfigurationSource configuration;
+    private ConfigurationSource xwikicfg;
 
     @Override
     public boolean isPathBasedMultiWiki()
     {
-        return super.isPathBasedMultiWiki("1".equals(this.configuration.getProperty("xwiki.virtual.usepath", "1")));
+        return super.isPathBasedMultiWiki("1".equals(this.xwikicfg.getProperty("xwiki.virtual.usepath", "1")));
     }
 
     @Override
     public String getWikiPathPrefix()
     {
-        return super.getWikiPathPrefix(this.configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki"));
+        return super.getWikiPathPrefix(this.xwikicfg.getProperty("xwiki.virtual.usepath.servletpath", "wiki"));
     }
 
     @Override
     public String getEntityPathPrefix()
     {
-        String prefix = super.getWikiPathPrefix(this.configuration.getProperty("xwiki.defaultservletpath", "bin"));
+        String prefix = super.getWikiPathPrefix(this.xwikicfg.getProperty("xwiki.defaultservletpath", "bin"));
 
         // Remove potential trailing "/" since the documentation in xwiki.cfg says it should contain a trailing "/" but
         // getEntityPathPrefix should return the prefix without "/"...
@@ -71,7 +71,7 @@ public class LegacyStandardURLConfiguration extends DefaultStandardURLConfigurat
     {
         WikiNotFoundBehavior legacyBehavior = WikiNotFoundBehavior.DISPLAY_ERROR;
 
-        String legacyValue = this.configuration.getProperty("xwiki.virtual.failOnWikiDoesNotExist", "0");
+        String legacyValue = this.xwikicfg.getProperty("xwiki.virtual.failOnWikiDoesNotExist", "0");
 
         if (!"1".equals(legacyValue)) {
             legacyBehavior = WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI;

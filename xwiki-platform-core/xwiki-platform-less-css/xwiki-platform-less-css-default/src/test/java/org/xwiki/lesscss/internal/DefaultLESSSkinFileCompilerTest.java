@@ -32,6 +32,8 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.lesscss.LESSCompiler;
 import org.xwiki.lesscss.LESSCompilerException;
 import org.xwiki.lesscss.LESSSkinFileCache;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -76,11 +78,15 @@ public class DefaultLESSSkinFileCompilerTest
 
     private XWikiEngineContext engineContext;
 
+    private DocumentReferenceResolver<String> referenceResolver;
+
     @Before
     public void setUp() throws Exception
     {
         lessCompiler = mocker.getInstance(LESSCompiler.class);
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
+        referenceResolver = mocker.getInstance(new DefaultParameterizedType(null, DocumentReferenceResolver.class,
+                        String.class));
         cache = mocker.getInstance(LESSSkinFileCache.class);
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
         xcontext = mock(XWikiContext.class);
@@ -94,6 +100,9 @@ public class DefaultLESSSkinFileCompilerTest
         when(request.getParameter("colorTheme")).thenReturn("myColorTheme");
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
         when(xwiki.getSkin(xcontext)).thenReturn("skin");
+        DocumentReference colorThemeReference = new DocumentReference("xwiki", "XWiki", "MyColorTheme");
+        when(referenceResolver.resolve("myColorTheme")).thenReturn(colorThemeReference);
+        when(xwiki.exists(colorThemeReference, xcontext)).thenReturn(true);
     }
 
     private void prepareMocksForCompilation() throws Exception
@@ -116,7 +125,6 @@ public class DefaultLESSSkinFileCompilerTest
     {
         // Mocks
         prepareMocksForCompilation();
-
         // Test
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", false));
 
@@ -154,6 +162,23 @@ public class DefaultLESSSkinFileCompilerTest
     }
 
     @Test
+    public void compileSkinFileWhenColorThemeDoesNotExist() throws Exception
+    {
+        // Mock
+        when(cache.get("style2.less", "wikiId", "skin", "default")).thenReturn("DEFAULT COLOR THEME");
+        DocumentReference colorThemeReference = new DocumentReference("xwiki", "XWiki", "invalidColorTheme");
+        when(referenceResolver.resolve("invalidColorTheme")).thenReturn(colorThemeReference);
+        when(xwiki.exists(colorThemeReference, xcontext)).thenReturn(false);
+        prepareMocksForCompilation();
+        XWikiRequest request = mock(XWikiRequest.class);
+        when(xcontext.getRequest()).thenReturn(request);
+        when(request.getParameter("colorTheme")).thenReturn("invalidColorTheme");
+
+        // Test
+        assertEquals("DEFAULT COLOR THEME", mocker.getComponentUnderTest().compileSkinFile("style2.less", false));
+    }
+
+    @Test
     public void compileSkinFileWhenExceptionWithLESS() throws Exception
     {
         // Mock
@@ -163,16 +188,16 @@ public class DefaultLESSSkinFileCompilerTest
         when(lessCompiler.compile(anyString(), any(Path[].class))).thenThrow(exception);
 
         // Test
-        Exception exceptionCaughed = null;
+        Exception exceptionCaught = null;
         try {
             mocker.getComponentUnderTest().compileSkinFile("style2.less", true);
         } catch(LESSCompilerException e) {
-            exceptionCaughed = e;
+            exceptionCaught = e;
         }
 
         // Verify
-        assertNotNull(exceptionCaughed);
-        assertEquals(exception, exceptionCaughed.getCause());
-        assertEquals("Failed to compile the file [style2.less] with LESS.", exceptionCaughed.getMessage());
+        assertNotNull(exceptionCaught);
+        assertEquals(exception, exceptionCaught.getCause());
+        assertEquals("Failed to compile the file [style2.less] with LESS.", exceptionCaught.getMessage());
     }
 }

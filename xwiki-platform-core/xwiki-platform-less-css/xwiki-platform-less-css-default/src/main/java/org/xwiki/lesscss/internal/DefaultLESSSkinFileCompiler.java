@@ -34,6 +34,7 @@ import org.xwiki.lesscss.LESSCompiler;
 import org.xwiki.lesscss.LESSCompilerException;
 import org.xwiki.lesscss.LESSSkinFileCache;
 import org.xwiki.lesscss.LESSSkinFileCompiler;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
@@ -61,6 +62,9 @@ public class DefaultLESSSkinFileCompiler implements LESSSkinFileCompiler
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
 
+    @Inject
+    private DocumentReferenceResolver<String> referenceResolver;
+
     @Override
     public String compileSkinFile(String fileName, boolean force) throws LESSCompilerException
     {
@@ -72,6 +76,12 @@ public class DefaultLESSSkinFileCompiler implements LESSSkinFileCompiler
         String skin = context.getWiki().getSkin(context);
         XWikiRequest request = context.getRequest();
         String colorTheme = request.getParameter("colorTheme");
+
+        // Check that the color theme exists, to avoid a DOS if some user tries to compile a skin file
+        // with random colorTheme names
+        if (!context.getWiki().exists(referenceResolver.resolve(colorTheme), context)) {
+            colorTheme = "default";
+        }
 
         // Check if the result is in the cache
         if (!force) {

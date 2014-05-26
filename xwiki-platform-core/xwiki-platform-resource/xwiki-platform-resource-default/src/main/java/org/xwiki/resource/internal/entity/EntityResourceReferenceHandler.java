@@ -60,10 +60,6 @@ public class EntityResourceReferenceHandler extends AbstractResourceReferenceHan
     public void handle(ResourceReference reference, ResourceReferenceHandlerChain chain)
         throws ResourceReferenceHandlerException
     {
-        // All references we get are of type EntityResourceReference since handler only handles Entity Resource
-        // References
-        EntityResourceReference entityResourceReference = (EntityResourceReference) reference;
-
         this.actionResourceReferenceHandlerManager.handle(reference);
 
         // Be a good citizen, continue the chain, in case some lower-priority Handler has something to do for this

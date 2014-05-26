@@ -479,7 +479,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
             // In order to circumvent a bug in Hibernate (See the javadoc of XWHS#createHibernateSequenceIfRequired for
             // details), we need to ensure that Hibernate will create the "hibernate_sequence" sequence.
-            createHibernateSequenceIfRequired(contextSchema, session);
+            createHibernateSequenceIfRequired(schemaSQL, contextSchema, session);
 
         } catch (Exception e) {
             throw new HibernateException("Failed creating schema update script", e);
@@ -513,32 +513,45 @@ public class XWikiHibernateBaseStore implements Initializable
      * automatically create sequence with the same name (see also
      * https://hibernate.atlassian.net/browse/HHH-1672). As a workaround, we create the required sequence here.
      *
+     * @param schemaSQL the list of SQL commands to execute to update the schema, possibly containing the
+     *        "hibernate_sequence" sequence creation
      * @param schemaName the schema name corresponding to the subwiki being updated
      * @param session the Hibernate session, used to get the Dialect object
      * @since 5.2RC1
      */
-    protected void createHibernateSequenceIfRequired(String schemaName, Session session)
+    protected void createHibernateSequenceIfRequired(String[] schemaSQL, String schemaName, Session session)
     {
         // There's no issue when in database mode, only in schema mode.
         if (isInSchemaMode()) {
             Dialect dialect = ((SessionFactoryImplementor) session.getSessionFactory()).getDialect();
             if (dialect.getNativeIdentifierGeneratorClass().equals(SequenceGenerator.class)) {
-                // Check if the sequence exists for the current schema. Since there's no way to do that in a generic
-                // way that would work on all DBs and since calling dialect.getQuerySequencesString() will get the
-                // native SQL query to find out all sequences BUT only for the default schema, we need to find another
-                // way. The solution we're implementing is to try to create the sequence and if it fails then we
-                // consider it already exists.
+                // We create the sequence only if it's not already in the SQL to execute as otherwise we would get an
+                // error that the sequence already exists ("relation "hibernate_sequence" already exists").
+                boolean hasSequence = false;
                 String sequenceSQL = String.format("create sequence %s.hibernate_sequence", schemaName);
-                try {
-                    // Ignore errors in the log during the creation of the sequence since we know it can fail and we
-                    // don't want to show false positives to the user.
-                    this.loggerManager.pushLogListener(null);
-                    session.createSQLQuery(sequenceSQL).executeUpdate();
-                } catch(HibernateException e) {
-                    // Sequence failed to be created, we assume it already exists and that's why an exception was
-                    // raised!
-                } finally {
-                    this.loggerManager.popLogListener();
+                for (String sql : schemaSQL) {
+                    if (sequenceSQL.equals(sql)) {
+                        hasSequence = true;
+                        break;
+                    }
+                }
+                if (!hasSequence) {
+                    // Ideally we would need to check if the sequence exists for the current schema.
+                    // Since there's no way to do that in a generic way that would work on all DBs and since calling
+                    // dialect.getQuerySequencesString() will get the native SQL query to find out all sequences BUT
+                    // only for the default schema, we need to find another way. The solution we're implementing is to
+                    // try to create the sequence and if it fails then we consider it already exists.
+                    try {
+                        // Ignore errors in the log during the creation of the sequence since we know it can fail and we
+                        // don't want to show false positives to the user.
+                        this.loggerManager.pushLogListener(null);
+                        session.createSQLQuery(sequenceSQL).executeUpdate();
+                    } catch (HibernateException e) {
+                        // Sequence failed to be created, we assume it already exists and that's why an exception was
+                        // raised!
+                    } finally {
+                        this.loggerManager.popLogListener();
+                    }
                 }
             }
         }

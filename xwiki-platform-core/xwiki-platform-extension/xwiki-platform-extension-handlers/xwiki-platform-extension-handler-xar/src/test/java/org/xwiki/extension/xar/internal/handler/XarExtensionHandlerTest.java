@@ -78,8 +78,6 @@ public class XarExtensionHandlerTest
     public MockitoRepositoryUtilsRule repositoryUtil = new MockitoRepositoryUtilsRule(this.componentManager,
         this.oldcore);
 
-    private Map<DocumentReference, XWikiDocument> documents = new HashMap<DocumentReference, XWikiDocument>();
-
     private ExtensionId localXarExtensiontId1;
 
     private ExtensionId localXarExtensiontId2;
@@ -108,109 +106,6 @@ public class XarExtensionHandlerTest
         this.classes.put("StyleSheetExtension", styleSheetClass);
 
         // checking
-
-        Mockito.when(
-            this.oldcore.getMockXWiki().getDocument(Mockito.any(DocumentReference.class),
-                Mockito.any(XWikiContext.class))).then(new Answer<XWikiDocument>()
-        {
-            @Override
-            public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
-            {
-                DocumentReference target = (DocumentReference) invocation.getArguments()[0];
-
-                if (target.getLocale() == null) {
-                    target = new DocumentReference(target, Locale.ROOT);
-                }
-
-                XWikiDocument document = documents.get(target);
-
-                if (document == null) {
-                    document = new XWikiDocument(target);
-                }
-
-                return document;
-            }
-        });
-        Mockito
-            .doAnswer(new Answer()
-            {
-                @Override
-                public Object answer(InvocationOnMock invocation) throws Throwable
-                {
-                    XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
-                    boolean minorEdit = (Boolean) invocation.getArguments()[2];
-
-                    document.setMinorEdit(minorEdit);
-                    document.setNew(false);
-
-                    if (document.isContentDirty() || document.isMetaDataDirty()) {
-                        Date ndate = new Date();
-                        document.setDate(ndate);
-                        if (document.isContentDirty()) {
-                            document.setContentUpdateDate(ndate);
-                            document.setContentAuthorReference(document.getAuthorReference());
-                        }
-                        document.incrementVersion();
-                        document.setContentDirty(false);
-                        document.setMetaDataDirty(false);
-                    }
-
-                    XWikiDocument previousDocument = documents.get(document.getDocumentReferenceWithLocale());
-
-                    for (XWikiAttachment attachment : document.getAttachmentList()) {
-                        if (!attachment.isContentDirty()) {
-                            attachment.setAttachment_content(previousDocument.getAttachment(attachment.getFilename())
-                                .getAttachment_content());
-                        }
-                    }
-
-                    documents.put(document.getDocumentReferenceWithLocale(), document);
-
-                    return null;
-                }
-            })
-            .when(this.oldcore.getMockXWiki())
-            .saveDocument(Mockito.any(XWikiDocument.class), Mockito.any(String.class), Mockito.anyBoolean(),
-                Mockito.any(XWikiContext.class));
-        Mockito
-            .doAnswer(new Answer()
-            {
-                @Override
-                public Object answer(InvocationOnMock invocation) throws Throwable
-                {
-                    oldcore.getMockXWiki().saveDocument((XWikiDocument) invocation.getArguments()[0],
-                        (String) invocation.getArguments()[1], false, (XWikiContext) invocation.getArguments()[2]);
-
-                    return null;
-                }
-            }).when(this.oldcore.getMockXWiki())
-            .saveDocument(Mockito.any(XWikiDocument.class), Mockito.any(String.class), Mockito.any(XWikiContext.class));
-        Mockito.doAnswer(new Answer()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
-
-                documents.remove(document.getDocumentReferenceWithLocale());
-
-                return null;
-            }
-        }).when(this.oldcore.getMockXWiki())
-            .deleteDocument(Mockito.any(XWikiDocument.class), Mockito.any(XWikiContext.class));
-        Mockito.when(
-            this.oldcore.getMockXWiki()
-                .getXClass(Mockito.any(DocumentReference.class), Mockito.any(XWikiContext.class))).then(
-            new Answer<BaseClass>()
-            {
-                @Override
-                public BaseClass answer(InvocationOnMock invocation) throws Throwable
-                {
-                    DocumentReference documentReference = (DocumentReference) invocation.getArguments()[0];
-
-                    return classes.get(documentReference.getName());
-                }
-            });
 
         Mockito.when(this.oldcore.getMockXWiki().hasAttachmentRecycleBin(Mockito.any(XWikiContext.class))).thenReturn(
             true);
@@ -405,7 +300,7 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
 
         // translated.translated.tr
-        XWikiDocument translated = this.documents.get(new DocumentReference(translatedReference, new Locale("tr")));
+        XWikiDocument translated = this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("tr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in langauge tr has not been saved in the database",
             translated);
@@ -419,7 +314,7 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
 
         // translated.translated.fr
-        XWikiDocument translated2 = this.documents.get(new DocumentReference(translatedReference, new Locale("fr")));
+        XWikiDocument translated2 = this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("fr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in language fr has not been saved in the database",
             translated2);
@@ -539,7 +434,7 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
 
         // translated.translated.tr
-        XWikiDocument translated = this.documents.get(new DocumentReference(translatedReference, new Locale("tr")));
+        XWikiDocument translated = this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("tr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in langauge tr has not been saved in the database",
             translated);
@@ -553,7 +448,7 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
 
         // translated.translated.fr
-        XWikiDocument translated2 = this.documents.get(new DocumentReference(translatedReference, new Locale("fr")));
+        XWikiDocument translated2 = this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("fr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in language fr has not been saved in the database",
             translated2);

@@ -323,6 +323,8 @@ public abstract class XWikiAction extends Action
                 try {
                     entityResourceReferenceHandler.handle(resourceReference,
                         new DefaultResourceReferenceHandlerChain(Collections.<ResourceReferenceHandler>emptyList()));
+                    // Don't let the old actions kick in!
+                    return null;
                 } catch (NotFoundResourceHandlerException e) {
                     // No Entity Resource Action has been found. Don't do anything and let it go through
                     // so that the old Action system kicks in...

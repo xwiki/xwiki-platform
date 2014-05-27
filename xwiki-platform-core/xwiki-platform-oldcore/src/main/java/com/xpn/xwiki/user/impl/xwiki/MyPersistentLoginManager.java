@@ -251,7 +251,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             if (validationHash != null) {
                 // Validation
                 Cookie validationCookie = new Cookie(getCookiePrefix() + COOKIE_VALIDATION, validationHash);
-                setupCookie(validationCookie, sessionCookie, cookieDomain, response);
+                setupCookie(validationCookie, sessionCookie, secureCookie, cookieDomain, response);
             } else {
                 if (LOGGER.isErrorEnabled()) {
                     LOGGER.error("WARNING!!! WARNING!!!");

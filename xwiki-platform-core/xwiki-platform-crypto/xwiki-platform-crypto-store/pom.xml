@@ -33,7 +33,7 @@
   <description>Provides storage for crypto data</description>
   <modules>
     <module>xwiki-platform-crypto-store-api</module>
-    <module>xwiki-platform-crypto-store-xwiki</module>
+    <module>xwiki-platform-crypto-store-wiki</module>
   </modules>
   <properties>
     <!-- Name to display by the Extension Manager -->

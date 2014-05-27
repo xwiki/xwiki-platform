@@ -1,6 +1,0 @@
-org.xwiki.crypto.store.internal.CertificateClassDocumentInitializer
-org.xwiki.crypto.store.internal.DefaultSignatureStore
-org.xwiki.crypto.store.internal.PrivateKeyClassDocumentInitializer
-org.xwiki.crypto.store.internal.SignatureClassDocumentInitializer
-org.xwiki.crypto.store.internal.X509CertificateStore
-org.xwiki.crypto.store.internal.X509KeyStore

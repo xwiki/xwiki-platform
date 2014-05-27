@@ -65,5 +65,15 @@
       <artifactId>xwiki-commons-crypto-pkix</artifactId>
       <version>${commons.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-crypto-store-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-crypto-store-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

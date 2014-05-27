@@ -39,7 +39,9 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
+import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Displays the title of a document.
@@ -180,12 +182,25 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         DocumentDisplayerParameters parameters)
     {
         StringWriter writer = new StringWriter();
-        String nameSpace =
+        String namespace =
             defaultEntityReferenceSerializer.serialize(parameters.isTransformationContextIsolated() ? documentReference
                 : documentAccessBridge.getCurrentDocumentReference());
+
+        // Get the velocity engine
+        VelocityEngine velocityEngine;
+        try {
+            velocityEngine = this.velocityManager.getVelocityEngine();
+        } catch (XWikiVelocityException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Execute Velocity code
         Map<String, Object> backupObjects = null;
         boolean canPop = false;
         try {
+            // Prepare namespace cleanup
+            velocityEngine.startedUsingMacroNamespace(namespace);
+
             if (parameters.isExecutionContextIsolated()) {
                 backupObjects = new HashMap<String, Object>();
                 // The following method call also clones the execution context.
@@ -193,11 +208,14 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
                 // Pop the document from the context only if the push was successful!
                 canPop = true;
             }
-            velocityManager.getVelocityEngine()
-                .evaluate(velocityManager.getVelocityContext(), writer, nameSpace, title);
+            velocityEngine
+                .evaluate(velocityManager.getVelocityContext(), writer, namespace, title);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
+            // Clean namespace unless this execution is part of a wider range
+            velocityEngine.stoppedUsingMacroNamespace(namespace);
+
             if (canPop) {
                 documentAccessBridge.popDocumentFromContext(backupObjects);
             }

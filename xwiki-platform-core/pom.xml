@@ -394,7 +394,7 @@
               <justification>Young API</justification>
             </difference>
             <difference>
-              <differenceType>8001</differenceType>
+              <differenceType>7004</differenceType>
               <className>com/xpn/xwiki/store/XWikiHibernateBaseStore</className>
               <method>void createHibernateSequenceIfRequired(java.lang.String, org.hibernate.Session)</method>
               <justification>Internal stuff</justification>

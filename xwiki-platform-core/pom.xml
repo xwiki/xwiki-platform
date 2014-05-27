@@ -372,6 +372,12 @@
               <method>void stop(org.xwiki.gwt.dom.client.Window)</method>
               <justification>This method is available on the Window object.</justification>
             </difference>
+            <difference>
+              <differenceType>8001</differenceType>
+              <className>com/xpn/xwiki/store/XWikiHibernateBaseStore</className>
+              <method>void createHibernateSequenceIfRequired(java.lang.String, org.hibernate.Session)</method>
+              <justification>Internal stuff</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

@@ -389,7 +389,7 @@
               <justification>Young API</justification>
             </difference>
             <difference>
-              <differenceType>7004</differenceType>
+              <differenceType>8001</differenceType>
               <className>org/xwiki/crypto/store/KeyStoreException</className>
               <justification>Young API</justification>
             </difference>

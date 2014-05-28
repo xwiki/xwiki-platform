@@ -662,6 +662,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #getEntryContent($entryDoc $entryObj $onlyExtract $entryContent)
   {{html wiki="false"}}$entryDoc.getRenderedContent($entryContent, $entryDoc.syntax.toIdString()){{/html}}
   ))) ## entry-content
+  &lt;div class='clearfloats'&gt;&lt;/div&gt;
 #end
 ##
 ##

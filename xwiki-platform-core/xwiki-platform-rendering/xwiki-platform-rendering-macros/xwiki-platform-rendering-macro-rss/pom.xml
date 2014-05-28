@@ -40,7 +40,7 @@
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
     </dependency>
-    <!-- Rome does not trigger version of jdom we want -->
+    <!-- Rome does not trigger id of jdom we want -->
     <dependency>
       <groupId>org.jdom</groupId>
       <artifactId>jdom</artifactId>

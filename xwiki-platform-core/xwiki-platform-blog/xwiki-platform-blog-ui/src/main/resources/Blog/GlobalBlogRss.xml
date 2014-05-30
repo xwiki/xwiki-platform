@@ -53,7 +53,7 @@ $response.setContentType('application/rss+xml')
 #getBlogTitle($blogDoc $title)
 #set($feedMetadata = {
   "title": $title,
-  "description": "Most recent blog posts in the wiki",
+  "description": $services.localization.render('xe.blog.code.description.wiki'),
   "url": $xwiki.getDocument($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))).externalURL
   })
 #getBlogEntriesBaseQuery($query)

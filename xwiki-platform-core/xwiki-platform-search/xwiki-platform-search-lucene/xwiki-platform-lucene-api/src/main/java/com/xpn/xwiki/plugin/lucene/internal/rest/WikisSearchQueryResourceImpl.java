@@ -17,18 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.internal.resources.wikis;
+package com.xpn.xwiki.plugin.lucene.internal.rest;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.BaseSearchResult;
+import org.xwiki.rest.internal.resources.search.SearchSource;
 import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.resources.wikis.WikisSearchQueryResource;
 
 @Component("org.xwiki.rest.internal.resources.wikis.WikisSearchQueryResourceImpl")
 public class WikisSearchQueryResourceImpl extends BaseSearchResult implements WikisSearchQueryResource
 {
+    private static final String MULTIWIKI_QUERY_TEMPLATE_INFO =
+        "q={lucenequery}(&number={number})(&start={start})(&orderField={fieldname}(&order={asc|desc}))(&distinct=1)(&prettyNames={false|true})(&wikis={wikis})(&className={classname})";
+
+    @Inject
+    @Named("lucene")
+    private SearchSource luceneSearch;
+
     @Override
     public SearchResults search(String query, Integer number, Integer start, Boolean distinct, String searchWikis,
         String orderField, String order, Boolean withPrettyNames, String className) throws XWikiRestException
@@ -39,14 +50,13 @@ public class WikisSearchQueryResourceImpl extends BaseSearchResult implements Wi
                 MULTIWIKI_QUERY_TEMPLATE_INFO));
 
             searchResults.getSearchResults().addAll(
-                searchQuery(
+                this.luceneSearch.search(
                     query,
-                    QueryType.LUCENE.toString(),
                     getXWikiContext().getWikiId(),
                     searchWikis,
                     Utils.getXWiki(componentManager).getRightService()
                         .hasProgrammingRights(Utils.getXWikiContext(componentManager)), orderField, order, distinct,
-                    number, start, withPrettyNames, className));
+                    number, start, withPrettyNames, className, uriInfo));
 
             return searchResults;
         } catch (Exception e) {

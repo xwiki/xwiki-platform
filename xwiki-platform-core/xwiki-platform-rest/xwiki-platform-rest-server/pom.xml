@@ -137,11 +137,6 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-lucene-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.jvnet.jaxb2_commons</groupId>
       <artifactId>jaxb2-fluent-api</artifactId>
       <version>3.0</version>
@@ -221,13 +216,13 @@
             org/xwiki/rest/internal/resources/spaces/SpaceSearchResourceImpl.java,
             org/xwiki/rest/internal/resources/spaces/SpacesResourceImpl.java,
             org/xwiki/rest/internal/resources/SyntaxesResourceImpl.java,
+            org/xwiki/rest/internal/resources/search/*,
             org/xwiki/rest/internal/resources/tags/PagesForTagsResourceImpl.java,
             org/xwiki/rest/internal/resources/tags/TagsResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikiAttachmentsResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikiPagesResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikiSearchResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikiSearchQueryResourceImpl.java,
-            org/xwiki/rest/internal/resources/wikis/WikisSearchQueryResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikisResourceImpl.java,
             org/xwiki/rest/internal/Utils.java,
             org/xwiki/rest/internal/XWikiAuthentication.java,

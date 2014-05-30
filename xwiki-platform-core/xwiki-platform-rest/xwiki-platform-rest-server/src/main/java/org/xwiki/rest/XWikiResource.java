@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -78,6 +79,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      * The XWiki component manager that is used to lookup XWiki components and context.
      */
     @Inject
+    @Named("context")
     protected ComponentManager componentManager;
 
     /**

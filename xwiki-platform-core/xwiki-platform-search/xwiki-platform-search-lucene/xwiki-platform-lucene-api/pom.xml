@@ -44,6 +44,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rest-server</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
       <version>${lucene.version}</version>
@@ -136,7 +141,9 @@
             com/xpn/xwiki/plugin/lucene/SearchResult.java,
             com/xpn/xwiki/plugin/lucene/SearchResults.java,
             com/xpn/xwiki/plugin/lucene/internal/WikiData.java,
-            com/xpn/xwiki/plugin/lucene/internal/XWikiDocumentQueue.java
+            com/xpn/xwiki/plugin/lucene/internal/XWikiDocumentQueue.java,
+            com/xpn/xwiki/plugin/lucene/internal/rest/LuceneSearchSource.java,
+            com/xpn/xwiki/plugin/lucene/internal/rest/WikisSearchQueryResourceImpl.java
           </excludes>
         </configuration>
       </plugin>

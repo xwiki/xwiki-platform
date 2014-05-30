@@ -82,7 +82,7 @@ import com.xpn.xwiki.web.Utils;
  * relevance), filter by one or several languages, and search in one, several or all virtual wikis.
  * 
  * @version $Id$
- * @deprecated the plugin technology is deprecated
+ * @deprecated use SOLR module instead
  */
 @Deprecated
 public class LucenePlugin extends XWikiDefaultPlugin

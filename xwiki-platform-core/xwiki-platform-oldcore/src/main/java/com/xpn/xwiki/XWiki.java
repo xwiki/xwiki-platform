@@ -93,6 +93,12 @@ import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.classloader.ClassLoaderManager;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentRepositoryException;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
@@ -160,7 +166,6 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
-import com.xpn.xwiki.render.DefaultXWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
@@ -240,8 +245,6 @@ public class XWiki implements EventListener
      * @since 1.4M1
      */
     private AttachmentRecycleBinStore attachmentRecycleBinStore;
-
-    private XWikiRenderingEngine renderingEngine;
 
     private XWikiPluginManager pluginManager;
 
@@ -659,7 +662,7 @@ public class XWiki implements EventListener
     {
         JobProgressManager progress = Utils.getComponent(JobProgressManager.class);
 
-        progress.pushLevelProgress(5, this);
+        progress.pushLevelProgress(4, this);
 
         try {
             setDatabase(context.getMainXWiki());
@@ -715,10 +718,6 @@ public class XWiki implements EventListener
             // "Pre-initialize" XWikiStubContextProvider so that rendering engine, plugins or listeners reacting to
             // potential document changes can use it
             Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class).initialize(context);
-
-            progress.stepPropress(this);
-
-            resetRenderingEngine(context);
 
             progress.stepPropress(this);
 
@@ -960,8 +959,22 @@ public class XWiki implements EventListener
 
     public void resetRenderingEngine(XWikiContext context) throws XWikiException
     {
-        // Prepare the Rendering Engine
-        setRenderingEngine(new DefaultXWikiRenderingEngine(this, context));
+        XWikiRenderingEngine engine;
+        try {
+            engine = Utils.getComponentManager().getInstance(XWikiRenderingEngine.class);
+        } catch (ComponentLookupException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to lookup rendering engine", e);
+        }
+
+        if (engine instanceof Initializable) {
+            try {
+                ((Initializable) engine).initialize();
+            } catch (InitializationException e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Failed to initialize rendering engine", e);
+            }
+        }
     }
 
     private void preparePlugins(XWikiContext context)
@@ -1453,14 +1466,32 @@ public class XWiki implements EventListener
         return null;
     }
 
+    /**
+     * @deprecated since 6.1M2, directly lookup default {@link XWikiRenderingEngine} component instead
+     */
+    @Deprecated
     public XWikiRenderingEngine getRenderingEngine()
     {
-        return this.renderingEngine;
+        return Utils.getComponent(XWikiRenderingEngine.class);
     }
 
+    /**
+     * @deprecated since 6.1M2
+     */
+    @Deprecated
     public void setRenderingEngine(XWikiRenderingEngine renderingEngine)
     {
-        this.renderingEngine = renderingEngine;
+        DefaultComponentDescriptor<XWikiRenderingEngine> descriptor = new DefaultComponentDescriptor<XWikiRenderingEngine>();
+
+        descriptor.setImplementation(renderingEngine.getClass());
+        descriptor.setRoleType(XWikiRenderingEngine.class);
+        descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
+
+        try {
+            Utils.getRootComponentManager().registerComponent(descriptor, renderingEngine);
+        } catch (ComponentRepositoryException e) {
+            LOGGER.error("Failed to register rendering engine [{}]", renderingEngine, e);
+        }
     }
 
     public MetaClass getMetaclass()

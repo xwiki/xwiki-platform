@@ -399,6 +399,38 @@
               <method>void createHibernateSequenceIfRequired(java.lang.String, org.hibernate.Session)</method>
               <justification>Internal stuff</justification>
             </difference>
+            
+            <difference>
+              <differenceType>4001</differenceType>
+              <className>com/xpn/xwiki/render/XWikiMacrosMappingRenderer</className>
+              <to>org/xwiki/observation/EventListener</to>
+              <justification>Use internal listener instead</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/render/XWikiMacrosMappingRenderer</className>
+              <method>java.util.List getEvents()</method>
+              <justification>Use internal listener instead</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/render/XWikiMacrosMappingRenderer</className>
+              <method>java.lang.String getName()</method>
+              <justification>Use internal listener instead</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>com/xpn/xwiki/render/XWikiMacrosMappingRenderer</className>
+              <method>void onEvent(org.xwiki.observation.event.Event, java.lang.Object, java.lang.Object)</method>
+              <justification>Use internal listener instead</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>com/xpn/xwiki/render/XWikiRenderer</className>
+              <method>java.lang.String getId()</method>
+              <justification>Used only if the renderer is a component</justification>
+            </difference>
+            
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

@@ -23,11 +23,15 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Environment;
 import org.hibernate.connection.ConnectionProvider;
@@ -91,13 +95,19 @@ public class DBCPConnectionProvider implements ConnectionProvider
     private static final String PREFIX = "hibernate.dbcp.";
 
     private BasicDataSource ds;
+    
+    // Attribute set to true from config, used in getConnexion() to monior or not the connexion raiser
+    private boolean monitorTransactionCaller = false;
+    private Map<String,Integer> callerMap = null;
 
     // Old Environment property for backward-compatibility (property removed in Hibernate3)
     private static final String DBCP_PS_MAXACTIVE = "hibernate.dbcp.ps.maxActive";
 
     // Property doesn't exists in Hibernate2
     private static final String AUTOCOMMIT = "hibernate.connection.autocommit";
-
+    // Property to monitor connexions holder 
+    private static final String CONNEXION_CALLER = "connexion.trace";
+    
     @Override
     public void configure(Properties props) throws HibernateException
     {
@@ -129,6 +139,14 @@ public class DBCPConnectionProvider implements ConnectionProvider
                 dbcpProperties.put("password", password);
             }
 
+            
+            // DBCP Connexion tracer : monitor the connexion caller to diagonstic leaks.
+            // Activated with connexion.trace=true in hibernate.cfg.xml
+            String connexionCaller = props.getProperty(CONNEXION_CALLER);
+            if ("true".equalsIgnoreCase(connexionCaller)) {
+                this.monitorTransactionCaller = true;
+                callerMap =  new ConcurrentHashMap<String,Integer>();
+            }
             // Isolation level
             String isolationLevel = props.getProperty(Environment.ISOLATION);
             if ((isolationLevel != null) && (isolationLevel.trim().length() > 0)) {
@@ -223,10 +241,39 @@ public class DBCPConnectionProvider implements ConnectionProvider
         Connection conn = null;
         try {
             conn = ds.getConnection();
+            
+            // Connexion caller monitoring
+            if (monitorTransactionCaller) {
+                // Decreasing the count number for this stackframe
+                String callerKey = formatStackTrace(ExceptionUtils.getStackFrames  (new Exception()));
+                Integer counter = callerMap.get(callerKey);
+                if (null != counter) {
+                  callerMap.put(callerKey, ++counter);
+                } else {
+                  callerMap.put(callerKey, 1);
+                }
+            }
+            
         } finally {
             logStatistics();
         }
         return conn;
+    }
+
+    private String formatStackTrace(String[] stackFrames) {
+      StringBuilder sb = new StringBuilder();
+      String tmp;
+      String arr[];
+      int pos;
+      for (String frame : stackFrames) {
+          pos =  frame.indexOf('(');
+          if (-1 != pos) {
+            tmp = frame.substring(0,pos);
+            arr = tmp.split("\\.");
+            sb.append("<-").append(arr[arr.length-2]).append(".").append(arr[arr.length-1]).append("()").toString();
+          }
+      }
+      return sb.toString();
     }
 
     @Override
@@ -234,6 +281,18 @@ public class DBCPConnectionProvider implements ConnectionProvider
     {
         try {
             conn.close();
+            // Connexion caller monitoring
+            if (monitorTransactionCaller) {
+              // Decreasing the count number for this stackframe
+              String callerKey = formatStackTrace(ExceptionUtils.getStackFrames  (new Exception()));
+              Integer counter = callerMap.get(callerKey);
+              if (null != counter) {
+                callerMap.put(callerKey, --counter);
+              } else {
+                LOGGER.warn("Strange case in connexions monitoring, a closed connexion is not found in the openned list : " + callerKey);
+              }
+            }
+            
         } finally {
             logStatistics();
         }
@@ -242,6 +301,10 @@ public class DBCPConnectionProvider implements ConnectionProvider
     @Override
     public void close() throws HibernateException
     {
+      
+       
+        
+        // Storing the class raising the connection. It will be monitored
         LOGGER.debug("Close DBCPConnectionProvider");
         logStatistics();
         try {
@@ -280,5 +343,13 @@ public class DBCPConnectionProvider implements ConnectionProvider
             LOGGER.info("active: " + ds.getNumActive() + " (max: " + ds.getMaxActive() + ")   " + "idle: "
                 + ds.getNumIdle() + "(max: " + ds.getMaxIdle() + ")");
         }
+    }
+
+    
+    /**
+     * @return the callerMap
+     */
+    public Map<String, Integer> getCallerMap() {
+      return callerMap;
     }
 }

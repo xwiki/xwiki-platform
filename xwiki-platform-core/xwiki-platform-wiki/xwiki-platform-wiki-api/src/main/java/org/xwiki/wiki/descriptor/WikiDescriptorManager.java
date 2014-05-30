@@ -38,13 +38,13 @@ public interface WikiDescriptorManager
     /**
      * Get the list of all wikis.
      *
-     * @return the lit of every wiki created on the farm.
+     * @return the list of every wiki created on the farm
      * @throws org.xwiki.wiki.manager.WikiManagerException if problems occur
      */
     Collection<WikiDescriptor> getAll() throws WikiManagerException;
 
     /**
-     * Get a wiki from one of its alias.
+     * Get a wiki from one of its aliases.
      *
      * @param wikiAlias Alias of the wiki to retrieve
      * @return The corresponding wiki descriptor of that alias.

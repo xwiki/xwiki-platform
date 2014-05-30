@@ -23,6 +23,7 @@ import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -170,7 +171,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         }
 
         if (event.getDate() == null) {
-            event.setDate(context.getWiki().getCurrentDate());
+            event.setDate(new Date());
         }
 
         if (event.getEventId() == null) {

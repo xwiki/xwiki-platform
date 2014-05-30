@@ -73,6 +73,7 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.net.smtp.SMTPClient;
 import org.apache.commons.net.smtp.SMTPReply;
 import org.apache.velocity.VelocityContext;
@@ -124,6 +125,7 @@ import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 import org.xwiki.xml.XMLUtils;
 
@@ -580,6 +582,10 @@ public class XWiki implements EventListener
         return client;
     }
 
+    /**
+     * @deprecated use {@link FieldUtils#readDeclaredField(Object, String, boolean)} instead
+     */
+    @Deprecated
     public static Object getPrivateField(Object obj, String fieldName)
     {
         try {
@@ -4058,7 +4064,9 @@ public class XWiki implements EventListener
      * @param context the XWiki context
      * @return the number of copied documents
      * @throws XWikiException failed to copy wiki
+     * @deprecated since 5.3, use {@link WikiManager#copy(String, String, String, boolean, boolean, boolean)} instead
      */
+    @Deprecated
     public int copyWiki(String sourceWiki, String targetWiki, String language, XWikiContext context)
         throws XWikiException
     {
@@ -4075,7 +4083,9 @@ public class XWiki implements EventListener
      * @param context the XWiki context
      * @return the number of copied documents
      * @throws XWikiException failed to copy wiki
+     * @deprecated since 5.3, use {@link WikiManager#copy(String, String, String, boolean, boolean, boolean)} instead
      */
+    @Deprecated
     public int copyWiki(String sourceWiki, String targetWiki, String language, boolean clean, XWikiContext context)
         throws XWikiException
     {
@@ -4287,6 +4297,10 @@ public class XWiki implements EventListener
 
     // Usefull date functions
 
+    /**
+     * @deprecated use {@link Date#Date()} instead...
+     */
+    @Deprecated
     public Date getCurrentDate()
     {
         return new Date();
@@ -4298,6 +4312,10 @@ public class XWiki implements EventListener
         return (int) (ctime.getTime() - time);
     }
 
+    /**
+     * @deprecated use {@link Date#Date(long)} instead...
+     */
+    @Deprecated
     public Date getDate(long time)
     {
         return new Date(time);
@@ -4829,9 +4847,13 @@ public class XWiki implements EventListener
         return this.fullNameSQL;
     }
 
-    public String getDocName(String docname)
+    /**
+     * @deprecated use {@link EntityReferenceResolver} instead
+     */
+    @Deprecated
+    public String getDocName(String fullName)
     {
-        return docname.substring(docname.indexOf('.') + 1);
+        return fullName.substring(fullName.indexOf('.') + 1);
     }
 
     public String getUserName(String user, XWikiContext context)

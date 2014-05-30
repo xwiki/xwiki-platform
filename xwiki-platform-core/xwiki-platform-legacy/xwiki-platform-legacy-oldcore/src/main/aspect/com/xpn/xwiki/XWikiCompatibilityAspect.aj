@@ -83,10 +83,14 @@ public privileged aspect XWikiCompatibilityAspect
     private EntityReferenceSerializer<String> XWiki.localStringEntityReferenceSerializer = Utils.getComponent(
         EntityReferenceSerializer.TYPE_STRING, "local");
 
+    
     /**
      * Used to get the temporary and permanent directory.
      */
     private Environment XWiki.environment = Utils.getComponent((Type) Environment.class);
+
+    /** Is the wiki running in test mode? Deprecated, was used when running Cactus tests. */
+    private boolean XWiki.test = false;
 
     /**
      * Transform a text in a URL compatible text

@@ -117,10 +117,10 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.ResourceReferenceResolver;
+import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -272,9 +272,6 @@ public class XWiki implements EventListener
 
     private MetaClass metaclass = MetaClass.getMetaClass();
 
-    /** Is the wiki running in test mode? Deprecated, was used when running Cactus tests. */
-    private boolean test = false;
-
     private String version = null;
 
     private XWikiEngineContext engine_context;
@@ -283,7 +280,9 @@ public class XWiki implements EventListener
 
     private String fullNameSQL;
 
-    // These are caches in order to improve finding virtual wikis
+    /**
+     * The list of initialized wikis.
+     */
     private List<String> virtualWikiList = new ArrayList<String>();
 
     /**
@@ -347,7 +346,8 @@ public class XWiki implements EventListener
     private PrivilegedTemplateRenderer privilegedTemplateRenderer = Utils
         .getComponent(PrivilegedTemplateRenderer.class);
 
-    private ResourceReferenceManager resourceReferenceManager = Utils.getComponent((Type) ResourceReferenceManager.class);
+    private ResourceReferenceManager resourceReferenceManager = Utils
+        .getComponent((Type) ResourceReferenceManager.class);
 
     /**
      * Whether backlinks are enabled or not (cached for performance).
@@ -498,8 +498,9 @@ public class XWiki implements EventListener
         URL url = context.getURL();
         EntityResourceReference entityResourceReference;
         try {
-            entityResourceReference = (EntityResourceReference) urlResolver.resolve(url,
-                Collections.<String, Object> singletonMap("ignorePrefix", context.getRequest().getContextPath()));
+            entityResourceReference =
+                (EntityResourceReference) urlResolver.resolve(url,
+                    Collections.<String, Object> singletonMap("ignorePrefix", context.getRequest().getContextPath()));
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
                 String.format("Failed to extract Entity Resource from URL [%s]", url), e);
@@ -846,7 +847,9 @@ public class XWiki implements EventListener
     /**
      * @return a cached list of all active virtual wikis (i.e. wikis who have been hit by a user request). To get a full
      *         list of all virtual wikis database names use {@link #getVirtualWikisDatabaseNames(XWikiContext)}.
+     * @deprecated since 5.3, use {@link WikiDescriptorManager#getAll()} instead
      */
+    @Deprecated
     public List<String> getVirtualWikiList()
     {
         return this.virtualWikiList;
@@ -861,27 +864,24 @@ public class XWiki implements EventListener
      *         Note: the wiki name is commonly also the name of the databse where the wiki's data is stored. However, if
      *         configured accordingly, the database can be diferent from the wiki name, like for example when setting a
      *         wiki database prefix.
+     * @deprecated since 5.3, use {@link WikiDescriptorManager#getAll()} instead
      */
+    @Deprecated
     public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
     {
-        List<String> databaseNames = new ArrayList<String>();
+        List<String> wikis = new ArrayList<String>();
+
         WikiDescriptorManager descriptorManager = Utils.getComponent(WikiDescriptorManager.class);
         try {
             for (WikiDescriptor descriptor : descriptorManager.getAll()) {
-                databaseNames.add(descriptor.getId());
+                wikis.add(descriptor.getId());
             }
         } catch (WikiManagerException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to get the list of wikis", e);
         }
 
-        // Make sure to include the main wiki in the result.
-        String mainWiki = context.getMainXWiki();
-        if (!databaseNames.contains(mainWiki)) {
-            databaseNames.add(mainWiki);
-        }
-
-        return databaseNames;
+        return wikis;
     }
 
     /**

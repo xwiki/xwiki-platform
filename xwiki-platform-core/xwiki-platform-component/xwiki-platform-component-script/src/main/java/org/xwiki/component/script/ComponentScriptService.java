@@ -156,6 +156,7 @@ public class ComponentScriptService implements ScriptService
      * Get the error generated while performing the previously called action.
      *
      * @return the last exception or {@code null} if no exception was thrown
+     * @since 6.1M2
      */
     public Exception getLastError()
     {

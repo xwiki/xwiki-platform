@@ -36,9 +36,9 @@ import org.xwiki.wiki.manager.WikiManagerException;
 public interface WikiDescriptorManager
 {
     /**
-     * Get the list of all wikis (except the main one).
+     * Get the list of all wikis.
      *
-     * @return the lit of every wiki created on the farm (except the main one).
+     * @return the lit of every wiki created on the farm.
      * @throws org.xwiki.wiki.manager.WikiManagerException if problems occur
      */
     Collection<WikiDescriptor> getAll() throws WikiManagerException;

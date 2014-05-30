@@ -42,6 +42,7 @@ import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Default implementation for {@link WikiDescriptorManager}.
+ * 
  * @version $Id$
  * @since 6.0M1
  */
@@ -72,6 +73,12 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         List<WikiDescriptor> result = new ArrayList<WikiDescriptor>();
         try {
             List<String> documentNames = descriptorDocumentHelper.getAllXWikiServerClassDocumentNames();
+
+            // Make sure we always return a descriptor for main wiki, even a virtual one
+            if (!documentNames.contains(getMainWikiId())) {
+                result.add(getMainWikiDescriptor());
+            }
+
             for (String documentName : documentNames) {
                 // Get the id
                 String wikiId = descriptorDocumentHelper.getWikiIdFromDocumentFullname(documentName);
@@ -126,9 +133,13 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         if (descriptor == null) {
             // Try to load a page named XWiki.XWikiServer<wikiId>
             XWikiDocument document = descriptorDocumentHelper.getDocumentFromWikiId(wikiId);
+
             if (!document.isNew()) {
                 // Build the descriptor
                 descriptor = buildDescriptorFromDocument(document);
+            } else if (getMainWikiId().equals(wikiId)) {
+                // Return a "virtual" descriptor if main wiki does not yet have a descriptor document
+                descriptor = new WikiDescriptor(wikiId, "localhost");
             }
         }
 
@@ -136,7 +147,8 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
     }
 
     @Override
-    public boolean exists(String wikiId) throws WikiManagerException {
+    public boolean exists(String wikiId) throws WikiManagerException
+    {
         return getById(wikiId) != null;
     }
 
@@ -146,8 +158,8 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         try {
             wikiDescriptorBuilder.save(descriptor);
         } catch (WikiDescriptorBuilderException e) {
-            throw new WikiManagerException(String.format("Unable to save wiki descriptor for [%s].",
-                    descriptor.getId()), e);
+            throw new WikiManagerException(
+                String.format("Unable to save wiki descriptor for [%s].", descriptor.getId()), e);
         }
     }
 
@@ -182,6 +194,5 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         }
         return descriptor;
     }
-
 
 }

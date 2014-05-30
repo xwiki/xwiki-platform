@@ -190,6 +190,7 @@ public class DefaultWikiDescriptorManagerTest
         // Get the XWikiDocuments for the Document References
         XWikiDocument document1 = mock(XWikiDocument.class);
         XWikiDocument document2 = mock(XWikiDocument.class);
+        XWikiDocument maindocument = mock(XWikiDocument.class);
 
         DefaultWikiDescriptor descriptor3 = new DefaultWikiDescriptor("wikiid3", "wikialias3");
 
@@ -202,6 +203,9 @@ public class DefaultWikiDescriptorManagerTest
         when(cache.getFromId("wikiid3")).thenReturn(descriptor3);
         when(descriptorDocumentHelper.getDocumentFromWikiId("wikiid1")).thenReturn(document1);
         when(descriptorDocumentHelper.getDocumentFromWikiId("wikiid2")).thenReturn(document2);
+        when(descriptorDocumentHelper.getDocumentFromWikiId("xwiki")).thenReturn(maindocument);
+
+        when(maindocument.isNew()).thenReturn(true);
 
         // Get all XWiki.XWikiServerClass XObjects to pass to the Wiki Descriptor Builder
         List<BaseObject> baseObjects = Arrays.asList(mock(BaseObject.class));
@@ -215,7 +219,7 @@ public class DefaultWikiDescriptorManagerTest
                 thenReturn(descriptor1, descriptor2);
 
         Collection<WikiDescriptor> descriptors = this.mocker.getComponentUnderTest().getAll();
-        assertEquals(3, descriptors.size());
+        assertEquals(4, descriptors.size());
 
         // Verify that XWiki.XWikiServerWikiid3 has not be loaded
         verify(descriptorDocumentHelper, never()).getDocumentFromWikiId("wikiid3");

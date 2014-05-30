@@ -109,7 +109,7 @@ public class ComponentScriptService implements ScriptService
      * @param <T> the component role type
      * @param roleType the class (aka role) that the component implements
      * @return the component instance or null if not found
-     * @since 4.0RC1
+     * @since 4.0RC1 and modified in 6.1M2 to be public (had package visibility)
      */
     public <T> T getInstance(Type roleType)
     {
@@ -135,7 +135,7 @@ public class ComponentScriptService implements ScriptService
      * @param roleHint the hint that differentiates a component implementation from another one (each component is
      *            registered with a hint; the "default" hint being the default)
      * @return the component instance or null if not found
-     * @since 4.0RC1
+     * @since 4.0RC1 and modified in 6.1M2 to be public (had package visibility)
      */
     public <T> T getInstance(Type roleType, String roleHint)
     {

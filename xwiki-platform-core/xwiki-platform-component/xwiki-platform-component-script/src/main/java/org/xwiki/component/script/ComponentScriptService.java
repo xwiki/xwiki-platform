@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -43,6 +44,11 @@ import org.xwiki.script.service.ScriptService;
 @Singleton
 public class ComponentScriptService implements ScriptService
 {
+    /**
+     * The key under which the last encountered error is stored in the current execution context.
+     */
+    private static final String ERROR_KEY = "scriptservice.component.error";
+
     /**
      * The Component Manager that we'll return to the user or use to return component instances to the user.
      * Note that we use a Context Component Manager so that the user gets all components registered in its context.
@@ -62,6 +68,12 @@ public class ComponentScriptService implements ScriptService
      */
     @Inject
     private DocumentAccessBridge bridge;
+
+    /**
+     * Provides access to the current context.
+     */
+    @Inject
+    private Execution execution;
 
     /**
      * @return the Component Manager if the document has Programming Rights or null otherwise
@@ -96,16 +108,20 @@ public class ComponentScriptService implements ScriptService
      *
      * @param <T> the component role type
      * @param roleType the class (aka role) that the component implements
-     * @return the component instance
-     * @throws ComponentLookupException in case the component cannot be found
-     * @since 4.0RC1
+     * @return the component instance or null if not found
+     * @since 4.0RC1 and modified in 6.1M2 to be public (had package visibility)
      */
-    <T> T getInstance(Type roleType) throws ComponentLookupException
+    public <T> T getInstance(Type roleType)
     {
         T result = null;
         ComponentManager cm = getComponentManager();
         if (cm != null) {
-            result = cm.getInstance(roleType);
+            try {
+                result = cm.getInstance(roleType);
+            } catch (ComponentLookupException e) {
+                result = null;
+                setError(e);
+            }
         }
         return result;
     }
@@ -118,17 +134,45 @@ public class ComponentScriptService implements ScriptService
      * @param roleType the class (aka role) that the component implements
      * @param roleHint the hint that differentiates a component implementation from another one (each component is
      *            registered with a hint; the "default" hint being the default)
-     * @return the component instance
-     * @throws ComponentLookupException in case the component cannot be found
-     * @since 4.0RC1
+     * @return the component instance or null if not found
+     * @since 4.0RC1 and modified in 6.1M2 to be public (had package visibility)
      */
-    <T> T getInstance(Type roleType, String roleHint) throws ComponentLookupException
+    public <T> T getInstance(Type roleType, String roleHint)
     {
         T result = null;
         ComponentManager cm = getComponentManager();
         if (cm != null) {
-            result = cm.getInstance(roleType, roleHint);
+            try {
+                result = cm.getInstance(roleType, roleHint);
+            } catch (ComponentLookupException e) {
+                result = null;
+                setError(e);
+            }
         }
         return result;
     }
+
+    /**
+     * Get the error generated while performing the previously called action.
+     *
+     * @return the last exception or {@code null} if no exception was thrown
+     * @since 6.1M2
+     */
+    public Exception getLastError()
+    {
+        return (Exception) this.execution.getContext().getProperty(ERROR_KEY);
+    }
+
+    /**
+     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
+     *
+     * @param exception the exception to store, can be {@code null} to clear the previously stored exception
+     * @see #getLastError()
+     * @since 6.1M2
+     */
+    private void setError(Exception exception)
+    {
+        this.execution.getContext().setProperty(ERROR_KEY, exception);
+    }
+
 }

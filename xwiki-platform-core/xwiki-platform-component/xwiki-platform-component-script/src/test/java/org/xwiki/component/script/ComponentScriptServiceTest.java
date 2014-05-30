@@ -28,7 +28,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
@@ -48,7 +51,7 @@ public class ComponentScriptServiceTest
 
     @Rule
     public MockitoComponentMockingRule<ComponentScriptService> mocker =
-        new MockitoComponentMockingRule<ComponentScriptService>(ComponentScriptService.class);
+        new MockitoComponentMockingRule<>(ComponentScriptService.class);
 
     /**
      * Used to check programming rights.
@@ -60,11 +63,14 @@ public class ComponentScriptServiceTest
      */
     private ComponentManager contextComponentManager;
 
+    private Execution execution;
+
     @Before
     public void configure() throws Exception
     {
         this.dab = this.mocker.getInstance(DocumentAccessBridge.class);
         this.contextComponentManager = this.mocker.getInstance(ComponentManager.class, "context");
+        this.execution = this.mocker.getInstance(Execution.class);
     }
 
     @Test
@@ -146,5 +152,31 @@ public class ComponentScriptServiceTest
         when(this.contextComponentManager.getInstance(SomeRole.class, "hint")).thenReturn(instance);
 
         assertEquals(instance, this.mocker.getComponentUnderTest().getInstance(SomeRole.class, "hint"));
+    }
+
+    @Test
+    public void getComponentInstanceWhenComponentDoesntExist() throws Exception
+    {
+        when(this.dab.hasProgrammingRights()).thenReturn(true);
+        when(this.contextComponentManager.getInstance(SomeRole.class)).thenThrow(
+            new ComponentLookupException("error"));
+        ExecutionContext context = new ExecutionContext();
+        when(this.execution.getContext()).thenReturn(context);
+
+        assertNull(this.mocker.getComponentUnderTest().getInstance(SomeRole.class));
+        assertEquals("error", this.mocker.getComponentUnderTest().getLastError().getMessage());
+    }
+
+    @Test
+    public void getComponentInstanceWithHintWhenComponentDoesntExist() throws Exception
+    {
+        when(this.dab.hasProgrammingRights()).thenReturn(true);
+        when(this.contextComponentManager.getInstance(SomeRole.class, "hint")).thenThrow(
+            new ComponentLookupException("error"));
+        ExecutionContext context = new ExecutionContext();
+        when(this.execution.getContext()).thenReturn(context);
+
+        assertNull(this.mocker.getComponentUnderTest().getInstance(SomeRole.class, "hint"));
+        assertEquals("error", this.mocker.getComponentUnderTest().getLastError().getMessage());
     }
 }

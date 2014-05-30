@@ -30,9 +30,11 @@
   <artifactId>xwiki-platform-captcha</artifactId>
   <name>XWiki Platform - Captcha</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Captcha</description>
+  <description>Offers API to generate Captchas</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Captcha Module</xwiki.extension.name>
   </properties>
   <dependencies>
     <!-- CaptchaActions are components -->

@@ -168,6 +168,7 @@ public class ComponentScriptService implements ScriptService
      *
      * @param exception the exception to store, can be {@code null} to clear the previously stored exception
      * @see #getLastError()
+     * @since 6.1M2
      */
     private void setError(Exception exception)
     {

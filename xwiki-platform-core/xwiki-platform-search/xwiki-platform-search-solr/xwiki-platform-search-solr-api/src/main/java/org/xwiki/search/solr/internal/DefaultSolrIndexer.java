@@ -30,6 +30,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -38,6 +39,10 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.job.Job;
 import org.xwiki.model.EntityType;
@@ -66,7 +71,7 @@ import com.xpn.xwiki.util.AbstractXWikiRunnable;
  */
 @Component
 @Singleton
-public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrIndexer, Initializable, Disposable
+public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposable, Runnable
 {
     /**
      * Index queue entry.
@@ -269,6 +274,12 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     @Inject
     private SolrReferenceResolver solrRefereceResolver;
 
+    @Inject
+    private Execution execution;
+
+    @Inject
+    private ExecutionContextManager ecim;
+
     /**
      * The queue of index operation to perform.
      */
@@ -351,7 +362,7 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
     }
 
     @Override
-    protected void runInternal()
+    public void run()
     {
         this.logger.debug("Start SOLR indexer thread");
 
@@ -475,15 +486,22 @@ public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrInd
      *         the reference type is not supported.
      * @throws SolrIndexerException if problems occur.
      * @throws IllegalArgumentException if there is an incompatibility between a reference and the assigned extractor.
+     * @throws ExecutionContextException
      */
     private LengthSolrInputDocument getSolrDocument(EntityReference reference) throws SolrIndexerException,
-        IllegalArgumentException
+        IllegalArgumentException, ExecutionContextException
     {
         SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
 
         // If the entity type is supported, use the extractor to get the SolrInputDocuent.
         if (metadataExtractor != null) {
-            return metadataExtractor.getSolrDocument(reference);
+            this.ecim.initialize(new ExecutionContext());
+
+            try {
+                return metadataExtractor.getSolrDocument(reference);
+            } finally {
+                this.execution.removeContext();
+            }
         }
 
         return null;

@@ -35,7 +35,7 @@
   <date>1226261191000</date>
   <contentUpdateDate>1226261191000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render('xe.blog.code.categories')</title>
+  <title>Blog categories</title>
   <template/>
   <defaultTemplate/>
   <validationScript/>

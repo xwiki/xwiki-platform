@@ -216,7 +216,7 @@
  *###
 #macro(printBlogCategoryRssChannelDescription $categoryDoc $entries)
   &lt;channel rdf:about="$categoryDoc.getURL()"&gt;
-    &lt;title&gt;$xwiki.getDocument($categoryDoc).getDisplayTitle()&lt;/title&gt;
+    &lt;title&gt;$services.localization.render($categoryDoc.getValue('name'))&lt;/title&gt;
     &lt;link&gt;$categoryDoc.getExternalURL()&lt;/link&gt;
     ## TODO: Add a Description field in the blog class
     &lt;description&gt;$services.localization.render('xe.blog.code.description.category', [$categoryDoc.display('name')])&lt;/description&gt;

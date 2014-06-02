@@ -27,7 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.maven.model.Model;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -47,7 +46,6 @@ import org.xwiki.extension.distribution.internal.job.FarmDistributionJobStatus;
 import org.xwiki.extension.distribution.internal.job.WikiDistributionJob;
 import org.xwiki.extension.distribution.internal.job.WikiDistributionJobStatus;
 import org.xwiki.extension.repository.CoreExtensionRepository;
-import org.xwiki.extension.repository.internal.core.MavenCoreExtension;
 import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobManager;
@@ -148,24 +146,22 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
         // Determine distribution status
         if (this.distributionExtension != null) {
             // Distribution UI
-            Model mavenModel = (Model) this.distributionExtension.getProperty(MavenCoreExtension.PKEY_MAVEN_MODEL);
-
-            String mainUIId = mavenModel.getProperties().getProperty("xwiki.extension.distribution.ui");
+            String mainUIId = (String) this.distributionExtension.getProperty("xwiki.extension.distribution.ui");
 
             if (mainUIId != null) {
                 String mainUIVersion =
-                    mavenModel.getProperties().getProperty("xwiki.extension.distribution.ui.version");
+                    (String) this.distributionExtension.getProperty("xwiki.extension.distribution.ui.version");
 
                 this.mainUIExtensionId =
                     new ExtensionId(mainUIId, mainUIVersion != null ? new DefaultVersion(mainUIVersion)
                         : this.distributionExtension.getId().getVersion());
             }
 
-            String wikiUIId = mavenModel.getProperties().getProperty("xwiki.extension.distribution.wikiui");
+            String wikiUIId = (String) this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui");
 
             if (wikiUIId != null) {
                 String wikiUIVersion =
-                    mavenModel.getProperties().getProperty("xwiki.extension.distribution.wikiui.version");
+                    (String) this.distributionExtension.getProperty("xwiki.extension.distribution.wikiui.version");
 
                 this.wikiUIExtensionId =
                     new ExtensionId(wikiUIId, wikiUIVersion != null ? new DefaultVersion(wikiUIVersion)

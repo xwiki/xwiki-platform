@@ -24,13 +24,13 @@ import java.util.Map;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Represents all XWiki configuration options for the Mail feature.
+ * Represents all XWiki configuration options for the Mail Sending feature.
  *
  * @version $Id$
  * @since 6.1M2
  */
 @Role
-public interface MailConfiguration
+public interface MailSenderConfiguration
 {
     String getSMTPServer();
 

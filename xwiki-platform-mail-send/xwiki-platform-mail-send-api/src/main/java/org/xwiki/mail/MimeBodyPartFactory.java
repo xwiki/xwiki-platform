@@ -25,6 +25,13 @@ import javax.mail.internet.MimeBodyPart;
 
 import org.xwiki.component.annotation.Role;
 
+/**
+ * Creates some message body Part to be added to a Multi Part message.
+ *
+ * @param <T> the type of content to be added to a Multi Part message
+ * @version $Id$
+ * @since 6.1M2
+ */
 @Role
 public interface MimeBodyPartFactory<T>
 {

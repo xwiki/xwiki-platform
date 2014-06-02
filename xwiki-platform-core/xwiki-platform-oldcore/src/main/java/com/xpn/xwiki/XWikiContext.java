@@ -97,6 +97,30 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private static final String USERREFERENCE_KEY = "userreference";
 
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
+     * the current wiki is used instead of the current document reference's wiki.
+     */
+    private final DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
+        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+
+    /**
+     * Used to convert a proper Document Reference to a string but without the wiki name.
+     */
+    private final EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.TYPE_STRING, "local");
+
+    /**
+     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
+     * wiki).
+     */
+    private final EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
+        EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+
+    /** The Execution so that we can check if permissions were dropped there. */
+    private final Execution execution = Utils.getComponent(Execution.class);
+
     private boolean finished = false;
 
     private XWiki wiki;
@@ -142,30 +166,6 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     // FIXME: why synchronized since a context is supposed to be tied to a thread ?
     private List<String> displayedFields = Collections.synchronizedList(new ArrayList<String>());
-
-    /**
-     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
-     * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
-     * the current wiki is used instead of the current document reference's wiki.
-     */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-
-    /**
-     * Used to convert a proper Document Reference to a string but without the wiki name.
-     */
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.TYPE_STRING, "local");
-
-    /**
-     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
-     * wiki).
-     */
-    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.TYPE_STRING, "compactwiki");
-
-    /** The Execution so that we can check if permissions were dropped there. */
-    private final Execution execution = Utils.getComponent(Execution.class);
 
     public XWikiContext()
     {

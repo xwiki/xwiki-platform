@@ -32,11 +32,34 @@ import org.xwiki.component.annotation.Role;
 @Role
 public interface MailSenderConfiguration
 {
-    String getSMTPServer();
+    /**
+     * @return the SMTP server
+     */
+    String getHost();
 
-    int getSMTPPort();
+    /**
+     * @return the SMTP server port
+     */
+    int getPort();
 
+    /**
+     * @return the SMTP user name to authenticate to the SMTP server, if any
+     */
+    String getUsername();
+
+    /**
+     * @return the SMTP password to authenticate to the SMTP server, if any
+     */
+    String getPassword();
+
+    /**
+     * @return the email address sending the email
+     */
     String getFromAddress();
 
+    /**
+     * @return the list of additional properties to use when sending the mail
+     *         (eg {@code mail.smtp.starttls.enable=true} if TLS should be used)
+     */
     Map<String, String> getExtraProperties();
 }

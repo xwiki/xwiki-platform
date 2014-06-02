@@ -33,7 +33,7 @@
   <packaging>jar</packaging>
   <description>Default implementation for XWiki Platform - LESS CSS - API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.93</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

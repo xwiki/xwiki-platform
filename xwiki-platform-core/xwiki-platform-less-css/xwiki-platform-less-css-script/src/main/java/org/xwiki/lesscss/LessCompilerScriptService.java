@@ -52,6 +52,9 @@ public class LessCompilerScriptService implements ScriptService
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
+    private LESSColorThemeConverter lessColorThemeConverter;
+
+    @Inject
     private AuthorizationManager authorizationManager;
 
     /**
@@ -82,6 +85,21 @@ public class LessCompilerScriptService implements ScriptService
             return lessCompiler.compileSkinFile(fileName, force);
         } catch (LESSCompilerException e) {
             return e.getMessage();
+        }
+    }
+
+    /**
+     * Return a color theme from a LESS file located in the "less" directory of the current skin.
+     *
+     * @param filename name of the LESS file
+     * @return the corresponding Color Theme.
+     */
+    public ColorTheme getColorThemeFromSkinFile(String filename)
+    {
+        try {
+            return lessColorThemeConverter.getColorThemeFromSkinFile(filename, false);
+        } catch (LESSCompilerException e) {
+            return new ColorTheme();
         }
     }
 

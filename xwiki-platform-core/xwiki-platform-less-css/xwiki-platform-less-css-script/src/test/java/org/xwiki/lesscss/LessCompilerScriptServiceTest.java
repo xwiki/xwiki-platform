@@ -58,6 +58,8 @@ public class LessCompilerScriptServiceTest
 
     private LESSSkinFileCache cache;
 
+    private LESSColorThemeConverter lessColorThemeConverter;
+
     private AuthorizationManager authorizationManager;
 
     private Provider<XWikiContext> xcontextProvider;
@@ -68,6 +70,7 @@ public class LessCompilerScriptServiceTest
     public void setUp() throws Exception
     {
         lessCompiler = mocker.getInstance(LESSSkinFileCompiler.class);
+        lessColorThemeConverter = mocker.getInstance(LESSColorThemeConverter.class);
         cache = mocker.getInstance(LESSSkinFileCache.class);
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
@@ -106,6 +109,29 @@ public class LessCompilerScriptServiceTest
 
         // Verify
         assertEquals(exception.getMessage(), result);
+    }
+
+    @Test
+    public void getColorThemeFromSkinFile() throws Exception
+    {
+        // Test
+        mocker.getComponentUnderTest().getColorThemeFromSkinFile("style.less");
+        // Verify
+        verify(lessColorThemeConverter).getColorThemeFromSkinFile("style.less", false);
+    }
+
+    @Test
+    public void getColorThemeFromSkinFileWithException() throws Exception
+    {
+        // Mocks
+        Exception exception = new LESSCompilerException("Exception with LESS", null);
+        when(lessColorThemeConverter.getColorThemeFromSkinFile("style.less", false)).thenThrow(exception);
+
+        // Test
+        ColorTheme result = mocker.getComponentUnderTest().getColorThemeFromSkinFile("style.less");
+
+        // Verify
+        assertEquals(0, result.size());
     }
 
     @Test

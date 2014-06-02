@@ -23,14 +23,14 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Component to cache already computed LESS files contained in the skin.
+ * Component to cache color themes computed from LESS files.
  *
- * @since 6.1M1
+ * @since 6.1M2
  * @version $Id$
  */
-@Role
 @Unstable
-public interface LESSSkinFileCache extends LESSCache<String>
+@Role
+public interface ColorThemeCache extends LESSCache<ColorTheme>
 {
 
 }

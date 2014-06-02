@@ -19,47 +19,43 @@
  */
 package org.xwiki.lesscss.internal;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.lesscss.LESSSkinFileCache;
+import org.xwiki.lesscss.ColorTheme;
+import org.xwiki.lesscss.ColorThemeCache;
 
 /**
- * Default implementation for {@link org.xwiki.lesscss.LESSSkinFileCache}.
+ * Default implementation for {@link org.xwiki.lesscss.ColorThemeCache}.
  *
  * @since 6.1M1
  * @version $Id$
  */
 @Component
 @Singleton
-public class DefaultLESSSkinFileCache extends AbstractCache<String> implements LESSSkinFileCache, Initializable
+public class DefaultColorThemeCache extends AbstractCache<ColorTheme> implements ColorThemeCache, Initializable
 {
     /**
      * Id of the cache for generated CSS.
      */
-    public static final String LESS_FILES_CACHE_ID = "lesscss.skinfiles.cache";
-
-    @Inject
-    private CacheManager cacheManager;
+    public static final String LESS_COLOR_THEMES_CACHE_ID = "lesscss.colortheme.cache";
 
     @Override
     public void initialize() throws InitializationException
     {
         try {
-            CacheConfiguration configuration = new CacheConfiguration(LESS_FILES_CACHE_ID);
+            CacheConfiguration configuration = new CacheConfiguration(LESS_COLOR_THEMES_CACHE_ID);
             CacheFactory cacheFactory = cacheManager.getCacheFactory();
             this.cache = cacheFactory.newCache(configuration);
         } catch (ComponentLookupException | CacheException e) {
             throw new InitializationException(
-                    String.format("Failed to initialize LESS skin files cache [%s].", LESS_FILES_CACHE_ID), e);
+                    String.format("Failed to initialize LESS color themes cache [%s].", LESS_COLOR_THEMES_CACHE_ID), e);
         }
     }
 }

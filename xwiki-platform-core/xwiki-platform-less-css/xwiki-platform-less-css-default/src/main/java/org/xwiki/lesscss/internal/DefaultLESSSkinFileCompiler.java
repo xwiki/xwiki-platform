@@ -26,20 +26,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.lesscss.LESSCompiler;
 import org.xwiki.lesscss.LESSCompilerException;
 import org.xwiki.lesscss.LESSSkinFileCache;
 import org.xwiki.lesscss.LESSSkinFileCompiler;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Default implementation for {@link org.xwiki.lesscss.LESSSkinFileCompiler}.
@@ -48,57 +46,23 @@ import com.xpn.xwiki.web.XWikiRequest;
  * @version $Id$
  */
 @Component
-public class DefaultLESSSkinFileCompiler implements LESSSkinFileCompiler
+public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> implements LESSSkinFileCompiler,
+        Initializable
 {
     @Inject
     private LESSCompiler lessCompiler;
 
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
     private LESSSkinFileCache cache;
 
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
-
-    @Inject
-    private DocumentReferenceResolver<String> referenceResolver;
-
     @Override
-    public String compileSkinFile(String fileName, boolean force) throws LESSCompilerException
+    public void initialize() throws InitializationException
     {
-        String result;
-
-        // Get information about the context
-        String wikiId = wikiDescriptorManager.getCurrentWikiId();
-        XWikiContext context = xcontextProvider.get();
-        String skin = context.getWiki().getSkin(context);
-        XWikiRequest request = context.getRequest();
-        String colorTheme = request.getParameter("colorTheme");
-
-        // Check that the color theme exists, to avoid a DOS if some user tries to compile a skin file
-        // with random colorTheme names
-        if (!context.getWiki().exists(referenceResolver.resolve(colorTheme), context)) {
-            colorTheme = "default";
-        }
-
-        // Check if the result is in the cache
-        if (!force) {
-            result = cache.get(fileName, wikiId, skin, colorTheme);
-            if (result != null) {
-                return result;
-            }
-        }
-
-        // Either the result was in the cache or the force flag is set to true, we need to compile
-        result = compile(fileName);
-        cache.set(fileName, wikiId, skin, colorTheme, result);
-
-        return result;
+        super.cache = cache;
     }
 
-    private String compile(String fileName) throws LESSCompilerException
+    @Override
+    protected String compile(String fileName, boolean force) throws LESSCompilerException
     {
         // Get the XWiki object
         XWikiContext xcontext = xcontextProvider.get();
@@ -124,6 +88,12 @@ public class DefaultLESSSkinFileCompiler implements LESSSkinFileCompiler
         } catch (LESSCompilerException | IOException e) {
             throw new LESSCompilerException(String.format("Failed to compile the file [%s] with LESS.", fileName), e);
         }
+    }
+
+    @Override
+    public String compileSkinFile(String fileName, boolean force) throws LESSCompilerException
+    {
+        return this.compileFromSkinFile(fileName, force);
     }
 
 }

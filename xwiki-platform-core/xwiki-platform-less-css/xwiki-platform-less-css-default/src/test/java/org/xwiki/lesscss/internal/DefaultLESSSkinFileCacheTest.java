@@ -67,7 +67,7 @@ public class DefaultLESSSkinFileCacheTest
     public void get() throws Exception
     {
         // Mock
-        when(cache.get("wikiId_skin_colorTheme_file")).thenReturn("Expected output");
+        when(cache.get("6wikiId_4skin_10colorTheme_4file")).thenReturn("Expected output");
 
         // Test
         String result = mocker.getComponentUnderTest().get("file", "wikiId", "skin", "colorTheme");
@@ -83,7 +83,7 @@ public class DefaultLESSSkinFileCacheTest
         mocker.getComponentUnderTest().set("file", "wikiId", "skin", "colorTheme", "css");
 
         // Verify
-        verify(cache).set(eq("wikiId_skin_colorTheme_file"), eq("css"));
+        verify(cache).set(eq("6wikiId_4skin_10colorTheme_4file"), eq("css"));
     }
 
     @Test
@@ -113,9 +113,9 @@ public class DefaultLESSSkinFileCacheTest
         mocker.getComponentUnderTest().clear("wiki1");
 
         // Verify
-        verify(cache, times(1)).remove("wiki1_skin1_colorTheme1_file1");
-        verify(cache).remove("wiki1_skin2_colorTheme1_file1");
-        verify(cache, never()).remove("wiki2_skin1_colorTheme1_file1");
+        verify(cache, times(1)).remove("5wiki1_5skin1_11colorTheme1_5file1");
+        verify(cache).remove("5wiki1_5skin2_11colorTheme1_5file1");
+        verify(cache, never()).remove("5wiki2_5skin1_11colorTheme1_5file1");
     }
 
 }

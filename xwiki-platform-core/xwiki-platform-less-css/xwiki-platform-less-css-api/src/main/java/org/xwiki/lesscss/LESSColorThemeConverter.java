@@ -20,17 +20,24 @@
 package org.xwiki.lesscss;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
- * Component to cache already computed LESS files contained in the skin.
+ * Component to parse a LESS skin file and to return a Color Theme from it.
  *
- * @since 6.1M1
+ * This component must cache its results in an instance of {@link ColorThemeCache}.
+ *
+ * @since 6.1M2
  * @version $Id$
  */
 @Role
-@Unstable
-public interface LESSSkinFileCache extends LESSCache<String>
+public interface LESSColorThemeConverter
 {
-
+    /**
+     * Get a color theme form a LESS skin file.
+     * @param fileName name of the LESS file
+     * @param force force the computation, even if the output is already in the cache (not recommended)
+     * @return the computed Color Theme
+     * @throws LESSCompilerException if problem occurs
+     */
+    ColorTheme getColorThemeFromSkinFile(String fileName, boolean force) throws LESSCompilerException;
 }

@@ -30,6 +30,7 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.lesscss.ColorThemeCache;
 import org.xwiki.lesscss.LESSSkinFileCache;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -57,6 +58,9 @@ public class SkinAndColorThemeListener implements EventListener
 
     @Inject
     private LESSSkinFileCache lessSkinFileCache;
+
+    @Inject
+    private ColorThemeCache colorThemeCache;
 
     @Override
     public String getName()
@@ -95,6 +99,8 @@ public class SkinAndColorThemeListener implements EventListener
         DocumentReference documentReference = document.getDocumentReference();
 
         // Clear the cache for the specified wiki and color theme
-        lessSkinFileCache.clear(documentReference.getWikiReference().getName());
+        String wiki = documentReference.getWikiReference().getName();
+        lessSkinFileCache.clear(wiki);
+        colorThemeCache.clear(wiki);
     }
 }

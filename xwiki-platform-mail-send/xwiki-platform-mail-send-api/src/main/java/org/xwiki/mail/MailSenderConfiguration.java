@@ -62,4 +62,9 @@ public interface MailSenderConfiguration
      *         (eg {@code mail.smtp.starttls.enable=true} if TLS should be used)
      */
     Map<String, String> getExtraProperties();
+
+    /**
+     * @return if true then the SMTP server requires authentication
+     */
+    boolean usesAuthentication();
 }

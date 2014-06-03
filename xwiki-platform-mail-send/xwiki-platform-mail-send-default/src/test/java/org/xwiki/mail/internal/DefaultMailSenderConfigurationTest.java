@@ -102,7 +102,7 @@ public class DefaultMailSenderConfigurationTest
         assertEquals("server", returnedProperties.getProperty("mail.smtp.host"));
         assertEquals("25", returnedProperties.getProperty("mail.smtp.port"));
         assertEquals("smtp", returnedProperties.getProperty("mail.transport.protocol"));
-        assertEquals("john@doe.com", returnedProperties.getProperty("mail.from"));
+        assertEquals("john@doe.com", returnedProperties.getProperty("mail.smtp.from"));
         assertNull(returnedProperties.getProperty("mail.smtp.user"));
     }
 

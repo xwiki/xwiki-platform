@@ -73,7 +73,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     /**
      * Java Mail SMTP property for the from email address.
      */
-    public static final String JAVAMAIL_FROM = "mail.from";
+    public static final String JAVAMAIL_FROM = "mail.smtp.from";
 
     @Inject
     private Logger logger;

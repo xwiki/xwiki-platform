@@ -19,7 +19,7 @@
  */
 package org.xwiki.mail;
 
-import java.util.Map;
+import java.util.Properties;
 
 import org.xwiki.component.annotation.Role;
 
@@ -58,10 +58,10 @@ public interface MailSenderConfiguration
     String getFromAddress();
 
     /**
-     * @return the list of additional properties to use when sending the mail
+     * @return the list of properties to use when sending the mail
      *         (eg {@code mail.smtp.starttls.enable=true} if TLS should be used)
      */
-    Map<String, String> getExtraProperties();
+    Properties getProperties();
 
     /**
      * @return if true then the SMTP server requires authentication

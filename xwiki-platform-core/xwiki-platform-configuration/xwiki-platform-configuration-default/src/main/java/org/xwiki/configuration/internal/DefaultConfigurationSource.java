@@ -35,7 +35,7 @@ import org.xwiki.configuration.ConfigurationSource;
  * <li>wiki preferences wiki page</li>
  * <li>xwiki properties file (xwiki.properties)</li>
  * </ul>
- * Should be used when a configuration should not be overriden by the user in his/her profile (in which case the
+ * Should be used when a configuration should not be overridden by the user in his/her profile (in which case the
  * {@link AllConfigurationSource} should be used.
  * 
  * @version $Id$

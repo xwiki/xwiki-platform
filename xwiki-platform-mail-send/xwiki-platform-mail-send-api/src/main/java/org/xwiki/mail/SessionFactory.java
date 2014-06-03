@@ -36,4 +36,9 @@ public interface SessionFactory
      * @return the configured {@link javax.mail.Session} object
      */
     Session create();
+
+    /**
+     * @return the default configured {@link javax.mail.Session} object
+     */
+    Session getDefaultSession();
 }

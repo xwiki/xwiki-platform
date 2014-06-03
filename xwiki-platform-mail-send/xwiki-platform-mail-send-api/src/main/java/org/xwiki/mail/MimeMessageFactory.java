@@ -27,5 +27,6 @@ import org.xwiki.component.annotation.Role;
 @Role
 public interface MimeMessageFactory
 {
+    MimeMessage create(String to, String subject);
     MimeMessage create(String to, String subject, Session session);
 }

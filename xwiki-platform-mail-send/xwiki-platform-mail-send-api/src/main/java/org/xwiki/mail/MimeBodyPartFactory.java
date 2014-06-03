@@ -37,5 +37,6 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public interface MimeBodyPartFactory<T>
 {
-    MimeBodyPart create(String id, T content, Map<String, String> parameters);
+    MimeBodyPart create(T content);
+    MimeBodyPart create(T content, Map<String, String> parameters);
 }

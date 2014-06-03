@@ -21,7 +21,6 @@ package org.xwiki.configuration.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -29,34 +28,34 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Composite Configuration Source that looks in the following sources in that order:
+ * Composite Configuration Source that looks in the following Document sources (configuration in wiki pages) in that
+ * order:
  * <ul>
- * <li>documents sources (space first and then wiki preferences wiki pages)</li>
- * <li>xwiki properties file (xwiki.properties)</li>
+ * <li>space preferences wiki page</li>
+ * <li>wiki preferences wiki page</li>
  * </ul>
- * Should be used when a configuration should not be overridden by the user in his/her profile (in which case the
- * {@link AllConfigurationSource} should be used.
- * 
+ * Should be used when you need to look for configuration properties only in Documents (wiki pages).
+ *
  * @version $Id$
- * @since 2.0M1
+ * @since 6.1M2
  */
 @Component
-@Singleton
-public class DefaultConfigurationSource extends CompositeConfigurationSource implements Initializable
+@Named("documents")
+public class DocumentsConfigurationSource extends CompositeConfigurationSource implements Initializable
 {
     @Inject
-    @Named("xwikiproperties")
-    private ConfigurationSource xwikiPropertiesSource;
+    @Named("wiki")
+    private ConfigurationSource wikiPreferencesSource;
 
     @Inject
-    @Named("documents")
-    private ConfigurationSource documentsSource;
+    @Named("space")
+    private ConfigurationSource spacePreferencesSource;
 
     @Override
     public void initialize() throws InitializationException
     {
         // First source is looked up first when a property value is requested.
-        addConfigurationSource(this.documentsSource);
-        addConfigurationSource(this.xwikiPropertiesSource);
+        addConfigurationSource(this.spacePreferencesSource);
+        addConfigurationSource(this.wikiPreferencesSource);
     }
 }

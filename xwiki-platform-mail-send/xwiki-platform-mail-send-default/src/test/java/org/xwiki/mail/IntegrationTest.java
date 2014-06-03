@@ -49,6 +49,14 @@ public class IntegrationTest
 
     private GreenMail mail;
 
+    private MailSenderConfiguration configuration;
+
+    private MimeMessageFactory mimeMessageFactory;
+
+    private MimeBodyPartFactory<String> htmlPartFactory;
+
+    private MailSender sender;
+
     @Before
     public void startMail()
     {
@@ -64,29 +72,35 @@ public class IntegrationTest
         }
     }
 
+    @Before
+    public void initialize() throws Exception
+    {
+        this.configuration = this.componentManager.getInstance(MailSenderConfiguration.class);
+        this.mimeMessageFactory = this.componentManager.getInstance(MimeMessageFactory.class);
+        this.htmlPartFactory = this.componentManager.getInstance(
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "html");
+        this.sender = this.componentManager.getInstance(MailSender.class);
+    }
+
     @Test
     @Ignore("Goal is to make this test pass!")
     public void sendMail() throws Exception
     {
         // Step 1: Create a JavaMail Session
-        MailSenderConfiguration configuration = this.componentManager.getInstance(MailSenderConfiguration.class);
-        Session session = Session.getInstance(configuration.getAllProperties(), new XWikiAuthenticator(configuration));
+        Session session =
+            Session.getInstance(this.configuration.getAllProperties(), new XWikiAuthenticator(this.configuration));
 
         // Step 2: Create the Message to send
-        MimeMessageFactory mimeMessageFactory = this.componentManager.getInstance(MimeMessageFactory.class);
-        MimeMessage message = mimeMessageFactory.create("john@doe.com", "subject", session);
+        MimeMessage message = this.mimeMessageFactory.create("john@doe.com", "subject", session);
 
         // Step 3: Add the Message Body
         Multipart multipart = new MimeMultipart("mixed");
         // Add HTML in the body
-        MimeBodyPartFactory<String> htmlPartFactory = this.componentManager.getInstance(
-            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "html");
-        multipart.addBodyPart(htmlPartFactory.create("some html here"));
+        multipart.addBodyPart(this.htmlPartFactory.create("some html here"));
         message.setContent(multipart);
 
         // Step 4: Send the mail
-        MailSender sender = this.componentManager.getInstance(MailSender.class);
-        sender.send(message, session);
+        this.sender.send(message, session);
 
         // Verify that the mail has been sent
         this.mail.waitForIncomingEmail(10000, 1);

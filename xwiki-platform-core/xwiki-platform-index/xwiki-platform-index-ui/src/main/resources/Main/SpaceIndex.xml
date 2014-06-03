@@ -172,13 +172,13 @@
   #set ($sort = $xcontext.macro.params.get('sort'))
   #if ("$sort" == 'name')
     ## sorting alphabetical list of document
-    #set ($sort = 'name asc')
+    #set ($sort = 'doc.name asc')
   #elseif ("$sort" == 'modificationDate')
     ## list of document sorting by update date 
-    #set ($sort = 'contentUpdateDate desc')
+    #set ($sort = 'doc.contentUpdateDate desc')
   #else
     ## list of document sorting by creation date by default if creationDate value, no value,  or wrong value is specified
-    #set ($sort = 'creationDate desc')
+    #set ($sort = 'doc.creationDate desc')
   #end
   ## get the space to display the documents for
   #set ($spaceParam = $doc.space)
@@ -186,7 +186,7 @@
   #if ("$!spaceMacroParam" != '')
     #set ($spaceParam = $spaceMacroParam)
   #end
-  #set ($docNames = $services.query.hql("where doc.space=? order by doc.$sort").addFilter('currentlanguage').addFilter('hidden').setLimit($limit).bindValues([${spaceParam}]).execute())
+  #set ($docNames = $services.query.hql("where doc.space=? order by $sort").addFilter('currentlanguage').addFilter('hidden').setLimit($limit).bindValues([${spaceParam}]).execute())
   {{html}}
     #displayDocumentList($docNames false []) 
     ## Note: we pass an empty blacklistedSpaces list since we are used as a space dashboard, not a global dashboard

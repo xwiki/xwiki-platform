@@ -1,1 +1,2 @@
 org.xwiki.mail.script.MailSenderScriptService
+org.xwiki.mail.internal.DefaultMailSenderConfiguration

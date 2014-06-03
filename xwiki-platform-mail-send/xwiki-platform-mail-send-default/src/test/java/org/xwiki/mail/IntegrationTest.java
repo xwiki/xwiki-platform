@@ -21,6 +21,7 @@ package org.xwiki.mail;
 
 import javax.mail.Multipart;
 import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
@@ -51,8 +52,6 @@ public class IntegrationTest
 
     private MailSenderConfiguration configuration;
 
-    private MimeMessageFactory mimeMessageFactory;
-
     private MimeBodyPartFactory<String> htmlPartFactory;
 
     private MailSender sender;
@@ -76,7 +75,6 @@ public class IntegrationTest
     public void initialize() throws Exception
     {
         this.configuration = this.componentManager.getInstance(MailSenderConfiguration.class);
-        this.mimeMessageFactory = this.componentManager.getInstance(MimeMessageFactory.class);
         this.htmlPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "html");
         this.sender = this.componentManager.getInstance(MailSender.class);
@@ -91,7 +89,9 @@ public class IntegrationTest
             Session.getInstance(this.configuration.getAllProperties(), new XWikiAuthenticator(this.configuration));
 
         // Step 2: Create the Message to send
-        MimeMessage message = this.mimeMessageFactory.create("john@doe.com", "subject", session);
+        MimeMessage message = new MimeMessage(session);
+        message.setSubject("subject");
+        message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress("john@doe.com"));
 
         // Step 3: Add the Message Body
         Multipart multipart = new MimeMultipart("mixed");

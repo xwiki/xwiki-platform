@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail.internal;
 
+import java.nio.charset.StandardCharsets;
+
 import org.xwiki.mail.MimeMessageFactory;
 
 import javax.mail.MessagingException;
@@ -30,18 +32,16 @@ import javax.mail.internet.InternetAddress;
  * @version $Id$
  * @since 6.1M2
  */
-public class DefaultMimeMessageFactory implements MimeMessageFactory {
-
-    /** Encoding user for emails */
-    private static final String EMAIL_ENCODING = "utf-8";
-
+public class DefaultMimeMessageFactory implements MimeMessageFactory
+{
     @Override
-    public MimeMessage create(String to, String subject, Session session) {
+    public MimeMessage create(String to, String subject, Session session)
+    {
         MimeMessage message = new MimeMessage(session);
         try {
-            message.setRecipient(MimeMessage.RecipientType.TO ,new InternetAddress(to));
-            message.setSubject(subject, EMAIL_ENCODING );
-        } catch (MessagingException e){
+            message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress(to));
+            message.setSubject(subject, StandardCharsets.UTF_8.name());
+        } catch (MessagingException e) {
             e.printStackTrace();
         }
         return message;

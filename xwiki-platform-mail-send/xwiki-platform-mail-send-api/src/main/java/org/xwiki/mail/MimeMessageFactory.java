@@ -29,6 +29,5 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public interface MimeMessageFactory
 {
-    MimeMessage create(String to, String subject);
     MimeMessage create(String to, String subject, Session session);
 }

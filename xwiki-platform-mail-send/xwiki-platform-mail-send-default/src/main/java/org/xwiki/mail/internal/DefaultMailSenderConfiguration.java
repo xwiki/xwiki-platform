@@ -50,6 +50,31 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
      */
     private static final String PREFIX = "mail.sender.";
 
+    /**
+     * Java Mail SMTP property for the protocol.
+     */
+    public static final String JAVAMAIL_TRANSPORT_PROTOCOL = "mail.transport.protocol";
+
+    /**
+     * Java Mail SMTP property for the host.
+     */
+    public static final String JAVAMAIL_SMTP_HOST = "mail.smtp.host";
+
+    /**
+     * Java Mail SMTP property for the server port.
+     */
+    public static final String JAVAMAIL_SMTP_PORT = "mail.smtp.port";
+
+    /**
+     * Java Mail SMTP property for the username.
+     */
+    public static final String JAVAMAIL_SMTP_USERNAME = "mail.smtp.user";
+
+    /**
+     * Java Mail SMTP property for the from email address.
+     */
+    public static final String JAVAMAIL_FROM = "mail.from";
+
     @Inject
     private Logger logger;
 
@@ -97,7 +122,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     }
 
     @Override
-    public Properties getProperties()
+    public Properties getAdditionalProperties()
     {
         Properties properties;
 
@@ -120,6 +145,26 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
         }
 
         return properties;
+    }
+
+    @Override
+    public Properties getAllProperties()
+    {
+        Properties properties = new Properties();
+        addProperty(properties, JAVAMAIL_TRANSPORT_PROTOCOL, "smtp");
+        addProperty(properties, JAVAMAIL_SMTP_HOST, getHost());
+        addProperty(properties, JAVAMAIL_SMTP_USERNAME, getUsername());
+        addProperty(properties, JAVAMAIL_FROM, getFromAddress());
+        addProperty(properties, JAVAMAIL_SMTP_PORT, Integer.toString(getPort()));
+        properties.putAll(getAdditionalProperties());
+        return properties;
+    }
+
+    private void addProperty(Properties properties, String key, String value)
+    {
+        if (value != null) {
+            properties.setProperty(key, value);
+        }
     }
 
     @Override

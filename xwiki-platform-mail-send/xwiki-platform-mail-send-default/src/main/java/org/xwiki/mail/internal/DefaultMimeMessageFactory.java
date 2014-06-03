@@ -20,9 +20,7 @@
 package org.xwiki.mail.internal;
 
 import org.xwiki.mail.MimeMessageFactory;
-import org.xwiki.mail.SessionFactory;
 
-import javax.inject.Inject;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
@@ -36,15 +34,6 @@ public class DefaultMimeMessageFactory implements MimeMessageFactory {
 
     /** Encoding user for emails */
     private static final String EMAIL_ENCODING = "utf-8";
-
-
-    @Inject
-    SessionFactory sessionFactory;
-
-    @Override
-    public MimeMessage create(String to, String subject) {
-        return this.create(to, subject, sessionFactory.getDefaultSession());
-    }
 
     @Override
     public MimeMessage create(String to, String subject, Session session) {

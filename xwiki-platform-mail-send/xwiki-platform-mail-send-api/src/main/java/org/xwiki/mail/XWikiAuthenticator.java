@@ -19,28 +19,34 @@
  */
 package org.xwiki.mail;
 
-import javax.mail.Session;
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
 
-import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * Create a {@link javax.mail.Session} object filled with all the information required (smtp server, port, from, etc).
+ * XWiki Java Mail Authenticator taking the user name and password from a
+ * {@link org.xwiki.mail.MailSenderConfiguration} instance.
  *
  * @version $Id$
- * @since 6.1M1
+ * @since 6.1M2
  */
-@Role
 @Unstable
-public interface SessionFactory
+public class XWikiAuthenticator extends Authenticator
 {
-    /**
-     * @return the configured {@link javax.mail.Session} object
-     */
-    Session create();
+    private MailSenderConfiguration configuration;
 
     /**
-     * @return the default configured {@link javax.mail.Session} object
+     * @param configuration the configuration from which to extract the SMTP server's user name and password to use
      */
-    Session getDefaultSession();
+    public XWikiAuthenticator(MailSenderConfiguration configuration)
+    {
+        this.configuration = configuration;
+    }
+
+    @Override
+    protected PasswordAuthentication getPasswordAuthentication()
+    {
+        return new PasswordAuthentication(this.configuration.getUsername(), this.configuration.getPassword());
+    }
 }

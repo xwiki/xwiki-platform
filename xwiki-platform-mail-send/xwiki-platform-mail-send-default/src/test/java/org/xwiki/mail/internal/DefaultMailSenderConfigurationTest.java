@@ -42,18 +42,18 @@ public class DefaultMailSenderConfigurationTest
         new MockitoComponentMockingRule<>(DefaultMailSenderConfiguration.class);
 
     @Test
-    public void getProperties() throws Exception
+    public void getAdditionalProperties() throws Exception
     {
         ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
         when(documentsSource.getProperty("javamail_extra_props")).thenReturn("key1=value1\nkey2=value2");
 
-        Properties properties = this.mocker.getComponentUnderTest().getProperties();
+        Properties properties = this.mocker.getComponentUnderTest().getAdditionalProperties();
         assertEquals("value1", properties.getProperty("key1"));
         assertEquals("value2", properties.getProperty("key2"));
     }
 
     @Test
-    public void getPropertiesFromXWikiProperties() throws Exception
+    public void getAdditionalPropertiesFromXWikiProperties() throws Exception
     {
         ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
         when(documentsSource.getProperty("javamail_extra_props")).thenReturn("");
@@ -65,18 +65,18 @@ public class DefaultMailSenderConfigurationTest
         properties.setProperty("key2", "value2");
         when(xwikiPropertiesSource.getProperty("mail.sender.properties", Properties.class)).thenReturn(properties);
 
-        Properties returnedProperties = this.mocker.getComponentUnderTest().getProperties();
+        Properties returnedProperties = this.mocker.getComponentUnderTest().getAdditionalProperties();
         assertEquals("value1", returnedProperties.getProperty("key1"));
         assertEquals("value2", returnedProperties.getProperty("key2"));
     }
 
     @Test
-    public void getPropertiesWhenErrorInFormat() throws Exception
+    public void getAdditionalPropertiesWhenErrorInFormat() throws Exception
     {
         ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
         when(documentsSource.getProperty("javamail_extra_props")).thenReturn("\\uinvalid");
 
-        assertTrue(this.mocker.getComponentUnderTest().getProperties().isEmpty());
+        assertTrue(this.mocker.getComponentUnderTest().getAdditionalProperties().isEmpty());
 
         // Verify the logs
         verify(this.mocker.getMockedLogger()).warn(
@@ -85,11 +85,33 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
+    public void getAllProperties() throws Exception
+    {
+        ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
+        when(documentsSource.getProperty("javamail_extra_props")).thenReturn("mail.smtp.starttls.enable=true");
+        when(documentsSource.getProperty("smtp_server_username", (String) null)).thenReturn(null);
+        when(documentsSource.getProperty("smtp_server_password", (String) null)).thenReturn(null);
+        when(documentsSource.getProperty("smtp_server", (String) null)).thenReturn("server");
+        when(documentsSource.getProperty("smtp_port", (Integer) null)).thenReturn(25);
+        when(documentsSource.getProperty("smtp_from", (String) null)).thenReturn("john@doe.com");
+
+        Properties returnedProperties = this.mocker.getComponentUnderTest().getAllProperties();
+
+        assertEquals(5, returnedProperties.size());
+        assertEquals("true", returnedProperties.getProperty("mail.smtp.starttls.enable"));
+        assertEquals("server", returnedProperties.getProperty("mail.smtp.host"));
+        assertEquals("25", returnedProperties.getProperty("mail.smtp.port"));
+        assertEquals("smtp", returnedProperties.getProperty("mail.transport.protocol"));
+        assertEquals("john@doe.com", returnedProperties.getProperty("mail.from"));
+        assertNull(returnedProperties.getProperty("mail.smtp.user"));
+    }
+
+    @Test
     public void usesAuthenticationWhenNoUserNameAndPassword() throws Exception
     {
         ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
-        when(documentsSource.getProperty("smtp_server_username", null)).thenReturn(null);
-        when(documentsSource.getProperty("smtp_server_password", null)).thenReturn(null);
+        when(documentsSource.getProperty("smtp_server_username", (String) null)).thenReturn(null);
+        when(documentsSource.getProperty("smtp_server_password", (String) null)).thenReturn(null);
 
         assertFalse(this.mocker.getComponentUnderTest().usesAuthentication());
     }
@@ -98,9 +120,9 @@ public class DefaultMailSenderConfigurationTest
     public void usesAuthenticationWhenUserNameAndPasswordExist() throws Exception
     {
         ConfigurationSource documentsSource = this.mocker.getInstance(ConfigurationSource.class, "documents");
-        when(documentsSource.getProperty("smtp_server_username", null)).thenReturn("user");
-        when(documentsSource.getProperty("smtp_server_password", null)).thenReturn("pass");
+        when(documentsSource.getProperty("smtp_server_username", (String) null)).thenReturn("user");
+        when(documentsSource.getProperty("smtp_server_password", (String) null)).thenReturn("pass");
 
-        assertFalse(this.mocker.getComponentUnderTest().usesAuthentication());
+        assertTrue(this.mocker.getComponentUnderTest().usesAuthentication());
     }
 }

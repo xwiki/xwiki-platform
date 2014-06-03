@@ -60,10 +60,20 @@ public interface MailSenderConfiguration
     String getFromAddress();
 
     /**
-     * @return the list of properties to use when sending the mail
-     *         (eg {@code mail.smtp.starttls.enable=true} if TLS should be used)
+     * @return the list of additional Java Mail properties (in addition to the host, port, username and from
+     *         properties) to use when sending the mail (eg {@code mail.smtp.starttls.enable=true} if TLS should be
+     *         used). See <a href="https://javamail.java.net/nonav/docs/api/com/sun/mail/smtp/package-summary.html">Java
+     *         Mail Properties</a> for the full list of available properties.
      */
-    Properties getProperties();
+    Properties getAdditionalProperties();
+
+    /**
+     * @return the full list of Java Mail properties to use when sending the email (this includes the Java Mail
+     *         properties for host ({@code mail.smtp.host}), port ({@code mail.smtp.port}),
+     *         username ({@code mail.smtp.user}), from {@code mail.smtp.from}) + the all the additional properties
+     *         from {@link #getAdditionalProperties()}
+     */
+    Properties getAllProperties();
 
     /**
      * @return if true then the SMTP server requires authentication

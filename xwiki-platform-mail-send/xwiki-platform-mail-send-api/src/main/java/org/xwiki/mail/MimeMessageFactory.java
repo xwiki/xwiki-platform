@@ -23,8 +23,10 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 @Role
+@Unstable
 public interface MimeMessageFactory
 {
     MimeMessage create(String to, String subject);

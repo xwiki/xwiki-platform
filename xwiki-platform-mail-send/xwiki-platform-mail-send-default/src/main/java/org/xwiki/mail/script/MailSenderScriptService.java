@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 /**
  * Expose Mail Sending API to scripts.
@@ -34,6 +35,7 @@ import org.xwiki.script.service.ScriptService;
 @Component
 @Named("mailsender")
 @Singleton
+@Unstable
 public class MailSenderScriptService implements ScriptService
 {
 }

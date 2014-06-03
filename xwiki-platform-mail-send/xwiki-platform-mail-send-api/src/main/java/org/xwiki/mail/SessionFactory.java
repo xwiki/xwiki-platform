@@ -22,6 +22,7 @@ package org.xwiki.mail;
 import javax.mail.Session;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Create a {@link javax.mail.Session} object filled with all the information required (smtp server, port, from, etc).
@@ -30,6 +31,7 @@ import org.xwiki.component.annotation.Role;
  * @since 6.1M1
  */
 @Role
+@Unstable
 public interface SessionFactory
 {
     /**

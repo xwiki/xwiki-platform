@@ -22,6 +22,7 @@ package org.xwiki.mail;
 import java.util.Properties;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Represents all XWiki configuration options for the Mail Sending feature.
@@ -30,6 +31,7 @@ import org.xwiki.component.annotation.Role;
  * @since 6.1M2
  */
 @Role
+@Unstable
 public interface MailSenderConfiguration
 {
     /**

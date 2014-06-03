@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.mail.internet.MimeBodyPart;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Creates some message body Part to be added to a Multi Part message.
@@ -33,6 +34,7 @@ import org.xwiki.component.annotation.Role;
  * @since 6.1M2
  */
 @Role
+@Unstable
 public interface MimeBodyPartFactory<T>
 {
     MimeBodyPart create(String id, T content, Map<String, String> parameters);

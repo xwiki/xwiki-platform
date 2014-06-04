@@ -2,6 +2,19 @@
 // Typography
 // --------------------------------------------------
 
+// Local Mixins ===========================================================
+
+.text-smaller {
+  font-size: floor(@font-size-base * 0.9);
+}
+
+.text-muted-smaller {
+  .text-muted;
+  .text-smaller;
+}
+
+// Headings ===============================================================
+
 @font-size-h1:            ceil((@font-size-base * 2)); // ~28px
 @font-size-h2:            ceil((@font-size-base * 1.78)); // ~25px
 @font-size-h3:            ceil((@font-size-base * 1.57)); // ~22px
@@ -15,4 +28,43 @@
 
 h1.xwikipaneltitle {
   font-size: ceil((@font-size-base * 1.57)); // ~22px;
+}
+
+// Muted Usage ============================================================
+
+.separator, .itemCount {
+  .text-muted;
+}
+
+.noitems {
+  .text-muted-smaller;
+}
+
+#hierarchy, 
+.xdocLastModification,
+#xdocFooter,
+#historyform td, #changes-info {
+  .text-muted-smaller;
+}
+
+#footerglobal, 
+ul.xlist li.create a {
+  .text-muted;
+}
+
+// Verbatim ===============================================================
+
+tt.wikimodel-verbatim {
+  font-family: sans-serif;
+  white-space: pre-wrap;
+}
+
+// Other ==================================================================
+
+#document-title h1 {
+  margin-top: (@line-height-computed / 2);
+}
+
+.accordionTabTitleBar h1 { // Used by: Administration - Panel Wizard
+  font-size: @font-size-base;
 }

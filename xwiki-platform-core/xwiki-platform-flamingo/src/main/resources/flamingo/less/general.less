@@ -2,31 +2,12 @@
 // General
 // --------------------------------------------------
 
-// Local Mixins ===============================================================
-
-.text-smaller {
-  font-size: floor(@font-size-base * 0.9);
-}
-
-.text-muted-smaller {
-  .text-muted;
-  .text-smaller;
-}
-
 // Classes ====================================================================
 
 .clearfloats:extend(.clearfix all) {}
 
 .centered {
   .text-center;
-}
-
-.separator, .itemCount {
-  .text-muted;
-}
-
-.noitems {
-  .text-muted-smaller;
 }
 
 // Containers =================================================================

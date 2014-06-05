@@ -21,6 +21,7 @@ package org.xwiki.crypto.store;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.stability.Unstable;
 
 /**
  * Reference to a cryptographic store in the wiki.
@@ -28,6 +29,7 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 6.1M1
  */
+@Unstable
 public class WikiStoreReference implements StoreReference
 {
     private EntityReference reference;

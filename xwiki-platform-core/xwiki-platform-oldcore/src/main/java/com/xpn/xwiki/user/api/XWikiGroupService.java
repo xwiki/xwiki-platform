@@ -247,4 +247,17 @@ public interface XWikiGroupService
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     int countAllMembersNamesForGroup(String group, XWikiContext context) throws XWikiException;
+
+    /**
+     * Check if a member (user or group) belongs to a group or not.
+     *
+     * @param memberReference The reference of the member to check
+     * @param groupReference The reference of the group to test
+     * @param context The current {@link XWikiContext context}.
+     * @return <tt>true</tt> if the user does belong to the specified group, false otherwise or if an exception occurs.
+     * @throws XWikiException If an error occurs when checking the groups.
+     * @since Platform-1.3
+     */
+    boolean isMemberInGroup(DocumentReference memberReference, DocumentReference groupReference,
+                            XWikiContext context) throws XWikiException;
 }

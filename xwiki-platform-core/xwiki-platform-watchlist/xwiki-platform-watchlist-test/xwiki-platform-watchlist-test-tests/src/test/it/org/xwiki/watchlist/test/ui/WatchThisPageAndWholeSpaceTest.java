@@ -25,7 +25,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.openqa.selenium.By;
 import org.xwiki.scheduler.test.po.SchedulerHomePage;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
@@ -105,11 +104,6 @@ public class WatchThisPageAndWholeSpaceTest extends AbstractTest
 
         // Verify that the watched page & space are present in the watchlist manager
         this.watchlistPage = WatchlistUserProfilePage.gotoPage(this.watchlistPage.getUsername());
-        // TODO: use LiveTableElement instead but does not seems to work...
-        // LiveTableElement watchlist = this.watchlistPage.getWatchlistMacro().getWatchList();
-        // watchlist.waitUntilReady();
-        this.watchlistPage.waitUntilElementIsVisible(By
-            .xpath("//tbody[@id='mywatchlist-display']/tr/td/a[@href='/xwiki/bin/view/Test/TestWatchThisPage']"));
         Assert.assertTrue(this.watchlistPage.getWatchlistMacro().isWatched("Test", "TestWatchThisPage"));
         Assert.assertTrue(this.watchlistPage.getWatchlistMacro().isWatched("TestWatchWholeSpace"));
 

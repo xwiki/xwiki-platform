@@ -42,10 +42,10 @@ public class WatchlistMacro extends BaseElement
      * formatter are: removal action and reference to removed.
      */
     private static final String WATCHLIST_REMOVE_BUTTON_PATTERN_CSS 
-        = "tbody#mywatchlist-display>tr>td>a[href$='?xpage=watch&do=%s&reference=%s']";
+        = "tbody#mywatchlist-0-display>tr>td>a[href$='?xpage=watch&do=%s&reference=%s']";
 
     public LiveTableElement getWatchList() {
-        LiveTableElement liveTableElement = new LiveTableElement("mywatchlist");
+        LiveTableElement liveTableElement = new LiveTableElement("mywatchlist-0");
         liveTableElement.waitUntilReady();
 
         return liveTableElement;

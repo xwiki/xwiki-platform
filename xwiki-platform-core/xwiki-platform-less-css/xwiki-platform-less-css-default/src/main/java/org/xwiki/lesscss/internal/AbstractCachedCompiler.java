@@ -75,7 +75,7 @@ public abstract class AbstractCachedCompiler<T>
         // Get information about the context
         String wikiId = wikiDescriptorManager.getCurrentWikiId();
         XWikiContext context = xcontextProvider.get();
-        String skin = context.getWiki().getBaseSkin(context);
+        String skin = context.getWiki().getSkin(context);
         XWikiRequest request = context.getRequest();
 
         // Getting the full name representation of colorTheme

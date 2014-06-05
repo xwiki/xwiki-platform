@@ -56,7 +56,7 @@ public class SkinAndColorThemeListenerTest
 {
     @Rule
     public MockitoComponentMockingRule<SkinAndColorThemeListener> mocker =
-            new MockitoComponentMockingRule(SkinAndColorThemeListener.class);
+            new MockitoComponentMockingRule<>(SkinAndColorThemeListener.class);
 
     private LESSSkinFileCache lessSkinFileCache;
     @Before

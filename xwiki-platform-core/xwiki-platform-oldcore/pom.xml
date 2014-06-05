@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>5.4.1</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -39,9 +39,6 @@
     <!-- Skipping CLIRR since xwiki-platform-legacy-oldcore wraps this module and runs CLIRR on it -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <xwiki.jacoco.instructionRatio>0.29</xwiki.jacoco.instructionRatio>
-    <!--<xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>-->
-    <xwiki.enforcer.skip>true</xwiki.enforcer.skip>
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
   <dependencies>
     <dependency>

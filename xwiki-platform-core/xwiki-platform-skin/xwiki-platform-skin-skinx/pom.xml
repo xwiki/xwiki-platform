@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-skin</artifactId>
-    <version>5.4.1</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-skin-skinx</artifactId>
   <name>XWiki Platform - Skin - Skin Extensions</name>
@@ -37,8 +37,6 @@
          [ERROR] Unable to locate enclosing class com.xpn.xwiki.web.sx.JsExtension for nested class
          com.xpn.xwiki.web.sx.JsExtension$1 -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-    <xwiki.enforcer.skip>true</xwiki.enforcer.skip>
   </properties>
   <dependencies>
     <!-- Build tools -->

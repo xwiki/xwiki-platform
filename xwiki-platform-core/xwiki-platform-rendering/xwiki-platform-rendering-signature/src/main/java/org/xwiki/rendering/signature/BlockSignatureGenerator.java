@@ -25,6 +25,7 @@ import java.security.GeneralSecurityException;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.crypto.signer.param.CMSSignedDataGeneratorParameters;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.stability.Unstable;
 
 /**
  * Generate the signature of a {@link Block}.
@@ -33,7 +34,8 @@ import org.xwiki.rendering.block.Block;
  * @since 6.1M2
  */
 @Role
-public interface BlockSigner
+@Unstable
+public interface BlockSignatureGenerator
 {
     /**
      * Generate a signature.

@@ -37,7 +37,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.signature.BlockVerifier;
+import org.xwiki.rendering.signature.BlockSignatureVerifier;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -50,16 +50,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit test for {@link org.xwiki.rendering.signature.internal.MacroBlockVerifier}.
+ * Unit test for {@link MacroBlockSignatureVerifier}.
  *
  * @version $Id$
  * @since 6.1M2
  */
-public class MacroBlockVerifierTest
+public class MacroBlockSignatureVerifierTest
 {
     @Rule
-    public final MockitoComponentMockingRule<BlockVerifier> mocker =
-        new MockitoComponentMockingRule<BlockVerifier>(MacroBlockVerifier.class);
+    public final MockitoComponentMockingRule<BlockSignatureVerifier> mocker =
+        new MockitoComponentMockingRule<BlockSignatureVerifier>(MacroBlockSignatureVerifier.class);
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -73,7 +73,7 @@ public class MacroBlockVerifierTest
 
     private BlockDumper dumper;
     private CMSSignedDataVerifier cmsVerifier;
-    private BlockVerifier verifier;
+    private BlockSignatureVerifier verifier;
 
     @Before
     public void setUp() throws Exception

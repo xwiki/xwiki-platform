@@ -45,8 +45,8 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractNoParameterSignableMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.SignableMacro;
-import org.xwiki.rendering.signature.BlockSigner;
-import org.xwiki.rendering.signature.BlockVerifier;
+import org.xwiki.rendering.signature.BlockSignatureGenerator;
+import org.xwiki.rendering.signature.BlockSignatureVerifier;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -139,10 +139,10 @@ public class SignableMacroTest
         store = mocker.registerMockComponent(SignatureStore.class);
         when(store.retrieve(BLOCK_REFERENCE)).thenReturn(SIGNATURE);
 
-        BlockSigner signer = mocker.registerMockComponent(BlockSigner.class, "macro");
+        BlockSignatureGenerator signer = mocker.registerMockComponent(BlockSignatureGenerator.class, "macro");
         when(signer.generate(BLOCK, PARAMETERS)).thenReturn(SIGNATURE);
 
-        BlockVerifier verifier = mocker.registerMockComponent(BlockVerifier.class, "macro");
+        BlockSignatureVerifier verifier = mocker.registerMockComponent(BlockSignatureVerifier.class, "macro");
         when(verifier.verify(SIGNATURE, BLOCK, null)).thenReturn(VERIFIED);
 
         BlockReferenceResolver<Block> resolver =

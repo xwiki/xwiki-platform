@@ -19,12 +19,15 @@
  */
 package org.xwiki.rendering.macro;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Exception thrown by the {@link SignableMacro}.
  *
  * @version $Id$
  * @since 6.1M2
  */
+@Unstable
 public class MacroSignatureException extends Exception
 {
     /**

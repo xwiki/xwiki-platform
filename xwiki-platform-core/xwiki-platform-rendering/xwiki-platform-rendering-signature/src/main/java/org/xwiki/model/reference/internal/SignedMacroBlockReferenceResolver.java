@@ -37,7 +37,11 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.signature.internal.BlockDumper;
 
 /**
- * Resolve block references from {@link Block} instances for the purpose of linking them to signatures.
+ * Resolve macro block references from {@link Block} instances for the purpose of linking them to signatures.
+ *
+ * The name of the block reference is an SHA-1 digest based on the macro block content, parameters, and the
+ * metadata source if found in XDOM. The block receive no parent by default. A optional
+ * {@link EntityReference} can be provided to specify the parent entity.
  *
  * @version $Id$
  * @since 6.1M2
@@ -59,6 +63,12 @@ public class SignedMacroBlockReferenceResolver implements BlockReferenceResolver
     @Named("macro")
     private BlockDumper dumper;
 
+    /**
+     * {@inheritDoc}
+     *
+     * This implementation is specific for macro blocks. The block argument could be either
+     * a {@link org.xwiki.rendering.block.MacroBlock} or a {@link org.xwiki.rendering.block.MacroMarkerBlock}.
+     */
     @Override
     public BlockReference resolve(Block block, Object... parameters)
     {

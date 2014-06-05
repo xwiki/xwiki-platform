@@ -23,6 +23,7 @@ import org.xwiki.crypto.pkix.CertificateProvider;
 import org.xwiki.crypto.signer.param.CMSSignedDataGeneratorParameters;
 import org.xwiki.crypto.signer.param.CMSSignedDataVerified;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.stability.Unstable;
 
 /**
  * Mixin interface providing additional signature functionality to a macro.
@@ -30,12 +31,15 @@ import org.xwiki.rendering.block.Block;
  * @version $Id$
  * @since 6.1M2
  */
+@Unstable
 public interface SignableMacro
 {
     /**
      * Sign the given macro block.
      *
-     * @param block the block to sign. This block should have a known content source.
+     * @param block the block to sign. This block should have a known content source and could be either
+     *              a {@link org.xwiki.rendering.block.MacroBlock} or
+     *              a {@link org.xwiki.rendering.block.MacroMarkerBlock}.
      * @param parameters the signature generation parameters.
      * @throws MacroSignatureException on error.
      */
@@ -44,7 +48,9 @@ public interface SignableMacro
     /**
      * Verify signature of the given macro block.
      *
-     * @param block the block to verify.  This block should have a known content source.
+     * @param block the block to verify.  This block should have a known content source and could be either
+     *              a {@link org.xwiki.rendering.block.MacroBlock} or
+     *              a {@link org.xwiki.rendering.block.MacroMarkerBlock}.
      * @param certificateProvider a certificate provider providing available certificates.
      * @return signature verification results, or null no signature where found for the given block.
      * @throws MacroSignatureException on error.

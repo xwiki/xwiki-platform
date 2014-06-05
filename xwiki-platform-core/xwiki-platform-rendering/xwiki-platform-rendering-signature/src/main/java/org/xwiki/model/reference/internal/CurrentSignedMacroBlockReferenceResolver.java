@@ -34,7 +34,12 @@ import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
 
 /**
- * Resolve block references from {@link org.xwiki.rendering.block.Block} instances for the purpose of linking them to signatures.
+ * Resolve block references from {@link Block} instances for the purpose of linking them to signatures and use their
+ * metadata source as parent when available in XDOM.
+ *
+ * The name of the block reference is an SHA-1 digest based on the macro block content, parameters, and the
+ * metadata source if found in XDOM. The metadata source is also resolved using a current document reference resolver
+ * to be set as parent.
  *
  * @version $Id$
  * @since 6.1M2
@@ -52,6 +57,13 @@ public class CurrentSignedMacroBlockReferenceResolver implements BlockReferenceR
     @Named("current")
     private DocumentReferenceResolver<String> sourceResolver;
 
+    /**
+     * {@inheritDoc}
+     *
+     * This implementation is specific for macro blocks. The block argument is recommended to have a known content
+     * source could be either a {@link org.xwiki.rendering.block.MacroBlock} or
+     * a {@link org.xwiki.rendering.block.MacroMarkerBlock}.
+     */
     @Override
     public BlockReference resolve(Block block, Object... parameters)
     {

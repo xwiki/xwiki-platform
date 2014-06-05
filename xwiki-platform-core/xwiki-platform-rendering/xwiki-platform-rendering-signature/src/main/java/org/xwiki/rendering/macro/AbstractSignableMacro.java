@@ -36,17 +36,19 @@ import org.xwiki.model.reference.BlockReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
-import org.xwiki.rendering.signature.BlockSigner;
-import org.xwiki.rendering.signature.BlockVerifier;
+import org.xwiki.rendering.signature.BlockSignatureGenerator;
+import org.xwiki.rendering.signature.BlockSignatureVerifier;
+import org.xwiki.stability.Unstable;
 
 /**
  * Helper to implement signable Macro, supplementing the default implementation provided
- * by {@link org.xwiki.rendering.macro.AbstractMacro} to easy the support of signatures.
+ * by {@link org.xwiki.rendering.macro.AbstractMacro} to ease the support of signatures.
  *
  * @param <P> the type of the macro parameters bean
  * @version $Id$
  * @since 6.1M2
  */
+@Unstable
 public abstract class AbstractSignableMacro<P> extends AbstractMacro<P> implements SignableMacro
 {
     private static final String HINT = "macro";
@@ -59,8 +61,8 @@ public abstract class AbstractSignableMacro<P> extends AbstractMacro<P> implemen
 
     // Lazily loaded components.
     private SignatureStore signatureStore;
-    private BlockSigner signer;
-    private BlockVerifier verifier;
+    private BlockSignatureGenerator signer;
+    private BlockSignatureVerifier verifier;
     private BlockReferenceResolver<Block> blockResolver;
 
     /**
@@ -148,10 +150,10 @@ public abstract class AbstractSignableMacro<P> extends AbstractMacro<P> implemen
      * @return the macro block signer. Lazy get to avoid strong dependency.
      * @throws ComponentLookupException if no instance has been found.
      */
-    private BlockSigner getSigner() throws ComponentLookupException
+    private BlockSignatureGenerator getSigner() throws ComponentLookupException
     {
         if (signer == null) {
-            signer = getComponentManager().getInstance(BlockSigner.class, HINT);
+            signer = getComponentManager().getInstance(BlockSignatureGenerator.class, HINT);
         }
         return signer;
     }
@@ -160,10 +162,10 @@ public abstract class AbstractSignableMacro<P> extends AbstractMacro<P> implemen
      * @return the macro block verifier. Lazy get to avoid strong dependency.
      * @throws ComponentLookupException if no instance has been found.
      */
-    private BlockVerifier getVerifier() throws ComponentLookupException
+    private BlockSignatureVerifier getVerifier() throws ComponentLookupException
     {
         if (verifier == null) {
-            verifier = getComponentManager().getInstance(BlockVerifier.class, HINT);
+            verifier = getComponentManager().getInstance(BlockSignatureVerifier.class, HINT);
         }
         return verifier;
     }

@@ -35,7 +35,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.signature.BlockSigner;
+import org.xwiki.rendering.signature.BlockSignatureGenerator;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -47,16 +47,16 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit test for {@link org.xwiki.rendering.signature.internal.MacroBlockSigner}.
+ * Unit test for {@link MacroBlockSignatureGenerator}.
  *
  * @version $Id$
  * @since 6.1M2
  */
-public class MacroBlockSignerTest
+public class MacroBlockSignatureGeneratorTest
 {
     @Rule
-    public final MockitoComponentMockingRule<BlockSigner> mocker =
-        new MockitoComponentMockingRule<BlockSigner>(MacroBlockSigner.class);
+    public final MockitoComponentMockingRule<BlockSignatureGenerator> mocker =
+        new MockitoComponentMockingRule<BlockSignatureGenerator>(MacroBlockSignatureGenerator.class);
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -69,7 +69,7 @@ public class MacroBlockSignerTest
 
     private BlockDumper dumper;
     private CMSSignedDataGenerator generator;
-    private BlockSigner signer;
+    private BlockSignatureGenerator signer;
 
     @Before
     public void setUp() throws Exception

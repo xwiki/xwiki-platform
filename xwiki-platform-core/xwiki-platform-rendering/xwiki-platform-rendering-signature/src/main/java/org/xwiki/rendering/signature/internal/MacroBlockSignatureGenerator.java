@@ -27,17 +27,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.crypto.pkix.CertificateProvider;
-import org.xwiki.crypto.signer.CMSSignedDataVerifier;
-import org.xwiki.crypto.signer.param.CMSSignedDataVerified;
+import org.xwiki.crypto.signer.CMSSignedDataGenerator;
+import org.xwiki.crypto.signer.param.CMSSignedDataGeneratorParameters;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
-import org.xwiki.rendering.signature.BlockVerifier;
+import org.xwiki.rendering.signature.BlockSignatureGenerator;
 
 /**
- * Verify signature of {@link org.xwiki.rendering.block.MacroBlock}
- * and {@link org.xwiki.rendering.block.MacroMarkerBlock}.
+ * Sign {@link MacroBlock} and {@link MacroMarkerBlock}.
  *
  * @version $Id$
  * @since 6.1M2
@@ -45,24 +43,24 @@ import org.xwiki.rendering.signature.BlockVerifier;
 @Component
 @Named("macro")
 @Singleton
-public class MacroBlockVerifier implements BlockVerifier
+public class MacroBlockSignatureGenerator implements BlockSignatureGenerator
 {
     @Inject
     @Named("macro")
     private BlockDumper dumper;
 
     @Inject
-    private CMSSignedDataVerifier verifier;
+    private CMSSignedDataGenerator generator;
 
     @Override
-    public CMSSignedDataVerified verify(byte[] signature, Block block, CertificateProvider certificateProvider)
+    public byte[] generate(Block block, CMSSignedDataGeneratorParameters params)
         throws GeneralSecurityException, IOException
     {
         if (!isSupported(block)) {
             throw new IllegalArgumentException("Unsupported block [" + block.getClass().getName() + "].");
         }
 
-        return verifier.verify(signature, dumper.dump(block), certificateProvider);
+        return generator.generate(dumper.dump(block), params);
     }
 
     @Override
@@ -72,4 +70,3 @@ public class MacroBlockVerifier implements BlockVerifier
     }
 
 }
-

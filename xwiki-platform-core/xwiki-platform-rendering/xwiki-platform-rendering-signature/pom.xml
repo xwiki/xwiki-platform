@@ -28,9 +28,9 @@
     <version>6.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rendering-signature</artifactId>
-  <name>XWiki Platform - Rendering - XWiki-specific implementation</name>
+  <name>XWiki Platform - Rendering - Signature</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Rendering - XWiki-specific implementation</description>
+  <description>XWiki Platform - Rendering - Signature</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.64</xwiki.jacoco.instructionRatio>
   </properties>

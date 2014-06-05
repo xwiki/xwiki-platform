@@ -8,13 +8,25 @@
 }
 
 h1.xwikipaneltitle {
-  .panel-heading;
   .panel-title;
+  margin: @padding-large-vertical @padding-large-horizontal;
+  padding: @padding-large-vertical 0;
   background-color: @panel-bg;
   color: @xwiki-panel-header-text;
+  border-bottom: @border-width solid @xwiki-page-content-bg;
+  box-shadow: 0 @border-width 0 @border-color;
 }
 
 .xwikipanelcontents {
-  .panel-body;
+  padding: 0 @padding-large-horizontal @padding-base-vertical;
   overflow: hidden;
+}
+
+// Lists inside panels ====================================================
+
+.panel {
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
 }

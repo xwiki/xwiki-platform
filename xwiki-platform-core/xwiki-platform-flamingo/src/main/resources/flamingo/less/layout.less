@@ -188,13 +188,22 @@
   }
 }
 
-#leftPanels, #rightPanels{
+#leftPanels, #rightPanels {
   .make-xs-column(12);
 }
 
 .main {
   background-color: @xwiki-page-content-bg;
-  padding: @padding-large-vertical inherit;
+  box-shadow: 0 1px 2px @border-color;
+}
+
+.main, 
+#leftPanels, #rightPanels, #editPanels {
+  padding: (@grid-gutter-width / 2) inherit;
+}
+
+#xdocFooter, #xwikidata {
+  .make-xs-column(12);
 }
 
 #footerglobal {
@@ -203,4 +212,6 @@
   padding: @padding-large-vertical @padding-large-horizontal;
   .text-smaller;
   text-align: center;
+  position: relative;
+  z-index: 2;
 }

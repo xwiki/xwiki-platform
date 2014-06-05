@@ -3,7 +3,7 @@
 ###
 ###
 #template("startpage.vm")
-<div class="main layoutsubsection">
+<div class="main">
 <div id="mainContentArea">
 #if($message)
   <div id="xwikimessage">$message</div>

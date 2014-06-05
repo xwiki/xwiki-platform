@@ -7,7 +7,7 @@
 #else
   $response.setStatus(404)
   #template("startpage.vm")
-  <div class="main layoutsubsection">
+  <div class="main">
   <div id="contentmenu" class="actionmenu">
     #template("menus/content.vm")
   </div>

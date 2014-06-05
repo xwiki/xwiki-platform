@@ -430,10 +430,10 @@
     <defaultValue>creationDate</defaultValue>
   </property>
   <property>
-    <description>Facultative parameter to choose the sorting of the list of document.&#xd;
-Value must be:&#xd;
-- creationDate sort by creation date (default)&#xd;
-- modificationDate sort by update date&#xd;
+    <description>Facultative parameter to choose the sorting of the list of document.
+Value must be:
+- creationDate sort by creation date (default)
+- modificationDate sort by update date
 - or name sort alphabeticaly</description>
   </property>
   <property>

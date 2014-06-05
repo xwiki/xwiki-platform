@@ -17,7 +17,7 @@
     #set($viewer = 'content')
   #end
   
-  <div class="main layoutsubsection">
+  <div class="main">
   <div id="mainContentArea">
   #template("hierarchy.vm")
   #if($viewer == 'content')

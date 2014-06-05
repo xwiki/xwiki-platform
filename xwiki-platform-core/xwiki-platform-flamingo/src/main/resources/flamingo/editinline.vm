@@ -8,7 +8,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 #set($force = $!request.get("force"))
 #set($allowDocEdit = !(($doc.getLocked()==true)&&(!$force)) )
 ##
-<div class="main layoutsubsection">
+<div class="main">
 <div id="mainContentArea">
 ## ----------------------------------------------------------------------------
 ## Start FORM at start of content area IF editing is allowed.
@@ -39,7 +39,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
 ## If the document cannot be edited, display an information and a forcing link:
 ##
 #if (!$allowDocEdit)
-  <div class="layoutsection">
+  <div>
   $response.setStatus(423)
   #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")
   #set($forceEditURL = $doc.getURL($xcontext.action, ${newquerystring}))

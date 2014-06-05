@@ -5,12 +5,7 @@
 ### Contains the company logo, links to global actions and the search facility
 ###
 #if($isInServletMode) ## Visible only in a page
-<div id="headerglobal" class="layoutsection">
-#if($xcontext.action == "view")
-<div class="minwidthb"></div>
-#else
-<div class="minwidthd"></div>
-#end
+<div id="headerglobal">
   <div id="globallinks">
 #if ($displayLanguageChoice && $xwiki.isMultiLingual())
   <span class="glink" id="headerlanguages">

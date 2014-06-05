@@ -1187,7 +1187,7 @@ ${Msz}Mb##
   #if("$!options.rowCount" != '') #set($count = $options.rowCount) #else #set($count = 15) #end
   #if("$!options.maxPages" != '') #set($maxPages = $options.maxPages) #else #set($maxPages = 10) #end
   #if("$!options.selectedColumn" != '') #set($selectedColumn = $options.selectedColumn) #end
-  #if("$!options.callback" != '') #set($callback = $options.callback) #end
+  #if("$!options.callback" != '') #set($callback = $options.callback) #else #set($callback = '') #end
   #if("$!options.tagCloud" == '' || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
   #if ($options.selectedTags && $options.selectedTags.size() > 0)
     #set ($selectedTags = $options.selectedTags)
@@ -1422,7 +1422,7 @@ ${Msz}Mb##
         #set ($discard = $liveTableParams.put('pageSizeBounds', $pageSizeBounds))
       #end
       #set ($callbackParam = "#livetablecallback($divid $collist $colprops $transprefix), ")
-      #if ($callback)
+      #if ($!callback != '')
         #set ($callbackParam = "$callback, ")
       #end
       window["$jsName"] = new XWiki.widgets.LiveTable("$dataurl", "${divid}",

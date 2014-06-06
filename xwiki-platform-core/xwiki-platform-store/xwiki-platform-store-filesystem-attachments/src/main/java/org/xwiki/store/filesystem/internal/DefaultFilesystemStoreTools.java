@@ -160,7 +160,13 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     {
         this.storageDir = new File(this.environment.getPermanentDirectory(), STORAGE_DIR_NAME);
         if (config.cleanOnStartup()) {
-            deleteEmptyDirs(this.storageDir, 0);
+            final File dir = this.storageDir;
+            new Thread(new Runnable() {
+                public void run()
+                {
+                    deleteEmptyDirs(dir, 0);
+                }
+            }).start();
         }
     }
 

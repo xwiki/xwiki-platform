@@ -628,4 +628,16 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is:
 # wiki.alias.suffix=
 
+#-------------------------------------------------------------------------------------
+# Store
+#-------------------------------------------------------------------------------------
+
+#-# [Since 6.1M1]
+#-# If active, the Filesystem Attachment Store will automatically clear empty directories on startup,
+#-# in some cases this may create undue load on the server and may need to be disabled. To do that,
+#-# set the following to false.
+#-# Note that if you disable this feature, empty directories will accumulate and you are responsible
+#-# for cleaning them up.
+# store.fsattach.cleanOnStartup=true
+
 $!xwikiPropertiesAdditionalProperties

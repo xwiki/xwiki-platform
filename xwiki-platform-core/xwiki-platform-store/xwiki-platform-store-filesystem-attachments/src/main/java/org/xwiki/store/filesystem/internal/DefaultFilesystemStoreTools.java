@@ -102,6 +102,9 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     @Named("path")
     private EntityReferenceSerializer<String> pathSerializer;
 
+    @Inject
+    private FilesystemAttachmentsConfiguration config;
+
     /**
      * We need to get the XWiki object in order to get the work directory.
      */
@@ -156,7 +159,9 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     public void initialize()
     {
         this.storageDir = new File(this.environment.getPermanentDirectory(), STORAGE_DIR_NAME);
-        deleteEmptyDirs(this.storageDir, 0);
+        if (config.cleanOnStartup()) {
+            deleteEmptyDirs(this.storageDir, 0);
+        }
     }
 
     /**

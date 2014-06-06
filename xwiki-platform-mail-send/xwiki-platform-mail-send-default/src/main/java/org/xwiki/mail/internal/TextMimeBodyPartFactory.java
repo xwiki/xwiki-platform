@@ -4,9 +4,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MimeBodyPartFactory;
 
 /**
@@ -15,7 +17,9 @@ import org.xwiki.mail.MimeBodyPartFactory;
  * @version $Id$
  * @since 6.1M2
  */
+@Component
 @Named("text")
+@Singleton
 public class TextMimeBodyPartFactory implements MimeBodyPartFactory<String>
 {
     @Override public MimeBodyPart create(String content, Map<String, Object> parameters)

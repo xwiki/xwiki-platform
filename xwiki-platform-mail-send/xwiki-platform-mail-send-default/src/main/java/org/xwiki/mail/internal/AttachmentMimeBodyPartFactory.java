@@ -29,9 +29,11 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MimeBodyPartFactory;
 
 import com.xpn.xwiki.XWikiException;
@@ -43,7 +45,9 @@ import com.xpn.xwiki.api.Attachment;
  * @version $Id$
  * @since 6.1M2
  */
+@Component
 @Named("attachment")
+@Singleton
 public class AttachmentMimeBodyPartFactory implements MimeBodyPartFactory<Attachment>
 {
     @Override public MimeBodyPart create(Attachment attachment, Map<String, Object> parameters)

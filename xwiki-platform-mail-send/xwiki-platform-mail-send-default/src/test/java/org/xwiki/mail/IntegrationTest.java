@@ -19,6 +19,9 @@
  */
 package org.xwiki.mail;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
@@ -95,11 +98,13 @@ public class IntegrationTest
 
         // Step 3: Add the Message Body
         Multipart multipart = new MimeMultipart("mixed");
+        // Step 4: Add parameters Map
+        Map<String, Object> parameters = new HashMap<>();
         // Add HTML in the body
-        multipart.addBodyPart(this.htmlPartFactory.create("some html here"));
+        multipart.addBodyPart(this.htmlPartFactory.create("some html here", parameters));
         message.setContent(multipart);
 
-        // Step 4: Send the mail
+        // Step 5: Send the mail
         this.sender.send(message, session);
 
         // Verify that the mail has been sent

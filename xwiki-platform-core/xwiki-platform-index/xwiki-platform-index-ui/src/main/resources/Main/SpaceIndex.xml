@@ -34,7 +34,7 @@
   <creationDate>1252454400000</creationDate>
   <date>1329088048000</date>
   <contentUpdateDate>1329088048000</contentUpdateDate>
-  <version>1.1</version>
+  <version>1.2</version>
   <title>$services.localization.render('platform.index.spaceIndex')</title>
   <template/>
   <defaultTemplate/>
@@ -168,9 +168,9 @@
   #end
   #set ($limit = $mathtool.toInteger($limit))
   ## get the sort of the list of document
-  ##values are creationDate, modificationDate and name
+  ##values are creationDate, modificationDate and docName
   #set ($sort = $xcontext.macro.params.get('sort'))
-  #if ("$sort" == 'name')
+  #if ("$sort" == 'docName')
     ## sorting alphabetical list of document
     #set ($sort = 'doc.name asc')
   #elseif ("$sort" == 'modificationDate')
@@ -434,7 +434,7 @@
 Value must be:
 - creationDate sort by creation date (default)
 - modificationDate sort by update date
-- or name sort alphabeticaly</description>
+- or docName sort alphabeticaly</description>
   </property>
   <property>
     <mandatory>0</mandatory>

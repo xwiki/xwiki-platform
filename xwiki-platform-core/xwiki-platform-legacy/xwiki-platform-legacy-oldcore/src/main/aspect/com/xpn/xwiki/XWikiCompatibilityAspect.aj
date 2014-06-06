@@ -48,6 +48,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.model.EntityType;
 import org.xwiki.url.XWikiEntityURL;
+import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
@@ -1113,4 +1114,21 @@ public privileged aspect XWikiCompatibilityAspect
 
         return parseContent(translatedMessage, context);
     }
+
+    public String XWiki.getFlash(String url, String width, String height, XWikiContext context)
+    {
+        VelocityContext vorigcontext = ((VelocityContext) context.get("vcontext"));
+        try {
+            VelocityContext vcontext = (VelocityContext) vorigcontext.clone();
+            vcontext.put("flashurl", url);
+            vcontext.put("width", width);
+            vcontext.put("height", height);
+            context.put("vcontext", vcontext);
+
+            return parseTemplate("flash.vm", context);
+        } finally {
+            context.put("vcontext", vorigcontext);
+        }
+    }
+
 }

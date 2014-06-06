@@ -5344,22 +5344,6 @@ public class XWiki implements EventListener
         return list;
     }
 
-    public String getFlash(String url, String width, String height, XWikiContext context)
-    {
-        VelocityContext vorigcontext = ((VelocityContext) context.get("vcontext"));
-        try {
-            VelocityContext vcontext = (VelocityContext) vorigcontext.clone();
-            vcontext.put("flashurl", url);
-            vcontext.put("width", width);
-            vcontext.put("height", height);
-            context.put("vcontext", vcontext);
-
-            return parseTemplate("flash.vm", context);
-        } finally {
-            context.put("vcontext", vorigcontext);
-        }
-    }
-
     /**
      * accessor for the isReadOnly instance var.
      * 

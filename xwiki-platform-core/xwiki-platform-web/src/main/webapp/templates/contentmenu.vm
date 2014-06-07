@@ -7,7 +7,7 @@
 ##
 ## Let's clean the query string to avoid injections
 ##
-#set($cleanQueryString = $escapetool.url($request.getParameterMap()))
+#set($cleanQueryString = $escapetool.html($escapetool.url($request.getParameterMap())))
 #if($hasEdit && !$isReadOnly)
   ## Compute the default edit mode
   #set($editaction = $doc.getDefaultEditMode())

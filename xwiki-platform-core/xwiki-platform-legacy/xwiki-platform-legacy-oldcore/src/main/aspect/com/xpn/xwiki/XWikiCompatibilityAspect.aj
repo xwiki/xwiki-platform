@@ -1115,6 +1115,11 @@ public privileged aspect XWikiCompatibilityAspect
         return parseContent(translatedMessage, context);
     }
 
+    /**
+     * @deprecated starting with 6.1M2 this method shouldn't be used. There's no replacement, it's just not the right
+     *             way to do this anymore and the flash.vm template doesn't exist anymore
+     */
+    @Deprecated
     public String XWiki.getFlash(String url, String width, String height, XWikiContext context)
     {
         VelocityContext vorigcontext = ((VelocityContext) context.get("vcontext"));

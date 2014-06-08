@@ -55,11 +55,11 @@
  * NOTE: This macro is not fully encapsulated because it defines a few Velocity variables that are used in subsequent macros.
  *#
 #macro(gridresultwithfilter_buildQuery $className $collist $filterfrom $filterwhere $filterParams)
-  ## Additional columns, should *not* contain parameters, all added column names must be filtered
+  ## Additional columns; should *not* contain raw parameters, all added column names must be filtered
   #set($fromSql = '')
-  ## parametrized filter part of the query
+  ## Parametrized filter part of the query
   #set($whereSql = '')
-  ## list of parameters to use with $whereSql
+  ## List of values to use with $whereSql
   #set($whereParams = [])
   #set($class = $xwiki.getDocument($className).getxWikiClass())
   ##
@@ -102,7 +102,7 @@
     #else
       #set($tableAlias = $order)
     #end
-    ## only safe version should be used in SQL queries
+    ## Only safe version should be used in SQL queries
     #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
     ##
     #if($order.startsWith('doc.'))
@@ -123,6 +123,7 @@
       #if("$multiselect" != '1')
         #livetable_getTableName($order)
         #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
+        ## FIXME: Check if this is indeed a property of the class
         #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
         #set($discard = $whereParams.add("${order}"))
         #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
@@ -217,7 +218,7 @@
  *#
 #macro(gridresult_buildRowsJSON $map)
   #set($offset = $mathtool.toInteger($request.get('offset')))
-  ## offset starts from 0 in velocity and 1 in javascript
+  ## Offset starts from 0 in velocity and 1 in javascript
   #set($offset = $offset - 1)
   #if (!$offset || $offset &lt; 0)
     #set($offset = 0)
@@ -352,7 +353,7 @@
       #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))
     #end
     #set($fieldUrl = '')
-    ## only retrieve an URL for a DBListClass item
+    ## Only retrieve an URL for a DBListClass item
     #if($propType == 'DBListClass' &amp;&amp; $propClass.get($colname).getProperty('multiSelect').value != 1)
       #set($fieldUrl = $xwiki.getURL($fieldValue))
       #if($fieldUrl == $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
@@ -362,7 +363,7 @@
     #set($discard = $row.put($colname, $fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", '')))
     #set($discard = $row.put("${colname}_value", $fieldValue))
     #set($discard = $row.put("${colname}_url", $fieldUrl))
-    ## reset to the default class
+    ## Reset to the default class
     #set($discard = $itemDoc.use($className))
   #end
 #end
@@ -548,7 +549,7 @@
   #else
     #set($tableAlias = $colname)
   #end
-  ## only safe versions should be used in SQL queries
+  ## Only safe versions should be used in SQL queries
   #set($safe_colname = "$!{colname.replaceAll('[^a-zA-Z0-9_.]','')}")
   #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
   ##

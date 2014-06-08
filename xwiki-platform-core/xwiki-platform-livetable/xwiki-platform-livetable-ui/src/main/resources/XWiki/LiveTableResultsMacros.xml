@@ -92,6 +92,7 @@
   ## Order
   ##
   #set($order = "$!request.sort")
+  #set ($orderSql = '')
   #if($order != '')
     #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
     #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
@@ -139,7 +140,7 @@
   #set($allMatchingParams = [])
   #if("$!className" != '')
     ## Class query
-    #set($countSql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
+    #set($sql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
     #set($discard = $sqlParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))
     #set($discard = $sqlParams.addAll($whereParams))
     ##
@@ -159,7 +160,7 @@
     #end
   #else
     ## Document query
-    #set($countSql = "$!fromSql $!filterfrom where 1=1 $!whereSql $!filterwhere")
+    #set($sql = "$!fromSql $!filterfrom where 1=1 $!whereSql $!filterwhere")
     #set($discard = $sqlParams.addAll($whereParams))
     ##
     #set($tagsMatchingFiltersFrom = "$!fromSql $!filterfrom")
@@ -175,7 +176,9 @@
       #set($discard = $allMatchingParams.addAll($filterParams))
     #end
   #end
-  #set($sql = "$countSql $!{orderSql}")
+  #if ($orderSql != '')
+    #set($sql = "$sql $!{orderSql}")
+  #end
 #end
 
 
@@ -378,7 +381,6 @@
   #gridresultwithfilter_buildQuery($className $collist $filterfrom $filterwhere $filterParams)
   #if("$!request.sql" == '1')
     #set($discard = $map.put('sql', $sql))
-    #set($discard = $map.put('countsql', $countSql))
     #set($discard = $map.put('params', $sqlParams))
   #end
   #set($discard = $map.put('reqNo', $mathtool.toInteger($request.reqNo)))

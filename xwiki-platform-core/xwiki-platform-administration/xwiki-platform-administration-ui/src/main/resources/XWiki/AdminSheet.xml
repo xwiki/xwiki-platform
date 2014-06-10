@@ -3296,8 +3296,6 @@ document.observe('xwiki:dom:loaded', function() {
 #set ($configurationIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/wrench.png')${escapetool.S})")
 .admin-menu .group.configurationIcon {
   background-image: $configurationIcon;
-}
-.skin-colibri .admin-menu .group.configurationIcon {
   #css3_backgroundIconAndLinearGradient($configurationIcon, {
      'to': 'bottom',
      'colors': [
@@ -3306,7 +3304,7 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   })
 }
-.skin-colibri .admin-menu .group.configurationIcon:hover , .skin-colibri .admin-menu .current.configurationIcon {
+.admin-menu .group.configurationIcon:hover , .admin-menu .current.configurationIcon {
   #css3_backgroundIconAndLinearGradient($configurationIcon, {
      'to': 'bottom',
      'colors': [
@@ -3319,8 +3317,6 @@ document.observe('xwiki:dom:loaded', function() {
 #set ($lfIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/layout_content.png')${escapetool.S})")
 .admin-menu .group.lfIcon {
   background-image: $lfIcon;
-}
-.skin-colibri .admin-menu .group.lfIcon {
   #css3_backgroundIconAndLinearGradient($lfIcon, {
      'to': 'bottom',
      'colors': [
@@ -3329,7 +3325,7 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   })
 }
-.skin-colibri .admin-menu .group.lfIcon:hover , .skin-colibri .admin-menu .current.lfIcon {
+.admin-menu .group.lfIcon:hover , .admin-menu .current.lfIcon {
   #css3_backgroundIconAndLinearGradient($lfIcon, {
      'to': 'bottom',
      'colors': [
@@ -3342,8 +3338,6 @@ document.observe('xwiki:dom:loaded', function() {
 #set ($usersgroupsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/group.png')${escapetool.S})")
 .admin-menu .group.usersgroupsIcon {
   background-image: $usersgroupsIcon;
-}
-.skin-colibri .admin-menu .group.usersgroupsIcon {
   #css3_backgroundIconAndLinearGradient($usersgroupsIcon, {
      'to': 'bottom',
      'colors': [
@@ -3352,7 +3346,7 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   })
 }
-.skin-colibri .admin-menu .group.usersgroupsIcon:hover , .skin-colibri .admin-menu .current.usersgroupsIcon {
+.admin-menu .group.usersgroupsIcon:hover , .admin-menu .current.usersgroupsIcon {
   #css3_backgroundIconAndLinearGradient($usersgroupsIcon, {
      'to': 'bottom',
      'colors': [
@@ -3365,8 +3359,6 @@ document.observe('xwiki:dom:loaded', function() {
 #set ($contentIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/folder_page.png')${escapetool.S})")
 .admin-menu .group.contentIcon {
   background-image: $contentIcon;
-}
-.skin-colibri .admin-menu .group.contentIcon {
   #css3_backgroundIconAndLinearGradient($contentIcon, {
      'to': 'bottom',
      'colors': [
@@ -3375,7 +3367,7 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   })
 }
-.skin-colibri .admin-menu .group.contentIcon:hover , .skin-colibri  .admin-menu .current.contentIcon {
+.admin-menu .group.contentIcon:hover , .admin-menu .current.contentIcon {
   #css3_backgroundIconAndLinearGradient($contentIcon, {
      'to': 'bottom',
      'colors': [
@@ -3388,8 +3380,6 @@ document.observe('xwiki:dom:loaded', function() {
 #set ($extensionmanagerIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/xwiki/plugin_wrench.png')${escapetool.S})")
 .admin-menu .group.extensionmanagerIcon {
   background-image: $extensionmanagerIcon;
-}
-.skin-colibri .admin-menu .group.extensionmanagerIcon {
   #css3_backgroundIconAndLinearGradient($extensionmanagerIcon, {
      'to': 'bottom',
      'colors': [
@@ -3397,6 +3387,71 @@ document.observe('xwiki:dom:loaded', function() {
       {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
     ]
   })
+}
+.admin-menu .group.extensionmanagerIcon:hover , .admin-menu .current.extensionmanagerIcon {
+  #css3_backgroundIconAndLinearGradient($extensionmanagerIcon, {
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.menuGradientColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
+}
+
+#set ($applicationsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/plugin.png')${escapetool.S})")
+.admin-menu .group.applicationsIcon {
+  background-image: $applicationsIcon;
+  #css3_backgroundIconAndLinearGradient($applicationsIcon, {
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.menuContentGradientColor, 'position': '0%'},
+      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
+    ]
+  })
+}
+.admin-menu .group.applicationsIcon:hover , .admin-menu .current.applicationsIcon {
+  #css3_backgroundIconAndLinearGradient($applicationsIcon, {
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.menuGradientColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
+}
+
+#set ($readOnlyIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/error.png')${escapetool.S})")
+.admin-menu .group.readOnly {
+  background-image: $readOnlyIcon;
+  #css3_backgroundIconAndLinearGradient($readOnlyIcon, {
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.menuContentGradientColor, 'position': '0%'},
+      {'color': $theme.menuContentBackgroundColor, 'position': '100%'}
+    ]
+  })
+}
+.admin-menu .group.readOnly:hover , .admin-menu .current.readOnly {
+  #css3_backgroundIconAndLinearGradient($readOnlyIcon, {
+     'to': 'bottom',
+     'colors': [
+      {'color': $theme.menuGradientColor, 'position': '0%'},
+      {'color': $theme.menuBackgroundColor, 'position': '50%'}
+    ]
+  })
+}
+.admin-menu .group.readOnly, .admin-menu .group.readOnly:hover , .admin-menu .current.readOnly  {
+  background-position: 5px 50%, top center;
+}
+
+/* Override general table styles. */
+/* TODO: Move to livetable.css */
+
+#userstable td, #groupstable td, #usersandgroupstable td, #alldocstable td {
+  border-color: transparent;
+}
+
+#userstable, #groupstable, #usersandgroupstable, #alldocstable {
+  border-color: transparent;
 }
 
 #usersandgroupstable-filters #name {
@@ -3511,7 +3566,7 @@ document.observe('xwiki:dom:loaded', function() {
   #end
   #set ($discard = $adminMenu.removeAll($categoriesToRemove))
 #end
-#if ("$!crtCategoryId" != '' &amp;&amp; $crtCategoryId >= $adminMenu.size())
+#if ("$!crtCategoryId" != '' &amp;&amp; $crtCategoryId &gt;= $adminMenu.size())
   #set ($crtCategoryId = '')
 #end
 
@@ -3785,4 +3840,3 @@ document.observe('xwiki:dom:loaded', function() {
 #end
 {{/velocity}}</content>
 </xwikidoc>
-

@@ -98,13 +98,11 @@ public class IntegrationTest
 
         // Step 3: Add the Message Body
         Multipart multipart = new MimeMultipart("mixed");
-        // Step 4: Add parameters Map
-        Map<String, Object> parameters = new HashMap<>();
         // Add HTML in the body
-        multipart.addBodyPart(this.htmlPartFactory.create("some html here", parameters));
+        multipart.addBodyPart(this.htmlPartFactory.create("some html here"));
         message.setContent(multipart);
 
-        // Step 5: Send the mail
+        // Step 4: Send the mail
         this.sender.send(message, session);
 
         // Verify that the mail has been sent

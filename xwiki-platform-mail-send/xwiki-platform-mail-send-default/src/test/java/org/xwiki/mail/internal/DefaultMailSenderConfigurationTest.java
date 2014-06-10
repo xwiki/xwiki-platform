@@ -26,8 +26,12 @@ import org.junit.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultMailSenderConfiguration}.
@@ -39,7 +43,7 @@ public class DefaultMailSenderConfigurationTest
 {
     @Rule
     public MockitoComponentMockingRule<DefaultMailSenderConfiguration> mocker =
-        new MockitoComponentMockingRule<>(DefaultMailSenderConfiguration.class);
+            new MockitoComponentMockingRule<>(DefaultMailSenderConfiguration.class);
 
     @Test
     public void getAdditionalProperties() throws Exception
@@ -59,7 +63,7 @@ public class DefaultMailSenderConfigurationTest
         when(documentsSource.getProperty("javamail_extra_props")).thenReturn("");
 
         ConfigurationSource xwikiPropertiesSource =
-            this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
+                this.mocker.getInstance(ConfigurationSource.class, "xwikiproperties");
         Properties properties = new Properties();
         properties.setProperty("key1", "value1");
         properties.setProperty("key2", "value2");
@@ -80,8 +84,8 @@ public class DefaultMailSenderConfigurationTest
 
         // Verify the logs
         verify(this.mocker.getMockedLogger()).warn(
-            "Error while parsing mail properties [{}]. Root cause [{}]. Ignoring configuration...",
-            "\\uinvalid", "IllegalArgumentException: Malformed \\uxxxx encoding.");
+                "Error while parsing mail properties [{}]. Root cause [{}]. Ignoring configuration...",
+                "\\uinvalid", "IllegalArgumentException: Malformed \\uxxxx encoding.");
     }
 
     @Test

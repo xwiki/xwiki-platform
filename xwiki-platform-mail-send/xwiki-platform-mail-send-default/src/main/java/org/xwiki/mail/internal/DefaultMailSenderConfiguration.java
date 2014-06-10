@@ -35,8 +35,8 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.mail.MailSenderConfiguration;
 
 /**
- * Gets the Mail Sending configuration by first looking it up in document sources (space and wiki preferences) and
- * if not found in the xwiki properties file.
+ * Gets the Mail Sending configuration by first looking it up in document sources (space and wiki preferences) and if
+ * not found in the xwiki properties file.
  *
  * @version $Id$
  * @since 6.1M2
@@ -45,11 +45,6 @@ import org.xwiki.mail.MailSenderConfiguration;
 @Singleton
 public class DefaultMailSenderConfiguration implements MailSenderConfiguration
 {
-    /**
-     * Prefix for configuration keys for the Mail Sending module.
-     */
-    private static final String PREFIX = "mail.sender.";
-
     /**
      * Java Mail SMTP property for the protocol.
      */
@@ -75,6 +70,11 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
      */
     public static final String JAVAMAIL_FROM = "mail.smtp.from";
 
+    /**
+     * Prefix for configuration keys for the Mail Sending module.
+     */
+    private static final String PREFIX = "mail.sender.";
+
     @Inject
     private Logger logger;
 
@@ -90,35 +90,35 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public String getHost()
     {
         return this.documentsSource.getProperty("smtp_server",
-            this.xwikiPropertiesSource.getProperty(PREFIX + "host", String.class));
+                this.xwikiPropertiesSource.getProperty(PREFIX + "host", String.class));
     }
 
     @Override
     public int getPort()
     {
         return this.documentsSource.getProperty("smtp_port",
-            this.xwikiPropertiesSource.getProperty(PREFIX + "port", Integer.class));
+                this.xwikiPropertiesSource.getProperty(PREFIX + "port", Integer.class));
     }
 
     @Override
     public String getUsername()
     {
         return this.documentsSource.getProperty("smtp_server_username",
-            this.xwikiPropertiesSource.getProperty(PREFIX + "username", String.class));
+                this.xwikiPropertiesSource.getProperty(PREFIX + "username", String.class));
     }
 
     @Override
     public String getPassword()
     {
         return this.documentsSource.getProperty("smtp_server_password",
-            this.xwikiPropertiesSource.getProperty(PREFIX + "password", String.class));
+                this.xwikiPropertiesSource.getProperty(PREFIX + "password", String.class));
     }
 
     @Override
     public String getFromAddress()
     {
         return this.documentsSource.getProperty("smtp_from",
-            this.xwikiPropertiesSource.getProperty(PREFIX + "from", String.class));
+                this.xwikiPropertiesSource.getProperty(PREFIX + "from", String.class));
     }
 
     @Override
@@ -140,7 +140,7 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
                 // Will happen if the user has not used the right format, in which case we log a warning but discard
                 // the user values.
                 this.logger.warn("Error while parsing mail properties [{}]. Root cause [{}]. Ignoring configuration...",
-                    extraPropertiesAsString, ExceptionUtils.getRootCauseMessage(e));
+                        extraPropertiesAsString, ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

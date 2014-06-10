@@ -22,9 +22,13 @@
 package org.xwiki.mail.internal;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Map;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.environment.Environment;
@@ -32,9 +36,8 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.api.Attachment;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -45,27 +48,57 @@ import static org.mockito.Mockito.when;
  */
 public class AttachmentMimeBodyPartFactoryTest
 {
+    // Passed at the Maven level in the pom.xml file.
+    private static final String TEMPORARY_DIRECTORY =
+        System.getProperty("temporaryDirectory", System.getProperty("java.io.tmpdir"));
+
     @Rule
     public MockitoComponentMockingRule<AttachmentMimeBodyPartFactory> mocker =
-            new MockitoComponentMockingRule<>(AttachmentMimeBodyPartFactory.class);
-
+        new MockitoComponentMockingRule<>(AttachmentMimeBodyPartFactory.class);
 
     @Test
-    public void createAttachmentBodyPart() throws Exception
+    public void createAttachmentBodyPartWithHeader() throws Exception
     {
         Environment environment = this.mocker.getInstance(Environment.class);
-        when(environment.getTemporaryDirectory()).thenReturn(new File("/tmpdir"));
+        when(environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
 
         Attachment attachment = mock(Attachment.class);
-        byte[] fileContent = "Lorem Ipsum".getBytes();
+        when(attachment.getContent()).thenReturn("Lorem Ipsum".getBytes());
         when(attachment.getFilename()).thenReturn("image.png");
-        when(attachment.getMimeType()).thenReturn("image/png;");
-        when(attachment.getContent()).thenReturn(fileContent);
+        when(attachment.getMimeType()).thenReturn("image/png");
 
-        MimeBodyPart attachmentPart = this.mocker.getComponentUnderTest().create(attachment);
+        Map<String, Object> parameters = Collections.singletonMap("headers", (Object)
+            Collections.singletonMap("Content-Transfer-Encoding", "quoted-printable"));
 
-        verify(attachment).getFilename();
-        verify(attachment).getMimeType();
-        verify(attachment).getContent();
+        MimeBodyPart part = this.mocker.getComponentUnderTest().create(attachment, parameters);
+
+        assertEquals("<image.png>", part.getContentID());
+        // JavaMail adds some extra params to the content-type header
+        // (e.g. image/png; name=attachment8219195155963823979.tmp) , we just verify the content type that we passed.
+        assertTrue(part.getContentType().startsWith("image/png"));
+        // We verify the format of the generated temporary file containing our attachment data
+        assertTrue(part.getFileName().matches("attachment.*\\.tmp"));
+
+        assertArrayEquals(new String[]{ "quoted-printable" }, part.getHeader("Content-Transfer-Encoding"));
+
+        assertEquals("Lorem Ipsum", IOUtils.toString(part.getDataHandler().getInputStream()));
+    }
+
+    @Test
+    public void createAttachmentBodyPartWhenWriteError() throws Exception
+    {
+        Environment environment = this.mocker.getInstance(Environment.class);
+        when(environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
+
+        Attachment attachment = mock(Attachment.class);
+        when(attachment.getFilename()).thenReturn("image.png");
+        when(attachment.getContent()).thenThrow(new RuntimeException("error"));
+
+        try {
+            this.mocker.getComponentUnderTest().create(attachment);
+            fail("Should have thrown an exception here!");
+        } catch (MessagingException expected) {
+            assertEquals("Failed to save attachment [image.png] to the file system", expected.getMessage());
+        }
     }
 }

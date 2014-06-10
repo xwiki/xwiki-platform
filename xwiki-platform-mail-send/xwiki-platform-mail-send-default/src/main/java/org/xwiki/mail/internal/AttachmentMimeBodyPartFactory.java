@@ -20,7 +20,6 @@
 package org.xwiki.mail.internal;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
@@ -35,16 +34,17 @@ import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
-import org.xwiki.mail.MimeBodyPartFactory;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Attachment;
 
 /**
- * Creates attachment body Part to be added to a Multi Part message.
+ * Creates an attachment Body Part from an {@link Attachment} object. This will be added to a Multi Part message.
  *
  * @version $Id$
  * @since 6.1M2
@@ -52,8 +52,10 @@ import com.xpn.xwiki.api.Attachment;
 @Component
 @Named("attachment")
 @Singleton
-public class AttachmentMimeBodyPartFactory implements MimeBodyPartFactory<Attachment>
+public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<Attachment> implements Initializable
 {
+    private static final String HEADERS_PARAMETER_KEY = "headers";
+
     @Inject
     private Environment environment;
 
@@ -63,62 +65,69 @@ public class AttachmentMimeBodyPartFactory implements MimeBodyPartFactory<Attach
     @Inject
     private Logger logger;
 
-    @Override public MimeBodyPart create(Attachment attachment)
+    private File temporaryDirectory;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        this.temporaryDirectory = new File(this.environment.getTemporaryDirectory(), "mail");
+        this.temporaryDirectory.mkdirs();
+    }
+
+    @Override
+    public MimeBodyPart create(Attachment attachment) throws MessagingException
     {
         return this.create(attachment, Collections.<String, Object>emptyMap());
     }
 
-    @Override public MimeBodyPart create(Attachment attachment, Map<String, Object> parameters)
+    @Override
+    public MimeBodyPart create(Attachment attachment, Map<String, Object> parameters) throws MessagingException
     {
-        // Check if existing headers
-        Boolean hasHeaders = parameters.containsKey("headers");
-
         // Create the attachment part of the email
         MimeBodyPart attachmentPart = new MimeBodyPart();
 
+        // Save the attachment to a temporary file on the file system and wrap it in a Java Mail Data Source.
+        DataSource source = createTemporaryAttachmentDataSource(attachment);
+        attachmentPart.setDataHandler(new DataHandler(source));
+
+        attachmentPart.setHeader("Content-Type", attachment.getMimeType());
+
+        // Add a content-id so that we can uniquely reference this attachment. This is used for example to
+        // display the attachment inline in some mail HTML content.
+        // Note: According to http://tools.ietf.org/html/rfc2392 the id must be enclosed in angle brackets.
+        attachmentPart.setHeader("Content-ID", "<" + attachment.getFilename() + ">");
+
+        attachmentPart.setFileName(source.getName());
+
+        // Handle headers passed as parameter
+        addHeaders(attachmentPart, parameters);
+
+        return attachmentPart;
+    }
+
+    private DataSource createTemporaryAttachmentDataSource(Attachment attachment) throws MessagingException
+    {
+        File temporaryAttachmentFile;
         FileOutputStream fos = null;
         try {
-            // Get attachment informations
-            String fileName = attachment.getFilename();
-            String attachmentMimeType = attachment.getMimeType();
-            byte[] stream = attachment.getContent();
-
-            File tempDir = environment.getTemporaryDirectory();
-            File temp = File.createTempFile("tmpfile", ".tmp", tempDir);
-
-            fos = new FileOutputStream(temp);
-            fos.write(stream);
-
-            DataSource source = new FileDataSource(temp);
-
-            attachmentPart.setDataHandler(new DataHandler(source));
-            attachmentPart.setHeader("Content-Type", attachmentMimeType);
-            attachmentPart.setHeader("Content-ID", "<" + fileName + ">");
-            attachmentPart.setFileName(source.getName());
-
-            if (hasHeaders && parameters.get("headers") instanceof Map) {
-                Map<String, String> headers = (Map<String, String>) parameters.get("headers");
-                for (Map.Entry<String, String> header : headers.entrySet()) {
-                    attachmentPart.setHeader(header.getKey(), header.getValue());
-                }
-            }
-        } catch (FileNotFoundException e) {
-            logger.warn("FileNotFoundException has occurred [{}]", e.getMessage());
-        } catch (XWikiException xe) {
-            logger.warn("XWikiException has occurred [{}]", xe.getMessage());
-        } catch (IOException iox) {
-            logger.warn("IOException has occurred [{}]", iox.getMessage());
-        } catch (MessagingException mx) {
-            logger.warn("MessagingException has occurred [{}]", mx.getMessage());
+            temporaryAttachmentFile = File.createTempFile("attachment", ".tmp", this.temporaryDirectory);
+            temporaryAttachmentFile.deleteOnExit();
+            fos = new FileOutputStream(temporaryAttachmentFile);
+            fos.write(attachment.getContent());
+        } catch (Exception e) {
+            throw new MessagingException(
+                String.format("Failed to save attachment [%s] to the file system", attachment.getFilename()), e);
         } finally {
             try {
                 if(fos != null){
                     fos.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                // Only an error at closing, we continue
+                this.logger.warn("Failed to close the temporary file attachment when sending an email. "
+                    + "Root reason: [{}]", ExceptionUtils.getRootCauseMessage(e));
             }
         }
-        return attachmentPart;
+        return new FileDataSource(temporaryAttachmentFile);
     }
 }

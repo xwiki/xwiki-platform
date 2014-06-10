@@ -42,9 +42,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>de.sandroboehme.lesscss</groupId>
+      <groupId>org.lesscss</groupId>
       <artifactId>lesscss</artifactId>
-      <version>1.6.1.1.0</version>
+      <version>1.7.0.1.1</version>
       <exclusions>
         <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
         <exclusion>

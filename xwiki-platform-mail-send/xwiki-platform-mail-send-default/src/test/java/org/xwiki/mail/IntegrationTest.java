@@ -19,8 +19,7 @@
  */
 package org.xwiki.mail;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 
 import javax.mail.Multipart;
 import javax.mail.Session;
@@ -55,7 +54,7 @@ public class IntegrationTest
 
     private MailSenderConfiguration configuration;
 
-    private MimeBodyPartFactory<String> htmlPartFactory;
+    private MimeBodyPartFactory<String> defaultBodyPartFactory;
 
     private MailSender sender;
 
@@ -78,8 +77,8 @@ public class IntegrationTest
     public void initialize() throws Exception
     {
         this.configuration = this.componentManager.getInstance(MailSenderConfiguration.class);
-        this.htmlPartFactory = this.componentManager.getInstance(
-            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "html");
+        this.defaultBodyPartFactory = this.componentManager.getInstance(
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
         this.sender = this.componentManager.getInstance(MailSender.class);
     }
 
@@ -99,7 +98,8 @@ public class IntegrationTest
         // Step 3: Add the Message Body
         Multipart multipart = new MimeMultipart("mixed");
         // Add HTML in the body
-        multipart.addBodyPart(this.htmlPartFactory.create("some html here"));
+        multipart.addBodyPart(this.defaultBodyPartFactory.create("some text here",
+            Collections.<String, Object>singletonMap("mimetype", "text/plain")));
         message.setContent(multipart);
 
         // Step 4: Send the mail

@@ -29,6 +29,7 @@ import org.xwiki.mail.MimeBodyPartFactory;
 /**
  * Helper that knows how to handle mail headers by extracting them from the passed parameters.
  *
+ * @param <T> the type of content to be added to a Multi Part message
  * @version $Id$
  * @since 6.1M2
  */

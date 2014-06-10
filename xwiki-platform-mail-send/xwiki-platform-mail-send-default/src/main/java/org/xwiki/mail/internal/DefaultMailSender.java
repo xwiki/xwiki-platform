@@ -17,18 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail;
+package org.xwiki.mail.internal;
 
+import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.MailSender;
 
-@Role
-@Unstable
-public interface MailSender
+@Component
+@Singleton
+public class DefaultMailSender implements MailSender
 {
-    void send(MimeMessage message, Session session) throws MessagingException;
+    @Override
+    public void send(MimeMessage message, Session session) throws MessagingException
+    {
+        Transport transport = session.getTransport("smtp");
+        try {
+            transport.connect();
+            transport.sendMessage(message, message.getAllRecipients());
+        } finally {
+            transport.close();
+        }
+    }
 }

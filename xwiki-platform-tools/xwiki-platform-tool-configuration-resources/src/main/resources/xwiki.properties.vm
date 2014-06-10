@@ -632,7 +632,7 @@ rendering.transformations = $xwikiRenderingTransformations
 # Store
 #-------------------------------------------------------------------------------------
 
-#-# [Since 6.1M1]
+#-# [Since 6.1M2]
 #-# If active, the Filesystem Attachment Store will automatically clear empty directories on startup,
 #-# in some cases this may create undue load on the server and may need to be disabled. To do that,
 #-# set the following to false.

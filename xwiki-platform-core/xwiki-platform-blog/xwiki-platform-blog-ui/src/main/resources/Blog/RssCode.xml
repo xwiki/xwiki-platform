@@ -154,7 +154,7 @@
     &lt;title&gt;$title&lt;/title&gt;
     &lt;link&gt;$blogDoc.getExternalURL()&lt;/link&gt;
     ## TODO: Add a Description field in the blog class
-    &lt;description&gt;Most recent blog posts in the $blogDoc.space space&lt;/description&gt;
+    &lt;description&gt;$services.localization.render('xe.blog.code.description.space', [$blogDoc.space])&lt;/description&gt;
     #getWikiLogo($logoUrl)
     &lt;image rdf:resource="$logoUrl"/&gt;
     &lt;dc:language&gt;$blogDoc.defaultLanguage&lt;/dc:language&gt;
@@ -188,7 +188,7 @@
     &lt;title&gt;$escapetool.xml($mainDoc.plainTitle)&lt;/title&gt;
     &lt;link&gt;$mainDoc.getExternalURL()&lt;/link&gt;
     ## TODO: Add a Description field in the blog class
-    &lt;description&gt;Most recent blog posts in the wiki&lt;/description&gt;
+    &lt;description&gt;$services.localization.render('xe.blog.code.description.wiki')&lt;/description&gt;
     #getWikiLogo($logoUrl)
     &lt;image rdf:resource="$logoUrl"/&gt;
     &lt;dc:rights&gt;$escapetool.xml($xwiki.spaceCopyright)&lt;/dc:rights&gt;
@@ -216,10 +216,10 @@
  *###
 #macro(printBlogCategoryRssChannelDescription $categoryDoc $entries)
   &lt;channel rdf:about="$categoryDoc.getURL()"&gt;
-    &lt;title&gt;$categoryDoc.display('name')&lt;/title&gt;
+    &lt;title&gt;$services.localization.render($categoryDoc.getValue('name'))&lt;/title&gt;
     &lt;link&gt;$categoryDoc.getExternalURL()&lt;/link&gt;
     ## TODO: Add a Description field in the blog class
-    &lt;description&gt;Most recent blog posts in the $categoryDoc.display('name') category&lt;/description&gt;
+    &lt;description&gt;$services.localization.render('xe.blog.code.description.category', [$categoryDoc.display('name')])&lt;/description&gt;
     &lt;dc:rights&gt;$escapetool.xml($xwiki.spaceCopyright)&lt;/dc:rights&gt;
     &lt;items&gt;
       &lt;rdf:Seq&gt;

@@ -94,7 +94,7 @@ Thus it is forbidden to depend on the HTML Macro.
             </configuration>
           </execution>
         </executions>
-      </plugin>      
+      </plugin>
     </plugins>
   </build>
   <modules>

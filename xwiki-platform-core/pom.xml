@@ -399,7 +399,7 @@
               <method>void createHibernateSequenceIfRequired(java.lang.String, org.hibernate.Session)</method>
               <justification>Internal stuff</justification>
             </difference>
-            
+
             <difference>
               <differenceType>4001</differenceType>
               <className>com/xpn/xwiki/render/XWikiMacrosMappingRenderer</className>
@@ -430,7 +430,6 @@
               <method>java.lang.String getId()</method>
               <justification>Used only if the renderer is a component</justification>
             </difference>
-            
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

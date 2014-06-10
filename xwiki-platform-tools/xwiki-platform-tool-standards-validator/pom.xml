@@ -52,7 +52,7 @@
       <artifactId>vnu-lite</artifactId>
       <version>20140222-xwiki</version>
     </dependency>
-    <dependency>    
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>

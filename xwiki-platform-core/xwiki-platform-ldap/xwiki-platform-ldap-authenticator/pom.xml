@@ -38,7 +38,7 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>com.novell.ldap</groupId>
       <artifactId>jldap</artifactId>

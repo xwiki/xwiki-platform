@@ -48,7 +48,7 @@
       <groupId>org.restlet.jse</groupId>
       <artifactId>org.restlet</artifactId>
       <version>${restlet.version}</version>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>

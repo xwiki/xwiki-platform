@@ -28,7 +28,7 @@
   <artifactId>xwiki-platform-annotation-reference</artifactId>
   <name>XWiki Platform - Annotations - References Manipulation</name>
   <description>
-    Extensions of the standard XWiki references serializers and resolvers to be able to address XWiki content in a 
+    Extensions of the standard XWiki references serializers and resolvers to be able to address XWiki content in a
     single string.
   </description>
   <packaging>jar</packaging>

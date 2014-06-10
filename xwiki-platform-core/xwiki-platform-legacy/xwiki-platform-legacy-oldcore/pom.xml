@@ -63,14 +63,14 @@
       <artifactId>jackrabbit-core</artifactId>
       <version>1.1-xwiki</version>
     </dependency>
-    
+
     <!-- There's no release of Graffito yet (http://incubator.apache.org/graffito/jcr-mapping/index.html) -->
     <dependency>
       <groupId>org.apache.portals</groupId>
       <artifactId>graffito-jcr-mapping</artifactId>
       <version>1.0-a1-amelentev-dev</version>
     </dependency>
-    
+
     <!-- See http://jira.codehaus.org/browse/MEV-488 -->
     <dependency>
       <groupId>javax.jcr</groupId>

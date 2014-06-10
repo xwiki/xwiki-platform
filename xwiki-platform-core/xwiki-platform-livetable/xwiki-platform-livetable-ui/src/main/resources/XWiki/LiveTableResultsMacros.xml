@@ -233,7 +233,7 @@
   #set($query = $services.query.hql($sql))
   ## Apply query filters if defined. Otherwise use default.
   #foreach ($queryFilter in $stringtool.split($!request.queryFilters, ', '))
-    #set ($query = $query.addFilter($queryFilter)) 
+    #set ($query = $query.addFilter($queryFilter))
   #end
   #set ($query = $query.setLimit($limit).setOffset($offset).bindValues($sqlParams))
   #set($items = $query.execute())

@@ -50,7 +50,7 @@
       <artifactId>xwiki-commons-context</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -69,4 +69,3 @@
     </plugins>
   </build>
 </project>
-       

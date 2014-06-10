@@ -634,7 +634,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-      </plugin>      
+      </plugin>
       <!-- Publish a Core Test JAR -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

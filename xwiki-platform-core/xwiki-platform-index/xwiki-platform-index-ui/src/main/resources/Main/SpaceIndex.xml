@@ -167,13 +167,26 @@
     #set ($limit = '100')
   #end
   #set ($limit = $mathtool.toInteger($limit))
+  ## get the sort of the list of document
+  ##values are creationDate, modificationDate and docName
+  #set ($sort = $xcontext.macro.params.get('sort'))
+  #if ("$sort" == 'docName')
+    ## sorting alphabetical list of document
+    #set ($sort = 'doc.name asc')
+  #elseif ("$sort" == 'modificationDate')
+    ## list of document sorting by update date 
+    #set ($sort = 'doc.contentUpdateDate desc')
+  #else
+    ## list of document sorting by creation date by default if creationDate value, no value,  or wrong value is specified
+    #set ($sort = 'doc.creationDate desc')
+  #end
   ## get the space to display the documents for
   #set ($spaceParam = $doc.space)
   #set ($spaceMacroParam = $xcontext.macro.params.get('space'))
   #if ("$!spaceMacroParam" != '')
     #set ($spaceParam = $spaceMacroParam)
   #end
-  #set ($docNames = $services.query.hql('where doc.space=? order by doc.creationDate desc').addFilter('currentlanguage').addFilter('hidden').setLimit($limit).bindValues([${spaceParam}]).execute())
+  #set ($docNames = $services.query.hql("where doc.space=? order by $sort").addFilter('currentlanguage').addFilter('hidden').setLimit($limit).bindValues([${spaceParam}]).execute())
   {{html}}
     #displayDocumentList($docNames false []) 
     ## Note: we pass an empty blacklistedSpaces list since we are used as a space dashboard, not a global dashboard
@@ -213,7 +226,7 @@
       <defaultCategory>Navigation</defaultCategory>
     </property>
     <property>
-      <description>Lists the documents in a space.</description>
+      <description>Lists documents in a space.</description>
     </property>
     <property>
       <id>spaceindex</id>
@@ -359,6 +372,76 @@
     <property>
       <name>space</name>
     </property>
+  </object>
+  <object>
+   <name>Main.SpaceIndex</name>
+   <number>2</number>
+   <className>XWiki.WikiMacroParameterClass</className>
+   <guid>fc4b56bc-f0a0-4295-89cd-3936da62bbe3</guid>
+   <class>
+    <name>XWiki.WikiMacroParameterClass</name>
+    <customClass/>
+    <customMapping/>
+    <defaultViewSheet/>
+    <defaultEditSheet/>
+    <defaultWeb/>
+    <nameField/>
+    <validationScript/>
+    <defaultValue>
+      <disabled>0</disabled>
+      <name>defaultValue</name>
+      <number>4</number>
+      <prettyName>Parameter default value</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </defaultValue>
+    <description>
+      <disabled>0</disabled>
+      <name>description</name>
+      <number>2</number>
+      <prettyName>Parameter description</prettyName>
+      <rows>5</rows>
+      <size>40</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+    </description>
+    <mandatory>
+      <disabled>0</disabled>
+      <displayFormType>select</displayFormType>
+      <displayType>yesno</displayType>
+      <name>mandatory</name>
+      <number>3</number>
+      <prettyName>Parameter mandatory</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </mandatory>
+    <name>
+      <disabled>0</disabled>
+      <name>name</name>
+      <number>1</number>
+      <prettyName>Parameter name</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </name>
+   </class>
+  <property>
+    <defaultValue>creationDate</defaultValue>
+  </property>
+  <property>
+    <description>Facultative parameter to choose the sorting of the list of document.
+Value must be:
+- creationDate sort by creation date (default)
+- modificationDate sort by update date
+- or docName sort alphabeticaly</description>
+  </property>
+  <property>
+    <mandatory>0</mandatory>
+  </property>
+  <property>
+    <name>sort</name>
+  </property>
   </object>
   <content>{{velocity}}
 #if("$!request.space" != "") #set($space=$request.space) #else #set($space = $doc.space) #end

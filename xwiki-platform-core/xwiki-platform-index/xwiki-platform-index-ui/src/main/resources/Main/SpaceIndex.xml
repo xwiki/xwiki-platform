@@ -34,7 +34,7 @@
   <creationDate>1252454400000</creationDate>
   <date>1329088048000</date>
   <contentUpdateDate>1329088048000</contentUpdateDate>
-  <version>1.2</version>
+  <version>1.1</version>
   <title>$services.localization.render('platform.index.spaceIndex')</title>
   <template/>
   <defaultTemplate/>

@@ -74,26 +74,28 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
         try {
             List<String> documentNames = descriptorDocumentHelper.getAllXWikiServerClassDocumentNames();
 
-            // Make sure we always return a descriptor for main wiki, even a virtual one
-            if (!documentNames.contains(getMainWikiId())) {
-                result.add(getMainWikiDescriptor());
-            }
+            boolean foundMainWiki = false;
+
+            XWikiContext xcontext = xcontextProvider.get();
 
             for (String documentName : documentNames) {
                 // Get the id
                 String wikiId = descriptorDocumentHelper.getWikiIdFromDocumentFullname(documentName);
-                // Get the descriptor from the cache
-                DefaultWikiDescriptor descriptor = cache.getFromId(wikiId);
-                if (descriptor == null) {
-                    // Get the document
-                    XWikiDocument document = descriptorDocumentHelper.getDocumentFromWikiId(wikiId);
-                    // Extract the Wiki
-                    descriptor = buildDescriptorFromDocument(document);
-                }
+
+                // Get the descriptor
+                WikiDescriptor descriptor = getById(wikiId);
+
                 // Add it to the result list
                 if (descriptor != null) {
                     result.add(descriptor);
+
+                    foundMainWiki |= xcontext.isMainWiki(wikiId);
                 }
+            }
+
+            // Make sure we always return a descriptor for main wiki, even a virtual one
+            if (!foundMainWiki) {
+                result.add(getMainWikiDescriptor());
             }
         } catch (Exception e) {
             throw new WikiManagerException("Failed to locate XWiki.XWikiServerClass documents", e);

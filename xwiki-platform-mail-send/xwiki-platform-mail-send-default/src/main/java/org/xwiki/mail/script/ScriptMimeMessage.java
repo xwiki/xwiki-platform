@@ -87,6 +87,11 @@ public class ScriptMimeMessage extends MimeMessage
         }
     }
 
+    public void waitTillSent()
+    {
+        this.mailSender.waitTillSent();
+    }
+
     private MimeBodyPartFactory getBodyPartFactory(String mimeType, Class contentClass) throws MessagingException
     {
         MimeBodyPartFactory factory;

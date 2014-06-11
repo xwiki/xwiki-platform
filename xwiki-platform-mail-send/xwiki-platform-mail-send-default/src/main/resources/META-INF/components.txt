@@ -4,3 +4,4 @@ org.xwiki.mail.internal.AttachmentMimeBodyPartFactory
 org.xwiki.mail.internal.DefaultMimeBodyPartFactory
 org.xwiki.mail.internal.HtmlMimeBodyPartFactory
 org.xwiki.mail.internal.DefaultMailSender
+org.xwiki.mail.internal.DefaultMailSenderThread

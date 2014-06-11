@@ -1,5 +1,10 @@
 #template('colorThemeInit.vm')
-html, body {
+/*
+  The skin sets some styles on #body so we need a more specific selector in order to overwrite them. Moreover, Chrome
+  seems to ignore the !important when computing the current style of the edited element, which leads to the wrong style
+  being copied to new elements (see XWIKI-10276).
+*/
+html, body#body[contenteditable=true] {
   background-color: $theme.pageContentBackgroundColor !important;
   background-image: none !important;
   color: $theme.textColor !important;

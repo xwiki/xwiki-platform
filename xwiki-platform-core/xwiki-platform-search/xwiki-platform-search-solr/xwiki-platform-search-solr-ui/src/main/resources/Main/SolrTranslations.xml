@@ -162,6 +162,7 @@ solr.field.comment=Comments
 solr.field.objcontent=Objects
 solr.field.mimetype=File Type
 solr.field.attauthor=Uploaded By
+solr.field.attauthor_display=Uploaded By
 solr.field.attdate=Upload Date
 solr.field.attsize=File Size</content>
   <object>

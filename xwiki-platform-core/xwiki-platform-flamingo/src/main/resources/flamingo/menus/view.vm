@@ -18,8 +18,8 @@
       #template("menus/wiki.vm")
       #template("menus/space.vm")
       #template("menus/page.vm")
-      #template("quicksearch.vm")
     #xwikitopmenuleftend()
+    #template("quicksearch.vm")
     
   ## End of Top Menu
   #xwikitopmenuend()

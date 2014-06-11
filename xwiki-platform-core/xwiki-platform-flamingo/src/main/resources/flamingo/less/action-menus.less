@@ -18,11 +18,18 @@
       margin: 0;
     }
   }
+  @media (max-width: @screen-sm-min) {
+    .dropdown-menu .divider {
+      background-color: @navbar-default-border;
+    }
+  }
 }
 
 .globalsearch { 
-  .input-group {
-    width: 15em;
+  @media (min-width: @screen-sm-min) {
+    .input-group {
+      width: 15em;
+    }
   }
 
   .button {

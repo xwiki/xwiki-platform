@@ -31,7 +31,6 @@ import javax.inject.Singleton;
 import org.apache.commons.io.IOUtils;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.job.Request;
 import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.observation.ObservationManager;

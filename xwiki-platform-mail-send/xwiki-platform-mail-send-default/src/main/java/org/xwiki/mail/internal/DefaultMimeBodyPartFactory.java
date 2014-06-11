@@ -20,7 +20,6 @@
 package org.xwiki.mail.internal;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -28,6 +27,7 @@ import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 
@@ -47,12 +47,8 @@ public class DefaultMimeBodyPartFactory extends AbstractMimeBodyPartFactory<Stri
     @Inject
     private Logger logger;
 
-    @Override public MimeBodyPart create(String content) throws MessagingException
-    {
-        return this.create(content, Collections.<String, Object>emptyMap());
-    }
-
-    @Override public MimeBodyPart create(String content, Map<String, Object> parameters) throws MessagingException
+    @Override
+    public MimeBodyPart create(String content, Map<String, Object> parameters) throws MessagingException
     {
         // Create the body part of the email
         MimeBodyPart bodyPart = new MimeBodyPart();
@@ -65,5 +61,20 @@ public class DefaultMimeBodyPartFactory extends AbstractMimeBodyPartFactory<Stri
         addHeaders(bodyPart, parameters);
 
         return bodyPart;
+    }
+
+    /**
+     * Extracts the mime type from the passed parameters Map.
+     *
+     * @param parameters the parameters from which to extract the mime type if defined
+     * @return either the extracted mimetype or {@code text/plain} if not the property is not passed in the parameters
+     */
+    protected String getMimetype(Map<String, Object> parameters)
+    {
+        String mimeType = (String) parameters.get("mimetype");
+        if (StringUtils.isEmpty(mimeType)) {
+            mimeType = "text/plain";
+        }
+        return mimeType;
     }
 }

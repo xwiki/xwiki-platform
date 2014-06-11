@@ -22,7 +22,6 @@ package org.xwiki.mail.internal;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
 
 import javax.activation.DataHandler;
@@ -72,12 +71,6 @@ public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<A
     {
         this.temporaryDirectory = new File(this.environment.getTemporaryDirectory(), "mail");
         this.temporaryDirectory.mkdirs();
-    }
-
-    @Override
-    public MimeBodyPart create(Attachment attachment) throws MessagingException
-    {
-        return this.create(attachment, Collections.<String, Object>emptyMap());
     }
 
     @Override

@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Collections;
 import java.util.Map;
 
 import javax.mail.MessagingException;
@@ -35,6 +36,12 @@ import org.xwiki.mail.MimeBodyPartFactory;
  */
 public abstract class AbstractMimeBodyPartFactory<T> implements MimeBodyPartFactory<T>
 {
+    @Override
+    public MimeBodyPart create(T content) throws MessagingException
+    {
+        return this.create(content, Collections.<String, Object>emptyMap());
+    }
+
     /**
      * Add the mail headers passed as parameters into the Mime Body part also passed as parameter.
      *
@@ -50,18 +57,5 @@ public abstract class AbstractMimeBodyPartFactory<T> implements MimeBodyPartFact
                 part.setHeader(header.getKey(), header.getValue());
             }
         }
-    }
-
-    /**
-     * @param parameters the parameters from which to extract the headers
-     * @return the mimetype passed, if null return text/plain
-     */
-    protected String getMimetype(Map<String, Object> parameters)
-    {
-        String mimetype = (String) parameters.get("mimetype");
-        if (mimetype != null && !mimetype.equals("")) {
-            return mimetype;
-        }
-        return "text/plain";
     }
 }

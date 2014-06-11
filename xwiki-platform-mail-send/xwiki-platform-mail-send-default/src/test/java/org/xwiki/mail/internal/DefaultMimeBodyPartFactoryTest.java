@@ -25,7 +25,9 @@ import java.util.Map;
 
 import javax.mail.internet.MimeBodyPart;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -38,35 +40,27 @@ import static org.junit.Assert.assertEquals;
  */
 public class DefaultMimeBodyPartFactoryTest
 {
-    @Test
-    public void createDefaultBodyPart() throws Exception
-    {
-        // Step 1: Create a DefaultMimeBodyPartFactory object
-        DefaultMimeBodyPartFactory defaultPartFactory = new DefaultMimeBodyPartFactory();
+    @Rule
+    public MockitoComponentMockingRule<DefaultMimeBodyPartFactory> mocker =
+        new MockitoComponentMockingRule<>(DefaultMimeBodyPartFactory.class);
 
-        // Step 2: Create the body part
-        MimeBodyPart bodyPart = defaultPartFactory.create("Lorem ipsum");
+    @Test
+    public void createWithoutMimeTypePassed() throws Exception
+    {
+        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("Lorem ipsum");
 
         assertEquals("Lorem ipsum", bodyPart.getContent());
         assertEquals("text/plain", bodyPart.getContentType());
     }
 
     @Test
-    public void createDefaultBodyPartWithHeaders() throws Exception
+    public void createWithMimeTypePassedAndWithHeaders() throws Exception
     {
-        // Step 1: Create a DefaultMimeBodyPartFactory object
-        DefaultMimeBodyPartFactory defaultPartFactory = new DefaultMimeBodyPartFactory();
-
-        // Step 2: Add parameters Map
-        Map<String, String> headers = Collections.singletonMap("Content-Transfer-Encoding", "quoted-printable");
-        //Map<String, Object> parameters = Collections.<String, Object>singletonMap("headers", headers);
-
-        Map<String, Object> parameters = new HashMap();
-        parameters.put("headers", headers);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("headers", Collections.singletonMap("Content-Transfer-Encoding", "quoted-printable"));
         parameters.put("mimetype", "text/calendar");
 
-        // Step 3: Create the body part
-        MimeBodyPart bodyPart = defaultPartFactory.create("Lorem ipsum", parameters);
+        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("Lorem ipsum", parameters);
 
         assertEquals("Lorem ipsum", bodyPart.getContent());
         assertEquals("text/calendar", bodyPart.getContentType());

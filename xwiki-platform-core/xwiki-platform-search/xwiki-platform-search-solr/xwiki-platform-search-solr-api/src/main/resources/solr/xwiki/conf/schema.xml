@@ -484,6 +484,7 @@
     </fieldType>
 
     <!-- A text type for English text where stopwords and synonyms are managed using the REST API -->
+    <!--
     <fieldType name="managed_en" class="solr.TextField" positionIncrementGap="100">
       <analyzer>
         <tokenizer class="solr.StandardTokenizerFactory"/>
@@ -491,6 +492,7 @@
         <filter class="solr.ManagedSynonymFilterFactory" managed="english" />
       </analyzer>
     </fieldType>
+    -->
 
     <!-- A general text field that has reasonable, generic
          cross-language defaults: it tokenizes with StandardTokenizer,
@@ -1159,9 +1161,8 @@
     <!-- Thai -->
     <fieldType name="text_th" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
-        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <tokenizer class="solr.ThaiTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.ThaiWordFilterFactory"/>
         <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_th.txt" />
       </analyzer>
     </fieldType>

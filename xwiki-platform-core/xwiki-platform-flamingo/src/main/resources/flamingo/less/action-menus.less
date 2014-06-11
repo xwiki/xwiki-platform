@@ -2,10 +2,22 @@
 // Action Menus
 // --------------------------------------------------
 
-#menuview .navbar {
-  border-radius: 0;
-  border: 0;
-  margin-bottom: 0;
+#menuview {
+  .navbar {
+    border-radius: 0;
+    border: 0;
+    margin-bottom: 0;
+  }
+  .navbar-header {
+    min-width: percentage((1 / @grid-columns));
+    text-align: center;
+  }
+  .navbar-brand {
+    float: none;
+    img {
+      margin: 0;
+    }
+  }
 }
 
 .globalsearch { 

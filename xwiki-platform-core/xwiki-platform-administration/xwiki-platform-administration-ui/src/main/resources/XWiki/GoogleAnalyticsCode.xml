@@ -85,7 +85,7 @@
 #set ($methodPropertyClass = $analyticsCodeClass.method)##
 #if ($hasAdmin)##
   #if ($request.action == 'save')##
-    #saveGoogleAccount($request.get('analytics_account') $request.get('analytics_method'))##
+    #saveGoogleAccount($request.analytics_account $request.analytics_method)##
   #end## save action
 #else## !hasAdmin
   {{error}}{{translation key="needadminrights"/}}.{{/error}}
@@ -93,7 +93,7 @@
 #displayAnalyticsStatus()
 
 {{html}}
-&lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post" class="xform half"&gt;
+&lt;form action="" method="post" class="xform half"&gt;
   &lt;dl&gt;
     &lt;dt&gt;
       &lt;label for="analytics_method"&gt;$!methodPropertyClass.translatedPrettyName&lt;/label&gt;

@@ -11,14 +11,31 @@
 }
 
 // Tables =====================================================================
+
 table:extend(.table all) {}
 
-table{
+table {
   .table;
+  /* Used by: Livetable */
+  table {
+    background-color: @xwiki-page-content-bg;
+  }
+  th {
+    label {
+      font-weight: normal;
+      margin: 0;
+    }
+  }
 }
 
 // Avatars ====================================================================
+
 .avatar_30 {
   max-width: 30px;
   max-height: 30px;
+}
+
+.avatar_50 {
+  max-width: 50px;
+  max-height: 50px;
 }

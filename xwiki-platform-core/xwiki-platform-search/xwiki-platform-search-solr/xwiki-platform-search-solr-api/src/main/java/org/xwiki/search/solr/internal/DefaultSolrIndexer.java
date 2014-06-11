@@ -568,7 +568,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
         job.initialize(request);
 
-        this.indexerJobs.execute(new ExecutionContextRunnable(job, this.componentManager));
+        this.indexerJobs.execute(job);
 
         return job;
     }

@@ -103,7 +103,7 @@ public class XWikiInitializerJob extends AbstractJob<XWikiInitializerRequest, XW
         if (this.thread == null) {
             initialize(new XWikiInitializerRequest());
 
-            this.thread = new Thread(new ExecutionContextRunnable(this, this.componentManager));
+            this.thread = new Thread(this);
 
             this.thread.setDaemon(true);
             this.thread.setName("XWiki initialization");

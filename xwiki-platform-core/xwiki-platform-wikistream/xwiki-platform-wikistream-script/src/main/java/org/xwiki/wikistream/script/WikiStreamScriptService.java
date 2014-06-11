@@ -36,7 +36,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.job.Job;
-import org.xwiki.job.JobManager;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.AuthorizationException;
@@ -78,8 +78,7 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    @Named("wikistream")
-    private JobManager jobManager;
+    private JobExecutor jobExecutor;
 
     @Inject
     @Named(WikiStreamConverterJob.JOBTYPE)
@@ -131,7 +130,7 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
                 new WikiStreamConverterJobRequest(inputType, inputProperties, outputType, outputProperties);
 
             if (async) {
-                job = this.jobManager.addJob(WikiStreamConverterJob.JOBTYPE, request);
+                job = this.jobExecutor.execute(WikiStreamConverterJob.JOBTYPE, request);
             } else {
                 job = this.jobProvider.get();
                 job.initialize(request);
@@ -156,7 +155,7 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
         try {
             checkProgrammingRights();
 
-            return this.jobManager.getCurrentJob();
+            return this.jobExecutor.getCurrentJob(WikiStreamConverterJob.ROOT_GROUP);
         } catch (Exception e) {
             setError(e);
         }

@@ -99,7 +99,7 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
             // Add it to the list of jobs
             jobs.put(jobId, job);
             // Pass it to the executor
-            jobExecutor.execute(new ExecutionContextRunnable(job, this.componentManager));
+            jobExecutor.execute(job);
             // Return the job
             return job;
         } catch (ComponentLookupException e) {

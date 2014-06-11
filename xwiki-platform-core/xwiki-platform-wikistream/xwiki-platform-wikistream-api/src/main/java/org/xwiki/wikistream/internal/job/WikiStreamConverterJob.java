@@ -19,6 +19,8 @@
  */
 package org.xwiki.wikistream.internal.job;
 
+import java.util.Arrays;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -27,11 +29,14 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.job.GroupedJob;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.job.internal.DefaultJobStatus;
 import org.xwiki.wikistream.input.InputWikiStream;
 import org.xwiki.wikistream.input.InputWikiStreamFactory;
 import org.xwiki.wikistream.job.WikiStreamConverterJobRequest;
+import org.xwiki.wikistream.job.WikiStreamJobRequest;
 import org.xwiki.wikistream.output.OutputWikiStream;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 
@@ -45,12 +50,18 @@ import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 @Named(WikiStreamConverterJob.JOBTYPE)
 public class WikiStreamConverterJob extends
-    AbstractJob<WikiStreamConverterJobRequest, DefaultJobStatus<WikiStreamConverterJobRequest>>
+    AbstractJob<WikiStreamConverterJobRequest, DefaultJobStatus<WikiStreamConverterJobRequest>> implements GroupedJob
 {
     /**
      * The id of the job.
      */
     public static final String JOBTYPE = "wikistream.converter";
+
+    /**
+     * The root group of all wiki stream conversion jobs.
+     */
+    public static final JobGroupPath ROOT_GROUP = new JobGroupPath(Arrays.asList(WikiStreamJobRequest.JOBID_PREFIX,
+        "converter"));
 
     @Inject
     @Named("context")
@@ -60,6 +71,12 @@ public class WikiStreamConverterJob extends
     public String getType()
     {
         return JOBTYPE;
+    }
+
+    @Override
+    public JobGroupPath getGroupPath()
+    {
+        return ROOT_GROUP;
     }
 
     @Override

@@ -22,6 +22,7 @@ package org.xwiki.extension.distribution.internal.job;
 import java.util.List;
 
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
 
@@ -42,7 +43,7 @@ public class FarmDistributionJobStatus extends DistributionJobStatus<Distributio
         super(request, observationManager, loggerManager, steps);
     }
 
-    public FarmDistributionJobStatus(DistributionJobStatus<DistributionRequest> status,
+    public FarmDistributionJobStatus(JobStatus status,
         ObservationManager observationManager, LoggerManager loggerManager)
     {
         super(status, observationManager, loggerManager);

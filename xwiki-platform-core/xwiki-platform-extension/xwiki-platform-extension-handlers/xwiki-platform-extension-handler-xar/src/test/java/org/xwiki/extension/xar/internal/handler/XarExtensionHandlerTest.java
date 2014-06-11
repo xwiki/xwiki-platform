@@ -20,7 +20,6 @@
 package org.xwiki.extension.xar.internal.handler;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -32,8 +31,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.UninstallException;
@@ -45,7 +42,7 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.job.Job;
-import org.xwiki.job.JobManager;
+import org.xwiki.job.JobExecutor;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
@@ -82,7 +79,7 @@ public class XarExtensionHandlerTest
 
     private ExtensionId localXarExtensiontId2;
 
-    private JobManager jobManager;
+    private JobExecutor jobExecutor;
 
     private InstalledExtensionRepository xarExtensionRepository;
 
@@ -120,7 +117,7 @@ public class XarExtensionHandlerTest
 
         // lookup
 
-        this.jobManager = this.componentManager.getInstance(JobManager.class);
+        this.jobExecutor = this.componentManager.getInstance(JobExecutor.class);
         this.xarExtensionRepository =
             this.componentManager.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
 
@@ -167,7 +164,8 @@ public class XarExtensionHandlerTest
         if (namespace != null) {
             installRequest.addNamespace(namespace);
         }
-        Job installJob = this.jobManager.executeJob(InstallJob.JOBTYPE, installRequest);
+        Job installJob = this.jobExecutor.execute(InstallJob.JOBTYPE, installRequest);
+        installJob.join();
 
         List<LogEvent> errors = installJob.getStatus().getLog().getLogsFrom(LogLevel.WARN);
         if (!errors.isEmpty()) {
@@ -190,7 +188,8 @@ public class XarExtensionHandlerTest
         if (wiki != null) {
             uninstallRequest.addNamespace("wiki:" + wiki);
         }
-        Job uninstallJob = this.jobManager.executeJob(UninstallJob.JOBTYPE, uninstallRequest);
+        Job uninstallJob = this.jobExecutor.execute(UninstallJob.JOBTYPE, uninstallRequest);
+        uninstallJob.join();
 
         List<LogEvent> errors = uninstallJob.getStatus().getLog().getLogsFrom(LogLevel.WARN);
         if (!errors.isEmpty()) {
@@ -300,7 +299,8 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
 
         // translated.translated.tr
-        XWikiDocument translated = this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("tr")));
+        XWikiDocument translated =
+            this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("tr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in langauge tr has not been saved in the database",
             translated);
@@ -314,7 +314,8 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
 
         // translated.translated.fr
-        XWikiDocument translated2 = this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("fr")));
+        XWikiDocument translated2 =
+            this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("fr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in language fr has not been saved in the database",
             translated2);
@@ -434,7 +435,8 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", defaultTranslated.getVersion());
 
         // translated.translated.tr
-        XWikiDocument translated = this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("tr")));
+        XWikiDocument translated =
+            this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("tr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in langauge tr has not been saved in the database",
             translated);
@@ -448,7 +450,8 @@ public class XarExtensionHandlerTest
         Assert.assertEquals("Wrong version", "1.1", translated.getVersion());
 
         // translated.translated.fr
-        XWikiDocument translated2 = this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("fr")));
+        XWikiDocument translated2 =
+            this.oldcore.getDocuments().get(new DocumentReference(translatedReference, new Locale("fr")));
 
         Assert.assertNotNull("Document wiki:translated.translated in language fr has not been saved in the database",
             translated2);

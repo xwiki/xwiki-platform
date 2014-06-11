@@ -51,4 +51,17 @@ public abstract class AbstractMimeBodyPartFactory<T> implements MimeBodyPartFact
             }
         }
     }
+
+    /**
+     * @param parameters the parameters from which to extract the headers
+     * @return the mimetype passed, if null return text/plain
+     */
+    protected String getMimetype(Map<String, Object> parameters)
+    {
+        String mimetype = (String) parameters.get("mimetype");
+        if (mimetype != null && !mimetype.equals("")) {
+            return mimetype;
+        }
+        return "text/plain";
+    }
 }

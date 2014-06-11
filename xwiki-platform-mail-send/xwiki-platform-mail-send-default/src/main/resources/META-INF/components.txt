@@ -1,5 +1,5 @@
 org.xwiki.mail.script.MailSenderScriptService
 org.xwiki.mail.internal.DefaultMailSenderConfiguration
 org.xwiki.mail.internal.AttachmentMimeBodyPartFactory
-org.xwiki.mail.internal.TextMimeBodyPartFactory
+org.xwiki.mail.internal.DefaultMimeBodyPartFactory
 org.xwiki.mail.internal.DefaultMailSender

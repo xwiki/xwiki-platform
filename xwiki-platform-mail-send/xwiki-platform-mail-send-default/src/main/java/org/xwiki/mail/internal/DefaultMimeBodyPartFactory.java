@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
@@ -39,9 +38,8 @@ import org.xwiki.component.annotation.Component;
  * @since 6.1M2
  */
 @Component
-@Named("text")
 @Singleton
-public class TextMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
+public class DefaultMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
 {
     /**
      * Provides access to the logger.
@@ -49,24 +47,23 @@ public class TextMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
     @Inject
     private Logger logger;
 
-    @Override public MimeBodyPart create(String content)
+    @Override public MimeBodyPart create(String content) throws MessagingException
     {
         return this.create(content, Collections.<String, Object>emptyMap());
     }
 
-    @Override public MimeBodyPart create(String content, Map<String, Object> parameters)
+    @Override public MimeBodyPart create(String content, Map<String, Object> parameters) throws MessagingException
     {
-        // Create the text part of the email
-        MimeBodyPart textPart = new MimeBodyPart();
-        try {
-            textPart.setContent(content, "text/plain; charset=" + StandardCharsets.UTF_8.name());
+        // Create the body part of the email
+        MimeBodyPart bodyPart = new MimeBodyPart();
 
-            // Handle headers passed as parameter
-            addHeaders(textPart, parameters);
+        bodyPart.setContent(content, "text/plain; charset=" + StandardCharsets.UTF_8.name());
 
-        } catch (MessagingException e) {
-            logger.error("MessagingException has occurred [{}]", e.getMessage());
-        }
-        return textPart;
+        bodyPart.setHeader("Content-Type", getMimetype(parameters));
+
+        // Handle headers passed as parameter
+        addHeaders(bodyPart, parameters);
+
+        return bodyPart;
     }
 }

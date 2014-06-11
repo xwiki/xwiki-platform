@@ -21,10 +21,6 @@ package org.xwiki.mail.internal;
 
 import java.util.Queue;
 
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-
-import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Role;
 
 /**
@@ -54,7 +50,7 @@ public interface MailSenderThread extends Runnable
      *
      * @param mailQueue the queue where pending emails to send are located
      */
-    void startProcessing(Queue<Pair<MimeMessage, Session>> mailQueue);
+    void startProcessing(Queue<MailSenderQueueItem> mailQueue);
 
     /**
      * Stops sending mails from the queue.
@@ -66,5 +62,5 @@ public interface MailSenderThread extends Runnable
      *
      * @param mailQueue the queue where pending emails to send are located
      */
-    void run(Queue<Pair<MimeMessage, Session>> mailQueue);
+    void run(Queue<MailSenderQueueItem> mailQueue);
 }

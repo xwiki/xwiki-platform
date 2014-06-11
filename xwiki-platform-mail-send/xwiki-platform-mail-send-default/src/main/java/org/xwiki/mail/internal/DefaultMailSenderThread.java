@@ -29,12 +29,11 @@ import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.mail.MailSenderErrorEvent;
+import org.xwiki.mail.MailResultListener;
 import org.xwiki.observation.ObservationManager;
 
 /**
@@ -56,7 +55,7 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
     /**
      * The queue containing mails to send.
      */
-    private Queue<Pair<MimeMessage, Session>> mailQueue;
+    private Queue<MailSenderQueueItem> mailQueue;
 
     /**
      * Allows to stop this thread, used in {@link #stopProcessing()}.
@@ -70,14 +69,14 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
     private int count;
 
     @Override
-    public void startProcessing(Queue<Pair<MimeMessage, Session>> mailQueue)
+    public void startProcessing(Queue<MailSenderQueueItem> mailQueue)
     {
         this.mailQueue = mailQueue;
         start();
     }
 
     @Override
-    public void run(Queue<Pair<MimeMessage, Session>> mailQueue)
+    public void run(Queue<MailSenderQueueItem> mailQueue)
     {
         this.mailQueue = mailQueue;
         run();
@@ -88,17 +87,16 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
     {
         try {
             do {
+                // Handle next message in the queue
+                if (!this.mailQueue.isEmpty()) {
+                    sendMail(this.mailQueue.poll());
+                }
+                // Make some pause to not overload the server
                 try {
-                    // Handle next message in the queue
-                    if (!this.mailQueue.isEmpty()) {
-                        Pair<MimeMessage, Session> mailData = this.mailQueue.poll();
-                        sendMail(mailData.getLeft(), mailData.getRight());
-                    }
-                    // Make some pause to not overload the server
                     DefaultMailSenderThread.sleep(100L);
                 } catch (Exception e) {
                     // There was an unexpected problem, we stop this thread and log the problem.
-                    this.logger.error("Mail Sender Thread was stopped due to some problem", e);
+                    this.logger.debug("Mail Sender Thread was forcefully stopped", e);
                     break;
                 }
             } while (!this.shouldStop);
@@ -120,17 +118,20 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
     /**
      * Send the mail
      */
-    protected void sendMail(MimeMessage message, Session session)
+    protected void sendMail(MailSenderQueueItem item)
     {
+        MimeMessage message = item.getMessage();
+        MailResultListener listener = item.getListener();
+
         try {
             // Step 1: If the current Session in use is different from the one passed then close the current Transport,
             // get a new one and reconnect. Also do that every 100 mails sent.
             // TODO: explain why!
             // TODO: Also explain why we don't use Transport.send()
-            if (session != this.currentSession || (this.count % 100) == 0) {
+            if (item.getSession() != this.currentSession || (this.count % 100) == 0) {
                 closeTransport();
-                this.currentSession = session;
-                this.currentTransport = session.getTransport("smtp");
+                this.currentSession = item.getSession();
+                this.currentTransport = this.currentSession.getTransport("smtp");
                 this.currentTransport.connect();
             } else if (!this.currentTransport.isConnected()) {
                 this.currentTransport.connect();
@@ -139,8 +140,16 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
             // Step 2: Send the mail
             this.currentTransport.sendMessage(message, message.getAllRecipients());
             this.count++;
+
+            // Step 3: Notify the user of the success if a listener has been provided
+            if (listener != null) {
+                listener.onSuccess(message);
+            }
         } catch (MessagingException e) {
-            sendErrorEvent(message, e);
+            // An error occurred, notify the user if a listener has been provided
+            if (listener != null) {
+                listener.onError(message, e);
+            }
         }
     }
 
@@ -153,15 +162,6 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
                 this.logger.warn("Failed to close JavaMail Transport connection. Reason [{}]",
                     ExceptionUtils.getRootCauseMessage(e));
             }
-        }
-    }
-
-    private void sendErrorEvent(MimeMessage message, MessagingException e)
-    {
-        // Dynamically look for an Observation Manager and only send the event if one can be found.
-        ObservationManager observationManager = this.observationManagerProvider.get();
-        if (observationManager != null) {
-            observationManager.notify(new MailSenderErrorEvent(), message, e);
         }
     }
 }

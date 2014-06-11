@@ -19,18 +19,11 @@
  */
 package org.xwiki.mail;
 
-import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
-
-@Role
-@Unstable
-public interface MailSender
+public interface MailResultListener
 {
-    void send(MimeMessage message, Session session) throws MessagingException;
-    void send(MimeMessage message, Session session, MailResultListener listener) throws MessagingException;
-    void waitTillSent(long timeout);
+    void onSuccess(MimeMessage message);
+
+    void onError(MimeMessage message, Throwable t);
 }

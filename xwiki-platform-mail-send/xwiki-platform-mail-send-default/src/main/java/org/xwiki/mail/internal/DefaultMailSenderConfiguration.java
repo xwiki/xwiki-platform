@@ -90,14 +90,14 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public String getHost()
     {
         return this.documentsSource.getProperty("smtp_server",
-                this.xwikiPropertiesSource.getProperty(PREFIX + "host", String.class));
+                this.xwikiPropertiesSource.getProperty(PREFIX + "host", "localhost"));
     }
 
     @Override
     public int getPort()
     {
         return this.documentsSource.getProperty("smtp_port",
-                this.xwikiPropertiesSource.getProperty(PREFIX + "port", Integer.class));
+                this.xwikiPropertiesSource.getProperty(PREFIX + "port", 25));
     }
 
     @Override

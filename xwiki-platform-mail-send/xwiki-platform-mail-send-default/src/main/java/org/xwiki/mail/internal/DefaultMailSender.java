@@ -29,12 +29,11 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.mail.MailResultListener;
 import org.xwiki.mail.MailSender;
 
 @Component
@@ -51,34 +50,42 @@ public class DefaultMailSender implements MailSender, Initializable
      * The Mail queue that the mail sender thread will use to send mails. We use a separate thread to allow sending
      * mail asynchronously.
      */
-    private Queue<Pair<MimeMessage, Session>> mailQueue = new ConcurrentLinkedQueue<Pair<MimeMessage, Session>>();
+    private Queue<MailSenderQueueItem> mailQueue = new ConcurrentLinkedQueue<>();
 
     @Override
     public void initialize() throws InitializationException
     {
-        this.mailSenderThread.setName("Link Checker Thread");
+        this.mailSenderThread.setName("Mail Sender Thread");
         this.mailSenderThread.startProcessing(getMailQueue());
     }
 
     @Override
     public void send(MimeMessage message, Session session) throws MessagingException
     {
+        send(message, session, null);
+    }
+
+    @Override
+    public void send(MimeMessage message, Session session, MailResultListener listener) throws MessagingException
+    {
         // Push new mail message on the queue
-        getMailQueue().add(new ImmutablePair<MimeMessage, Session>(message, session));
+        getMailQueue().add(new MailSenderQueueItem(message, session, listener));
     }
 
     /**
      * @return the mail queue containing all pending mails to be sent
      */
-    public Queue<Pair<MimeMessage, Session>> getMailQueue()
+    public Queue<MailSenderQueueItem> getMailQueue()
     {
         return this.mailQueue;
     }
 
     @Override
-    public void waitTillSent()
+    public void waitTillSent(long timeout)
     {
-        while (!getMailQueue().isEmpty()) {
+        long startTime = System.currentTimeMillis();
+        while (!getMailQueue().isEmpty() || System.currentTimeMillis() - startTime < timeout) {
+            System.out.println("check " + (System.currentTimeMillis() - startTime));
             try {
                 Thread.sleep(100L);
             } catch (InterruptedException e) {
@@ -88,5 +95,16 @@ public class DefaultMailSender implements MailSender, Initializable
                 break;
             }
         }
+    }
+
+    /**
+     * Stops the sending thread. Should be called when the application is stopped for a clean shutdown.
+     * @throws InterruptedException if the thread failed to be stopped
+     */
+    public void stopMailSenderThread() throws InterruptedException
+    {
+        this.mailSenderThread.stopProcessing();
+        // Wait till the thread goes away
+        this.mailSenderThread.join();
     }
 }

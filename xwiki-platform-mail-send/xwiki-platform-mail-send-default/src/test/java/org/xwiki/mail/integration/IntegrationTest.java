@@ -17,8 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail;
+package org.xwiki.mail.integration;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 
 import javax.mail.Multipart;
@@ -27,13 +28,20 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.codehaus.plexus.util.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.mail.MailResultListener;
+import org.xwiki.mail.MailSender;
+import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MimeBodyPartFactory;
+import org.xwiki.mail.XWikiAuthenticator;
+import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.test.ComponentManagerRule;
+import org.xwiki.test.annotation.AllComponents;
 
 import com.icegreen.greenmail.util.GreenMail;
 
@@ -45,6 +53,7 @@ import static org.junit.Assert.*;
  * @version $Id$
  * @since 6.1M2
  */
+@AllComponents
 public class IntegrationTest
 {
     @Rule
@@ -82,8 +91,15 @@ public class IntegrationTest
         this.sender = this.componentManager.getInstance(MailSender.class);
     }
 
+    @After
+    public void cleanUp() throws Exception
+    {
+        // Make sure we stop the Mail Sender thread after each test (since it's started automatically when looking
+        // up the MailSender component.
+        ((DefaultMailSender) this.sender).stopMailSenderThread();
+    }
+
     @Test
-    @Ignore("Goal is to make this test pass!")
     public void sendMail() throws Exception
     {
         // Step 1: Create a JavaMail Session
@@ -102,12 +118,36 @@ public class IntegrationTest
             Collections.<String, Object>singletonMap("mimetype", "text/plain")));
         message.setContent(multipart);
 
-        // Step 4: Send the mail
-        this.sender.send(message, session);
+        // Step 4: Send the mail and wait for it to be sent
+        this.sender.send(message, session, new MailResultListener()
+        {
+            @Override
+            public void onSuccess(MimeMessage message)
+            {
+                // Do nothing, we check below that the mail has been received!
+            }
 
-        // Verify that the mail has been sent
-        this.mail.waitForIncomingEmail(10000, 1);
+            @Override
+            public void onError(MimeMessage message, Throwable t)
+            {
+                // Shouldn't happen, fail the test!
+                fail("Error sending mail: " + ExceptionUtils.getFullStackTrace(t));
+            }
+        });
+
+        // Verify that the mail has been received (wait maximum of 5 seconds).
+        this.mail.waitForIncomingEmail(5000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
         assertEquals(1, messages.length);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        messages[0].writeTo(baos);
+        String messageText = baos.toString();
+
+        assertTrue(messageText.contains("To: john@doe.com"));
+        assertTrue(messageText.contains("Subject: subject"));
+        assertTrue(messageText.contains("Content-Type: multipart/mixed"));
+        assertTrue(messageText.contains("Content-Type: text/plain"));
+        assertTrue(messageText.contains("some text here"));
     }
 }

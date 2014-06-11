@@ -17,20 +17,46 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail;
+package org.xwiki.mail.internal;
 
-import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import org.xwiki.mail.MailResultListener;
 
-@Role
-@Unstable
-public interface MailSender
+/**
+ * Represents a Mail message placed on the queue for sending.
+ *
+ * @version $Id:$
+ * @since 6.1M2
+ */
+public class MailSenderQueueItem
 {
-    void send(MimeMessage message, Session session) throws MessagingException;
-    void send(MimeMessage message, Session session, MailResultListener listener) throws MessagingException;
-    void waitTillSent(long timeout);
+    private MimeMessage message;
+
+    private Session session;
+
+    private MailResultListener listener;
+
+    public MailSenderQueueItem(MimeMessage message, Session session, MailResultListener listener)
+    {
+        this.message = message;
+        this.session = session;
+        this.listener = listener;
+    }
+
+    public MimeMessage getMessage()
+    {
+        return this.message;
+    }
+
+    public Session getSession()
+    {
+        return this.session;
+    }
+
+    public MailResultListener getListener()
+    {
+        return this.listener;
+    }
 }

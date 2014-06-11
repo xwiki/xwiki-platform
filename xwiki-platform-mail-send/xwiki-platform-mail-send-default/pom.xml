@@ -54,6 +54,13 @@
       <version>1.3</version>
       <scope>test</scope>
     </dependency>
+    <!-- Needed at runtime by the Extension Manager to properly load some components
+         (e.g. DefaultXWikiStubContextProvider) -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <!-- Used by unit tests to set the temporary directory to be the Maven target directory -->
   <build>

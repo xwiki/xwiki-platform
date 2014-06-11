@@ -17,39 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail;
+package org.xwiki.mail.integration;
 
-import org.xwiki.observation.event.AbstractFilterableEvent;
-import org.xwiki.observation.event.Event;
-import org.xwiki.observation.event.filter.EventFilter;
+import org.xwiki.mail.internal.DefaultMailSenderConfiguration;
 
-/**
- * An error happened when sending a mail.
- *
- * @version $Id$
- * @since 6.1M2
- */
-public class MailSenderErrorEvent implements Event
+public class TestMailSenderConfiguration extends DefaultMailSenderConfiguration
 {
-    /**
-     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
-     * changes.
-     */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * Constructor initializing the event filter with an
-     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
-     * other annotation add event.
-     */
-    public MailSenderErrorEvent()
+    @Override
+    public String getHost()
     {
-        super();
+        return "localhost";
     }
 
     @Override
-    public boolean matches(Object mailSenderErrorEvent)
+    public int getPort()
     {
-        return true;
+        return 3025;
     }
 }

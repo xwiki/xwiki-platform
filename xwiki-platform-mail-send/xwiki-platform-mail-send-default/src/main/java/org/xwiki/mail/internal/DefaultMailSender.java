@@ -19,28 +19,74 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.Transport;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.mail.MailSender;
 
 @Component
 @Singleton
-public class DefaultMailSender implements MailSender
+public class DefaultMailSender implements MailSender, Initializable
 {
+    @Inject
+    private MailSenderThread mailSenderThread;
+
+    @Inject
+    private Logger logger;
+
+    /**
+     * The Mail queue that the mail sender thread will use to send mails. We use a separate thread to allow sending
+     * mail asynchronously.
+     */
+    private Queue<Pair<MimeMessage, Session>> mailQueue = new ConcurrentLinkedQueue<Pair<MimeMessage, Session>>();
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        this.mailSenderThread.setName("Link Checker Thread");
+        this.mailSenderThread.startProcessing(getMailQueue());
+    }
+
     @Override
     public void send(MimeMessage message, Session session) throws MessagingException
     {
-        Transport transport = session.getTransport("smtp");
-        try {
-            transport.connect();
-            transport.sendMessage(message, message.getAllRecipients());
-        } finally {
-            transport.close();
+        // Push new mail message on the queue
+        getMailQueue().add(new ImmutablePair<MimeMessage, Session>(message, session));
+    }
+
+    /**
+     * @return the mail queue containing all pending mails to be sent
+     */
+    public Queue<Pair<MimeMessage, Session>> getMailQueue()
+    {
+        return this.mailQueue;
+    }
+
+    @Override
+    public void waitTillSent()
+    {
+        while (!getMailQueue().isEmpty()) {
+            try {
+                Thread.sleep(100L);
+            } catch (InterruptedException e) {
+                // Ignore but consider that the mail was sent
+                this.logger.warn("Interrupted while waiting for mail to be sent. Reason [{}]",
+                    ExceptionUtils.getRootCauseMessage(e));
+                break;
+            }
         }
     }
 }

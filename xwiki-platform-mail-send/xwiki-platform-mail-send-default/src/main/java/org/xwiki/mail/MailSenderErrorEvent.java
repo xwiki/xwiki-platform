@@ -19,17 +19,37 @@
  */
 package org.xwiki.mail;
 
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
+import org.xwiki.observation.event.AbstractFilterableEvent;
+import org.xwiki.observation.event.Event;
+import org.xwiki.observation.event.filter.EventFilter;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
-
-@Role
-@Unstable
-public interface MailSender
+/**
+ * An error happened when sending a mail.
+ *
+ * @version $Id$
+ * @since 6.1M2
+ */
+public class MailSenderErrorEvent implements Event
 {
-    void send(MimeMessage message, Session session) throws MessagingException;
-    void waitTillSent();
+    /**
+     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
+     * changes.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor initializing the event filter with an
+     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
+     * other annotation add event.
+     */
+    public MailSenderErrorEvent()
+    {
+        super();
+    }
+
+    @Override
+    public boolean matches(Object mailSenderErrorEvent)
+    {
+        return true;
+    }
 }

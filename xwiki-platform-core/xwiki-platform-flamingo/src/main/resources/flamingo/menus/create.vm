@@ -13,63 +13,21 @@
 #set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $hasComment || $displayCreateWiki)
 #if ($displayCreateSubmenu)
   #xwikicreatemenuentrystart('' $services.localization.render('core.menu.create') 'tmCreate' 'hasIcon' 'plus')
-  #set ($hasPreviousMenuSection = false)
   #if ($displayCreateWiki)
     #set ($createWikiDocReference = $services.model.createDocumentReference('xwiki', 'WikiManager', 'CreateWiki'))
     #submenuitem("$xwiki.getURL($createWikiDocReference)" $services.localization.render('core.menu.create.wiki') 'tmCreateWiki', '', 'globe')
-    #set ($hasPreviousMenuSection = true)
   #end
   #if ($hasCreateSpace)
-    #if ($hasPreviousMenuSection)
-      #submenuseparator()
-    #end
     #submenuitem("$doc.getURL('create', 'tocreate=space')" $services.localization.render('core.menu.create.space') 'tmCreateSpace', '', 'folder-open')
-    #set ($hasPreviousMenuSection = true)
   #end
   #if ($hasCreatePage)
-    #if ($hasPreviousMenuSection)
-      #submenuseparator()
-    #end
     #submenuitem("$doc.getURL('create')" $services.localization.render('core.menu.create.page') 'tmCreatePage', '', 'file')
     ## Only display the Office Importer menu action if the Office Importer application is installed
     #set ($officeImporterMainDocument = $xwiki.getDocument('XWiki.OfficeImporter'))
     #if ("$!{officeImporterMainDocument.isNew()}" == 'false')
+      #submenuseparator()
       #submenuitem($officeImporterMainDocument.getURL('view', "&amp;parent=$!{escapetool.url($doc.fullName)}") $services.localization.render('core.menu.create.pageFromOffice') 'tmCreatePageFromOffice', '', 'import')
     #end
-    #set ($hasPreviousMenuSection = true)
-  #end
-  #if ((($hasComment && $showcomments) || ($hasEdit && $showattachments)) && !$doc.isNew() && $hasPreviousMenuSection)
-    #submenuseparator()
-  #end
-  #if ($hasComment && $showcomments && !$doc.isNew())
-    #submenuitem("$doc.getURL('view', 'viewer=comments')" $services.localization.render('core.menu.create.comment') 'tmCreateComment', '', 'comment')
-    <script type="text/javascript">
-      //<![CDATA[
-        document.observe('xwiki:dom:loaded', function() {
-          $('tmCreateComment').observe('click', function(event) {
-            event.stop();
-            XWiki.displayDocExtra('Comments', 'commentsinline.vm', true);
-            return false;
-          });
-        });
-      //]]>
-    </script>
-    #set ($hasPreviousMenuSection = true)
-  #end
-  #if ($hasEdit && $showattachments && !$doc.isNew())
-    #submenuitem("$doc.getURL('view', 'viewer=attachments')" $services.localization.render('core.menu.create.attachment') 'tmCreateAttachment', '', 'paperclip')
-    <script type="text/javascript">
-      //<![CDATA[
-        document.observe('xwiki:dom:loaded', function() {
-          $('tmCreateAttachment').observe('click', function(event) {
-            event.stop();
-            XWiki.displayDocExtra('Attachments', 'attachmentsinline.vm', true);
-            return false;
-          });
-        });
-      //]]>
-    </script>
-    #set ($hasPreviousMenuSection = true)
   #end
   #xwikicreatemenuentryend()
 #end

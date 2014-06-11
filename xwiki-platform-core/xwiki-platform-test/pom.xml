@@ -130,6 +130,7 @@
             org/xwiki/test/integration/XWikiExecutor.java,
             org/xwiki/test/integration/XWikiTestSetup.java,
             org/xwiki/test/integration/XWikiExecutorSuite.java,
+            org/xwiki/test/ui/*.java,
             org/xwiki/test/ui/**/*.java
           </excludes>
         </configuration>

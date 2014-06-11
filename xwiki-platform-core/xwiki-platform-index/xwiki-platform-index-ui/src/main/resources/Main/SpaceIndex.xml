@@ -159,34 +159,34 @@
     <guid>3b41888d-d9b1-4f4b-b790-16c880aaf332</guid>
     <property>
       <code>{{velocity}}
-  ## TODO: add me a parameter to specify the style, list or livetable
-  ## get the number of documents to display
+  ## TODO: add a parameter to specify the style, list or livetable
+  ## Get the number of documents to display
   #set ($limit = $xcontext.macro.params.get('count'))
   #if ("$!limit" == '')
     ## 100 documents displayed by default if no value is specified
     #set ($limit = '100')
   #end
   #set ($limit = $mathtool.toInteger($limit))
-  ## get the sort of the list of document
-  ##values are creationDate, modificationDate and docName
+  ## Compute the XWQL portion related to sorting, based on the passed "sort" parameter
+  ## Valid values are "creationDate", "modificationDate" and "docName"
   #set ($sort = $xcontext.macro.params.get('sort'))
   #if ("$sort" == 'docName')
-    ## sorting alphabetical list of document
-    #set ($sort = 'doc.name asc')
+    ## Sorting alphabetically
+    #set ($sortQuery = 'doc.name asc')
   #elseif ("$sort" == 'modificationDate')
-    ## list of document sorting by update date 
-    #set ($sort = 'doc.contentUpdateDate desc')
+    ## Sorting by update date
+    #set ($sortQuery = 'doc.contentUpdateDate desc')
   #else
-    ## list of document sorting by creation date by default if creationDate value, no value,  or wrong value is specified
-    #set ($sort = 'doc.creationDate desc')
+    ## Sort by creation date by default
+    #set ($sortQuery = 'doc.creationDate desc')
   #end
-  ## get the space to display the documents for
+  ## Get the space to display the documents for
   #set ($spaceParam = $doc.space)
   #set ($spaceMacroParam = $xcontext.macro.params.get('space'))
   #if ("$!spaceMacroParam" != '')
     #set ($spaceParam = $spaceMacroParam)
   #end
-  #set ($docNames = $services.query.hql("where doc.space=? order by $sort").addFilter('currentlanguage').addFilter('hidden').setLimit($limit).bindValues([${spaceParam}]).execute())
+  #set ($docNames = $services.query.hql("where doc.space=? order by $sortQuery").addFilter('currentlanguage').addFilter('hidden').setLimit($limit).bindValues([${spaceParam}]).execute())
   {{html}}
     #displayDocumentList($docNames false []) 
     ## Note: we pass an empty blacklistedSpaces list since we are used as a space dashboard, not a global dashboard

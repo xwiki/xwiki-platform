@@ -272,7 +272,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
     }
 
     @Override
-    public void validateExtension(XWikiDocument document, boolean readOnly) throws XWikiException
+    public void validateExtension(XWikiDocument document, boolean save) throws XWikiException
     {
         BaseObject extensionObject = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
 
@@ -285,7 +285,6 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        XWikiDocument documentToSave = null;
         BaseObject extensionObjectToSave = null;
 
         // Update last version field
@@ -294,10 +293,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         if (lastVersion != null
             && !StringUtils.equals(lastVersion,
                 getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, (String) null))) {
-            // FIXME: We can't save directly the provided document coming from the event
-            documentToSave = xcontext.getWiki().getDocument(document, xcontext);
-            extensionObjectToSave = documentToSave.getXObject(extensionObject.getReference());
-
+            extensionObjectToSave = document.getXObject(extensionObject.getReference());
             extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion, xcontext);
 
             needSave = true;
@@ -316,12 +312,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         int currentValue = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, 0);
 
         if ((currentValue == 1) != valid) {
-            if (documentToSave == null) {
-                // FIXME: We can't save directly the provided document coming from the event
-                documentToSave = xcontext.getWiki().getDocument(document, xcontext);
-                extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-            }
-
+            extensionObjectToSave = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
             extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, valid ? "1" : "0", xcontext);
 
             needSave = true;
@@ -334,13 +325,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         if (valid) {
             for (String fieldName : AbstractExtensionRESTResource.EPROPERTIES_EXTRA) {
                 if (extensionObject.safeget(fieldName) == null) {
-                    if (extensionObjectToSave == null) {
-                        // FIXME: We can't save directly the provided document coming from the event
-                        documentToSave = xcontext.getWiki().getDocument(document, xcontext);
-                        extensionObjectToSave =
-                            documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-                    }
-
+                    extensionObjectToSave = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
                     extensionObjectToSave.set(fieldName, "", xcontext);
                     needSave = true;
                 }
@@ -349,8 +334,8 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
         // Save document
 
-        if (needSave) {
-            xcontext.getWiki().saveDocument(documentToSave, "Validated extension", true, xcontext);
+        if (save && needSave) {
+            xcontext.getWiki().saveDocument(document, "Validated extension", true, xcontext);
         }
     }
 
@@ -493,7 +478,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
                 + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension", Query.XWQL);
 
         for (Object[] documentName : query.<Object[]> execute()) {
-            validateExtension(getDocument(documentName), false);
+            validateExtension(getDocument(documentName), true);
         }
     }
 

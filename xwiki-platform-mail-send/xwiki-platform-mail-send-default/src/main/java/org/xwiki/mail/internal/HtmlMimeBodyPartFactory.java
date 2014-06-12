@@ -21,6 +21,7 @@ package org.xwiki.mail.internal;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -47,67 +48,53 @@ import com.xpn.xwiki.api.Attachment;
 @Component
 @Named("html")
 @Singleton
+@SuppressWarnings("unchecked")
 public class HtmlMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
 {
-    @Inject
-    private MimeBodyPartFactory defaultPartFactory;
-
     @Inject
     @Named("attachment")
     private MimeBodyPartFactory attachmentPartFactory;
 
-    private List<Attachment> attachments = new ArrayList<>();
+    @Inject
+    private MimeBodyPartFactory defaultPartFactory;
 
-    private List<Attachment> embeddedImages = new ArrayList<>();
-
-    private String htmlContent;
+    private static final Pattern CID_PATTERN =
+            Pattern.compile("src=('|\")cid:([^'\"]*)('|\")", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
     @Override public MimeBodyPart create(String content, Map<String, Object> parameters) throws MessagingException
     {
 
-        this.htmlContent = content;
-
-        boolean hasAttachments = parameters.containsKey("attachments");
-
-        if (hasAttachments) {
-            this.attachments = (List<Attachment>) parameters.<String, Object>get("attachments");
-        }
-
-        MimeBodyPart bodyPart = new MimeBodyPart();
-
         MimeMultipart multipart = new MimeMultipart("mixed");
 
+        List<Attachment> attachments = (List<Attachment>) parameters.<String, Object>get("attachments");
+        List<Attachment> embeddedImages = new ArrayList<>();
+
         MimeBodyPart htmlBodyPart = new MimeBodyPart();
-        if (this.attachments != null) {
+
+        if (attachments != null) {
             // separate attachment and embedded images
-            this.foundEmbeddedImages();
-            htmlBodyPart.setContent(this.getRelatedPart());
+            Map<String, List> attachmentsMap = handleAttachments(content, attachments);
+
+            embeddedImages = attachmentsMap.get("embeddedImages");
+            attachments = attachmentsMap.get("attachments");
+
+            htmlBodyPart.setContent(createRelatedBodyPart(content, embeddedImages));
         } else {
             // Create the HTML body part of the email
             htmlBodyPart.setContent(content, "text/plain; charset=" + StandardCharsets.UTF_8.name());
             htmlBodyPart.setHeader("Content-Type", "text/html");
         }
 
+        //
         String alternaniveText = (String) parameters.get("alternate");
-        if (alternaniveText != null && !alternaniveText.equals("")) {
-            MimeMultipart alternaniveMultiPart = new MimeMultipart("alternative");
-
-            alternaniveMultiPart.addBodyPart(defaultPartFactory.create(alternaniveText));
-            alternaniveMultiPart.addBodyPart(htmlBodyPart);
-
-            MimeBodyPart alternanivePartWrapper = new MimeBodyPart();
-            alternanivePartWrapper.setContent(alternaniveMultiPart);
-
-            multipart.addBodyPart(alternanivePartWrapper);
+        if (alternaniveText != null) {
+            multipart.addBodyPart(createAlternativePart(htmlBodyPart, defaultPartFactory.create(alternaniveText)));
         } else {
             multipart.addBodyPart(htmlBodyPart);
         }
+        addAttachments(multipart, attachments);
 
-        // Add attachments part to multipart
-        for (Attachment attachment : this.attachments) {
-            multipart.addBodyPart(attachmentPartFactory.create(attachment));
-        }
-
+        MimeBodyPart bodyPart = new MimeBodyPart();
         bodyPart.setContent(multipart);
 
         // Handle headers passed as parameter
@@ -115,36 +102,68 @@ public class HtmlMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
         return bodyPart;
     }
 
+    private void addAttachments(MimeMultipart multipart, List<Attachment> attachments) throws MessagingException
+    {
+        // Add attachments part to multipart
+        if (attachments != null) {
+            for (Attachment attachment : attachments) {
+                multipart.addBodyPart(attachmentPartFactory.create(attachment));
+            }
+        }
+    }
+
+    /**
+     * @return Multipart part of the email, define the html as a multipart/alternative
+     */
+    private MimeBodyPart createAlternativePart(MimeBodyPart htmlBodyPart, MimeBodyPart textBodyPart)
+            throws MessagingException
+    {
+        MimeMultipart alternativeMultiPart = new MimeMultipart("alternative");
+
+        alternativeMultiPart.addBodyPart(textBodyPart);
+        alternativeMultiPart.addBodyPart(htmlBodyPart);
+
+        MimeBodyPart alternativePartWrapper = new MimeBodyPart();
+        alternativePartWrapper.setContent(alternativeMultiPart);
+        return alternativePartWrapper;
+    }
+
     /**
      * @return Multipart part of the email, define the html as a multipart/related in case there are images
      */
-    private MimeMultipart getRelatedPart() throws MessagingException
+    private MimeMultipart createRelatedBodyPart(String content, List<Attachment> embeddedImages)
+            throws MessagingException
     {
         MimeMultipart htmlMultipart = new MimeMultipart("related");
-        MimeBodyPart htmlPart = new MimeBodyPart();
 
-        htmlPart.setContent(this.htmlContent, "text/html; charset=" + StandardCharsets.UTF_8.name());
-        htmlPart.setHeader("Content-Disposition", "inline");
-        htmlPart.setHeader("Content-Transfer-Encoding", "quoted-printable");
-
-        htmlMultipart.addBodyPart(htmlPart);
+        htmlMultipart.addBodyPart(createRelatedHtmlPart(content));
 
         // Add the images to the HTML multipart
-        for (Attachment attachment : this.embeddedImages) {
-            htmlMultipart.addBodyPart(attachmentPartFactory.create(attachment));
-        }
+        addAttachments(htmlMultipart, embeddedImages);
         return htmlMultipart;
+    }
+
+    /**
+     * Create the Html part of the related body part
+     */
+    private MimeBodyPart createRelatedHtmlPart(String content) throws MessagingException
+    {
+        MimeBodyPart htmlPart = new MimeBodyPart();
+        htmlPart.setContent(content, "text/html; charset=" + StandardCharsets.UTF_8.name());
+        htmlPart.setHeader("Content-Disposition", "inline");
+        htmlPart.setHeader("Content-Transfer-Encoding", "quoted-printable");
+        return htmlPart;
     }
 
     /**
      * Separate embedded images from attachments list
      */
-    private void foundEmbeddedImages()
+    private Map<String, List> handleAttachments(String content, List<Attachment> attachments)
     {
+        List<Attachment> embeddedImages = new ArrayList<>();
+
         // Find images used with src="cid:" in the email HTML part
-        Pattern cidPattern =
-                Pattern.compile("src=('|\")cid:([^'\"]*)('|\")", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-        Matcher matcher = cidPattern.matcher(this.htmlContent);
+        Matcher matcher = CID_PATTERN.matcher(content);
         List<String> foundEmbeddedImages = new ArrayList<String>();
         while (matcher.find()) {
             foundEmbeddedImages.add(matcher.group(2));
@@ -153,11 +172,18 @@ public class HtmlMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
         // Loop over the attachments of the email, add images used from the HTML to the list of attachments to be
         // embedded with the HTML part, add the other attachements to the list of attachments to be attached to the
         // email.
-        for (Attachment attachment : this.attachments) {
+        for (Attachment attachment : attachments) {
             if (foundEmbeddedImages.contains(attachment.getFilename())) {
-                this.embeddedImages.add(attachment);
-                this.attachments.remove(attachment);
+                embeddedImages.add(attachment);
+                attachments.remove(attachment);
             }
         }
+
+        Map<String, List> attachmentsMap = new HashMap<>();
+
+        attachmentsMap.put("attachments", attachments);
+        attachmentsMap.put("embeddedImages", embeddedImages);
+
+        return attachmentsMap;
     }
 }

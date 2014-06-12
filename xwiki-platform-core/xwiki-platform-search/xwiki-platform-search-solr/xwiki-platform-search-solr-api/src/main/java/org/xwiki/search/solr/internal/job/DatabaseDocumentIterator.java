@@ -31,6 +31,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.LocaleUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Component;
@@ -127,7 +128,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
         String locale = (String) result[2];
         String version = (String) result[3];
         DocumentReference documentReference = new DocumentReference(wiki, space, name);
-        if (!locale.isEmpty()) {
+        if (!StringUtils.isEmpty(locale)) {
             documentReference = new DocumentReference(documentReference, LocaleUtils.toLocale(locale));
         }
         return new ImmutablePair<DocumentReference, String>(documentReference, version);

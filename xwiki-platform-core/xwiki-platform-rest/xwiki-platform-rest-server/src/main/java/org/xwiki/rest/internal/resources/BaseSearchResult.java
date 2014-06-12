@@ -545,7 +545,7 @@ public class BaseSearchResult extends XWikiResource
                     this.componentManager.getInstance(SearchSource.class, queryTypeString.toLowerCase());
 
                 result =
-                    searchSource.search(queryTypeString, wikiName, wikis, hasProgrammingRights, orderField, order,
+                    searchSource.search(query, wikiName, wikis, hasProgrammingRights, orderField, order,
                         distinct, number, start, withPrettyNames, className, uriInfo);
             } else {
                 result = new ArrayList<SearchResult>();

@@ -84,8 +84,7 @@ public class DefaultMailSender implements MailSender, Initializable
     public void waitTillSent(long timeout)
     {
         long startTime = System.currentTimeMillis();
-        while (!getMailQueue().isEmpty() || System.currentTimeMillis() - startTime < timeout) {
-            System.out.println("check " + (System.currentTimeMillis() - startTime));
+        while (!getMailQueue().isEmpty() && System.currentTimeMillis() - startTime < timeout) {
             try {
                 Thread.sleep(100L);
             } catch (InterruptedException e) {

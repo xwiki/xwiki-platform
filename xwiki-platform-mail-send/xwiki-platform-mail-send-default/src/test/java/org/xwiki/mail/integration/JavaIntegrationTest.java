@@ -136,13 +136,14 @@ public class JavaIntegrationTest
             }
         };
 
-        // Send 3 mails (3 times the same mail)
+        // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
         this.sender.send(message, session, listener);
         this.sender.send(message, session, listener);
         this.sender.send(message, session, listener);
+        this.sender.waitTillSent(10000L);
 
         // Verify that the mails have been received (wait maximum 10 seconds).
-        this.mail.waitForIncomingEmail(10000L, 3);
+        this.mail.waitForIncomingEmail(10000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

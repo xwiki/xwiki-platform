@@ -91,10 +91,11 @@ public class ScriptingIntegrationTest
         ScriptMimeMessage message = this.scriptService.createMessage("john@doe.com", "subject");
         message.addPart("plain/text", "some text here");
 
-        // Send 3 mails (3 times the same mail)
+        // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
         message.send();
         message.send();
         message.send();
+        message.waitTillSent(10000L);
 
         // Verify that the mails have been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 3);

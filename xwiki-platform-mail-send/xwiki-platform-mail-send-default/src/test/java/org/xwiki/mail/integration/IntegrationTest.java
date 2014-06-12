@@ -44,6 +44,7 @@ import org.xwiki.test.ComponentManagerRule;
 import org.xwiki.test.annotation.AllComponents;
 
 import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetupTest;
 
 import static org.junit.Assert.*;
 
@@ -70,7 +71,7 @@ public class IntegrationTest
     @Before
     public void startMail()
     {
-        this.mail = new GreenMail();
+        this.mail = new GreenMail(ServerSetupTest.SMTP);
         this.mail.start();
     }
 
@@ -119,7 +120,7 @@ public class IntegrationTest
         message.setContent(multipart);
 
         // Step 4: Send the mail and wait for it to be sent
-        this.sender.send(message, session, new MailResultListener()
+        MailResultListener listener = new MailResultListener()
         {
             @Override
             public void onSuccess(MimeMessage message)
@@ -133,12 +134,16 @@ public class IntegrationTest
                 // Shouldn't happen, fail the test!
                 fail("Error sending mail: " + ExceptionUtils.getFullStackTrace(t));
             }
-        });
+        };
 
-        // Verify that the mail has been received (wait maximum of 5 seconds).
-        this.mail.waitForIncomingEmail(5000L, 1);
+        // Send 3 mails (3 times the same mail)
+        this.sender.send(message, session, listener);
+        this.sender.send(message, session, listener);
+        this.sender.send(message, session, listener);
+
+        // Verify that the mails have been received (wait maximum 10 seconds).
+        this.mail.waitForIncomingEmail(10000L, 3);
         MimeMessage[] messages = this.mail.getReceivedMessages();
-        assertEquals(1, messages.length);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         messages[0].writeTo(baos);

@@ -73,4 +73,10 @@ public interface SolrConfiguration
      * @since 5.1M2
      */
     int getIndexerQueueCapacity();
+
+    /**
+     * @return true if a full synchronization job between the database and SOLR index should be run when XWiki starts
+     * @since 6.1M1
+     */
+    boolean synchronizeAtStartup();
 }

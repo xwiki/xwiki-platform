@@ -513,6 +513,12 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is 10000.
 # solr.indexer.queue.capacity=100000
 
+#-# [Since 6.1M2]
+#-# Indicating if a synchronization between SOLR index and XWiki database should be run at startup.
+#-# Synchronization can be started from search administration.
+#-# The default is true.
+# solr.synchronizeAtStartup=false
+
 #-------------------------------------------------------------------------------------
 # Security
 #-------------------------------------------------------------------------------------

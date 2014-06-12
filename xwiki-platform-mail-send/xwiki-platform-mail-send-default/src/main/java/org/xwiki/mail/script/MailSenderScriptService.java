@@ -100,8 +100,12 @@ public class MailSenderScriptService implements ScriptService
             new ScriptMimeMessage(session, this.mailSender, this.execution, this.componentManager);
 
         try {
-            message.setFrom(InternetAddress.parse(from)[0]);
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            if (from != null) {
+                message.setFrom(InternetAddress.parse(from)[0]);
+            }
+            if (to != null) {
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            }
             message.setSubject(subject);
         } catch (Exception e) {
             // An error occurred, save it and return null

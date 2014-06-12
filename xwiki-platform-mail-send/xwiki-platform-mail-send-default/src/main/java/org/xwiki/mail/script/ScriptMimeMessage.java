@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.script;
 
+import java.util.Collections;
 import java.util.Map;
 
 import javax.mail.MessagingException;
@@ -65,6 +66,11 @@ public class ScriptMimeMessage extends MimeMessage
         this.componentManager = componentManager;
     }
 
+    public void addPart(String mimeType, Object content) throws MessagingException
+    {
+        addPart(mimeType, content, Collections.<String, Object>emptyMap());
+    }
+
     public void addPart(String mimeType, Object content, Map<String, Object> parameters) throws MessagingException
     {
         MimeBodyPartFactory factory = getBodyPartFactory(mimeType, content.getClass());
@@ -80,6 +86,10 @@ public class ScriptMimeMessage extends MimeMessage
     public void send()
     {
         try {
+            // Add the multi part to the content of the message to send. We do this when calling send() since the user
+            // can call addPart() several times.
+            setContent(this.multipart);
+
             this.mailSender.send(this, this.session);
         } catch (MessagingException e) {
             // Save the exception for reporting through the script services's getError() API

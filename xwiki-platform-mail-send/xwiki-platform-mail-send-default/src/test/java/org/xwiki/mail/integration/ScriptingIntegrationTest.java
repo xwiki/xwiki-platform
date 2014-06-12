@@ -20,53 +20,41 @@
 package org.xwiki.mail.integration;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Collections;
 
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
-import org.codehaus.plexus.util.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.mail.MailResultListener;
 import org.xwiki.mail.MailSender;
-import org.xwiki.mail.MailSenderConfiguration;
-import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.mail.internal.DefaultMailSender;
+import org.xwiki.mail.script.MailSenderScriptService;
+import org.xwiki.mail.script.ScriptMimeMessage;
+import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.ComponentManagerRule;
 import org.xwiki.test.annotation.AllComponents;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Integration tests to prove that mail sending is working fully end to end.
+ * Integration tests to prove that mail sending is working fully end to end with the Scripting API.
  *
  * @version $Id$
  * @since 6.1M2
  */
 @AllComponents
-public class IntegrationTest
+public class ScriptingIntegrationTest
 {
     @Rule
     public ComponentManagerRule componentManager = new ComponentManagerRule();
 
     private GreenMail mail;
 
-    private MailSenderConfiguration configuration;
-
-    private MimeBodyPartFactory<String> defaultBodyPartFactory;
-
-    private MailSender sender;
+    private MailSenderScriptService scriptService;
 
     @Before
     public void startMail()
@@ -86,10 +74,7 @@ public class IntegrationTest
     @Before
     public void initialize() throws Exception
     {
-        this.configuration = this.componentManager.getInstance(MailSenderConfiguration.class);
-        this.defaultBodyPartFactory = this.componentManager.getInstance(
-            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
-        this.sender = this.componentManager.getInstance(MailSender.class);
+        this.scriptService = this.componentManager.getInstance(ScriptService.class, "mailsender");
     }
 
     @After
@@ -97,49 +82,19 @@ public class IntegrationTest
     {
         // Make sure we stop the Mail Sender thread after each test (since it's started automatically when looking
         // up the MailSender component.
-        ((DefaultMailSender) this.sender).stopMailSenderThread();
+        ((DefaultMailSender) this.componentManager.getInstance(MailSender.class)).stopMailSenderThread();
     }
 
     @Test
     public void sendMail() throws Exception
     {
-        // Step 1: Create a JavaMail Session
-        Session session =
-            Session.getInstance(this.configuration.getAllProperties(), new XWikiAuthenticator(this.configuration));
-
-        // Step 2: Create the Message to send
-        MimeMessage message = new MimeMessage(session);
-        message.setSubject("subject");
-        message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress("john@doe.com"));
-
-        // Step 3: Add the Message Body
-        Multipart multipart = new MimeMultipart("mixed");
-        // Add HTML in the body
-        multipart.addBodyPart(this.defaultBodyPartFactory.create("some text here",
-            Collections.<String, Object>singletonMap("mimetype", "text/plain")));
-        message.setContent(multipart);
-
-        // Step 4: Send the mail and wait for it to be sent
-        MailResultListener listener = new MailResultListener()
-        {
-            @Override
-            public void onSuccess(MimeMessage message)
-            {
-                // Do nothing, we check below that the mail has been received!
-            }
-
-            @Override
-            public void onError(MimeMessage message, Throwable t)
-            {
-                // Shouldn't happen, fail the test!
-                fail("Error sending mail: " + ExceptionUtils.getFullStackTrace(t));
-            }
-        };
+        ScriptMimeMessage message = this.scriptService.createMessage("john@doe.com", "subject");
+        message.addPart("plain/text", "some text here");
 
         // Send 3 mails (3 times the same mail)
-        this.sender.send(message, session, listener);
-        this.sender.send(message, session, listener);
-        this.sender.send(message, session, listener);
+        message.send();
+        message.send();
+        message.send();
 
         // Verify that the mails have been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 3);

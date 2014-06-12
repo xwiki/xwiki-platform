@@ -28,7 +28,7 @@ import org.xwiki.observation.event.filter.EventFilter;
  * The event also send the following parameters:
  * </p>
  * <ul>
- * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance</li>
+ * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance which is going to be saved</li>
  * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
  * </ul>
  * 

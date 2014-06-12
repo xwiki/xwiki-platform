@@ -166,6 +166,7 @@
   text-align: justify;
   /* Overriding of toucan value */
   margin: 0;
+  padding: 0;
 }
 
 div#dashboardleft ol.tagCloud {

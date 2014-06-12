@@ -17,7 +17,7 @@
         #set ($watchClasses = 'hidden')
         #set ($unwatchClasses = '')
       #end
-      #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.add.space', [$escapetool.xml($doc.space)]) 'tmWatchSpace', $watchClasses, 'eye-open')
+      #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.add.space') 'tmWatchSpace', $watchClasses, 'eye-open')
       #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removespace')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.remove.space') 'tmUnwatchSpace', $unwatchClasses, 'eye-open')
       #set ($hasPreviousMenuSection = true)
     #end

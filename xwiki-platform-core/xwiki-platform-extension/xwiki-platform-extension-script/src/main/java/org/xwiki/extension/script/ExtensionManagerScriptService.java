@@ -746,7 +746,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         if (job == null) {
             jobStatus = this.jobStore.getJobStatus(jobId);
         } else {
-            jobStatus = null;
+            jobStatus = job.getStatus();
         }
 
         if (jobStatus != null && !this.documentAccessBridge.hasProgrammingRights()) {

@@ -76,7 +76,7 @@ public interface SolrConfiguration
 
     /**
      * @return true if a full synchronization job between the database and SOLR index should be run when XWiki starts
-     * @since 6.1M1
+     * @since 6.1M2
      */
     boolean synchronizeAtStartup();
 }

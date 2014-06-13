@@ -38,6 +38,26 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public interface MimeBodyPartFactory<T>
 {
+    /**
+     * Create a {@link javax.mail.BodyPart}.
+     *
+     * @param content the content of the body part (depends on the implementation, can be some String containing plain
+     *        text, some String containing HTML, an attachment, etc)
+     * @return the created Body Part
+     * @throws MessagingException when an error occurs
+     */
     MimeBodyPart create(T content) throws MessagingException;
+
+    /**
+     * Create a {@link javax.mail.BodyPart}.
+     *
+     * @param content the content of the body part (depends on the implementation, can be some String containing plain
+     *        text, some String containing HTML, an attachment, etc)
+     * @param parameters the list of extra parameters. This is used for example to pass alternate content for the mail
+     *        using the {@code alternate} key in the HTML Mime Body Part Factory. Mail headers can also be passed using
+     *        the {@code headers} key with a {@code Map<String, String>} value containing header keys and values
+     * @return the created Body Part
+     * @throws MessagingException when an error occurs
+     */
     MimeBodyPart create(T content, Map<String, Object> parameters) throws MessagingException;
 }

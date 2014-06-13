@@ -21,9 +21,26 @@ package org.xwiki.mail;
 
 import javax.mail.internet.MimeMessage;
 
+/**
+ * Allows listening to Mail sending results.
+ *
+ * @version $Id$
+ * @since 6.1M2
+ */
 public interface MailResultListener
 {
+    /**
+     * Called when the mail is sent successfully.
+     *
+     * @param message the message sent
+     */
     void onSuccess(MimeMessage message);
 
+    /**
+     * Called when the mail has failed to be sent.
+     *
+     * @param message the message that was tried to be sent
+     * @param t the exception explaining why the message couldn't be sent
+     */
     void onError(MimeMessage message, Throwable t);
 }

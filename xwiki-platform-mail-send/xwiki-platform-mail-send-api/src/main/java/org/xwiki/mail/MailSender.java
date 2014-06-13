@@ -26,11 +26,39 @@ import javax.mail.internet.MimeMessage;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
+/**
+ * Send mails asynchronously with option to wait for the mail to be sent.
+ *
+ * @version $Id$
+ * @since 6.1M2
+ */
 @Role
 @Unstable
 public interface MailSender
 {
+    /**
+     * Send a mail.
+     *
+     * @param message the message to sent
+     * @param session the JavaMail session containing all the configuration for the SMTP host, port, etc
+     * @throws MessagingException when an error occurs
+     */
     void send(MimeMessage message, Session session) throws MessagingException;
+
+    /**
+     * Send a mail.
+     *
+     * @param message the message to sent
+     * @param session the JavaMail session containing all the configuration for the SMTP host, port, etc
+     * @param listener a listener called when the mail is sent succesfully or when there is an error
+     * @throws MessagingException when an error occurs
+     */
     void send(MimeMessage message, Session session, MailResultListener listener) throws MessagingException;
+
+    /**
+     * Wait for all messages on the sending queue to be sent before returning.
+     *
+     * @param timeout the maximum amount of time to wait in milliseconds
+     */
     void waitTillSent(long timeout);
 }

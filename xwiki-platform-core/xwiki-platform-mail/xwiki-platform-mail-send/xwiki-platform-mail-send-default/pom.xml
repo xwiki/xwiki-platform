@@ -33,6 +33,8 @@
   <description>Default implementation of the API to send emails</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Mail Sender Implementation</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

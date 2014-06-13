@@ -31,6 +31,10 @@
   <artifactId>xwiki-platform-mail-send-api</artifactId>
   <name>XWiki Platform - Mail - Send - API</name>
   <description>API to send emails</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Mail Sender API</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>javax.mail</groupId>

@@ -27,7 +27,7 @@ import org.xwiki.mail.MailResultListener;
 /**
  * Represents a Mail message placed on the queue for sending.
  *
- * @version $Id:$
+ * @version $Id$
  * @since 6.1M2
  */
 public class MailSenderQueueItem

@@ -21,12 +21,15 @@ package org.xwiki.mail;
 
 import javax.mail.internet.MimeMessage;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Allows listening to Mail sending results.
  *
  * @version $Id$
  * @since 6.1M2
  */
+@Unstable
 public interface MailResultListener
 {
     /**

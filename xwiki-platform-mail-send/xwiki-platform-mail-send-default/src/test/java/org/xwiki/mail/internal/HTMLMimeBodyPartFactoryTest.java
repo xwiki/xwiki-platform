@@ -38,16 +38,16 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link HTMLMimeBodyPartFactory2}.
+ * Unit tests for {@link HTMLMimeBodyPartFactory}.
  *
  * @version $Id$
  * @since 6.1M2
  */
-public class HTMLMimeBodyPartFactoryTest2
+public class HTMLMimeBodyPartFactoryTest
 {
     @Rule
     public MockitoComponentMockingRule<MimeBodyPartFactory> mocker =
-            new MockitoComponentMockingRule<MimeBodyPartFactory>(HTMLMimeBodyPartFactory2.class);
+            new MockitoComponentMockingRule<MimeBodyPartFactory>(HTMLMimeBodyPartFactory.class);
 
     @Test
     public void createWhenOnlyHTMLContent() throws Exception

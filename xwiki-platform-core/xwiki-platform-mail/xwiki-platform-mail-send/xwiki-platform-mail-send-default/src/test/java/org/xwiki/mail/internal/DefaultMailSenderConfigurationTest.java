@@ -96,7 +96,7 @@ public class DefaultMailSenderConfigurationTest
         when(documentsSource.getProperty("smtp_server_username", (String) null)).thenReturn(null);
         when(documentsSource.getProperty("smtp_server_password", (String) null)).thenReturn(null);
         when(documentsSource.getProperty("smtp_server", (String) null)).thenReturn("server");
-        when(documentsSource.getProperty("smtp_port", (Integer) null)).thenReturn(25);
+        when(documentsSource.getProperty("smtp_port")).thenReturn("25");
         when(documentsSource.getProperty("smtp_from", (String) null)).thenReturn("john@doe.com");
 
         Properties returnedProperties = this.mocker.getComponentUnderTest().getAllProperties();

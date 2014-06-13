@@ -75,6 +75,8 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
      */
     private static final String PREFIX = "mail.sender.";
 
+    private static final int DEFAULT_PORT = 25;
+
     @Inject
     private Logger logger;
 
@@ -96,8 +98,19 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public int getPort()
     {
-        return this.documentsSource.getProperty("smtp_port",
-                this.xwikiPropertiesSource.getProperty(PREFIX + "port", 25));
+        // TODO: Improve this code by fixing the Document Configuration Source.
+        int port;
+        String portAsString = this.documentsSource.getProperty("smtp_port");
+        if (!StringUtils.isEmpty(portAsString)) {
+            try {
+                port = Integer.parseInt(portAsString);
+            } catch (NumberFormatException e) {
+                port = DEFAULT_PORT;
+            }
+        } else {
+            port = this.xwikiPropertiesSource.getProperty(PREFIX + "port", DEFAULT_PORT);
+        }
+        return port;
     }
 
     @Override

@@ -646,4 +646,49 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# for cleaning them up.
 # store.fsattach.cleanOnStartup=true
 
+#-------------------------------------------------------------------------------------
+# Mail
+#-------------------------------------------------------------------------------------
+
+#-# [Since 6.1M2]
+#-# SMTP host when sending emails, defaults to "localhost".
+#-# This configuration property can be overridden in XWikiPreferences objects, by using the "smtp_server" property name.
+# mail.sender.host = localhost
+
+#-# [Since 6.1M2]
+#-# SMTP port when sending emails, defaults to 25.
+#-# This configuration property can be overridden in XWikiPreferences objects, by using the "smtp_port" property name.
+# mail.sender.port = 25
+
+#-# [Since 6.1M2]
+#-# From email address to use. Not defined by default and needs to be set up when calling the mail API.
+#-# This configuration property can be overridden in XWikiPreferences objects, by using the "smtp_from" property name.
+# mail.sender.from = john@doe.com
+
+#-# [Since 6.1M2]
+#-# Username to authenticate on the SMTP server, if needed. By default no authentication is performed.
+#-# This configuration property can be overridden in XWikiPreferences objects, by using the "smtp_server_username"
+#-# property name.
+# mail.sender.username = someuser
+
+#-# [Since 6.1M2]
+#-# Password to authenticate on the SMTP server, if needed. By default no authentication is performed.
+#-# This configuration property can be overridden in XWikiPreferences objects, by using the "smtp_server_password"
+#-# property name.
+# mail.sender.password = somepassword
+
+#-# [Since 6.1M2]
+#-# Password to authenticate on the SMTP server, if needed. By default no authentication is performed.
+#-# This configuration property can be overridden in XWikiPreferences objects, by using the "javamail_extra_props"
+#-# property name.
+#-# By default the following properties are set automatically:
+#-#   mail.transport.protocol = smtp
+#-#   mail.smtp.host = <value of the mail.sender.host property>
+#-#   mail.smtp.port = <value of the mail.sender.port property>
+#-#   mail.smtp.user = <value of the mail.sender.username property>
+#-#   mail.smtp.from = <value of the mail.sender.from property>
+#-# Example:
+# mail.sender.properties = mail.smtp.starttls.enable = true
+# mail.sender.properties = mail.smtp.socks.host = someserver
+
 $!xwikiPropertiesAdditionalProperties

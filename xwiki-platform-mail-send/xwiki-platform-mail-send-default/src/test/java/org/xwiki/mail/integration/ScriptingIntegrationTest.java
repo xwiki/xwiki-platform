@@ -27,6 +27,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.script.MailSenderScriptService;
@@ -38,7 +40,7 @@ import org.xwiki.test.annotation.AllComponents;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Scripting API.
@@ -88,6 +90,10 @@ public class ScriptingIntegrationTest
     @Test
     public void sendMail() throws Exception
     {
+        // Set the EC
+        Execution execution = this.componentManager.getInstance(Execution.class);
+        execution.setContext(new ExecutionContext());
+
         ScriptMimeMessage message = this.scriptService.createMessage("john@doe.com", "subject");
         message.addPart("plain/text", "some text here");
 
@@ -96,6 +102,9 @@ public class ScriptingIntegrationTest
         message.send();
         message.send();
         message.waitTillSent(10000L);
+
+        // Verify that there are no errors
+        assertEquals(0, message.getErrors().size());
 
         // Verify that the mails have been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 3);

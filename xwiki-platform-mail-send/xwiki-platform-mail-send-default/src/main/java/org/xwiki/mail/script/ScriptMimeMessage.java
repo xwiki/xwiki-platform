@@ -21,6 +21,7 @@ package org.xwiki.mail.script;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -37,6 +38,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MimeBodyPartFactory;
+import org.xwiki.mail.internal.script.ScriptMailSenderListener;
 
 /**
  * Extends {@link javax.mail.internet.MimeMessage} to add helper APIs to add body part content and to send the message.
@@ -56,6 +58,8 @@ public class ScriptMimeMessage extends MimeMessage
 
     private Multipart multipart;
 
+    private ScriptMailSenderListener listener;
+
     public ScriptMimeMessage(Session session, MailSender mailSender, Execution execution,
         ComponentManager componentManager)
     {
@@ -64,6 +68,7 @@ public class ScriptMimeMessage extends MimeMessage
         this.mailSender = mailSender;
         this.execution = execution;
         this.componentManager = componentManager;
+        this.listener = new ScriptMailSenderListener(this.execution);
     }
 
     public void addPart(String mimeType, Object content) throws MessagingException
@@ -90,7 +95,8 @@ public class ScriptMimeMessage extends MimeMessage
             // can call addPart() several times.
             setContent(this.multipart);
 
-            this.mailSender.send(this, this.session);
+            this.mailSender.send(this, this.session, this.listener);
+
         } catch (MessagingException e) {
             // Save the exception for reporting through the script services's getError() API
             this.execution.getContext().setProperty(MailSenderScriptService.ERROR_KEY, e);
@@ -100,6 +106,11 @@ public class ScriptMimeMessage extends MimeMessage
     public void waitTillSent(long timeout)
     {
         this.mailSender.waitTillSent(timeout);
+    }
+
+    public BlockingQueue<Throwable> getErrors()
+    {
+        return this.listener.getExceptionQueue();
     }
 
     private MimeBodyPartFactory getBodyPartFactory(String mimeType, Class contentClass) throws MessagingException

@@ -49,7 +49,7 @@ import com.xpn.xwiki.api.Attachment;
  * @since 6.1M2
  */
 @Component
-@Named("attachment")
+@Named("xwiki/attachment")
 @Singleton
 public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<Attachment> implements Initializable
 {

@@ -50,7 +50,7 @@ import com.xpn.xwiki.api.Attachment;
  * @since 6.1M2
  */
 @Component
-@Named("html")
+@Named("text/html")
 @Singleton
 @SuppressWarnings("unchecked")
 public class HTMLMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>

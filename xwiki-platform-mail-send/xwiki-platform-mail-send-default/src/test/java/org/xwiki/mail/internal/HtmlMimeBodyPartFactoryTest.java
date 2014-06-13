@@ -20,13 +20,11 @@
 package org.xwiki.mail.internal;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
 import org.junit.Ignore;
@@ -41,16 +39,16 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link HtmlMimeBodyPartFactory}.
+ * Unit tests for {@link HTMLMimeBodyPartFactory}.
  *
  * @version $Id$
  * @since 6.1M2
  */
-public class HtmlMimeBodyPartFactoryTest
+public class HTMLMimeBodyPartFactoryTest
 {
     @Rule
     public MockitoComponentMockingRule<MimeBodyPartFactory> mocker =
-            new MockitoComponentMockingRule<MimeBodyPartFactory>(HtmlMimeBodyPartFactory.class);
+            new MockitoComponentMockingRule<MimeBodyPartFactory>(HTMLMimeBodyPartFactory.class);
 
     @Test
     public void createWhenOnlyHTMLContent() throws Exception

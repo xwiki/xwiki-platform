@@ -53,7 +53,7 @@ import com.xpn.xwiki.api.Attachment;
 @Named("html")
 @Singleton
 @SuppressWarnings("unchecked")
-public class HTMLMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
+public class HTMLMimeBodyPartFactory2 extends AbstractMimeBodyPartFactory<String>
 {
     @Inject
     @Named("attachment")

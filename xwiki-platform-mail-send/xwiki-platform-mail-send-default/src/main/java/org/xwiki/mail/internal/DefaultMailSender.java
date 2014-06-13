@@ -36,6 +36,13 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.mail.MailResultListener;
 import org.xwiki.mail.MailSender;
 
+/**
+ * Default implementation using the {@link org.xwiki.mail.internal.DefaultMailSenderThread} to send emails
+ * asynchronously.
+ *
+ * @version $Id$
+ * @since 6.1M2
+ */
 @Component
 @Singleton
 public class DefaultMailSender implements MailSender, Initializable

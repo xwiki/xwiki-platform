@@ -55,15 +55,15 @@ import com.xpn.xwiki.api.Attachment;
 @SuppressWarnings("unchecked")
 public class HTMLMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
 {
+    private static final Pattern CID_PATTERN =
+        Pattern.compile("src=('|\")cid:([^'\"]*)('|\")", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+
     @Inject
     @Named("attachment")
     private MimeBodyPartFactory attachmentPartFactory;
 
     @Inject
     private MimeBodyPartFactory defaultPartFactory;
-
-    private static final Pattern CID_PATTERN =
-            Pattern.compile("src=('|\")cid:([^'\"]*)('|\")", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
     @Override
     public MimeBodyPart create(String content, Map<String, Object> parameters) throws MessagingException
@@ -158,7 +158,7 @@ public class HTMLMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
     }
 
     /**
-     * Separate embedded images from attachments list
+     * Separate embedded images from attachments list.
      *
      * @return the embedded attachments on the left and the normal attachments on the right of the Pair
      */

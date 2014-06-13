@@ -39,6 +39,10 @@ public class ScriptMailSenderListener implements MailResultListener
 
     private Execution execution;
 
+    /**
+     * @param execution the Execution component, used to save the exceptions in a thread-safe manner (i.e. each thread
+     *        has its list of mail errors)
+     */
     public ScriptMailSenderListener(Execution execution)
     {
         this.execution = execution;
@@ -65,6 +69,9 @@ public class ScriptMailSenderListener implements MailResultListener
         queue.add(t);
     }
 
+    /**
+     * @return the list of exceptions raised when sending mails in the current thread
+     */
     public BlockingQueue<Throwable> getExceptionQueue()
     {
         BlockingQueue<Throwable> queue =

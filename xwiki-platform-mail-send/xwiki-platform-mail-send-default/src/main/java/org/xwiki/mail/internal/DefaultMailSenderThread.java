@@ -116,7 +116,9 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
     }
 
     /**
-     * Send the mail
+     * Send the mail.
+     *
+     * @param item the queue item containing all the data for sending the mail
      */
     protected void sendMail(MailSenderQueueItem item)
     {

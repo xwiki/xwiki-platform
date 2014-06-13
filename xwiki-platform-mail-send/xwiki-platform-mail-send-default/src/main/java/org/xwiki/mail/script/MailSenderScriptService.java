@@ -37,7 +37,7 @@ import org.xwiki.stability.Unstable;
 
 /**
  * Expose Mail Sending API to scripts.
- * </p>
+ * <p/>
  * Example for sending an HTML message with attachments and a text alternative:
  * <pre><code>
  *   #set ($message = $services.mailSender.createMessage(to, subject))
@@ -76,16 +76,42 @@ public class MailSenderScriptService implements ScriptService
     @Inject
     private Execution execution;
 
+    /**
+     * Create an empty Mail message. The user of this API needs to set the recipients, the subject, and the message
+     * content (aka Parts) before sending the mail. Note that the "From" sender name is taken from the Mail Sender
+     * Configuration.
+     *
+     * @return the created Body Part or null if an error happened
+     */
     public ScriptMimeMessage createMessage()
     {
         return createMessage(this.configuration.getFromAddress(), null, null);
     }
 
+    /**
+     * Create a Mail message with the "To" recipient and the mail subject set. The user of this API needs to set the
+     * message content (aka Parts) before sending the mail. Note that the "From" sender name is taken from the Mail
+     * Sender Configuration.
+     *
+     * @param to the "To" email address
+     * @param subject the subject of the mail to send
+     * @return the created Body Part or null if an error happened
+     */
     public ScriptMimeMessage createMessage(String to, String subject)
     {
         return createMessage(this.configuration.getFromAddress(), to, subject);
     }
 
+    /**
+     * Create a Mail message with the "To" recipient and the mail subject set. The user of this API needs to set the
+     * message content (aka Parts) before sending the mail. Note that the "From" sender name from the Mail Sender
+     * Configuration is overridden by the passed "From" parameter.
+     *
+     * @param from the email address of the sender
+     * @param to the "To" email address
+     * @param subject the subject of the mail to send
+     * @return the created Body Part or null if an error happened
+     */
     public ScriptMimeMessage createMessage(String from, String to, String subject)
     {
         Session session;
@@ -138,4 +164,4 @@ public class MailSenderScriptService implements ScriptService
     {
         this.execution.getContext().setProperty(ERROR_KEY, e);
     }
- }
+}

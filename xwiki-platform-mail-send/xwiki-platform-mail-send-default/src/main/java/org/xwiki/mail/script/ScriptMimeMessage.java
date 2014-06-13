@@ -60,6 +60,13 @@ public class ScriptMimeMessage extends MimeMessage
 
     private ScriptMailSenderListener listener;
 
+    /**
+     * @param session the JavaMail Session that is used to send the mail (contains all configuration such as SMTP
+     *        server, SMTP port, etc)
+     * @param mailSender the component to send the mail
+     * @param execution used to get the Execution Context and store an error in it if the send fails
+     * @param componentManager used to dynamically load all {@link MimeBodyPartFactory} components
+     */
     public ScriptMimeMessage(Session session, MailSender mailSender, Execution execution,
         ComponentManager componentManager)
     {
@@ -71,11 +78,30 @@ public class ScriptMimeMessage extends MimeMessage
         this.listener = new ScriptMailSenderListener(this.execution);
     }
 
+    /**
+     * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
+     *
+     * @param mimeType the mime type of the content parameter
+     * @param content the content to include in the mail
+     * @throws MessagingException when an error happens, for example if a body part factory fails to generate a valid
+     *         Body Part
+     */
     public void addPart(String mimeType, Object content) throws MessagingException
     {
         addPart(mimeType, content, Collections.<String, Object>emptyMap());
     }
 
+    /**
+     * Add some content to the mail to be sent. Can be called several times to add different content type to the mail.
+     *
+     * @param mimeType the mime type of the content parameter
+     * @param content the content to include in the mail
+     * @param parameters the list of extra parameters. This is used for example to pass alternate content for the mail
+     *        using the {@code alternate} key in the HTML Mime Body Part Factory. Mail headers can also be passed using
+     *        the {@code headers} key with a {@code Map<String, String>} value containing header keys and values
+     * @throws MessagingException when an error happens, for example if a body part factory fails to generate a valid
+     *         Body Part
+     */
     public void addPart(String mimeType, Object content, Map<String, Object> parameters) throws MessagingException
     {
         MimeBodyPartFactory factory = getBodyPartFactory(mimeType, content.getClass());
@@ -88,6 +114,9 @@ public class ScriptMimeMessage extends MimeMessage
         this.multipart.addBodyPart(part);
     }
 
+    /**
+     * Send the mail asynchronously. You should use {@link #waitTillSent(long)} to make it blocking.
+     */
     public void send()
     {
         try {
@@ -103,11 +132,19 @@ public class ScriptMimeMessage extends MimeMessage
         }
     }
 
+    /**
+     * Wait for all messages on the sending queue to be sent before returning.
+     *
+     * @param timeout the maximum amount of time to wait in milliseconds
+     */
     public void waitTillSent(long timeout)
     {
         this.mailSender.waitTillSent(timeout);
     }
 
+    /**
+     * @return a queue containing top errors raised during the send of all emails in the queue for the current thread
+     */
     public BlockingQueue<Throwable> getErrors()
     {
         return this.listener.getExceptionQueue();

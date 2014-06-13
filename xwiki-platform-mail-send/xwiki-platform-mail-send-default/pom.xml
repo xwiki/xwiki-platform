@@ -31,6 +31,9 @@
   <artifactId>xwiki-platform-mail-send-default</artifactId>
   <name>XWiki Platform - Mail - Send - Default Implementation</name>
   <description>Default implementation of the API to send emails</description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

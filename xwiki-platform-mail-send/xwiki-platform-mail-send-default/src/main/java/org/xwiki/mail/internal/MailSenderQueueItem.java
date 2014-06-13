@@ -38,6 +38,11 @@ public class MailSenderQueueItem
 
     private MailResultListener listener;
 
+    /**
+     * @param message see {@link #getMessage()}
+     * @param session see {@link #getSession()}
+     * @param listener see {@link #getListener()}
+     */
     public MailSenderQueueItem(MimeMessage message, Session session, MailResultListener listener)
     {
         this.message = message;
@@ -45,16 +50,25 @@ public class MailSenderQueueItem
         this.listener = listener;
     }
 
+    /**
+     * @return the mail message to be sent
+     */
     public MimeMessage getMessage()
     {
         return this.message;
     }
 
+    /**
+     * @return the JavaMail Session to be used when sending
+     */
     public Session getSession()
     {
         return this.session;
     }
 
+    /**
+     * @return an optional listener to call when the mail is sent successfully or when there's an error
+     */
     public MailResultListener getListener()
     {
         return this.listener;

@@ -112,7 +112,7 @@ public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<A
                 String.format("Failed to save attachment [%s] to the file system", attachment.getFilename()), e);
         } finally {
             try {
-                if(fos != null){
+                if (fos != null) {
                     fos.close();
                 }
             } catch (IOException e) {

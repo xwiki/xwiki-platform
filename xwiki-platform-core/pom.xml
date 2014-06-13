@@ -495,6 +495,7 @@
     <module>xwiki-platform-livetable</module>
     <module>xwiki-platform-localization</module>
     <module>xwiki-platform-logging</module>
+    <module>xwiki-platform-mail</module>
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-menu</module>
     <module>xwiki-platform-messagestream</module>

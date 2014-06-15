@@ -59,11 +59,11 @@ public class HTMLMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
         Pattern.compile("src=('|\")cid:([^'\"]*)('|\")", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
     @Inject
-    @Named("attachment")
-    private MimeBodyPartFactory attachmentPartFactory;
+    @Named("xwiki/attachment")
+    private MimeBodyPartFactory<Attachment> attachmentPartFactory;
 
     @Inject
-    private MimeBodyPartFactory defaultPartFactory;
+    private MimeBodyPartFactory<String> defaultPartFactory;
 
     @Override
     public MimeBodyPart create(String content, Map<String, Object> parameters) throws MessagingException

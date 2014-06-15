@@ -38,6 +38,8 @@ public class MailSenderQueueItem
 
     private MailResultListener listener;
 
+    private long threadId;
+
     /**
      * @param message see {@link #getMessage()}
      * @param session see {@link #getSession()}
@@ -48,6 +50,7 @@ public class MailSenderQueueItem
         this.message = message;
         this.session = session;
         this.listener = listener;
+        this.threadId = Thread.currentThread().getId();
     }
 
     /**
@@ -72,5 +75,13 @@ public class MailSenderQueueItem
     public MailResultListener getListener()
     {
         return this.listener;
+    }
+
+    /**
+     * @return the id of the thread that wants to send this email
+     */
+    public long getThreadId()
+    {
+        return this.threadId;
     }
 }

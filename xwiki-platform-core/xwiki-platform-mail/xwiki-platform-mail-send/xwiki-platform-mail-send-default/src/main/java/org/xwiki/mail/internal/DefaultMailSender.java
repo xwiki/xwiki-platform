@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal;
 
+import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -91,7 +92,7 @@ public class DefaultMailSender implements MailSender, Initializable
     public void waitTillSent(long timeout)
     {
         long startTime = System.currentTimeMillis();
-        while (!getMailQueue().isEmpty() && System.currentTimeMillis() - startTime < timeout) {
+        while (hasMailQueueItemForCurrentThread() && System.currentTimeMillis() - startTime < timeout) {
             try {
                 Thread.sleep(100L);
             } catch (InterruptedException e) {
@@ -101,6 +102,18 @@ public class DefaultMailSender implements MailSender, Initializable
                 break;
             }
         }
+    }
+
+    private boolean hasMailQueueItemForCurrentThread()
+    {
+        Iterator<MailSenderQueueItem> iterator = getMailQueue().iterator();
+        while (iterator.hasNext()) {
+            MailSenderQueueItem item = iterator.next();
+            if (Thread.currentThread().getId() == item.getThreadId()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

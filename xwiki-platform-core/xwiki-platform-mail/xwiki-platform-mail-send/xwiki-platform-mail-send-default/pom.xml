@@ -53,6 +53,15 @@
       <version>${project.version}</version>
     </dependency>
     <!-- Test Dependencies -->
+    <!-- Override the Servlet environment that is drawn by the oldcore dependency. This works because the
+        StandardEnvironment component has a higher priority than the ServletEnvironment one (they both implement
+        Environment). -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-standard</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail</artifactId>

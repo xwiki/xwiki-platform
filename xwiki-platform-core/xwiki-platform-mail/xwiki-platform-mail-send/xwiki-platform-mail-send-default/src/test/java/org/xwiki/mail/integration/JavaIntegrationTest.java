@@ -19,15 +19,19 @@
  */
 package org.xwiki.mail.integration;
 
-import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.mail.BodyPart;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -66,7 +70,25 @@ public class JavaIntegrationTest
 
     private MimeBodyPartFactory<String> defaultBodyPartFactory;
 
+    private MimeBodyPartFactory<String> htmlBodyPartFactory;
+
     private MailSender sender;
+
+    private MailResultListener listener = new MailResultListener()
+    {
+        @Override
+        public void onSuccess(MimeMessage message)
+        {
+            // Do nothing, we check below that the mail has been received!
+        }
+
+        @Override
+        public void onError(MimeMessage message, Throwable t)
+        {
+            // Shouldn't happen, fail the test!
+            fail("Error sending mail: " + ExceptionUtils.getFullStackTrace(t));
+        }
+    };
 
     @Before
     public void startMail()
@@ -89,6 +111,8 @@ public class JavaIntegrationTest
         this.configuration = this.componentManager.getInstance(MailSenderConfiguration.class);
         this.defaultBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
+        this.htmlBodyPartFactory = this.componentManager.getInstance(
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
         this.sender = this.componentManager.getInstance(MailSender.class);
     }
 
@@ -101,7 +125,7 @@ public class JavaIntegrationTest
     }
 
     @Test
-    public void sendMail() throws Exception
+    public void sendTextMail() throws Exception
     {
         // Step 1: Create a JavaMail Session
         Session session =
@@ -120,40 +144,97 @@ public class JavaIntegrationTest
         message.setContent(multipart);
 
         // Step 4: Send the mail and wait for it to be sent
-        MailResultListener listener = new MailResultListener()
-        {
-            @Override
-            public void onSuccess(MimeMessage message)
-            {
-                // Do nothing, we check below that the mail has been received!
-            }
-
-            @Override
-            public void onError(MimeMessage message, Throwable t)
-            {
-                // Shouldn't happen, fail the test!
-                fail("Error sending mail: " + ExceptionUtils.getFullStackTrace(t));
-            }
-        };
-
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        this.sender.send(message, session, listener);
-        this.sender.send(message, session, listener);
-        this.sender.send(message, session, listener);
+        this.sender.send(message, session, this.listener);
+        this.sender.send(message, session, this.listener);
+        this.sender.send(message, session, this.listener);
         this.sender.waitTillSent(10000L);
 
         // Verify that the mails have been received (wait maximum 10 seconds).
+        this.mail.waitForIncomingEmail(10000L, 3);
+        MimeMessage[] messages = this.mail.getReceivedMessages();
+
+        assertEquals("subject", messages[0].getHeader("Subject")[0]);
+        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
+
+        assertEquals(1, ((MimeMultipart) messages[0].getContent()).getCount());
+
+        BodyPart textBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(0);
+        assertEquals("text/plain", textBodyPart.getHeader("Content-Type")[0]);
+        assertEquals("some text here", textBodyPart.getContent());
+    }
+
+    @Test
+    public void sendHTMLAndCalendarInvitationMail() throws Exception
+    {
+        // Step 1: Create a JavaMail Session
+        Session session =
+            Session.getInstance(this.configuration.getAllProperties(), new XWikiAuthenticator(this.configuration));
+
+        // Step 2: Create the Message to send
+        MimeMessage message = new MimeMessage(session);
+        message.setSubject("subject");
+        message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress("john@doe.com"));
+
+        // Step 3: Add the Message Body
+        Multipart multipart = new MimeMultipart("alternative");
+        // Add an HTML body part
+        multipart.addBodyPart(this.htmlBodyPartFactory.create(
+            "<font size=\"\\\"2\\\"\">simple meeting invitation</font>"));
+        // Add the Calendar invitation body part
+        String calendarContent = "BEGIN:VCALENDAR\r\n"
+            + "METHOD:REQUEST\r\n"
+            + "PRODID: Meeting\r\n"
+            + "VERSION:2.0\r\n"
+            + "BEGIN:VEVENT\r\n"
+            + "DTSTAMP:20140616T164100\r\n"
+            + "DTSTART:20140616T164100\r\n"
+            + "DTEND:20140616T194100\r\n"
+            + "SUMMARY:test request\r\n"
+            + "UID:324\r\n"
+            + "ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE:MAILTO:john@doe.com\r\n"
+            + "ORGANIZER:MAILTO:john@doe.com\r\n"
+            + "LOCATION:on the net\r\n"
+            + "DESCRIPTION:learn some stuff\r\n"
+            + "SEQUENCE:0\r\n"
+            + "PRIORITY:5\r\n"
+            + "CLASS:PUBLIC\r\n"
+            + "STATUS:CONFIRMED\r\n"
+            + "TRANSP:OPAQUE\r\n"
+            + "BEGIN:VALARM\r\n"
+            + "ACTION:DISPLAY\r\n"
+            + "DESCRIPTION:REMINDER\r\n"
+            + "TRIGGER;RELATED=START:-PT00H15M00S\r\n"
+            + "END:VALARM\r\n"
+            + "END:VEVENT\r\n"
+            + "END:VCALENDAR";
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("mimetype", "text/calendar;method=CANCEL");
+        parameters.put("headers", Collections.singletonMap("Content-Class", "urn:content-classes:calendarmessage"));
+        multipart.addBodyPart(this.defaultBodyPartFactory.create(calendarContent, parameters));
+
+        message.setContent(multipart);
+
+        // Step 4: Send the mail and wait for it to be sent
+        this.sender.send(message, session, this.listener);
+        this.sender.waitTillSent(10000L);
+
+        // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);
         MimeMessage[] messages = this.mail.getReceivedMessages();
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        messages[0].writeTo(baos);
-        String messageText = baos.toString();
+        assertEquals("subject", messages[0].getHeader("Subject")[0]);
+        assertEquals("john@doe.com", messages[0].getHeader("To")[0]);
 
-        assertTrue(messageText.contains("To: john@doe.com"));
-        assertTrue(messageText.contains("Subject: subject"));
-        assertTrue(messageText.contains("Content-Type: multipart/mixed"));
-        assertTrue(messageText.contains("Content-Type: text/plain"));
-        assertTrue(messageText.contains("some text here"));
+        assertEquals(2, ((MimeMultipart) messages[0].getContent()).getCount());
+
+        BodyPart htmlBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(0);
+        assertEquals("text/html", htmlBodyPart.getHeader("Content-Type")[0]);
+        assertEquals("<font size=\"\\\"2\\\"\">simple meeting invitation</font>", htmlBodyPart.getContent());
+
+        BodyPart calendarBodyPart = ((MimeMultipart) messages[0].getContent()).getBodyPart(1);
+        assertEquals("text/calendar;method=CANCEL", calendarBodyPart.getHeader("Content-Type")[0]);
+        InputStream is = (InputStream) calendarBodyPart.getContent();
+        assertEquals(calendarContent, IOUtils.toString(is));
     }
 }

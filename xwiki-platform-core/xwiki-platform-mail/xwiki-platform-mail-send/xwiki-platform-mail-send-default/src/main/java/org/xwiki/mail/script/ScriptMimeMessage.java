@@ -20,6 +20,7 @@
 package org.xwiki.mail.script;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
@@ -110,7 +111,14 @@ public class ScriptMimeMessage extends MimeMessage
         if (this.multipart == null) {
             this.multipart = new MimeMultipart("mixed");
         }
-        MimeBodyPart part = factory.create(content, parameters);
+
+        // Pass the mime type in the parameters so that generic Mime Body Part factories can use it.
+        // Note that if the use has already passed a "mimetype" parameter then we don't override it!
+        Map<String, Object> enhancedParameters = new HashMap<>();
+        enhancedParameters.put("mimetype", mimeType);
+        enhancedParameters.putAll(parameters);
+
+        MimeBodyPart part = factory.create(content, enhancedParameters);
         this.multipart.addBodyPart(part);
     }
 

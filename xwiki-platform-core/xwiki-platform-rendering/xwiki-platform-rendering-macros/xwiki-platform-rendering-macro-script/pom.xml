@@ -31,7 +31,7 @@
   <name>XWiki Platform - Rendering - Macro - Script</name>
   <description>Executes a script implementing the Java Scripting API (JSR-223)</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.54</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.53</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Script Macro</xwiki.extension.name>
   </properties>

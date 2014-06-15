@@ -29,6 +29,7 @@ import javax.mail.internet.MimeMultipart;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -71,7 +72,8 @@ public class HTMLMimeBodyPartFactoryTest
     public void createWhenHTMLAndAlternateTextContent() throws Exception
     {
         MimeBodyPart textBodyPart = mock(MimeBodyPart.class);
-        MimeBodyPartFactory defaultBodyPartFactory = this.mocker.getInstance(MimeBodyPartFactory.class);
+        MimeBodyPartFactory defaultBodyPartFactory = this.mocker.getInstance(
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
         when(defaultBodyPartFactory.create("some text")).thenReturn(textBodyPart);
 
         MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("<p>some html</p>",
@@ -89,8 +91,8 @@ public class HTMLMimeBodyPartFactoryTest
         Attachment attachment = mock(Attachment.class);
 
         MimeBodyPart attachmentBodyPart = mock(MimeBodyPart.class);
-        MimeBodyPartFactory attachmentBodyPartFactory =
-            this.mocker.getInstance(MimeBodyPartFactory.class, "attachment");
+        MimeBodyPartFactory attachmentBodyPartFactory = this.mocker.getInstance(
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, Attachment.class), "xwiki/attachment");
         when(attachmentBodyPartFactory.create(same(attachment))).thenReturn(attachmentBodyPart);
 
         MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("<p>some html</p>",
@@ -111,8 +113,8 @@ public class HTMLMimeBodyPartFactoryTest
         when(embeddedAttachment.getFilename()).thenReturn("embeddedAttachment.png");
 
         MimeBodyPart embeddedAttachmentBodyPart = mock(MimeBodyPart.class);
-        MimeBodyPartFactory attachmentBodyPartFactory =
-            this.mocker.getInstance(MimeBodyPartFactory.class, "attachment");
+        MimeBodyPartFactory attachmentBodyPartFactory = this.mocker.getInstance(
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, Attachment.class), "xwiki/attachment");
         when(attachmentBodyPartFactory.create(same(embeddedAttachment))).thenReturn(embeddedAttachmentBodyPart);
 
         MimeBodyPart normalAttachmentBodyPart = mock(MimeBodyPart.class);
@@ -144,15 +146,16 @@ public class HTMLMimeBodyPartFactoryTest
         when(embeddedAttachment.getFilename()).thenReturn("embeddedAttachment.png");
 
         MimeBodyPart embeddedAttachmentBodyPart = mock(MimeBodyPart.class);
-        MimeBodyPartFactory attachmentBodyPartFactory =
-            this.mocker.getInstance(MimeBodyPartFactory.class, "attachment");
+        MimeBodyPartFactory attachmentBodyPartFactory = this.mocker.getInstance(
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, Attachment.class), "xwiki/attachment");
         when(attachmentBodyPartFactory.create(same(embeddedAttachment))).thenReturn(embeddedAttachmentBodyPart);
 
         MimeBodyPart normalAttachmentBodyPart = mock(MimeBodyPart.class);
         when(attachmentBodyPartFactory.create(same(normalAttachment))).thenReturn(normalAttachmentBodyPart);
 
         MimeBodyPart textBodyPart = mock(MimeBodyPart.class);
-        MimeBodyPartFactory defaultBodyPartFactory = this.mocker.getInstance(MimeBodyPartFactory.class);
+        MimeBodyPartFactory defaultBodyPartFactory = this.mocker.getInstance(
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
         when(defaultBodyPartFactory.create("some text")).thenReturn(textBodyPart);
 
         Map<String, Object> parameters = new HashMap<>();

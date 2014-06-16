@@ -5,3 +5,5 @@ org.xwiki.mail.internal.DefaultMimeBodyPartFactory
 org.xwiki.mail.internal.HTMLMimeBodyPartFactory
 org.xwiki.mail.internal.DefaultMailSender
 org.xwiki.mail.internal.DefaultMailSenderThread
+org.xwiki.mail.internal.RecipientConverter
+org.xwiki.mail.internal.AddressesConverter

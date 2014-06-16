@@ -52,6 +52,11 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-text</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
     <!-- Test Dependencies -->
     <!-- Override the Servlet environment that is drawn by the oldcore dependency. This works because the
         StandardEnvironment component has a higher priority than the ServletEnvironment one (they both implement

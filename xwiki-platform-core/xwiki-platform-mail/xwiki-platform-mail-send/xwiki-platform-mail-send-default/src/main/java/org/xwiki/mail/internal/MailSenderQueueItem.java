@@ -22,7 +22,10 @@ package org.xwiki.mail.internal;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.mail.MailResultListener;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Represents a Mail message placed on the queue for sending.
@@ -83,5 +86,35 @@ public class MailSenderQueueItem
     public long getThreadId()
     {
         return this.threadId;
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+
+        ToStringBuilder messageBuilder = new XWikiToStringBuilder(this);
+
+        String subjectValue;
+        try {
+            subjectValue = getMessage().getSubject();
+        } catch (Exception e) {
+            subjectValue = String.format("<couldn't get message, reason: [%s]>",
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+        messageBuilder.append("subject", subjectValue);
+
+        String fromValue;
+        try {
+            fromValue = getMessage().getFrom()[0].toString();
+        } catch (Exception e) {
+            fromValue = String.format("<couldn't get from, reason: [%s]>",
+                ExceptionUtils.getRootCauseMessage(e));
+        }
+        messageBuilder.append("from", fromValue);
+
+        builder.append("message", getMessage() == null ? null : messageBuilder.toString());
+        builder.append("threadId", getThreadId());
+        return builder.toString();
     }
 }

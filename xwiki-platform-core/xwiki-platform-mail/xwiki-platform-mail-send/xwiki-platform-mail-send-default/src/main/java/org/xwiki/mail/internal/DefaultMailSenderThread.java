@@ -22,7 +22,6 @@ package org.xwiki.mail.internal;
 import java.util.Queue;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -34,7 +33,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.mail.MailResultListener;
-import org.xwiki.observation.ObservationManager;
 
 /**
  * Thread that regularly check for mails on a Queue, and for each mail tries to send it.
@@ -48,9 +46,6 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
 {
     @Inject
     private Logger logger;
-
-    @Inject
-    private Provider<ObservationManager> observationManagerProvider;
 
     /**
      * The queue containing mails to send.
@@ -89,7 +84,15 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
             do {
                 // Handle next message in the queue
                 if (!this.mailQueue.isEmpty()) {
-                    sendMail(this.mailQueue.poll());
+                    MailSenderQueueItem mailItem = this.mailQueue.poll();
+                    try {
+                        sendMail(mailItem);
+                    } catch (Exception e) {
+                        // If any error happens, we log it but we don't stop this thread so that we can send
+                        // other mails
+                        this.logger.warn("Failed to send mail [{}]. Root reason [{}]", mailItem,
+                            ExceptionUtils.getRootCauseMessage(e));
+                    }
                 }
                 // Make some pause to not overload the server
                 try {

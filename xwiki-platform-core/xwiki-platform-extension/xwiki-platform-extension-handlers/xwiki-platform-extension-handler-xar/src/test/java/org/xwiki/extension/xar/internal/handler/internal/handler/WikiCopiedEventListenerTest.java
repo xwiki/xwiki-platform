@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package WikiEventListener;
+package org.xwiki.extension.xar.internal.handler.internal.handler;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,6 +36,8 @@ import org.xwiki.extension.test.EmptyExtension;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 
 @AllComponents
@@ -73,6 +75,11 @@ public class WikiCopiedEventListenerTest
 
         this.localExtensionDependency1 = this.localExtensionRepository.storeExtension(extensionDependency);
         this.localExtension1 = this.localExtensionRepository.storeExtension(extension);
+    }
+
+    @AfterComponent
+    public void addContextualAuthorizationManagerComponent() throws Exception {
+        this.repositoryUtil.getComponentManager().registerMockComponent(ContextualAuthorizationManager.class);
     }
 
     @Test

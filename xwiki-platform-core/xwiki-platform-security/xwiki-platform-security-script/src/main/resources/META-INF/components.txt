@@ -1,0 +1,2 @@
+org.xwiki.security.authorization.script.SecurityAuthorizationScriptService
+org.xwiki.security.script.SecurityScriptService

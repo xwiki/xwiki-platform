@@ -45,5 +45,6 @@
   <modules>
     <module>xwiki-platform-security-api</module>
     <module>xwiki-platform-security-bridge</module>
+    <module>xwiki-platform-security-script</module>
   </modules>
 </project>

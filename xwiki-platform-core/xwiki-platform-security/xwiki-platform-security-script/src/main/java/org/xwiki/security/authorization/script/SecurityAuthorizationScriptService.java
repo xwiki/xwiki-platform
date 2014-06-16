@@ -17,26 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.security.authorization;
+package org.xwiki.security.authorization.script;
 
-import org.xwiki.component.annotation.Role;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
 /**
- * This API is for checking the access rights of current user in the current context. It is aims to replace
- * com.xpn.xwiki.user.api.XWikiRightService.
- *
- * The ContextualAuthorizationManager does not provide any help for authentication. Authentication should have been
- * ensured previously if needed.
+ * Security Authorization Script Service.
  *
  * @version $Id$
  * @since 6.1RC1
  */
-@Role
+@Component
+@Named(SecurityAuthorizationScriptService.ROLEHINT)
 @Unstable
-public interface ContextualAuthorizationManager
+public class SecurityAuthorizationScriptService implements ScriptService
 {
+    /**
+     * The role hint of this component.
+     */
+    public static final String ROLEHINT = "security";
+
+    @Inject
+    private AuthorizationManager authorizationManager;
+
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+
     /**
      * Check if access identified by {@code right} on the current entity is allowed in the current context.
      * The context includes information like the authenticated user, the current macro being executed, the rendering
@@ -46,7 +63,10 @@ public interface ContextualAuthorizationManager
      * @param right the right needed for execution of the action
      * @throws AccessDeniedException if the action should be denied, which may also happen when an error occurs
      */
-    void checkAccess(Right right) throws AccessDeniedException;
+    void checkAccess(Right right) throws AccessDeniedException
+    {
+        contextualAuthorizationManager.checkAccess(right);
+    }
 
     /**
      * Verifies if access identified by {@code right} on the current entity would be allowed in the current context.
@@ -57,7 +77,10 @@ public interface ContextualAuthorizationManager
      * @param right the right to check .
      * @return {@code true} if the user has the specified right on the entity, {@code false} otherwise
      */
-    boolean hasAccess(Right right);
+    boolean hasAccess(Right right)
+    {
+        return contextualAuthorizationManager.hasAccess(right);
+    }
 
     /**
      * Check if access identified by {@code right} on the given entity is allowed in the current context.
@@ -69,7 +92,10 @@ public interface ContextualAuthorizationManager
      * @param entityReference the entity on which to check the right
      * @throws AccessDeniedException if the action should be denied, which may also happen when an error occurs
      */
-    void checkAccess(Right right, EntityReference entityReference) throws AccessDeniedException;
+    void checkAccess(Right right, EntityReference entityReference) throws AccessDeniedException
+    {
+        contextualAuthorizationManager.checkAccess(right, entityReference);
+    }
 
     /**
      * Verifies if access identified by {@code right} on the given entity would be allowed in the current context.
@@ -77,9 +103,45 @@ public interface ContextualAuthorizationManager
      * context restriction, the dropping of rights by macro, etc...
      * This function should be used for interface matters, use {@link #checkAccess} at security checkpoints.
      *
-     * @param right the right to check .
+     * @param right the right to check.
      * @param entityReference the entity on which to check the right
      * @return {@code true} if the user has the specified right on the entity, {@code false} otherwise
      */
-    boolean hasAccess(Right right, EntityReference entityReference);
+    boolean hasAccess(Right right, EntityReference entityReference)
+    {
+        return contextualAuthorizationManager.hasAccess(right, entityReference);
+    }
+
+    /**
+     * Check if the user identified by {@code userReference} has the access identified by {@code right} on the
+     * entity identified by {@code entityReference}. Note that some rights may be checked higher in hierarchy of the
+     * provided entity if such right is not enabled at lowest hierarchy level provided.
+     * This function should be used at security checkpoint.
+     *
+     * @param right the right needed for execution of the action
+     * @param userReference the user to check the right for
+     * @param entityReference the entity on which to check the right
+     * @throws AccessDeniedException if the action should be denied, which may also happen when an error occurs
+     */
+    void checkAccess(Right right, DocumentReference userReference, EntityReference entityReference)
+        throws AccessDeniedException
+    {
+        authorizationManager.checkAccess(right, userReference, entityReference);
+    }
+
+    /**
+     * Verifies if the user identified by {@code userReference} has the access identified by {@code right} on the
+     * entity identified by {@code entityReference}. Note that some rights may be checked higher in hierarchy of the
+     * provided entity if such right is not enabled at lowest hierarchy level provided.
+     * This function should be used for interface matters, use {@link #checkAccess} at security checkpoints.
+     *
+     * @param right the right to check .
+     * @param userReference the user to check the right for
+     * @param entityReference the entity on which to check the right
+     * @return {@code true} if the user has the specified right on the entity, {@code false} otherwise
+     */
+    boolean hasAccess(Right right, DocumentReference userReference, EntityReference entityReference)
+    {
+        return authorizationManager.hasAccess(right, userReference, entityReference);
+    }
 }

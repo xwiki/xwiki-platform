@@ -25,6 +25,7 @@ import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -66,6 +67,8 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
+
+        registerMockComponent(ContextualAuthorizationManager.class);
 
         this.xwiki = new XWiki();
         getContext().setWiki(this.xwiki);

@@ -19,12 +19,6 @@
  */
 package com.xpn.xwiki.test;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,6 +51,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -69,6 +64,12 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
+
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test rule to initialize and manipulate various oldcore APIs.
@@ -95,6 +96,8 @@ public class MockitoOldcoreRule implements MethodRule
     private XWikiRightService mockRightService;
 
     private AuthorizationManager mockAuthorizationManager;
+
+    private ContextualAuthorizationManager mockContextualAuthorizationManager;
 
     protected Map<DocumentReference, XWikiDocument> documents =
         new ConcurrentHashMap<DocumentReference, XWikiDocument>();
@@ -165,6 +168,8 @@ public class MockitoOldcoreRule implements MethodRule
         this.context.setMainXWiki("xwiki");
 
         this.mockAuthorizationManager = getMocker().registerMockComponent(AuthorizationManager.class);
+        this.mockContextualAuthorizationManager =
+            getMocker().registerMockComponent(ContextualAuthorizationManager.class);
 
         this.mockXWiki = mock(XWiki.class);
         getXWikiContext().setWiki(this.mockXWiki);
@@ -462,6 +467,11 @@ public class MockitoOldcoreRule implements MethodRule
     public AuthorizationManager getMockAuthorizationManager()
     {
         return this.mockAuthorizationManager;
+    }
+
+    public ContextualAuthorizationManager getMockContextualAuthorizationManager()
+    {
+        return this.mockContextualAuthorizationManager;
     }
 
     public XWikiStoreInterface getMockStore()

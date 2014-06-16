@@ -42,6 +42,8 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -91,6 +93,9 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
+        final ContextualAuthorizationManager mockCam =
+            getComponentManager().registerMockComponent(getMockery(), ContextualAuthorizationManager.class);
+
         final XWiki mockXWiki = getMockery().mock(XWiki.class);
         final XWikiGroupService mockXWikiGroupService = getMockery().mock(XWikiGroupService.class);
 
@@ -123,6 +128,9 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
+                allowing(mockCam).hasAccess(Right.PROGRAM);
+                will(returnValue(true));
+
                 allowing(mockXWiki).getDocument(with(equal(wikiMacroDocumentReference)), with(any(XWikiContext.class)));
                 will(returnValue(wikiMacroDocument));
 

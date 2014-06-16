@@ -47,6 +47,7 @@ public interface XWikiBridge
      *
      * @param right the right to be checked.
      * @return {@code true} if authentication is needed.
+     * @since 6.1RC1
      */
     boolean needsAuthentication(Right right);
 }

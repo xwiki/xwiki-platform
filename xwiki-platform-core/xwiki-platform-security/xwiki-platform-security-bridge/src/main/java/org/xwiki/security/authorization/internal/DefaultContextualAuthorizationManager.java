@@ -40,7 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Default implementation of the {@link ContextualAuthorizationManager}.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 6.1RC1
  */
 @Component
 @Singleton

@@ -29,17 +29,9 @@
 ## ----------------------------
 <div class="xcontent">
   <div class="col-xs-12 #if($displayContentMenu)col-md-7#end">
-    <div id="document-title" class="col-xs-12 row"><h1>$titleToDisplay</h1></div>
-    <div id="xdocAuthors" class="row">
-  ##    <div class="xdocCreation">  Creation
-  ##      $services.localization.render('core.footer.creation', [$xwiki.getUserName($doc.creator), $xwiki.formatDate($doc.creationDate)])<br/>
-  ##      #if($tdoc.realLanguage != $doc.realLanguage)
-  ##        $services.localization.render('core.footer.translationCreation', [$tdoc.realLanguage, $xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])<br/>
-  ##      #end
-  ##    </div>
-      <div class="xdocLastModification col-xs-12"> ## Last modification
-        $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
-      </div>
+    <div id="document-title"><h1>$titleToDisplay</h1></div>
+    <div id="xdocAuthors">
+      $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
     </div>
   </div>
   #if($displayContentMenu)

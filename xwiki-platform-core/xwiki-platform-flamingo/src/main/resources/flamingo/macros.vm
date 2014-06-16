@@ -1103,7 +1103,7 @@ $html
  * @param class The class to use.
  *#
 #macro(submitButton $name $shortcut $value $class)
-<input class="btn $class" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$shortcut"#end value="$value"/>
+<input class="btn $!class" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$shortcut"#end value="$value"/>
 #end
 #**
  * Displays a submit button for the editor. This macro calls submitButton,

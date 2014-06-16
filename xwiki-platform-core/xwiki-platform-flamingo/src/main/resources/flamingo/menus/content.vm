@@ -1,10 +1,4 @@
 <div id="contentmenu" class="pull-right">
-##<div class="gradientfilterIE"></div>
-##<div class="componentcontainer">
-##<strong id="xwikicontentmenutitle" class="hidden">$services.localization.render('core.menu.content.title')</strong>
-##<div class="rightmenu">
-##</div>
-##<div class="leftmenu">
 #if($hasEdit && !$isReadOnly)
   ## Compute the default edit mode
   #set($editaction = $doc.getDefaultEditMode())
@@ -102,6 +96,4 @@
     </script>
   #end
 #end
-##</div>
-##</div>
 </div>

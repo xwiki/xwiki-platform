@@ -1,3 +1,7 @@
+#if ($xcontext.action=='preview')
+  #set($displayContentMenu = false)
+#end
+
 #if ($request.xpage == "print")
   #set($showLeftPanels = false)
   #set($showRightPanels = false)

@@ -310,43 +310,13 @@ public class XWikiCachingRightService implements XWikiRightService
     @Override
     public boolean hasProgrammingRights(XWikiContext context)
     {
-        // The ContextualAuthorizationManager is not used here, since it does not provide the old behavior of the
-        // PR right using the content authors.
-
-        if (renderingContext.isRestricted() || context.hasDroppedPermissions()) {
-            return false;
-        }
-
-        XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
-        sdoc = (sdoc != null) ? sdoc : context.getDoc();
-
-        WikiReference wiki =
-            (sdoc != null) ? sdoc.getDocumentReference().getWikiReference() : new WikiReference(context.getWikiId());
-
-        return hasProgrammingRights(sdoc, context);
+        return contextualAuthorizationManager.hasAccess(Right.PROGRAM);
     }
 
     @Override
     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
     {
-        DocumentReference user;
-        WikiReference wiki;
-
-        if (doc != null) {
-            user = doc.getContentAuthorReference();
-            wiki = doc.getDocumentReference().getWikiReference();
-        } else {
-            user = context.getUserReference();
-            wiki = new WikiReference(context.getWikiId());
-        }
-
-        if (user != null && XWikiConstants.GUEST_USER.equals(user.getName())) {
-            // Public users (not logged in) should be passed as null in the new API. It may happen that badly
-            // design code, and poorly written API does not take care, so we prevent security issue here.
-            user = null;
-        }
-
-        return authorizationManager.hasAccess(Right.PROGRAM, user, wiki);
+        return contextualAuthorizationManager.hasAccess(Right.PROGRAM, doc.getDocumentReference());
     }
 
     @Override

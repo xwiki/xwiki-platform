@@ -24,6 +24,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
@@ -32,6 +33,7 @@ import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -64,7 +66,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     @Override
     public void checkAccess(Right right, EntityReference entity) throws AccessDeniedException
     {
-        DocumentReference user = getCurrentUser();
+        DocumentReference user = getCurrentUser(right, entity);
 
         if (!checkPreAccess(right)) {
             throw new AccessDeniedException(right, user, entity);
@@ -82,7 +84,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     @Override
     public boolean hasAccess(Right right, EntityReference entity)
     {
-        DocumentReference user = getCurrentUser();
+        DocumentReference user = getCurrentUser(right, entity);
 
         return checkPreAccess(right) && authorizationManager.hasAccess(right, user, entity);
     }
@@ -107,9 +109,59 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     /**
      * @return the current user from context.
      */
-    private DocumentReference getCurrentUser()
+    private DocumentReference getCurrentUser(Right right, EntityReference entity)
     {
+        // Backward compatibility for the old way of assigning programming right.
+        if (right == Right.PROGRAM) {
+            XWikiDocument doc = getDocument(entity);
+            if (doc != null) {
+                return getContentAuthor(doc);
+            }
+        }
         return xcontextProvider.get().getUserReference();
+    }
+
+    /**
+     * Retrieve the document corresponding to the given reference.
+     *
+     * @param entity an entity reference. The document reference is extracted from it.
+     * @return a document or null if the reference could not be resolved to a document.
+     */
+    private XWikiDocument getDocument(EntityReference entity)
+    {
+        if (entity == null) {
+            return null;
+        }
+
+        EntityReference docEntity = entity.extractReference(EntityType.DOCUMENT);
+        if (docEntity == null) {
+            return null;
+        }
+
+        XWikiContext context = xcontextProvider.get();
+        try {
+            return context.getWiki().getDocument(new DocumentReference(docEntity), context);
+        } catch (Exception e) {
+            // Ignored
+        }
+        return null;
+    }
+
+    /**
+     * @param doc a document.
+     * @return the content author reference of that document.
+     */
+    private DocumentReference getContentAuthor(XWikiDocument doc)
+    {
+        DocumentReference user = doc.getContentAuthorReference();
+
+        if (user != null && XWikiConstants.GUEST_USER.equals(user.getName())) {
+            // Public users (not logged in) should be passed as null in the new API. It may happen that badly
+            // design code, and poorly written API does not take care, so we prevent security issue here.
+            user = null;
+        }
+
+        return null;
     }
 
     /**

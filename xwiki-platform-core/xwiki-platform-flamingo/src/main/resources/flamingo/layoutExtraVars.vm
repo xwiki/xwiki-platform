@@ -8,7 +8,7 @@
   #set($displayContentMenu = false)
 #end
 
-#if($xcontext.action == 'edit' && $request.editor != 'inline')
+#if($xcontext.action == 'edit' && $editor != 'inline')
   #set($showLeftPanels = '0')
   #set($showRightPanels = '1')
 #end

@@ -17,24 +17,25 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
  <form id="inline" method="post" action="$doc.getURL("preview")" class="withLock">
 #end
 #template("hierarchy.vm")
-<div id="editMeta" class="col-xs-12 col-md-7">
-  #template('editmeta.vm')
-  ## ----------------------------------------------------------------------------
-  ## Compute title to display and modify rendered content accordingly.
-  ## ----------------------------------------------------------------------------
-  #set ($renderedContent = $cdoc.getRenderedContent())
-  #template("titlevars.vm")
-  ## ----------------------------
-  ## Display the title
-  ## ----------------------------
-  <div id="document-title"><h1>$titleToDisplay</h1></div>
-</div>
-#if($displayContentMenu)
-  <div class="col-xs-12 col-md-5">
-    #template("menus/content.vm")
+<div class="row">
+  <div id="editMeta" class="col-xs-12 col-md-7">
+    #template('editmeta.vm')
+    ## ----------------------------------------------------------------------------
+    ## Compute title to display and modify rendered content accordingly.
+    ## ----------------------------------------------------------------------------
+    #set ($renderedContent = $cdoc.getRenderedContent())
+    #template("titlevars.vm")
+    ## ----------------------------
+    ## Display the title
+    ## ----------------------------
+    <div id="document-title"><h1>$titleToDisplay</h1></div>
   </div>
-#end
-<div class="col-xs-12">
+  #if($displayContentMenu)
+    <div class="col-xs-12 col-md-5">
+      #template("menus/content.vm")
+    </div>
+  #end
+</div>
 ##
 ## If the document cannot be edited, display an information and a forcing link:
 ##
@@ -77,7 +78,6 @@ $renderedContent
 #set($editactions = "bottom")
 <div class="bottombuttons">#template("editactions.vm")</div>
 </div> ## form
-</div>
 </form>
 #template("textarea_wysiwyg.vm")
 #end ## can edit

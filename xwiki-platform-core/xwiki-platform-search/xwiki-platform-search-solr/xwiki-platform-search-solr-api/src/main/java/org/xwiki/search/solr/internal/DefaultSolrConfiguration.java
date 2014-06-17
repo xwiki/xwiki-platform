@@ -20,9 +20,9 @@
 package org.xwiki.search.solr.internal;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -156,7 +156,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
         }
 
         // Core directory
-        Set<URL> solrCoreResourcess = ClasspathHelper.forPackage(HOME_DIRECTORY_CORE_PACKAGE);
+        Collection<URL> solrCoreResourcess = ClasspathHelper.forPackage(HOME_DIRECTORY_CORE_PACKAGE);
         Reflections reflections =
             new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner()).setUrls(solrCoreResourcess)
                 .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(HOME_DIRECTORY_CORE_PACKAGE))));

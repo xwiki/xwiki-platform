@@ -28,20 +28,20 @@
 ## Display the title
 ## ----------------------------
 <div class="xcontent">
-  <div class="col-xs-12 #if($displayContentMenu)col-md-7#end">
-    <div id="document-title"><h1>$titleToDisplay</h1></div>
-    <div id="xdocAuthors">
-      $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+  <div class="row">
+    <div class="col-xs-12 #if($displayContentMenu)col-md-7#end">
+      <div id="document-title"><h1>$titleToDisplay</h1></div>
+      <div id="xdocAuthors">
+        $services.localization.render('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+      </div>
     </div>
+    #if($displayContentMenu)
+      <div class="col-xs-12 col-md-5">
+        #template("menus/content.vm")
+      </div>
+    #end
   </div>
-  #if($displayContentMenu)
-    <div class="col-xs-12 col-md-5">
-      #template("menus/content.vm")
-    </div>
-  #end
-  <div class="col-xs-12">
-    <hr/>
-  </div>
+  <hr/>
   ## --------------------------------------------------------------------------
   ## Drop permissions as they are no longer needed. This allows us not to have
   ## to review the code below for security holes since nothing bad can happen.
@@ -50,7 +50,7 @@
   ## ----------------------------
   ## Display the rendered content
   ## ----------------------------
-  <div id="xwikicontent" class="col-xs-12">
+  <div id="xwikicontent">
   $renderedContent
   </div>
 </div>

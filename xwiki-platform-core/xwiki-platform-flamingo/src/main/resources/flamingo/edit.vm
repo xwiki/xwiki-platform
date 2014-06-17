@@ -90,29 +90,29 @@
   <div class="alleditcontent">
   <div id="mainEditArea">
   #template("hierarchy.vm")
-  #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)
-    <div id="editMeta" class="col-xs-12 col-md-7">
-      #template('editmeta.vm')
-    </div>
-  #else
-    <div id="document-title" class="col-xs-12 col-md-7"><h1>
-    #if($editor == 'rights')
-      $services.localization.render('core.editors.rights.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
-    #elseif($editor == 'object')
-      $services.localization.render('core.editors.object.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
-    #elseif($editor == 'class')
-      $services.localization.render('core.editors.class.title', [$escapetool.xml($doc.fullName), $doc.getURL()])
+  <div class="row">
+    #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)
+      <div id="editMeta" class="col-xs-12 col-md-7">
+        #template('editmeta.vm')
+      </div>
+    #else
+      <div id="document-title" class="col-xs-12 col-md-7"><h1>
+      #if($editor == 'rights')
+        $services.localization.render('core.editors.rights.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
+      #elseif($editor == 'object')
+        $services.localization.render('core.editors.object.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
+      #elseif($editor == 'class')
+        $services.localization.render('core.editors.class.title', [$escapetool.xml($doc.fullName), $doc.getURL()])
+      #end
+      </h1></div>
     #end
-    </h1></div>
-  #end
-  #if($displayContentMenu)
-    <div class="col-xs-12 col-md-5">
-      #template("menus/content.vm")
-    </div>
-  #end
-  <div class="col-xs-12">
-    #template("edit${editor}.vm")
-  </div>
+    #if($displayContentMenu)
+      <div class="col-xs-12 col-md-5">
+        #template("menus/content.vm")
+      </div>
+    #end
+  </div> ## row
+  #template("edit${editor}.vm")
   ## This javascript must be placed here since it uses velocity variables set in the template above.
   <script type="text/javascript">
     //<![CDATA[

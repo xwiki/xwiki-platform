@@ -1,6 +1,13 @@
 //
 // Layout
 // --------------------------------------------------
+#xwikimaincontainer{
+  .container-fluid();
+}
+
+#menuview, #contentcontainer, #xwikieditor, #footerglobal{
+  .make-row();
+}
 
 #body{
   // Both left and right panels are displayed
@@ -204,15 +211,11 @@
   box-shadow: 0 1px 2px @border-color;
 }
 
-.main, 
+.main,
 #leftPanels, #rightPanels, #editPanels,
 #docextrapanes {
   padding-top: (@grid-gutter-width / 2);
   padding-bottom: (@grid-gutter-width / 2);
-}
-
-#xdocFooter, #xwikidata {
-  .make-xs-column(12);
 }
 
 #footerglobal {

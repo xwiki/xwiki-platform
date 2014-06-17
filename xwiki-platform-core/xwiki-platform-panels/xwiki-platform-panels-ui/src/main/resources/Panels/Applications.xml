@@ -424,6 +424,10 @@ div.applicationPanelMoreContainer li a {
   text-align: center;
 }
 
+.panel-width-Small .applicationsPanel li a{
+  padding: 0.7em 0;
+}
+
 .panel-width-Small .applicationsPanel li img{
   float: none;  
 }

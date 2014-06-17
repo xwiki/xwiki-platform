@@ -101,7 +101,9 @@
           </exclusion>
         </exclusions>
       </dependency>
-      <!-- netcdf 4.2-min triggered by by tika (tika 1.5 at least) wrongly embbeds jcip classes -->
+      <!-- netcdf 4.2-min triggered by by tika (tika 1.5 at least) wrongly embbeds jcip classes
+           TODO: remove it when upgrading Tika since it's fixed in the next tika version (1.6 ?)
+      -->
       <dependency>
         <groupId>edu.ucar</groupId>
         <artifactId>netcdf</artifactId>

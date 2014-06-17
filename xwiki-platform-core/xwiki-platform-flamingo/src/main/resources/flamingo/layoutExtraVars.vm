@@ -3,12 +3,17 @@
 #end
 
 #if ($request.xpage == "print")
-  #set($showLeftPanels = false)
-  #set($showRightPanels = false)
+  #set($showLeftPanels = '0')
+  #set($showRightPanels = '0')
   #set($displayContentMenu = false)
 #end
 
 #if($xcontext.action == 'edit' && $editor != 'inline')
   #set($showLeftPanels = '0')
   #set($showRightPanels = '1')
+#end
+
+#if($xcontext.action == 'edit' && ($editor == 'object' || $editor == 'rights' || $editor == 'class'))
+  #set($showLeftPanels = '0')
+  #set($showRightPanels = '0')
 #end

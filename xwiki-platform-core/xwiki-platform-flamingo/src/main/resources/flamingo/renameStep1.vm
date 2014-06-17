@@ -6,14 +6,15 @@
 #set($newname = $services.localization.render('core.rename.inputPrompt'))
 <form action="?xpage=rename&amp;step=2" method="post" class="xform"
     onsubmit="if(this.newPageName.value=='${escapetool.xml($newname)}') this.newPageName.value=''">
-  #set($backlinks = $doc.getBacklinks())
-  #if($backlinks.size() > 0)
-    <h2><span>$services.localization.render('core.rename.title.newName')</span></h2>
-  #end
   ## CSRF prevention
   <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
   #set($pweb = $doc.space)
+  <div class="row">
   <div class="padded col-xs-12 col-md-6">
+    #set($backlinks = $doc.getBacklinks())
+    #if($backlinks.size() > 0)
+      <h2><span>$services.localization.render('core.rename.title.newName')</span></h2>
+    #end
     <dl>
       <dt>
         <label for="sourceSpaceName">$services.localization.render('core.rename.sourcespace')</label>

@@ -421,7 +421,7 @@ div.applicationPanelMoreContainer li a {
 .panel-width-Small .applicationsPanel li{
   list-style-type: none;
   padding: 0;
-  text-align: center;
+  text-align: center;l
 }
 
 .panel-width-Small .applicationsPanel li a{

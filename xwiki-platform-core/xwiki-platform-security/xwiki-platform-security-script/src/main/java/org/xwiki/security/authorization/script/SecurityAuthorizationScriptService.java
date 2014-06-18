@@ -30,6 +30,7 @@ import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -39,14 +40,14 @@ import org.xwiki.stability.Unstable;
  * @since 6.1RC1
  */
 @Component
-@Named(SecurityAuthorizationScriptService.ROLEHINT)
+@Named(SecurityScriptService.ROLEHINT + '.' + SecurityAuthorizationScriptService.ID)
 @Unstable
 public class SecurityAuthorizationScriptService implements ScriptService
 {
     /**
      * The role hint of this component.
      */
-    public static final String ROLEHINT = "security";
+    public static final String ID = "authorization";
 
     @Inject
     private AuthorizationManager authorizationManager;
@@ -63,7 +64,7 @@ public class SecurityAuthorizationScriptService implements ScriptService
      * @param right the right needed for execution of the action
      * @throws AccessDeniedException if the action should be denied, which may also happen when an error occurs
      */
-    void checkAccess(Right right) throws AccessDeniedException
+    public void checkAccess(Right right) throws AccessDeniedException
     {
         contextualAuthorizationManager.checkAccess(right);
     }
@@ -77,7 +78,7 @@ public class SecurityAuthorizationScriptService implements ScriptService
      * @param right the right to check .
      * @return {@code true} if the user has the specified right on the entity, {@code false} otherwise
      */
-    boolean hasAccess(Right right)
+    public boolean hasAccess(Right right)
     {
         return contextualAuthorizationManager.hasAccess(right);
     }
@@ -92,7 +93,7 @@ public class SecurityAuthorizationScriptService implements ScriptService
      * @param entityReference the entity on which to check the right
      * @throws AccessDeniedException if the action should be denied, which may also happen when an error occurs
      */
-    void checkAccess(Right right, EntityReference entityReference) throws AccessDeniedException
+    public void checkAccess(Right right, EntityReference entityReference) throws AccessDeniedException
     {
         contextualAuthorizationManager.checkAccess(right, entityReference);
     }
@@ -107,7 +108,7 @@ public class SecurityAuthorizationScriptService implements ScriptService
      * @param entityReference the entity on which to check the right
      * @return {@code true} if the user has the specified right on the entity, {@code false} otherwise
      */
-    boolean hasAccess(Right right, EntityReference entityReference)
+    public boolean hasAccess(Right right, EntityReference entityReference)
     {
         return contextualAuthorizationManager.hasAccess(right, entityReference);
     }
@@ -123,7 +124,7 @@ public class SecurityAuthorizationScriptService implements ScriptService
      * @param entityReference the entity on which to check the right
      * @throws AccessDeniedException if the action should be denied, which may also happen when an error occurs
      */
-    void checkAccess(Right right, DocumentReference userReference, EntityReference entityReference)
+    public void checkAccess(Right right, DocumentReference userReference, EntityReference entityReference)
         throws AccessDeniedException
     {
         authorizationManager.checkAccess(right, userReference, entityReference);
@@ -140,7 +141,7 @@ public class SecurityAuthorizationScriptService implements ScriptService
      * @param entityReference the entity on which to check the right
      * @return {@code true} if the user has the specified right on the entity, {@code false} otherwise
      */
-    boolean hasAccess(Right right, DocumentReference userReference, EntityReference entityReference)
+    public boolean hasAccess(Right right, DocumentReference userReference, EntityReference entityReference)
     {
         return authorizationManager.hasAccess(right, userReference, entityReference);
     }

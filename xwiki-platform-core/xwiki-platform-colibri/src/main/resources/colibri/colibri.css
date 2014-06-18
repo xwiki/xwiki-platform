@@ -192,7 +192,7 @@ textarea, select {
 textarea {
   max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
 }
-input, textarea {
+input, select, textarea {
   #css3_boxSizing('border-box')
   padding: .3em;
 }

@@ -355,7 +355,7 @@ return XWiki;
 
 .messagestream-tools {
   position: relative;
-  margin: 2px 0;
+  margin: .5em 0 1em;
 }
 .messagestream-tools .accepted-suggestions {
   display: inline;
@@ -374,7 +374,6 @@ return XWiki;
   background-image: url("$xwiki.getSkinFile('icons/silk/group.png')");
 }
 .messagestream select {
-  padding: .2em;
   width: auto;
 }
 .messagestream input.targetName {

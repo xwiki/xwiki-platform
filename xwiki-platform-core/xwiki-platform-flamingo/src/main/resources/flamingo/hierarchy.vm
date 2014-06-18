@@ -22,7 +22,7 @@
 #end
 #if($isInServletMode) ## Visible only in a page
   #if("$!doc.parent" !=  '' || $xcontext.action != 'view')
-    <ol id="hierarchy" class="breadcrumb">
+    <ol id="hierarchy" class="breadcrumb clearfix">
     #if ($doc.fullName != 'Main.WebHome')
       #if ($xcontext.action == 'edit' || $xcontext.action == 'inline')
         #computeHierarchy($doc "<li><a href='${doc.getURL('view')}'>$escapetool.xml($tdoc.getPlainTitle())</a></li>" 0)

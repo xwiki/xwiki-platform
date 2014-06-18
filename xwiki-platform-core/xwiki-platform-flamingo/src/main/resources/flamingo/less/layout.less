@@ -9,6 +9,8 @@
   .make-row();
 }
 
+@main-padding: @grid-gutter-width * 2;
+
 #body{
   // Both left and right panels are displayed
   &.content{
@@ -20,7 +22,7 @@
       // Left panels are small and right panels are small
       &.panel-right-width-Small{
         .main{
-          .make-md-column(10);
+          .make-md-column(10, @main-padding);
         }
         #leftPanels{
           .make-md-column-pull(10);
@@ -29,7 +31,7 @@
       // Left panels are small and right panels are medium
       &.panel-right-width-Medium{
         .main{
-          .make-md-column(9);
+          .make-md-column(9, @main-padding);
         }
         #leftPanels{
           .make-md-column-pull(9);
@@ -38,7 +40,7 @@
       // Left panels are small and right panels are large
       &.panel-right-width-Large{
         .main{
-          .make-md-column(8);
+          .make-md-column(8, @main-padding);
         }
         #leftPanels{
           .make-md-column-pull(8);
@@ -53,7 +55,7 @@
       // Left panels are medium and right panels are small
       &.panel-right-width-Small{
         .main{
-          .make-md-column(9);
+          .make-md-column(9, @main-padding);
         }
         #leftPanels{
           .make-md-column-pull(9);
@@ -62,7 +64,7 @@
       // Left panels are medium and right panels are medium
       &.panel-right-width-Medium{
         .main{
-          .make-md-column(8);
+          .make-md-column(8, @main-padding);
         }
         #leftPanels{
           .make-md-column-pull(8);
@@ -71,7 +73,7 @@
       // Left panels are medium and right panels are large
       &.panel-right-width-Large{
         .main{
-          .make-md-column(7);
+          .make-md-column(7, @main-padding);
         }
         #leftPanels{
           .make-md-column-pull(7);
@@ -86,7 +88,7 @@
       // Left panels are large and right panels are small
       &.panel-right-width-Small{
         .main{
-          .make-md-column(8);
+          .make-md-column(8, @main-padding);
         }
         #leftPanels{
           .make-md-column-pull(8);
@@ -95,7 +97,7 @@
       // Left panels are large and right panels are medium
       &.panel-right-width-Medium{
         .main{
-          .make-md-column(7);
+          .make-md-column(7, @main-padding);
         }
         #leftPanels{
           .make-md-column-pull(7);
@@ -104,7 +106,7 @@
       // Left panels are large and right panels are large
       &.panel-right-width-Large{
         .main{
-          .make-md-column(6);
+          .make-md-column(6, @main-padding);
         }
         #leftPanels{
           .make-md-column-pull(6);
@@ -117,17 +119,17 @@
   &.hideleft{
     &.panel-right-width-Small{
       .main{
-        .make-md-column(11);
+        .make-md-column(11, @main-padding);
       }
     }
     &.panel-right-width-Medium{
       .main{
-        .make-md-column(10);
+        .make-md-column(10, @main-padding);
       }
     }
     &.panel-right-width-Large{
       .main{
-        .make-md-column(9);
+        .make-md-column(9, @main-padding);
       }
     }
   }
@@ -136,7 +138,7 @@
   &.hideright{
     &.panel-left-width-Small{
       .main{
-        .make-md-column(11);
+        .make-md-column(11, @main-padding);
         .make-md-column-push(1);
       }
       #leftPanels{
@@ -145,7 +147,7 @@
     }
     &.panel-left-width-Medium{
       .main{
-        .make-md-column(10);
+        .make-md-column(10, @main-padding);
         .make-md-column-push(2);
       }
       #leftPanels{
@@ -154,7 +156,7 @@
     }
     &.panel-left-width-Large{
       .main{
-        .make-md-column(9);
+        .make-md-column(9, @main-padding);
         .make-md-column-push(3);
       }
       #leftPanels{
@@ -166,7 +168,7 @@
   // No Panels
   &.hidelefthideright{
     .main{
-      .make-md-column(12);
+      .make-md-column(12, @main-padding);
     }
   }
   

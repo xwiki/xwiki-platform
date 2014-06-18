@@ -52,7 +52,6 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
       ## CSRF prevention
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
       <input type="hidden" name="language" value="$!xcontext.language" />
-      <div class="centered">
       <table class="table table-striped table-hover" summary="$services.localization.render('core.viewers.history.summary', [$escapetool.xml($doc.displayTitle), $versions.get($mathtool.sub($versions.size(), 1)), $versions.get(0)])">
 ## Print the table header
         <tr>
@@ -121,7 +120,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
 #end
     #set ($discard = $paginationParameters.put('position', 'bottom'))
     #pagination ($paginationParameters)
-      <div class="row form-inline">
+      <div class="form-inline">
         #if ($totalVersions > 1)
           <input type="submit" accesskey="c" value="$services.localization.render('core.viewers.history.compare')" class="btn btn-primary"/>
           #if ($hasAdmin)
@@ -138,7 +137,6 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
               onclick="document.forms.${formname}.action='$tdoc.getURL('view', "viewer=history&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" />
           #end
         #end
-      </div>
       </div>
     </div>
   </form>

@@ -1,3 +1,7 @@
+## Fake class to mark where to start ignoring CSS
+.not-sent-to-the-browser-from-this-point{
+  color: red;
+}
 #macro(mapping $colorThemeVar $lessVar)
     .colortheme-$colorThemeVar{
         color: $lessVar;

@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -138,9 +137,18 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
             return null;
         }
 
-        XWikiContext context = xcontextProvider.get();
+        XWikiContext xcontext = xcontextProvider.get();
+
+        // This is here for backward compatibility of hasProgrammingRights(XWikiContext context)
+        // method from the old right service, since the document in context may be a fake document.
+        // For example, the DistributionAction use a fake document with PR in context to have PR for
+        // its distribution.vm template.
+        if (xcontext.getDoc().getDocumentReference().equals(docEntity)) {
+            return xcontext.getDoc();
+        }
+
         try {
-            return context.getWiki().getDocument(new DocumentReference(docEntity), context);
+            return xcontext.getWiki().getDocument(new DocumentReference(docEntity), xcontext);
         } catch (Exception e) {
             // Ignored
         }
@@ -182,12 +190,9 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
             doc = xcontext.getDoc();
         }
         if (doc != null) {
-            if (right == Right.PROGRAM) {
-                return doc.getDocumentReference().getWikiReference();
-            }
             return doc.getDocumentReference();
         }
 
-        return new WikiReference(xcontext.getWikiId());
+        return null;
     }
 }

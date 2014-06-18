@@ -17,7 +17,15 @@
 #if ($isSuperAdmin)
   #xwikitopmenuentry('#' $!services.localization.render('superadmin') 'tmUser' 'hasIcon')
 #else
-  #xwikitopmenuentrystart($xwiki.getURL($xcontext.user, 'view') "$services.localization.render('core.menu.type.profile')__SEPARATOR__$!xwiki.getUserName($xcontext.user, false)" 'tmUser' 'hasIcon' 'user')
+  #getUserAvatarURL($xcontext.user, $currentUserAvatar, 32)
+  #if($currentUserAvatar.specified)
+    #set($currentUserAvatar = "#smallUserAvatar($xcontext.user)")
+    #set($userGlyphIcon = '')
+  #else
+    #set($currentUserAvatar = "")
+    #set($userGlyphIcon = 'user')
+  #end
+  #xwikitopmenuentrystart($xwiki.getURL($xcontext.user, 'view') "$services.localization.render('core.menu.type.profile')__SEPARATOR__$!xwiki.getUserName($xcontext.user, false)" 'tmUser' 'hasIcon navbar-avatar' $userGlyphIcon $currentUserAvatar)
     #submenuitem($xwiki.getURL($xcontext.user, 'view') $services.localization.render('core.menu.profile') 'tmProfile', '', 'user')
     #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=preferences') $services.localization.render('core.menu.userPreferences') 'tmUserPreferences', '', 'wrench')
     #if ($hasWatch)

@@ -166,3 +166,16 @@ table {
 .loading {
   background: transparent url(@xwiki-icon-spinner) no-repeat center;
 }
+
+// Navbar avatar --------------------------------------------------------------
+.navbar-avatar{
+  height: @navbar-height;
+  > img {
+    @avatar-size: 24px;
+    border-radius: 3px;
+    height: @avatar-size;
+    margin-top: -@navbar-padding-horizontal+@navbar-height/2-@avatar-size/2;
+    vertical-align: middle;
+    width: @avatar-size;
+  }
+}

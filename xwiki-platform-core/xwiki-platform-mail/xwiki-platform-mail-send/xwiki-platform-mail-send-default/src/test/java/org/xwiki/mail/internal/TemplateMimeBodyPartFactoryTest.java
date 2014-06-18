@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.internet.MimeBodyPart;
-
 import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Rule;
@@ -61,22 +59,21 @@ import static org.mockito.Mockito.when;
 public class TemplateMimeBodyPartFactoryTest
 {
     private DocumentReference documentReference = mock(DocumentReference.class);
-    private Map<String, String> data = mock(HashMap.class);
+
     private VelocityEngine velocityEngine = mock(VelocityEngine.class);
 
     @Rule
     public MockitoComponentMockingRule<TemplateMimeBodyPartFactory> mocker =
-            new MockitoComponentMockingRule<>(TemplateMimeBodyPartFactory.class);
+        new MockitoComponentMockingRule<>(TemplateMimeBodyPartFactory.class);
 
     @Before
     public void setUp() throws Exception
     {
-        // Mocking DocumentAccessBridge
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), eq("text"))).thenReturn(
-                "Hello ${name}, ${email}");
+            "Hello ${name}, ${email}");
         when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), eq("html"))).thenReturn(
-                "Hello <b>${name}</b> <br />${email}");
+            "Hello <b>${name}</b> <br />${email}");
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
 
@@ -97,36 +94,36 @@ public class TemplateMimeBodyPartFactoryTest
                 return null;
             }
         }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
-                anyString(), anyString());
+            anyString(), anyString());
     }
 
     @Test
     public void createWithoutAttachment() throws Exception
     {
         MimeBodyPartFactory<String> htmlMimeBodyPartFactory = this.mocker.getInstance(
-                new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
 
-        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create(documentReference,
-                Collections.<String, Object>singletonMap("velocityVariables", data));
+        this.mocker.getComponentUnderTest().create(documentReference,
+            Collections.<String, Object>singletonMap("velocityVariables", new HashMap<String, String>()));
 
         verify(htmlMimeBodyPartFactory).create("Hello <b>John Doe</b> <br />john@doe.com",
-                Collections.<String, Object>singletonMap("alternate", "Hello John Doe, john@doe.com"));
+            Collections.<String, Object>singletonMap("alternate", "Hello John Doe, john@doe.com"));
     }
 
     @Test
     public void createWithAttachment() throws Exception
     {
         MimeBodyPartFactory<String> htmlMimeBodyPartFactory = this.mocker.getInstance(
-                new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
 
         Attachment attachment = mock(Attachment.class);
         List<Attachment> attachments = Collections.singletonList(attachment);
 
         Map<String, Object> bodyPartParameters = new HashMap<>();
-        bodyPartParameters.put("velocityVariables", data);
+        bodyPartParameters.put("velocityVariables", new HashMap<String, String>());
         bodyPartParameters.put("attachments", attachments);
 
-        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create(documentReference, bodyPartParameters);
+        this.mocker.getComponentUnderTest().create(documentReference, bodyPartParameters);
 
         Map<String, Object> htmlParameters = new HashMap<>();
         htmlParameters.put("alternate", "Hello John Doe, john@doe.com");

@@ -31,7 +31,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
 import org.apache.velocity.VelocityContext;
-import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MimeBodyPartFactory;
@@ -70,9 +69,6 @@ public class TemplateMimeBodyPartFactory extends AbstractMimeBodyPartFactory<Doc
     private VelocityManager velocityManager;
 
     @Inject
-    private Logger logger;
-
-    @Inject
     @Named("current")
     private CurrentReferenceDocumentReferenceResolver resolver;
 
@@ -80,15 +76,15 @@ public class TemplateMimeBodyPartFactory extends AbstractMimeBodyPartFactory<Doc
     @Named("text/html")
     private MimeBodyPartFactory<String> htmlBodyPartFactory;
 
-
-    @Override public MimeBodyPart create(DocumentReference documentReference, Map<String, Object> parameters)
+    @Override
+    public MimeBodyPart create(DocumentReference documentReference, Map<String, Object> parameters)
         throws MessagingException
     {
         Map<String, String> velocityVariables = (Map<String, String>) parameters.get("velocityVariables");
         VelocityContext velocityContext = createVelocityContext(velocityVariables);
 
         DocumentReference mailClassReference = this.resolver.resolve(MAIL_CLASS);
-        String templateFullName = serializer.serialize(documentReference);
+        String templateFullName = this.serializer.serialize(documentReference);
 
         String textContent =
                 evaluateProperty(velocityContext, documentReference, mailClassReference, templateFullName, "text");
@@ -103,39 +99,38 @@ public class TemplateMimeBodyPartFactory extends AbstractMimeBodyPartFactory<Doc
         if (attachments != null) {
             htmlParameters.put(attachmentProperty, attachments);
         }
-        return htmlBodyPartFactory
-                .create(htmlContent, htmlParameters);
+        return this.htmlBodyPartFactory.create(htmlContent, htmlParameters);
     }
 
     /**
-     * @return evaluated content with passed velocity variables
+     * @return the xproperty's content evaluated with Velocity, using the passed Velocity Context
      */
-    private String evaluateProperty(VelocityContext vContext, DocumentReference documentReference,
+    private String evaluateProperty(VelocityContext velocityContext, DocumentReference documentReference,
             DocumentReference mailClassReference, String templateFullName, String property) throws MessagingException
     {
-        String content = documentBridge.getProperty(documentReference, mailClassReference, property).toString();
+        String content = this.documentBridge.getProperty(documentReference, mailClassReference, property).toString();
         try {
             StringWriter writer = new StringWriter();
-            velocityManager.getVelocityEngine().evaluate(vContext, writer, templateFullName, content);
+            this.velocityManager.getVelocityEngine().evaluate(velocityContext, writer, templateFullName, content);
             return writer.toString();
         } catch (XWikiVelocityException e) {
-            throw new MessagingException(
-                    String.format("Failed to evaluate document for reference [%s]", documentReference), e);
+            throw new MessagingException(String.format("Failed to evaluate property [%s] for Document reference [%s]",
+                property, documentReference), e);
         }
     }
 
     /**
-     * @return VelocityContext context with passed parameters
+     * @return a Velocity Context created from the passed properties
      */
     private VelocityContext createVelocityContext(Map<String, String> data)
     {
-        VelocityContext vContext = new VelocityContext();
+        VelocityContext velocityContext = new VelocityContext();
         if (data != null) {
             for (Map.Entry<String, String> header : data.entrySet()) {
-                vContext.put(header.getKey(), header.getValue());
+                velocityContext.put(header.getKey(), header.getValue());
             }
         }
 
-        return vContext;
+        return velocityContext;
     }
 }

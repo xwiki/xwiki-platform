@@ -1,37 +1,12 @@
-//
-// Flamingo main LESS file
-// --------------------------------------------------
-
-// Imports ====================================================================
-@import "bootstrap/bootstrap.less"; // Bootstrap
-@import "variables.less"; // Bootstrap variables overrided by flamingo
-@import "accordion.less";
-@import "action-menus.less";
-@import "admin.less";
-@import "annotations.less";
-@import "buttons.less";
-@import "edit.less";
-@import "forms.less";
-@import "general.less";
-@import "grid.less";
-@import "headers.less";
-@import "layout.less";
-@import "messages.less";
-@import "misc.less";
-@import "panels.less";
-@import "type.less";
-@import "vertical-menus.less";
-@import "xlist.less";
-
-// Velocity Variables =========================================================
-//
-// As the main LESS file for this skin, we can use Velocity.
-// Here we initialize some variables that can be used in other LESS files
-//
+################################################
+##
+## LESS variables initialized by Velocity
+##
+################################################
 #set($doNotLoadColorThemeFromCSS = true)
 #template('colorThemeInit.vm')
 
-// Mapping between XWiki Color Theme and Bootstrap variables
+## Mapping between XWiki Color Theme and Bootstrap variables
 @text-color:                          $theme.textColor;
 @link-color:                          $theme.linkColor;
 @headings-color:                      $theme.titleColor;
@@ -80,15 +55,15 @@
 @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
 @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
 
-// Fix font path
+## Fix font path
 @icon-font-path:                      "$services.webjars.url('bootstrap/3.1.1/fonts')/";
 
-// Some XWiki variables
+## Some XWiki variables
 @highlightColor:                      $theme.highlightColor;
 @background-secondary-color:          $theme.backgroundSecondaryColor;
 @accordion-title-bar-background:      "$xwiki.getSkinFile('icons/xwiki/accordion.png')";
 
-// Some Silk icons
+## Some Silk icons
 @silk-icon-folder:                    "$xwiki.getSkinFile('icons/silk/folder.png')";
 @silk-icon-page-white-text:           "$xwiki.getSkinFile('icons/silk/page_white_text.png')";
 @silk-icon-comment:                   "$xwiki.getSkinFile('icons/silk/comment.png')";
@@ -96,18 +71,7 @@
 @silk-icon-bullet-add:                "$xwiki.getSkinFile('icons/silk/bullet_add.png')";
 @silk-icon-chart-organization:        "$xwiki.getSkinFile('icons/silk/chart_organisation.png')";
 
-// Some XWiki icons
+## Some XWiki icons
 @xwiki-icon-parent-edit:              "$xwiki.getSkinFile('icons/xwiki/parent_edit.gif')";
 @xwiki-icon-edit-section:             "$xwiki.getSkinFile('icons/xwiki/edit-section.png')";
 @xwiki-icon-spinner:                  "$xwiki.getSkinFile('icons/xwiki/spinner.gif')";
-
-// And here it is the entry-point for color-theme textarea
-#if($themeDoc)
-  #set($extraObj = $themeDoc.getObject('ColorThemes.ColorThemeExtraClass'))
-  #if($extraObj)
-    $themeDoc.getValue('lessCode', $extraObj)
-  #end
-#end
-
-/* NOT SENT TO THE BROWSER FROM THIS POINT */
-#template('colorThemeMappingOutput.vm')

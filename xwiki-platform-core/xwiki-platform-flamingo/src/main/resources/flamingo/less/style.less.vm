@@ -1,0 +1,45 @@
+//
+// Flamingo main LESS file
+// --------------------------------------------------
+
+// Imports ====================================================================
+@import "bootstrap/bootstrap.less"; // Bootstrap
+@import "variables.less"; // Bootstrap variables overrided by flamingo
+@import "accordion.less";
+@import "action-menus.less";
+@import "admin.less";
+@import "annotations.less";
+@import "buttons.less";
+@import "edit.less";
+@import "forms.less";
+@import "general.less";
+@import "grid.less";
+@import "headers.less";
+@import "layout.less";
+@import "messages.less";
+@import "misc.less";
+@import "panels.less";
+@import "type.less";
+@import "vertical-menus.less";
+@import "xlist.less";
+
+// Velocity Content =============================================================
+//
+// As the main LESS file for this skin, we can use Velocity.
+// ------------------------------------------------------------------------------
+
+// Here we initialize some variables that can be used in other LESS files
+#template('less/variablesInit.vm')
+
+// And here it is the entry-point for color-theme textarea (not documented)
+#if($themeDoc)
+  #set($extraObj = $themeDoc.getObject('ColorThemes.ColorThemeExtraClass'))
+  #if($extraObj)
+    $themeDoc.getValue('lessCode', $extraObj)
+  #end
+#end
+
+// ==============================================================================
+// NOT SENT TO THE BROWSER FROM THIS POINT
+// ==============================================================================
+#template('less/colorThemeMappingOutput.vm')

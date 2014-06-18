@@ -102,7 +102,7 @@
 #end
 
 #if(!$doNotLoadColorThemeFromCSS)
-    #set($theme2 = $services.lesscss.getColorThemeFromSkinFile("style.less"))
+    #set($theme2 = $services.lesscss.getColorThemeFromSkinFile("style.less.vm"))
     #foreach($key in $theme2.keySet())
         #set($discard = $theme.put($key, $theme2.get($key)))
     #end

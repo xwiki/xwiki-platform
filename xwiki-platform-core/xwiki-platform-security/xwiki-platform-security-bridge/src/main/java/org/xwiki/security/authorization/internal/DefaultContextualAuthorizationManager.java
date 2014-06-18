@@ -169,7 +169,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
             user = null;
         }
 
-        return null;
+        return user;
     }
 
     /**

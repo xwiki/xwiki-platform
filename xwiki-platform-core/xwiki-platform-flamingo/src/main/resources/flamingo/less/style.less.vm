@@ -31,14 +31,6 @@
 // Here we initialize some variables that can be used in other LESS files
 #template('less/variablesInit.vm')
 
-// And here it is the entry-point for color-theme textarea (not documented)
-#if($themeDoc)
-  #set($extraObj = $themeDoc.getObject('ColorThemes.ColorThemeExtraClass'))
-  #if($extraObj)
-    $themeDoc.getValue('lessCode', $extraObj)
-  #end
-#end
-
 // ==============================================================================
 // NOT SENT TO THE BROWSER FROM THIS POINT
 // ==============================================================================

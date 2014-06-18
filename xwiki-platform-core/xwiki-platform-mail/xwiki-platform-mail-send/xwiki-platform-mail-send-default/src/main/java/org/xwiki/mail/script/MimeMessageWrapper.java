@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
+import javax.mail.Address;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
@@ -31,8 +33,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
@@ -42,15 +42,14 @@ import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.script.ScriptMailSenderListener;
 
 /**
- * Extends {@link javax.mail.internet.MimeMessage} to add helper APIs to add body part content and to send the message.
+ * Simulates a, {@link javax.mail.internet.MimeMessage} with additional helper methods to add body part content and to
+ * send the message.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 6.1RC1
  */
-public class ScriptMimeMessage extends MimeMessage
+public class MimeMessageWrapper
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptMimeMessage.class);
-
     private ComponentManager componentManager;
 
     private MailSender mailSender;
@@ -61,22 +60,34 @@ public class ScriptMimeMessage extends MimeMessage
 
     private ScriptMailSenderListener listener;
 
+    private Session session;
+
+    private MimeMessage message;
+
     /**
-     * @param session the JavaMail Session that is used to send the mail (contains all configuration such as SMTP
-     *        server, SMTP port, etc)
+     * @param message the wrapped {@link MimeMessage}
+     * @param session the JavaMail session used to send the mail
      * @param mailSender the component to send the mail
      * @param execution used to get the Execution Context and store an error in it if the send fails
      * @param componentManager used to dynamically load all {@link MimeBodyPartFactory} components
      */
-    public ScriptMimeMessage(Session session, MailSender mailSender, Execution execution,
+    public MimeMessageWrapper(MimeMessage message, Session session, MailSender mailSender, Execution execution,
         ComponentManager componentManager)
     {
-        super(session);
-
+        this.message = message;
+        this.session = session;
         this.mailSender = mailSender;
         this.execution = execution;
         this.componentManager = componentManager;
         this.listener = new ScriptMailSenderListener(this.execution);
+    }
+
+    /**
+     * @return the wrapped {@link javax.mail.internet.MimeMessage}
+     */
+    public MimeMessage getMessage()
+    {
+        return this.message;
     }
 
     /**
@@ -130,14 +141,84 @@ public class ScriptMimeMessage extends MimeMessage
         try {
             // Add the multi part to the content of the message to send. We do this when calling send() since the user
             // can call addPart() several times.
-            setContent(this.multipart);
+            getMessage().setContent(this.multipart);
 
-            this.mailSender.send(this, this.session, this.listener);
+            this.mailSender.send(getMessage(), this.session, this.listener);
 
         } catch (MessagingException e) {
             // Save the exception for reporting through the script services's getError() API
-            this.execution.getContext().setProperty(MailSenderScriptService.ERROR_KEY, e);
+            setError(e);
         }
+    }
+
+    /**
+     * @param subject the subject to set in the Mime Message
+     */
+    public void setSubject(String subject)
+    {
+        try {
+            getMessage().setSubject(subject);
+        } catch (Exception e) {
+            setError(e);
+        }
+    }
+
+    /**
+     * @param address the address from which this message will be sent
+     */
+    public void setFrom(Address address)
+    {
+        try {
+            getMessage().setFrom(address);
+        } catch (Exception e) {
+            setError(e);
+        }
+    }
+
+    /**
+     * @param type the type of recipients (to, cc, bcc, newsgroups)
+     * @param addresses the email addresses of the recipients
+     */
+    public void addRecipients(Message.RecipientType type, Address[] addresses)
+    {
+        try {
+            getMessage().addRecipients(type, addresses);
+        } catch (Exception e) {
+            setError(e);
+        }
+    }
+
+    /**
+     * @param type the type of recipient (to, cc, bcc, newsgroups)
+     * @param address the email address of the recipient
+     */
+    public void addRecipient(Message.RecipientType type, Address address)
+    {
+        try {
+            getMessage().addRecipient(type, address);
+        } catch (Exception e) {
+            setError(e);
+        }
+    }
+
+    /**
+     * Add a mail header.
+     *
+     * @param name the header's name  (eg "Message-Id")
+     * @param value the header's value
+     */
+    public void addHeader(String name, String value)
+    {
+        try {
+            getMessage().addHeader(name, value);
+        } catch (Exception e) {
+            setError(e);
+        }
+    }
+
+    private void setError(Exception e)
+    {
+        this.execution.getContext().setProperty(MailSenderScriptService.ERROR_KEY, e);
     }
 
     /**

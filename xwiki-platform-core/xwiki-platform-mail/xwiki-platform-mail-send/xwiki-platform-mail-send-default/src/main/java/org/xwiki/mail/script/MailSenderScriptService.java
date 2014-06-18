@@ -25,12 +25,14 @@ import javax.inject.Singleton;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
@@ -77,13 +79,41 @@ public class MailSenderScriptService implements ScriptService
     private Execution execution;
 
     /**
+     * Creates a pre-filled Mime Message by running the Component implementation of
+     * {@link org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
+     *
+     * @param hint the component hint of a {@link org.xwiki.mail.MimeMessageFactory} component
+     * @param parameters a list of parameters that the implementation requires (it's generic and the number and types
+     *        depend on the implementation)
+     * @return the pre-filled Mime Message wrapped in a {@link org.xwiki.mail.script.MimeMessageWrapper} instance
+     */
+    public MimeMessageWrapper createMessage(String hint, Object... parameters)
+    {
+        MimeMessageWrapper messageWrapper;
+        try {
+            // Look for a specific MimeMessageFactory for the passed hint.
+            MimeMessageFactory factory = this.componentManager.getInstance(MimeMessageFactory.class, hint);
+            Session session = createSession();
+            messageWrapper = new MimeMessageWrapper(factory.createMessage(session, parameters), session,
+                this.mailSender, this.execution, this.componentManager);
+        } catch (Exception e) {
+            // No factory found, set an error
+            // An error occurred, save it and return null
+            setError(e);
+            return null;
+        }
+
+        return messageWrapper;
+    }
+
+    /**
      * Create an empty Mail message. The user of this API needs to set the recipients, the subject, and the message
      * content (aka Parts) before sending the mail. Note that the "From" sender name is taken from the Mail Sender
      * Configuration.
      *
      * @return the created Body Part or null if an error happened
      */
-    public ScriptMimeMessage createMessage()
+    public MimeMessageWrapper createMessage()
     {
         return createMessage(this.configuration.getFromAddress(), null, null);
     }
@@ -97,7 +127,7 @@ public class MailSenderScriptService implements ScriptService
      * @param subject the subject of the mail to send
      * @return the created Body Part or null if an error happened
      */
-    public ScriptMimeMessage createMessage(String to, String subject)
+    public MimeMessageWrapper createMessage(String to, String subject)
     {
         return createMessage(this.configuration.getFromAddress(), to, subject);
     }
@@ -112,25 +142,19 @@ public class MailSenderScriptService implements ScriptService
      * @param subject the subject of the mail to send
      * @return the created Body Part or null if an error happened
      */
-    public ScriptMimeMessage createMessage(String from, String to, String subject)
+    public MimeMessageWrapper createMessage(String from, String to, String subject)
     {
-        Session session;
-        if (this.configuration.usesAuthentication()) {
-            session = Session.getInstance(this.configuration.getAllProperties(),
-                new XWikiAuthenticator(this.configuration));
-        } else {
-            session = Session.getInstance(this.configuration.getAllProperties());
-        }
-
-        ScriptMimeMessage message =
-            new ScriptMimeMessage(session, this.mailSender, this.execution, this.componentManager);
+        Session session = createSession();
+        MimeMessage message = new MimeMessage(session);
+        MimeMessageWrapper messageWrapper =
+            new MimeMessageWrapper(message, session, this.mailSender, this.execution, this.componentManager);
 
         try {
             if (from != null) {
-                message.setFrom(InternetAddress.parse(from)[0]);
+                messageWrapper.setFrom(InternetAddress.parse(from)[0]);
             }
             if (to != null) {
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+                messageWrapper.addRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
             }
             message.setSubject(subject);
         } catch (Exception e) {
@@ -139,7 +163,19 @@ public class MailSenderScriptService implements ScriptService
             return null;
         }
 
-        return message;
+        return messageWrapper;
+    }
+
+    private Session createSession()
+    {
+        Session session;
+        if (this.configuration.usesAuthentication()) {
+            session = Session.getInstance(this.configuration.getAllProperties(),
+                new XWikiAuthenticator(this.configuration));
+        } else {
+            session = Session.getInstance(this.configuration.getAllProperties());
+        }
+        return session;
     }
 
     // Error management

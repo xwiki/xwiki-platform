@@ -36,7 +36,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.script.MailSenderScriptService;
-import org.xwiki.mail.script.ScriptMimeMessage;
+import org.xwiki.mail.script.MimeMessageWrapper;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.ComponentManagerRule;
 import org.xwiki.test.annotation.AllComponents;
@@ -98,7 +98,7 @@ public class ScriptingIntegrationTest
         Execution execution = this.componentManager.getInstance(Execution.class);
         execution.setContext(new ExecutionContext());
 
-        ScriptMimeMessage message = this.scriptService.createMessage("john@doe.com", "subject");
+        MimeMessageWrapper message = this.scriptService.createMessage("john@doe.com", "subject");
         message.addPart("text/plain", "some text here");
 
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
@@ -131,7 +131,7 @@ public class ScriptingIntegrationTest
         Execution execution = this.componentManager.getInstance(Execution.class);
         execution.setContext(new ExecutionContext());
 
-        ScriptMimeMessage message = this.scriptService.createMessage("john@doe.com", "subject");
+        MimeMessageWrapper message = this.scriptService.createMessage("john@doe.com", "subject");
         message.addPart("text/html", "<font size=\"\\\"2\\\"\">simple meeting invitation</font>");
         String calendarContent = "BEGIN:VCALENDAR\r\n"
             + "METHOD:REQUEST\r\n"

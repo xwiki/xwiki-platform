@@ -180,7 +180,7 @@ public class JavaIntegrationTest
         Multipart multipart = new MimeMultipart("alternative");
         // Add an HTML body part
         multipart.addBodyPart(this.htmlBodyPartFactory.create(
-            "<font size=\"\\\"2\\\"\">simple meeting invitation</font>"));
+            "<font size=\"\\\"2\\\"\">simple meeting invitation</font>", Collections.<String, Object>emptyMap()));
         // Add the Calendar invitation body part
         String calendarContent = "BEGIN:VCALENDAR\r\n"
             + "METHOD:REQUEST\r\n"

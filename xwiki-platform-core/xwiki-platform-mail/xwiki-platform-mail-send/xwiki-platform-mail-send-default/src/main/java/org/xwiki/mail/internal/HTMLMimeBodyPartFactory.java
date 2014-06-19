@@ -89,7 +89,8 @@ public class HTMLMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
         // Step 2: Handle the optional alternative text
         String alternativeText = (String) parameters.get("alternate");
         if (alternativeText != null) {
-            resultBodyPart = createAlternativePart(htmlBodyPart, this.defaultPartFactory.create(alternativeText));
+            resultBodyPart = createAlternativePart(htmlBodyPart,
+                this.defaultPartFactory.create(alternativeText, Collections.<String, Object>emptyMap()));
         } else {
             // No alternative text, just add the HTML body part to the Multipart
             resultBodyPart = htmlBodyPart;
@@ -114,7 +115,8 @@ public class HTMLMimeBodyPartFactory extends AbstractMimeBodyPartFactory<String>
     private void handleAttachments(MimeMultipart multipart, List<Attachment> attachments) throws MessagingException
     {
         for (Attachment attachment : attachments) {
-            multipart.addBodyPart(this.attachmentPartFactory.create(attachment));
+            multipart.addBodyPart(
+                this.attachmentPartFactory.create(attachment, Collections.<String, Object>emptyMap()));
         }
     }
 

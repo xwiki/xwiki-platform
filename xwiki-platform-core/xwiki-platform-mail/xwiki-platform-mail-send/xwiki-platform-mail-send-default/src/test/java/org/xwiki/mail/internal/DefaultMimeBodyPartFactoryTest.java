@@ -47,7 +47,8 @@ public class DefaultMimeBodyPartFactoryTest
     @Test
     public void createWithoutMimeTypePassed() throws Exception
     {
-        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("Lorem ipsum");
+        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("Lorem ipsum",
+            Collections.<String, Object>emptyMap());
 
         assertEquals("Lorem ipsum", bodyPart.getContent());
         assertEquals("text/plain", bodyPart.getContentType());

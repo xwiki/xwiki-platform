@@ -68,7 +68,8 @@ public class AttachmentMimeBodyPartFactoryTest
         when(attachment.getFilename()).thenReturn("image.png");
         when(attachment.getMimeType()).thenReturn("image/png");
 
-        MimeBodyPart part = this.mocker.getComponentUnderTest().create(attachment);
+        MimeBodyPart part = this.mocker.getComponentUnderTest().create(attachment,
+            Collections.<String, Object>emptyMap());
 
         assertEquals("<image.png>", part.getContentID());
         // JavaMail adds some extra params to the content-type header
@@ -119,7 +120,7 @@ public class AttachmentMimeBodyPartFactoryTest
         when(attachment.getContent()).thenThrow(new RuntimeException("error"));
 
         try {
-            this.mocker.getComponentUnderTest().create(attachment);
+            this.mocker.getComponentUnderTest().create(attachment, Collections.<String, Object>emptyMap());
             fail("Should have thrown an exception here!");
         } catch (MessagingException expected) {
             assertEquals("Failed to save attachment [image.png] to the file system", expected.getMessage());

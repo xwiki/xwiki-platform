@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.Collections;
 import java.util.Map;
 
 import javax.mail.MessagingException;
@@ -36,12 +35,6 @@ import org.xwiki.mail.MimeBodyPartFactory;
  */
 public abstract class AbstractMimeBodyPartFactory<T> implements MimeBodyPartFactory<T>
 {
-    @Override
-    public MimeBodyPart create(T content) throws MessagingException
-    {
-        return this.create(content, Collections.<String, Object>emptyMap());
-    }
-
     /**
      * Add the mail headers passed as parameters into the Mime Body part also passed as parameter.
      *

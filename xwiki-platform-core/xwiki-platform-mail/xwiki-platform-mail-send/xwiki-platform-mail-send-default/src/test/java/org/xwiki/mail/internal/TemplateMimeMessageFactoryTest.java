@@ -63,12 +63,8 @@ public class TemplateMimeMessageFactoryTest
 
         Session session = Session.getDefaultInstance(new Properties());
         MimeMessage message = this.mocker.getComponentUnderTest()
-                .createMessage(session, documentReference, "news@xwiki.org", "john@doe.com", Collections
-                        .<String, Object>singletonMap("company", "XWiki"));
+                .createMessage(session, documentReference, Collections.<String, Object>singletonMap("company", "XWiki"));
 
         assertEquals("XWiki news", message.getSubject());
-        assertArrayEquals(new InternetAddress[]{ new InternetAddress("news@xwiki.org") }, message.getFrom());
-        assertArrayEquals(new InternetAddress[]{ new InternetAddress("john@doe.com") },
-                message.getRecipients(MimeMessage.RecipientType.TO));
     }
 }

@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal;
 
-import java.util.Collections;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -27,14 +26,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
-
-import static java.util.Arrays.asList;
 
 /**
  * Creates mime message with the subject pre-filled with evaluated subject xproperty from an XWiki.Mail xobject in the
@@ -52,28 +48,14 @@ public class TemplateMimeMessageFactory implements MimeMessageFactory
     private DefaultMailTemplateManager mailTemplateManager;
 
     @Override
-    public MimeMessage createMessage(Session session, Object... parameters) throws MessagingException
+    public MimeMessage createMessage(Session session, Object source, Map parameters) throws MessagingException
     {
         MimeMessage message = new MimeMessage(session);
 
-        DocumentReference documentReference = (DocumentReference) parameters[0];
-        Map<String, String> data = Collections.emptyMap();
+        DocumentReference documentReference = (DocumentReference) source;
 
-        if (asList(parameters).size() == 3) {
+        String subject = this.mailTemplateManager.evaluate(documentReference, "subject",(Map<String, String>) parameters);
 
-            message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress((String) parameters[1]));
-            data = (Map<String, String>) parameters[2];
-
-        } else if (asList(parameters).size() == 4) {
-
-            message.setFrom(new InternetAddress((String) parameters[1]));
-
-            message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress((String) parameters[2]));
-
-            data = (Map<String, String>) parameters[3];
-        }
-
-        String subject = this.mailTemplateManager.evaluate(documentReference, "subject", data);
         message.setSubject(subject);
 
         return message;

@@ -26,6 +26,7 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Create a {@link MimeMessage}. This allows Component implementors the ability to pre-fill a
@@ -37,6 +38,7 @@ import org.xwiki.component.annotation.Role;
  * @since 6.1RC1
  */
 @Role
+@Unstable
 public interface MimeMessageFactory<T>
 {
     /**

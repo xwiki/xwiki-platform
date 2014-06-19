@@ -3,11 +3,11 @@ org.xwiki.mail.internal.DefaultMailSenderConfiguration
 org.xwiki.mail.internal.AttachmentMimeBodyPartFactory
 org.xwiki.mail.internal.DefaultMimeBodyPartFactory
 org.xwiki.mail.internal.HTMLMimeBodyPartFactory
-org.xwiki.mail.internal.TemplateMimeBodyPartFactory
 org.xwiki.mail.internal.DefaultMailSender
 org.xwiki.mail.internal.DefaultMailSenderThread
 org.xwiki.mail.internal.RecipientConverter
 org.xwiki.mail.internal.AddressesConverter
 org.xwiki.mail.internal.MailMandatoryDocumentInitializer
-org.xwiki.mail.internal.TemplateMimeMessageFactory
-org.xwiki.mail.internal.DefaultMailTemplateManager
+org.xwiki.mail.internal.template.TemplateMimeBodyPartFactory
+org.xwiki.mail.internal.template.TemplateMimeMessageFactory
+org.xwiki.mail.internal.template.DefaultMailTemplateManager

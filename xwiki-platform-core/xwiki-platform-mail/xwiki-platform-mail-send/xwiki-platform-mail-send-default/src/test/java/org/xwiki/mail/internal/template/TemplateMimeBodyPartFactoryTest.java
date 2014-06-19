@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.template;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,6 +29,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MimeBodyPartFactory;
+import org.xwiki.mail.internal.template.DefaultMailTemplateManager;
+import org.xwiki.mail.internal.template.TemplateMimeBodyPartFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityEngine;
@@ -40,7 +42,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link TemplateMimeBodyPartFactory}.
+ * Unit tests for {@link org.xwiki.mail.internal.template.TemplateMimeBodyPartFactory}.
  *
  * @version $Id$
  * @since 6.1RC1

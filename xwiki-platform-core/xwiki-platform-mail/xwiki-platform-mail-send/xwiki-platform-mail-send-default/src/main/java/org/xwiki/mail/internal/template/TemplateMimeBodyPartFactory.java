@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.template;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +31,7 @@ import javax.mail.internet.MimeBodyPart;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MimeBodyPartFactory;
+import org.xwiki.mail.internal.AbstractMimeBodyPartFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.api.Attachment;

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.template;
 
 import java.io.StringWriter;
 import java.util.Map;
@@ -30,7 +30,6 @@ import javax.mail.MessagingException;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.mail.MailTemplateManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -40,6 +39,9 @@ import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
 /**
+ * Default implementation evaluating template properties by taking them from {@code XWiki.Mail} and applying Velocity
+ * on them.
+ *
  * @version $Id$
  * @since 6.1RC1
  */

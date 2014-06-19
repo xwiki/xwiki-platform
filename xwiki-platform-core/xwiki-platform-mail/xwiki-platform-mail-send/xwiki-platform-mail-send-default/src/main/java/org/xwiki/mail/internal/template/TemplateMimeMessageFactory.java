@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.internal;
+package org.xwiki.mail.internal.template;
 
 import java.util.Map;
 
@@ -54,7 +54,8 @@ public class TemplateMimeMessageFactory implements MimeMessageFactory
 
         DocumentReference documentReference = (DocumentReference) source;
 
-        String subject = this.mailTemplateManager.evaluate(documentReference, "subject",(Map<String, String>) parameters);
+        String subject =
+            this.mailTemplateManager.evaluate(documentReference, "subject", (Map<String, String>) parameters);
 
         message.setSubject(subject);
 

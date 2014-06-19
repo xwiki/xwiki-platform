@@ -40,6 +40,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.script.ScriptMailSenderListener;
+import org.xwiki.stability.Unstable;
 
 /**
  * Simulates a, {@link javax.mail.internet.MimeMessage} with additional helper methods to add body part content and to
@@ -48,6 +49,7 @@ import org.xwiki.mail.internal.script.ScriptMailSenderListener;
  * @version $Id$
  * @since 6.1RC1
  */
+@Unstable
 public class MimeMessageWrapper
 {
     private ComponentManager componentManager;
@@ -79,7 +81,7 @@ public class MimeMessageWrapper
         this.mailSender = mailSender;
         this.execution = execution;
         this.componentManager = componentManager;
-        this.listener = new ScriptMailSenderListener(this.execution);
+        this.listener = new ScriptMailSenderListener(this.execution.getContext());
     }
 
     /**

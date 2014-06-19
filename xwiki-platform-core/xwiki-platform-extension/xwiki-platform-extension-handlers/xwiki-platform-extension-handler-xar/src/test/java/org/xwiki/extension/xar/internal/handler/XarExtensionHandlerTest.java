@@ -976,4 +976,115 @@ public class XarExtensionHandlerTest
 
         verifyHasAdminRight(3);
     }
+
+    @Test
+    public void testInstallOnNamespaceThenOnRoot() throws Throwable
+    {
+        mockHasAdminRight(true);
+        Mockito.when(this.oldcore.getMockXWiki().getVirtualWikisDatabaseNames(Mockito.any(XWikiContext.class)))
+            .thenReturn(Arrays.asList("wiki1", "wiki2"));
+
+        // install on wiki
+
+        install(this.localXarExtensiontId1, "wiki1", this.contextUser);
+
+        // validate
+
+        XWikiDocument pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "page"),
+                getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("1.1", pageWiki1.getVersion());
+
+        pageWiki1.setContent("modified content");
+        this.oldcore.getMockXWiki().saveDocument(pageWiki1, getXWikiContext());
+
+        // install on root
+
+        install(this.localXarExtensiontId1, null, this.contextUser);
+
+        // validate
+
+        pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "page"),
+                getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("1.1", pageWiki1.getVersion());
+    }
+
+    @Test
+    public void testInstallOnNamespaceThenUpgradeOnRoot() throws Throwable
+    {
+        mockHasAdminRight(true);
+        Mockito.when(this.oldcore.getMockXWiki().getVirtualWikisDatabaseNames(Mockito.any(XWikiContext.class)))
+            .thenReturn(Arrays.asList("wiki1", "wiki2"));
+
+        // install on wiki
+
+        install(this.localXarExtensiontId1, "wiki1", this.contextUser);
+
+        // validate
+
+        XWikiDocument pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "page"),
+                getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("1.1", pageWiki1.getVersion());
+
+        pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "samespace", "samepage"),
+                getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("1.1", pageWiki1.getVersion());
+
+        XWikiDocument pageWiki2 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki2", "space", "page"),
+                getXWikiContext());
+
+        Assert.assertTrue(pageWiki2.isNew());
+
+        pageWiki2 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki2", "samespace", "samepage"),
+                getXWikiContext());
+
+        Assert.assertTrue(pageWiki2.isNew());
+
+        // install on root
+
+        install(this.localXarExtensiontId2, null, this.contextUser);
+
+        // validate
+
+        pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "page"),
+                getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("2.1", pageWiki1.getVersion());
+
+        pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "samespace", "samepage"),
+                getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("1.1", pageWiki1.getVersion());
+
+        pageWiki2 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki2", "space", "page"),
+                getXWikiContext());
+
+        Assert.assertFalse(pageWiki2.isNew());
+        Assert.assertEquals("1.1", pageWiki1.getVersion());
+
+        pageWiki2 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki2", "samespace", "samepage"),
+                getXWikiContext());
+
+        Assert.assertFalse(pageWiki2.isNew());
+        Assert.assertEquals("1.1", pageWiki2.getVersion());
+    }
 }

@@ -1,5 +1,4 @@
-##syntax=xwiki/2.1
-{{html clean="false"}}
+##raw.syntax=xhtml/1.0
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
   <head>
@@ -26,20 +25,13 @@
   </head>
   <body>
     <div id="content">
-{{/html}}
-
-{{velocity}}
-#set($percent = 0)
-#set($jobstatus = $xwiki.jobStatus)
-#if ($jobstatus)
-  #set($percent = $jobstatus.progress.offset * 100)
-  #set($percent = $percent.intValue())
-#end
-XWiki is initializing ($percent%)...
-{{/velocity}}
-
-{{html clean="false"}}
+      #set($percent = 0)
+      #set($jobstatus = $xwiki.jobStatus)
+      #if ($jobstatus)
+        #set($percent = $jobstatus.progress.offset * 100)
+        #set($percent = $percent.intValue())
+      #end
+      <p>XWiki is initializing ($percent%)...</p>
     </div>
   </body>
 </html>
-{{/html}}

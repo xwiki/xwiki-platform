@@ -51,6 +51,8 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.rendering.internal.parser.MissingParserException;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.resource.NotFoundResourceHandlerException;
 import org.xwiki.resource.ResourceReference;
@@ -59,6 +61,7 @@ import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -316,13 +319,14 @@ public abstract class XWikiAction extends Action
                 // Call the Actions
 
                 // Call the new Entity Resource Reference Handler.
-                ResourceReferenceHandler entityResourceReferenceHandler = Utils.getComponent(
-                    new DefaultParameterizedType(null, ResourceReferenceHandler.class, ResourceType.class), "bin");
+                ResourceReferenceHandler entityResourceReferenceHandler =
+                    Utils.getComponent(new DefaultParameterizedType(null, ResourceReferenceHandler.class,
+                        ResourceType.class), "bin");
                 ResourceReference resourceReference =
                     Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
                 try {
-                    entityResourceReferenceHandler.handle(resourceReference,
-                        new DefaultResourceReferenceHandlerChain(Collections.<ResourceReferenceHandler>emptyList()));
+                    entityResourceReferenceHandler.handle(resourceReference, new DefaultResourceReferenceHandlerChain(
+                        Collections.<ResourceReferenceHandler> emptyList()));
                     // Don't let the old actions kick in!
                     return null;
                 } catch (NotFoundResourceHandlerException e) {
@@ -472,10 +476,11 @@ public abstract class XWikiAction extends Action
         }
     }
 
-    private void renderInit(XWikiContext xcontext) throws IOException, ComponentLookupException
+    private void renderInit(XWikiContext xcontext) throws IOException, ComponentLookupException, ParseException,
+        MissingParserException, XWikiVelocityException
     {
         String content =
-            Utils.getComponent(WikiTemplateRenderer.class).render("/templates/init.wiki", "init", Syntax.XHTML_1_0);
+            Utils.getComponent(WikiTemplateRenderer.class).render("/templates/init.wiki", Syntax.XHTML_1_0, "init");
 
         xcontext.getResponse().setStatus(503);
         xcontext.getResponse().setContentType("text/html; charset=UTF-8");

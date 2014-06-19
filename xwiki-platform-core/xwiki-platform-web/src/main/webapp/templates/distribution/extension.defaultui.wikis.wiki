@@ -1,4 +1,4 @@
-##syntax=xwiki/2.1
+##source.syntax=xwiki/2.1
 {{velocity output="false"}}
 ## NOTE: We don't use #template because it currently registers the Velocity macros in a different namespace which makes
 ## them unavailable in the current wiki page or the current template. We also tried #parse but it "randomly" fails to

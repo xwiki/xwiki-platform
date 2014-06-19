@@ -8,11 +8,6 @@ org.xwiki.mail.internal.DefaultMailSender
 org.xwiki.mail.internal.DefaultMailSenderThread
 org.xwiki.mail.internal.RecipientConverter
 org.xwiki.mail.internal.AddressesConverter
-<<<<<<< HEAD
 org.xwiki.mail.internal.MailMandatoryDocumentInitializer
 org.xwiki.mail.internal.TemplateMimeMessageFactory
 org.xwiki.mail.internal.DefaultMailTemplateManager
-=======
-org.xwiki.mail.internal.TemplateMimeMessageFactory
-org.xwiki.mail.internal.DefaultMailTemplateManager
->>>>>>> XWIKI-10510: Add ability to send emails from a Template document containing a XWiki.Mail xobject

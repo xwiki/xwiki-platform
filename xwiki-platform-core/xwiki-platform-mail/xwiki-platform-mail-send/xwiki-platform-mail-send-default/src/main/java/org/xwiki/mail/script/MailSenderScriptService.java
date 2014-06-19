@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.script;
 
+import java.util.Collections;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -108,6 +109,19 @@ public class MailSenderScriptService implements ScriptService
         }
 
         return messageWrapper;
+    }
+
+    /**
+     * Creates a pre-filled Mime Message by running the Component implementation of
+     * {@link org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
+     *
+     * @param hint the component hint of a {@link org.xwiki.mail.MimeMessageFactory} component
+     * @param source the source from which to prefill the Mime Message (depends on the implementation)
+     * @return the pre-filled Mime Message wrapped in a {@link org.xwiki.mail.script.MimeMessageWrapper} instance
+     */
+    public MimeMessageWrapper createMessage(String hint, Object source)
+    {
+        return createMessage(hint, source, Collections.<String, Object>emptyMap());
     }
 
     /**

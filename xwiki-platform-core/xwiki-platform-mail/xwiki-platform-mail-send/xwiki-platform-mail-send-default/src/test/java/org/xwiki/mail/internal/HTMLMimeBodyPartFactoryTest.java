@@ -53,7 +53,8 @@ public class HTMLMimeBodyPartFactoryTest
     @Test
     public void createWhenOnlyHTMLContent() throws Exception
     {
-        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("<p>some html</p>");
+        MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("<p>some html</p>",
+            Collections.<String, Object>emptyMap());
 
         assertEquals("<p>some html</p>", bodyPart.getContent());
     }
@@ -74,7 +75,7 @@ public class HTMLMimeBodyPartFactoryTest
         MimeBodyPart textBodyPart = mock(MimeBodyPart.class);
         MimeBodyPartFactory defaultBodyPartFactory = this.mocker.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
-        when(defaultBodyPartFactory.create("some text")).thenReturn(textBodyPart);
+        when(defaultBodyPartFactory.create(eq("some text"), any(Map.class))).thenReturn(textBodyPart);
 
         MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("<p>some html</p>",
             Collections.<String, Object>singletonMap("alternate", "some text"));
@@ -93,7 +94,7 @@ public class HTMLMimeBodyPartFactoryTest
         MimeBodyPart attachmentBodyPart = mock(MimeBodyPart.class);
         MimeBodyPartFactory attachmentBodyPartFactory = this.mocker.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, Attachment.class), "xwiki/attachment");
-        when(attachmentBodyPartFactory.create(same(attachment))).thenReturn(attachmentBodyPart);
+        when(attachmentBodyPartFactory.create(same(attachment), any(Map.class))).thenReturn(attachmentBodyPart);
 
         MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create("<p>some html</p>",
             Collections.<String, Object>singletonMap("attachments", Arrays.asList(attachment)));
@@ -115,10 +116,12 @@ public class HTMLMimeBodyPartFactoryTest
         MimeBodyPart embeddedAttachmentBodyPart = mock(MimeBodyPart.class);
         MimeBodyPartFactory attachmentBodyPartFactory = this.mocker.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, Attachment.class), "xwiki/attachment");
-        when(attachmentBodyPartFactory.create(same(embeddedAttachment))).thenReturn(embeddedAttachmentBodyPart);
+        when(attachmentBodyPartFactory.create(same(embeddedAttachment), any(Map.class))).thenReturn(
+            embeddedAttachmentBodyPart);
 
         MimeBodyPart normalAttachmentBodyPart = mock(MimeBodyPart.class);
-        when(attachmentBodyPartFactory.create(same(normalAttachment))).thenReturn(normalAttachmentBodyPart);
+        when(attachmentBodyPartFactory.create(same(normalAttachment), any(Map.class))).thenReturn(
+            normalAttachmentBodyPart);
 
         MimeBodyPart bodyPart = this.mocker.getComponentUnderTest().create(
             "<p>html... <img src='cid:embeddedAttachment.png'/></p>",
@@ -148,15 +151,17 @@ public class HTMLMimeBodyPartFactoryTest
         MimeBodyPart embeddedAttachmentBodyPart = mock(MimeBodyPart.class);
         MimeBodyPartFactory attachmentBodyPartFactory = this.mocker.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, Attachment.class), "xwiki/attachment");
-        when(attachmentBodyPartFactory.create(same(embeddedAttachment))).thenReturn(embeddedAttachmentBodyPart);
+        when(attachmentBodyPartFactory.create(same(embeddedAttachment), any(Map.class))).thenReturn(
+            embeddedAttachmentBodyPart);
 
         MimeBodyPart normalAttachmentBodyPart = mock(MimeBodyPart.class);
-        when(attachmentBodyPartFactory.create(same(normalAttachment))).thenReturn(normalAttachmentBodyPart);
+        when(attachmentBodyPartFactory.create(same(normalAttachment), any(Map.class))).thenReturn(
+            normalAttachmentBodyPart);
 
         MimeBodyPart textBodyPart = mock(MimeBodyPart.class);
         MimeBodyPartFactory defaultBodyPartFactory = this.mocker.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
-        when(defaultBodyPartFactory.create("some text")).thenReturn(textBodyPart);
+        when(defaultBodyPartFactory.create(eq("some text"), any(Map.class))).thenReturn(textBodyPart);
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("attachments", Arrays.asList(normalAttachment, embeddedAttachment));

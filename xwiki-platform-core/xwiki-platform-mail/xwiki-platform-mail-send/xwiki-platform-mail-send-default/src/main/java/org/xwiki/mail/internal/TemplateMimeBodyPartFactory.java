@@ -36,13 +36,13 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
 
 /**
  * Creates an Body Part from a Document Reference pointing to a Document containing an XWiki.Mail XObject (the first one
@@ -70,7 +70,7 @@ public class TemplateMimeBodyPartFactory extends AbstractMimeBodyPartFactory<Doc
 
     @Inject
     @Named("current")
-    private CurrentReferenceDocumentReferenceResolver resolver;
+    private DocumentReferenceResolver<EntityReference> resolver;
 
     @Inject
     @Named("text/html")

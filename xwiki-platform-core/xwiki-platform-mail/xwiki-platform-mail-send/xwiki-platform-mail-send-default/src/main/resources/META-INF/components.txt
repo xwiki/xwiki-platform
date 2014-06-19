@@ -8,3 +8,4 @@ org.xwiki.mail.internal.DefaultMailSender
 org.xwiki.mail.internal.DefaultMailSenderThread
 org.xwiki.mail.internal.RecipientConverter
 org.xwiki.mail.internal.AddressesConverter
+org.xwiki.mail.internal.MailMandatoryDocumentInitializer

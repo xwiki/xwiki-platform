@@ -108,14 +108,14 @@ public class MailSenderScriptService implements ScriptService
 
     /**
      * Create an empty Mail message. The user of this API needs to set the recipients, the subject, and the message
-     * content (aka Parts) before sending the mail. Note that the "From" sender name is taken from the Mail Sender
-     * Configuration.
+     * content (aka Parts) before sending the mail. Note that if not specified, the "From" sender name will be taken
+     * from the Mail Sender Configuration.
      *
      * @return the created Body Part or null if an error happened
      */
     public MimeMessageWrapper createMessage()
     {
-        return createMessage(this.configuration.getFromAddress(), null, null);
+        return createMessage(null, null, null);
     }
 
     /**

@@ -34,4 +34,10 @@ public class TestMailSenderConfiguration extends DefaultMailSenderConfiguration
     {
         return 3025;
     }
+
+    @Override
+    public String getFromAddress()
+    {
+        return "mary@doe.com";
+    }
 }

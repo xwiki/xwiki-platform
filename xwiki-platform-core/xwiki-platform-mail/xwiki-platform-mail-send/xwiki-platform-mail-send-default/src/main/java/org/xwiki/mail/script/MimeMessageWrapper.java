@@ -250,15 +250,21 @@ public class MimeMessageWrapper
             // No factory found for the passed Mime Type and type of Content.
             // If the content class is of type String then we default to the default MimeBodyPartFactory for String
             // content.
-            try {
-                factory = this.componentManager.getInstance(
-                    new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
-            } catch (ComponentLookupException ee) {
-                // This shouldn't happen, if it does then it's an error and we want that error to bubble up till the
-                // user since it would be pretty bad to send an email with some missing body part!
-                throw new MessagingException(String.format(
-                    "Failed to find default Mime Body Part Factory for mime type [%s] and Content type [%s]",
+            if (String.class.isAssignableFrom(contentClass)) {
+                try {
+                    factory = this.componentManager.getInstance(
+                        new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
+                } catch (ComponentLookupException ee) {
+                    // This shouldn't happen, if it does then it's an error and we want that error to bubble up till the
+                    // user since it would be pretty bad to send an email with some missing body part!
+                    throw new MessagingException(String.format(
+                        "Failed to find default Mime Body Part Factory for mime type [%s] and Content type [%s]",
                         mimeType, contentClass.getName()), e);
+                }
+            } else {
+                throw new MessagingException(String.format(
+                    "Failed to a Mime Body Part Factory matching the mime type [%s] and the Content type [%s]",
+                    mimeType, contentClass.getName()), e);
             }
         }
         return factory;

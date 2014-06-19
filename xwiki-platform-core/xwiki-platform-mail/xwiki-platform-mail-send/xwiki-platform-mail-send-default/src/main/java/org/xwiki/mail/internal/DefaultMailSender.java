@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -36,6 +37,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.mail.MailResultListener;
 import org.xwiki.mail.MailSender;
+import org.xwiki.mail.MailSenderConfiguration;
 
 /**
  * Default implementation using the {@link org.xwiki.mail.internal.DefaultMailSenderThread} to send emails
@@ -50,6 +52,9 @@ public class DefaultMailSender implements MailSender, Initializable
 {
     @Inject
     private MailSenderThread mailSenderThread;
+
+    @Inject
+    private MailSenderConfiguration configuration;
 
     @Inject
     private Logger logger;
@@ -76,6 +81,18 @@ public class DefaultMailSender implements MailSender, Initializable
     @Override
     public void send(MimeMessage message, Session session, MailResultListener listener) throws MessagingException
     {
+        // Perform some basic verification to avoid NPEs in JavaMail
+        if (message.getFrom() == null) {
+            // Try using the From address in the Session
+            String from = this.configuration.getFromAddress();
+            if (from != null) {
+                message.setFrom(new InternetAddress(from));
+            } else {
+                throw new MessagingException("Missing the From Address for sending the mail. "
+                    + "You need to either define it in the Mail Configuration or pass it in your message.");
+            }
+        }
+
         // Push new mail message on the queue
         getMailQueue().add(new MailSenderQueueItem(message, session, listener));
     }

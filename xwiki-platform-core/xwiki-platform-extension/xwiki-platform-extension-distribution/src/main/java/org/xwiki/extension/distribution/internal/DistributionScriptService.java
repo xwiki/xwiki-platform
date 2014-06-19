@@ -46,6 +46,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.script.service.ScriptService;
@@ -115,6 +116,9 @@ public class DistributionScriptService implements ScriptService
     @Named(DocumentsModifiedDuringDistributionListener.NAME)
     private EventListener modifiedDocumentsListener;
 
+    @Inject
+    private RenderingContext renderingContext;
+
     /**
      * @param <T> the type of the object
      * @param unsafe the unsafe object
@@ -145,8 +149,8 @@ public class DistributionScriptService implements ScriptService
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.isMainWiki(wiki) ? this.distributionManager.getFarmDistributionState() : this.distributionManager
-            .getWikiDistributionState(wiki);
+        return xcontext.isMainWiki(wiki) ? this.distributionManager.getFarmDistributionState()
+            : this.distributionManager.getWikiDistributionState(wiki);
     }
 
     /**
@@ -270,7 +274,7 @@ public class DistributionScriptService implements ScriptService
             new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)), null,
                 false);
 
-        txContext.setId(transformationId);
+        txContext.setId(transformationId != null ? transformationId : this.renderingContext.getTransformationId());
 
         try {
             this.transformationManager.performTransformations(block, txContext);

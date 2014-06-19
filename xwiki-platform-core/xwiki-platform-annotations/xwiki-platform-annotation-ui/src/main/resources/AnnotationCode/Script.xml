@@ -699,7 +699,11 @@ XWiki.Annotation = Class.create({
       // create the annotations button
       var annContainer = new Element('div', {'class': 'topmenuentry hasIcon', 'id': 'tmAnnotations'});
       var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
-      annLink.update("&lt;strong&gt;$services.localization.render('annotations.title')&lt;/strong&gt;");
+      if (window.document.body.hasClassName('skin-flamingo')) {
+        annLink.update("&lt;span class=\"glyphicon glyphicon-edit\"&gt;&lt;/span&gt; $services.localization.render('annotations.title')");
+      } else {
+        annLink.update("&lt;strong&gt;$services.localization.render('annotations.title')&lt;/strong&gt;");
+      }
       annContainer.insert({top: annLink});
       rightMenu.insert({bottom: annContainer});
 
@@ -733,8 +737,15 @@ XWiki.Annotation = Class.create({
         },
 
         onSuccess: function(response) {
-          $('contentmenu').insert({after: response.responseText});
-          this.settingsPanel = $('contentmenu').next();
+          // Unfortunately, this is skin dependent
+          if (window.document.body.hasClassName('skin-flamingo')) {
+            var place = $$('.xcontent > hr')[0];
+            place.insert({after: response.responseText});
+            this.settingsPanel = place.next();
+          } else { // colibri
+            $('contentmenu').insert({after: response.responseText});
+            this.settingsPanel = $('contentmenu').next();
+          }
           // fire a settings panel loaded event
           this.settingsPanel.fire('xwiki:annotations:settings:loaded');
           // hide message at page bottom

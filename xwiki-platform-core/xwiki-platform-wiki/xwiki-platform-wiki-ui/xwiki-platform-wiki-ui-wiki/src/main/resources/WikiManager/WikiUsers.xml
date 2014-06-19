@@ -454,130 +454,133 @@
 #if ("$!wikiPrettyName" == '')
   #set ($wikiPrettyName = $wiki.id)
 #end
-## Operation are enabled if the user is admin and the form_token is valid
-#if ($hasAdmin &amp;&amp; $services.csrf.isTokenValid($request.form_token))
-  #if ($request.acceptUser || $request.rejectUser)
-    ## Handle a candidate members's request.
-    ##
-    #set ($candidateNumber = $mathtool.toInteger("$!{request.candidateNumber}"))
-    #set ($candidacy = $services.wiki.user.getCandidacy($wiki.id, $candidateNumber))
-    #if ($candidacy &amp;&amp; $candidacy.status == 'PENDING')
-      #if ($request.acceptUser)
-        #set ($success = $services.wiki.user.acceptRequest($candidacy, $request.reviewerComment, $request.reviewerPrivateComment))
-        #if ($success)
-          #set ($notificationMessage = $services.localization.render('platform.wiki.currentwiki.joinRequestAcceptedNotification', [$wikiPrettyName]))
-        #end
-      #elseif ($request.rejectUser)
-        #set ($success = $services.wiki.user.refuseRequest($candidacy, $request.reviewerComment, $request.reviewerPrivateComment))
-        #if ($success)
-          #set ($notificationMessage = $services.localization.render('platform.wiki.currentwiki.joinRequestRejectedNotification', [$wikiPrettyName]))
-        #end
-      #end
-      ## Notify the user.
-      #if ("$!{request.reviewerComment}" != '')
-        ## FIXME: replace newline with ${escapetool.newline} when upgrading velocity-tools to 2.0 (in xwiki3.1+?)
-        #set ($notificationMessage = "${notificationMessage}
-  $services.localization.render('platform.wiki.currentwiki.candidateHandledComment') ${request.reviewerComment}")
-      #end
-      #set ($userDocumentReference = $services.model.resolveDocument($candidacy.userId))
-      #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
-      #if ($success)
-
+## OPERATIONS
+#if(($request.acceptUser || $request.rejectUser || $request.inviteUser || $request.cancelInvitation) &amp;&amp; $hasAdmin)
+  ## Operation are enabled if the form_token is valid
+  #if ($services.csrf.isTokenValid($request.form_token))
+    #if ($request.acceptUser || $request.rejectUser)
+      ## Handle a candidate members's request.
+      ##
+      #set ($candidateNumber = $mathtool.toInteger("$!{request.candidateNumber}"))
+      #set ($candidacy = $services.wiki.user.getCandidacy($wiki.id, $candidateNumber))
+      #if ($candidacy &amp;&amp; $candidacy.status == 'PENDING')
         #if ($request.acceptUser)
-          {{info}}{{translation key="platform.wiki.currentwiki.candidateAcceptedSuccess"/}}{{/info}}
-        #else
-          {{info}}{{translation key="platform.wiki.currentwiki.candidateRejectedSuccess"/}}{{/info}}
+          #set ($success = $services.wiki.user.acceptRequest($candidacy, $request.reviewerComment, $request.reviewerPrivateComment))
+          #if ($success)
+            #set ($notificationMessage = $services.localization.render('platform.wiki.currentwiki.joinRequestAcceptedNotification', [$wikiPrettyName]))
+          #end
+        #elseif ($request.rejectUser)
+          #set ($success = $services.wiki.user.refuseRequest($candidacy, $request.reviewerComment, $request.reviewerPrivateComment))
+          #if ($success)
+            #set ($notificationMessage = $services.localization.render('platform.wiki.currentwiki.joinRequestRejectedNotification', [$wikiPrettyName]))
+          #end
         #end
-
-      #else
-
-          {{error}}{{translation key="platform.wiki.currentwiki.candidateReviewFailure"/}}{{/error}}
-
-      #end
-    #end
-  #elseif($request.inviteUser)
-    ## Handle inviting users.
-    ##
-    #set ($names = [])
-    #set ($namesArray = $request.getParameterValues('name'))
-    #set ($discard = $names.addAll($namesArray.subList(0, $namesArray.size())))
-    #set ($discard = $names.removeAll(['']))
-    #set ($message = $request.message)
-    ##
-    ## Remove users that are already members.
-    #set ($alreadyMembers = [])
-    #set ($members = $services.wiki.user.getMembers($wiki.id))
-    #foreach ($name in $names)
-      #if ($members.contains($name))
-        #set ($discard = $alreadyMembers.add($name))
-        
-        {{error}}$services.localization.render('platform.wiki.currentwiki.inviteUserAlreadyMember', [$xwiki.getUserName($name, false)]){{/error}}
-
-      #end
-    #end
-    #set ($discard = $names.removeAll($alreadyMembers))
-    ##
-    ## Remove users that have already been invited.
-    #set ($alreadyInvited = [])
-    #foreach ($name in $names)
-      #foreach ($candidateMember in $services.wiki.user.getAllInvitations($wiki.id))
-        #if ($candidateMember.status == 'PENDING')
-          #set ($errorMessageKey = 'platform.wiki.currentwiki.inviteUserAlreadyInvited')
-          #set ($errorMessageKey = 'platform.wiki.currentwiki.inviteRequestAlreadyExists')
-
-          {{error}}$services.localization.render($errorMessageKey, [$xwiki.getUserName($name, false)]){{/error}}
-
-          #set ($discard = $alreadyInvited.add($name))
-          #break
-        #end
-      #end
-    #end
-    #set ($discard = $names.removeAll($alreadyInvited))
-    ##
-    #foreach ($userName in $names)
-      #set ($temp = $services.wiki.user.invite($userName, $wiki.id, $message))
-      ## Notify the user.
-      #set ($notificationMessage = $services.localization.render('platform.wiki.currentwiki.inviteNotification', [$wikiPrettyName]))
-      #if ("$!message" != '')
-        ## FIXME: remplace newline with ${escapetool.newline} when upgrading velocity-tools to 2.0 (in xwiki3.1+?)
-        #set ($notificationMessage = "$notificationMessage
-  $services.localization.render('platform.wiki.currentwiki.candidateHandledComment') $message")
-      #end
-      #set ($userDocumentReference = $services.model.resolveDocument($userName))
-      #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
-
-      {{info}}$services.localization.render('platform.wiki.currentwiki.inviteSuccess', [$xwiki.getUserName($userName, false)]){{/info}}
-
-    #end
-  #elseif ($request.cancelInvitation)
-    ##
-    ## Handle cancelling an invitation.
-    #set ($candidateNumber = $mathtool.toInteger("$!{request.candidateNumber}"))
-    #set ($candidateMember = $services.wiki.user.getCandidacy($wiki.id, $candidateNumber))
-    #if ($candidateMember &amp;&amp; $candidateMember.status == 'PENDING')
-      ## Remove the invitation
-      #set ($success = $services.wiki.user.cancelCandidacy($candidateMember))
-      #if($success)
         ## Notify the user.
-        #set ($notificationMessage = $services.localization.render('platform.wiki.currentwiki.invitationCancelNotification'))
-        #set ($userDocumentReference = $services.model.resolveDocument($candidateMember.userId))
+        #if ("$!{request.reviewerComment}" != '')
+          ## FIXME: replace newline with ${escapetool.newline} when upgrading velocity-tools to 2.0 (in xwiki3.1+?)
+          #set ($notificationMessage = "${notificationMessage}
+    $services.localization.render('platform.wiki.currentwiki.candidateHandledComment') ${request.reviewerComment}")
+        #end
+        #set ($userDocumentReference = $services.model.resolveDocument($candidacy.userId))
         #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
+        #if ($success)
+
+          #if ($request.acceptUser)
+            {{info}}{{translation key="platform.wiki.currentwiki.candidateAcceptedSuccess"/}}{{/info}}
+          #else
+            {{info}}{{translation key="platform.wiki.currentwiki.candidateRejectedSuccess"/}}{{/info}}
+          #end
+
+        #else
+
+            {{error}}{{translation key="platform.wiki.currentwiki.candidateReviewFailure"/}}{{/error}}
+
+        #end
+      #end
+    #elseif($request.inviteUser)
+      ## Handle inviting users.
+      ##
+      #set ($names = [])
+      #set ($namesArray = $request.getParameterValues('name'))
+      #set ($discard = $names.addAll($namesArray.subList(0, $namesArray.size())))
+      #set ($discard = $names.removeAll(['']))
+      #set ($message = $request.message)
+      ##
+      ## Remove users that are already members.
+      #set ($alreadyMembers = [])
+      #set ($members = $services.wiki.user.getMembers($wiki.id))
+      #foreach ($name in $names)
+        #if ($members.contains($name))
+          #set ($discard = $alreadyMembers.add($name))
+          
+          {{error}}$services.localization.render('platform.wiki.currentwiki.inviteUserAlreadyMember', [$xwiki.getUserName($name, false)]){{/error}}
+
+        #end
+      #end
+      #set ($discard = $names.removeAll($alreadyMembers))
+      ##
+      ## Remove users that have already been invited.
+      #set ($alreadyInvited = [])
+      #foreach ($name in $names)
+        #foreach ($candidateMember in $services.wiki.user.getAllInvitations($wiki.id))
+          #if ($candidateMember.status == 'PENDING')
+            #set ($errorMessageKey = 'platform.wiki.currentwiki.inviteUserAlreadyInvited')
+            #set ($errorMessageKey = 'platform.wiki.currentwiki.inviteRequestAlreadyExists')
+
+            {{error}}$services.localization.render($errorMessageKey, [$xwiki.getUserName($name, false)]){{/error}}
+
+            #set ($discard = $alreadyInvited.add($name))
+            #break
+          #end
+        #end
+      #end
+      #set ($discard = $names.removeAll($alreadyInvited))
+      ##
+      #foreach ($userName in $names)
+        #set ($temp = $services.wiki.user.invite($userName, $wiki.id, $message))
+        ## Notify the user.
+        #set ($notificationMessage = $services.localization.render('platform.wiki.currentwiki.inviteNotification', [$wikiPrettyName]))
+        #if ("$!message" != '')
+          ## FIXME: remplace newline with ${escapetool.newline} when upgrading velocity-tools to 2.0 (in xwiki3.1+?)
+          #set ($notificationMessage = "$notificationMessage
+    $services.localization.render('platform.wiki.currentwiki.candidateHandledComment') $message")
+        #end
+        #set ($userDocumentReference = $services.model.resolveDocument($userName))
+        #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
+
+        {{info}}$services.localization.render('platform.wiki.currentwiki.inviteSuccess', [$xwiki.getUserName($userName, false)]){{/info}}
+
+      #end
+    #elseif ($request.cancelInvitation)
+      ##
+      ## Handle cancelling an invitation.
+      #set ($candidateNumber = $mathtool.toInteger("$!{request.candidateNumber}"))
+      #set ($candidateMember = $services.wiki.user.getCandidacy($wiki.id, $candidateNumber))
+      #if ($candidateMember &amp;&amp; $candidateMember.status == 'PENDING')
+        ## Remove the invitation
+        #set ($success = $services.wiki.user.cancelCandidacy($candidateMember))
+        #if($success)
+          ## Notify the user.
+          #set ($notificationMessage = $services.localization.render('platform.wiki.currentwiki.invitationCancelNotification'))
+          #set ($userDocumentReference = $services.model.resolveDocument($candidateMember.userId))
+          #set ($temp = $messageStream.postDirectMessageToUser($notificationMessage, $userDocumentReference))
+          
+          {{info}}{{translation key="platform.wiki.currentwiki.invitationCancelSuccess"/}}{{/info}}
+          
+        #else
         
-        {{info}}{{translation key="platform.wiki.currentwiki.invitationCancelSuccess"/}}{{/info}}
-        
-      #else
-      
-        {{error}}{{translation key="platform.wiki.currentwiki.invitationCancelFailure"/}}{{/error}}
-        
+          {{error}}{{translation key="platform.wiki.currentwiki.invitationCancelFailure"/}}{{/error}}
+          
+        #end
       #end
     #end
+  #else
+
+    {{warning}}
+      {{translation key="platform.wiki.csrf.error" /}}
+    {{/warning}}
+    
   #end
-#elseif(($request.acceptUser || $request.rejectUser || $request.inviteUser || $request.cancelInvitation) &amp;&amp; $hasAdmin)
-
-  {{warning}}
-    {{translation key="platform.wiki.csrf.error" /}}
-  {{/warning}}
-
 #end
 ### MEMBERSHIP TYPE AND USER SCOPE ###
 #set($discard = $xwiki.jsx.use('WikiManager.WikiUsers'))

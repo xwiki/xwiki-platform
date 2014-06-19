@@ -68,6 +68,7 @@ public class MailSenderTest extends AbstractTest
         getUtil().deletePage(getTestClassName(), "SendMail");
 
         // Configure the SMTP host/port for the wiki so that it points to GreenMail.
+        getUtil().addObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences");
         getUtil().updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", 0, "smtp_port", 3025);
         getUtil().updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiPreferences", 0, "smtp_server", "localhost");
 
@@ -78,8 +79,8 @@ public class MailSenderTest extends AbstractTest
 
         // Create another page with the Velocity script to send the template email
         String velocity = "{{velocity}}\n"
-            + "#set ($message = $services.mailsender.createMessage('localhost@xwiki.org', 'mary@doe.com', "
-                + "'john@doe.com', 'subject test'))\n"
+            + "#set ($message = $services.mailsender.createMessage('localhost@xwiki.org', 'john@doe.com', "
+                + "'subject test'))\n"
             + "#set ($templateReference = $services.model.createDocumentReference('', '" + getTestClassName()
                 + "', 'MailTemplate'))\n"
             + "#set ($discard = $message.addPart('xwiki/template', $templateReference, "

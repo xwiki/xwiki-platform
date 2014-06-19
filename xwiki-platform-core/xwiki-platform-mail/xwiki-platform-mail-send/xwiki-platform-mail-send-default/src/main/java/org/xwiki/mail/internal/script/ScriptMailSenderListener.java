@@ -24,11 +24,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.mail.internet.MimeMessage;
 
-import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MailResultListener;
 
 /**
- * Saves errors when sending messages in the Execution Context so that it's Thread safe.
+ * Saves errors when sending messages, in the passed Execution Context so that it's Thread safe.
  *
  * @version $Id$
  * @since 6.1M2
@@ -37,15 +37,14 @@ public class ScriptMailSenderListener implements MailResultListener
 {
     private static final String CONTEXT_KEY = "mailsenderExceptions";
 
-    private Execution execution;
+    private ExecutionContext executionContext;
 
     /**
-     * @param execution the Execution component, used to save the exceptions in a thread-safe manner (i.e. each thread
-     *        has its list of mail errors)
+     * @param executionContext the context in which to save errors (i.e. thus, each thread has its list of mail errors)
      */
-    public ScriptMailSenderListener(Execution execution)
+    public ScriptMailSenderListener(ExecutionContext executionContext)
     {
-        this.execution = execution;
+        this.executionContext = executionContext;
     }
 
     @Override
@@ -62,7 +61,7 @@ public class ScriptMailSenderListener implements MailResultListener
         BlockingQueue<Throwable> queue = getExceptionQueue();
         if (queue == null) {
             queue = new LinkedBlockingQueue<>(100);
-            this.execution.getContext().setProperty(CONTEXT_KEY, queue);
+            this.executionContext.setProperty(CONTEXT_KEY, queue);
         }
 
         // Add the error to the queue
@@ -74,8 +73,7 @@ public class ScriptMailSenderListener implements MailResultListener
      */
     public BlockingQueue<Throwable> getExceptionQueue()
     {
-        BlockingQueue<Throwable> queue =
-            (BlockingQueue<Throwable>) this.execution.getContext().getProperty(CONTEXT_KEY);
+        BlockingQueue<Throwable> queue = (BlockingQueue<Throwable>) this.executionContext.getProperty(CONTEXT_KEY);
         if (queue == null) {
             queue = new LinkedBlockingQueue<>(1);
         }

@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail.script;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -29,6 +31,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
@@ -83,18 +86,19 @@ public class MailSenderScriptService implements ScriptService
      * {@link org.xwiki.mail.MimeMessageFactory} corresponding to the passed hint.
      *
      * @param hint the component hint of a {@link org.xwiki.mail.MimeMessageFactory} component
-     * @param parameters a list of parameters that the implementation requires (it's generic and the number and types
-     *        depend on the implementation)
+     * @param source the source from which to prefill the Mime Message (depends on the implementation)
+     * @param parameters an optional generic list of parameters. The supported parameters depend on the implementation
      * @return the pre-filled Mime Message wrapped in a {@link org.xwiki.mail.script.MimeMessageWrapper} instance
      */
-    public MimeMessageWrapper createMessage(String hint, Object... parameters)
+    public MimeMessageWrapper createMessage(String hint, Object source, Map<String, Object> parameters)
     {
         MimeMessageWrapper messageWrapper;
         try {
             // Look for a specific MimeMessageFactory for the passed hint.
-            MimeMessageFactory factory = this.componentManager.getInstance(MimeMessageFactory.class, hint);
+            MimeMessageFactory factory = this.componentManager.getInstance(
+                new DefaultParameterizedType(null, MimeMessageFactory.class, source.getClass(), null), hint);
             Session session = createSession();
-            messageWrapper = new MimeMessageWrapper(factory.createMessage(session, parameters), session,
+            messageWrapper = new MimeMessageWrapper(factory.createMessage(session, source, parameters), session,
                 this.mailSender, this.execution, this.componentManager);
         } catch (Exception e) {
             // No factory found, set an error
@@ -115,7 +119,7 @@ public class MailSenderScriptService implements ScriptService
      */
     public MimeMessageWrapper createMessage()
     {
-        return createMessage(null, null, null);
+        return createMessage(null, null, (String) null);
     }
 
     /**

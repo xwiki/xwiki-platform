@@ -162,7 +162,7 @@
       "actions" : "${escapetool.javascript("&lt;form action='' enctype='multipart/form-data' method='post'&gt;
         &lt;fieldset&gt;
           &lt;input name='logger_name' value='$logger.key' type='hidden'/&gt;
-          &lt;select name='logger_level' size='1' style='width: 80px'&gt;
+          &lt;select name='logger_level' size='1'&gt;
             #if ($loggLevelName != 'TRACE')
               &lt;option label='TRACE' value='TRACE'&gt;TRACE&lt;/option&gt;
             #end

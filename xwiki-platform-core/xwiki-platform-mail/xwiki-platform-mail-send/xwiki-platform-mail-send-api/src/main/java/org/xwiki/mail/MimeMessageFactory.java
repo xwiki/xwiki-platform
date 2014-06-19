@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail;
 
+import java.util.Map;
+
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
@@ -30,21 +32,22 @@ import org.xwiki.component.annotation.Role;
  * {@link javax.mail.internet.MimeMessage} according to some algorithm. For example a Template Mime Message Factory
  * could compute the subject from an XObject in a wiki page.
  *
+ * @param <T> the type of the source from which to prefill the Mime Message
  * @version $Id$
  * @since 6.1RC1
  */
 @Role
-public interface MimeMessageFactory
+public interface MimeMessageFactory<T>
 {
     /**
      * Create a {@link javax.mail.internet.MimeMessage}.
      *
      * @param session the JavaMail Session needed to create an instance of {@link MimeMessage} (contains all
      *        configuration such as SMTP server, SMTP port, etc)
-     * @param parameters a generic list of parameters that Components implementing this interface support. The type and
-     *        number of supported parameters is up to the implementation.
+     * @param source the source from which to prefill the Mime Message (depends on the implementation)
+     * @param parameters an optional generic list of parameters. The supported parameters depend on the implementation
      * @return the pre-filled {@link javax.mail.internet.MimeMessage} that can then be further modified by the user
      * @throws MessagingException in case of an error while creating the {@link javax.mail.internet.MimeMessage}
      */
-    MimeMessage createMessage(Session session, Object... parameters) throws MessagingException;
+    MimeMessage createMessage(Session session, T source, Map<String, Object> parameters) throws MessagingException;
 }

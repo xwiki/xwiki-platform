@@ -19,8 +19,6 @@
  */
 package org.xwiki.mail.test.ui;
 
-import javax.mail.internet.MimeMessage;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,6 +28,9 @@ import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
+
+import static org.junit.Assert.*;
+
 
 /**
  * UI tests for the Mail Sender feature.
@@ -89,7 +90,7 @@ public class MailSenderTest extends AbstractTest
 
         // Verify that the mail has been received.
         this.mail.waitForIncomingEmail(10000L, 1);
-        MimeMessage[] messages = this.mail.getReceivedMessages();
+        assertEquals(1, this.mail.getReceivedMessages().length);
 
     }
 }

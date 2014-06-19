@@ -56,7 +56,7 @@
 ## Put anchors before the footer, otherwise the top of each section would be hidden by the floating topmenu
 ##
 #if ($docextras.size() > 0)
-<div id="docextraanchors" class="invisible">
+<div id="docextraanchors" class="hidden">
 #foreach ($docextra in $docextras)<span id="${docextra.get(0)}anchor">&nbsp;</span>#end
 </div>
 #end

@@ -19,9 +19,7 @@
  */
 package org.xwiki.mail.internal;
 
-import java.io.StringWriter;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -32,18 +30,9 @@ import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.velocity.VelocityContext;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MimeMessageFactory;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
-
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
 
 import static java.util.Arrays.asList;
 
@@ -59,76 +48,34 @@ import static java.util.Arrays.asList;
 @Singleton
 public class TemplateMimeMessageFactory implements MimeMessageFactory
 {
-    private static final EntityReference MAIL_CLASS =
-            new EntityReference("Mail", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
-
     @Inject
-    private DocumentAccessBridge documentBridge;
-
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
-
-    @Inject
-    @Named("current")
-    private CurrentReferenceDocumentReferenceResolver resolver;
-
-    @Inject
-    private VelocityManager velocityManager;
+    private DefaultMailTemplateManager mailTemplateManager;
 
     @Override
     public MimeMessage createMessage(Session session, Object... parameters) throws MessagingException
     {
         MimeMessage message = new MimeMessage(session);
 
-        List<Object> parametersReversed = asList(parameters);
-        Collections.reverse(parametersReversed);
+        DocumentReference documentReference = (DocumentReference) parameters[0];
+        Map<String, String> data = Collections.emptyMap();
 
-        Map<String, String> data = (Map<String, String>) parametersReversed.get(0);
-        DocumentReference documentReference = (DocumentReference) parametersReversed.get(1);
+        if (asList(parameters).size() == 3) {
 
-        message.setSubject(evaluateSubject(documentReference, data));
+            message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress((String) parameters[1]));
+            data = (Map<String, String>) parameters[2];
 
-        if (parametersReversed.get(2) != 0) {
-            String to = (String) parametersReversed.get(2);
-            message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress(to));
+        } else if (asList(parameters).size() == 4) {
+
+            message.setFrom(new InternetAddress((String) parameters[1]));
+
+            message.setRecipient(MimeMessage.RecipientType.TO, new InternetAddress((String) parameters[2]));
+
+            data = (Map<String, String>) parameters[3];
         }
-        if (parametersReversed.get(3) != 0) {
-            String from = (String) parametersReversed.get(3);
-            message.setFrom(new InternetAddress(from));
-        }
+
+        String subject = this.mailTemplateManager.evaluate(documentReference, "subject", data);
+        message.setSubject(subject);
 
         return message;
-    }
-
-    private String evaluateSubject(DocumentReference documentReference, Map<String, String> data)
-        throws MessagingException
-    {
-        VelocityContext velocityContext = createVelocityContext(data);
-        DocumentReference mailClassReference = this.resolver.resolve(MAIL_CLASS);
-
-        String templateFullName = this.serializer.serialize(documentReference);
-        String subjectProperty = "subject";
-        String content =
-                this.documentBridge.getProperty(documentReference, mailClassReference, subjectProperty).toString();
-        try {
-            StringWriter writer = new StringWriter();
-            velocityManager.getVelocityEngine().evaluate(velocityContext, writer, templateFullName, content);
-            return writer.toString();
-        } catch (XWikiVelocityException e) {
-            throw new MessagingException(String.format("Failed to evaluate subject [%s] for Document reference [%s]",
-                    subjectProperty, documentReference), e);
-        }
-    }
-
-    private VelocityContext createVelocityContext(Map<String, String> data)
-    {
-        VelocityContext velocityContext = new VelocityContext();
-        if (data != null) {
-            for (Map.Entry<String, String> header : data.entrySet()) {
-                velocityContext.put(header.getKey(), header.getValue());
-            }
-        }
-
-        return velocityContext;
     }
 }

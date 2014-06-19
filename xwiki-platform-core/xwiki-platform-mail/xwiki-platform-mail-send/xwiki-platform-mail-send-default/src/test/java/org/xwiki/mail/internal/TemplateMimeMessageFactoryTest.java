@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal;
 
-import java.io.Writer;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -27,24 +26,17 @@ import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.apache.velocity.VelocityContext;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.VelocityManager;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -64,31 +56,14 @@ public class TemplateMimeMessageFactoryTest
     public void createMessage() throws Exception
     {
         DocumentReference documentReference = mock(DocumentReference.class);
-        VelocityEngine velocityEngine = mock(VelocityEngine.class);
 
-        DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
-        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), eq("subject")))
-                .thenReturn(
-                        "${company} news");
-        VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
-        when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
-
-        doAnswer(new Answer()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                Object[] args = invocation.getArguments();
-                ((Writer) args[1]).write("XWiki news");
-                return null;
-            }
-        }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
-                anyString(), eq("${company} news"));
+        DefaultMailTemplateManager mailTemplateManager = this.mocker.getInstance(DefaultMailTemplateManager.class);
+        when(mailTemplateManager.evaluate(same(documentReference), eq("subject"), anyMap())).thenReturn(
+                "XWiki news");
 
         Session session = Session.getDefaultInstance(new Properties());
-
         MimeMessage message = this.mocker.getComponentUnderTest()
-                .createMessage(session, "news@xwiki.org", "john@doe.com", documentReference, Collections
+                .createMessage(session, documentReference, "news@xwiki.org", "john@doe.com", Collections
                         .<String, Object>singletonMap("company", "XWiki"));
 
         assertEquals("XWiki news", message.getSubject());

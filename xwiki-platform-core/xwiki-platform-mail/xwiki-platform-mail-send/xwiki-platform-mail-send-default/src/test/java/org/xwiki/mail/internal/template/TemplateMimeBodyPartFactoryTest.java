@@ -29,11 +29,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.mail.internal.template.DefaultMailTemplateManager;
-import org.xwiki.mail.internal.template.TemplateMimeBodyPartFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.velocity.VelocityEngine;
 
 import com.xpn.xwiki.api.Attachment;
 
@@ -51,8 +48,6 @@ public class TemplateMimeBodyPartFactoryTest
 {
     private DocumentReference documentReference = mock(DocumentReference.class);
 
-    private VelocityEngine velocityEngine = mock(VelocityEngine.class);
-
     @Rule
     public MockitoComponentMockingRule<TemplateMimeBodyPartFactory> mocker =
         new MockitoComponentMockingRule<>(TemplateMimeBodyPartFactory.class);
@@ -60,7 +55,7 @@ public class TemplateMimeBodyPartFactoryTest
     @Before
     public void setUp() throws Exception
     {
-        DefaultMailTemplateManager mailTemplateManager = this.mocker.getInstance(DefaultMailTemplateManager.class);
+        MailTemplateManager mailTemplateManager = this.mocker.getInstance(MailTemplateManager.class);
         when(mailTemplateManager.evaluate(this.documentReference, "text", new HashMap<String, String>())).thenReturn(
                 "Hello John Doe, john@doe.com");
         when(mailTemplateManager.evaluate(this.documentReference, "html", new HashMap<String, String>())).thenReturn(

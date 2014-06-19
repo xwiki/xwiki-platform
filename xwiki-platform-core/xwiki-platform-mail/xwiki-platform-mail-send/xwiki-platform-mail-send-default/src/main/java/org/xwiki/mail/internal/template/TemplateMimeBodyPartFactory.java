@@ -53,7 +53,7 @@ public class TemplateMimeBodyPartFactory extends AbstractMimeBodyPartFactory<Doc
     private MimeBodyPartFactory<String> htmlBodyPartFactory;
 
     @Inject
-    private DefaultMailTemplateManager mailTemplateManager;
+    private MailTemplateManager mailTemplateManager;
 
     @Override
     public MimeBodyPart create(DocumentReference documentReference, Map<String, Object> parameters)

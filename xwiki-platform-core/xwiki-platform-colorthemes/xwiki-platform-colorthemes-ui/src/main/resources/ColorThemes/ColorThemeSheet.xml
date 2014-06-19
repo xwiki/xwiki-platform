@@ -358,6 +358,10 @@ XWiki.editors.ColorThemeWizard = Class.create({
       item._x_undoButton.observe('click', function(event){
         item.value = item._x_undoButton._x_value;
         this.inputValueChanged(null, item);
+        if (ProColor) {
+          // Calling the "colorSync" function attached to the procolor button adjacent to the input field.
+          item.adjacent("a")[0].colorSync(false);
+        }
         item._x_undoButton.style.visibility = "hidden";
       }.bindAsEventListener(this));
     }.bind(this));

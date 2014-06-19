@@ -49,10 +49,9 @@
 ##
 #if(!$doc.isNew())
   #xwikibuttonentrystart('' $services.localization.render('core.menu.moreactions') 'tmMoreActions' 'btn-default' 'cog')
+    #submenuitem('' $services.localization.render('core.menu.export') 'tmExport', '', 'download-alt', 'data-toggle="modal" data-target="#exportModal"')
     #submenuitem($doc.getURL('view', "xpage=print&amp;$!escapetool.html($request.getQueryString())") $services.localization.render('core.menu.preview') 'tmPrintPreview', '', 'print')
     #submenuitem($doc.getURL('view', "viewer=code") $services.localization.render('core.menu.view.source') 'tmViewSource', '', 'search')
-    ## Export
-    #submenuitem('' $services.localization.render('core.menu.export') 'tmExport', '', 'download-alt', 'data-toggle="modal" data-target="#exportModal"')
     
     ## ----------------------------
     ## Display the shortcuts

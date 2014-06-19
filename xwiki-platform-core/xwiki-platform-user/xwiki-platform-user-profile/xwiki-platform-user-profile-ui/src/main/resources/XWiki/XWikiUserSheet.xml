@@ -457,7 +457,7 @@ return XWiki;
   content: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
 }
 
-.profile-menu .group.user-menu-title{
+.skin-colibri .profile-menu .group.user-menu-title{
   #set ($menuIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/user.png')${escapetool.S})")
   #css3_backgroundIconAndLinearGradient($menuIcon, {
     'to': 'bottom',

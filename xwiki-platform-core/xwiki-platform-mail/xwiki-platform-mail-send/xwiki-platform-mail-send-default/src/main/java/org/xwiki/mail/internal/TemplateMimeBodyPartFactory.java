@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal;
 
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,17 +29,9 @@ import javax.inject.Singleton;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
-import org.apache.velocity.VelocityContext;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.api.Attachment;
 
@@ -56,40 +47,21 @@ import com.xpn.xwiki.api.Attachment;
 @Singleton
 public class TemplateMimeBodyPartFactory extends AbstractMimeBodyPartFactory<DocumentReference>
 {
-    private static final EntityReference MAIL_CLASS =
-            new EntityReference("Mail", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
-
-    @Inject
-    private DocumentAccessBridge documentBridge;
-
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
-
-    @Inject
-    private VelocityManager velocityManager;
-
-    @Inject
-    @Named("current")
-    private DocumentReferenceResolver<EntityReference> resolver;
-
     @Inject
     @Named("text/html")
     private MimeBodyPartFactory<String> htmlBodyPartFactory;
+
+    @Inject
+    private DefaultMailTemplateManager mailTemplateManager;
 
     @Override
     public MimeBodyPart create(DocumentReference documentReference, Map<String, Object> parameters)
         throws MessagingException
     {
         Map<String, String> velocityVariables = (Map<String, String>) parameters.get("velocityVariables");
-        VelocityContext velocityContext = createVelocityContext(velocityVariables);
 
-        DocumentReference mailClassReference = this.resolver.resolve(MAIL_CLASS);
-        String templateFullName = this.serializer.serialize(documentReference);
-
-        String textContent =
-                evaluateProperty(velocityContext, documentReference, mailClassReference, templateFullName, "text");
-        String htmlContent =
-                evaluateProperty(velocityContext, documentReference, mailClassReference, templateFullName, "html");
+        String textContent = this.mailTemplateManager.evaluate(documentReference, "text", velocityVariables);
+        String htmlContent = this.mailTemplateManager.evaluate(documentReference, "html", velocityVariables);
 
         Map<String, Object> htmlParameters = new HashMap<>();
         htmlParameters.put("alternate", textContent);
@@ -100,37 +72,5 @@ public class TemplateMimeBodyPartFactory extends AbstractMimeBodyPartFactory<Doc
             htmlParameters.put(attachmentProperty, attachments);
         }
         return this.htmlBodyPartFactory.create(htmlContent, htmlParameters);
-    }
-
-    /**
-     * @return the xproperty's content evaluated with Velocity, using the passed Velocity Context
-     */
-    private String evaluateProperty(VelocityContext velocityContext, DocumentReference documentReference,
-            DocumentReference mailClassReference, String templateFullName, String property) throws MessagingException
-    {
-        String content = this.documentBridge.getProperty(documentReference, mailClassReference, property).toString();
-        try {
-            StringWriter writer = new StringWriter();
-            this.velocityManager.getVelocityEngine().evaluate(velocityContext, writer, templateFullName, content);
-            return writer.toString();
-        } catch (XWikiVelocityException e) {
-            throw new MessagingException(String.format("Failed to evaluate property [%s] for Document reference [%s]",
-                property, documentReference), e);
-        }
-    }
-
-    /**
-     * @return a Velocity Context created from the passed properties
-     */
-    private VelocityContext createVelocityContext(Map<String, String> data)
-    {
-        VelocityContext velocityContext = new VelocityContext();
-        if (data != null) {
-            for (Map.Entry<String, String> header : data.entrySet()) {
-                velocityContext.put(header.getKey(), header.getValue());
-            }
-        }
-
-        return velocityContext;
     }
 }

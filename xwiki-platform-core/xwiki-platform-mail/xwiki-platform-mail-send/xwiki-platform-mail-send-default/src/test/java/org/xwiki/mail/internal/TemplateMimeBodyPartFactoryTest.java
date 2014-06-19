@@ -19,33 +19,22 @@
  */
 package org.xwiki.mail.internal;
 
-import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.velocity.VelocityContext;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.api.Attachment;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -69,32 +58,11 @@ public class TemplateMimeBodyPartFactoryTest
     @Before
     public void setUp() throws Exception
     {
-        DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
-        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), eq("text"))).thenReturn(
-            "Hello ${name}, ${email}");
-        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), eq("html"))).thenReturn(
-            "Hello <b>${name}</b> <br />${email}");
-        VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
-        when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
-
-        doAnswer(new Answer()
-        {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable
-            {
-                Object[] args = invocation.getArguments();
-                switch (((String) args[3])) {
-                    case "Hello ${name}, ${email}":
-                        ((Writer) args[1]).write("Hello John Doe, john@doe.com");
-                        break;
-                    case "Hello <b>${name}</b> <br />${email}":
-                        ((Writer) args[1]).write("Hello <b>John Doe</b> <br />john@doe.com");
-                        break;
-                }
-                return null;
-            }
-        }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
-            anyString(), anyString());
+        DefaultMailTemplateManager mailTemplateManager = this.mocker.getInstance(DefaultMailTemplateManager.class);
+        when(mailTemplateManager.evaluate(this.documentReference, "text", new HashMap<String, String>())).thenReturn(
+                "Hello John Doe, john@doe.com");
+        when(mailTemplateManager.evaluate(this.documentReference, "html", new HashMap<String, String>())).thenReturn(
+                "Hello <b>John Doe</b> <br />john@doe.com");
     }
 
     @Test
@@ -103,7 +71,7 @@ public class TemplateMimeBodyPartFactoryTest
         MimeBodyPartFactory<String> htmlMimeBodyPartFactory = this.mocker.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
 
-        this.mocker.getComponentUnderTest().create(documentReference,
+        this.mocker.getComponentUnderTest().create(this.documentReference,
             Collections.<String, Object>singletonMap("velocityVariables", new HashMap<String, String>()));
 
         verify(htmlMimeBodyPartFactory).create("Hello <b>John Doe</b> <br />john@doe.com",
@@ -131,4 +99,6 @@ public class TemplateMimeBodyPartFactoryTest
 
         verify(htmlMimeBodyPartFactory).create("Hello <b>John Doe</b> <br />john@doe.com", htmlParameters);
     }
+
+
 }

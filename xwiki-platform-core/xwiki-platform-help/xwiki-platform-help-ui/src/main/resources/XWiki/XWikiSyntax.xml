@@ -30,18 +30,15 @@
   <creationDate>1384447292000</creationDate>
   <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1384452769000</date>
   <contentUpdateDate>1384452769000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render("help.syntaxpage.title")</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden/>
+  <hidden>false</hidden>
   <content>{{velocity output="false"}}
 #set($SUPPORTED_SYNTAXES = {})
 #set($void = $SUPPORTED_SYNTAXES.put(1.0, 'XWiki Syntax 1.0'))
@@ -94,31 +91,50 @@
   #foreach ($item in $results)
     #set($sectionDoc = $xwiki.getDocument($item))
     #set($obj = $sectionDoc.getObject("XWiki.XWikiSyntaxClass"))
-    #set($sectionOrigList = $sectionDoc.getSections())
-    #set($sectionList = $sectionDoc.getTranslatedDocument().getSections())
 
-    ## Get catName for first category
-    #if($catCount == -1)
-      #set($catCount = $catCount + 1)
-      #set($catId = $sectionOrigList.get(0).getSectionTitle())
-      #set($catName = $sectionList.get(0).getSectionTitle())
-
-    ## Put previous category into map, get new catName and reset children map
-    #elseif($catCount &lt; $obj.getProperty("category").value)
-      #set($cat = { 'id' : $catId.toLowerCase(), 'name' : $catName, 'children' : $catChildren })
-      $syntaxMenu.add($cat)
-      #set($catCount = $catCount + 1)
-      #set($catId = $sectionOrigList.get(0).getSectionTitle())
-      #set($catName = $sectionList.get(0).getSectionTitle())
-      #set($catChildren = [])
+    ## detect if we entered a new category
+    #if($catCount &lt; $obj.getProperty("category").value))
+      ## Put previous category into map (if existing), and reset children map
+      #if($catId)
+        #set($cat = { 'id' : $catId, 'name' : $catName, 'children' : $catChildren })
+        $syntaxMenu.add($cat)
+        #set($catChildren = [])
+      #end
+      ## extract new catId and catName values, and sectionTitle as we are already traveling the DOM
+      #foreach($headerBlock in $sectionDoc.getDocument().getXDOM().getBlocks('class:HeaderBlock', 'DESCENDANT'))
+        #if($headerBlock.getLevel().getAsInt() == 1)
+          #set($catId = $headerBlock.getId().substring(1))
+          #set($catName = $services.rendering.render($headerBlock, 'plain/1.0'))
+        #elseif($headerBlock.getLevel().getAsInt() == 2)
+          #set($sectionTitle = $services.rendering.render($headerBlock, 'plain/1.0'))
+          #break
+        #end
+      #end
+      #foreach($headerBlock in $sectionDoc.getTranslatedDocument().getDocument().getXDOM().getBlocks('class:HeaderBlock', 'DESCENDANT'))
+        #if($headerBlock.getLevel().getAsInt() == 1)
+          #set($catName = $services.rendering.render($headerBlock, 'plain/1.0'))
+        #elseif($headerBlock.getLevel().getAsInt() == 2)
+          #set($sectionTitle = $services.rendering.render($headerBlock, 'plain/1.0'))
+          #break ## otherwise finds nested example headlines 
+        #end
+      #end
+      #set($catCount = $obj.getProperty("category").value)
+    #else
+      ## still in same category, only need new section title
+      #foreach($headerBlock in $sectionDoc.getTranslatedDocument().getDocument().getXDOM().getBlocks('class:HeaderBlock', 'DESCENDANT'))
+        #if($headerBlock.getLevel().getAsInt() == 2)
+          #set($sectionTitle = $services.rendering.render($headerBlock, 'plain/1.0'))
+          #break
+        #end
+      #end
     #end
 
-    ## Add new sections to children map
-    #set($child = {'id' : $sectionDoc.getName().substring(11), 'minSyntax' : $obj.getProperty("minSyntaxVersion").value, 'maxSyntax' : $obj.getProperty("maxSyntaxVersion").value, 'name' : $sectionList.get(1).getSectionTitle()})
+    ## Add new sections to category children map
+    #set($child = {'id' : $sectionDoc.getName().substring(11), 'minSyntax' : $obj.getProperty("minSyntaxVersion").value, 'maxSyntax' : $obj.getProperty("maxSyntaxVersion").value, 'name' : $sectionTitle})
     $catChildren.add($child)
   #end
 #end
-#set($cat = { 'id' : $catId.toLowerCase(), 'name' : $catName, 'children' : $catChildren })
+#set($cat = { 'id' : $catId, 'name' : $catName, 'children' : $catChildren })
 $syntaxMenu.add($cat)
 
 

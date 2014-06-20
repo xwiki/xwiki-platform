@@ -19,24 +19,33 @@
  */
 package org.xwiki.mail.internal.template;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.MessagingException;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.template.TemplateMimeBodyPartFactory}.
@@ -46,7 +55,7 @@ import static org.mockito.Mockito.when;
  */
 public class TemplateMimeBodyPartFactoryTest
 {
-    private DocumentReference documentReference = mock(DocumentReference.class);
+    private DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
     @Rule
     public MockitoComponentMockingRule<TemplateMimeBodyPartFactory> mocker =
@@ -57,9 +66,9 @@ public class TemplateMimeBodyPartFactoryTest
     {
         MailTemplateManager mailTemplateManager = this.mocker.getInstance(MailTemplateManager.class);
         when(mailTemplateManager.evaluate(this.documentReference, "text", new HashMap<String, String>())).thenReturn(
-                "Hello John Doe, john@doe.com");
+            "Hello John Doe, john@doe.com");
         when(mailTemplateManager.evaluate(this.documentReference, "html", new HashMap<String, String>())).thenReturn(
-                "Hello <b>John Doe</b> <br />john@doe.com");
+            "Hello <b>John Doe</b> <br />john@doe.com");
     }
 
     @Test
@@ -88,7 +97,7 @@ public class TemplateMimeBodyPartFactoryTest
         bodyPartParameters.put("velocityVariables", new HashMap<String, String>());
         bodyPartParameters.put("attachments", attachments);
 
-        this.mocker.getComponentUnderTest().create(documentReference, bodyPartParameters);
+        this.mocker.getComponentUnderTest().create(this.documentReference, bodyPartParameters);
 
         Map<String, Object> htmlParameters = new HashMap<>();
         htmlParameters.put("alternate", "Hello John Doe, john@doe.com");
@@ -97,5 +106,62 @@ public class TemplateMimeBodyPartFactoryTest
         verify(htmlMimeBodyPartFactory).create("Hello <b>John Doe</b> <br />john@doe.com", htmlParameters);
     }
 
+    @Test
+    public void createWithAttachmentAndTemplateAttachments() throws Exception
+    {
+        MimeBodyPartFactory<String> htmlMimeBodyPartFactory = this.mocker.getInstance(
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
 
+        Attachment attachment1 = mock(Attachment.class, "attachment1");
+        Map<String, Object> bodyPartParameters = new HashMap<>();
+        bodyPartParameters.put("velocityVariables", new HashMap<String, String>());
+        bodyPartParameters.put("attachments", Collections.singletonList(attachment1));
+        bodyPartParameters.put("includeTemplateAttachments", true);
+
+        // Mock the retrieval and conversion of attachments from the Template document
+        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
+        XWikiDocument xwikiDocument = mock(XWikiDocument.class);
+        when(dab.getDocument(this.documentReference)).thenReturn(xwikiDocument);
+        XWikiAttachment xwikiAttachment = mock(XWikiAttachment.class);
+        when(xwikiDocument.getAttachmentList()).thenReturn(Collections.singletonList(xwikiAttachment));
+        AttachmentConverter attachmentConverter = this.mocker.getInstance(AttachmentConverter.class);
+        Attachment attachment2 = mock(Attachment.class, "attachment2");
+        when(attachmentConverter.convert(Collections.singletonList(xwikiAttachment))).thenReturn(
+            Collections.singletonList(attachment2));
+
+        this.mocker.getComponentUnderTest().create(this.documentReference, bodyPartParameters);
+
+        Map<String, Object> htmlParameters = new HashMap<>();
+        htmlParameters.put("alternate", "Hello John Doe, john@doe.com");
+        htmlParameters.put("attachments", Arrays.asList(attachment1, attachment2));
+
+        verify(htmlMimeBodyPartFactory).create("Hello <b>John Doe</b> <br />john@doe.com", htmlParameters);
+    }
+
+    @Test
+    public void createWithAttachmentAndTemplateAttachmentsWhenError() throws Exception
+    {
+        MimeBodyPartFactory<String> htmlMimeBodyPartFactory = this.mocker.getInstance(
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class), "text/html");
+
+        Attachment attachment1 = mock(Attachment.class, "attachment1");
+        Map<String, Object> bodyPartParameters = new HashMap<>();
+        bodyPartParameters.put("velocityVariables", new HashMap<String, String>());
+        bodyPartParameters.put("attachments", Collections.singletonList(attachment1));
+        bodyPartParameters.put("includeTemplateAttachments", true);
+
+        // Mock the retrieval and conversion of attachments from the Template document
+        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
+        when(dab.getDocument(this.documentReference)).thenThrow(new Exception("error"));
+
+        try {
+            this.mocker.getComponentUnderTest().create(this.documentReference, bodyPartParameters);
+            fail("Should have thrown an exception here");
+        } catch (MessagingException expected) {
+            assertEquals("Failed to include attachments from the Mail Template [wiki:space.page]",
+                expected.getMessage());
+        }
+
+        verifyNoMoreInteractions(htmlMimeBodyPartFactory);
+    }
 }

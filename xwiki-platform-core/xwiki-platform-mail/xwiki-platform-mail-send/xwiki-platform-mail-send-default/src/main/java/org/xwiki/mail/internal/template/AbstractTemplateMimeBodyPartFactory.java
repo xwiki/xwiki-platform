@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal.template;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +29,14 @@ import javax.inject.Named;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.AbstractMimeBodyPartFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Creates an Body Part from a Document Reference pointing to a Document containing an XWiki.Mail XObject (the first one
@@ -43,9 +47,19 @@ import com.xpn.xwiki.api.Attachment;
  */
 public abstract class AbstractTemplateMimeBodyPartFactory extends AbstractMimeBodyPartFactory<DocumentReference>
 {
+    private static final String ATTACHMENT_PROPERTY_NAME = "attachments";
+
+    private static final String INCLUDE_TEMPLATE_ATTACHMENTS_PROPERTY_NAME = "includeTemplateAttachments";
+
     @Inject
     @Named("text/html")
     private MimeBodyPartFactory<String> htmlBodyPartFactory;
+
+    @Inject
+    private DocumentAccessBridge bridge;
+
+    @Inject
+    private AttachmentConverter attachmentConverter;
 
     /**
      * @return the Template Manager instance to use, this allows passing either the default component implementation or
@@ -65,11 +79,30 @@ public abstract class AbstractTemplateMimeBodyPartFactory extends AbstractMimeBo
         Map<String, Object> htmlParameters = new HashMap<>();
         htmlParameters.put("alternate", textContent);
 
-        String attachmentProperty = "attachments";
-        List<Attachment> attachments = (List<Attachment>) parameters.get(attachmentProperty);
-        if (attachments != null) {
-            htmlParameters.put(attachmentProperty, attachments);
+        // Handle attachments:
+        // - if the user has passed an "attachments" property with a list of attachment then add them
+        // - if the user has set the "includeTemplateAttachments" property then add all attachments found in the
+        //   template document too
+        List<Attachment> attachments = new ArrayList<>();
+        List<Attachment> parameterAttachments = (List<Attachment>) parameters.get(ATTACHMENT_PROPERTY_NAME);
+        if (parameterAttachments != null) {
+            attachments.addAll(parameterAttachments);
         }
+        Boolean includeTemplateAttachments = (Boolean) parameters.get(INCLUDE_TEMPLATE_ATTACHMENTS_PROPERTY_NAME);
+        if (includeTemplateAttachments != null && includeTemplateAttachments) {
+            try {
+                List<XWikiAttachment> xwikiAttachments =
+                    ((XWikiDocument) this.bridge.getDocument(documentReference)).getAttachmentList();
+                attachments.addAll(this.attachmentConverter.convert(xwikiAttachments));
+            } catch (Exception e) {
+                throw new MessagingException(
+                    String.format("Failed to include attachments from the Mail Template [%s]", documentReference), e);
+            }
+        }
+        if (!attachments.isEmpty()) {
+            htmlParameters.put(ATTACHMENT_PROPERTY_NAME, attachments);
+        }
+
         return this.htmlBodyPartFactory.create(htmlContent, htmlParameters);
     }
 }

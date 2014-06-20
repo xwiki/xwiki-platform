@@ -19,6 +19,9 @@
  */
 package org.xwiki.mail.test.ui;
 
+import java.io.ByteArrayInputStream;
+
+import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -76,6 +79,9 @@ public class MailSenderTest extends AbstractTest
         getUtil().createPage(getTestClassName(), "MailTemplate", "", "");
         getUtil().addObject(getTestClassName(), "MailTemplate", "XWiki.Mail",
             "subject", "Status for $name", "html", "<strong>Hello $name</strong>", "text", "Hello $name");
+        ByteArrayInputStream bais = new ByteArrayInputStream("content".getBytes());
+        getUtil().attachFile(getTestClassName(), "MailTemplate", "something.txt", bais, true,
+            new UsernamePasswordCredentials("superadmin", "pass"));
 
         // Create another page with the Velocity script to send the template email
         String velocity = "{{velocity}}\n"

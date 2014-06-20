@@ -39,8 +39,7 @@ import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
 /**
- * Default implementation evaluating template properties by taking them from {@code XWiki.Mail} and applying Velocity
- * on them.
+ * Default implementation evaluating template properties by taking them from {@code XWiki.Mail} and applying Velocity on them.
  *
  * @version $Id$
  * @since 6.1RC1
@@ -50,7 +49,7 @@ import org.xwiki.velocity.XWikiVelocityException;
 public class DefaultMailTemplateManager implements MailTemplateManager
 {
     private static final EntityReference MAIL_CLASS =
-            new EntityReference("Mail", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+        new EntityReference("Mail", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
     @Inject
     private DocumentAccessBridge documentBridge;
@@ -65,7 +64,8 @@ public class DefaultMailTemplateManager implements MailTemplateManager
     @Inject
     private VelocityManager velocityManager;
 
-    @Override public String evaluate(DocumentReference documentReference, String property, Map<String, String> data)
+    @Override
+    public String evaluate(DocumentReference documentReference, String property, Map<String, String> data)
         throws MessagingException
     {
         VelocityContext velocityContext = createVelocityContext(data);
@@ -73,14 +73,14 @@ public class DefaultMailTemplateManager implements MailTemplateManager
 
         String templateFullName = this.serializer.serialize(documentReference);
         String content =
-                this.documentBridge.getProperty(documentReference, mailClassReference, property).toString();
+            this.documentBridge.getProperty(documentReference, mailClassReference, property).toString();
         try {
             StringWriter writer = new StringWriter();
             velocityManager.getVelocityEngine().evaluate(velocityContext, writer, templateFullName, content);
             return writer.toString();
         } catch (XWikiVelocityException e) {
             throw new MessagingException(String.format("Failed to evaluate property [%s] for Document reference [%s]",
-                    property, documentReference), e);
+                property, documentReference), e);
         }
     }
 

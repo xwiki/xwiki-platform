@@ -30,7 +30,6 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.mail.internal.template.DefaultMailTemplateManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityEngine;
@@ -58,7 +57,7 @@ public class DefaultMailTemplateManagerTest
 {
     @Rule
     public MockitoComponentMockingRule<DefaultMailTemplateManager> mocker =
-            new MockitoComponentMockingRule<>(DefaultMailTemplateManager.class);
+        new MockitoComponentMockingRule<>(DefaultMailTemplateManager.class);
 
     @Test
     public void evaluate() throws Exception
@@ -67,7 +66,7 @@ public class DefaultMailTemplateManagerTest
         DocumentReference documentReference = mock(DocumentReference.class);
 
         when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), eq("html"))).thenReturn(
-                "Hello <b>${name}</b> <br />${email}");
+            "Hello <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
@@ -83,10 +82,10 @@ public class DefaultMailTemplateManagerTest
                 return null;
             }
         }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
-                anyString(), eq("Hello <b>${name}</b> <br />${email}"));
+            anyString(), eq("Hello <b>${name}</b> <br />${email}"));
 
         String result =
-                this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>());
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>());
 
         assertEquals(result, "Hello <b>John Doe</b> <br />john@doe.com");
     }
@@ -98,18 +97,17 @@ public class DefaultMailTemplateManagerTest
         DocumentReference documentReference = mock(DocumentReference.class);
 
         when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), eq("html"))).thenReturn(
-                "Hello <b>${name}</b> <br />${email}");
+            "Hello <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
 
         when(velocityEngine.evaluate(any(VelocityContext.class), any(Writer.class),
-                anyString(), eq("Hello <b>${name}</b> <br />${email}"))).thenThrow(new XWikiVelocityException("Error"));
+            anyString(), eq("Hello <b>${name}</b> <br />${email}"))).thenThrow(new XWikiVelocityException("Error"));
 
         try {
-            String result = this.mocker.getComponentUnderTest()
-                    .evaluate(documentReference, "html", new HashMap<String, String>());
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>());
             fail("Should have thrown an exception here!");
         } catch (MessagingException expected) {
             assertTrue(expected.getMessage().startsWith("Failed to evaluate property [html] for Document reference"));

@@ -81,7 +81,7 @@ public class WikiTemplateRendererTest
 
     private void setTemplateContent(String content) throws UnsupportedEncodingException
     {
-        when(this.environmentmMock.getResourceAsStream("template")).thenReturn(
+        when(this.environmentmMock.getResourceAsStream("/templates/template")).thenReturn(
             new ByteArrayInputStream(content.getBytes("UTF8")));
     }
 
@@ -107,6 +107,30 @@ public class WikiTemplateRendererTest
         });
 
         setTemplateContent("##raw.syntax=xhtml/1.0\n<html>$toto</html>");
+
+        assertEquals("<html>value</html>", mocker.getComponentUnderTest().render("template", Syntax.XHTML_1_0));
+    }
+
+    @Test
+    public void testRenderWithoutRawSyntax() throws ComponentLookupException, ParseException, MissingParserException, IOException,
+        XWikiVelocityException
+    {
+        when(
+            this.velocityEngineMock.evaluate(Matchers.<Context> any(), Matchers.<Writer> any(), anyString(),
+                eq("<html>$toto</html>"))).then(new Answer<Boolean>()
+        {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable
+            {
+                Writer writer = (Writer) invocation.getArguments()[1];
+
+                writer.write("<html>value</html>");
+
+                return Boolean.TRUE;
+            }
+        });
+
+        setTemplateContent("<html>$toto</html>");
 
         assertEquals("<html>value</html>", mocker.getComponentUnderTest().render("template", Syntax.XHTML_1_0));
     }

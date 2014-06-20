@@ -479,8 +479,7 @@ public abstract class XWikiAction extends Action
     private void renderInit(XWikiContext xcontext) throws IOException, ComponentLookupException, ParseException,
         MissingParserException, XWikiVelocityException
     {
-        String content =
-            Utils.getComponent(WikiTemplateRenderer.class).render("/templates/init.wiki", Syntax.XHTML_1_0, "init");
+        String content = Utils.getComponent(WikiTemplateRenderer.class).render("init.vm", Syntax.XHTML_1_0, "init");
 
         xcontext.getResponse().setStatus(503);
         xcontext.getResponse().setContentType("text/html; charset=UTF-8");

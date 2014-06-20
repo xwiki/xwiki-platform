@@ -19,20 +19,23 @@
  */
 package com.xpn.xwiki.internal.template;
 
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.user.api.XWikiRightService;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.inject.Inject;
 
 import org.apache.velocity.VelocityContext;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
+import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.velocity.VelocityManager;
 
-import javax.inject.Inject;
-import java.util.Set;
-import java.util.HashSet;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * This renderer will elevate the privileges of a hard coded set of templates to delegate programming rights independent
@@ -54,6 +57,12 @@ public class DefaultPrivilegedTemplateRenderer implements PrivilegedTemplateRend
     /** The execution. */
     @Inject
     private Execution execution;
+
+    @Inject
+    private RenderingContext renderingContext;
+    
+    @Inject
+    private VelocityManager velocityManager;
 
     /** The set of privileged templates. */
     private final Set<String> privilegedTemplates = new HashSet<String>();
@@ -116,13 +125,31 @@ public class DefaultPrivilegedTemplateRenderer implements PrivilegedTemplateRend
      * Evaluate the template.
      *
      * @param content The template content.
-     * @param templateName The template nam
+     * @param templateName The template name
      * @param context The context.
      * @return The rendered result.
      */
     private String evaluate(String content, String templateName, XWikiContext context)
     {
-        return XWikiVelocityRenderer
-            .evaluate(content, templateName, (VelocityContext) context.get("vcontext"), context);
+        boolean setTransformationId = false;
+
+        if (this.renderingContext.getTransformationId() == null) {
+            if (this.renderingContext instanceof MutableRenderingContext) {
+                // Make the current velocity template id available
+                ((MutableRenderingContext) this.renderingContext).push(this.renderingContext.getTransformation(),
+                    this.renderingContext.getXDOM(), this.renderingContext.getDefaultSyntax(), templateName,
+                    this.renderingContext.isRestricted());
+                setTransformationId = true;
+            }
+        }
+
+        try {
+            return XWikiVelocityRenderer.evaluate(content, templateName, (VelocityContext) context.get("vcontext"),
+                context);
+        } finally {
+            if (setTransformationId) {
+                ((MutableRenderingContext) this.renderingContext).pop();
+            }
+        }
     }
 }

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,11 +38,13 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
@@ -64,6 +67,8 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
+import com.xpn.xwiki.XWikiContext;
+
 /**
  * Internal toolkit to experiment on wiki bases templates.
  * 
@@ -74,7 +79,7 @@ import org.xwiki.velocity.XWikiVelocityException;
 @Singleton
 public class WikiTemplateRenderer
 {
-    private static final Pattern FIRSTLINE = Pattern.compile("^##(target|raw)\\.syntax=(.*)$\r?\n?", Pattern.MULTILINE);
+    private static final Pattern FIRSTLINE = Pattern.compile("^##(source|raw)\\.syntax=(.*)$\r?\n?", Pattern.MULTILINE);
 
     @Inject
     private Environment environment;
@@ -102,6 +107,17 @@ public class WikiTemplateRenderer
     private RenderingContext renderingContext;
 
     @Inject
+    @Named("plain/1.0")
+    private BlockRenderer plainRenderer;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    @Named("xwikicfg")
+    private ConfigurationSource xwikicfg;
+
+    @Inject
     private Logger logger;
 
     private class StringContent
@@ -120,15 +136,101 @@ public class WikiTemplateRenderer
         }
     }
 
+    // TODO: put that in some SkinContext component
+    private String getSkin()
+    {
+        String skin = null;
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        if (xcontext != null) {
+            // Try to get it from context
+            skin = (String) xcontext.get("skin");
+            if (skin != null) {
+                return skin;
+            }
+
+            // Try to get it from URL
+            if (xcontext.getRequest() != null) {
+                skin = xcontext.getRequest().getParameter("skin");
+            }
+
+            // TODO: Try to get it from user preferences
+        }
+
+        // Try to get it from xwiki.cfg
+        if (StringUtils.isEmpty(skin)) {
+            skin = this.xwikicfg.getProperty("xwiki.defaultskin", "colibri");
+        }
+
+        return skin;
+    }
+
+    // TODO: put that in some SkinContext component
+    private String getBaseSkin()
+    {
+        String baseskin = null;
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        if (xcontext != null) {
+            // Try to get it from context
+            baseskin = (String) xcontext.get("baseskin");
+            if (baseskin != null) {
+                return baseskin;
+            }
+
+            // TODO: try to get it from the skin
+        }
+
+        // Try to get it from xwiki.cfg
+        if (StringUtils.isEmpty(baseskin)) {
+            baseskin = this.xwikicfg.getProperty("xwiki.defaultbaseskin", "colibri");
+        }
+
+        return baseskin;
+    }
+
+    private InputStream getTemplateStream(String template)
+    {
+        InputStream stream;
+
+        // Try from skin
+        String skin = getSkin();
+        if (skin != null) {
+            stream = this.environment.getResourceAsStream("/skins/" + skin + "/" + template);
+            if (stream != null) {
+                return stream;
+            }
+        }
+
+        // Try from base skin
+        String baseSkin = getBaseSkin();
+        if (baseSkin != null) {
+            stream = this.environment.getResourceAsStream("/baseSkin/" + skin + "/" + template);
+            if (stream != null) {
+                return stream;
+            }
+        }
+
+        String templatePath = "/templates/" + template;
+
+        // Prevent inclusion of templates from other directories
+        template = URI.create(templatePath).normalize().toString();
+        if (!template.startsWith("/templates/")) {
+            this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!", template);
+            return null;
+        }
+
+        // Try from /templates/
+        return this.environment.getResourceAsStream(templatePath);
+    }
+
     private StringContent getStringContent(String template) throws IOException, ParseException
     {
-        InputStream stream = this.environment.getResourceAsStream(template);
-
         String content;
-        try {
+        try (InputStream stream = getTemplateStream(template)) {
             content = IOUtils.toString(stream, "UTF-8");
-        } finally {
-            IOUtils.closeQuietly(stream);
         }
 
         Matcher matcher = FIRSTLINE.matcher(content);
@@ -150,7 +252,27 @@ public class WikiTemplateRenderer
             }
         }
 
-        return new StringContent(content, Syntax.PLAIN_1_0, null);
+        // The default is xhtml to support old templates
+        return new StringContent(content, null, Syntax.XHTML_1_0);
+    }
+
+    protected String renderError(Throwable throwable, Syntax targetSyntax)
+    {
+        XDOM xdom = generateError(throwable);
+
+        WikiPrinter printer = new DefaultWikiPrinter();
+
+        BlockRenderer blockRenderer;
+        try {
+            blockRenderer =
+                this.componentManagerProvider.get().getInstance(BlockRenderer.class, targetSyntax.toIdString());
+        } catch (ComponentLookupException e) {
+            blockRenderer = this.plainRenderer;
+        }
+
+        blockRenderer.render(xdom, printer);
+
+        return printer.toString();
     }
 
     protected XDOM generateError(Throwable throwable)
@@ -206,17 +328,33 @@ public class WikiTemplateRenderer
 
             if (content.sourceSyntax != null) {
                 xdom = this.parser.parse(content.content, content.sourceSyntax);
-            } else if (content.rawSyntax != null) {
-                String result = evaluateString(content.content, null);
-                xdom = new XDOM(Arrays.asList(new RawBlock(result, content.rawSyntax)));
             } else {
-                xdom = new XDOM(Collections.<Block> emptyList());
+                String result = evaluateString(content.content, transformationId);
+                xdom = new XDOM(Arrays.asList(new RawBlock(result, content.rawSyntax)));
             }
         } catch (Throwable e) {
             xdom = generateError(e);
         }
 
         return xdom;
+    }
+
+    public String renderNoExceptions(String template, Syntax targetSyntax)
+    {
+        try {
+            return render(template, targetSyntax);
+        } catch (Exception e) {
+            return renderError(e, targetSyntax);
+        }
+    }
+
+    public String renderNoExceptions(String template, Syntax targetSyntax, String transformationId)
+    {
+        try {
+            return render(template, targetSyntax, transformationId);
+        } catch (Exception e) {
+            return renderError(e, targetSyntax);
+        }
     }
 
     public String render(String template, Syntax targetSyntax) throws ComponentLookupException, ParseException,
@@ -228,9 +366,7 @@ public class WikiTemplateRenderer
     public String render(String template, Syntax targetSyntax, String transformationId)
         throws ComponentLookupException, ParseException, MissingParserException, IOException, XWikiVelocityException
     {
-        XDOM xdom = getXDOM(template, transformationId);
-
-        transform(xdom, transformationId);
+        XDOM xdom = execute(template, transformationId);
 
         WikiPrinter printer = new DefaultWikiPrinter();
 
@@ -239,6 +375,20 @@ public class WikiTemplateRenderer
         blockRenderer.render(xdom, printer);
 
         return printer.toString();
+    }
+
+    public XDOM execute(String template)
+    {
+        return execute(template, this.renderingContext.getTransformationId());
+    }
+
+    public XDOM execute(String template, String transformationId)
+    {
+        XDOM xdom = getXDOM(template, transformationId);
+
+        transform(xdom, transformationId);
+
+        return xdom;
     }
 
     protected String evaluateString(String content, String transformationId) throws XWikiVelocityException

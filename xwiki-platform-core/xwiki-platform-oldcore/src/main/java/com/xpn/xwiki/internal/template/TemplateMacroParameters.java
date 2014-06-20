@@ -17,34 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.extension.distribution.internal.job.step;
+package com.xpn.xwiki.internal.template;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.extension.distribution.internal.job.DistributionJob;
-import org.xwiki.rendering.block.Block;
+import org.xwiki.properties.annotation.PropertyDescription;
 
 /**
+ * Parameters for the {@link com.xpn.xwiki.internal.template.TemplateMacro} Macro.
+ * 
  * @version $Id$
- * @since 5.0M1
+ * @since 6.1RC1
  */
-@Role
-public interface DistributionStep
+public class TemplateMacroParameters
 {
-    public enum State
+    /**
+     * @see #getName()
+     */
+    private String name;
+
+    /**
+     * @param name the name of the template
+     */
+    @PropertyDescription("the name of the template")
+    public void setName(String name)
     {
-        CANCELED,
-        COMPLETED
+        this.name = name;
     }
 
-    void initialize(DistributionJob distributionJob);
-
-    void prepare();
-
-    String getId();
-
-    State getState();
-
-    void setState(State stepState);
-
-    Block execute();
+    /**
+     * @return the name of the template
+     */
+    public String getName()
+    {
+        return this.name;
+    }
 }

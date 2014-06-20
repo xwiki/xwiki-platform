@@ -28,8 +28,9 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.velocity.VelocityManager;
 
 /**
@@ -63,11 +64,11 @@ public class XWikiRenderingContext extends DefaultRenderingContext implements In
     }
 
     @Override
-    public void push(Transformation transformation, TransformationContext context)
+    public void push(Transformation transformation, XDOM xdom, Syntax syntax, String id, boolean restricted)
     {
-        super.push(transformation, context);
+        super.push(transformation, xdom, syntax, id, restricted);
 
-        String namespace = context.getId();
+        String namespace = id;
         if (namespace != null) {
             openNamespace(namespace);
         }

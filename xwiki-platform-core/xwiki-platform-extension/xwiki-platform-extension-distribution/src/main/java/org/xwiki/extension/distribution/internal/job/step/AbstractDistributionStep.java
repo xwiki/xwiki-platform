@@ -32,14 +32,14 @@ import com.xpn.xwiki.internal.template.WikiTemplateRenderer;
 public abstract class AbstractDistributionStep implements DistributionStep
 {
     @Inject
-    protected transient WikiTemplateRenderer renderer;
+    protected WikiTemplateRenderer renderer;
 
     @Inject
-    protected transient Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
+    protected Provider<WikiDescriptorManager> wikiDescriptorManagerProvider;
 
-    protected transient DistributionJob distributionJob;
+    protected DistributionJob distributionJob;
 
-    private String stepId;
+    private final String stepId;
 
     private State state;
 
@@ -110,12 +110,12 @@ public abstract class AbstractDistributionStep implements DistributionStep
 
     protected String getTemplate()
     {
-        return "/templates/distribution/" + getId() + ".wiki";
+        return "distribution/" + getId() + ".wiki";
     }
 
     @Override
-    public Block render()
+    public Block execute()
     {
-        return this.renderer.getXDOM(getTemplate());
+        return this.renderer.execute(getTemplate());
     }
 }

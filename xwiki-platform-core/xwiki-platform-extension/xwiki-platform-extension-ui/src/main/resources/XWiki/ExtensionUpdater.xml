@@ -215,12 +215,7 @@ q947knSRPDh79ly9lbE8P66vAn7JAG95wO4cdBf4AF7C4F/faBX0ldtYE2zQMegLnGQV7EsP/Jab
 tPp47F+8TV7tglXQV7dfgO3/CzAA45CQwcpUSW8AAAAASUVORK5CYII=
 </content>
   </attachment>
-  <content>{{velocity output="false"}}
-## NOTE: We use #parse instead of #template because the later currently registers the Velocity macros in a different
-## namespace which makes them unavailable in the current wiki page or the current template. Switch back to #template when
-## this problem is fixed because #parse doesn't allow the template to be overridden from the skin.
-#parse('extension.vm')
-{{/velocity}}
+  <content>{{template name="extension.vm"/}}
 
 {{velocity}}
 {{html}}

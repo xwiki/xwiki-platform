@@ -19,7 +19,6 @@
  */
 package org.xwiki.extension.distribution.internal;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -39,16 +38,12 @@ import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.RenderingContext;
-import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
@@ -99,18 +94,6 @@ public class DistributionScriptService implements ScriptService
     @Inject
     @Named("xhtml/1.0")
     private BlockRenderer xhtmlRenderer;
-
-    /**
-     * Used to execute transformations.
-     */
-    @Inject
-    private transient TransformationManager transformationManager;
-
-    /**
-     * The component used to serialize entity references.
-     */
-    @Inject
-    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     @Inject
     @Named(DocumentsModifiedDuringDistributionListener.NAME)
@@ -230,15 +213,7 @@ public class DistributionScriptService implements ScriptService
      */
     public String renderCurrentStepToXHTML()
     {
-        String transformationId = null;
-
-        XWikiContext xcontext = xcontextProvider.get();
-        if (xcontext != null && xcontext.getDoc() != null) {
-            transformationId =
-                this.defaultEntityReferenceSerializer.serialize(xcontext.getDoc().getDocumentReference());
-        }
-
-        return renderCurrentStepToXHTML(transformationId);
+        return renderCurrentStepToXHTML(this.renderingContext.getTransformationId());
     }
 
     public String renderCurrentStepToXHTML(String transformationId)
@@ -252,9 +227,7 @@ public class DistributionScriptService implements ScriptService
                 State jobState = jobStatus.getState();
 
                 if (jobState == State.RUNNING || jobState == State.WAITING) {
-                    Block block = job.getCurrentStep().render();
-
-                    transform(block, transformationId);
+                    Block block = job.getCurrentStep().execute();
 
                     WikiPrinter printer = new DefaultWikiPrinter();
 
@@ -266,21 +239,6 @@ public class DistributionScriptService implements ScriptService
         }
 
         return null;
-    }
-
-    private void transform(Block block, String transformationId)
-    {
-        TransformationContext txContext =
-            new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)), null,
-                false);
-
-        txContext.setId(transformationId != null ? transformationId : this.renderingContext.getTransformationId());
-
-        try {
-            this.transformationManager.performTransformations(block, txContext);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**

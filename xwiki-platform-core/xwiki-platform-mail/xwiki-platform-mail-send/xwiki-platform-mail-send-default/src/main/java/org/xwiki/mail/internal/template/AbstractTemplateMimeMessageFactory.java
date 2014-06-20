@@ -19,11 +19,14 @@
  */
 package org.xwiki.mail.internal.template;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import java.util.Map;
 
-import org.xwiki.component.annotation.Component;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+
+import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Creates mime message with the subject pre-filled with evaluated subject xproperty from an XWiki.Mail xobject in the
@@ -32,17 +35,21 @@ import org.xwiki.component.annotation.Component;
  * @version $Id$
  * @since 6.1RC1
  */
-@Component
-@Named("template")
-@Singleton
-public class TemplateMimeMessageFactory extends AbstractTemplateMimeMessageFactory
+public abstract class AbstractTemplateMimeMessageFactory implements MimeMessageFactory
 {
-    @Inject
-    private DefaultMailTemplateManager mailTemplateManager;
+    /**
+     * @return the Template Manager instance to use, this allows passing either the default component implementation or
+     * a secure one for scripts
+     */
+    protected abstract MailTemplateManager getTemplateManager();
 
     @Override
-    protected MailTemplateManager getTemplateManager()
+    public MimeMessage createMessage(Session session, Object source, Map parameters) throws MessagingException
     {
-        return this.mailTemplateManager;
+        MimeMessage message = new MimeMessage(session);
+        DocumentReference documentReference = (DocumentReference) source;
+        String subject = getTemplateManager().evaluate(documentReference, "subject", (Map<String, String>) parameters);
+        message.setSubject(subject);
+        return message;
     }
 }

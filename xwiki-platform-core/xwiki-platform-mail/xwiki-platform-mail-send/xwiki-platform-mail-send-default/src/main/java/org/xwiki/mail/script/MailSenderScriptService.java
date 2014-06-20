@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.script;
 
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
@@ -95,9 +97,7 @@ public class MailSenderScriptService implements ScriptService
     {
         MimeMessageWrapper messageWrapper;
         try {
-            // Look for a specific MimeMessageFactory for the passed hint.
-            MimeMessageFactory factory = this.componentManager.getInstance(
-                new DefaultParameterizedType(null, MimeMessageFactory.class, source.getClass(), null), hint);
+            MimeMessageFactory factory = getMimeMessageFactory(hint, source.getClass());
             Session session = createSession();
             messageWrapper = new MimeMessageWrapper(factory.createMessage(session, source, parameters), session,
                 this.mailSender, this.execution, this.componentManager);
@@ -109,6 +109,24 @@ public class MailSenderScriptService implements ScriptService
         }
 
         return messageWrapper;
+    }
+
+    private MimeMessageFactory getMimeMessageFactory(String hint, Type type) throws ComponentLookupException
+    {
+        MimeMessageFactory factory;
+
+        // Step 1: Look for a secure version first
+        try {
+            factory = this.componentManager.getInstance(
+                new DefaultParameterizedType(null, MimeMessageFactory.class, type, null),
+                    String.format("%s/secure", hint));
+        } catch (ComponentLookupException e) {
+            // Step 2: Look for a non secure version if a secure one doesn't exist...
+            factory = this.componentManager.getInstance(
+                new DefaultParameterizedType(null, MimeMessageFactory.class, type, null), hint);
+        }
+
+        return factory;
     }
 
     /**

@@ -26,19 +26,19 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 
 /**
- * Creates an Body Part from a Document Reference pointing to a Document containing an XWiki.Mail XObject (the first one
- * found is used).
+ * Secured version of {@link TemplateMimeMessageFactory} to be used by scripts.
  *
  * @version $Id$
  * @since 6.1RC1
  */
 @Component
-@Named("xwiki/template")
+@Named("template/secure")
 @Singleton
-public class TemplateMimeBodyPartFactory extends AbstractTemplateMimeBodyPartFactory
+public class SecureTemplateMimeMessageFactory extends AbstractTemplateMimeMessageFactory
 {
     @Inject
-    private MailTemplateManager mailTemplateManager;
+    @Named("secure")
+    private DefaultMailTemplateManager mailTemplateManager;
 
     @Override
     protected MailTemplateManager getTemplateManager()

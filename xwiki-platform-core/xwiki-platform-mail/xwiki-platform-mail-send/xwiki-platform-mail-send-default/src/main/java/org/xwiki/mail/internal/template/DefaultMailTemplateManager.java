@@ -39,7 +39,8 @@ import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
 /**
- * Default implementation evaluating template properties by taking them from {@code XWiki.Mail} and applying Velocity on them.
+ * Default implementation evaluating template properties by taking them from {@code XWiki.Mail} and applying Velocity
+ * on them.
  *
  * @version $Id$
  * @since 6.1RC1

@@ -246,8 +246,7 @@ public class MimeMessageWrapper
         MimeBodyPartFactory factory;
         try {
             // Look for a specific MimeBodyPartFactory for the passed Mime Type and Content type.
-            factory = this.componentManager.getInstance(new DefaultParameterizedType(null, MimeBodyPartFactory.class,
-                contentClass),  mimeType);
+            factory = getSpecificBodyPartFactory(mimeType, contentClass);
         } catch (ComponentLookupException e) {
             // No factory found for the passed Mime Type and type of Content.
             // If the content class is of type String then we default to the default MimeBodyPartFactory for String
@@ -256,18 +255,34 @@ public class MimeMessageWrapper
                 try {
                     factory = this.componentManager.getInstance(
                         new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));
-                } catch (ComponentLookupException ee) {
-                    // This shouldn't happen, if it does then it's an error and we want that error to bubble up till the
-                    // user since it would be pretty bad to send an email with some missing body part!
+                } catch (ComponentLookupException eee) {
+                    // This shouldn't happen, if it does then it's an error and we want that error to bubble up till
+                    // the user since it would be pretty bad to send an email with some missing body part!
                     throw new MessagingException(String.format(
                         "Failed to find default Mime Body Part Factory for mime type [%s] and Content type [%s]",
-                        mimeType, contentClass.getName()), e);
+                            mimeType, contentClass.getName()), e);
                 }
             } else {
                 throw new MessagingException(String.format(
                     "Failed to a Mime Body Part Factory matching the mime type [%s] and the Content type [%s]",
-                    mimeType, contentClass.getName()), e);
+                        mimeType, contentClass.getName()), e);
             }
+        }
+        return factory;
+    }
+
+    private MimeBodyPartFactory getSpecificBodyPartFactory(String mimeType, Class contentClass)
+        throws ComponentLookupException
+    {
+        MimeBodyPartFactory factory;
+        try {
+            // Look a secure version of a specific MimeBodyPartFactory for the passed Mime Type and Content type.
+            factory = this.componentManager.getInstance(new DefaultParameterizedType(null, MimeBodyPartFactory.class,
+                contentClass),  String.format("%s/secure", mimeType));
+        } catch (ComponentLookupException e) {
+            // Look for a specific MimeBodyPartFactory for the passed Mime Type and Content type (non secure).
+            factory = this.componentManager.getInstance(
+                new DefaultParameterizedType(null, MimeBodyPartFactory.class, contentClass), mimeType);
         }
         return factory;
     }

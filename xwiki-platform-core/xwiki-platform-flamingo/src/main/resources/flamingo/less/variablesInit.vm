@@ -15,11 +15,13 @@
 
 @border-color:                        $theme.borderColor;
 @nav-tabs-border-color:               $theme.borderColor;
+@nav-tabs-active-link-hover-border-color: $theme.borderColor;
 @pagination-border:                   $theme.borderColor;
 @pagination-hover-border:             $theme.borderColor;
 @pagination-disabled-border:          $theme.borderColor;
 @list-group-border:                   $theme.borderColor;
 @thumbnail-border:                    $theme.borderColor;
+@input-border:                        $theme.borderColor;
 
 @navbar-default-toggle-border-color:  $theme.borderColor;
 @navbar-default-bg:                   $theme.menuBackgroundColor;

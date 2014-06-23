@@ -115,3 +115,14 @@ input.button, .buttonwrapper button, .buttonwrapper a {
   }
 }
 
+.buttonwrapper input.secondary, .buttonwrapper button.secondary, .buttonwrapper a.secondary, 
+a.button, a.secondary {
+  .btn-gradient(lighten(@btn-default-bg, 5%));
+  .btn-border(@btn-default-bg);
+
+  &:hover, 
+  &:focus {
+    .btn-gradient(@btn-default-bg);
+    .btn-border(@btn-default-bg);
+  }
+}

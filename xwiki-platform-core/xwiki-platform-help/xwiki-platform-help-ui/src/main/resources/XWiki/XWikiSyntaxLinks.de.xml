@@ -68,7 +68,7 @@
 {{{{attach:Text|file=img.png}}}}
 )))|[[Text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Link zu einem Anhang auf einer anderen Seite|(((
-{{info}}See [[Anhangsmakro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] für Details{{/info}}
+{{info}}Siehe [[Anhangsmakro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] für Details{{/info}}
 {{{{attach:Text|document=Bereich.Seite|file=img.png}}}}
 )))|[[Text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 
@@ -114,8 +114,8 @@ Das vollständige Format eines Links ist **##[Linktext {&gt; oder |}] (Ressource
 |Bild-Link mit Bildparametern|{{{[[[[image:Bereich2.Seite2@Bild.png||width="26" height="26"]]&gt;&gt;Bereich1.Seite1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
 |Link zu einem Anhang auf der aktuellen Seite|{{{[[Text&gt;&gt;attach:img.png]]}}}|[[Text&gt;&gt;attach:img.png]]
 |Link zu einem Anhang auf einer anderen Seite|{{{[[Text&gt;&gt;attach:Bereich.Seite@img.png]]}}}|[[Text&gt;&gt;attach:XWiki.XWikiSyntax@img.png]]
-|Link zu einem Anker auf einer Seite|{{{[[Text&gt;&gt;Bereich.Seite||anchor=anchor]]}}}|[[Text&gt;&gt;XWiki.XWikiSyntax||anchor=anchor]]
-|Link zu einer Überschrift auf einer Seite|{{{[[Text&gt;&gt;Bereich.Seite||anchor=HMyheading]]}}}|[[Text&gt;&gt;XWiki.XWikiSyntax||anchor=HMyheading]]
+|Link zu einem Anker auf einer Seite|{{{[[Text&gt;&gt;Bereich.Seite#anchor]]}}}|[[Text&gt;&gt;XWiki.XWikiSyntax||anchor=anchor]]
+|Link zu einer Überschrift auf einer Seite|{{{[[Text&gt;&gt;Bereich.Seite#HMyheading]]}}}|[[Text&gt;&gt;XWiki.XWikiSyntax||anchor=HMyheading]]
 
 {{info}}Wenn Sie eine Überschrift in einem Dokument hinzufügen, wird daraus automatisch ein Anker generiert, der aus einem vorangestellem "H", gefolgt von den Buchstaben in der Überschrift gebildet wird. Beispiel: eine Überschrift "Neuer Abschnitt" erzeugt einen Anker "HNeuerAbschnitt".{{/info}}
 

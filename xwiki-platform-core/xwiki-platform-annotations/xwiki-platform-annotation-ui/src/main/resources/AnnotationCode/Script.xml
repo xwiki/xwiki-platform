@@ -739,7 +739,7 @@ XWiki.Annotation = Class.create({
         onSuccess: function(response) {
           // Unfortunately, this is skin dependent
           if (window.document.body.hasClassName('skin-flamingo')) {
-            var place = $$('.xcontent > hr')[0];
+            var place = $$('.xcontent &gt; hr')[0];
             place.insert({after: response.responseText});
             this.settingsPanel = place.next();
           } else { // colibri

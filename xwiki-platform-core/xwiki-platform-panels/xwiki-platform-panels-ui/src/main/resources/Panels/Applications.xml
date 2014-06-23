@@ -141,7 +141,7 @@
   #end
 &lt;/ul&gt;
 #if($xwiki.hasWikiAdminRights())
-  &lt;ul class="applicationsPanel nav nav-pills nav-stacked"&gt;
+  &lt;ul class="applicationsPanel nav nav-pills nav-stacked" id="applicationsPanelMoreList"&gt;
     &lt;li&gt;&lt;a href="$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.AddExtensions')" class="applicationPanelMoreButton"&gt;&lt;span class="application-img"&gt;image:icon:add &lt;/span&gt; &lt;span class="application-label"&gt;$services.localization.render('panels.applications.more')&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
   &lt;div class="applicationPanelMoreContainer hidden"&gt;
     &lt;ul&gt;
@@ -398,12 +398,20 @@ document.observe('xwiki:dom:loaded', function(e) {
     <property>
       <code>#template('colorThemeInit.vm')
 
+ul#applicationsPanelMoreList{
+  margin-top: 1em;
+}
+
 ul.applicationsPanel li img {
   float:left;
 }
 
 ul.applicationsPanel li .application-label{
   margin-left: 0.5em;
+}
+
+div.applicationPanelMoreContainer ul {
+  margin-left: 0;
 }
 
 div.applicationPanelMoreContainer li a {

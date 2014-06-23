@@ -46,6 +46,36 @@
       .btn-border(@btn-success-bg);
     }
   }
+
+  &-info {
+    .btn-gradient(@btn-info-bg);
+    .btn-border(@btn-info-bg);
+
+    &:hover {
+      .btn-gradient(darken(@btn-info-bg, 5%));
+      .btn-border(@btn-info-bg);
+    }
+  }
+
+  &-warning {
+    .btn-gradient(@btn-warning-bg);
+    .btn-border(@btn-warning-bg);
+
+    &:hover {
+      .btn-gradient(darken(@btn-warning-bg, 5%));
+      .btn-border(@btn-warning-bg);
+    }
+  }
+
+  &-danger {
+    .btn-gradient(@btn-danger-bg);
+    .btn-border(@btn-danger-bg);
+
+    &:hover {
+      .btn-gradient(darken(@btn-danger-bg, 5%));
+      .btn-border(@btn-danger-bg);
+    }
+  }
 }
 
 // Mapping ================================================================

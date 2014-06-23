@@ -389,7 +389,8 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         if (document.getObject(getExtensionClassName()) != null) {
             // new or already existing object
             if (document.getObject(getExtensionClassName(), USE_FIELDNAME, "always", false) != null) {
-                if (context.getWiki().getRightService().hasProgrammingRights(document, context)) {
+                if (Utils.getComponent(AuthorizationManager.class).hasAccess(Right.PROGRAM,
+                    document.getContentAuthorReference(), document.getDocumentReference())) {
                     getAlwaysUsedExtensions().add(document.getDocumentReference());
 
                     return;

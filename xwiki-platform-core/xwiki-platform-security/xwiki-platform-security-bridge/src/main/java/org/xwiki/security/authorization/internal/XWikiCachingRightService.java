@@ -316,7 +316,26 @@ public class XWikiCachingRightService implements XWikiRightService
     @Override
     public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
     {
-        return contextualAuthorizationManager.hasAccess(Right.PROGRAM, doc.getDocumentReference());
+        DocumentReference user;
+        WikiReference wiki;
+
+        if (doc != null) {
+            user = doc.getContentAuthorReference();
+            wiki = doc.getDocumentReference().getWikiReference();
+        } else {
+            user = context.getUserReference();
+            wiki = new WikiReference(context.getWikiId());
+        }
+
+        if (user != null && XWikiConstants.GUEST_USER.equals(user.getName())) {
+            // Public users (not logged in) should be passed as null in the new API. It may happen that badly
+            // design code, and poorly written API does not take care, so we prevent security issue here.
+            user = null;
+        }
+
+        // This method as never check for external contextual aspect like rendering context restriction or dropping of
+        // permissions. So we do not use the contextual authorization manager to keep backward compatibility.
+        return authorizationManager.hasAccess(Right.PROGRAM, user, wiki);
     }
 
     @Override

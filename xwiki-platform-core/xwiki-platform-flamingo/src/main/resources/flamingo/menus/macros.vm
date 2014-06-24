@@ -5,6 +5,7 @@
 #set ($mainWikiHomeDocumentReference = $services.wiki.getById($mainWikiId).mainPageReference)
 #set ($WikiManagerMainDocReference = $services.model.createDocumentReference($mainWikiId, 'WikiManager', 'WebHome'))
 #set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
+#set ($isWikiAPIAvailable = ("$!services.wiki" != '' && "$!services.wiki.user" != ''))
 #set ($isMainWikiUser = ($mainWikiId == "$!{xcontext.userReference.wikiReference.name}"))
 
 ###

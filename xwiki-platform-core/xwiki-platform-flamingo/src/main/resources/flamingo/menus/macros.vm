@@ -1,4 +1,13 @@
 ###
+###    GLOBALS
+###
+#set ($mainWikiId = $services.wiki.mainWikiId)
+#set ($mainWikiHomeDocumentReference = $services.wiki.getById($mainWikiId).mainPageReference)
+#set ($WikiManagerMainDocReference = $services.model.createDocumentReference($mainWikiId, 'WikiManager', 'WebHome'))
+#set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
+#set ($isMainWikiUser = ($mainWikiId == "$!{xcontext.userReference.wikiReference.name}"))
+
+###
 ###    Toplevel Menu
 ###
 #macro(xwikitopmenustart)

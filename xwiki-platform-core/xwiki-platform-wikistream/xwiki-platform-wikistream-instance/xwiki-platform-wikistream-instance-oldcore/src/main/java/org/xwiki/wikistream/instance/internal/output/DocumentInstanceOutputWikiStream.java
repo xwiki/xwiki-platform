@@ -158,7 +158,8 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
                 document = inputDocument;
             } else {
                 if (this.properties.isPreviousDeleted() && !this.documentDeleted) {
-                    xcontext.getWiki().deleteDocument(document, xcontext);
+                    // Make sure to not generate DocumentDeletedEvent since from listener point of view it's not
+                    xcontext.getWiki().getStore().deleteXWikiDoc(document, xcontext);
                     this.documentDeleted = true;
                     document = inputDocument;
                 } else {

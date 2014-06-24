@@ -1481,7 +1481,8 @@ public class XWiki implements EventListener
     @Deprecated
     public void setRenderingEngine(XWikiRenderingEngine renderingEngine)
     {
-        DefaultComponentDescriptor<XWikiRenderingEngine> descriptor = new DefaultComponentDescriptor<XWikiRenderingEngine>();
+        DefaultComponentDescriptor<XWikiRenderingEngine> descriptor =
+            new DefaultComponentDescriptor<XWikiRenderingEngine>();
 
         descriptor.setImplementation(renderingEngine.getClass());
         descriptor.setRoleType(XWikiRenderingEngine.class);
@@ -3687,14 +3688,11 @@ public class XWiki implements EventListener
 
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
-        String server = null, database = null;
-        try {
-            server = doc.getDocumentReference().getWikiReference().getName();
+        String currentWiki = null;
 
-            if (server != null) {
-                database = context.getWikiId();
-                context.setWikiId(server);
-            }
+        currentWiki = context.getWikiId();
+        try {
+            context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
 
             ObservationManager om = Utils.getComponent(ObservationManager.class);
 
@@ -3722,11 +3720,10 @@ public class XWiki implements EventListener
                 if (om != null) {
                     XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
                     // Again to follow general event policy, new document author is the user who modified the document
-                    // (here
-                    // the modification is delete)
+                    // (here the modification is delete)
                     blankDoc.setOriginalDocument(doc);
-                    blankDoc.setAuthor(context.getUser());
-                    blankDoc.setContentAuthor(context.getUser());
+                    blankDoc.setAuthorReference(context.getUserReference());
+                    blankDoc.setContentAuthorReference(context.getUserReference());
                     om.notify(new DocumentDeletedEvent(doc.getDocumentReference()), blankDoc, context);
                 }
             } catch (Exception ex) {
@@ -3734,9 +3731,7 @@ public class XWiki implements EventListener
                     doc.getDocumentReference(), ex);
             }
         } finally {
-            if ((server != null) && (database != null)) {
-                context.setWikiId(database);
-            }
+            context.setWikiId(currentWiki);
         }
     }
 

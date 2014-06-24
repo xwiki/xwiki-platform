@@ -36,6 +36,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
@@ -59,7 +60,7 @@ public class TemplateMimeMessageFactoryTest
         DocumentReference documentReference = mock(DocumentReference.class);
 
         DefaultMailTemplateManager mailTemplateManager = this.mocker.getInstance(DefaultMailTemplateManager.class);
-        when(mailTemplateManager.evaluate(same(documentReference), eq("subject"), anyMap())).thenReturn(
+        when(mailTemplateManager.evaluate(same(documentReference), eq("subject"), anyMap(), anyString())).thenReturn(
                 "XWiki news");
 
         Session session = Session.getDefaultInstance(new Properties());

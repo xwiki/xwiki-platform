@@ -73,8 +73,10 @@ public abstract class AbstractTemplateMimeBodyPartFactory extends AbstractMimeBo
     {
         Map<String, String> velocityVariables = (Map<String, String>) parameters.get("velocityVariables");
 
-        String textContent = getTemplateManager().evaluate(documentReference, "text", velocityVariables);
-        String htmlContent = getTemplateManager().evaluate(documentReference, "html", velocityVariables);
+        String language = (String) parameters.get("language");
+
+        String textContent = getTemplateManager().evaluate(documentReference, "text", velocityVariables, language);
+        String htmlContent = getTemplateManager().evaluate(documentReference, "html", velocityVariables, language);
 
         Map<String, Object> htmlParameters = new HashMap<>();
         htmlParameters.put("alternate", textContent);
@@ -92,11 +94,12 @@ public abstract class AbstractTemplateMimeBodyPartFactory extends AbstractMimeBo
         if (includeTemplateAttachments != null && includeTemplateAttachments) {
             try {
                 List<XWikiAttachment> xwikiAttachments =
-                    ((XWikiDocument) this.bridge.getDocument(documentReference)).getAttachmentList();
+                        ((XWikiDocument) this.bridge.getDocument(documentReference)).getAttachmentList();
                 attachments.addAll(this.attachmentConverter.convert(xwikiAttachments));
             } catch (Exception e) {
                 throw new MessagingException(
-                    String.format("Failed to include attachments from the Mail Template [%s]", documentReference), e);
+                        String.format("Failed to include attachments from the Mail Template [%s]", documentReference),
+                        e);
             }
         }
         if (!attachments.isEmpty()) {

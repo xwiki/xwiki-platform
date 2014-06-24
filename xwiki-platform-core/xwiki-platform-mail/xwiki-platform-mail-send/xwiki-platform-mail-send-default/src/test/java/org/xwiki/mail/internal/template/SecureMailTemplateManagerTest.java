@@ -53,7 +53,7 @@ public class SecureMailTemplateManagerTest
         when(dab.getCurrentUserReference()).thenReturn(new DocumentReference("userwiki", "userspace", "userpage"));
 
         try {
-            this.mocker.getComponentUnderTest().evaluate(reference, "property", Collections.<String, String>emptyMap());
+            this.mocker.getComponentUnderTest().evaluate(reference, "property", Collections.<String, String>emptyMap(), null);
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
             assertEquals("Current user [userwiki:userspace.userpage] has no permission to view Mail Template "

@@ -54,18 +54,19 @@ public class SecureMailTemplateManager implements MailTemplateManager
     private DocumentAccessBridge documentBridge;
 
     @Override
-    public String evaluate(DocumentReference documentReference, String property, Map<String, String> data)
+    public String evaluate(DocumentReference documentReference, String property, Map<String, String> data,
+            String language)
         throws MessagingException
     {
         // Verify that the current user has the view right on the Template document
         if (!this.authorizationManager.hasAccess(
-            Right.VIEW, this.documentBridge.getCurrentUserReference(), documentReference))
+                Right.VIEW, this.documentBridge.getCurrentUserReference(), documentReference))
         {
             throw new MessagingException(
-                String.format("Current user [%s] has no permission to view Mail Template Document [%s]",
-                    this.documentBridge.getCurrentUserReference(), documentReference));
+                    String.format("Current user [%s] has no permission to view Mail Template Document [%s]",
+                            this.documentBridge.getCurrentUserReference(), documentReference));
         }
 
-        return this.templateManager.evaluate(documentReference, property, data);
+        return this.templateManager.evaluate(documentReference, property, data, language);
     }
 }

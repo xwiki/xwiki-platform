@@ -41,9 +41,10 @@ public interface MailTemplateManager
      * @param documentReference the document reference of template containing XWiki.Mail xobject
      * @param property the name of xproperty
      * @param data the list of velocity variables
+     * @param language the value of language xproperty to select
      * @return Evaluated property
      * @throws MessagingException  when an error occurs
      */
-    String evaluate(DocumentReference documentReference, String property, Map<String, String> data)
+    String evaluate(DocumentReference documentReference, String property, Map<String, String> data, String language)
         throws MessagingException;
 }

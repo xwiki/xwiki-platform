@@ -48,7 +48,13 @@ public abstract class AbstractTemplateMimeMessageFactory implements MimeMessageF
     {
         MimeMessage message = new MimeMessage(session);
         DocumentReference documentReference = (DocumentReference) source;
-        String subject = getTemplateManager().evaluate(documentReference, "subject", (Map<String, String>) parameters);
+
+        Map<String, String> velocityVariables = (Map<String, String>) parameters.get("velocityVariables");
+
+        String language = (String) parameters.get("language");
+
+        String subject = getTemplateManager()
+                .evaluate(documentReference, "subject", (Map<String, String>) velocityVariables, language);
         message.setSubject(subject);
         return message;
     }

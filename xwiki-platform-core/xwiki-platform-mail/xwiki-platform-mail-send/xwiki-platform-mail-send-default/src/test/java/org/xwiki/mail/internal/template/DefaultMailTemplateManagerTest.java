@@ -40,6 +40,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
@@ -65,7 +66,7 @@ public class DefaultMailTemplateManagerTest
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = mock(DocumentReference.class);
 
-        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), eq("html"))).thenReturn(
+        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class),anyInt(), eq("html"))).thenReturn(
             "Hello <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
@@ -85,9 +86,41 @@ public class DefaultMailTemplateManagerTest
             anyString(), eq("Hello <b>${name}</b> <br />${email}"));
 
         String result =
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>());
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>(), null);
 
         assertEquals(result, "Hello <b>John Doe</b> <br />john@doe.com");
+    }
+
+    @Test
+    public void evaluateWithLanguage() throws Exception
+    {
+        DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
+        DocumentReference documentReference = mock(DocumentReference.class);
+
+        when(documentBridge.getObjectNumber(same(documentReference), any(DocumentReference.class), eq("language"), eq("fr"))).thenReturn(1);
+        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), eq(1) , eq("html"))).thenReturn(
+                "Salut <b>${name}</b> <br />${email}");
+
+        VelocityEngine velocityEngine = mock(VelocityEngine.class);
+        VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
+        when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
+
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+                Object[] args = invocation.getArguments();
+                ((Writer) args[1]).write("Salut <b>John Doe</b> <br />john@doe.com");
+                return null;
+            }
+        }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
+                anyString(), eq("Salut <b>${name}</b> <br />${email}"));
+
+        String result =
+                this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>(), "fr");
+
+        assertEquals(result, "Salut <b>John Doe</b> <br />john@doe.com");
     }
 
     @Test
@@ -96,7 +129,7 @@ public class DefaultMailTemplateManagerTest
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = mock(DocumentReference.class);
 
-        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), eq("html"))).thenReturn(
+        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class),anyInt() , eq("html"))).thenReturn(
             "Hello <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
@@ -107,7 +140,7 @@ public class DefaultMailTemplateManagerTest
             anyString(), eq("Hello <b>${name}</b> <br />${email}"))).thenThrow(new XWikiVelocityException("Error"));
 
         try {
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>());
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>(), null);
             fail("Should have thrown an exception here!");
         } catch (MessagingException expected) {
             assertTrue(expected.getMessage().startsWith("Failed to evaluate property [html] for Document reference"));

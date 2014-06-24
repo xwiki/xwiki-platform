@@ -2,10 +2,6 @@
 ##          HOME MENU
 ##################################
 #set ($discard = $xwiki.ssfx.use('uicomponents/wiki/wiki.css', true))
-#set ($mainWikiId = $services.wiki.mainWikiId)
-#set ($mainWikiHomeDocumentReference = $services.wiki.getById($mainWikiId).mainPageReference)
-#set ($WikiManagerMainDocReference = $services.model.createDocumentReference($mainWikiId, 'WikiManager', 'WebHome'))
-#set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
 ## This menu is displayed if:
 ## - Wiki UI is available
 ## - The current wiki is the main wiki OR the current wiki has support for local users only

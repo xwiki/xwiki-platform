@@ -67,14 +67,6 @@
 #end
 
 ###
-###    Glyph Icon
-###
-### @param iconName The name of the icon to display, without the glyphicon prefix (eg: 'globe')
-#macro(glyphicon $iconName)
-#if("$!iconName"!='')<span class="glyphicon glyphicon-${iconName}"></span>#end
-#end
-
-###
 ###    Toplevel Menu entry with subitems
 ###
 ### Generate a menu entry and start the subitem section

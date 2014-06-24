@@ -20,18 +20,6 @@
 
 package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import org.jmock.Mock;
-import org.jmock.core.Invocation;
-import org.jmock.core.stub.CustomStub;
-import org.xwiki.localization.LocalizationContext;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -42,6 +30,17 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
+
+import org.jmock.Mock;
+import org.jmock.core.Invocation;
+import org.jmock.core.stub.CustomStub;
+import org.xwiki.localization.LocalizationContext;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultXObjectDocument}.
@@ -62,9 +61,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
     protected void setUp() throws Exception
     {
         super.setUp();
-
-        registerMockComponent(ContextualAuthorizationManager.class);
-
+        
         this.xwiki = new XWiki();
         getContext().setWiki(this.xwiki);
 

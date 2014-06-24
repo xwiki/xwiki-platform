@@ -30,7 +30,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -62,8 +61,6 @@ public class XClassEventGeneratorListenerTest extends AbstractBridgedComponentTe
     public void setUp() throws Exception
     {
         super.setUp();
-
-        getComponentManager().registerMockComponent(getMockery(), ContextualAuthorizationManager.class);
 
         this.observation = getComponentManager().getInstance(ObservationManager.class);
 

@@ -103,7 +103,7 @@ XWiki.widgets.LiveTable = Class.create({
       this.tagCloud = new LiveTableTagCloud(this, domNodeName + "-tagcloud");
     }
     this.loadingStatus = $(this.domNodeName + '-ajax-loader') || $('ajax-loader');
-    this.limitsDisplay = $(this.domNodeName + '-limits') || new Element("div");
+    this.limitsDisplays = $$('#' + this.domNodeName + ' .xwiki-livetable-limits') || [];
     this.filters = "";
     this.handler = handler || function(){};
     this.totalRows = -1;
@@ -277,7 +277,9 @@ XWiki.widgets.LiveTable = Class.create({
     var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $services.localization.render('platform.livetable.paginationResultsOf') <strong>" + this.totalRows + "</strong>";
     msg = msg.toLowerCase();
 
-    this.limitsDisplay.innerHTML = "$services.localization.render('platform.livetable.paginationResults') " + msg;
+    this.limitsDisplays.each(function(limitsDisplay) {
+      limitsDisplay.innerHTML = "$services.localization.render('platform.livetable.paginationResults') " + msg;
+    });
     this.clearDisplay();
 
     for (var i = off; i <= f; i++) {

@@ -93,6 +93,8 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
+        final ContextualAuthorizationManager mockCam = getContextualAuthorizationManager();
+
         final XWiki mockXWiki = getMockery().mock(XWiki.class);
         final XWikiGroupService mockXWikiGroupService = getMockery().mock(XWikiGroupService.class);
 

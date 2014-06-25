@@ -89,6 +89,11 @@
   <div id="editcolumn" class="editor editor-${editor}">
   <div class="alleditcontent">
   <div id="mainEditArea">
+  #if($editor == 'wiki' || $editor == 'wysiwyg' || $editor == 'inline')
+    <div class='edit-meta-tools'>
+      <a id='editParentTrigger' class='tool edit-parent' href='#mainEditArea' title="$services.localization.render('core.editors.content.parentField.edit.title')">[$services.localization.render('core.editors.content.parentField.edit')]</a>
+    </div>
+  #end
   #template("hierarchy.vm")
   <div class="row">
     #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)

@@ -34,6 +34,11 @@ input[type="text"].empty {
   .text-muted;
 }
 
+/* Overrides Bootstrap generic select[size] selector, since it should be applied only for size>1 */
+select[size="0"], select[size="1"] {
+  height: @input-height-base;
+}
+
 .xform {
   input[type="text"], input[type="password"], select, textarea {
     width: 100%;

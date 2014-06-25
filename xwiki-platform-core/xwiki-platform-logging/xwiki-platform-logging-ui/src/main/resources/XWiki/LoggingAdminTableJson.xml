@@ -162,7 +162,7 @@
       "actions" : "${escapetool.javascript("&lt;form action='' enctype='multipart/form-data' method='post'&gt;
         &lt;fieldset&gt;
           &lt;input name='logger_name' value='$logger.key' type='hidden'/&gt;
-          &lt;select name='logger_level' size='1'&gt;
+          &lt;select name='logger_level'&gt;
             #if ($loggLevelName != 'TRACE')
               &lt;option label='TRACE' value='TRACE'&gt;TRACE&lt;/option&gt;
             #end
@@ -179,7 +179,7 @@
               &lt;option label='ERROR' value='ERROR'&gt;ERROR&lt;/option&gt;
             #end
             #if ($loggLevelName &amp;&amp; $logger.value != '')
-              &lt;option label='default' value=''&gt;&amp;lt;default&amp;gt;&lt;/option&gt;
+              &lt;option label='default' value=''&gt;default&lt;/option&gt;
             #end
           &lt;/select&gt;
           &lt;span class='buttonwrapper'&gt;&lt;input name='loggeraction_set' value='${escapetool.xml($services.localization.render('logging.admin.livetable.actions.set'))}' class='button' type='submit'&gt;&lt;/span&gt;

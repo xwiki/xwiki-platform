@@ -8,6 +8,14 @@
   a{
     .btn();
     .btn-info();
+    
+    .btn-gradient(@btn-info-bg);
+    .btn-border(@btn-info-bg);
+
+    &:hover {
+      .btn-gradient(darken(@btn-info-bg, 5%));
+      .btn-border(@btn-info-bg);
+    }
   }
 }
 

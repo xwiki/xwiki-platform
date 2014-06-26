@@ -39,6 +39,8 @@ import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationContext;
 import org.xwiki.observation.ObservationManager;
@@ -159,7 +161,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     protected void prepareEvent(ActivityEvent event, XWikiDocument doc, XWikiContext context)
     {
         if (event.getUser() == null) {
-            event.setUser(context.getUser());
+            event.setUser(getSerializedReference(context.getUserReference()));
         }
 
         if (event.getWiki() == null) {
@@ -387,7 +389,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         event.setVersion(doc.getVersion());
         event.setParams(params);
         // This might be wrong once non-altering events will be logged.
-        event.setUser(doc.getAuthor());
+        event.setUser(getSerializedReference(doc.getAuthorReference()));
         event.setHidden(doc.isHidden());
         addActivityEvent(event, doc, context);
     }
@@ -1021,5 +1023,17 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         }
 
         return results;
+    }
+
+    /**
+     * @param documentReference to be serialized
+     * @return the default (absolute) string serialized document reference
+     */
+    private static String getSerializedReference(DocumentReference documentReference)
+    {
+        EntityReferenceSerializer<String> serializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING);
+        String stringSerialization = serializer.serialize(documentReference);
+
+        return stringSerialization;
     }
 }

@@ -5510,15 +5510,16 @@ public class XWiki implements EventListener
         deleteAllDocuments(doc, true, context);
     }
 
-    public void deleteAllDocuments(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
+    public void deleteAllDocuments(XWikiDocument doc, boolean toTrash, XWikiContext context) throws XWikiException
     {
-        // Delete all documents
-        for (String lang : doc.getTranslationList(context)) {
-            XWikiDocument tdoc = doc.getTranslatedDocument(lang, context);
-            deleteDocument(tdoc, totrash, context);
+        // Delete all translation documents
+        for (Locale locale : doc.getTranslationLocales(context)) {
+            XWikiDocument tdoc = doc.getTranslatedDocument(locale, context);
+            deleteDocument(tdoc, toTrash, context);
         }
 
-        deleteDocument(doc, context);
+        // Delete the default document
+        deleteDocument(doc, toTrash, context);
     }
 
     public void refreshLinks(XWikiContext context) throws XWikiException

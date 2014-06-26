@@ -199,15 +199,17 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         String keySeparator = EVENT_ID_ELEMENTS_SEPARATOR;
         String wikiSpaceSeparator = ":";
 
-        String key = event.getStream() + keySeparator + event.getApplication() + keySeparator + event.getWiki()
-            + wikiSpaceSeparator + event.getPage() + keySeparator + event.getType();
+        String key =
+            event.getStream() + keySeparator + event.getApplication() + keySeparator + event.getWiki()
+                + wikiSpaceSeparator + event.getPage() + keySeparator + event.getType();
         long hash = key.hashCode();
         if (hash < 0) {
             hash = -hash;
         }
 
-        String id = "" + hash + keySeparator + event.getDate().getTime() + keySeparator
-            + RandomStringUtils.randomAlphanumeric(8);
+        String id =
+            "" + hash + keySeparator + event.getDate().getTime() + keySeparator
+                + RandomStringUtils.randomAlphanumeric(8);
         if (context.get(REQUEST_ID_CONTEXT_KEY) == null) {
             context.put(REQUEST_ID_CONTEXT_KEY, id);
         }
@@ -248,10 +250,10 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     }
 
     /**
-     * This method determine if events must be store in the local wiki. If the activitystream is set not to store
-     * events in the main wiki, the method will return true. If events are stored in the main wiki, the method
-     * retrieves the 'platform.plugin.activitystream.uselocalstore' configuration option. If the option is not
-     * found the method returns true (default behavior).
+     * This method determine if events must be store in the local wiki. If the activitystream is set not to store events
+     * in the main wiki, the method will return true. If events are stored in the main wiki, the method retrieves the
+     * 'platform.plugin.activitystream.uselocalstore' configuration option. If the option is not found the method
+     * returns true (default behavior).
      * 
      * @param context the XWiki context
      * @return true if the activity stream is configured to store events in the main wiki, false otherwise
@@ -269,9 +271,9 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     }
 
     /**
-     * This method determine if events must be store in the main wiki. If the current wiki is the main wiki, this
-     * method returns false, otherwise if retrieves the 'platform.plugin.activitystream.usemainstore' configuration
-     * option. If the option is not found the method returns true (default behavior).
+     * This method determine if events must be store in the main wiki. If the current wiki is the main wiki, this method
+     * returns false, otherwise if retrieves the 'platform.plugin.activitystream.usemainstore' configuration option. If
+     * the option is not found the method returns true (default behavior).
      * 
      * @param context the XWiki context
      * @return true if the activity stream is configured to store events in the main wiki, false otherwise
@@ -287,7 +289,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             (ActivityStreamPlugin) context.getWiki().getPlugin(ActivityStreamPlugin.PLUGIN_NAME, context);
         return Integer.parseInt(plugin.getActivityStreamPreference("usemainstore", "1", context)) == 1;
     }
-    
+
     /**
      * @param event event to add to the stream
      * @param doc which fired the event
@@ -394,7 +396,6 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         addActivityEvent(event, doc, context);
     }
 
-    
     /**
      * @param event the event
      * @param bTransaction true if inside a transaction
@@ -418,8 +419,9 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                     bTransactionMutable = hibstore.beginTransaction(false, context);
                 }
                 Session session = hibstore.getSession(context);
-                Query query = session.createQuery(
-                    "select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
+                Query query =
+                    session
+                        .createQuery("select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
                 query.setString("eventId", eventId);
                 if (query.uniqueResult() != null) {
                     act = new ActivityEventImpl();
@@ -451,8 +453,9 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                     bTransactionMutable = hibstore.beginTransaction(false, context);
                 }
                 Session session = hibstore.getSession(context);
-                Query query = session.createQuery(
-                    "select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
+                Query query =
+                    session
+                        .createQuery("select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
                 query.setString("eventId", eventId);
                 if (query.uniqueResult() != null) {
                     act = new ActivityEventImpl();
@@ -603,10 +606,10 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     }
 
     /**
-     * This method will add a where clause to filter events fired from hidden documents. The clause will not be added
-     * to the query if the user has specified that he wish to see hidden documents in his profile. If the clause is
-     * added this method will also add a 'where' to the query if it is missing.
-     *
+     * This method will add a where clause to filter events fired from hidden documents. The clause will not be added to
+     * the query if the user has specified that he wish to see hidden documents in his profile. If the clause is added
+     * this method will also add a 'where' to the query if it is missing.
+     * 
      * @param query The query to add the filter to
      */
     private void addHiddenEventsFilter(StringBuffer query)
@@ -624,7 +627,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     /**
      * This method will add the passed optional where clause to the given query if the optional clause is not an empty
      * string nor null. If the clause is added this method will also add a 'where' to the query if it is missing.
-     *
+     * 
      * @param query The query to add the where clause to
      * @param optionalWhereClause The optional where clause to add
      */
@@ -938,8 +941,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             try {
                 addDocumentActivityEvent(streamName, currentDoc, eventType, msgPrefix + eventType, params, context);
             } catch (ActivityStreamException e) {
-                LOGGER.error("Exception while trying to add a document activity event, updated document: [" + wiki + ":"
-                    + currentDoc + "]");
+                LOGGER.error("Exception while trying to add a document activity event, updated document: [" + wiki
+                    + ":" + currentDoc + "]");
             }
         }
     }
@@ -955,15 +958,15 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     }
 
     @Override
-    public List<Object[]> searchUniquePages(String optionalWhereClause, int maxItems, int startAt,
-        XWikiContext context) throws ActivityStreamException
+    public List<Object[]> searchUniquePages(String optionalWhereClause, int maxItems, int startAt, XWikiContext context)
+        throws ActivityStreamException
     {
         return searchUniquePages(optionalWhereClause, null, maxItems, startAt, context);
     }
 
     @Override
-    public List<Object[]> searchUniquePages(String optionalWhereClause, List<Object> parametersValues,
-        int maxItems, int startAt, XWikiContext context) throws ActivityStreamException
+    public List<Object[]> searchUniquePages(String optionalWhereClause, List<Object> parametersValues, int maxItems,
+        int startAt, XWikiContext context) throws ActivityStreamException
     {
         StringBuffer searchHql = new StringBuffer();
         List<Object[]> results;
@@ -988,15 +991,15 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     }
 
     @Override
-    public List<Object[]> searchDailyPages(String optionalWhereClause, int maxItems, int startAt,
-        XWikiContext context) throws ActivityStreamException
+    public List<Object[]> searchDailyPages(String optionalWhereClause, int maxItems, int startAt, XWikiContext context)
+        throws ActivityStreamException
     {
         return searchDailyPages(optionalWhereClause, null, maxItems, startAt, context);
     }
 
     @Override
-    public List<Object[]> searchDailyPages(String optionalWhereClause, List<Object> parametersValues,
-        int maxItems, int startAt, XWikiContext context) throws ActivityStreamException
+    public List<Object[]> searchDailyPages(String optionalWhereClause, List<Object> parametersValues, int maxItems,
+        int startAt, XWikiContext context) throws ActivityStreamException
     {
         StringBuffer searchHql = new StringBuffer();
         List<Object[]> results = new ArrayList<Object[]>();
@@ -1006,7 +1009,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         addHiddenEventsFilter(searchHql);
         addOptionalEventsFilter(searchHql, optionalWhereClause);
         searchHql.append(" group by year(act.date), month(act.date), day(act.date), act.page, act.wiki "
-                + "order by 5 desc");
+            + "order by 5 desc");
 
         String originalDatabase = context.getWikiId();
         try {
@@ -1014,7 +1017,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             List<Object[]> rawResults =
                 context.getWiki().getStore().search(searchHql.toString(), maxItems, startAt, parametersValues, context);
             for (Object[] rawResult : rawResults) {
-                results.add(new Object[] {rawResult[3], rawResult[4], rawResult[5]});
+                results.add(new Object[] { rawResult[3], rawResult[4], rawResult[5] });
             }
         } catch (XWikiException e) {
             throw new ActivityStreamException(e);

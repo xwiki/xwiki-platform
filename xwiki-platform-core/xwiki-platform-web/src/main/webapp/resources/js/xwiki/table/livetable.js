@@ -103,7 +103,7 @@ XWiki.widgets.LiveTable = Class.create({
       this.tagCloud = new LiveTableTagCloud(this, domNodeName + "-tagcloud");
     }
     this.loadingStatus = $(this.domNodeName + '-ajax-loader') || $('ajax-loader');
-    this.limitsDisplays = $$('#' + this.domNodeName + ' .xwiki-livetable-limits') || [];
+    this.limitsDisplays = $(this.domNodeName).select('.xwiki-livetable-limits') || [];
     this.filters = "";
     this.handler = handler || function(){};
     this.totalRows = -1;

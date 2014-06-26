@@ -508,7 +508,7 @@ public class XWiki implements EventListener
                     Collections.<String, Object> singletonMap("ignorePrefix", context.getRequest().getContextPath()));
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
-                String.format("Failed to extract Entity Resource from URL [%s]", url), e);
+                String.format("Failed to extract Entity Resource Reference from URL [%s]", url), e);
         }
         Utils.getComponent(Execution.class).getContext()
             .setProperty(ResourceReferenceManager.RESOURCE_CONTEXT_PROPERTY, entityResourceReference);

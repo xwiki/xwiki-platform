@@ -379,6 +379,16 @@ XWiki.editors.ColorThemeWizard = Class.create({
         $$(this.maquetteSelector + ', ' + this.maquetteSelector + ' *').each(function(item) {
           this.refreshStyle(item);
         }.bind(this));
+        // Reset the inputs' background color
+        if (ProColor) {
+          $$(this.pickerSelector + ' input[type=text]').each(function(item) {
+            // Calling the "colorSync" function attached to the procolor button adjacent to the input field.
+            var proColorButton = item.adjacent("a")[0];
+            if (proColorButton != undefined) {
+              proColorButton.colorSync(false);
+            }
+          });
+        }
       }.bindAsEventListener(this));
     }.bind(this));
   },

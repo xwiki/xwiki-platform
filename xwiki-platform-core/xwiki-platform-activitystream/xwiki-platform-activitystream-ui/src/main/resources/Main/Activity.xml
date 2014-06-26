@@ -936,9 +936,10 @@ $xwiki.ssx.use('Main.Activity')##
   #foreach ($u in $aAuthors)
     #if ("$!u" != '')
       #set ($usersQuery = $usersQuery.concat(',?'))
-      #set ($discard = $fromUsersParameters.add($u))
-      #set ($discard = $toUsersParameters.add("${u}^XWiki.XWikiUsers"))
-      #if ($services.model.serialize($services.model.resolveDocument($u), 'default') != $currentUser)
+      #set ($resolvedUser = $services.model.serialize($services.model.resolveDocument($u), 'default'))
+      #set ($discard = $fromUsersParameters.add($resolvedUser))
+      #set ($discard = $toUsersParameters.add("${resolvedUser}^XWiki.XWikiUsers"))
+      #if ($resolvedUser != $currentUser)
         #set ($hasDifferentUsers = true)
       #end
     #end

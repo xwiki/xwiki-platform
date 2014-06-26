@@ -72,7 +72,7 @@
             #set ($userDocument = $xwiki.getDocument($followedUser))
             ## Prepare the list of followed users as it appears in the activity macro parameter
             ## (do it here to avoid another foreach loop later)
-            #set ($authorsParam = "$!{authorsParam},${userDocument.fullName},${userDocument.prefixedFullName}")
+            #set ($authorsParam = "$!{authorsParam},${userDocument.prefixedFullName}")
             ## Display the user info
             &lt;li class="vcard"&gt;
             #set ($userID = $userDocument.name)

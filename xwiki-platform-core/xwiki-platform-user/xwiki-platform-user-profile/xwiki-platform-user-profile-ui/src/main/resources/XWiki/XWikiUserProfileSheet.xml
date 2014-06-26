@@ -142,7 +142,7 @@
       #end
 {{/html}}
 
-{{activity authors="${doc.fullName},${doc.prefixedFullName}" /}}
+{{activity authors="${doc.prefixedFullName}" /}}
 
 {{html clean='false'}}
       &lt;/div&gt;

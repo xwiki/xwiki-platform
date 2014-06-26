@@ -333,7 +333,6 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         try {
             XWikiDocument doc = context.getWiki().getDocument(getExtensionClassName(), context);
             boolean needsUpdate = false;
-            String useOptions = "currentPage=Always on this page|onDemand=On demand|always=Always on this wiki";
 
             BaseClass bclass = doc.getXClass();
             if (context.get("initdone") != null) {
@@ -344,7 +343,8 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
 
             needsUpdate |= bclass.addTextField("name", "Name", 30);
             needsUpdate |= bclass.addTextAreaField("code", "Code", 50, 20);
-            needsUpdate |= bclass.addStaticListField(USE_FIELDNAME, "Use this extension", useOptions);
+            needsUpdate |= bclass.addStaticListField(USE_FIELDNAME, "Use this extension",
+                "currentPage|onDemand|always");
             needsUpdate |= bclass.addBooleanField("parse", "Parse content", "yesno");
             needsUpdate |= bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
             needsUpdate |= setExtensionClassDocumentFields(doc);

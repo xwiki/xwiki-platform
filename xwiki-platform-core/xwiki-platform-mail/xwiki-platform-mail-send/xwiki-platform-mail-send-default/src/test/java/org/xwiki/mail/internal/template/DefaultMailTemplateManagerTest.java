@@ -86,7 +86,7 @@ public class DefaultMailTemplateManagerTest
             anyString(), eq("Hello <b>${name}</b> <br />${email}"));
 
         String result =
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>(), null);
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>());
 
         assertEquals(result, "Hello <b>John Doe</b> <br />john@doe.com");
     }
@@ -140,7 +140,7 @@ public class DefaultMailTemplateManagerTest
             anyString(), eq("Hello <b>${name}</b> <br />${email}"))).thenThrow(new XWikiVelocityException("Error"));
 
         try {
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>(), null);
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>());
             fail("Should have thrown an exception here!");
         } catch (MessagingException expected) {
             assertTrue(expected.getMessage().startsWith("Failed to evaluate property [html] for Document reference"));

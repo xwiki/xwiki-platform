@@ -735,6 +735,7 @@ XWiki.Annotation = Class.create({
     }
     if (window.document.body.hasClassName('skin-flamingo')) {
       // Hack: hide the bootstrap dropdown menu
+      // TODO: find a way to let Bootstrap close the menu in a regular way.
       var btnGroup = $('tmMoreActions').ancestors()[0];
       btnGroup.removeClassName('open');
     }

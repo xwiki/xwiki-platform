@@ -66,7 +66,7 @@ public class DefaultMailTemplateManagerTest
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = mock(DocumentReference.class);
 
-        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class),anyInt(), eq("html"))).thenReturn(
+        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), anyInt(), eq("html"))).thenReturn(
             "Hello <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);

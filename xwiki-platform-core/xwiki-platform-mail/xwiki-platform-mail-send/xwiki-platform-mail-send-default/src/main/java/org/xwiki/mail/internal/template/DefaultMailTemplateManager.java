@@ -92,6 +92,12 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         }
     }
 
+    @Override public String evaluate(DocumentReference documentReference, String property, Map<String, String> data)
+        throws MessagingException
+    {
+        return evaluate(documentReference, property, data, null);
+    }
+
     private VelocityContext createVelocityContext(Map<String, String> data)
     {
         VelocityContext velocityContext = new VelocityContext();

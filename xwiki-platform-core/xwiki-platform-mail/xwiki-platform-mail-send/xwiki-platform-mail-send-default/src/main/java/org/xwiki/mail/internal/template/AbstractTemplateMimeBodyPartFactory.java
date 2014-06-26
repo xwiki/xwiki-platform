@@ -94,12 +94,12 @@ public abstract class AbstractTemplateMimeBodyPartFactory extends AbstractMimeBo
         if (includeTemplateAttachments != null && includeTemplateAttachments) {
             try {
                 List<XWikiAttachment> xwikiAttachments =
-                        ((XWikiDocument) this.bridge.getDocument(documentReference)).getAttachmentList();
+                    ((XWikiDocument) this.bridge.getDocument(documentReference)).getAttachmentList();
                 attachments.addAll(this.attachmentConverter.convert(xwikiAttachments));
             } catch (Exception e) {
                 throw new MessagingException(
-                        String.format("Failed to include attachments from the Mail Template [%s]", documentReference),
-                        e);
+                    String.format("Failed to include attachments from the Mail Template [%s]", documentReference),
+                    e);
             }
         }
         if (!attachments.isEmpty()) {

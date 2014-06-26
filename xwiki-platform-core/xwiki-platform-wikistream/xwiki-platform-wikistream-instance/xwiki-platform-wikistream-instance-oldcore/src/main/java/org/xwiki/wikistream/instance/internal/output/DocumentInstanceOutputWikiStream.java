@@ -20,6 +20,7 @@
 package org.xwiki.wikistream.instance.internal.output;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -158,8 +159,15 @@ public class DocumentInstanceOutputWikiStream extends AbstractBeanOutputWikiStre
                 document = inputDocument;
             } else {
                 if (this.properties.isPreviousDeleted() && !this.documentDeleted) {
+                    // Put previous version in recycle bin
+                    if (xcontext.getWiki().hasRecycleBin(xcontext)) {
+                        xcontext.getWiki().getRecycleBinStore()
+                            .saveToRecycleBin(document, xcontext.getUser(), new Date(), xcontext, true);
+                    }
+
                     // Make sure to not generate DocumentDeletedEvent since from listener point of view it's not
                     xcontext.getWiki().getStore().deleteXWikiDoc(document, xcontext);
+
                     this.documentDeleted = true;
                     document = inputDocument;
                 } else {

@@ -1297,7 +1297,7 @@ ${Msz}Mb##
         <span class="pagination">
           <span class="xwiki-livetable-pagination-text">$services.localization.render('platform.livetable.paginationPage')</span>
           <span class="xwiki-livetable-pagination-content" ></span>
-        </ul>
+        </span>
       </td>
     </tr>
     <tr>

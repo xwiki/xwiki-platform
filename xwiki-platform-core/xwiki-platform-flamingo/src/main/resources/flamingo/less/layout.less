@@ -208,11 +208,17 @@
   .make-xs-column(12);
 }
 
+.rightmenu{
+  display: inline;
+}
+
 // Layout Styling =============================================================
 
 .main {
   background-color: @xwiki-page-content-bg;
-  box-shadow: 0 1px 2px @border-color;
+   div& { // Do not apply on WYSIWYG body.main
+    box-shadow: 0 1px 2px @border-color;
+  }
 }
 
 .main,
@@ -254,4 +260,11 @@
   text-align: center;
   position: relative;
   z-index: 2;
+  
+  a {
+    color: @navbar-default-link-color;
+    &:hover{
+      color: @navbar-default-link-hover-color;
+    }
+  }
 }

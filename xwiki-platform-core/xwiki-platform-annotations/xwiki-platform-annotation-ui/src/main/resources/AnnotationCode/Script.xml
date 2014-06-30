@@ -682,32 +682,39 @@ XWiki.Annotation = Class.create({
   },
 
   hookMenuButton : function() {
-    var contentmenu = $('contentmenu');
-    if (contentmenu) {
-      var rightMenu = contentmenu.down('.rightmenu');
-      // create and insert if it doesn't exist
-      if (!rightMenu) {
-        rightMenu = new Element('div', {'class':'rightmenu'});
-        // insert it before the left menu
-        var leftMenu = contentmenu.down('.leftmenu');
-        if (leftMenu) {
-          leftMenu.insert({before: rightMenu});
-        } else {
-          contentmenu.insert({bottom: rightMenu});
-        }
-      }
-      // create the annotations button
-      var annContainer = new Element('div', {'class': 'topmenuentry hasIcon', 'id': 'tmAnnotations'});
+    // Flamingo case
+    if (window.document.body.hasClassName('skin-flamingo')) {
+      var moreActionsMenu = $('tmMoreActions').adjacent('ul')[0];
+      var annContainer = new Element('li');
       var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
-      if (window.document.body.hasClassName('skin-flamingo')) {
-        annLink.update("&lt;span class=\"glyphicon glyphicon-edit\"&gt;&lt;/span&gt; $services.localization.render('annotations.title')");
-      } else {
+      annLink.update("&lt;span class=\"glyphicon glyphicon-edit\"&gt;&lt;/span&gt; $services.localization.render('annotations.title')");
+      annContainer.insert(annLink);
+      moreActionsMenu.insert(annContainer);
+      annLink.observe('click', this.toggleSettingsPanel.bind(this));      
+    } else {
+      var contentmenu = $('contentmenu');
+      if (contentmenu) {
+        var rightMenu = contentmenu.down('.rightmenu');
+        // create and insert if it doesn't exist
+        if (!rightMenu) {
+          rightMenu = new Element('div', {'class':'rightmenu'});
+          // insert it before the left menu
+          var leftMenu = contentmenu.down('.leftmenu');
+          if (leftMenu) {
+            leftMenu.insert({before: rightMenu});
+          } else {
+            contentmenu.insert({bottom: rightMenu});
+          }
+        }
+        // create the annotations button
+        var annContainer = new Element('div', {'class': 'topmenuentry hasIcon', 'id': 'tmAnnotations'});
+        var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
         annLink.update("&lt;strong&gt;$services.localization.render('annotations.title')&lt;/strong&gt;");
-      }
-      annContainer.insert({top: annLink});
-      rightMenu.insert({bottom: annContainer});
+        annContainer.insert({top: annLink});
+        rightMenu.insert({bottom: annContainer});
 
-      annLink.observe('click', this.toggleSettingsPanel.bind(this));
+        annLink.observe('click', this.toggleSettingsPanel.bind(this));
+      }
     }
   },
 
@@ -725,6 +732,12 @@ XWiki.Annotation = Class.create({
     // if another click handling is in progress
     if (menu.disabled) {
       return;
+    }
+    if (window.document.body.hasClassName('skin-flamingo')) {
+      // Hack: hide the bootstrap dropdown menu
+      // TODO: find a way to let Bootstrap close the menu in a regular way.
+      var btnGroup = $('tmMoreActions').ancestors()[0];
+      btnGroup.removeClassName('open');
     }
     if (!this.settingsPanel) {
       new Ajax.Request('$xwiki.getURL("AnnotationCode.Settings", "view", "xpage=plain")', {

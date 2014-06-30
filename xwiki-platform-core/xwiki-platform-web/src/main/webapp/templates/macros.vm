@@ -1471,6 +1471,7 @@ ${Msz}Mb##
     </tr>
     <tr>
       <td class="xwiki-livetable-pagination">
+        <span class="xwiki-livetable-limits"></span>
         <span class="controlPagination">
           <a title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPagePrevTitle')</span></a>
           <a title="$services.localization.render('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPageNextTitle')</span></a>

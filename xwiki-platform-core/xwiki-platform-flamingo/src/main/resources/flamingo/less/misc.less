@@ -153,6 +153,37 @@ table {
   }
 }
 
+// FIX: Auto-save
+.skin-flamingo #autosaveControl input.autosave-frequency{
+  width: 3em;
+}
+
+// FIX: user profile
+.skin-flamingo{
+  .user-menu-profile:before, .user-menu-preferences:before, .user-menu-watchlist:before, .user-menu-network:before, .user-menu-wikis:before, .user-menu-dashboard:before{
+    display: none;
+  }
+}
+
+// FIX: file upload
+.skin-flamingo{
+  .upload-status-container{
+    .buttonwrapper a, .upload-canceled-label{
+      .btn-xs();
+    }
+  }
+}
+
+// FIX: app bar
+.applicationPanelMoreContainer ul li > span > a{
+  &:extend(.nav > li > a);
+  &:extend(.nav-pills > li > a);
+  
+  &:hover{
+    &:extend(.nav > li > a:hover);
+  }
+}
+
 // Export ---------------------------------------------------------------------
 #exportModal{
   .modal-body{
@@ -165,4 +196,20 @@ table {
 // Loading --------------------------------------------------------------------
 .loading {
   background: transparent url(@xwiki-icon-spinner) no-repeat center;
+}
+
+// Importer -------------------------------------------------------------------
+#package .checkbox{
+  min-height: 10px;
+  margin: 0;
+  padding: 0.3em;
+}
+
+// Importer options
+.historyStrategyOption{
+  input[type="radio"], input[type="checkbox"] {
+    min-height: 10px;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
 }

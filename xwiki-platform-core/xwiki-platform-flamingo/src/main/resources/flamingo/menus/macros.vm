@@ -1,4 +1,14 @@
 ###
+###    GLOBALS
+###
+#set ($mainWikiId = $services.wiki.mainWikiId)
+#set ($mainWikiHomeDocumentReference = $services.wiki.getById($mainWikiId).mainPageReference)
+#set ($WikiManagerMainDocReference = $services.model.createDocumentReference($mainWikiId, 'WikiManager', 'WebHome'))
+#set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
+#set ($isWikiAPIAvailable = ("$!services.wiki" != '' && "$!services.wiki.user" != ''))
+#set ($isMainWikiUser = ($mainWikiId == "$!{xcontext.userReference.wikiReference.name}"))
+
+###
 ###    Toplevel Menu
 ###
 #macro(xwikitopmenustart)
@@ -57,14 +67,6 @@
 #end
 
 ###
-###    Glyph Icon
-###
-### @param iconName The name of the icon to display, without the glyphicon prefix (eg: 'globe')
-#macro(glyphicon $iconName)
-#if("$!iconName"!='')<span class="glyphicon glyphicon-${iconName}"></span>#end
-#end
-
-###
 ###    Toplevel Menu entry with subitems
 ###
 ### Generate a menu entry and start the subitem section
@@ -82,8 +84,9 @@
     #set($linkTitle = "${linkWords.get(0)}: ${linkWords.get(1)}")
   #end
   <li class="dropdown text-left">
-      <a href="$actionurl" #if($id)id="$id"#end class="dropdown-toggle $!class" data-toggle="dropdown" title="$linkTitle">#glyphicon($icon) $!iconImg $linkName <b class="caret"></b></a>
-        <ul class="dropdown-menu">
+      <a href="$actionurl" #if($id)id="$id"#end class="$!class" title="$linkTitle">#glyphicon($icon) $!iconImg $linkName</a>
+      <a href="$actionurl" class="hasCaret dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></a>
+      <ul class="dropdown-menu">
 #end
 
 ###

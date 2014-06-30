@@ -34,14 +34,19 @@ input[type="text"].empty {
   .text-muted;
 }
 
+/* Overrides Bootstrap generic select[size] selector, since it should be applied only for size>1 */
+select[size="0"], select[size="1"] {
+  height: @input-height-base;
+}
+
 .xform {
   input[type="text"], input[type="password"], select, textarea {
     width: 100%;
   }
-  input[type="radio"]{
-    min-height: auto;
-    margin: 0;
+  input[type="radio"], 
+  input[type="checkbox"] {
     min-height: 10px;
+    margin: 0 .3em 0 0;
   }
   dl {
     dt {
@@ -79,4 +84,13 @@ input[type="text"].empty {
   .xErrorField {
     border-color: @state-danger-bg;
   }
+}
+
+.xformInline label{
+  text-transform: uppercase;
+  margin-right: 0.5em;
+}
+
+.xwiki-form-listclass{
+  display: block;
 }

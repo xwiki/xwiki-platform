@@ -31,7 +31,6 @@ import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
@@ -178,7 +177,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.registerComponents();
 
-        registerMockComponent(ContextualAuthorizationManager.class).stubs()
+        getContextualAuthorizationManager().stubs()
             .method("hasAccess").with(eq(Right.PROGRAM)).will(returnValue(true));
 
         // Setup display configuration.

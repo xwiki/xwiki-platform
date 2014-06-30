@@ -30,9 +30,6 @@
         #computeHierarchy($doc "<li class='active'>$escapetool.xml($tdoc.getPlainTitle())</li>" 0)
       #end
     #end
-    #if($xcontext.action == 'edit' && ($editor == 'wiki' || $editor == 'wysiwyg' || $editor == 'inline'))
-      <div class='edit-meta-tools'><a id='editParentTrigger' class='tool edit-parent' href='#mainEditArea' title="$services.localization.render('core.editors.content.parentField.edit.title')">[$services.localization.render('core.editors.content.parentField.edit')]</a></div>
-    #end
     </ol>
   #end
 #end

@@ -1297,7 +1297,7 @@ ${Msz}Mb##
         <span class="pagination">
           <span class="xwiki-livetable-pagination-text">$services.localization.render('platform.livetable.paginationPage')</span>
           <span class="xwiki-livetable-pagination-content" ></span>
-        </ul>
+        </span>
       </td>
     </tr>
     <tr>
@@ -1389,6 +1389,7 @@ ${Msz}Mb##
     </tr>
     <tr>
       <td class="xwiki-livetable-pagination">
+        <span class="xwiki-livetable-limits"></span>
         <span class="controlPagination">
           <a title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPagePrevTitle')</span></a>
           <a title="$services.localization.render('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPageNextTitle')</span></a>
@@ -2199,7 +2200,7 @@ var $jsVarName = {
   #if ($name == '')
     #set ($name = $services.localization.render("$!{options.translationPrefix}${item.id}"))
   #end
-  $level (% id="vertical-menu-${item.id}" class="${class}" %){{html}}<a #if ("$!{item.url}" != '')href="$item.url"#{end}>$name</a>{{/html}}
+  $level (% id="vertical-menu-${item.id}" class="${class}" %){{html}}<a #if ("$!{item.url}" != '')href="$item.url"#{end}>#if($item.glyphicon)#glyphicon($item.glyphicon) #end$name</a>{{/html}}
   #if ($hasChildren)
     #foreach ($child in $item.children)
       #verticalNavigationItem($child $level.concat('*') $options)
@@ -2439,4 +2440,12 @@ Recursive title display detected!##
  *#
 #macro(breadcrumb_current_line $title)
   <li class="active">$title</li>
+#end
+
+###
+###    Glyph Icon
+###
+### @param iconName The name of the icon to display, without the glyphicon prefix (eg: 'globe')
+#macro(glyphicon $iconName)
+#if("$!iconName"!='')<span class="glyphicon glyphicon-${iconName}"></span>#end
 #end

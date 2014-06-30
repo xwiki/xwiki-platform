@@ -60,6 +60,9 @@ public class DatePingDataProvider implements PingDataProvider
 
     private static final String PROPERTY_MIN = "min";
 
+    private static final String ERROR_MESSAGE = "Failed to compute the first ping date and the number of elapsed days "
+        + "since the first ping. This information has not been added to the Active Installs ping data. Reason [{}]";
+
     @Inject
     private JestClientManager jestClientManager;
 
@@ -91,6 +94,11 @@ public class DatePingDataProvider implements PingDataProvider
                 .build();
             JestResult result = this.jestClientManager.getClient().execute(search);
 
+            if (!result.isSucceeded()) {
+                this.logger.warn(ERROR_MESSAGE, result.getErrorMessage());
+                return jsonMap;
+            }
+
             @SuppressWarnings("unchecked")
             Map<String, Object> aggregationsMap = (Map<String, Object>) result.getValue("aggregations");
             @SuppressWarnings("unchecked")
@@ -114,10 +122,7 @@ public class DatePingDataProvider implements PingDataProvider
         } catch (Exception e) {
             // If this fails we just don't send this information but we still send the other piece of information.
             // However we log a warning since it's a problem that needs to be seen and looked at.
-            this.logger.warn("Failed to compute the first ping date and the number of elapsed days since the first "
-                    + "ping. This information has not been added to the Active Installs ping data. Reason [{}]",
-                ExceptionUtils.getRootCauseMessage(e)
-            );
+            this.logger.warn(ERROR_MESSAGE, ExceptionUtils.getRootCauseMessage(e));
         }
         return jsonMap;
     }

@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.AttachmentReference;
@@ -68,6 +70,11 @@ public class OfficeMacroImporter
     private final EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
+     * Used to find out the Syntax of the document containing the attachment to render.
+     */
+    private final DocumentAccessBridge documentAccessBridge;
+
+    /**
      * Creates a new instance.
      * 
      * @param componentManager the component manager
@@ -78,6 +85,7 @@ public class OfficeMacroImporter
             macroTransformation = componentManager.getInstance(Transformation.class, "macro");
             xhtmlRenderer = componentManager.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");
             entityReferenceSerializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+            documentAccessBridge = componentManager.getInstance(DocumentAccessBridge.class);
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize the office importer based on office macro.", e);
         }
@@ -100,8 +108,22 @@ public class OfficeMacroImporter
         MacroBlock officeMacro = new MacroBlock("office", macroParams, false);
 
         XDOM xdom = new XDOM(Collections.<Block> singletonList(officeMacro));
+
+        // Since we're generating an XDOM block we need to set up the required MetaData information
+
+        // Set the BASE MetaData
         xdom.getMetaData().addMetaData(MetaData.BASE,
             entityReferenceSerializer.serialize(attachmentReference.getDocumentReference()));
+
+        // Set the SYNTAX MetaData
+        try {
+            DocumentModelBridge document = documentAccessBridge.getDocument(attachmentReference.getDocumentReference());
+            xdom.getMetaData().addMetaData(MetaData.SYNTAX, document.getSyntax());
+        } catch (Exception e) {
+            throw new RuntimeException(String.format(
+                "Failed to compute Syntax for the document containing attachment [%s]", attachmentReference));
+        }
+
         return xdom;
     }
 

@@ -129,7 +129,7 @@ public class OfficeMacroImporter
             xdom.getMetaData().addMetaData(MetaData.SYNTAX, document.getSyntax());
         } catch (Exception e) {
             throw new RuntimeException(String.format(
-                "Failed to compute Syntax for the document containing attachment [%s]", attachmentReference));
+                "Failed to compute Syntax for the document containing attachment [%s]", attachmentReference), e);
         }
 
         return xdom;

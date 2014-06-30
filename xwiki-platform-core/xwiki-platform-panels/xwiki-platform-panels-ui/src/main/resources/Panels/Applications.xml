@@ -144,7 +144,7 @@
   &lt;ul class="applicationsPanel applicationsPanelMoreList nav nav-pills nav-stacked"&gt;
     &lt;li&gt;&lt;a href="$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.AddExtensions')" class="applicationPanelMoreButton"&gt;&lt;span class="application-img"&gt;image:icon:add &lt;/span&gt; &lt;span class="application-label"&gt;$services.localization.render('panels.applications.more')&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
   &lt;div class="applicationPanelMoreContainer hidden"&gt;
-    &lt;ul&gt;
+    &lt;ul class="nav nav-pills nav-stacked"&gt;
       #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications.more', {'sortByParameter' : 'label'}))
         #set($params = $uix.getParameters())
         #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '')

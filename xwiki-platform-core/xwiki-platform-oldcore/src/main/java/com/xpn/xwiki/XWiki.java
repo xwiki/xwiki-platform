@@ -1633,7 +1633,8 @@ public class XWiki implements EventListener
                     doc.getXObject(new DocumentReference(doc.getDocumentReference().getWikiReference().getName(),
                         SYSTEM_SPACE, "XWikiSkins"));
                 if (object != null) {
-                    String content = object.getStringValue(template);
+                    String escapedTemplateName = template.replaceAll("/", ".");
+                    String content = object.getStringValue(escapedTemplateName);
                     if (StringUtils.isNotBlank(content)) {
                         // Let's use this template
                         // Use "" as namespace to register macros in global namespace. That way it

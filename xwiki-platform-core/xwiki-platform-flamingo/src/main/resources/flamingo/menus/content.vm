@@ -1,5 +1,5 @@
 #set ($canShare = $canView && $xwiki.exists('XWiki.SharePage') && !$isGuest)
-<div id="contentmenu" class="pull-right">
+<div id="contentmenu" class="pull-right actionmenu">
 #if($hasEdit && !$isReadOnly)
   ## Compute the default edit mode
   #set($editaction = $doc.getDefaultEditMode())

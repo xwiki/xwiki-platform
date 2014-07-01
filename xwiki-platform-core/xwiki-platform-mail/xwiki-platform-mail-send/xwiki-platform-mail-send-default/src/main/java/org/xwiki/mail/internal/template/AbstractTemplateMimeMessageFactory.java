@@ -41,8 +41,6 @@ import org.xwiki.model.reference.DocumentReference;
  */
 public abstract class AbstractTemplateMimeMessageFactory implements MimeMessageFactory
 {
-    @Inject
-    private Execution execution;
 
     /**
      * @return the Template Manager instance to use, this allows passing either the default component implementation or

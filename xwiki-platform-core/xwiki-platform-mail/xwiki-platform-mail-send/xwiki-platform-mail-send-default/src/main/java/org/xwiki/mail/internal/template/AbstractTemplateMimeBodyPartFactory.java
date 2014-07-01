@@ -64,9 +64,6 @@ public abstract class AbstractTemplateMimeBodyPartFactory extends AbstractMimeBo
     @Inject
     private AttachmentConverter attachmentConverter;
 
-    @Inject
-    private Execution execution;
-
     /**
      * @return the Template Manager instance to use, this allows passing either the default component implementation or
      * a secure one for scripts

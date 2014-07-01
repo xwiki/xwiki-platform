@@ -20,21 +20,31 @@
 package org.xwiki.mail.internal.template;
 
 import java.io.Writer;
+import java.util.Collections;
 import java.util.HashMap;
 
 import javax.mail.MessagingException;
 
 import org.apache.velocity.VelocityContext;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -60,14 +70,38 @@ public class DefaultMailTemplateManagerTest
     public MockitoComponentMockingRule<DefaultMailTemplateManager> mocker =
         new MockitoComponentMockingRule<>(DefaultMailTemplateManager.class);
 
+    @Before
+    public void setUp() throws Exception
+    {
+        Execution execution = this.mocker.getInstance(Execution.class);
+
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+        when(execution.getContext()).thenReturn(executionContext);
+
+        XWikiContext xwikiContext = mock(XWikiContext.class);
+        when(executionContext.getProperty("xwikicontext")).thenReturn(xwikiContext);
+
+        XWiki xwiki = mock(XWiki.class);
+        when(xwikiContext.getWiki()).thenReturn(xwiki);
+        when(xwiki.getDefaultLocale(xwikiContext)).thenReturn(LocaleUtils.toLocale("en"));
+
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(xwiki.getDocument(any(DocumentReference.class), eq(xwikiContext))).thenReturn(document);
+
+        BaseObject object = mock(BaseObject.class);
+
+        when(document.getXObjects(any(DocumentReference.class))).thenReturn(Collections.singletonList(object));
+    }
+
     @Test
     public void evaluate() throws Exception
     {
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = mock(DocumentReference.class);
 
-        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), anyInt(), eq("html"))).thenReturn(
-            "Hello <b>${name}</b> <br />${email}");
+        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), anyInt(), eq("html")))
+            .thenReturn(
+                "Hello <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
@@ -97,8 +131,11 @@ public class DefaultMailTemplateManagerTest
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = mock(DocumentReference.class);
 
-        when(documentBridge.getObjectNumber(same(documentReference), any(DocumentReference.class), eq("language"), eq("fr"))).thenReturn(1);
-        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), eq(1) , eq("html"))).thenReturn(
+        when(documentBridge
+            .getObjectNumber(any(DocumentReference.class), any(DocumentReference.class), eq("language"), anyString()))
+            .thenReturn(1);
+        when(documentBridge.getProperty(any(DocumentReference.class), any(DocumentReference.class), eq(1), eq("html")))
+            .thenReturn(
                 "Salut <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
@@ -115,10 +152,11 @@ public class DefaultMailTemplateManagerTest
                 return null;
             }
         }).when(velocityEngine).evaluate(any(VelocityContext.class), any(Writer.class),
-                anyString(), eq("Salut <b>${name}</b> <br />${email}"));
+            anyString(), eq("Salut <b>${name}</b> <br />${email}"));
 
         String result =
-                this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>(), "fr");
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>(),
+                LocaleUtils.toLocale("fr"));
 
         assertEquals(result, "Salut <b>John Doe</b> <br />john@doe.com");
     }
@@ -129,8 +167,9 @@ public class DefaultMailTemplateManagerTest
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = mock(DocumentReference.class);
 
-        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class),anyInt() , eq("html"))).thenReturn(
-            "Hello <b>${name}</b> <br />${email}");
+        when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), anyInt(), eq("html")))
+            .thenReturn(
+                "Hello <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);

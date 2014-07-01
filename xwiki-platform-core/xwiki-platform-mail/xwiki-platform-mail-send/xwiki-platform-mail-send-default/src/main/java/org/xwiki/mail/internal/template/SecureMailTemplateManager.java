@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal.template;
 
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -55,7 +56,7 @@ public class SecureMailTemplateManager implements MailTemplateManager
 
     @Override
     public String evaluate(DocumentReference documentReference, String property, Map<String, String> velocityVariables,
-        String language)
+        Locale language)
         throws MessagingException
     {
         // Verify that the current user has the view right on the Template document

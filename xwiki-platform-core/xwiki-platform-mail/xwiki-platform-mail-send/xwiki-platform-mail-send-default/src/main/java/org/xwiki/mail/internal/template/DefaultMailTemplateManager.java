@@ -20,6 +20,7 @@
 package org.xwiki.mail.internal.template;
 
 import java.io.StringWriter;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -30,6 +31,7 @@ import javax.mail.MessagingException;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -37,6 +39,9 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 /**
  * Default implementation evaluating template properties by taking them from {@code XWiki.Mail} and applying Velocity on
@@ -50,7 +55,9 @@ import org.xwiki.velocity.XWikiVelocityException;
 public class DefaultMailTemplateManager implements MailTemplateManager
 {
     private static final EntityReference MAIL_CLASS =
-            new EntityReference("Mail", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+        new EntityReference("Mail", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+
+    private static final String LANGUAGE_PROPERTY_NAME = "language";
 
     @Inject
     private DocumentAccessBridge documentBridge;
@@ -65,37 +72,81 @@ public class DefaultMailTemplateManager implements MailTemplateManager
     @Inject
     private VelocityManager velocityManager;
 
+    @Inject
+    private Execution execution;
+
     @Override
     public String evaluate(DocumentReference documentReference, String property, Map<String, String> data,
-            String language)
+        Locale language)
         throws MessagingException
     {
-        VelocityContext velocityContext = createVelocityContext(data);
         DocumentReference mailClassReference = this.resolver.resolve(MAIL_CLASS);
 
+        VelocityContext velocityContext = createVelocityContext(data);
+
         String templateFullName = this.serializer.serialize(documentReference);
-        int objectNumber = 0;
-        if (language != null) {
-            objectNumber =
-                    this.documentBridge.getObjectNumber(documentReference, mailClassReference, "language", language);
-        }
+
+        int objectNumber = getObjectMailNumber(documentReference, mailClassReference, language);
+
         String content =
-                this.documentBridge.getProperty(documentReference, mailClassReference, objectNumber, property)
-                        .toString();
+            this.documentBridge.getProperty(documentReference, mailClassReference, objectNumber, property)
+                .toString();
         try {
             StringWriter writer = new StringWriter();
             velocityManager.getVelocityEngine().evaluate(velocityContext, writer, templateFullName, content);
             return writer.toString();
         } catch (XWikiVelocityException e) {
             throw new MessagingException(String.format("Failed to evaluate property [%s] for Document reference [%s]",
-                    property, documentReference), e);
+                property, documentReference), e);
         }
     }
 
-    @Override public String evaluate(DocumentReference documentReference, String property, Map<String, String> data)
+    @Override
+    public String evaluate(DocumentReference documentReference, String property, Map<String, String> data)
         throws MessagingException
     {
-        return evaluate(documentReference, property, data, null);
+        return evaluate(documentReference, property, data, getDefaultLocale());
+    }
+
+    private int getObjectMailNumber(DocumentReference documentReference, DocumentReference mailClassReference,
+        Locale language) throws MessagingException
+    {
+        int number = -1;
+
+        number = this.documentBridge.getObjectNumber(documentReference, mailClassReference, LANGUAGE_PROPERTY_NAME,
+            language.getLanguage());
+
+        if (!getDefaultLocale().equals(language) && number == -1) {
+            number =
+                this.documentBridge
+                    .getObjectNumber(documentReference, mailClassReference, LANGUAGE_PROPERTY_NAME,
+                        language.getLanguage());
+        } else if (getMailObjectsCount(documentReference, mailClassReference) == 1 && number == -1) {
+            number = 0;
+        } else if (number == -1) {
+            throw new MessagingException(
+                String.format("Failed to retrieve XWiki.Mail xobject from Document reference [%s]", documentReference),
+                new Exception());
+        }
+
+        return number;
+    }
+
+    private int getMailObjectsCount(DocumentReference documentReference, DocumentReference mailClassReference)
+        throws MessagingException
+    {
+        XWikiContext context = getXWikiContext();
+        int objectsCount = 0;
+        try {
+            objectsCount =
+                context.getWiki().getDocument(documentReference, context).getXObjects(mailClassReference)
+                    .size();
+        } catch (XWikiException e) {
+            throw new MessagingException(
+                String.format("Failed to retrieve XWiki.Mail xobjects from Document reference [%s]",
+                    documentReference), e);
+        }
+        return objectsCount;
     }
 
     private VelocityContext createVelocityContext(Map<String, String> data)
@@ -108,5 +159,16 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         }
 
         return velocityContext;
+    }
+
+    private XWikiContext getXWikiContext()
+    {
+        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+    }
+
+    private Locale getDefaultLocale()
+    {
+        XWikiContext context = getXWikiContext();
+        return context.getWiki().getDefaultLocale(context);
     }
 }

@@ -19,6 +19,8 @@
  */
 package org.xwiki.wiki.internal.manager;
 
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -47,6 +49,8 @@ public class DefaultWikiDescriptorCache implements WikiDescriptorCache, Initiali
     private Cache<DefaultWikiDescriptor> wikiAliasCache;
 
     private Cache<DefaultWikiDescriptor> wikiIdCache;
+
+    private Collection<String> wikiIds;
 
     @Override
     public void initialize() throws InitializationException
@@ -101,5 +105,17 @@ public class DefaultWikiDescriptorCache implements WikiDescriptorCache, Initiali
     public DefaultWikiDescriptor getFromAlias(String wikiAlias)
     {
         return wikiAliasCache.get(wikiAlias);
+    }
+
+    @Override
+    public void setWikiIds(Collection<String> wikiIds)
+    {
+        this.wikiIds = wikiIds;
+    }
+
+    @Override
+    public Collection<String> getWikiIds()
+    {
+        return this.wikiIds;
     }
 }

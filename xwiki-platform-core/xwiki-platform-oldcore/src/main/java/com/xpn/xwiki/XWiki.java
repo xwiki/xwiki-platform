@@ -869,24 +869,19 @@ public class XWiki implements EventListener
      *         Note: the wiki name is commonly also the name of the databse where the wiki's data is stored. However, if
      *         configured accordingly, the database can be diferent from the wiki name, like for example when setting a
      *         wiki database prefix.
-     * @deprecated since 5.3, use {@link WikiDescriptorManager#getAll()} instead
+     * @deprecated since 5.3, use {@link WikiDescriptorManager#getAllIds()} instead
      */
     @Deprecated
     public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
     {
-        List<String> wikis = new ArrayList<String>();
-
         WikiDescriptorManager descriptorManager = Utils.getComponent(WikiDescriptorManager.class);
+
         try {
-            for (WikiDescriptor descriptor : descriptorManager.getAll()) {
-                wikis.add(descriptor.getId());
-            }
+            return new ArrayList<String>(descriptorManager.getAllIds());
         } catch (WikiManagerException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to get the list of wikis", e);
         }
-
-        return wikis;
     }
 
     /**

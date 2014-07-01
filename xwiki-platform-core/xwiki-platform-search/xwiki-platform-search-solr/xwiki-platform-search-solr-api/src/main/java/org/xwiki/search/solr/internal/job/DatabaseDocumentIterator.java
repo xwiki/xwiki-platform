@@ -21,7 +21,6 @@ package org.xwiki.search.solr.internal.job;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -44,7 +43,6 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -258,16 +256,15 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
     private List<String> getWikis()
     {
         if (rootReference == null) {
-            List<String> wikis = new ArrayList<String>();
-            Collection<WikiDescriptor> wikiDescriptors = Collections.emptyList();
+            List<String> wikis;
             try {
-                wikiDescriptors = wikiDescriptorManager.getAll();
+                wikis = new ArrayList<String>(wikiDescriptorManager.getAllIds());
             } catch (WikiManagerException e) {
                 logger.error("Failed to get the list of available wikis.", e);
+
+                wikis = Collections.emptyList();
             }
-            for (WikiDescriptor wikiDescriptor : wikiDescriptors) {
-                wikis.add(wikiDescriptor.getId());
-            }
+
             return wikis;
         } else {
             return Arrays.asList(rootReference.extractReference(EntityType.WIKI).getName());

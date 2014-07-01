@@ -349,6 +349,13 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/wiki/descriptor/WikiDescriptorManager</className>
+              <method>java.util.Collection getAllIds()</method>
+              <justification>Wiki module is still a young API.
+              Added an API for a very common use case so that we optimize it</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

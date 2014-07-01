@@ -19,9 +19,11 @@
  */
 package org.xwiki.search.solr.internal.job;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +44,6 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
@@ -60,13 +61,11 @@ public class DatabaseDocumentIteratorTest
     @Before
     public void configure() throws Exception
     {
-        WikiDescriptor chess = new WikiDescriptor("chess", null);
-        WikiDescriptor tennis = new WikiDescriptor("tennis", null);
         // We explicitly leave the list of wikis unsorted.
-        Collection<WikiDescriptor> wikiDescriptors = Arrays.asList(tennis, chess);
+        Collection<String> wikiIds = Arrays.asList("chess", "tennis");
 
         WikiDescriptorManager wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        when(wikiDescriptorManager.getAll()).thenReturn(wikiDescriptors);
+        when(wikiDescriptorManager.getAllIds()).thenReturn(wikiIds);
     }
 
     @Test

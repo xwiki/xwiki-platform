@@ -1294,6 +1294,34 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/application_view_tile.png')");
 }
 
+.actionmenu .tmMainWiki{
+  background-image: url("$xwiki.getSkinFile('icons/silk/house.png')");
+}
+
+.actionmenu .tmAdminMainWiki {
+  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
+}
+
+.actionmenu .tmWikiIndex {
+  background-image: url("$xwiki.getSkinFile('icons/silk/text_list_bullets.png')");
+}
+
+.actionmenu .tmMainWikiDocumentIndex {
+  background-image: url("$xwiki.getSkinFile('icons/silk/book_open.png')");
+}
+
+.actionmenu .tmMainUserIndex {
+  background-image: url("$xwiki.getSkinFile('icons/silk/group.png')");
+}
+
+.actionmenu .tmDeleteWiki {
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
+}
+
+.actionmenu .tmUserWikis {
+  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
+}
+
 /* Styles for the floating menu, when scrolling down the page. */
 .floating-menu {
   margin-top: -18px;

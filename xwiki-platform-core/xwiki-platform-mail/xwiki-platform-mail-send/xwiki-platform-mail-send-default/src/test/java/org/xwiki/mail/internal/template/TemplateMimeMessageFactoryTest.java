@@ -20,6 +20,9 @@
 package org.xwiki.mail.internal.template;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Session;
@@ -27,16 +30,12 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.mail.internal.template.DefaultMailTemplateManager;
-import org.xwiki.mail.internal.template.TemplateMimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
@@ -52,7 +51,7 @@ public class TemplateMimeMessageFactoryTest
 {
     @Rule
     public MockitoComponentMockingRule<TemplateMimeMessageFactory> mocker =
-            new MockitoComponentMockingRule<>(TemplateMimeMessageFactory.class);
+        new MockitoComponentMockingRule<>(TemplateMimeMessageFactory.class);
 
     @Test
     public void createMessage() throws Exception
@@ -60,12 +59,17 @@ public class TemplateMimeMessageFactoryTest
         DocumentReference documentReference = mock(DocumentReference.class);
 
         DefaultMailTemplateManager mailTemplateManager = this.mocker.getInstance(DefaultMailTemplateManager.class);
-        when(mailTemplateManager.evaluate(same(documentReference), eq("subject"), anyMap(), anyString())).thenReturn(
+        when(mailTemplateManager.evaluate(same(documentReference), eq("subject"), anyMap(), any(Locale.class)))
+            .thenReturn(
                 "XWiki news");
 
         Session session = Session.getDefaultInstance(new Properties());
-        MimeMessage message = this.mocker.getComponentUnderTest()
-                .createMessage(session, documentReference, Collections.<String, Object>singletonMap("company", "XWiki"));
+
+        Map<String, Object> parameters = new HashMap();
+        parameters.put("language", "fr");
+        parameters.put("velocityVariables", Collections.<String, Object>singletonMap("company", "XWiki"));
+
+        MimeMessage message = this.mocker.getComponentUnderTest().createMessage(session, documentReference, parameters);
 
         assertEquals("XWiki news", message.getSubject());
     }

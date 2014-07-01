@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal.template;
 
+import java.util.Locale;
 import java.util.Map;
 
 import javax.mail.MessagingException;
@@ -46,7 +47,7 @@ public interface MailTemplateManager
      * @throws MessagingException when an error occurs
      */
     String evaluate(DocumentReference documentReference, String property, Map<String, String> velocityVariables,
-        String language)
+        Locale language)
         throws MessagingException;
 
     /**

@@ -493,28 +493,40 @@ th.avatar {
   padding: 0 25px 25px;
 }
 
-.panel-left-width-Small .main{
+.panel-left-width-Small .main {
   margin-left: 100px;
 }
 
-.panel-left-width-Medium .main{
+.panel-left-width-Medium .main {
   margin-left: 200px;
 }
 
-.panel-left-width-Large .main{
+.panel-left-width-Large .main {
   margin-left: 300px;
 }
 
-.panel-right-width-Small .main{
+.panel-right-width-Small .main {
   margin-right: 100px;
 }
 
-.panel-right-width-Medium .main{
+.panel-right-width-Small .editor .alleditcontent {
+  margin-right: 125px;
+}
+
+.panel-right-width-Medium .main {
   margin-right: 200px;
 }
 
-.panel-right-width-Large .main{
+panel-right-width-Medium .editor .alleditcontent {
+  margin-right: 225px;
+}
+
+.panel-right-width-Large .main {
   margin-right: 300px;
+}
+
+.panel-right-width-Large .editor .alleditcontent {
+  margin-right: 325px;
 }
 
 #body.hideleft #contentcolumn .main {
@@ -1677,9 +1689,9 @@ input.icon-button {
 /* --------------------------------------------------------------
   * Panel elements
 -------------------------------------------------------------- */
-#rightPanels {
+#rightPanels, #editPanels {
   float: right;
-  margin: 0 0 0 -380px;
+  margin: 0 0 0 -325px;
 }
 
 #leftPanels {
@@ -1687,69 +1699,50 @@ input.icon-button {
   margin: 0 0 0 -100%;
 }
 
-.panel-left-width-Small #leftPanels{
-  width: 110px;
+.panel-left-width-Small #leftPanels, 
+.panel-right-width-Small #rightPanels,
+.panel-right-width-Small #editPanels {
+  width: 125px;
 }
 
-.panel-left-width-Small #leftPanels > .panel{
-  width: 90px;
+.panel-left-width-Small #leftPanels > .panel, 
+.panel-right-width-Small #rightPanels > .panel, 
+.panel-right-width-Small #editPanels > .panel {
+  width: 85px;
 }
 
-.panel-left-width-Medium #leftPanels{
-  width: 220px;
+.panel-left-width-Medium #leftPanels, 
+.panel-right-width-Medium #rightPanels, 
+.panel-right-width-Medium #editPanels {
+  width: 225px;
 }
 
-.panel-left-width-Medium #leftPanels > .panel{
-  width: 190px;
+.panel-left-width-Medium #leftPanels > .panel, 
+.panel-right-width-Medium #rightPanels > .panel, 
+.panel-right-width-Medium #editPanels > .panel {
+  width: 185px;
 }
 
-.panel-left-width-Large #leftPanels{
-  width: 330px;
+.panel-left-width-Large #leftPanels, 
+.panel-right-width-Large #rightPanels, 
+.panel-right-width-Large #editPanels {
+  width: 325px;
 }
 
-.panel-left-width-Large #leftPanels > .panel{
-  width: 300px;
-}
-
-.panel-right-width-Small #rightPanels{
-  width: 110px;
-}
-
-.panel-right-width-Small #rightPanels > .panel{
-  width: 90px;
-}
-
-.panel-right-width-Medium #rightPanels{
-  width: 220px;
-}
-
-.panel-right-width-Medium #rightPanels > .panel{
-  width: 190px;
-}
-
-.panel-right-width-Large #rightPanels{
-  width: 330px;
-}
-
-.panel-right-width-Large #rightPanels > .panel{
-  width: 300px;
-}
-
-#editPanels {
-  float: left;
-  margin: 0 0 0 -220px;
+.panel-left-width-Large #leftPanels > .panel, 
+.panel-right-width-Large #rightPanels > .panel, 
+.panel-right-width-Large #editPanels > .panel {
+  width: 285px;
 }
 
 .panel {
   display: block;
 }
 
-#leftPanels .panel {
+#leftPanels .panel,
+#rightPanels .panel, 
+#editPanels .panel {
   margin: 0 0 10px 20px;
-}
-
-#rightPanels .panel, #editPanels .panel {
-  margin: 0 0 10px 10px;
 }
 
 h1.xwikipaneltitle {

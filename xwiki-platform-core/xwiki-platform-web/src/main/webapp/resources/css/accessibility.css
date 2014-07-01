@@ -1,6 +1,9 @@
 body {
   font-size: 100% !important;
 }
+.skin-flamingo {
+  font-size: 160% !important;
+}
 a:link, a:active, a:visited {
   text-decoration: underline;
 }

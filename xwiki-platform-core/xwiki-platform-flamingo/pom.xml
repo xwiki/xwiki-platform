@@ -73,7 +73,7 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- Step 1: Unpack Bootstrap jar in order to add less sources in Flamingo -->
+      <!-- Step 1: Unpack Bootstrap jar in order to add LESS sources in Flamingo -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>

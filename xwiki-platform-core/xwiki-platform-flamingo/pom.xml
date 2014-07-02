@@ -35,7 +35,9 @@
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Name to display by the Extension Manager -->
-      <xwiki.extension.name>Flamingo Skin</xwiki.extension.name>
+    <xwiki.extension.name>Flamingo Skin</xwiki.extension.name>
+    <!-- Bootstrap version is used in several places -->
+    <bootstrap.version>3.1.1</bootstrap.version>
   </properties>
   <dependencies>
     <!-- LESS Module -->
@@ -55,7 +57,7 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>bootstrap</artifactId>
-      <version>3.1.1</version>
+      <version>${bootstrap.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -71,6 +73,34 @@
   </dependencies>
   <build>
     <plugins>
+      <!-- Step 1: Unpack Bootstrap jar in order to add less sources in Flamingo -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>bootstrap-jar</id>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.webjars</groupId>
+                  <artifactId>bootstrap</artifactId>
+                  <version>${bootstrap.version}</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/bootstrap</outputDirectory>
+                  <includes>
+                    META-INF/resources/webjars/bootstrap/${bootstrap.version}/less/**
+                  </includes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Assembly -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

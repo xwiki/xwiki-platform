@@ -31,6 +31,11 @@
       <directory>${basedir}/src/main/resources</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>
+    <!-- Add bootstrap sources -->
+    <fileSet>
+      <directory>${project.build.directory}/bootstrap/META-INF/resources/webjars/bootstrap/${bootstrap.version}/less/</directory>
+      <outputDirectory>flamingo/less/bootstrap</outputDirectory>
+    </fileSet>
     <!-- Add License/Notice files -->
     <fileSet>
       <directory>${basedir}/target/maven-shared-archive-resources/</directory>

@@ -37,6 +37,9 @@
     ## ---------------------------------------------------------------------------------------------------------------
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     ## ---------------------------------------------------------------------------------------------------------------
+    ## Enable Responsiveness for phones
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    ## ---------------------------------------------------------------------------------------------------------------
     ## Favicons
     ## Legacy, for IE
     <link rel="shortcut icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.ico')" />

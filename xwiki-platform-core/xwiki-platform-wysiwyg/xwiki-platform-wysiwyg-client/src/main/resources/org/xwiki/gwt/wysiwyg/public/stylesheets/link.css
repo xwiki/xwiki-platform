@@ -66,5 +66,6 @@
 }
  
 .xSearchForm input.gwt-TextBox {
+  height: auto;
   width: 365px;
 }

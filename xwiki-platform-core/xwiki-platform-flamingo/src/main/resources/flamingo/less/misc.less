@@ -184,6 +184,17 @@ table {
   }
 }
 
+// FIX: Tree view (see XWIKI-10514).
+#XWEWrapper{
+  // Fix for IE11 (the first column is too large)
+  tr > td:first-child{
+    width: 0;
+  }
+  td{
+    vertical-align: middle;
+  }
+}
+
 // Export ---------------------------------------------------------------------
 #exportModal{
   .modal-body{

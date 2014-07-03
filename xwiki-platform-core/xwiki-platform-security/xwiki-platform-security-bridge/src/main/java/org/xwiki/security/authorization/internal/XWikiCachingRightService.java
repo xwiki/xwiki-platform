@@ -51,10 +51,10 @@ public class XWikiCachingRightService implements XWikiRightService
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiCachingRightService.class);
 
-    /** The login action. */
+    /** The delete action. */
     private static final String DELETE_ACTION = "delete";
 
-    /** The delete action. */
+    /** The login action. */
     private static final String LOGIN_ACTION = "login";
 
     /**

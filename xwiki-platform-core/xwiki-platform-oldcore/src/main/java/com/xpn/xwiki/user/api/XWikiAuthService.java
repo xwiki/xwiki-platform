@@ -26,26 +26,52 @@ import java.security.Principal;
 
 public interface XWikiAuthService
 {
+    /**
+     * Check whether a user is authenticated.
+     *
+     * @param context the XWiki context object
+     * @return a {@link XWikiUser} object representing the user or {@code null} if the user is not
+     *         authenticated
+     * @throws XWikiException in case of authentication error
+     */
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException;
 
     /**
-     * Authenticates the user.
+     * Check whether a user is authenticated.
+     *
+     * <p>Implementations may ignore username and password and just forward calls to
+     * {@link #checkAuth(XWikiContext)}, e.g. for Single sign-on (SSO) systems.
      *
      * @param username the user name for the user to authenticate
      * @param password the password of the user to authenticate
      * @param context the XWiki context object
-     * @return null if the user is not authenticated properly or a {@link XWikiUser} object
-     *         representing the authenticated user if successful
-     * @throws XWikiException in case of authentication error 
+     * @return a {@link XWikiUser} object representing the user or {@code null} if the user is not
+     *         authenticated
+     * @throws XWikiException in case of authentication error
      */
     public XWikiUser checkAuth(String username, String password, String rememberme,
         XWikiContext context) throws XWikiException;
 
+    /**
+     * Prints the login screen or redirects there.
+     *
+     * <p>This method is called when the user is not authenticated and XWiki determines that the
+     * user has to be to perform an action, e.g. by checking the "authenticate_edit" preference.
+     *
+     * @param context the XWiki context object
+     * @throws XWikiException in case of authentication error
+     */
     public void showLogin(XWikiContext context) throws XWikiException;
 
     /**
-     * @return a null Principal Object if the user hasn't been authenticated or a valid Principal
-     *         Object if the user is correctly authenticated
+     * Authenticates a user.
+     *
+     * @param username the user name for the user to authenticate
+     * @param password the password of the user to authenticate
+     * @param context the XWiki context object
+     * @return a {@link Principal} object representing the user or {@code null} if authentication
+     *         failed.
+     * @throws XWikiException in case of authentication error
      */
     public Principal authenticate(String username, String password, XWikiContext context)
         throws XWikiException;

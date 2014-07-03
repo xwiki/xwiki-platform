@@ -36,7 +36,6 @@
   <contentUpdateDate>1321383708000</contentUpdateDate>
   <version>1.1</version>
   <title>#if($doc.fullName=='AppWithinMinutes.LiveTableEditSheet')LiveTable Edit Sheet#{else}#evaluate($doc.title)#end</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -665,11 +664,10 @@ return XWiki;
   {{html}}&lt;div class="clearfloats"&gt;&lt;/div&gt;{{/html}}
 #end
 
-#macro(maybeGrantSpaceAdminRights)
-  #set($spaceHomeRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebHome'))
+#macro(maybeGrantSpaceAdminRight $spaceHomeRef)
   ## Grant space administration rights only if the space is new.
   #if(!$xwiki.exists($spaceHomeRef))
-    #set($spacePrefsRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebPreferences'))
+    #set($spacePrefsRef = $services.model.createDocumentReference($spaceHomeRef.wikiReference.name, $spaceHomeRef.lastSpaceReference.name, 'WebPreferences'))
     #set($spacePrefsDoc = $xwiki.getDocument($spacePrefsRef))
     ## Don't overwrite existing space preferences.
     #if($spacePrefsDoc.isNew())
@@ -682,6 +680,17 @@ return XWiki;
       #set($discard = $spacePrefsDoc.saveWithProgrammingRights($services.localization.render('platform.appwithinminutes.grantSpaceAdminRightsSaveComment')))
     #end
   #end
+#end
+
+#macro(maybeGrantSpaceAdminRights)
+  ## Data space
+  #set($dataSpaceHomeRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebHome'))
+  #maybeGrantSpaceAdminRight($dataSpaceHomeRef)
+  ## Code space
+  #set($className = $request.get('AppWithinMinutes.LiveTableClass_0_class'))
+  #set($classRef = $services.model.resolveDocument($className))
+  #set($codeSpaceHomeRef = $services.model.createDocumentReference($classRef.wikiReference.name, $classRef.lastSpaceReference.name, 'WebHome'))
+  #maybeGrantSpaceAdminRight($codeSpaceHomeRef)
 #end
 
 #macro(updateAndSaveLiveTable)

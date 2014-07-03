@@ -48,7 +48,9 @@ public interface XWikiAuthService
      * @return a {@link XWikiUser} object representing the user or {@code null} if the user is not
      *         authenticated
      * @throws XWikiException in case of authentication error
+     * @deprecated
      */
+    @Deprecated
     public XWikiUser checkAuth(String username, String password, String rememberme,
         XWikiContext context) throws XWikiException;
 

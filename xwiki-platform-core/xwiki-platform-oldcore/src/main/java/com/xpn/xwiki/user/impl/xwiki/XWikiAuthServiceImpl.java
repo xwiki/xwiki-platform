@@ -253,7 +253,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             final String userName = getContextUserName(wrappedRequest.getUserPrincipal(), context);
             if (LOGGER.isInfoEnabled()) {
                 if (userName != null) {
-                    LOGGER.info("User " + userName + " is authentified");
+                    LOGGER.info("User " + userName + " is authenticated");
                 }
             }
 
@@ -302,7 +302,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             Principal principal = wrappedRequest.getUserPrincipal();
             if (LOGGER.isInfoEnabled()) {
                 if (principal != null) {
-                    LOGGER.info("User " + principal.getName() + " is authentified");
+                    LOGGER.info("User " + principal.getName() + " is authenticated");
                 }
             }
 
@@ -320,18 +320,15 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     private String getContextUserName(Principal principal, XWikiContext context)
     {
-        String contextUserName;
-
-        if (principal != null) {
-            // Ensures that the wiki part is removed if specified in the Principal name and if it's not the same wiki
-            // as the current wiki.
-            // TODO: Warning the code below will fail if current doc's wiki != current wiki.
-            DocumentReference userDocumentReference =
-                this.currentDocumentReferenceResolver.resolve(principal.getName());
-            contextUserName = this.compactWikiEntityReferenceSerializer.serialize(userDocumentReference);
-        } else {
-            contextUserName = null;
+        if (principal == null) {
+            return null;
         }
+
+        // Ensures that the wiki part is removed if specified in the Principal name and if it's not the same wiki
+        // as the current wiki.
+        // TODO: Warning the code below will fail if current doc's wiki != current wiki.
+        DocumentReference userDocumentReference = this.currentDocumentReferenceResolver.resolve(principal.getName());
+        String contextUserName = this.compactWikiEntityReferenceSerializer.serialize(userDocumentReference);
 
         return contextUserName;
     }
@@ -383,70 +380,68 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             return authenticateSuperAdmin(password, context);
         }
 
+        if (context == null) {
+            LOGGER.error("XWikiContext is null");
+            return null;
+        }
+
         // If we have the context then we are using direct mode, and we should be able to specify the database
         // This is needed for virtual mode to work
-        if (context != null) {
-            String susername = cannonicalUsername;
-            String virtualXwikiName = null;
-            int i = cannonicalUsername.indexOf(".");
-            int j = cannonicalUsername.indexOf(":");
+        String susername = cannonicalUsername;
+        String virtualXwikiName = null;
+        int i = cannonicalUsername.indexOf(".");
+        int j = cannonicalUsername.indexOf(":");
 
-            // Extract the specified wiki name, if it exists
-            if (j > 0) {
-                virtualXwikiName = cannonicalUsername.substring(0, j);
+        // Extract the specified wiki name, if it exists
+        if (j > 0) {
+            virtualXwikiName = cannonicalUsername.substring(0, j);
+        }
+
+        // Use just the username, without a wiki or space prefix
+        if (i != -1) {
+            susername = cannonicalUsername.substring(i + 1);
+        } else if (j > 0) {
+            // The username could be in the format xwiki:Username, so strip the wiki prefix.
+            susername = cannonicalUsername.substring(j + 1);
+        }
+
+        String db = context.getWikiId();
+
+        try {
+            // Set the context database to the specified wiki, if any
+            if (virtualXwikiName != null) {
+                context.setWikiId(virtualXwikiName);
             }
-
-            // Use just the username, without a wiki or space prefix
-            if (i != -1) {
-                susername = cannonicalUsername.substring(i + 1);
-            } else if (j > 0) {
-                // The username could be in the format xwiki:Username, so strip the wiki prefix.
-                susername = cannonicalUsername.substring(j + 1);
-            }
-
-            String db = context.getWikiId();
-
+            // Check in the current database first
             try {
-                // Set the context database to the specified wiki, if any
-                if (virtualXwikiName != null) {
-                    context.setWikiId(virtualXwikiName);
+                String user = findUser(susername, context);
+                if (user != null && checkPassword(user, password, context)) {
+                    return new SimplePrincipal(virtualXwikiName != null ? context.getWikiId() + ":" + user : user);
                 }
-                // Check in the current database first
+            } catch (Exception e) {
+                // continue
+            }
+
+            if (!context.isMainWiki()) {
+                // Then we check in the main database
+                context.setWikiId(context.getMainXWiki());
                 try {
                     String user = findUser(susername, context);
                     if (user != null && checkPassword(user, password, context)) {
-                        return new SimplePrincipal(virtualXwikiName != null ? context.getWikiId() + ":" + user : user);
+                        return new SimplePrincipal(context.getWikiId() + ":" + user);
                     }
                 } catch (Exception e) {
-                    // continue
+                    context.put("message", "loginfailed");
+                    return null;
                 }
-
-                if (!context.isMainWiki()) {
-                    // Then we check in the main database
-                    context.setWikiId(context.getMainXWiki());
-                    try {
-                        String user = findUser(susername, context);
-                        if (user != null && checkPassword(user, password, context)) {
-                            return new SimplePrincipal(context.getWikiId() + ":" + user);
-                        }
-                    } catch (Exception e) {
-                        context.put("message", "loginfailed");
-                        return null;
-                    }
-                }
-
-                // No user found
-                context.put("message", "invalidcredentials");
-                return null;
-
-            } finally {
-                context.setWikiId(db);
             }
 
-        } else {
-            LOGGER.error("XWikiContext is null");
-
+            // No user found
+            context.put("message", "invalidcredentials");
             return null;
+
+        } finally {
+            context.setWikiId(db);
         }
     }
 
@@ -537,32 +532,32 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             LOGGER.debug("Create user param is " + createuser);
         }
 
-        if (createuser != null) {
-            String wikiname = context.getWiki().clearName(user, true, true, context);
-            XWikiDocument userdoc =
-                context.getWiki().getDocument(new DocumentReference(context.getWikiId(), "XWiki", wikiname), context);
-            if (userdoc.isNew()) {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("User page does not exist for user " + user);
-                }
-
-                if ("empty".equals(createuser)) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Creating emptry user for user " + user);
-                    }
-
-                    context.getWiki().createEmptyUser(wikiname, "edit", context);
-                }
-            } else {
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("User page already exists for user " + user);
-                }
-            }
-
-            return wikiname;
+        if (createuser == null) {
+            return user;
         }
 
-        return user;
+        String wikiname = context.getWiki().clearName(user, context);
+        XWikiDocument userdoc =
+            context.getWiki().getDocument(new DocumentReference(context.getWikiId(), "XWiki", wikiname), context);
+        if (userdoc.isNew()) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("User page does not exist for user " + user);
+            }
+
+            if ("empty".equals(createuser)) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Creating emptry user for user " + user);
+                }
+
+                context.getWiki().createEmptyUser(wikiname, "edit", context);
+            }
+        } else {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("User page already exists for user " + user);
+            }
+        }
+
+        return wikiname;
     }
 
     /**

@@ -22,6 +22,7 @@ package org.xwiki.mail.internal.template;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -30,6 +31,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.AbstractMimeBodyPartFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -73,8 +75,13 @@ public abstract class AbstractTemplateMimeBodyPartFactory extends AbstractMimeBo
     {
         Map<String, String> velocityVariables = (Map<String, String>) parameters.get("velocityVariables");
 
-        String textContent = getTemplateManager().evaluate(documentReference, "text", velocityVariables);
-        String htmlContent = getTemplateManager().evaluate(documentReference, "html", velocityVariables);
+        String language = (String) parameters.get("language");
+
+        Locale locale = LocaleUtils.toLocale(language);
+
+        String textContent = getTemplateManager().evaluate(documentReference, "text", velocityVariables, locale);
+        String htmlContent =
+            getTemplateManager().evaluate(documentReference, "html", velocityVariables, locale);
 
         Map<String, Object> htmlParameters = new HashMap<>();
         htmlParameters.put("alternate", textContent);
@@ -96,7 +103,8 @@ public abstract class AbstractTemplateMimeBodyPartFactory extends AbstractMimeBo
                 attachments.addAll(this.attachmentConverter.convert(xwikiAttachments));
             } catch (Exception e) {
                 throw new MessagingException(
-                    String.format("Failed to include attachments from the Mail Template [%s]", documentReference), e);
+                    String.format("Failed to include attachments from the Mail Template [%s]", documentReference),
+                    e);
             }
         }
         if (!attachments.isEmpty()) {

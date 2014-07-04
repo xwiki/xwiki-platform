@@ -19,12 +19,14 @@
  */
 package org.xwiki.mail.internal.template;
 
+import java.util.Locale;
 import java.util.Map;
 
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
 
@@ -37,6 +39,7 @@ import org.xwiki.model.reference.DocumentReference;
  */
 public abstract class AbstractTemplateMimeMessageFactory implements MimeMessageFactory
 {
+
     /**
      * @return the Template Manager instance to use, this allows passing either the default component implementation or
      * a secure one for scripts
@@ -48,7 +51,15 @@ public abstract class AbstractTemplateMimeMessageFactory implements MimeMessageF
     {
         MimeMessage message = new MimeMessage(session);
         DocumentReference documentReference = (DocumentReference) source;
-        String subject = getTemplateManager().evaluate(documentReference, "subject", (Map<String, String>) parameters);
+
+        Map<String, String> velocityVariables = (Map<String, String>) parameters.get("velocityVariables");
+
+        String language = (String) parameters.get("language");
+
+        Locale locale = LocaleUtils.toLocale(language);
+
+        String subject = getTemplateManager()
+            .evaluate(documentReference, "subject", (Map<String, String>) velocityVariables, locale);
         message.setSubject(subject);
         return message;
     }

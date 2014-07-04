@@ -138,7 +138,7 @@ public class DefaultMailTemplateManager implements MailTemplateManager
                     documentReference, language));
         } else if (number == -1) {
             throw new MessagingException(String.format(
-                "No [%s] object matches the language [%s] or the default language [%s] in the Document [%s]",
+                "No [%s] object matches the locale [%s] or the default locale [%s] in the Document [%s]",
                     language, getDefaultLocale(), documentReference));
         }
         return number;

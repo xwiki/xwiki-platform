@@ -32,8 +32,7 @@ import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
 
-import static org.junit.Assert.*;
-
+import static org.junit.Assert.assertEquals;
 
 /**
  * UI tests for the Mail Sender feature.
@@ -78,7 +77,8 @@ public class MailSenderTest extends AbstractTest
         // Create a Wiki page containing a Mail Template (ie a XWiki.Mail object)
         getUtil().createPage(getTestClassName(), "MailTemplate", "", "");
         getUtil().addObject(getTestClassName(), "MailTemplate", "XWiki.Mail",
-            "subject", "Status for $name", "html", "<strong>Hello $name</strong>", "text", "Hello $name");
+            "subject", "Status for $name", "language", "en", "html", "<strong>Hello $name</strong>", "text",
+            "Hello $name");
         ByteArrayInputStream bais = new ByteArrayInputStream("content".getBytes());
         getUtil().attachFile(getTestClassName(), "MailTemplate", "something.txt", bais, true,
             new UsernamePasswordCredentials("superadmin", "pass"));
@@ -86,11 +86,11 @@ public class MailSenderTest extends AbstractTest
         // Create another page with the Velocity script to send the template email
         String velocity = "{{velocity}}\n"
             + "#set ($message = $services.mailsender.createMessage('localhost@xwiki.org', 'john@doe.com', "
-                + "'subject test'))\n"
+            + "'subject test'))\n"
             + "#set ($templateReference = $services.model.createDocumentReference('', '" + getTestClassName()
-                + "', 'MailTemplate'))\n"
+            + "', 'MailTemplate'))\n"
             + "#set ($discard = $message.addPart('xwiki/template', $templateReference, "
-                + "{'velocityVariables' : { 'name' : 'John' }}))\n"
+            + "{'velocityVariables' : { 'name' : 'John' }, 'language' : 'en'}))\n"
             + "#set ($discard = $message.send())\n"
             + "{{/velocity}}";
         getUtil().createPage(getTestClassName(), "SendMail", velocity, "");
@@ -98,6 +98,5 @@ public class MailSenderTest extends AbstractTest
         // Verify that the mail has been received.
         this.mail.waitForIncomingEmail(10000L, 1);
         assertEquals(1, this.mail.getReceivedMessages().length);
-
     }
 }

@@ -40,6 +40,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.environment.Environment;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
@@ -63,6 +64,8 @@ public class WikiTemplateRendererTest
 
     private VelocityEngine velocityEngineMock;
 
+    private RenderingConfiguration renderingConfigurationMock;
+
     @Before
     public void before() throws XWikiVelocityException
     {
@@ -77,6 +80,7 @@ public class WikiTemplateRendererTest
     {
         this.environmentmMock = this.mocker.registerMockComponent(Environment.class);
         this.velocityManagerMock = this.mocker.registerMockComponent(VelocityManager.class);
+        this.renderingConfigurationMock = this.mocker.registerMockComponent(RenderingConfiguration.class);
     }
 
     private void setTemplateContent(String content) throws UnsupportedEncodingException
@@ -112,8 +116,8 @@ public class WikiTemplateRendererTest
     }
 
     @Test
-    public void testRenderWithoutRawSyntax() throws ComponentLookupException, ParseException, MissingParserException, IOException,
-        XWikiVelocityException
+    public void testRenderWithoutRawSyntax() throws ComponentLookupException, ParseException, MissingParserException,
+        IOException, XWikiVelocityException
     {
         when(
             this.velocityEngineMock.evaluate(Matchers.<Context> any(), Matchers.<Writer> any(), anyString(),

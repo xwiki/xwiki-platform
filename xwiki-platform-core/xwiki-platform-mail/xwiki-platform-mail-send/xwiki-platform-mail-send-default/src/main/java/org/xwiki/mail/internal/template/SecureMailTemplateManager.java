@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal.template;
 
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -54,7 +55,8 @@ public class SecureMailTemplateManager implements MailTemplateManager
     private DocumentAccessBridge documentBridge;
 
     @Override
-    public String evaluate(DocumentReference documentReference, String property, Map<String, String> data)
+    public String evaluate(DocumentReference documentReference, String property, Map<String, String> velocityVariables,
+        Locale language)
         throws MessagingException
     {
         // Verify that the current user has the view right on the Template document
@@ -66,6 +68,13 @@ public class SecureMailTemplateManager implements MailTemplateManager
                     this.documentBridge.getCurrentUserReference(), documentReference));
         }
 
-        return this.templateManager.evaluate(documentReference, property, data);
+        return this.templateManager.evaluate(documentReference, property, velocityVariables, language);
+    }
+
+    @Override public String evaluate(DocumentReference documentReference, String property,
+        Map<String, String> velocityVariables)
+        throws MessagingException
+    {
+        return evaluate(documentReference, property, velocityVariables, null);
     }
 }

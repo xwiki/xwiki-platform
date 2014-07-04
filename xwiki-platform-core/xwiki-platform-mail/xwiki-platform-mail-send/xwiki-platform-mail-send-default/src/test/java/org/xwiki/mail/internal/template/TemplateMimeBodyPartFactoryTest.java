@@ -40,12 +40,12 @@ import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-
-import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.template.TemplateMimeBodyPartFactory}.
@@ -65,10 +65,12 @@ public class TemplateMimeBodyPartFactoryTest
     public void setUp() throws Exception
     {
         MailTemplateManager mailTemplateManager = this.mocker.getInstance(MailTemplateManager.class);
-        when(mailTemplateManager.evaluate(this.documentReference, "text", new HashMap<String, String>())).thenReturn(
-            "Hello John Doe, john@doe.com");
-        when(mailTemplateManager.evaluate(this.documentReference, "html", new HashMap<String, String>())).thenReturn(
-            "Hello <b>John Doe</b> <br />john@doe.com");
+        when(mailTemplateManager.evaluate(this.documentReference, "text", new HashMap<String, String>(), null))
+            .thenReturn(
+                "Hello John Doe, john@doe.com");
+        when(mailTemplateManager.evaluate(this.documentReference, "html", new HashMap<String, String>(), null))
+            .thenReturn(
+                "Hello <b>John Doe</b> <br />john@doe.com");
     }
 
     @Test

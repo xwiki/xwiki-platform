@@ -165,11 +165,10 @@ public class DefaultMailTemplateManagerTest
     public void evaluateWithError() throws Exception
     {
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
-        DocumentReference documentReference = mock(DocumentReference.class);
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
         when(documentBridge.getProperty(same(documentReference), any(DocumentReference.class), anyInt(), eq("html")))
-            .thenReturn(
-                "Hello <b>${name}</b> <br />${email}");
+            .thenReturn("Hello <b>${name}</b> <br />${email}");
 
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         VelocityManager velocityManager = this.mocker.getInstance(VelocityManager.class);
@@ -182,7 +181,8 @@ public class DefaultMailTemplateManagerTest
             this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>());
             fail("Should have thrown an exception here!");
         } catch (MessagingException expected) {
-            assertTrue(expected.getMessage().startsWith("Failed to evaluate property [html] for Document reference"));
+            assertEquals("Failed to evaluate property [html] for Document [wiki:space.page] and locale [null]",
+                expected.getMessage());
         }
     }
 }

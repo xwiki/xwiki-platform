@@ -125,5 +125,10 @@
   #set($showRightPanels = '0')
 #end
 
+#if($xcontext.action == 'login')
+  #set($showLeftPanels = '0')
+  #set($showRightPanels = '0')
+#end
+
 ## To let custom skins easily override layout variables, we evaluate a template that is empty by default.
 #template("layoutExtraVars.vm")

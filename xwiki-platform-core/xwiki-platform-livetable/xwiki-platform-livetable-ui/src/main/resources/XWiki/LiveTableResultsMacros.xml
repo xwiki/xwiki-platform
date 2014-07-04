@@ -572,7 +572,7 @@
   #if("$!filterValue" != '')
     #set($discard = $tablelist.add($tableAlias))
     #if($colname.startsWith('doc.'))
-      #set($whereSql = "${whereSql} and upper(str(${safe_colname.replace('_','.')})) like upper(?)")
+      #set($whereSql = "${whereSql} and upper(${safe_colname.replace('_','.')}) like upper(?)")
       #set($discard = $whereParams.add("%${filterValue}%"))
     #elseif($propType == 'NumberClass' || $propType == 'BooleanClass')
       #livetable_getTableName($colname)

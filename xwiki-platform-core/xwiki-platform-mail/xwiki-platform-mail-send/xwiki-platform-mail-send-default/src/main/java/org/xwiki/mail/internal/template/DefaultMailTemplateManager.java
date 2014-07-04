@@ -77,12 +77,12 @@ public class DefaultMailTemplateManager implements MailTemplateManager
 
     @Override
     public String evaluate(DocumentReference documentReference, String property, Map<String, String> data,
-        Locale language)
+        Locale locale)
         throws MessagingException
     {
-        Locale languageParameter = language;
-        if (languageParameter == null || languageParameter == Locale.ROOT) {
-            languageParameter = getDefaultLocale();
+        Locale computedLocale = locale;
+        if (computedLocale == null || computedLocale == Locale.ROOT) {
+            computedLocale = getDefaultLocale();
         }
 
         DocumentReference mailClassReference = this.resolver.resolve(MAIL_CLASS);
@@ -91,18 +91,18 @@ public class DefaultMailTemplateManager implements MailTemplateManager
 
         String templateFullName = this.serializer.serialize(documentReference);
 
-        int objectNumber = getObjectMailNumber(documentReference, mailClassReference, languageParameter);
+        int objectNumber = getObjectMailNumber(documentReference, mailClassReference, computedLocale);
 
         String content =
-            this.documentBridge.getProperty(documentReference, mailClassReference, objectNumber, property)
-                .toString();
+            this.documentBridge.getProperty(documentReference, mailClassReference, objectNumber, property).toString();
         try {
             StringWriter writer = new StringWriter();
             velocityManager.getVelocityEngine().evaluate(velocityContext, writer, templateFullName, content);
             return writer.toString();
         } catch (XWikiVelocityException e) {
-            throw new MessagingException(String.format("Failed to evaluate property [%s] for Document reference [%s]",
-                property, documentReference));
+            throw new MessagingException(String.format(
+                "Failed to evaluate property [%s] for Document [%s] and locale [%s]",
+                    property, documentReference, locale), e);
         }
     }
 
@@ -128,21 +128,18 @@ public class DefaultMailTemplateManager implements MailTemplateManager
 
         // Check that the language passed is not the default language
         if (!getDefaultLocale().equals(language) && number == -1) {
-            number =
-                this.documentBridge
-                    .getObjectNumber(documentReference, mailClassReference, LANGUAGE_PROPERTY_NAME,
-                        getDefaultLocale().getLanguage());
+            number = this.documentBridge.getObjectNumber(documentReference, mailClassReference, LANGUAGE_PROPERTY_NAME,
+                getDefaultLocale().getLanguage());
         } else if (mailObjectsCount == 1 && number == -1) {
             number = 0;
         } else if (mailObjectsCount == 0 && number == -1) {
-            throw new MessagingException(
-                String.format("No XWiki.Mail xobject found in the document reference [%s]", documentReference));
+            throw new MessagingException(String.format(
+                "No [%s] object found in the Document [%s] for language [%s]", MAIL_CLASS.toString(),
+                    documentReference, language));
         } else if (number == -1) {
-            throw new MessagingException(
-                String.format(
-                    "No XWiki.Mail xobject matches the language passed [%s] or the default language [%s] " +
-                        "in the document reference [%s]",
-                    language.getLanguage(), getDefaultLocale().getLanguage(), documentReference));
+            throw new MessagingException(String.format(
+                "No [%s] object matches the language [%s] or the default language [%s] in the Document [%s]",
+                    language, getDefaultLocale(), documentReference));
         }
         return number;
     }
@@ -153,13 +150,11 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         XWikiContext context = getXWikiContext();
         int objectsCount;
         try {
-            objectsCount =
-                context.getWiki().getDocument(documentReference, context).getXObjects(mailClassReference)
-                    .size();
+            objectsCount = context.getWiki().getDocument(documentReference, context).getXObjects(mailClassReference)
+                .size();
         } catch (XWikiException e) {
-            throw new MessagingException(
-                String
-                    .format("Failed to retrieve XWiki.Mail xobjects from Document reference [%s]", documentReference));
+            throw new MessagingException(String.format(
+                "Failed to find number of [%s] objects in Document [%s]", mailClassReference, documentReference), e);
         }
         return objectsCount;
     }

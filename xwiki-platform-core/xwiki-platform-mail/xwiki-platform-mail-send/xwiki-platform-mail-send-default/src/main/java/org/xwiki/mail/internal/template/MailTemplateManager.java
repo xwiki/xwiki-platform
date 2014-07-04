@@ -43,14 +43,14 @@ public interface MailTemplateManager
      * @param documentReference the document reference of the template containing the XWiki.Mail xobject
      * @param property the name of xproperty
      * @param velocityVariables the list of velocity variables to set in the Velocity Context when evaluating
-     * @param language the language value used to find a matching XWiki.Mail xobject (there can be one xobject per
+     * @param locale the language value used to find a matching XWiki.Mail xobject (there can be one xobject per
      *        language)
      * @return the evaluated property
      * @throws MessagingException when an error occurs
      * @since 6.1
      */
     String evaluate(DocumentReference documentReference, String property, Map<String, String> velocityVariables,
-        Locale language) throws MessagingException;
+        Locale locale) throws MessagingException;
 
     /**
      * Evaluate a xproperty from a template document containing one or several XWiki.Mail xobjects (one per

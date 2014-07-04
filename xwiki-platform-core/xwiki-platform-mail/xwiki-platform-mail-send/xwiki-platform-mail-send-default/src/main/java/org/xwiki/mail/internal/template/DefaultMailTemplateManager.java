@@ -80,13 +80,18 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         Locale language)
         throws MessagingException
     {
+        Locale languageParameter = language;
+        if (languageParameter == null || languageParameter == Locale.ROOT) {
+            languageParameter = getDefaultLocale();
+        }
+
         DocumentReference mailClassReference = this.resolver.resolve(MAIL_CLASS);
 
         VelocityContext velocityContext = createVelocityContext(data);
 
         String templateFullName = this.serializer.serialize(documentReference);
 
-        int objectNumber = getObjectMailNumber(documentReference, mailClassReference, language);
+        int objectNumber = getObjectMailNumber(documentReference, mailClassReference, languageParameter);
 
         String content =
             this.documentBridge.getProperty(documentReference, mailClassReference, objectNumber, property)
@@ -97,7 +102,7 @@ public class DefaultMailTemplateManager implements MailTemplateManager
             return writer.toString();
         } catch (XWikiVelocityException e) {
             throw new MessagingException(String.format("Failed to evaluate property [%s] for Document reference [%s]",
-                property, documentReference), e);
+                property, documentReference));
         }
     }
 
@@ -105,30 +110,40 @@ public class DefaultMailTemplateManager implements MailTemplateManager
     public String evaluate(DocumentReference documentReference, String property, Map<String, String> data)
         throws MessagingException
     {
-        return evaluate(documentReference, property, data, getDefaultLocale());
+        return evaluate(documentReference, property, data, null);
     }
 
+    /**
+     * @return the number of the XWiki.Mail xobject with language xproperty is equal to the language parameter if not
+     * exist return the XWiki.Mail xobject with language xproperty as default language if not exist return the first
+     * XWiki.Mail xobject if there is only one XWiki.Mail xobject
+     */
     private int getObjectMailNumber(DocumentReference documentReference, DocumentReference mailClassReference,
         Locale language) throws MessagingException
     {
-        int number = -1;
-
-        number = this.documentBridge.getObjectNumber(documentReference, mailClassReference, LANGUAGE_PROPERTY_NAME,
+        int number = this.documentBridge.getObjectNumber(documentReference, mailClassReference, LANGUAGE_PROPERTY_NAME,
             language.getLanguage());
 
+        int mailObjectsCount = getMailObjectsCount(documentReference, mailClassReference);
+
+        // Check that the language passed is not the default language
         if (!getDefaultLocale().equals(language) && number == -1) {
             number =
                 this.documentBridge
                     .getObjectNumber(documentReference, mailClassReference, LANGUAGE_PROPERTY_NAME,
-                        language.getLanguage());
-        } else if (getMailObjectsCount(documentReference, mailClassReference) == 1 && number == -1) {
+                        getDefaultLocale().getLanguage());
+        } else if (mailObjectsCount == 1 && number == -1) {
             number = 0;
+        } else if (mailObjectsCount == 0 && number == -1) {
+            throw new MessagingException(
+                String.format("No XWiki.Mail xobject found in the document reference [%s]", documentReference));
         } else if (number == -1) {
             throw new MessagingException(
-                String.format("Failed to retrieve XWiki.Mail xobject from Document reference [%s]", documentReference),
-                new Exception());
+                String.format(
+                    "No XWiki.Mail xobject matches the language passed [%s] or the default language [%s] " +
+                        "in the document reference [%s]",
+                    language.getLanguage(), getDefaultLocale().getLanguage(), documentReference));
         }
-
         return number;
     }
 
@@ -136,15 +151,15 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         throws MessagingException
     {
         XWikiContext context = getXWikiContext();
-        int objectsCount = 0;
+        int objectsCount;
         try {
             objectsCount =
                 context.getWiki().getDocument(documentReference, context).getXObjects(mailClassReference)
                     .size();
         } catch (XWikiException e) {
             throw new MessagingException(
-                String.format("Failed to retrieve XWiki.Mail xobjects from Document reference [%s]",
-                    documentReference), e);
+                String
+                    .format("Failed to retrieve XWiki.Mail xobjects from Document reference [%s]", documentReference));
         }
         return objectsCount;
     }

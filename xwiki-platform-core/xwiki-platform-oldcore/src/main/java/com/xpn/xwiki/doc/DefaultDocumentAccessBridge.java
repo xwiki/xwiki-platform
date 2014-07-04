@@ -43,6 +43,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -50,7 +52,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -89,6 +90,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Inject
     @Named("compactwiki")
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     private XWikiContext getContext()
     {
@@ -685,9 +689,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Override
     public boolean hasProgrammingRights()
     {
-        XWikiContext xcontext = getContext();
-
-        return xcontext.getWiki().getRightService().hasProgrammingRights(xcontext);
+        return authorization.hasAccess(Right.PROGRAM);
     }
 
     @Override

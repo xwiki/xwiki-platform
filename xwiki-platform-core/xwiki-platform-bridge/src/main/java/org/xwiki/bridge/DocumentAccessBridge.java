@@ -582,7 +582,11 @@ public interface DocumentAccessBridge
 
     /**
      * @return true if the current document's author has programming rights.
+     * @deprecated since 6.1RC1, use
+     *             {@link org.xwiki.security.authorization.ContextualAuthorizationManager#hasAccess(org.xwiki.security.authorization.Right)}
+     *             instead
      */
+    @Deprecated
     boolean hasProgrammingRights();
 
     /**

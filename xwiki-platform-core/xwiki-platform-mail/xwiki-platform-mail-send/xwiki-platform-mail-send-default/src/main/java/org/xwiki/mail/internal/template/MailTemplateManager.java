@@ -37,26 +37,29 @@ import org.xwiki.model.reference.DocumentReference;
 public interface MailTemplateManager
 {
     /**
-     * Evaluate xproperty from template document containing a XWiki.Mail xobject.
+     * Evaluate a xproperty from a template document containing one or several XWiki.Mail xobjects (one per
+     * supported language). The xobject used is matched according to the passed language parameter value.
      *
-     * @param documentReference the document reference of template containing XWiki.Mail xobject
+     * @param documentReference the document reference of the template containing the XWiki.Mail xobject
      * @param property the name of xproperty
-     * @param velocityVariables the list of velocity variables
-     * @param language the value of language xproperty to select
-     * @return Evaluated property
+     * @param velocityVariables the list of velocity variables to set in the Velocity Context when evaluating
+     * @param language the language value used to find a matching XWiki.Mail xobject (there can be one xobject per
+     *        language)
+     * @return the evaluated property
      * @throws MessagingException when an error occurs
+     * @since 6.1
      */
     String evaluate(DocumentReference documentReference, String property, Map<String, String> velocityVariables,
-        Locale language)
-        throws MessagingException;
+        Locale language) throws MessagingException;
 
     /**
-     * Evaluate xproperty from template document containing a XWiki.Mail xobject.
+     * Evaluate a xproperty from a template document containing one or several XWiki.Mail xobjects (one per
+     * supported language). The xobject used is matched according to the default language defined in the wiki.
      *
-     * @param documentReference the document reference of template containing XWiki.Mail xobject
+     * @param documentReference the document reference of the template containing the XWiki.Mail xobject
      * @param property the name of xproperty
-     * @param velocityVariables the list of velocity variables
-     * @return Evaluated property
+     * @param velocityVariables the list of velocity variables to set in the Velocity Context when evaluating
+     * @return the evaluated property
      * @throws MessagingException when an error occurs
      */
     String evaluate(DocumentReference documentReference, String property, Map<String, String> velocityVariables)

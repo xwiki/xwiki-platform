@@ -22,12 +22,12 @@ package org.xwiki.mail.internal.template;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.mail.MessagingException;
 
 import org.apache.velocity.VelocityContext;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -71,7 +71,8 @@ public class DefaultMailTemplateManagerTest
     public MockitoComponentMockingRule<DefaultMailTemplateManager> mocker =
         new MockitoComponentMockingRule<>(DefaultMailTemplateManager.class);
 
-    private void init() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
         Execution execution = this.mocker.getInstance(Execution.class);
 
@@ -96,7 +97,6 @@ public class DefaultMailTemplateManagerTest
     @Test
     public void evaluate() throws Exception
     {
-        init();
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
@@ -120,7 +120,7 @@ public class DefaultMailTemplateManagerTest
             anyString(), eq("Hello <b>${name}</b> <br />${email}"));
 
         String result =
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>());
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP);
 
         assertEquals(result, "Hello <b>John Doe</b> <br />john@doe.com");
     }
@@ -128,7 +128,6 @@ public class DefaultMailTemplateManagerTest
     @Test
     public void evaluateWithLanguage() throws Exception
     {
-        init();
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
@@ -155,7 +154,7 @@ public class DefaultMailTemplateManagerTest
             anyString(), eq("Salut <b>${name}</b> <br />${email}"));
 
         String result =
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>(),
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP,
                 LocaleUtils.toLocale("fr"));
 
         verify(documentBridge)
@@ -167,7 +166,6 @@ public class DefaultMailTemplateManagerTest
     @Test
     public void evaluateWithObjectNotFoundWithLanguagePassed() throws Exception
     {
-        init();
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
@@ -201,7 +199,7 @@ public class DefaultMailTemplateManagerTest
             anyString(), eq("Salut <b>${name}</b> <br />${email}"));
 
         String result =
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>(),
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP,
                 LocaleUtils.toLocale("fr"));
 
         verify(documentBridge)
@@ -212,14 +210,9 @@ public class DefaultMailTemplateManagerTest
         assertEquals(result, "Salut <b>John Doe</b> <br />john@doe.com");
     }
 
-    /**
-     *
-     * @throws Exception
-     */
     @Test
     public void evaluateWithObjectNotFoundWithDefaultLanguage() throws Exception
     {
-        init();
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
@@ -253,7 +246,7 @@ public class DefaultMailTemplateManagerTest
             anyString(), eq("Salut <b>${name}</b> <br />${email}"));
 
         String result =
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>(),
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP,
                 LocaleUtils.toLocale("fr"));
 
         verify(documentBridge)
@@ -267,7 +260,6 @@ public class DefaultMailTemplateManagerTest
     @Test
     public void evaluateWithErrorNoObjectMatches() throws Exception
     {
-
         Execution execution = this.mocker.getInstance(Execution.class);
 
         ExecutionContext executionContext = mock(ExecutionContext.class);
@@ -303,7 +295,7 @@ public class DefaultMailTemplateManagerTest
             .thenReturn(-1);
 
         try {
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>(),
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP,
                 LocaleUtils.toLocale("fr"));
             fail("Should have thrown an exception here!");
         } catch (MessagingException expected) {
@@ -315,9 +307,8 @@ public class DefaultMailTemplateManagerTest
     }
 
     @Test
-    public void evaluateWithError() throws Exception
+    public void evaluateWhenVelocityError() throws Exception
     {
-        init();
         DocumentAccessBridge documentBridge = this.mocker.getInstance(DocumentAccessBridge.class);
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
 
@@ -332,7 +323,7 @@ public class DefaultMailTemplateManagerTest
             anyString(), eq("Hello <b>${name}</b> <br />${email}"))).thenThrow(new XWikiVelocityException("Error"));
 
         try {
-            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", new HashMap<String, String>());
+            this.mocker.getComponentUnderTest().evaluate(documentReference, "html", Collections.EMPTY_MAP);
             fail("Should have thrown an exception here!");
         } catch (MessagingException expected) {
             assertEquals("Failed to evaluate property [html] for Document [wiki:space.page] and locale [null]",

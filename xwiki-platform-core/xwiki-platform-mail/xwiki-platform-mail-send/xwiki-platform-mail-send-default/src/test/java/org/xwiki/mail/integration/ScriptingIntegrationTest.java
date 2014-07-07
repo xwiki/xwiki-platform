@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail.integration;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.InputStream;
 import java.util.Collections;
 
@@ -38,13 +40,12 @@ import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.mail.script.MailSenderScriptService;
 import org.xwiki.mail.script.MimeMessageWrapper;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.ComponentManagerRule;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Scripting API.
@@ -56,7 +57,7 @@ import static org.junit.Assert.assertEquals;
 public class ScriptingIntegrationTest
 {
     @Rule
-    public ComponentManagerRule componentManager = new ComponentManagerRule();
+    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
 
     private GreenMail mail;
 
@@ -80,6 +81,8 @@ public class ScriptingIntegrationTest
     @Before
     public void initialize() throws Exception
     {
+        this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+
         this.scriptService = this.componentManager.getInstance(ScriptService.class, "mailsender");
     }
 

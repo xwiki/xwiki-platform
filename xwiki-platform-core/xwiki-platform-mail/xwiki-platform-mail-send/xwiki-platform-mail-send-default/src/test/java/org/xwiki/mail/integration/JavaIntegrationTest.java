@@ -19,6 +19,9 @@
  */
 package org.xwiki.mail.integration;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,13 +47,12 @@ import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.mail.internal.DefaultMailSender;
-import org.xwiki.test.ComponentManagerRule;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetupTest;
-
-import static org.junit.Assert.*;
 
 /**
  * Integration tests to prove that mail sending is working fully end to end with the Java API.
@@ -62,7 +64,7 @@ import static org.junit.Assert.*;
 public class JavaIntegrationTest
 {
     @Rule
-    public ComponentManagerRule componentManager = new ComponentManagerRule();
+    public MockitoComponentManagerRule componentManager = new MockitoComponentManagerRule();
 
     private GreenMail mail;
 
@@ -108,6 +110,8 @@ public class JavaIntegrationTest
     @Before
     public void initialize() throws Exception
     {
+        this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+
         this.configuration = this.componentManager.getInstance(MailSenderConfiguration.class);
         this.defaultBodyPartFactory = this.componentManager.getInstance(
             new DefaultParameterizedType(null, MimeBodyPartFactory.class, String.class));

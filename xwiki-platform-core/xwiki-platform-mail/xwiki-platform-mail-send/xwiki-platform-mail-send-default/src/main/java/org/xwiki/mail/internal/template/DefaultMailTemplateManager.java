@@ -130,7 +130,9 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         if (!getDefaultLocale().equals(language) && number == -1) {
             number = this.documentBridge.getObjectNumber(documentReference, mailClassReference, LANGUAGE_PROPERTY_NAME,
                 getDefaultLocale().getLanguage());
-        } else if (mailObjectsCount == 1 && number == -1) {
+        }
+
+        if (mailObjectsCount == 1 && number == -1) {
             number = 0;
         } else if (mailObjectsCount == 0 && number == -1) {
             throw new MessagingException(String.format(
@@ -139,7 +141,7 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         } else if (number == -1) {
             throw new MessagingException(String.format(
                 "No [%s] object matches the locale [%s] or the default locale [%s] in the Document [%s]",
-                    language, getDefaultLocale(), documentReference));
+                    MAIL_CLASS.toString(), language, getDefaultLocale(), documentReference));
         }
         return number;
     }

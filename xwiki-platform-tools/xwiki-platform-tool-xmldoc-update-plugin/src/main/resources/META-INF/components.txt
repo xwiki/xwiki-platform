@@ -1,0 +1,1 @@
+500:com.xpn.xwiki.tool.doc.MojoConfigurationSource

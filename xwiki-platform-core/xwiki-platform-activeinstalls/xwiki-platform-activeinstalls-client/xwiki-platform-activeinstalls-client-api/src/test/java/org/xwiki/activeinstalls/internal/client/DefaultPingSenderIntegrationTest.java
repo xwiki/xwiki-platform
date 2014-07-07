@@ -19,6 +19,8 @@
  */
 package org.xwiki.activeinstalls.internal.client;
 
+import java.net.UnknownHostException;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
@@ -82,8 +84,8 @@ public class DefaultPingSenderIntegrationTest
         try {
             pingSender.sendPing();
             fail("Should have raised an exception here");
-        } catch (Exception expected) {
-            assertEquals("host: nodename nor servname provided, or not known", expected.getMessage());
+        } catch (UnknownHostException expected) {
+            // Nothing to check, this proves the proxy isn't set up!
         }
         assertTrue("The HTTP server was not called by the ping sender", findAll(allRequests()).isEmpty());
 

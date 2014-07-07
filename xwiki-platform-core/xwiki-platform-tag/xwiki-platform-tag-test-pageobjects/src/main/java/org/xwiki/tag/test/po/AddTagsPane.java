@@ -54,7 +54,7 @@ public class AddTagsPane extends BaseElement
     /**
      * The XPATH expression used to locate the add button inside the {@link #addTagsForm}.
      */
-    private By addButtonLocator = By.xpath("//input[@type = 'submit' and @value = 'add']");
+    private By addButtonLocator = By.xpath("//input[@type = 'submit' and @class = 'button button-add-tag']");
 
     /**
      * @param tags comma separated list of tags to add

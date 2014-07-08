@@ -145,7 +145,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
                 if (principal != null) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("User " + principal.getName() + " has been authentified from cookie");
+                        LOGGER.debug("User " + principal.getName() + " has been authenticated from cookie");
                     }
 
                     // make sure the Principal contains wiki name information

@@ -54,7 +54,7 @@ public class AddTagsPane extends BaseElement
     /**
      * The XPATH expression used to locate the add button inside the {@link #addTagsForm}.
      */
-    private By addButtonLocator = By.xpath("//input[@type = 'submit' and @class = 'button button-add-tag']");
+    private By addButtonLocator = By.xpath("//form[@class = 'tag-add-form']//input[@type = 'submit']");
 
     /**
      * @param tags comma separated list of tags to add
@@ -106,6 +106,6 @@ public class AddTagsPane extends BaseElement
      */
     public void cancel()
     {
-        addTagsForm.findElement(By.xpath("//input[@type = 'reset' and @value = 'cancel']")).click();
+        addTagsForm.findElement(By.xpath("//form[@class = 'tag-add-form']//input[@type = 'reset']")).click();
     }
 }

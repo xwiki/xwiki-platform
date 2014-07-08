@@ -188,7 +188,7 @@
     <className>XWiki.XWikiSkins</className>
     <guid>c52655e2-0fae-4b2c-8508-378d1c1fb4ac</guid>
     <property>
-      <baseskin>flamingo</baseskin>
+      <baseskin>colibri</baseskin>
     </property>
     <property>
       <edit.vm/>

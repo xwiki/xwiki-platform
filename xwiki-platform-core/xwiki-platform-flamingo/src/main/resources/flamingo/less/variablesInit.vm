@@ -58,7 +58,7 @@
 @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
 
 ## Fix font path
-@icon-font-path:                      "$services.webjars.url('bootstrap/3.1.1/fonts')/";
+@icon-font-path:                      "$services.webjars.url('bootstrap/3.2.0/fonts')/";
 
 ## Some XWiki variables
 @highlightColor:                      $theme.highlightColor;

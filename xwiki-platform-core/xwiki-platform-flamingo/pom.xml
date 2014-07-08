@@ -37,7 +37,7 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Flamingo Skin</xwiki.extension.name>
     <!-- Bootstrap version is used in several places -->
-    <bootstrap.version>3.1.1</bootstrap.version>
+    <bootstrap.version>3.2.0</bootstrap.version>
   </properties>
   <dependencies>
     <!-- LESS Module -->

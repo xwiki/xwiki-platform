@@ -546,7 +546,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
             if ("empty".equals(createuser)) {
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Creating emptry user for user " + user);
+                    LOGGER.debug("Creating empty user for user " + user);
                 }
 
                 context.getWiki().createEmptyUser(wikiname, "edit", context);

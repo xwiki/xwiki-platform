@@ -31,7 +31,6 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionId;
-import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
@@ -153,13 +152,24 @@ public class ExtensionInstanceOutputWikiStream extends AbstractBeanOutputWikiStr
                 localExtension = this.localRepository.storeExtension(extension);
             }
 
-            // Register the extension as installed
+
             String namespace = getCurrentNamespace();
-            InstalledExtension installedExtension =
-                this.installedRepository.getInstalledExtension(localExtension.getId());
-            if (installedExtension == null || !installedExtension.isInstalled(namespace)) {
-                this.installedRepository.installExtension(localExtension, namespace, false);
+
+            // Make sure it's not already there
+            // TODO: should probably make it configurable
+            if (installedRepository.getInstalledExtension(localExtension.getId().getId(), namespace) == null) {
+                for (String feature : localExtension.getFeatures()) {
+                    if (installedRepository.getInstalledExtension(feature, namespace) != null) {
+                        // Already exist so don't register it or it could create a mess
+                        return;
+                    }
+                }
+            } else {
+                return;
             }
+
+            // Register the extension as installed
+            installedRepository.installExtension(localExtension, namespace, false);
         } catch (Exception e) {
             this.logger.error("Failed to register extenion [{}] from the XAR", extensionId, e);
         }

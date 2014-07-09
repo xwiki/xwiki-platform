@@ -28,6 +28,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -92,7 +93,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
     @Inject
-    private ContextualAuthorizationManager authorization;
+    private Provider<ContextualAuthorizationManager> authorizationProvider;
 
     private XWikiContext getContext()
     {
@@ -689,7 +690,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Override
     public boolean hasProgrammingRights()
     {
-        return authorization.hasAccess(Right.PROGRAM);
+        return this.authorizationProvider.get().hasAccess(Right.PROGRAM);
     }
 
     @Override

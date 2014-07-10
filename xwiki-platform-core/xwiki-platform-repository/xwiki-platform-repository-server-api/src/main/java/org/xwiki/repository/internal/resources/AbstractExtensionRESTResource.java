@@ -33,7 +33,6 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.Execution;
 import org.xwiki.extension.repository.xwiki.model.jaxb.AbstractExtension;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionAuthor;
 import org.xwiki.extension.repository.xwiki.model.jaxb.ExtensionDependency;
@@ -48,6 +47,8 @@ import org.xwiki.query.QueryException;
 import org.xwiki.repository.internal.RepositoryManager;
 import org.xwiki.repository.internal.XWikiRepositoryModel;
 import org.xwiki.rest.XWikiResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -112,14 +113,11 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
     }
 
-    /**
-     * The execution needed to get the annotation author from the context user.
-     */
-    @Inject
-    protected Execution execution;
-
     @Inject
     protected RepositoryManager repositoryManager;
+
+    @Inject
+    protected ContextualAuthorizationManager authorization;
 
     /**
      * The object factory for model objects to be used when creating representations.
@@ -470,12 +468,6 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         return property != null ? (T) property.getValue() : def;
     }
 
-    @Override
-    protected XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-    }
-
     protected ResponseBuilder getAttachmentResponse(XWikiAttachment xwikiAttachment) throws XWikiException
     {
         if (xwikiAttachment == null) {
@@ -496,9 +488,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
 
     protected void checkRights(XWikiDocument document) throws XWikiException
     {
-        XWikiContext xcontext = getXWikiContext();
-        if (!xcontext.getWiki().getRightService()
-            .hasAccessLevel("view", xcontext.getUser(), document.getPrefixedFullName(), xcontext)) {
+        if (!this.authorization.hasAccess(Right.VIEW, document.getDocumentReference())) {
             throw new WebApplicationException(Status.FORBIDDEN);
         }
     }

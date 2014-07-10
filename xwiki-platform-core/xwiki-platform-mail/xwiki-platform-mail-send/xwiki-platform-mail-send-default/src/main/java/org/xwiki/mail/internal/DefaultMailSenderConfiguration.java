@@ -77,8 +77,6 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
 
     private static final int DEFAULT_PORT = 25;
 
-    private static final String DEFAULT_FROM_EMAIL = "no-reply@xwiki.org";
-
     @Inject
     private Logger logger;
 

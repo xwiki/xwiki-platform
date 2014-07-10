@@ -1,7 +1,6 @@
 ##################################
 ##          HOME MENU
 ##################################
-#set ($discard = $xwiki.ssfx.use('uicomponents/wiki/wiki.css', true))
 ## This menu is displayed if:
 ## - Wiki UI is available
 ## - The current wiki is the main wiki OR the current wiki has support for local users only

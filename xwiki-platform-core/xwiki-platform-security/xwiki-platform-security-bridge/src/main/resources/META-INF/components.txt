@@ -1,6 +1,9 @@
 org.xwiki.security.authorization.internal.DefaultContextualAuthorizationManager
 org.xwiki.security.authorization.internal.DefaultSecurityCacheRulesInvalidator
 org.xwiki.security.authorization.internal.DefaultSecurityEntryReader
-org.xwiki.security.authorization.internal.UserAndGroupReferenceResolver
+org.xwiki.security.authorization.internal.resolver.CurrentUserAndGroupDocumentReferenceResolver
+org.xwiki.security.authorization.internal.resolver.CurrentUserAndGroupEntityReferenceResolver
+org.xwiki.security.authorization.internal.resolver.UserAndGroupDocumentReferenceResolver
+org.xwiki.security.authorization.internal.resolver.UserAndGroupEntityReferenceResolver
 org.xwiki.security.internal.DefaultUserBridge
 org.xwiki.security.internal.DefaultXWikiBridge

@@ -73,19 +73,13 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
+
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-test-component</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <!-- Mockito cause a conflict with JMock legacy, providing an inappropriate implementation of hamcrest -->
-          <groupId>org.mockito</groupId>
-          <artifactId>mockito-all</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

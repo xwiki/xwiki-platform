@@ -136,6 +136,9 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
             this.xwikiPropertiesSource.getProperty(PREFIX + "from", String.class));
         if (fromAddress == null) {
             fromAddress = DEFAULT_FROM_EMAIL;
+            // Raise a warning since the wiki admin should define a proper from value
+            this.logger.warn("No 'from' email address is configured, defaulting to [{}]. "
+                + "Please set up a proper 'from' email address.", DEFAULT_FROM_EMAIL);
         }
         return fromAddress;
     }

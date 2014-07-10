@@ -672,9 +672,6 @@ extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xw
 #-# [Since 6.1M2]
 #-# From email address to use. Not defined by default and needs to be set up when calling the mail API.
 #-# This configuration property can be overridden in XWikiPreferences objects, by using the "admin_email" property name.
-#-# If this property is not defined anywhere and the user calling the mail API doesn't pass excplicitly a from address
-#-# the value "no-reply@xwiki.org" will be used by default but generate a warning in the logs asking an admin to set up
-#-# a proper from address.
 # mail.sender.from = john@doe.com
 
 #-# [Since 6.1M2]

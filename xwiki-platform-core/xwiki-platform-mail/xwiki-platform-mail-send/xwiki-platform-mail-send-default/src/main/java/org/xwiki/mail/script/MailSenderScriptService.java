@@ -202,6 +202,14 @@ public class MailSenderScriptService implements ScriptService
         return messageWrapper;
     }
 
+    /**
+     * @return the configuration for sending mails (SMTP host, port, etc)
+     */
+    public MailSenderConfiguration getConfiguration()
+    {
+        return this.configuration;
+    }
+
     private Session createSession()
     {
         Session session;

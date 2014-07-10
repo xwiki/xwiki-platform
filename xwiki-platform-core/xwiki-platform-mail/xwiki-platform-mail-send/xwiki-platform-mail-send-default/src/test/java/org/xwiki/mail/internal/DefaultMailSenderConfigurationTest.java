@@ -133,8 +133,6 @@ public class DefaultMailSenderConfigurationTest
     @Test
     public void getFromWhenNotDefined() throws Exception
     {
-        assertEquals("no-reply@xwiki.org", this.mocker.getComponentUnderTest().getFromAddress());
-        verify(this.mocker.getMockedLogger()).warn("No 'from' email address is configured, defaulting to [{}]. "
-            + "Please set up a proper 'from' email address.", "no-reply@xwiki.org");
+        assertNull(this.mocker.getComponentUnderTest().getFromAddress());
     }
 }

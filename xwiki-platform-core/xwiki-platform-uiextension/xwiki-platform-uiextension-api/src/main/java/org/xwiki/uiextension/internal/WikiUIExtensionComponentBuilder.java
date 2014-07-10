@@ -24,18 +24,20 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponent;
-import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentBuilder;
+import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -60,14 +62,8 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     private Logger logger;
 
     /**
-     * The {@link org.xwiki.context.Execution} component used for accessing XWikiContext.
-     */
-    @Inject
-    private Execution execution;
-
-    /**
-     * Used to transform the reference to the UI Extension XClass to a string usable in a query.
-     * {@see #searchDocumentReferences()}
+     * Used to transform the reference to the UI Extension XClass to a string usable in a query. {@see
+     * #searchDocumentReferences()}
      */
     @Inject
     @Named("compactwiki")
@@ -86,6 +82,12 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     @Named("wiki")
     private ComponentManager cm;
 
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private AuthorizationManager authorization;
+
     /**
      * Checks if the last author of the document holding the extension(s) has the rights required to register extensions
      * for the given scope. If the document author doesn't have the required rights a {@link WikiComponentException} is
@@ -97,17 +99,12 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
      */
     private void checkRights(XWikiDocument extensionsDoc, WikiComponentScope scope) throws WikiComponentException
     {
-        try {
-            if (scope == WikiComponentScope.GLOBAL
-                && !getXWikiContext().getWiki().getRightService().hasProgrammingRights(extensionsDoc,
-                    getXWikiContext())) {
-                throw new WikiComponentException("Registering global UI extensions requires programming rights");
-            } else if (!getXWikiContext().getWiki().getRightService().hasAccessLevel("admin",
-                extensionsDoc.getContentAuthor(), "XWiki.XWikiPreferences", getXWikiContext())) {
-                throw new WikiComponentException("Registering UI extensions requires admin rights");
-            }
-        } catch (XWikiException e) {
-            throw new WikiComponentException("Failed to check rights required to register UI Extension(s)", e);
+        if (scope == WikiComponentScope.GLOBAL
+            && !this.authorization.hasAccess(Right.PROGRAM, extensionsDoc.getContentAuthorReference(), null)) {
+            throw new WikiComponentException("Registering global UI extensions requires programming rights");
+        } else if (!this.authorization.hasAccess(Right.ADMIN, extensionsDoc.getContentAuthorReference(), extensionsDoc
+            .getDocumentReference().getWikiReference())) {
+            throw new WikiComponentException("Registering UI extensions requires admin rights");
         }
     }
 
@@ -125,7 +122,7 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
 
         if (extensionDefinitions.size() == 0) {
             throw new WikiComponentException(String.format("No UI extension object could be found in document [%s]",
-                extensionsDoc.getPrefixedFullName()));
+                extensionsDoc.getDocumentReference()));
         }
 
         return extensionDefinitions;
@@ -138,7 +135,8 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
         XWikiDocument doc = null;
 
         try {
-            doc = getXWikiContext().getWiki().getDocument(reference, getXWikiContext());
+            XWikiContext xcontext = xcontextProvider.get();
+            doc = xcontext.getWiki().getDocument(reference, xcontext);
         } catch (XWikiException e) {
             throw new WikiComponentException(
                 String.format("Failed to create UI Extension(s) document [%s]", reference), e);
@@ -161,8 +159,9 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
 
             String roleHint = serializer.serialize(extensionDefinition.getReference());
 
-            WikiUIExtension extension = new WikiUIExtension(roleHint, id, extensionPointId,
-                extensionDefinition.getReference(), doc.getAuthorReference());
+            WikiUIExtension extension =
+                new WikiUIExtension(roleHint, id, extensionPointId, extensionDefinition.getReference(),
+                    doc.getAuthorReference());
             // It would be nice to have PER_LOOKUP components for UIX parameters but without constructor injection it's
             // safer to use a POJO and pass the Component Manager to it.
             WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(rawParameters, cm);
@@ -187,30 +186,21 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
     {
         List<DocumentReference> results = new ArrayList<DocumentReference>();
         // Note that the query is made to work with Oracle which treats empty strings as null.
-        String query = ", BaseObject as obj, StringProperty as epId where obj.className=? "
-            + "and obj.name=doc.fullName and epId.id.id=obj.id and epId.id.name=? "
-            + "and  (epId.value <> '' or (epId.value is not null and '' is null))";
+        String query =
+            ", BaseObject as obj, StringProperty as epId where obj.className=? "
+                + "and obj.name=doc.fullName and epId.id.id=obj.id and epId.id.name=? "
+                + "and  (epId.value <> '' or (epId.value is not null and '' is null))";
         List<String> parameters = new ArrayList<String>();
         parameters.add(this.compactWikiSerializer.serialize(UI_EXTENSION_CLASS));
         parameters.add(EXTENSION_POINT_ID_PROPERTY);
 
         try {
-            results.addAll(
-                getXWikiContext().getWiki().getStore().searchDocumentReferences(query, parameters, getXWikiContext()));
+            XWikiContext xcontext = xcontextProvider.get();
+            results.addAll(xcontext.getWiki().getStore().searchDocumentReferences(query, parameters, xcontext));
         } catch (XWikiException e) {
             this.logger.warn("Search for UI extensions failed: [{}]", e.getMessage());
         }
 
         return results;
-    }
-
-    /**
-     * Utility method for accessing XWikiContext.
-     *
-     * @return the XWikiContext.
-     */
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 }

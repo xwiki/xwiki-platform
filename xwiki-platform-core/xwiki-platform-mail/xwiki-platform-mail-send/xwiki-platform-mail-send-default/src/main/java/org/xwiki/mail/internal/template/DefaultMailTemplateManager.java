@@ -76,9 +76,8 @@ public class DefaultMailTemplateManager implements MailTemplateManager
     private Execution execution;
 
     @Override
-    public String evaluate(DocumentReference documentReference, String property, Map<String, String> data,
-        Locale locale)
-        throws MessagingException
+    public String evaluate(DocumentReference templateReference, String property, Map<String, String> data,
+        Locale locale) throws MessagingException
     {
         Locale computedLocale = locale;
         if (computedLocale == null || computedLocale == Locale.ROOT) {
@@ -89,12 +88,12 @@ public class DefaultMailTemplateManager implements MailTemplateManager
 
         VelocityContext velocityContext = createVelocityContext(data);
 
-        String templateFullName = this.serializer.serialize(documentReference);
+        String templateFullName = this.serializer.serialize(templateReference);
 
-        int objectNumber = getObjectMailNumber(documentReference, mailClassReference, computedLocale);
+        int objectNumber = getObjectMailNumber(templateReference, mailClassReference, computedLocale);
 
         String content =
-            this.documentBridge.getProperty(documentReference, mailClassReference, objectNumber, property).toString();
+            this.documentBridge.getProperty(templateReference, mailClassReference, objectNumber, property).toString();
         try {
             StringWriter writer = new StringWriter();
             velocityManager.getVelocityEngine().evaluate(velocityContext, writer, templateFullName, content);
@@ -102,15 +101,15 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         } catch (XWikiVelocityException e) {
             throw new MessagingException(String.format(
                 "Failed to evaluate property [%s] for Document [%s] and locale [%s]",
-                    property, documentReference, locale), e);
+                    property, templateReference, locale), e);
         }
     }
 
     @Override
-    public String evaluate(DocumentReference documentReference, String property, Map<String, String> data)
+    public String evaluate(DocumentReference templateReference, String property, Map<String, String> data)
         throws MessagingException
     {
-        return evaluate(documentReference, property, data, null);
+        return evaluate(templateReference, property, data, null);
     }
 
     /**
@@ -118,17 +117,17 @@ public class DefaultMailTemplateManager implements MailTemplateManager
      * exist return the XWiki.Mail xobject with language xproperty as default language if not exist return the first
      * XWiki.Mail xobject if there is only one XWiki.Mail xobject
      */
-    private int getObjectMailNumber(DocumentReference documentReference, DocumentReference mailClassReference,
+    private int getObjectMailNumber(DocumentReference templateReference, DocumentReference mailClassReference,
         Locale language) throws MessagingException
     {
-        int number = this.documentBridge.getObjectNumber(documentReference, mailClassReference, LANGUAGE_PROPERTY_NAME,
+        int number = this.documentBridge.getObjectNumber(templateReference, mailClassReference, LANGUAGE_PROPERTY_NAME,
             language.getLanguage());
 
-        int mailObjectsCount = getMailObjectsCount(documentReference, mailClassReference);
+        int mailObjectsCount = getMailObjectsCount(templateReference, mailClassReference);
 
         // Check that the language passed is not the default language
         if (!getDefaultLocale().equals(language) && number == -1) {
-            number = this.documentBridge.getObjectNumber(documentReference, mailClassReference, LANGUAGE_PROPERTY_NAME,
+            number = this.documentBridge.getObjectNumber(templateReference, mailClassReference, LANGUAGE_PROPERTY_NAME,
                 getDefaultLocale().getLanguage());
         }
 
@@ -137,26 +136,26 @@ public class DefaultMailTemplateManager implements MailTemplateManager
         } else if (mailObjectsCount == 0 && number == -1) {
             throw new MessagingException(String.format(
                 "No [%s] object found in the Document [%s] for language [%s]", MAIL_CLASS.toString(),
-                    documentReference, language));
+                templateReference, language));
         } else if (number == -1) {
             throw new MessagingException(String.format(
                 "No [%s] object matches the locale [%s] or the default locale [%s] in the Document [%s]",
-                    MAIL_CLASS.toString(), language, getDefaultLocale(), documentReference));
+                    MAIL_CLASS.toString(), language, getDefaultLocale(), templateReference));
         }
         return number;
     }
 
-    private int getMailObjectsCount(DocumentReference documentReference, DocumentReference mailClassReference)
+    private int getMailObjectsCount(DocumentReference templateReference, DocumentReference mailClassReference)
         throws MessagingException
     {
         XWikiContext context = getXWikiContext();
         int objectsCount;
         try {
-            objectsCount = context.getWiki().getDocument(documentReference, context).getXObjects(mailClassReference)
+            objectsCount = context.getWiki().getDocument(templateReference, context).getXObjects(mailClassReference)
                 .size();
         } catch (XWikiException e) {
             throw new MessagingException(String.format(
-                "Failed to find number of [%s] objects in Document [%s]", mailClassReference, documentReference), e);
+                "Failed to find number of [%s] objects in Document [%s]", mailClassReference, templateReference), e);
         }
         return objectsCount;
     }

@@ -60,12 +60,11 @@ public class TemplateMimeMessageFactoryTest
 
         DefaultMailTemplateManager mailTemplateManager = this.mocker.getInstance(DefaultMailTemplateManager.class);
         when(mailTemplateManager.evaluate(same(documentReference), eq("subject"), anyMap(), any(Locale.class)))
-            .thenReturn(
-                "XWiki news");
+            .thenReturn("XWiki news");
 
         Session session = Session.getDefaultInstance(new Properties());
 
-        Map<String, Object> parameters = new HashMap();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("language", "fr");
         parameters.put("velocityVariables", Collections.<String, Object>singletonMap("company", "XWiki"));
 

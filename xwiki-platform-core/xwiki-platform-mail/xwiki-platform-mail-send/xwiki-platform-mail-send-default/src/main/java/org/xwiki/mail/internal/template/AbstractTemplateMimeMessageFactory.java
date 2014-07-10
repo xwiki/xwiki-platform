@@ -31,15 +31,14 @@ import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Creates mime message with the subject pre-filled with evaluated subject xproperty from an XWiki.Mail xobject in the
- * Document pointed to by the passed documentReference.
+ * Creates a Mime Message with the subject pre-filled with the evaluated "subject" xproperty found in an "XWiki.Mail"
+ * xobject located in the template document pointed to by the passed reference.
  *
  * @version $Id$
  * @since 6.1RC1
  */
-public abstract class AbstractTemplateMimeMessageFactory implements MimeMessageFactory
+public abstract class AbstractTemplateMimeMessageFactory implements MimeMessageFactory<DocumentReference>
 {
-
     /**
      * @return the Template Manager instance to use, this allows passing either the default component implementation or
      * a secure one for scripts
@@ -47,10 +46,10 @@ public abstract class AbstractTemplateMimeMessageFactory implements MimeMessageF
     protected abstract MailTemplateManager getTemplateManager();
 
     @Override
-    public MimeMessage createMessage(Session session, Object source, Map parameters) throws MessagingException
+    public MimeMessage createMessage(Session session, DocumentReference templateReference, Map parameters)
+        throws MessagingException
     {
         MimeMessage message = new MimeMessage(session);
-        DocumentReference documentReference = (DocumentReference) source;
 
         Map<String, String> velocityVariables = (Map<String, String>) parameters.get("velocityVariables");
 
@@ -59,7 +58,7 @@ public abstract class AbstractTemplateMimeMessageFactory implements MimeMessageF
         Locale locale = LocaleUtils.toLocale(language);
 
         String subject = getTemplateManager()
-            .evaluate(documentReference, "subject", (Map<String, String>) velocityVariables, locale);
+            .evaluate(templateReference, "subject", velocityVariables, locale);
         message.setSubject(subject);
         return message;
     }

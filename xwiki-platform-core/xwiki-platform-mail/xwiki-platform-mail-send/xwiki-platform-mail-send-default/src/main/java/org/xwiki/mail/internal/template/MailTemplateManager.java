@@ -40,7 +40,7 @@ public interface MailTemplateManager
      * Evaluate a xproperty from a template document containing one or several XWiki.Mail xobjects (one per
      * supported language). The xobject used is matched according to the passed language parameter value.
      *
-     * @param documentReference the document reference of the template containing the XWiki.Mail xobject
+     * @param templateReference the reference to the template document containing the XWiki.Mail xobject
      * @param property the name of xproperty
      * @param velocityVariables the list of velocity variables to set in the Velocity Context when evaluating
      * @param locale the language value used to find a matching XWiki.Mail xobject (there can be one xobject per
@@ -49,19 +49,19 @@ public interface MailTemplateManager
      * @throws MessagingException when an error occurs
      * @since 6.1
      */
-    String evaluate(DocumentReference documentReference, String property, Map<String, String> velocityVariables,
+    String evaluate(DocumentReference templateReference, String property, Map<String, String> velocityVariables,
         Locale locale) throws MessagingException;
 
     /**
      * Evaluate a xproperty from a template document containing one or several XWiki.Mail xobjects (one per
      * supported language). The xobject used is matched according to the default language defined in the wiki.
      *
-     * @param documentReference the document reference of the template containing the XWiki.Mail xobject
+     * @param templateReference the reference to the template document containing the XWiki.Mail xobject
      * @param property the name of xproperty
      * @param velocityVariables the list of velocity variables to set in the Velocity Context when evaluating
      * @return the evaluated property
      * @throws MessagingException when an error occurs
      */
-    String evaluate(DocumentReference documentReference, String property, Map<String, String> velocityVariables)
+    String evaluate(DocumentReference templateReference, String property, Map<String, String> velocityVariables)
         throws MessagingException;
 }

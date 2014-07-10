@@ -7,6 +7,7 @@ org.xwiki.mail.internal.DefaultMailSender
 org.xwiki.mail.internal.DefaultMailSenderThread
 org.xwiki.mail.internal.RecipientConverter
 org.xwiki.mail.internal.AddressesConverter
+org.xwiki.mail.internal.AddressConverter
 org.xwiki.mail.internal.MailMandatoryDocumentInitializer
 org.xwiki.mail.internal.template.TemplateMimeBodyPartFactory
 org.xwiki.mail.internal.template.SecureTemplateMimeBodyPartFactory

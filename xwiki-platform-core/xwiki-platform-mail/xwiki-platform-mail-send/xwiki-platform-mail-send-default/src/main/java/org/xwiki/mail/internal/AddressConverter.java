@@ -31,42 +31,42 @@ import org.xwiki.properties.converter.AbstractConverter;
 import org.xwiki.properties.converter.ConversionException;
 
 /**
- * Converts a String listing one or several coma-separated email addresses to an array of {@link javax.mail.Address}
- * instance. Useful when using the Mail Sender scripting API to add a recipient.
+ * Converts a String to a {@link javax.mail.Address} instance. Useful when using the Mail Sender
+ * scripting API to add a recipient.
  *
  * @version $Id$
- * @since 6.1RC1
+ * @since 6.2M1
  */
 @Component
 @Singleton
-public class AddressesConverter extends AbstractConverter<Address[]>
+public class AddressConverter extends AbstractConverter<Address>
 {
     @Override
-    protected Address[] convertToType(Type targetType, Object value)
+    protected Address convertToType(Type targetType, Object value)
     {
         if (value == null) {
             return null;
         }
 
-        if (value instanceof Address[]) {
-            return (Address[]) value;
+        if (value instanceof Address) {
+            return (Address) value;
         }
 
-        Address[] addresses;
+        Address address;
 
         try {
-            addresses = InternetAddress.parse(value.toString());
+            address = InternetAddress.parse(value.toString())[0];
         } catch (AddressException e) {
             throw new ConversionException(
-                String.format("Failed to convert [%s] to an array of [%s]", value, Address.class.getName()), e);
+                String.format("Failed to convert [%s] to [%s]", value, Address.class.getName()), e);
         }
 
-        return addresses;
+        return address;
     }
 
     @Override
-    protected String convertToString(Address[] value)
+    protected String convertToString(Address value)
     {
-        return InternetAddress.toString(value);
+        return InternetAddress.toString(new Address[] {value});
     }
 }

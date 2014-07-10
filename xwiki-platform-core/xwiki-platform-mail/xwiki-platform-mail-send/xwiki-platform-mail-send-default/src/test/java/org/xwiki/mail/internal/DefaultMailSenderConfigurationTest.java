@@ -97,7 +97,7 @@ public class DefaultMailSenderConfigurationTest
         when(documentsSource.getProperty("smtp_server_password", (String) null)).thenReturn(null);
         when(documentsSource.getProperty("smtp_server", (String) null)).thenReturn("server");
         when(documentsSource.getProperty("smtp_port")).thenReturn("25");
-        when(documentsSource.getProperty("smtp_from", (String) null)).thenReturn("john@doe.com");
+        when(documentsSource.getProperty("admin_email", (String) null)).thenReturn("john@doe.com");
 
         Properties returnedProperties = this.mocker.getComponentUnderTest().getAllProperties();
 
@@ -128,5 +128,11 @@ public class DefaultMailSenderConfigurationTest
         when(documentsSource.getProperty("smtp_server_password", (String) null)).thenReturn("pass");
 
         assertTrue(this.mocker.getComponentUnderTest().usesAuthentication());
+    }
+
+    @Test
+    public void getFromWhenNotDefined() throws Exception
+    {
+        assertEquals("no-reply@xwiki.org", this.mocker.getComponentUnderTest().getFromAddress());
     }
 }

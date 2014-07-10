@@ -77,6 +77,8 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
 
     private static final int DEFAULT_PORT = 25;
 
+    private static final String DEFAULT_FROM_EMAIL = "no-reply@xwiki.org";
+
     @Inject
     private Logger logger;
 
@@ -130,8 +132,12 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     @Override
     public String getFromAddress()
     {
-        return this.documentsSource.getProperty("smtp_from",
-                this.xwikiPropertiesSource.getProperty(PREFIX + "from", String.class));
+        String fromAddress = this.documentsSource.getProperty("admin_email",
+            this.xwikiPropertiesSource.getProperty(PREFIX + "from", String.class));
+        if (fromAddress == null) {
+            fromAddress = DEFAULT_FROM_EMAIL;
+        }
+        return fromAddress;
     }
 
     @Override

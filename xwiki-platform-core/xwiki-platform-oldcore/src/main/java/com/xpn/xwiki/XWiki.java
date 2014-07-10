@@ -4665,6 +4665,11 @@ public class XWiki implements EventListener
     private static final String DEFAULT_RIGHT_SERVICE_CLASS =
         "org.xwiki.security.authorization.internal.XWikiCachingRightService";
 
+    /**
+     * @deprecated since 6.2M1, use {@link AuthorizationManager} or {@link ContextualLocalizationManager} components
+     *             instead
+     */
+    @Deprecated
     public XWikiRightService getRightService()
     {
         synchronized (this.RIGHT_SERVICE_LOCK) {

@@ -38,7 +38,7 @@ public class SecureTemplateMimeMessageFactory extends AbstractTemplateMimeMessag
 {
     @Inject
     @Named("secure")
-    private DefaultMailTemplateManager mailTemplateManager;
+    private MailTemplateManager mailTemplateManager;
 
     @Override
     protected MailTemplateManager getTemplateManager()

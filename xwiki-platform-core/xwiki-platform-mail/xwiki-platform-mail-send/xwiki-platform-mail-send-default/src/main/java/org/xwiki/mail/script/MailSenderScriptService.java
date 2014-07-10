@@ -118,7 +118,7 @@ public class MailSenderScriptService implements ScriptService
         // Step 1: Look for a secure version first
         try {
             factory = this.componentManager.getInstance(
-                new DefaultParameterizedType(null, MimeMessageFactory.class, type, null),
+                new DefaultParameterizedType(null, MimeMessageFactory.class, type),
                     String.format("%s/secure", hint));
         } catch (ComponentLookupException e) {
             // Step 2: Look for a non secure version if a secure one doesn't exist...

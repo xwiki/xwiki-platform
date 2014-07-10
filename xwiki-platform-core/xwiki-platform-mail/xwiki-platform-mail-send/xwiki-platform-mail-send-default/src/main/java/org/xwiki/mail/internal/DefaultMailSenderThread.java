@@ -84,14 +84,13 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
             do {
                 // Handle next message in the queue
                 if (!this.mailQueue.isEmpty()) {
-                    MailSenderQueueItem mailItem = this.mailQueue.poll();
+                    // Important: only remove the mail item from the queue after the mail has been sent as otherwise,
+                    // MailSender.waitTillSent() may return before the mail is actually sent!
+                    MailSenderQueueItem mailItem = this.mailQueue.peek();
                     try {
                         sendMail(mailItem);
-                    } catch (Exception e) {
-                        // If any error happens, we log it but we don't stop this thread so that we can send
-                        // other mails
-                        this.logger.warn("Failed to send mail [{}]. Root reason [{}]", mailItem,
-                            ExceptionUtils.getRootCauseMessage(e));
+                    } finally {
+                        this.mailQueue.remove(mailItem);
                     }
                 }
                 // Make some pause to not overload the server
@@ -150,7 +149,7 @@ public class DefaultMailSenderThread extends Thread implements MailSenderThread
             if (listener != null) {
                 listener.onSuccess(message);
             }
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             // An error occurred, notify the user if a listener has been provided
             if (listener != null) {
                 listener.onError(message, e);

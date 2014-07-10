@@ -29,12 +29,13 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.mail.internal.script.ScriptMailSenderListener;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
 /**
- * Unit tests for {@link org.xwiki.mail.internal.DefaultMailSender}.
+ * Unit tests for {@link org.xwiki.mail.internal.DefaultMailSenderThread}.
  *
  * @version $Id$
  * @since 6.1RC1
@@ -42,30 +43,48 @@ import static org.mockito.Mockito.*;
 public class DefaultMailSenderThreadTest
 {
     @Rule
-    public MockitoComponentMockingRule<TestableDefaultMailSenderThread> mocker =
-        new MockitoComponentMockingRule<>(TestableDefaultMailSenderThread.class);
+    public MockitoComponentMockingRule<DefaultMailSenderThread> mocker =
+        new MockitoComponentMockingRule<>(DefaultMailSenderThread.class);
 
     @Test
     public void runWhenMailSendingFails() throws Exception
     {
-        Session session = Session.getDefaultInstance(new Properties());
+        // Create a Session with an invalid host so that it generates an error
+        Properties properties = new Properties();
+        properties.setProperty("mail.smtp.host", "xwiki-unknown");
+        Session session = Session.getDefaultInstance(properties);
         MimeMessage message = new MimeMessage(session);
         message.setSubject("subject");
         message.setFrom(InternetAddress.parse("john@doe.com")[0]);
-        MailSenderQueueItem item = new MailSenderQueueItem(message, session, null);
+        ScriptMailSenderListener listener = new ScriptMailSenderListener();
+        MailSenderQueueItem item = new MailSenderQueueItem(message, session, listener);
 
         Queue<MailSenderQueueItem> mailQueue = new ConcurrentLinkedQueue<>();
 
-        // When this mail item is processed it'll send a RuntimeException.
+        // Send 2 mails. Both will fail but we want to verify that the second one is processed even though the first
+        // one failed.
+        mailQueue.add(item);
         mailQueue.add(item);
 
         DefaultMailSenderThread thread = this.mocker.getComponentUnderTest();
-        thread.stopProcessing();
-        thread.run(mailQueue);
+        thread.startProcessing(mailQueue);
 
-        // This is the real test: we verify that there's been an error while sending the email and that it's been
-        // logged. This proves that the Mail Sender Thread doesn't stop when there's an error sending an email.
-        verify(this.mocker.getMockedLogger()).warn("Failed to send mail [{}]. Root reason [{}]", item,
-            "RuntimeException: error");
+        // This is the real test: we verify that there's been an error while sending each email and that it's been
+        // logged. This also proves that the Mail Sender Thread doesn't stop when there's an error sending an email.
+        boolean success = true;
+        try {
+            long time = System.currentTimeMillis();
+            while (listener.getExceptionQueue().size() != 2) {
+                if (System.currentTimeMillis() - time > 5000L) {
+                    success = false;
+                    break;
+                }
+                Thread.sleep(100L);
+            }
+        } finally {
+            thread.stopProcessing();
+            thread.join();
+        }
+        assertTrue(success);
     }
 }

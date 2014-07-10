@@ -50,6 +50,7 @@ import org.xwiki.security.internal.XWikiConstants;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 
 /**
@@ -154,7 +155,7 @@ public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesI
         XWikiDocument doc = (XWikiDocument) source;
         DocumentReference docRef = doc.getDocumentReference();
         DocumentReference groupClass = resolver.resolve(XWikiConstants.GROUP_CLASS, docRef);
-        List objects = doc.getXObjects(groupClass);
+        List<BaseObject> objects = doc.getXObjects(groupClass);
         return objects != null && objects.size() > 0;
     }
 

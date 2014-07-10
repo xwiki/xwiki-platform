@@ -36,6 +36,7 @@ import org.xwiki.extension.test.EmptyExtension;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
@@ -78,8 +79,10 @@ public class WikiCopiedEventListenerTest
     }
 
     @AfterComponent
-    public void addContextualAuthorizationManagerComponent() throws Exception {
+    public void addContextualAuthorizationManagerComponent() throws Exception
+    {
         this.repositoryUtil.getComponentManager().registerMockComponent(ContextualAuthorizationManager.class);
+        this.repositoryUtil.getComponentManager().registerMockComponent(AuthorizationManager.class);
     }
 
     @Test

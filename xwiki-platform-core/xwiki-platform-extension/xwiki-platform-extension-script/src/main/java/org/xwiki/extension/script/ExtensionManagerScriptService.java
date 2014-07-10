@@ -65,6 +65,8 @@ import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -144,6 +146,9 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
     @Inject
     private ScriptServiceManager scriptServiceManager;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     /**
      * @param <S> the type of the {@link ScriptService}
@@ -370,7 +375,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
+        if (!this.authorization.hasAccess(Right.PROGRAM)) {
             // Make sure only PR user can remove the right checking or change the users
             setRightsProperties(installRequest);
         }
@@ -435,7 +440,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
+        if (!this.authorization.hasAccess(Right.PROGRAM)) {
             // Make sure only PR user can remove the right checking or change the users
             setRightsProperties(installRequest);
         }
@@ -508,7 +513,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
+        if (!this.authorization.hasAccess(Right.PROGRAM)) {
             // Make sure only PR user can remove the right checking or change the users
             setRightsProperties(uninstallRequest);
         }
@@ -619,7 +624,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
+        if (!this.authorization.hasAccess(Right.PROGRAM)) {
             // Make sure only PR user can remove the right checking or change the users
             setRightsProperties(uninstallRequest);
         }
@@ -730,7 +735,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
+        if (!this.authorization.hasAccess(Right.PROGRAM)) {
             setError(new JobException("Need programming right to get current job"));
             return null;
         }
@@ -749,7 +754,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
             jobStatus = job.getStatus();
         }
 
-        if (jobStatus != null && !this.documentAccessBridge.hasProgrammingRights()) {
+        if (jobStatus != null && !this.authorization.hasAccess(Right.PROGRAM)) {
             jobStatus = safe(jobStatus);
         }
 
@@ -792,7 +797,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         JobStatus jobStatus;
         if (job != null) {
             jobStatus = job.getStatus();
-            if (!this.documentAccessBridge.hasProgrammingRights()) {
+            if (!this.authorization.hasAccess(Right.PROGRAM)) {
                 jobStatus = safe(jobStatus);
             }
         } else {

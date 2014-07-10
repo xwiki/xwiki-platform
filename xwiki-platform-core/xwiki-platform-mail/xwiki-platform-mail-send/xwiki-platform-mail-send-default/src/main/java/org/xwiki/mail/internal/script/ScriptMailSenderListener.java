@@ -58,7 +58,7 @@ public class ScriptMailSenderListener implements MailResultListener
     {
         // Create the queue on the first error (that saves memory and there shouldn't be any threading issue since
         // we're using the Execution Context which is a ThreadLocal.
-        BlockingQueue<Throwable> queue = getExceptionQueue();
+        BlockingQueue<Throwable> queue = (BlockingQueue<Throwable>) this.executionContext.getProperty(CONTEXT_KEY);
         if (queue == null) {
             queue = new LinkedBlockingQueue<>(100);
             this.executionContext.setProperty(CONTEXT_KEY, queue);

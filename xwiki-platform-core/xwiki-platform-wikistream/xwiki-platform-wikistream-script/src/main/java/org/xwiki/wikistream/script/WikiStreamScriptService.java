@@ -39,7 +39,8 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.security.authorization.AuthorizationException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 import org.xwiki.wikistream.WikiStreamFactory;
 import org.xwiki.wikistream.descriptor.WikiStreamDescriptor;
@@ -50,8 +51,6 @@ import org.xwiki.wikistream.job.WikiStreamConverterJobRequest;
 import org.xwiki.wikistream.output.OutputStreamOutputTarget;
 import org.xwiki.wikistream.output.OutputWikiStreamFactory;
 import org.xwiki.wikistream.type.WikiStreamType;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Expose various WikiStream related APIs to scripts.
@@ -75,7 +74,7 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
     private Provider<ComponentManager> componentManagerProvider;
 
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    private ContextualAuthorizationManager authorization;
 
     @Inject
     private JobExecutor jobExecutor;
@@ -87,15 +86,6 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
     public ScriptService get(String id)
     {
         return this.scriptServiceManager.get(ROLEHINT + '.' + id);
-    }
-
-    // TODO: introduce advanced right checking system instead
-    private void checkProgrammingRights() throws AuthorizationException
-    {
-        XWikiContext xcontext = this.xcontextProvider.get();
-        if (!xcontext.getWiki().getRightService().hasProgrammingRights(xcontext)) {
-            throw new AuthorizationException("WikiStream conversion require programming right");
-        }
     }
 
     /**
@@ -124,7 +114,7 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
         Job job = null;
 
         try {
-            checkProgrammingRights();
+            this.authorization.checkAccess(Right.PROGRAM);
 
             WikiStreamConverterJobRequest request =
                 new WikiStreamConverterJobRequest(inputType, inputProperties, outputType, outputProperties);
@@ -153,7 +143,7 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
         Job job = null;
 
         try {
-            checkProgrammingRights();
+            this.authorization.checkAccess(Right.PROGRAM);
 
             return this.jobExecutor.getCurrentJob(WikiStreamConverterJob.ROOT_GROUP);
         } catch (Exception e) {
@@ -246,7 +236,7 @@ public class WikiStreamScriptService extends AbstractWikiStreamScriptService
         resetError();
 
         try {
-            checkProgrammingRights();
+            this.authorization.checkAccess(Right.PROGRAM);
 
             return this.componentManagerProvider.get().getInstance(factoryType, inputType.serialize());
         } catch (Exception e) {

@@ -22,7 +22,6 @@ package org.xwiki.mail.internal;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.internal.script.ScriptMailSenderListener;
 
 import static org.mockito.Mockito.*;
@@ -39,8 +38,7 @@ public class ScriptMailSenderListenerTest
     @Test
     public void errorAndRetrieveError() throws Exception
     {
-        ExecutionContext context = new ExecutionContext();
-        ScriptMailSenderListener listener = new ScriptMailSenderListener(context);
+        ScriptMailSenderListener listener = new ScriptMailSenderListener();
         MimeMessage message = mock(MimeMessage.class);
         listener.onError(message, new Exception("error"));
         assertEquals(1, listener.getExceptionQueue().size());

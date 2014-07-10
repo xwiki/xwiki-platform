@@ -81,7 +81,7 @@ public class MimeMessageWrapper
         this.mailSender = mailSender;
         this.execution = execution;
         this.componentManager = componentManager;
-        this.listener = new ScriptMailSenderListener(this.execution.getContext());
+        this.listener = new ScriptMailSenderListener();
     }
 
     /**

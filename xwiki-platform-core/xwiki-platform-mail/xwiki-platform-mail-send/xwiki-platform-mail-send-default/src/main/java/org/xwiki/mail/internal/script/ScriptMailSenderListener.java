@@ -24,7 +24,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.mail.internet.MimeMessage;
 
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.mail.MailResultListener;
 
 /**
@@ -37,15 +36,7 @@ public class ScriptMailSenderListener implements MailResultListener
 {
     private static final String CONTEXT_KEY = "mailsenderExceptions";
 
-    private ExecutionContext executionContext;
-
-    /**
-     * @param executionContext the context in which to save errors (i.e. thus, each thread has its list of mail errors)
-     */
-    public ScriptMailSenderListener(ExecutionContext executionContext)
-    {
-        this.executionContext = executionContext;
-    }
+    private BlockingQueue<Throwable> errorQueue = new LinkedBlockingQueue<>(100);
 
     @Override
     public void onSuccess(MimeMessage message)
@@ -56,16 +47,8 @@ public class ScriptMailSenderListener implements MailResultListener
     @Override
     public void onError(MimeMessage message, Throwable t)
     {
-        // Create the queue on the first error (that saves memory and there shouldn't be any threading issue since
-        // we're using the Execution Context which is a ThreadLocal.
-        BlockingQueue<Throwable> queue = (BlockingQueue<Throwable>) this.executionContext.getProperty(CONTEXT_KEY);
-        if (queue == null) {
-            queue = new LinkedBlockingQueue<>(100);
-            this.executionContext.setProperty(CONTEXT_KEY, queue);
-        }
-
         // Add the error to the queue
-        queue.add(t);
+        this.errorQueue.add(t);
     }
 
     /**
@@ -73,10 +56,6 @@ public class ScriptMailSenderListener implements MailResultListener
      */
     public BlockingQueue<Throwable> getExceptionQueue()
     {
-        BlockingQueue<Throwable> queue = (BlockingQueue<Throwable>) this.executionContext.getProperty(CONTEXT_KEY);
-        if (queue == null) {
-            queue = new LinkedBlockingQueue<>(1);
-        }
-        return queue;
+        return this.errorQueue;
     }
 }

@@ -203,6 +203,23 @@ table {
   margin-bottom: @input-height-base;
 }
 
+// FIX: User profile
+.skin-flamingo{
+  #user-menu-col{
+    width: 13em;
+    @media (max-width: @screen-xs-min) {
+      float: none;
+      margin: auto;
+    }
+  }
+
+  #user-page-content{
+    @media (max-width: @screen-xs-min) {
+      margin-left: 0;
+    }
+  }
+}
+
 // Export ---------------------------------------------------------------------
 #exportModal{
   .modal-body{

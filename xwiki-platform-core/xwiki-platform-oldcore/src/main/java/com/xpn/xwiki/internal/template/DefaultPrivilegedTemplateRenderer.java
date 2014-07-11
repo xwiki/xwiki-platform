@@ -138,7 +138,7 @@ public class DefaultPrivilegedTemplateRenderer implements PrivilegedTemplateRend
                 // Make the current velocity template id available
                 ((MutableRenderingContext) this.renderingContext).push(this.renderingContext.getTransformation(),
                     this.renderingContext.getXDOM(), this.renderingContext.getDefaultSyntax(), templateName,
-                    this.renderingContext.isRestricted());
+                    this.renderingContext.isRestricted(), this.renderingContext.getTargetSyntax());
                 setTransformationId = true;
             }
         }

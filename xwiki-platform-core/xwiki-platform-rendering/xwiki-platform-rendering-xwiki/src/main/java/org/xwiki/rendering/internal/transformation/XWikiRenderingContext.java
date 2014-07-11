@@ -64,9 +64,10 @@ public class XWikiRenderingContext extends DefaultRenderingContext implements In
     }
 
     @Override
-    public void push(Transformation transformation, XDOM xdom, Syntax syntax, String id, boolean restricted)
+    public void push(Transformation transformation, XDOM xdom, Syntax syntax, String id, boolean restricted,
+        Syntax targetSyntax)
     {
-        super.push(transformation, xdom, syntax, id, restricted);
+        super.push(transformation, xdom, syntax, id, restricted, targetSyntax);
 
         String namespace = id;
         if (namespace != null) {

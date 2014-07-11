@@ -8201,7 +8201,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * 
      * @param previousDocument the previous version of the document
      * @param newDocument the next version of the document
-     * @param configuration the configuration of the merge Indicate how to deal with some conflicts use cases, etc.
+     * @param configuration the configuration of the merge indicates how to deal with some conflicts use cases, etc.
      * @param context the XWiki context
      * @return a repport of what happen during the merge (errors, etc.)
      * @since 3.2M1

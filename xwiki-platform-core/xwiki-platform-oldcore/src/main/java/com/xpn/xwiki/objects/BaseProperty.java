@@ -142,7 +142,7 @@ public class BaseProperty<R extends EntityReference> extends BaseElement<R> impl
     }
 
     @Override
-    public BaseProperty clone()
+    public BaseProperty<R> clone()
     {
         BaseProperty<R> property = (BaseProperty<R>) super.clone();
 

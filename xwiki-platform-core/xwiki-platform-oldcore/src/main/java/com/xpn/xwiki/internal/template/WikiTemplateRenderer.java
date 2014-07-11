@@ -295,13 +295,14 @@ public class WikiTemplateRenderer
         return new XDOM(errorBlocks);
     }
 
-    private void transform(Block block, String transformationId)
+    private void transform(Block block, String transformationId, Syntax targetSyntax)
     {
         TransformationContext txContext =
             new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)), null,
                 false);
 
         txContext.setId(transformationId);
+        txContext.setTargetSyntax(targetSyntax);
 
         try {
             this.transformationManager.performTransformations(block, txContext);
@@ -366,7 +367,7 @@ public class WikiTemplateRenderer
     public String render(String template, Syntax targetSyntax, String transformationId)
         throws ComponentLookupException, ParseException, MissingParserException, IOException, XWikiVelocityException
     {
-        XDOM xdom = execute(template, transformationId);
+        XDOM xdom = execute(template, transformationId, targetSyntax);
 
         WikiPrinter printer = new DefaultWikiPrinter();
 
@@ -379,14 +380,14 @@ public class WikiTemplateRenderer
 
     public XDOM execute(String template)
     {
-        return execute(template, this.renderingContext.getTransformationId());
+        return execute(template, this.renderingContext.getTransformationId(), this.renderingContext.getTargetSyntax());
     }
 
-    public XDOM execute(String template, String transformationId)
+    public XDOM execute(String template, String transformationId, Syntax targetSyntax)
     {
         XDOM xdom = getXDOM(template, transformationId);
 
-        transform(xdom, transformationId);
+        transform(xdom, transformationId, targetSyntax);
 
         return xdom;
     }

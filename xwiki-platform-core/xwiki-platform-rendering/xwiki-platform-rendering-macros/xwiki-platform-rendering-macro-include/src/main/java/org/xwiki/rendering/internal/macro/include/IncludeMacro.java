@@ -179,6 +179,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         displayParameters.setSectionId(parameters.getSection());
         displayParameters.setTransformationContextIsolated(displayParameters.isContentTransformed());
         displayParameters.setTransformationContextRestricted(context.getTransformationContext().isRestricted());
+        displayParameters.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
 
         Stack<Object> references = this.inclusionsBeingExecuted.get();
         if (parametersContext == Context.NEW) {

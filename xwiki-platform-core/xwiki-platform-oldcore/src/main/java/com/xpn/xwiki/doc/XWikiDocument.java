@@ -978,6 +978,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             parameters.setTransformationContextIsolated(isolateVelocityMacros);
             // Render the translated content (matching the current language) using this document's syntax.
             parameters.setContentTranslated(tdoc != this);
+            parameters.setTargetSyntax(targetSyntax);
             XDOM contentXDOM = getDocumentDisplayer().display(this, parameters);
             renderedContent = renderXDOM(contentXDOM, targetSyntax);
             getRenderingCache().setRenderedContent(getDocumentReference(), content, renderedContent, context);
@@ -1064,6 +1065,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
                 parameters.setTransformationContextIsolated(true);
                 parameters.setTransformationContextRestricted(restrictedTransformationContext);
+                parameters.setTargetSyntax(this.syntaxFactory.createSyntaxFromIdString(targetSyntaxId));
                 XDOM contentXDOM = getDocumentDisplayer().display(fakeDocument, parameters);
                 result = renderXDOM(contentXDOM, this.syntaxFactory.createSyntaxFromIdString(targetSyntaxId));
 
@@ -1262,6 +1264,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
         parameters.setTitleDisplayed(true);
         parameters.setExecutionContextIsolated(true);
+        parameters.setTargetSyntax(outputSyntax);
         XDOM titleXDOM = getDocumentDisplayer().display(this, parameters);
         try {
             return renderXDOM(titleXDOM, outputSyntax);

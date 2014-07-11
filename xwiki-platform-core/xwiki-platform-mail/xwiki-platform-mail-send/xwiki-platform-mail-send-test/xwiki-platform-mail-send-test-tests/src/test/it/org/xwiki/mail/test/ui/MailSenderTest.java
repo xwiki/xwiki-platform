@@ -85,10 +85,12 @@ public class MailSenderTest extends AbstractTest
 
         // Create another page with the Velocity script to send the template email
         String velocity = "{{velocity}}\n"
-            + "#set ($message = $services.mailsender.createMessage('localhost@xwiki.org', 'john@doe.com', "
-            + "'subject test'))\n"
             + "#set ($templateReference = $services.model.createDocumentReference('', '" + getTestClassName()
             + "', 'MailTemplate'))\n"
+            + "#set ($message = $services.mailsender.createMessage('template', $templateReference"
+            + ", {'language' : 'en'}))\n"
+            + "#set ($discard = $message.setFrom('localhost@xwiki.org'))\n"
+            + "#set ($discard = $message.addRecipients('to', 'john@doe.com'))\n"
             + "#set ($discard = $message.addPart('xwiki/template', $templateReference, "
             + "{'velocityVariables' : { 'name' : 'John' }, 'language' : 'en'}))\n"
             + "#set ($discard = $message.send())\n"

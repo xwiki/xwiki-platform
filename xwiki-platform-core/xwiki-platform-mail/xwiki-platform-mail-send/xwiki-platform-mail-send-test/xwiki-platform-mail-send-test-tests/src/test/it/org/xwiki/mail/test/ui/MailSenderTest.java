@@ -76,9 +76,10 @@ public class MailSenderTest extends AbstractTest
 
         // Create a Wiki page containing a Mail Template (ie a XWiki.Mail object)
         getUtil().createPage(getTestClassName(), "MailTemplate", "", "");
+        // Note: we use the $doc binding in the content to verify that standard variables are correctly bound.
         getUtil().addObject(getTestClassName(), "MailTemplate", "XWiki.Mail",
-            "subject", "Status for $name", "language", "en", "html", "<strong>Hello $name</strong>", "text",
-            "Hello $name");
+            "subject", "Status for $name on $doc.fullName", "language", "en", "html", "<strong>Hello $name</strong>",
+            "text", "Hello $name");
         ByteArrayInputStream bais = new ByteArrayInputStream("content".getBytes());
         getUtil().attachFile(getTestClassName(), "MailTemplate", "something.txt", bais, true,
             new UsernamePasswordCredentials("superadmin", "pass"));
@@ -87,12 +88,11 @@ public class MailSenderTest extends AbstractTest
         String velocity = "{{velocity}}\n"
             + "#set ($templateReference = $services.model.createDocumentReference('', '" + getTestClassName()
             + "', 'MailTemplate'))\n"
-            + "#set ($message = $services.mailsender.createMessage('template', $templateReference"
-            + ", {'language' : 'en'}))\n"
+            + "#set ($parameters = {'velocityVariables' : { 'name' : 'John' }, 'language' : 'en'})\n"
+            + "#set ($message = $services.mailsender.createMessage('template', $templateReference, $parameters))\n"
             + "#set ($discard = $message.setFrom('localhost@xwiki.org'))\n"
             + "#set ($discard = $message.addRecipients('to', 'john@doe.com'))\n"
-            + "#set ($discard = $message.addPart('xwiki/template', $templateReference, "
-            + "{'velocityVariables' : { 'name' : 'John' }, 'language' : 'en'}))\n"
+            + "#set ($discard = $message.addPart('xwiki/template', $templateReference, $parameters))\n"
             + "#set ($discard = $message.send())\n"
             + "{{/velocity}}";
         getUtil().createPage(getTestClassName(), "SendMail", velocity, "");
@@ -100,5 +100,7 @@ public class MailSenderTest extends AbstractTest
         // Verify that the mail has been received.
         this.mail.waitForIncomingEmail(10000L, 1);
         assertEquals(1, this.mail.getReceivedMessages().length);
+        assertEquals("Status for John on " + getTestClassName() + ".SendMail",
+            this.mail.getReceivedMessages()[0].getSubject());
     }
 }

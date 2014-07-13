@@ -214,7 +214,7 @@ widgets.ModalPopup = Class.create({
       shortcut.remove(this.shortcuts[action].keys[i]);
     }
   },
-  createButton : function(type, text, title, id) {
+  createButton : function(type, text, title, id, extraClass) {
     var wrapper = new Element("span", {"class" : "buttonwrapper"});
     var button = new Element("input", {
       "type" : type,
@@ -223,6 +223,9 @@ widgets.ModalPopup = Class.create({
       "title" : title,
       "id" : id
     });
+    if (extraClass) {
+      button.addClassName(extraClass);
+    }
     wrapper.update(button);
     return wrapper;
   }

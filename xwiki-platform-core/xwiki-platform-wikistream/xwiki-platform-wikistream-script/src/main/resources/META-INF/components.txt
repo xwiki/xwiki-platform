@@ -1,2 +1,0 @@
-org.xwiki.wikistream.script.WikiStreamScriptService
-500:org.xwiki.wikistream.script.internal.ScriptWikiStreamConverterJob

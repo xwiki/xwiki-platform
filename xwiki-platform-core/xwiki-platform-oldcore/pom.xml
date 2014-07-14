@@ -595,17 +595,17 @@
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wikistream-instance-api</artifactId>
+      <artifactId>xwiki-platform-filter-instance-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wikistream-instance-document</artifactId>
+      <artifactId>xwiki-platform-filter-instance-document</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wikistream-stream-xar</artifactId>
+      <artifactId>xwiki-platform-filter-stream-xar</artifactId>
       <version>${project.version}</version>
     </dependency>
 

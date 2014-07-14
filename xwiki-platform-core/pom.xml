@@ -358,86 +358,86 @@
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>org/xwiki/wikistream/instance/output/ExtensionInstanceOutputProperties</className>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
               <method>org.xwiki.model.reference.EntityReference getDefaultReference()</method>
-              <justification>WikiStream module is still a young API.
+              <justification>Filter module is still a young API.
               Those properties were copy/pasted by mistake</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>org/xwiki/wikistream/instance/output/ExtensionInstanceOutputProperties</className>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
               <method>org.xwiki.rendering.syntax.Syntax getDefaultSyntax()</method>
-              <justification>WikiStream module is still a young API.
+              <justification>Filter module is still a young API.
               Those properties were copy/pasted by mistake</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>org/xwiki/wikistream/instance/output/ExtensionInstanceOutputProperties</className>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
               <method>java.lang.String getSaveComment()</method>
-              <justification>WikiStream module is still a young API.
+              <justification>Filter module is still a young API.
               Those properties were copy/pasted by mistake</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>org/xwiki/wikistream/instance/output/ExtensionInstanceOutputProperties</className>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
               <method>boolean isAuthorPreserved()</method>
-              <justification>WikiStream module is still a young API.
+              <justification>Filter module is still a young API.
               Those properties were copy/pasted by mistake</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>org/xwiki/wikistream/instance/output/ExtensionInstanceOutputProperties</className>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
               <method>boolean isPreviousDeleted()</method>
-              <justification>WikiStream module is still a young API.
+              <justification>Filter module is still a young API.
               Those properties were copy/pasted by mistake</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>org/xwiki/wikistream/instance/output/ExtensionInstanceOutputProperties</className>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
               <method>boolean isVersionPreserved()</method>
-              <justification>WikiStream module is still a young API.
+              <justification>Filter module is still a young API.
               Those properties were copy/pasted by mistake</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>org/xwiki/wikistream/instance/output/ExtensionInstanceOutputProperties</className>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
               <method>void setAuthorPreserved(boolean)</method>
-              <justification>WikiStream module is still a young API.
+              <justification>Filter module is still a young API.
               Those properties were copy/pasted by mistake</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>org/xwiki/wikistream/instance/output/ExtensionInstanceOutputProperties</className>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
               <method>void setDefaultReference(org.xwiki.model.reference.EntityReference)</method>
-              <justification>WikiStream module is still a young API.
+              <justification>Filter module is still a young API.
               Those properties were copy/pasted by mistake</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>org/xwiki/wikistream/instance/output/ExtensionInstanceOutputProperties</className>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
               <method>void setDefaultSyntax(org.xwiki.rendering.syntax.Syntax)</method>
-              <justification>WikiStream module is still a young API.
+              <justification>Filter module is still a young API.
               Those properties were copy/pasted by mistake</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>org/xwiki/wikistream/instance/output/ExtensionInstanceOutputProperties</className>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
               <method>void setPreviousDeleted(boolean)</method>
-              <justification>WikiStream module is still a young API.
+              <justification>Filter module is still a young API.
               Those properties were copy/pasted by mistake</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>org/xwiki/wikistream/instance/output/ExtensionInstanceOutputProperties</className>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
               <method>void setSaveComment(java.lang.String)</method>
-              <justification>WikiStream module is still a young API.
+              <justification>Filter module is still a young API.
               Those properties were copy/pasted by mistake</justification>
             </difference>
             <difference>
               <differenceType>7002</differenceType>
-              <className>org/xwiki/wikistream/instance/output/ExtensionInstanceOutputProperties</className>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
               <method>void setVersionPreserved(boolean)</method>
-              <justification>WikiStream module is still a young API.
+              <justification>Filter module is still a young API.
               Those properties were copy/pasted by mistake</justification>
             </difference>
           </ignored>
@@ -487,6 +487,7 @@
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-faq</module>
     <module>xwiki-platform-feed</module>
+    <module>xwiki-platform-filter</module>
     <module>xwiki-platform-flamingo</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-git</module>
@@ -541,7 +542,6 @@
     <module>xwiki-platform-webdav</module>
     <module>xwiki-platform-webjars</module>
     <module>xwiki-platform-wiki</module>
-    <module>xwiki-platform-wikistream</module>
     <module>xwiki-platform-wysiwyg</module>
     <module>xwiki-platform-xar</module>
     <module>xwiki-platform-xml</module>

@@ -28,6 +28,19 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.mime.MediaType;
 import org.slf4j.Marker;
+import org.xwiki.filter.FilterException;
+import org.xwiki.filter.event.model.WikiDocumentFilter;
+import org.xwiki.filter.input.BeanInputFilterStreamFactory;
+import org.xwiki.filter.input.InputFilterStreamFactory;
+import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
+import org.xwiki.filter.instance.output.InstanceOutputProperties;
+import org.xwiki.filter.internal.input.BeanInputFilterStream;
+import org.xwiki.filter.internal.input.DefaultInputStreamInputSource;
+import org.xwiki.filter.internal.output.BeanOutputFilterStream;
+import org.xwiki.filter.output.BeanOutputFilterStreamFactory;
+import org.xwiki.filter.output.OutputFilterStreamFactory;
+import org.xwiki.filter.type.FilterStreamType;
+import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
@@ -41,19 +54,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.input.BeanInputWikiStreamFactory;
-import org.xwiki.wikistream.input.InputWikiStreamFactory;
-import org.xwiki.wikistream.instance.output.DocumentInstanceOutputProperties;
-import org.xwiki.wikistream.instance.output.InstanceOutputProperties;
-import org.xwiki.wikistream.internal.input.BeanInputWikiStream;
-import org.xwiki.wikistream.internal.input.DefaultInputStreamInputSource;
-import org.xwiki.wikistream.internal.output.BeanOutputWikiStream;
-import org.xwiki.wikistream.model.filter.WikiDocumentFilter;
-import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
-import org.xwiki.wikistream.output.OutputWikiStreamFactory;
-import org.xwiki.wikistream.type.WikiStreamType;
-import org.xwiki.wikistream.xar.input.XARInputProperties;
 import org.xwiki.xar.XarException;
 import org.xwiki.xar.XarPackage;
 
@@ -110,13 +110,13 @@ public class ImportAction extends XWikiAction
     }
 
     private void getPackageInfos(XWikiAttachment packFile, XWikiResponse response, XWikiContext xcontext)
-        throws IOException, XWikiException, WikiStreamException, XarException
+        throws IOException, XWikiException, FilterException, XarException
     {
         String encoding = xcontext.getWiki().getEncoding();
         response.setContentType(MediaType.APPLICATION_XML.toString());
         response.setCharacterEncoding(encoding);
 
-        if (xcontext.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 1) == 0) {
+        if (xcontext.getWiki().ParamAsLong("xwiki.action.import.xar.usefilter", 1) == 0) {
             PackageAPI importer = ((PackageAPI) xcontext.getWiki().getPluginApi("package", xcontext));
             importer.Import(packFile.getContentInputStream(xcontext));
             String xml = importer.toXml();
@@ -131,14 +131,14 @@ public class ImportAction extends XWikiAction
     }
 
     private String importPackage(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
-        throws IOException, XWikiException, WikiStreamException
+        throws IOException, XWikiException, FilterException
     {
         String all = request.get("all");
         if (!"1".equals(all)) {
-            if (context.getWiki().ParamAsLong("xwiki.action.import.xar.usewikistream", 1) == 0) {
+            if (context.getWiki().ParamAsLong("xwiki.action.import.xar.usefilter", 1) == 0) {
                 importPackageOld(packFile, request, context);
             } else {
-                importPackageWikiStream(packFile, request, context);
+                importPackageFilterStream(packFile, request, context);
             }
 
             if (!StringUtils.isBlank(request.getParameter("ajax"))) {
@@ -186,7 +186,7 @@ public class ImportAction extends XWikiAction
     }
 
     private void importPackageOld(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
-        throws IOException, XWikiException, WikiStreamException
+        throws IOException, XWikiException, FilterException
     {
         PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
 
@@ -237,8 +237,8 @@ public class ImportAction extends XWikiAction
         importer.install();
     }
 
-    private void importPackageWikiStream(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
-        throws IOException, XWikiException, WikiStreamException
+    private void importPackageFilterStream(XWikiAttachment packFile, XWikiRequest request, XWikiContext context)
+        throws IOException, XWikiException, FilterException
     {
         String[] pages = request.getParameterValues("pages");
 
@@ -290,15 +290,15 @@ public class ImportAction extends XWikiAction
             instanceProperties.setAuthorPreserved(false);
         }
 
-        BeanInputWikiStreamFactory<XARInputProperties> xarWikiStreamFactory =
-            Utils.getComponent((Type) InputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_11.serialize());
-        BeanInputWikiStream<XARInputProperties> xarWikiStream =
-            xarWikiStreamFactory.createInputWikiStream(xarProperties);
+        BeanInputFilterStreamFactory<XARInputProperties> xarFilterStreamFactory =
+            Utils.getComponent((Type) InputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_11.serialize());
+        BeanInputFilterStream<XARInputProperties> xarFilterStream =
+            xarFilterStreamFactory.createInputFilterStream(xarProperties);
 
-        BeanOutputWikiStreamFactory<InstanceOutputProperties> instanceWikiStreamFactory =
-            Utils.getComponent((Type) OutputWikiStreamFactory.class, WikiStreamType.XWIKI_INSTANCE.serialize());
-        BeanOutputWikiStream<InstanceOutputProperties> instanceWikiStream =
-            instanceWikiStreamFactory.createOutputWikiStream(instanceProperties);
+        BeanOutputFilterStreamFactory<InstanceOutputProperties> instanceFilterStreamFactory =
+            Utils.getComponent((Type) OutputFilterStreamFactory.class, FilterStreamType.XWIKI_INSTANCE.serialize());
+        BeanOutputFilterStream<InstanceOutputProperties> instanceFilterStream =
+            instanceFilterStreamFactory.createOutputFilterStream(instanceProperties);
 
         // Notify all the listeners about import
         ObservationManager observation = Utils.getComponent(ObservationManager.class);
@@ -319,10 +319,10 @@ public class ImportAction extends XWikiAction
         observation.notify(new XARImportingEvent(), null, context);
 
         try {
-            xarWikiStream.read(instanceWikiStream.getFilter());
+            xarFilterStream.read(instanceFilterStream.getFilter());
 
-            xarWikiStream.close();
-            instanceWikiStream.close();
+            xarFilterStream.close();
+            instanceFilterStream.close();
         } finally {
             // Stop isolating log
             loggerManager.popLogListener();

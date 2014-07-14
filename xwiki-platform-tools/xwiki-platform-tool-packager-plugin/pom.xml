@@ -219,7 +219,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wikistream-instance-oldcore</artifactId>
+      <artifactId>xwiki-platform-filter-instance-oldcore</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

@@ -39,6 +39,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.extension.xar.internal.handler.XarExtensionPlan;
+import org.xwiki.filter.instance.internal.output.XWikiDocumentOutputFilterStream;
+import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
+import org.xwiki.filter.xar.input.XARInputProperties;
+import org.xwiki.filter.xar.internal.XARFilterUtils;
 import org.xwiki.logging.marker.BeginTranslationMarker;
 import org.xwiki.logging.marker.EndTranslationMarker;
 import org.xwiki.logging.marker.TranslationMarker;
@@ -48,15 +52,11 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.wikistream.WikiStreamException;
-import org.xwiki.wikistream.input.BeanInputWikiStreamFactory;
-import org.xwiki.wikistream.input.InputWikiStreamFactory;
-import org.xwiki.wikistream.instance.internal.output.XWikiDocumentOutputWikiStream;
-import org.xwiki.wikistream.instance.output.DocumentInstanceOutputProperties;
-import org.xwiki.wikistream.internal.input.BeanInputWikiStream;
-import org.xwiki.wikistream.internal.input.DefaultInputStreamInputSource;
-import org.xwiki.wikistream.xar.input.XARInputProperties;
-import org.xwiki.wikistream.xar.internal.XARWikiStreamUtils;
+import org.xwiki.filter.FilterException;
+import org.xwiki.filter.input.BeanInputFilterStreamFactory;
+import org.xwiki.filter.input.InputFilterStreamFactory;
+import org.xwiki.filter.internal.input.BeanInputFilterStream;
+import org.xwiki.filter.internal.input.DefaultInputStreamInputSource;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarFile;
 import org.xwiki.xar.internal.model.XarModel;
@@ -119,11 +119,11 @@ public class Packager
     private MandatoryDocumentInitializerManager initializerManager;
 
     @Inject
-    @Named(XARWikiStreamUtils.ROLEHINT)
-    private InputWikiStreamFactory xarWikiStreamFactory;
+    @Named(XARFilterUtils.ROLEHINT)
+    private InputFilterStreamFactory xarFilterStreamFactory;
 
     public void importXAR(String comment, File xarFile, PackageConfiguration configuration) throws IOException,
-        XWikiException, ComponentLookupException, WikiStreamException
+        XWikiException, ComponentLookupException, FilterException
     {
         if (configuration.getWiki() == null) {
             XWikiContext xcontext = this.xcontextProvider.get();
@@ -139,7 +139,7 @@ public class Packager
 
     private XarMergeResult importXARToWiki(String comment, File xarFile, WikiReference wikiReference,
         PackageConfiguration configuration) throws IOException, ComponentLookupException, XWikiException,
-        WikiStreamException
+        FilterException
     {
         FileInputStream fis = new FileInputStream(xarFile);
         try {
@@ -151,7 +151,7 @@ public class Packager
 
     private XarMergeResult importXARToWiki(String comment, InputStream xarInputStream, WikiReference wikiReference,
         PackageConfiguration configuration) throws IOException, ComponentLookupException, XWikiException,
-        WikiStreamException
+        FilterException
     {
         XarMergeResult mergeResult = new XarMergeResult();
 
@@ -189,7 +189,7 @@ public class Packager
     }
 
     private XarEntryMergeResult importDocumentToWiki(String comment, WikiReference wikiReference,
-        InputStream inputStream, PackageConfiguration configuration) throws XWikiException, WikiStreamException,
+        InputStream inputStream, PackageConfiguration configuration) throws XWikiException, FilterException,
         ComponentLookupException, IOException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -302,7 +302,7 @@ public class Packager
     }
 
     public XWikiDocument getXWikiDocument(WikiReference wikiReference, LocalDocumentReference documentReference,
-        XarFile xarFile) throws WikiStreamException, ComponentLookupException, IOException
+        XarFile xarFile) throws FilterException, ComponentLookupException, IOException
     {
         XarEntry realEntry = xarFile.getEntry(documentReference);
         if (realEntry != null) {
@@ -318,7 +318,7 @@ public class Packager
         return null;
     }
 
-    public XWikiDocument getXWikiDocument(InputStream stream, WikiReference wikiReference) throws WikiStreamException,
+    public XWikiDocument getXWikiDocument(InputStream stream, WikiReference wikiReference) throws FilterException,
         ComponentLookupException, IOException
     {
         // Output
@@ -326,8 +326,8 @@ public class Packager
         documentProperties.setDefaultReference(wikiReference);
         documentProperties.setVersionPreserved(false);
         documentProperties.setAuthorPreserved(true);
-        XWikiDocumentOutputWikiStream documentFilter =
-            this.componentManager.getInstance(XWikiDocumentOutputWikiStream.class);
+        XWikiDocumentOutputFilterStream documentFilter =
+            this.componentManager.getInstance(XWikiDocumentOutputFilterStream.class);
         documentFilter.setProperties(documentProperties);
 
         // Input
@@ -335,14 +335,14 @@ public class Packager
         xarProperties.setForceDocument(true);
         xarProperties.setWithHistory(false);
         xarProperties.setSource(new DefaultInputStreamInputSource(stream));
-        BeanInputWikiStream<XARInputProperties> xarWikiStream =
-            ((BeanInputWikiStreamFactory<XARInputProperties>) this.xarWikiStreamFactory)
-                .createInputWikiStream(xarProperties);
+        BeanInputFilterStream<XARInputProperties> xarFilterStream =
+            ((BeanInputFilterStreamFactory<XARInputProperties>) this.xarFilterStreamFactory)
+                .createInputFilterStream(xarProperties);
 
         // Convert
-        xarWikiStream.read(documentFilter);
+        xarFilterStream.read(documentFilter);
 
-        xarWikiStream.close();
+        xarFilterStream.close();
 
         return documentFilter.getDocument();
     }

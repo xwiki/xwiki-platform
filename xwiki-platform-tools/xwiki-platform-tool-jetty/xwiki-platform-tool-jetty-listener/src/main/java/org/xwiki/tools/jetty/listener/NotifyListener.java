@@ -56,4 +56,17 @@ public class NotifyListener extends AbstractLifeCycleListener
         }
         LOGGER.info(DELIMITER);
     }
+
+    @Override
+    public void lifeCycleStopping(LifeCycle event)
+    {
+        LOGGER.info(DELIMITER);
+        LOGGER.info(Messages.getString("jetty.stopping.notification"));
+    }
+
+    @Override
+    public void lifeCycleStopped(LifeCycle event)
+    {
+        LOGGER.info(Messages.getString("jetty.stopped.notification"));
+    }
 }

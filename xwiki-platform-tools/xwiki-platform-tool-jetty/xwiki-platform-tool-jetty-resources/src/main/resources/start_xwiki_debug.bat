@@ -19,10 +19,34 @@ REM Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 REM 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 REM -------------------------------------------------------------------------
 
+
+REM -------------------------------------------------------------------------
+REM Optional ENV vars
+REM -----------------
+REM   START_OPTS - parameters passed to the Java VM when running Jetty
+REM     e.g. to increase the memory allocated to the JVM to 1GB, use
+REM       set START_OPTS=-Xmx1024m
+REM   JETTY_PORT - the port on which to start Jetty, 8080 by default
+REM   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command, 8079 by default
+REM -------------------------------------------------------------------------
+
 set JETTY_HOME=jetty
-set JETTY_PORT=8080
-set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
+if not defined XWIKI_OPTS set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
 set XWIKI_OPTS=%XWIKI_OPTS% -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+
+REM The port on which to start Jetty can be defined in an enviroment variable called JETTY_PORT
+if not defined JETTY_PORT (
+  REM Alternatively, it can be passed to this script as the first argument
+  set JETTY_PORT=%1
+  if not defined JETTY_PORT (
+    set JETTY_PORT=8080
+  )
+)
+
+REM The port on which Jetty listens for a Stop command can be defined in an enviroment variable called JETTY_STOP_PORT
+if not defined JETTY_STOP_PORT (
+  set JETTY_STOP_PORT=8079
+)
 
 REM For enabling YourKit Profiling.
 REM %3 must the path where Yourkit can find the agent.
@@ -52,7 +76,7 @@ REM Specify Jetty's home directory
 set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home=%JETTY_HOME%
 
 REM Specify port and key to stop a running Jetty instance
-set XWIKI_OPTS=%XWIKI_OPTS% -DSTOP.KEY=xwiki -DSTOP.PORT=8079
+set XWIKI_OPTS=%XWIKI_OPTS% -DSTOP.KEY=xwiki -DSTOP.PORT=%JETTY_STOP_PORT%
 
 REM Specify the encoding to use
 set XWIKI_OPTS=%XWIKI_OPTS% -Dfile.encoding=UTF8

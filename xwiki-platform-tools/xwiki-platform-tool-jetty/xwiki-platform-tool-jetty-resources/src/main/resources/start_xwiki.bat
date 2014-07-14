@@ -30,6 +30,8 @@ REM   JETTY_PORT - the port on which to start Jetty, 8080 by default
 REM   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command, 8079 by default
 REM -------------------------------------------------------------------------
 
+setlocal EnableDelayedExpansion
+
 set JETTY_HOME=jetty
 if not defined XWIKI_OPTS set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
 
@@ -88,7 +90,10 @@ REM Note that setting this value too high can leave your server vulnerable to de
 REM service attacks.
 set XWIKI_OPTS=%XWIKI_OPTS% -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1000000
 
-"%JAVA_PATH%" %XWIKI_OPTS% %3 %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar
+set JETTY_CONFIGURATION_FILES=
+for /r %%i in (%JETTY_HOME%\etc\jetty-*.xml) do set JETTY_CONFIGURATION_FILES=!JETTY_CONFIGURATION_FILES! "%%i"
+
+"%JAVA_PATH%" %XWIKI_OPTS% %3 %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar %JETTY_HOME%/etc/jetty.xml %JETTY_CONFIGURATION_FILES%
 
 REM Pause so that the command window used to run this script doesn't close automatically in case of problem
 REM (like when the JDK/JRE is not installed)

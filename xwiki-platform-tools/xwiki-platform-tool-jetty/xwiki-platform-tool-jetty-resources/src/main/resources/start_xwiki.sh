@@ -106,7 +106,10 @@ XWIKI_OPTS="$XWIKI_OPTS -Dorg.eclipse.jetty.server.Request.maxFormContentSize=10
 # Create a lock file to signify that XWiki is running
 touch xwiki.lck
 
-java $XWIKI_OPTS $3 $4 $5 $6 $7 $8 $9 -jar $JETTY_HOME/start.jar
+# If there are no optional configuration files, make bash ignore the last parameter instead of passing it verbatim
+shopt -s nullglob
+
+java $XWIKI_OPTS $3 $4 $5 $6 $7 $8 $9 -jar $JETTY_HOME/start.jar ${JETTY_HOME}/etc/jetty.xml ${JETTY_HOME}/etc/jetty-*.xml
 
 # Remove XWiki lock file
 rm -f xwiki.lck

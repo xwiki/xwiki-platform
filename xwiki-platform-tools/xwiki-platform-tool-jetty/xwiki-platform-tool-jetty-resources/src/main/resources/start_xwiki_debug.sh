@@ -105,4 +105,7 @@ XWIKI_OPTS="$XWIKI_OPTS -Dfile.encoding=UTF8"
 # service attacks.
 XWIKI_OPTS="$XWIKI_OPTS -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1000000"
 
-java $XWIKI_OPTS $4 $5 $6 $7 $8 $9 -jar $JETTY_HOME/start.jar
+# If there are no optional configuration files, make bash ignore the last parameter instead of passing it verbatim
+shopt -s nullglob
+
+java $XWIKI_OPTS $4 $5 $6 $7 $8 $9 -jar $JETTY_HOME/start.jar ${JETTY_HOME}/etc/jetty.xml ${JETTY_HOME}/etc/jetty-*.xml

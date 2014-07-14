@@ -53,6 +53,7 @@ public class NotifyListener extends AbstractLifeCycleListener
             LOGGER.info(Messages.getString("jetty.startup.notification"), serverUrl);
         } catch (UnknownHostException ex) {
             // Shouldn't happen, localhost should be available
+            LOGGER.ignore(ex);
         }
         LOGGER.info(DELIMITER);
     }

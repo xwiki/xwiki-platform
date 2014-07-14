@@ -51,6 +51,8 @@ if not defined JETTY_STOP_PORT (
   )
 )
 
+echo Starting Jetty on port %JETTY_PORT%, please wait...
+
 REM Get javaw.exe from the latest properly installed JRE
 for /f tokens^=2^ delims^=^" %%i in ('reg query HKEY_CLASSES_ROOT\jarfile\shell\open\command /ve') do set JAVAW_PATH=%%i
 set JAVA_PATH=%JAVAW_PATH:\javaw.exe=%\java.exe

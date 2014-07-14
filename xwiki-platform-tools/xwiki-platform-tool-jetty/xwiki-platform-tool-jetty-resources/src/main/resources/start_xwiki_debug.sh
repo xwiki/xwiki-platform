@@ -73,7 +73,7 @@ if [ "$2" = "profiler" ]; then
   export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:$3"
 fi
 
-echo Starting Jetty on port $JETTY_PORT ...
+echo Starting Jetty on port ${JETTY_PORT}, please wait...
 
 # Location where XWiki stores generated data and where database files are.
 XWIKI_DATA_DIR=${xwikiDataDir}

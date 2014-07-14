@@ -48,6 +48,8 @@ if not defined JETTY_STOP_PORT (
   set JETTY_STOP_PORT=8079
 )
 
+echo Starting Jetty on port %JETTY_PORT%, please wait...
+
 REM For enabling YourKit Profiling.
 REM %3 must the path where Yourkit can find the agent.
 REM For example: "C:\PROGRA~1\YOURKI~1.11\bin\win32"

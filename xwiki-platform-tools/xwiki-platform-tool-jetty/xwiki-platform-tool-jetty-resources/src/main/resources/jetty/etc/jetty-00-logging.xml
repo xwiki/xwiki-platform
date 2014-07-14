@@ -22,18 +22,30 @@
 
 <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
-<!-- =========================================================== -->
-<!-- Jetty lifecycle listener that prints a message to open a    -->
-<!-- browser when the server is started. This is to provide      -->
-<!-- information to newbies so that they know what to do after   -->
-<!-- the server is started.                                      -->
-<!-- =========================================================== -->
+<!-- =============================================================== -->
+<!-- Configure stderr and stdout to also go to a rollover log file   -->
+<!-- =============================================================== -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
-  <Call name="addLifeCycleListener">
+  <New id="ServerLog" class="java.io.PrintStream">
     <Arg>
-      <New class="org.xwiki.tools.jetty.listener.NotifyListener" />
+      <!-- Split output to both the file and the old stderr -->
+      <New class="org.apache.commons.io.output.TeeOutputStream">
+        <Arg>
+          <New class="org.eclipse.jetty.util.RolloverFileOutputStream">
+            <Arg><Property name="xwiki.data.dir" default="."/>/logs/yyyy_mm_dd.output.log</Arg>
+            <Arg type="boolean">false</Arg>
+            <Arg type="int">90</Arg>
+            <Arg><Call class="java.util.TimeZone" name="getTimeZone"><Arg>GMT</Arg></Call></Arg>
+            <Get id="ServerLogName" name="datedFilename"/>
+          </New>
+        </Arg>
+        <Arg><Get class="java.lang.System" name="err"/></Arg>
+      </New>
     </Arg>
-  </Call>
+  </New>
+
+  <Call class="java.lang.System" name="setErr"><Arg><Ref id="ServerLog"/></Arg></Call>
+  <Call class="java.lang.System" name="setOut"><Arg><Ref id="ServerLog"/></Arg></Call>
 
 </Configure>

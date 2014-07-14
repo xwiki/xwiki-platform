@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+
+<!-- =============================================================== -->
+<!-- Configure SSL for the Jetty Server                              -->
+<!-- A keystore with a valid certificate MUST be configured before   -->
+<!-- this configuration file can be enabled. See                     -->
+<!-- http://www.eclipse.org/jetty/documentation/current/configuring-ssl.html -->
+<!-- for help with creating certificates and adding them to a        -->
+<!-- keystore.                                                       -->
+<!-- =============================================================== -->
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+
+  <New id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
+    <Set name="KeyStore"><Property name="jetty.home" default="." />/etc/keystore</Set>
+    <Set name="KeyStorePassword">OBF:1ytc1vu91v2p1y831y7v1v1p1vv11yta</Set>
+    <Set name="TrustStore"><Property name="jetty.home" default="." />/etc/keystore</Set>
+    <Set name="TrustStorePassword">OBF:1ytc1vu91v2p1y831y7v1v1p1vv11yta</Set>
+    <!-- Disable old and vulnerable protocols -->
+    <Set name="excludeProtocols">
+      <Array type="java.lang.String">
+        <Item>SSLv2Hello</Item>
+        <Item>SSLv2</Item>
+      </Array>
+    </Set>
+    <!-- Disable weak ciphers -->
+    <Set name="excludeCipherSuites">
+      <Array type="java.lang.String">
+        <Item>TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA</Item>
+        <Item>TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA</Item>
+        <Item>TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA</Item>
+        <Item>TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA</Item>
+        <Item>TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA</Item>
+        <Item>TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA</Item>
+        <Item>TLS_RSA_WITH_3DES_EDE_CBC_SHA</Item>
+        <Item>TLS_RSA_WITH_RC4_128_MD5</Item>
+        <!-- NULL ciphers shouldn't be used -->
+        <Item>TLS_RSA_WITH_NULL_SHA256</Item>
+        <Item>TLS_ECDHE_ECDSA_WITH_NULL_SHA</Item>
+        <Item>TLS_ECDHE_RSA_WITH_NULL_SHA</Item>
+        <Item>SSL_RSA_WITH_NULL_SHA</Item>
+        <Item>TLS_ECDH_ECDSA_WITH_NULL_SHA</Item>
+        <Item>TLS_ECDH_RSA_WITH_NULL_SHA</Item>
+        <Item>TLS_ECDH_anon_WITH_NULL_SHA</Item>
+        <Item>SSL_RSA_WITH_NULL_MD5</Item>
+        <!-- These are not weak ciphers, but Java 7 only allows <=1024 bits,
+             refusing a connection if a client sends a larger key, which often happens -->
+        <Item>TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384</Item>
+        <Item>TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA</Item>
+        <Item>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256</Item>
+        <Item>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA</Item>
+        <Item>TLS_ECDHE_RSA_WITH_RC4_128_SHA</Item>
+      </Array>
+    </Set>
+  </New>
+
+  <Call name="addConnector">
+    <Arg>
+      <New class="org.eclipse.jetty.server.ssl.SslSelectChannelConnector">
+        <Arg><Ref id="sslContextFactory" /></Arg>
+        <!-- Change to 443 to listen to the default https port -->
+        <Set name="Port">8443</Set>
+        <Set name="maxIdleTime">30000</Set>
+        <Set name="Acceptors">2</Set>
+        <!-- Increase if the server is expecting many users/requests -->
+        <Set name="AcceptQueueSize">100</Set>
+      </New>
+    </Arg>
+  </Call>
+
+</Configure>

@@ -35,6 +35,7 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-util</artifactId>
       <version>${jetty.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

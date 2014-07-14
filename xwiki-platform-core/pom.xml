@@ -440,6 +440,26 @@
               <justification>Filter module is still a young API.
               Those properties were copy/pasted by mistake</justification>
             </difference>
+            <!-- Mail Sender API: Young API! -->
+            <difference>
+              <differenceType>7005</differenceType>
+              <className>org/xwiki/mail/MailResultListener</className>
+              <method>void onError(javax.mail.internet.MimeMessage, java.lang.Throwable)</method>
+              <to>void onError(javax.mail.internet.MimeMessage, java.lang.Exception)</to>
+              <justification>Mail Sender API is still a young API.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/mail/MailSender</className>
+              <method>void send(javax.mail.internet.MimeMessage, javax.mail.Session, org.xwiki.mail.MailResultListener)</method>
+              <justification>Mail Sender API is still a young API.</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/mail/MailSender</className>
+              <method>void sendAsynchronously(javax.mail.internet.MimeMessage, javax.mail.Session, org.xwiki.mail.MailResultListener)</method>
+              <justification>Mail Sender API is still a young API.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

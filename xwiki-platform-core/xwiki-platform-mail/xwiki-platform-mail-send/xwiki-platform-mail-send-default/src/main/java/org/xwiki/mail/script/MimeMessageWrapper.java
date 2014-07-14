@@ -49,7 +49,7 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.1RC1
  */
-@UnstableXW
+@Unstable
 public class MimeMessageWrapper
 {
     private ComponentManager componentManager;

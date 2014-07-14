@@ -37,6 +37,7 @@
       <Arg>
         <New class="org.eclipse.jetty.deploy.providers.ContextProvider">
           <Set name="monitoredDirName"><Property name="jetty.home" default="." />/contexts</Set>
+          <Set name="defaultsDescriptor"><Property name="jetty.home" default="."/>/etc/webdefault.xml</Set>
           <Set name="scanInterval">60</Set>
         </New>
       </Arg>

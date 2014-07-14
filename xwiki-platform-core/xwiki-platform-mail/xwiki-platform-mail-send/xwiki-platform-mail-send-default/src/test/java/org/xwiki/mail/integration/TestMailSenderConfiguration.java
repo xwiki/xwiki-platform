@@ -21,6 +21,11 @@ package org.xwiki.mail.integration;
 
 import org.xwiki.mail.internal.DefaultMailSenderConfiguration;
 
+/**
+ * Makes {@link DefaultMailSenderConfiguration} more easily testable.
+ *
+ * @version $Id$
+ */
 public class TestMailSenderConfiguration extends DefaultMailSenderConfiguration
 {
     @Override

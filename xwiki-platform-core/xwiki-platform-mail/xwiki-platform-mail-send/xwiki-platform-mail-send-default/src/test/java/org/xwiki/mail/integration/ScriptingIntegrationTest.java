@@ -105,9 +105,9 @@ public class ScriptingIntegrationTest
         message.addPart("text/plain", "some text here");
 
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        message.send();
-        message.send();
-        message.send();
+        message.sendAsynchronously();
+        message.sendAsynchronously();
+        message.sendAsynchronously();
         message.waitTillSent(10000L);
 
         // Verify that there are no errors
@@ -167,7 +167,6 @@ public class ScriptingIntegrationTest
                 Collections.singletonMap("Content-Class", "urn:content-classes:calendarmessage")));
 
         message.send();
-        message.waitTillSent(10000L);
 
         // Verify that there are no errors
         assertEquals(0, message.getErrors().size());

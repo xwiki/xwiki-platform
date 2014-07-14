@@ -39,7 +39,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MimeBodyPartFactory;
-import org.xwiki.mail.internal.script.ScriptMailSenderListener;
+import org.xwiki.mail.internal.DefaultMailResultListener;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -49,7 +49,7 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 6.1RC1
  */
-@Unstable
+@UnstableXW
 public class MimeMessageWrapper
 {
     private ComponentManager componentManager;
@@ -60,7 +60,7 @@ public class MimeMessageWrapper
 
     private Multipart multipart;
 
-    private ScriptMailSenderListener listener;
+    private DefaultMailResultListener listener;
 
     private Session session;
 
@@ -81,7 +81,7 @@ public class MimeMessageWrapper
         this.mailSender = mailSender;
         this.execution = execution;
         this.componentManager = componentManager;
-        this.listener = new ScriptMailSenderListener();
+        this.listener = new DefaultMailResultListener();
     }
 
     /**
@@ -112,7 +112,7 @@ public class MimeMessageWrapper
      * @param content the content to include in the mail
      * @param parameters the list of extra parameters. This is used for example to pass alternate content for the mail
      *        using the {@code alternate} key in the HTML Mime Body Part Factory. Mail headers can also be passed using
-     *        the {@code headers} key with a {@code Map<String, String>} value containing header keys and values
+     *        the {@code headers} key with a {@code Map&lt;String, String&gt;} value containing header keys and values
      * @throws MessagingException when an error happens, for example if a body part factory fails to generate a valid
      *         Body Part
      */
@@ -136,7 +136,8 @@ public class MimeMessageWrapper
     }
 
     /**
-     * Send the mail asynchronously. You should use {@link #waitTillSent(long)} to make it blocking.
+     * Send the mail synchronously (wait till the message is sent). Any error can be retrieved by calling
+     * {@link #getErrors()}.
      */
     public void send()
     {
@@ -145,7 +146,7 @@ public class MimeMessageWrapper
             // can call addPart() several times.
             getMessage().setContent(this.multipart);
 
-            this.mailSender.send(getMessage(), this.session, this.listener);
+            this.mailSender.send(getMessage(), this.session);
 
         } catch (MessagingException e) {
             // Save the exception for reporting through the script services's getError() API
@@ -153,6 +154,23 @@ public class MimeMessageWrapper
         }
     }
 
+    /**
+     * Send the mail asynchronously. You should use {@link #waitTillSent(long)} to make it blocking or simply use
+     * {@link #send()}. Any error can be retrieved by calling {@link #getErrors()}.
+     */
+    public void sendAsynchronously()
+    {
+        try {
+            // Add the multi part to the content of the message to send. We do this when calling send() since the user
+            // can call addPart() several times.
+            getMessage().setContent(this.multipart);
+        } catch (MessagingException e) {
+            // Save the exception for reporting through the script services's getError() API
+            setError(e);
+        }
+
+        this.mailSender.sendAsynchronously(getMessage(), this.session, this.listener);
+    }
     /**
      * @param subject the subject to set in the Mime Message
      */
@@ -236,7 +254,7 @@ public class MimeMessageWrapper
     /**
      * @return a queue containing top errors raised during the send of all emails in the queue for the current thread
      */
-    public BlockingQueue<Throwable> getErrors()
+    public BlockingQueue<Exception> getErrors()
     {
         return this.listener.getExceptionQueue();
     }

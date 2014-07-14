@@ -43,7 +43,7 @@ public interface MailResultListener
      * Called when the mail has failed to be sent.
      *
      * @param message the message that was tried to be sent
-     * @param t the exception explaining why the message couldn't be sent
+     * @param e the exception explaining why the message couldn't be sent
      */
-    void onError(MimeMessage message, Throwable t);
+    void onError(MimeMessage message, Exception e);
 }

@@ -21,6 +21,7 @@ package org.xwiki.mail.internal;
 
 import java.util.Iterator;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Inject;
@@ -75,26 +76,37 @@ public class DefaultMailSender implements MailSender, Initializable
     @Override
     public void send(MimeMessage message, Session session) throws MessagingException
     {
-        send(message, session, null);
+        DefaultMailResultListener listener = new DefaultMailResultListener();
+        sendAsynchronously(message, session, listener);
+        waitTillSent(Long.MAX_VALUE);
+        BlockingQueue<Exception> errorQueue = listener.getExceptionQueue();
+        if (!errorQueue.isEmpty()) {
+            throw new MessagingException(String.format("Failed to send mail message [%s]", message), errorQueue.peek());
+        }
     }
 
     @Override
-    public void send(MimeMessage message, Session session, MailResultListener listener) throws MessagingException
+    public void sendAsynchronously(MimeMessage message, Session session, MailResultListener listener)
     {
-        // Perform some basic verification to avoid NPEs in JavaMail
-        if (message.getFrom() == null) {
-            // Try using the From address in the Session
-            String from = this.configuration.getFromAddress();
-            if (from != null) {
-                message.setFrom(new InternetAddress(from));
-            } else {
-                throw new MessagingException("Missing the From Address for sending the mail. "
-                    + "You need to either define it in the Mail Configuration or pass it in your message.");
+        try {
+            // Perform some basic verification to avoid NPEs in JavaMail
+            if (message.getFrom() == null) {
+                // Try using the From address in the Session
+                String from = this.configuration.getFromAddress();
+                if (from != null) {
+                    message.setFrom(new InternetAddress(from));
+                } else {
+                    throw new MessagingException("Missing the From Address for sending the mail. "
+                        + "You need to either define it in the Mail Configuration or pass it in your message.");
+                }
             }
-        }
 
-        // Push new mail message on the queue
-        getMailQueue().add(new MailSenderQueueItem(message, session, listener));
+            // Push new mail message on the queue
+            getMailQueue().add(new MailSenderQueueItem(message, session, listener));
+        } catch (Exception e) {
+            // Save any exception in the listener
+            listener.onError(message, e);
+        }
     }
 
     /**

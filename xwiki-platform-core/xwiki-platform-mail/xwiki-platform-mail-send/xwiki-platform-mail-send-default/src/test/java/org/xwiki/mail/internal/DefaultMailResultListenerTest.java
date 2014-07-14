@@ -22,23 +22,22 @@ package org.xwiki.mail.internal;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
-import org.xwiki.mail.internal.script.ScriptMailSenderListener;
 
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
 /**
- * Unit tests for {@link ScriptMailSenderListener}.
+ * Unit tests for {@link DefaultMailResultListener}.
  *
  * @version $Id$
  * @since 6.2M1
  */
-public class ScriptMailSenderListenerTest
+public class DefaultMailResultListenerTest
 {
     @Test
     public void errorAndRetrieveError() throws Exception
     {
-        ScriptMailSenderListener listener = new ScriptMailSenderListener();
+        DefaultMailResultListener listener = new DefaultMailResultListener();
         MimeMessage message = mock(MimeMessage.class);
         listener.onError(message, new Exception("error"));
         assertEquals(1, listener.getExceptionQueue().size());

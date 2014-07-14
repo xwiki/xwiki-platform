@@ -85,10 +85,10 @@ public class JavaIntegrationTest
         }
 
         @Override
-        public void onError(MimeMessage message, Throwable t)
+        public void onError(MimeMessage message, Exception e)
         {
             // Shouldn't happen, fail the test!
-            fail("Error sending mail: " + ExceptionUtils.getFullStackTrace(t));
+            fail("Error sending mail: " + ExceptionUtils.getFullStackTrace(e));
         }
     };
 
@@ -149,9 +149,9 @@ public class JavaIntegrationTest
 
         // Step 4: Send the mail and wait for it to be sent
         // Send 3 mails (3 times the same mail) to verify we can send several emails at once.
-        this.sender.send(message, session, this.listener);
-        this.sender.send(message, session, this.listener);
-        this.sender.send(message, session, this.listener);
+        this.sender.sendAsynchronously(message, session, this.listener);
+        this.sender.sendAsynchronously(message, session, this.listener);
+        this.sender.sendAsynchronously(message, session, this.listener);
         this.sender.waitTillSent(10000L);
 
         // Verify that the mails have been received (wait maximum 10 seconds).
@@ -220,8 +220,7 @@ public class JavaIntegrationTest
         message.setContent(multipart);
 
         // Step 4: Send the mail and wait for it to be sent
-        this.sender.send(message, session, this.listener);
-        this.sender.waitTillSent(10000L);
+        this.sender.send(message, session);
 
         // Verify that the mail has been received (wait maximum 10 seconds).
         this.mail.waitForIncomingEmail(10000L, 1);

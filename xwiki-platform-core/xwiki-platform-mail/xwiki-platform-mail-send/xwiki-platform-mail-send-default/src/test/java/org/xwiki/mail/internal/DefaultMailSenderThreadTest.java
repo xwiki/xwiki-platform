@@ -29,7 +29,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.mail.internal.script.ScriptMailSenderListener;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.*;
@@ -56,7 +55,7 @@ public class DefaultMailSenderThreadTest
         MimeMessage message = new MimeMessage(session);
         message.setSubject("subject");
         message.setFrom(InternetAddress.parse("john@doe.com")[0]);
-        ScriptMailSenderListener listener = new ScriptMailSenderListener();
+        DefaultMailResultListener listener = new DefaultMailResultListener();
         MailSenderQueueItem item = new MailSenderQueueItem(message, session, listener);
 
         Queue<MailSenderQueueItem> mailQueue = new ConcurrentLinkedQueue<>();

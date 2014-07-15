@@ -32,7 +32,7 @@
   <packaging>pom</packaging>
   <description>Tools for packaging a Jetty installation</description>
   <properties>
-    <jetty.version>8.1.9.v20130131</jetty.version>
+    <jetty.version>8.1.15.v20140411</jetty.version>
   </properties>
   <modules>
     <!-- Sorted Alphabetically -->

@@ -62,6 +62,11 @@ if [ -z "$JETTY_PORT" ]; then
   fi
 fi
 
+# The port on which Jetty listens for a Stop command can be defined in an enviroment variable called JETTY_STOP_PORT
+if [ -z "$JETTY_STOP_PORT" ]; then
+  JETTY_STOP_PORT=8079
+fi
+
 # For enabling YourKit Profiling.
 # $3 must the path where Yourkit can find the agent.
 # For example: "/Applications/YourKit Java Profiler 7.0.11.app/bin/mac" or "/home/User/yjp-11.0.8/bin/linux-x86-64/"
@@ -93,7 +98,7 @@ XWIKI_OPTS="$XWIKI_OPTS -Djetty.port=$JETTY_PORT"
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME"
 
 # Specify port and key to stop a running Jetty instance
-XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=${JETTY_STOP_PORT:-8079}"
+XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOP_PORT"
 
 # Specify the encoding to use
 XWIKI_OPTS="$XWIKI_OPTS -Dfile.encoding=UTF8"

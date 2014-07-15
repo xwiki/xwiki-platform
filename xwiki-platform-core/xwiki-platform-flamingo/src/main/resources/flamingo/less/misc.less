@@ -220,6 +220,26 @@ table {
   }
 }
 
+// FIX: Drop down must be on front of Tree View (XWIKI-10633)
+.dropdown-menu{
+  z-index: 500000;
+}
+
+// Fix the Tree view (XWIKI-10633)
+#XWEWrapper{
+  .gridBody{
+    overflow: hidden;
+  }
+  
+  .normal table, .normalOver table, .normalDown table{
+    background-color: transparent;
+  }
+  
+  .vScrollThumbGrip, .vScrollThumbGripOver, .vScrollThumbGripDisabled, .vScrollThumbGripDown{
+    margin-left: 2px\0;
+  }  
+}
+
 // Export ---------------------------------------------------------------------
 #exportModal{
   .modal-body{

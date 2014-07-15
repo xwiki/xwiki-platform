@@ -19,46 +19,41 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator;
 
 /**
- * The instance of this class monitors updates and invalidates right cache entries whenever necessary.
+ * The component is used as a bridge between the {@link org.xwiki.observation.EventListener} and the
+ * {@link org.xwiki.security.authorization.cache.SecurityCacheRulesInvalidator}.
  * 
  * @version $Id$
  * @since 4.0M2
  */
-@Component
+@Component(roles = ReadWriteLock.class)
+@Named(DefaultSecurityCacheRulesInvalidator.NAME)
 @Singleton
-public class DefaultSecurityCacheRulesInvalidator implements SecurityCacheRulesInvalidator
+public class DefaultSecurityCacheRulesInvalidatorLock implements ReadWriteLock
 {
-    /**
-     * The role hint.
-     */
-    public static final String NAME = "org.xwiki.security.authorization.internal.DefaultSecurityCacheRulesInvalidator";
-
     /**
      * Fair read-write lock to suspend the delivery of cache updates while there are loads in progress.
      */
-    @Inject
-    @Named(NAME)
-    private ReadWriteLock readWriteLock;
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 
     @Override
-    public void suspend()
+    public Lock readLock()
     {
-        readWriteLock.readLock().lock();
+        return this.readWriteLock.readLock();
     }
 
     @Override
-    public void resume()
+    public Lock writeLock()
     {
-        readWriteLock.readLock().unlock();
+        return this.readWriteLock.writeLock();
     }
 }

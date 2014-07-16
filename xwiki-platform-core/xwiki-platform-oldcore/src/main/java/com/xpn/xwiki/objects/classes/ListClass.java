@@ -20,9 +20,11 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,10 +33,13 @@ import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -480,17 +485,9 @@ public abstract class ListClass extends PropertyClass
     {
         List<String> list = getList(context);
         Map<String, ListItem> map = getMap(context);
-        List<String> selectlist;
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop == null) {
-            selectlist = new ArrayList<String>();
-        } else if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
-        } else {
-            selectlist = new ArrayList<String>();
-            selectlist.add(String.valueOf(prop.getValue()));
-        }
+        List<String> selectlist = toList(prop);
 
         // Add the selected values that are not in the predefined list.
         for (String item : selectlist) {
@@ -588,17 +585,7 @@ public abstract class ListClass extends PropertyClass
             }
         }
 
-        List<String> selectlist;
-
-        BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop == null) {
-            selectlist = new ArrayList<String>();
-        } else if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
-        } else {
-            selectlist = new ArrayList<String>();
-            selectlist.add(String.valueOf(prop.getValue()));
-        }
+        List<String> selectlist = toList((BaseProperty) object.safeget(name));
 
         // Add the selected values that are not in the predefined list.
         for (String item : selectlist) {
@@ -627,4 +614,97 @@ public abstract class ListClass extends PropertyClass
 
     public abstract Map<String, ListItem> getMap(XWikiContext context);
 
+    /**
+     * {@link ListClass} does not produce only {@link ListProperty}s and this method allows to access the value as
+     * {@link List} whatever property is actually storing it.
+     * <p>
+     * There is no guarantees the returned {@link List} will be modifiable.
+     * 
+     * @param property the property created by this class
+     * @return the {@link List} representation of this property
+     * @since 6.2M1
+     */
+    public List<String> toList(BaseProperty< ? > property)
+    {
+        List<String> list;
+
+        if (property == null) {
+            list = Collections.emptyList();
+        } else if (property instanceof ListProperty) {
+            list = ((ListProperty) property).getList();
+        } else {
+            list = Arrays.asList(String.valueOf(property.getValue()));
+        }
+
+        return list;
+    }
+
+    /**
+     * Set the passed {@link List} into the passed property.
+     * 
+     * @param property the property to modify
+     * @param list the list to set
+     * @since 6.2M1
+     */
+    public void fromList(BaseProperty< ? > property, List<String> list)
+    {
+        if (property instanceof ListProperty) {
+            ((ListProperty) property).setList(list);
+        } else {
+            property.setValue(list == null || list.isEmpty() ? null : list.get(0));
+        }
+    }
+
+    @Override
+    public <T extends EntityReference> void mergeProperty(BaseProperty<T> currentProperty,
+        BaseProperty<T> previousProperty, BaseProperty<T> newProperty, MergeConfiguration configuration,
+        XWikiContext context, MergeResult mergeResult)
+    {
+        // If it's not a multiselect then we don't have any special merge to do. We keep default StringProperty behavior
+        if (isMultiSelect()) {
+            // If not a free input assume it's not an ordered list
+            if (!DISPLAYTYPE_INPUT.equals(getDisplayType()) && currentProperty instanceof ListProperty) {
+                mergeNotOrderedListProperty(currentProperty, previousProperty, newProperty, configuration, context,
+                    mergeResult);
+
+                return;
+            }
+        }
+
+        // Fallback on default ListProperty merging
+        super.mergeProperty(currentProperty, previousProperty, newProperty, configuration, context, mergeResult);
+    }
+
+    protected <T extends EntityReference> void mergeNotOrderedListProperty(BaseProperty<T> currentProperty,
+        BaseProperty<T> previousProperty, BaseProperty<T> newProperty, MergeConfiguration configuration,
+        XWikiContext context, MergeResult mergeResult)
+    {
+        List<String> currentList = new LinkedList<String>(toList(currentProperty));
+        List<String> previousList = toList(previousProperty);
+        List<String> newList = toList(newProperty);
+
+        // Remove elements to remove
+        if (previousList != null) {
+            for (String element : previousList) {
+                if (newList == null || !newList.contains(element)) {
+                    currentList.remove(element);
+                }
+            }
+        }
+
+        // Add missing elements
+        if (newList != null) {
+            for (String element : newList) {
+                if ((previousList == null || !previousList.contains(element))) {
+                    if (!currentList.contains(element)) {
+                        currentList.add(element);
+                    }
+                }
+            }
+        }
+
+        fromList(currentProperty, currentList);
+
+        return;
+    }
 }

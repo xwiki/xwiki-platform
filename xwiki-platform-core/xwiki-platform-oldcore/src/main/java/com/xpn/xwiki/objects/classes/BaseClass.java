@@ -1234,22 +1234,22 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         BaseClass previousClass = (BaseClass) previousElement;
         BaseClass newClass = (BaseClass) newElement;
 
-        setCustomClass(MergeUtils.mergeCharacters(previousClass.getCustomClass(), newClass.getCustomClass(),
+        setCustomClass(MergeUtils.mergeOject(previousClass.getCustomClass(), newClass.getCustomClass(),
             getCustomClass(), mergeResult));
 
-        setCustomMapping(MergeUtils.mergeCharacters(previousClass.getCustomMapping(), newClass.getCustomMapping(),
+        setCustomMapping(MergeUtils.mergeOject(previousClass.getCustomMapping(), newClass.getCustomMapping(),
             getCustomMapping(), mergeResult));
 
-        setDefaultWeb(MergeUtils.mergeCharacters(previousClass.getDefaultWeb(), newClass.getDefaultWeb(),
-            getDefaultWeb(), mergeResult));
+        setDefaultWeb(MergeUtils.mergeOject(previousClass.getDefaultWeb(), newClass.getDefaultWeb(), getDefaultWeb(),
+            mergeResult));
 
-        setDefaultViewSheet(MergeUtils.mergeCharacters(previousClass.getDefaultViewSheet(),
-            newClass.getDefaultViewSheet(), getDefaultViewSheet(), mergeResult));
+        setDefaultViewSheet(MergeUtils.mergeOject(previousClass.getDefaultViewSheet(), newClass.getDefaultViewSheet(),
+            getDefaultViewSheet(), mergeResult));
 
-        setDefaultEditSheet(MergeUtils.mergeCharacters(previousClass.getDefaultEditSheet(),
-            newClass.getDefaultEditSheet(), getDefaultEditSheet(), mergeResult));
+        setDefaultEditSheet(MergeUtils.mergeOject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
+            getDefaultEditSheet(), mergeResult));
 
-        setNameField(MergeUtils.mergeCharacters(previousClass.getNameField(), newClass.getNameField(), getNameField(),
+        setNameField(MergeUtils.mergeOject(previousClass.getNameField(), newClass.getNameField(), getNameField(),
             mergeResult));
 
         // Properties

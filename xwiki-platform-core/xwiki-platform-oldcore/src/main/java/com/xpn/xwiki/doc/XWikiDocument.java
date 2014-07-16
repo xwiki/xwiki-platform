@@ -8215,8 +8215,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         MergeResult mergeResult = new MergeResult();
 
         // Title
-        setTitle(MergeUtils.mergeCharacters(previousDocument.getTitle(), newDocument.getTitle(), getTitle(),
-            mergeResult));
+        setTitle(MergeUtils.mergeOject(previousDocument.getTitle(), newDocument.getTitle(), getTitle(), mergeResult));
 
         // Content
         setContent(MergeUtils.mergeLines(previousDocument.getContent(), newDocument.getContent(), getContent(),

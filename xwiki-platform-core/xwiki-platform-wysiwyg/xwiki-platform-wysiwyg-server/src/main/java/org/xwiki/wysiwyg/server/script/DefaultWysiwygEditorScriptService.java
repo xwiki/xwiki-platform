@@ -21,6 +21,7 @@ package org.xwiki.wysiwyg.server.script;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -33,6 +34,7 @@ import org.xwiki.wysiwyg.server.WysiwygEditorConfiguration;
 import org.xwiki.wysiwyg.server.WysiwygEditorScriptService;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Default implementation of {@link WysiwygEditorScriptService}.
@@ -74,6 +76,9 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
     @Inject
     private WysiwygEditorConfiguration editorConfiguration;
 
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     @Override
     public boolean isSyntaxSupported(String syntaxId)
     {
@@ -92,13 +97,13 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
         protectAgainstProgrammingRightsExecution();
 
         // Save the value of the "is in rendering engine" context property.
-        Object isInRenderingEngine = getXWikiContext().get(IS_IN_RENDERING_ENGINE);
+        Object isInRenderingEngine = this.xcontextProvider.get().get(IS_IN_RENDERING_ENGINE);
 
         try {
             // This tells display() methods that we are inside the rendering engine and thus that they can return wiki
             // syntax and not HTML syntax (which is needed when outside the rendering engine, i.e. when we're inside
             // templates using only Velocity for example).
-            getXWikiContext().put(IS_IN_RENDERING_ENGINE, true);
+            this.xcontextProvider.get().put(IS_IN_RENDERING_ENGINE, true);
 
             return this.htmlConverter.parseAndRender(html, syntax);
         } catch (Exception e) {
@@ -107,9 +112,9 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
         } finally {
             // Restore the value of the value of the "is in rendering engine" context property.
             if (isInRenderingEngine != null) {
-                getXWikiContext().put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
+                this.xcontextProvider.get().put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
             } else {
-                getXWikiContext().remove(IS_IN_RENDERING_ENGINE);
+                this.xcontextProvider.get().remove(IS_IN_RENDERING_ENGINE);
             }
         }
     }
@@ -120,13 +125,13 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
         protectAgainstProgrammingRightsExecution();
 
         // Save the value of the "is in rendering engine" context property.
-        Object isInRenderingEngine = getXWikiContext().get(IS_IN_RENDERING_ENGINE);
+        Object isInRenderingEngine = this.xcontextProvider.get().get(IS_IN_RENDERING_ENGINE);
 
         try {
             // This tells display() methods that we are inside the rendering engine and thus that they can return wiki
             // syntax and not HTML syntax (which is needed when outside the rendering engine, i.e. when we're inside
             // templates using only Velocity for example).
-            getXWikiContext().put(IS_IN_RENDERING_ENGINE, true);
+            this.xcontextProvider.get().put(IS_IN_RENDERING_ENGINE, true);
 
             return this.htmlConverter.toHTML(source, syntaxId);
         } catch (Exception e) {
@@ -135,9 +140,9 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
         } finally {
             // Restore the value of the value of the "is in rendering engine" context property.
             if (isInRenderingEngine != null) {
-                getXWikiContext().put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
+                this.xcontextProvider.get().put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
             } else {
-                getXWikiContext().remove(IS_IN_RENDERING_ENGINE);
+                this.xcontextProvider.get().remove(IS_IN_RENDERING_ENGINE);
             }
         }
     }
@@ -156,13 +161,11 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
      */
     private void protectAgainstProgrammingRightsExecution()
     {
-        XWikiContext xwikiContext = getXWikiContext();
-        xwikiContext.getDoc().setContentAuthorReference(xwikiContext.getUserReference());
-    }
+        XWikiContext xwikiContext = this.xcontextProvider.get();
 
-    @SuppressWarnings("unchecked")
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        // We clone the document in order to not impact the environment (the document cache for example).
+        XWikiDocument clonedDocument = xwikiContext.getDoc().clone();
+        clonedDocument.setContentAuthorReference(xwikiContext.getUserReference());
+        xwikiContext.setDoc(clonedDocument);
     }
 }

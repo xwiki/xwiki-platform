@@ -146,16 +146,16 @@
     (((=${space}=)))
     (% id="xwikinav${space}Content" class="accordionTabContentBox" %)
     (((
-    #set ($spaceDocs = $services.query.xwql('where doc.space=?1 order by doc.name').addFilter('hidden').bindValue(1, $space).execute())
+    #set ($spaceDocs = $services.query.xwql('where doc.space=?1 order by doc.name').addFilter('hidden').addFilter('unique').bindValue(1, $space).execute())
     #foreach ($page in $spaceDocs)
       #if (!$hiddenPages.contains($page) || $hasAdmin)
-        #set($dotIndex = $page.indexOf('.')+1)
-        #set($pageName = $page.substring($dotIndex))
+        #set($docReference = $services.model.resolveDocument($page))
+        #set($pageName = $docReference.name)
         #if (!$blacklistedPages.contains($pageName) || $hasAdmin)
           #if ($doc.fullName == $page)
             * **${doc.name}**
           #else
-            * [[$page>>$page]]
+            * [[$pageName>>$services.model.serialize($docReference)]]
           #end
         #end
       #end

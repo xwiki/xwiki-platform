@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
+import javax.inject.Inject;
+
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -32,6 +34,7 @@ import org.xwiki.security.authorization.Right;
  */
 public abstract class AbstractScriptSafeProvider<T> implements ScriptSafeProvider<T>
 {
+    @Inject
     protected ContextualAuthorizationManager authorization;
 
     protected boolean hasProgrammingRights()

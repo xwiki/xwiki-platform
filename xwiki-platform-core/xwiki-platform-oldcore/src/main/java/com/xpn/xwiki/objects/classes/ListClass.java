@@ -688,6 +688,7 @@ public abstract class ListClass extends PropertyClass
             for (String element : previousList) {
                 if (newList == null || !newList.contains(element)) {
                     currentList.remove(element);
+                    mergeResult.setModified(true);
                 }
             }
         }
@@ -698,6 +699,7 @@ public abstract class ListClass extends PropertyClass
                 if ((previousList == null || !previousList.contains(element))) {
                     if (!currentList.contains(element)) {
                         currentList.add(element);
+                        mergeResult.setModified(true);
                     }
                 }
             }

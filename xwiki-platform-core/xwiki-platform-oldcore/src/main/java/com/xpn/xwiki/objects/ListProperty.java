@@ -27,22 +27,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
-import org.xwiki.diff.DiffManager;
 import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
 import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.internal.objects.ListPropertyPersistentList;
-import com.xpn.xwiki.web.Utils;
 
 public class ListProperty extends BaseProperty implements Cloneable
 {
-    /**
-     * Used to do the actual merge.
-     */
-    private static DiffManager diffManager = Utils.getComponent(DiffManager.class);
-
     /**
      * We make this a notifying list, because we must propagate any value updates to the owner document.
      */
@@ -268,9 +261,7 @@ public class ListProperty extends BaseProperty implements Cloneable
     }
 
     /**
-     * List implementation for updating dirty flag when updated.
-     *
-     * This will be accessed from ListPropertyUserType.
+     * List implementation for updating dirty flag when updated. This will be accessed from ListPropertyUserType.
      */
     public static class NotifyList extends AbstractNotifyOnUpdateList<String>
     {

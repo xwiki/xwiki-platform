@@ -127,8 +127,9 @@
     <property>
       <content>{{velocity}}
 #panelheader($doc.space)
-#foreach ($subdoc in $xwiki.getSpaceDocsName($doc.space))
-* [[${doc.space}.${subdoc}>>${doc.space}.${subdoc}]]
+#foreach ($docName in $xwiki.getSpaceDocsName($doc.space))
+  #set ($docReference = $services.model.createDocumentReference('', $doc.space, $docName))
+  * [[$docReference.name>>$docReference]]
 #end
 #panelfooter()
 {{/velocity}}</content>

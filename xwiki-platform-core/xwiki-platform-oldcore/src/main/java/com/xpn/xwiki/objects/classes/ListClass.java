@@ -48,11 +48,19 @@ public abstract class ListClass extends PropertyClass
 {
     private static final String XCLASSNAME = "list";
 
+    protected static final String DISPLAYTYPE_INPUT = "input";
+
+    protected static final String DISPLAYTYPE_RADIO = "radio";
+
+    protected static final String DISPLAYTYPE_CHECKBOX = "checkbox";
+
+    protected static final String DISPLAYTYPE_SELECT = "select";
+
     public ListClass(String name, String prettyname, PropertyMetaClass wclass)
     {
         super(name, prettyname, wclass);
         setRelationalStorage(false);
-        setDisplayType("select");
+        setDisplayType(DISPLAYTYPE_SELECT);
         setMultiSelect(false);
         setSize(1);
         setSeparator(" ");
@@ -265,7 +273,7 @@ public abstract class ListClass extends PropertyClass
             return prop;
         }
 
-        if ((strings.length == 1) && (getDisplayType().equals("input") || isMultiSelect())) {
+        if ((strings.length == 1) && (getDisplayType().equals(DISPLAYTYPE_INPUT) || isMultiSelect())) {
             ((ListProperty) prop).setList(getListFromString(strings[0], getSeparators(), false));
             return prop;
         }
@@ -441,7 +449,7 @@ public abstract class ListClass extends PropertyClass
     @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
-        if (getDisplayType().equals("input")) {
+        if (getDisplayType().equals(DISPLAYTYPE_INPUT)) {
             input input = new input();
             input.setAttributeFilter(new XMLAttributeValueFilter());
             BaseProperty prop = (BaseProperty) object.safeget(name);
@@ -454,13 +462,13 @@ public abstract class ListClass extends PropertyClass
             input.setID(prefix + name);
             input.setDisabled(isDisabled());
             buffer.append(input.toString());
-        } else if (getDisplayType().equals("radio") || getDisplayType().equals("checkbox")) {
+        } else if (getDisplayType().equals(DISPLAYTYPE_RADIO) || getDisplayType().equals(DISPLAYTYPE_CHECKBOX)) {
             displayRadioEdit(buffer, name, prefix, object, context);
         } else {
             displaySelectEdit(buffer, name, prefix, object, context);
         }
 
-        if (!getDisplayType().equals("input")) {
+        if (!getDisplayType().equals(DISPLAYTYPE_INPUT)) {
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
             hidden.setAttributeFilter(new XMLAttributeValueFilter());
             buffer.append(hidden);
@@ -500,8 +508,8 @@ public abstract class ListClass extends PropertyClass
             String value = getElementValue(rawvalue);
             String display = XMLUtils.escape(getDisplayValue(rawvalue, name, map, context));
             input radio =
-                new input((getDisplayType().equals("radio") && !isMultiSelect()) ? input.radio : input.checkbox, prefix
-                    + name, value);
+                new input((getDisplayType().equals(DISPLAYTYPE_RADIO) && !isMultiSelect()) ? input.radio
+                    : input.checkbox, prefix + name, value);
             radio.setAttributeFilter(new XMLAttributeValueFilter());
             radio.setID("xwiki-form-" + name + "-" + object.getNumber() + "-" + count);
             radio.setDisabled(isDisabled());

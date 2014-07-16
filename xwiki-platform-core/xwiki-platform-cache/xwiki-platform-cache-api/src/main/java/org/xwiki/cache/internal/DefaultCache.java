@@ -26,7 +26,7 @@ import org.xwiki.cache.event.CacheEntryListener;
  * Default implementation of {@link Cache}. Does not really store anything and always return null when trying to get a
  * value associated with a key.
  * 
- * @param <T> the class of the data stored in the cache.
+ * @param <T> the type of data stored in the cache
  * @version $Id$
  */
 public class DefaultCache<T> implements Cache<T>
@@ -34,42 +34,43 @@ public class DefaultCache<T> implements Cache<T>
     @Override
     public void remove(String key)
     {
-
+        // Not a real cache, nothing to do here
     }
 
     @Override
     public void set(String key, T obj)
     {
-
+        // Not a real cache, nothing to do here
     }
 
     @Override
     public T get(String key)
     {
+        // Not a real cache, nothing was stored
         return null;
     }
 
     @Override
     public void removeAll()
     {
-
+        // Not a real cache, nothing to do here
     }
 
     @Override
     public void addCacheEntryListener(CacheEntryListener<T> listener)
     {
-
+        // Since this is not a real cache, there will be no events to send, so there's no need to remember listeners
     }
 
     @Override
     public void removeCacheEntryListener(CacheEntryListener<T> listener)
     {
-
+        // Since this is not a real cache, there will be no events to send, so there's no need to remember listeners
     }
 
     @Override
     public void dispose()
     {
-
+        // Not a real cache, no resources to free
     }
 }

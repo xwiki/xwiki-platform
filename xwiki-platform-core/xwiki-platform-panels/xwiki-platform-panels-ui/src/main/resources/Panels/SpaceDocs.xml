@@ -128,7 +128,7 @@
       <content>{{velocity}}
 #panelheader($doc.space)
 #foreach ($subdoc in $xwiki.getSpaceDocsName($doc.space))
-* [[${doc.space}.${subdoc}]]
+* [[${doc.space}.${subdoc}>>${doc.space}.${subdoc}]]
 #end
 #panelfooter()
 {{/velocity}}</content>

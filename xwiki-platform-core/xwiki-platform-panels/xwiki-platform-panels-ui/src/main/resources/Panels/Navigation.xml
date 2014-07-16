@@ -155,7 +155,7 @@
           #if ($doc.fullName == $page)
             * **${doc.name}**
           #else
-            * [[$page]]
+            * [[$page>>$page]]
           #end
         #end
       #end

@@ -92,7 +92,6 @@ public class MailSenderTest extends AbstractTest
             + "#set ($message = $services.mailsender.createMessage('template', $templateReference, $parameters))\n"
             + "#set ($discard = $message.setFrom('localhost@xwiki.org'))\n"
             + "#set ($discard = $message.addRecipients('to', 'john@doe.com'))\n"
-            + "#set ($discard = $message.addPart('xwiki/template', $templateReference, $parameters))\n"
             + "#set ($discard = $message.send())\n"
             + "{{/velocity}}";
         getUtil().createPage(getTestClassName(), "SendMail", velocity, "");

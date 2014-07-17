@@ -22,13 +22,20 @@ package org.xwiki.mail.internal.template;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.mail.Address;
+import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.properties.ConverterManager;
 
 /**
  * Creates a Mime Message with the subject pre-filled with the evaluated "subject" xproperty found in an "XWiki.Mail"
@@ -39,27 +46,59 @@ import org.xwiki.model.reference.DocumentReference;
  */
 public abstract class AbstractTemplateMimeMessageFactory implements MimeMessageFactory<DocumentReference>
 {
+    @Inject
+    private ConverterManager converterManager;
+
     /**
      * @return the Template Manager instance to use, this allows passing either the default component implementation or
      * a secure one for scripts
      */
     protected abstract MailTemplateManager getTemplateManager();
 
+    /**
+     * @return the Body Part Factory instance to use, this allows passing either the default component implementation or
+     * a secure one for scripts
+     */
+    protected abstract MimeBodyPartFactory<DocumentReference> getMimeBodyPartFactory();
+
     @Override
-    public MimeMessage createMessage(Session session, DocumentReference templateReference, Map parameters)
-        throws MessagingException
+    public MimeMessage createMessage(Session session, DocumentReference templateReference,
+        Map<String, Object> parameters) throws MessagingException
     {
         MimeMessage message = new MimeMessage(session);
 
+        // Handle optional "from" address.
+        Address from = this.converterManager.convert(Address.class, parameters.get("from"));
+        if (from != null) {
+            message.setFrom(from);
+        }
+
+        // Handle optional "to", "cc" and "bcc" addresses.
+        setRecipient(message, Message.RecipientType.TO, parameters.get("to"));
+        setRecipient(message, Message.RecipientType.CC, parameters.get("cc"));
+        setRecipient(message, Message.RecipientType.BCC, parameters.get("bcc"));
+
+        // Handle the subject. Get it from the template
         Map<String, String> velocityVariables = (Map<String, String>) parameters.get("velocityVariables");
-
         String language = (String) parameters.get("language");
-
         Locale locale = LocaleUtils.toLocale(language);
-
-        String subject = getTemplateManager()
-            .evaluate(templateReference, "subject", velocityVariables, locale);
+        String subject = getTemplateManager().evaluate(templateReference, "subject", velocityVariables, locale);
         message.setSubject(subject);
+
+        // Add a default body part taken from the template.
+        Multipart multipart = new MimeMultipart("mixed");
+        multipart.addBodyPart(getMimeBodyPartFactory().create(templateReference, parameters));
+        message.setContent(multipart);
+
         return message;
+    }
+
+    private void setRecipient(MimeMessage message, Message.RecipientType type, Object value)
+        throws MessagingException
+    {
+        Address[] addresses = this.converterManager.convert(Address[].class, value);
+        if (addresses != null) {
+            message.setRecipients(type, addresses);
+        }
     }
 }

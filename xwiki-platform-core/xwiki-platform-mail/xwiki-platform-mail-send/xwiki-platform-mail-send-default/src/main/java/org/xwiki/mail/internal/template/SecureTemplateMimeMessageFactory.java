@@ -24,6 +24,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.MimeBodyPartFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Secured version of {@link TemplateMimeMessageFactory} to be used by scripts.
@@ -40,9 +42,19 @@ public class SecureTemplateMimeMessageFactory extends AbstractTemplateMimeMessag
     @Named("secure")
     private MailTemplateManager mailTemplateManager;
 
+    @Inject
+    @Named("xwiki/template/secure")
+    private MimeBodyPartFactory<DocumentReference> templateBodyPartFactory;
+
     @Override
     protected MailTemplateManager getTemplateManager()
     {
         return this.mailTemplateManager;
+    }
+
+    @Override
+    protected MimeBodyPartFactory<DocumentReference> getMimeBodyPartFactory()
+    {
+        return this.templateBodyPartFactory;
     }
 }

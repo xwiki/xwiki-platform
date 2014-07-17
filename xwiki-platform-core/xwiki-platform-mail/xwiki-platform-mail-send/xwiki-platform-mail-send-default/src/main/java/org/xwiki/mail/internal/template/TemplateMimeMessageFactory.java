@@ -24,6 +24,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.mail.MimeBodyPartFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Creates mime message with the subject pre-filled with evaluated subject xproperty from an XWiki.Mail xobject in the
@@ -38,11 +40,21 @@ import org.xwiki.component.annotation.Component;
 public class TemplateMimeMessageFactory extends AbstractTemplateMimeMessageFactory
 {
     @Inject
-    private DefaultMailTemplateManager mailTemplateManager;
+    private MailTemplateManager mailTemplateManager;
+
+    @Inject
+    @Named("xwiki/template")
+    private MimeBodyPartFactory<DocumentReference> templateBodyPartFactory;
 
     @Override
     protected MailTemplateManager getTemplateManager()
     {
         return this.mailTemplateManager;
+    }
+
+    @Override
+    protected MimeBodyPartFactory<DocumentReference> getMimeBodyPartFactory()
+    {
+        return this.templateBodyPartFactory;
     }
 }

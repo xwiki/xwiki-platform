@@ -25,21 +25,26 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.mail.Address;
+import javax.mail.Message;
 import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.template.TemplateMimeMessageFactory}.
@@ -53,23 +58,73 @@ public class TemplateMimeMessageFactoryTest
     public MockitoComponentMockingRule<TemplateMimeMessageFactory> mocker =
         new MockitoComponentMockingRule<>(TemplateMimeMessageFactory.class);
 
+    private Session session;
+
+    private DocumentReference templateReference;
+
+    private MimeBodyPart mimeBodyPart;
+
+    @Before
+    public void setUp() throws Exception
+    {
+        this.templateReference = new DocumentReference("templatewiki", "templatespace", "templatepage");
+
+        MailTemplateManager mailTemplateManager = this.mocker.getInstance(MailTemplateManager.class);
+        when(mailTemplateManager.evaluate(same(this.templateReference), eq("subject"), anyMap(), any(Locale.class)))
+            .thenReturn("XWiki news");
+
+        MimeBodyPartFactory<DocumentReference> templateBodyPartFactory = this.mocker.getInstance(
+            new DefaultParameterizedType(null, MimeBodyPartFactory.class, DocumentReference.class), "xwiki/template");
+        this.mimeBodyPart = mock(MimeBodyPart.class);
+        when(templateBodyPartFactory.create(same(this.templateReference), anyMap())).thenReturn(this.mimeBodyPart);
+
+        this.session = Session.getDefaultInstance(new Properties());
+    }
+
     @Test
     public void createMessage() throws Exception
     {
-        DocumentReference documentReference = mock(DocumentReference.class);
-
-        DefaultMailTemplateManager mailTemplateManager = this.mocker.getInstance(DefaultMailTemplateManager.class);
-        when(mailTemplateManager.evaluate(same(documentReference), eq("subject"), anyMap(), any(Locale.class)))
-            .thenReturn("XWiki news");
-
-        Session session = Session.getDefaultInstance(new Properties());
-
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("language", "fr");
         parameters.put("velocityVariables", Collections.<String, Object>singletonMap("company", "XWiki"));
 
-        MimeMessage message = this.mocker.getComponentUnderTest().createMessage(session, documentReference, parameters);
+        MimeMessage message =
+            this.mocker.getComponentUnderTest().createMessage(this.session, this.templateReference, parameters);
 
         assertEquals("XWiki news", message.getSubject());
+
+        // Also verify that a body part has been added
+        assertEquals(this.mimeBodyPart, ((MimeMultipart) message.getContent()).getBodyPart(0));
+    }
+
+    @Test
+    public void createMessageWithToFromCCAndBCCAddressesAsStrings() throws Exception
+    {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("language", "fr");
+        parameters.put("velocityVariables", Collections.<String, Object>singletonMap("company", "XWiki"));
+        parameters.put("to", "to@doe.com");
+        parameters.put("cc", "cc@doe.com");
+        parameters.put("bcc", "bcc@doe.com");
+        parameters.put("from", "from@doe.com");
+
+        ConverterManager converterManager = this.mocker.getInstance(ConverterManager.class);
+        when(converterManager.convert(Address[].class, "to@doe.com")).thenReturn(InternetAddress.parse("to@doe.com"));
+        when(converterManager.convert(Address[].class, "cc@doe.com")).thenReturn(InternetAddress.parse("cc@doe.com"));
+        when(converterManager.convert(Address[].class, "bcc@doe.com")).thenReturn(InternetAddress.parse("bcc@doe.com"));
+        when(converterManager.convert(Address.class, "from@doe.com")).thenReturn(
+            InternetAddress.parse("from@doe.com")[0]);
+
+        MimeMessage message =
+            this.mocker.getComponentUnderTest().createMessage(this.session, this.templateReference, parameters);
+
+        assertEquals("XWiki news", message.getSubject());
+        assertArrayEquals(InternetAddress.parse("from@doe.com"), message.getFrom());
+        assertArrayEquals(InternetAddress.parse("to@doe.com"), message.getRecipients(Message.RecipientType.TO));
+        assertArrayEquals(InternetAddress.parse("cc@doe.com"), message.getRecipients(Message.RecipientType.CC));
+        assertArrayEquals(InternetAddress.parse("bcc@doe.com"), message.getRecipients(Message.RecipientType.BCC));
+
+        // Also verify that a body part has been added
+        assertEquals(this.mimeBodyPart, ((MimeMultipart) message.getContent()).getBodyPart(0));
     }
 }

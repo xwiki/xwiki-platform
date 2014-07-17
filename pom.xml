@@ -26,6 +26,7 @@
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
     <version>6.2-SNAPSHOT</version>
+    <relativePath>../xwiki-commons/xwiki-commons-pom/</relativePath>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform</artifactId>

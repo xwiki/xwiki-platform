@@ -40,6 +40,7 @@ import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MailSenderConfiguration;
 import org.xwiki.mail.MimeMessageFactory;
 import org.xwiki.mail.XWikiAuthenticator;
+import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -99,8 +100,19 @@ public class MailSenderScriptService implements ScriptService
         try {
             MimeMessageFactory factory = getMimeMessageFactory(hint, source.getClass());
             Session session = createSession();
-            messageWrapper = new MimeMessageWrapper(factory.createMessage(session, source, parameters), session,
-                this.mailSender, this.execution, this.componentManager);
+
+            // If the factory hasn't created an ExtendedMimeMessage we wrap it in one so that we can add body parts
+            // easily as they are added by the users and construct a MultiPart out of it when we send the mail.
+            ExtendedMimeMessage extendedMimeMessage;
+            MimeMessage message = factory.createMessage(session, source, parameters);
+            if (message instanceof ExtendedMimeMessage) {
+                extendedMimeMessage = (ExtendedMimeMessage) message;
+            } else {
+                extendedMimeMessage = new ExtendedMimeMessage(message);
+            }
+
+            messageWrapper = new MimeMessageWrapper(extendedMimeMessage, session, this.mailSender, this.execution,
+                this.componentManager);
         } catch (Exception e) {
             // No factory found, set an error
             // An error occurred, save it and return null
@@ -181,7 +193,7 @@ public class MailSenderScriptService implements ScriptService
     public MimeMessageWrapper createMessage(String from, String to, String subject)
     {
         Session session = createSession();
-        MimeMessage message = new MimeMessage(session);
+        ExtendedMimeMessage message = new ExtendedMimeMessage(session);
         MimeMessageWrapper messageWrapper =
             new MimeMessageWrapper(message, session, this.mailSender, this.execution, this.componentManager);
 

@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.script;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +30,6 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
 import org.xwiki.component.manager.ComponentLookupException;
@@ -40,6 +39,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.mail.MailSender;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.internal.DefaultMailResultListener;
+import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -58,22 +58,20 @@ public class MimeMessageWrapper
 
     private Execution execution;
 
-    private Multipart multipart;
-
     private DefaultMailResultListener listener;
 
     private Session session;
 
-    private MimeMessage message;
+    private ExtendedMimeMessage message;
 
     /**
-     * @param message the wrapped {@link MimeMessage}
+     * @param message the wrapped {@link javax.mail.internet.MimeMessage}
      * @param session the JavaMail session used to send the mail
      * @param mailSender the component to send the mail
      * @param execution used to get the Execution Context and store an error in it if the send fails
      * @param componentManager used to dynamically load all {@link MimeBodyPartFactory} components
      */
-    public MimeMessageWrapper(MimeMessage message, Session session, MailSender mailSender, Execution execution,
+    public MimeMessageWrapper(ExtendedMimeMessage message, Session session, MailSender mailSender, Execution execution,
         ComponentManager componentManager)
     {
         this.message = message;
@@ -87,7 +85,7 @@ public class MimeMessageWrapper
     /**
      * @return the wrapped {@link javax.mail.internet.MimeMessage}
      */
-    public MimeMessage getMessage()
+    public ExtendedMimeMessage getMessage()
     {
         return this.message;
     }
@@ -97,10 +95,8 @@ public class MimeMessageWrapper
      *
      * @param mimeType the mime type of the content parameter
      * @param content the content to include in the mail
-     * @throws MessagingException when an error happens, for example if a body part factory fails to generate a valid
-     *         Body Part
      */
-    public void addPart(String mimeType, Object content) throws MessagingException
+    public void addPart(String mimeType, Object content)
     {
         addPart(mimeType, content, Collections.<String, Object>emptyMap());
     }
@@ -113,26 +109,24 @@ public class MimeMessageWrapper
      * @param parameters the list of extra parameters. This is used for example to pass alternate content for the mail
      *        using the {@code alternate} key in the HTML Mime Body Part Factory. Mail headers can also be passed using
      *        the {@code headers} key with a {@code Map&lt;String, String&gt;} value containing header keys and values
-     * @throws MessagingException when an error happens, for example if a body part factory fails to generate a valid
-     *         Body Part
      */
-    public void addPart(String mimeType, Object content, Map<String, Object> parameters) throws MessagingException
+    public void addPart(String mimeType, Object content, Map<String, Object> parameters)
     {
-        MimeBodyPartFactory factory = getBodyPartFactory(mimeType, content.getClass());
+        try {
+            MimeBodyPartFactory factory = getBodyPartFactory(mimeType, content.getClass());
 
-        // If this is the first Part we create the MultiPart object.
-        if (this.multipart == null) {
-            this.multipart = new MimeMultipart("mixed");
+            // Pass the mime type in the parameters so that generic Mime Body Part factories can use it.
+            // Note that if the use has already passed a "mimetype" parameter then we don't override it!
+            Map<String, Object> enhancedParameters = new HashMap<>();
+            enhancedParameters.put("mimetype", mimeType);
+            enhancedParameters.putAll(parameters);
+
+            Multipart multipart = getMultipart();
+            multipart.addBodyPart(factory.create(content, enhancedParameters));
+        } catch (Exception e) {
+            // Save the exception for reporting through the script services's getError() API
+            setError(e);
         }
-
-        // Pass the mime type in the parameters so that generic Mime Body Part factories can use it.
-        // Note that if the use has already passed a "mimetype" parameter then we don't override it!
-        Map<String, Object> enhancedParameters = new HashMap<>();
-        enhancedParameters.put("mimetype", mimeType);
-        enhancedParameters.putAll(parameters);
-
-        MimeBodyPart part = factory.create(content, enhancedParameters);
-        this.multipart.addBodyPart(part);
     }
 
     /**
@@ -142,12 +136,7 @@ public class MimeMessageWrapper
     public void send()
     {
         try {
-            // Add the multi part to the content of the message to send. We do this when calling send() since the user
-            // can call addPart() several times.
-            getMessage().setContent(this.multipart);
-
             this.mailSender.send(getMessage(), this.session);
-
         } catch (MessagingException e) {
             // Save the exception for reporting through the script services's getError() API
             setError(e);
@@ -160,15 +149,6 @@ public class MimeMessageWrapper
      */
     public void sendAsynchronously()
     {
-        try {
-            // Add the multi part to the content of the message to send. We do this when calling send() since the user
-            // can call addPart() several times.
-            getMessage().setContent(this.multipart);
-        } catch (MessagingException e) {
-            // Save the exception for reporting through the script services's getError() API
-            setError(e);
-        }
-
         this.mailSender.sendAsynchronously(getMessage(), this.session, this.listener);
     }
     /**
@@ -296,12 +276,31 @@ public class MimeMessageWrapper
         try {
             // Look a secure version of a specific MimeBodyPartFactory for the passed Mime Type and Content type.
             factory = this.componentManager.getInstance(new DefaultParameterizedType(null, MimeBodyPartFactory.class,
-                contentClass),  String.format("%s/secure", mimeType));
+                contentClass), String.format("%s/secure", mimeType));
         } catch (ComponentLookupException e) {
             // Look for a specific MimeBodyPartFactory for the passed Mime Type and Content type (non secure).
             factory = this.componentManager.getInstance(
                 new DefaultParameterizedType(null, MimeBodyPartFactory.class, contentClass), mimeType);
         }
         return factory;
+    }
+
+    private Multipart getMultipart() throws MessagingException, IOException
+    {
+        Multipart multipart;
+        ExtendedMimeMessage mimeMessage = getMessage();
+        if (mimeMessage.isEmpty()) {
+            multipart = new MimeMultipart("mixed");
+            mimeMessage.setContent(multipart);
+        } else {
+            Object contentObject = mimeMessage.getContent();
+            if (contentObject instanceof Multipart) {
+                multipart = (Multipart) contentObject;
+            } else {
+                throw new MessagingException(String.format("Unknown mail content type [%s]: [%s]",
+                    contentObject.getClass().getName(), contentObject));
+            }
+        }
+        return multipart;
     }
 }

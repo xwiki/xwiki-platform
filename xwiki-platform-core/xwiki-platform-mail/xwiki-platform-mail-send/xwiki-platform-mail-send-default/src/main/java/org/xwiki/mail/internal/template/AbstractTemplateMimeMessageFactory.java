@@ -34,6 +34,7 @@ import javax.mail.internet.MimeMultipart;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.mail.MimeMessageFactory;
+import org.xwiki.mail.internal.ExtendedMimeMessage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.ConverterManager;
 
@@ -65,7 +66,7 @@ public abstract class AbstractTemplateMimeMessageFactory implements MimeMessageF
     public MimeMessage createMessage(Session session, DocumentReference templateReference,
         Map<String, Object> parameters) throws MessagingException
     {
-        MimeMessage message = new MimeMessage(session);
+        MimeMessage message = new ExtendedMimeMessage(session);
 
         // Handle optional "from" address.
         Address from = this.converterManager.convert(Address.class, parameters.get("from"));

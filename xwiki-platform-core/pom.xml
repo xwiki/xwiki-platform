@@ -460,6 +460,20 @@
               <method>void sendAsynchronously(javax.mail.internet.MimeMessage, javax.mail.Session, org.xwiki.mail.MailResultListener)</method>
               <justification>Mail Sender API is still a young API.</justification>
             </difference>
+            <difference>
+              <differenceType>7005</differenceType>
+              <className>org/xwiki/mail/script/MimeMessageWrapper</className>
+              <method>MimeMessageWrapper*</method>
+              <to>MimeMessageWrapper*</to>
+              <justification>Mail Sender API is still a young API.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>org/xwiki/mail/script/MimeMessageWrapper</className>
+              <method>javax.mail.internet.MimeMessage getMessage()</method>
+              <to>org.xwiki.mail.internal.ExtendedMimeMessage</to>
+              <justification>Mail Sender API is still a young API.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

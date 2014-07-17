@@ -54,9 +54,9 @@ public class XWikiExecutor
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiExecutor.class);
 
     public static final String SKIP_STARTING_XWIKI_INSTANCE = System.getProperty("xwiki.test.skipStart", "false");
-    
+
     public static final String BASEDIR = System.getProperty("basedir");
-    
+
     public static final String URL = System.getProperty("xwiki.test.baseURL", "http://localhost");
 
     public static final String DEFAULT_PORT = System.getProperty("xwikiPort", "8080");
@@ -168,7 +168,7 @@ public class XWikiExecutor
 
     public void start() throws Exception
     {
-        if (SKIP_STARTING_XWIKI_INSTANCE.equals("true")){
+        if (SKIP_STARTING_XWIKI_INSTANCE.equals("true")) {
             LOGGER.info("Using running instance at [{}:{}]", URL, getPort());
         }
         else {
@@ -202,7 +202,7 @@ public class XWikiExecutor
         ShutdownHookProcessDestroyer processDestroyer = new ShutdownHookProcessDestroyer();
 
         // Prevent the process from running indefinitely and kill it after 1 hour...
-        ExecuteWatchdog watchDog = new ExecuteWatchdog(60L*60L*1000L);
+        ExecuteWatchdog watchDog = new ExecuteWatchdog(60L * 60L * 1000L);
 
         // The executor to execute the command
         DefaultExecutor executor = new DefaultExecutor();
@@ -309,11 +309,11 @@ public class XWikiExecutor
 
             // First wait for the stop process to have stopped, waiting a max of 5 minutes!
             // It's going to stop the start process...
-            stopProcessHandler.waitFor(5*60L*1000L);
+            stopProcessHandler.waitFor(5 * 60L * 1000L);
 
             // Now wait for the start process to be stopped, waiting a max of 5 minutes!
             if (this.startedProcessHandler != null) {
-                this.startedProcessHandler.waitFor(5*60L*1000L);
+                this.startedProcessHandler.waitFor(5 * 60L * 1000L);
             }
 
             LOGGER.info("XWiki server stopped");

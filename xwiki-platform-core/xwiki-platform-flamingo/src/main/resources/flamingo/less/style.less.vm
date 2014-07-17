@@ -3,6 +3,7 @@
 // --------------------------------------------------
 
 // Imports ====================================================================
+@import "before-bootstrap.less"; // Fixes that must be included BEFORE bootstrap
 @import "bootstrap/bootstrap.less"; // Bootstrap
 @import "variables.less"; // Bootstrap variables overrided by flamingo
 @import "accordion.less";

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,8 +65,8 @@ import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.renderer.printer.WriterWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.RenderingContext;
@@ -351,7 +352,8 @@ public class WikiTemplateRenderer
             // Prevent inclusion of templates from other directories
             String normalizedTemplate = URI.create(templatePath).normalize().toString();
             if (!normalizedTemplate.startsWith("/templates/")) {
-                this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!", normalizedTemplate);
+                this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!",
+                    normalizedTemplate);
 
                 return null;
             }
@@ -409,23 +411,11 @@ public class WikiTemplateRenderer
         return new StringContent(content, null, Syntax.XHTML_1_0);
     }
 
-    private String renderError(Throwable throwable)
+    private void renderError(Throwable throwable, Writer writer)
     {
         XDOM xdom = generateError(throwable);
 
-        WikiPrinter printer = new DefaultWikiPrinter();
-
-        BlockRenderer blockRenderer;
-        try {
-            blockRenderer =
-                this.componentManagerProvider.get().getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
-        } catch (ComponentLookupException e) {
-            blockRenderer = this.plainRenderer;
-        }
-
-        blockRenderer.render(xdom, printer);
-
-        return printer.toString();
+        render(xdom, writer);
     }
 
     private XDOM generateError(Throwable throwable)
@@ -481,8 +471,7 @@ public class WikiTemplateRenderer
         return xdom;
     }
 
-    private XDOM getXDOM(StringContent content) throws ParseException, MissingParserException,
-        XWikiVelocityException
+    private XDOM getXDOM(StringContent content) throws ParseException, MissingParserException, XWikiVelocityException
     {
         XDOM xdom;
 
@@ -510,15 +499,34 @@ public class WikiTemplateRenderer
 
     public String renderNoException(String template)
     {
+        Writer writer = new StringWriter();
+
+        renderNoException(template, writer);
+
+        return writer.toString();
+    }
+
+    public void renderNoException(String template, Writer writer)
+    {
         try {
-            return render(template);
+            render(template, writer);
         } catch (Exception e) {
-            return renderError(e);
+            renderError(e, writer);
         }
     }
 
-    public String render(String template) throws ComponentLookupException, IOException, ParseException,
-        MissingParserException, XWikiVelocityException
+    public String render(String template) throws IOException, ParseException, MissingParserException,
+        XWikiVelocityException
+    {
+        Writer writer = new StringWriter();
+
+        render(template, writer);
+
+        return writer.toString();
+    }
+
+    public void render(String template, Writer writer) throws IOException, ParseException, MissingParserException,
+        XWikiVelocityException
     {
         StringContent content = getStringContent(template);
 
@@ -526,20 +534,26 @@ public class WikiTemplateRenderer
             if (content.sourceSyntax != null) {
                 XDOM xdom = execute(content);
 
-                WikiPrinter printer = new DefaultWikiPrinter();
-
-                BlockRenderer blockRenderer =
-                    this.componentManagerProvider.get()
-                        .getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
-                blockRenderer.render(xdom, printer);
-
-                return printer.toString();
+                render(xdom, writer);
             } else {
-                return evaluateString(content.content);
+                evaluateString(content.content, writer);
             }
-        } else {
-            return "";
         }
+    }
+
+    private void render(XDOM xdom, Writer writer)
+    {
+        WikiPrinter printer = new WriterWikiPrinter(writer);
+
+        BlockRenderer blockRenderer;
+        try {
+            blockRenderer =
+                this.componentManagerProvider.get().getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
+        } catch (ComponentLookupException e) {
+            blockRenderer = this.plainRenderer;
+        }
+
+        blockRenderer.render(xdom, printer);
     }
 
     public XDOM executeNoException(String template)
@@ -555,8 +569,7 @@ public class WikiTemplateRenderer
         return xdom;
     }
 
-    private XDOM execute(StringContent content) throws ParseException, MissingParserException,
-        XWikiVelocityException
+    private XDOM execute(StringContent content) throws ParseException, MissingParserException, XWikiVelocityException
     {
         XDOM xdom = getXDOM(content);
 
@@ -575,9 +588,16 @@ public class WikiTemplateRenderer
 
     private String evaluateString(String content) throws XWikiVelocityException
     {
-        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        Writer writer = new StringWriter();
 
-        StringWriter writer = new StringWriter();
+        evaluateString(content, writer);
+
+        return writer.toString();
+    }
+
+    private void evaluateString(String content, Writer writer) throws XWikiVelocityException
+    {
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
 
         // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally
         // by Velocity as a cache index key for caching macros.
@@ -594,8 +614,6 @@ public class WikiTemplateRenderer
         } finally {
             velocityEngine.stoppedUsingMacroNamespace(namespace);
         }
-
-        return writer.toString();
     }
 
     private Syntax getTargetSyntax()

@@ -478,7 +478,7 @@ public abstract class XWikiAction extends Action
         }
     }
 
-    private void renderInit(XWikiContext xcontext) throws IOException, ComponentLookupException, ParseException,
+    private void renderInit(XWikiContext xcontext) throws IOException, ParseException,
         MissingParserException, XWikiVelocityException
     {
         RenderingContext renderingContext = Utils.getComponent(RenderingContext.class);
@@ -487,23 +487,20 @@ public abstract class XWikiAction extends Action
 
         if (mutableRenderingContext != null) {
             mutableRenderingContext.push(renderingContext.getTransformation(), renderingContext.getXDOM(),
-                renderingContext.getDefaultSyntax(), "init.vm", renderingContext.isRestricted(),
-                Syntax.XHTML_1_0);
+                renderingContext.getDefaultSyntax(), "init.vm", renderingContext.isRestricted(), Syntax.XHTML_1_0);
         }
 
-        String content;
+        xcontext.getResponse().setStatus(503);
+        xcontext.getResponse().setContentType("text/html; charset=UTF-8");
+
         try {
-            content = Utils.getComponent(WikiTemplateRenderer.class).render("init.vm");
+            Utils.getComponent(WikiTemplateRenderer.class).render("init.vm", xcontext.getResponse().getWriter());
         } finally {
             if (mutableRenderingContext != null) {
                 mutableRenderingContext.pop();
             }
         }
 
-        xcontext.getResponse().setStatus(503);
-        xcontext.getResponse().setContentType("text/html; charset=UTF-8");
-        xcontext.getResponse().setContentLength(content.length());
-        xcontext.getResponse().getWriter().write(content);
         xcontext.getResponse().flushBuffer();
 
         xcontext.setFinished(true);

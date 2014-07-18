@@ -289,7 +289,7 @@ icon=icon:bullet_go</parameters>
       <scope>wiki</scope>
     </property>
   </object>
-  <content>{{template name="extension.vm"/}}
+  <content>{{template name="extension.vm" output="false"/}}
 
 {{velocity}}
 ## HTML cleaner messes up the content of the legend tag.

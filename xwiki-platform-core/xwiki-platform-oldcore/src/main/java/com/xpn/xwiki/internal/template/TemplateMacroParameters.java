@@ -35,6 +35,11 @@ public class TemplateMacroParameters
     private String name;
 
     /**
+     * @see #setOutput(boolean)
+     */
+    private boolean output = true;
+
+    /**
      * @param name the name of the template
      */
     @PropertyDescription("the name of the template")
@@ -49,5 +54,22 @@ public class TemplateMacroParameters
     public String getName()
     {
         return this.name;
+    }
+
+    /**
+     * @return specify whether or not the result of the execution should be returned the macro.
+     */
+    @PropertyDescription("Specifies whether or not the result of the execution should be returned the macro.")
+    public boolean isOutput()
+    {
+        return this.output;
+    }
+
+    /**
+     * @param output specify whether or not the result of the execution should be returned the macro.
+     */
+    public void setOutput(boolean output)
+    {
+        this.output = output;
     }
 }

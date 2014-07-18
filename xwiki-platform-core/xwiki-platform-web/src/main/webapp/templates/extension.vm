@@ -4,6 +4,8 @@
 #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/buttonGroup.css', true))
 #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/buttonGroup.js'))
 
+#set($discard = $services.template.execute('job_macros.vm'))
+
 ## Various configuration of extension.vm behavior
 ## * skipCheckRight: skip right validation when executing a action (install plan, install, etc.)
 ## * skipCurrentUser: don't take into account context use (XAR extension documents will keep their author for example)
@@ -185,28 +187,6 @@
   #if ($jobStatus && $jobState != 'FINISHED')
     #displayJobProgressBar($jobStatus)
   #end
-#end
-
-#macro (displayJobProgressBar $jobStatus)
-  <div class="ui-progress">
-    <div class="ui-progress-background">
-      #set ($percent = $jobStatus.progress.offset)
-      ## There is no progress information if the job was scheduled but hasn't started yet.
-      #if (!$percent)
-        #set ($percent = 0)
-      #end
-      #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
-      <div class="ui-progress-bar green" style="width:${percent}%"></div>
-    </div>
-    #if ($jobStatus && !$jobStatus.log.isEmpty())
-      ## We need the tail of the log queue.
-      #set ($logList = [])
-      #set ($discard = $logList.addAll($jobStatus.log))
-      <p class="ui-progress-message">
-        #printLogMessage($logList.get($mathtool.sub($logList.size(), 1)))
-      </p>
-    #end
-  </div>
 #end
 
 #macro (displayExtensionDetails_menuLink $detail $selected)
@@ -513,153 +493,6 @@ $namespace##
       #end
     #end
   #end
-#end
-
-#macro (displayJobStatusLog $status)
-  <dl class="xform">
-    ## Collapse the job log if the job is waiting for user input (leave more space for the job question).
-    <dt>
-      <label class="collapsible#if ($status.state == 'WAITING') collapsed#end">
-        #set ($jobType = $status.request.getProperty('job.type'))
-        #set ($translationKey = "extensions.info.jobLog.$jobType")
-        #if (!$services.localization.get($translationKey))
-          #set ($translationKey = 'extensions.info.jobLog')
-        #end
-        $services.localization.render($translationKey)
-      </label>
-    </dt>
-    <dd>#printStatusLog($status)</dd>
-  </dl>
-#end
-
-#macro (printStatusLog $status)
-  #if ($status.log.size() > 0)
-  <ul class="job-log">
-  #foreach ($log in $status.log)
-    #set ($logLevel = $log.level.toString().toLowerCase())
-    #if (!$foreach.hasNext && $status.state != 'FINISHED')
-      ## Display the last log item as loading if the job is in progress.
-      #set ($logLevel = 'loading')
-    #end
-    <li class="job-log-item job-log-item-$logLevel">
-      #if ($log.throwable)
-        #set ($message = "#getThrowableRootCauseMessage($log.throwable)")
-        #if ("$!message.trim()" != '')
-          <div>$escapetool.xml($message)</div>
-        #else
-          <div>#printLogMessage($log)</div>
-        #end
-        #printThrowable($log.throwable)
-      #else
-        <div>#printLogMessage($log)</div>
-      #end
-    </li>
-  #end
-  </ul>
-  #end
-#end
-
-#macro (getThrowableRootCauseMessage $throwable)
-  #if ($throwable.cause)
-    #getThrowableRootCauseMessage($throwable.cause)
-  #else
-    $!{throwable.message}##
-  #end
-#end
-
-#macro (printThrowable $throwable $isCause)
-#if (!$isCause)
-  <div class="stacktrace">##
-#end
-$throwable.class: #if(!$throwable.message)null#else$escapetool.xml($throwable.message)#end
-
-#foreach($stackTraceElement in $throwable.stackTrace)
-    at $stackTraceElement
-#end
-#if ($throwable.cause)
-Caused by: #printThrowable($throwable.cause true)
-#end
-#if (!$isCause)</div>#end
-#end
-
-#macro (printLogMessage $log $resolveRemotely)
-  #set ($message = '')
-  #set ($messageElements = $log.messageElements)
-  #foreach ($messageElement in $messageElements)
-    #if ($velocityCount == $messageElements.size())
-      ## Skip the last message element because we always have more message elements than arguments.
-      #break
-    #end
-    #set ($argument = $log.argumentArray.get($foreach.index))
-    #set ($message = "$message$escapetool.xml($messageElement)")
-    ## This code prints a message from the log. The $argument is the entity that is concerned by the message.
-    ## We will display a link to that entity, so we need to extract the document from it.
-    #set ($documentReference = $argument.extractReference("DOCUMENT"))
-    #if ($documentReference)
-      #set ($documentReferenceDisplay = "#displayDocumentReference($documentReference)")
-      #set ($message = "$message$documentReferenceDisplay.trim()")
-    #elseif ($argument.id && ($argument.version || $argument.versionConstraint))
-      #if ($resolveRemotely)
-        ## Assume the argument is an extension dependency.
-        #set ($_extension = $extensionManager.resolve($argument, $extensionNamespace))
-        #if (!$_extension)
-          ## Assume the argument is an extension id.
-          #set ($_extension = $extensionManager.resolve($argument.id, $argument.version.value))
-        #end
-      #else
-        ## Search for the extension/dependency only in the core and local repositories.
-        ## TODO: Check also the remote extensions that have been partially cached locally (e.g. only their pom has been
-        ## downloaded). We need a resolve method that doesn't perform any remote calls.
-        #set ($_extension = $extensionManager.getRepository('core').resolve($argument))
-        #if (!$_extension)
-          #set ($_extension = $extensionManager.getRepository('local').resolve($argument))
-        #end
-      #end
-      #if ($_extension)
-        #set ($_extensionURL = "#getExtensionURL($_extension.id.id, $_extension.id.version.value)")
-        #set ($_extensionName = "#displayExtensionName($_extension)")
-        #set ($_extensionName = "$escapetool.xml($_extensionName.trim()) $escapetool.xml($_extension.id.version.value)")
-      #else
-        #set ($version = $argument.version)
-        #if (!$version)
-          #set ($version = $argument.versionConstraint)
-        #end
-        #set ($_extensionURL = "#getExtensionURL($argument.id, $version)")
-        #set ($_extensionName = $argument)
-      #end
-      #set ($message = "$message<a href=""$_extensionURL"" class=""extension-link"">$_extensionName</a>")
-    #elseif ($argument.listIterator())
-      ## Assume the argument is a job id.
-      #set ($message = "$message$escapetool.xml($stringtool.join($argument, '/'))")
-    #elseif ($argument.startsWith('wiki:'))
-      #set ($message = "$message#wikiHomePageLink($argument)")
-    #elseif ($argument.previous && $argument.next)
-      ## Assume the argument is a diff Delta.
-      #set ($message = "$message@@ -$mathtool.add($argument.previous.index, 1),$argument.previous.size() +$mathtool.add($argument.next.index, 1),$argument.next.size() @@")
-    #else
-      #set ($message = "$message$!escapetool.xml($argument)")
-    #end
-  #end
-  ## Add the last message element.
-  $message$!escapetool.xml($messageElements.get($mathtool.sub($messageElements.size(), 1)))##
-#end
-
-#macro (displayDocumentReference $documentReference)
-  #set ($path = [])
-  #set ($wikiPrettyName = $services.wiki.getById($documentReference.wikiReference.name).prettyName)
-  #if ("$!wikiPrettyName.trim()" == '')
-    #set ($wikiPrettyName = $documentReference.wikiReference.name)
-  #end
-  #set ($wikiHomeDocRef = $services.model.resolveDocument('', 'default', $documentReference.wikiReference))
-  #set ($discard = $path.add("<a href=""$xwiki.getURL($wikiHomeDocRef)"">$escapetool.xml($wikiPrettyName)</a>"))
-  ##
-  #foreach ($spaceReference in $documentReference.spaceReferences)
-    #set ($spaceHomeDocRef = $services.model.resolveDocument('', 'default', $spaceReference))
-    #set ($discard = $path.add("<a href=""$xwiki.getURL($spaceHomeDocRef)"">$escapetool.xml($spaceReference.name)</a>"))
-  #end
-  ##
-  #set ($discard = $path.add("<a href=""$xwiki.getURL($documentReference)"">$escapetool.xml($documentReference.name)</a>"))
-  $stringtool.join($path, ' &raquo; ')
 #end
 
 #macro (displayExtensionDetails_progressQuestion $extension $jobStatus)

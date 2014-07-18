@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.internal.template;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -73,6 +74,16 @@ public class TemplateMacro extends AbstractMacro<TemplateMacroParameters>
     public List<Block> execute(TemplateMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return this.renderer.getXDOM(parameters.getName()).getChildren();
+        if (parameters.isOutput()) {
+            return this.renderer.getXDOMNoException(parameters.getName()).getChildren();
+        } else {
+            try {
+                this.renderer.execute(parameters.getName());
+            } catch (Exception e) {
+                throw new MacroExecutionException("Failed to execute template [" + parameters.getName() + "]", e);
+            }
+
+            return Collections.emptyList();
+        }
     }
 }

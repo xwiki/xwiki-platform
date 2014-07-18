@@ -46,6 +46,14 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.filter.input.InputSource;
+import org.xwiki.filter.input.InputStreamInputSource;
+import org.xwiki.filter.input.ReaderInputSource;
+import org.xwiki.filter.internal.input.DefaultInputStreamInputSource;
+import org.xwiki.filter.internal.input.StringInputSource;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.RawBlock;
@@ -67,7 +75,12 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Internal toolkit to experiment on wiki bases templates.
@@ -80,6 +93,8 @@ import com.xpn.xwiki.XWikiContext;
 public class WikiTemplateRenderer
 {
     private static final Pattern FIRSTLINE = Pattern.compile("^##(source|raw)\\.syntax=(.*)$\r?\n?", Pattern.MULTILINE);
+
+    private static final LocalDocumentReference SKINCLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiSkins");
 
     @Inject
     private Environment environment;
@@ -118,6 +133,10 @@ public class WikiTemplateRenderer
     private ConfigurationSource xwikicfg;
 
     @Inject
+    @Named("currentmixed")
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
+
+    @Inject
     private Logger logger;
 
     private class StringContent
@@ -139,98 +158,230 @@ public class WikiTemplateRenderer
     // TODO: put that in some SkinContext component
     private String getSkin()
     {
-        String skin = null;
+        String skin;
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
         if (xcontext != null) {
             // Try to get it from context
             skin = (String) xcontext.get("skin");
-            if (skin != null) {
+            if (StringUtils.isNotEmpty(skin)) {
                 return skin;
+            } else {
+                skin = null;
             }
 
             // Try to get it from URL
             if (xcontext.getRequest() != null) {
                 skin = xcontext.getRequest().getParameter("skin");
+                if (StringUtils.isNotEmpty(skin)) {
+                    return skin;
+                } else {
+                    skin = null;
+                }
             }
 
-            // TODO: Try to get it from user preferences
+            // Try to get it from user preferences
+            skin = getSkinFromUser();
+            if (skin != null) {
+                return skin;
+            }
         }
 
         // Try to get it from xwiki.cfg
-        if (StringUtils.isEmpty(skin)) {
-            skin = this.xwikicfg.getProperty("xwiki.defaultskin", "colibri");
+        skin = this.xwikicfg.getProperty("xwiki.defaultskin", "colibri");
+
+        return StringUtils.isNotEmpty(skin) ? skin : null;
+    }
+
+    private String getSkinFromUser()
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        XWiki xwiki = xcontext.getWiki();
+        if (xwiki != null && xwiki.getStore() != null) {
+            String skin = xwiki.getUserPreference("skin", xcontext);
+            if (StringUtils.isEmpty(skin)) {
+                return null;
+            }
         }
 
-        return skin;
+        return null;
     }
 
     // TODO: put that in some SkinContext component
     private String getBaseSkin()
     {
-        String baseskin = null;
+        String baseskin;
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
         if (xcontext != null) {
             // Try to get it from context
             baseskin = (String) xcontext.get("baseskin");
-            if (baseskin != null) {
+            if (StringUtils.isNotEmpty(baseskin)) {
                 return baseskin;
+            } else {
+                baseskin = null;
             }
 
-            // TODO: try to get it from the skin
+            // Try to get it from the skin
+            String skin = getSkin();
+            if (skin != null) {
+                BaseObject skinObject = getSkinObject(skin);
+                if (skinObject != null) {
+                    baseskin = skinObject.getStringValue("baseskin");
+                    if (StringUtils.isNotEmpty(baseskin)) {
+                        return baseskin;
+                    }
+                }
+            }
         }
 
         // Try to get it from xwiki.cfg
-        if (StringUtils.isEmpty(baseskin)) {
-            baseskin = this.xwikicfg.getProperty("xwiki.defaultbaseskin", "colibri");
-        }
+        baseskin = this.xwikicfg.getProperty("xwiki.defaultbaseskin", "colibri");
 
-        return baseskin;
+        return StringUtils.isNotEmpty(baseskin) ? baseskin : null;
     }
 
-    private InputStream getTemplateStream(String template)
+    private XWikiDocument getSkinDocument(String skin)
     {
-        InputStream stream;
+        XWikiContext xcontext = this.xcontextProvider.get();
+        if (xcontext != null) {
+            DocumentReference skinReference = this.currentMixedDocumentReferenceResolver.resolve(skin);
+            XWiki xwiki = xcontext.getWiki();
+            if (xwiki != null && xwiki.getStore() != null) {
+                XWikiDocument doc;
+                try {
+                    doc = xwiki.getDocument(skinReference, xcontext);
+                } catch (XWikiException e) {
+                    this.logger.error("Faied to get document [{}]", skinReference, e);
+
+                    return null;
+                }
+                if (!doc.isNew()) {
+                    return doc;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private BaseObject getSkinObject(String skin)
+    {
+        XWikiDocument skinDocument = getSkinDocument(skin);
+
+        return skinDocument != null ? skinDocument.getXObject(SKINCLASS_REFERENCE) : null;
+    }
+
+    private InputSource getTemplateStreamFromSkin(String skin, String template)
+    {
+        InputSource source = null;
+
+        // Try from wiki pages
+        source = getTemplateStreamFromDocumentSkin(skin, template);
+
+        // Try from filesystem skins
+        if (skin != null) {
+            InputStream stream = this.environment.getResourceAsStream("/skins/" + skin + "/" + template);
+            if (stream != null) {
+                return new DefaultInputStreamInputSource(stream, true);
+            }
+        }
+
+        return source;
+    }
+
+    private InputSource getTemplateStreamFromDocumentSkin(String skin, String template)
+    {
+        XWikiDocument skinDocument = getSkinDocument(skin);
+
+        if (skinDocument != null) {
+            // Try parsing the object property
+            BaseObject skinObject = skinDocument.getXObject(SKINCLASS_REFERENCE);
+            if (skinObject != null) {
+                String escapedTemplateName = template.replaceAll("/", ".");
+                String content = skinObject.getStringValue(escapedTemplateName);
+
+                return new StringInputSource(content);
+            }
+
+            // Try parsing a document attachment
+            XWikiAttachment attachment = skinDocument.getAttachment(template);
+            if (attachment != null) {
+                // It's impossible to know the real attachment encoding, but let's assume that they respect the
+                // standard and use UTF-8 (which is required for the files located on the filesystem)
+                try {
+                    return new DefaultInputStreamInputSource(attachment.getContentInputStream(this.xcontextProvider
+                        .get()), true);
+                } catch (XWikiException e) {
+                    this.logger.error("Faied to get attachment content [{}]", skinDocument.getDocumentReference(), e);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private InputSource getTemplateStream(String template)
+    {
+        InputSource source = null;
 
         // Try from skin
         String skin = getSkin();
         if (skin != null) {
-            stream = this.environment.getResourceAsStream("/skins/" + skin + "/" + template);
-            if (stream != null) {
-                return stream;
-            }
+            source = getTemplateStreamFromSkin(skin, template);
         }
 
         // Try from base skin
-        String baseSkin = getBaseSkin();
-        if (baseSkin != null) {
-            stream = this.environment.getResourceAsStream("/baseSkin/" + skin + "/" + template);
-            if (stream != null) {
-                return stream;
+        if (source == null) {
+            String baseSkin = getBaseSkin();
+            if (baseSkin != null) {
+                source = getTemplateStreamFromSkin(baseSkin, template);
             }
         }
 
-        String templatePath = "/templates/" + template;
+        // Try from /template/ resources
+        if (source == null) {
+            String templatePath = "/templates/" + template;
 
-        // Prevent inclusion of templates from other directories
-        template = URI.create(templatePath).normalize().toString();
-        if (!template.startsWith("/templates/")) {
-            this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!", template);
-            return null;
+            // Prevent inclusion of templates from other directories
+            template = URI.create(templatePath).normalize().toString();
+            if (!template.startsWith("/templates/")) {
+                this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!", template);
+
+                return null;
+            }
+
+            source = new DefaultInputStreamInputSource(this.environment.getResourceAsStream(templatePath), true);
         }
 
-        // Try from /templates/
-        return this.environment.getResourceAsStream(templatePath);
+        return source;
     }
 
     private StringContent getStringContent(String template) throws IOException, ParseException
     {
+        InputSource source = getTemplateStream(template);
+
+        if (source == null) {
+            return null;
+        }
+
         String content;
-        try (InputStream stream = getTemplateStream(template)) {
-            content = IOUtils.toString(stream, "UTF-8");
+        try {
+            if (source instanceof StringInputSource) {
+                content = source.toString();
+            } else if (source instanceof ReaderInputSource) {
+                content = IOUtils.toString(((ReaderInputSource) source).getReader());
+            } else if (source instanceof InputStreamInputSource) {
+                content = IOUtils.toString(((InputStreamInputSource) source).getInputStream(), "UTF-8");
+            } else {
+                // Unsupported type
+                return null;
+            }
+        } finally {
+            source.close();
         }
 
         Matcher matcher = FIRSTLINE.matcher(content);
@@ -256,7 +407,7 @@ public class WikiTemplateRenderer
         return new StringContent(content, null, Syntax.XHTML_1_0);
     }
 
-    protected String renderError(Throwable throwable, Syntax targetSyntax)
+    protected String renderError(Throwable throwable)
     {
         XDOM xdom = generateError(throwable);
 
@@ -265,7 +416,7 @@ public class WikiTemplateRenderer
         BlockRenderer blockRenderer;
         try {
             blockRenderer =
-                this.componentManagerProvider.get().getInstance(BlockRenderer.class, targetSyntax.toIdString());
+                this.componentManagerProvider.get().getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
         } catch (ComponentLookupException e) {
             blockRenderer = this.plainRenderer;
         }
@@ -295,14 +446,14 @@ public class WikiTemplateRenderer
         return new XDOM(errorBlocks);
     }
 
-    private void transform(Block block, String transformationId, Syntax targetSyntax)
+    private void transform(Block block)
     {
         TransformationContext txContext =
-            new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)), null,
-                false);
+            new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)),
+                this.renderingContext.getDefaultSyntax(), this.renderingContext.isRestricted());
 
-        txContext.setId(transformationId);
-        txContext.setTargetSyntax(targetSyntax);
+        txContext.setId(this.renderingContext.getTransformationId());
+        txContext.setTargetSyntax(getTargetSyntax());
 
         try {
             this.transformationManager.performTransformations(block, txContext);
@@ -311,28 +462,16 @@ public class WikiTemplateRenderer
         }
     }
 
-    public XDOM getXDOM(String template)
-    {
-        return getXDOM(template, this.renderingContext.getTransformationId());
-    }
-
     /**
      * @param template the template to parse
      * @return the result of the template parsing
      */
-    public XDOM getXDOM(String template, String transformationId)
+    public XDOM getXDOMNoException(String template)
     {
         XDOM xdom;
 
         try {
-            StringContent content = getStringContent(template);
-
-            if (content.sourceSyntax != null) {
-                xdom = this.parser.parse(content.content, content.sourceSyntax);
-            } else {
-                String result = evaluateString(content.content, transformationId);
-                xdom = new XDOM(Arrays.asList(new RawBlock(result, content.rawSyntax)));
-            }
+            xdom = getXDOM(template);
         } catch (Throwable e) {
             xdom = generateError(e);
         }
@@ -340,59 +479,74 @@ public class WikiTemplateRenderer
         return xdom;
     }
 
-    public String renderNoExceptions(String template, Syntax targetSyntax)
+    private XDOM getXDOM(String template) throws IOException, ParseException, MissingParserException,
+        XWikiVelocityException
+    {
+        XDOM xdom;
+
+        StringContent content = getStringContent(template);
+
+        if (content != null) {
+            if (content.sourceSyntax != null) {
+                xdom = this.parser.parse(content.content, content.sourceSyntax);
+            } else {
+                String result = evaluateString(content.content);
+                xdom = new XDOM(Arrays.asList(new RawBlock(result, content.rawSyntax)));
+            }
+        } else {
+            xdom = new XDOM(Collections.<Block> emptyList());
+        }
+
+        return xdom;
+    }
+
+    public String renderNoException(String template)
     {
         try {
-            return render(template, targetSyntax);
+            return render(template);
         } catch (Exception e) {
-            return renderError(e, targetSyntax);
+            return renderError(e);
         }
     }
 
-    public String renderNoExceptions(String template, Syntax targetSyntax, String transformationId)
+    public String render(String template) throws ComponentLookupException, IOException, ParseException,
+        MissingParserException, XWikiVelocityException
     {
-        try {
-            return render(template, targetSyntax, transformationId);
-        } catch (Exception e) {
-            return renderError(e, targetSyntax);
-        }
-    }
-
-    public String render(String template, Syntax targetSyntax) throws ComponentLookupException, ParseException,
-        MissingParserException, IOException, XWikiVelocityException
-    {
-        return render(template, targetSyntax, this.renderingContext.getTransformationId());
-    }
-
-    public String render(String template, Syntax targetSyntax, String transformationId)
-        throws ComponentLookupException, ParseException, MissingParserException, IOException, XWikiVelocityException
-    {
-        XDOM xdom = execute(template, transformationId, targetSyntax);
+        XDOM xdom = execute(template);
 
         WikiPrinter printer = new DefaultWikiPrinter();
 
         BlockRenderer blockRenderer =
-            this.componentManagerProvider.get().getInstance(BlockRenderer.class, targetSyntax.toIdString());
+            this.componentManagerProvider.get().getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
         blockRenderer.render(xdom, printer);
 
         return printer.toString();
     }
 
-    public XDOM execute(String template)
+    public XDOM executeNoException(String template)
     {
-        return execute(template, this.renderingContext.getTransformationId(), this.renderingContext.getTargetSyntax());
-    }
+        XDOM xdom;
 
-    public XDOM execute(String template, String transformationId, Syntax targetSyntax)
-    {
-        XDOM xdom = getXDOM(template, transformationId);
-
-        transform(xdom, transformationId, targetSyntax);
+        try {
+            xdom = execute(template);
+        } catch (Throwable e) {
+            xdom = generateError(e);
+        }
 
         return xdom;
     }
 
-    protected String evaluateString(String content, String transformationId) throws XWikiVelocityException
+    public XDOM execute(String template) throws IOException, ParseException, MissingParserException,
+        XWikiVelocityException
+    {
+        XDOM xdom = getXDOM(template);
+
+        transform(xdom);
+
+        return xdom;
+    }
+
+    protected String evaluateString(String content) throws XWikiVelocityException
     {
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
 
@@ -400,7 +554,7 @@ public class WikiTemplateRenderer
 
         // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally
         // by Velocity as a cache index key for caching macros.
-        String namespace = transformationId;
+        String namespace = this.renderingContext.getTransformationId();
         if (namespace == null) {
             namespace = "unknown namespace";
         }
@@ -415,5 +569,12 @@ public class WikiTemplateRenderer
         }
 
         return writer.toString();
+    }
+
+    private Syntax getTargetSyntax()
+    {
+        Syntax targetSyntax = this.renderingContext.getTargetSyntax();
+
+        return targetSyntax != null ? targetSyntax : Syntax.PLAIN_1_0;
     }
 }

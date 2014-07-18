@@ -116,6 +116,6 @@ public abstract class AbstractDistributionStep implements DistributionStep
     @Override
     public Block execute()
     {
-        return this.renderer.execute(getTemplate());
+        return this.renderer.executeNoException(getTemplate());
     }
 }

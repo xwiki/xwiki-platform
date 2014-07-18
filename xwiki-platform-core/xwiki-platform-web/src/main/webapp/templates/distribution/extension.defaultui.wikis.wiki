@@ -1,6 +1,6 @@
 ##source.syntax=xwiki/2.1
-{{template name="extension.vm"/}}
-{{template name="distribution/macros.vm"/}}
+{{template name="extension.vm output="false""/}}
+{{template name="distribution/macros.vm output="false""/}}
 
 {{velocity}}
 #if ("$!request.action" == '')

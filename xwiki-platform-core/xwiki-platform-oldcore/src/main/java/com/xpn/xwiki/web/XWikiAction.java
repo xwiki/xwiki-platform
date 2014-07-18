@@ -52,8 +52,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.internal.parser.MissingParserException;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.resource.NotFoundResourceHandlerException;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandler;
@@ -479,7 +481,24 @@ public abstract class XWikiAction extends Action
     private void renderInit(XWikiContext xcontext) throws IOException, ComponentLookupException, ParseException,
         MissingParserException, XWikiVelocityException
     {
-        String content = Utils.getComponent(WikiTemplateRenderer.class).render("init.vm", Syntax.XHTML_1_0, "init");
+        RenderingContext renderingContext = Utils.getComponent(RenderingContext.class);
+        MutableRenderingContext mutableRenderingContext =
+            renderingContext instanceof MutableRenderingContext ? (MutableRenderingContext) renderingContext : null;
+
+        if (mutableRenderingContext != null) {
+            mutableRenderingContext.push(renderingContext.getTransformation(), renderingContext.getXDOM(),
+                renderingContext.getDefaultSyntax(), "init.vm", renderingContext.isRestricted(),
+                Syntax.XHTML_1_0);
+        }
+
+        String content;
+        try {
+            content = Utils.getComponent(WikiTemplateRenderer.class).render("init.vm");
+        } finally {
+            if (mutableRenderingContext != null) {
+                mutableRenderingContext.pop();
+            }
+        }
 
         xcontext.getResponse().setStatus(503);
         xcontext.getResponse().setContentType("text/html; charset=UTF-8");

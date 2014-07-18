@@ -1,9 +1,24 @@
+#set($jobstatus = $xwiki.jobStatus)
+#set($errors = $jobstatus.log.getLogsFrom('ERROR'))
+#set($hasErrors = !$errors.isEmpty())
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
-    <title>XWiki is loading...</title>
-    <meta http-equiv="refresh" content="1"/>
+    #if ($jobstatus.state.name() != 'FINISHED')
+      #set($percent = 0)
+      #if ($jobstatus)
+        #set($percent = $jobstatus.progress.offset * 100)
+        #set($percent = $percent.intValue())
+      #end
+      <title>$services.localization.render('platform.web.init.message.intializing', $percent)</title>
+      <meta http-equiv="refresh" content="1"/>
+    #elseif ($hasErrors)
+      <title>$services.localization.render('platform.web.init.message.intializationFailure')</title>
+    #else
+      <title>$services.localization.render('platform.web.init.message.intializationSuccess')</title>
+      <meta http-equiv="refresh" content="1"/>
+    #end
     <style type="text/css">
       body{
         background-color: gray;
@@ -12,7 +27,7 @@
       }
       #content{
         margin: 1em auto;
-        width: 800px;
+        width: 80%;
         color: #4D4D4D;
         border: 1px solid #E8E8E8;
         background-color: #FFF;
@@ -20,17 +35,83 @@
         box-shadow: 0px 0px 7px #E8E8E8;
         padding: 1em;
       }
+
+      ul.log {
+        list-style-type: none;
+        margin: .5em 0 0;
+      }
+      ul.log li:hover {
+        background-color: $theme.highlightColor;
+      }
+      .log-item {
+        background: transparent none no-repeat left;
+        padding: 0.3em 0 0.3em 20px;
+        position: relative;
+      }
+      .log-item > div {
+        line-height: 1.4em;
+      }
+      .log-item {
+        background-position: left .3em;
+      }
+      .log-item-loading {
+        background-image: url("/xwiki/resources/icons/xwiki/spinner.gif");
+        color: #336699;
+      }
+      .log-item-trace {
+        background-image: url("/xwiki/resources/icons/silk/bug.png");
+        color: #336699;
+      }
+      .log-item-debug {
+        background-image: url("/xwiki/resources/icons/silk/bug.png");
+        color: #336699;
+      }
+      .log-item-info {
+        background-image: url("/xwiki/resources/icons/silk/information.png");
+        color: #336699;
+      }
+      .log-item-warn {
+        background-image: url("/xwiki/resources/icons/silk/error.png");
+        color: #D09000;
+      }
+      .log-item-error {
+        background-image: url("/xwiki/resources/icons/silk/exclamation.png");
+        color: #CC3333;
+      }
+      .log-item .stacktrace {
+        white-space: pre;
+      }
     </style>
+
+    <script type='text/javascript' src='/xwiki/resources/js/amd/require.js'></script>
+    <script type='text/javascript' src='/xwiki/resources/uicomponents/logging/logging.js'></script>
+    <script type="text/javascript">
+    // <![CDATA[
+      require.config({
+        baseUrl: '/',
+          paths: { 'jquery': "/xwiki/resources/js/amd/jquery" },
+        map: {
+          '*': { 'jquery': 'jQueryNoConflict' },
+          'jQueryNoConflict': { 'jquery': 'jquery' }
+        }
+      });
+    define('jQueryNoConflict', ['jquery'], function($) { $.noConflict(); return $; });
+    // ]]>
+    </script>
   </head>
   <body>
     <div id="content">
-      #set($percent = 0)
-      #set($jobstatus = $xwiki.jobStatus)
-      #if ($jobstatus)
-        #set($percent = $jobstatus.progress.offset * 100)
-        #set($percent = $percent.intValue())
+      #if ($jobstatus.state.name() != 'FINISHED')
+        <p>$services.localization.render('platform.web.init.message.intializing', $percent)</p>
+      #else
+        #if ($hasErrors)
+          <p>$services.localization.render('platform.web.init.message.intializationFailure')<p>
+        #else
+          <p>$services.localization.render('platform.web.init.message.intializationSuccess')</p>
+        #end
+        $services.template.execute('logging_macros.vm')
+        #printLogs($jobstatus.log)
       #end
-      <p>XWiki is initializing ($percent%)...</p>
     </div>
   </body>
 </html>

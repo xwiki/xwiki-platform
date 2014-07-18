@@ -5214,6 +5214,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * @since 6.2M1
+     */
+    public String getStringValue(EntityReference classReference, String fieldName)
+    {
+        return getStringValue(resolveClassReference(classReference), fieldName);
+    }
+
+    /**
      * @since 2.2M2
      */
     public String getStringValue(DocumentReference classReference, String fieldName)

@@ -215,7 +215,7 @@ q947knSRPDh79ly9lbE8P66vAn7JAG95wO4cdBf4AF7C4F/faBX0ldtYE2zQMegLnGQV7EsP/Jab
 tPp47F+8TV7tglXQV7dfgO3/CzAA45CQwcpUSW8AAAAASUVORK5CYII=
 </content>
   </attachment>
-  <content>{{template name="extension.vm"/}}
+  <content>{{template name="extension.vm" output="false"/}}
 
 {{velocity}}
 {{html}}

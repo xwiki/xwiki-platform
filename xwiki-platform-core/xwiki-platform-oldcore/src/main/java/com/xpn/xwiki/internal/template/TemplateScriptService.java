@@ -21,44 +21,56 @@ package com.xpn.xwiki.internal.template;
 
 import groovy.lang.Singleton;
 
+import java.io.IOException;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.internal.parser.MissingParserException;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Internal helper to manipulate wiki based templates from scripts.
  * 
  * @version $Id$
- * @since 6.1RC1
+ * @since 6.2M1
  */
 @Component
+@Named("template")
 @Singleton
 public class TemplateScriptService implements ScriptService
 {
+    @Inject
     private WikiTemplateRenderer renderer;
 
     /**
      * Execute and render passed template.
+     * <p>
+     * The current transformation id is used.
      * 
      * @param template the template name
      * @param targetSyntax the syntax in which to render the template
      * @return the result of the template execution and rendering
      */
-    public String render(String template, Syntax targetSyntax)
+    public String render(String template)
     {
-        return this.renderer.renderNoExceptions(template, targetSyntax);
+        return this.renderer.renderNoException(template);
     }
 
     /**
-     * Execute and render passed template.
+     * Execute and passed template.
+     * <p>
+     * The current transformation id is used.
      * 
      * @param template the template name
-     * @param targetSyntax the syntax in which to render the template
      * @param transformationId the identifier of the transformation
      * @return the result of the template execution and rendering
      */
-    public String render(String template, Syntax targetSyntax, String transformationId)
+    public void execute(String template) throws Exception
     {
-        return this.renderer.renderNoExceptions(template, targetSyntax, transformationId);
+        this.renderer.execute(template);
     }
 }

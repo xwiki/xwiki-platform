@@ -19,16 +19,11 @@
  */
 package com.xpn.xwiki.internal;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.IOUtils;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.Request;
@@ -36,11 +31,8 @@ import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
-import com.xpn.xwiki.web.XWikiEngineContext;
 
 /**
  * Job dedicated to XWiki initialization.
@@ -118,10 +110,7 @@ public class XWikiInitializerJob extends AbstractJob<XWikiInitializerRequest, XW
         this.progressManager.pushLevelProgress(2, this);
 
         try {
-            String xwikiname = XWiki.DEFAULT_MAIN_WIKI;
-
             XWikiContext xcontext = this.xcontextProvider.get();
-            XWikiEngineContext econtext = xcontext.getEngineContext();
 
             XWiki xwiki = new XWiki(xcontext, xcontext.getEngineContext(), true);
 
@@ -138,7 +127,7 @@ public class XWikiInitializerJob extends AbstractJob<XWikiInitializerRequest, XW
             this.observation.notify(new ApplicationReadyEvent(), xwiki, xcontext);
 
             // Make XWiki class available to others (among other things it unlock page loading)
-            econtext.setAttribute(xwikiname, xwiki);
+            xcontext.getEngineContext().setAttribute(XWiki.DEFAULT_MAIN_WIKI, xwiki);
         } finally {
             this.progressManager.popLevelProgress(this);
         }
@@ -150,72 +139,5 @@ public class XWikiInitializerJob extends AbstractJob<XWikiInitializerRequest, XW
         super.jobFinished(exception);
 
         this.thread = null;
-    }
-
-    /**
-     * First try to find the configuration file pointed by the passed location as a file. If it does not exist or if the
-     * file cannot be read (for example if the security manager doesn't allow it), then try to load the file as a
-     * resource using the Servlet Context and failing that from the classpath.
-     * 
-     * @param configurationLocation the location where the XWiki configuration file is located (either an absolute or
-     *            relative file path or a resource location)
-     * @return the configuration data
-     * @todo this code should be moved to a Configuration class proper
-     */
-    private XWikiConfig readXWikiConfiguration(String configurationLocation, XWikiEngineContext econtext,
-        XWikiContext xcontext)
-    {
-        InputStream xwikicfgis = null;
-
-        // First try loading from a file.
-        File f = new File(configurationLocation);
-        try {
-            if (f.exists()) {
-                xwikicfgis = new FileInputStream(f);
-            }
-        } catch (Exception e) {
-            // Error loading the file. Most likely, the Security Manager prevented it.
-            // We'll try loading it as a resource below.
-            this.logger.debug("Failed to load the file [" + configurationLocation + "] using direct "
-                + "file access. The error was [" + e.getMessage() + "]. Trying to load it "
-                + "as a resource using the Servlet Context...");
-        }
-
-        // Second, try loading it as a resource using the Servlet Context
-        if (xwikicfgis == null) {
-            xwikicfgis = econtext.getResourceAsStream(configurationLocation);
-            this.logger.debug("Failed to load the resource [" + configurationLocation + "] as a resource "
-                + "using the Servlet Context. Trying to load it as classpath resource...");
-        }
-
-        // Third, try loading it from the classloader used to load this current class
-        if (xwikicfgis == null) {
-            // TODO: Verify if checking on MODE_GWT is correct. I think we should only check for
-            // the debug mode and even for that we need to find some better way of doing it so
-            // that we don't have hardcoded code only for development debugging purposes.
-            if (xcontext.getMode() == XWikiContext.MODE_GWT || xcontext.getMode() == XWikiContext.MODE_GWT_DEBUG) {
-                xwikicfgis = XWiki.class.getClassLoader().getResourceAsStream("xwiki-gwt.cfg");
-            } else {
-                xwikicfgis = XWiki.class.getClassLoader().getResourceAsStream("xwiki.cfg");
-            }
-        }
-
-        if (xwikicfgis == null) {
-            this.logger.warn("Failed to load the configuration [" + configurationLocation + "] using any method.");
-
-            return null;
-        }
-
-        XWikiConfig config;
-        try {
-            config = new XWikiConfig(xwikicfgis);
-        } catch (XWikiException e) {
-            this.logger.error("Failed to load configuration [{}]", configurationLocation, e);
-            config = new XWikiConfig();
-        } finally {
-            IOUtils.closeQuietly(xwikicfgis);
-        }
-
-        return config;
     }
 }

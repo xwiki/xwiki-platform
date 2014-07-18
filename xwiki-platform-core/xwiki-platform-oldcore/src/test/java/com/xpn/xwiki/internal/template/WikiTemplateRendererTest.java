@@ -39,11 +39,14 @@ import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.parser.MissingParserException;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -64,8 +67,6 @@ public class WikiTemplateRendererTest
 
     private VelocityEngine velocityEngineMock;
 
-    private RenderingConfiguration renderingConfigurationMock;
-
     @Before
     public void before() throws XWikiVelocityException
     {
@@ -80,7 +81,6 @@ public class WikiTemplateRendererTest
     {
         this.environmentmMock = this.mocker.registerMockComponent(Environment.class);
         this.velocityManagerMock = this.mocker.registerMockComponent(VelocityManager.class);
-        this.renderingConfigurationMock = this.mocker.registerMockComponent(RenderingConfiguration.class);
     }
 
     private void setTemplateContent(String content) throws UnsupportedEncodingException
@@ -92,8 +92,7 @@ public class WikiTemplateRendererTest
     // Tests
 
     @Test
-    public void testRender() throws ComponentLookupException, ParseException, MissingParserException, IOException,
-        XWikiVelocityException
+    public void testRender() throws Exception
     {
         when(
             this.velocityEngineMock.evaluate(Matchers.<Context> any(), Matchers.<Writer> any(), anyString(),
@@ -110,9 +109,9 @@ public class WikiTemplateRendererTest
             }
         });
 
-        setTemplateContent("##raw.syntax=xhtml/1.0\n<html>$toto</html>");
+        setTemplateContent("##raw.syntax=plain/1.0\n<html>$toto</html>");
 
-        assertEquals("<html>value</html>", mocker.getComponentUnderTest().render("template", Syntax.XHTML_1_0));
+        assertEquals("<html>value</html>", mocker.getComponentUnderTest().render("template"));
     }
 
     @Test
@@ -136,6 +135,10 @@ public class WikiTemplateRendererTest
 
         setTemplateContent("<html>$toto</html>");
 
-        assertEquals("<html>value</html>", mocker.getComponentUnderTest().render("template", Syntax.XHTML_1_0));
+        this.mocker.<Execution> getInstance(Execution.class).pushContext(new ExecutionContext());
+        ((MutableRenderingContext) this.mocker.getInstance(RenderingContext.class)).push(null, null, null, null, false,
+            Syntax.XHTML_1_0);
+
+        assertEquals("<html>value</html>", mocker.getComponentUnderTest().render("template"));
     }
 }

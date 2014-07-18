@@ -299,7 +299,7 @@ XWiki.ExtensionBehaviour = Class.create({
       var progressMenu = new Element('a', {href: '#' + progressSectionAnchor}).update(progressMenuLabel);
       this._enhanceMenuItemBehaviour(progressMenu);
       this.container.down('.innerMenu').insert(new Element('li').insert(progressMenu));
-    } else if (progressSection.down('.job-log-item-loading')) {
+    } else if (progressSection.down('.log-item-loading')) {
       // Just hide the question that has been answered if there is any progress item loading.
       progressSection.down('.extension-question').hide();
     } else {
@@ -469,23 +469,9 @@ XWiki.ExtensionBehaviour = Class.create({
    * Enhances the behaviour of the Progress section within the extension details.
    */
   _enhanceProgressBehaviour : function() {
-    // Toggle stacktrace display in job log.
-    this.container.select('.job-log-item').each(function (logItem) {
-      var stacktrace = logItem.down('.stacktrace');
-      if (stacktrace) {
-        // Hide the stacktrace by default.
-        stacktrace.toggle();
-        // Show the stacktrace when the log message is clicked.
-        var logMessage = logItem.down('div');
-        logMessage.setStyle({"cursor": "pointer"});
-        logMessage.observe('click', function() {
-          stacktrace.toggle();
-        });
-      }
-    });
     // Scroll the progress log to the end if it has a loading item.
     // TODO: Preserve the scroll position if the user scrolls through the log.
-    var loadingLogItem = this.container.down('.job-log-item-loading');
+    var loadingLogItem = this.container.down('.log-item-loading');
     if (loadingLogItem) {
       var log = loadingLogItem.up();
       log.scrollTop = log.scrollHeight;
@@ -725,7 +711,7 @@ require(['jquery'], function($) {
       // FIXME: We're using Prototype.js API for now to fire the event.
       document.fire('xwiki:dom:updated', {elements: [this]});
     });
-    container.children('.extension-body-progress').find('.job-log-item-loading').each(function() {
+    container.children('.extension-body-progress').find('.log-item-loading').each(function() {
       // Scroll the progress log to the end if it has a loading item.
       // TODO: Preserve the scroll position if the user scrolls through the log.
       this.parentNode.scrollTop = this.parentNode.scrollHeight;

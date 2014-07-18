@@ -275,6 +275,7 @@ public class WikiTemplateRenderer
         return skinDocument != null ? skinDocument.getXObject(SKINCLASS_REFERENCE) : null;
     }
 
+    @SuppressWarnings("resource")
     private InputSource getTemplateStreamFromSkin(String skin, String template)
     {
         InputSource source = null;
@@ -324,6 +325,7 @@ public class WikiTemplateRenderer
         return null;
     }
 
+    @SuppressWarnings("resource")
     private InputSource getTemplateStream(String template)
     {
         InputSource source = null;
@@ -347,9 +349,9 @@ public class WikiTemplateRenderer
             String templatePath = "/templates/" + template;
 
             // Prevent inclusion of templates from other directories
-            template = URI.create(templatePath).normalize().toString();
-            if (!template.startsWith("/templates/")) {
-                this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!", template);
+            String normalizedTemplate = URI.create(templatePath).normalize().toString();
+            if (!normalizedTemplate.startsWith("/templates/")) {
+                this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!", normalizedTemplate);
 
                 return null;
             }
@@ -407,7 +409,7 @@ public class WikiTemplateRenderer
         return new StringContent(content, null, Syntax.XHTML_1_0);
     }
 
-    protected String renderError(Throwable throwable)
+    private String renderError(Throwable throwable)
     {
         XDOM xdom = generateError(throwable);
 
@@ -426,7 +428,7 @@ public class WikiTemplateRenderer
         return printer.toString();
     }
 
-    protected XDOM generateError(Throwable throwable)
+    private XDOM generateError(Throwable throwable)
     {
         List<Block> errorBlocks = new ArrayList<Block>();
 
@@ -479,12 +481,10 @@ public class WikiTemplateRenderer
         return xdom;
     }
 
-    private XDOM getXDOM(String template) throws IOException, ParseException, MissingParserException,
+    private XDOM getXDOM(StringContent content) throws ParseException, MissingParserException,
         XWikiVelocityException
     {
         XDOM xdom;
-
-        StringContent content = getStringContent(template);
 
         if (content != null) {
             if (content.sourceSyntax != null) {
@@ -498,6 +498,14 @@ public class WikiTemplateRenderer
         }
 
         return xdom;
+    }
+
+    public XDOM getXDOM(String template) throws IOException, ParseException, MissingParserException,
+        XWikiVelocityException
+    {
+        StringContent content = getStringContent(template);
+
+        return getXDOM(content);
     }
 
     public String renderNoException(String template)
@@ -516,14 +524,13 @@ public class WikiTemplateRenderer
 
         if (content != null) {
             if (content.sourceSyntax != null) {
-                XDOM xdom = this.parser.parse(content.content, content.sourceSyntax);
-
-                transform(xdom);
+                XDOM xdom = execute(content);
 
                 WikiPrinter printer = new DefaultWikiPrinter();
 
                 BlockRenderer blockRenderer =
-                    this.componentManagerProvider.get().getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
+                    this.componentManagerProvider.get()
+                        .getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
                 blockRenderer.render(xdom, printer);
 
                 return printer.toString();
@@ -548,17 +555,25 @@ public class WikiTemplateRenderer
         return xdom;
     }
 
-    public XDOM execute(String template) throws IOException, ParseException, MissingParserException,
+    private XDOM execute(StringContent content) throws ParseException, MissingParserException,
         XWikiVelocityException
     {
-        XDOM xdom = getXDOM(template);
+        XDOM xdom = getXDOM(content);
 
         transform(xdom);
 
         return xdom;
     }
 
-    protected String evaluateString(String content) throws XWikiVelocityException
+    public XDOM execute(String template) throws IOException, ParseException, MissingParserException,
+        XWikiVelocityException
+    {
+        StringContent content = getStringContent(template);
+
+        return execute(content);
+    }
+
+    private String evaluateString(String content) throws XWikiVelocityException
     {
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
 

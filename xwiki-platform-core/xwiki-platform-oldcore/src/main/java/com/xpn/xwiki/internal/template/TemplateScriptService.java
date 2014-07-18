@@ -21,16 +21,11 @@ package com.xpn.xwiki.internal.template;
 
 import groovy.lang.Singleton;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.internal.parser.MissingParserException;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Internal helper to manipulate wiki based templates from scripts.

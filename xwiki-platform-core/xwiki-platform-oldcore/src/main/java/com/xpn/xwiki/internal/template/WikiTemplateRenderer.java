@@ -518,11 +518,12 @@ public class WikiTemplateRenderer
             if (content.sourceSyntax != null) {
                 XDOM xdom = this.parser.parse(content.content, content.sourceSyntax);
 
+                transform(xdom);
+
                 WikiPrinter printer = new DefaultWikiPrinter();
 
                 BlockRenderer blockRenderer =
-                    this.componentManagerProvider.get()
-                        .getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
+                    this.componentManagerProvider.get().getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
                 blockRenderer.render(xdom, printer);
 
                 return printer.toString();

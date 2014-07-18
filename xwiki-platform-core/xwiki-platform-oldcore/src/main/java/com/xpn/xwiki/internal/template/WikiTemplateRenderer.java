@@ -512,15 +512,26 @@ public class WikiTemplateRenderer
     public String render(String template) throws ComponentLookupException, IOException, ParseException,
         MissingParserException, XWikiVelocityException
     {
-        XDOM xdom = execute(template);
+        StringContent content = getStringContent(template);
 
-        WikiPrinter printer = new DefaultWikiPrinter();
+        if (content != null) {
+            if (content.sourceSyntax != null) {
+                XDOM xdom = this.parser.parse(content.content, content.sourceSyntax);
 
-        BlockRenderer blockRenderer =
-            this.componentManagerProvider.get().getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
-        blockRenderer.render(xdom, printer);
+                WikiPrinter printer = new DefaultWikiPrinter();
 
-        return printer.toString();
+                BlockRenderer blockRenderer =
+                    this.componentManagerProvider.get()
+                        .getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
+                blockRenderer.render(xdom, printer);
+
+                return printer.toString();
+            } else {
+                return evaluateString(content.content);
+            }
+        } else {
+            return "";
+        }
     }
 
     public XDOM executeNoException(String template)

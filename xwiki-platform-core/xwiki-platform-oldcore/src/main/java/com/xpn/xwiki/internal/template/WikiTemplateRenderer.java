@@ -82,6 +82,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 
 /**
  * Internal toolkit to experiment on wiki bases templates.
@@ -304,9 +305,13 @@ public class WikiTemplateRenderer
             BaseObject skinObject = skinDocument.getXObject(SKINCLASS_REFERENCE);
             if (skinObject != null) {
                 String escapedTemplateName = template.replaceAll("/", ".");
-                String content = skinObject.getStringValue(escapedTemplateName);
-
-                return new StringInputSource(content);
+                BaseProperty templateProperty = (BaseProperty) skinObject.safeget(escapedTemplateName);
+                if (templateProperty != null) {
+                    Object value = templateProperty.getValue();
+                    if (value instanceof String && StringUtils.isNotEmpty((String) value)) {
+                        return new StringInputSource((String) value);
+                    }
+                }
             }
 
             // Try parsing a document attachment

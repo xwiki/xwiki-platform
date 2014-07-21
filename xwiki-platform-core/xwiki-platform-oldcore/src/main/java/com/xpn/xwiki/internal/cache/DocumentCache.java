@@ -79,6 +79,11 @@ public interface DocumentCache<C>
     void removeAll();
 
     /**
+     * Remove all the entries the cache contains for specified document
+     */
+    void removeAll(DocumentReference documentReference);
+
+    /**
      * Release all the resources this cache use.
      */
     void dispose();

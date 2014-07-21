@@ -53,4 +53,11 @@ public interface RenderingCache
      */
     void setRenderedContent(DocumentReference documentReference, String source, String renderedContent,
         XWikiContext context);
+
+    /**
+     * Flushes rendering cache (all cached variants) for specified document.
+     *
+     * @param documentReference the reference of the document for flushing rendering cache
+     */
+    void flushCache(DocumentReference documentReference);
 }

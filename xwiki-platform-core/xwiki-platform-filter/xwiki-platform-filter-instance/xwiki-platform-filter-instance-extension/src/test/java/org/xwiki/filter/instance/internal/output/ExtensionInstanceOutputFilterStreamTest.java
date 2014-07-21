@@ -19,16 +19,18 @@
  */
 package org.xwiki.filter.instance.internal.output;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.text.ParseException;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.ExtensionRepositoryManager;
@@ -74,7 +76,7 @@ public class ExtensionInstanceOutputFilterStreamTest
     {
         this.extensionRepositoryMock =
             this.repositoryUtil.getComponentManager().registerMockComponent(ExtensionRepositoryManager.class);
-        Mockito.doThrow(ResolveException.class).when(this.extensionRepositoryMock).resolve(Mockito.<ExtensionId> any());
+        doThrow(ResolveException.class).when(this.extensionRepositoryMock).resolve((ExtensionId) any());
     }
 
     // Tests
@@ -132,13 +134,12 @@ public class ExtensionInstanceOutputFilterStreamTest
     // tests
 
     @Test
-    public void testImportExtensionId() throws FilterException, ParseException, ResolveException,
-        UnsupportedEncodingException
+    public void testImportExtensionId() throws FilterException, ResolveException, UnsupportedEncodingException
     {
-        Mockito.doReturn(new EmptyExtension(new ExtensionId("extensionid1", "version1"), "test"))
-            .when(this.extensionRepositoryMock).resolve(new ExtensionId("extensionid1", "version1"));
-        Mockito.doReturn(new EmptyExtension(new ExtensionId("extensionid2", "version2"), "test"))
-            .when(this.extensionRepositoryMock).resolve(new ExtensionId("extensionid2", "version2"));
+        doReturn(new EmptyExtension(new ExtensionId("extensionid1", "version1"), "test")).when(
+            this.extensionRepositoryMock).resolve(new ExtensionId("extensionid1", "version1"));
+        doReturn(new EmptyExtension(new ExtensionId("extensionid2", "version2"), "test")).when(
+            this.extensionRepositoryMock).resolve(new ExtensionId("extensionid2", "version2"));
 
         importFromXML("extensionid");
 
@@ -156,11 +157,11 @@ public class ExtensionInstanceOutputFilterStreamTest
     }
 
     @Test
-    public void testImportExtensionIdWithoutNamespace() throws FilterException, ParseException, ResolveException,
+    public void testImportExtensionIdWithoutNamespace() throws FilterException, ResolveException,
         UnsupportedEncodingException
     {
-        Mockito.doReturn(new EmptyExtension(new ExtensionId("extensionid", "version"), "test"))
-            .when(this.extensionRepositoryMock).resolve(new ExtensionId("extensionid", "version"));
+        doReturn(new EmptyExtension(new ExtensionId("extensionid", "version"), "test")).when(
+            this.extensionRepositoryMock).resolve(new ExtensionId("extensionid", "version"));
 
         importFromXML("extensionidwithoutnamespace");
 

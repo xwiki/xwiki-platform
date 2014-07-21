@@ -324,8 +324,10 @@ public class ImportAction extends XWikiAction
             xarFilterStream.close();
             instanceFilterStream.close();
         } finally {
-            // Stop isolating log
-            loggerManager.popLogListener();
+            if (loggerManager != null) {
+                // Stop isolating log
+                loggerManager.popLogListener();
+            }
 
             // Close the input source
             source.close();

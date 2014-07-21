@@ -363,7 +363,10 @@ public class WikiTemplateRenderer
                 return null;
             }
 
-            source = new DefaultInputStreamInputSource(this.environment.getResourceAsStream(templatePath), true);
+            InputStream inputStream = this.environment.getResourceAsStream(templatePath);
+            if (inputStream != null) {
+                source = new DefaultInputStreamInputSource(inputStream, true);
+            }
         }
 
         return source;

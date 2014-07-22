@@ -41,7 +41,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <content>Песочница - часть вики, где вы можете потренироваться в редактировании страниц. Здесь можно узнать как работает создание новых страниц и редактирование существующих. Чтобы начать редактирование, просто нажмите на ссылку "Правка".
 

@@ -75,6 +75,11 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
     @Inject
     private Container container;
 
+    /**
+     * Used to determine the Content Type of the requested resource files.
+     */
+    private Tika tika = new Tika();
+
     @Override
     public List<EntityResourceAction> getSupportedResourceReferences()
     {
@@ -92,7 +97,7 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
 
         if (resourceStream != null) {
             try {
-                this.container.getResponse().setContentType(new Tika().detect(resourceStream, resourceName));
+                this.container.getResponse().setContentType(tika.detect(resourceStream, resourceName));
                 IOUtils.copy(resourceStream, this.container.getResponse().getOutputStream());
             } catch (IOException e) {
                 throw new ResourceReferenceHandlerException(

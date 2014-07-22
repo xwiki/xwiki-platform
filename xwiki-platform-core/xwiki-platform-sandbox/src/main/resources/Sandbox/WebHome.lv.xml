@@ -41,7 +41,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <content>Smilšu kaste ir viki vieta, kuru jūs varat brīvi mainīt. Jūs šeit varat mācīties un mēģināt. Jūs varat pārbaudīt, kā tiek rediģēti esošie dokumenti, un kā var veidot jaunas lapas. Lai sāktu, spiediet **Rediģēt**! {{info}}Neuztraucieties par satura zaudēšanu šajā lapā, jo jūs vienmēr varat atritināt saturu uz iepriekšējo versiju, "Vēsture" cilnē lapas apakšā.{{/info}} Ja vēlaties izpētīt [[XWiki sintaksi&gt;&gt;XWiki.XWikiSyntax]], aktivizējiet izvēlni "Rādīt" "Viki kodu", vai izvēlieties "Kods" cilni, lapas rediģēšanas režīmā.
 

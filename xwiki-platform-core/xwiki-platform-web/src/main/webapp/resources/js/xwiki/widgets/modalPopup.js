@@ -192,16 +192,8 @@ widgets.ModalPopup = Class.create({
   registerShortcuts : function(action) {
     var shortcuts = this.shortcuts[action].keys;
     var method = this.shortcuts[action].method.bindAsEventListener(this, action);
-    var type = 'keypress';
-    if ((Prototype.Browser.IE && !window.addEventListener) || Prototype.Browser.WebKit) {
-      // Old IE or WebKit-based.
-      type = 'keyup';
-    } else if (Prototype.Browser.IE) {
-      // New IE
-      type = 'keydown';
-    }
     for (var i = 0; i < shortcuts.size(); ++i) {
-      shortcut.add(shortcuts[i], method, {type: type});
+      shortcut.add(shortcuts[i], method);
     }
   },
   /**

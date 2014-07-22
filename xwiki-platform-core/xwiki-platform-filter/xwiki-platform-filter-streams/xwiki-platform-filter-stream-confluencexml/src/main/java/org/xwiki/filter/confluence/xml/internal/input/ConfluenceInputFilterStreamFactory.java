@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.confluence.input.ConfluenceInputProperties;
 import org.xwiki.filter.confluence.xml.internal.ConfluenceFilter;
-import org.xwiki.filter.internal.input.AbstractBeanInputFilterStreamFactory;
+import org.xwiki.filter.input.AbstractBeanInputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
 
 /**

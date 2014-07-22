@@ -37,7 +37,7 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
-import org.xwiki.filter.internal.output.AbstractBeanOutputFilterStream;
+import org.xwiki.filter.output.AbstractBeanOutputFilterStream;
 import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;

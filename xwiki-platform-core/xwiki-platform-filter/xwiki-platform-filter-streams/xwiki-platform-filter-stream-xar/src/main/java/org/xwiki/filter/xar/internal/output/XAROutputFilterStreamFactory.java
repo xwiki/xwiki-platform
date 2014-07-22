@@ -23,7 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.filter.internal.output.AbstractBeanOutputFilterStreamFactory;
+import org.xwiki.filter.output.AbstractBeanOutputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.internal.XARFilter;
 import org.xwiki.filter.xar.internal.XARFilterUtils;

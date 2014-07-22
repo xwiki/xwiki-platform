@@ -21,7 +21,7 @@ package org.xwiki.filter.instance.internal.output;
 
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.filter.instance.output.OutputInstanceFilterStreamFactory;
-import org.xwiki.filter.internal.output.AbstractBeanOutputFilterStreamFactory;
+import org.xwiki.filter.output.AbstractBeanOutputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
 
 /**

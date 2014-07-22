@@ -47,7 +47,7 @@ import org.xwiki.filter.event.model.WikiAttachmentFilter;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.event.user.GroupFilter;
 import org.xwiki.filter.event.user.UserFilter;
-import org.xwiki.filter.internal.input.AbstractBeanInputFilterStream;
+import org.xwiki.filter.input.AbstractBeanInputFilterStream;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.syntax.Syntax;

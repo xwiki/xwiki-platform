@@ -40,7 +40,7 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.extension.ExtensionFilter;
 import org.xwiki.filter.event.model.WikiFilter;
-import org.xwiki.filter.internal.output.AbstractBeanOutputFilterStream;
+import org.xwiki.filter.output.AbstractBeanOutputFilterStream;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.EntityReference;

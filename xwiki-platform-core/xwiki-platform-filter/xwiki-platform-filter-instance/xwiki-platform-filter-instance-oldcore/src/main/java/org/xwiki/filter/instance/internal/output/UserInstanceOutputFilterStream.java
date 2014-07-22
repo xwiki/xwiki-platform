@@ -39,7 +39,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.user.UserFilter;
-import org.xwiki.filter.internal.output.AbstractBeanOutputFilterStream;
+import org.xwiki.filter.output.AbstractBeanOutputFilterStream;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;

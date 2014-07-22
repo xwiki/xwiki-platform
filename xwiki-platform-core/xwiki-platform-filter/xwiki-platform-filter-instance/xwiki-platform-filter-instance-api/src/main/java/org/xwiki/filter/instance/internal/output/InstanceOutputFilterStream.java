@@ -36,7 +36,7 @@ import org.xwiki.filter.FilterException;
 import org.xwiki.filter.instance.internal.InstanceUtils;
 import org.xwiki.filter.instance.output.InstanceOutputProperties;
 import org.xwiki.filter.instance.output.OutputInstanceFilterStreamFactory;
-import org.xwiki.filter.internal.output.AbstractBeanOutputFilterStream;
+import org.xwiki.filter.output.AbstractBeanOutputFilterStream;
 
 /**
  * @version $Id$

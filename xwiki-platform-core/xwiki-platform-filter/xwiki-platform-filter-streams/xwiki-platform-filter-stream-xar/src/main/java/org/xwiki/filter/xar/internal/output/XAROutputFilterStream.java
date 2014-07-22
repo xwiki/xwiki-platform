@@ -41,7 +41,7 @@ import org.xwiki.filter.event.model.WikiClassFilter;
 import org.xwiki.filter.event.model.WikiObjectFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiAttachmentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
-import org.xwiki.filter.internal.output.AbstractBeanOutputFilterStream;
+import org.xwiki.filter.output.AbstractBeanOutputFilterStream;
 import org.xwiki.filter.output.WriterOutputTarget;
 import org.xwiki.filter.xar.internal.XARAttachmentModel;
 import org.xwiki.filter.xar.internal.XARClassModel;

@@ -39,7 +39,7 @@ import org.xwiki.filter.descriptor.FilterStreamDescriptor;
 import org.xwiki.filter.instance.internal.InstanceUtils;
 import org.xwiki.filter.instance.output.InstanceOutputProperties;
 import org.xwiki.filter.instance.output.OutputInstanceFilterStreamFactory;
-import org.xwiki.filter.internal.output.AbstractBeanOutputFilterStreamFactory;
+import org.xwiki.filter.output.AbstractBeanOutputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
 
 /**

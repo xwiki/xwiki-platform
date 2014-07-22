@@ -36,11 +36,11 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.descriptor.CompositeFilterStreamDescriptor;
 import org.xwiki.filter.descriptor.FilterStreamDescriptor;
+import org.xwiki.filter.input.AbstractBeanInputFilterStreamFactory;
 import org.xwiki.filter.instance.input.InstanceInputEventGenerator;
 import org.xwiki.filter.instance.input.InstanceInputProperties;
 import org.xwiki.filter.instance.internal.InstanceFilter;
 import org.xwiki.filter.instance.internal.InstanceUtils;
-import org.xwiki.filter.internal.input.AbstractBeanInputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
 
 /**

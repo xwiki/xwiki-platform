@@ -41,7 +41,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <content>L'area test o sandbox è una parte del wiki che si può modificare liberamente. Il suo scopo è quello di aiutarvi nell'imparare a fare modifiche. Si scoprirà come è possibile modificare le pagine e come crearne di nuove. Cliccate **Modifica** per iniziare!
 

@@ -29,6 +29,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.tika.Tika;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.resource.AbstractResourceReferenceHandler;
@@ -67,7 +68,7 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
     public static final EntityResourceAction ACTION = new EntityResourceAction("webjars");
 
     /**
-     * Prefix for locating JS resources in the classloader.
+     * Prefix for locating resource files (JavaScript, CSS) in the classloader.
      */
     private static final String WEBJARS_RESOURCE_PREFIX = "META-INF/resources/webjars/";
 
@@ -91,6 +92,7 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
 
         if (resourceStream != null) {
             try {
+                this.container.getResponse().setContentType(new Tika().detect(resourceStream, resourceName));
                 IOUtils.copy(resourceStream, this.container.getResponse().getOutputStream());
             } catch (IOException e) {
                 throw new ResourceReferenceHandlerException(

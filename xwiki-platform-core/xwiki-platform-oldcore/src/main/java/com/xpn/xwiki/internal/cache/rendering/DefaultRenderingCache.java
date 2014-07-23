@@ -191,8 +191,8 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
         return sb.toString();
     }
 
-	@Override
-	public void flushCache(DocumentReference documentReference) {
-		this.cache.removeAll(documentReference);
-	}
+    @Override
+    public void flushCache(DocumentReference documentReference) {
+        this.cache.removeAll(documentReference);
+    }
 }

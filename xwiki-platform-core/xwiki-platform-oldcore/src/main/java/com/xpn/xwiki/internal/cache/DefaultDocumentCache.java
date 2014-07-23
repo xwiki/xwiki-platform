@@ -85,8 +85,8 @@ public class DefaultDocumentCache<C> implements DocumentCache<C>
         @Override
         public void onEvent(Event event, Object source, Object data)
         {
-        	XWikiDocument doc = (XWikiDocument) source;
-        	removeAll(doc.getDocumentReference());
+            XWikiDocument doc = (XWikiDocument) source;
+            removeAll(doc.getDocumentReference());
         }
     }
 

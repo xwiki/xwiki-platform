@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.internal.cache.rendering.CachedItem;
+import com.xpn.xwiki.internal.cache.rendering.RenderingCacheAware;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
@@ -55,8 +57,12 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  * @see LinkExtensionPlugin
  * @version $Id$
  */
+<<<<<<< HEAD
+public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin implements RenderingCacheAware
+=======
 @SuppressWarnings("deprecation")
 public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
+>>>>>>> xwiki/master
 {
     /** Log object to log messages in this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSkinExtensionPlugin.class);
@@ -152,6 +158,27 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
     {
         use(resource, context);
         getParametersMap(context).put(resource, parameters);
+    }
+    
+    /**
+     * Get additional infos to store in the cache
+     * @param context the current xwiki context
+     * @return additional infos for the cache
+     */
+    public CachedItem.UsedExtension getAdditionalCacheInfos(XWikiContext context){
+            return new CachedItem.UsedExtension(
+                            getPulledResources(context),
+                            new HashMap<String, Map<String,Object>>(getParametersMap(context)));
+    }
+    
+    /**
+     * Restore cache info that were previously stored using getAdditionalCacheInfos
+     * @param context the current xwiki context
+     * @param infos infos to restore from cache
+     */
+    public void restoreCachedInfos(XWikiContext context, CachedItem.UsedExtension infos){
+            getPulledResources(context).addAll(infos.resource);
+            getParametersMap(context).putAll(infos.parameters);
     }
 
     /**

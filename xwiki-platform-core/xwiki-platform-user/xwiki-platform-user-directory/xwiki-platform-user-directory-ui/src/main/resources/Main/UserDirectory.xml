@@ -202,6 +202,8 @@
     #set($type = 'number')
   #elseif ($classPropertyType.endsWith('PasswordClass'))
     #set($sortable = false)
+  #elseif ($classPropertyType.endsWith('TextAreaClass'))
+    #set($html = true)
   #end
   #set ($columnValue = { 'type' : $type, 'link' : $link, 'html' : $html, 'sortable' : $sortable, 'displayName' : $displayName })
   #set ($discard = $columnsProperties.put($column, $columnValue))

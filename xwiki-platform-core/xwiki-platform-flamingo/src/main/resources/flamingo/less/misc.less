@@ -240,6 +240,15 @@ table {
   }  
 }
 
+// FIX: Syntax help page (XWIKI-10675)
+.syntax-menu:extend(.admin-menu all){}
+#syntax-page-content:extend(#admin-page-content all){}
+.skin-flamingo{
+  #syntax-page-content{
+    margin-left: 0;
+  }
+}
+
 // Export ---------------------------------------------------------------------
 #exportModal{
   .modal-body{

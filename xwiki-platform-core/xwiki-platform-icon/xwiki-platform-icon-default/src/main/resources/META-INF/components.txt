@@ -1,0 +1,3 @@
+org.xwiki.icon.internal.DefaultIconManager
+org.xwiki.icon.internal.DefaultIconSetCache
+org.xwiki.icon.internal.DefaultIconSetLoader

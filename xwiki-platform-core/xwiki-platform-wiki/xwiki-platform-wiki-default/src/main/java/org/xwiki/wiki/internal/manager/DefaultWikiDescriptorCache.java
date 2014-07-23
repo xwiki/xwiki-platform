@@ -19,12 +19,14 @@
  */
 package org.xwiki.wiki.internal.manager;
 
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -33,6 +35,7 @@ import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 
 /**
  * Default implementation of {@link WikiDescriptorCache}.
+ * 
  * @version $Id$
  * @since 5.3M2
  */
@@ -41,11 +44,13 @@ import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 public class DefaultWikiDescriptorCache implements WikiDescriptorCache, Initializable
 {
     @Inject
-    private CacheFactory cacheFactory;
+    private CacheManager cacheManager;
 
     private Cache<DefaultWikiDescriptor> wikiAliasCache;
 
     private Cache<DefaultWikiDescriptor> wikiIdCache;
+
+    private Collection<String> wikiIds;
 
     @Override
     public void initialize() throws InitializationException
@@ -56,18 +61,14 @@ public class DefaultWikiDescriptorCache implements WikiDescriptorCache, Initiali
 
     private Cache<DefaultWikiDescriptor> createCache(String cacheId) throws InitializationException
     {
-        Cache<DefaultWikiDescriptor> cache;
-
         CacheConfiguration configuration = new CacheConfiguration(cacheId);
 
         try {
-            cache = this.cacheFactory.newCache(configuration);
+            return this.cacheManager.createNewCache(configuration);
         } catch (CacheException e) {
             throw new InitializationException(String.format("Failed to initialize wiki descriptor caches [%s]",
-                    configuration.getConfigurationId()), e);
+                configuration.getConfigurationId()), e);
         }
-
-        return cache;
     }
 
     @Override
@@ -104,5 +105,17 @@ public class DefaultWikiDescriptorCache implements WikiDescriptorCache, Initiali
     public DefaultWikiDescriptor getFromAlias(String wikiAlias)
     {
         return wikiAliasCache.get(wikiAlias);
+    }
+
+    @Override
+    public void setWikiIds(Collection<String> wikiIds)
+    {
+        this.wikiIds = wikiIds;
+    }
+
+    @Override
+    public Collection<String> getWikiIds()
+    {
+        return this.wikiIds;
     }
 }

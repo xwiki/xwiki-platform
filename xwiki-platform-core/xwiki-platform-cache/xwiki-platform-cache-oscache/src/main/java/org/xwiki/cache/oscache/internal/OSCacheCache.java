@@ -110,7 +110,11 @@ public class OSCacheCache<T> extends AbstractCache<T> implements CacheEntryEvent
     @Override
     public void set(String key, T obj)
     {
-        this.cacheAdmin.putInCache(cacheKey(key), obj);
+        if (obj != null) {
+            this.cacheAdmin.putInCache(cacheKey(key), obj);
+        } else {
+            this.remove(key);
+        }
     }
 
     @Override
@@ -120,7 +124,7 @@ public class OSCacheCache<T> extends AbstractCache<T> implements CacheEntryEvent
 
         String cacheKey = cacheKey(key);
         try {
-            value = (T) this.cacheAdmin.getFromCache(cacheKey, oscacheConfiguration.getTimeToLive());
+            value = (T) this.cacheAdmin.getFromCache(cacheKey, this.oscacheConfiguration.getTimeToLive());
         } catch (NeedsRefreshException e) {
             this.cacheAdmin.cancelUpdate(cacheKey);
 

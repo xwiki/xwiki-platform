@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Main</web>
+  <name>SolrFileSizeFacet</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1393233161000</creationDate>
+  <parent>Main.SolrSearch</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1393233161000</date>
+  <contentUpdateDate>1393233161000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#macro (displaySearchFacetValues_fileSize $facetValues)
+  ##
+  ## Predefined size intervals, specified in bytes.
+  ##
+  #set ($intervals = $solrConfig.facet.fileSize.intervals)
+  #foreach ($interval in $intervals)
+    #set ($start = $interval.start)
+    #set ($end = $interval.end)
+    #if (!$start)
+      #set ($start = '*')
+      #set ($hint = $services.localization.render('solr.facet.size.lessThan', ["#dynamicsize($end)"]))
+    #elseif (!$end)
+      #set ($end = '*')
+      #set ($hint = $services.localization.render('solr.facet.size.moreThan', ["#dynamicsize($start)"]))
+    #else
+      #set ($hint = $services.localization.render('solr.facet.size.between', ["#dynamicsize($start)", "#dynamicsize($end)"]))
+    #end
+    #set ($discard = $interval.putAll({
+      'label': $services.localization.render("solr.facet.size.$interval.id"),
+      'hint': $hint,
+      'name': "[$start TO $end]",
+      'count': 0
+    }))
+  #end
+  ##
+  ## Add custom size intervals specified on the request.
+  ##
+  #foreach ($selectedValue in $facetRequestValues)
+    ## Determine if the value/range is custom.
+    #set ($custom = true)
+    #foreach ($interval in $intervals)
+      #if ($interval.name == $selectedValue)
+        #set ($custom = false)
+        #break
+      #end
+    #end
+    #if ($custom)
+      #set ($rangeMatcher = $rangePattern.matcher($selectedValue))
+      #if ($rangeMatcher.matches())
+        #set ($discard = $intervals.add({
+          'start': $mathtool.toInteger($rangeMatcher.group(1)),
+          'end'  : $mathtool.toInteger($rangeMatcher.group(2)),
+          'name' : $selectedValue,
+          'count': 0
+        }))
+      #end
+    #end
+  #end
+  ##
+  ## Count matches for each date interval.
+  ##
+  #foreach ($facetValue in $facetValues)
+    #set ($size = $mathtool.toInteger($facetValue.name))
+    #foreach ($interval in $intervals)
+      #if ((!$interval.start || $interval.start &lt;= $size)
+          &amp;&amp; (!$interval.end || $size &lt; $interval.end))
+        #set ($discard = $interval.put('count', $mathtool.add($interval.count, $facetValue.count)))
+      #end
+    #end
+  #end
+  ## Filter the size intervals that don't have matches.
+  #set ($intervalsWithMatches = [])
+  #foreach ($interval in $intervals)
+    #if ($interval.count &gt; 0 || $facetRequestValues.contains($interval.name))
+      #set ($discard = $intervalsWithMatches.add($interval))
+    #end
+  #end
+  ## Make sure we sort the intervals based on the number of matches.
+  #set ($intervals = $sorttool.sort($intervalsWithMatches, 'count:desc'))
+  ##
+  ## Display the size intervals.
+  ##
+  &lt;ul&gt;
+    #foreach ($facetValue in $intervals)
+      &lt;li&gt;#displaySearchFacetValue($facetValue {} 'displaySearchFacetValue_fileSize')&lt;/li&gt;
+    #end
+  &lt;/ul&gt;
+#end
+
+#macro (displaySearchFacetValue_fileSize $sizeInterval)
+  #if ($facetValue.label)
+    &lt;span title="$escapetool.xml($facetValue.hint)"&gt;$escapetool.xml($facetValue.label)&lt;/span&gt;
+  #elseif ($facetValue.start || $facetValue.end)
+    ## Display the custom interval.
+    #if (!$facetValue.start)
+      $escapetool.xml($services.localization.render('solr.facet.size.lessThan',
+        ["#dynamicsize($facetValue.end)"]))
+    #elseif (!$facetValue.end)
+      $escapetool.xml($services.localization.render('solr.facet.size.moreThan',
+        ["#dynamicsize($facetValue.start)"]))
+    #else
+      $services.localization.render('solr.facet.size.between',
+        ["#dynamicsize($facetValue.start)", "#dynamicsize($facetValue.end)"])
+    #end
+  #else
+    $escapetool.xml($services.localization.render('solr.facet.size.any'))
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ($facetValues)
+  {{html}}#displaySearchFacetValues_fileSize($facetValues){{/html}}
+#end
+{{/velocity}}</content>
+</xwikidoc>

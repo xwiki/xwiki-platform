@@ -130,7 +130,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
           #end
         #end
         #if ($xwiki.hasMinorEdit())
-          #if (!$request.getParameter('showminor'))
+          #if ("$!request.showminor" != 'true')
             <div class="buttonwrapper"><input class="button" type="submit" name="viewminorversions" value="$services.localization.render('core.viewers.history.showMinorEdits')"
               onclick="document.forms.${formname}.action='$tdoc.getURL('view', "viewer=history&amp;showminor=true&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" /></div>
           #else

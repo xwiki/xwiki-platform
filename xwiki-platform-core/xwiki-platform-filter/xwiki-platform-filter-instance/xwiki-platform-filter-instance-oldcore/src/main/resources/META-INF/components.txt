@@ -1,0 +1,13 @@
+org.xwiki.filter.instance.internal.DefaultInstanceModel
+org.xwiki.filter.instance.internal.input.DocumentInstanceInputEventGenerator
+org.xwiki.filter.instance.internal.input.BaseClassEventGenerator
+org.xwiki.filter.instance.internal.input.BaseObjectEventGenerator
+org.xwiki.filter.instance.internal.input.BasePropertyEventGenerator
+org.xwiki.filter.instance.internal.input.PropertyClassEventGenerator
+org.xwiki.filter.instance.internal.input.XWikiAttachmentEventGenerator
+org.xwiki.filter.instance.internal.input.XWikiDocumentLocaleEventGenerator
+org.xwiki.filter.instance.internal.output.DocumentInstanceOutputFilterStream
+org.xwiki.filter.instance.internal.output.DocumentInstanceOutputFilterStreamFactory
+org.xwiki.filter.instance.internal.output.UserInstanceOutputFilterStream
+org.xwiki.filter.instance.internal.output.UserInstanceOutputFilterStreamFactory
+org.xwiki.filter.instance.internal.output.XWikiDocumentOutputFilterStream

@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>AppWithinMinutes</web>
   <name>LiveTableEditSheet</name>
@@ -16,7 +36,6 @@
   <contentUpdateDate>1321383708000</contentUpdateDate>
   <version>1.1</version>
   <title>#if($doc.fullName=='AppWithinMinutes.LiveTableEditSheet')LiveTable Edit Sheet#{else}#evaluate($doc.title)#end</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -240,7 +259,7 @@ function init() {
   form.addClassName('xform');
 
   // Remove the preview button.
-  form.down("input[name='action_preview']").up().remove();
+  form.down("input[name='action_preview']").remove();
 
   // Rename the save buttons.
   form.down("input[name='action_save']").name = 'xaction_save';
@@ -440,6 +459,7 @@ return XWiki;
   font-size: 90%;
   list-style: none outside none;
   margin: 0;
+  padding: 0;
 }
 
 #inline .hList li {
@@ -644,11 +664,10 @@ return XWiki;
   {{html}}&lt;div class="clearfloats"&gt;&lt;/div&gt;{{/html}}
 #end
 
-#macro(maybeGrantSpaceAdminRights)
-  #set($spaceHomeRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebHome'))
+#macro(maybeGrantSpaceAdminRight $spaceHomeRef)
   ## Grant space administration rights only if the space is new.
   #if(!$xwiki.exists($spaceHomeRef))
-    #set($spacePrefsRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebPreferences'))
+    #set($spacePrefsRef = $services.model.createDocumentReference($spaceHomeRef.wikiReference.name, $spaceHomeRef.lastSpaceReference.name, 'WebPreferences'))
     #set($spacePrefsDoc = $xwiki.getDocument($spacePrefsRef))
     ## Don't overwrite existing space preferences.
     #if($spacePrefsDoc.isNew())
@@ -661,6 +680,17 @@ return XWiki;
       #set($discard = $spacePrefsDoc.saveWithProgrammingRights($services.localization.render('platform.appwithinminutes.grantSpaceAdminRightsSaveComment')))
     #end
   #end
+#end
+
+#macro(maybeGrantSpaceAdminRights)
+  ## Data space
+  #set($dataSpaceHomeRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebHome'))
+  #maybeGrantSpaceAdminRight($dataSpaceHomeRef)
+  ## Code space
+  #set($className = $request.get('AppWithinMinutes.LiveTableClass_0_class'))
+  #set($classRef = $services.model.resolveDocument($className))
+  #set($codeSpaceHomeRef = $services.model.createDocumentReference($classRef.wikiReference.name, $classRef.lastSpaceReference.name, 'WebHome'))
+  #maybeGrantSpaceAdminRight($codeSpaceHomeRef)
 #end
 
 #macro(updateAndSaveLiveTable)
@@ -719,7 +749,7 @@ return XWiki;
 
 {{velocity}}
 #if("$!request.wizard" == 'true')
-  {{include document="AppWithinMinutes.WizardStep" /}}
+  {{include reference="AppWithinMinutes.WizardStep" /}}
 #end
 {{/velocity}}
 

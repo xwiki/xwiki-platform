@@ -42,10 +42,10 @@ public class ClassesResourceImpl extends XWikiResource implements ClassesResourc
     @Override
     public Classes getClasses(String wikiName, Integer start, Integer number) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             List<String> classNames = Utils.getXWikiApi(componentManager).getClassList();
             Collections.sort(classNames);
@@ -64,7 +64,7 @@ public class ClassesResourceImpl extends XWikiResource implements ClassesResourc
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 }

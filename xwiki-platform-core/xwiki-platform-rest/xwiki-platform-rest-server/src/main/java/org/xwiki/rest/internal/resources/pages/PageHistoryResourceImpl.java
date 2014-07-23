@@ -46,21 +46,22 @@ public class PageHistoryResourceImpl extends XWikiResource implements PageHistor
     public History getPageHistory(String wikiName, String spaceName, String pageName, Integer start, Integer number,
             String order, Boolean withPrettyNames) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         History history = new History();
 
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
+            // Note that the query is made to work with Oracle which treats empty strings as null.
             String query = String.format("select doc.space, doc.name, rcs.id, rcs.date, rcs.author, rcs.comment"
                 + " from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId = doc.id and"
-                + " doc.space = :space and doc.name = :name and doc.language = :language"
+                + " doc.space = :space and doc.name = :name and (doc.language = '' or doc.language is null)"
                 + " order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s", order, order, order);
 
             List<Object> queryResult = null;
             queryResult = queryManager.createQuery(query, Query.XWQL).bindValue("space", spaceName).bindValue("name",
-                    pageName).setLimit(number).bindValue("language", "").setOffset(start).execute();
+                    pageName).setLimit(number).setOffset(start).execute();
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
@@ -80,7 +81,7 @@ public class PageHistoryResourceImpl extends XWikiResource implements PageHistor
         } catch (QueryException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
 
         return history;

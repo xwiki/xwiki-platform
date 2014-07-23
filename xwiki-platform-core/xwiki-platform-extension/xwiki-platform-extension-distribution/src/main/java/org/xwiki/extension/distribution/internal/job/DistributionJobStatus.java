@@ -19,12 +19,15 @@
  */
 package org.xwiki.extension.distribution.internal.job;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.internal.DefaultJobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.observation.ObservationManager;
@@ -64,16 +67,22 @@ public class DistributionJobStatus<R extends DistributionRequest> extends Defaul
 
     private int currentStateIndex;
 
-    public DistributionJobStatus(DistributionJobStatus<R> status, ObservationManager observationManager,
-        LoggerManager loggerManager)
+    public DistributionJobStatus(JobStatus status, ObservationManager observationManager, LoggerManager loggerManager)
     {
-        super(status.getRequest(), observationManager, loggerManager, false);
+        super(ObjectUtils.cloneIfPossible((R) status.getRequest()), observationManager, loggerManager, false);
 
-        this.previousDistributionExtension = status.previousDistributionExtension;
-        this.previousDistributionExtensionUi = status.previousDistributionExtensionUi;
-        this.distributionExtension = status.distributionExtension;
-        this.distributionExtensionUi = status.distributionExtensionUi;
-        this.stepList = status.stepList;
+        if (status instanceof DistributionJobStatus) {
+            DistributionJobStatus<R> distributionJobStatus = (DistributionJobStatus<R>) status;
+
+            this.previousDistributionExtension = distributionJobStatus.previousDistributionExtension;
+            this.previousDistributionExtensionUi = distributionJobStatus.previousDistributionExtensionUi;
+            this.distributionExtension = distributionJobStatus.distributionExtension;
+            this.distributionExtensionUi = distributionJobStatus.distributionExtensionUi;
+            this.stepList =
+                distributionJobStatus.stepList != null
+                    ? new ArrayList<DistributionStep>(distributionJobStatus.stepList)
+                    : new ArrayList<DistributionStep>();
+        }
     }
 
     public DistributionJobStatus(R request, ObservationManager observationManager, LoggerManager loggerManager,

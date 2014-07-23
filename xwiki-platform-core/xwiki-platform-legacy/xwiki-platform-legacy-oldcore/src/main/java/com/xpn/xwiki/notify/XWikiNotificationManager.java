@@ -148,7 +148,7 @@ public class XWikiNotificationManager
             }
         }
 
-        name = context.getDatabase() + ":" + newdoc.getFullName();
+        name = context.getWikiId() + ":" + newdoc.getFullName();
 
         synchronized (namedrules) {
             vnamedrules = getNamedRules(name);
@@ -187,7 +187,7 @@ public class XWikiNotificationManager
             }
         }
 
-        name = context.getDatabase() + ":" + newdoc.getFullName();
+        name = context.getWikiId() + ":" + newdoc.getFullName();
 
         synchronized (namedrules) {
             vnamedrules = getNamedRules(name);
@@ -224,7 +224,7 @@ public class XWikiNotificationManager
                 rule.verify(doc, action, context);
             }
         }
-        name = context.getDatabase() + ":" + doc.getFullName();
+        name = context.getWikiId() + ":" + doc.getFullName();
         synchronized (namedrules) {
             vnamedrules = getNamedRules(name);
             if (vnamedrules != null)

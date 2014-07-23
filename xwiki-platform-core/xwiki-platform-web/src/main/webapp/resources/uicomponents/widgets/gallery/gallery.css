@@ -8,7 +8,7 @@
   /* Position relative is required because some of the inner elements have position absolute and the gallery container
   must be their offset parent. */
   position: relative;
-  width: $mathtool.add($imageMaxWidth, 128)$px;
+  max-width: $mathtool.add($imageMaxWidth, 128)$px;
 }
 
 .xGallery.maximized {
@@ -16,6 +16,7 @@
   position: fixed;
   top: 0;
   z-index: 1001;
+  max-width: none;
 }
 
 .xGallery .currentImageWrapper {

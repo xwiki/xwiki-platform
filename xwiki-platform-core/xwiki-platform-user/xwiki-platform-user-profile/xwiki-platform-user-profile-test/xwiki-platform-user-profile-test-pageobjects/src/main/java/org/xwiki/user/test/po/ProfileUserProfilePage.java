@@ -55,10 +55,10 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
     @FindBy(className = "adr")
     private WebElement userAddress;
 
-    @FindBy(xpath = "//dd[1]/span[@class='wikiexternallink']")
+    @FindBy(xpath = "//dd[preceding-sibling::dt[1]/label[. = 'Blog']]//a")
     private WebElement userBlog;
 
-    @FindBy(xpath = "//dd[2]/span[@class='wikiexternallink']")
+    @FindBy(xpath = "//dd[preceding-sibling::dt[1]/label[. = 'Blog Feed']]//a")
     private WebElement userBlogFeed;
 
     @FindBy(xpath = "//div[@id='avatar']//a")

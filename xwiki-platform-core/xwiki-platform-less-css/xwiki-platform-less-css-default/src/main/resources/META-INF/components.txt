@@ -1,0 +1,6 @@
+org.xwiki.lesscss.internal.DefaultColorThemeCache
+org.xwiki.lesscss.internal.DefaultLESSColorThemeConverter
+org.xwiki.lesscss.internal.DefaultLESSCompiler
+org.xwiki.lesscss.internal.DefaultLESSSkinFileCache
+org.xwiki.lesscss.internal.DefaultLESSSkinFileCompiler
+org.xwiki.lesscss.internal.SkinAndColorThemeListener

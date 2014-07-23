@@ -50,14 +50,19 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  * type classname is used. For example, JS extensions are inserted in place of
  * <tt>&lt;!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin --&gt;</tt>.
  * </p>
- * 
+ *
  * @see SkinExtensionPluginApi
  * @see JsSkinExtensionPlugin
  * @see CssSkinExtensionPlugin
  * @see LinkExtensionPlugin
  * @version $Id$
  */
+<<<<<<< HEAD
 public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin implements RenderingCacheAware
+=======
+@SuppressWarnings("deprecation")
+public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
+>>>>>>> xwiki/master
 {
     /** Log object to log messages in this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSkinExtensionPlugin.class);
@@ -70,7 +75,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
 
     /**
      * XWiki plugin constructor.
-     * 
+     *
      * @param name The name of the plugin, which can be used for retrieving the plugin API from velocity. Unused.
      * @param className The canonical classname of the plugin. Unused.
      * @param context The current request context.
@@ -86,7 +91,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      * format for the link, for example Javascript uses <code>&lt;script src="/path/to/Document"&gt;</code>, while CSS
      * uses <code>&lt;link rel="stylesheet" href="/path/to/Document"&gt;</code> (the actual syntax is longer, this is
      * just a simplified example).
-     * 
+     *
      * @param resource the name of the wiki document holding the resource.
      * @param context the current request context, needed to access the URLFactory.
      * @return A <code>String</code> representation of the linking element that should be printed in the generated HTML.
@@ -97,7 +102,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      * Returns the list of always used extensions of this type. Which resources are always used depends on the type of
      * resource, for example document based StyleSheet extensions have a property in the object, <tt>use</tt>, which can
      * have the value <tt>always</tt> to declare that an extension should always be used.
-     * 
+     *
      * @param context The current request context.
      * @return A set of resource names that should be pulled in the current response. Note that this method is called
      *         for each request, as the list might change in time, and it can be different for each wiki in a farm.
@@ -107,7 +112,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     /**
      * Determines if the requested document contains on page skin extension objects of this type. True if at least one
      * of the extension objects has the <tt>currentPage</tt> value for the <tt>use</tt> property.
-     * 
+     *
      * @param context the current request context
      * @return a boolean specifying if the current document contains on page skin extensions
      */
@@ -122,7 +127,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     /**
      * Mark a resource as used in the current result. A resource is registered only once per request, further calls will
      * not result in additional links, even if it is pulled with different parameters.
-     * 
+     *
      * @param resource The name of the resource to pull.
      * @param context The current request context.
      * @see #use(String, Map, XWikiContext)
@@ -143,7 +148,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      * registered only once per request, further calls will not result in additional links, even if it is pulled with
      * different parameters. If more than one calls per request are made, the parameters used are the ones from the last
      * call (or none, if the last call did not specify any parameters).
-     * 
+     *
      * @param resource The name of the resource to pull.
      * @param parameters The parameters for this resource.
      * @param context The current request context.
@@ -179,7 +184,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     /**
      * Get the list of pulled resources (of the plugin's type) for the current request. The returned list is always
      * valid.
-     * 
+     *
      * @param context The current request context.
      * @return A set of names that holds the resources pulled in the current request.
      */
@@ -193,7 +198,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     /**
      * Get the map of additional parameters for each pulled resource (of the plugin's type) for the current request. The
      * returned map is always valid.
-     * 
+     *
      * @param context The current request context.
      * @return A map of resource parameters, where the key is the resource's name, and the value is a map holding the
      *         actual parameters for a given resource. If a resource was pulled without additional parameters, then no
@@ -209,7 +214,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     /**
      * Initializes the list of pulled extensions corresponding to this request, if it wasn't already initialized. This
      * method is not thread safe, since a context should not be shared among threads.
-     * 
+     *
      * @param context The current context where this list is stored.
      */
     protected void initializeRequestListIfNeeded(XWikiContext context)
@@ -225,7 +230,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     /**
      * Composes and returns the links to the resources pulled in the current request. This method is called at the end
      * of each request, once for each type of resource (subclass), and the result is placed in the generated XHTML.
-     * 
+     *
      * @param context The current request context.
      * @return a XHMTL fragment with all extensions imports statements for this request. This includes both extensions
      *         that are defined as being "used always" and "on demand" extensions explicitly requested for this page.
@@ -258,7 +263,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     /**
      * Get the parameters for a pulled resource. Note that a valid map is always returned, even if no parameters were
      * given when the resource was pulled.
-     * 
+     *
      * @param resource The resource for which to retrieve the parameters.
      * @param context The current request context.
      * @return The parameters for the resource, as a map where the keys are the parameter names, and the values are
@@ -275,7 +280,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
 
     /**
      * Get a parameter value for a pulled resource.
-     * 
+     *
      * @param parameterName the name of the parameter to retrieve
      * @param resource the resource for which to retrieve the parameter
      * @param context the current request context
@@ -291,7 +296,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      * {@link com.xpn.xwiki.doc.XWikiDocument#getURL(String, String, String, XWikiContext) getURL()} and printed in the
      * XHTML result. The parameters separator is the escaped &amp;amp;. The query string already starts with an
      * &amp;amp; if at least one parameter exists.
-     * 
+     *
      * @param resource The pulled resource whose parameters should be converted.
      * @param context The current request context.
      * @return The constructed query string, or an empty string if there are no parameters.
@@ -310,13 +315,17 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
             query.append("=");
             query.append(sanitize(parameter.getValue().toString()));
         }
+        // If the main page is requested unminified, also send unminified extensions
+        if ("false".equals(context.getRequest().getParameter("minify"))) {
+            query.append("&amp;minify=false");
+        }
         return query.toString();
     }
 
     /**
      * Prevent "HTML Injection" by making sure the rendered text does not escape the current element. This is achieved
      * by URL-encoding the following characters: '"&lt;&gt;
-     * 
+     *
      * @param value The string to sanitize.
      * @return The unchanged string, if it does not contain special characters, or the empty string.
      */
@@ -338,7 +347,7 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      * At the end of the request, insert the links to the pulled resources in the response, in the place marked by an
      * XML comment of the format <tt>&lt;!-- canonical.plugin.classname --&gt;</tt>.
      * </p>
-     * 
+     *
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#endParsing(String, XWikiContext)
      */
     @Override

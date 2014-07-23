@@ -164,7 +164,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     @Override
     protected void runInternal()
     {
-        getContext().setDatabase(getContext().getMainXWiki());
+        getContext().setWikiId(getContext().getMainXWiki());
         runMainLoop();
     }
 

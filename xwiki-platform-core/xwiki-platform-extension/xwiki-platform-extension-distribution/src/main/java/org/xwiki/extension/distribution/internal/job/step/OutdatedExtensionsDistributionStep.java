@@ -64,7 +64,7 @@ public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
                 installedExtensions = this.installedRepository.getInstalledExtensions(getNamespace());
             }
 
-            // Upgrade outdated extensions only when there is outdated extensions
+            // Upgrade outdated extensions only when there is invalid extensions
             for (InstalledExtension extension : installedExtensions) {
                 Collection<String> installedNamespaces = extension.getNamespaces();
                 if (installedNamespaces == null) {

@@ -30,8 +30,8 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
+import org.xwiki.extension.distribution.internal.DistributionManager;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -51,8 +51,14 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
     @Inject
     private transient InstalledExtensionRepository installedRepository;
 
+    /**
+     * The component used to get information about the current distribution.
+     */
     @Inject
-    private Logger logger;
+    protected transient DistributionManager distributionManager;
+
+    @Inject
+    private transient Logger logger;
 
     public WikisDefaultUIDistributionStep()
     {
@@ -62,15 +68,15 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
     @Override
     public void prepare()
     {
-        if (getState() != State.CANCELED) {
+        if (getState() == null) {
             setState(State.COMPLETED);
 
             if (isMainWiki()) {
                 WikiDescriptorManager wikiDescriptorManager = this.wikiDescriptorManagerProvider.get();
 
-                Collection<WikiDescriptor> wikis;
+                Collection<String> wikiIds;
                 try {
-                    wikis = wikiDescriptorManager.getAll();
+                    wikiIds = wikiDescriptorManager.getAllIds();
                 } catch (WikiManagerException e) {
                     this.logger.error("Failed to get the list of wikis", e);
                     setState(null);
@@ -79,9 +85,9 @@ public class WikisDefaultUIDistributionStep extends AbstractDistributionStep
 
                 ExtensionId wikiExtensionUI = this.distributionManager.getWikiUIExtensionId();
 
-                for (WikiDescriptor wiki : wikis) {
-                    if (!wikiDescriptorManager.getMainWikiId().equals(wiki.getId())) {
-                        String namespace = "wiki:" + wiki.getId();
+                for (String wikiId : wikiIds) {
+                    if (!wikiDescriptorManager.getMainWikiId().equals(wikiId)) {
+                        String namespace = "wiki:" + wikiId;
 
                         // Only if the UI is not already installed
                         if (wikiExtensionUI != null) {

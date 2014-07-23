@@ -52,5 +52,5 @@
 })
 {{/velocity}}
 
-{{include document="XWiki.AdminFieldsDisplaySheet" /}}</content>
+{{include reference="XWiki.AdminFieldsDisplaySheet" /}}</content>
 </xwikidoc>

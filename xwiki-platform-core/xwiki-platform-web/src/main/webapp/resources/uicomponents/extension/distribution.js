@@ -59,8 +59,8 @@ var AbstractExtensionListStep = Class.create({
     // Listen to DOM changes to catch when the list of extensions is reloaded.
     document.observe('xwiki:dom:updated', function(event) {
       event.memo.elements.each(function(element) {
-        // Update the step buttons only if the updated element contains extensions.
-        element.down('.extension-item') && this._updateStepButtons();
+        // Update the step buttons if the updated element contains extensions or if it represents the extension updater.
+        (element.down('.extension-item') || element.hasClassName('extensionUpdater')) && this._updateStepButtons();
       }.bind(this));
     }.bindAsEventListener(this));
   },
@@ -70,7 +70,7 @@ var AbstractExtensionListStep = Class.create({
     if (!stepButtons) return;
     stepButtons = stepButtons.select('button');
     // Disable the step buttons if there is any extension loading.
-    if (this.container.down('.extension-item.extension-item-loading') || this.container.down('.extension-log-item-loading')) {
+    if (this.container.down('.extension-item.extension-item-loading') || this.container.down('.job-log-item-loading')) {
       // Disable all step buttons.
       stepButtons.invoke('disable');
       this._disable && this._disable();
@@ -319,17 +319,6 @@ function init() {
   // Enhance the form that repairs the previous UI.
   $('body').select('form.previousUI').each(function(previousUIForm) {
     new PreviousUIForm(previousUIForm);
-  });
-
-  // Enhance the tree of documents.
-  $('body').select('.expandable .parent').each(function(parent) {
-    var toggle = function() {
-      parent.toggleClassName("collapsed");
-      parent.next().toggle();
-    };
-    parent.observe('click', toggle);
-    // The tree is initially collapsed.
-    toggle();
   });
 
   $('extension.defaultui') && new XWiki.DefaultUIStep();

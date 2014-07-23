@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>AppWithinMinutes</web>
   <name>ClassEditSheet</name>
@@ -893,7 +913,7 @@ return XWiki;
     form.addClassName('xform');
 
     // Remove the preview button.
-    form.down("input[name='action_preview']").up().remove();
+    form.down("input[name='action_preview']").remove();
 
     // Rename the save buttons.
     form.down("input[name='action_save']").name = 'xaction_save';
@@ -1118,6 +1138,7 @@ return XWiki;
 
 #fields {
   margin: 0;
+  padding: 0;
 }
 
 #fields &gt; li {
@@ -1191,6 +1212,7 @@ return XWiki;
 
 #palette ul {
   margin: 0;
+  padding: 0;
 }
 
 #palette li {
@@ -1903,7 +1925,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       {{error}}{{html}}$errorMessage{{/html}}{{/error}}
     #elseif("$!request.wizard" == 'true')
       ## Redirect to next wizard step.
-      #set($homePageRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebHome'))
+      #set($className = $stringtool.removeEnd($doc.name, 'Class'))
+      #set($homePageRef = $services.model.createDocumentReference($doc.wiki, $className, 'WebHome'))
       #set($queryString = 'wizard=true')
       #if(!$xwiki.exists($homePageRef))
         #set($homePageTitle = '$services.localization.render(''platform.appwithinminutes.appHomePageTitle'', [$doc.space])')
@@ -1926,7 +1949,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 
 {{velocity}}
 #if("$!request.wizard" == 'true')
-  {{include document="AppWithinMinutes.WizardStep" /}}
+  {{include reference="AppWithinMinutes.WizardStep" /}}
 #end
 {{/velocity}}
 

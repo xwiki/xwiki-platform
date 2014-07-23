@@ -38,6 +38,8 @@ import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.WikiComponentBridge;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -76,6 +78,9 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
     @Inject
     private WikiComponentBridge componentBridge;
 
+    @Inject
+    private ContextualAuthorizationManager authorization;
+
     @Override
     public List<DocumentReference> getDocumentReferences()
     {
@@ -103,7 +108,7 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
     {
         List<WikiComponent> components = new ArrayList<WikiComponent>();
 
-        if (!this.componentBridge.hasProgrammingRights(reference)) {
+        if (!this.authorization.hasAccess(Right.PROGRAM, reference)) {
             throw new WikiComponentException("Registering wiki components requires programming rights");
         }
 

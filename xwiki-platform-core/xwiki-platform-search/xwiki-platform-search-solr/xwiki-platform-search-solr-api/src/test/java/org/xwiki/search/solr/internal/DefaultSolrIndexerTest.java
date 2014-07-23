@@ -79,7 +79,7 @@ public class DefaultSolrIndexerTest
         // XWikiContext
 
         this.xcontext = new XWikiContext();
-        this.xcontext.setDatabase("xwiki");
+        this.xcontext.setWikiId("xwiki");
         this.xcontext.setWiki(this.xwiki);
 
         URL url = this.getClass().getClassLoader().getResource("solrhome");

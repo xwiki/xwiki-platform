@@ -19,7 +19,7 @@
  */
 package org.xwiki.search.solr.internal;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.net.URL;
@@ -27,6 +27,7 @@ import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.core.CoreContainer;
+import org.apache.solr.core.SolrCore;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -115,10 +116,11 @@ public class EmbeddedSolrInstanceInitializationTest
         }
 
         Assert.assertEquals(expected + File.separator, container.getSolrHome());
-        Assert.assertTrue(new File(new File(container.getSolrHome(), DefaultSolrConfiguration.CONF_DIRECTORY),
-            "schema.xml").exists());
-        Assert.assertTrue(new File(new File(container.getSolrHome(), DefaultSolrConfiguration.CONF_DIRECTORY),
-            "solrconfig.xml").exists());
+        Assert.assertEquals(1, container.getCores().size());
+        SolrCore core = container.getCores().iterator().next();
+        File coreBaseDirectory = new File(container.getSolrHome(), core.getName());
+        File configDirectory = new File(coreBaseDirectory, DefaultSolrConfiguration.CONF_DIRECTORY);
+        Assert.assertTrue(new File(configDirectory, core.getSchemaResource()).exists());
+        Assert.assertTrue(new File(configDirectory, core.getConfigResource()).exists());
     }
-
 }

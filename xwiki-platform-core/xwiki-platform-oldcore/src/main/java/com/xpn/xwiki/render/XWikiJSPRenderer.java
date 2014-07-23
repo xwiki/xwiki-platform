@@ -19,13 +19,23 @@
  */
 package com.xpn.xwiki.render;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+@Component
+@Named("jsp")
+@Singleton
 public class XWikiJSPRenderer implements XWikiRenderer
 {
-    public XWikiJSPRenderer()
+    @Override
+    public String getId()
     {
+        return "jsp";
     }
 
     @Override

@@ -97,8 +97,6 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockDocumentAccessBridge).getCurrentUser();
-                will(returnValue("XWiki.Admin"));
                 allowing(mockDocumentAccessBridge).getDocumentURL(with(aNonNull(DocumentReference.class)),
                     with("view"), with(returnValue), with(aNull(String.class)));
                 will(returnValue);
@@ -163,11 +161,53 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     }
 
     /**
+     * Add a mocking role to have a logged user.
+     * @throws Exception if problems occur
+     */
+    private void userIsLogged() throws Exception
+    {
+        // document access bridge
+        final DocumentAccessBridge mockDocumentAccessBridge =
+                getComponentManager().getInstance(DocumentAccessBridge.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockDocumentAccessBridge).getCurrentUserReference();
+                will(returnValue(new DocumentReference("mainWiki", "XWiki", "Admin")));
+            }
+        });
+    }
+
+    /**
      * Test that the secret token is a non-empty string.
      */
     @Test
-    public void testToken()
+    public void testToken() throws Exception
     {
+        userIsLogged();
+
+        String token = this.csrf.getToken();
+        Assert.assertNotNull("CSRF token is null", token);
+        Assert.assertNotSame("CSRF token is empty string", "", token);
+        Assert.assertTrue("CSRF token is too short: \"" + token + "\"", token.length() > 20);
+    }
+
+    /**
+     * Test that the secret token is a non-empty string, even for guest user.
+     */
+    @Test
+    public void testTokenForGuestUser() throws Exception
+    {
+        // document access bridge
+        final DocumentAccessBridge mockDocumentAccessBridge =
+                getComponentManager().getInstance(DocumentAccessBridge.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(mockDocumentAccessBridge).getCurrentUserReference();
+                will(returnValue(null));
+            }
+        });
         String token = this.csrf.getToken();
         Assert.assertNotNull("CSRF token is null", token);
         Assert.assertNotSame("CSRF token is empty string", "", token);
@@ -178,8 +218,10 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
      * Test that the same secret token is returned on subsequent calls.
      */
     @Test
-    public void testTokenTwice()
+    public void testTokenTwice() throws Exception
     {
+        userIsLogged();
+
         String token1 = this.csrf.getToken();
         String token2 = this.csrf.getToken();
         Assert.assertNotNull("CSRF token is null", token1);
@@ -191,8 +233,10 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
      * Test that the produced valid secret token is indeed valid.
      */
     @Test
-    public void testTokenValidity()
+    public void testTokenValidity() throws Exception
     {
+        userIsLogged();
+
         String token = this.csrf.getToken();
         Assert.assertTrue("Valid token did not pass the check", this.csrf.isTokenValid(token));
     }
@@ -203,6 +247,8 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     @Test
     public void testNullNotValid() throws Exception
     {
+        userIsLogged();
+
         // Verify that the correct message is logged
         final Logger logger = getMockLogger();
 
@@ -220,6 +266,8 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     @Test
     public void testEmptyNotValid() throws Exception
     {
+        userIsLogged();
+
         // Verify that the correct message is logged
         final Logger logger = getMockLogger();
 
@@ -237,6 +285,8 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
     @Test
     public void testPrefixNotValid() throws Exception
     {
+        userIsLogged();
+
         // Verify that the correct message is logged
         final Logger logger = getMockLogger();
 
@@ -255,8 +305,10 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
      * Test that the resubmission URL is correct.
      */
     @Test
-    public void testResubmissionURL()
+    public void testResubmissionURL() throws Exception
     {
+        userIsLogged();
+
         String url = this.csrf.getResubmissionURL();
         try {
             // srid is random, extract it from the url
@@ -276,8 +328,10 @@ public class DefaultCSRFTokenTest extends AbstractMockingComponentTestCase
      * where XWiki-syntax is allowed.
      */
     @Test
-    public void testXWikiSyntaxCompatibility()
+    public void testXWikiSyntaxCompatibility() throws Exception
     {
+        userIsLogged();
+
         // We cannot easily control the value of the token, so we just test if it contains any "bad" characters and hope
         // for the best. Since the probability that the token contains some specific character is about 1/3, this test
         // will start to flicker (instead of always failing) if something like XWIKI-5996 is reintroduced

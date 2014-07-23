@@ -1,43 +1,51 @@
 $response.setContentType("text/xml")
 <?xml version="1.0" encoding="UTF-8"?>
 <results>
-#set ($input = "$!request.input.toLowerCase()")
-#if ($input.length() > 0)
-  ## Resolve the input as a user/group reference and use only the document name for matching.
-  #set ($input = $services.model.resolveDocument($input).name)
+#macro (suggestUsersOrGroups)
+  #set ($input = "$!request.input.toLowerCase()")
+  #if ($input.length() > 0)
+    ## Resolve the input as a user/group reference and use only the document name for matching.
+    #set ($input = $services.model.resolveDocument($input).name)
+  #end
+  #if ($request.uorg == 'user')
+    #set ($statement = "from doc.object(XWiki.XWikiUsers) as user where lower(doc.name) like :input or concat(concat(lower(user.first_name), ' '), lower(user.last_name)) like :input order by user.first_name, user.last_name")
+  #else
+    #set ($statement = 'from doc.object(XWiki.XWikiGroups) as groups where lower(doc.name) like :input and doc.fullName <> ''XWiki.XWikiGroupTemplate'' order by doc.name')
+  #end
+  #set ($query = $services.query.xwql($statement).setWiki($wikiReference.name).addFilter('unique'))
+  #set ($discard = $query.setOffset(0).setLimit(10).bindValue('input', "%$input%"))
+  #foreach ($result in $query.execute())
+    #displayResult($result)
+  #end
 #end
+
+#macro (displayResult $result)
+  #set ($reference = $services.model.resolveDocument($result, $wikiReference))
+  ## Make sure we use relative references as much as possible. See XWIKI-10046.
+  #set ($stringReference = $services.model.serialize($reference, 'compactwiki'))
+  #getUserAvatarURL($reference $avatarURL 30)
+  #if ($request.uorg == 'user')
+    ## The string returned by XWiki#getUserName() is XML encoded.
+    #set ($prettyName = $xwiki.getUserName($stringReference, false))
+  #else
+    #set ($prettyName = $xwiki.getDocument($reference).plainTitle)
+    #if ("$!prettyName" == '')
+      #set ($prettyName = $reference.name)
+    #end
+  #end
+  <rs id="$escapetool.xml($reference.name)" icon="$escapetool.xml($avatarURL.url)"
+    info="$prettyName">$escapetool.xml($stringReference)</rs>
+#end
+
 #if ($request.wiki == 'global')
   #set ($wikiReference = $services.model.createWikiReference($xcontext.mainWikiName))
 #else
   #set ($wikiReference = $doc.documentReference.wikiReference)
 #end
-#if ($request.uorg == 'user')
-  #set ($statement = 'from doc.object(XWiki.XWikiUsers) as user where lower(doc.name) like :input or lower(user.first_name) like :input or lower(user.last_name) like :input order by user.first_name, user.last_name')
-  #set ($query = $services.query.xwql($statement).setWiki($wikiReference.name))
-  #set ($discard = $query.setOffset(0).setLimit(10).bindValue('input', "%$input%"))
-  #foreach($user in $query.execute())
-    #set ($userReference = $services.model.resolveDocument($user, $wikiReference))
-    #set ($userStringReference = $services.model.serialize($userReference, 'default'))
-    #getUserAvatarURL($userReference $avatarURL 30)
-    ## The string returned by XWiki#getUserName() is XML encoded.
-    #set ($userName = $xwiki.getUserName($userStringReference, false))
-    <rs id="$escapetool.xml($userReference.name)" icon="$escapetool.xml($avatarURL.url)"
-      info="$userName">$escapetool.xml($userStringReference)</rs>
-  #end
-#else ## groups
-  #set ($statement = 'from doc.object(XWiki.XWikiGroups) as groups where lower(doc.name) like :input and doc.fullName <> ''XWiki.XWikiGroupTemplate'' order by doc.name')
-  #set ($query = $services.query.xwql($statement).setWiki($wikiReference.name).addFilter("unique"))
-  #set ($discard = $query.setOffset(0).setLimit(10).bindValue('input', "%$input%"))
-  #foreach($group in $query.execute())
-    #set ($groupReference = $services.model.resolveDocument($group, $wikiReference))
-    #set ($groupStringReference = $services.model.serialize($groupReference, 'default'))
-    #getUserAvatarURL($groupReference $avatarURL 30)
-    #set ($groupName = $xwiki.getDocument($groupReference).plainTitle)
-    #if ("$!groupName" == '')
-      #set ($groupName = $groupReference.name)
-    #end
-    <rs id="$escapetool.xml($groupReference.name)" info="$escapetool.xml($groupName)"
-      icon="$escapetool.xml($avatarURL.url)">$escapetool.xml($groupStringReference)</rs>
-  #end
+#if ($request.exactMatch == 'true')
+  ## This is normally used for loading the initial selection.
+  #displayResult("$!request.input")
+#else
+  #suggestUsersOrGroups()
 #end
 </results>

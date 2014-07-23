@@ -1,0 +1,258 @@
+.#------------------------------------------------------------------------------
+.expect|filter+xml
+.# XWIKI-9803 - test that CDATA sections are repaired properly
+.# XWIKI-9807 - attachments with several versions fail to load
+.# XWIKI-9817 - empty pages have no "bodyType" attribute
+.# XWIKI-9922 - When attachment author/creator is not provided parser send null author/creator
+.# XWIKI-10014 - Failed to import attachments with multiple versions in some version of Confluence
+.#------------------------------------------------------------------------------
+<wikiSpace name="Test XWIKI-9803">
+  <wikiDocument name="WebHome">
+    <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_date</string>
+            <date>2011-08-20 14:55:49.598 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
+      <wikiDocumentRevision revision="1">
+        <p>
+          <parameters>
+            <entry>
+              <string>revision_date</string>
+              <date>2011-08-20 14:55:49.598 UTC</date>
+            </entry>
+            <entry>
+              <string>revision_comment</string>
+              <string>spaces description</string>
+            </entry>
+            <entry>
+              <string>title</string>
+              <string></string>
+            </entry>
+          </parameters>
+        </p>
+        <document>
+          <p>
+            <metadata>
+              <metadata>
+                <entry>
+                  <string>syntax</string>
+                  <org.xwiki.rendering.syntax.Syntax>
+                    <type>
+                      <name>Confluence</name>
+                      <id>confluence</id>
+                    </type>
+                    <version>1.0</version>
+                  </org.xwiki.rendering.syntax.Syntax>
+                </entry>
+              </metadata>
+            </metadata>
+          </p>
+          <paragraph>
+            <word>space</word>
+            <space></space>
+            <word>description</word>
+          </paragraph>
+        </document>
+      </wikiDocumentRevision>
+    </wikiDocumentLocale>
+  </wikiDocument>
+  <wikiDocument name="with [[brace]]s (and [single brace])">
+    <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>creation_date</string>
+            <date>2013-12-12 12:30:15.120 UTC</date>
+          </entry>
+          <entry>
+            <string>lastrevision</string>
+            <string>2</string>
+          </entry>
+        </parameters>
+      </p>
+      <wikiDocumentRevision revision="1">
+        <p>
+          <parameters>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-12-12 12:30:15.120 UTC</date>
+            </entry>
+            <entry>
+              <string>revision_comment</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>title</string>
+              <string>with [[braces]] (and [single brace])</string>
+            </entry>
+          </parameters>
+        </p>
+        <document>
+          <p>
+            <metadata>
+              <metadata>
+                <entry>
+                  <string>syntax</string>
+                  <org.xwiki.rendering.syntax.Syntax>
+                    <type>
+                      <name>Confluence</name>
+                      <id>confluence+xhtml</id>
+                    </type>
+                    <version>1.0</version>
+                  </org.xwiki.rendering.syntax.Syntax>
+                </entry>
+              </metadata>
+            </metadata>
+          </p>
+          <paragraph>
+            <word>Test</word>
+            <space></space>
+            <specialSymbol>[</specialSymbol>
+            <specialSymbol>[</specialSymbol>
+            <word>brace</word>
+            <specialSymbol>]</specialSymbol>
+            <specialSymbol>]</specialSymbol>
+            <word>s</word>
+          </paragraph>
+          <macro id="code" content="in [[code block]]"></macro>
+          <paragraph>
+            <image>
+              <p>
+                <reference>
+                  <isTyped>true</isTyped>
+                  <reference>blind.gif</reference>
+                  <type>
+                    <scheme>attach</scheme>
+                  </type>
+                  <parameters></parameters>
+                </reference>
+              </p>
+            </image>
+          </paragraph>
+        </document>
+      </wikiDocumentRevision>
+      <wikiDocumentRevision revision="2">
+        <p>
+          <parameters>
+            <entry>
+              <string>revision_date</string>
+              <date>2013-12-12 12:38:02.510 UTC</date>
+            </entry>
+            <entry>
+              <string>revision_comment</string>
+              <string></string>
+            </entry>
+            <entry>
+              <string>title</string>
+              <string>with [[brace]]s (and [single brace])</string>
+            </entry>
+          </parameters>
+        </p>
+        <document>
+          <p>
+            <metadata>
+              <metadata>
+                <entry>
+                  <string>syntax</string>
+                  <org.xwiki.rendering.syntax.Syntax>
+                    <type>
+                      <name>Confluence</name>
+                      <id>confluence+xhtml</id>
+                    </type>
+                    <version>1.0</version>
+                  </org.xwiki.rendering.syntax.Syntax>
+                </entry>
+              </metadata>
+            </metadata>
+          </p>
+          <paragraph>
+            <word>Test</word>
+            <space></space>
+            <specialSymbol>[</specialSymbol>
+            <specialSymbol>[</specialSymbol>
+            <word>braces</word>
+            <specialSymbol>]</specialSymbol>
+            <specialSymbol>]</specialSymbol>
+          </paragraph>
+          <macro id="code" content="in [[code block]]"></macro>
+          <macro id="excerpt" content="in excerpt">
+            <p>
+              <parameters>
+                <entry>
+                  <string>hidden</string>
+                  <string>true</string>
+                </entry>
+                <entry>
+                  <string>atlassian-macro-output-type</string>
+                  <string>BLOCK</string>
+                </entry>
+              </parameters>
+            </p>
+          </macro>
+        </document>
+        <wikiAttachment name="blind.gif" size="111">
+          <p>
+            <content>R0lGODlhAQABALMAAP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AICAgCH5BAEAAA8AIf4WR0lGIFNtYXJ0U2F2ZXIgVmVyMS4xYQAsAAAAAAEAAQBABALwAQA7</content>
+            <parameters>
+              <entry>
+                <string>content_type</string>
+                <string>image/gif</string>
+              </entry>
+              <entry>
+                <string>creation_date</string>
+                <date>2013-12-12 12:38:37.720 UTC</date>
+              </entry>
+              <entry>
+                <string>revision</string>
+                <string>2</string>
+              </entry>
+              <entry>
+                <string>revision_date</string>
+                <date>2013-12-12 12:38:37.720 UTC</date>
+              </entry>
+              <entry>
+                <string>revision_comment</string>
+                <string>second</string>
+              </entry>
+            </parameters>
+          </p>
+        </wikiAttachment>
+      </wikiDocumentRevision>
+    </wikiDocumentLocale>
+  </wikiDocument>
+  <wikiDocument name="empty">
+    <wikiDocumentLocale>
+      <p>
+        <parameters>
+          <entry>
+            <string>lastrevision</string>
+            <string>1</string>
+          </entry>
+        </parameters>
+      </p>
+      <wikiDocumentRevision revision="1">
+        <p>
+          <parameters>
+            <entry>
+              <string>title</string>
+              <string>empty</string>
+            </entry>
+          </parameters>
+        </p>
+      </wikiDocumentRevision>
+    </wikiDocumentLocale>
+  </wikiDocument>
+</wikiSpace>
+.#------------------------------------------------------------------------------
+.input|confluence+xml
+.configuration.source=misc.xml.zip
+.#------------------------------------------------------------------------------

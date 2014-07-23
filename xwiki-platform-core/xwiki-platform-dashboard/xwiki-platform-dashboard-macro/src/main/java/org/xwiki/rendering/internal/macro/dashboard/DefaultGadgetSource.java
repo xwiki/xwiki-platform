@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.macro.dashboard;
 
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +31,6 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -47,7 +45,7 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.macro.dashboard.Gadget;
 import org.xwiki.rendering.macro.dashboard.GadgetSource;
-import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
@@ -104,10 +102,10 @@ public class DefaultGadgetSource implements GadgetSource
     private VelocityManager velocityManager;
 
     /**
-     * The component manager, to get the appropriate parser for the content of the gadget and the title.
+     * The parser, to parse the content of the gadget and the title.
      */
     @Inject
-    private ComponentManager componentManager;
+    private ContentParser contentParser;
 
     @Override
     public List<Gadget> getGadgets(String source, MacroTransformationContext context) throws Exception
@@ -156,7 +154,6 @@ public class DefaultGadgetSource implements GadgetSource
         }
         VelocityEngine velocityEngine = velocityManager.getVelocityEngine();
         // prepare the parser to parse the title and content of the gadget into blocks
-        Parser contentParser = (Parser) componentManager.getInstance(Parser.class, sourceSyntax.toIdString());
         ParserUtils parserUtils = new ParserUtils();
 
         for (BaseObject xObject : objects) {
@@ -177,10 +174,10 @@ public class DefaultGadgetSource implements GadgetSource
             String gadgetTitle = writer.toString();
 
             // parse both the title and content in the syntax of the transformation context
-            XDOM titleXDom = contentParser.parse(new StringReader(gadgetTitle));
+            XDOM titleXDom = contentParser.parse(gadgetTitle, sourceSyntax, xObject.getDocumentReference());
             List<Block> titleBlocks = titleXDom.getChildren();
             parserUtils.removeTopLevelParagraph(titleBlocks);
-            XDOM contentXDom = contentParser.parse(new StringReader(content));
+            XDOM contentXDom = contentParser.parse(content, sourceSyntax, xObject.getDocumentReference());
             List<Block> contentBlocks = contentXDom.getChildren();
             parserUtils.removeTopLevelParagraph(contentBlocks);
 

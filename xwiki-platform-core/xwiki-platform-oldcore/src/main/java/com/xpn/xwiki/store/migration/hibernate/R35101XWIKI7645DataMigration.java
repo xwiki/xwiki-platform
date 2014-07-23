@@ -133,7 +133,7 @@ public class R35101XWIKI7645DataMigration extends AbstractHibernateDataMigration
                         throw ex;
                     }
                 }
-                getIndexesQuery.setString(1, getSchemaFromWikiName(Utils.getContext().getDatabase()));
+                getIndexesQuery.setString(1, getSchemaFromWikiName(Utils.getContext().getWikiId()));
                 getIndexesQuery.setString(2, table[0]);
                 ResultSet indexes = getIndexesQuery.executeQuery();
                 while (indexes.next()) {

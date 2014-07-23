@@ -1,12 +1,8 @@
-##syntax=xwiki/2.1
-{{velocity output="false"}}
-## NOTE: We don't use #template because it currently registers the Velocity macros in a different namespace which makes
-## them unavailable in the current wiki page or the current template. We also tried #parse but it "randomly" fails to
-## register the Velocity macros from the parsed template. The only solution we found is to use #evaluate with #include
-## but unfortunately this doesn't allow the template to be overridden from the skin.
-#evaluate("#include('extension.vm')")
-#evaluate("#include('distribution/macros.vm')")
+##source.syntax=xwiki/2.1
+{{template name="extension.vm" output="false"/}}
+{{template name="distribution/macros.vm" output="false"/}}
 
+{{velocity output="false"}}
 #macro (displayDefaultUIExtension $distributionUIId)
   (% class="xLabel" %)
   {{translation key="platform.extension.distributionWizard.uiStepUILabel"/}}
@@ -21,7 +17,7 @@
       {{warning}}{{translation key="platform.extension.distributionWizard.uiStepInternetAccessWarning"/}}{{/warning}}
 
       ## Allow the user to install, upgrade or downgrade the UI.
-      {{html}}#displayExtension($distributionUIExtension){{/html}}
+      {{html}}#displayExtensionAndUpdateStepButtons($distributionUIExtension){{/html}}
     #else
       {{info}}$services.localization.render('extensions.advancedSearch.noResults',
         ["**$!escapetool.xml($distributionUIId.id)**", "**$!escapetool.xml($distributionUIId.version)**"]){{/info}}

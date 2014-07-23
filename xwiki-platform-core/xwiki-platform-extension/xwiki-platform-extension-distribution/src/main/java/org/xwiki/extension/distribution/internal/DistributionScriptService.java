@@ -19,7 +19,6 @@
  */
 package org.xwiki.extension.distribution.internal;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -39,15 +38,12 @@ import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
@@ -99,21 +95,12 @@ public class DistributionScriptService implements ScriptService
     @Named("xhtml/1.0")
     private BlockRenderer xhtmlRenderer;
 
-    /**
-     * Used to execute transformations.
-     */
-    @Inject
-    private transient TransformationManager transformationManager;
-
-    /**
-     * The component used to serialize entity references.
-     */
-    @Inject
-    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
-
     @Inject
     @Named(DocumentsModifiedDuringDistributionListener.NAME)
     private EventListener modifiedDocumentsListener;
+
+    @Inject
+    private RenderingContext renderingContext;
 
     /**
      * @param <T> the type of the object
@@ -135,7 +122,7 @@ public class DistributionScriptService implements ScriptService
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return getState(xcontext.getDatabase());
+        return getState(xcontext.getWikiId());
     }
 
     /**
@@ -145,8 +132,8 @@ public class DistributionScriptService implements ScriptService
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.isMainWiki(wiki) ? this.distributionManager.getFarmDistributionState() : this.distributionManager
-            .getWikiDistributionState(wiki);
+        return xcontext.isMainWiki(wiki) ? this.distributionManager.getFarmDistributionState()
+            : this.distributionManager.getWikiDistributionState(wiki);
     }
 
     /**
@@ -164,7 +151,7 @@ public class DistributionScriptService implements ScriptService
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return getUIExtensionId(xcontext.getDatabase());
+        return getUIExtensionId(xcontext.getWikiId());
     }
 
     /**
@@ -180,14 +167,27 @@ public class DistributionScriptService implements ScriptService
     }
 
     /**
-     * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
+     * @return the previous status of the distribution job for the current wiki (e.g. from last time the distribution
+     *         was upgraded)
      */
     public DistributionJobStatus< ? > getPreviousJobStatus()
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.isMainWiki() ? this.distributionManager.getPreviousFarmJobStatus() : this.distributionManager
-            .getPreviousWikiJobStatus(xcontext.getDatabase());
+        return getPreviousJobStatus(xcontext.getWikiId());
+    }
+
+    /**
+     * @param wiki the wiki for which to retrieve the previous status of the distribution job
+     * @return the previous status of the distribution job for the specified wiki (e.g. from last time the distribution
+     *         was upgraded)
+     */
+    public DistributionJobStatus< ? > getPreviousJobStatus(String wiki)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki(wiki) ? this.distributionManager.getPreviousFarmJobStatus()
+            : this.distributionManager.getPreviousWikiJobStatus(wiki);
     }
 
     /**
@@ -213,15 +213,7 @@ public class DistributionScriptService implements ScriptService
      */
     public String renderCurrentStepToXHTML()
     {
-        String transformationId = null;
-
-        XWikiContext xcontext = xcontextProvider.get();
-        if (xcontext != null && xcontext.getDoc() != null) {
-            transformationId =
-                this.defaultEntityReferenceSerializer.serialize(xcontext.getDoc().getDocumentReference());
-        }
-
-        return renderCurrentStepToXHTML(transformationId);
+        return renderCurrentStepToXHTML(this.renderingContext.getTransformationId());
     }
 
     public String renderCurrentStepToXHTML(String transformationId)
@@ -235,9 +227,7 @@ public class DistributionScriptService implements ScriptService
                 State jobState = jobStatus.getState();
 
                 if (jobState == State.RUNNING || jobState == State.WAITING) {
-                    Block block = job.getCurrentStep().render();
-
-                    transform(block, transformationId);
+                    Block block = job.getCurrentStep().execute();
 
                     WikiPrinter printer = new DefaultWikiPrinter();
 
@@ -251,21 +241,6 @@ public class DistributionScriptService implements ScriptService
         return null;
     }
 
-    private void transform(Block block, String transformationId)
-    {
-        TransformationContext txContext =
-            new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)), null,
-                false);
-
-        txContext.setId(transformationId);
-
-        try {
-            this.transformationManager.performTransformations(block, txContext);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     /**
      * @return the document modified during the Distribution Wizard execution
      * @since 5.4RC1
@@ -273,7 +248,7 @@ public class DistributionScriptService implements ScriptService
     public Map<DocumentReference, DocumentStatus> getModifiedDocuments()
     {
         return ((DocumentsModifiedDuringDistributionListener) this.modifiedDocumentsListener).getDocuments().get(
-            this.xcontextProvider.get().getDatabase());
+            this.xcontextProvider.get().getWikiId());
     }
 
     /**
@@ -284,7 +259,7 @@ public class DistributionScriptService implements ScriptService
     {
         Map<DocumentReference, DocumentStatus> documents =
             ((DocumentsModifiedDuringDistributionListener) this.modifiedDocumentsListener).getDocuments().get(
-                this.xcontextProvider.get().getDatabase());
+                this.xcontextProvider.get().getWikiId());
 
         Map<String, Map<String, Map<String, Map<String, DocumentStatus>>>> tree =
             new TreeMap<String, Map<String, Map<String, Map<String, DocumentStatus>>>>();

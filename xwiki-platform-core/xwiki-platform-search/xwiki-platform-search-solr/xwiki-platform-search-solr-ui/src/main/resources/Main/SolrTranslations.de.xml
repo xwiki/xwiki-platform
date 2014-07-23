@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>Main</web>
   <name>SolrTranslations</name>
   <language>de</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>Main.SolrSearch</parent>
   <creator>xwiki:XWiki.Admin</creator>
@@ -42,22 +62,57 @@ solr.admin.status.queueSize.label=Länge der Warteschlange
 solr.admin.status.title=Status
 solr.admin.submit=Ausführen
 solr.admin.title=Solr Suche Administration
-solr.facets.collapseAll=Alles aufklappen
+solr.facet.date.after=Nach {0}
+solr.facet.date.any=Jedes Datum
+solr.facet.date.applyCustomInterval=Anwenden
+solr.facet.date.before=Vor {0}
+solr.facet.date.between=Von {0} bis {1}
+solr.facet.date.customInterval=Frei angebarer Zeitraum
+solr.facet.date.end=Enddatum mit Zeit
+solr.facet.date.last30Days=Letzte 30 Tage
+solr.facet.date.last7Days=Letzte 7 Tage
+solr.facet.date.olderThan30Days=Älter als 30 Tage
+solr.facet.date.start=Startdatum mit Zeit
+solr.facet.date.today=Heute
+solr.facet.fileType.image.icon=Piktogram
+solr.facet.fileType.other.octet-stream=Binärdaten
+solr.facet.fileType.text.javascript=JavaScript
+solr.facet.fileType.text.plain=Test
+solr.facet.size.any=Jede Größe
+solr.facet.size.between=Zwischen {0} und {1}
+solr.facet.size.large=Groß
+solr.facet.size.lessThan=Weniger als {0} 
+solr.facet.size.medium=Mittel
+solr.facet.size.moreThan=Mehr als {0} 
+solr.facet.size.small=Klein
+solr.facet.size.tiny=Winzig
+solr.facets.collapseAll=Alles zuklappen
 solr.facets.emptyValue=-/-
-solr.facets.expandAll=Alles zuklappen
+solr.facets.expandAll=Alles aufklappen
 solr.facets.hint=Wählen Sie eine Kategorie aus und aktivieren Sie die Filter, um die aktuellen Suchergebnisse einzugrenzen.
+solr.facets.moreValues={0} weitere
 solr.facets.resetAll=Zurücksetzen
 solr.facets.title=Suche verfeinern
+solr.field.attauthor=Hochgeladen von
 solr.field.attcontent=Dateiname
+solr.field.attdate=Hochgeladen am
+solr.field.attsize=Dateigröße
+solr.field.author=Letzter Autor
 solr.field.author_display=Autor
+solr.field.class=Objekttyp
+solr.field.class.definedBy=Definiert durch {0} » {1} 
 solr.field.comment=Kommentare
 solr.field.creationdate=Erstelldatum
+solr.field.creator=Ersteller
 solr.field.creator_display=Ersteller
+solr.field.date=Letzte Änderung
 solr.field.doccontent=Angezeiger Inhalt des Dokuments
 solr.field.doccontentraw=Quelltext des Dokuments
 solr.field.filename=Dateiinhalt
 solr.field.locale=Sprache
 solr.field.locale.emptyValue=Ohne Sprachangabe
+solr.field.locale.emptyValue.hint=Einige Dokumente sind mit keiner Sprache assoziiert, weil sie entweder Programmcode enthalten (welcher keiner natürlichen Spache entspricht) oder weil sie eine Benutzerschnittstelle sind (wie diese Seite).
+solr.field.mimetype=Dateityp
 solr.field.name=Dokument
 solr.field.name_exact=Dokument
 solr.field.objcontent=Objekte
@@ -66,39 +121,34 @@ solr.field.propertyvalue=Eigenschaftswert
 solr.field.space=Bereich
 solr.field.space_exact=Bereich
 solr.field.title=Titel
+solr.field.type=Ergebnistyp
 solr.field.wiki=Wiki
-solr.filter.hint=Wählen Sie hier vordefinierte Filter aus, um Ihre Suchergebnisse einzuschränken.
-solr.filter.queryBoost.hint=Erlaubt, die Gewichtung einiger Felder für die Suchergebnis-relevanz zu beeinflussen\: z.B. title^1.2 name^2.0 author^1.0 doccontent^0.5 \: der Titel des Dokuments wird 1,2-mal höher gewertet, der Name gleich zweimal, der Inhalt nur halb so stark. 
-solr.filter.queryBoost.label=Gewichtung
-solr.filter.title=Erweiterte Optionen
-solr.filter.toggle=Suchfilter an/ausschalten
-solr.filterBy.fileType=Dateityp
-solr.filterBy.fileType.all=Alle Dateitypen
+solr.filterBy.fileType.archive=Archiv
 solr.filterBy.fileType.audio=Audio
+solr.filterBy.fileType.font=Schrittyp
 solr.filterBy.fileType.image=Bild
+solr.filterBy.fileType.other=Anders
+solr.filterBy.fileType.presentation=Präsentation
+solr.filterBy.fileType.spreadsheet=Tabellenkalkulation
 solr.filterBy.fileType.text=Text
 solr.filterBy.fileType.video=Video
-solr.filterBy.language=Sprache
-solr.filterBy.language.all=Alle Sprachen
-solr.filterBy.space=Bereich
-solr.filterBy.type=Inhaltstyp
-solr.filterBy.type.all=Alles
 solr.filterBy.type.attachment=Anhang
 solr.filterBy.type.document=Dokument
 solr.filterBy.type.object=Objekt
 solr.filterBy.type.object_property=Objekteigenschaft
-solr.filterBy.wiki=Wiki
-solr.filterBy.wiki.all=Alle Wikis
 solr.result.author=Geändert von {0} am {1}
 solr.result.highlightAll=Alle Vorkommen anzeigen
 solr.result.language=Sprache
 solr.result.location=Gefunden in {0} » {1} » {2}
 solr.result.mediaType=Dateityp {0}
-solr.result.object=Objekttyp {0}
-solr.result.property=Eigenschaft {0}\#{1}
+solr.result.uploadedBy=Hochgeladen von {0} am {1} ({2}) 
 solr.sortBy=Sortierung\:
+solr.sortBy.attauthor_display_sort=Hochgeladen von 
+solr.sortBy.attdate_sort=Hochgeladen am
+solr.sortBy.attsize_sort=Dateigröße
 solr.sortBy.author_display_sort=Letzter Autor
 solr.sortBy.date=Datum
+solr.sortBy.filename_sort=Dateiname
 solr.sortBy.score=Relevanz
 solr.sortBy.title_sort=Titel
 solr.sortOrder.asc=Aufsteigend

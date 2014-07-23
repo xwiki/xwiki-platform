@@ -25,8 +25,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -58,7 +60,8 @@ public class RenderingScriptService implements ScriptService
      * Used to lookup parsers and renderers to discover available syntaxes.
      */
     @Inject
-    private ComponentManager componentManager;
+    @Named("context")
+    private Provider<ComponentManager> componentManagerProvider;
 
     /**
      * @see #getDefaultTransformationNames()
@@ -72,6 +75,9 @@ public class RenderingScriptService implements ScriptService
     @Inject
     private SyntaxFactory syntaxFactory;
 
+    @Inject
+    private Logger logger;
+
     /**
      * @return the list of syntaxes for which a Parser is available
      */
@@ -79,11 +85,12 @@ public class RenderingScriptService implements ScriptService
     {
         List<Syntax> syntaxes = new ArrayList<Syntax>();
         try {
-            for (Parser parser : this.componentManager.<Parser>getInstanceList(Parser.class)) {
+            for (Parser parser : this.componentManagerProvider.get().<Parser> getInstanceList(Parser.class)) {
                 syntaxes.add(parser.getSyntax());
             }
         } catch (ComponentLookupException e) {
             // Failed to lookup parsers, consider there are no syntaxes available
+            this.logger.error("Failed to lookup parsers", e);
         }
 
         return syntaxes;
@@ -96,20 +103,22 @@ public class RenderingScriptService implements ScriptService
     {
         List<Syntax> syntaxes = new ArrayList<Syntax>();
         try {
-            List<PrintRendererFactory> factories = this.componentManager.getInstanceList(PrintRendererFactory.class);
+            List<PrintRendererFactory> factories =
+                this.componentManagerProvider.get().getInstanceList(PrintRendererFactory.class);
             for (PrintRendererFactory factory : factories) {
                 syntaxes.add(factory.getSyntax());
             }
         } catch (ComponentLookupException e) {
             // Failed to lookup renderers, consider there are no syntaxes available
+            this.logger.error("Failed to lookup renderers", e);
         }
 
         return syntaxes;
     }
 
     /**
-     * @return the names of Transformations that are configured in the Rendering Configuration and which are used by
-     *         the Transformation Manager when running all transformations
+     * @return the names of Transformations that are configured in the Rendering Configuration and which are used by the
+     *         Transformation Manager when running all transformations
      */
     public List<String> getDefaultTransformationNames()
     {
@@ -118,7 +127,7 @@ public class RenderingScriptService implements ScriptService
 
     /**
      * Parses a text written in the passed syntax.
-     *
+     * 
      * @param text the text to parse
      * @param syntaxId the id of the syntax in which the text is written in
      * @return the XDOM representing the AST of the parsed text or null if an error occurred
@@ -128,7 +137,7 @@ public class RenderingScriptService implements ScriptService
     {
         XDOM result;
         try {
-            Parser parser = this.componentManager.getInstance(Parser.class, syntaxId);
+            Parser parser = this.componentManagerProvider.get().getInstance(Parser.class, syntaxId);
             result = parser.parse(new StringReader(text));
         } catch (Exception e) {
             result = null;
@@ -138,7 +147,7 @@ public class RenderingScriptService implements ScriptService
 
     /**
      * Render a list of Blocks into the passed syntax.
-     *
+     * 
      * @param block the block to render
      * @param outputSyntaxId the syntax in which to render the blocks
      * @return the string representing the passed blocks in the passed syntax or null if an error occurred
@@ -149,7 +158,8 @@ public class RenderingScriptService implements ScriptService
         String result;
         WikiPrinter printer = new DefaultWikiPrinter();
         try {
-            BlockRenderer renderer = this.componentManager.getInstance(BlockRenderer.class, outputSyntaxId);
+            BlockRenderer renderer =
+                this.componentManagerProvider.get().getInstance(BlockRenderer.class, outputSyntaxId);
             renderer.render(block, printer);
             result = printer.toString();
         } catch (Exception e) {
@@ -160,7 +170,7 @@ public class RenderingScriptService implements ScriptService
 
     /**
      * Converts a Syntax specified as a String into a proper Syntax object.
-     *
+     * 
      * @param syntaxId the syntax as a string (eg "xwiki/2.0", "html/4.01", etc)
      * @return the proper Syntax object representing the passed syntax
      */

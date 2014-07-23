@@ -125,10 +125,17 @@ public class EditPage extends BasePage
 
     public void clickSaveAndContinue()
     {
+        this.clickSaveAndContinue(true);
+    }
+
+    public void clickSaveAndContinue(boolean wait)
+    {
         this.saveandcontinue.click();
 
-        // Wait until the page is really saved.
-        waitForNotificationSuccessMessage("Saved");
+        if (wait) {
+            // Wait until the page is really saved.
+            waitForNotificationSuccessMessage("Saved");
+        }
     }
 
     public ViewPage clickSaveAndView()
@@ -180,8 +187,11 @@ public class EditPage extends BasePage
     @Override
     protected void clickContentMenuEditSubMenuEntry(String id)
     {
-        // Hover the top (floating) edit menu bar then the current editor menu.
-        new Actions(getDriver()).moveToElement(editMenuBar).moveToElement(currentEditorMenu).perform();
+        // The edit menu bar is floating when the page is scrolled, but it is hidden. What's visible is a 'handle' that
+        // is implemented using :after CSS pseudo element. The user has to hover this handle in order to view the edit
+        // menu. Unfortunately Selenium cannot interact with pseudo elements so the solution is to scroll the page up to
+        // the top and then hover the menu. We scroll the page by moving the mouse over the logo image.
+        new Actions(getDriver()).moveToElement(logo).moveToElement(currentEditorMenu).perform();
         getDriver().findElement(By.xpath("//a[@id='" + id + "']")).click();
     }
 }

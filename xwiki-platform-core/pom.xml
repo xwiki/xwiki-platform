@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,7 +18,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -27,15 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>5.4-SNAPSHOT</version>
+    <version>6.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
-    <gwt.version>2.5.1</gwt.version>
-    <gwt.maven.plugin.version>2.5.1</gwt.maven.plugin.version>
+    <gwt.version>2.6.0</gwt.version>
+    <gwt.maven.plugin.version>2.6.0</gwt.maven.plugin.version>
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
@@ -55,24 +53,24 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.5.4-rc1</version>
+        <version>2.7-b2-xwiki</version>
       </dependency>
       <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.3.4.Final</version>
+        <version>3.4.4.Final</version>
       </dependency>
       <!-- Apache Tika used by Lucene and Office modules -->
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-core</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parsers</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -97,9 +95,9 @@
             <artifactId>bcmail-jdk15</artifactId>
           </exclusion>
           <!-- Tika triggers the wrong asm artifact so we have to take care of that ourself -->
-      	  <exclusion>
-      	    <artifactId>asm-debug-all</artifactId>
-      	    <groupId>org.ow2.asm</groupId>
+          <exclusion>
+            <artifactId>asm-debug-all</artifactId>
+            <groupId>org.ow2.asm</groupId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -108,21 +106,6 @@
         <groupId>org.ow2.asm</groupId>
         <artifactId>asm</artifactId>
         <version>4.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk15on</artifactId>
-        <version>1.49</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpkix-jdk15on</artifactId>
-        <version>1.49</version>
-      </dependency>
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcmail-jdk15on</artifactId>
-        <version>1.49</version>
       </dependency>
       <!-- Rome is used in rss macro and feed api modules and in Tika -->
       <dependency>
@@ -224,18 +207,16 @@
         <artifactId>jta</artifactId>
         <version>1.1</version>
       </dependency>
-      <!-- Make sure we exclude iText which we don't need and which incidentally would bring a bad dependency version
-           on bcprov and bcmail for jdk14. -->
       <dependency>
         <groupId>org.jfree</groupId>
         <artifactId>jfreechart</artifactId>
-        <version>1.0.14</version>
-        <exclusions>
-          <exclusion>
-            <groupId>com.lowagie</groupId>
-            <artifactId>itext</artifactId>
-          </exclusion>
-        </exclusions>
+        <version>1.0.17</version>
+      </dependency>
+      <!-- Used directly and indirectly in various projects. -->
+      <dependency>
+        <groupId>joda-time</groupId>
+        <artifactId>joda-time</artifactId>
+        <version>2.3</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -300,6 +281,13 @@
             <excludes>
               <exclude>**/gwt/**/client/**/*.java</exclude>
             </excludes>
+            <systemProperties>
+              <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
+              <property>
+                <name>screenshotDirectory</name>
+                <value>${basedir}/target/screenshots</value>
+              </property>
+            </systemProperties>
           </configuration>
         </plugin>
         <plugin>
@@ -361,13 +349,136 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/wiki/descriptor/WikiDescriptorManager</className>
+              <method>java.util.Collection getAllIds()</method>
+              <justification>Wiki module is still a young API.
+              Added an API for a very common use case so that we optimize it</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
+              <method>org.xwiki.model.reference.EntityReference getDefaultReference()</method>
+              <justification>Filter module is still a young API.
+              Those properties were copy/pasted by mistake</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
+              <method>org.xwiki.rendering.syntax.Syntax getDefaultSyntax()</method>
+              <justification>Filter module is still a young API.
+              Those properties were copy/pasted by mistake</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
+              <method>java.lang.String getSaveComment()</method>
+              <justification>Filter module is still a young API.
+              Those properties were copy/pasted by mistake</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
+              <method>boolean isAuthorPreserved()</method>
+              <justification>Filter module is still a young API.
+              Those properties were copy/pasted by mistake</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
+              <method>boolean isPreviousDeleted()</method>
+              <justification>Filter module is still a young API.
+              Those properties were copy/pasted by mistake</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
+              <method>boolean isVersionPreserved()</method>
+              <justification>Filter module is still a young API.
+              Those properties were copy/pasted by mistake</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
+              <method>void setAuthorPreserved(boolean)</method>
+              <justification>Filter module is still a young API.
+              Those properties were copy/pasted by mistake</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
+              <method>void setDefaultReference(org.xwiki.model.reference.EntityReference)</method>
+              <justification>Filter module is still a young API.
+              Those properties were copy/pasted by mistake</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
+              <method>void setDefaultSyntax(org.xwiki.rendering.syntax.Syntax)</method>
+              <justification>Filter module is still a young API.
+              Those properties were copy/pasted by mistake</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
+              <method>void setPreviousDeleted(boolean)</method>
+              <justification>Filter module is still a young API.
+              Those properties were copy/pasted by mistake</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
+              <method>void setSaveComment(java.lang.String)</method>
+              <justification>Filter module is still a young API.
+              Those properties were copy/pasted by mistake</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
+              <method>void setVersionPreserved(boolean)</method>
+              <justification>Filter module is still a young API.
+              Those properties were copy/pasted by mistake</justification>
+            </difference>
+            <!-- Mail Sender API: Young API! -->
+            <difference>
+              <differenceType>7005</differenceType>
+              <className>org/xwiki/mail/MailResultListener</className>
+              <method>void onError(javax.mail.internet.MimeMessage, java.lang.Throwable)</method>
+              <to>void onError(javax.mail.internet.MimeMessage, java.lang.Exception)</to>
+              <justification>Mail Sender API is still a young API.</justification>
+            </difference>
+            <difference>
+              <differenceType>7002</differenceType>
+              <className>org/xwiki/mail/MailSender</className>
+              <method>void send(javax.mail.internet.MimeMessage, javax.mail.Session, org.xwiki.mail.MailResultListener)</method>
+              <justification>Mail Sender API is still a young API.</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/mail/MailSender</className>
+              <method>void sendAsynchronously(javax.mail.internet.MimeMessage, javax.mail.Session, org.xwiki.mail.MailResultListener)</method>
+              <justification>Mail Sender API is still a young API.</justification>
+            </difference>
+            <difference>
+              <differenceType>7005</differenceType>
+              <className>org/xwiki/mail/script/MimeMessageWrapper</className>
+              <method>MimeMessageWrapper*</method>
+              <to>MimeMessageWrapper*</to>
+              <justification>Mail Sender API is still a young API.</justification>
+            </difference>
+            <difference>
+              <differenceType>7006</differenceType>
+              <className>org/xwiki/mail/script/MimeMessageWrapper</className>
+              <method>javax.mail.internet.MimeMessage getMessage()</method>
+              <to>org.xwiki.mail.internal.ExtendedMimeMessage</to>
+              <justification>Mail Sender API is still a young API.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Lots of refactoring in WikiStream -->
-            <exclude>org/xwiki/wikistream/**</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -410,6 +521,8 @@
     <module>xwiki-platform-extension</module>
     <module>xwiki-platform-faq</module>
     <module>xwiki-platform-feed</module>
+    <module>xwiki-platform-filter</module>
+    <module>xwiki-platform-flamingo</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-git</module>
     <module>xwiki-platform-groovy</module>
@@ -422,10 +535,12 @@
     <module>xwiki-platform-jira</module>
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-ldap</module>
+    <module>xwiki-platform-less-css</module>
     <module>xwiki-platform-linkchecker</module>
     <module>xwiki-platform-livetable</module>
     <module>xwiki-platform-localization</module>
     <module>xwiki-platform-logging</module>
+    <module>xwiki-platform-mail</module>
     <module>xwiki-platform-mailsender</module>
     <module>xwiki-platform-menu</module>
     <module>xwiki-platform-messagestream</module>
@@ -459,9 +574,8 @@
     <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webdav</module>
+    <module>xwiki-platform-webjars</module>
     <module>xwiki-platform-wiki</module>
-    <module>xwiki-platform-wikistream</module>
-    <module>xwiki-platform-wiki-manager</module>
     <module>xwiki-platform-wysiwyg</module>
     <module>xwiki-platform-xar</module>
     <module>xwiki-platform-xml</module>

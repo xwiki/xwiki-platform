@@ -99,6 +99,18 @@ public class BasePage extends BaseElement
     @FindBy(id = "tmSpace")
     private WebElement spaceMenu;
 
+    @FindBy(id = "tmWiki")
+    private WebElement wikiMenu;
+    
+    @FindBy(id = "tmWatchWiki")
+    private WebElement watchWikiLink;
+    
+    /**
+     * Used to scroll the page to the top before accessing the floating menu.
+     */
+    @FindBy(id = "companylogo")
+    protected WebElement logo;
+
     public String getPageTitle()
     {
         return getDriver().getTitle();
@@ -142,8 +154,11 @@ public class BasePage extends BaseElement
      */
     protected void clickContentMenuTopEntry(String id)
     {
-        // Hover the top (floating) content menu bar.
-        new Actions(getDriver()).moveToElement(contentMenuBar).perform();
+        // The content menu bar is floating when the page is scrolled, but it is hidden. What's visible is a 'handle'
+        // that is implemented using :after CSS pseudo element. The user has to hover this handle in order to view the
+        // content menu. Unfortunately Selenium cannot interact with pseudo elements so the solution is to scroll the
+        // page up to the top and then hover the menu. We scroll the page by moving the mouse over the logo image.
+        new Actions(getDriver()).moveToElement(logo).moveToElement(contentMenuBar).perform();
         getDriver().findElement(By.xpath("//div[@id='" + id + "']//strong")).click();
     }
 
@@ -154,8 +169,9 @@ public class BasePage extends BaseElement
      */
     protected void clickContentMenuEditSubMenuEntry(String id)
     {
-        // Hover the top (floating) content menu bar then the edit menu.
-        new Actions(getDriver()).moveToElement(contentMenuBar).moveToElement(editMenu).perform();
+        // Scroll the page to the top by moving the mouse over the logo image (see #clickContentMenuTopEntry(String) for
+        // the reason), hover the top content menu bar then the edit menu.
+        new Actions(getDriver()).moveToElement(logo).moveToElement(contentMenuBar).moveToElement(editMenu).perform();
         getDriver().findElement(By.xpath("//a[@id='" + id + "']")).click();
     }
 
@@ -392,6 +408,15 @@ public class BasePage extends BaseElement
     {
         new Actions(getDriver()).moveToElement(spaceMenu).perform();
         this.watchSpaceLink.click();
+    }
+
+    /**
+     * @since 6.0M1
+     */
+    public void watchWiki()
+    {
+        new Actions(getDriver()).moveToElement(wikiMenu).perform();
+        this.watchWikiLink.click();
     }
 
     /**

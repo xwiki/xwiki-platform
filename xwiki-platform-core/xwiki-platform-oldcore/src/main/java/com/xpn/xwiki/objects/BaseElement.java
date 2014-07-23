@@ -51,13 +51,14 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     /**
      * Reference to the document in which this element is defined (for elements where this make sense, for example for
      * an XClass or a XObject).
-     * @since 5.3M1
      * 
+     * @since 5.3M1
      */
     protected DocumentReference documentReference;
 
     /**
      * The owner document, if this element was obtained from a document.
+     * 
      * @since 5.3M1
      */
     protected transient XWikiDocument ownerDocument;
@@ -293,7 +294,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)
     {
-        setPrettyName(MergeUtils.mergeCharacters(((BaseElement) previousElement).getPrettyName(),
+        setPrettyName(MergeUtils.mergeOject(((BaseElement) previousElement).getPrettyName(),
             ((BaseElement) newElement).getPrettyName(), getPrettyName(), mergeResult));
     }
 

@@ -41,10 +41,10 @@ public class ClassResourceImpl extends XWikiResource implements ClassResource
     @Override
     public Class getClass(String wikiName, String className) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(className);
             if (xwikiClass == null) {
@@ -55,7 +55,7 @@ public class ClassResourceImpl extends XWikiResource implements ClassResource
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 }

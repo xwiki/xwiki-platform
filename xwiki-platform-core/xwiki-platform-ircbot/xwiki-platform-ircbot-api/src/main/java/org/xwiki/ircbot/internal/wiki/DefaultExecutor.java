@@ -24,10 +24,12 @@ import org.pircbotx.hooks.Event;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.internal.transformation.macro.MacroErrorManager;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -40,6 +42,11 @@ import org.xwiki.rendering.transformation.TransformationException;
  */
 public class DefaultExecutor implements WikiIRCModel.Executor
 {
+    /**
+     * @see #DefaultExecutor
+     */
+    private RenderingContext renderingContext;
+
     /**
      * @see #DefaultExecutor
      */
@@ -76,16 +83,17 @@ public class DefaultExecutor implements WikiIRCModel.Executor
      * @param syntax the Syntax in which the Macros are written
      * @param event the IRC Bot Event that the Wiki Bot Listener is responding to and that we use to send back the
      *        rendered content to the IRC Channel
+     * @param renderingContext the rendering context we need to keep updated for proper right management.
      * @param macroTransformation the Macro transformation to transform the passed XDOM and execute the Macros in it
      * @param plainTextBlockRenderer the Renderer to use to transform the XDOM into some plain text to send to the IRC
-     *        channel
      */
-    public DefaultExecutor(XDOM xdom, Syntax syntax, Event event, Transformation macroTransformation,
-        BlockRenderer plainTextBlockRenderer)
+    public DefaultExecutor(XDOM xdom, Syntax syntax, Event event, RenderingContext renderingContext,
+        Transformation macroTransformation, BlockRenderer plainTextBlockRenderer)
     {
         this.xdom = xdom;
         this.syntax = syntax;
         this.event = event;
+        this.renderingContext = renderingContext;
         this.macroTransformation = macroTransformation;
         this.plainTextBlockRenderer = plainTextBlockRenderer;
     }
@@ -116,7 +124,7 @@ public class DefaultExecutor implements WikiIRCModel.Executor
 
         // Execute the Macro Transformation on XDOM and send the result to the IRC server
         TransformationContext txContext = new TransformationContext(temporaryXDOM, syntax);
-        this.macroTransformation.transform(temporaryXDOM, txContext);
+        ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext, temporaryXDOM);
 
         DefaultWikiPrinter printer = new DefaultWikiPrinter();
         this.plainTextBlockRenderer.render(temporaryXDOM, printer);

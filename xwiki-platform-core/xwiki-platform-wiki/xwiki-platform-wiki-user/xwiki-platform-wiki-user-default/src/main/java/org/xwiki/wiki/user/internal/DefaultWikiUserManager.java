@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -386,6 +387,40 @@ public class DefaultWikiUserManager implements WikiUserManager
     public Collection<MemberCandidacy> getAllRequests(String wikiId) throws WikiUserManagerException
     {
         return getAllMemberCandidacies(wikiId, MemberCandidacy.CandidateType.REQUEST);
+    }
+
+    @Override
+    public boolean hasPendingInvitation(DocumentReference user, String wikiId) throws WikiUserManagerException
+    {
+        Collection<MemberCandidacy> invitations = getAllInvitations(wikiId);
+        if (invitations != null) {
+            String userId = documentReferenceSerializer.serialize(user);
+            for (MemberCandidacy invitation : invitations) {
+                if (StringUtils.equals(invitation.getUserId(), userId)
+                    && invitation.getStatus() == MemberCandidacy.Status.PENDING) {
+                    return true;
+                }
+            }
+        }
+        // No pending invitation
+        return false;
+    }
+
+    @Override
+    public boolean hasPendingRequest(DocumentReference user, String wikiId) throws WikiUserManagerException
+    {
+        Collection<MemberCandidacy> requests = getAllRequests(wikiId);
+        if (requests != null) {
+            String userId = documentReferenceSerializer.serialize(user);
+            for (MemberCandidacy request : requests) {
+                if (StringUtils.equals(request.getUserId(), userId)
+                    && request.getStatus() == MemberCandidacy.Status.PENDING) {
+                    return true;
+                }
+            }
+        }
+        // No pending request
+        return false;
     }
 
     @Override

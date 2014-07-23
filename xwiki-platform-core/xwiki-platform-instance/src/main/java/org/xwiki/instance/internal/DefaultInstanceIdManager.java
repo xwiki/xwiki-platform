@@ -92,8 +92,8 @@ public class DefaultInstanceIdManager implements InstanceIdManager
             // Try retrieving the UUID from the database
 
             // First ensure that we're on the main wiki since we store the unique id only on the main wiki
-            String originalDatabase = context.getDatabase();
-            context.setDatabase(context.getMainXWiki());
+            String originalDatabase = context.getWikiId();
+            context.setWikiId(context.getMainXWiki());
 
             try {
                 InstanceId id = store.failSafeExecuteRead(context,
@@ -134,7 +134,7 @@ public class DefaultInstanceIdManager implements InstanceIdManager
                 this.instanceId = id;
             } finally {
                 // Restore original database
-                context.setDatabase(originalDatabase);
+                context.setWikiId(originalDatabase);
             }
         }
     }

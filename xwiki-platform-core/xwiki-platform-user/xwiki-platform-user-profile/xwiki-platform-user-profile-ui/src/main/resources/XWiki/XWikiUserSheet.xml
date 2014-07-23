@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -34,7 +35,7 @@
   <date>1385071571000</date>
   <contentUpdateDate>1385071571000</contentUpdateDate>
   <version>1.1</version>
-  <title>$services.localization.render('platform.core.profile.title', ["$!doc.getValue('first_name') $!doc.getValue('last_name')"])</title>
+  <title>#set($userName="$!doc.getValue('first_name') $!doc.getValue('last_name')")#if($userName==' ')#set($userName=$doc.name)#{end}$services.localization.render('platform.core.profile.title', [$userName])</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -51,28 +52,29 @@
 ## Setting categories
 #########################
 #set($categories = [])
-#set($discard = $categories.add({'id':'profile', 'sheet':'XWiki.XWikiUserProfileSheet'}))
+#set($discard = $categories.add({'id':'profile', 'sheet':'XWiki.XWikiUserProfileSheet', 'glyphicon': 'user'}))
 #set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
 #if($isMyProfile || $hasAdmin)
-  #set($discard = $categories.add({'id':'preferences', 'sheet':'XWiki.XWikiUserPreferencesSheet'}))
+  #set($discard = $categories.add({'id':'preferences', 'sheet':'XWiki.XWikiUserPreferencesSheet', 'glyphicon': 'wrench'}))
 #end
 ## TODO: add APIs to be able to display users watchlists to admins
-#if($isMyProfile &amp;&amp; $hasWatch)  
-  #set($discard = $categories.add({'id':'watchlist', 'sheet':'XWiki.XWikiUserWatchListSheet'}))
+#if($isMyProfile &amp;&amp; $hasWatch)
+  #set($discard = $categories.add({'id':'watchlist', 'sheet':'XWiki.XWikiUserWatchListSheet', 'glyphicon': 'eye-open'}))
 #end
 #if($isMyProfile)
-  #set($discard = $categories.add({'id':'network', 'sheet':'XWiki.XWikiUserNetworkSheet'}))
+  #set($discard = $categories.add({'id':'network', 'sheet':'XWiki.XWikiUserNetworkSheet', 'glyphicon': 'globe'}))
 #end
 #set($userWikiSheet = 'WikiManager.UserWikiSheet')
-#if($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWikiSheet))  
+#if($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWikiSheet))
   #set($discard = $categories.add({
     'id': 'wikis',
     'name': $services.localization.render('platform.wiki.menu.userwikis'),
-    'sheet': $userWikiSheet
+    'sheet': $userWikiSheet,
+    'glyphicon': 'list'
   }))
 #end
 #if($isMyProfile &amp;&amp; $hasDashboard)
-  #set($discard = $categories.add({'id':'dashboard', 'sheet':'Dashboard.XWikiUserDashboardSheet'}))  
+  #set($discard = $categories.add({'id':'dashboard', 'sheet':'Dashboard.XWikiUserDashboardSheet', 'glyphicon': 'th'}))
 #end
 #########################
 ## Current category
@@ -145,7 +147,7 @@
 #########################
 {{html clean="false"}}
   #if($xcontext.action == 'edit' || $xcontext.action == 'inline')
-    &lt;input type='hidden' name='category' value="$!{currentCategory}" /&gt;
+    &lt;input type='hidden' name='category' value="$!{escapetool.xml($currentCategory)}" /&gt;
   #end
   &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
   #if($request.get('xpage'))
@@ -456,7 +458,7 @@ return XWiki;
   content: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
 }
 
-.profile-menu .group.user-menu-title{
+.skin-colibri .profile-menu .group.user-menu-title{
   #set ($menuIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/user.png')${escapetool.S})")
   #css3_backgroundIconAndLinearGradient($menuIcon, {
     'to': 'bottom',
@@ -563,24 +565,6 @@ div.editProfileCategory a {
   font-weight: bold;
 }
 
-span.wikiWatchlistType, span.spaceWatchlistType, span.pageWatchlistType {
-  width: 16px;
-  height: 16px;
-  display: block;
-}
-
-span.wikiWatchlistType {
-  background: url("$xwiki.getSkinFile('icons/silk/world.png')") no-repeat;
-}
-
-span.spaceWatchlistType {
-  background: url("$xwiki.getSkinFile('icons/silk/folder.png')") no-repeat;
-}
-
-span.pageWatchlistType {
-  background: url("$xwiki.getSkinFile('icons/silk/page_white_text.png')") no-repeat;
-}
-
 span#avatarUpload {
   display:block;
   width:$tabswidth;
@@ -644,8 +628,6 @@ span#avatarUpload {
   background: url("$xwiki.getSkinFile('icons/silk/picture_edit.png')") no-repeat center center $theme.pageContentBackgroundColor !important;
   border: 0 none !important;
   border-bottom-left-radius: 8px;
-  -moz-border-radius-bottomleft: 8px;
-  -webkit-border-bottom-left-radius: 8px;
   height: 18px;
   position: absolute;
   right: 0;

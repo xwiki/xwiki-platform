@@ -109,6 +109,12 @@
   </form>
 #end
 
+#macro (displayExtensionAndUpdateStepButtons $extension)
+  #set ($jobStatus = $NULL)
+  #displayExtension($extension)
+  #set ($disableStepButtons = $disableStepButtons || $jobStatus.state == 'RUNNING' || $jobStatus.state == 'WAITING')
+#end
+
 #macro (repairPreviousUI $wiki $recommendedUIExtension $documentCount)
   #set ($previousUI = $NULL)
   #if ($request.previousUIId && $request.previousUIVersion && $wiki == $request.wiki)
@@ -127,34 +133,48 @@
     ## TODO: Find a better way to 'force' the repair XAR extension button.
     #set ($showRepairXARButton = true)
     ## Wrap the extension in a DIV so that its bottom border is displayed.
-    <div>#displayExtension($previousUI)</div>
+    <div>#displayExtensionAndUpdateStepButtons($previousUI)</div>
   #end
 #end
 
 #macro (maybeRepairPreviousUI $wiki $recommendedUIExtension)
+  #if (!$recommendedUIExtension)
+    ## The recommended UI extension couldn't be found in the configured repositories.
+    #break
+  #end
+  ## See if the previous UI extension is known.
+  #set ($previousDistributionJobStatus = $services.distribution.getPreviousJobStatus($wiki))
+  #if ($previousDistributionJobStatus.distributionExtensionUI == $recommendedUIExtension.id)
+    ## The Distribution Wizard may have been restarted before the finish.
+    #set ($previousUIId = $previousDistributionJobStatus.previousDistributionExtensionUI)
+  #else
+    #set ($previousUIId = $previousDistributionJobStatus.distributionExtensionUI)
+  #end
+  #if ($previousUIId)
+    ## The previous UI extension is known. Nothing to repair.
+    #break
+  #end
+  ## The recommended UI is available to install and we don't know the previous UI.
   #getExtensionJobStatus($recommendedUIExtension.id.id $recommendedUIExtension.id.version.value $recommendedUIJobStatus)
   #getInstalledExtension($recommendedUIExtension "wiki:$wiki" $installedVersion)
   #if (!$installedVersion && (!$recommendedUIJobStatus || $recommendedUIJobStatus.state == 'FINISHED'))
     ## There is no previous version of the recommended UI installed on the specified wiki and there is no job running
     ## for the recommended UI either.
-    #if ($services.distribution.getState($wiki) == 'DIFFERENT')
-      ## TODO: Display the previous distribution UI extension to let the user uninstall it.
-    #else
-      ## Determine if this is a new install or an upgrade from a version where the default distribution UI wasn't
-      ## installed with the Extension Manager (or at least it wasn't marked as installed).
-      ## Check if there are other extensions installed.
-      #set ($installedExtensionCount = $services.extension.installed.getInstalledExtensions("wiki:$wiki").size())
-      ## Check how many documents that are not XClasses are in the database (a number of XClasses are created
-      ## automatically at startup when the database is empty and we don't want to take them into account).
-      #set ($documentCount = $services.query.xwql("where doc.xWikiClassXML is null or doc.xWikiClassXML not like '<%'"
-        ).setWiki($wiki).addFilter('unique').addFilter('count').execute().get(0))
-      ## Unfortunately there are still 3 documents that are not XClasses and which are created automatically (Watchlist
-      ## notifiers) and we want to exclude them also.
-      #if ($installedExtensionCount > 0 || $documentCount > 3)
-        ## There are documents in the database (past the default set that is automatically created), maybe from the
-        ## previous version of the default distribution UI, but the UI is not marked as installed.
-        #repairPreviousUI($wiki $recommendedUIExtension $documentCount)
-      #end
+    ##
+    ## Determine if this is a new install or an upgrade from a version where the default distribution UI wasn't
+    ## installed with the Extension Manager (or at least it wasn't marked as installed).
+    ## Check if there are other extensions installed.
+    #set ($installedExtensionCount = $services.extension.installed.getInstalledExtensions("wiki:$wiki").size())
+    ## Check how many documents that are not XClasses are in the database (a number of XClasses are created
+    ## automatically at startup when the database is empty and we don't want to take them into account).
+    #set ($documentCount = $services.query.xwql("where doc.xWikiClassXML is null or doc.xWikiClassXML not like '<%'"
+      ).setWiki($wiki).addFilter('unique').addFilter('count').execute().get(0))
+    ## Unfortunately there are still 3 documents that are not XClasses and which are created automatically (Watchlist
+    ## notifiers) and we want to exclude them also.
+    #if ($installedExtensionCount > 0 || $documentCount > 3)
+      ## There are documents in the database (past the default set that is automatically created), maybe from the
+      ## previous version of the default distribution UI, but the UI is not marked as installed.
+      #repairPreviousUI($wiki $recommendedUIExtension $documentCount)
     #end
   #end
 #end

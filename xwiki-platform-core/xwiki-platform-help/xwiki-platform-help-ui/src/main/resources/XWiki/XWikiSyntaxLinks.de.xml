@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>XWiki</web>
   <name>XWikiSyntaxLinks</name>
   <language>de</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>XWiki.XWikiSyntax</parent>
   <creator>xwiki:XWiki.Admin</creator>
@@ -30,7 +50,6 @@
 {{comment}}please do not translate the sub headlines{{/comment}}
 === 1.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Funktion|=XWiki Syntax 1.0|=(% style="width:20%" %)Ergebnis
 |Link zu Seite im aktuellen Bereich|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
 |Link mit Linktext|{{{[Linktext&gt;WebHome]}}}|[[Linktext&gt;&gt;WebHome]]
@@ -49,7 +68,7 @@
 {{{{attach:Text|file=img.png}}}}
 )))|[[Text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Link zu einem Anhang auf einer anderen Seite|(((
-{{info}}See [[Anhangsmakro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] für Details{{/info}}
+{{info}}Siehe [[Anhangsmakro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Attach+Macro+%28Radeox%29]] für Details{{/info}}
 {{{{attach:Text|document=Bereich.Seite|file=img.png}}}}
 )))|[[Text&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 
@@ -77,7 +96,6 @@ Das vollständige Format eines Links ist **##[Linktext {&gt; oder |}] (Ressource
 
 === 2.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Funktion|=XWiki Syntax 2.0|=(% style="width:20%" %)Ergebnis
 |Link zu Seite im aktuellen Bereich|{{{[[WebHome]]}}}|[[WebHome]]
 |Link mit Linktext|(((
@@ -96,8 +114,8 @@ Das vollständige Format eines Links ist **##[Linktext {&gt; oder |}] (Ressource
 |Bild-Link mit Bildparametern|{{{[[[[image:Bereich2.Seite2@Bild.png||width="26" height="26"]]&gt;&gt;Bereich1.Seite1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||width="26" height="26"]]&gt;&gt;Main.WebHome]]
 |Link zu einem Anhang auf der aktuellen Seite|{{{[[Text&gt;&gt;attach:img.png]]}}}|[[Text&gt;&gt;attach:img.png]]
 |Link zu einem Anhang auf einer anderen Seite|{{{[[Text&gt;&gt;attach:Bereich.Seite@img.png]]}}}|[[Text&gt;&gt;attach:XWiki.XWikiSyntax@img.png]]
-|Link zu einem Anker auf einer Seite|{{{[[Text&gt;&gt;Bereich.Seite||anchor=anchor]]}}}|[[Text&gt;&gt;XWiki.XWikiSyntax||anchor=anchor]]
-|Link zu einer Überschrift auf einer Seite|{{{[[Text&gt;&gt;Bereich.Seite||anchor=HMyheading]]}}}|[[Text&gt;&gt;XWiki.XWikiSyntax||anchor=HMyheading]]
+|Link zu einem Anker auf einer Seite|{{{[[Text&gt;&gt;Bereich.Seite#anchor]]}}}|[[Text&gt;&gt;XWiki.XWikiSyntax||anchor=anchor]]
+|Link zu einer Überschrift auf einer Seite|{{{[[Text&gt;&gt;Bereich.Seite#HMyheading]]}}}|[[Text&gt;&gt;XWiki.XWikiSyntax||anchor=HMyheading]]
 
 {{info}}Wenn Sie eine Überschrift in einem Dokument hinzufügen, wird daraus automatisch ein Anker generiert, der aus einem vorangestellem "H", gefolgt von den Buchstaben in der Überschrift gebildet wird. Beispiel: eine Überschrift "Neuer Abschnitt" erzeugt einen Anker "HNeuerAbschnitt".{{/info}}
 
@@ -132,9 +150,7 @@ Das vollständige Format eines Links ist **##[Linktext&gt;&gt;] (Ressource) [@in
 
 === 2.1 Links ===
 
-(% style="overflow:hidden;word-wrap:break-word" %)
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Funktion|=XWiki Syntax 2.1|=(% style="width:20%" %)Ergebnis
+|=Funktion|=XWiki Syntax 2.1|=Ergebnis
 |Link zu Seite im aktuellen Bereich|{{{[[WebHome]]}}}|[[WebHome]]
 |Link mit Linktext|(((
 {{{[[Linktext&gt;&gt;WebHome]]}}}

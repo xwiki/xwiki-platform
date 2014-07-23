@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,7 +18,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -27,7 +25,7 @@
   <parent>
     <artifactId>xwiki-platform-search</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>5.4-SNAPSHOT</version>
+    <version>6.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr</artifactId>
   <packaging>pom</packaging>
@@ -46,13 +44,49 @@
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
+            <artifactId>slf4j-log4j12</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
           </exclusion>
           <!-- Solr is using an old version of Woodstox but we need the newer version which is used by our Cache
                module -->
           <exclusion>
             <groupId>org.codehaus.woodstox</groupId>
             <artifactId>wstx-asl</artifactId>
+          </exclusion>
+          <!-- We use a different version of Restlet. -->
+          <exclusion>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet.ext.servlet</artifactId>
+          </exclusion>
+          <!-- Does not make any sense to have runtime or build dependency on servlet API. It should be provided scope. -->
+          <exclusion>
+            <artifactId>javax.servlet</artifactId>
+            <groupId>org.eclipse.jetty.orbit</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <!-- Make sure we use the right version of Restlet. -->
+      <dependency>
+        <groupId>org.restlet.jse</groupId>
+        <artifactId>org.restlet</artifactId>
+        <version>${restlet.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.restlet.jee</groupId>
+        <artifactId>org.restlet.ext.servlet</artifactId>
+        <version>${restlet.version}</version>
+        <exclusions>
+          <!-- Restlet API is already provided above -->
+          <exclusion>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>org.restlet</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

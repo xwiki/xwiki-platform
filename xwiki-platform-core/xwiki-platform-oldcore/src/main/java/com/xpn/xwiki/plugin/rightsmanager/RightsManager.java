@@ -203,13 +203,13 @@ public final class RightsManager
             return countAllLocalUsersOrGroups(user, matchFields, context);
         }
 
-        String database = context.getDatabase();
+        String database = context.getWikiId();
 
         try {
-            context.setDatabase(wikiName);
+            context.setWikiId(wikiName);
             return countAllLocalUsersOrGroups(user, matchFields, context);
         } finally {
-            context.setDatabase(database);
+            context.setWikiId(database);
         }
     }
 
@@ -383,10 +383,10 @@ public final class RightsManager
             return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order, context);
         }
 
-        String database = context.getDatabase();
+        String database = context.getWikiId();
 
         try {
-            context.setDatabase(wikiName);
+            context.setWikiId(wikiName);
 
             List< ? > localGroupList =
                 getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order, context);
@@ -402,7 +402,7 @@ public final class RightsManager
 
             return localGroupList;
         } finally {
-            context.setDatabase(database);
+            context.setWikiId(database);
         }
     }
 
@@ -891,7 +891,7 @@ public final class RightsManager
             needUpdate |= usersOrGroups.remove(userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName);
         }
 
-        if (context.getDatabase() == null || context.getDatabase().equalsIgnoreCase(userOrGroupWiki)) {
+        if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(userOrGroupWiki)) {
             needUpdate |= usersOrGroups.remove(userOrGroupName);
 
             if (userOrGroupSpace == null || userOrGroupSpace.equals(DEFAULT_USERORGROUP_SPACE)) {
@@ -1005,7 +1005,7 @@ public final class RightsManager
 
         where.append(" and prop.value like ?");
 
-        if (context.getDatabase() == null || context.getDatabase().equalsIgnoreCase(userOrGroupWiki)) {
+        if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(userOrGroupWiki)) {
             if (userOrGroupSpace == null || userOrGroupSpace.equals(DEFAULT_USERORGROUP_SPACE)) {
                 parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupName + HQLLIKE_ALL_SYMBOL);
             } else {
@@ -1083,7 +1083,7 @@ public final class RightsManager
         }
 
         if (memberList.contains(memberName)
-            || memberList.contains(context.getDatabase() + WIKIFULLNAME_SEP + memberName)) {
+            || memberList.contains(context.getWikiId() + WIKIFULLNAME_SEP + memberName)) {
             found = true;
         } else {
             for (String groupMemberName : memberList) {

@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>WikiManager</web>
   <name>Translations</name>
   <language>fr</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>XWiki.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
@@ -34,8 +54,8 @@ admin.xwiki.usersconfiguration.title=Configuration
 admin.xwiki.workspaceusers.description=Gérer les membres de ce wiki\: ajouter, supprimer, inviter, accepter ou rejeter des membres de ce wiki.
 core.menu.admin.wiki=Administrer le wiki
 core.menu.type.wiki=Wiki
-core.menu.watchlist.add.wiki=Surveiller ce wiki
-core.menu.watchlist.remove.wiki=Ne plus surveiller ce wiki
+core.menu.watchlist.add.wiki=Ajuouter le wiki aux favoris
+core.menu.watchlist.remove.wiki=Retirer le wiki des favoris
 platform.wiki.currentwiki.candidateAcceptedSuccess=La demande a été acceptée.
 platform.wiki.currentwiki.candidateHandledComment=Commentaire \:
 platform.wiki.currentwiki.candidateHandledSaveComment=Candidat traité {0} ({1})
@@ -49,7 +69,7 @@ platform.wiki.currentwiki.candidates.reject.label=Rejeter
 platform.wiki.currentwiki.candidates.reviewer.label=Admin \:
 platform.wiki.currentwiki.candidates.reviewermessage.label=Message de l'administrateur \:
 platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Message privé \:
-platform.wiki.currentwiki.candidates.status.label=Status \:
+platform.wiki.currentwiki.candidates.status.label=Statut\:
 platform.wiki.currentwiki.candidates.type.label=Type \:
 platform.wiki.currentwiki.currentUserCanLeave=Si vous le souhaitez, vous pouvez {0}quitter ce wiki{1}.
 platform.wiki.currentwiki.currentUserIsAdmin=Vous êtes administrateur de ce wiki.

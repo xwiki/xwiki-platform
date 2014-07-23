@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,10 +38,11 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.component.wiki.internal.WikiComponentConstants;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -63,17 +65,17 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
     @Inject
     protected Logger logger;
 
-    /**
-      * The execution context.
-      */
     @Inject
-    private Execution execution;
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * The rendering bridge.
      */
     @Inject
     private ContentParser renderingBridge;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     @Override
     public Syntax getSyntax(DocumentReference reference) throws WikiComponentException
@@ -128,7 +130,7 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
             for (BaseObject method : componentDocument.getObjects(METHOD_CLASS)) {
                 if (!StringUtils.isBlank(method.getStringValue(METHOD_NAME_FIELD))) {
                     handledMethods.put(method.getStringValue(METHOD_NAME_FIELD), renderingBridge.parse(
-                        method.getStringValue(METHOD_CODE_FIELD), this.getSyntax(reference)));
+                        method.getStringValue(METHOD_CODE_FIELD), this.getSyntax(reference), reference));
                 }
             }
         }
@@ -148,8 +150,7 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
                         interfaces.add(implemented);
                     } catch (Exception e) {
                         this.logger.warn("Interface [{}] not found, declared for wiki component [{}]",
-                            iface.getStringValue(INTERFACE_NAME_FIELD),
-                            componentDocument.getDocumentReference());
+                            iface.getStringValue(INTERFACE_NAME_FIELD), componentDocument.getDocumentReference());
                     }
                 }
             }
@@ -166,15 +167,14 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
             for (BaseObject dependency : componentDocument.getObjects(DEPENDENCY_CLASS)) {
                 try {
                     DefaultComponentDescriptor cd = new DefaultComponentDescriptor();
-                    cd.setRoleType(
-                        ReflectionUtils.unserializeType(dependency.getStringValue(COMPONENT_ROLE_TYPE_FIELD),
-                            Thread.currentThread().getContextClassLoader()));
+                    cd.setRoleType(ReflectionUtils.unserializeType(
+                        dependency.getStringValue(COMPONENT_ROLE_TYPE_FIELD), Thread.currentThread()
+                            .getContextClassLoader()));
                     cd.setRoleHint(dependency.getStringValue(COMPONENT_ROLE_HINT_FIELD));
                     dependencies.put(dependency.getStringValue(DEPENDENCY_BINDING_NAME_FIELD), cd);
                 } catch (Exception e) {
                     this.logger.warn("Interface [{}] not found, declared as dependency for wiki component [{}]",
-                        dependency.getStringValue(COMPONENT_ROLE_TYPE_FIELD),
-                        componentDocument.getDocumentReference());
+                        dependency.getStringValue(COMPONENT_ROLE_TYPE_FIELD), componentDocument.getDocumentReference());
                 }
             }
         }
@@ -185,8 +185,7 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
     @Override
     public boolean hasProgrammingRights(DocumentReference reference) throws WikiComponentException
     {
-        return getXWikiContext().getWiki().getRightService().hasProgrammingRights(getDocument(reference),
-            getXWikiContext());
+        return this.authorization.hasAccess(Right.PROGRAM, reference);
     }
 
     /**
@@ -219,18 +218,10 @@ public class DefaultWikiComponentBridge implements WikiComponentConstants, WikiC
     protected XWikiDocument getDocument(DocumentReference reference) throws WikiComponentException
     {
         try {
-            return this.getXWikiContext().getWiki().getDocument(reference, getXWikiContext());
+            XWikiContext xcontext = this.xcontextProvider.get();
+            return xcontext.getWiki().getDocument(reference, xcontext);
         } catch (XWikiException e) {
             throw new WikiComponentException(String.format("Failed to retrieve the document [%s]", reference), e);
         }
-    }
-
-    /**
-     * @return the XWikiContext extracted from the execution.
-     * @throws org.xwiki.component.wiki.WikiComponentException if the execution context can't be retrieved
-     */
-    protected XWikiContext getXWikiContext() throws WikiComponentException
-    {
-        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
     }
 }

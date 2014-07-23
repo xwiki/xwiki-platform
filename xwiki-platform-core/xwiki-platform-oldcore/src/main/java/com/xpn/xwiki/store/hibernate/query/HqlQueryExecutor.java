@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.store.hibernate.query;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
@@ -81,10 +82,10 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Override
     public <T> List<T> execute(final Query query) throws QueryException
     {
-        String oldDatabase = getContext().getDatabase();
+        String oldDatabase = getContext().getWikiId();
         try {
             if (query.getWiki() != null) {
-                getContext().setDatabase(query.getWiki());
+                getContext().setWikiId(query.getWiki());
             }
             return getStore().executeRead(getContext(), new HibernateCallback<List<T>>()
             {
@@ -95,7 +96,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                     org.hibernate.Query hquery = createHibernateQuery(session, query);
                     populateParameters(hquery, query);
 
-                    List results = hquery.list();
+                    List<T> results = hquery.list();
                     if (query.getFilters() != null && !query.getFilters().isEmpty()) {
                         for (QueryFilter filter : query.getFilters()) {
                             results = filter.filterResults(results);
@@ -105,9 +106,9 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                 }
             });
         } catch (XWikiException e) {
-            throw new QueryException("Exception while execute query", query, e);
+            throw new QueryException("Exception while executing query", query, e);
         } finally {
-            getContext().setDatabase(oldDatabase);
+            getContext().setWikiId(oldDatabase);
         }
     }
 
@@ -125,7 +126,8 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     protected String completeShortFormStatement(String statement)
     {
         String lcStatement = statement.toLowerCase().trim();
-        if (lcStatement.startsWith("where") || lcStatement.startsWith(",") || lcStatement.startsWith("order")) {
+        if (lcStatement.isEmpty() || lcStatement.startsWith(",") || lcStatement.startsWith("where ")
+            || lcStatement.startsWith("order by ")) {
             return "select doc.fullName from XWikiDocument doc " + statement.trim();
         }
 
@@ -184,7 +186,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
             hquery.setMaxResults(query.getLimit());
         }
         for (Entry<String, Object> e : query.getNamedParameters().entrySet()) {
-            hquery.setParameter(e.getKey(), e.getValue());
+            setNamedParameter(hquery, e.getKey(), e.getValue());
         }
         if (query.getPositionalParameters().size() > 0) {
             int start = Collections.min(query.getPositionalParameters().keySet());
@@ -197,9 +199,27 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                 // jpql-style. "?index"
                 for (Entry<Integer, Object> e : query.getPositionalParameters().entrySet()) {
                     // hack. hibernate assume "?1" is named parameter, so use string "1".
-                    hquery.setParameter("" + e.getKey(), e.getValue());
+                    setNamedParameter(hquery, String.valueOf(e.getKey()), e.getValue());
                 }
             }
+        }
+    }
+
+    /**
+     * Sets the value of the specified named parameter, taking into account the type of the given value.
+     * 
+     * @param query the query to set the parameter for
+     * @param name the parameter name
+     * @param value the non-null parameter value
+     */
+    protected void setNamedParameter(org.hibernate.Query query, String name, Object value)
+    {
+        if (value instanceof Collection) {
+            query.setParameterList(name, (Collection< ? >) value);
+        } else if (value.getClass().isArray()) {
+            query.setParameterList(name, (Object[]) value);
+        } else {
+            query.setParameter(name, value);
         }
     }
 
@@ -216,6 +236,6 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
      */
     protected XWikiContext getContext()
     {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 }

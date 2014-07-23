@@ -19,14 +19,16 @@
  */
 package org.xwiki.wiki.test.po;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.test.ui.po.LiveTableElement;
 
 /**
  * Represents actions that can be done on the WikiManager.WebHome page.
- *
+ * 
  * @version $Id$
  */
 public class WikiIndexPage extends ExtendedViewPage
@@ -38,26 +40,46 @@ public class WikiIndexPage extends ExtendedViewPage
     private List<WebElement> wikiPrettyNames;
 
     /**
+     * The wiki index live table.
+     */
+    private LiveTableElement liveTable = new LiveTableElement("wikis");
+
+    /**
      * Opens the home page.
      */
     public static WikiIndexPage gotoPage()
     {
-        getUtil().gotoPage(getSpace(), getPage());
+        getUtil().gotoPage("WikiManager", "WebHome");
         return new WikiIndexPage();
     }
 
-    public static String getSpace()
+    public List<WikiLink> getWikiPrettyNames()
     {
-        return "WikiManager";
+        List<WikiLink> list = new ArrayList<>();
+        for (WebElement prettyName : wikiPrettyNames) {
+            list.add(new WikiLink(prettyName));
+        }
+        return list;
     }
 
-    public static String getPage()
+    /**
+     * @since 6.0M1
+     */
+    public WikiLink getWikiLink(String wikiName)
     {
-        return "WebHome";
+        for (WikiLink link : getWikiPrettyNames()) {
+            if (link.getWikiName().equals(wikiName)) {
+                return link;
+            }
+        }
+        // We have not found the wiki in the list
+        return null;
     }
 
-    public List<WebElement> getWikiPrettyNames()
+    @Override
+    public WikiIndexPage waitUntilPageIsLoaded()
     {
-        return wikiPrettyNames;
+        this.liveTable.waitUntilReady();
+        return this;
     }
 }

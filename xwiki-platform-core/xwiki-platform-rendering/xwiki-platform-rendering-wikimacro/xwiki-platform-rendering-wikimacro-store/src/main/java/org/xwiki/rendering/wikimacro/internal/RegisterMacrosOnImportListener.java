@@ -99,7 +99,7 @@ public class RegisterMacrosOnImportListener implements EventListener
             XWikiContext xcontext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
             xcontext.remove("grouplist");
             // get the current wiki to register macros for
-            String currentWiki = xcontext.getDatabase();
+            String currentWiki = xcontext.getWikiId();
             macroInitializer.registerExistingWikiMacros(currentWiki);
         } catch (Exception e) {
             this.logger.warn("Could not register existing macros on import", e);

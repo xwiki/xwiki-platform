@@ -45,6 +45,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * When the wiki is initialized or the configuration document is updated, make sure that the configured annotation class
@@ -117,18 +118,18 @@ public class CheckAnnotationClassEventListener implements EventListener
 
             if (event instanceof ApplicationReadyEvent) {
                 // Application started. Need to go trough all subwikis and ensure validity.
-                String currentDatabase = deprecatedContext.getDatabase();
+                String currentDatabase = deprecatedContext.getWikiId();
 
                 try {
                     for (String wikiName : xwiki.getVirtualWikisDatabaseNames(deprecatedContext)) {
                         // Change the context wiki.
-                        deprecatedContext.setDatabase(wikiName);
+                        deprecatedContext.setWikiId(wikiName);
                         // Do the work for the wiki.
                         ensureAnnotationClassIsValid();
                     }
                 } finally {
                     // Restore the original wiki.
-                    deprecatedContext.setDatabase(currentDatabase);
+                    deprecatedContext.setWikiId(currentDatabase);
                 }
             } else {
                 // Config document of the current wiki got modified.
@@ -136,7 +137,7 @@ public class CheckAnnotationClassEventListener implements EventListener
             }
         } catch (Exception e) {
             logger.error("Failed to update the configured annotation class for wiki [{}] on event [{}]", new Object[] {
-                getXWikiContext().getDatabase(), event.getClass().getSimpleName(), e});
+                getXWikiContext().getWikiId(), event.getClass().getSimpleName(), e});
         }
     }
 
@@ -180,6 +181,16 @@ public class CheckAnnotationClassEventListener implements EventListener
                 annotationClass.addTextAreaField(Annotation.ORIGINAL_SELECTION_FIELD, "Original Selection", 40, 5);
             needsUpdate |= annotationClass.addTextField(Annotation.TARGET_FIELD, "Target", 30);
             needsUpdate |= annotationClass.addTextField(Annotation.STATE_FIELD, "State", 30);
+
+            // Set creator and author if they're not set already
+            if (annotationClassDocument.getCreatorReference() == null) {
+                needsUpdate = true;
+                annotationClassDocument.setCreator(XWikiRightService.SUPERADMIN_USER);
+            }
+            if (annotationClassDocument.getAuthorReference() == null) {
+                needsUpdate = true;
+                annotationClassDocument.setAuthorReference(annotationClassDocument.getCreatorReference());
+            }
 
             if (needsUpdate) {
                 deprecatedContext.getWiki().saveDocument(annotationClassDocument,

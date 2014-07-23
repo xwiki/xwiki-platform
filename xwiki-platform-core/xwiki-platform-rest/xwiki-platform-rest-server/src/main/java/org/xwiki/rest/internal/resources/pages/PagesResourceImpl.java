@@ -45,12 +45,12 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
             String parentFilterExpression, String order, Boolean withPrettyNames)
             throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         Pages pages = objectFactory.createPages();
 
         try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             Query query = ("date".equals(order)) ? queryManager.createQuery(
                     "select doc.name from Document doc where doc.space=:space and language='' order by doc.date desc",
@@ -105,7 +105,7 @@ public class PagesResourceImpl extends XWikiResource implements PagesResource
         } catch (Exception e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
 
         return pages;

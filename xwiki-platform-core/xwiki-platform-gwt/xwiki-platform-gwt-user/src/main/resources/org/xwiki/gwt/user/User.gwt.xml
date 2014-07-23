@@ -29,20 +29,23 @@
   <!-- RichTextArea -->
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplIEOld">
     <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
-    <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
-    </any>
+    <when-property-is name="user.agent" value="ie8" />
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplIE">
     <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
-    <when-property-is name="user.agent" value="ie9" />
+    <any>
+      <when-property-is name="user.agent" value="ie9" />
+      <when-property-is name="user.agent" value="ie10" />
+    </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplMozilla">
     <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl" />
-    <when-property-is name="user.agent" value="gecko1_8" />
+    <any>
+      <when-property-is name="user.agent" value="gecko1_8" />
+      <when-property-is name="user.agent" value="ie11" />
+    </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.RichTextAreaImplSafari">
@@ -71,15 +74,16 @@
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.IEBehaviorAdjuster">
     <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster" />
-    <when-property-is name="user.agent" value="ie9" />
+    <any>
+      <when-property-is name="user.agent" value="ie9" />
+      <when-property-is name="user.agent" value="ie10" />
+      <when-property-is name="user.agent" value="ie11" />
+    </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.IEOldBehaviorAdjuster">
     <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster" />
-    <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
-    </any>
+    <when-property-is name="user.agent" value="ie8" />
   </replace-with>
 
   <!-- ReloaderImpl -->
@@ -89,11 +93,8 @@
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImplIEOld">
     <when-type-is class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImpl" />
-    <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
-      <!-- ie9 fires the unload event when the in-line frame is detached -->
-    </any>
+    <when-property-is name="user.agent" value="ie8" />
+    <!-- ie9+ fires the unload event when the in-line frame is detached -->
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.internal.ReloaderImplOpera">
@@ -112,12 +113,9 @@
   </replace-with>
 
   <!-- TextBoxImpl -->
-  <replace-with class="org.xwiki.gwt.user.client.ui.internal.TextBoxImplIE6">
+  <replace-with class="org.xwiki.gwt.user.client.ui.internal.TextBoxImplIEOld">
     <when-type-is class="com.google.gwt.user.client.ui.impl.TextBoxImpl" />
-    <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
-    </any>
+    <when-property-is name="user.agent" value="ie8" />
   </replace-with>
 
   <!-- DeleteExecutable -->
@@ -127,10 +125,7 @@
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImplIEOld">
     <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl" />
-    <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
-    </any>
+    <when-property-is name="user.agent" value="ie8" />
   </replace-with>
 
   <!-- InsertHTMLExecutableImpl -->
@@ -140,10 +135,7 @@
 
   <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImplIE">
     <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImpl" />
-    <any>
-      <when-property-is name="user.agent" value="ie6" />
-      <when-property-is name="user.agent" value="ie8" />
-      <!-- TODO: Check if the standard implementation works fine in IE9 -->
-    </any>
+    <when-property-is name="user.agent" value="ie8" />
+    <!-- TODO: Check if the standard implementation works fine in IE9+ -->
   </replace-with>
 </module>

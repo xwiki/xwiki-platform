@@ -29,6 +29,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -59,10 +61,7 @@ public class Utils
      */
     public static String getPageId(String wikiName, String spaceName, String pageName)
     {
-        XWikiDocument xwikiDocument = new XWikiDocument();
-        xwikiDocument.setDatabase(wikiName);
-        xwikiDocument.setName(pageName);
-        xwikiDocument.setSpace(spaceName);
+        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
 
         Document document = new Document(xwikiDocument, null);
 
@@ -92,10 +91,7 @@ public class Utils
      */
     public static String getPageFullName(String wikiName, String spaceName, String pageName)
     {
-        XWikiDocument xwikiDocument = new XWikiDocument();
-        xwikiDocument.setDatabase(wikiName);
-        xwikiDocument.setName(pageName);
-        xwikiDocument.setSpace(spaceName);
+        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
 
         Document document = new Document(xwikiDocument, null);
 
@@ -115,10 +111,7 @@ public class Utils
     public static String getObjectId(String wikiName, String spaceName, String pageName, String className,
         int objectNumber)
     {
-        XWikiDocument xwikiDocument = new XWikiDocument();
-        xwikiDocument.setDatabase(wikiName);
-        xwikiDocument.setName(pageName);
-        xwikiDocument.setSpace(spaceName);
+        XWikiDocument xwikiDocument = new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
 
         Document document = new Document(xwikiDocument, null);
 
@@ -132,9 +125,12 @@ public class Utils
      */
     public static String getPageId(String wikiName, String pageFullName)
     {
-        XWikiDocument xwikiDocument = new XWikiDocument();
-        xwikiDocument.setDatabase(wikiName);
-        xwikiDocument.setFullName(pageFullName);
+        DocumentReferenceResolver<String> defaultDocumentReferenceResolver =
+                com.xpn.xwiki.web.Utils.getComponent(DocumentReferenceResolver.TYPE_STRING);
+
+        DocumentReference documentReference =
+                defaultDocumentReferenceResolver.resolve(pageFullName, new WikiReference(wikiName));
+        XWikiDocument xwikiDocument = new XWikiDocument(documentReference);
 
         Document document = new Document(xwikiDocument, null);
 

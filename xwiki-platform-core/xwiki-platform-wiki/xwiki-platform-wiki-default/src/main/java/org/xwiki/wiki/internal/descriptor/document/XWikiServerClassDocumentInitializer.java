@@ -283,12 +283,6 @@ public class XWikiServerClassDocumentInitializer extends AbstractMandatoryDocume
             needsUpdate |= this.classSheetBinder.bind(document, sheet);
         }
 
-        // Check if the document is hidden
-        if (!document.isHidden()) {
-            document.setHidden(true);
-            needsUpdate = true;
-        }
-
         return needsUpdate;
     }
 

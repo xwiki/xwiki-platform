@@ -59,6 +59,8 @@ import org.slf4j.LoggerFactory;
  */
 public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 {
+    private static final long serialVersionUID = -8454351828032103173L;
+
     /**
      * The string used to separate the fields in the hashed validation message.
      */
@@ -171,12 +173,31 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * @param sessionCookie Whether the cookie is only for this session, or for a longer period.
      * @param cookieDomain The domain for which the cookie is set.
      * @param response The servlet response.
+     * @deprecated this shouldn't have been public, use
+     *             {@link #setupCookie(Cookie, boolean, boolean, String, HttpServletResponse)}
      */
+    @Deprecated
     public void setupCookie(Cookie cookie, boolean sessionCookie, String cookieDomain, HttpServletResponse response)
+    {
+        setupCookie(cookie, sessionCookie, false, cookieDomain, response);
+    }
+
+    /**
+     * Setup a cookie: expiration date, path, domain + send it to the response.
+     * 
+     * @param cookie the cookie to setup
+     * @param sessionCookie whether the cookie is only for this session, or for a longer period
+     * @param secureCookie whether the cookie should be marked as secure or not
+     * @param cookieDomain the domain for which the cookie is set
+     * @param response the servlet response
+     */
+    private void setupCookie(Cookie cookie, boolean sessionCookie, boolean secureCookie, String cookieDomain,
+        HttpServletResponse response)
     {
         if (!sessionCookie) {
             setMaxAge(cookie);
         }
+        cookie.setSecure(secureCookie);
         cookie.setPath(this.cookiePath);
         if (cookieDomain != null) {
             cookie.setDomain(cookieDomain);
@@ -210,28 +231,29 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
         // Let's check if the cookies should be session cookies or persistent ones.
         boolean sessionCookie = !(isTrue(request.getParameter("j_rememberme")));
+        boolean secureCookie = request.isSecure();
         String cookieDomain = getCookieDomain(request);
 
         // Create client cookies to remember the login information.
 
         // Username
         Cookie usernameCookie = new Cookie(getCookiePrefix() + COOKIE_USERNAME, protectedUsername);
-        setupCookie(usernameCookie, sessionCookie, cookieDomain, response);
+        setupCookie(usernameCookie, sessionCookie, secureCookie, cookieDomain, response);
 
         // Password
         Cookie passwdCookie = new Cookie(getCookiePrefix() + COOKIE_PASSWORD, protectedPassword);
-        setupCookie(passwdCookie, sessionCookie, cookieDomain, response);
+        setupCookie(passwdCookie, sessionCookie, secureCookie, cookieDomain, response);
 
         // Remember me
         Cookie rememberCookie = new Cookie(getCookiePrefix() + COOKIE_REMEMBERME, !sessionCookie + "");
-        setupCookie(rememberCookie, sessionCookie, cookieDomain, response);
+        setupCookie(rememberCookie, sessionCookie, secureCookie, cookieDomain, response);
 
         if (this.protection.equals(PROTECTION_ALL) || this.protection.equals(PROTECTION_VALIDATION)) {
             String validationHash = getValidationHash(protectedUsername, protectedPassword, getClientIP(request));
             if (validationHash != null) {
                 // Validation
                 Cookie validationCookie = new Cookie(getCookiePrefix() + COOKIE_VALIDATION, validationHash);
-                setupCookie(validationCookie, sessionCookie, cookieDomain, response);
+                setupCookie(validationCookie, sessionCookie, secureCookie, cookieDomain, response);
             } else {
                 if (LOGGER.isErrorEnabled()) {
                     LOGGER.error("WARNING!!! WARNING!!!");
@@ -302,6 +324,10 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         }
         // Protect cookies from being used from JavaScript, see http://www.owasp.org/index.php/HttpOnly
         cookieValue.append("; HttpOnly");
+        // Only send this cookie on HTTPS connections coming from a page in the same domain
+        if (cookie.getSecure()) {
+            cookieValue.append("; Secure");
+        }
 
         // Session cookies should be discarded.
         // FIXME Safari 5 can't handle properly "Discard", as it really discards all the response header data after the
@@ -383,8 +409,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
             byte[] array = md5.digest();
             StringBuffer sb = new StringBuffer();
-            for (int j = 0; j < array.length; ++j) {
-                int b = array[j] & 0xFF;
+            for (byte element : array) {
+                int b = element & 0xFF;
                 if (b < 0x10) {
                     sb.append('0');
                 }
@@ -462,8 +488,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private static Cookie getCookie(Cookie[] cookies, String cookieName)
     {
         if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
+            for (Cookie cookie : cookies) {
                 if (cookieName.equals(cookie.getName())) {
                     return (cookie);
                 }
@@ -484,6 +509,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         Cookie cookie = getCookie(request.getCookies(), cookieName);
         if (cookie != null) {
             cookie.setMaxAge(0);
+            cookie.setValue("");
             cookie.setPath(this.cookiePath);
             addCookie(response, cookie);
             String cookieDomain = getCookieDomain(request);
@@ -518,8 +544,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         String value = defaultValue;
         if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
+            for (Cookie cookie : cookies) {
                 if (cookieName.equals(cookie.getName())) {
                     value = cookie.getValue();
                 }

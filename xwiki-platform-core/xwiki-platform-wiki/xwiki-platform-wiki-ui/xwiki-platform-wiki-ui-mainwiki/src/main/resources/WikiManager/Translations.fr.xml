@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>WikiManager</web>
   <name>Translations</name>
   <language>fr</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>WikiManager.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
@@ -42,6 +62,7 @@ platform.wiki.browse._actions.leave=Quitter
 platform.wiki.browse._actions.requestJoin=Demander à rejoindre
 platform.wiki.browse._actions.viewInvitation=Visualiser l'invitation
 platform.wiki.browse.description=Description
+platform.wiki.browse.doc.creationDate=Date de création
 platform.wiki.browse.emptyvalue=Sans objet
 platform.wiki.browse.membershipType=Type d'adhésion
 platform.wiki.browse.owner=Gestionnaire
@@ -57,13 +78,25 @@ platform.wiki.create.wizard.desc.description=Une courte description du wiki et d
 platform.wiki.create.wizard.desc.members=Les utilisateurs qui peuvent participer au wiki.
 platform.wiki.create.wizard.desc.newTemplateHint=Le modèle à utiliser pour le nouveau wiki (tous les documents seront clonés).
 platform.wiki.create.wizard.desc.owner=L'utilisateur qui est le gestionnaire du wiki.
+platform.wiki.create.wizard.desc.wikialias=Le nom de domaine qui identifiera le wiki.
 platform.wiki.create.wizard.desc.wikiname=L'identifiant unique du nouveau wiki.
 platform.wiki.create.wizard.desc.wikiprettyname=Le nom d'affichage du wiki.
 platform.wiki.create.wizard.setAsTemplate.label=Ce wiki sera un modèle
+platform.wiki.create.wizard.step.cleaningUp=Nettoyage
+platform.wiki.create.wizard.step.cleaningUp.confirm=Confirmer
+platform.wiki.create.wizard.step.cleaningUp.confirmmessage=Le wiki {0} va être supprimé.
+platform.wiki.create.wizard.step.cleaningup.error=Une erreur est survenue, le wiki {0} n''a pas été supprimé.
+platform.wiki.create.wizard.step.cleaningup.success=Le wiki {0} a été supprimé.
+platform.wiki.create.wizard.step.create=Créer
+platform.wiki.create.wizard.step.dw=Après avoir cliqué sur "créer", le wiki sera créé, et ensuite l'Assistant de Distribution sera lancé pour initialiser votre wiki. Si vous passez cette étape, votre wiki sera vide.
 platform.wiki.create.wizard.step.nameAndType=Étape 1 - Choisissez un nom
 platform.wiki.create.wizard.step.nameAndType.shortname=Nom
+platform.wiki.create.wizard.step.next=Étape suivante
+platform.wiki.create.wizard.step.previous=Étape précédente
 platform.wiki.create.wizard.step.provisioning=Le système est en cours de provisioning du wiki.
+platform.wiki.create.wizard.step.provisioning.cleanUp=Nettoyer et supprimer le wiki
 platform.wiki.create.wizard.step.provisioning.complete=Le wiki est presque prêt. Cliquez sur "Terminer" pour réaliser la dernière opération.
+platform.wiki.create.wizard.step.provisioning.error=Le wiki {0} a été créé mais certains documents issus du modèle n''ont pas été copiés. Vous devriez supprimer ce wiki.
 platform.wiki.create.wizard.step.provisioning.finalize=Terminer
 platform.wiki.create.wizard.step.provisioning.wait=Veuillez patienter pendant que le système exécute le provisioning du wiki.
 platform.wiki.create.wizard.step.users=Étape 2 - Sélectionnez les membres
@@ -93,15 +126,19 @@ platform.wiki.prop.description=Description
 platform.wiki.prop.membershipType.hint=La manière dont les utilisateurs peuvent rejoindre ce wiki.
 platform.wiki.prop.membershipType.label=Type d'adhèsion
 platform.wiki.prop.owner=Gestionnaire
+platform.wiki.prop.wikialias=Alias
 platform.wiki.prop.wikiname=Identifiant du Wiki
 platform.wiki.prop.wikiprettyname=Nom d'affichage
+platform.wiki.sheet.aliases=Un alias est un nom alternatif du wiki. Vous pouvez ajouter des alias afin de créer des URLs différentes pour le wiki.
 platform.wiki.sheet.desc.description=Une courte description de votre wiki.
 platform.wiki.sheet.desc.homepage=La page d'accueil du wiki.
 platform.wiki.sheet.desc.iswikitemplate=Indique si ce wiki pourra être utilisé comme modèle lors de la création de nouveaux wikis.
 platform.wiki.sheet.desc.owner=Un utilisateur global qui aura tous les droits sur ce wiki.
-platform.wiki.sheet.desc.secure=Si cette option est activée, toutes les URLs externes générées par le wiki débuteront par ~~https~~.
+platform.wiki.sheet.desc.secure=Si cette option est activée, toutes les URLs externes générées par le wiki débuteront par //https//.
 platform.wiki.sheet.desc.server=L'alias utilisé afin d'accéder au wiki.
 platform.wiki.sheet.desc.wikiprettyname=Le nom d'affichage du wiki.
+platform.wiki.sheet.descriptor=Cette page vous permet de personnaliser l''accès au wiki {0} et quelques paramètres. Des configurations supplémentaires sont disponibles dans la page d''administration du wiki.
+platform.wiki.sheet.descriptor.admin=Pages d'administration du wiki.
 platform.wiki.sheet.erroraliasalreadynotexists=L''alias wiki "{0}" existe déjà.
 platform.wiki.sheet.erroraliasdoesnotexists=L''alias wiki "{0}" n''existe pas.
 platform.wiki.sheet.prop.description=Description
@@ -111,9 +148,10 @@ platform.wiki.sheet.prop.owner=Gestionnaire
 platform.wiki.sheet.prop.secure=Sécurisé (SSL)
 platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.wikiprettyname=Nom d'affichage
+platform.wiki.sheet.title=Description du wiki "{0}" 
 platform.wiki.sheet.title.createnewalias=Créer un nouvel alias
 platform.wiki.sheet.title.settings=Paramètres du wiki
-platform.wiki.sheet.title.viewaliases=Voir les alias
+platform.wiki.sheet.title.viewaliases=Visualiser les alias
 platform.wiki.users.delete.empty=Supprimer le Wiki
 platform.wiki.users.delete.title=Supprimer le Wiki "{0}"
 platform.wiki.users.invitation.accept.label=Accepter
@@ -161,5 +199,7 @@ platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=Vous n'êtes membre d
 platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=L'utilisateur n'est membre d'aucun wiki.
 platform.wiki.users.userAlreadyMemberOfWiki=L''utilisateur {0}{1}{2} est déjà membre du wiki {3}{4}{5}.
 platform.wiki.users.userNotMemberOfWiki=L''utilisateur {0}{1}{2} n''est pas un membre du wiki {3}{4}{5}.
+rendering.macro.wikis.description=Liste de tous les wikis
+rendering.macro.wikis.name=Wikis
 </content>
 </xwikidoc>

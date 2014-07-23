@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.slf4j.Logger;
@@ -39,6 +41,9 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.xml.XMLUtils;
 
@@ -56,6 +61,9 @@ import com.xpn.xwiki.render.XWikiVirtualMacro;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
+@Component
+@Named("groovy")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiGroovyRenderer.class);
@@ -63,6 +71,12 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
     private Cache<Template> cache;
 
     private Cache<CachedGroovyClass> classCache;
+
+    @Override
+    public String getId()
+    {
+        return "groovy";
+    }
 
     @Override
     public void flushCache()

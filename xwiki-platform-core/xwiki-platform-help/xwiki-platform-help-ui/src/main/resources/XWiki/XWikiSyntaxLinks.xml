@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>XWiki</web>
   <name>XWikiSyntaxLinks</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <parent>XWiki.XWikiSyntax</parent>
   <creator>xwiki:XWiki.Admin</creator>
@@ -134,7 +154,6 @@ yDNML/sVGo/RsN38CXv76mflVFX1y8jOVVwHXBgYj5NR1EqC732+FF7hvX/OTHd91ns4OV4tn3Gm
 
 === 1.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Feature|=XWiki Syntax 1.0|=(% style="width:20%" %)Result
 |Link to a page in the current Space|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
 |Link with a label|{{{[label&gt;WebHome]}}}|[[label&gt;&gt;WebHome]]
@@ -186,7 +205,6 @@ The full format of a link is **##[label {&gt; or |}] (resource) [@interWikiAlias
 
 === 2.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Feature|=XWiki Syntax 2.0|=(% style="width:20%" %)Result
 |Link to a page in the current Space|{{{[[WebHome]]}}}|[[WebHome]]
 |Link with a label|(((
@@ -240,8 +258,7 @@ The full format of a link is **##[label&gt;&gt;] (resource) [@interWikiAlias] [|
 
 === 2.1 Links ===
 
-(% style="overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Feature|=XWiki Syntax 2.1|=(% style="width:20%" %)Result
+|=Feature|=XWiki Syntax 2.1|=Result
 |Link to a page in the current Space|{{{[[WebHome]]}}}|[[WebHome]]
 |Link with a label|(((
 {{{[[label&gt;&gt;WebHome]]}}}

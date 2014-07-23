@@ -324,12 +324,12 @@ public class WatchListJobManager
      */
     public List<Document> getJobs(XWikiContext context)
     {
-        String oriDatabase = context.getDatabase();
+        String oriDatabase = context.getWikiId();
         List<Object> params = new ArrayList<Object>();
         List<Document> results = new ArrayList<Document>();
 
         try {
-            context.setDatabase(context.getMainXWiki());
+            context.setWikiId(context.getMainXWiki());
             params.add(WATCHLIST_JOB_CLASS);
             List<String> docNames = context.getWiki().getStore().searchDocumentsNames(
                 ", BaseObject obj where doc.fullName=obj.name and obj.className=?", 0, 0, params, context);
@@ -340,7 +340,7 @@ public class WatchListJobManager
         } catch (Exception e) {
             LOGGER.error("error getting list of available watchlist jobs", e);
         } finally {
-            context.setDatabase(oriDatabase);
+            context.setWikiId(oriDatabase);
         }
 
         return results;

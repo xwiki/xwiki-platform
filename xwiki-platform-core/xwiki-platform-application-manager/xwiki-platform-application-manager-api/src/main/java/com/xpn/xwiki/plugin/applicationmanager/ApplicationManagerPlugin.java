@@ -81,19 +81,19 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
     {
         this.applicationManager = new ApplicationManager();
 
-        String database = context.getDatabase();
+        String database = context.getWikiId();
         try {
             XWikiURLFactory urlf =
                 context.getWiki().getURLFactoryService().createURLFactory(context.getMode(), context);
             context.setURLFactory(urlf);
-            context.setDatabase(context.getMainXWiki());
+            context.setWikiId(context.getMainXWiki());
             this.applicationManager.init(context);
         } catch (XWikiException e) {
             LOGGER.error(
                 this.localizationManager.getTranslationPlain(
                     ApplicationManagerMessageTool.LOG_REFRESHALLTRANSLATIONS), e);
         } finally {
-            context.setDatabase(database);
+            context.setWikiId(database);
         }
     }
 

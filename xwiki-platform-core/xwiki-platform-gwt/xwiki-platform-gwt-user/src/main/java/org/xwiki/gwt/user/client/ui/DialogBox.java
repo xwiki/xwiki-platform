@@ -24,11 +24,11 @@ import org.xwiki.gwt.user.client.DragListener;
 import org.xwiki.gwt.user.client.Images;
 import org.xwiki.gwt.user.client.Strings;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.EventTarget;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.ui.FlowPanel;

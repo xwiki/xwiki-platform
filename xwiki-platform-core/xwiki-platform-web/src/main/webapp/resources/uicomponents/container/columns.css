@@ -26,6 +26,15 @@
   padding-left: $columnPadding%;
 }
 
+/* Responsiveness, upon the same limit than Twitter Bootstrap (768px) */
+@media (max-width: 768px) {
+  .container-columns .column {
+    width: 100%;
+    padding-right: 0;
+    padding-left: 0;
+  }
+}
+
 /* Make sure that the columns take space when they're empty: if height is auto, and they are floated, they will collapse
    as if they didn't exist, which breaks the layout */
 .container-columns .column {

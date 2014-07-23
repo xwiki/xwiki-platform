@@ -48,7 +48,7 @@ public class DistributionInitializerListener implements EventListener
      * The list of events to listen to.
      */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationReadyEvent(),
-        new ActionExecutingEvent("view"));
+        new ActionExecutingEvent("view"), new ActionExecutingEvent("distribution"));
 
     /**
      * The component used to get information about the current distribution.
@@ -77,7 +77,10 @@ public class DistributionInitializerListener implements EventListener
             if (event instanceof ApplicationReadyEvent) {
                 this.distributionManager.startFarmJob();
             } else if (!((XWikiContext) arg2).isMainWiki()) {
-                startWikiJob(((XWikiContext) arg2).getDatabase());
+                String wiki = ((XWikiContext) arg2).getWikiId();
+                if (this.distributionManager.getWikiJob(wiki) == null) {
+                    startWikiJob(wiki);
+                }
             }
         }
     }

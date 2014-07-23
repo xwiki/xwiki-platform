@@ -36,15 +36,24 @@ import org.xwiki.wiki.manager.WikiManagerException;
 public interface WikiDescriptorManager
 {
     /**
-     * Get the list of all wikis (except the main one).
+     * Get the list of all wikis descriptors.
      *
-     * @return the lit of every wiki created on the farm (except the main one).
+     * @return the list of every wiki created on the farm
      * @throws org.xwiki.wiki.manager.WikiManagerException if problems occur
      */
     Collection<WikiDescriptor> getAll() throws WikiManagerException;
 
     /**
-     * Get a wiki from one of its alias.
+     * Get the list of all wikis identifiers.
+     *
+     * @return the list of every wiki created on the farm
+     * @throws org.xwiki.wiki.manager.WikiManagerException if problems occur
+     * @since 6.2M1
+     */
+    Collection<String> getAllIds() throws WikiManagerException;
+
+    /**
+     * Get a wiki from one of its aliases.
      *
      * @param wikiAlias Alias of the wiki to retrieve
      * @return The corresponding wiki descriptor of that alias.

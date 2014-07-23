@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>XWiki</web>
   <name>XWikiSyntaxLinks</name>
   <language>sv</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>XWiki.XWikiSyntax</parent>
   <creator>xwiki:XWiki.Admin</creator>
@@ -30,7 +50,6 @@
 {{comment}}please do not translate the sub headlines{{/comment}}
 === 1.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Formateringstyp|=XWiki syntax 1.0|=(% style="width:20%" %)Resultat
 |Länk till sida i aktuellt rum|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
 |Länk med etikett|{{{[etikett&gt;WebHome]}}}|[[etikett&gt;&gt;WebHome]]
@@ -77,7 +96,6 @@ Det fullständiga formatet för en länk är **##[etikett {| eller &gt;}]+(resur
 
 === 2.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Formateringstyp|=XWiki syntax 2.0|=(% style="width:20%" %)Resultat
 |Länk till sida i aktuellt rum|{{{[[WebHome]]}}}|[[WebHome]]
 |Länk med etikett|{{{[[etikett&gt;&gt;WebHome]]}}}|[[etikett&gt;&gt;WebHome]]
@@ -125,8 +143,7 @@ Det fullständiga formatet för en länk är **##[etikett&gt;&gt;] (resurs) [@in
 
 === 2.1 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Formateringstyp|=XWiki syntax 2.1|=(% style="width:20%" %)Resultat
+|=Formateringstyp|=XWiki syntax 2.1|=Resultat
 |Länk till sida i aktuellt rum|{{{[[WebHome]]}}}|[[WebHome]]
 |Länk med etikett|{{{[[etikett&gt;&gt;WebHome]]}}}|[[etikett&gt;&gt;WebHome]]
 |Länk med wikisyntax i etikett|{{{[[**fetstilad etikett**&gt;&gt;WebHome]]}}}|[[**fetstilad etikett**&gt;&gt;WebHome]]

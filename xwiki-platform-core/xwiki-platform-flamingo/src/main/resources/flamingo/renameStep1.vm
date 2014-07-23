@@ -1,0 +1,77 @@
+###
+### Rename document template, step 1: choose new name + updated backlinks + updated parents
+###
+## TODO: check if this information should be displayed?
+<div id="document-title"><h1>$services.localization.render('core.rename.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])</h1></div>
+#set($newname = $services.localization.render('core.rename.inputPrompt'))
+<form action="?xpage=rename&amp;step=2" method="post" class="xform"
+    onsubmit="if(this.newPageName.value=='${escapetool.xml($newname)}') this.newPageName.value=''">
+  ## CSRF prevention
+  <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
+  #set($pweb = $doc.space)
+  <div class="row">
+  <div class="padded col-xs-12 col-md-6">
+    #set($backlinks = $doc.getBacklinks())
+    #if($backlinks.size() > 0)
+      <h2><span>$services.localization.render('core.rename.title.newName')</span></h2>
+    #end
+    <dl>
+      <dt>
+        <label for="sourceSpaceName">$services.localization.render('core.rename.sourcespace')</label>
+        <span class="xHint">$services.localization.render('core.rename.sourcespace.hint')</span>
+      </dt>
+      <dd>$!{escapetool.xml($doc.space)} <input type="hidden" id="sourceSpaceName" name="sourceSpaceName" value="$!{escapetool.xml($doc.space)}" size="60"/></dd>
+      <dt>
+        <label for="sourcePageName">$services.localization.render('core.rename.sourcepage')</label>
+        <span class="xHint">$services.localization.render('core.rename.sourcepage.hint')</span>
+      </dt>
+      <dd>$!{escapetool.xml($doc.name)} <input type="hidden" id="sourcePageName" name="sourcePageName" value="$!{escapetool.xml($doc.name)}" size="60"/></dd>
+      <dt>
+        <label for="newSpaceName">$services.localization.render('core.rename.newspace')</label>
+        <span class="xHint">$services.localization.render('core.rename.newspace.hint')</span>
+      </dt>
+      <dd>
+        <input type="text" name="newSpaceName" id="newSpaceName" size="60" class="suggestSpaces" value="$escapetool.xml($doc.space)"/>
+      </dd>
+      <dt>
+        <label for="newPageName">$services.localization.render('core.rename.newpage')</label>
+        <span class="xHint">$services.localization.render('core.rename.newpage.hint')</span>
+      </dt>
+      <dd>
+        <input type="text" id="newPageName" size="60" name="newPageName" value="${escapetool.xml($doc.name)}" class="panelinput"/>
+      </dd>
+    </dl>
+    <div class="padded">
+      <span class="buttonwrapper"><input class="button" type="submit" name="formactionrename" value="$services.localization.render('core.rename.submit')"/></span>
+      <span class="buttonwrapper"><a class="cancel secondary button" href="$doc.getURL()">$services.localization.render('cancel')</a></span>
+    </div>
+  </div>
+  <div class="col-xs-12 col-md-6">
+  #if($backlinks.size() > 0)
+    <h2><span>$services.localization.render('core.rename.title.updateDocs')</span></h2>
+    #foreach($backlink in $backlinks)
+      #if(!$xwiki.hasAccessLevel('edit', $xcontext.user, $backlink))
+        <div><input id="backlink_$velocityCount" type="checkbox" disabled="disabled"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
+      #elseif($xwiki.getDocument($backlink).isProgrammaticContent())
+        <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$escapetool.xml($backlink)"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
+      #else
+        <div><input id="backlink_$velocityCount" type="checkbox" name="backlink_$escapetool.xml($backlink)" checked="checked"/> <a href='$xwiki.getURL($backlink)' rel='__blank'><label for='backlink_$velocityCount'>$escapetool.xml($backlink)</label></a></div>
+      #end
+    #end
+  #end
+  #set($children = $doc.getChildren())
+  #if($children.size() > 0)
+    <h2><span>$services.localization.render('core.rename.title.updateChildren')</span></h2>
+    #foreach($child in $children)
+      #if(!$xwiki.hasAccessLevel('edit', $xcontext.user, $child))
+        <div><input id="children_$velocityCount" type="checkbox" disabled="disabled"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>
+      #elseif($xwiki.getDocument($child).isProgrammaticContent())
+        <div><input id="children_$velocityCount" type="checkbox" name="child_$escapetool.xml($child)"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>
+      #else
+        <div><input id="children_$velocityCount" type="checkbox" name="child_$escapetool.xml($child)" checked="checked"/> <a href='$xwiki.getURL($child)' rel='__blank'><label for='children_$velocityCount'>$escapetool.xml($child)</label></a></div>
+      #end
+    #end
+  #end
+  </div>
+  </div>
+</form>

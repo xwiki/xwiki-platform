@@ -108,8 +108,8 @@ public class ImportTest extends AbstractTest
         importedPage.openCommentsDocExtraPane();
         HistoryPane history = importedPage.openHistoryDocExtraPane();
 
-        Assert.assertEquals("4.1", history.getCurrentVersion());
-        Assert.assertEquals("Imported from XAR", history.getCurrentVersionComment());
+        Assert.assertEquals("3.1", history.getCurrentVersion());
+        Assert.assertEquals("A third version of the document", history.getCurrentVersionComment());
         Assert.assertTrue(history.hasVersionWithSummary("A new version of the document"));
     }
 

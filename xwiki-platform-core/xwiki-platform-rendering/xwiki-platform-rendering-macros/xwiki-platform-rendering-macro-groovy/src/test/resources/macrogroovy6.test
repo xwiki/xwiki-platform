@@ -1,0 +1,32 @@
+.runTransformations
+.#--------------------------------------------------------
+.input|xwiki/2.0
+.# Test that executing a groovy macro from a groovy macro works as expected and does not break the top macro
+.#--------------------------------------------------------
+{{groovy}}
+println "before"
+
+services.component.getInstance(org.xwiki.rendering.converter.Converter.class).convert(new java.io.StringReader("{{groovy}}print 'inside'{{/groovy}}"), org.xwiki.rendering.syntax.Syntax.XWIKI_2_1, org.xwiki.rendering.syntax.Syntax.PLAIN_1_0, org.xwiki.rendering.renderer.printer.VoidWikiPrinter.VOIDWIKIPRINTER)
+
+println "after"
+{{/groovy}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [groovy] [] [println "before"
+
+services.component.getInstance(org.xwiki.rendering.converter.Converter.class).convert(new java.io.StringReader("{{groovy}}print 'inside'{{/groovy}}"), org.xwiki.rendering.syntax.Syntax.XWIKI_2_1, org.xwiki.rendering.syntax.Syntax.PLAIN_1_0, org.xwiki.rendering.renderer.printer.VoidWikiPrinter.VOIDWIKIPRINTER)
+
+println "after"]
+beginParagraph
+onWord [before]
+onNewLine
+onWord [after]
+endParagraph
+endMacroMarkerStandalone [groovy] [] [println "before"
+
+services.component.getInstance(org.xwiki.rendering.converter.Converter.class).convert(new java.io.StringReader("{{groovy}}print 'inside'{{/groovy}}"), org.xwiki.rendering.syntax.Syntax.XWIKI_2_1, org.xwiki.rendering.syntax.Syntax.PLAIN_1_0, org.xwiki.rendering.renderer.printer.VoidWikiPrinter.VOIDWIKIPRINTER)
+
+println "after"]
+endDocument

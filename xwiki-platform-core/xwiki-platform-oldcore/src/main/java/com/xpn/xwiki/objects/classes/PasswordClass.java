@@ -119,7 +119,7 @@ public class PasswordClass extends StringClass
      */
     public String getStorageType()
     {
-        BaseProperty st = (BaseProperty) this.getField("storageType");
+        BaseProperty st = (BaseProperty) this.getField(PasswordMetaClass.STORAGE_TYPE);
         if (st != null) {
             String type = st.getValue().toString().trim();
             if (!type.equals("")) {

@@ -1500,6 +1500,7 @@ ul.hSortable li .separator {
       <code>table.colorPalette {
   border: 1px solid #B5B6B5;
   margin: 0;
+  width: auto;
 }
 
 .colorPalette td {
@@ -1519,6 +1520,7 @@ ul.hSortable li .separator {
   padding: 0;
   margin: 0;
   border: 3px solid white; 
+  box-sizing: content-box;
 }
 
 .colorPalette td div:hover {

@@ -62,7 +62,7 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         
         this.context = new XWikiContext();
 
-        this.context.setDatabase("xwiki");
+        this.context.setWikiId("xwiki");
         this.context.setMainXWiki("xwiki");
 
         // Make sure response.encodeURL() calls don't fail
@@ -98,6 +98,8 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
             .will(returnValue(null));
         mockServletContext.stubs().method("getAttribute").with(eq("javax.servlet.context.tempdir"))
             .will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/xwiki.cfg"))
+        .will(returnValue(null));
 
         Mock mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
         mockCoreConfiguration.stubs().method("getDefaultDocumentSyntax").will(returnValue(Syntax.XWIKI_1_0));

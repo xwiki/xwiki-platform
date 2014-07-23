@@ -1234,78 +1234,27 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         BaseClass previousClass = (BaseClass) previousElement;
         BaseClass newClass = (BaseClass) newElement;
 
-        setCustomClass(MergeUtils.mergeCharacters(previousClass.getCustomClass(), newClass.getCustomClass(),
+        setCustomClass(MergeUtils.mergeOject(previousClass.getCustomClass(), newClass.getCustomClass(),
             getCustomClass(), mergeResult));
 
-        setCustomMapping(MergeUtils.mergeCharacters(previousClass.getCustomMapping(), newClass.getCustomMapping(),
+        setCustomMapping(MergeUtils.mergeOject(previousClass.getCustomMapping(), newClass.getCustomMapping(),
             getCustomMapping(), mergeResult));
 
-        setDefaultWeb(MergeUtils.mergeCharacters(previousClass.getDefaultWeb(), newClass.getDefaultWeb(),
-            getDefaultWeb(), mergeResult));
+        setDefaultWeb(MergeUtils.mergeOject(previousClass.getDefaultWeb(), newClass.getDefaultWeb(), getDefaultWeb(),
+            mergeResult));
 
-        setDefaultViewSheet(MergeUtils.mergeCharacters(previousClass.getDefaultViewSheet(),
-            newClass.getDefaultViewSheet(), getDefaultViewSheet(), mergeResult));
+        setDefaultViewSheet(MergeUtils.mergeOject(previousClass.getDefaultViewSheet(), newClass.getDefaultViewSheet(),
+            getDefaultViewSheet(), mergeResult));
 
-        setDefaultEditSheet(MergeUtils.mergeCharacters(previousClass.getDefaultEditSheet(),
-            newClass.getDefaultEditSheet(), getDefaultEditSheet(), mergeResult));
+        setDefaultEditSheet(MergeUtils.mergeOject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
+            getDefaultEditSheet(), mergeResult));
 
-        setNameField(MergeUtils.mergeCharacters(previousClass.getNameField(), newClass.getNameField(), getNameField(),
+        setNameField(MergeUtils.mergeOject(previousClass.getNameField(), newClass.getNameField(), getNameField(),
             mergeResult));
 
         // Properties
 
-        List<ObjectDiff> classDiff = newClass.getDiff(previousClass, context);
-        for (ObjectDiff diff : classDiff) {
-            PropertyClass propertyResult = (PropertyClass) getField(diff.getPropName());
-            PropertyClass previousProperty = (PropertyClass) previousClass.getField(diff.getPropName());
-            PropertyClass newProperty = (PropertyClass) newClass.getField(diff.getPropName());
-
-            if (diff.getAction() == ObjectDiff.ACTION_PROPERTYADDED) {
-                if (propertyResult == null) {
-                    // Add if none has been added by user already
-                    addField(diff.getPropName(),
-                        configuration.isProvidedVersionsModifiables() ? newClass.getField(diff.getPropName())
-                            : newClass.getField(diff.getPropName()).clone());
-                    mergeResult.setModified(true);
-                } else if (!propertyResult.equals(newProperty)) {
-                    // XXX: collision between DB and new: property to add but already exists in the DB
-                    mergeResult.getLog().error("Collision found on class property [{}]", newProperty.getReference());
-                }
-            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
-                if (propertyResult != null) {
-                    if (propertyResult.equals(previousProperty)) {
-                        // Delete if it's the same as previous one
-                        removeField(diff.getPropName());
-                        mergeResult.setModified(true);
-                    } else {
-                        // XXX: collision between DB and new: property to remove but not the same as previous
-                        // version
-                        mergeResult.getLog().error("Collision found on class property [{}]",
-                            previousProperty.getReference());
-                    }
-                } else {
-                    // Already removed from DB, lets assume the user is prescient
-                    mergeResult.getLog().warn("Object property [{}] already removed", previousProperty.getReference());
-                }
-            } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
-                if (propertyResult != null) {
-                    if (propertyResult.equals(previousProperty)) {
-                        // Let some automatic migration take care of that modification between DB and new
-                        addField(diff.getPropName(), newClass.getField(diff.getPropName()));
-                        mergeResult.setModified(true);
-                    } else if (!propertyResult.equals(newProperty)) {
-                        propertyResult.merge(previousProperty, newProperty, configuration, context, mergeResult);
-                    }
-                } else {
-                    // XXX: collision between DB and new: property to modify but does not exists in DB
-                    // Lets assume it's a mistake to fix
-                    mergeResult.getLog().warn("Collision found on class property [{}]", newProperty.getReference());
-
-                    addField(diff.getPropName(), newClass.getField(diff.getPropName()));
-                    mergeResult.setModified(true);
-                }
-            }
-        }
+        super.merge(previousElement, newElement, configuration, context, mergeResult);
     }
 
     @Override

@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>Panels</web>
   <name>Applications</name>
@@ -108,34 +128,37 @@
       <content>{{velocity}}
 #set($discard = $xwiki.ssx.use('Panels.Applications'))
 #set($discard = $xwiki.jsx.use('Panels.Applications'))
+
+## I need the HTML macro here because otherwise I am not able to put the class "active" to the first &lt;li&gt;.
+{{html wiki="true"}}
 #panelheader($services.localization.render('panels.applications.title'))
-#foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))
-  #set($params = $uix.getParameters())
-  #if($"$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
-(% class="applicationsPanel" %)
-* [[image:$params.icon $params.label&gt;&gt;$params.target]]
+&lt;ul class="applicationsPanel nav nav-pills nav-stacked"&gt;
+  #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))
+    #set($params = $uix.getParameters())
+    #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
+      &lt;li&gt;&lt;a href="$xwiki.getURL($params.target)"&gt;&lt;span class="application-img"&gt;image:$params.icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/a&gt;&lt;/li&gt;
+    #end
   #end
-#end
+&lt;/ul&gt;
 #if($xwiki.hasWikiAdminRights())
-## We need the 3 newlines below to have a separation between the lists
-
-
-
-(% class="applicationsPanel" %)
-* [[image:icon:add $services.localization.render('panels.applications.more')&gt;&gt;XWiki.XWikiPreferences||class="applicationPanelMoreButton" queryString="editor=globaladmin&amp;section=XWiki.AddExtensions"]]
-
-(% class="applicationPanelMoreContainer hidden" %)(((
-(% class="applicationsPanel" %)
-#foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications.more', {'sortByParameter' : 'label'}))
-  #set($params = $uix.getParameters())
-  #if($"$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '')
-(% class="applicationsPanel" %)
-* [[image:$params.icon $params.label&gt;&gt;$params.target]]
-  #end
-#end
-)))
+  &lt;ul class="applicationsPanel applicationsPanelMoreList nav nav-pills nav-stacked"&gt;
+    &lt;li&gt;&lt;a href="$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.AddExtensions')" class="applicationPanelMoreButton"&gt;&lt;span class="application-img"&gt;image:icon:add &lt;/span&gt; &lt;span class="application-label"&gt;$services.localization.render('panels.applications.more')&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;div class="applicationPanelMoreContainer hidden"&gt;
+    &lt;ul class="nav nav-pills nav-stacked"&gt;
+      #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications.more', {'sortByParameter' : 'label'}))
+        #set($params = $uix.getParameters())
+        #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '')
+        ##class="applicationsPanel"
+          &lt;li&gt;[[&lt;span class="application-img"&gt;image:$params.icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/span&gt;&gt;&gt;$params.target]]&lt;/li&gt;
+        #end
+      #end
+    &lt;/ul&gt;
+  &lt;/div&gt;
+  &lt;/ul&gt;
 #end
 #panelfooter()
+{{/html}}
+
 {{/velocity}}</content>
     </property>
     <property>
@@ -373,8 +396,22 @@ document.observe('xwiki:dom:loaded', function(e) {
       <cache>long</cache>
     </property>
     <property>
-      <code>ul.applicationsPanel li img {
+      <code>#template('colorThemeInit.vm')
+
+.applicationsPanelMoreList{
+  margin-top: 1em;
+}
+
+ul.applicationsPanel li img {
   float:left;
+}
+
+ul.applicationsPanel li .application-label{
+  margin-left: 0.5em;
+}
+
+div.applicationPanelMoreContainer ul {
+  margin-left: 0;
 }
 
 div.applicationPanelMoreContainer li a {
@@ -383,19 +420,91 @@ div.applicationPanelMoreContainer li a {
   font-weight: bold;
 }
 
+.panel-width-Small .panel.Applications{
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+}
 
+.panel-width-Small .applicationsPanel li{
+  list-style-type: none;
+  padding: 0;
+  text-align: center;
+}
 
+.panel-width-Small .applicationsPanel li a{
+  padding: 0.7em 0;
+}
+
+.panel-width-Small .applicationsPanel li img{
+  float: none;  
+}
+
+.panel-width-Small .applicationsPanel li .application-img{
+  display: block;
+}
+
+.panel-width-Small .applicationsPanel li .application-label{
+  margin-left: 0;
+}
+
+.panel-width-Small .panel.Applications .xwikipaneltitle{
+  display: none;
+}
+
+.panel-width-Small .panel.Applications .xwikipanelcontents{
+  border: 0;
+  background-color: transparent;
+  padding: 0;
+}
+
+.panel-width-Small .applicationPanelMoreContainer ul{
+  padding: 0;
+  background-color: #fff;
+}
+
+.panel-width-Small .applicationPanelMoreContainer ul li:hover{
+  background-color: $theme.highlightColor;
+}
+
+.panel-width-Small .applicationPanelMoreContainer ul li:hover a{
+  color: $theme.textPrimaryColor;
+}
+
+/* for colibri */
+.skin-colibri .panel-width-Small .applicationsPanel{
+  margin: 0;
+}
+.skin-colibri .panel-width-Small .applicationsPanel li{
+  padding: 15px 0;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  margin: 1px 0;
+}
+.skin-colibri .panel-width-Small .applicationsPanel li.active{
+  background-color: $theme.buttonPrimaryBackgroundColor;  
+}
+.skin-colibri .panel-width-Small .applicationsPanel li.active a{
+  color: $theme.buttonPrimaryTextColor
+}
+.skin-colibri .panel-width-Small .applicationsPanel li:hover{
+  background-color: $theme.highlightColor;
+}
+.skin-colibri .panel-width-Small .applicationsPanel li:hover a{
+  color: $theme.textPrimaryColor; 
+}
 </code>
     </property>
     <property>
       <name>Applications Panel</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{include document="Panels.PanelSheet"/}}</content>
+  <content/>
 </xwikidoc>

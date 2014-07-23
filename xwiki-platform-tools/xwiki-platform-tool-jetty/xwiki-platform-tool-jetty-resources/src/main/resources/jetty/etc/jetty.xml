@@ -74,18 +74,6 @@
   </Call>
 
   <!-- =========================================================== -->
-  <!-- Jetty lifecycle listener that prints a message to open a    -->
-  <!-- browser when the server is started. This is to provide      -->
-  <!-- information to newbies so that they know what to do after   -->
-  <!-- the server is started.                                      -->
-  <!-- =========================================================== -->
-  <Call name="addLifeCycleListener">
-    <Arg>
-      <New class="org.xwiki.tools.jetty.listener.NotifyListener" />
-    </Arg>
-  </Call>
-
-  <!-- =========================================================== -->
   <!-- Set handler Collection Structure                            -->
   <!-- =========================================================== -->
   <Set name="handler">
@@ -103,90 +91,12 @@
     </New>
   </Set>
 
-  <!-- =============================================================== -->
-  <!-- Create the deployment manager                                   -->
-  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-  <!-- The deployment manager handles the lifecycle of deploying web   -->
-  <!-- applications. Apps are provided by instances of the             -->
-  <!-- AppProvider interface.  Typically these are provided by         -->
-  <!-- one or more of:                                                 -->
-  <!--   jetty-webapps.xml       - monitors webapps for wars and dirs  -->
-  <!--   jetty-contexts.xml      - monitors contexts for context xml   -->
-  <!--   jetty-templates.xml     - monitors contexts and templates     -->
-  <!-- =============================================================== -->
-  <Call name="addBean">
-    <Arg>
-      <New id="DeploymentManager" class="org.eclipse.jetty.deploy.DeploymentManager">
-        <Set name="contexts">
-          <Ref id="Contexts"/>
-        </Set>
-        <!-- Note: We don't need to define a "org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern" attribute
-             since 1) we don't use tlds and 2) starting with Jetty 8.x, jetty employs a Servlet 3.0 way of finding
-             tlds, see http://wiki.eclipse.org/Jetty/Howto/Configure_JSP#Jetty_8.x -->
-        <!-- Note: Once we start using Servlet 3.0 we'll need to set the attribute named
-             "org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern" to not incur too heavy startup times.
-             See http://wiki.eclipse.org/Jetty/Howto/Avoid_slow_deployment.
-
-             Example:
-
-               <Call name="setContextAttribute">
-                 <Arg>org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern</Arg>
-                 <Arg>.*/.*myPrefixedJarToScan1-[^/]\.jar$|.*/.*myPrefixedJarToScan2-[^/]\.jar$</Arg>
-               </Call>
-             -->
-      </New>
-    </Arg>
-  </Call>
-
-  <!-- =============================================================== -->
-  <!-- Add a ContextProvider to the deployment manager                 -->
-  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-  <!-- This scans the webapps directory for war files and directories  -->
-  <!-- to deploy.                                                      -->
-  <!-- This configuration must be used with jetty-deploy.xml, which    -->
-  <!-- creates the deployment manager instance                         -->
-  <!-- =============================================================== -->
-  <Ref id="DeploymentManager">
-    <Call name="addAppProvider">
-      <Arg>
-        <New class="org.eclipse.jetty.deploy.providers.ContextProvider">
-          <Set name="monitoredDirName"><Property name="jetty.home" default="."/>/contexts
-          </Set>
-        </New>
-      </Arg>
-    </Call>
-  </Ref>
-
-  <!-- =========================================================== -->
-  <!-- Configure Request Log                                       -->
-  <!-- =========================================================== -->
-  <Ref id="Handlers">
-    <Call name="addHandler">
-      <Arg>
-        <New id="RequestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler">
-          <Set name="requestLog">
-            <New id="RequestLogImpl" class="org.eclipse.jetty.server.NCSARequestLog">
-              <Set name="filename"><Property name="xwiki.data.dir" default="."/>/logs/yyyy_mm_dd.request.log
-              </Set>
-              <Set name="filenameDateFormat">yyyy_MM_dd</Set>
-              <Set name="retainDays">90</Set>
-              <Set name="append">true</Set>
-              <Set name="extended">false</Set>
-              <Set name="logCookies">false</Set>
-              <Set name="LogTimeZone">GMT</Set>
-            </New>
-          </Set>
-        </New>
-      </Arg>
-    </Call>
-  </Ref>
-
   <!-- =========================================================== -->
   <!-- extra options                                               -->
   <!-- =========================================================== -->
   <Set name="stopAtShutdown">true</Set>
-  <Set name="sendServerVersion">true</Set>
-  <Set name="sendDateHeader">true</Set>
+  <Set name="sendServerVersion">false</Set>
+  <Set name="sendDateHeader">false</Set>
   <Set name="gracefulShutdown">1000</Set>
   <Set name="dumpAfterStart">false</Set>
   <Set name="dumpBeforeStop">false</Set>

@@ -171,24 +171,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<EntityL
     public void setSelection(final AttachmentReference imageReference, final AsyncCallback< ? > cb)
     {
         if (displayWikiSelector) {
-            wikiService.isMultiWiki(new AsyncCallback<Boolean>()
-            {
-                public void onFailure(Throwable caught)
-                {
-                    if (cb != null) {
-                        cb.onFailure(caught);
-                    }
-                }
-
-                public void onSuccess(Boolean result)
-                {
-                    if (result) {
-                        setWikiSelection(imageReference, cb);
-                    } else {
-                        setSpaceSelection(imageReference, cb);
-                    }
-                }
-            });
+            setWikiSelection(imageReference, cb);
         } else {
             setSpaceSelection(imageReference, cb);
         }

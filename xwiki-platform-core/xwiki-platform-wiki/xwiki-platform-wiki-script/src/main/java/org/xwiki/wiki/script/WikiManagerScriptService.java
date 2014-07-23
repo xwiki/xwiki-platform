@@ -39,6 +39,8 @@ import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.url.internal.standard.StandardURLConfiguration;
+import org.xwiki.wiki.configuration.WikiConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManager;
@@ -47,7 +49,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Script service to manager wikis.
+ * Script service to manage wikis.
  * 
  * @version $Id$
  * @since 5.3M2
@@ -99,6 +101,12 @@ public class WikiManagerScriptService implements ScriptService
 
     @Inject
     private ScriptServiceManager scriptServiceManager;
+
+    @Inject
+    private StandardURLConfiguration standardURLConfiguration;
+
+    @Inject
+    private WikiConfiguration wikiConfiguration;
 
     /**
      * Logging tool.
@@ -311,6 +319,25 @@ public class WikiManagerScriptService implements ScriptService
     }
 
     /**
+     * Get all the wiki identifiers.
+     * 
+     * @return the list of all wiki identifiers
+     * @since 6.2M1
+     */
+    public Collection<String> getAllIds()
+    {
+        Collection<String> wikis;
+        try {
+            wikis = wikiDescriptorManager.getAllIds();
+        } catch (WikiManagerException e) {
+            error(e);
+            wikis = new ArrayList<String>();
+        }
+
+        return wikis;
+    }
+
+    /**
      * Test if a wiki exists.
      * 
      * @param wikiId unique identifier to test
@@ -408,6 +435,35 @@ public class WikiManagerScriptService implements ScriptService
             error(e);
             return false;
         }
+    }
+
+    /**
+     * Tell if the path mode is used for subwikis.
+     *
+     * Example:
+     * <pre>
+     * {@code
+     * wiki alias: subwiki
+     * URL if path mode is enabled:
+     *   /xwiki/wiki/subwiki/
+     * URL if path mode is disabled:
+     *   http://subwiki/
+     * }
+     * </pre>
+     *
+     * @return either or not the path mode is enabled
+     */
+    public boolean isPathMode()
+    {
+        return standardURLConfiguration.isPathBasedMultiWiki();
+    }
+
+    /**
+     * @return the default suffix to append to new wiki aliases.
+     */
+    public String getAliasSuffix()
+    {
+        return wikiConfiguration.getAliasSuffix();
     }
 
     /**

@@ -1,0 +1,1 @@
+900:org.xwiki.mail.integration.TestMailSenderConfiguration

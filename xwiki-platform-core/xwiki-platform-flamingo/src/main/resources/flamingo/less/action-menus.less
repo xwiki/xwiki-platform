@@ -1,0 +1,67 @@
+//
+// Action Menus
+// --------------------------------------------------
+
+#menuview {
+  .navbar {
+    border-radius: 0;
+    border: 0;
+    margin-bottom: 0;
+    @padding-value: ceil(@navbar-padding-horizontal / 2);
+    .hasIcon, .hasCaret {
+      display: inline-block;
+      padding-left: @padding-value; 
+      padding-right: @padding-value;
+    }
+    .hasCaret {
+      margin-right: @padding-value;
+    }
+  }
+  .navbar-header {
+    min-width: percentage((1 / @grid-columns));
+    text-align: center;
+  }
+  .navbar-brand {
+    float: none;
+    img {
+      height: @navbar-height;
+    }
+  }
+  @media (max-width: @screen-sm-min) {
+    .dropdown-menu .divider {
+      background-color: @navbar-default-border;
+    }
+  }
+}
+
+.globalsearch { 
+  @media (min-width: @screen-sm-min) {
+    .input-group {
+      width: 15em;
+    }
+  }
+
+  .button {
+    height: @input-height-base;
+  }
+}
+
+#contentmenu {
+  .text-right();  
+  .btn-group {
+    margin: 2px 0;
+  }
+}
+
+// Navbar avatar ==========================================================
+
+.navbar-avatar {
+  > img {
+    @avatar-size: 24px;
+    border-radius: @thumbnail-border-radius;
+    height: @avatar-size;
+    margin-top: -@navbar-padding-horizontal+@navbar-height/2-@avatar-size/2;
+    vertical-align: middle;
+    width: @avatar-size;
+  }
+}

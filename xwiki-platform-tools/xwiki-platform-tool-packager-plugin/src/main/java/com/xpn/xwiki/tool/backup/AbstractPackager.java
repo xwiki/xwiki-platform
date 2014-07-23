@@ -77,7 +77,7 @@ public abstract class AbstractPackager
             throw new Exception("Failed to initialize Execution Context.", e);
         }
 
-        xcontext.setDatabase(databaseName);
+        xcontext.setWikiId(databaseName);
         xcontext.setMainXWiki(databaseName);
 
         // Use a dummy Request even in daemon mode so that XWiki's initialization can create a Servlet URL Factory.
@@ -131,7 +131,7 @@ public abstract class AbstractPackager
      */
     public void disposeXWikiContext(XWikiContext xcontext) throws ComponentLookupException
     {
-        ComponentManager componentManager = Utils.getComponentManager();
+        ComponentManager componentManager = Utils.getRootComponentManager();
 
         // Remove ExecutionContext
         Execution execution = componentManager.getInstance(Execution.class);

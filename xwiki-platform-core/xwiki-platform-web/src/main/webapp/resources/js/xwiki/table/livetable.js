@@ -43,10 +43,15 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Nodes under which all forms controls (input, selects, etc.) will be filters for this table
     this.filtersNodes = [
-          options.filterNodes     // Option API to precise filter nodes (single node or array of nodes)
+          options.filterNodes     // Option that specifies an array of filter nodes. Each item is either a reference to a
+                                  // DOM element or a String that is either the identifier of an element or a CSS selector.
        || $(options.filtersNode)  // Deprecated option (kept for backward compatibility)
        || $(domNodeName).down(".xwiki-livetable-display-filters") // Default filter node when none precised
     ].flatten().compact();
+    this.filtersNodes = this.filtersNodes.collect(function(item) {
+      // If it's a String then the item must be either the identifier of an element or a CSS selector.
+      return typeof item === 'string' ? ($(item) || $(document.body).down(item)) : item;
+    });
 
     // Array of nodes under which pagination for this livetable will be displayed.
     this.paginationNodes = options.paginationNodes || $(this.domNodeName).select(".xwiki-livetable-pagination");
@@ -98,7 +103,7 @@ XWiki.widgets.LiveTable = Class.create({
       this.tagCloud = new LiveTableTagCloud(this, domNodeName + "-tagcloud");
     }
     this.loadingStatus = $(this.domNodeName + '-ajax-loader') || $('ajax-loader');
-    this.limitsDisplay = $(this.domNodeName + '-limits') || new Element("div");
+    this.limitsDisplays = $(this.domNodeName).select('.xwiki-livetable-limits') || [];
     this.filters = "";
     this.handler = handler || function(){};
     this.totalRows = -1;
@@ -272,7 +277,9 @@ XWiki.widgets.LiveTable = Class.create({
     var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $services.localization.render('platform.livetable.paginationResultsOf') <strong>" + this.totalRows + "</strong>";
     msg = msg.toLowerCase();
 
-    this.limitsDisplay.innerHTML = "$services.localization.render('platform.livetable.paginationResults') " + msg;
+    this.limitsDisplays.each(function(limitsDisplay) {
+      limitsDisplay.innerHTML = "$services.localization.render('platform.livetable.paginationResults') " + msg;
+    });
     this.clearDisplay();
 
     for (var i = off; i <= f; i++) {

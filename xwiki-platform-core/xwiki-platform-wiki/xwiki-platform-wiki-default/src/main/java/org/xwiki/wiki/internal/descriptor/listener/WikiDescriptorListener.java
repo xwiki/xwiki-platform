@@ -57,7 +57,7 @@ public class WikiDescriptorListener implements EventListener
      * Relative reference to the XWiki.XWikiServerClass containing wiki descriptor metadata.
      */
     static final EntityReference SERVER_CLASS = new EntityReference("XWikiServerClass", EntityType.DOCUMENT,
-            new EntityReference("XWiki", EntityType.SPACE));
+        new EntityReference("XWiki", EntityType.SPACE));
 
     @Inject
     private WikiDescriptorBuilder builder;
@@ -77,16 +77,19 @@ public class WikiDescriptorListener implements EventListener
     @Override
     public List<Event> getEvents()
     {
-        return Arrays.<Event>asList(
-                new DocumentCreatedEvent(),
-                new DocumentUpdatedEvent(),
-                new DocumentDeletedEvent());
+        return Arrays
+            .<Event> asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
         XWikiDocument document = (XWikiDocument) source;
+
+        // If a wiki is deleted or created reset the list of wiki ids
+        if (event instanceof DocumentDeletedEvent || event instanceof DocumentCreatedEvent) {
+            this.cache.setWikiIds(null);
+        }
 
         // If the document is deleted then check the original document to see if it had XWiki Server objects and if
         // so then unregister them
@@ -99,7 +102,7 @@ public class WikiDescriptorListener implements EventListener
         if (serverClassObjects != null && !serverClassObjects.isEmpty()) {
             DefaultWikiDescriptor descriptor = this.builder.buildDescriptorObject(serverClassObjects, document);
             if (descriptor != null) {
-                cache.add(descriptor);
+                this.cache.add(descriptor);
             }
         }
     }
@@ -109,10 +112,10 @@ public class WikiDescriptorListener implements EventListener
         List<BaseObject> existingServerClassObjects = document.getXObjects(SERVER_CLASS);
         if (existingServerClassObjects != null && !existingServerClassObjects.isEmpty()) {
             String wikiId =
-                    wikiDescriptorDocumentHelper.getWikiIdFromDocumentReference(document.getDocumentReference());
-            DefaultWikiDescriptor existingDescriptor = cache.getFromId(wikiId);
+                this.wikiDescriptorDocumentHelper.getWikiIdFromDocumentReference(document.getDocumentReference());
+            DefaultWikiDescriptor existingDescriptor = this.cache.getFromId(wikiId);
             if (existingDescriptor != null) {
-                cache.remove(existingDescriptor);
+                this.cache.remove(existingDescriptor);
             }
         }
     }

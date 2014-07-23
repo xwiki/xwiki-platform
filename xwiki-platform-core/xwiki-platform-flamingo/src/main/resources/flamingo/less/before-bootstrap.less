@@ -1,0 +1,13 @@
+//
+// Before Bootstrap
+//
+// Put here some fixes that need to be imported before Bootstrap
+// --------------------------------------------------
+
+// XWIKI-10663 - Glyphicons does not work with IE8
+// (fix explained there: http://www.boonex.com/n/ie8-icon-font-fix-and-unused-language-keys-2012-08-20)
+@font-face {
+  font-family: 'Glyphicons Halflings';
+  src: url('@{icon-font-path}@{icon-font-name}.eot');
+}
+// Then Bootstrap will declare @font-face for the second time

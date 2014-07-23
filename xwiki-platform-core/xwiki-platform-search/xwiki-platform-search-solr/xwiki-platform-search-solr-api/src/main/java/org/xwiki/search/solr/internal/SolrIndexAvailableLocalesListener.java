@@ -120,7 +120,7 @@ public class SolrIndexAvailableLocalesListener implements EventListener
     {
         XWikiContext xcontext = (XWikiContext) data;
 
-        String wiki = xcontext.getDatabase();
+        String wiki = xcontext.getWikiId();
 
         Set<Locale> oldLocales = this.localesCache.get(wiki);
         List<Locale> availableLocales = xcontext.getWiki().getAvailableLocales(xcontext);

@@ -196,7 +196,7 @@ public class Document extends Api
     }
 
     /**
-     * return the name of a document. for exemple if the fullName of a document is "MySpace.Mydoc", the name is MyDoc.
+     * return the name of a document. for example if the fullName of a document is "MySpace.Mydoc", the name is MyDoc.
      * 
      * @return the name of the document
      */
@@ -225,19 +225,6 @@ public class Document extends Api
     public String getWiki()
     {
         return this.doc.getDocumentReference().getWikiReference().getName();
-    }
-
-    /**
-     * Get the name of the space of the document for exemple if the fullName of a document is "MySpace.Mydoc", the name
-     * is MySpace.
-     * 
-     * @return The name of the space of the document.
-     * @deprecated use {@link #getSpace()} instead of this function.
-     */
-    @Deprecated
-    public String getWeb()
-    {
-        return this.doc.getSpace();
     }
 
     /**
@@ -2589,15 +2576,6 @@ public class Document extends Api
     }
 
     /**
-     * @deprecated use {@link #rename(String)} instead
-     */
-    @Deprecated
-    public void renameDocument(String newDocumentName) throws XWikiException
-    {
-        rename(newDocumentName);
-    }
-
-    /**
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
      * which list the document we are renaming as their parent. See
      * {@link #rename(String, java.util.List, java.util.List)} for more details.
@@ -2626,15 +2604,6 @@ public class Document extends Api
             this.context.getWiki().getDocument(newReference, this.context), this.context)) {
             this.getDoc().rename(newReference, getXWikiContext());
         }
-    }
-
-    /**
-     * @deprecated use {@link #rename(String, java.util.List)} instead
-     */
-    @Deprecated
-    public void renameDocument(String newDocumentName, List<String> backlinkDocumentNames) throws XWikiException
-    {
-        rename(newDocumentName, backlinkDocumentNames);
     }
 
     /**

@@ -29,7 +29,6 @@ import org.restlet.data.Form;
 import org.restlet.engine.http.header.HeaderConstants;
 import org.restlet.security.ChallengeAuthenticator;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rest.internal.Constants;
 import org.xwiki.rest.internal.resources.BrowserAuthenticationResource;
 
 import com.xpn.xwiki.XWiki;
@@ -107,7 +106,7 @@ public class XWikiAuthentication extends ChallengeAuthenticator
                 if (xwikiUser != null) {
                     // Make sure the user is absolute
                     xwikiContext.setUser(xwikiUser.getUser().contains(":") ? xwikiUser.getUser() : xwikiContext
-                        .getDatabase() + ':' + xwikiUser.getUser());
+                        .getWikiId() + ':' + xwikiUser.getUser());
                     getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", xwikiUser.getUser()));
                 }
             } catch (XWikiException e) {

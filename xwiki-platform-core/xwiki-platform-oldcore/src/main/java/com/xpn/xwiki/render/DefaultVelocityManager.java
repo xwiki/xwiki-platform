@@ -43,7 +43,6 @@ import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.DeprecatedContext;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Note: This class should be moved to the Velocity module. However this is not possible right now since we need to
@@ -80,12 +79,18 @@ public class DefaultVelocityManager implements VelocityManager
      */
     @Inject
     private Provider<XWikiContext> xcontextProvider;
-    
+
     /**
      * Used to get the current script context.
      */
     @Inject
     private ScriptContextManager scriptContextManager;
+
+    @Inject
+    private VelocityFactory velocityFactory;
+
+    @Inject
+    private VelocityConfiguration velocityConfiguration;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -106,7 +111,7 @@ public class DefaultVelocityManager implements VelocityManager
                 vcontext.put(entry.getKey(), entry.getValue());
             }
         }
-        
+
         XWikiContext xcontext = xcontextProvider.get();
 
         // Add the "context" binding which is deprecated since 1.9.1.
@@ -168,9 +173,9 @@ public class DefaultVelocityManager implements VelocityManager
     }
 
     /**
-     * @return the Velocity Engine corresponding to the current execution context. More specifically returns
-     *         the Velocity Engine for the current skin since each skin has its own Velocity Engine so that each
-     *         skin can have global velocimacros defined
+     * @return the Velocity Engine corresponding to the current execution context. More specifically returns the
+     *         Velocity Engine for the current skin since each skin has its own Velocity Engine so that each skin can
+     *         have global velocimacros defined
      * @throws XWikiVelocityException in case of an error while creating a Velocity Engine
      */
     @Override
@@ -186,14 +191,19 @@ public class DefaultVelocityManager implements VelocityManager
 
         // Get the location of the skin's macros.vm file
         XWikiContext xcontext = this.xcontextProvider.get();
-        String skin = xcontext.getWiki().getSkin(xcontext);
-        String cacheKey = getVelocityEngineCacheKey(skin, xcontext);
+
+        String cacheKey;
+        if (xcontext.getWiki() != null) {
+            String skin = xcontext.getWiki().getSkin(xcontext);
+            cacheKey = getVelocityEngineCacheKey(skin, xcontext);
+        } else {
+            cacheKey = "";
+        }
 
         // Get the Velocity Engine to use
-        VelocityFactory velocityFactory = Utils.getComponent(VelocityFactory.class);
         VelocityEngine velocityEngine;
-        if (velocityFactory.hasVelocityEngine(cacheKey)) {
-            velocityEngine = velocityFactory.getVelocityEngine(cacheKey);
+        if (this.velocityFactory.hasVelocityEngine(cacheKey)) {
+            velocityEngine = this.velocityFactory.getVelocityEngine(cacheKey);
         } else {
             // Note 1: This block is synchronized to prevent threads from creating several instances of
             // Velocity Engines (for the same skin).
@@ -201,26 +211,29 @@ public class DefaultVelocityManager implements VelocityManager
             // called quite often and we would incur the synchronization penalty. Ideally the engine should be
             // created only when a new skin is created and not be on the main execution path.
             synchronized (this) {
-                if (velocityFactory.hasVelocityEngine(cacheKey)) {
-                    velocityEngine = velocityFactory.getVelocityEngine(cacheKey);
+                if (this.velocityFactory.hasVelocityEngine(cacheKey)) {
+                    velocityEngine = this.velocityFactory.getVelocityEngine(cacheKey);
                 } else {
                     // Gather the global Velocity macros that we want to have. These are skin dependent.
                     Properties properties = new Properties();
 
-                    // If the user hasn't specified any custom Velocity Resource Loader to use, use the XWiki Resource Loader
-                    if (!Utils.getComponent(VelocityConfiguration.class).getProperties().containsKey(RESOURCE_LOADER)) {
+                    // If the user hasn't specified any custom Velocity Resource Loader to use, use the XWiki Resource
+                    // Loader
+                    if (!this.velocityConfiguration.getProperties().containsKey(RESOURCE_LOADER)) {
                         properties.setProperty(RESOURCE_LOADER, "xwiki");
                         properties.setProperty(RESOURCE_LOADER_CLASS, XWikiWebappResourceLoader.class.getName());
                     }
 
-                    // Note: if you don't want any template to be used set the property named
-                    // xwiki.render.velocity.macrolist to an empty string value.
-                    String macroList = xcontext.getWiki().Param("xwiki.render.velocity.macrolist");
-                    if (macroList == null) {
-                        macroList = "/templates/macros.vm" + (cacheKey.equals("default") ? "" : "," + cacheKey);
+                    if (xcontext.getWiki() != null) {
+                        // Note: if you don't want any template to be used set the property named
+                        // xwiki.render.velocity.macrolist to an empty string value.
+                        String macroList = xcontext.getWiki().Param("xwiki.render.velocity.macrolist");
+                        if (macroList == null) {
+                            macroList = "/templates/macros.vm" + (cacheKey.equals("default") ? "" : "," + cacheKey);
+                        }
+                        properties.put(RuntimeConstants.VM_LIBRARY, macroList);
                     }
-                    properties.put(RuntimeConstants.VM_LIBRARY, macroList);
-                    velocityEngine = velocityFactory.createVelocityEngine(cacheKey, properties);
+                    velocityEngine = this.velocityFactory.createVelocityEngine(cacheKey, properties);
                 }
             }
         }

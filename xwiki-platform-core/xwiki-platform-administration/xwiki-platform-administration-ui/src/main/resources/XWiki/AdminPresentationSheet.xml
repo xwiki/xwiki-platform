@@ -159,5 +159,5 @@ $xwiki.jsx.use('XWiki.AdminPresentationSheet')
 })
 {{/velocity}}
 
-{{include document="XWiki.AdminFieldsDisplaySheet" /}}</content>
+{{include reference="XWiki.AdminFieldsDisplaySheet" /}}</content>
 </xwikidoc>

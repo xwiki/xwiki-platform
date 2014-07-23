@@ -20,6 +20,7 @@
 package org.xwiki.extension.distribution.internal.job;
 
 import java.util.List;
+import java.util.concurrent.locks.Condition;
 
 import javax.inject.Inject;
 
@@ -30,6 +31,7 @@ import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep.State;
 import org.xwiki.extension.distribution.internal.job.step.ReportDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WelcomeDistributionStep;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.internal.AbstractJob;
 
 /**
@@ -44,6 +46,11 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
      */
     @Inject
     protected DistributionManager distributionManager;
+
+    /**
+     * Condition to wait for ready state.
+     */
+    protected final Condition readyCondition = lock.newCondition();
 
     @Override
     public String getType()
@@ -94,8 +101,8 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
                 && previousStatus.getDistributionExtension() != null
                 && !ObjectUtils.equals(previousStatus.getDistributionExtension(),
                     this.distributionManager.getDistributionExtension())) {
-                status.setDistributionExtension(previousStatus.getDistributionExtension());
-                status.setDistributionExtensionUI(previousStatus.getDistributionExtensionUI());
+                status.setPreviousDistributionExtension(previousStatus.getDistributionExtension());
+                status.setPreviousDistributionExtensionUI(previousStatus.getDistributionExtensionUI());
             }
 
             status.setDistributionExtension(this.distributionManager.getDistributionExtension().getId());
@@ -159,6 +166,7 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
                     DistributionQuestion question = new DistributionQuestion(step);
 
                     // Waiting to start
+                    signalReady();
                     getStatus().ask(question);
 
                     if (question.getAction() != null) {
@@ -189,5 +197,42 @@ public abstract class AbstractDistributionJob<R extends DistributionRequest, S e
     public DistributionStep getCurrentStep()
     {
         return getStatus().getCurrentStep();
+    }
+
+    @Override
+    protected void jobFinished(Throwable exception)
+    {
+        super.jobFinished(exception);
+
+        signalReady();
+    }
+
+    private void signalReady()
+    {
+        this.lock.lock();
+
+        try {
+            this.readyCondition.signalAll();
+        } finally {
+            this.lock.unlock();
+        }
+    }
+
+    @Override
+    public void awaitReady()
+    {
+        if (getStatus() == null || getStatus().getState() == JobStatus.State.RUNNING) {
+            try {
+                this.lock.lockInterruptibly();
+
+                try {
+                    this.readyCondition.await();
+                } finally {
+                    this.lock.unlock();
+                }
+            } catch (InterruptedException e) {
+                this.logger.warn("The distribution job has been interrupted");
+            }
+        }
     }
 }

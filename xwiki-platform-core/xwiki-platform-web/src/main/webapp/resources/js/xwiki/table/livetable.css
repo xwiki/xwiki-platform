@@ -10,8 +10,10 @@
   float: left;
   line-height: 22px;
 }
-.xwiki-livetable-pagination .xwiki-livetable-limits {
+.skin-colibri .xwiki-livetable-pagination .xwiki-livetable-limits {
   float: left;
+}
+.xwiki-livetable-pagination .xwiki-livetable-limits {
   line-height: 22px;
 }
 .xwiki-livetable-pagination .xwiki-livetable-limits strong {
@@ -20,6 +22,9 @@
 .xwiki-livetable-pagination .xwiki-livetable-pagesize {
   line-height: 22px;
   margin-left: 5px;
+}
+.xwiki-livetable-pagination .xwiki-livetable-pagesize .pagesizeselect {
+  padding: 0;
 }
 .xwiki-livetable-pagination .xwiki-livetable-pagination-content, .xwiki-livetable-pagination .xwiki-livetable-pagination-text {
   display: inline;

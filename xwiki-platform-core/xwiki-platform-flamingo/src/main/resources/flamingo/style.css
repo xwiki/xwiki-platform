@@ -1,0 +1,9 @@
+## Get the compiled LESS code
+#set($css = $services.lesscss.compileSkinFile("style.less.vm"))
+## Remove the useless part
+#set($index = $css.indexOf('.not-sent-to-the-browser-from-this-point'))
+#if($index >= 0)
+  #set($css = $css.substring(0, $index))
+#end
+## Display the CSS
+$!css

@@ -1,32 +1,32 @@
 ##
 ## JS Libraries.
 ##
-$xwiki.jsfx.use('js/amd/require.js', {'defer': false})
-
-$xwiki.jsfx.use('js/prototype/prototype.js', {'defer': false})
-$xwiki.jsfx.use('js/scriptaculous/effects.js', true)
+$xwiki.jsfx.use('js/amd/require.js', {'defer': false})##
+##
+$xwiki.jsfx.use('js/prototype/prototype.js', {'defer': false})##
+$xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
 ##
 ## In order to make it easy to debug Javascript in browsers, allow the request parameter "minify=false" to be passed to
 ## avoid using the minified versions of JS/CSS.
 ##
 #if ("$!request.minify" == 'false')
-  $xwiki.jsfx.use('js/xwiki/xwiki.js', {'forceSkinAction': true, 'defer': false})
-  $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)
-  $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', {'forceSkinAction' : true, 'colorTheme' : $themeDoc})
-  $xwiki.jsfx.use('js/xwiki/widgets/jumpToPage.js', true)
-  $xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', {'forceSkinAction' : true, 'language' : $xcontext.language})
-  $xwiki.jsfx.use('uicomponents/model/entityReference.js')
-  $xwiki.jsfx.use('uicomponents/widgets/confirmationBox.js', true)
-  $xwiki.ssfx.use('uicomponents/widgets/confirmationBox.css', true)
-  $xwiki.jsfx.use('uicomponents/widgets/confirmedAjaxRequest.js', true)
-  $xwiki.jsfx.use('uicomponents/widgets/notification.js', true)
-  $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)
-  $xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')
-  $xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'language' : $xcontext.language})
-  $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true)
+  $xwiki.jsfx.use('js/xwiki/xwiki.js', {'forceSkinAction': true, 'defer': false})##
+  $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##
+  $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', {'forceSkinAction' : true, 'colorTheme' : $themeDoc})##
+  $xwiki.jsfx.use('js/xwiki/widgets/jumpToPage.js', true)##
+  $xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', {'forceSkinAction' : true, 'language' : $xcontext.language})##
+  $xwiki.jsfx.use('uicomponents/model/entityReference.js')##
+  $xwiki.jsfx.use('uicomponents/widgets/confirmationBox.js', true)##
+  $xwiki.ssfx.use('uicomponents/widgets/confirmationBox.css', true)##
+  $xwiki.jsfx.use('uicomponents/widgets/confirmedAjaxRequest.js', true)##
+  $xwiki.jsfx.use('uicomponents/widgets/notification.js', true)##
+  $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)##
+  $xwiki.jsfx.use('uicomponents/widgets/list/xlist.js')##
+  $xwiki.jsfx.use('uicomponents/suggest/suggest.js', {'forceSkinAction' : true, 'language' : $xcontext.language})##
+  $xwiki.ssfx.use('uicomponents/suggest/suggest.css', true)##
 #else
-  $xwiki.jsfx.use('js/xwiki/xwiki-min.js', {'forceSkinAction': true, 'defer': false, 'language': $xcontext.language})
-  $xwiki.ssfx.use('css/xwiki-min.css', {'forceSkinAction': true, 'colorTheme': $themeDoc, 'language': $xcontext.language})
+  $xwiki.jsfx.use('js/xwiki/xwiki-min.js', {'forceSkinAction': true, 'defer': false, 'language': $xcontext.language})##
+  $xwiki.ssfx.use('css/xwiki-min.css', {'forceSkinAction': true, 'colorTheme': $themeDoc, 'language': $xcontext.language})##
 #end
 #if($xwiki.exists('XWiki.SearchSuggestConfig'))
   ## Hook to request the search suggest script if search suggest configuration is present.
@@ -46,15 +46,15 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
     $xwiki.jsfx.use('uicomponents/search/searchSuggest.js', {
       'forceSkinAction' : true,
       'h' : $searchSuggestConfigHash.hashCode()
-    })
-    $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)
+    })##
+    $xwiki.ssfx.use('uicomponents/search/searchSuggest.css', true)##
   #end
 #end
 #set($editActions = ['edit', 'inline', 'admin'])
 #if($editActions.contains($xcontext.action))
-  $xwiki.jsfx.use('uicomponents/lock/lock.js')
-  $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js')
-  $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true)
+  $xwiki.jsfx.use('uicomponents/lock/lock.js')##
+  $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js')##
+  $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true)##
 #end
 ##
 ## Hooks for inserting JavaScript skin extensions

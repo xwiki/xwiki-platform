@@ -31,9 +31,9 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1378814314000</creationDate>
-  <date>1378815003000</date>
-  <contentUpdateDate>1378814881000</contentUpdateDate>
+  <creationDate>1398951564000</creationDate>
+  <date>1399016714000</date>
+  <contentUpdateDate>1398951564000</contentUpdateDate>
   <version>1.1</version>
   <title>Active Installs Counters</title>
   <defaultTemplate/>
@@ -1093,30 +1093,54 @@ var flipCounter = function(d, options){
     <property>
       <code>require(['jquery'], function($) {
 
-var totalCounterValue = $.ajax({
-  url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+var totalCounterValue1 = $.ajax({
+  url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue1', 'view', 'xpage=plain&amp;outputSyntax=plain')",
   async: false
 }).responseText;
-var totalInstallsCounter = new flipCounter("totalCounter", {value: totalCounterValue, auto:false});
+var totalInstallsCounter1 = new flipCounter("totalCounter1", {value: totalCounterValue1, auto:false});
 
-var activeCounterValue = $.ajax({
-  url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+var totalCounterValue2 = $.ajax({
+  url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue2', 'view', 'xpage=plain&amp;outputSyntax=plain')",
   async: false
 }).responseText;
-var activeInstallsCounter = new flipCounter("activeCounter", {value: activeCounterValue, auto:false});
+var totalInstallsCounter2 = new flipCounter("totalCounter2", {value: totalCounterValue2, auto:false});
+
+var activeCounterValue1 = $.ajax({
+  url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue1', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+  async: false
+}).responseText;
+var activeInstallsCounter1 = new flipCounter("activeCounter1", {value: activeCounterValue1, auto:false});
+
+var activeCounterValue2 = $.ajax({
+  url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue2', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+  async: false
+}).responseText;
+var activeInstallsCounter2 = new flipCounter("activeCounter2", {value: activeCounterValue2, auto:false});
 
 setInterval(function(){ 
-  var totalCounterValue = $.ajax({
-    url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+  var totalCounterValue1 = $.ajax({
+    url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue1', 'view', 'xpage=plain&amp;outputSyntax=plain')",
     async: false
   }).responseText;
-  totalInstallsCounter.setValue(totalCounterValue);
+  totalInstallsCounter1.setValue(totalCounterValue1);
 
-  var activeCounterValue = $.ajax({
-    url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+  var totalCounterValue2 = $.ajax({
+    url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue2', 'view', 'xpage=plain&amp;outputSyntax=plain')",
     async: false
   }).responseText;
-  activeInstallsCounter.setValue(activeCounterValue);
+  totalInstallsCounter2.setValue(totalCounterValue2);
+
+  var activeCounterValue1 = $.ajax({
+    url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue1', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+    async: false
+  }).responseText;
+  activeInstallsCounter1.setValue(activeCounterValue1);
+
+  var activeCounterValue2 = $.ajax({
+    url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue2', 'view', 'xpage=plain&amp;outputSyntax=plain')",
+    async: false
+  }).responseText;
+  activeInstallsCounter2.setValue(activeCounterValue2);
 }, 5000);
 
 });</code>

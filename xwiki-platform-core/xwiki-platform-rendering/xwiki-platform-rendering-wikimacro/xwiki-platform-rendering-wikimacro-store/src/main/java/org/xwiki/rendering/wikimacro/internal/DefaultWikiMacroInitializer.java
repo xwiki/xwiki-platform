@@ -122,7 +122,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
         XWikiContext xcontext = getContext();
 
         // Register the wiki macros that exist
-        String originalWiki = xcontext.getDatabase();
+        String originalWiki = xcontext.getWikiId();
         try {
             if (!local) {
                 Set<String> wikiNames = new HashSet<String>();
@@ -136,7 +136,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
                 registerMacrosForWiki(wiki, xcontext);
             }
         } finally {
-            xcontext.setDatabase(originalWiki);
+            xcontext.setWikiId(originalWiki);
         }
     }
 
@@ -155,7 +155,7 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
             // registration of macros registered for the current wiki will work.
             // TODO: In the future when we have APIs for it, move the code to set the current wiki and the current user
             // (see below) to the WikiMacroManager's implementation.
-            xcontext.setDatabase(wikiName);
+            xcontext.setWikiId(wikiName);
 
             // Make sure classes exists and are up to date in this wiki
             installOrUpgradeWikiMacroClasses();

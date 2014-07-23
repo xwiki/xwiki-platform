@@ -205,9 +205,9 @@ public class HtmlPackager
         ZipEntry zipentry = new ZipEntry(zipname);
         zos.putNextEntry(zipentry);
 
-        String originalDatabase = context.getDatabase();
+        String originalDatabase = context.getWikiId();
         try {
-            context.setDatabase(doc.getDocumentReference().getWikiReference().getName());
+            context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
             context.setDoc(doc);
             vcontext.put(VCONTEXT_DOC, doc.newDocument(context));
             vcontext.put(VCONTEXT_CDOC, vcontext.get(VCONTEXT_DOC));
@@ -221,7 +221,7 @@ public class HtmlPackager
             zos.write(content.getBytes(context.getWiki().getEncoding()));
             zos.closeEntry();
         } finally {
-            context.setDatabase(originalDatabase);
+            context.setWikiId(originalDatabase);
         }
     }
 

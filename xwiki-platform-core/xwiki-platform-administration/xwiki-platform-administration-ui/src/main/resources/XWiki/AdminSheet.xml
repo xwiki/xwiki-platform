@@ -3239,7 +3239,12 @@ document.observe('xwiki:dom:loaded', function() {
 }
 #change-context {
   float: right;
+}
+.skin-colibri #change-context {
   padding-top: 15px;
+}
+.skin-flamingo #change-context {
+  padding-top: 55px;
 }
 /* IE6 is very sick... */
 #change-context div {
@@ -3251,7 +3256,7 @@ document.observe('xwiki:dom:loaded', function() {
 
 /*******************************************************/
 
-#admin-page-content {
+.skin-colibri #admin-page-content {
   margin-left: 15em;
 }
 
@@ -3291,6 +3296,8 @@ document.observe('xwiki:dom:loaded', function() {
 #set ($configurationIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/wrench.png')${escapetool.S})")
 .admin-menu .group.configurationIcon {
   background-image: $configurationIcon;
+}
+.skin-colibri .admin-menu .group.configurationIcon {
   #css3_backgroundIconAndLinearGradient($configurationIcon, {
      'to': 'bottom',
      'colors': [
@@ -3299,7 +3306,7 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   })
 }
-.admin-menu .group.configurationIcon:hover , .admin-menu .current.configurationIcon {
+.skin-colibri .admin-menu .group.configurationIcon:hover , .skin-colibri .admin-menu .current.configurationIcon {
   #css3_backgroundIconAndLinearGradient($configurationIcon, {
      'to': 'bottom',
      'colors': [
@@ -3312,6 +3319,8 @@ document.observe('xwiki:dom:loaded', function() {
 #set ($lfIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/layout_content.png')${escapetool.S})")
 .admin-menu .group.lfIcon {
   background-image: $lfIcon;
+}
+.skin-colibri .admin-menu .group.lfIcon {
   #css3_backgroundIconAndLinearGradient($lfIcon, {
      'to': 'bottom',
      'colors': [
@@ -3320,7 +3329,7 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   })
 }
-.admin-menu .group.lfIcon:hover , .admin-menu .current.lfIcon {
+.skin-colibri .admin-menu .group.lfIcon:hover , .skin-colibri .admin-menu .current.lfIcon {
   #css3_backgroundIconAndLinearGradient($lfIcon, {
      'to': 'bottom',
      'colors': [
@@ -3333,6 +3342,9 @@ document.observe('xwiki:dom:loaded', function() {
 #set ($usersgroupsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/group.png')${escapetool.S})")
 .admin-menu .group.usersgroupsIcon {
   background-image: $usersgroupsIcon;
+}
+
+.skin-colibri .admin-menu .group.usersgroupsIcon {
   #css3_backgroundIconAndLinearGradient($usersgroupsIcon, {
      'to': 'bottom',
      'colors': [
@@ -3341,7 +3353,7 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   })
 }
-.admin-menu .group.usersgroupsIcon:hover , .admin-menu .current.usersgroupsIcon {
+.skin-colibri .admin-menu .group.usersgroupsIcon:hover , .skin-colibri .admin-menu .current.usersgroupsIcon {
   #css3_backgroundIconAndLinearGradient($usersgroupsIcon, {
      'to': 'bottom',
      'colors': [
@@ -3354,6 +3366,8 @@ document.observe('xwiki:dom:loaded', function() {
 #set ($contentIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/folder_page.png')${escapetool.S})")
 .admin-menu .group.contentIcon {
   background-image: $contentIcon;
+}
+.skin-colibri .admin-menu .group.contentIcon {
   #css3_backgroundIconAndLinearGradient($contentIcon, {
      'to': 'bottom',
      'colors': [
@@ -3362,7 +3376,7 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   })
 }
-.admin-menu .group.contentIcon:hover , .admin-menu .current.contentIcon {
+.skin-colibri .admin-menu .group.contentIcon:hover , .skin-colibri  .admin-menu .current.contentIcon {
   #css3_backgroundIconAndLinearGradient($contentIcon, {
      'to': 'bottom',
      'colors': [
@@ -3375,6 +3389,8 @@ document.observe('xwiki:dom:loaded', function() {
 #set ($extensionmanagerIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/xwiki/plugin_wrench.png')${escapetool.S})")
 .admin-menu .group.extensionmanagerIcon {
   background-image: $extensionmanagerIcon;
+}
+.skin-colibri .admin-menu .group.extensionmanagerIcon {
   #css3_backgroundIconAndLinearGradient($extensionmanagerIcon, {
      'to': 'bottom',
      'colors': [
@@ -3383,7 +3399,7 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   })
 }
-.admin-menu .group.extensionmanagerIcon:hover , .admin-menu .current.extensionmanagerIcon {
+.skin-colibri .admin-menu .group.extensionmanagerIcon:hover , .admin-menu .current.extensionmanagerIcon {
   #css3_backgroundIconAndLinearGradient($extensionmanagerIcon, {
      'to': 'bottom',
      'colors': [
@@ -3396,6 +3412,8 @@ document.observe('xwiki:dom:loaded', function() {
 #set ($applicationsIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/plugin.png')${escapetool.S})")
 .admin-menu .group.applicationsIcon {
   background-image: $applicationsIcon;
+}
+.skin-colibri .admin-menu .group.applicationsIcon {
   #css3_backgroundIconAndLinearGradient($applicationsIcon, {
      'to': 'bottom',
      'colors': [
@@ -3404,7 +3422,7 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   })
 }
-.admin-menu .group.applicationsIcon:hover , .admin-menu .current.applicationsIcon {
+.skin-colibri .admin-menu .group.applicationsIcon:hover , .skin-colibri .admin-menu .current.applicationsIcon {
   #css3_backgroundIconAndLinearGradient($applicationsIcon, {
      'to': 'bottom',
      'colors': [
@@ -3417,6 +3435,8 @@ document.observe('xwiki:dom:loaded', function() {
 #set ($readOnlyIcon = "url(${escapetool.S}$xwiki.getSkinFile('icons/silk/error.png')${escapetool.S})")
 .admin-menu .group.readOnly {
   background-image: $readOnlyIcon;
+}
+.skin-colibri .admin-menu .group.readOnly {
   #css3_backgroundIconAndLinearGradient($readOnlyIcon, {
      'to': 'bottom',
      'colors': [
@@ -3425,7 +3445,7 @@ document.observe('xwiki:dom:loaded', function() {
     ]
   })
 }
-.admin-menu .group.readOnly:hover , .admin-menu .current.readOnly {
+.skin-colibri .admin-menu .group.readOnly:hover , .skin-colibri .admin-menu .current.readOnly {
   #css3_backgroundIconAndLinearGradient($readOnlyIcon, {
      'to': 'bottom',
      'colors': [
@@ -3468,7 +3488,7 @@ document.observe('xwiki:dom:loaded', function() {
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{include document="XWiki.ConfigurableClassMacros" /}}
+  <content>{{include reference="XWiki.ConfigurableClassMacros" /}}
 
 {{velocity output="false"}}
 #if ($request.xaction == 'switchContext')
@@ -3536,21 +3556,6 @@ document.observe('xwiki:dom:loaded', function() {
     'children' : []
   }
 ])
-
-##
-## Make some adjustments in case this is a workspace
-##
-#if ($services.workspace.isWorkspace($xcontext.database))
-  #foreach ($category in $adminMenu)
-    #if ($category.id == 'configuration')
-      $category.children.add(0, {'id' : 'XWiki.ManageWorkspace'})
-    #elseif ($category.id == 'usersgroups')
-      $category.children.remove({'id' : 'Users'})
-      $category.children.remove({'id' : 'Registration'})
-      $category.children.add(0, {'id' : 'XWiki.WorkspaceUsers'})
-    #end
-  #end
-#end
 
 ##
 ## Fill in the list of custom applications to configure
@@ -3782,8 +3787,34 @@ document.observe('xwiki:dom:loaded', function() {
     #set ($sectionName = $currentSpace)
   #end
 #admin_spaceSwitch()
-(% id="hierarchy" %)(((
-#if ($crtCategory){{html}}&lt;a href="${xwiki.getURL($currentDoc, $adminAction)}"&gt;$services.localization.render('admin.main.title')&lt;/a&gt;{{/html}}#{else}(% class="current" %){{translation key="admin.main.title"/}}(%%)#{end}#if ($crtCategory) (% class="separator" %)»(%%) #if ($crtSection){{html}}&lt;a href="${crtCategory.url}"&gt;${crtCategory.name}&lt;/a&gt;{{/html}}#{else}(% class="current" %)${crtCategory.name}(%%)#{end}#if ($crtSection) (% class="separator" %)»(%%) (% class="current" %)${crtSection.name}(%%)#end#end
+(% id="hierarchy" %)
+(((
+
+{{html}}
+#breadcrumb_start()
+  #if ($crtCategory)
+    #breadcrumb_line($xwiki.getURL($currentDoc, $adminAction), $services.localization.render('admin.main.title'))
+    ##&lt;li&gt;&lt;a href="${xwiki.getURL($currentDoc, $adminAction)}"&gt;$services.localization.render('admin.main.title')&lt;/a&gt;&lt;/li&gt;
+  #else
+    #breadcrumb_current_line($services.localization.render('admin.main.title'))
+    ##&lt;li class="active"&gt;$services.localization.render('admin.main.title')&lt;/li&gt;
+  #end
+  #if ($crtCategory)
+    #if ($crtSection)
+      #breadcrumb_line($crtCategory.url, $crtCategory.name)
+      ##&lt;li&gt;&lt;a href="$crtCategory.url"&gt;$crtCategory.name&lt;/a&gt;&lt;/li&gt;
+    #else
+      #breadcrumb_current_line($crtCategory.name)
+      ##&lt;li class="active"&gt;$crtCategory.name&lt;/li&gt;
+    #end
+    #if ($crtSection)
+      #breadcrumb_current_line($crtSection.name) 
+      ##&lt;li class="active"&gt;$crtSection.name&lt;/li&gt;
+    #end
+  #end
+#breadcrumb_end()
+{{/html}}
+
 )))
 (% id="document-title" %)(((
   = $services.localization.render('admin.section.title', [$sectionName]) =
@@ -3805,19 +3836,19 @@ document.observe('xwiki:dom:loaded', function() {
         #if("$!{request.editmode}" == 'inline' &amp;&amp; $xwiki.exists($section))
           $xcontext.setDisplayMode('edit')##
 
-          {{html clean="false"}}{{include document="XWiki.AdminInlineSheet" /}}{{/html}}
+          {{html clean="false"}}{{include reference="XWiki.AdminInlineSheet" /}}{{/html}}
         #else
           #if($xwiki.exists("XWiki.Admin${section}Sheet"))
             ## Custom XE administration section
 
-            {{include document="XWiki.Admin${section}Sheet" /}}
+            {{include reference="XWiki.Admin${section}Sheet" /}}
 
           #elseif($xwiki.exists($section))
             {{html clean="false"}}#includeForm($section){{/html}}
           #end
         #end
         #if ($crtSection.configurable)
-          {{include document="XWiki.ConfigurableClass" /}}
+          {{include reference="XWiki.ConfigurableClass" /}}
         #end
       ))) ## admin-page-content
     #end

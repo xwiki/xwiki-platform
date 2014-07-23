@@ -88,7 +88,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     protected XWikiAuthenticator getAuthenticator(XWikiContext context) throws XWikiException
     {
-        String wikiName = context.getDatabase();
+        String wikiName = context.getWikiId();
 
         if (wikiName != null) {
             wikiName = wikiName.toLowerCase();
@@ -404,18 +404,18 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 susername = cannonicalUsername.substring(j + 1);
             }
 
-            String db = context.getDatabase();
+            String db = context.getWikiId();
 
             try {
                 // Set the context database to the specified wiki, if any
                 if (virtualXwikiName != null) {
-                    context.setDatabase(virtualXwikiName);
+                    context.setWikiId(virtualXwikiName);
                 }
                 // Check in the current database first
                 try {
                     String user = findUser(susername, context);
                     if (user != null && checkPassword(user, password, context)) {
-                        return new SimplePrincipal(virtualXwikiName != null ? context.getDatabase() + ":" + user : user);
+                        return new SimplePrincipal(virtualXwikiName != null ? context.getWikiId() + ":" + user : user);
                     }
                 } catch (Exception e) {
                     // continue
@@ -423,11 +423,11 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
                 if (!context.isMainWiki()) {
                     // Then we check in the main database
-                    context.setDatabase(context.getMainXWiki());
+                    context.setWikiId(context.getMainXWiki());
                     try {
                         String user = findUser(susername, context);
                         if (user != null && checkPassword(user, password, context)) {
-                            return new SimplePrincipal(context.getDatabase() + ":" + user);
+                            return new SimplePrincipal(context.getWikiId() + ":" + user);
                         }
                     } catch (Exception e) {
                         context.put("message", "loginfailed");
@@ -440,7 +440,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 return null;
 
             } finally {
-                context.setDatabase(db);
+                context.setWikiId(db);
             }
 
         } else {
@@ -455,7 +455,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         String user;
 
         // First let's look in the cache
-        if (context.getWiki().exists(new DocumentReference(context.getDatabase(), "XWiki", username), context)) {
+        if (context.getWiki().exists(new DocumentReference(context.getWikiId(), "XWiki", username), context)) {
             user = "XWiki." + username;
         } else {
             // Note: The result of this search depends on the Database. If the database is
@@ -540,7 +540,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         if (createuser != null) {
             String wikiname = context.getWiki().clearName(user, true, true, context);
             XWikiDocument userdoc =
-                context.getWiki().getDocument(new DocumentReference(context.getDatabase(), "XWiki", wikiname), context);
+                context.getWiki().getDocument(new DocumentReference(context.getWikiId(), "XWiki", wikiname), context);
             if (userdoc.isNew()) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("User page does not exist for user " + user);
@@ -580,6 +580,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         // XWiki uses contextPath in the wrong way, putting a / at the end, and not at the start. Fix this here.
         if (contextPath.endsWith("/") && !contextPath.startsWith("/")) {
             contextPath = "/" + StringUtils.chop(contextPath);
+        } else if ("/".equals(contextPath)) {
+            contextPath = "";
         }
 
         // URLFactory.getURL applies Util.escapeURL, which might convert the contextPath into an %NN escaped string.
@@ -587,6 +589,15 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         contextPath = Util.escapeURL(contextPath);
 
         String urlPrefix = url.getProtocol() + "://" + url.getAuthority() + contextPath;
-        return StringUtils.removeStart(url.toExternalForm(), urlPrefix);
+
+        // Since the passed URL has been potentially modified by HttpServletResponse.encodeURL() we also need to call
+        // encodeURL on urlPrefix to have a matching result.
+        String encodedUrlPrefix = context.getResponse().encodeURL(urlPrefix);
+        // Remove a potential jsessionid in the URL
+        encodedUrlPrefix = encodedUrlPrefix.replaceAll(";jsessionid=.*?(?=\\?|$)", "");
+        // Also remove any query string that might have been added by an outbound URL rewrite rule
+        encodedUrlPrefix = StringUtils.substringBeforeLast(encodedUrlPrefix, "?");
+
+        return StringUtils.removeStart(url.toExternalForm(), encodedUrlPrefix);
     }
 }

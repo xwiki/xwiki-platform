@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,7 +18,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -27,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>5.4-SNAPSHOT</version>
+    <version>6.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -59,12 +57,6 @@
     </dependency>
 
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
-
-    <dependency>
-      <groupId>com.novell.ldap</groupId>
-      <artifactId>jldap</artifactId>
-      <version>4.3</version>
-    </dependency>
 
     <!-- We need to create a JIRA issue on the Maven project to upload these artifacts -->
     <dependency>
@@ -195,11 +187,6 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>javassist</groupId>
-      <artifactId>javassist</artifactId>
-      <version>3.12.1.GA</version>
-    </dependency>
-    <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
       <version>2.0.5</version>
@@ -303,6 +290,11 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
+        <!-- Useless here -->
+        <exclusion>
+          <groupId>org.apache.xmlgraphics</groupId>
+          <artifactId>batik-js</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -336,7 +328,6 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <version>2.2</version>
     </dependency>
     <!-- Mail sender -->
     <dependency>
@@ -549,7 +540,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-resource</artifactId>
+      <artifactId>xwiki-platform-resource-default</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -604,17 +595,17 @@
 
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wikistream-instance-api</artifactId>
+      <artifactId>xwiki-platform-filter-instance-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wikistream-instance-document</artifactId>
+      <artifactId>xwiki-platform-filter-instance-document</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wikistream-stream-xar</artifactId>
+      <artifactId>xwiki-platform-filter-stream-xar</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -643,7 +634,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-      </plugin>      
+      </plugin>
       <!-- Publish a Core Test JAR -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -734,6 +725,8 @@
               **/internal/model/reference/CurrentStringEntityReferenceResolver.java,
               **/internal/observation/remote/converter/AbstractXWikiEventConverter.java,
               **/internal/observation/remote/converter/ActionExecutionEventConverter.java,
+              **/internal/template/TemplateScriptService.java,
+              **/internal/template/WikiTemplateRenderer.java,
               **/monitor/api/MonitorData.java,
               **/monitor/api/MonitorPlugin.java,
               **/monitor/api/MonitorTimer.java,
@@ -779,10 +772,6 @@
               **/plugin/diff/DiffPluginApi.java,
               **/plugin/diff/DiffPlugin.java,
               **/plugin/graphviz/GraphVizMacro.java,
-              <!-- XWiki LDAP Utils has a fan out complexity of 21 that needs to be investigated and refactored. -->
-              **/plugin/ldap/XWikiLDAPUtils.java,
-              <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
-              **/plugin/ldap/XWikiLDAPConnection.java,
               **/plugin/mail/MailPluginApi.java,
               **/plugin/mail/MailPlugin.java,
               **/plugin/packaging/DocumentFilter.java,
@@ -903,8 +892,6 @@
               **/user/api/XWikiRightNotFoundException.java,
               **/user/api/XWikiRightService.java,
               **/user/api/XWikiUser.java,
-              **/user/impl/LDAP/LDAPProfileXClass.java,
-              **/user/impl/LDAP/XWikiLDAPAuthServiceImpl.java,
               **/user/impl/xwiki/AppServerTrustedAuthServiceImpl.java,
               **/user/impl/xwiki/GroovyAuthServiceImpl.java,
               **/user/impl/xwiki/MyBasicAuthenticator.java,
@@ -993,8 +980,11 @@
               **/xmlrpc/XWikiXmlRpcURLFactory.java,
               **/xmlrpc/XWikiXmlRpcUser.java,
               <!-- Small Fan-Out complexity issue but it would need a big refactor to be fixed. -->
-              **/stats/impl/xwiki/XWikiStatsReader.java,
+              **/stats/impl/xwiki/XWikiStatsReader.java
           </excludes>
+          <resourceExcludes>
+              ApplicationResources*.properties
+          </resourceExcludes>
         </configuration>
       </plugin>
     </plugins>

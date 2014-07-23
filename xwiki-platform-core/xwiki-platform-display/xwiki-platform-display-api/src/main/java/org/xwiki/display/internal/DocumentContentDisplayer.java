@@ -19,7 +19,6 @@
  */
 package org.xwiki.display.internal;
 
-import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,8 +30,8 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
@@ -41,7 +40,8 @@ import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.block.match.CompositeBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.ContentParser;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.velocity.VelocityManager;
@@ -103,7 +103,7 @@ public class DocumentContentDisplayer implements DocumentDisplayer
      * Used to get a parser for a specific syntax.
      */
     @Inject
-    private ComponentManager componentManager;
+    private ContentParser parser;
 
     @Override
     public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
@@ -313,7 +313,8 @@ public class DocumentContentDisplayer implements DocumentDisplayer
                 } else {
                     // If the translated document has a different syntax then we have to parse its content using the
                     // syntax of the given document.
-                    return parseContent(translatedDocument.getContent(), document.getSyntax().toIdString());
+                    return parseContent(translatedDocument.getContent(), document.getSyntax(),
+                        document.getDocumentReference());
                 }
             }
         } catch (Exception e) {
@@ -329,11 +330,10 @@ public class DocumentContentDisplayer implements DocumentDisplayer
      * @param syntaxId the syntax of the given content, used as a hint then looking up the parser component
      * @return the result of parsing the given content
      */
-    private XDOM parseContent(String content, String syntaxId)
+    private XDOM parseContent(String content, Syntax syntax, DocumentReference source)
     {
         try {
-            Parser parser = componentManager.getInstance(Parser.class, syntaxId);
-            return parser.parse(new StringReader(content));
+            return parser.parse(content, syntax, source);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

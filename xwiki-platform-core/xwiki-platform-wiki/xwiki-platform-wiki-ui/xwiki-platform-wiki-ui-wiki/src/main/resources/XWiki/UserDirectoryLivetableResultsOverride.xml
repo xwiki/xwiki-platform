@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>XWiki</web>
   <name>UserDirectoryLivetableResultsOverride</name>
@@ -91,18 +111,18 @@
   #end
   ##
   ## Extend the livetable query to display only the direct users of the wiki and the indirect users (that are members of subgroups of the wiki group)
-  #if ($wikiMemberUsers.size() > 0 || $wikiMemberGroups.size() > 0)
+  #if ($wikiMemberUsers.size() &gt; 0 || $wikiMemberGroups.size() &gt; 0)
     #set ($extraWhereClause = "AND ")
-    #if ($wikiMemberUsers.size() > 0 &amp;&amp; $wikiMemberGroups.size() > 0)
+    #if ($wikiMemberUsers.size() &gt; 0 &amp;&amp; $wikiMemberGroups.size() &gt; 0)
       ## Begin both clauses group
       #set ($extraWhereClause = "${extraWhereClause}(")
     #end
     ##
     ## Users
-    #if ($wikiMemberUsers.size() > 0)
+    #if ($wikiMemberUsers.size() &gt; 0)
       #set ($extraWhereClause = "${extraWhereClause}CONCAT('${services.wiki.mainWikiId}:', doc.fullName) IN (")
       #foreach ($wikiMemberUser in $wikiMemberUsers)
-        #if ($velocityCount > 1)
+        #if ($velocityCount &gt; 1)
           #set ($extraWhereClause = "${extraWhereClause},")
         #end
         #set ($extraWhereClause = "${extraWhereClause}?")
@@ -111,14 +131,14 @@
       #set ($extraWhereClause = "${extraWhereClause})")
     #end
     ## Groups
-    #if ($wikiMemberGroups.size() > 0)
-      #if ($wikiMemberUsers.size() > 0)
+    #if ($wikiMemberGroups.size() &gt; 0)
+      #if ($wikiMemberUsers.size() &gt; 0)
         ## This is grouped with the users clause from above.
         #set ($extraWhereClause = "${extraWhereClause} OR ")
       #end
       #set ($extraWhereClause = "${extraWhereClause}doc.fullName IN (SELECT prop.value FROM BaseObject as obj, StringProperty as prop WHERE obj.className='XWiki.XWikiGroups' AND prop.id.id=obj.id AND prop.name='member' AND obj.name IN (")
       #foreach ($wikiMemberGroup in $wikiMemberGroups)
-        #if ($velocityCount > 1)
+        #if ($velocityCount &gt; 1)
           #set ($extraWhereClause = "${extraWhereClause},")
         #end
         #set ($extraWhereClause = "${extraWhereClause}?")
@@ -128,7 +148,7 @@
     #end
     ##
     ## Close both clauses group
-    #if ($wikiMemberUsers.size() > 0 &amp;&amp; $wikiMemberGroups.size() > 0)
+    #if ($wikiMemberUsers.size() &gt; 0 &amp;&amp; $wikiMemberGroups.size() &gt; 0)
       #set ($extraWhereClause = "${extraWhereClause})")
     #end
    ## Step2: Set the database to the main wiki so that the query will be performed on the right wiki.
@@ -139,7 +159,7 @@
 
 {{comment}}Call the default user directory data source that we have just enhanced.{{/comment}}
 
-{{include document='XWiki.UserDirectoryLivetableResults' /}}
+{{include reference='XWiki.UserDirectoryLivetableResults' /}}
 
 {{velocity output='false'}}
 #if($request.userScope == 'global')

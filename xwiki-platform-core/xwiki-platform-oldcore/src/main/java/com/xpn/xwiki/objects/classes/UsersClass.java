@@ -29,9 +29,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
@@ -189,5 +192,35 @@ public class UsersClass extends ListClass
     {
         String value = ppcel.getText();
         return fromString(value);
+    }
+
+    @Override
+    public List<String> toList(BaseProperty< ? > property)
+    {
+        List<String> selectlist;
+
+        if (property == null) {
+            selectlist = Collections.emptyList();
+        } else {
+            selectlist = getListFromString((String) property.getValue());
+        }
+
+        return selectlist;
+    }
+
+    @Override
+    public void fromList(BaseProperty< ? > property, List<String> list)
+    {
+        property.setValue(list != null ? StringUtils.join(list, ',') : null);
+    }
+
+    @Override
+    public <T extends EntityReference> void mergeProperty(BaseProperty<T> currentProperty,
+        BaseProperty<T> previousProperty, BaseProperty<T> newProperty, MergeConfiguration configuration,
+        XWikiContext xcontext, MergeResult mergeResult)
+    {
+        // always a not ordered list
+        mergeNotOrderedListProperty(currentProperty, previousProperty, newProperty, configuration, xcontext,
+            mergeResult);
     }
 }

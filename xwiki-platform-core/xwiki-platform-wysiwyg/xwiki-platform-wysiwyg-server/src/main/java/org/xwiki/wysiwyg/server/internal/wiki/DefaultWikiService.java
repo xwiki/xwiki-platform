@@ -67,15 +67,10 @@ public class DefaultWikiService extends AbstractWikiService
      * @return the XWiki context
      * @deprecated avoid using this method; try using the document access bridge instead
      */
+    @Deprecated
     private XWikiContext getXWikiContext()
     {
         return (XWikiContext) execution.getContext().getProperty("xwikicontext");
-    }
-
-    @Override
-    public Boolean isMultiWiki()
-    {
-        return getXWikiContext().getWiki().isVirtualMode();
     }
 
     @Override
@@ -86,7 +81,7 @@ public class DefaultWikiService extends AbstractWikiService
             virtualWikiNamesList = getXWikiContext().getWiki().getVirtualWikisDatabaseNames(getXWikiContext());
             // put the current, default database if nothing is inside
             if (virtualWikiNamesList.size() == 0) {
-                virtualWikiNamesList.add(getXWikiContext().getDatabase());
+                virtualWikiNamesList.add(getXWikiContext().getWikiId());
             }
             Collections.sort(virtualWikiNamesList);
         } catch (Exception e) {

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.api;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.xwiki.model.reference.DocumentReference;
 
@@ -134,7 +135,7 @@ public class Context extends Api
      */
     public String getDatabase()
     {
-        return getXWikiContext().getDatabase();
+        return getXWikiContext().getWikiId();
     }
 
     /**
@@ -157,7 +158,7 @@ public class Context extends Api
      */
     public String getOriginalDatabase()
     {
-        return getXWikiContext().getOriginalDatabase();
+        return getXWikiContext().getOriginalWikiId();
     }
 
     /**
@@ -170,7 +171,7 @@ public class Context extends Api
     public void setDatabase(String database)
     {
         if (hasProgrammingRights()) {
-            getXWikiContext().setDatabase(database);
+            getXWikiContext().setWikiId(database);
         }
     }
 
@@ -224,29 +225,62 @@ public class Context extends Api
 
     /**
      * Returns the language of the current request. If <code>multilingual</code> is turned off then the language used is
-     * given by the <code>default_language</code> preference. Otherwise, the language is take from either the request
+     * given by the <code>default_language</code> preference. Otherwise, the language is taken from either the request
      * object, the cookie, user preferences or from the navigator language settings, the last having the lower priority.
      * 
      * @return The language of the current request.
      * @see #getInterfaceLanguage()
+     * @deprecated since 6.0M1, use {@link #getLocale()} instead
      */
+    // TODO: fully deprecate it when XE won't use it anymore
+    //@Deprecated
     public String getLanguage()
     {
         return getXWikiContext().getLanguage();
     }
 
     /**
+     * Returns the locale of the current request. If <code>multilingual</code> is turned off then the locale used is
+     * given by the <code>default_language</code> preference. Otherwise, the locale is taken from either the request
+     * object, the cookie, user preferences or from the navigator locale settings, the last having the lower priority.
+     * 
+     * @return The language of the current request.
+     * @see #getInterfaceLanguage()
+     */
+    public Locale getLocale()
+    {
+        return getXWikiContext().getLocale();
+    }
+
+    /**
      * Returns the interface language preference of the current user. If <code>multilingual</code> is turned off then
-     * the language used is given by the <code>default_language</code> preference. Otherwise, the language is take from
+     * the language used is given by the <code>default_language</code> preference. Otherwise, the language is taken from
      * either the request object, the context, the cookie, user preferences or from the navigator language settings, the
      * last having the lower priority.
      * 
      * @return The interface language preference of the current user.
      * @see #getLanguage()
+     * @deprecated since 6.0M1, use {@link #getInterfaceLocale()} instead
      */
+    // TODO: fully deprecate it when XE won't use it anymore
+    //@Deprecated
     public String getInterfaceLanguage()
     {
         return getXWikiContext().getInterfaceLanguage();
+    }
+
+    /**
+     * Returns the interface locale preference of the current user. If <code>multilingual</code> is turned off then
+     * the locale used is given by the <code>default_language</code> preference. Otherwise, the locale is taken from
+     * either the request object, the context, the cookie, user preferences or from the navigator locale settings, the
+     * last having the lower priority.
+     * 
+     * @return The interface locale preference of the current user.
+     * @see #getLocale()
+     */
+    public Locale getInterfaceLocale()
+    {
+        return getXWikiContext().getInterfaceLocale();
     }
 
     /**
@@ -310,6 +344,7 @@ public class Context extends Api
      * 
      * @return The document reference for the current logged in user which made the request or <code>null</code> if
      *         there is no currently logged in user (anonymous/guest user).
+     * @since 3.2M3
      */
     public DocumentReference getUserReference()
     {

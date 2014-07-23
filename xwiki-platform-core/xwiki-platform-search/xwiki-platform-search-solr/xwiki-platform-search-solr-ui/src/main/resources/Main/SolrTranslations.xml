@@ -1,23 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc version="1.1">
   <web>Main</web>
   <name>SolrTranslations</name>
   <language/>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1385047506000</creationDate>
   <parent>Main.SolrSearch</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1385298756000</date>
   <contentUpdateDate>1385298756000</contentUpdateDate>
   <version>1.1</version>
   <title>Solr Search Translations</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -98,6 +115,7 @@ solr.facet.fileType.other.octet-stream=Binary Data
 solr.facet.date.today=Today
 solr.facet.date.last7Days=Last 7 days
 solr.facet.date.last30Days=Last 30 days
+solr.facet.date.olderThan30Days=Older than 30 days
 solr.facet.date.customInterval=Custom date &amp; time interval
 solr.facet.date.start=Start date and time
 solr.facet.date.end=End date and time
@@ -128,6 +146,7 @@ solr.field.name_exact=Page
 solr.field.title=Title
 solr.field.author=Last Author
 solr.field.author_display=Last Author
+solr.field.creator=Creator
 solr.field.creator_display=Creator
 solr.field.date=Last Modification Date
 solr.field.creationdate=Creation Date
@@ -143,6 +162,7 @@ solr.field.comment=Comments
 solr.field.objcontent=Objects
 solr.field.mimetype=File Type
 solr.field.attauthor=Uploaded By
+solr.field.attauthor_display=Uploaded By
 solr.field.attdate=Upload Date
 solr.field.attsize=File Size</content>
   <object>

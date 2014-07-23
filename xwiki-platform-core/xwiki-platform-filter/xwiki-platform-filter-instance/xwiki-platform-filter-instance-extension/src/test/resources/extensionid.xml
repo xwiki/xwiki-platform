@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<namespace name="namespace1">
+  <extension id="extensionid1" version="version1">
+  </extension>
+  <wiki name="wiki2">
+    <extension id="extensionid2" version="version2">
+    </extension>
+  </wiki>
+</namespace>

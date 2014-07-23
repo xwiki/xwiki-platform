@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>XWiki</web>
   <name>XWikiSyntaxLinks</name>
   <language>fr</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>XWiki.XWikiSyntax</parent>
   <creator>xwiki:XWiki.Admin</creator>
@@ -30,7 +50,6 @@
 {{comment}}please do not translate the sub headlines{{/comment}}
 === 1.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Fonctionnalité|=Syntaxe XWiki 1.0|=(% style="width:20%" %)Résultat
 |Lien vers une page de l'espace courant|{{{[WebHome]}}}|[[Web Home&gt;&gt;WebHome]]
 |Lien avec étiquette|{{{[étiquette&gt;WebHome]}}}|[[étiquette&gt;&gt;WebHome]]
@@ -82,7 +101,6 @@ La syntaxe complète d'un lien est ##(alias[|&gt;])+(link)(@interWikiAlias)+([|g
 
 === 2.0 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
 |=(% style="width:20%" %)Fonctionnalité|=Syntaxe XWiki 2.0|=(% style="width:20%" %)Résultat
 |Lien vers une page de l'espace courant|{{{[[WebHome]]}}}|[[WebHome]]
 |Lien avec étiquette|{{{[[étiquette&gt;&gt;WebHome]]}}}|[[étiquette&gt;&gt;WebHome]]
@@ -120,8 +138,7 @@ La syntaxe complète\ d'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
 
 === 2.1 Links ===
 
-(% style="table-layout:fixed;overflow:hidden;word-wrap:break-word" %)
-|=(% style="width:20%" %)Fonctionnalité|=Syntaxe XWiki 2.1|=(% style="width:20%" %)Résultat
+|=Fonctionnalité|=Syntaxe XWiki 2.1|=Résultat
 |Lien vers une page de l'espace courant|{{{[[WebHome]]}}}|[[WebHome]]
 |Lien avec étiquette|{{{[[étiquette&gt;&gt;WebHome]]}}}|[[étiquette&gt;&gt;WebHome]]
 |Lien vers une page avec l'espace spécifié|{{{[[Main.WebHome]]}}}|[[Main.WebHome]]

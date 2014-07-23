@@ -333,7 +333,7 @@ HL2ph7uN448AAAAASUVORK5CYII=
 &lt;form id="$formId" method="post" action="$formAction" class="xform half"&gt;
 {{/html}}
 
-{{include document="XWiki.WysiwygEditorConfig" context="new" /}}
+{{include reference="XWiki.WysiwygEditorConfig" context="new" /}}
 
 {{html clean=false}}
   ## We add in a redirect field to prevent the user from being carried away when they save if they don't have javascript.

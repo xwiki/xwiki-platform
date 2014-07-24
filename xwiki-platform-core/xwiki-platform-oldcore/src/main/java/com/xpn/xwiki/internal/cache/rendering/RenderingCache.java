@@ -60,4 +60,9 @@ public interface RenderingCache
      * @param documentReference the reference of the document for flushing rendering cache
      */
     void flushCache(DocumentReference documentReference);
+
+    /**
+     * Flushes whole rendering cache.
+     */
+    void flushWholeCache();
 }

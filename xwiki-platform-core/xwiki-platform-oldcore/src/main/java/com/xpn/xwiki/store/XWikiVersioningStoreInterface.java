@@ -54,18 +54,17 @@ public interface XWikiVersioningStoreInterface
     XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
     /**
-     * Delete all history for a document.
+     * Delete all document history.
      * 
-     * @param doc the document for which to delete all the history
+     * @param doc - deleted document
      */
     void deleteArchive(XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException;
 
     /**
-     * Load {@link XWikiRCSNodeContent} on demand. Used in
-     * {@link com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo#getContent(XWikiContext)} for example.
+     * Load {@link XWikiRCSNodeContent} by demand. Used in {@link XWikiRCSNodeInfo#getContent(XWikiContext)}
      * 
-     * @return the RCS node content for the passed node id
-     * @param id the node id (see {@link XWikiRCSNodeContent#getId()})
+     * @return loaded rcs node content
+     * @param id = {@link XWikiRCSNodeContent#getId()}
      */
     XWikiRCSNodeContent loadRCSNodeContent(XWikiRCSNodeId id, boolean bTransaction, XWikiContext context)
         throws XWikiException;

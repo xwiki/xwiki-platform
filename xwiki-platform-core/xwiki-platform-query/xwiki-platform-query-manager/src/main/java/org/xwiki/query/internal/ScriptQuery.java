@@ -100,7 +100,7 @@ public class ScriptQuery implements Query
 
         try {
             // Create a copy of the wrapped query.
-            QueryManager queryManager = (QueryManager) this.componentManager.getInstance(QueryManager.class);
+            QueryManager queryManager = (QueryManager) componentManager.getInstance(QueryManager.class);
             Query countQuery = queryManager.createQuery(getStatement(), getLanguage());
             countQuery.setWiki(getWiki());
             for (Map.Entry<Integer, Object> entry : getPositionalParameters().entrySet()) {
@@ -114,7 +114,7 @@ public class ScriptQuery implements Query
             }
 
             // Add the count filter to it.
-            countQuery.addFilter(this.componentManager.<QueryFilter>getInstance(QueryFilter.class, "count"));
+            countQuery.addFilter(componentManager.<QueryFilter>getInstance(QueryFilter.class, "count"));
 
             // Execute and retrieve the count result.
             List<Long> results = countQuery.execute();
@@ -130,109 +130,109 @@ public class ScriptQuery implements Query
     @Override
     public String getStatement()
     {
-        return this.query.getStatement();
+        return query.getStatement();
     }
 
     @Override
     public String getLanguage()
     {
-        return this.query.getLanguage();
+        return query.getLanguage();
     }
 
     @Override
     public boolean isNamed()
     {
-        return this.query.isNamed();
+        return query.isNamed();
     }
 
     @Override
     public Query setWiki(String wiki)
     {
-        this.query.setWiki(wiki);
+        query.setWiki(wiki);
         return this;
     }
 
     @Override
     public String getWiki()
     {
-        return this.query.getWiki();
+        return query.getWiki();
     }
 
     @Override
     public Query bindValue(String var, Object val)
     {
-        this.query.bindValue(var, val);
+        query.bindValue(var, val);
         return this;
     }
 
     @Override
     public Query bindValue(int index, Object val)
     {
-        this.query.bindValue(index, val);
+        query.bindValue(index, val);
         return this;
     }
 
     @Override
     public Query bindValues(List<Object> values)
     {
-        this.query.bindValues(values);
+        query.bindValues(values);
         return this;
     }
 
     @Override
     public Map<String, Object> getNamedParameters()
     {
-        return this.query.getNamedParameters();
+        return query.getNamedParameters();
     }
 
     @Override
     public Map<Integer, Object> getPositionalParameters()
     {
-        return this.query.getPositionalParameters();
+        return query.getPositionalParameters();
     }
 
     @Override
     public Query addFilter(QueryFilter filter)
     {
-        this.query.addFilter(filter);
+        query.addFilter(filter);
         return this;
     }
 
     @Override
     public List<QueryFilter> getFilters()
     {
-        return this.query.getFilters();
+        return query.getFilters();
     }
 
     @Override
     public Query setLimit(int limit)
     {
-        this.query.setLimit(limit);
+        query.setLimit(limit);
         return this;
     }
 
     @Override
     public Query setOffset(int offset)
     {
-        this.query.setOffset(offset);
+        query.setOffset(offset);
         return this;
     }
 
     @Override
     public int getLimit()
     {
-        return this.query.getLimit();
+        return query.getLimit();
     }
 
     @Override
     public int getOffset()
     {
-        return this.query.getOffset();
+        return query.getOffset();
     }
 
     @Override
     public <T> List<T> execute() throws QueryException
     {
-        return this.query.execute();
+        return query.execute();
     }
 }

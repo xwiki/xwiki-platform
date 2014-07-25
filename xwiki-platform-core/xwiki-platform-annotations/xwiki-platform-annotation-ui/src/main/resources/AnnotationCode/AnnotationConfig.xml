@@ -872,5 +872,5 @@ E6XXiobSRS0opnII3NtUYrLGcq2snWE0lIjrb1v5f0WM9mBc/Mn7AAAAAElFTkSuQmCC</content>
       </propertiesToShow>
     </property>
   </object>
-  <content>{{include reference="AnnotationConfigSheet" /}}</content>
+  <content>{{include document="AnnotationConfigSheet" /}}</content>
 </xwikidoc>

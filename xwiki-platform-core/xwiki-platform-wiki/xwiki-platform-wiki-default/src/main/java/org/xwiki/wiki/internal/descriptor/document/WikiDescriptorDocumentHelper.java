@@ -48,12 +48,6 @@ public interface WikiDescriptorDocumentHelper
     String getWikiIdFromDocumentReference(DocumentReference descriptorDocumentReference);
 
     /**
-     * @param descriptorDocumentFullname the fullname of the document that hold the wiki descriptor
-     * @return the id of the wiki corresponding to the descriptor
-     */
-    String getWikiIdFromDocumentFullname(String descriptorDocumentFullname);
-
-    /**
      * @param wikiId The id of the wiki that we want the descriptor document
      * @return the descriptor document corresponding to the wikiId
      * @throws WikiManagerException if problems occur
@@ -79,10 +73,4 @@ public interface WikiDescriptorDocumentHelper
      * @throws WikiManagerException if problems occur
      */
     List<XWikiDocument> getAllXWikiServerClassDocument() throws WikiManagerException;
-
-    /**
-     * @return the list of all descriptor document names
-     * @throws WikiManagerException if problems occur
-     */
-    List<String> getAllXWikiServerClassDocumentNames() throws WikiManagerException;
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!-- Used by DefaultAuthorizationManagerIntegrationTest#testInheritancePolicyForNoAdminWikiAccess() -->
+<!-- Used by XWikiSecurityAuthorizationTest#testInheritancePolicyForNoAdminWikiAccess() -->
 <wikis>
   <wiki name="wiki" mainWiki="true" alt="Main Wiki denying all access to userA">
     <user name="userA" />

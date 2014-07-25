@@ -1,25 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
 <xwikidoc>
   <web>WikiManager</web>
   <name>LeaveWiki</name>
@@ -45,7 +25,7 @@
   <hidden>true</hidden>
   <content>{{velocity}}
 #set ($wikiId = $request.wikiId)
-#set ($form_token = $request.form_token)
+#set ($confirm = $request.confirm)
 ##
 #if ("$!wikiId" == '')
   {{error}}{{translation key="platform.wiki.error.oneParameterNotSpecified" parameters="wikiId"/}}{{/error}}
@@ -67,45 +47,27 @@
     #end
     #set ($currentUser = "${xcontext.mainWikiName}:${xcontext.user}")
     #set ($wikiMainPage = $wiki.mainPageReference)
-    #set ($wikiMainPageLinkStart = '')
-    #set ($wikiMainPageLinkEnd = '')
-    #if ($xwiki.exists($wikiMainPage))
-      #set ($wikiMainPageLinkStart = '[[')
-      #set ($wikiMainPageLinkEnd = "&gt;&gt;${wikiMainPage}]]")
-    #end
     ##
     #set ($members = $services.wiki.user.getMembers($wikiId))
     #if (!$members || !$members.contains($currentUser))
-      {{error}}$services.localization.render('platform.wiki.users.userNotMemberOfWiki', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/error}}
+      {{error}}$services.localization.render('platform.wiki.users.userNotMemberOfWiki', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/error}}
     #elseif ($wiki.ownerId == $currentUser)
-      {{error}}$services.localization.render('platform.wiki.users.leave.error.userIsOwner', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/error}}
+      {{error}}$services.localization.render('platform.wiki.users.leave.error.userIsOwner', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/error}}
     #else
-      #if (!$services.csrf.isTokenValid($form_token))
+      #if ("$!confirm" != 1)
         #set ($browseDocumentReference = $services.model.createDocumentReference($services.wiki.mainWikiId, 'WikiManager', 'WebHome'))
         #set ($backUrl = $xwiki.getURL($browseDocumentReference))
-        #if("$!form_token" != '')
-
-          {{warning}}
-           {{translation key="platform.wiki.csrf.error" /}}
-          {{/warning}}
-
-        #end
+        #set ($confirmUrl = $doc.getURL('view', "$!request.queryString&amp;confirm=1"))
         {{box}}
-          $services.localization.render('platform.wiki.users.leave.confirmation', [$wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd])
+          $services.localization.render('platform.wiki.users.leave.confirmation', ['[[', $wikiName, "&gt;&gt;$wikiMainPage]]"])
           ((({{html}}
-            &lt;form action="$doc.getURL()" method="post"&gt;
-              &lt;fieldset&gt;
-                &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($wikiId)" /&gt;
-                &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
-                &lt;span class="buttonwrapper"&gt;&lt;button class="button"&gt;$services.localization.render('platform.wiki.users.leave.confirmation.yes')&lt;/button&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.users.leave.confirmation.no')&lt;/a&gt;&lt;/span&gt;
-              &lt;/fieldset&gt;
-            &lt;/form&gt;
+            &lt;span class="buttonwrapper"&gt;&lt;a class="button" href="$confirmUrl"&gt;$services.localization.render('platform.wiki.users.leave.confirmation.yes')&lt;/a&gt; &lt;a class="button" href="$backUrl"&gt;$services.localization.render('platform.wiki.users.leave.confirmation.no')&lt;/a&gt;&lt;/span&gt;
           {{/html}})))
         {{/box}}
       #else
         #set ($result = $services.wiki.user.leave($currentUser, $wikiId))
         #if ($result)
-          {{success}}$services.localization.render('platform.wiki.users.leave.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/success}}
+          {{success}}$services.localization.render('platform.wiki.users.leave.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", '[[', $wikiName, "&gt;&gt;$wikiMainPage]]"]){{/success}}
         #else
           #printException($services.wiki.user.lastException.message)
         #end

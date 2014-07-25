@@ -62,7 +62,7 @@ public class LogoutAction extends XWikiAction
         if (StringUtils.isEmpty(redirect)) {
             ModelConfiguration modelDefaults = Utils.getComponent(ModelConfiguration.class);
             DocumentReference doc = new DocumentReference(
-                context.getWikiId(),
+                context.getDatabase(),
                 modelDefaults.getDefaultReferenceValue(EntityType.SPACE),
                 modelDefaults.getDefaultReferenceValue(EntityType.DOCUMENT));
             redirect = context.getWiki().getURL(doc, "view", context);

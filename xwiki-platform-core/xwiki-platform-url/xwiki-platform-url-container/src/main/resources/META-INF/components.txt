@@ -1,2 +1,0 @@
-org.xwiki.url.internal.container.ExtendedURLURLNormalizer
-org.xwiki.url.internal.container.URLURLNormalizer

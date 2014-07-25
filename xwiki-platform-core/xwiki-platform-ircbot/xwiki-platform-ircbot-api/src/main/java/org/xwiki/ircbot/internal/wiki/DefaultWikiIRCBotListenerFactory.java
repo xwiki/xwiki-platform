@@ -19,6 +19,7 @@
  */
 package org.xwiki.ircbot.internal.wiki;
 
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.ircbot.IRCBotException;
 import org.xwiki.ircbot.wiki.WikiIRCBotConstants;
@@ -37,11 +39,9 @@ import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.parser.MissingParserException;
-import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -70,12 +70,6 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
     private Logger logger;
 
     /**
-     * Used to update the rendering context.
-     */
-    @Inject
-    private RenderingContext renderingContext;
-
-    /**
      * Used to execute the Bot Listener's event scripts.
      */
     @Inject
@@ -96,12 +90,6 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
     @Inject
     @Named("compactwiki")
     private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    /**
-     * Content parser used to parse the event handler content.
-     */
-    @Inject
-    private ContentParser parser;
 
     /**
      * Provides APIs to easily access data stored in wiki pages.
@@ -136,8 +124,9 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
 
                 XDOM eventScriptXDOM;
                 try {
-                    eventScriptXDOM = parser.parse(eventScript, doc.getSyntax(), documentReference);
-                } catch (MissingParserException e) {
+                    Parser parser = this.componentManager.getInstance(Parser.class, doc.getSyntax().toIdString());
+                    eventScriptXDOM = parser.parse(new StringReader(eventScript));
+                } catch (ComponentLookupException e) {
                     throw new IRCBotException(
                         String.format("Could not find a parser for the event content [%s]", eventName), e);
                 } catch (ParseException e) {
@@ -156,7 +145,7 @@ public class DefaultWikiIRCBotListenerFactory implements WikiIRCBotListenerFacto
         // and renders its XDOM. The reason is that the XDOM might use privileged API that require some special rights
         // (like Programming Rights if it contains a Groovy macro for example).
         WikiIRCBotListener listener = new WikiIRCBotListener(botListenerData, events, doc.getSyntax(),
-            renderingContext, this.macroTransformation, this.plainTextBlockRenderer, this.ircModel,
+            this.macroTransformation, this.plainTextBlockRenderer, this.ircModel,
             this.ircModel.getXWikiContext().getUserReference());
 
         // Call Wiki Bot Listener initialization.

@@ -1,25 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
 <xwikidoc>
   <web>Main</web>
   <name>SpaceIndex</name>
@@ -159,34 +139,21 @@
     <guid>3b41888d-d9b1-4f4b-b790-16c880aaf332</guid>
     <property>
       <code>{{velocity}}
-  ## TODO: add a parameter to specify the style, list or livetable
-  ## Get the number of documents to display
+  ## TODO: add me a parameter to specify the style, list or livetable
+  ## get the number of documents to display
   #set ($limit = $xcontext.macro.params.get('count'))
   #if ("$!limit" == '')
     ## 100 documents displayed by default if no value is specified
     #set ($limit = '100')
   #end
   #set ($limit = $mathtool.toInteger($limit))
-  ## Compute the XWQL portion related to sorting, based on the passed "sort" parameter
-  ## Valid values are "creationDate", "modificationDate" and "docName"
-  #set ($sort = $xcontext.macro.params.get('sort'))
-  #if ("$sort" == 'docName')
-    ## Sorting alphabetically
-    #set ($sortQuery = 'doc.name asc')
-  #elseif ("$sort" == 'modificationDate')
-    ## Sorting by update date
-    #set ($sortQuery = 'doc.contentUpdateDate desc')
-  #else
-    ## Sort by creation date by default
-    #set ($sortQuery = 'doc.creationDate desc')
-  #end
-  ## Get the space to display the documents for
+  ## get the space to display the documents for
   #set ($spaceParam = $doc.space)
   #set ($spaceMacroParam = $xcontext.macro.params.get('space'))
   #if ("$!spaceMacroParam" != '')
     #set ($spaceParam = $spaceMacroParam)
   #end
-  #set ($docNames = $services.query.hql("where doc.space=? order by $sortQuery").addFilter('currentlanguage').addFilter('hidden').setLimit($limit).bindValues([${spaceParam}]).execute())
+  #set ($docNames = $services.query.hql('where doc.space=? order by doc.creationDate desc').addFilter('currentlanguage').addFilter('hidden').setLimit($limit).bindValues([${spaceParam}]).execute())
   {{html}}
     #displayDocumentList($docNames false []) 
     ## Note: we pass an empty blacklistedSpaces list since we are used as a space dashboard, not a global dashboard
@@ -226,7 +193,7 @@
       <defaultCategory>Navigation</defaultCategory>
     </property>
     <property>
-      <description>Lists documents in a space.</description>
+      <description>Lists the documents in a space.</description>
     </property>
     <property>
       <id>spaceindex</id>
@@ -371,76 +338,6 @@
     </property>
     <property>
       <name>space</name>
-    </property>
-  </object>
-  <object>
-    <name>Main.SpaceIndex</name>
-    <number>2</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>fc4b56bc-f0a0-4295-89cd-3936da62bbe3</guid>
-    <class>
-      <name>XWiki.WikiMacroParameterClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <defaultValue>
-        <disabled>0</disabled>
-        <name>defaultValue</name>
-        <number>4</number>
-        <prettyName>Parameter default value</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </defaultValue>
-      <description>
-        <disabled>0</disabled>
-        <name>description</name>
-        <number>2</number>
-        <prettyName>Parameter description</prettyName>
-        <rows>5</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </description>
-      <mandatory>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>mandatory</name>
-        <number>3</number>
-        <prettyName>Parameter mandatory</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </mandatory>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Parameter name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-    </class>
-    <property>
-      <defaultValue>creationDate</defaultValue>
-    </property>
-    <property>
-      <description>Optional parameter to choose the sorting of the list of document.
-Value must be:
-- creationDate sort by creation date (default)
-- modificationDate sort by update date
-- or docName sort alphabetically</description>
-    </property>
-    <property>
-      <mandatory>0</mandatory>
-    </property>
-    <property>
-      <name>sort</name>
     </property>
   </object>
   <content>{{velocity}}

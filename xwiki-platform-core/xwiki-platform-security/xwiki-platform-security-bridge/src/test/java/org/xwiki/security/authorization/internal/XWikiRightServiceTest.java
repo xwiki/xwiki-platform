@@ -41,7 +41,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
         LegacyTestWiki testWiki = newTestWiki("userFromAnotherWiki1.xml", true);
 
         XWikiContext ctx = testWiki.getXWikiContext();
-        ctx.setWikiId("wiki");
+        ctx.setDatabase("wiki");
 
         assertAccessLevelTrue("User from another wiki has right on a local wiki", "view",
             "wiki:XWiki.user", "wiki2:Space.Page", ctx);
@@ -57,7 +57,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
-        ctx.setWikiId("wiki");
+        ctx.setDatabase("wiki");
 
         assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from user wiki",
             "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
@@ -65,7 +65,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
         assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from user wiki",
             "view", "XWiki.user", "wiki2:Space.Page", ctx);
         
-        ctx.setWikiId("wiki2");
+        ctx.setDatabase("wiki2");
 
         assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
             "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
@@ -82,7 +82,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
-        ctx.setWikiId("wiki");
+        ctx.setDatabase("wiki");
 
         assertAccessLevelTrue(
             "User group from another wiki does not have right on a local wiki when tested from user wiki", "view",
@@ -92,7 +92,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
             "User group from another wiki does not have right on a local wiki when tested from user wiki", "view",
             "XWiki.user", "wiki2:Space.Page", ctx);
 
-        ctx.setWikiId("wiki2");
+        ctx.setDatabase("wiki2");
 
         assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
             "view", "wiki:XWiki.user", "wiki2:Space.Page", ctx);
@@ -109,7 +109,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
-        ctx.setWikiId("wiki");
+        ctx.setDatabase("wiki");
 
         assertAccessLevelTrue(
             "Wiki owner from another wiki does not have right on a local wiki when tested from user wiki", "view",
@@ -119,7 +119,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
             "Wiki owner from another wiki does not have right on a local wiki when tested from user wiki", "view",
             "XWiki.user", "wiki2:Space.Page", ctx);
 
-        ctx.setWikiId("wiki2");
+        ctx.setDatabase("wiki2");
 
         assertAccessLevelTrue(
             "Wiki owner from another wiki does not have right on a local wiki when tested from local wiki", "view",
@@ -143,7 +143,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
-        ctx.setWikiId("wiki");
+        ctx.setDatabase("wiki");
 
         setContext(ctx);
 
@@ -173,7 +173,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
-        ctx.setWikiId("wiki");
+        ctx.setDatabase("wiki");
 
         assertAccessLevelTrue("Guest does not have view right on empty wiki.", "view", "wiki:XWiki.XWikiGuest",
             "wiki:Space.Page", ctx);
@@ -208,7 +208,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
-        ctx.setWikiId("wiki2");
+        ctx.setDatabase("wiki2");
 
         assertAccessLevelTrue("User from global wiki should have right on local wiki through local group", "view",
             "wiki:XWiki.user", "wiki2:Space.Page", ctx);
@@ -221,7 +221,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         XWikiContext ctx = testWiki.getXWikiContext();
 
-        ctx.setWikiId("wiki2");
+        ctx.setDatabase("wiki2");
 
         assertAccessLevelTrue("Users from global wiki should have right on local wiki through local group", "view",
             "wiki:XWiki.user", "wiki2:Space.Page", ctx);
@@ -236,7 +236,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
         LegacyTestWiki testWiki = newTestWiki("denieddocument.xml", true);
 
         XWikiContext ctx = testWiki.getXWikiContext();
-        ctx.setWikiId("wiki");
+        ctx.setDatabase("wiki");
         testWiki.setDoc("wiki:Space.Page");
 
         // view

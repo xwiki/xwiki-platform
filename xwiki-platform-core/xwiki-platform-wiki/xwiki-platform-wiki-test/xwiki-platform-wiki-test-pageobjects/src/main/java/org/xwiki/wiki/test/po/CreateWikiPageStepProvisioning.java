@@ -19,7 +19,6 @@
  */
 package org.xwiki.wiki.test.po;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -43,13 +42,8 @@ public class CreateWikiPageStepProvisioning extends ExtendedViewPage
 
     public WikiHomePage finalizeCreation()
     {
-        // The finalize button is not visible until the provisioning is done, so we wait for it
-        waitUntilElementIsVisible(By.id("finalize"), 30);
-        // Now we can click
         finalizeButton.click();
-        // And wait for the page to be loaded
         waitUntilPageIsLoaded();
-        // And now we are in the home page of the new created wiki
         return new WikiHomePage();
     }
 
@@ -61,10 +55,5 @@ public class CreateWikiPageStepProvisioning extends ExtendedViewPage
     public boolean isFinalizeButtonEnabled()
     {
         return finalizeButton.isEnabled();
-    }
-
-    public boolean isFinalizeButtonVisible()
-    {
-        return finalizeButton.isDisplayed();
     }
 }

@@ -20,15 +20,6 @@
 
 package org.xwiki.security.authorization;
 
-import static org.xwiki.security.authorization.Right.ADMIN;
-import static org.xwiki.security.authorization.Right.CREATE_WIKI;
-import static org.xwiki.security.authorization.Right.CREATOR;
-import static org.xwiki.security.authorization.Right.DELETE;
-import static org.xwiki.security.authorization.Right.ILLEGAL;
-import static org.xwiki.security.authorization.Right.LOGIN;
-import static org.xwiki.security.authorization.Right.PROGRAM;
-import static org.xwiki.security.authorization.Right.REGISTER;
-
 import java.io.File;
 
 import org.junit.Rule;
@@ -53,6 +44,15 @@ import org.xwiki.security.authorization.testwikis.internal.parser.DefaultTestDef
 import org.xwiki.security.authorization.testwikis.internal.parser.XWikiConstants;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
+
+import static org.xwiki.security.authorization.Right.ADMIN;
+import static org.xwiki.security.authorization.Right.CREATOR;
+import static org.xwiki.security.authorization.Right.DELETE;
+import static org.xwiki.security.authorization.Right.ILLEGAL;
+import static org.xwiki.security.authorization.Right.LOGIN;
+import static org.xwiki.security.authorization.Right.PROGRAM;
+import static org.xwiki.security.authorization.Right.REGISTER;
+import static org.xwiki.security.authorization.Right.CREATE_WIKI;
 
 
 /**

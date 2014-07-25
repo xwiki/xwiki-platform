@@ -24,7 +24,7 @@
 <infos>
 <name>Backup</name>
 <description>on Wed Aug 17 16:49:11 CEST 2005 by XWiki.superadmin</description>
-<licence>LGPL</licence>
+<licence>GPL</licence>
 <author>XWiki</author>
 <version>1.0.0</version>
 <backupPack>true</backupPack>

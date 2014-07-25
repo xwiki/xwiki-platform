@@ -102,7 +102,7 @@ public class ContextTest extends AbstractComponentTestCase
         // Setup Context and XWiki objects
         final XWikiContext xcontext = new XWikiContext();
         xcontext.setMainXWiki("testwiki");
-        xcontext.setWikiId("testwiki");
+        xcontext.setDatabase("testwiki");
 
         final com.xpn.xwiki.XWiki xwiki = getMockery().mock(com.xpn.xwiki.XWiki.class);
         xcontext.setWiki(xwiki);

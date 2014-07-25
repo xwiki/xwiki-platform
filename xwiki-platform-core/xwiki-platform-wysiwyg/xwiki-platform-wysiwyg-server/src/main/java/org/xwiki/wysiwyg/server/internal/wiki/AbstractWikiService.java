@@ -100,12 +100,6 @@ public abstract class AbstractWikiService implements WikiService
     private CSRFToken csrf;
 
     @Override
-    public Boolean isMultiWiki()
-    {
-        return true;
-    }
-
-    @Override
     public List<String> getSpaceNames(String wikiName)
     {
         try {

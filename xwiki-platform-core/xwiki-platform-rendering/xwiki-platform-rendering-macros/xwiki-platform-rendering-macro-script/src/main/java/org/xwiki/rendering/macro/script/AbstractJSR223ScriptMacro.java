@@ -19,9 +19,7 @@
  */
 package org.xwiki.rendering.macro.script;
 
-import java.io.Reader;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -39,9 +37,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.Block.Axes;
 import org.xwiki.rendering.block.match.MetadataBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -59,17 +57,6 @@ import org.xwiki.script.ScriptContextManager;
 public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParameters> extends AbstractScriptMacro<P>
     implements PrivilegedScriptMacro
 {
-
-    /**
-     * The name of the binding containing the {@link ScriptContext} itself.
-     */
-    public static final String BINDING_CONTEXT = "context";
-
-    /**
-     * The name of the "out" binding..
-     */
-    public static final String BINDING_OUT = "out";
-
     /**
      * Key under which the Script Engines are saved in the Execution Context, see {@link #execution}.
      */
@@ -221,27 +208,21 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
 
         ScriptContext scriptContext = getScriptContext();
 
-        Writer currentWriter = scriptContext.getWriter();
-        Reader currentReader = scriptContext.getReader();
-        Object currentContextBinding = scriptContext.getAttribute(BINDING_CONTEXT, ScriptContext.ENGINE_SCOPE);
-        Object currentFilename = scriptContext.getAttribute(ScriptEngine.FILENAME, ScriptContext.ENGINE_SCOPE);
-        // Some engines like Groovy are duplicating the writer in "out" binding
-        Object currentOut = scriptContext.getAttribute(BINDING_OUT, ScriptContext.ENGINE_SCOPE);
+        StringWriter stringWriter = new StringWriter();
+
         // Set standard javax.script.filename property
         MetaDataBlock metaDataBlock =
             context.getCurrentMacroBlock().getFirstBlock(new MetadataBlockMatcher(MetaData.SOURCE),
                 Axes.ANCESTOR_OR_SELF);
         if (metaDataBlock != null) {
-            scriptContext.setAttribute(ScriptEngine.FILENAME, metaDataBlock.getMetaData().getMetaData(MetaData.SOURCE),
-                ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute(ScriptEngine.FILENAME, metaDataBlock.getMetaData()
+                .getMetaData(MetaData.SOURCE), ScriptContext.ENGINE_SCOPE);
         }
 
+        // set writer in script context
+        scriptContext.setWriter(stringWriter);
+
         try {
-            StringWriter stringWriter = new StringWriter();
-
-            // set writer in script context
-            scriptContext.setWriter(stringWriter);
-
             Object scriptResult = eval(content, engine, scriptContext);
 
             if (scriptResult instanceof XDOM) {
@@ -256,16 +237,8 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
                 result = parseScriptResult(stringWriter.toString(), parameters, context);
             }
         } finally {
-            // restore current writer
-            scriptContext.setWriter(currentWriter);
-            // restore current reader
-            scriptContext.setReader(currentReader);
-            // restore "context" binding
-            scriptContext.setAttribute(BINDING_CONTEXT, currentContextBinding, ScriptContext.ENGINE_SCOPE);
-            // restore "javax.script.filename" binding
-            scriptContext.setAttribute(ScriptEngine.FILENAME, currentFilename, ScriptContext.ENGINE_SCOPE);
-            // restore "out" binding
-            scriptContext.setAttribute(BINDING_OUT, currentOut, ScriptContext.ENGINE_SCOPE);
+            // remove writer script from context
+            scriptContext.setWriter(null);
         }
 
         return result;

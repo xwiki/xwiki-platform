@@ -29,7 +29,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptService;
@@ -405,64 +404,6 @@ public class WikiUserManagerScriptService implements ScriptService
     }
 
     /**
-     * @param user DocumentReference to the user to test
-     * @param wikiId id of the wiki to test
-     * @return either or not the user has a pending invitation to join the wiki, null if some problems occur
-     */
-    public Boolean hasPendingInvitation(DocumentReference user, String wikiId)
-    {
-        try {
-            // Check if the current user is userId and if the current script has the programing rights
-            XWikiContext xcontext = xcontextProvider.get();
-            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                    xcontext.getDoc().getDocumentReference());
-
-            // If the current user is not concerned by the invitation, he must be admin of the subwiki
-            if (!xcontext.getUserReference().equals(user)) {
-                authorizationManager.checkAccess(Right.ADMIN,
-                        xcontext.getUserReference(), new WikiReference(wikiId));
-            }
-            // Do the job
-            return wikiUserManager.hasPendingInvitation(user, wikiId);
-        } catch (AccessDeniedException e) {
-            setLastError(e);
-        } catch (WikiUserManagerException e) {
-            setLastError(e);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param user DocumentReference to the user to test
-     * @param wikiId id of the wiki to test
-     * @return either or not the user has a pending request to join the wiki, null if some problems occur
-     */
-    public Boolean hasPendingRequest(DocumentReference user, String wikiId)
-    {
-        try {
-            // Check if the current user is userId and if the current script has the programing rights
-            XWikiContext xcontext = xcontextProvider.get();
-            authorizationManager.checkAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
-                    xcontext.getDoc().getDocumentReference());
-
-            // If the current user is not concerned by the invitation, he must be admin of the subwiki
-            if (!xcontext.getUserReference().equals(user)) {
-                authorizationManager.checkAccess(Right.ADMIN,
-                        xcontext.getUserReference(), new WikiReference(wikiId));
-            }
-            // Do the job
-            return wikiUserManager.hasPendingRequest(user, wikiId);
-        } catch (AccessDeniedException e) {
-            setLastError(e);
-        } catch (WikiUserManagerException e) {
-            setLastError(e);
-        }
-
-        return null;
-    }
-
-    /**
      * Get all the join requests for a wiki that the current user has the right to see.
      *
      * @param wikiId id of the wiki to join
@@ -492,8 +433,7 @@ public class WikiUserManagerScriptService implements ScriptService
         XWikiContext xcontext = xcontextProvider.get();
         String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
         if (!userId.equals(currentUser)) {
-            setLastError(new WikiUserManagerException(String.format("User [%s] cannot call "
-                    + "$services.wiki.user.join() with an other userId.", currentUser)));
+            //TODO
             return false;
         }
 
@@ -519,8 +459,7 @@ public class WikiUserManagerScriptService implements ScriptService
         XWikiContext xcontext = xcontextProvider.get();
         String currentUser = entityReferenceSerializer.serialize(xcontext.getUserReference());
         if (!userId.equals(currentUser)) {
-            setLastError(new WikiUserManagerException(String.format("User [%s] cannot call $services.wiki.user.leave()"
-                    + " with an other userId.", currentUser)));
+            //TODO
             return false;
         }
 

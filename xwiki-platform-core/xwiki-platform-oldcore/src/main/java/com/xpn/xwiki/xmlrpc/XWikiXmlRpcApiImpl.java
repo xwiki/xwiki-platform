@@ -1435,7 +1435,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
         List<String> syntaxes = new ArrayList<String>();
         List<Parser> parsers;
-        ComponentManager componentManager = Utils.getContextComponentManager();
+        ComponentManager componentManager = Utils.getComponentManager();
         try {
             parsers = componentManager.getInstanceList(Parser.class);
             for (Parser parser : parsers) {
@@ -1460,7 +1460,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
         List<String> syntaxes = new ArrayList<String>();
         List<PrintRendererFactory> renderers;
-        ComponentManager componentManager = Utils.getContextComponentManager();
+        ComponentManager componentManager = Utils.getComponentManager();
         try {
             // TODO: use BlockRenderer
             renderers = componentManager.getInstanceList(PrintRendererFactory.class);

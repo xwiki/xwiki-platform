@@ -705,25 +705,15 @@ public class Package
                     localExtension = localRepository.storeExtension(extension);
                 }
 
+                // Register the extension as installed
                 InstalledExtensionRepository installedRepository =
                     Utils.getComponent(InstalledExtensionRepository.class);
-
-                String namespace = "wiki:" + context.getWikiId();
-
-                // Make sure it's not already there
-                if (installedRepository.getInstalledExtension(localExtension.getId().getId(), namespace) == null) {
-                    for (String feature : localExtension.getFeatures()) {
-                        if (installedRepository.getInstalledExtension(feature, namespace) != null) {
-                            // Already exist so don't register it or it could create a mess
-                            return;
-                        }
-                    }
-                } else {
-                    return;
+                String namespace = "wiki:" + context.getDatabase();
+                InstalledExtension installedExtension =
+                    installedRepository.getInstalledExtension(localExtension.getId());
+                if (installedExtension == null || !installedExtension.isInstalled(namespace)) {
+                    installedRepository.installExtension(localExtension, namespace, false);
                 }
-
-                // Register the extension as installed
-                installedRepository.installExtension(localExtension, namespace, false);
             } catch (Exception e) {
                 LOGGER.error("Failed to register extenion [{}] from the XAR", extensionId, e);
             }
@@ -738,14 +728,14 @@ public class Package
      */
     private boolean isFarmAdmin(XWikiContext context)
     {
-        String wiki = context.getWikiId();
+        String wiki = context.getDatabase();
 
         try {
-            context.setWikiId(context.getMainXWiki());
+            context.setDatabase(context.getMainXWiki());
 
             return context.getWiki().getRightService().hasWikiAdminRights(context);
         } finally {
-            context.setWikiId(wiki);
+            context.setDatabase(wiki);
         }
     }
 

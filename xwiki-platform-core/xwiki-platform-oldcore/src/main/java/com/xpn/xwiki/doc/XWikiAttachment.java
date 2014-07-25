@@ -81,8 +81,6 @@ public class XWikiAttachment implements Cloneable
 
     public XWikiAttachment(XWikiDocument doc, String filename)
     {
-        this();
-
         setDoc(doc);
         setFilename(filename);
     }

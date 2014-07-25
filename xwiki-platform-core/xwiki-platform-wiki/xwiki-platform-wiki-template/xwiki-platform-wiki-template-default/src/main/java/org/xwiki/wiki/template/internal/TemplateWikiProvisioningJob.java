@@ -80,7 +80,6 @@ public class TemplateWikiProvisioningJob extends AbstractJob<WikiProvisioningJob
             observationManager.notify(new WikiProvisionedEvent(wikiId), wikiId, xcontext);
             observationManager.notify(new WikiCopiedEvent(templateId, wikiId), templateId, xcontext);
         } catch (WikiManagerException e) {
-            logger.error("Failed to provision wiki [{}] from template [{}].", wikiId, templateId, e);
             observationManager.notify(new WikiProvisioningFailedEvent(wikiId), wikiId, xcontext);
         }
     }

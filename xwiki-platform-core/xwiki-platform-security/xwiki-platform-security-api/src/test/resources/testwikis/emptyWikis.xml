@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!-- Used by DefaultAuthorizationManagerIntegrationTest#testDefaultAccessOnEmptyWikis() -->
+<!-- Used by XWikiSecurityAuthorizationTest#testDefaultAccessOnEmptyWikis() -->
 <wikis>
   <wiki name="any Main Wiki" mainWiki="true" />
   <wiki name="any SubWiki" />

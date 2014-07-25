@@ -1,25 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
 <xwikidoc>
   <web>XWiki</web>
   <name>AttachmentSelector</name>
@@ -651,6 +631,11 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
 #set ($imgSize = $mathtool.sub($boxSize, $mathtool.mul($boxPadding, 2)))
 #set ($actionsHeight = 20)
 #set ($actionsWidth = 16)
+#macro (__css3 $rule)
+  ${rule};
+  -moz-${rule};
+  -webkit-${rule};
+#end
 /*--------------------------------------------------------*/
 /* Attachment picker layout fixes                              */
 .attachment-picker p {
@@ -668,7 +653,7 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
 .gallery_attachmentbox {
   background: $theme.pageContentBackgroundColor;
   border: 1px solid $theme.borderColor;
-  border-radius: 5px;
+  #__css3('border-radius: 5px')
   float: left;
   margin: ${boxMargin}px;
   overflow: hidden;
@@ -698,7 +683,7 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
 .gallery_attachmenttitle {
   background: $theme.backgroundSecondaryColor;
   border-bottom: 1px dotted $theme.borderColor;
-  border-radius: 5px 5px 0px 0px;
+  #__css3('border-radius: 5px 5px 0px 0px')
   font-size: 85%;
   padding: 3px ${boxPadding}px;
   overflow: hidden;
@@ -2208,7 +2193,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
 &lt;form action="$targetAttachDocument.getURL('upload')" enctype="multipart/form-data" method="post" id="uploadAttachment" class="uploadAttachment xform"&gt;
   &lt;div class="gallery_upload_input"&gt;
     #if (${options.rawfilter} != '')
-      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render("${translationPrefix}.upload.hint", [${options.rawfilter}]))&lt;/span&gt;
+      &lt;span class="xHint"&gt;$services.localization.render("${translationPrefix}.upload.hint", [${options.rawfilter}])&lt;/span&gt;
     #end
     &lt;input type="file" name="filepath" id="attachfile" class="attachment" size="30" title="$!{escapetool.xml($options.rawfilter)}"/&gt;
     &lt;input type="hidden" name="xredirect" value="$xwiki.getDocument($attachmentPickerDocName).getURL('get', "xaction=postUpload&amp;amp;docAction=$!{escapetool.url($options.get('docAction'))}&amp;amp;targetdocname=$!{escapetool.url($targetAttachDocument.fullName)}&amp;amp;docname=$!{escapetool.url($targetDocument.fullName)}&amp;amp;fieldname=$!{escapetool.url($options.get('classname'))}_$!{escapetool.url($options.get('object'))}_$!{escapetool.url($options.get('property'))}&amp;amp;form_token=$!{services.csrf.getToken()}")" /&gt;

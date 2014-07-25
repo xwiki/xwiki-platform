@@ -1,13 +1,16 @@
-##source.syntax=xwiki/2.1
-{{template name="extension.vm" output="false"/}}
+##syntax=xwiki/2.1
+{{velocity output="false"}}
+## NOTE: We don't use #template because it currently registers the Velocity macros in a different namespace which makes
+## them unavailable in the current wiki page or the current template. We also tried #parse but it "randomly" fails to
+## register the Velocity macros from the parsed template. The only solution we found is to use #evaluate with #include
+## but unfortunately this doesn't allow the template to be overridden from the skin.
+#evaluate("#include('extension.vm')")
+{{/velocity}}
 
 {{velocity}}
 #if ("$!request.action" == '')
   ## Display the step.
-  #set ($discard = "#getExtensionUpdaterPlan($plan)")
   #if (!$isAjaxRequest)
-    ## The list of outdated/invalid extensions is paginated so we load the CSS here because the request is not AJAX.
-    #set ($discard = $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true))
     $services.localization.render('platform.extension.distributionWizard.extensionsStepDescription', [
       '[[', '>>http://platform.xwiki.org/xwiki/bin/view/Features/Applications]]',
       '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Wiki+Macro+Bridge+Application]]',
@@ -15,28 +18,32 @@
       '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Component+Module]]',
       '[[', '>>http://extensions.xwiki.org/xwiki/bin/view/Extension/Script+Module#HScriptServices]]'])
 
-    {{html}}#displayExtensionUpdaterTrigger($plan){{/html}}
-
   #end
-  (% class="extensionUpdater" %)(((
-    #if ($plan.state == 'FINISHED')
-      (% class="xHint" %)
-      $services.localization.render('platform.extension.updater.lastCheckDate',
-          [$xwiki.formatDate($plan.endDate)])
-
-      {{html}}#displayExtensionUpdaterPlan($plan){{/html}}
-      #set ($showCompleteStepButton = $invalid.isEmpty())
-    #elseif ($plan)
-      (% class="xHint" %)
+  {{html}}
+  #getExtensionUpdaterPlan($plan)
+  #isExtensionUpdaterPlanOutdated($plan $outdated)
+  #if ($outdated)
+    ## There is no upgrade plan computed or the previously computed plan is outdated.
+    #computeExtensionUpdaterPlan($plan)
+  #end
+  {{/html}}
+  (% id="extensionUpdater" %)(((
+    #if ($plan.state != 'FINISHED')
       {{translation key="platform.extension.updater.loading"/}}
 
       {{html}}
       #displayJobProgressBar($plan)
       #displayExtensionUpdaterPlanStatus($plan)
       {{/html}}
+    #else
+      {{html}}#displayExtensionUpdaterPlan($plan){{/html}}
+      (% class="xHint" %)
+      $services.localization.render('platform.extension.updater.reloadHint', ['[[', ">>||class=""checkForUpdates""
+        queryString=""action=checkForUpdates&xredirect=$!escapetool.url($request.xredirect)""]]"])
+      #set ($showCompleteStepButton = $invalid.isEmpty())
     #end
   )))
-#elseif ($request.action.startsWith('checkForUpdates'))
-  #computeExtensionUpdaterPlan($plan $request.action.equals('checkForUpdatesGlobally'))
+#elseif ($request.action == 'checkForUpdates')
+  #computeExtensionUpdaterPlan()
 #end
 {{/velocity}}

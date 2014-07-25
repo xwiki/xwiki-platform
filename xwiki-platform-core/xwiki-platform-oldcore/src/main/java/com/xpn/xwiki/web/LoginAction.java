@@ -29,14 +29,6 @@ import com.xpn.xwiki.XWikiException;
  */
 public class LoginAction extends XWikiAction
 {
-    /**
-     * Default constructor.
-     */
-    public LoginAction()
-    {
-        this.waitForXWikiInitialization = false;
-    }
-
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

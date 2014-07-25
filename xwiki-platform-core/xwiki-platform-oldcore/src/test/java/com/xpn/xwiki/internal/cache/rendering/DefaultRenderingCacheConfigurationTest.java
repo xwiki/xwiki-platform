@@ -68,7 +68,7 @@ public class DefaultRenderingCacheConfigurationTest extends AbstractBridgedCompo
         this.configuration = getComponentManager().getInstance(RenderingCacheConfiguration.class);
         this.documentReference = new DocumentReference("wiki", "space", "page");
 
-        getContext().setWikiId("wiki");
+        getContext().setDatabase("wiki");
     }
 
     @Test

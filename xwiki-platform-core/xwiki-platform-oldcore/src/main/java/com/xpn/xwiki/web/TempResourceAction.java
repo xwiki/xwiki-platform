@@ -131,7 +131,7 @@ public class TempResourceAction extends XWikiAction
         Matcher matcher = URI_PATTERN.matcher(uri);
         File result = null;
         if (matcher.find()) {
-            String wiki = context.getWikiId();
+            String wiki = context.getDatabase();
             try {
                 wiki = URLEncoder.encode(wiki, URL_ENCODING);
             } catch (UnsupportedEncodingException e) {

@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -40,6 +39,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Produce {@link XClassPropertyEvent property events} based on document events.
@@ -57,9 +57,6 @@ public class XClassPropertyEventGeneratorListener implements EventListener
      */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentDeletedEvent(),
         new DocumentCreatedEvent(), new DocumentUpdatedEvent());
-
-    @Inject
-    private ObservationManager observation;
 
     @Override
     public String getName()
@@ -96,8 +93,10 @@ public class XClassPropertyEventGeneratorListener implements EventListener
      */
     private void onDocumentCreatedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
     {
+        ObservationManager observation = Utils.getComponent(ObservationManager.class);
+
         for (PropertyInterface property : (Collection<PropertyInterface>) doc.getXClass().getFieldList()) {
-            this.observation.notify(new XClassPropertyAddedEvent(property.getReference()), doc, context);
+            observation.notify(new XClassPropertyAddedEvent(property.getReference()), doc, context);
         }
     }
 
@@ -108,8 +107,10 @@ public class XClassPropertyEventGeneratorListener implements EventListener
      */
     private void onDocumentDeletedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
     {
+        ObservationManager observation = Utils.getComponent(ObservationManager.class);
+
         for (PropertyInterface property : (Collection<PropertyInterface>) originalDoc.getXClass().getFieldList()) {
-            this.observation.notify(new XClassPropertyDeletedEvent(property.getReference()), doc, context);
+            observation.notify(new XClassPropertyDeletedEvent(property.getReference()), doc, context);
         }
     }
 
@@ -120,6 +121,8 @@ public class XClassPropertyEventGeneratorListener implements EventListener
      */
     private void onDocumentUpdatedEvent(XWikiDocument originalDoc, XWikiDocument doc, XWikiContext context)
     {
+        ObservationManager observation = Utils.getComponent(ObservationManager.class);
+
         BaseClass baseClass = doc.getXClass();
         BaseClass baseClassOriginal = originalDoc.getXClass();
 
@@ -129,12 +132,11 @@ public class XClassPropertyEventGeneratorListener implements EventListener
                 PropertyInterface propertyOriginal = baseClassOriginal.getField(diff.getPropName());
 
                 if (ObjectDiff.ACTION_PROPERTYREMOVED.equals(diff.getAction())) {
-                    this.observation.notify(
-                        new XClassPropertyDeletedEvent(propertyOriginal.getReference()), doc, context);
+                    observation.notify(new XClassPropertyDeletedEvent(propertyOriginal.getReference()), doc, context);
                 } else if (ObjectDiff.ACTION_PROPERTYADDED.equals(diff.getAction())) {
-                    this.observation.notify(new XClassPropertyAddedEvent(property.getReference()), doc, context);
+                    observation.notify(new XClassPropertyAddedEvent(property.getReference()), doc, context);
                 } else if (ObjectDiff.ACTION_PROPERTYCHANGED.equals(diff.getAction())) {
-                    this.observation.notify(new XClassPropertyUpdatedEvent(property.getReference()), doc, context);
+                    observation.notify(new XClassPropertyUpdatedEvent(property.getReference()), doc, context);
                 }
             }
         }

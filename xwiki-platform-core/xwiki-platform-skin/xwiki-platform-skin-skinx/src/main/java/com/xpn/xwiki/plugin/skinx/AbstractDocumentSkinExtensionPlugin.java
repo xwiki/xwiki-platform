@@ -42,8 +42,6 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -196,7 +194,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
     {
         XWikiContext context = Utils.getContext();
         // Retrieve the current wiki name from the XWiki context
-        String currentWiki = StringUtils.defaultIfEmpty(context.getWikiId(), context.getMainXWiki());
+        String currentWiki = StringUtils.defaultIfEmpty(context.getDatabase(), context.getMainXWiki());
         // If we already have extensions defined for this wiki, we return them
         if (this.alwaysUsedExtensions.get(currentWiki) != null) {
             return this.alwaysUsedExtensions.get(currentWiki);
@@ -213,8 +211,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                         XWikiDocument doc = context.getWiki().getDocument(extension, context);
                         // Only add the extension as being "always used" if the page holding it has been saved with
                         // programming rights.
-                        if (Utils.getComponent(AuthorizationManager.class).hasAccess(Right.PROGRAM,
-                            doc.getContentAuthorReference(), doc.getDocumentReference())) {
+                        if (context.getWiki().getRightService().hasProgrammingRights(doc, context)) {
                             extensions.add(extension);
                         }
                     } catch (XWikiException e1) {
@@ -333,6 +330,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         try {
             XWikiDocument doc = context.getWiki().getDocument(getExtensionClassName(), context);
             boolean needsUpdate = false;
+            String useOptions = "currentPage=Always on this page|onDemand=On demand|always=Always on this wiki";
 
             BaseClass bclass = doc.getXClass();
             if (context.get("initdone") != null) {
@@ -343,8 +341,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
 
             needsUpdate |= bclass.addTextField("name", "Name", 30);
             needsUpdate |= bclass.addTextAreaField("code", "Code", 50, 20);
-            needsUpdate |= bclass.addStaticListField(USE_FIELDNAME, "Use this extension",
-                "currentPage|onDemand|always");
+            needsUpdate |= bclass.addStaticListField(USE_FIELDNAME, "Use this extension", useOptions);
             needsUpdate |= bclass.addBooleanField("parse", "Parse content", "yesno");
             needsUpdate |= bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
             needsUpdate |= setExtensionClassDocumentFields(doc);
@@ -389,8 +386,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         if (document.getObject(getExtensionClassName()) != null) {
             // new or already existing object
             if (document.getObject(getExtensionClassName(), USE_FIELDNAME, "always", false) != null) {
-                if (Utils.getComponent(AuthorizationManager.class).hasAccess(Right.PROGRAM,
-                    document.getContentAuthorReference(), document.getDocumentReference())) {
+                if (context.getWiki().getRightService().hasProgrammingRights(document, context)) {
                     getAlwaysUsedExtensions().add(document.getDocumentReference());
 
                     return;

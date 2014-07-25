@@ -39,7 +39,7 @@ import org.xwiki.security.authorization.testwikis.internal.entities.DefaultTestU
  * @version $Id$
  * @since 5.0M2
  */
-public class TestUserFactory extends AbstractSecureEntityFactory<TestDocument>
+public class TestUserFactory extends AbstractEntityFactory<TestDocument>
 {
     /**
      * Create a new factory for document representing users.

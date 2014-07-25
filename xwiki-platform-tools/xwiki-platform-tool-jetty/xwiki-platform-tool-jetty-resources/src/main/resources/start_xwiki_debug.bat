@@ -19,38 +19,10 @@ REM Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 REM 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 REM -------------------------------------------------------------------------
 
-
-REM -------------------------------------------------------------------------
-REM Optional ENV vars
-REM -----------------
-REM   START_OPTS - parameters passed to the Java VM when running Jetty
-REM     e.g. to increase the memory allocated to the JVM to 1GB, use
-REM       set START_OPTS=-Xmx1024m
-REM   JETTY_PORT - the port on which to start Jetty, 8080 by default
-REM   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command, 8079 by default
-REM -------------------------------------------------------------------------
-
-setlocal EnableDelayedExpansion
-
 set JETTY_HOME=jetty
-if not defined XWIKI_OPTS set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
+set JETTY_PORT=8080
+set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
 set XWIKI_OPTS=%XWIKI_OPTS% -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
-
-REM The port on which to start Jetty can be defined in an enviroment variable called JETTY_PORT
-if not defined JETTY_PORT (
-  REM Alternatively, it can be passed to this script as the first argument
-  set JETTY_PORT=%1
-  if not defined JETTY_PORT (
-    set JETTY_PORT=8080
-  )
-)
-
-REM The port on which Jetty listens for a Stop command can be defined in an enviroment variable called JETTY_STOP_PORT
-if not defined JETTY_STOP_PORT (
-  set JETTY_STOP_PORT=8079
-)
-
-echo Starting Jetty on port %JETTY_PORT%, please wait...
 
 REM For enabling YourKit Profiling.
 REM %3 must the path where Yourkit can find the agent.
@@ -62,11 +34,6 @@ if "%2"=="profiler" (
   set PATH=%3;%PATH%
   set JAVA_TOOL_OPTIONS=-agentlib:yjpagent
 )
-
-REM Get javaw.exe from the latest properly installed JRE
-for /f tokens^=2^ delims^=^" %%i in ('reg query HKEY_CLASSES_ROOT\jarfile\shell\open\command /ve') do set JAVAW_PATH=%%i
-set JAVA_PATH=%JAVAW_PATH:\javaw.exe=%\java.exe
-if "%JAVA_PATH%"=="" set JAVA_PATH=java
 
 REM Location where XWiki stores generated data and where database files are.
 set XWIKI_DATA_DIR=${xwikiDataDir}
@@ -85,7 +52,7 @@ REM Specify Jetty's home directory
 set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home=%JETTY_HOME%
 
 REM Specify port and key to stop a running Jetty instance
-set XWIKI_OPTS=%XWIKI_OPTS% -DSTOP.KEY=xwiki -DSTOP.PORT=%JETTY_STOP_PORT%
+set XWIKI_OPTS=%XWIKI_OPTS% -DSTOP.KEY=xwiki -DSTOP.PORT=8079
 
 REM Specify the encoding to use
 set XWIKI_OPTS=%XWIKI_OPTS% -Dfile.encoding=UTF8
@@ -98,13 +65,6 @@ REM Note that setting this value too high can leave your server vulnerable to de
 REM service attacks.
 set XWIKI_OPTS=%XWIKI_OPTS% -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1000000
 
-set JETTY_CONFIGURATION_FILES=
-for /r %%i in (%JETTY_HOME%\etc\jetty-*.xml) do set JETTY_CONFIGURATION_FILES=!JETTY_CONFIGURATION_FILES! "%%i"
-
-"%JAVA_PATH%" %XWIKI_OPTS% %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar %JETTY_HOME%/etc/jetty.xml %JETTY_CONFIGURATION_FILES%
+java %XWIKI_OPTS% %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar
 
 if %2==profiler set PATH=%OLD_PATH%
-
-REM Pause so that the command window used to run this script doesn't close automatically in case of problem
-REM (like when the JDK/JRE is not installed)
-PAUSE

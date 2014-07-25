@@ -4,8 +4,8 @@
 #elseif ($type == 'view' || $type == 'rendered')
 #if ($xwiki.getXWikiPreferenceAsInt('obfuscateEmailAddresses', 0) == 1)
 $!value.replaceAll('^(.).*@', '$1...@')##
-#elseif ($value !='')
-<a href="mailto:$!value">$!value</a>##
+#else
+$!value##
 #end
 #elseif ($type == 'hidden')
   #set ($id = $escapetool.xml("${prefix}${name}"))

@@ -20,16 +20,11 @@
 package org.xwiki.model.reference;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.xwiki.model.EntityType;
 
 /**
@@ -46,7 +41,7 @@ public class EntityReferenceSet
 
         public String name;
 
-        public List<Map<String, Serializable>> parameters;
+        public Map<String, Serializable> parameters;
 
         public EntityType childrenType;
 
@@ -56,19 +51,19 @@ public class EntityReferenceSet
         {
         }
 
-        public EntityReferenceEntry(EntityType type, String name)
+        public EntityReferenceEntry(EntityType type, String name, Map<String, Serializable> parameters)
         {
             this.type = type;
             this.name = name;
+            this.parameters = parameters;
         }
 
         public EntityReferenceEntry(EntityReferenceEntry entry)
         {
-            this(entry.type, entry.name);
+            this(entry.type, entry.name, entry.parameters);
 
             this.childrenType = entry.childrenType;
             this.children = entry.children;
-            this.parameters = entry.parameters;
         }
 
         public EntityReferenceEntry add()
@@ -94,31 +89,12 @@ public class EntityReferenceSet
             EntityReferenceEntry entry = this.children.get(name);
 
             if (entry == null) {
-                entry = new EntityReferenceEntry(entityType, name);
-
-                if (entityParameters != null) {
-                    entry.addParameters(entityParameters);
-                }
+                entry = new EntityReferenceEntry(entityType, name, entityParameters);
 
                 this.children.put(name, entry);
-            } else {
-                if (!entry.matches(entityParameters)) {
-                    entry.addParameters(entityParameters);
-                }
             }
 
             return entry;
-        }
-
-        private void addParameters(Map<String, Serializable> entityParameters)
-        {
-            if (!entityParameters.isEmpty()) {
-                if (this.parameters == null) {
-                    this.parameters = new ArrayList<Map<String, Serializable>>();
-                }
-
-                this.parameters.add(entityParameters);
-            }
         }
 
         public void reset()
@@ -129,29 +105,14 @@ public class EntityReferenceSet
 
         public boolean matches(EntityReference reference)
         {
-            return matches(reference.getParameters());
-        }
-
-        public boolean matches(Map<String, Serializable> referenceParameters)
-        {
             if (parameters == null) {
                 return true;
             }
 
-            boolean matches = parameters.isEmpty();
-
-            for (Map<String, Serializable> parametersMap : parameters) {
-                matches |= matches(referenceParameters, parametersMap);
-            }
-
-            return matches;
-        }
-
-        private boolean matches(Map<String, Serializable> referenceParameters, Map<String, Serializable> map)
-        {
-            for (Map.Entry<String, Serializable> entry : map.entrySet()) {
-                if (referenceParameters.containsKey(entry.getKey())) {
-                    if (!Objects.equals(entry.getValue(), referenceParameters.get(entry.getKey()))) {
+            Map<String, Serializable> referenceParameters = reference.getParameters();
+            for (Map.Entry<String, Serializable> mapEntry : parameters.entrySet()) {
+                if (referenceParameters.containsKey(mapEntry.getKey())) {
+                    if (!ObjectUtils.equals(mapEntry.getValue(), referenceParameters.get(mapEntry.getKey()))) {
                         return false;
                     }
                 }
@@ -285,25 +246,10 @@ public class EntityReferenceSet
         }
 
         // Check if the reference is shorter than the exclude(s)
-        return currentEntry.children != null
         // Check if the excluded parameters are the same as the one the reference contains
-            || (currentEntry.parameters != null && CollectionUtils.intersection(
-                getParametersKeys(currentEntry.parameters), reference.getParameters().keySet()).isEmpty());
-    }
-
-    private Set<String> getParametersKeys(List<Map<String, Serializable>> parameters)
-    {
-        if (parameters.isEmpty()) {
-            return Collections.emptySet();
-        }
-
-        Set<String> set = new HashSet<String>();
-
-        for (Map<String, Serializable> map : parameters) {
-            set.addAll(map.keySet());
-        }
-
-        return set;
+        return currentEntry.children != null
+            || (!currentEntry.parameters.isEmpty() && CollectionUtils.intersection(currentEntry.parameters.keySet(),
+                reference.getParameters().keySet()).isEmpty());
     }
 
     /**

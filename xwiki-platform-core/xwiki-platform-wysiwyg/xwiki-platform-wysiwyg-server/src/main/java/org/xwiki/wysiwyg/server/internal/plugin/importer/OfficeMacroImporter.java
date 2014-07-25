@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.AttachmentReference;
@@ -32,12 +30,10 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 
@@ -49,11 +45,6 @@ import org.xwiki.rendering.transformation.TransformationContext;
  */
 public class OfficeMacroImporter
 {
-    /**
-     * Used to update the rendering context.
-     */
-    private final RenderingContext renderingContext;
-
     /**
      * The component used to execute the XDOM macro transformations before rendering to XHTML.
      * <p>
@@ -77,11 +68,6 @@ public class OfficeMacroImporter
     private final EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
-     * Used to find out the Syntax of the document containing the attachment to render.
-     */
-    private final DocumentAccessBridge documentAccessBridge;
-
-    /**
      * Creates a new instance.
      * 
      * @param componentManager the component manager
@@ -89,11 +75,9 @@ public class OfficeMacroImporter
     public OfficeMacroImporter(ComponentManager componentManager)
     {
         try {
-            renderingContext = componentManager.getInstance(RenderingContext.class);
             macroTransformation = componentManager.getInstance(Transformation.class, "macro");
             xhtmlRenderer = componentManager.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");
             entityReferenceSerializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
-            documentAccessBridge = componentManager.getInstance(DocumentAccessBridge.class);
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize the office importer based on office macro.", e);
         }
@@ -116,22 +100,8 @@ public class OfficeMacroImporter
         MacroBlock officeMacro = new MacroBlock("office", macroParams, false);
 
         XDOM xdom = new XDOM(Collections.<Block> singletonList(officeMacro));
-
-        // Since we're generating an XDOM block we need to set up the required MetaData information
-
-        // Set the BASE MetaData
         xdom.getMetaData().addMetaData(MetaData.BASE,
             entityReferenceSerializer.serialize(attachmentReference.getDocumentReference()));
-
-        // Set the SYNTAX MetaData
-        try {
-            DocumentModelBridge document = documentAccessBridge.getDocument(attachmentReference.getDocumentReference());
-            xdom.getMetaData().addMetaData(MetaData.SYNTAX, document.getSyntax());
-        } catch (Exception e) {
-            throw new RuntimeException(String.format(
-                "Failed to compute Syntax for the document containing attachment [%s]", attachmentReference), e);
-        }
-
         return xdom;
     }
 
@@ -146,7 +116,7 @@ public class OfficeMacroImporter
     {
         TransformationContext txContext = new TransformationContext();
         txContext.setXDOM(xdom);
-        ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext, xdom);
+        macroTransformation.transform(xdom, txContext);
 
         WikiPrinter printer = new DefaultWikiPrinter();
         xhtmlRenderer.render(xdom, printer);

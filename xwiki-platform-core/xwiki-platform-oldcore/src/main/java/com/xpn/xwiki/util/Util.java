@@ -554,12 +554,12 @@ public class Util
         if (i0 != -1) {
             database = name.substring(0, i0);
             name = name.substring(i0 + 1);
-            context.setWikiId(database);
+            context.setDatabase(database);
             return name;
         }
 
         // This does not make sense
-        // context.setWikiId(context.getWiki().getDatabase());
+        // context.setDatabase(context.getWiki().getDatabase());
         if (name.indexOf(".") != -1) {
             return name;
         } else {

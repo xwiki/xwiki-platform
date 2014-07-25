@@ -26,10 +26,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -37,108 +33,72 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.ConfigurationSource;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
+import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-@Component
-@Singleton
-public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine, Initializable
+public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRenderingEngine.class);
 
     /** The default order in which the rendering engines will be run on the input. */
-    private static final String[] DEFAULT_RENDERING_ORDER = new String[] {"macromapping", "groovy", "velocity",
-    "plugin", "wiki", "wikiwiki"};
+    private final String[] defaultRenderingOrder = new String[] {"macromapping", "groovy", "velocity", "plugin",
+    "wiki", "wikiwiki"};
 
-    @Inject
-    @Named("xwikicfg")
-    private ConfigurationSource configuration;
+    private List<XWikiRenderer> renderers = new ArrayList<XWikiRenderer>();
 
-    @Inject
-    private CacheManager cacheManager;
-
-    @Inject
-    @Named("context")
-    private ComponentManager componentManager;
-
-    @Inject
-    @Named("wikiwiki")
-    private XWikiRenderer xwikiRenderer;
-
-    private List<XWikiRenderer> renderers;
-
-    private HashMap<String, XWikiRenderer> renderermap;
+    private HashMap<String, XWikiRenderer> renderermap = new LinkedHashMap<String, XWikiRenderer>();
 
     private Cache<XWikiRenderingCache> cache;
 
-    public DefaultXWikiRenderingEngine()
+    public DefaultXWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException
     {
-
-    }
-
-    /**
-     * @deprecated since 6.1M2, use default {@link XWikiRenderingEngine} component instead
-     */
-    @Deprecated
-    public DefaultXWikiRenderingEngine(XWiki xwiki, XWikiContext context)
-    {
-        this.configuration = Utils.getComponent(ConfigurationSource.class, "xwikicfg");
-        this.cacheManager = Utils.getComponent(CacheManager.class);
-        this.componentManager = Utils.getContextComponentManager();
-        this.xwikiRenderer = Utils.getComponent(XWikiRenderer.class, "wikiwiki");
-
-        try {
-            initialize();
-        } catch (InitializationException e) {
-            LOGGER.error("Failed to initialize rendering engine", e);
-        }
-    }
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        this.renderers = new ArrayList<XWikiRenderer>();
-        this.renderermap = new LinkedHashMap<String, XWikiRenderer>();
-
-        String[] renderingOrder = this.configuration.getProperty("xwiki.render.renderingorder", String[].class);
+        String[] renderingOrder = xwiki.getConfig().getPropertyAsList("xwiki.render.renderingorder");
         if (renderingOrder == null || renderingOrder.length == 0) {
-            renderingOrder = DEFAULT_RENDERING_ORDER;
+            renderingOrder = defaultRenderingOrder;
         }
 
-        try {
-            for (int i = 0; i < renderingOrder.length; i++) {
-                if (this.configuration.getProperty("xwiki.render." + renderingOrder[i], "1").equals("1")) {
-                    String hint = renderingOrder[i];
+        for (int i = 0; i < renderingOrder.length; i++) {
+            if (xwiki.Param("xwiki.render." + renderingOrder[i], "1").equals("1")) {
 
-                    if (this.componentManager.hasComponent(XWikiRenderer.class, hint)) {
-                        XWikiRenderer renderer = this.componentManager.getInstance(XWikiRenderer.class, hint);
+                if (renderingOrder[i].equals("macromapping")) {
+                    addRenderer("mapping", new XWikiMacrosMappingRenderer(xwiki, context));
 
-                        addRenderer(renderer.getId(), renderer);
+                } else if (renderingOrder[i].equals("velocity")) {
+                    addRenderer("velocity", new XWikiVelocityRenderer());
+
+                } else if (renderingOrder[i].equals("groovy")) {
+                    addRenderer("groovy", new XWikiGroovyRenderer());
+
+                } else if (renderingOrder[i].equals("plugin")) {
+                    addRenderer("plugin", new XWikiPluginRenderer());
+
+                } else if (renderingOrder[i].equals("wiki")) {
+                    addRenderer("wiki", new XWikiRadeoxRenderer(false));
+
+                } else if (renderingOrder[i].equals("wikiwiki")) {
+                    if (xwiki.Param("xwiki.render.wikiwiki", "0").equals("1")) {
+                        addRenderer("xwiki", new XWikiWikiBaseRenderer(true, true));
+                    } else {
+                        addRenderer("xwiki", new XWikiWikiBaseRenderer(false, true));
                     }
                 }
             }
-
-            // If there is no wikiwiki renderer, we must add it because it's the base renderer
-            if (!this.renderermap.containsKey("xwiki")) {
-                addRenderer("xwiki", this.xwikiRenderer);
-            }
-
-            initCache(null);
-        } catch (Exception e) {
-            throw new InitializationException("Failed to initialize rendering engine", e);
         }
+
+        // If there is no wikiwiki renderer, we must add it because it's the base renderer
+        if (renderermap.get("xwiki") == null) {
+            addRenderer("xwiki", new XWikiWikiBaseRenderer(false, true));
+        }
+
+        initCache(context);
     }
 
     @Override
@@ -146,7 +106,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine, Initia
     {
         XWikiMacrosMappingRenderer mmrendered = (XWikiMacrosMappingRenderer) getRenderer("mapping");
         if (mmrendered != null) {
-            mmrendered.loadPreferences();
+            mmrendered.loadPreferences(context.getWiki(), context);
         }
     }
 
@@ -154,13 +114,12 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine, Initia
     {
         int iCapacity = 100;
         try {
-            String capacity = this.configuration.getProperty("xwiki.render.cache.capacity");
+            String capacity = context.getWiki().Param("xwiki.render.cache.capacity");
             if (capacity != null) {
                 iCapacity = Integer.parseInt(capacity);
             }
         } catch (Exception e) {
         }
-
         initCache(iCapacity, context);
     }
 
@@ -173,7 +132,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine, Initia
             lru.setMaxEntries(iCapacity);
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-            this.cache = this.cacheManager.createNewCache(configuration);
+            this.cache = Utils.getComponent(CacheManager.class).createNewCache(configuration);
         } catch (CacheException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
                 "Failed to create cache");
@@ -285,14 +244,15 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine, Initia
         } catch (XWikiException e) {
         }
 
+
         try {
             XWikiRenderingCache cacheObject = (this.cache != null) ? this.cache.get(key) : null;
 
             if (cacheObject != null) {
                 XWikiRequest request = context.getRequest();
                 boolean refresh =
-                    (request != null) && ("1".equals(request.get("refresh"))) || "inline".equals(context.getAction())
-                        || "admin".equals(context.getAction());
+                    (request != null) && ("1".equals(request.get("refresh")))
+                    || "inline".equals(context.getAction()) || "admin".equals(context.getAction());
                 if ((cacheObject.isValid() && (!refresh))) {
                     addToCached(key, context);
                     return cacheObject.getContent();
@@ -306,7 +266,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine, Initia
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
             // We need to make sure we don't use the cache duretion currently in the system
-            context.setCacheDuration(this.configuration.getProperty("xwiki.rendering.defaultCacheDuration", 0));
+            context
+                .setCacheDuration((int) context.getWiki().ParamAsLong("xwiki.rendering.defaultCacheDuration", 0));
             // Start monitoring timer
             if (monitor != null) {
                 monitor.startTimer("rendering");
@@ -342,7 +303,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine, Initia
                     } else {
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("skip renderer: " + rendererName + " for the document "
-                                + contentdoc.getFullName());
+                                         + contentdoc.getFullName());
                         }
                     }
                 }
@@ -369,7 +330,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine, Initia
             try {
                 int cacheDuration = context.getCacheDuration();
                 if (cacheDuration > 0) {
-                    XWikiRenderingCache cacheObject = new XWikiRenderingCache(key, content, cacheDuration, new Date());
+                    XWikiRenderingCache cacheObject =
+                        new XWikiRenderingCache(key, content, cacheDuration, new Date());
                     this.cache.set(key, cacheObject);
                 }
             } catch (Exception e) {
@@ -415,7 +377,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine, Initia
             qs = qs.replaceAll("refresh=1&?", "");
             qs = qs.replaceAll("&?refresh=1", "");
         }
-        String db = ((context == null) ? "xwiki" : context.getWikiId());
+        String db = ((context == null) ? "xwiki" : context.getDatabase());
         String cdoc =
             ((contentdoc == null) ? "" : contentdoc.getDatabase() + ":" + contentdoc.getFullName() + ":"
                 + contentdoc.getRealLanguage() + ":" + contentdoc.getVersion());
@@ -465,4 +427,5 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine, Initia
             return renderer.convertSingleLine(macroname, params, allcontent, macro, context);
         }
     }
+
 }

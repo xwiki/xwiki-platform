@@ -53,7 +53,7 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
     public Pages getPages(String wikiName, Integer start, String name, String space, String author, Integer number)
             throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getWikiId();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         Pages pages = objectFactory.createPages();
 
@@ -156,7 +156,7 @@ public class WikiPagesResourceImpl extends XWikiResource implements WikiPagesRes
                 pages.getPageSummaries().add(pageSummary);
             }
         } finally {
-            Utils.getXWikiContext(componentManager).setWikiId(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
 
         return pages;

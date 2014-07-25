@@ -63,6 +63,15 @@ public class IEOldSelectionCacheProxy extends IEOldSelection
         return cachedRange;
     }
 
+    @Override
+    public void removeAllRanges()
+    {
+        super.removeAllRanges();
+        // In IE6 the selection change event is not fired when we select hidden text. It's good to invalidate the cache
+        // after removing all ranges, which usually happens before selecting a new range.
+        invalidateCache();
+    }
+
     /**
      * @return the object notified when the selection changes
      */

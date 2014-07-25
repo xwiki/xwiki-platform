@@ -51,6 +51,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.merge.CollisionException;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -93,7 +94,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      */
     protected Map<String, Object> fields = new LinkedHashMap<String, Object>();
 
-    protected List<Object> fieldsToRemove = new ArrayList<>();
+    protected List fieldsToRemove = new ArrayList();
 
     /**
      * The meaning of this reference fields depends on the element represented. Examples:
@@ -433,17 +434,17 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
-    public Set< ? > getSetValue(String name)
+    public Set<?> getSetValue(String name)
     {
         ListProperty prop = (ListProperty) safeget(name);
         if (prop == null) {
             return new HashSet<Object>();
         } else {
-            return new HashSet<Object>((Collection< ? >) prop.getValue());
+            return new HashSet<Object>((Collection<?>) prop.getValue());
         }
     }
 
-    public void setSetValue(String name, Set< ? > value)
+    public void setSetValue(String name, Set<?> value)
     {
         ListProperty property = new ListProperty();
         property.setValue(value);
@@ -783,8 +784,9 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                         : newProperty.clone());
                     mergeResult.setModified(true);
                 } else if (!propertyResult.equals(newProperty)) {
-                    // collision between DB and new: property to add but already exists in the DB
-                    mergeResult.getLog().error("Collision found on property [{}]", newProperty.getReference());
+                    // XXX: collision between DB and new: property to add but already exists in the DB
+                    mergeResult.error(new CollisionException("Collision found on property ["
+                        + newProperty.getReference() + "]"));
                 }
             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
                 if (propertyResult != null) {
@@ -793,13 +795,15 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                         removeField(diff.getPropName());
                         mergeResult.setModified(true);
                     } else {
-                        // collision between DB and new: property to remove but not the same as previous
+                        // XXX: collision between DB and new: property to remove but not the same as previous
                         // version
-                        mergeResult.getLog().error("Collision found on property [{}]", previousProperty.getReference());
+                        mergeResult.error(new CollisionException("Collision found on property ["
+                            + previousProperty.getReference() + "]"));
                     }
                 } else {
                     // Already removed from DB, lets assume the user is prescient
-                    mergeResult.getLog().warn("Property [{}] already removed", previousProperty.getReference());
+                    mergeResult.warn(new CollisionException("Property [" + previousProperty.getReference()
+                        + "] already removed"));
                 }
             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYCHANGED) {
                 if (propertyResult != null) {
@@ -810,12 +814,13 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                         mergeResult.setModified(true);
                     } else if (!propertyResult.equals(newProperty)) {
                         // Try to apply 3 ways merge on the property
-                        mergeField(propertyResult, previousProperty, newProperty, configuration, context, mergeResult);
+                        propertyResult.merge(previousProperty, newProperty, configuration, context, mergeResult);
                     }
                 } else {
-                    // collision between DB and new: property to modify but does not exists in DB
+                    // XXX: collision between DB and new: property to modify but does not exists in DB
                     // Lets assume it's a mistake to fix
-                    mergeResult.getLog().warn("Collision found on property [{}]", newProperty.getReference());
+                    mergeResult.warn(new CollisionException("Collision found on property ["
+                        + newProperty.getReference() + "]"));
 
                     addField(diff.getPropName(), configuration.isProvidedVersionsModifiables() ? newProperty
                         : newProperty.clone());
@@ -823,12 +828,6 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 }
             }
         }
-    }
-
-    protected void mergeField(PropertyInterface currentElement, ElementInterface previousElement,
-        ElementInterface newElement, MergeConfiguration configuration, XWikiContext context, MergeResult mergeResult)
-    {
-        currentElement.merge(previousElement, newElement, configuration, context, mergeResult);
     }
 
     @Override

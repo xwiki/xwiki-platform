@@ -440,7 +440,7 @@ public class WatchListStore implements EventListener
                 currentElement.append(watchedItems.substring(previousPos, newPos));
                 elements.add(currentElement.toString());
                 currentElement.setLength(0);
-            } else if (newPos > previousPos) {
+            } else {
                 currentElement.append(watchedItems.substring(previousPos, newPos - 1)).append(WATCHLIST_ELEMENT_SEP);
             }
             previousPos = newPos + 1;
@@ -448,30 +448,6 @@ public class WatchListStore implements EventListener
         currentElement.append(watchedItems.substring(previousPos));
         elements.add(currentElement.toString());
         return elements;
-    }
-    
-    /**
-     * the inverse to {@link #unescapeList(String)}.
-     * @param watchedItems the list of watched items, each unescaped
-     * @return a string comma separated, escaped items 
-     */
-    private String escapeList(List<String> watchedItems)
-    {
-        if (watchedItems == null || watchedItems.isEmpty()) {
-            return StringUtils.EMPTY;
-        }
-        StringBuilder currentElement = new StringBuilder();
-        boolean empty = true;
-        for (String item : watchedItems) {
-            if (!empty) {
-                currentElement.append(WATCHLIST_ELEMENT_SEP);
-            }
-            // Escape the element to watch in case it contains the WATCHLIST_ELEMENT_SEP separator
-            String escapedItem = item.replaceAll(WATCHLIST_ELEMENT_SEP, "\\\\" + WATCHLIST_ELEMENT_SEP);
-            currentElement.append(escapedItem);
-            empty = false;
-        }
-        return currentElement.toString();
     }
 
     /**
@@ -526,7 +502,7 @@ public class WatchListStore implements EventListener
         String elementToWatch = newWatchedElement;
 
         if (!ElementType.WIKI.equals(type) && !newWatchedElement.contains(WIKI_SPACE_SEP)) {
-            elementToWatch = context.getWikiId() + WIKI_SPACE_SEP + newWatchedElement;
+            elementToWatch = context.getDatabase() + WIKI_SPACE_SEP + newWatchedElement;
         }
 
         if (isWatched(elementToWatch, user, type, context)) {
@@ -536,7 +512,10 @@ public class WatchListStore implements EventListener
         // Copy the list of watched elements because it could be unmodifiable.
         List<String> watchedElements = new ArrayList<String>(getWatchedElements(user, type, context));
 
-        watchedElements.add(elementToWatch);
+        // Escape the element to watch in case it contains the WIKI_SPACE_SEP separator
+        String escapedElementToWatch = elementToWatch.replaceAll(WATCHLIST_ELEMENT_SEP, "\\\\" + WATCHLIST_ELEMENT_SEP);
+
+        watchedElements.add(escapedElementToWatch);
 
         setWatchListElementsProperty(user, type, watchedElements, context);
         return true;
@@ -550,7 +529,7 @@ public class WatchListStore implements EventListener
      * @param type type of the element to remove
      * @param context Context of the request
      * @return True if the element was in list and has been removed, false if the element was'nt in the list
-     * @throws XWikiException If the WatchList Object cannot be retrieved or if the user's profile cannot be saved
+     * @throws XWikiException If the WatchList Object cannot be retreived or if the user's profile cannot be saved
      */
     public boolean removeWatchedElement(String user, String watchedElement, ElementType type, XWikiContext context)
         throws XWikiException
@@ -558,7 +537,7 @@ public class WatchListStore implements EventListener
         String elementToRemove = watchedElement;
 
         if (!ElementType.WIKI.equals(type) && !watchedElement.contains(WIKI_SPACE_SEP)) {
-            elementToRemove = context.getWikiId() + WIKI_SPACE_SEP + watchedElement;
+            elementToRemove = context.getDatabase() + WIKI_SPACE_SEP + watchedElement;
         }
 
         if (!this.isWatched(elementToRemove, user, type, context)) {
@@ -628,7 +607,7 @@ public class WatchListStore implements EventListener
     {
         XWikiDocument userDocument = context.getWiki().getDocument(user, context);
         userDocument.setLargeStringValue(WATCHLIST_CLASS, getWatchListClassPropertyForType(type),
-            escapeList(elements));
+            StringUtils.join(elements, WATCHLIST_ELEMENT_SEP));
         userDocument.isMinorEdit();
         context.getWiki().saveDocument(userDocument, context.getMessageTool().get("watchlist.save.object"), true,
             context);
@@ -656,12 +635,12 @@ public class WatchListStore implements EventListener
             LOGGER.error("error getting list of wiki servers", e);
         }
 
-        String oriDatabase = context.getWikiId();
+        String oriDatabase = context.getDatabase();
 
         try {
             for (String wiki : wikiServers) {
                 String wikiPrefix = wiki + WIKI_SPACE_SEP;
-                context.setWikiId(wiki);
+                context.setDatabase(wiki);
                 try {
                     List<String> upDocsInWiki =
                         context.getWiki().getStore().searchDocumentsNames(request, 0, 0, values, context);
@@ -674,7 +653,7 @@ public class WatchListStore implements EventListener
                 }
             }
         } finally {
-            context.setWikiId(oriDatabase);
+            context.setDatabase(oriDatabase);
         }
 
         return results;
@@ -728,7 +707,7 @@ public class WatchListStore implements EventListener
      */
     private void watchListObjectsEventHandler(XWikiDocument originalDoc, XWikiDocument currentDoc, XWikiContext context)
     {
-        String wiki = context.getWikiId();
+        String wiki = context.getDatabase();
         BaseObject originalWatchListObj = originalDoc.getObject(WATCHLIST_CLASS);
         BaseObject currentWatchListObj = currentDoc.getObject(WATCHLIST_CLASS);
 

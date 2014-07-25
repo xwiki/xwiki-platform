@@ -1,30 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
 <xwikidoc>
   <web>Main</web>
   <name>SolrTranslations</name>
   <language>fr</language>
-  <defaultLanguage>en</defaultLanguage>
+  <defaultLanguage/>
   <translation>1</translation>
   <parent>Main.SolrSearch</parent>
   <creator>xwiki:XWiki.Admin</creator>
@@ -62,60 +42,22 @@ solr.admin.status.queueSize.label=Taille de la file d'attente
 solr.admin.status.title=Statut
 solr.admin.submit=Appliquer
 solr.admin.title=Administration de la recherche Solr
-solr.facet.date.after=Après le {0} 
-solr.facet.date.any=Toutes les dates
-solr.facet.date.applyCustomInterval=Appliquer
-solr.facet.date.before=Avant le {0} 
-solr.facet.date.between=Entre le {0} et le {1} 
-solr.facet.date.customInterval=Intervalle de date et d'heure personnalisé
-solr.facet.date.end=Date et heure de fin
-solr.facet.date.last30Days=Ces 30 derniers jours
-solr.facet.date.last7Days=Ces 7 derniers jours
-solr.facet.date.olderThan30Days=Plus anciens que 30 jours
-solr.facet.date.start=Date et heure de début
-solr.facet.date.today=Aujourd'hui
-solr.facet.fileType.archive.java-archive=JAR
-solr.facet.fileType.archive.xara=XAR
-solr.facet.fileType.image.icon=Icône
-solr.facet.fileType.other.octet-stream=Binaire
-solr.facet.fileType.text.java-source=Code source Java
-solr.facet.fileType.text.javascript=JavaScript
-solr.facet.fileType.text.plain=Plein texte
-solr.facet.fileType.text.sh=Script  Shell
-solr.facet.size.any=Toutes les tailles
-solr.facet.size.between=Entre {0} et {1} 
-solr.facet.size.large=Gros
-solr.facet.size.lessThan=Moins de {0} 
-solr.facet.size.medium=Moyen
-solr.facet.size.moreThan=Plus de {0} 
-solr.facet.size.small=Petit
-solr.facet.size.tiny=Minuscule
 solr.facets.collapseAll=Tout réduire
 solr.facets.emptyValue=Valeur vide
 solr.facets.expandAll=Tout étendre
 solr.facets.hint=Selectionner une catégorie et activer les filtres sur les résultats courants
-solr.facets.moreValues={0} restants
 solr.facets.resetAll=Tout réinitialiser
 solr.facets.title=Redéfinir votre recherche
-solr.field.attauthor=Enregistré par
 solr.field.attcontent=Contenu du fichier joint
-solr.field.attdate=Date d'enregistrement
-solr.field.attsize=Taille de fichier
-solr.field.author=Dernier auteur
 solr.field.author_display=Auteur
-solr.field.class=Type d'objet
-solr.field.class.definedBy=Défini par {0} » {1} 
 solr.field.comment=Commentaires
 solr.field.creationdate=Date de création
 solr.field.creator_display=Créateur
-solr.field.date=Date de dernière modification
 solr.field.doccontent=Contenu du document
 solr.field.doccontentraw=Contenu brut du document
 solr.field.filename=Nom du fichier joint
 solr.field.locale=Langage
 solr.field.locale.emptyValue=Pas de langage
-solr.field.locale.emptyValue.hint=Certains documents n'ont aucune langue définie parce qu'ils contiennent des scripts (qui ne sont pas rédigés dans une langue naturelle) ou parce qu'ils sont évalués en fonction de la langue de l'utilisateur (comme cette page).
-solr.field.mimetype=Type de fichier
 solr.field.name=Page
 solr.field.name_exact=Page
 solr.field.objcontent=Objet
@@ -124,36 +66,39 @@ solr.field.propertyvalue=Valeur de la propriété
 solr.field.space=Espace
 solr.field.space_exact=Espace
 solr.field.title=Titre
-solr.field.type=Type de résultat
 solr.field.wiki=Wiki
-solr.filterBy.fileType.archive=Archive
+solr.filter.hint=Sélectionner les filtres prédéfinis qui seront appliqués à la requête.
+solr.filter.queryBoost.hint=Autorise à modifier la pertinence de certains champs, par exemple \: title^1.2 name^2.0 author^1.0 doccontent^0.5
+solr.filter.queryBoost.label=Boost de requête
+solr.filter.title=Options avancées
+solr.filter.toggle=Alterner le filtre de recherche
+solr.filterBy.fileType=Type de fichier
+solr.filterBy.fileType.all=Tous types de fichiers
 solr.filterBy.fileType.audio=Audio
-solr.filterBy.fileType.font=Police de caractères
 solr.filterBy.fileType.image=Image
-solr.filterBy.fileType.office=Office
-solr.filterBy.fileType.other=Autre
-solr.filterBy.fileType.presentation=Présentation
-solr.filterBy.fileType.spreadsheet=Feuille de calcul
 solr.filterBy.fileType.text=Texte
 solr.filterBy.fileType.video=Vidéo
-solr.filterBy.fileType.word=Document Word
+solr.filterBy.language=Langage
+solr.filterBy.language.all=Tous les langages
+solr.filterBy.space=Espace
+solr.filterBy.type=Type
+solr.filterBy.type.all=Tous les types
 solr.filterBy.type.attachment=Fichier joint
 solr.filterBy.type.document=Document
 solr.filterBy.type.object=Objet
 solr.filterBy.type.object_property=Propriété de l'objet
+solr.filterBy.wiki=Wiki
+solr.filterBy.wiki.all=Tous les wikis
 solr.result.author=Mofidié par {0} le {1}
 solr.result.highlightAll=Surligner toutes les occurrences
 solr.result.language=Langage
 solr.result.location=Situé dans {0} » {1} » {2}
 solr.result.mediaType=Ficher de type {0}
-solr.result.uploadedBy=Enregistré par {0} le {1} ({2}) 
+solr.result.object=Objet de type {0} 
+solr.result.property=Propriété {0}\#{1}
 solr.sortBy=Trier par\:
-solr.sortBy.attauthor_display_sort=Enregistré par
-solr.sortBy.attdate_sort=Date d'enregistrement
-solr.sortBy.attsize_sort=Taille du fichier
 solr.sortBy.author_display_sort=Dernier Auteur
 solr.sortBy.date=Date
-solr.sortBy.filename_sort=Nom de fichier
 solr.sortBy.score=Pertinence
 solr.sortBy.title_sort=Titre
 solr.sortOrder.asc=Ascendant

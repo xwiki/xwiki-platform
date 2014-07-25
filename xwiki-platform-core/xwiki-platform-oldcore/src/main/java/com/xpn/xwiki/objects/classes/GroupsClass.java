@@ -20,7 +20,6 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -30,12 +29,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.merge.MergeConfiguration;
-import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
@@ -140,10 +136,12 @@ public class GroupsClass extends ListClass
     @Override
     public BaseProperty fromStringArray(String[] strings)
     {
-        List<String> list = Arrays.asList(strings);
-
+        List<String> list = new ArrayList<String>();
+        for (int i = 0; i < strings.length; i++) {
+            list.add(strings[i]);
+        }
         BaseProperty prop = newProperty();
-        fromList(prop, list);
+        prop.setValue(StringUtils.join(list, ','));
         return prop;
     }
 
@@ -176,35 +174,5 @@ public class GroupsClass extends ListClass
     {
         String value = ppcel.getText();
         return fromString(value);
-    }
-
-    @Override
-    public List<String> toList(BaseProperty< ? > property)
-    {
-        List<String> selectlist;
-
-        if (property == null) {
-            selectlist = new ArrayList<String>();
-        } else {
-            selectlist = getListFromString((String) property.getValue());
-        }
-
-        return selectlist;
-    }
-
-    @Override
-    public void fromList(BaseProperty< ? > property, List<String> list)
-    {
-        property.setValue(list != null ? StringUtils.join(list, ',') : null);
-    }
-
-    @Override
-    public <T extends EntityReference> void mergeProperty(BaseProperty<T> currentProperty,
-        BaseProperty<T> previousProperty, BaseProperty<T> newProperty, MergeConfiguration configuration,
-        XWikiContext xcontext, MergeResult mergeResult)
-    {
-        // always a not ordered list
-        mergeNotOrderedListProperty(currentProperty, previousProperty, newProperty, configuration, xcontext,
-            mergeResult);
     }
 }

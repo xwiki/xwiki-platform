@@ -95,7 +95,7 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
             }
 
             XWikiDocument xwikiDocument =
-                    Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
+                    Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
                             Utils.getXWikiContext(componentManager));
             BaseObject xwikiObject = xwikiDocument.getObject("XWiki.TagClass", 0);
 

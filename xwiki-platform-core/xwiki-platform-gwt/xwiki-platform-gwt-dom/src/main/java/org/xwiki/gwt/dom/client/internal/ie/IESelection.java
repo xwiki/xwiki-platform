@@ -24,7 +24,7 @@ import org.xwiki.gwt.dom.client.internal.DefaultSelection;
 import org.xwiki.gwt.dom.client.internal.mozilla.NativeSelection;
 
 /**
- * Although Internet Explorer 9+ implements the Selection and Range API it still doesn't support separate selections per
+ * Although Internet Explorer 9 implements the Selection and Range API it still doesn't support separate selections per
  * window. If you have an in-line frame, any selection you make inside it will be lost when you focus its parent window.
  * The child and parent windows have different selection objects but these objects can't have rangeCount greater than 0
  * at the same time. If one of them contains a range, the other is empty.

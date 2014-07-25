@@ -1,30 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
 <xwikidoc>
   <web>Main</web>
   <name>SolrTranslations</name>
   <language>nl</language>
-  <defaultLanguage>en</defaultLanguage>
+  <defaultLanguage/>
   <translation>1</translation>
   <parent>Main.SolrSearch</parent>
   <creator>xwiki:XWiki.Admin</creator>
@@ -50,17 +30,31 @@ solr.facets.title=Verfijn uw zoekopdracht
 solr.field.attcontent=Bijlage Inhoud
 solr.field.filename=Bijlage Naam
 solr.field.objcontent=Objecten
+solr.filter.hint=Selecteer vooraf gedefinieerde filters die toegepast zullen worden op uw query
+solr.filter.title=Geavanceerde opties
+solr.filter.toggle=Schakel de zoekfilter in
+solr.filterBy.fileType=Bestandstype
+solr.filterBy.fileType.all=Alle bestandstypen
 solr.filterBy.fileType.audio=Audio
 solr.filterBy.fileType.image=Afbeelding
 solr.filterBy.fileType.text=Tekst
 solr.filterBy.fileType.video=Video
+solr.filterBy.language=Talen
+solr.filterBy.language.all=Alle talen
+solr.filterBy.space=Ruimte
+solr.filterBy.type=Type
+solr.filterBy.type.all=Alle types
 solr.filterBy.type.attachment=Bijlage
 solr.filterBy.type.document=Document
 solr.filterBy.type.object=Object
 solr.filterBy.type.object_property=Object eigenschap
+solr.filterBy.wiki=Wiki
+solr.filterBy.wiki.all=Alle wikis
 solr.result.author=Gewijzigd door {0} op {1} 
 solr.result.location=Gelegen in {0} » {1} » {2} 
 solr.result.mediaType=Bestand van het type {0}
+solr.result.object=Object van het type {0}
+solr.result.property=Eigenschap {0}\#{1} 
 solr.sortBy=Sorteren op\:
 solr.sortBy.author_display_sort=Laatste auteur
 solr.sortBy.date=Datum

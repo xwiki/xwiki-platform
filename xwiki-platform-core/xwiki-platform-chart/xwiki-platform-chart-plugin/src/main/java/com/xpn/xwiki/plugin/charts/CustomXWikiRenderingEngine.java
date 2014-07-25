@@ -22,46 +22,18 @@ package com.xpn.xwiki.plugin.charts;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.InitializationException;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.render.DefaultXWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiRadeoxRenderer;
 import com.xpn.xwiki.render.XWikiRenderer;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
 
-@Component
-@Named(CustomXWikiRenderingEngine.ROLEHINT)
-@Singleton
 public class CustomXWikiRenderingEngine extends DefaultXWikiRenderingEngine
 {
-    public final static String ROLEHINT = "chart";
-
-    public CustomXWikiRenderingEngine()
-    {
-
-    }
-
-    /**
-     * @deprecated since 6.1M2, use component with role {@link XWikiRenderingEngine} and hint {@value #ROLEHINT} instead
-     */
-    @Deprecated
     public CustomXWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException
     {
         super(xwiki, context);
-    }
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        initialize();
-
         List<String> unneededRenderers = new LinkedList<String>();
         boolean found = false;
         for (String name : getRendererNames()) {

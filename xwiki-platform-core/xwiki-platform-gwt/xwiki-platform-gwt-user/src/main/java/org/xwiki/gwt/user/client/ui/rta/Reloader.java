@@ -206,7 +206,7 @@ public class Reloader implements RequestCallback, LoadHandler
         impl.unloadIFrameElement(iFrame);
 
         // The listener is not removed when onDetach is called. See RichTextArea#onDetach() for details.
-        DOM.setEventListener(iFrame, null);
+        DOM.setEventListener((com.google.gwt.user.client.Element) iFrame.cast(), null);
 
         // Clone the previous in-line frame.
         IFrameElement newIFrame = (IFrameElement) iFrame.cloneNode(false);
@@ -218,11 +218,12 @@ public class Reloader implements RequestCallback, LoadHandler
             parent.appendChild(newIFrame);
         }
 
-        // Don't let the in-line frame load to prevent the browser from recording a new history entry.
+        // Don't let the in-line frame load to prevent the browser from recording a new history entry. We use DOMUtils
+        // because only static references to overlay types are allowed from JSNI.
         newIFrame.getContentWindow().stop();
 
         // onAttach sets the listener only the first time it is called. See RichTextArea#onAttach() for details.
-        DOM.setEventListener(iFrame, rta);
+        DOM.setEventListener((com.google.gwt.user.client.Element) iFrame.cast(), rta);
 
         return newIFrame;
     }

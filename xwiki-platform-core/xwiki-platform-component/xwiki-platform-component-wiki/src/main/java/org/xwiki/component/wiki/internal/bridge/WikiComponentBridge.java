@@ -118,8 +118,6 @@ public interface WikiComponentBridge
      * @param reference a reference to a document
      * @return true if the document has been saved by a user with programming rights, false otherwise
      * @throws WikiComponentException if the document can't be retrieved
-     * @deprecated since 6.2M1, use {@link org.xwiki.security.authorization.ContextualAuthorizationManager} instead
      */
-    @Deprecated
     boolean hasProgrammingRights(DocumentReference reference) throws WikiComponentException;
 }

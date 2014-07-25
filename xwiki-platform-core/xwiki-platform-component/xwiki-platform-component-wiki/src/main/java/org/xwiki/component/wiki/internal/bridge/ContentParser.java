@@ -21,7 +21,6 @@ package org.xwiki.component.wiki.internal.bridge;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.component.wiki.WikiComponentException;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -43,16 +42,4 @@ public interface ContentParser
      * @throws WikiComponentException if the content can't be parsed
      */
     XDOM parse(String content, Syntax syntax) throws WikiComponentException;
-
-    /**
-     * Parse content.
-     *
-     * @param content the content to parse
-     * @param syntax the syntax in which the content is written
-     * @param source the source entity (mostly a Document Reference) containing the parsed content.
-     * @return the XDOM corresponding to the parsed content
-     * @throws WikiComponentException if the content can't be parsed
-     * @since 6.0M2
-     */
-    XDOM parse(String content, Syntax syntax, EntityReference source) throws WikiComponentException;
 }

@@ -42,12 +42,12 @@ public class PagesForTagsResourceImpl extends XWikiResource implements PagesForT
     public Pages getTags(String wikiName, String tagNames, Integer start, Integer number, Boolean withPrettyNames)
             throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getWikiId();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         try {
             Pages pages = objectFactory.createPages();
 
-            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             String[] tagNamesArray = tagNames.split(",");
 
@@ -78,7 +78,7 @@ public class PagesForTagsResourceImpl extends XWikiResource implements PagesForT
         } catch (Exception e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setWikiId(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
     }
 

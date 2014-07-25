@@ -85,7 +85,7 @@ public class DBTreeListClass extends DBListClass
         } else {
             // Otherwise, to avoid re-computing the tree in case it is requested several times during the same request,
             // it is cached in the request context.
-            return (List<ListItem>) context.get(context.getWikiId() + ":" + getFieldFullName() + "-tree");
+            return (List<ListItem>) context.get(context.getDatabase() + ":" + getFieldFullName() + "-tree");
         }
     }
 
@@ -104,7 +104,7 @@ public class DBTreeListClass extends DBListClass
         } else {
             // Otherwise, to avoid re-computing the tree in case it is requested several times during the same request,
             // it is cached in the request context.
-            context.put(context.getWikiId() + ":" + getFieldFullName() + "-tree", cachedDBTreeList);
+            context.put(context.getDatabase() + ":" + getFieldFullName() + "-tree", cachedDBTreeList);
         }
     }
 
@@ -198,8 +198,16 @@ public class DBTreeListClass extends DBListClass
     @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
+        List<String> selectlist;
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        List<String> selectlist = toList(prop);
+        if (prop == null) {
+            selectlist = new ArrayList<String>();
+        } else if (prop instanceof ListProperty) {
+            selectlist = ((ListProperty) prop).getList();
+        } else {
+            selectlist = new ArrayList<String>();
+            selectlist.add(String.valueOf(prop.getValue()));
+        }
 
         if (isPicker()) {
             String result = displayTree(name, prefix, selectlist, "edit", context);

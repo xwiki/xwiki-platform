@@ -90,18 +90,4 @@
       <xsl:value-of select="substring-before(., '?')" />
     </xsl:attribute>
   </xsl:template>
-
-  <!-- It seems the Office server doesn't understand the INS and DEL HTML elements so we have to use CSS instead. -->
-  <xsl:template match="//xhtml:ins">
-    <xsl:element name="span">
-      <xsl:attribute name="style">text-decoration:underline</xsl:attribute>
-      <xsl:apply-templates select="@*|node()" />
-    </xsl:element>
-  </xsl:template>
-  <xsl:template match="//xhtml:del">
-    <xsl:element name="span">
-      <xsl:attribute name="style">text-decoration:line-through</xsl:attribute>
-      <xsl:apply-templates select="@*|node()" />
-    </xsl:element>
-  </xsl:template>
 </xsl:stylesheet>

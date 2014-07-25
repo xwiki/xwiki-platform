@@ -357,7 +357,7 @@ public class DBListClass extends ListClass
         if (isCache()) {
             return this.cachedDBList;
         } else {
-            return (List<ListItem>) context.get(context.getWikiId() + ":" + getFieldFullName());
+            return (List<ListItem>) context.get(context.getDatabase() + ":" + getFieldFullName());
         }
     }
 
@@ -366,7 +366,7 @@ public class DBListClass extends ListClass
         if (isCache()) {
             this.cachedDBList = cachedDBList;
         } else {
-            context.put(context.getWikiId() + ":" + getFieldFullName(), cachedDBList);
+            context.put(context.getDatabase() + ":" + getFieldFullName(), cachedDBList);
         }
     }
 
@@ -469,7 +469,7 @@ public class DBListClass extends ListClass
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         // input display
-        if (getDisplayType().equals(DISPLAYTYPE_INPUT)) {
+        if (getDisplayType().equals("input")) {
             input input = new input();
             input.setAttributeFilter(new XMLAttributeValueFilter());
             input.setType("text");
@@ -541,7 +541,7 @@ public class DBListClass extends ListClass
 
             input.setDisabled(isDisabled());
             buffer.append(input.toString());
-        } else if (getDisplayType().equals(DISPLAYTYPE_RADIO) || getDisplayType().equals(DISPLAYTYPE_CHECKBOX)) {
+        } else if (getDisplayType().equals("radio") || getDisplayType().equals("checkbox")) {
             displayRadioEdit(buffer, name, prefix, object, context);
         } else {
             displaySelectEdit(buffer, name, prefix, object, context);

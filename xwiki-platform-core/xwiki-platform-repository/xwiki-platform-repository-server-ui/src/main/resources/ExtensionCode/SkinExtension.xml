@@ -1,25 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
 <xwikidoc>
   <web>ExtensionCode</web>
   <name>SkinExtension</name>
@@ -236,6 +216,7 @@ div.extension-link {
   padding: 0 1em 0.5em;
   min-height: 100px;
   vertical-align: top;
+  width: 350px;
 }
 
 .extension-link form {
@@ -249,11 +230,17 @@ div.extension-link p {
 
 .extension-link{
   border-radius: 18px;
+  -webkit-border-radius: 18px;
+  -moz-border-radius: 18px;
 
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7), 0 1px 3px rgba(100%, 100%, 100%, 0.8) inset, 0 0 1px 1px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7), 0 1px 3px rgba(100%, 100%, 100%, 0.8) inset, 0 0 1px 1px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 -1px 2px #FFFFFF, 0 2px 5px 1px #000000, 0 0 1px 2px rgba(0, 0, 0, 0.3);
 
   background: #5B86B1;
-  background: linear-gradient(to bottom, #5B86B1 0%, #78A7E5 30px) #78A7E5;
+  background: linear-gradient(center top , #5B86B1 0%, #78A7E5 30px) #78A7E5;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #5B86B1), color-stop(1, #78A7E5)) #78A7E5;
+  background: -moz-linear-gradient(center top , #5B86B1 0%, #78A7E5 30px) #78A7E5;
 }
 
 .extension-link p, .small-extension-link  {
@@ -292,8 +279,12 @@ div.extension-link p {
   content: '\21a1';
 
   border-radius: 12px;
+  -moz-border-radius: 12px;
+  -webkit-border-radius: 12px;
 
   box-shadow: 0 1px 2px #FFFFFF inset, 0 2px 5px #000000 inset, 0 0 2px #000, 0 0 1px 1px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 0 1px 2px #FFFFFF inset, 0 2px 5px #000000 inset, 0 0 2px #000, 0 0 1px 1px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0 -1px 2px #FFFFFF, 0 0 2px 1px rgba(0, 0, 0, 0.7);
 
   display: inline-block;
   font-weight: 900;

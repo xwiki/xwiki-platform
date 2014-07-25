@@ -433,7 +433,7 @@ iKAtTBe0AQfYWgXdAG9qCi1fA5wQWwLgSdydYgcsNRLABafWgzPNB4DsfrNE6VJz6VvXltr/A+kB
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{include reference="XWiki.ConfigurableClassMacros" /}}
+  <content>{{include document="XWiki.ConfigurableClassMacros" /}}
 
 {{velocity}}
 #*

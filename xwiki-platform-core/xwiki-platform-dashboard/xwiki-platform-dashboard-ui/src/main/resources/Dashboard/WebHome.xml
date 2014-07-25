@@ -314,7 +314,7 @@
     <className>XWiki.GadgetClass</className>
     <guid>b180bc56-ce23-436c-9c6f-c08a4ff444a7</guid>
     <property>
-      <content>{{include reference="Main.Welcome"/}}</content>
+      <content>{{include document="Main.Welcome"/}}</content>
     </property>
     <property>
       <position>1, 1</position>

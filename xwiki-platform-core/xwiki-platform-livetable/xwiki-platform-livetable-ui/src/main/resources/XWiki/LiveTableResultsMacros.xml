@@ -1,40 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>XWiki</web>
   <name>LiveTableResultsMacros</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1393535342000</creationDate>
   <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1393542378000</date>
-  <contentUpdateDate>1393542368000</contentUpdateDate>
+  <creationDate>1252454400000</creationDate>
+  <date>1267453085000</date>
+  <contentUpdateDate>1267453085000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.livetable.resultsMacros')</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
@@ -55,11 +39,11 @@
  * NOTE: This macro is not fully encapsulated because it defines a few Velocity variables that are used in subsequent macros.
  *#
 #macro(gridresultwithfilter_buildQuery $className $collist $filterfrom $filterwhere $filterParams)
-  ## Additional columns; should *not* contain raw parameters, all added column names must be filtered
+  ## Additional columns, should *not* contain parameters, all added column names must be filtered
   #set($fromSql = '')
-  ## Parametrized filter part of the query
+  ## parametrized filter part of the query
   #set($whereSql = '')
-  ## List of values to use with $whereSql
+  ## list of parameters to use with $whereSql
   #set($whereParams = [])
   #set($class = $xwiki.getDocument($className).getxWikiClass())
   ##
@@ -92,7 +76,6 @@
   ## Order
   ##
   #set($order = "$!request.sort")
-  #set ($orderSql = '')
   #if($order != '')
     #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
     #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
@@ -103,7 +86,7 @@
     #else
       #set($tableAlias = $order)
     #end
-    ## Only safe version should be used in SQL queries
+    ## only safe version should be used in SQL queries
     #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
     ##
     #if($order.startsWith('doc.'))
@@ -124,7 +107,6 @@
       #if("$multiselect" != '1')
         #livetable_getTableName($order)
         #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
-        ## FIXME: Check if this is indeed a property of the class
         #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
         #set($discard = $whereParams.add("${order}"))
         #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
@@ -140,7 +122,7 @@
   #set($allMatchingParams = [])
   #if("$!className" != '')
     ## Class query
-    #set($sql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
+    #set($countSql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
     #set($discard = $sqlParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))
     #set($discard = $sqlParams.addAll($whereParams))
     ##
@@ -160,7 +142,7 @@
     #end
   #else
     ## Document query
-    #set($sql = "$!fromSql $!filterfrom where 1=1 $!whereSql $!filterwhere")
+    #set($countSql = "$!fromSql $!filterfrom where 1=1 $!whereSql $!filterwhere")
     #set($discard = $sqlParams.addAll($whereParams))
     ##
     #set($tagsMatchingFiltersFrom = "$!fromSql $!filterfrom")
@@ -176,9 +158,7 @@
       #set($discard = $allMatchingParams.addAll($filterParams))
     #end
   #end
-  #if ($orderSql != '')
-    #set($sql = "$sql $!{orderSql}")
-  #end
+  #set($sql = "$countSql $!{orderSql}")
 #end
 
 
@@ -221,7 +201,7 @@
  *#
 #macro(gridresult_buildRowsJSON $map)
   #set($offset = $mathtool.toInteger($request.get('offset')))
-  ## Offset starts from 0 in velocity and 1 in javascript
+  ## offset starts from 0 in velocity and 1 in javascript
   #set($offset = $offset - 1)
   #if (!$offset || $offset &lt; 0)
     #set($offset = 0)
@@ -230,12 +210,7 @@
   #if (!$limit)
     #set ($limit = 15)
   #end
-  #set($query = $services.query.hql($sql))
-  ## Apply query filters if defined. Otherwise use default.
-  #foreach ($queryFilter in $stringtool.split($!request.queryFilters, ', '))
-    #set ($query = $query.addFilter($queryFilter))
-  #end
-  #set ($query = $query.setLimit($limit).setOffset($offset).bindValues($sqlParams))
+  #set($query = $services.query.hql($sql).addFilter('currentlanguage').addFilter('hidden').setLimit($limit).setOffset($offset).bindValues($sqlParams))
   #set($items = $query.execute())
   #set($discard = $map.put('totalrows', $query.count()))
   #set($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
@@ -278,7 +253,7 @@
       #set($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
       #set($isTranslation = true)
     #else
-      #set($translatedDoc = $itemDoc.translatedDocument)
+      #set($translatedDoc = $itemDoc)
       #set($isTranslation = false)
     #end
     #set($fullname = $services.model.serialize($itemDoc.documentReference, 'default'))
@@ -298,8 +273,6 @@
     #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
     #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $xcontext.user, $fullname)))
     #set($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('delete', $xcontext.user, $fullname)))
-    #set($discard = $row.put('doc_hasrename', $row.doc_hasdelete))
-    #set($row.doc_hasrights = $row.doc_hasedit &amp;&amp; $isAdvancedUser)
     #set($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
     #set($discard = $row.put('doc_copy_url', $itemDoc.getURL('view', 'xpage=copy')))
     #set($discard = $row.put('doc_delete_url', $itemDoc.getURL('delete')))
@@ -308,9 +281,9 @@
     #set($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
     #set($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
     #set($discard = $row.put('doc_title', $translatedDoc.plainTitle))
-    #set($discard = $row.put('doc_author', $xwiki.getUserName($translatedDoc.author, false)))
+    #set($discard = $row.put('doc_author', $xwiki.getLocalUserName($translatedDoc.author, false)))
     #set($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
-    #set($discard = $row.put('doc_creator', $xwiki.getUserName($translatedDoc.creator, false)))
+    #set($discard = $row.put('doc_creator', $xwiki.getLocalUserName($translatedDoc.creator, false)))
     #foreach($colname in $collist)
       #gridresult_buildColumnJSON($colname $row)
     #end
@@ -358,7 +331,7 @@
       #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))
     #end
     #set($fieldUrl = '')
-    ## Only retrieve an URL for a DBListClass item
+    ## only retrieve an URL for a DBListClass item
     #if($propType == 'DBListClass' &amp;&amp; $propClass.get($colname).getProperty('multiSelect').value != 1)
       #set($fieldUrl = $xwiki.getURL($fieldValue))
       #if($fieldUrl == $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
@@ -368,7 +341,7 @@
     #set($discard = $row.put($colname, $fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", '')))
     #set($discard = $row.put("${colname}_value", $fieldValue))
     #set($discard = $row.put("${colname}_url", $fieldUrl))
-    ## Reset to the default class
+    ## reset to the default class
     #set($discard = $itemDoc.use($className))
   #end
 #end
@@ -383,6 +356,7 @@
   #gridresultwithfilter_buildQuery($className $collist $filterfrom $filterwhere $filterParams)
   #if("$!request.sql" == '1')
     #set($discard = $map.put('sql', $sql))
+    #set($discard = $map.put('countsql', $countSql))
     #set($discard = $map.put('params', $sqlParams))
   #end
   #set($discard = $map.put('reqNo', $mathtool.toInteger($request.reqNo)))
@@ -553,7 +527,7 @@
   #else
     #set($tableAlias = $colname)
   #end
-  ## Only safe versions should be used in SQL queries
+  ## only safe versions should be used in SQL queries
   #set($safe_colname = "$!{colname.replaceAll('[^a-zA-Z0-9_.]','')}")
   #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
   ##

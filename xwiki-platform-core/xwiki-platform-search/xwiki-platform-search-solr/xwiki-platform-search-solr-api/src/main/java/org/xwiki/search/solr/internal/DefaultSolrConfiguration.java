@@ -20,9 +20,9 @@
 package org.xwiki.search.solr.internal;
 
 import java.net.URL;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -75,9 +75,9 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public static final String[] HOME_DIRECTORY_FILE_NAMES = {"solr.xml"};
 
     /**
-     * The package containing the Solr core configuration files.
+     * The package containing the solr configuration.
      */
-    public static final String HOME_DIRECTORY_CORE_PACKAGE = "solr.xwiki";
+    public static final String HOME_DIRECTORY_CONF_PACKAGE = "solr.conf";
 
     /**
      * The prefix of the solr resources.
@@ -115,16 +115,6 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public static final int SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT = 100000;
 
     /**
-     * The name of the configuration property indicating if a synchronization should be run at startup.
-     */
-    public static final String SOLR_SYNCHRONIZE_AT_STARTUP = "solr.synchronizeAtStartup";
-
-    /**
-     * Indicate if a synchronization should be run at startup by default.
-     */
-    public static final boolean SOLR_SYNCHRONIZE_AT_STARTUP_DEFAULT = true;
-
-    /**
      * The Solr configuration source.
      */
     @Inject
@@ -155,11 +145,12 @@ public class DefaultSolrConfiguration implements SolrConfiguration
             result.put(file, this.getClass().getResource(String.format(CLASSPATH_LOCATION_PREFIX, file)));
         }
 
-        // Core directory
-        Collection<URL> solrCoreResourcess = ClasspathHelper.forPackage(HOME_DIRECTORY_CORE_PACKAGE);
+        // Conf directory
+        Set<URL> solrConfigurationResourcess = ClasspathHelper.forPackage(HOME_DIRECTORY_CONF_PACKAGE);
         Reflections reflections =
-            new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner()).setUrls(solrCoreResourcess)
-                .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(HOME_DIRECTORY_CORE_PACKAGE))));
+            new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner())
+                .setUrls(solrConfigurationResourcess)
+                .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(HOME_DIRECTORY_CONF_PACKAGE))));
 
         for (String resource : reflections.getResources(Predicates.<String> alwaysTrue())) {
             URL resourceURL = getClass().getResource("/" + resource);
@@ -189,11 +180,5 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     {
         return this.configuration
             .getProperty(SOLR_INDEXER_QUEUE_CAPACITY_PROPERTY, SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT);
-    }
-
-    @Override
-    public boolean synchronizeAtStartup()
-    {
-        return this.configuration.getProperty(SOLR_SYNCHRONIZE_AT_STARTUP, SOLR_SYNCHRONIZE_AT_STARTUP_DEFAULT);
     }
 }

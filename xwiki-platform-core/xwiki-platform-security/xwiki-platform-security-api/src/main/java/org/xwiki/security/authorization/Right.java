@@ -121,25 +121,25 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
         = new HashMap<EntityType, Set<Right>>();
 
     static {
-        LOGIN    = new Right("login",       ALLOW,  ALLOW, true,  null, WIKI_ONLY                       , true);
-        VIEW     = new Right("view",        ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT             , true);
+        LOGIN    = new Right("login",       ALLOW,  ALLOW, true,  null, WIKI_ONLY          , true);
+        VIEW     = new Right("view",        ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT, true);
         EDIT     = new Right("edit",        ALLOW,  DENY,  true,
-                                                    new RightSet(VIEW), WIKI_SPACE_DOCUMENT             , false);
-        DELETE   = new Right("delete",      DENY,   DENY,  true,  null, WIKI_SPACE_DOCUMENT             , false);
+                                                    new RightSet(VIEW), WIKI_SPACE_DOCUMENT, false);
+        DELETE   = new Right("delete",      DENY,   DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);
         CREATOR  = new Right("creator",     DENY,   ALLOW, false,
             new RightSet(DELETE), EnumSet.of(EntityType.DOCUMENT), false);
-        REGISTER = new Right("register",    ALLOW,  ALLOW, true,  null, WIKI_ONLY                       , false);
-        COMMENT  = new Right("comment",     ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT             , false);
+        REGISTER = new Right("register",    ALLOW,  ALLOW, true,  null, WIKI_ONLY          , false);
+        COMMENT  = new Right("comment",     ALLOW,  DENY,  true,  null, WIKI_SPACE_DOCUMENT, false);
 
         ADMIN    = new Right("admin",       DENY,   ALLOW, false,
-            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT), WIKI_SPACE                      , true);
-
-        CREATE_WIKI = new Right("createwiki", DENY, DENY,  true,  null, FARM_ONLY                       , false);
+            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT), WIKI_SPACE         , true);
 
         PROGRAM  = new Right("programming", DENY,   ALLOW, false,
-            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT, ADMIN, CREATE_WIKI), FARM_ONLY   , true);
+            new RightSet(LOGIN, VIEW, EDIT, DELETE, REGISTER, COMMENT, ADMIN), FARM_ONLY   , true);
 
-        ILLEGAL  = new Right(ILLEGAL_RIGHT_NAME, DENY, DENY, false, null, null                          , false);
+        ILLEGAL  = new Right(ILLEGAL_RIGHT_NAME, DENY, DENY, false, null, null             , false);
+
+        CREATE_WIKI = new Right("createwiki", DENY, DENY,  true,  null, FARM_ONLY          , false);
     }
 
     /** The numeric value of this access right. */

@@ -34,7 +34,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.formula.FormulaRenderer;
 import org.xwiki.formula.FormulaRenderer.FontSize;
 import org.xwiki.formula.FormulaRenderer.Type;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
@@ -154,20 +153,7 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
         try {
             FormulaRenderer renderer = this.manager.getInstance(FormulaRenderer.class, rendererHint);
             String imageName = renderer.process(formula, inline, fontSize, imageType);
-            // TODO: HACK!!
-            // We're going through the getAttachmentURL() API so that when the PdfURLFactory is used, the generated
-            // image is saved and then embedded in the exported PDF thanks to PDFURIResolver. In the future we need
-            // to remove this hack by introduce a proper Resource for generated image (say TemporaryResource),
-            // implement a TemporaryResourceSerializer<URL> and introduce a ResourceLoader interface and have it
-            // implemented for TemporaryResource...
-            AttachmentReference attachmentReference =
-                new AttachmentReference(imageName, this.dab.getCurrentDocumentReference());
-            String url = this.dab.getAttachmentURL(attachmentReference, false);
-            // Note that we have to replace the download action by the tex action since the getAttachmentURL() API
-            // will use the "download" action but when the generated URL is called by the browser it needs to point to
-            // the TexAction...
-            url = url.replace("/download/", "/tex/");
-            // TODO: end HACK!!
+            String url = this.dab.getDocumentURL(null, "tex", null, null) + "/" + imageName;
             ResourceReference imageReference = new ResourceReference(url, ResourceType.URL);
             ImageBlock result = new ImageBlock(imageReference, false);
             // Set the alternative text for the image to be the original formula

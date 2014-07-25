@@ -41,13 +41,12 @@ org.xwiki.rest.internal.resources.classes.ClassesResourceImpl
 org.xwiki.rest.internal.resources.classes.ClassResourceImpl
 org.xwiki.rest.internal.resources.classes.ClassPropertiesResourceImpl
 org.xwiki.rest.internal.resources.classes.ClassPropertyResourceImpl
-org.xwiki.rest.internal.resources.search.HQLSearchSource
-org.xwiki.rest.internal.resources.search.XWQLSearchSource
 org.xwiki.rest.internal.resources.tags.TagsResourceImpl
 org.xwiki.rest.internal.resources.tags.PagesForTagsResourceImpl
 org.xwiki.rest.internal.resources.ModificationsResourceImpl
 org.xwiki.rest.internal.resources.wikis.WikiSearchResourceImpl
 org.xwiki.rest.internal.resources.wikis.WikiSearchQueryResourceImpl
+org.xwiki.rest.internal.resources.wikis.WikisSearchQueryResourceImpl
 org.xwiki.rest.internal.representations.pages.TextPlainPageReader
 org.xwiki.rest.internal.representations.pages.FormUrlEncodedPageReader
 org.xwiki.rest.internal.representations.objects.TextPlainPropertyReader

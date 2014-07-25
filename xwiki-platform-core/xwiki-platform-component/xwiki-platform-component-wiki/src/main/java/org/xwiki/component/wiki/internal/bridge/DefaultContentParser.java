@@ -19,15 +19,16 @@
  */
 package org.xwiki.component.wiki.internal.bridge;
 
+import java.io.StringReader;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.parser.MissingParserException;
-import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
@@ -44,23 +45,20 @@ public class DefaultContentParser implements ContentParser
      * Used to retrieve parsers dynamically depending on documents syntax.
      */
     @Inject
-    private org.xwiki.rendering.parser.ContentParser contentParser;
+    private ComponentManager componentManager;
 
     @Override
     public XDOM parse(String content, Syntax syntax) throws WikiComponentException
     {
-        return parse(content, syntax, null);
-    }
+        XDOM xdom;
 
-    @Override
-    public XDOM parse(String content, Syntax syntax, EntityReference source) throws WikiComponentException
-    {
         try {
-            return contentParser.parse(content, syntax, source);
-        } catch (ParseException e) {
+            Parser parser = componentManager.getInstance(Parser.class, syntax.toIdString());
+            xdom  = parser.parse(new StringReader(content));
+        } catch (Exception e) {
             throw new WikiComponentException(String.format("Failed to parse content [%s]", content), e);
-        } catch (MissingParserException e) {
-            throw new WikiComponentException(String.format("Failed to find a parser to parse syntax [%s]", syntax), e);
         }
+
+        return xdom;
     }
 }

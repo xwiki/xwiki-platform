@@ -1,2 +1,0 @@
-com.xpn.xwiki.plugin.lucene.internal.rest.LuceneSearchSource
-com.xpn.xwiki.plugin.lucene.internal.rest.WikisSearchQueryResourceImpl

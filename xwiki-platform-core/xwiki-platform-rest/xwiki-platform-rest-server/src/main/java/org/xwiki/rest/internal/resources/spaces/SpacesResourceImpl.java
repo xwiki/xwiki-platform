@@ -43,12 +43,12 @@ public class SpacesResourceImpl extends XWikiResource implements SpacesResource
     public Spaces getSpaces(String wikiName, Integer start, Integer number)
             throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getWikiId();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         Spaces spaces = objectFactory.createSpaces();
 
         try {
-            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             List<String> spaceNames = queryManager.getNamedQuery("getSpaces").addFilter(
                     componentManager.<QueryFilter>getInstance(QueryFilter.class, "hidden")).setOffset(start)
@@ -70,7 +70,7 @@ public class SpacesResourceImpl extends XWikiResource implements SpacesResource
         } catch (Exception e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setWikiId(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
 
         return spaces;

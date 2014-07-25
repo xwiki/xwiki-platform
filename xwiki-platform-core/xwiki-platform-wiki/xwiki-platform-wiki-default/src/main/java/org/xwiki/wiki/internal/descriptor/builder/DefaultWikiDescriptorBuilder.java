@@ -28,10 +28,8 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -192,8 +190,22 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
                 objAlias.set(XWikiServerClassDocumentInitializer.FIELD_SERVER, alias, context);
             }
 
-            // Set the meta-data (creator, hidden flag, parent, etc...)
-            setDescriptorDocMetadata(descriptorDoc);
+            // Set the document as hidden
+            descriptorDoc.setHidden(true);
+
+            // The document must have a creator
+            if (descriptorDoc.getCreatorReference() == null) {
+                descriptorDoc.setCreatorReference(context.getUserReference());
+            }
+            // The document must have an author
+            if (descriptorDoc.getAuthorReference() == null) {
+                descriptorDoc.setAuthorReference(context.getUserReference());
+            }
+
+            // Set the document parent
+            DocumentReference parentReference = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
+                    "WikiManager", "WebHome");
+            descriptorDoc.setParentReference(parentReference);
 
             // Save the document
             xwiki.saveDocument(descriptorDoc, context);
@@ -211,29 +223,5 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
         }
 
         return descriptorDoc;
-    }
-
-    private void setDescriptorDocMetadata(XWikiDocument descriptorDoc)
-    {
-        XWikiContext context = xcontextProvider.get();
-
-        // Set the document as hidden
-        descriptorDoc.setHidden(true);
-
-        // The document must have a creator
-        if (descriptorDoc.getCreatorReference() == null) {
-            descriptorDoc.setCreatorReference(context.getUserReference());
-        }
-        // The document must have an author
-        if (descriptorDoc.getAuthorReference() == null) {
-            descriptorDoc.setAuthorReference(context.getUserReference());
-        }
-
-        // Set the document parent
-        if (descriptorDoc.getParentReference() == null) {
-            EntityReference parentReference = new EntityReference("WebHome", EntityType.DOCUMENT);
-            parentReference.appendParent(new EntityReference("WikiManager", EntityType.SPACE));
-            descriptorDoc.setParentReference(parentReference);
-        }
     }
 }

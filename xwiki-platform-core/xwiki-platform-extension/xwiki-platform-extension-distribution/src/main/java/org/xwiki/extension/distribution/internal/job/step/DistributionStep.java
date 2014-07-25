@@ -46,5 +46,5 @@ public interface DistributionStep
 
     void setState(State stepState);
 
-    Block execute();
+    Block render();
 }

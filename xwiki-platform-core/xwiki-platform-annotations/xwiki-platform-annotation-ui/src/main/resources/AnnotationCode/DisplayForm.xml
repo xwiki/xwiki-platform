@@ -43,7 +43,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include reference="AnnotationCode.Macros" /}}
+  <content>{{include document="AnnotationCode.Macros" /}}
 
 {{velocity filter="none"}}
 {{html clean="false"}}

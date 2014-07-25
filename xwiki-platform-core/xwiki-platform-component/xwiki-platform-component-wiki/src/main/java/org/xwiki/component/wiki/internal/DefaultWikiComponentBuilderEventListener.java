@@ -32,8 +32,6 @@ import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -107,10 +105,10 @@ public class DefaultWikiComponentBuilderEventListener implements EventListener, 
     private void installOrUpdateComponentInterfaceXClass() throws XWikiException
     {
         XWikiContext xcontext = getXWikiContext();
-        XWikiDocument doc = xcontext.getWiki().getDocument(INTERFACE_CLASS_REFERENCE, xcontext);
+        XWikiDocument doc = xcontext.getWiki().getDocument(INTERFACE_CLASS, xcontext);
 
         BaseClass bclass = doc.getXClass();
-        bclass.setDocumentReference(doc.getDocumentReference());
+        bclass.setName(INTERFACE_CLASS);
 
         boolean needsUpdate = false;
 
@@ -130,10 +128,10 @@ public class DefaultWikiComponentBuilderEventListener implements EventListener, 
     private void installOrUpdateComponentXClass() throws XWikiException
     {
         XWikiContext xcontext = getXWikiContext();
-        XWikiDocument doc = xcontext.getWiki().getDocument(COMPONENT_CLASS_REFERENCE, xcontext);
+        XWikiDocument doc = xcontext.getWiki().getDocument(COMPONENT_CLASS, xcontext);
 
         BaseClass bclass = doc.getXClass();
-        bclass.setDocumentReference(doc.getDocumentReference());
+        bclass.setName(COMPONENT_CLASS);
 
         boolean needsUpdate = false;
 
@@ -156,10 +154,10 @@ public class DefaultWikiComponentBuilderEventListener implements EventListener, 
     private void installOrUpdateComponentRequirementXClass() throws XWikiException
     {
         XWikiContext xcontext = getXWikiContext();
-        XWikiDocument doc = xcontext.getWiki().getDocument(DEPENDENCY_CLASS_REFERENCE, xcontext);
+        XWikiDocument doc = xcontext.getWiki().getDocument(DEPENDENCY_CLASS, xcontext);
 
         BaseClass bclass = doc.getXClass();
-        bclass.setDocumentReference(doc.getDocumentReference());
+        bclass.setName(DEPENDENCY_CLASS);
 
         boolean needsUpdate = false;
 
@@ -181,10 +179,10 @@ public class DefaultWikiComponentBuilderEventListener implements EventListener, 
     private void installOrUpdateComponentMethodXClass() throws XWikiException
     {
         XWikiContext xcontext = getXWikiContext();
-        XWikiDocument doc = xcontext.getWiki().getDocument(METHOD_CLASS_REFRENCE, xcontext);
+        XWikiDocument doc = xcontext.getWiki().getDocument(METHOD_CLASS, xcontext);
 
         BaseClass bclass = doc.getXClass();
-        bclass.setDocumentReference(doc.getDocumentReference());
+        bclass.setName(METHOD_CLASS);
 
         boolean needsUpdate = false;
 
@@ -221,18 +219,17 @@ public class DefaultWikiComponentBuilderEventListener implements EventListener, 
     {
         boolean needsUpdate = false;
 
-        if (doc.getCreatorReference() == null) {
+        if (StringUtils.isBlank(doc.getCreator())) {
             needsUpdate = true;
             doc.setCreator(CLASS_AUTHOR);
         }
-        if (doc.getAuthorReference() == null) {
+        if (StringUtils.isBlank(doc.getAuthor())) {
             needsUpdate = true;
-            doc.setAuthorReference(doc.getCreatorReference());
+            doc.setAuthor(doc.getCreator());
         }
-        if (doc.getParentReference() == null) {
+        if (StringUtils.isBlank(doc.getParent())) {
             needsUpdate = true;
-            doc.setParentReference(new EntityReference("XWikiClasses", EntityType.DOCUMENT)
-                .appendParent(new EntityReference("XWiki", EntityType.SPACE)));
+            doc.setParent("XWiki.XWikiClasses");
         }
         if (StringUtils.isBlank(doc.getTitle())) {
             needsUpdate = true;

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-platform-wikistream</artifactId>
+    <version>5.4-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-platform-wikistream-api</artifactId>
+  <name>XWiki Platform - WikiStream - API</name>
+  <description>XWiki Platform - WikiStream - API</description>
+  <packaging>jar</packaging>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-filter-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-job</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+
+    <!-- Testing dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/test/**.class</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+              org/xwiki/wikistream/descriptor/DefaultWikiStreamBeanDescriptor.java,
+              org/xwiki/wikistream/descriptor/DefaultWikiStreamBeanParameterDescriptor.java,
+              org/xwiki/wikistream/descriptor/WikiStreamDescriptor.java,
+              org/xwiki/wikistream/descriptor/WikiStreamPropertyDescriptor.java,
+              org/xwiki/wikistream/filter/FarmFilter.java,
+              org/xwiki/wikistream/filter/WikiAttachmentFilter.java,
+              org/xwiki/wikistream/filter/WikiClassFilter.java,
+              org/xwiki/wikistream/filter/WikiClassPropertyFilter.java,
+              org/xwiki/wikistream/filter/WikiDocumentFilter.java,
+              org/xwiki/wikistream/filter/WikiFilter.java,
+              org/xwiki/wikistream/filter/WikiObjectFilter.java,
+              org/xwiki/wikistream/filter/WikiObjectPropertyFilter.java,
+              org/xwiki/wikistream/filter/WikiSpaceFilter.java,
+              org/xwiki/wikistream/input/BeanInputWikiStreamFactory.java,
+              org/xwiki/wikistream/input/FileInputSource.java,
+              org/xwiki/wikistream/input/InputSource.java,
+              org/xwiki/wikistream/input/InputStreamInputSource.java,
+              org/xwiki/wikistream/input/InputWikiStream.java,
+              org/xwiki/wikistream/input/InputWikiStreamFactory.java,
+              org/xwiki/wikistream/input/ReaderInputSource.java,
+              org/xwiki/wikistream/input/URLInputSource.java,
+              org/xwiki/wikistream/internal/AbstractBeanWikiStreamFactory.java,
+              org/xwiki/wikistream/internal/AbstractWikiStream.java,
+              org/xwiki/wikistream/internal/input/AbstractBeanInputWikiStream.java,
+              org/xwiki/wikistream/internal/input/AbstractBeanInputWikiStreamFactory.java,
+              org/xwiki/wikistream/internal/input/AbstractReaderInputSource.java,
+              org/xwiki/wikistream/internal/input/BeanInputWikiStream.java,
+              org/xwiki/wikistream/internal/input/DefaultByteArrayInputSource.java,
+              org/xwiki/wikistream/internal/input/DefaultFileInputSource.java,
+              org/xwiki/wikistream/internal/input/DefaultInputStreamInputSource.java,
+              org/xwiki/wikistream/internal/input/DefaultReaderInputSource.java,
+              org/xwiki/wikistream/internal/input/DefaultURLInputSource.java,
+              org/xwiki/wikistream/internal/input/DirectoryInputSource.java,
+              org/xwiki/wikistream/internal/input/InputSourceConverter.java,
+              org/xwiki/wikistream/internal/input/StringInputSource.java,
+              org/xwiki/wikistream/internal/output/AbstractBeanOutputWikiStream.java,
+              org/xwiki/wikistream/internal/output/AbstractBeanOutputWikiStreamFactory.java,
+              org/xwiki/wikistream/internal/output/BeanOutputWikiStream.java,
+              org/xwiki/wikistream/internal/output/ByteArrayOutputTarget.java,
+              org/xwiki/wikistream/internal/output/DefaultFileOutputTarget.java,
+              org/xwiki/wikistream/internal/output/DefaultOutputStreamOutputTarget.java,
+              org/xwiki/wikistream/internal/output/DefaultWriterOutputTarget.java,
+              org/xwiki/wikistream/internal/output/OutputTargetConverter.java,
+              org/xwiki/wikistream/internal/utils/AllFilterInvocationHandler.java,
+              org/xwiki/wikistream/output/BeanOutputWikiStreamFactory.java,
+              org/xwiki/wikistream/output/FileOutputTarget.java,
+              org/xwiki/wikistream/output/OutputStreamOutputTarget.java,
+              org/xwiki/wikistream/output/OutputTarget.java,
+              org/xwiki/wikistream/output/OutputWikiStream.java,
+              org/xwiki/wikistream/output/OutputWikiStreamFactory.java,
+              org/xwiki/wikistream/output/WriterOutputTarget.java,
+              org/xwiki/wikistream/utils/WikiStreamConstants.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

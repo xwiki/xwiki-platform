@@ -144,18 +144,10 @@ public class DefaultAuthorizationManager implements AuthorizationManager
             return false;
         }
 
-        if ((!right.isReadOnly() && xwikiBridge.isWikiReadOnly())
-            || (userReference == null && xwikiBridge.needsAuthentication(right))) {
+        if (!right.isReadOnly() && xwikiBridge.isWikiReadOnly()) {
             return false;
         }
-
-        return evaluateSecurityAccess(right, userReference, entityReference, check);
-    }
-
-    private boolean evaluateSecurityAccess(Right right, DocumentReference userReference,
-        EntityReference entityReference, boolean check)
-        throws AuthorizationException
-    {
+        
         SecurityAccess securityAccess = getAccess(
             securityReferenceFactory.newUserReference(userReference),
             securityReferenceFactory.newEntityReference(entityReference)

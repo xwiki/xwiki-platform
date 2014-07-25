@@ -34,9 +34,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -89,11 +87,6 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     private final Syntax syntax;
 
     /**
-     * Used to update the rendering context.
-     */
-    private final RenderingContext renderingContext;
-
-    /**
      * Used to transform the macros within the extension content.
      */
     private final Transformation macroTransformation;
@@ -117,7 +110,6 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
         this.syntax = syntax;
         this.macroTransformation = componentManager.getInstance(Transformation.class, "macro");
         this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        this.renderingContext = componentManager.getInstance(RenderingContext.class);
     }
 
     @Override
@@ -153,10 +145,9 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
 
         // Perform macro transformations.
         try {
-            TransformationContext transformationContext = new TransformationContext(transformedXDOM, syntax);
+            TransformationContext transformationContext = new TransformationContext(xdom, syntax);
             transformationContext.setId(this.getRoleHint());
-            ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, transformationContext,
-                transformedXDOM);
+            macroTransformation.transform(transformedXDOM, transformationContext);
         } catch (TransformationException e) {
             LOGGER.error("Error while executing wiki component macro transformation for extension [{}]",
                 documentReference.toString());

@@ -118,7 +118,7 @@ ul.commentreplies, .reply {
   background-image: url("$xwiki.getSkinFile('icons/silk/pencil.png')"); /*comment_edit*/
 }
 /* Form */
-.skin-colibri #AddComment {
+#AddComment {
   border-top: 1px solid $theme.borderColor;
 }
 #AddComment fieldset {

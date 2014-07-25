@@ -39,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.rendering.converter.ConversionException;
@@ -198,8 +197,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             lru.setTimeToLive(this.refreshPeriod);
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-            CacheManager cacheManager = Utils.getComponent(CacheManager.class);
-            this.feedCache = cacheManager.createNewLocalCache(configuration);
+            this.feedCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
         } catch (CacheException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
                 "Failed to create cache");
@@ -373,7 +371,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                     nbfeedsErrors++;
                 }
 
-                UpdateThread updateThread = this.updateThreads.get(context.getWikiId() + ":" + space);
+                UpdateThread updateThread = this.updateThreads.get(context.getDatabase() + ":" + space);
                 if (updateThread != null) {
                     updateThread.setNbLoadedFeeds(nbfeeds + updateThread.getNbLoadedFeeds());
                     updateThread.setNbLoadedFeedsErrors(nbfeedsErrors + updateThread.getNbLoadedFeedsErrors());
@@ -429,10 +427,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     public boolean startUpdateFeedsInSpace(String space, boolean fullContent, int scheduleTimer, XWikiContext context)
         throws XWikiException
     {
-        UpdateThread updateThread = this.updateThreads.get(context.getWikiId() + ":" + space);
+        UpdateThread updateThread = this.updateThreads.get(context.getDatabase() + ":" + space);
         if (updateThread == null) {
             updateThread = new UpdateThread(space, fullContent, scheduleTimer, this, context);
-            this.updateThreads.put(context.getWikiId() + ":" + space, updateThread);
+            this.updateThreads.put(context.getDatabase() + ":" + space, updateThread);
             Thread thread = new Thread(updateThread);
             thread.start();
             return true;
@@ -443,7 +441,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     public void stopUpdateFeedsInSpace(String space, XWikiContext context) throws XWikiException
     {
-        UpdateThread updateThread = this.updateThreads.get(context.getWikiId() + ":" + space);
+        UpdateThread updateThread = this.updateThreads.get(context.getDatabase() + ":" + space);
         if (updateThread != null) {
             updateThread.stopUpdate();
         }
@@ -453,14 +451,14 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     {
         // make sure the update thread is removed.
         // this is called by the update thread when the loop is last exited
-        if (thread == this.updateThreads.get(context.getWikiId() + ":" + space)) {
-            this.updateThreads.remove(context.getWikiId() + ":" + space);
+        if (thread == this.updateThreads.get(context.getDatabase() + ":" + space)) {
+            this.updateThreads.remove(context.getDatabase() + ":" + space);
         }
     }
 
     public UpdateThread getUpdateThread(String space, XWikiContext context)
     {
-        return this.updateThreads.get(context.getWikiId() + ":" + space);
+        return this.updateThreads.get(context.getDatabase() + ":" + space);
     }
 
     public Collection<String> getActiveUpdateThreads()

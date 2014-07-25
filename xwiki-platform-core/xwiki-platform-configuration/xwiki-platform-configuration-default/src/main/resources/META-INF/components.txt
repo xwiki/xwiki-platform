@@ -5,4 +5,3 @@ org.xwiki.configuration.internal.UserPreferencesConfigurationSource
 org.xwiki.configuration.internal.DefaultConfigurationSource
 org.xwiki.configuration.internal.RestrictedConfigurationSource
 org.xwiki.configuration.internal.AllConfigurationSource
-org.xwiki.configuration.internal.DocumentsConfigurationSource

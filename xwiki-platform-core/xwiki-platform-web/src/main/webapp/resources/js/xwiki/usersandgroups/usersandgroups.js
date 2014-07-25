@@ -368,7 +368,7 @@ function displayUsersAndGroups(row, i, table, idx, form_token)
   var allows = row.allows;
   var denys = row.denys;
 
-  var saveUrl = window.docviewurl + "?xpage=saverights&clsname=" + table.json.clsname + "&fullname=" + encodeURIComponent(row.fullname) + "&uorg=" + uorg;
+  var saveUrl = window.docviewurl + "?xpage=saverights&clsname=" + table.json.clsname + "&fullname=" + row.fullname + "&uorg=" + uorg;
   if (form_token != undefined) {
       saveUrl += "&form_token=" + form_token;
   }
@@ -420,22 +420,28 @@ function editUserOrGroup(userinlineurl, usersaveurl, userredirecturl)
 function deleteUserOrGroup(i, table, docname, uorg, form_token)
 {
   return function() {
-    var message = "$escapetool.javascript($services.localization.render('rightsmanager.confirmdeletegroup'))";
-    if (uorg == "user") {
-      message = "$escapetool.javascript($services.localization.render('rightsmanager.confirmdeleteuser'))";
+    var url = "?xpage=deleteuorg&docname=" + docname;
+    if (form_token != undefined) {
+        url += "&form_token=" + form_token;
     }
-    if (confirm(message.replace('__name__', docname))) {
-      new Ajax.Request('', {
-        method: 'get',
-        parameters: {
-          xpage: 'deleteuorg',
-          docname: docname,
-          form_token: form_token
-        },
-        onSuccess: function(transport) {
-          table.deleteRow(i);
-        }
-      });
+    if (uorg == "user") {
+      if (confirm("$escapetool.javascript($services.localization.render('rightsmanager.confirmdeleteuser'))".replace('__name__', docname))) {
+        new Ajax.Request(url, {
+          method: 'get',
+          onSuccess: function(transport) {
+            table.deleteRow(i);
+          }
+        });
+      }
+    } else {
+      if (confirm("$escapetool.javascript($services.localization.render('rightsmanager.confirmdeletegroup'))".replace('__name__', docname))) {
+        new Ajax.Request(url, {
+          method: 'get',
+          onSuccess: function(transport) {
+            table.deleteRow(i);
+          }
+        });
+      }
     }
   }
 }

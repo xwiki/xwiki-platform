@@ -161,7 +161,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public URL getServerURL(XWikiContext context) throws MalformedURLException
     {
-        return getServerURL(context.getWikiId(), context);
+        return getServerURL(context.getDatabase(), context);
     }
 
     /**
@@ -178,7 +178,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      */
     public URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException
     {
-        if (xwikidb == null || xwikidb.equals(context.getOriginalWikiId())) {
+        if (xwikidb == null || xwikidb.equals(context.getOriginalDatabase())) {
             // This is the case if we are getting a URL for a page which is in
             // the same wiki as the page which is now being displayed.
             return this.serverURL;
@@ -250,7 +250,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     private void addServletPath(StringBuffer newpath, String xwikidb, XWikiContext context)
     {
         if (xwikidb == null) {
-            xwikidb = context.getWikiId();
+            xwikidb = context.getDatabase();
         }
 
         String spath = context.getWiki().getServletPath(xwikidb, context);
@@ -352,7 +352,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         StringBuffer newpath = new StringBuffer(this.contextPath);
         if (forceSkinAction) {
-            addServletPath(newpath, context.getWikiId(), context);
+            addServletPath(newpath, context.getDatabase(), context);
             addAction(newpath, "skin", context);
         }
         newpath.append("resources");

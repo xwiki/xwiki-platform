@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!-- Used by DefaultAuthorizationManagerIntegrationTest#testInheritancePolicyForFullFarmAccess() -->
+<!-- Used by XWikiSecurityAuthorizationTest#testInheritancePolicyForFullFarmAccess() -->
 <wikis>
   <wiki name="wiki" mainWiki="true" alt="main wiki allowing full access to userA">
     <user name="userA" />

@@ -92,6 +92,26 @@ public class ImagePluginTest extends AbstractBridgedXWikiComponentTestCase
 
         Mock mockXWiki = mock(XWiki.class);
         mockXWiki.stubs().method("Param").will(returnValue("10"));
+        Mock mockCacheFactory = mock(CacheFactory.class);
+        Cache<XWikiAttachment> cache = (new Cache<XWikiAttachment>() {
+            private final Map<String, XWikiAttachment> map = new HashMap<String, XWikiAttachment>();
+            @Override
+            public void set(String key, XWikiAttachment value) { map.put(key, value); }
+            @Override
+            public XWikiAttachment get(String key) { return map.get(key); }
+            @Override
+            public void remove(String key) { }
+            @Override
+            public void removeAll() { }
+            @Override
+            public void addCacheEntryListener(CacheEntryListener<XWikiAttachment> listener) { }
+            @Override
+            public void removeCacheEntryListener(CacheEntryListener<XWikiAttachment> listener) { }
+            @Override
+            public void dispose() { }
+        });
+        mockCacheFactory.expects(once()).method("newCache").will(returnValue(cache));
+        mockXWiki.stubs().method("getLocalCacheFactory").will(returnValue(mockCacheFactory.proxy()));
         getContext().setWiki((XWiki) mockXWiki.proxy());
         this.plugin = new ImagePlugin("image", ImagePlugin.class.getName(), getContext());
     }

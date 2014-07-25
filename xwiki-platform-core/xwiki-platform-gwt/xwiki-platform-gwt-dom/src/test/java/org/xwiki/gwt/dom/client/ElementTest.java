@@ -208,6 +208,8 @@ public class ElementTest extends DOMTestCase
         assertTrue(element.hasClassName(className));
         assertFalse(element.hasClassName(className.toUpperCase()));
         assertTrue(element.hasClassName("gwtListItem"));
+
+        assertFalse(element.hasClassName(null));
     }
 
     /**

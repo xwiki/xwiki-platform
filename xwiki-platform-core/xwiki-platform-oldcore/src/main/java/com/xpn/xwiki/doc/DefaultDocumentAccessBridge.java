@@ -28,7 +28,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,8 +43,6 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -83,17 +80,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      */
     @Inject
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
-
-    /**
-     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
-     * wiki).
-     */
-    @Inject
-    @Named("compactwiki")
-    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
-
-    @Inject
-    private Provider<ContextualAuthorizationManager> authorizationProvider;
 
     private XWikiContext getContext()
     {
@@ -253,11 +239,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
-        doc.setParent(this.compactWikiEntityReferenceSerializer.serialize(parentReference, doc.getDocumentReference()));
-        saveDocument(
-            doc,
-            String.format("Changed document parent to [%s].",
-                this.defaultEntityReferenceSerializer.serialize(parentReference)), true);
+        doc.setParentReference(parentReference);
+        saveDocument(doc, String.format("Changed document parent to [%s].",
+            this.defaultEntityReferenceSerializer.serialize(parentReference)), true);
     }
 
     @Override
@@ -690,7 +674,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Override
     public boolean hasProgrammingRights()
     {
-        return this.authorizationProvider.get().hasAccess(Right.PROGRAM);
+        XWikiContext xcontext = getContext();
+
+        return xcontext.getWiki().getRightService().hasProgrammingRights(xcontext);
     }
 
     @Override
@@ -768,7 +754,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public String getCurrentWiki()
     {
         XWikiContext xcontext = getContext();
-        return xcontext.getWikiId();
+        return xcontext.getDatabase();
     }
 
     /**

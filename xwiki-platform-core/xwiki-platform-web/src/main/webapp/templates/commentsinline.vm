@@ -151,15 +151,15 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 #if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
       </div>
       <span class="commenttools">
-      <span class="commenttool comment-permalink"><a class="permalink" rel="nofollow" href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.permalink')">$services.localization.render('core.viewers.comments.permalink')</a></span>
+      <span class="commenttool comment-permalink"><a class="permalink" href="$doc.getURL('view', 'viewer=comments')#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.permalink')">$services.localization.render('core.viewers.comments.permalink')</a></span>
       #if($xwiki.hasAccessLevel('comment'))
-        <span class="commenttool commentreply"><a class="commentreply" rel="nofollow" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$services.localization.render('core.viewers.comments.reply')</a></span>
+        <span class="commenttool commentreply"><a class="commentreply" href="$xredirect.replaceAll('&?replyto=\d++', '')&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$services.localization.render('core.viewers.comments.reply')"#if("$!replyTo" == "${comment.number}") style="display: none;"#end>$services.localization.render('core.viewers.comments.reply')</a></span>
         #if($comment.author == $xcontext.user && $hasEdit)
-          <span class="commenttool commentedit"><a class="edit" rel="nofollow" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$xredirect")" title="$services.localization.render('core.viewers.comments.edit')">$services.localization.render('core.viewers.comments.edit')</a></span>
+          <span class="commenttool commentedit"><a class="edit" href="$doc.getURL('view', "viewer=comments&amp;number=${comment.number}&amp;xredirect=$xredirect")" title="$services.localization.render('core.viewers.comments.edit')">$services.localization.render('core.viewers.comments.edit')</a></span>
         #end
       #end
       #if ($hasAdmin || (!$isGuest && $hasEdit && $comment.author == $xcontext.user))
-        <span class="commenttool commentdelete"><a class="delete" rel="nofollow" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$xredirect")" title="$services.localization.render('core.viewers.comments.delete')">$services.localization.render('core.viewers.comments.delete')</a></span>
+        <span class="commenttool commentdelete"><a class="delete" href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=$xredirect")" title="$services.localization.render('core.viewers.comments.delete')">$services.localization.render('core.viewers.comments.delete')</a></span>
       #end
       </span>## commenttools
     </div>## commentheader

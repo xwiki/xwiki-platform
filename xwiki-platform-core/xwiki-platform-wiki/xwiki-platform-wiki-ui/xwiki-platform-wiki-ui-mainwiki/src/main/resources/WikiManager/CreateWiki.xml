@@ -1,25 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
 <xwikidoc>
   <web>WikiManager</web>
   <name>CreateWiki</name>
@@ -125,9 +105,8 @@
     <property>
       <code>(function(){
 
-  var isWikiNameSet = false;
-  var isAliasSet = false;
-  var lastWikiName;
+  var domainnamesetted = false;
+  var lastwikiname;
 
   ## Error messages
   #set ($MSG_ERROR_WIKIALREADYEXISTS = "$services.localization.render('platform.wiki.create.error.wikiname.wikialreadyexists')")
@@ -156,11 +135,6 @@
     var wikiName   = $('wikiname');
     wikiName.observe('change', wikiNameChanged);
     wikiName.observe('keyup', wikiNameChanged);
-    var alias      = $('wikialias');
-    if (alias) {
-      alias.observe('change', aliasChanged);
-      alias.observe('keyup', aliasChanged);
-    }
     if(prettyName.value.blank() || wikiName.value.blank()){
       $('wizard-next').disabled = true;
     }
@@ -185,18 +159,10 @@
       $('wikiprettynamevalidation').innerHTML = '';
       prettyName.removeClassName('xErrorField');
       // If the user has manually changed the wikiname, we don't generate it automaticaly anymore
-      if(!isWikiNameSet){
+      if(!domainnamesetted){
         var wikiName = $('wikiname');
         wikiName.value = prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase();
         validateWikiName();
-      }
-      if(!isAliasSet){
-        var wikiAlias = $('wikialias');
-        if (wikiAlias) {
-          var alias = filterWikiName(prettyName.value.replace(/[^a-zA-Z0-9]/g,'_').toLowerCase());
-          alias += getAliasSuffix();
-          wikiAlias.value = alias;
-        }
       }
     }
   }
@@ -204,14 +170,8 @@
    * Wiki name changed
    */
   function wikiNameChanged(event){
-    isWikiNameSet = true;
+    domainnamesetted = true;
     validateWikiName();
-  }
-  /**
-   * Alias changed
-   */
-  function aliasChanged(event){
-    isAliasSet = true;
   }
   /**
    * Validate the wiki name
@@ -224,10 +184,10 @@
       wikiNameElement.value = filteredWikiName;
       wikiname = filteredWikiName;
     }
-    if (lastWikiName == wikiname){
+    if (lastwikiname == wikiname){
       return;
     }
-    lastWikiName = wikiname;
+    lastwikiname = wikiname;
     if (wikiname &amp;&amp; !wikiname.blank()) {
       var surl = "$ISWIKINAMEAVAILABLE" + "?xpage=plain&amp;outputSyntax=plain&amp;ajax=1&amp;wikiname=" + escape(wikiname);
       surl += "&amp;form_token=$!{services.csrf.getToken()}";
@@ -288,19 +248,6 @@
 
     return result;
   }
-  function getAliasSuffix() {
-    var suffix = "${services.wiki.aliasSuffix}";
-    if (suffix != "") {
-      suffix = "." + suffix;
-    } else {
-      // try to compute the suffix from the request URL
-      var hostname = window.location.hostname;
-      if (hostname != "localhost" &amp;&amp; !hostname.match(/[0-9]{1,3}(?:\.[0-9]{1,3}){3}/g)) {
-        suffix = hostname.substr(hostname.indexOf("."));
-      }
-    }
-    return suffix;
-}
 
   function userScopeChanged(){
     var value = $$('input:checked[type=radio][name=userScope]')[0].value
@@ -425,10 +372,7 @@
  */
 XWiki.ProvisioningBar = Class.create({
   initialize : function () {
-    // We run the progress bar only if the &lt;div id="ui-progress"&gt; exists
-    if ($('ui-progress')) {
-      this._callRefresh.bind(this).delay(1);
-    }
+    this._callRefresh.bind(this).delay(1);
   },
   _callRefresh : function () {
     // Document URL
@@ -446,15 +390,8 @@ XWiki.ProvisioningBar = Class.create({
   _refresh : function (status) {
     if (status.status == 'FINISHED') {
       $('ui-progress').addClassName('hidden');
-      // We need to know if we have error
-      if (status.error.length &gt; 0) {
-        $('errorMessage').removeClassName('hidden');
-        $('cleanUp').removeClassName('hidden');
-      } else {
-        // Success
-        $('successMessage').removeClassName('hidden');
-        $('finalize').removeClassName('hidden');
-      }
+      $('successMessage').removeClassName('hidden');
+      $('finalize').removeClassName('hidden');
     }
     else {
       var progress = status.progress;
@@ -757,12 +694,17 @@ return XWiki;
 #########################
 ## PLUGINS DEPENDENCIES
 #########################
-## If all dependancies are OK, we call the controller
-#if ($services.wiki)
-  #controller()
-#else
+#if (!$services.wiki)
   {{error}}{{translation key="platform.wiki.dependencies.wiki.missing"/}}{{/error}}
 
+#end
+#if (!$services.applicationmanager)
+  {{error}}$services.localization.render('platform.wiki.dependencies.applicationmanager.missing', ['[[', '&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Application+Manager+Plugin]]']){{/error}}
+
+#end
+## If all dependancies are OK, we call the controller
+#if($services.wiki &amp;&amp; $services.applicationmanager)
+  #controller()
 #end
 ##################################
 ##         CONTROLLER
@@ -775,8 +717,6 @@ return XWiki;
   #elseif($request.step == 'finalize')
     #set($wikiDescriptor = $services.wiki.getById($request.wikiId))
     #setMembers($wikiDescriptor)
-  #elseif($request.step == 'cleanUp')
-    #cleanUp()
   #else
     ## Default step
     #stepType()
@@ -810,31 +750,26 @@ return XWiki;
 ##
 ## Display the wizard footer
 ##################################
-#macro(wizardFooter $prev $next $create $finalize $finalizeHidden $cleanUp $cleanupHidden)
+#macro(wizardFooter $prev $next $create $finalize)
   &lt;div class="wizard-footer buttons"&gt;
     #if("$!prev" !='')
-      &lt;span class="buttonwrapper left"&gt;
-        &lt;button value="$prev" title="$services.localization.render('platform.wiki.create.wizard.step.previous')" name="step" id="wizard-previous" class="button secondary"&gt;$services.localization.render('platform.wiki.create.wizard.step.previous')&lt;/button&gt;
+      &lt;span class="buttonwrapper left"&gt;      
+        &lt;button value="$prev" title="Previous Step" name="step" id="wizard-previous" class="button secondary"&gt;Previous Step&lt;/button&gt;
       &lt;/span&gt;
     #end
     #if("$!next" !='')
       &lt;span class="buttonwrapper"&gt;
-        &lt;button value="$next" title="$services.localization.render('platform.wiki.create.wizard.step.next')" name="step" id="wizard-next" class="button"&gt;$services.localization.render('platform.wiki.create.wizard.step.next')&lt;/button&gt;
+        &lt;button value="$next" title="Go to next step" name="step" id="wizard-next" class="button"&gt;Go to next step&lt;/button&gt;
       &lt;/span&gt;
     #end
     #if("$!create" !='')
       &lt;span class="buttonwrapper"&gt;
-        &lt;button value="$create" title="$services.localization.render('platform.wiki.create.wizard.step.create')" name="step" id="wizard-create" class="button"&gt;$services.localization.render('platform.wiki.create.wizard.step.create')&lt;/button&gt;
+        &lt;button value="$create" title="Create" name="step" id="wizard-create" class="button"&gt;Create&lt;/button&gt;
       &lt;/span&gt;
     #end
     #if("$!finalize" != '')
       &lt;span class="buttonwrapper"&gt;
-        &lt;button value="finalize" title="$services.localization.render('platform.wiki.create.wizard.step.provisioning.finalize')" name="step" id="finalize" class="button #if($finalizeHidden)hidden#end"&gt;$services.localization.render('platform.wiki.create.wizard.step.provisioning.finalize')&lt;/button&gt;
-      &lt;/span&gt;
-    #end
-    #if("$!cleanUp" != '')
-      &lt;span class="buttonwrapper"&gt;
-        &lt;button value="cleanUp" title="$services.localization.render('platform.wiki.create.wizard.step.provisioning.cleanUp')" name="step" id="cleanUp" class="button #if($cleanupHidden)hidden#end"&gt;$services.localization.render('platform.wiki.create.wizard.step.provisioning.cleanUp')&lt;/button&gt;
+        &lt;button value="finalize" title="Finalize" name="step" id="finalize" class="button hidden"&gt;$finalize&lt;/button&gt;
       &lt;/span&gt;
     #end
   &lt;/div&gt;
@@ -891,20 +826,6 @@ return XWiki;
               &lt;/dd&gt;
             &lt;/dl&gt;
           &lt;/div&gt;
-          ### WIKI ALIAS ###
-          #if(!$services.wiki.isPathMode())
-            &lt;div&gt;
-              &lt;dl&gt;
-                &lt;dt&gt;
-                  &lt;label for="wikialias"&gt;$services.localization.render('platform.wiki.prop.wikialias')#required()&lt;/label&gt;
-                  &lt;span class='xHint'&gt;$services.localization.render('platform.wiki.create.wizard.desc.wikialias')&lt;/span&gt;
-                &lt;/dt&gt;
-                &lt;dd&gt;
-                  &lt;input size="40" id="wikialias" name="wikialias" type="text"  value="$!escapetool.xml($request.wikialias)"/&gt;
-                &lt;/dd&gt;
-              &lt;/dl&gt;
-            &lt;/div&gt;
-          #end
           ### DESCRIPTION ###
           &lt;div&gt;
             &lt;dl&gt;
@@ -987,11 +908,9 @@ return XWiki;
         ### FIRST STEP VALUES
         &lt;input type="hidden" name="wikiprettyname" value="$!escapetool.xml($request.getParameter('wikiprettyname'))" /&gt;
         &lt;input type="hidden" name="wikiname" value="$!escapetool.xml($request.wikiname)" /&gt;
-        &lt;input type="hidden" name="wikialias" value="$!escapetool.xml($request.wikialias)" /&gt;
         &lt;input type="hidden" name="description" value="$!escapetool.xml($request.getParameter('description'))" /&gt;
         &lt;input type="hidden" name="template" value="$!escapetool.xml($request.template)" /&gt;
         &lt;input type="hidden" name="set_as_template" value="$!escapetool.xml($request.set_as_template)" /&gt;
-        &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
         #userPicker_import(true)
         ### WIZARD FIRST HALF ###
         &lt;div class="half"&gt;
@@ -1133,73 +1052,37 @@ return XWiki;
 ## The final step that eventually create the wiki
 ##################################
 #macro(create)
-  #if ($services.csrf.isTokenValid($request.form_token))
-    #set($wikialias = $request.wikialias)
-    #if("$!wikialias" == '')
-      #set($wikialias = $request.wikiname)
+  #set($fromTemplate = false)
+  #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
+    ## check if the wiki is already in creation
+    #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $request.wikiname])
+    #if("$!services.wiki.template.getWikiProvisioningJobStatus($jobId)" == '')
+      #set($discard = $services.wiki.template.createWikiFromTemplate($request.wikiname, $request.wikiname, $request.template, $request.ownerId, true))
     #end
-    #set($fromTemplate = false)
-    #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
-      ## check if the wiki is already in creation
-      #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $request.wikiname])
-      #if("$!services.wiki.template.getWikiProvisioningJobStatus($jobId)" == '')
-        #set($discard = $services.wiki.template.createWikiFromTemplate($request.wikiname, $wikialias, $request.template, $request.ownerId, true))
-      #end
-      #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
-      #set($fromTemplate = true)
-    #else
-      #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $wikialias, $request.ownerId, true))
-    #end
-    #if (!$wikiDescriptor)
-
-      {{error}}$services.localization.render('platform.wiki.create.error', [$request.wikiname, $services.wiki.lastException]){{/error}}
-
-    #else
-      ## Set the pretty name
-      #set ($discard = $wikiDescriptor.setPrettyName($request.wikiprettyname))
-      #set ($discard = $wikiDescriptor.setDescription($request.description))
-      #set ($discard = $services.wiki.saveDescriptor($wikiDescriptor))
-      ## Set the template value
-      #if("$!request.set_as_template" != '')
-        #set ($discard = $services.wiki.template.setTemplate($wikiDescriptor.id, true))
-      #end
-      #if($fromTemplate)
-        #templateProvisioning($wikiDescriptor)
-      #else
-        #setDefaultRights($wikiDescriptor.id)
-        #setMembers($wikiDescriptor)
-      #end
-    #end
+    #set($wikiDescriptor = $services.wiki.getById($request.wikiname))
+    #set($fromTemplate = true)
   #else
-
-    {{warning}}
-      {{translation key="platform.wiki.csrf.error" /}}
-    {{/warning}}
-    
-    #stepMembers()
+    #set($wikiDescriptor = $services.wiki.createWiki($request.wikiname, $request.wikiname, $request.ownerId, true))
   #end
-#end
-##################################
-##      SET DEFAULT RIGHTS
-##################################
-#macro(setDefaultRights $wikiId)
-  #set ($preferencesDoc = $xwiki.getDocument($services.model.createDocumentReference($wikiId, 'XWiki', 'XWikiPreferences')))
-  #set ($rightObj1 = $preferencesDoc.newObject("${wikiId}:XWiki.XWikiGlobalRights"))
-  #set ($discard = $rightObj1.set('allow', 1))
-  #set ($discard = $rightObj1.set('groups', 'XWiki.XWikiAdminGroup'))
-  #set ($discard = $rightObj1.set('users', ''))
-  #set ($discard = $rightObj1.set('levels', 'admin'))
-  #set ($rightObj2 = $preferencesDoc.newObject("${wikiId}:XWiki.XWikiGlobalRights"))
-  #set ($discard = $rightObj2.set('allow', 1))
-  #set ($discard = $rightObj2.set('groups', 'XWiki.XWikiAllGroup'))
-  #set ($discard = $rightObj2.set('users', ''))
-  #set ($discard = $rightObj2.set('levels', 'comment,edit,register'))
-  #set ($rightObj3 = $preferencesDoc.newObject("${wikiId}:XWiki.XWikiGlobalRights"))
-  #set ($discard = $rightObj3.set('allow', 1))
-  #set ($discard = $rightObj3.set('groups', ''))
-  #set ($discard = $rightObj3.set('users', 'XWiki.XWikiGuest'))
-  #set ($discard = $rightObj3.set('levels', 'register'))
-  #set ($discard = $preferencesDoc.save('Set default rights.'))
+  #if (!$wikiDescriptor)
+
+    {{error}}$services.localization.render('platform.wiki.create.error', [$request.wikiname, $services.wiki.lastException]){{/error}}
+
+  #else
+    ## Set the pretty name
+    #set ($discard = $wikiDescriptor.setPrettyName($request.wikiprettyname))
+    #set ($discard = $wikiDescriptor.setDescription($request.description))
+    #set ($discard = $services.wiki.saveDescriptor($wikiDescriptor))
+    ## Set the template value
+    #if("$!request.set_as_template" != '')
+      #set ($discard = $services.wiki.template.setTemplate($wikiDescriptor.id, true))
+    #end
+    #if($fromTemplate)
+      #templateProvisioning($wikiDescriptor)
+    #else
+      #setMembers($wikiDescriptor)
+    #end
+  #end
 #end
 ##################################
 ##        SET MEMBERS
@@ -1254,28 +1137,21 @@ return XWiki;
 ## the wiki provisioning
 ##################################
 #macro(templateProvisioning $wikiDescriptor)
-  #set ($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
-  #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $wikiDescriptor.id])
-  #set ($status = $services.wiki.template.getWikiProvisioningJobStatus($jobId))
-  #set ($errors = $status.log.getLogs('ERROR'))
-  #set ($hasError = ($errors.size() &gt; 0))
-  
+  #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
+
   {{html}}
     &lt;form class="xform" method="post" action="$doc.getURL()"&gt;
     #addMembersAsHiddenInput()
     &lt;input type="hidden" name="membershipType" value="$!escapetool.xml($request.getParameter('membershipType'))" /&gt;
     &lt;input type="hidden" name="userScope" value="$!escapetool.xml($request.userScope)" /&gt;
     &lt;input type="hidden" name="wikiId" id="wikiId" value="$!escapetool.xml($wikiDescriptor.id)" /&gt;
-    &lt;input type="hidden" name="csrf" id="csrf" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
     #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.provisioning'))
     &lt;div class="wizard-body"&gt;
-      #if ($status.state == "RUNNING")
       &lt;div class="ui-progress" id="ui-progress"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.provisioning.wait')
         &lt;div class="ui-progress-background"&gt;
           #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $wikiDescriptor.id])
-          #set ($status = $services.wiki.template.getWikiProvisioningJobStatus($jobId))
-          #set ($percent = $status.progress.offset)
+          #set ($percent = $services.wiki.template.getWikiProvisioningJobStatus($jobId).progress.offset)
           ## There is no progress information if the job was scheduled but hasn't started yet.
           #if (!$percent)
             #set ($percent = 0)
@@ -1284,77 +1160,14 @@ return XWiki;
           &lt;div class="ui-progress-bar green" style="width:${percent}%" id="template-progress-bar"&gt;&lt;/div&gt;
         &lt;/div&gt;
       &lt;/div&gt;
-      #end
-      &lt;p class="successmessage box #if($hasError || $status.state == 'RUNNING')hidden#end" id="successMessage"&gt;
-        $services.localization.render('platform.wiki.create.wizard.step.provisioning.complete')
-      &lt;/p&gt;
-      &lt;p class="errormessage box #if(!$hasError || $status.state == 'RUNNING')hidden#end" id="errorMessage"&gt;
-        #set($wikiURL = $xwiki.getURL($wikiDescriptor.mainPageReference))
-        $services.localization.render('platform.wiki.create.wizard.step.provisioning.error', ["&lt;a href='$wikiURL'&gt;$!escapetool.xml($wikiDescriptor.id)&lt;/a&gt;"])
+      &lt;p class="successmessage box hidden" id="successMessage"&gt;
+      $services.localization.render('platform.wiki.create.wizard.step.provisioning.complete')
       &lt;/p&gt;
     &lt;/div&gt;
-    #if($status.state == "FINISHED")
-      #set($finalizeHidden = $hasError)
-      #set($cleanUpHidden = !$hasError)
-    #else
-      #set($finalizeHidden = true)
-      #set($cleanUpHidden = true)
-    #end
-    #wizardFooter('', '', '', 'finalize', $finalizeHidden, 'cleanUp', $cleanUpHidden)
+    #wizardFooter('', '', '', $services.localization.render('platform.wiki.create.wizard.step.provisioning.finalize'))
     &lt;/form&gt;
   {{/html}}
 
 #end
-##################################
-##           CLEAN UP
-##
-## Delete the wiki if errors has occured
-##################################
-#macro(cleanUp)
-  #set($discard = $xwiki.ssfx.use('uicomponents/wizard/wizard.css', true))
-  #if("$!request.deleteOk" == '')
-    #if ($services.csrf.isTokenValid($request.csrf))
-      #set($wikiId = $request.wikiId)
-      #set($ok = $services.wiki.deleteWiki($wikiId))
-      $response.sendRedirect($doc.getURL('view', "step=cleanUp&amp;deleteOk=$ok&amp;wikiId=$wikiId"))
-    #else
-      {{html}}
-        #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.cleaningUp'))
-        &lt;form action="$doc.getURL()" method="post"&gt;
-        &lt;div class="wizard-body"&gt;
-          &lt;p&gt;$services.localization.render('platform.wiki.create.wizard.step.cleaningUp.confirmmessage', ["&lt;strong&gt;$request.wikiId&lt;/strong&gt;"])&lt;/p&gt;
-          &lt;input type="hidden" name="csrf" value="$!escapetool.xml($services.csrf.getToken())" /&gt;
-          &lt;input type="hidden" name="wikiId" value="$!escapetool.xml($request.wikiId)" /&gt;
-          &lt;div class="wizard-footer buttons"&gt;
-            &lt;span class="buttonwrapper"&gt;
-              &lt;button value="cleanUp" title="Confirm" name="step" id="cleanUp" class="button"&gt;$services.localization.render('platform.wiki.create.wizard.step.cleaningUp.confirm')&lt;/button&gt;
-            &lt;/span&gt;
-          &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;/form&gt;
-       {{/html}}
-    #end
-  #else
-    #set($wikiId = $request.wikiId)
-
-    {{html}}
-      #wizardHeader($services.localization.render('platform.wiki.create.wizard.step.cleaningUp'))
-      &lt;div class="wizard-body"&gt;
-        #if($request.deleteOk)
-          &lt;p class="successmessage box"&gt;
-            $services.localization.render('platform.wiki.create.wizard.step.cleaningup.success', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"])
-          &lt;/p&gt;
-        #else
-          &lt;p class="errormessage box"&gt;
-            $services.localization.render('platform.wiki.create.wizard.step.cleaningup.error', ["&lt;strong&gt;$wikiId&lt;/strong&gt;"])
-          &lt;/p&gt;
-        #end
-      &lt;/div&gt;
-      &lt;/form&gt;
-    {{/html}}
-
-  #end
-#end
-{{/velocity}}
-</content>
+{{/velocity}}</content>
 </xwikidoc>

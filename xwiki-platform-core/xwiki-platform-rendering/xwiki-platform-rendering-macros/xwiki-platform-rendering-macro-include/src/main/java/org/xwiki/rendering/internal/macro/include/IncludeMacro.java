@@ -138,7 +138,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         throws MacroExecutionException
     {
         // Step 1: Perform checks.
-        if (parameters.getReference() == null) {
+        if (parameters.getReference() == null && parameters.getDocument() == null) {
             throw new MacroExecutionException(
                 "You must specify a 'reference' parameter pointing to the entity to include.");
         }
@@ -148,10 +148,9 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         checkRecursiveInclusion(context.getCurrentMacroBlock(), includedReference);
 
         if (!this.documentAccessBridge.isDocumentViewable(includedReference)) {
-            throw new MacroExecutionException(String.format(
-                "Current user [%s] doesn't have view rights on document [%s]",
-                this.documentAccessBridge.getCurrentUserReference(),
-                this.defaultEntityReferenceSerializer.serialize(includedReference)));
+            throw new MacroExecutionException("Current user [" + this.documentAccessBridge.getCurrentUser()
+                + "] doesn't have view rights on document ["
+                + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]");
         }
 
         Context parametersContext = parameters.getContext();
@@ -179,7 +178,6 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         displayParameters.setSectionId(parameters.getSection());
         displayParameters.setTransformationContextIsolated(displayParameters.isContentTransformed());
         displayParameters.setTransformationContextRestricted(context.getTransformationContext().isRestricted());
-        displayParameters.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
 
         Stack<Object> references = this.inclusionsBeingExecuted.get();
         if (parametersContext == Context.NEW) {

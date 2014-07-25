@@ -25,13 +25,13 @@ import org.xwiki.component.annotation.Role;
 public interface Container
 {
     /**
-     * @deprecated starting with 3.5M1, use the notion of {@link org.xwiki.environment.Environment} instead
+     * @deprecated starting with 3.5M1, use the notion of Environment instead
      */
     @Deprecated
     ApplicationContext getApplicationContext();
 
     /**
-     * @deprecated starting with 3.5M1, use the notion of {@link org.xwiki.environment.Environment} instead
+     * @deprecated starting with 3.5M1, use the notion of Environment instead
      */
     @Deprecated
     void setApplicationContext(ApplicationContext context);

@@ -35,18 +35,6 @@ import io.searchbox.client.JestClient;
 public interface JestClientManager
 {
     /**
-     * The elastic search index we use to index pings.
-     */
-    String INDEX = "installs";
-
-    /**
-     * The elastic search index type we use to index pings. The index is suffixed with a number corresponding to the
-     * version of our Elastic Search data model. The first data model was in an index named "install", the second one in
-     * "install2" and if we need a third model in the future, it'll go in "install3".
-     */
-    String TYPE = "install2";
-
-    /**
      * @return the object to use to connect to the remote instance
      */
     JestClient getClient();

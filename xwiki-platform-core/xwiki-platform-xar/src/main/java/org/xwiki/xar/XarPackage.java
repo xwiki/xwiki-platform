@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import javanet.staxutils.IndentingXMLStreamWriter;
 
@@ -43,6 +42,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.input.CloseShieldInputStream;
+import org.apache.commons.lang3.ObjectUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -145,7 +145,7 @@ public class XarPackage
 
         try {
             for (ZipArchiveEntry entry = zis.getNextZipEntry(); entry != null; entry = zis.getNextZipEntry()) {
-                if (!entry.isDirectory() && zis.canReadEntryData(entry)) {
+                if (zis.canReadEntryData(entry)) {
                     readEntry(zis, entry);
                 }
             }
@@ -348,7 +348,7 @@ public class XarPackage
         writer = new IndentingXMLStreamWriter(writer);
 
         try {
-            writer.writeStartDocument(encoding, "1.0");
+            writer.writeStartDocument();
             writer.writeStartElement(XarModel.ELEMENT_PACKAGE);
 
             writer.writeStartElement(XarModel.ELEMENT_INFOS);
@@ -357,16 +357,15 @@ public class XarPackage
             writeElement(writer, XarModel.ELEMENT_INFOS_LICENSE, getPackageLicense());
             writeElement(writer, XarModel.ELEMENT_INFOS_AUTHOR, getPackageAuthor());
             writeElement(writer, XarModel.ELEMENT_INFOS_VERSION, getPackageVersion());
-            writeElement(writer, XarModel.ELEMENT_INFOS_ISBACKUPPACK, String.valueOf(isPackageBackupPack()));
-            writeElement(writer, XarModel.ELEMENT_INFOS_ISPRESERVEVERSION, String.valueOf(isPackagePreserveVersion()));
-            writeElement(writer, XarModel.ELEMENT_INFOS_EXTENSIONID, getPackageExtensionId());
+            writeElement(writer, XarModel.ELEMENT_INFOS_ISBACKUPPACK, isPackageBackupPack() ? "1" : "0");
+            writeElement(writer, XarModel.ELEMENT_INFOS_ISPRESERVEVERSION, isPackagePreserveVersion() ? "1" : "0");
             writer.writeEndElement();
 
             writer.writeStartElement(XarModel.ELEMENT_FILES);
             for (XarEntry entry : this.entries.values()) {
                 writer.writeStartElement(XarModel.ELEMENT_FILES_FILES);
                 writer.writeAttribute(XarModel.ATTRIBUTE_DEFAULTACTION, String.valueOf(entry.getDefaultAction()));
-                writer.writeAttribute(XarModel.ATTRIBUTE_LOCALE, Objects.toString(entry.getLocale(), ""));
+                writer.writeAttribute(XarModel.ATTRIBUTE_LOCALE, ObjectUtils.toString(entry.getLocale(), ""));
                 writer.writeCharacters(TOSTRING_SERIALIZER.serialize(entry));
                 writer.writeEndElement();
             }

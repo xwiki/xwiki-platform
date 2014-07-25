@@ -21,13 +21,6 @@ package org.xwiki.rendering.macro.wikibridge;
 
 /**
  * Sent before a wiki macro starts execution.
- * <p>
- * The event also send the following parameters:
- * </p>
- * <ul>
- * <li>source: the related {@link org.xwiki.rendering.macro.wikibridge.WikiMacro} instance</li>
- * <li>data: a java.util.Map<String, Object> containing the macro bindings</li>
- * </ul>
  * 
  * @version $Id$
  * @since 2.6M1

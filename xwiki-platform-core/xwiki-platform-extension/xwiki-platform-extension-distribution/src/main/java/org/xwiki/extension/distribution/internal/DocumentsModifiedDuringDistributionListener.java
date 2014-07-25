@@ -194,7 +194,7 @@ public class DocumentsModifiedDuringDistributionListener extends AbstractEventLi
     private void checkDistributionAction(Event event, XWikiDocument document, XWikiContext xcontext)
     {
         if (DistributionAction.DISTRIBUTION_ACTION.equals(xcontext.getAction())) {
-            String distributionWiki = xcontext.getOriginalWikiId();
+            String distributionWiki = xcontext.getOriginalDatabase();
 
             DocumentStatus.Action action = toAction(event);
 

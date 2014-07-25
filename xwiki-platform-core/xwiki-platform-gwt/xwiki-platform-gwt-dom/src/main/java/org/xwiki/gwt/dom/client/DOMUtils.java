@@ -1552,6 +1552,16 @@ public class DOMUtils
     }
 
     /**
+     * Stop the given window from loading its document.
+     * 
+     * @param window the window to be stopped
+     */
+    public native void stop(Window window)
+    /*-{
+        window.stop();
+    }-*/;
+
+    /**
      * Removes a property from an element.
      * 
      * @param element a DOM element

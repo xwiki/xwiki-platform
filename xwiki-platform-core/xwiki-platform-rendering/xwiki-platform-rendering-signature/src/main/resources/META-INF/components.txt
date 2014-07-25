@@ -1,5 +1,0 @@
-org.xwiki.model.reference.internal.CurrentSignedMacroBlockReferenceResolver
-org.xwiki.model.reference.internal.SignedMacroBlockReferenceResolver
-org.xwiki.rendering.signature.internal.MacroBlockDumper
-org.xwiki.rendering.signature.internal.MacroBlockSignatureGenerator
-org.xwiki.rendering.signature.internal.MacroBlockSignatureVerifier

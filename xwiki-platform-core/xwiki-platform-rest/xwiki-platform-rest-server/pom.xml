@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
+ *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,6 +19,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -25,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest</artifactId>
-    <version>6.2-SNAPSHOT</version>
+    <version>5.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-server</artifactId>
   <packaging>jar</packaging>
@@ -74,46 +76,6 @@
           <groupId>javax.servlet</groupId>
           <artifactId>servlet-api</artifactId>
         </exclusion>
-        <!-- Already part of Java SE 6 -->
-        <exclusion>
-          <artifactId>jaxb-impl</artifactId>
-          <groupId>com.sun.xml.bind</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <!-- We need Jackson for a proper JSON representation of our REST resources.
-        See XWIKI-9136: Rest API JSON does not retrieve inherited fields -->
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet.ext.jackson</artifactId>
-      <version>${restlet.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <!-- We need a JAXB converter for XML representation because we model our REST resources using JAXB. Jackson (see
-        above) has a module that understands JAXB annotations but the output of the Restlet Jackson converter is not very
-        good (missing XML declaration and namespace, attributes serialized as elements) so we prefer to use a dedicated
-        JAXB converter for XML representation. -->
-      <groupId>org.restlet.jse</groupId>
-      <artifactId>org.restlet.ext.jaxb</artifactId>
-      <version>${restlet.version}</version>
-      <scope>runtime</scope>
-      <exclusions>
-        <!-- Already part of Java SE 6 -->
-        <exclusion>
-          <artifactId>jaxb-api</artifactId>
-          <groupId>javax.xml.bind</groupId>
-        </exclusion>
-        <!-- Already part of Java SE 6 -->
-        <exclusion>
-          <artifactId>stax-api</artifactId>
-          <groupId>javax.xml.stream</groupId>
-        </exclusion>
-        <!-- Already part of Java SE 6 -->
-        <exclusion>
-          <artifactId>jaxb-impl</artifactId>
-          <groupId>com.sun.xml.bind</groupId>
-        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -135,6 +97,11 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-component-api</artifactId>
       <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-search-lucene-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -216,13 +183,13 @@
             org/xwiki/rest/internal/resources/spaces/SpaceSearchResourceImpl.java,
             org/xwiki/rest/internal/resources/spaces/SpacesResourceImpl.java,
             org/xwiki/rest/internal/resources/SyntaxesResourceImpl.java,
-            org/xwiki/rest/internal/resources/search/*,
             org/xwiki/rest/internal/resources/tags/PagesForTagsResourceImpl.java,
             org/xwiki/rest/internal/resources/tags/TagsResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikiAttachmentsResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikiPagesResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikiSearchResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikiSearchQueryResourceImpl.java,
+            org/xwiki/rest/internal/resources/wikis/WikisSearchQueryResourceImpl.java,
             org/xwiki/rest/internal/resources/wikis/WikisResourceImpl.java,
             org/xwiki/rest/internal/Utils.java,
             org/xwiki/rest/internal/XWikiAuthentication.java,

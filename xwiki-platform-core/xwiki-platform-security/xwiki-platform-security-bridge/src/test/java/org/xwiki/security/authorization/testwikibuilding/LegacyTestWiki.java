@@ -134,7 +134,7 @@ public class LegacyTestWiki extends AbstractTestWiki
             {
                 // Expectations for XWikiContext
 
-                allowing(context).setWikiId(with(any(String.class)));
+                allowing(context).setDatabase(with(any(String.class)));
                 will(new CustomAction("set the current database")
                 {
                     @Override
@@ -144,7 +144,7 @@ public class LegacyTestWiki extends AbstractTestWiki
                         return null;
                     }
                 });
-                allowing(context).getWikiId();
+                allowing(context).getDatabase();
                 will(new CustomAction("return the current database")
                 {
                     @Override
@@ -319,6 +319,8 @@ public class LegacyTestWiki extends AbstractTestWiki
                             return getDocument(spaceName, documentName);
                         }
                     });
+                    allowing(xwiki).isVirtualMode();
+                    will(returnValue(true));
                 }
             });
         }
@@ -383,7 +385,7 @@ public class LegacyTestWiki extends AbstractTestWiki
 
     private Collection<DocumentReference> getAllGroupReferences(final DocumentReference userReference)
     {
-        final TestWiki wiki = wikis.get(context.getWikiId());
+        final TestWiki wiki = wikis.get(context.getDatabase());
 
         if (wiki == null) {
             return Collections.<DocumentReference> emptySet();
@@ -486,7 +488,7 @@ public class LegacyTestWiki extends AbstractTestWiki
 
     private XWikiDocument getDocument(EntityReference entityReference, XWikiContext context)
     {
-        return getDocument(new DocumentReference(entityReference.appendParent(new WikiReference(context.getWikiId()))));
+        return getDocument(new DocumentReference(entityReference.appendParent(new WikiReference(context.getDatabase()))));
     }
 
     private XWikiDocument getDocument(String name)

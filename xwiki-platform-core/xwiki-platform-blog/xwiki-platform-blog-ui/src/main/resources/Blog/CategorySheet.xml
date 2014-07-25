@@ -1,25 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
 <xwikidoc>
   <web>Blog</web>
   <name>CategorySheet</name>
@@ -74,7 +54,7 @@
       <action>view</action>
     </property>
   </object>
-  <content>{{include reference="Blog.CategoriesCode"/}}
+  <content>{{include document="Blog.CategoriesCode"/}}
 
 {{velocity}}
 {{html wiki=true}}
@@ -85,7 +65,7 @@
   = Category: #getCategoryName($doc) ($totalEntries posts) [[#toolImage('feed' '[RSS]')&gt;&gt;Blog.CategoryRss||queryString="xpage=plain&amp;category=$escapetool.url($doc.fullName)" title="RSS"]] =
   ## Keep testing the inline action for backward compatibility with older categories.
   #if ($xcontext.action != 'edit' &amp;&amp; $xcontext.action != 'inline')
-    {{include reference="Blog.CreatePost"/}}
+    {{include document="Blog.CreatePost"/}}
 
     #getCategoriesHierarchy($doc.space $tree)
     #if ("$!tree.get($doc.fullName)" != '')
@@ -103,7 +83,7 @@
 
     #getEntriesForCategory($doc.fullName $entries $totalEntries)
     #if ($totalEntries == 0)
-      {{info}}{{translation key="xe.blog.categories.noentries"/}}{{/info}}
+      {{info}}No entries in this category{{/info}}
     #else
       #displayBlog($entries 'category' true true)
       ## displayNavigationLinks requires a blog document, to determine how should the entries be split into pages. Return this

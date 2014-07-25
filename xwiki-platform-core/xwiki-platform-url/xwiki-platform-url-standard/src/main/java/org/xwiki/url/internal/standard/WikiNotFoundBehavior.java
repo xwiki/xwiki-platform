@@ -19,6 +19,8 @@
  */
 package org.xwiki.url.internal.standard;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Represents the action to take when a subwiki is not found (ie there's no wiki descriptor for it). Valid actions
  * are for example:
@@ -30,6 +32,7 @@ package org.xwiki.url.internal.standard;
  * @version $Id$
  * @since 5.1M1
  */
+@Unstable
 public enum WikiNotFoundBehavior
 {
     /**

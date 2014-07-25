@@ -84,7 +84,7 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
         this.macroObject.setLargeStringValue("code", "code");
         this.macroDocument.addXObject(macroObject);
 
-        getContext().setWikiId("wiki");
+        getContext().setDatabase("wiki");
     }
 
     private ComponentManager getWikiComponentManager() throws Exception
@@ -155,7 +155,7 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
 
         this.macroObject.setStringValue("visibility", "Current User");
 
-        getContext().setWikiId("wiki");
+        getContext().setDatabase("wiki");
         getContext().setUser("XWiki.user");
 
         this.wikiMacroEventListener.onEvent(documentCreatedEvent, this.macroDocument, getContext());
@@ -166,7 +166,7 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
 
         // register with another user
 
-        getContext().setWikiId("wik2");
+        getContext().setDatabase("wik2");
         getContext().setUser("XWiki.user2");
 
         this.wikiMacroEventListener.onEvent(documentCreatedEvent, this.macroDocument, getContext());
@@ -176,7 +176,7 @@ public class WikiMacrosTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("macroid", testMacro.getDescriptor().getId().getId());
 
         // validate that the macro as been properly unregistered for former user
-        getContext().setWikiId("wik1");
+        getContext().setDatabase("wik1");
         getContext().setUser("XWiki.user");
 
         try {

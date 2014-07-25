@@ -36,6 +36,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -46,6 +47,7 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 4.3M2
  */
+@Unstable
 @Component
 @Named("solr")
 public class SolrIndexScriptService implements ScriptService

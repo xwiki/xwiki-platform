@@ -110,11 +110,11 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 }
                 Session session = getSession(context);
 
-                String db = context.getWikiId();
+                String db = context.getDatabase();
                 String attachdb = (attachment.getDoc() == null) ? null : attachment.getDoc().getDatabase();
                 try {
                     if (attachdb != null) {
-                        context.setWikiId(attachdb);
+                        context.setDatabase(attachdb);
                     }
 
                     Query query =
@@ -138,7 +138,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     }
 
                 } finally {
-                    context.setWikiId(db);
+                    context.setDatabase(db);
                 }
 
                 if (bTransaction) {
@@ -208,11 +208,11 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             }
             Session session = getSession(context);
 
-            String db = context.getWikiId();
+            String db = context.getDatabase();
             String attachdb = (attachment.getDoc() == null) ? null : attachment.getDoc().getDatabase();
             try {
                 if (attachdb != null) {
-                    context.setWikiId(attachdb);
+                    context.setDatabase(attachdb);
                 }
                 XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
                 session.load(content, new Long(content.getId()));
@@ -222,7 +222,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
                 attachment.setAttachment_content(content);
             } finally {
-                context.setWikiId(db);
+                context.setDatabase(db);
             }
 
             if (bTransaction) {
@@ -262,11 +262,11 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
             Session session = getSession(context);
 
-            String db = context.getWikiId();
+            String db = context.getDatabase();
             String attachdb = (attachment.getDoc() == null) ? null : attachment.getDoc().getDatabase();
             try {
                 if (attachdb != null) {
-                    context.setWikiId(attachdb);
+                    context.setDatabase(attachdb);
                 }
 
                 // Delete the three attachment entries
@@ -287,7 +287,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 }
 
             } finally {
-                context.setWikiId(db);
+                context.setDatabase(db);
             }
 
             try {

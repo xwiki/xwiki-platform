@@ -57,14 +57,14 @@ public class UserDirectoryTest extends AbstractTest
         // Go back to the user directory page since the user creation navigated to another page
         page = UserDirectoryPage.gotoPage();
         assertEquals(1, liveTableElement.getRowCount());
-        assertTrue(liveTableElement.hasRow("User ID", "test"));
+        assertTrue(liveTableElement.hasRow("User ID", "xwiki:XWiki.test"));
         assertTrue(liveTableElement.hasRow("First Name", "John"));
         assertTrue(liveTableElement.hasRow("Last Name", "Doe"));
 
         // Log out to verify the livetable works in guest view too
         getUtil().forceGuestUser();
         assertEquals(1, liveTableElement.getRowCount());
-        assertTrue(liveTableElement.hasRow("User ID", "test"));
+        assertTrue(liveTableElement.hasRow("User ID", "xwiki:XWiki.test"));
         assertTrue(liveTableElement.hasRow("First Name", "John"));
         assertTrue(liveTableElement.hasRow("Last Name", "Doe"));
     }

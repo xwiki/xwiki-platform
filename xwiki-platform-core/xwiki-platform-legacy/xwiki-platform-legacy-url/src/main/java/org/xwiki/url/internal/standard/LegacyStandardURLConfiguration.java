@@ -20,17 +20,21 @@
 package org.xwiki.url.internal.standard;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.web.XWikiConfigurationService;
+import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Replaces {@link DefaultStandardURLConfiguration} with fallbacks to configuration properties defined in the
  * {@code xwiki.cfg} configuration file.
- * 
+ *
  * @version $Id$
  * @since 5.1M1
  */
@@ -39,25 +43,24 @@ import org.xwiki.configuration.ConfigurationSource;
 public class LegacyStandardURLConfiguration extends DefaultStandardURLConfiguration
 {
     @Inject
-    @Named("xwikicfg")
-    private ConfigurationSource xwikicfg;
+    private Execution execution;
 
     @Override
     public boolean isPathBasedMultiWiki()
     {
-        return super.isPathBasedMultiWiki("1".equals(this.xwikicfg.getProperty("xwiki.virtual.usepath", "1")));
+        return super.isPathBasedMultiWiki("1".equals(getLegacyValue("xwiki.virtual.usepath", "1")));
     }
 
     @Override
     public String getWikiPathPrefix()
     {
-        return super.getWikiPathPrefix(this.xwikicfg.getProperty("xwiki.virtual.usepath.servletpath", "wiki"));
+        return super.getWikiPathPrefix(getLegacyValue("xwiki.virtual.usepath.servletpath", "wiki"));
     }
 
     @Override
     public String getEntityPathPrefix()
     {
-        String prefix = super.getWikiPathPrefix(this.xwikicfg.getProperty("xwiki.defaultservletpath", "bin"));
+        String prefix = super.getWikiPathPrefix(getLegacyValue("xwiki.defaultservletpath", "bin"));
 
         // Remove potential trailing "/" since the documentation in xwiki.cfg says it should contain a trailing "/" but
         // getEntityPathPrefix should return the prefix without "/"...
@@ -71,12 +74,33 @@ public class LegacyStandardURLConfiguration extends DefaultStandardURLConfigurat
     {
         WikiNotFoundBehavior legacyBehavior = WikiNotFoundBehavior.DISPLAY_ERROR;
 
-        String legacyValue = this.xwikicfg.getProperty("xwiki.virtual.failOnWikiDoesNotExist", "0");
+        String legacyValue = getLegacyValue("xwiki.virtual.failOnWikiDoesNotExist", "0");
 
         if (!"1".equals(legacyValue)) {
             legacyBehavior = WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI;
         }
 
         return super.getWikiNotFoundBehavior(legacyBehavior);
+    }
+
+    private String getLegacyValue(String oldKey, String oldDefault)
+    {
+        String result = null;
+
+        // Hack!
+        // Get the ServletContext from the HTTP Session in case we're in a Servlet environment
+        ExecutionContext econtext = this.execution.getContext();
+        if (econtext != null) {
+            XWikiContext xcontext = (XWikiContext) econtext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+            if (xcontext != null) {
+                XWikiRequest request = xcontext.getRequest();
+                if (request != null) {
+                    result = XWikiConfigurationService.getProperty(oldKey, oldDefault,
+                        request.getSession().getServletContext());
+                }
+            }
+        }
+
+        return result;
     }
 }

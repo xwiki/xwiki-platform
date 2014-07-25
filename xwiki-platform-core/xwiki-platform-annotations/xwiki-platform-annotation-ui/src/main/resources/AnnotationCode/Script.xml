@@ -20,30 +20,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>AnnotationCode</web>
   <name>Script</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1391621055000</creationDate>
   <parent>AnnotationCode.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1391781566000</date>
-  <contentUpdateDate>1391621055000</contentUpdateDate>
+  <creationDate>1264864355000</creationDate>
+  <date>1299875556000</date>
+  <contentUpdateDate>1299875556000</contentUpdateDate>
   <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>
-</content>
   <object>
-    <name>AnnotationCode.Script</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>046e135f-7fed-40ec-a51d-c01ec1ac25e6</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -115,6 +115,10 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
+    <name>AnnotationCode.Script</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>046e135f-7fed-40ec-a51d-c01ec1ac25e6</guid>
     <property>
       <cache/>
     </property>
@@ -510,10 +514,6 @@ return XWiki;
     </property>
   </object>
   <object>
-    <name>AnnotationCode.Script</name>
-    <number>1</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>f380ccb0-3533-4b3b-b257-184223ca7bdd</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -585,6 +585,10 @@ return XWiki;
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
+    <name>AnnotationCode.Script</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>f380ccb0-3533-4b3b-b257-184223ca7bdd</guid>
     <property>
       <cache/>
     </property>
@@ -682,39 +686,28 @@ XWiki.Annotation = Class.create({
   },
 
   hookMenuButton : function() {
-    // Flamingo case
-    if (window.document.body.hasClassName('skin-flamingo')) {
-      var moreActionsMenu = $('tmMoreActions').adjacent('ul')[0];
-      var annContainer = new Element('li');
-      var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
-      annLink.update("&lt;span class=\"glyphicon glyphicon-edit\"&gt;&lt;/span&gt; $services.localization.render('annotations.title')");
-      annContainer.insert(annLink);
-      moreActionsMenu.insert(annContainer);
-      annLink.observe('click', this.toggleSettingsPanel.bind(this));      
-    } else {
-      var contentmenu = $('contentmenu');
-      if (contentmenu) {
-        var rightMenu = contentmenu.down('.rightmenu');
-        // create and insert if it doesn't exist
-        if (!rightMenu) {
-          rightMenu = new Element('div', {'class':'rightmenu'});
-          // insert it before the left menu
-          var leftMenu = contentmenu.down('.leftmenu');
-          if (leftMenu) {
-            leftMenu.insert({before: rightMenu});
-          } else {
-            contentmenu.insert({bottom: rightMenu});
-          }
+    var contentmenu = $('contentmenu');
+    if (contentmenu) {
+      var rightMenu = contentmenu.down('.rightmenu');
+      // create and insert if it doesn't exist
+      if (!rightMenu) {
+        rightMenu = new Element('div', {'class':'rightmenu'});
+        // insert it before the left menu
+        var leftMenu = contentmenu.down('.leftmenu');
+        if (leftMenu) {
+          leftMenu.insert({before: rightMenu});
+        } else {
+          contentmenu.insert({bottom: rightMenu});
         }
-        // create the annotations button
-        var annContainer = new Element('div', {'class': 'topmenuentry hasIcon', 'id': 'tmAnnotations'});
-        var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
-        annLink.update("&lt;strong&gt;$services.localization.render('annotations.title')&lt;/strong&gt;");
-        annContainer.insert({top: annLink});
-        rightMenu.insert({bottom: annContainer});
-
-        annLink.observe('click', this.toggleSettingsPanel.bind(this));
       }
+      // create the annotations button
+      var annContainer = new Element('div', {'class': 'topmenuentry hasIcon', 'id': 'tmAnnotations'});
+      var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
+      annLink.update("&lt;strong&gt;$services.localization.render('annotations.title')&lt;/strong&gt;");
+      annContainer.insert({top: annLink});
+      rightMenu.insert({bottom: annContainer});
+
+      annLink.observe('click', this.toggleSettingsPanel.bind(this));
     }
   },
 
@@ -733,12 +726,6 @@ XWiki.Annotation = Class.create({
     if (menu.disabled) {
       return;
     }
-    if (window.document.body.hasClassName('skin-flamingo')) {
-      // Hack: hide the bootstrap dropdown menu
-      // TODO: find a way to let Bootstrap close the menu in a regular way.
-      var btnGroup = $('tmMoreActions').ancestors()[0];
-      btnGroup.removeClassName('open');
-    }
     if (!this.settingsPanel) {
       new Ajax.Request('$xwiki.getURL("AnnotationCode.Settings", "view", "xpage=plain")', {
         parameters : {'target' : XWiki.currentWiki + ':' + XWiki.currentSpace + '.' + XWiki.currentPage},
@@ -750,15 +737,8 @@ XWiki.Annotation = Class.create({
         },
 
         onSuccess: function(response) {
-          // Unfortunately, this is skin dependent
-          if (window.document.body.hasClassName('skin-flamingo')) {
-            var place = $$('.xcontent &gt; hr')[0];
-            place.insert({after: response.responseText});
-            this.settingsPanel = place.next();
-          } else { // colibri
-            $('contentmenu').insert({after: response.responseText});
-            this.settingsPanel = $('contentmenu').next();
-          }
+          $('contentmenu').insert({after: response.responseText});
+          this.settingsPanel = $('contentmenu').next();
           // fire a settings panel loaded event
           this.settingsPanel.fire('xwiki:annotations:settings:loaded');
           // hide message at page bottom
@@ -1432,7 +1412,7 @@ XWiki.Annotation = Class.create({
 
   registerShortcuts : function(annotationShorcuts, method) {
     var eventType = 'keypress';
-    if (Prototype.Browser.IE || Prototype.Browser.WebKit || browser.isIE11up) {
+    if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
       eventType = 'keyup';
     }
     for (var i = 0; i &lt; annotationShorcuts.size(); ++i) {
@@ -1637,12 +1617,11 @@ return XWiki;
 }(XWiki || {}));
 
 document.observe('xwiki:dom:loaded', function() {
-  // Load the annotations only in view mode, if the document content is displayed
-  // (the document content is not displayed when viewer=history for instance).
-  if (XWiki.contextaction != 'view' || !$('xwikicontent')) {
+  // if the action on the current document is not view, don't load annotations
+  if (XWiki.contextaction != 'view') {
     return;
   }
-
+  
   #if ($annotationHighlightByDefault &amp;&amp; $annotationHighlightByDefault != 0)
     var displayHighlight = true;
   #else
@@ -1683,10 +1662,6 @@ document.observe('xwiki:dom:loaded', function() {
     </property>
   </object>
   <object>
-    <name>AnnotationCode.Script</name>
-    <number>0</number>
-    <className>XWiki.RequiredRightClass</className>
-    <guid>f9d89256-0497-45b2-982b-2129a93901fb</guid>
     <class>
       <name>XWiki.RequiredRightClass</name>
       <customClass/>
@@ -1717,8 +1692,14 @@ document.observe('xwiki:dom:loaded', function() {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </level>
     </class>
+    <name>AnnotationCode.Script</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>f9d89256-0497-45b2-982b-2129a93901fb</guid>
     <property>
       <level>programming</level>
     </property>
   </object>
+  <content>
+</content>
 </xwikidoc>

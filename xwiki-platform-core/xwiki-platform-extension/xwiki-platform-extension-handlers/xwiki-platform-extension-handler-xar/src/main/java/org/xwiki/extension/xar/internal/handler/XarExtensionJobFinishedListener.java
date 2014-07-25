@@ -41,7 +41,6 @@ import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
 import org.xwiki.extension.xar.question.CleanPagesQuestion;
-import org.xwiki.job.Job;
 import org.xwiki.job.Request;
 import org.xwiki.job.event.JobFinishedEvent;
 import org.xwiki.model.reference.DocumentReference;
@@ -202,23 +201,24 @@ public class XarExtensionJobFinishedListener implements EventListener
                             }
                         }
 
+                        // TODO: enable it when UI is ready
                         // Ask confirmation
-                        if (!pages.isEmpty() && jobFinishedEvent.getRequest().isInteractive()) {
-                            try {
-                                ((Job) source).getStatus().ask(question);
-                            } catch (InterruptedException e) {
-                                this.logger.warn("The thread has been interrupted", e);
-
-                                // The thread has been interrupted, do nothing
-                                return;
-                            }
-                        }
+                        // if (jobFinishedEvent.getRequest().isInteractive()) {
+                        // try {
+                        // job.getStatus().ask(question);
+                        // } catch (InterruptedException e) {
+                        // this.logger.warn("The thread has been interrupted", e);
+                        //
+                        // // The thread has been interrupted, do nothing
+                        // return;
+                        // }
+                        // }
 
                         // Delete pages
 
                         PackageConfiguration configuration = createPackageConfiguration(jobFinishedEvent.getRequest());
 
-                        for (Map.Entry<DocumentReference, Boolean> entry : pages.entrySet()) {
+                        for (Map.Entry<DocumentReference, Boolean> entry : question.getPages().entrySet()) {
                             if (entry.getValue()) {
                                 packager.deleteDocument(entry.getKey(), configuration);
                             }

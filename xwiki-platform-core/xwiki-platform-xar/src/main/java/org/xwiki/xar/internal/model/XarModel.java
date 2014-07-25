@@ -45,8 +45,6 @@ public class XarModel
 
     public static final String ELEMENT_INFOS_ISPRESERVEVERSION = "preserveVersion";
 
-    public static final String ELEMENT_INFOS_EXTENSIONID = "extensionId";
-
     public static final String ELEMENT_FILES = "files";
 
     public static final String ELEMENT_FILES_FILES = "file";

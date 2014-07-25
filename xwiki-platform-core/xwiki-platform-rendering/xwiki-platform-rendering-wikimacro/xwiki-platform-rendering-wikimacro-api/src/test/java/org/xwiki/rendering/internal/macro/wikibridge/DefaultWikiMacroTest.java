@@ -78,8 +78,6 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
     private WikiMacroFactory mockWikiMacroFactory;
 
-    private Map<String, Object> xcontext;
-
     @Override
     @Before
     public void setUp() throws Exception
@@ -96,11 +94,11 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
         // Make sure the old XWiki Context is set up in the Execution Context since it's used in
         // DefaultWikiMacro.execute().
-        this.xcontext = new HashMap<String, Object>();
+        Map<String, Object> xcontext = new HashMap<String, Object>();
         Execution execution = getComponentManager().getInstance(Execution.class);
-        execution.getContext().setProperty("xwikicontext", this.xcontext);
+        execution.getContext().setProperty("xwikicontext", xcontext);
         ScriptContextManager scm = getComponentManager().getInstance(ScriptContextManager.class);
-        scm.getScriptContext().setAttribute("xcontext", this.xcontext, ScriptContext.ENGINE_SCOPE);
+        scm.getScriptContext().setAttribute("xcontext", xcontext, ScriptContext.ENGINE_SCOPE);
 
         getMockery().checking(new Expectations()
         {
@@ -149,8 +147,6 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
         Assert.assertEquals("<p>This is <strong>bold</strong></p>", printer.toString());
-
-        Assert.assertFalse(this.xcontext.containsKey("macro"));
     }
 
     /**

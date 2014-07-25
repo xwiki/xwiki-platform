@@ -208,7 +208,7 @@ public class SolrReferenceResolverTest
         // XWikiContext
 
         this.xcontext = new XWikiContext();
-        this.xcontext.setWikiId("xwiki");
+        this.xcontext.setDatabase("xwiki");
         this.xcontext.setWiki(this.xwiki);
 
         // XWikiContext Provider

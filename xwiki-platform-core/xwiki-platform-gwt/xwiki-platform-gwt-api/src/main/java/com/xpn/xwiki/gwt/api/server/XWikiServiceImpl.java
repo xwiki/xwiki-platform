@@ -107,7 +107,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
 
         XWikiContext context = Utils.prepareContext("", request, response, engine);
         context.setMode(XWikiContext.MODE_GWT);
-        context.setWikiId("xwiki");
+        context.setDatabase("xwiki");
 
         initializeContainerComponent(context);
 

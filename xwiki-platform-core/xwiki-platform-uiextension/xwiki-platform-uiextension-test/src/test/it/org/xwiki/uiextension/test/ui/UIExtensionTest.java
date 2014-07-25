@@ -19,11 +19,13 @@
  */
 package org.xwiki.uiextension.test.ui;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.uiextension.internal.HelloWorldUIExtension;
+
+import org.junit.Assert;
 
 /**
  * UI tests for the UI Extension feature.
@@ -76,18 +78,18 @@ public class UIExtensionTest extends AbstractTest
             "name", "helloWikiWorld2",
             "extensionPointId", "hello",
             "content", "HelloWikiWorld2",
-            "parameters", "HelloWorldKey=zz2_$xcontext.user");
+            "parameters", "HelloWikiWorldKey=zz2_$xcontext.user");
         getUtil().addObject(getTestClassName(), HELLOWIKIWORLD_UIX_PAGE, "XWiki.UIExtensionClass",
             "name", "helloWikiWorld1",
             "extensionPointId", "hello",
             "content", "HelloWikiWorld1",
-            "parameters", "HelloWorldKey=zz1_$xcontext.user");
+            "parameters", "HelloWikiWorldKey=zz1_$xcontext.user");
         getUtil().gotoPage(getTestClassName(), HELLOWORLD_UIX_PAGE);
         Assert.assertEquals("HelloWorld\n"
             + "HelloWikiWorld1\n"
             + "HelloWikiWorld2\n"
             + "{HelloWorldKey=HelloWorldValue}\n"
-            + "{HelloWorldKey=zz1_XWiki.superadmin}\n"
-            + "{HelloWorldKey=zz2_XWiki.superadmin}", testPage.getContent());
+            + "{HelloWikiWorldKey=zz1_XWiki.superadmin}\n"
+            + "{HelloWikiWorldKey=zz2_XWiki.superadmin}", testPage.getContent());
     }
 }

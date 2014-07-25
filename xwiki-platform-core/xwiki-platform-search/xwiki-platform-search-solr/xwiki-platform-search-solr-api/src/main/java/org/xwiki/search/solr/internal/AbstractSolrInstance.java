@@ -26,7 +26,6 @@ import javax.inject.Inject;
 
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.StreamingResponseCallback;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.SolrParams;
@@ -116,15 +115,6 @@ public abstract class AbstractSolrInstance implements SolrInstance
 
         QueryResponse result = this.server.query(solrParams);
         return result;
-    }
-
-    @Override
-    public QueryResponse queryAndStreamResponse(SolrParams params, StreamingResponseCallback callback)
-        throws SolrServerException, IOException
-    {
-        this.logger.debug("Execute Solr query and stream response [{}]", params);
-
-        return this.server.queryAndStreamResponse(params, callback);
     }
 
     /**

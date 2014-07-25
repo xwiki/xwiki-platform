@@ -228,15 +228,6 @@
       </loaders>
    </namedCache>
 
-  <!-- LESS CSS cache -->
-  <namedCache name="lesscss.skinfiles.cache">
-    <loaders>
-      <loader class="org.infinispan.loaders.file.FileCacheStore" purgeOnStartup="true">
-        <!-- Let XWiki cache module set the proper location -->
-      </loader>
-    </loaders>
-  </namedCache>
-
    <!--
       A cache configured with eviction.
 

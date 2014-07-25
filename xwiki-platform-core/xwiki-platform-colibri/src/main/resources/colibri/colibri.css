@@ -161,13 +161,10 @@ input[type="text"], input[type="password"] {
 ::-webkit-input-placeholder {
   color: $theme.textSecondaryColor !important;
 }
-::-moz-placeholder {
+:-moz-placeholder {
   color: $theme.textSecondaryColor !important;
 }
 :-ms-placeholder {
-  color: $theme.textSecondaryColor !important;
-}
-:placeholder-shown {
   color: $theme.textSecondaryColor !important;
 }
 /* For browsers that don't support the placeholder attribute. */
@@ -192,7 +189,7 @@ textarea, select {
 textarea {
   max-width: 100%; /* Prevent resizing beyond the visible area in modern browsers */
 }
-input, select, textarea {
+input, textarea {
   #css3_boxSizing('border-box')
   padding: .3em;
 }
@@ -489,56 +486,24 @@ th.avatar {
 }
 
 .main {
-  margin: 0;
+  margin: 0 200px;
   padding: 0 25px 25px;
 }
 
-.panel-left-width-Small .main {
-  margin-left: 100px;
-}
-
-.panel-left-width-Medium .main {
-  margin-left: 200px;
-}
-
-.panel-left-width-Large .main {
-  margin-left: 300px;
-}
-
-.panel-right-width-Small .main {
-  margin-right: 100px;
-}
-
-.panel-right-width-Small .editor .alleditcontent {
-  margin-right: 125px;
-}
-
-.panel-right-width-Medium .main {
-  margin-right: 200px;
-}
-
-panel-right-width-Medium .editor .alleditcontent {
-  margin-right: 225px;
-}
-
-.panel-right-width-Large .main {
-  margin-right: 300px;
-}
-
-.panel-right-width-Large .editor .alleditcontent {
-  margin-right: 325px;
-}
-
 #body.hideleft #contentcolumn .main {
-  margin-left: 0;
+  margin: 0 200px 0 0;
 }
 
 #body.hideright #contentcolumn .main {
-  margin-right: 0;
+  margin: 0 0 0 200px;
 }
 
 #body.hidelefthideright #contentcolumn .main {
   margin: 0;
+}
+
+#body.content #contentcolumn .main {
+  margin: 0 200px;
 }
 
 #mainContentArea, #mainEditArea  {
@@ -1160,7 +1125,12 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
   background-position:  10px 3px;
   ## We don't use the #css3_backgroundIconAndLinearGradient macro because IE8 will accept the background-image property with multiple images, although it will fail to correctly interpret it
-  background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, linear-gradient(to top, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
+  #foreach ($prefix in ['-webkit-'])
+    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(to top, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
+  #end
+  #foreach ($prefix in ['-moz-', '-o-', ''])
+    background: url("$xwiki.getSkinFile('icons/silk/add.png')") 10px 3px no-repeat, ${prefix}linear-gradient(bottom, rgba(236,236,236,0.3) 0%, rgba(236,236,236,0) 30%, rgba(20,20,20,0) 70%, rgba(20,20,20,0.2) 100%) top $theme.menuAddEntryBackgroundColor;
+  #end
 }
 
 .actionmenu .tmWiki {
@@ -1304,34 +1274,6 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 
 .actionmenu .tmUserDashboard {
   background-image: url("$xwiki.getSkinFile('icons/silk/application_view_tile.png')");
-}
-
-.actionmenu .tmMainWiki{
-  background-image: url("$xwiki.getSkinFile('icons/silk/house.png')");
-}
-
-.actionmenu .tmAdminMainWiki {
-  background-image: url("$xwiki.getSkinFile('icons/silk/wrench.png')");
-}
-
-.actionmenu .tmWikiIndex {
-  background-image: url("$xwiki.getSkinFile('icons/silk/text_list_bullets.png')");
-}
-
-.actionmenu .tmMainWikiDocumentIndex {
-  background-image: url("$xwiki.getSkinFile('icons/silk/book_open.png')");
-}
-
-.actionmenu .tmMainUserIndex {
-  background-image: url("$xwiki.getSkinFile('icons/silk/group.png')");
-}
-
-.actionmenu .tmDeleteWiki {
-  background-image: url("$xwiki.getSkinFile('icons/silk/cross.png')");
-}
-
-.actionmenu .tmUserWikis {
-  background-image: url("$xwiki.getSkinFile('icons/silk/chart_organisation.png')");
 }
 
 /* Styles for the floating menu, when scrolling down the page. */
@@ -1689,60 +1631,35 @@ input.icon-button {
 /* --------------------------------------------------------------
   * Panel elements
 -------------------------------------------------------------- */
-#rightPanels, #editPanels {
+#rightPanels {
   float: right;
-  margin: 0 0 0 -325px;
+  margin: 0 0 0 -220px;
+  width: 220px;
 }
 
 #leftPanels {
   float: left;
   margin: 0 0 0 -100%;
+  width: 220px;
 }
 
-.panel-left-width-Small #leftPanels, 
-.panel-right-width-Small #rightPanels,
-.panel-right-width-Small #editPanels {
-  width: 125px;
-}
-
-.panel-left-width-Small #leftPanels > .panel, 
-.panel-right-width-Small #rightPanels > .panel, 
-.panel-right-width-Small #editPanels > .panel {
-  width: 85px;
-}
-
-.panel-left-width-Medium #leftPanels, 
-.panel-right-width-Medium #rightPanels, 
-.panel-right-width-Medium #editPanels {
-  width: 225px;
-}
-
-.panel-left-width-Medium #leftPanels > .panel, 
-.panel-right-width-Medium #rightPanels > .panel, 
-.panel-right-width-Medium #editPanels > .panel {
-  width: 185px;
-}
-
-.panel-left-width-Large #leftPanels, 
-.panel-right-width-Large #rightPanels, 
-.panel-right-width-Large #editPanels {
-  width: 325px;
-}
-
-.panel-left-width-Large #leftPanels > .panel, 
-.panel-right-width-Large #rightPanels > .panel, 
-.panel-right-width-Large #editPanels > .panel {
-  width: 285px;
+#editPanels {
+  float: left;
+  margin: 0 0 0 -220px;
+  width: 220px;
 }
 
 .panel {
   display: block;
+  width: 190px;
 }
 
-#leftPanels .panel,
-#rightPanels .panel, 
-#editPanels .panel {
+#leftPanels .panel {
   margin: 0 0 10px 20px;
+}
+
+#rightPanels .panel, #editPanels .panel {
+  margin: 0 0 10px 10px;
 }
 
 h1.xwikipaneltitle {
@@ -2258,7 +2175,7 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
 -------------------------------------------------------------- */
 
 /* ----------------Message Macro-------------------------*/
-span.errormessage, span.warningmessage, span.infomessage, span.plainmessage, span.successmessage {
+span.errormessage, span.warningmessage, span.infomessage, span.plainmessage {
   background-position: 2px center;
   overflow: visible;
   padding: 0 2px 0 22px;
@@ -2417,18 +2334,6 @@ input#tags {
 #XWEWrapper {
   /* Fix double scrollbar in IE7&8 */
   overflow: hidden !important;
-}
-/* Fix tree layout on IE11. Remove when SmartGWT adds support for IE11. */
-.listGrid table.treeCell > colgroup > col:last-of-type,
-.listGrid table.treeCellOver > colgroup > col:last-of-type,
-.listGrid table.treeCellSelected > colgroup > col:last-of-type,
-.listGrid table.treeCellSelectedOver > colgroup > col:last-of-type {
-  width: 100%;
-}
-/* The tree overflows over the filter input and the vertical scroll bar doesn't work on IE11 (see XWIKI-10337). Note that
-   the 'gridBody' CSS class doesn't seem to be present on Firefox and Chrome so this should affect only IE. */
-.listGrid .gridBody {
-  overflow: hidden;
 }
 
 /* -----------------------YUI Trees----------------------*/

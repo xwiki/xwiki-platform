@@ -19,6 +19,7 @@
  */
 package org.xwiki.activeinstalls.internal.server;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -27,16 +28,10 @@ import javax.inject.Singleton;
 import org.xwiki.activeinstalls.internal.JestClientManager;
 import org.xwiki.activeinstalls.server.DataManager;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.properties.ConverterManager;
 
-import com.google.gson.JsonObject;
-
-import io.searchbox.Action;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Count;
-import io.searchbox.core.Search;
-import io.searchbox.params.Parameters;
-import io.searchbox.params.SearchType;
+import net.sf.json.JSONObject;
 
 /**
  * Get stored ping data from a remote Elastic Search instance.
@@ -51,58 +46,28 @@ public class DefaultDataManager implements DataManager
     @Inject
     private JestClientManager jestClientManager;
 
-    @Inject
-    private ConverterManager converterManager;
-
     @Override
-    public JsonObject countInstalls(String indexType, String fullQuery, Map<String, Object> parameters)
-        throws Exception
+    public long getInstallCount(String query) throws Exception
     {
-        Count.Builder countBuilder = new Count.Builder()
-            .query(fullQuery)
-            .addIndex(JestClientManager.INDEX)
-            .addType(indexType);
+        Map queryMap = new HashMap();
+        queryMap.put("query", query);
 
-        // Add parameters.
-        for (Map.Entry<String, Object> parameterEntry : parameters.entrySet()) {
-            countBuilder.setParameter(parameterEntry.getKey(), parameterEntry.getValue());
-        }
+        // This allows to write queries such as: -distributionVersion:*SNAPSHOT
+        queryMap.put("lowercase_expanded_terms", false);
 
-        return executeActionQuery(countBuilder.build(), fullQuery).getJsonObject();
+        Map jsonMap = new HashMap();
+        jsonMap.put("query_string", JSONObject.fromObject(queryMap));
+
+        return executeCount(JSONObject.fromObject(jsonMap).toString());
     }
 
-    @Override
-    public JsonObject searchInstalls(String indexType, String fullQuery, Map<String, Object> parameters)
-        throws Exception
+    private long executeCount(String query) throws Exception
     {
-        Search.Builder searchBuilder = new Search.Builder(fullQuery)
-            .addIndex(JestClientManager.INDEX)
-            .addType(indexType);
-
-        // Add parameters and handle specifically the Search Type.
-        if (parameters.containsKey(Parameters.SEARCH_TYPE)) {
-            SearchType searchType = this.converterManager.convert(SearchType.class,
-                parameters.get(Parameters.SEARCH_TYPE));
-            searchBuilder.setSearchType(searchType);
-        }
-        for (Map.Entry<String, Object> parameterEntry : parameters.entrySet()) {
-            if (!parameterEntry.getKey().equals(Parameters.SEARCH_TYPE)) {
-                searchBuilder.setParameter(parameterEntry.getKey(), parameterEntry.getValue());
-            }
-        }
-
-        return executeActionQuery(searchBuilder.build(), fullQuery).getJsonObject();
-    }
-
-    private JestResult executeActionQuery(Action action, String fullQuery) throws Exception
-    {
-        JestResult result = this.jestClientManager.getClient().execute(action);
-
-        if (!result.isSucceeded()) {
-            throw new Exception(String.format("Error while executing [%s] query [%s]: [%s], Reason: [%s]",
-                action.getClass().getSimpleName(), fullQuery, result.getErrorMessage(), result.getJsonString()));
-        }
-
-        return result;
+        Count count = new Count.Builder(query)
+            .addIndex("installs")
+            .addType("install")
+            .build();
+        JestResult result = this.jestClientManager.getClient().execute(count);
+        return ((Double) result.getValue("count")).longValue();
     }
 }

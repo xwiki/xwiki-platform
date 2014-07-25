@@ -58,22 +58,13 @@ public class ExtensionProgressPane extends BaseElement
     }
 
     /**
-     * @return the element that displays the job log label, which is also used to collapse / expand the job log
-     */
-    public WebElement getJobLogLabel()
-    {
-        String xpath = "//*[@class = 'job-log']/parent::dd/preceding-sibling::dt[last()]/label";
-        return getUtil().findElementWithoutWaiting(getDriver(), container, By.xpath(xpath));
-    }
-
-    /**
      * @return the lines of job log
      */
     public List<LogItemPane> getJobLog()
     {
         List<LogItemPane> log = new ArrayList<LogItemPane>();
         for (WebElement element : getUtil().findElementsWithoutWaiting(getDriver(), container,
-            By.className("job-log-item"))) {
+            By.className("extension-log-item"))) {
             log.add(new LogItemPane(element));
         }
         return log;
@@ -88,14 +79,5 @@ public class ExtensionProgressPane extends BaseElement
             return new MergeConflictPane();
         }
         return null;
-    }
-
-    /**
-     * @return the confirmation to delete the unused wiki pages after uninstalling or upgrading a XAR extension
-     */
-    public UnusedPagesPane getUnusedPages()
-    {
-        return new UnusedPagesPane(getUtil().findElementWithoutWaiting(getDriver(), container,
-            By.className("extension-question")));
     }
 }

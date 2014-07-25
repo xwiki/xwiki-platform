@@ -78,7 +78,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             return (XWikiHibernateBaseStore) componentManager.getInstance(XWikiStoreInterface.class, "hibernate");
         } catch (ComponentLookupException e) {
             throw new DataMigrationException(String.format("Unable to reach the store for database %s",
-                getXWikiContext().getWikiId()), e);
+                getXWikiContext().getDatabase()), e);
         }
     }
 
@@ -166,7 +166,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             });
         } catch (Exception e) {
             throw new DataMigrationException(String.format("Unable to store new data version %d into database %s",
-                version.getVersion(), context.getWikiId()), e);
+                version.getVersion(), context.getDatabase()), e);
         }
     }
 
@@ -179,7 +179,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             liquibaseUpdate(migrations, false);
         } catch (Exception e) {
             throw new DataMigrationException(String.format("Unable to update schema of wiki [%s]",
-                getXWikiContext().getWikiId()), e);
+                getXWikiContext().getDatabase()), e);
         }
     }
 
@@ -191,7 +191,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     {
         if (logger.isInfoEnabled()) {
             logger.info("Checking Hibernate mapping and updating schema if needed for wiki [{}]",
-                getXWikiContext().getWikiId());
+                getXWikiContext().getDatabase());
         }
         getStore().updateSchema(getXWikiContext(), true);
     }
@@ -254,7 +254,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             return;
         }
 
-        final String database = getXWikiContext().getWikiId();
+        final String database = getXWikiContext().getDatabase();
 
         if (logger.isInfoEnabled()) {
             if( preHibernate ) {

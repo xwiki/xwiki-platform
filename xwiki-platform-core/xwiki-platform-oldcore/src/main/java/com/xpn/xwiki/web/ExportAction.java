@@ -28,19 +28,19 @@ import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.filter.FilterException;
-import org.xwiki.filter.input.InputFilterStream;
-import org.xwiki.filter.input.InputFilterStreamFactory;
-import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
-import org.xwiki.filter.output.BeanOutputFilterStreamFactory;
-import org.xwiki.filter.output.DefaultOutputStreamOutputTarget;
-import org.xwiki.filter.output.OutputFilterStream;
-import org.xwiki.filter.output.OutputFilterStreamFactory;
-import org.xwiki.filter.type.FilterStreamType;
-import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSet;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.wikistream.WikiStreamException;
+import org.xwiki.wikistream.input.InputWikiStream;
+import org.xwiki.wikistream.input.InputWikiStreamFactory;
+import org.xwiki.wikistream.instance.input.DocumentInstanceInputProperties;
+import org.xwiki.wikistream.internal.output.DefaultOutputStreamOutputTarget;
+import org.xwiki.wikistream.output.BeanOutputWikiStreamFactory;
+import org.xwiki.wikistream.output.OutputWikiStream;
+import org.xwiki.wikistream.output.OutputWikiStreamFactory;
+import org.xwiki.wikistream.type.WikiStreamType;
+import org.xwiki.wikistream.xar.output.XAROutputProperties;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -121,7 +121,7 @@ public class ExportAction extends XWikiAction
                     wikiName = pattern.substring(0, index);
                     pattern = pattern.substring(index + 1);
                 } else {
-                    wikiName = context.getWikiId();
+                    wikiName = context.getDatabase();
                 }
 
                 StringBuffer where;
@@ -146,7 +146,7 @@ public class ExportAction extends XWikiAction
                 params.add(pattern);
             }
 
-            String database = context.getWikiId();
+            String database = context.getDatabase();
             try {
                 for (Map.Entry<String, Object[]> entry : wikiQueries.entrySet()) {
                     String wikiName = entry.getKey();
@@ -155,7 +155,7 @@ public class ExportAction extends XWikiAction
                     @SuppressWarnings("unchecked")
                     List<String> params = (List<String>) query[1];
 
-                    context.setWikiId(wikiName);
+                    context.setDatabase(wikiName);
                     List<String> docsNames = context.getWiki().getStore().searchDocumentsNames(where, params, context);
                     for (String docName : docsNames) {
                         String pageReference = wikiName + XWikiDocument.DB_SPACE_SEP + docName;
@@ -166,7 +166,7 @@ public class ExportAction extends XWikiAction
                     }
                 }
             } finally {
-                context.setWikiId(database);
+                context.setDatabase(database);
             }
         }
 
@@ -225,7 +225,7 @@ public class ExportAction extends XWikiAction
         return null;
     }
 
-    private String exportXAR(XWikiContext context) throws XWikiException, IOException, FilterException
+    private String exportXAR(XWikiContext context) throws XWikiException, IOException, WikiStreamException
     {
         XWikiRequest request = context.getRequest();
 
@@ -256,7 +256,7 @@ public class ExportAction extends XWikiAction
             }
         }
 
-        if (context.getWiki().ParamAsLong("xwiki.action.export.xar.usefilter", 1) == 1) {
+        if (context.getWiki().ParamAsLong("xwiki.action.export.xar.usewikistream", 1) == 1) {
             // Create input wiki stream
             DocumentInstanceInputProperties inputProperties = new DocumentInstanceInputProperties();
 
@@ -266,7 +266,7 @@ public class ExportAction extends XWikiAction
             EntityReferenceSet entities = new EntityReferenceSet();
 
             if (all) {
-                entities.includes(new WikiReference(context.getWikiId()));
+                entities.includes(new WikiReference(context.getDatabase()));
             } else {
                 if (pages != null) {
                     DocumentReferenceResolver<String> resolver =
@@ -279,10 +279,10 @@ public class ExportAction extends XWikiAction
 
             inputProperties.setEntities(entities);
 
-            InputFilterStreamFactory inputFilterStreamFactory =
-                Utils.getComponent(InputFilterStreamFactory.class, FilterStreamType.XWIKI_INSTANCE.serialize());
+            InputWikiStreamFactory inputWikiStreamFactory =
+                Utils.getComponent(InputWikiStreamFactory.class, WikiStreamType.XWIKI_INSTANCE.serialize());
 
-            InputFilterStream inputFilterStream = inputFilterStreamFactory.createInputFilterStream(inputProperties);
+            InputWikiStream inputWikiStream = inputWikiStreamFactory.createInputWikiStream(inputProperties);
 
             // Create output wiki stream
             XAROutputProperties xarProperties = new XAROutputProperties();
@@ -306,19 +306,16 @@ public class ExportAction extends XWikiAction
             xarProperties.setPackageBackupPack(backup);
             xarProperties.setPreserveVersion(backup || history);
 
-            BeanOutputFilterStreamFactory<XAROutputProperties> xarFilterStreamFactory =
-                Utils.getComponent((Type) OutputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_11.serialize());
+            BeanOutputWikiStreamFactory<XAROutputProperties> xarWikiStreamFactory =
+                Utils.getComponent((Type) OutputWikiStreamFactory.class, WikiStreamType.XWIKI_XAR_11.serialize());
 
-            OutputFilterStream outputFilterStream = xarFilterStreamFactory.createOutputFilterStream(xarProperties);
+            OutputWikiStream outputWikiStream = xarWikiStreamFactory.createOutputWikiStream(xarProperties);
 
             // Export
             response.setContentType("application/zip");
             response.addHeader("Content-disposition", "attachment; filename=" + Util.encodeURI(name, context) + ".xar");
 
-            inputFilterStream.read(outputFilterStream.getFilter());
-
-            inputFilterStream.close();
-            outputFilterStream.close();
+            inputWikiStream.read(outputWikiStream.getFilter());
 
             // Flush
             response.getOutputStream().flush();

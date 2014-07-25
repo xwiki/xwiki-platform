@@ -262,7 +262,7 @@ isc.XWEResultTree.addMethods({
                     return true;
                 }
                 // If the node is page, see if it points to children or attachments. If so it's a folder.
-                var links = (node.links != null) ? node.links : [];
+                var links = (node.link != null) ? node.link : new Array();
                 for (var i = 0; i < links.length; i++) {
                     if (links[i].rel == XWiki.constants.rest.restChildrenRel
                             || links[i].rel == XWiki.constants.rest.restAttachmentsRel
@@ -372,7 +372,7 @@ isc.XWEResultTree.addMethods({
             hasAttachments = true;
         } else {
             // Loop over <link> to find an attachments relationship.
-            var links = (node.links != null) ? node.links : new Array();
+            var links = (node.link != null) ? node.link : new Array();
             var hasAttachments = false;
             for (var i = 0; i < links.length; i++) {
                 if (links[i].rel == XWiki.constants.rest.restAttachmentsRel) {
@@ -452,7 +452,8 @@ isc.XWEDataSource.addProperties({
     /*
      * Isomorphic DataSource generic options.
      */
-    dataFormat : "json", // Format we get from REST calls.
+    dataFormat : "xml", // Format we get from REST calls.
+    xmlNamespaces : { xwiki : "http://www.xwiki.org" }, // XML namespaces of our resources.
     resultTreeClass : "XWEResultTree", // Class to use to manage results.
     // We override DataSource.transformResponse to inject XWiki.callbacks.transformResponse callback handler.
     transformResponse : function (dsResponse, dsRequest, data) {
@@ -467,7 +468,7 @@ isc.XWEDataSource.addProperties({
      * Isomorphic DataSource per-DataSource type (will be overriden) options.
      */
     dataURL : XWiki.constants.rest.baseRestURI + "wikis/", // Default (farm) REST URL.
-    recordXPath : "/wikis", // Default (farm) XPATH for our resources.
+    recordXPath : "/xwiki:wikis/xwiki:wiki", // Default (farm) XPATH for our resources.
     fields : [ // Default fields (farm) in the resource.
         { name:"id", required: true, type: "text", primaryKey:true },
         { name:"name", type: "text" },
@@ -513,7 +514,7 @@ isc.XWEDataSource.addMethods({
         // And Restlet chokes with "No message body writer found" while it has all the info necessary to use the XML writer.
         // FIXME Remove this when the issue is fixed upstream in restlet JAX-RS or when we switch to another
         // JAX-RS implementation.
-        dsRequest.httpHeaders = { "Accept" : "application/json" };
+        dsRequest.httpHeaders = { "Accept" : "application/xml" };
 
         if (dsRequest.originalData) {
             dsRequest.originalData.r = "" + Math.floor(Math.random() * 1000000);
@@ -555,7 +556,7 @@ isc.XWEWikiDataSource.addClassMethods({
 
 isc.XWEWikiDataSource.addProperties({
     wiki: XWiki.currentWiki,
-    recordXPath : "/spaces",
+    recordXPath : "/xwiki:spaces/xwiki:space",
     fields : [
         { name:"id", required: true, type: "text", primaryKey:true },
         { name:"wiki", required: true, type: "text" },
@@ -606,7 +607,7 @@ isc.XWESpaceDataSource.addClassMethods({
 isc.XWESpaceDataSource.addProperties({
     wiki : "xwiki",
     space : "Main",
-    recordXPath : "/pageSummaries",
+    recordXPath : "/xwiki:pages/xwiki:pageSummary",
     fields : [
         { name:"id", required: true, type: "text", primaryKey:true },
         { name:"wiki", required: true, type: "text" },
@@ -675,7 +676,7 @@ isc.XWEPageDataSource.addProperties({
     wiki: "xwiki",
     space: "Main",
     page: "WebHome",
-    recordXPath : "/",
+    recordXPath : "/xwiki:page",
     fields : [
         { name:"id", required: true, type: "text", primaryKey:true },
         { name:"wiki", required: true, type: "text" },
@@ -715,7 +716,7 @@ isc.XWEAttachmentsDataSource.addProperties({
     wiki: "xwiki",
     space: "Main",
     page: "WebHome",
-    recordXPath : "/attachments",
+    recordXPath : "/xwiki:attachments/xwiki:attachment",
     fields : [
         { name:"id", required: true, type: "text", primaryKey:true },
         { name:"name", required: true, type: "text" },
@@ -933,7 +934,7 @@ isc.XWETreeGrid.addMethods({
                 // FetchData call, this method will load the REST resource we've defined above. Note the fetchCallback.
                 pageDS.transformRequest = function(dsRequest) {
                   // Work around bug in Restlet JAX-RS extension. See XWEDataSource#transformRequest for more details.
-                  dsRequest.httpHeaders = { 'Accept' : 'application/json' };
+                  dsRequest.httpHeaders = { 'Accept' : 'application/xml' };
                 };
                 pageDS.fetchData(null, fetchCallback, null);
             } else {

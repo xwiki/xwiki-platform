@@ -38,14 +38,6 @@ public class AdminAction extends XWikiAction
     /** The logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminAction.class);
 
-    /**
-     * Default constructor.
-     */
-    public AdminAction()
-    {
-        this.waitForXWikiInitialization = false;
-    }
-
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

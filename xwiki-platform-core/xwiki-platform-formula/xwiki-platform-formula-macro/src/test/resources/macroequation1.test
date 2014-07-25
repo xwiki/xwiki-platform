@@ -9,7 +9,7 @@
 beginDocument
 beginMacroMarkerStandalone [formula] [] [a+b]
 beginParagraph
-onImage [Typed = [true] Type = [url] Reference = [/xwiki/bin/view/space/page/06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966]] [false] [[alt]=[a+b]]
+onImage [Typed = [true] Type = [url] Reference = [/xwiki/bin/view/Main//06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966]] [false] [[alt]=[a+b]]
 endParagraph
 endMacroMarkerStandalone [formula] [] [a+b]
 endDocument

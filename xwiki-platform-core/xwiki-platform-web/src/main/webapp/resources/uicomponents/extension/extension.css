@@ -113,25 +113,22 @@ dl.extension-metadata > dd > ul {
   margin: 0;
 }
 
-ul.dependencies {
+.extension-body-dependencies ul, .extension-body-progress > ul {
   border-top: 1px dotted #E8E8E8;
   list-style-type: none;
-  margin: .5em 0 0;
-  /* This should accommodate 10 items */
-  max-height: 230px;
-  overflow: auto;
+  margin: 0;
 }
-ul.dependencies li:hover {
+.extension-body-dependencies li:hover, .extension-body-progress > ul li:hover {
   background-color: $theme.highlightColor;
 }
-.dependency-item {
+.dependency-item, .extension-log-item {
   background: transparent none no-repeat left;
   border-bottom: 1px dotted #E8E8E8;
   border-right: 7px solid $theme.pageContentBackgroundColor;
   padding: 0.3em 0 0.3em 20px;
   position: relative;
 }
-.dependency-item {
+.dependency-item, .extension-log-item > div {
   line-height: 1.4em;
 }
 .extension-item-core .extension-title, .extension-item-remote-core .extension-title,
@@ -185,6 +182,35 @@ ul.dependencies li:hover {
 .extension-diff-options select {
   margin-right: 0.3em;
   width: auto;
+}
+
+.extension-body-progress > ul {
+  margin-top: .5em;
+  /* This should accommodate 10 items */
+  max-height: 230px;
+  overflow: auto;
+}
+.extension-log-item {
+  background-position: left .3em;
+}
+.extension-log-item-info {
+  background-image: url("$xwiki.getSkinFile('icons/silk/information.png')");
+  color: $theme.notificationInfoColor;
+}
+.extension-log-item-loading {
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
+  color: $theme.notificationInfoColor;
+}
+.extension-log-item-warn {
+  background-image: url("$xwiki.getSkinFile('icons/silk/error.png')");
+  color: $theme.notificationWarningColor;
+}
+.extension-log-item-error {
+  background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.png')");
+  color: $theme.notificationErrorColor;
+}
+.extension-log-item .stacktrace {
+  white-space: pre-wrap;
 }
 
 .extension-search-bar {
@@ -366,15 +392,11 @@ ul.dependencies li:hover {
   min-width: 100px;
 }
 
-.extensionUpdater > .ui-progress {
+#extensionUpdater > .ui-progress {
   margin-bottom: .5em;
 }
-.extensionUpdater > .extension-body-progress {
+#extensionUpdater > .extension-body-progress {
   display: block;
-}
-/* The font size is smaller and the text is not aligned with the pagination control icons. */
-.extensionUpdater .paginationFilter .resultsNo, .extensionUpdater .paginationFilter .pagination {
-  padding-top: .3em;
 }
 
 .xLabel {
@@ -386,106 +408,4 @@ ul.dependencies li:hover {
   color: $theme.textSecondaryColor;
   font-size: smaller;
   margin: 0.3em 0;
-}
-
-/* Document Tree */
-ul.document-tree {
-  margin: 0;
-}
-.document-tree ul {
-  /* Reduce the default identation. */
-  margin-left: 1.3em;
-}
-.document-tree li {
-  list-style-type: none;
-}
-.document-tree .node {
-  background: none no-repeat scroll 2px center transparent;
-  padding: 2px 2px 2px 20px;
-  /* Node actions have absolute position. */
-  position: relative;
-}
-.document-tree .node:hover {
-  background-color: $theme.highlightColor;
-}
-.document-tree .node .locale {
-  color: $theme.textSecondaryColor;
-  font-style: italic;
-  padding-left: .2em;
-}
-.document-tree .node .locale:before {
-  content: '(';
-}
-.document-tree .node .locale:after {
-  content: ')';
-}
-.document-tree .node .actions {
-  position: absolute;
-  right: 2px;
-}
-.document-tree .wiki.node {
-  background-image: url("$xwiki.getSkinFile('icons/silk/world.png')")
-}
-.document-tree .space.node {
-  background-image: url("$xwiki.getSkinFile('icons/silk/folder.png')")
-}
-.document-tree .document.node {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white.png')")
-}
-.document-tree .document.parent.node {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_stack.png')")
-}
-.document-tree .locale.node {
-  background-image: url("$xwiki.getSkinFile('icons/silk/page_white_world.png')")
-}
-.document-tree .wiki.node, .document-tree .space.node {
-  font-weight: bolder;
-}
-/* Collapsible */
-ul.collapsible.document-tree {
-  /* Leave space for the +/- icons.  */
-  padding-left: 1em;
-}
-.collapsible.document-tree li.collapsed ul {
-  display: none;
-}
-.collapsible.document-tree .node {
-  /* Overwrite the left padding because it is set below by the +/- icon. */
-  padding: 2px;
-}
-.collapsible.document-tree .node:before {
-  /* Reserve the space so that all siblings are aligned even if not all of them have children. */
-  content: '\229F';
-  /* Display the +/- icon outside. This integrates nicely with highlightable nodes. */
-  margin-left: -1em;
-  /* Leave space for the node icon. */
-  padding-right: 20px;
-  visibility: hidden;
-}
-.collapsible.document-tree .parent.node {
-  /* Parent nodes can be collapsed / expanded so we display a different cursor. */
-  cursor: pointer;
-}
-.collapsible.document-tree .parent.node:before {
-  /* The '+' icon. */
-  content: '\229F';
-  visibility: visible;
-}
-.collapsible.document-tree li.collapsed .parent.node:before {
-  /* The '-' icon. */
-  content: '\229E';
-}
-/* Selectable */
-.selectable.document-tree input[type="checkbox"] {
-  /* There's some default margin that breaks the alignment. */
-  margin: 0;
-  /* Make sure the selected count is aligned correctly. */
-  vertical-align: middle;
-}
-.selectable.document-tree .selectedCount {
-  color: $theme.textSecondaryColor;
-  font-size: .8em;
-  /* Bold is inherited from wiki and space nodes so we need to overwrite it. */
-  font-weight: normal;
-  padding-right: .3em;
 }

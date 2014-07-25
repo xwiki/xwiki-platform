@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>WikiResources</web>
+  <name>Translations</name>
+  <language>lv</language>
+  <defaultLanguage/>
+  <translation>1</translation>
+  <parent>WikiResources.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1186679007000</creationDate>
+  <date>1357298520000</date>
+  <contentUpdateDate>1357298514000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Translations</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>true</hidden>
+  <content>## XWiki Translation for language lv generated from http://www.l10n.xwiki.org
+XWiki.XWikiServerClass_visibility_private=Privāts
+XWiki.XWikiServerClass_visibility_public=Publisks
+error.ERROR_XWIKI_ACCESS_DENIED=Jums nav tiesību veikt šo darbību
+wikimanager.action.createwiki.hidedoc=Slēpt dokumentāciju
+wikimanager.action.createwiki.nonstepbystep=Pāslēgt uz normālo izskatu
+wikimanager.action.createwiki.showdoc=Rādīt dokumentāciju
+wikimanager.action.createwiki.stepbystep=Pārslēgt uz vedņa izskatu
+wikimanager.action.next=Tālāk
+wikimanager.action.previous=Atpakaļ
+wikimanager.action.settemplate.false=Atstatīt
+wikimanager.action.settemplate.true=Iestatīt
+wikimanager.action.settings=Iestatījumi
+wikimanager.admins=Administratori
+wikimanager.answer.deletewiki.msg=Vai tiešām vēlaties dzēst viki "{0}"?
+wikimanager.answer.deletewiki.title=Dzēst viki
+wikimanager.createwiki=Izveidot viki
+wikimanager.defaultdatetimeformat=dd.MM.yyyy HH\:mm 
+</content>
+</xwikidoc>

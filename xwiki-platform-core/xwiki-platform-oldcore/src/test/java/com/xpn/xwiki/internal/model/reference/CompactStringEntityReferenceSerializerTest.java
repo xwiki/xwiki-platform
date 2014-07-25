@@ -66,35 +66,35 @@ public class CompactStringEntityReferenceSerializerTest extends AbstractBridgedC
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
 
-        getContext().setWikiId("wiki");
+        getContext().setDatabase("wiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
         Assert.assertEquals("page", this.serializer.serialize(reference));
 
-        getContext().setWikiId("wiki");
+        getContext().setDatabase("wiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "otherpage")));
         Assert.assertEquals("page", this.serializer.serialize(reference));
 
-        getContext().setWikiId("wiki");
+        getContext().setDatabase("wiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "otherspace", "otherpage")));
         Assert.assertEquals("space.page", this.serializer.serialize(reference));
 
-        getContext().setWikiId("otherwiki");
+        getContext().setDatabase("otherwiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("otherwiki", "otherspace", "otherpage")));
         Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
 
-        getContext().setWikiId("wiki");
+        getContext().setDatabase("wiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "otherspace", "page")));
         Assert.assertEquals("space.page", this.serializer.serialize(reference));
 
-        getContext().setWikiId("otherwiki");
+        getContext().setDatabase("otherwiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("otherwiki", "otherspace", "page")));
         Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
 
-        getContext().setWikiId("otherwiki");
+        getContext().setDatabase("otherwiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("otherwiki", "space", "page")));
         Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
 
-        getContext().setWikiId("otherwiki");
+        getContext().setDatabase("otherwiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("otherwiki", "space", "otherpage")));
         Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
     }
@@ -105,12 +105,12 @@ public class CompactStringEntityReferenceSerializerTest extends AbstractBridgedC
         AttachmentReference reference =
             new AttachmentReference("filename", new DocumentReference("wiki", "space", "page"));
 
-        getContext().setWikiId("wiki");
+        getContext().setDatabase("wiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
         Assert.assertEquals("page", this.serializer.serialize(reference.getParent()));
         Assert.assertEquals("space", this.serializer.serialize(reference.getParent().getParent()));
 
-        getContext().setWikiId("xwiki");
+        getContext().setDatabase("xwiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("xwiki", "xspace", "xpage")));
         Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference.getParent()));
         Assert.assertEquals("wiki:space", this.serializer.serialize(reference.getParent().getParent()));
@@ -123,15 +123,15 @@ public class CompactStringEntityReferenceSerializerTest extends AbstractBridgedC
         AttachmentReference reference =
             new AttachmentReference("filename", new DocumentReference("wiki", "space", "page"));
 
-        getContext().setWikiId("wiki");
+        getContext().setDatabase("wiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
         Assert.assertEquals("filename", this.serializer.serialize(reference));
 
-        getContext().setWikiId("wiki");
+        getContext().setDatabase("wiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "otherpage")));
         Assert.assertEquals("page@filename", this.serializer.serialize(reference));
 
-        getContext().setWikiId("otherwiki");
+        getContext().setDatabase("otherwiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("otherwiki", "space", "page")));
         Assert.assertEquals("wiki:space.page@filename", this.serializer.serialize(reference));
     }
@@ -141,7 +141,7 @@ public class CompactStringEntityReferenceSerializerTest extends AbstractBridgedC
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
 
-        getContext().setWikiId("wiki");
+        getContext().setDatabase("wiki");
         getContext().setDoc(new XWikiDocument(new DocumentReference("wiki", "space", "page")));
         Assert.assertEquals("space.page",
             this.serializer.serialize(reference, new EntityReference("otherspace", EntityType.SPACE)));

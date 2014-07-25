@@ -26,22 +26,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.manager.ComponentLifecycleException;
-import org.xwiki.component.phase.Disposable;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -52,10 +41,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
-@Component
-@Named("macromapping")
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class XWikiMacrosMappingRenderer implements XWikiRenderer, Initializable, Disposable
+public class XWikiMacrosMappingRenderer implements XWikiRenderer, EventListener
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiMacrosMappingRenderer.class);
 
@@ -88,109 +74,47 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, Initializable,
         }
     };
 
-    @Inject
-    private ObservationManager observationManager;
+    protected Map<String, String> macros_libraries = null;
 
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    protected Map<String, XWikiVirtualMacro> macros_mappings = null;
 
-    protected Map<String, String> macros_libraries;
-
-    protected Map<String, XWikiVirtualMacro> macros_mappings;
-
-    public XWikiMacrosMappingRenderer()
-    {
-
-    }
-
-    /**
-     * @deprecated since 6.1M2, lookup component with role {@link XWikiRenderer} and hint <code>macromapping</code>
-     *             instead
-     */
-    @Deprecated
     public XWikiMacrosMappingRenderer(XWiki xwiki, XWikiContext context)
     {
-        this.observationManager = Utils.getComponent(ObservationManager.class);
-        this.xcontextProvider = Utils.getComponent(XWikiContext.TYPE_PROVIDER);
-
-        try {
-            initialize();
-        } catch (InitializationException e) {
-            LOGGER.error("Failed to initialize", e);
-        }
-    }
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        loadPreferences();
+        loadPreferences(xwiki, context);
 
         // Add a notification rule if the preference property plugin is modified
-        this.observationManager.addListener(new EventListener()
-        {
-            @Override
-            public void onEvent(Event event, Object source, Object data)
-            {
-                loadPreferences();
-            }
-
-            @Override
-            public String getName()
-            {
-                return NAME;
-            }
-
-            @Override
-            public List<Event> getEvents()
-            {
-                return EVENTS;
-            }
-        });
+        Utils.getComponent(ObservationManager.class).addListener(this);
     }
 
     @Override
-    public String getId()
+    public String getName()
     {
-        return "mapping";
+        return NAME;
     }
 
     @Override
-    public void dispose() throws ComponentLifecycleException
+    public List<Event> getEvents()
     {
-        this.observationManager.removeListener(NAME);
+        return EVENTS;
     }
 
-    /**
-     * @deprecated since 6.1M2
-     */
-    @Deprecated
     public void loadPreferences(XWiki xwiki, XWikiContext context)
-    {
-        loadPreferences();
-    }
-
-    public void loadPreferences()
     {
         this.macros_libraries = new HashMap<String, String>();
         this.macros_mappings = new HashMap<String, XWikiVirtualMacro>();
 
-        XWikiContext xcontext = this.xcontextProvider.get();
-
-        if (xcontext != null && xcontext.getWiki() != null) {
+        if ((xwiki != null) && (context != null)) {
             String[] macrolanguages =
-                StringUtils.split(xcontext.getWiki()
-                    .getXWikiPreference("macros_languages", "velocity,groovy", xcontext), ", ");
+                StringUtils.split(xwiki.getXWikiPreference("macros_languages", "velocity,groovy", context), ", ");
             for (int i = 0; i < macrolanguages.length; i++) {
                 String language = macrolanguages[i];
-                this.macros_libraries
-                    .put(
-                        language,
-                        xcontext.getWiki().getXWikiPreference("macros_" + language,
-                            "XWiki." + language.substring(0, 1).toUpperCase() + language.substring(1) + "Macros",
-                            xcontext));
+                this.macros_libraries.put(
+                    language,
+                    xwiki.getXWikiPreference("macros_" + language, "XWiki." + language.substring(0, 1).toUpperCase()
+                        + language.substring(1) + "Macros", context));
             }
 
-            String macrosmapping = xcontext.getWiki().getMacroList(xcontext);
+            String macrosmapping = xwiki.getMacroList(context);
             String[] mappings = StringUtils.split(macrosmapping, "\r\n");
             for (int i = 0; i < mappings.length; i++) {
                 try {
@@ -213,7 +137,7 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, Initializable,
     public String render(String content, XWikiDocument contentdoc, XWikiDocument doc, XWikiContext context)
     {
         if (this.macros_libraries == null) {
-            loadPreferences();
+            loadPreferences(context.getWiki(), context);
         }
 
         content = convertSingleLines(content, context);
@@ -300,5 +224,13 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, Initializable,
         XWikiContext context)
     {
         return allcontent;
+    }
+
+    @Override
+    public void onEvent(Event event, Object source, Object data)
+    {
+        XWikiContext context = (XWikiContext) data;
+
+        loadPreferences(context.getWiki(), context);
     }
 }

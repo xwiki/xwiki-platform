@@ -20,7 +20,6 @@
 package org.xwiki.annotation.rights.internal;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -29,12 +28,13 @@ import org.xwiki.annotation.io.IOService;
 import org.xwiki.annotation.reference.TypedStringEntityReferenceResolver;
 import org.xwiki.annotation.rights.AnnotationRightService;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 /**
  * Implementation of the rights service based on the XWiki access rights.
@@ -46,6 +46,12 @@ import org.xwiki.security.authorization.Right;
 @Singleton
 public class XWikiAnnotationRightService implements AnnotationRightService
 {
+    /**
+     * The execution used to get the deprecated XWikiContext.
+     */
+    @Inject
+    private Execution execution;
+
     /**
      * Entity reference handler to resolve the reference target. <br />
      * TODO: should be a current reference resolver, to be fully correct, but for the moment it will be a default one,
@@ -61,12 +67,11 @@ public class XWikiAnnotationRightService implements AnnotationRightService
     @Inject
     private IOService annotationsStorageService;
 
+    /**
+     * Entity reference serializer, to create references to the documents to which annotation targets refer.
+     */
     @Inject
-    private AuthorizationManager authorization;
-
-    @Inject
-    @Named("user/current")
-    private DocumentReferenceResolver<String> userAndGroupReferenceResolver;
+    private EntityReferenceSerializer<String> serializer;
 
     /**
      * The logger to log.
@@ -78,20 +83,28 @@ public class XWikiAnnotationRightService implements AnnotationRightService
     public boolean canAddAnnotation(String target, String userName)
     {
         // if the user has comment right on the document represented by the target
-        return this.authorization.hasAccess(Right.COMMENT, getUserReference(userName), getDocumentReference(target));
+        XWikiContext xwikiContext = getXWikiContext();
+        try {
+            return xwikiContext.getWiki().getRightService().hasAccessLevel("comment", userName,
+                getDocumentReference(target), xwikiContext);
+        } catch (XWikiException e) {
+            logException(e, target, userName);
+            return false;
+        }
     }
 
     @Override
     public boolean canEditAnnotation(String annotationId, String target, String userName)
     {
         // if the user has edit right on the document represented by the target, or is the author of the annotation
+        XWikiContext xwikiContext = getXWikiContext();
         try {
             boolean hasEditRight =
-                this.authorization.hasAccess(Right.EDIT, getUserReference(userName), getDocumentReference(target));
+                xwikiContext.getWiki().getRightService().hasAccessLevel("edit", userName, getDocumentReference(target),
+                    xwikiContext);
             if (hasEditRight) {
                 return true;
             }
-
             // check if it's the author of the annotation
             Annotation ann = annotationsStorageService.getAnnotation(target, annotationId);
             return ann != null && ann.getAuthor().equals(userName);
@@ -111,7 +124,14 @@ public class XWikiAnnotationRightService implements AnnotationRightService
     public boolean canViewAnnotations(String target, String userName)
     {
         // if user can view the target, it should be able to view annotations on it
-        return this.authorization.hasAccess(Right.VIEW, getUserReference(userName), getDocumentReference(target));
+        XWikiContext xwikiContext = getXWikiContext();
+        try {
+            return xwikiContext.getWiki().getRightService().hasAccessLevel("view", userName,
+                getDocumentReference(target), xwikiContext);
+        } catch (XWikiException e) {
+            logException(e, target, userName);
+            return false;
+        }
     }
 
     /**
@@ -122,16 +142,16 @@ public class XWikiAnnotationRightService implements AnnotationRightService
      * @param target the serialized reference to target to extract the document reference from
      * @return the serialized reference to the document to which the target refers
      */
-    private EntityReference getDocumentReference(String target)
+    private String getDocumentReference(String target)
     {
-        EntityReference ref = this.referenceResolver.resolve(target, EntityType.DOCUMENT);
+        EntityReference ref = referenceResolver.resolve(target, EntityType.DOCUMENT);
+        // get the document name from the parsed reference
+        String docName = target;
+        if (ref.getType() == EntityType.DOCUMENT || ref.getType() == EntityType.OBJECT_PROPERTY) {
+            docName = serializer.serialize(ref.extractReference(EntityType.DOCUMENT));
+        }
 
-        return ref.extractReference(EntityType.DOCUMENT);
-    }
-
-    private DocumentReference getUserReference(String username)
-    {
-        return this.userAndGroupReferenceResolver.resolve(username);
+        return docName;
     }
 
     /**
@@ -143,6 +163,17 @@ public class XWikiAnnotationRightService implements AnnotationRightService
      */
     private void logException(Exception e, String target, String user)
     {
-        this.logger.warn("Couldn't get access rights for the target [{}] for user [{}]", target, user, e);
+        this.logger.warn("Couldn't get access rights for the target [{}] for user [{}]",
+            new Object[] {target, user, e});
+    }
+
+    /**
+     * Helper function to get the xwiki context from the execution context.
+     * 
+     * @return the xwiki context
+     */
+    private XWikiContext getXWikiContext()
+    {
+        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
     }
 }

@@ -39,10 +39,10 @@ public class SpaceResourceImpl extends XWikiResource implements SpaceResource
     @Override
     public Space getSpace(String wikiName, String spaceName) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getWikiId();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         try {
-            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
             Document home = null;
@@ -55,7 +55,7 @@ public class SpaceResourceImpl extends XWikiResource implements SpaceResource
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setWikiId(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
     }
 }

@@ -99,7 +99,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
         this.mockDocumentReferenceResolver =
             registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "macro", "macroDocumentReferenceResolver");
-        this.includeMacro = getComponentManager().getInstance(Macro.class, "include");
+        this.includeMacro = (IncludeMacro) getComponentManager().getInstance(Macro.class, "include");
         this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
     }
 
@@ -130,15 +130,13 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     {
         String expected =
             "beginDocument\n"
-                + "beginMetaData "
-                    + "[[syntax]=[XWiki 2.0][base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage]]\n"
+                + "beginMetaData [[syntax]=[XWiki 2.0][base]=[wiki:Space.IncludedPage][source]=[wiki:Space.IncludedPage]]\n"
                 + "beginMacroMarkerStandalone [velocity] [] [$foo]\n"
                 + "beginGroup [[class]=[xwikirenderingerror]]\n"
                 + "onWord [Failed to execute the [velocity] macro]\n"
                 + "endGroup [[class]=[xwikirenderingerror]]\n"
                 + "beginGroup [[class]=[xwikirenderingerrordescription hidden]]\n"
-                + "onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: "
-                    + "You don't have the right to execute the script macro [velocity]";
+                + "onVerbatim [org.xwiki.rendering.macro.MacroExecutionException: You don't have the right to execute this script";
 
         // We verify that a Velocity macro set in the including page is not seen in the included page.
         List<Block> blocks = runIncludeMacro(Context.NEW, "{{velocity}}$foo{{/velocity}}", true);
@@ -524,7 +522,8 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
         // Create a Macro transformation context with the Macro transformation object defined so that the include
         // macro can transform included page which is using a new context.
-        MacroTransformation macroTransformation = getComponentManager().getInstance(Transformation.class, "macro");
+        MacroTransformation macroTransformation =
+            (MacroTransformation) getComponentManager().getInstance(Transformation.class, "macro");
         MacroTransformationContext macroContext = createMacroTransformationContext(includedDocStringRef, false);
         macroContext.setId("wiki:Space.IncludingPage");
         macroContext.setTransformation(macroTransformation);

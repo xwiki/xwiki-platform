@@ -27,9 +27,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.configuration.ConfigurationSource;
 
-import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+import com.xpn.xwiki.internal.web.XWikiConfigurationService;
 
 /**
  * @version $Id$
@@ -44,12 +43,12 @@ public class XWikiRequestProcessor extends org.apache.struts.action.RequestProce
     {
         String result = super.processPath(httpServletRequest, httpServletResponse);
 
-        ConfigurationSource configuration =
-            Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
-        if ("1".equals(configuration.getProperty("xwiki.virtual.usepath", "1"))) {
+        if ("1".equals(XWikiConfigurationService.getProperty("xwiki.virtual.usepath", "1", getServletContext()))) {
             // Remove /wikiname part if the struts action is /wiki
             if (httpServletRequest.getServletPath().equals(
-                "/" + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki"))) {
+                "/"
+                    + XWikiConfigurationService.getProperty("xwiki.virtual.usepath.servletpath", "wiki",
+                        getServletContext()))) {
                 int wikiNameIndex = result.indexOf("/", 1);
                 if (wikiNameIndex == -1) {
                     result = "";

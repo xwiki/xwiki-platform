@@ -74,7 +74,8 @@ public class XWikiServletContextListener implements ServletContextListener
 
         // Initialize the Environment
         try {
-            ServletEnvironment servletEnvironment = this.componentManager.getInstance(Environment.class);
+            ServletEnvironment servletEnvironment =
+                (ServletEnvironment) this.componentManager.getInstance(Environment.class);
             servletEnvironment.setServletContext(servletContextEvent.getServletContext());
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize the Servlet Environment", e);

@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -34,7 +33,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.localization.LocaleUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -83,19 +81,7 @@ public class UploadAction extends XWikiAction
             return false;
         }
 
-        // We need to clone the document before we modify it because the cached storage gives the same instance to other
-        // requests (until the cache is invalidated).
         XWikiDocument doc = context.getDoc().clone();
-
-        // It is possible to submit an attachment to a new document (the WYSIWYG content editor does it for instance).
-        // Let's make sure the new document is created with the right (default) language.
-        if (doc.isNew()) {
-            doc.setLocale(Locale.ROOT);
-            if (doc.getDefaultLocale() == Locale.ROOT) {
-                doc.setDefaultLocale(LocaleUtils
-                    .toLocale(context.getWiki().getLanguagePreference(context), Locale.ROOT));
-            }
-        }
 
         // The document is saved for each attachment in the group.
         FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");

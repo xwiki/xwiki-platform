@@ -23,12 +23,12 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.StreamingResponseCallback;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.SolrParams;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.component.phase.Initializable;
+import org.xwiki.stability.Unstable;
 
 /**
  * Component in charge of communicating with the actual Solr server. This is direct access and consistency is not
@@ -40,6 +40,7 @@ import org.xwiki.component.phase.Initializable;
  * @version $Id$
  * @since 4.3M2
  */
+@Unstable
 @Role
 public interface SolrInstance extends Initializable
 {
@@ -122,21 +123,4 @@ public interface SolrInstance extends Initializable
      * @throws SolrServerException if problems occur.
      */
     QueryResponse query(SolrParams solrParams) throws SolrServerException;
-
-    /**
-     * Query solr, and stream the results. Unlike the standard query, this will send events for each Document rather
-     * then add them to the {@link QueryResponse}.
-     * <p>
-     * Although this function returns a {@link QueryResponse} it should be used with care since it excludes anything
-     * that was passed to callback. Also note that future version may pass even more info to the callback and may not
-     * return the results in the {@link QueryResponse}.
-     * 
-     * @param params query parameters
-     * @param callback the object to notify
-     * @return the query result
-     * @throws SolrServerException if problems occur
-     * @throws IOException if problems occur
-     */
-    QueryResponse queryAndStreamResponse(SolrParams params, StreamingResponseCallback callback)
-        throws SolrServerException, IOException;
 }

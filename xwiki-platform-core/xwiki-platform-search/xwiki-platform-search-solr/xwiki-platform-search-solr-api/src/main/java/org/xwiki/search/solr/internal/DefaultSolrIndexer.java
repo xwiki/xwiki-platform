@@ -30,7 +30,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.apache.solr.common.SolrInputDocument;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -39,10 +38,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
-import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.job.Job;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -70,7 +66,7 @@ import com.xpn.xwiki.util.AbstractXWikiRunnable;
  */
 @Component
 @Singleton
-public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposable, Runnable
+public class DefaultSolrIndexer extends AbstractXWikiRunnable implements SolrIndexer, Initializable, Disposable
 {
     /**
      * Index queue entry.
@@ -273,12 +269,6 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     @Inject
     private SolrReferenceResolver solrRefereceResolver;
 
-    @Inject
-    private Execution execution;
-
-    @Inject
-    private ExecutionContextManager ecim;
-
     /**
      * The queue of index operation to perform.
      */
@@ -361,7 +351,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
     }
 
     @Override
-    public void run()
+    protected void runInternal()
     {
         this.logger.debug("Start SOLR indexer thread");
 
@@ -405,8 +395,6 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
             // For the current contiguous operations queue, group the changes
             try {
-                this.ecim.initialize(new ExecutionContext());
-
                 if (IndexOperation.INDEX.equals(operation)) {
                     LengthSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);
                     if (solrDocument != null) {
@@ -425,8 +413,6 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 }
             } catch (Throwable e) {
                 this.logger.error("Failed to process entry [{}]", batchEntry, e);
-            } finally {
-                this.execution.removeContext();
             }
 
             // Commit the index changes so that they become available to queries. This is a costly operation and that is
@@ -489,10 +475,9 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
      *         the reference type is not supported.
      * @throws SolrIndexerException if problems occur.
      * @throws IllegalArgumentException if there is an incompatibility between a reference and the assigned extractor.
-     * @throws ExecutionContextException
      */
     private LengthSolrInputDocument getSolrDocument(EntityReference reference) throws SolrIndexerException,
-        IllegalArgumentException, ExecutionContextException
+        IllegalArgumentException
     {
         SolrMetadataExtractor metadataExtractor = getMetadataExtractor(reference.getType());
 
@@ -565,7 +550,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
         job.initialize(request);
 
-        this.indexerJobs.execute(job);
+        this.indexerJobs.execute(new ExecutionContextRunnable(job, this.componentManager));
 
         return job;
     }

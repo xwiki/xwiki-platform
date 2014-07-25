@@ -185,14 +185,6 @@ public class EntityReferenceSetTest
 
         Assert.assertFalse(set.matches(new DocumentReference("wiki", "space", "document", Locale.FRENCH)));
         Assert.assertFalse(set.matches(new DocumentReference("wiki", "space", "document", Locale.ROOT)));
-
-        set.includes(new DocumentReference("wiki", "space", "document", Locale.FRENCH));
-
-        Assert.assertTrue(set.matches(new DocumentReference("wiki", "space", "document")));
-        Assert.assertTrue(set.matches(new DocumentReference("wiki", "space", "document", Locale.ENGLISH)));
-        Assert.assertTrue(set.matches(new DocumentReference("wiki", "space", "document", Locale.FRENCH)));
-
-        Assert.assertFalse(set.matches(new DocumentReference("wiki", "space", "document", Locale.ROOT)));
     }
 
     @Test
@@ -207,15 +199,6 @@ public class EntityReferenceSetTest
         Assert.assertFalse(set.matches(new DocumentReference("wiki", "space", "document", Locale.ENGLISH)));
 
         Assert.assertTrue(set.matches(new DocumentReference("wiki", "space", "document", Locale.FRENCH)));
-        Assert.assertTrue(set.matches(new DocumentReference("wiki", "space", "document", Locale.ROOT)));
-
-        set.excludes(new DocumentReference("wiki", "space", "document", Locale.FRENCH));
-
-        Assert.assertTrue(set.matches(new DocumentReference("wiki", "space", "document")));
-
-        Assert.assertFalse(set.matches(new DocumentReference("wiki", "space", "document", Locale.ENGLISH)));
-        Assert.assertFalse(set.matches(new DocumentReference("wiki", "space", "document", Locale.FRENCH)));
-
         Assert.assertTrue(set.matches(new DocumentReference("wiki", "space", "document", Locale.ROOT)));
     }
 }

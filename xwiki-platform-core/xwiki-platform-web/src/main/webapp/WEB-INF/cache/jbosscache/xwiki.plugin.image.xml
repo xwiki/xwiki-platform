@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<jbosscache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:jboss:jbosscache-core:config:3.2">
+  <!-- Cache loader config block -->
+  <loaders passivation="false">
+    <!-- No need to fill the memory with images, better to store them on disk -->
+    <loader class="org.jboss.cache.loader.FileCacheLoader">
+      <!-- Let XWiki cache module set the proper location -->
+      <properties/>
+    </loader>
+  </loaders>
+
+   <!--
+      Eviction configuration.  WakeupInterval defines how often the eviction thread runs, in milliseconds.  0 means
+      the eviction thread will never run.
+   -->
+   <eviction wakeUpInterval="500">
+      <default algorithmClass="org.jboss.cache.eviction.LRUAlgorithm">
+         <property name="maxNodes" value="10000" />
+      </default>
+   </eviction>
+</jbosscache>

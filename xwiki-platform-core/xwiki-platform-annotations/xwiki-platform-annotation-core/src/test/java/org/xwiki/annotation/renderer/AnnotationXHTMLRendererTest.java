@@ -35,7 +35,6 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.test.MockWikiModel;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
@@ -218,10 +217,8 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
         // run transformations
         TransformationManager transformationManager = getComponentManager().getInstance(TransformationManager.class);
-        TransformationContext context = new TransformationContext(xdom,
-            syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax()));
-        context.setTargetSyntax(Syntax.ANNOTATED_XHTML_1_0);
-        transformationManager.performTransformations(xdom, context);
+        transformationManager.performTransformations(xdom, new TransformationContext(xdom,
+            syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax())));
 
         AnnotationPrintRenderer renderer =
             getComponentManager().getInstance(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);
@@ -250,10 +247,8 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
 
         // run transformations
         TransformationManager transformationManager = getComponentManager().getInstance(TransformationManager.class);
-        TransformationContext context = new TransformationContext(xdom,
-            syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax()));
-        context.setTargetSyntax(Syntax.ANNOTATED_XHTML_1_0);
-        transformationManager.performTransformations(xdom, context);
+        transformationManager.performTransformations(xdom, new TransformationContext(xdom,
+            syntaxFactory.createSyntaxFromIdString(docFactory.getDocument(docName).getSyntax())));
 
         AnnotationPrintRenderer renderer =
             getComponentManager().getInstance(AnnotationPrintRenderer.class, ANNOTATIONS_RENDERER_HINT);

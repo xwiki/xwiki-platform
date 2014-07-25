@@ -37,14 +37,14 @@ import org.xwiki.component.util.DefaultParameterizedType;
 public interface AttachmentReferenceResolver<T>
 {
     /**
-     * Type instance for AttachmentReferenceResolver<String>.
+     * Type instance for EntityReferenceResolver<String>.
      * 
      * @since 4.0M1
      */
     ParameterizedType TYPE_STRING = new DefaultParameterizedType(null, AttachmentReferenceResolver.class, String.class);
 
     /**
-     * Type instance for AttachmentReferenceResolver<EntityReference>.
+     * Type instance for EntityReferenceResolver<EntityReference>.
      * 
      * @since 4.0M1
      */

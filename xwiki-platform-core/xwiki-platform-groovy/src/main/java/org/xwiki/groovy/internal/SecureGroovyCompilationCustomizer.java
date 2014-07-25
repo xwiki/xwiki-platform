@@ -32,10 +32,9 @@ import org.codehaus.groovy.classgen.BytecodeExpression;
 import org.codehaus.groovy.classgen.BytecodeSequence;
 import org.codehaus.groovy.control.customizers.CompilationCustomizer;
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.groovy.GroovyCompilationCustomizer;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 /**
  * Provides a sandbox environment for running Groovy scripts in a safe way.
@@ -52,13 +51,13 @@ public class SecureGroovyCompilationCustomizer implements GroovyCompilationCusto
      * Used to check for Programming Rights; if the document has Programming Rights then don't perform any check.
      */
     @Inject
-    private ContextualAuthorizationManager authorizationManager;
+    private DocumentAccessBridge dab;
 
     @Override
     public CompilationCustomizer createCustomizer()
     {
         CompilationCustomizer customizer = null;
-        if (!this.authorizationManager.hasAccess(Right.PROGRAM)) {
+        if (!this.dab.hasProgrammingRights()) {
             SecureASTCustomizer secureCustomizer = new SecureASTCustomizer();
 
             secureCustomizer.setStarImportsWhitelist(Collections.<String>emptyList());

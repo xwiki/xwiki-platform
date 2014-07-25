@@ -907,7 +907,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         {
             private void fillDocumentIdConversion(Session session, Map<Long, Long> map)
             {
-                String database = getXWikiContext().getWikiId();
+                String database = getXWikiContext().getDatabase();
                 @SuppressWarnings("unchecked")
                 List<Object[]> results = session.createQuery(
                     "select doc.id, doc.space, doc.name, doc.defaultLanguage, doc.language from "

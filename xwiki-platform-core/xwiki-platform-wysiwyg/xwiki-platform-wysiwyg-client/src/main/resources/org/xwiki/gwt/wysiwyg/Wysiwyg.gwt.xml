@@ -27,7 +27,7 @@
   <stylesheet src="stylesheets/Wysiwyg.css" />
   <entry-point class="org.xwiki.gwt.wysiwyg.client.Wysiwyg" />
 
-  <extend-property name="locale" values="ca,cs,da,de,es,fr,it,lv,nl,pt_BR,ru,sk,sv,tr,zh,zh_TW" />
+  <extend-property name="locale" values="ca,cs,da,de,es,fr,it,lv,nl,pt_BR,ru,sk,sv,zh,zh_TW" />
 
   <!-- Custom linker that adds the document type declaration to the generated permutations. -->
   <define-linker name="StandardsMode" class="org.xwiki.gwt.core.linker.StandardsModeIFrameLinker" />
@@ -55,7 +55,10 @@
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.line.IELinePlugin">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.line.LinePlugin" />
-    <when-property-is name="user.agent" value="ie8" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
   </replace-with>
 
   <!-- SubmitPlugin -->
@@ -65,7 +68,10 @@
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.submit.internal.IEOldSubmitPlugin">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.submit.SubmitPlugin" />
-    <when-property-is name="user.agent" value="ie8" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
   </replace-with>
 
   <!-- ImageConfigDOMWriter -->
@@ -80,6 +86,11 @@
     </any>
   </replace-with>
 
+  <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.image.internal.IE6ImageConfigDOMWriter">
+    <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.image.ImageConfigDOMWriter" />
+    <when-property-is name="user.agent" value="ie6" />
+  </replace-with>
+
   <!-- PasteFilter -->
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteFilter">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteFilter" />
@@ -87,7 +98,10 @@
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.importer.IEPasteFilter">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteFilter" />
-    <when-property-is name="user.agent" value="ie8" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+      <when-property-is name="user.agent" value="ie8" />
+    </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.importer.WebKitPasteFilter">
@@ -103,9 +117,9 @@
   <replace-with class="org.xwiki.gwt.wysiwyg.client.plugin.importer.IEPasteManager">
     <when-type-is class="org.xwiki.gwt.wysiwyg.client.plugin.importer.PasteManager" />
     <any>
+      <when-property-is name="user.agent" value="ie6" />
       <when-property-is name="user.agent" value="ie8" />
       <when-property-is name="user.agent" value="ie9" />
-      <when-property-is name="user.agent" value="ie10" />
     </any>
   </replace-with>
 </module>

@@ -263,7 +263,7 @@ public class DomainObjectFactory
         pageSummary.setXwikiRelativeUrl(doc.getURL("view"));
         pageSummary.setXwikiAbsoluteUrl(doc.getExternalURL("view"));
         pageSummary.setTranslations(createTranslations(objectFactory, baseUri, doc));
-        pageSummary.setSyntax(doc.getSyntax().toIdString());
+        pageSummary.setSyntax(doc.getSyntaxId());
         pageSummary.setVersion(doc.getVersion());
         pageSummary.setAuthor(doc.getAuthor());
         if (withPrettyNames) {
@@ -397,7 +397,7 @@ public class DomainObjectFactory
 
         page.setMajorVersion(doc.getRCSVersion().at(0));
         page.setMinorVersion(doc.getRCSVersion().at(1));
-        page.setLanguage(doc.getLocale().toString());
+        page.setLanguage(doc.getLanguage());
         page.setCreator(doc.getCreator());
         if (withPrettyNames) {
             page.setCreatorName(xwikiApi.getUserName(doc.getCreator(), false));

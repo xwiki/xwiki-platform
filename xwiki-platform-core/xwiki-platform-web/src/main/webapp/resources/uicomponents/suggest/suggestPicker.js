@@ -111,15 +111,12 @@ var XWiki = (function (XWiki) {
     var sourceIndex = 0;
     this.input.value = values[index];
     this.suggest.doAjaxRequests(-1, {
-      parameters: {'exactMatch': true},
       onSuccess: function(response) {
         if (found) return;
         var suggestions = this.suggest.parseResponse(response, this.suggest.sources[sourceIndex]) || [];
         for (var i = 0; i < suggestions.length; i++) {
           if (this.matchesSelectedValue(values[index], suggestions[i])) {
             found = true;
-            // Make sure the selected value is kept as is (submitting without changes must preserve the previous value).
-            suggestions[i].value = values[index];
             this.addItem(suggestions[i]);
             return;
           }
@@ -203,7 +200,7 @@ var XWiki = (function (XWiki) {
    * @return true if the item existed and has been re-enabled, false otherwise
    */
   acceptAlreadyAddedItem : function (key) {
-    var input = this.list ? this.list.down('input[id="' + this.getInputId(key).replace(/[^a-zA-Z0-9_-]/g, '\\$&') + '"]') : $(this.getInputId(key));
+    var input = $(this.getInputId(key));
     if (input) {
       input.checked = true;
       this.notifySelectionChange(input.up('li') || input);

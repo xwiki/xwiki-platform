@@ -35,12 +35,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.properties.converter.ConversionException;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -65,12 +63,6 @@ public class DefaultWikiComponentMethodExecutor implements WikiComponentMethodEx
      */
     @Inject
     private Execution execution;
-
-    /**
-     * Used to update the rendering context.
-     */
-    @Inject
-    private RenderingContext renderingContext;
 
     /**
      * Macro transformation engine.
@@ -171,16 +163,15 @@ public class DefaultWikiComponentMethodExecutor implements WikiComponentMethodEx
                     "Failed to load wiki component document [%s]", componentDocumentReference), e);
             }
 
-            // We need to clone the xdom to avoid transforming the original and make it useless after the first
-            // transformation
-            XDOM transformedXDOM = xdom.clone();
-
             // Perform internal macro transformations
+            XDOM transformedXDOM;
             try {
-                TransformationContext transformationContext = new TransformationContext(transformedXDOM, syntax);
+                TransformationContext transformationContext = new TransformationContext(xdom, syntax);
                 transformationContext.setId(method.getClass().getName() + "#" + method.getName());
-                ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation,
-                    transformationContext, transformedXDOM);
+                // We need to clone the xdom to avoid transforming the original and make it useless after the first
+                // transformation
+                transformedXDOM = xdom.clone();
+                macroTransformation.transform(transformedXDOM, transformationContext);
             } catch (TransformationException e) {
                 throw new WikiComponentRuntimeException(String.format(
                     "Error while executing wiki component macro transformation for method [%s]", method.getName()), e);

@@ -21,9 +21,8 @@ package org.xwiki.rendering.macro.script;
 
 import javax.inject.Inject;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 /**
  * Default Script Macro Permission policy that Script Macro implementations can extends: allow script execution only
@@ -38,11 +37,11 @@ public abstract class AbstractScriptMacroPermissionPolicy implements MacroPermis
      * Used to verify if the current doc has programming rights.
      */
     @Inject
-    private ContextualAuthorizationManager authorizationManager;
+    private DocumentAccessBridge dab;
 
     @Override
     public boolean hasPermission(ScriptMacroParameters parameters, MacroTransformationContext context)
     {
-        return authorizationManager.hasAccess(Right.PROGRAM);
+        return !context.getTransformationContext().isRestricted() && this.dab.hasProgrammingRights();
     }
 }

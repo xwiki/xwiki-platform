@@ -23,8 +23,6 @@ import java.net.URL;
 import java.security.Principal;
 
 import org.jmock.Mock;
-import org.jmock.core.Invocation;
-import org.jmock.core.stub.CustomStub;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
@@ -33,7 +31,6 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.XWikiResponse;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl}.
@@ -56,7 +53,7 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
 
         BaseClass userClass = new BaseClass();
-        userClass.setDocumentReference(new DocumentReference(getContext().getWikiId(), "XWiki", "XWikiUsers"));
+        userClass.setDocumentReference(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiUsers"));
         userClass.addPasswordField("password", "Password", 10);
 
         this.mockXWiki.stubs().method("getUserClass").will(returnValue(userClass));
@@ -172,7 +169,7 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
         assertEquals("XWiki.Admin", principalLocal.getName());
 
         // Set the database name to local.
-        this.getContext().setWikiId("local");
+        this.getContext().setDatabase("local");
 
         // Finally run the test: Using xwiki:Xwiki.Admin should correctly authenticate the Admin user
         Principal principalVirtual = this.authService.authenticate("xwiki:XWiki.Admin", "admin", this.getContext());
@@ -186,50 +183,6 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
 
         assertEquals("/something",
             this.authService.stripContextPathFromURL(new URL("http://localhost:8080/xwiki/something"), getContext()));
-    }
-
-    public void testStripContextPathFromURLWhenRootContextPathWithSlash() throws Exception
-    {
-        this.mockXWiki.stubs().method("getWebAppPath").will(returnValue("/"));
-
-        assertEquals("/something",
-            this.authService.stripContextPathFromURL(new URL("http://localhost:8080/something"), getContext()));
-    }
-
-    public void testStripContextPathFromURLWhenRootContextPathWithoutSlash() throws Exception
-    {
-        this.mockXWiki.stubs().method("getWebAppPath").will(returnValue(""));
-
-        assertEquals("/something",
-            this.authService.stripContextPathFromURL(new URL("http://localhost:8080/something"), getContext()));
-    }
-
-    /**
-     * Simulates the use case when the {@code HttpServletResponse.encodeURL()} changes the context path.
-     */
-    public void testStripContextPathFromURLWhenOutBoundRewriteRuleChangingContextPath() throws Exception
-    {
-        this.mockXWiki.stubs().method("getWebAppPath").will(returnValue("xwiki/"));
-
-        Mock xwikiResponse = mock(XWikiResponse.class);
-        xwikiResponse.stubs().method("setLocale");
-        xwikiResponse.stubs().method("encodeURL").will(
-            new CustomStub("Implements XWikiResponse.encodeURL")
-            {
-                @Override
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    return "http://localhost:8080/anothercontext"
-                        + ";jsessionid=0AF95AFB8997826B936C0397DF6A0C7F?language=en";
-                }
-            });
-        getContext().setResponse((XWikiResponse) xwikiResponse.proxy());
-
-        // Note: the passed URL to stripContextPathFromURL() has also gone through encodeURL() which is why its
-        // context path has been changed from "xwiki" to "anothercontext".
-        assertEquals("/something", this.authService.stripContextPathFromURL(
-            new URL("http://localhost:8080/anothercontext/something"), getContext()));
-
     }
 
     public void testStripContextPathFromURLWithSlashBefore() throws Exception

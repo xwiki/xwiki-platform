@@ -165,14 +165,14 @@ public final class RightsManagerListener implements EventListener
     {
         List<String> wikiList = context.getWiki().getVirtualWikisDatabaseNames(context);
 
-        String database = context.getWikiId();
+        String database = context.getDatabase();
         try {
             for (String wikiName : wikiList) {
-                context.setWikiId(wikiName);
+                context.setDatabase(wikiName);
                 cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
             }
         } finally {
-            context.setWikiId(database);
+            context.setDatabase(database);
         }
     }
 }

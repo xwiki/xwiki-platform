@@ -39,9 +39,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
-import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Displays the title of a document.
@@ -52,12 +50,10 @@ import org.xwiki.velocity.XWikiVelocityException;
 public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplayer
 {
     /**
-     * The key used to store on the XWiki context map the stack of references to documents whose titles are currently
-     * being evaluated (in the current execution context). This stack is used to prevent infinite recursion, which can
-     * happen if the title displayer is called on the current document from the title field or from a script within the
-     * first content heading.
+     * The key used to store on the XWiki context map the stack trace for the
+     * {@link #extractTitleFromContent(org.xwiki.bridge.DocumentModelBridge, DocumentDisplayerParameters)} method.
      */
-    private static final String DOCUMENT_REFERENCE_STACK_KEY = "internal.displayer.title.documentReferenceStack";
+    private static final String EXTRACT_TITLE_STACK_TRACE_KEY = "internal.extractTitleFromContentStackTrace";
 
     /**
      * The object used for logging.
@@ -105,52 +101,29 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     @Override
     public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
-        // Protect against infinite recursion which can happen for instance if the document title displayer is called on
-        // the current document from the title field or from a script within the first content heading.
-        Map<Object, Object> xwikiContext = getXWikiContextMap();
-        @SuppressWarnings("unchecked")
-        Stack<DocumentReference> documentReferenceStack =
-            (Stack<DocumentReference>) xwikiContext.get(DOCUMENT_REFERENCE_STACK_KEY);
-        if (documentReferenceStack == null) {
-            documentReferenceStack = new Stack<DocumentReference>();
-            xwikiContext.put(DOCUMENT_REFERENCE_STACK_KEY, documentReferenceStack);
-        } else if (documentReferenceStack.contains(document.getDocumentReference())) {
-            logger.warn("Infinite recursion detected while displaying the title of [{}]. "
-                + "Using the document name as title.", document.getDocumentReference());
-            return getStaticTitle(document);
-        }
-
-        documentReferenceStack.push(document.getDocumentReference());
-        try {
-            return displayTitle(document, parameters);
-        } finally {
-            documentReferenceStack.pop();
-        }
-    }
-
-    private XDOM displayTitle(DocumentModelBridge document, DocumentDisplayerParameters parameters)
-    {
         // 1. Try to use the title provided by the user.
         if (!StringUtils.isEmpty(document.getTitle())) {
             try {
                 return parseTitle(evaluateTitle(document.getTitle(), document.getDocumentReference(), parameters));
             } catch (Exception e) {
-                logger.warn("Failed to interpret title of document [{}].", document.getDocumentReference(), e);
+                String reference = defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
+                logger.warn("Failed to interpret title of document [{}].", reference);
             }
         }
 
         // 2. Try to extract the title from the document content.
         try {
-            XDOM title = extractTitleFromContent(document, parameters);
+            XDOM title = safeExtractTitleFromContent(document, parameters);
             if (title != null) {
                 return title;
             }
         } catch (Exception e) {
-            logger.warn("Failed to extract title from content of document [{}].", document.getDocumentReference(), e);
+            String reference = defaultEntityReferenceSerializer.serialize(document.getDocumentReference());
+            logger.warn("Failed to extract title from content of document [{}].", reference);
         }
 
-        // 3. The title was not specified or its evaluation failed. Use the document name as a fall-back.
-        return getStaticTitle(document);
+        // 3. No title has been found. Use the document name as title.
+        return parseTitle(document.getDocumentReference().getName());
     }
 
     /**
@@ -182,45 +155,57 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         DocumentDisplayerParameters parameters)
     {
         StringWriter writer = new StringWriter();
-        String namespace =
+        String nameSpace =
             defaultEntityReferenceSerializer.serialize(parameters.isTransformationContextIsolated() ? documentReference
                 : documentAccessBridge.getCurrentDocumentReference());
-
-        // Get the velocity engine
-        VelocityEngine velocityEngine;
-        try {
-            velocityEngine = this.velocityManager.getVelocityEngine();
-        } catch (XWikiVelocityException e) {
-            throw new RuntimeException(e);
-        }
-
-        // Execute Velocity code
         Map<String, Object> backupObjects = null;
-        boolean canPop = false;
         try {
-            // Prepare namespace cleanup
-            velocityEngine.startedUsingMacroNamespace(namespace);
-
             if (parameters.isExecutionContextIsolated()) {
                 backupObjects = new HashMap<String, Object>();
                 // The following method call also clones the execution context.
                 documentAccessBridge.pushDocumentInContext(backupObjects, documentReference);
-                // Pop the document from the context only if the push was successful!
-                canPop = true;
             }
-            velocityEngine
-                .evaluate(velocityManager.getVelocityContext(), writer, namespace, title);
+            velocityManager.getVelocityEngine()
+                .evaluate(velocityManager.getVelocityContext(), writer, nameSpace, title);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            // Clean namespace unless this execution is part of a wider range
-            velocityEngine.stoppedUsingMacroNamespace(namespace);
-
-            if (canPop) {
+            if (parameters.isExecutionContextIsolated()) {
                 documentAccessBridge.popDocumentFromContext(backupObjects);
             }
         }
         return writer.toString();
+    }
+
+    /**
+     * Extracts the title from the document content. This method prevents infinite recursion which can happen for
+     * instance if the title displayer is called from a script within the first heading in the document content.
+     * 
+     * @param document the document to extract the title from
+     * @param parameters display parameters
+     * @return the title XDOM
+     */
+    private XDOM safeExtractTitleFromContent(DocumentModelBridge document, DocumentDisplayerParameters parameters)
+    {
+        // Protect against cycles which can happen for instance if the document title displayer is called on the current
+        // document from a script within the first content heading.
+        Map<Object, Object> xwikiContext = getXWikiContextMap();
+        @SuppressWarnings("unchecked")
+        Stack<DocumentReference> stackTrace =
+            (Stack<DocumentReference>) xwikiContext.get(EXTRACT_TITLE_STACK_TRACE_KEY);
+        if (stackTrace == null) {
+            stackTrace = new Stack<DocumentReference>();
+            xwikiContext.put(EXTRACT_TITLE_STACK_TRACE_KEY, stackTrace);
+        } else if (stackTrace.contains(document.getDocumentReference())) {
+            return null;
+        }
+
+        stackTrace.push(document.getDocumentReference());
+        try {
+            return extractTitleFromContent(document, parameters);
+        } finally {
+            stackTrace.pop();
+        }
     }
 
     /**
@@ -241,15 +226,6 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
      */
     protected abstract XDOM extractTitleFromContent(DocumentModelBridge document,
         DocumentDisplayerParameters parameters);
-
-    /**
-     * @param document an XWiki document
-     * @return the title used as a fall-back when the dynamic title cannot be evaluated
-     */
-    private XDOM getStaticTitle(DocumentModelBridge document)
-    {
-        return parseTitle(document.getDocumentReference().getName());
-    }
 
     /**
      * @return the object used for logging

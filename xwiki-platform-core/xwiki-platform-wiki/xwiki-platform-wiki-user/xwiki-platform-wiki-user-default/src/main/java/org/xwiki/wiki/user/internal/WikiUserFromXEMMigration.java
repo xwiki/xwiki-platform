@@ -224,8 +224,7 @@ public class WikiUserFromXEMMigration extends AbstractHibernateDataMigration
 
         // Save the document
         try {
-            xwiki.saveDocument(oldWikiDescriptor, "[UPGRADE] Remove the old WorkspaceManager.WorkspaceClass object.",
-                    context);
+            xwiki.saveDocument(oldWikiDescriptor, "Remove the old WorkspaceManager.WorkspaceClass object.", context);
         } catch (XWikiException e) {
             throw new DataMigrationException(String.format(
                     "Failed to save the document [%s] to remove the WorkspaceManager.WorkspaceClass object.",

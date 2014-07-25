@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -85,10 +84,9 @@ public class ConfiguredQueryExecutorProvider implements Provider<QueryExecutor>
         try {
             this.queryExecutor = this.manager.getInstance(QueryExecutor.class, storeName);
         } catch (ComponentLookupException e) {
-            this.logger.warn("Could not find a QueryExecutor with hint [{}] which is the hint for the storage engine, "
-                + "defined in your XWiki configuration under the [xwiki.store.main.hint] property. "
-                + "The default QueryExecutor will be used instead. Reason: [{}]", storeName,
-                ExceptionUtils.getRootCauseMessage(e));
+            this.logger.warn(
+                "Could not find a QueryExecutor with hint " + storeName + " which is the hint for the storage engine. "
+                    + "the default QueryExecutor will not be used instead.", e);
         }
 
         this.initialized = true;

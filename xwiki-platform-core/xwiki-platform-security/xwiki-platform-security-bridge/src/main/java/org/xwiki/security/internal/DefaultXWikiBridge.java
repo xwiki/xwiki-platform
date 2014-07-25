@@ -21,13 +21,12 @@ package org.xwiki.security.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -46,17 +45,25 @@ public class DefaultXWikiBridge implements XWikiBridge
     @Named("user")
     private DocumentReferenceResolver<String> resolver;
 
+    /** Execution object. */
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    private Execution execution;
 
     /** Cached main wiki reference. */
     private WikiReference mainWikiReference;
+
+    /**
+     * @return the current {@code XWikiContext}
+     */
+    private XWikiContext getXWikiContext() {
+        return ((XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY));
+    }
 
     @Override
     public WikiReference getMainWikiReference()
     {
         if (mainWikiReference == null) {
-            mainWikiReference = new WikiReference(xcontextProvider.get().getMainXWiki());
+            mainWikiReference = new WikiReference(getXWikiContext().getMainXWiki());
         }
         return mainWikiReference;
     }
@@ -64,44 +71,6 @@ public class DefaultXWikiBridge implements XWikiBridge
     @Override
     public boolean isWikiReadOnly()
     {
-        return xcontextProvider.get().getWiki().isReadOnly();
-    }
-
-    @Override
-    public boolean needsAuthentication(Right right)
-    {
-        XWikiContext context = xcontextProvider.get();
-        String prefName = "authenticate_" + right.getName();
-
-        String value = context.getWiki().getXWikiPreference(prefName, "", context);
-        Boolean result = checkNeedsAuthValue(value);
-        if (result != null) {
-            return result;
-        }
-
-        value = context.getWiki().getSpacePreference(prefName, "", context).toLowerCase();
-        result = checkNeedsAuthValue(value);
-        if (result != null) {
-            return result;
-        }
-
-        return false;
-    }
-
-    private Boolean checkNeedsAuthValue(String value)
-    {
-        if (value != null && !value.equals("")) {
-            if (value.toLowerCase().equals("yes")) {
-                return true;
-            }
-            try {
-                if (Integer.parseInt(value) > 0) {
-                    return true;
-                }
-            } catch (NumberFormatException e) {
-                return null;
-            }
-        }
-        return null;
+        return getXWikiContext().getWiki().isReadOnly();
     }
 }

@@ -33,21 +33,21 @@ import org.xwiki.cache.event.CacheEntryListener;
 public interface Cache<T>
 {
     /**
-     * Add a new value or overwrite the existing one associated with the provided key.
+     * Add a new value or overwrite the existing one associated with the provided key. *
      * <p>
      * You can catch this events using
      * {@link CacheEntryListener#cacheEntryAdded(org.xwiki.cache.event.CacheEntryEvent)} or
      * {@link CacheEntryListener#cacheEntryModified(org.xwiki.cache.event.CacheEntryEvent)}
      * </p>
      * 
-     * @param key the associated key used to access the value in the cache
-     * @param value the value to store in the cache; if {@code null}, the cache entry is removed
+     * @param key the associated key used to access the value in the cache.
+     * @param value the value to store in the cache.
      */
     void set(String key, T value);
 
     /**
      * @param key the key used to access the value in the cache.
-     * @return the value associated with the provided key, or {@code null} if there is no value.
+     * @return the value associated with the provided key, or null if there is no value.
      */
     T get(String key);
 

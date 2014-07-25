@@ -1189,7 +1189,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         doc.setParent("page");
         assertEquals("page", doc.getParent());
 
-        getContext().setWikiId("otherwiki");
+        getContext().setDatabase("otherwiki");
         assertEquals("page", doc.getParent());
 
         doc.setDocumentReference(new DocumentReference("otherwiki", "otherspace", "otherpage"));
@@ -1227,6 +1227,14 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         doc.setParent("parentpage2");
         assertEquals(new DocumentReference("docwiki2", "docspace2", "parentpage2"), doc.getParentReference());
+    }
+
+    public void testSetAbsoluteParentReference()
+    {
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
+
+        doc.setParentReference(new DocumentReference("docwiki", "docspace", "docpage2"));
+        assertEquals("docspace.docpage2", doc.getParent());
     }
 
     public void testSetRelativeParentReference()

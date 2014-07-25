@@ -1,0 +1,8 @@
+org.xwiki.crypto.signer.internal.factory.BcMD5withRsaSignerFactory
+org.xwiki.crypto.signer.internal.factory.BcRsaSsaPssSignerFactory
+org.xwiki.crypto.signer.internal.factory.BcSHA1withRsaSignerFactory
+org.xwiki.crypto.signer.internal.factory.BcSHA224withRsaSignerFactory
+org.xwiki.crypto.signer.internal.factory.BcSHA256withRsaSignerFactory
+org.xwiki.crypto.signer.internal.factory.BcSHA384withRsaSignerFactory
+org.xwiki.crypto.signer.internal.factory.BcSHA512withRsaSignerFactory
+org.xwiki.crypto.signer.internal.factory.DefaultSignerFactory

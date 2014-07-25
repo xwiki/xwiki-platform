@@ -1,12 +1,10 @@
 com.xpn.xwiki.DefaultSkinAccessBridge
 com.xpn.xwiki.doc.DefaultDocumentAccessBridge
-com.xpn.xwiki.internal.XWikiInitializerJob
 com.xpn.xwiki.internal.ComponentManagerBridgeEventListener
 com.xpn.xwiki.internal.DefaultCoreConfiguration
 com.xpn.xwiki.internal.DefaultMandatoryDocumentInitializerManager
 com.xpn.xwiki.internal.DefaultXWikiStubContextProvider
 com.xpn.xwiki.internal.MessageToolVelocityContextInitializer
-com.xpn.xwiki.internal.XWikiCfgConfigurationSource
 com.xpn.xwiki.internal.XWikiContextProvider
 com.xpn.xwiki.internal.XWikiStubContextInitializer
 com.xpn.xwiki.internal.cache.DefaultDocumentCache
@@ -48,9 +46,6 @@ com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter
 com.xpn.xwiki.internal.template.DefaultPrivilegedTemplateRenderer
-com.xpn.xwiki.internal.template.TemplateMacro
-com.xpn.xwiki.internal.template.TemplateScriptService
-com.xpn.xwiki.internal.template.WikiTemplateRenderer
 500:com.xpn.xwiki.internal.observation.remote.converter.FilteredSerializableEventConverter
 com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
@@ -62,14 +57,6 @@ com.xpn.xwiki.internal.sheet.DefaultModelBridge
 com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer
 com.xpn.xwiki.render.XWikiScriptContextInitializer
-com.xpn.xwiki.render.DefaultXWikiRenderingEngine
-com.xpn.xwiki.render.XWikiJSPRenderer
-com.xpn.xwiki.render.XWikiMacrosMappingRenderer
-com.xpn.xwiki.render.XWikiPluginRenderer
-com.xpn.xwiki.render.XWikiRadeoxRenderer
-com.xpn.xwiki.render.XWikiVelocityRenderer
-com.xpn.xwiki.render.XWikiWikiBaseRenderer
-com.xpn.xwiki.render.groovy.XWikiGroovyRenderer
 com.xpn.xwiki.store.hibernate.DefaultHibernateSessionFactory
 com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor
 com.xpn.xwiki.store.hibernate.query.DefaultQueryExecutor

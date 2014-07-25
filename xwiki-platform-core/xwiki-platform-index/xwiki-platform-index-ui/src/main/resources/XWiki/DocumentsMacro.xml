@@ -1,56 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
-<xwikidoc version="1.1">
+<xwikidoc>
   <web>XWiki</web>
   <name>DocumentsMacro</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1402556245000</creationDate>
   <parent>Main.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1402576900000</date>
-  <contentUpdateDate>1402576900000</contentUpdateDate>
+  <creationDate>1329065296000</creationDate>
+  <date>1345365384000</date>
+  <contentUpdateDate>1345365384000</contentUpdateDate>
   <version>1.1</version>
   <title>Documents Macro</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>Example:
-
-##{{{{{documents id="example" count="5" actions="false" columns="doc.title"/}}}}}##
-
-Generates:
-
-{{documents id="example" count="5" actions="false" space="Main" parent="Main.WebHome" columns="doc.title"/}}</content>
   <object>
-    <name>XWiki.DocumentsMacro</name>
-    <number>0</number>
-    <className>XWiki.WikiMacroClass</className>
-    <guid>27ec7479-a26b-4b03-a6ec-576f00eecbf3</guid>
     <class>
       <name>XWiki.WikiMacroClass</name>
       <customClass/>
@@ -160,6 +133,10 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibility>
     </class>
+    <name>XWiki.DocumentsMacro</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroClass</className>
+    <guid>27ec7479-a26b-4b03-a6ec-576f00eecbf3</guid>
     <property>
       <code>{{velocity}}
 #if ("$!xcontext.macro.params.columns" != "") 
@@ -194,7 +171,7 @@ Generates:
 #end
 #if(!$isGuest &amp;&amp; $xcontext.macro.params.actions == "true")
   #set($discard = $collist.add('_actions'))
-  #set($discard = $colprops.put('_actions', { 'actions' : ['copy', 'rename', 'rights', 'delete'] }))
+  #set($discard = $colprops.put('_actions', { 'actions' : ['copy', 'delete', 'rename', 'rights'] }))
 #end
 #if ("$!xcontext.macro.params.id" != "")
   #set ($livetableId = $xcontext.macro.params.id)
@@ -231,10 +208,6 @@ Generates:
     </property>
   </object>
   <object>
-    <name>XWiki.DocumentsMacro</name>
-    <number>0</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>65052d4b-4b4c-4ee0-bd16-ae4be4ee53b6</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -283,6 +256,10 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
+    <name>XWiki.DocumentsMacro</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>65052d4b-4b4c-4ee0-bd16-ae4be4ee53b6</guid>
     <property>
       <defaultValue>15</defaultValue>
     </property>
@@ -297,10 +274,6 @@ Generates:
     </property>
   </object>
   <object>
-    <name>XWiki.DocumentsMacro</name>
-    <number>1</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>1307889a-13ae-4f31-8d09-71f162d3276e</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -349,6 +322,10 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
+    <name>XWiki.DocumentsMacro</name>
+    <number>1</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>1307889a-13ae-4f31-8d09-71f162d3276e</guid>
     <property>
       <defaultValue>true</defaultValue>
     </property>
@@ -363,10 +340,6 @@ Generates:
     </property>
   </object>
   <object>
-    <name>XWiki.DocumentsMacro</name>
-    <number>2</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>ebff2ec2-730e-4389-a15d-74a07b8ace73</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -415,6 +388,10 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
+    <name>XWiki.DocumentsMacro</name>
+    <number>2</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>ebff2ec2-730e-4389-a15d-74a07b8ace73</guid>
     <property>
       <defaultValue/>
     </property>
@@ -429,10 +406,6 @@ Generates:
     </property>
   </object>
   <object>
-    <name>XWiki.DocumentsMacro</name>
-    <number>3</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>4eb5c373-3982-417c-8445-d6df9280bd73</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -481,6 +454,10 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
+    <name>XWiki.DocumentsMacro</name>
+    <number>3</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>4eb5c373-3982-417c-8445-d6df9280bd73</guid>
     <property>
       <defaultValue/>
     </property>
@@ -495,10 +472,6 @@ Generates:
     </property>
   </object>
   <object>
-    <name>XWiki.DocumentsMacro</name>
-    <number>4</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>2f12ef81-9f79-4f9a-829a-c0294a4d6178</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -547,6 +520,10 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
+    <name>XWiki.DocumentsMacro</name>
+    <number>4</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>2f12ef81-9f79-4f9a-829a-c0294a4d6178</guid>
     <property>
       <defaultValue/>
     </property>
@@ -561,10 +538,6 @@ Generates:
     </property>
   </object>
   <object>
-    <name>XWiki.DocumentsMacro</name>
-    <number>5</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>48fedb20-7177-4998-b377-feae7128b0eb</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -613,6 +586,10 @@ Generates:
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
+    <name>XWiki.DocumentsMacro</name>
+    <number>5</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>48fedb20-7177-4998-b377-feae7128b0eb</guid>
     <property>
       <defaultValue/>
     </property>
@@ -626,4 +603,11 @@ Generates:
       <name>columns</name>
     </property>
   </object>
+  <content>Example:
+
+##{{{{{documents id="example" count="5" actions="false" columns="doc.title"/}}}}}##
+
+Generates:
+
+{{documents id="example" count="5" actions="false" space="Main" parent="Main.WebHome" columns="doc.title"/}}</content>
 </xwikidoc>

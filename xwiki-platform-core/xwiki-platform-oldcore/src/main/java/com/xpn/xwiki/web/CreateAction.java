@@ -132,14 +132,6 @@ public class CreateAction extends XWikiAction
      */
     private static final String CURRENT_RESOLVER_HINT = "current";
 
-    /**
-     * Default constructor.
-     */
-    public CreateAction()
-    {
-        this.waitForXWikiInitialization = false;
-    }
-
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
@@ -346,7 +338,7 @@ public class CreateAction extends XWikiAction
 
         if (isSpace && !StringUtils.isEmpty(space)) {
             // If a space is ready to be created, redirect to the space home in edit mode
-            newDocRef = new DocumentReference(context.getWikiId(), space, "WebHome");
+            newDocRef = new DocumentReference(context.getDatabase(), space, "WebHome");
         }
 
         // check whether there is a template parameter set, be it an empty one. If a page should be created and there is
@@ -365,7 +357,7 @@ public class CreateAction extends XWikiAction
             // check if the creation in this space is allowed, and only set the new document reference if the creation
             // is allowed
             if (checkAllowedSpace(space, page, templateProvider, context)) {
-                newDocRef = new DocumentReference(context.getWikiId(), space, page);
+                newDocRef = new DocumentReference(context.getDatabase(), space, page);
             }
         }
 

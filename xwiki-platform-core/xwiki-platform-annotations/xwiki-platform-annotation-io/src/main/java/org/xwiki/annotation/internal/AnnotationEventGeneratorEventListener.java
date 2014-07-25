@@ -116,7 +116,7 @@ public class AnnotationEventGeneratorEventListener implements EventListener
     {
         // Don`t rely on the context from the data parameter.
         XWikiContext context = (XWikiContext) execution.getContext().getProperty("xwikicontext");
-        String currentWiki = context.getWikiId();
+        String currentWiki = context.getDatabase();
 
         try {
             XWikiDocument document = (XWikiDocument) source;
@@ -125,7 +125,7 @@ public class AnnotationEventGeneratorEventListener implements EventListener
             // Always work on the wiki of the source document. The Annotation Application's configuration looks at the
             // context to provide values for the current wiki. Objects could be modified cross-wiki and the context
             // database might not be right.
-            context.setWikiId(wikiOfAffectedDocument);
+            context.setDatabase(wikiOfAffectedDocument);
 
             // Only work if the Annotations Application is installed on the wiki.
             if (!annotationConfiguration.isInstalled()) {
@@ -177,7 +177,7 @@ public class AnnotationEventGeneratorEventListener implements EventListener
             logger.error("Failed to handle event of type [{}]", event.getClass().getName(), e);
         } finally {
             // Restore the context database.
-            context.setWikiId(currentWiki);
+            context.setDatabase(currentWiki);
         }
     }
 

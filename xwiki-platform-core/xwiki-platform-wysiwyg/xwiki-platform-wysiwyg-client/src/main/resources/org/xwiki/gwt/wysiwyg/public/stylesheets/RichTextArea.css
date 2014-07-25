@@ -1,16 +1,10 @@
 #template('colorThemeInit.vm')
-/*
-  The skin sets some styles on #body so we need a more specific selector in order to overwrite them. Moreover, Chrome
-  seems to ignore the !important when computing the current style of the edited element, which leads to the wrong style
-  being copied to new elements (see XWIKI-10276).
-*/
-html, body#body[contenteditable=true] {
+html, body {
   background-color: $theme.pageContentBackgroundColor !important;
   background-image: none !important;
   color: $theme.textColor !important;
   height: auto !important;
-  /* Selenium fails to type into the empty body if it's not visible. Set the minimum height as the line height. */
-  min-height: 1.4em !important;
+  min-height: 0 !important;
   min-width: 0 !important;
   overflow: visible !important;
   padding: 0 !important;

@@ -45,10 +45,10 @@ public class ClassPropertyResourceImpl extends XWikiResource implements ClassPro
     @Override
     public Property getClassProperty(String wikiName, String className, String propertyName) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getWikiId();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         try {
-            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(className);
             if (xwikiClass == null) {
@@ -74,7 +74,7 @@ public class ClassPropertyResourceImpl extends XWikiResource implements ClassPro
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setWikiId(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
     }
 }

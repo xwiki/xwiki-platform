@@ -60,10 +60,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  */
 public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 {
-    /**
-     * Make sure the index folder is not reused.
-     */
-    private final static String INDEXDIR = "target" + File.separator + "lucenetest-" + new Date().getTime();
+    private final static String INDEXDIR = System.getProperty("java.io.tmpdir") + File.separator + "lucenetest";
 
     private final Semaphore rebuildDone = new Semaphore(0);
 
@@ -182,7 +179,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
             .will(returnValue(Arrays.asList("xwiki")));
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
-        getContext().setWikiId("wiki");
+        getContext().setDatabase("wiki");
     }
 
     public void testCreateIndex() throws IOException

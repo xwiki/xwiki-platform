@@ -20,6 +20,7 @@
 package org.xwiki.url.internal.standard;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Configuration options specific to the {@code standard} URL implementation scheme.
@@ -28,6 +29,7 @@ import org.xwiki.component.annotation.Role;
  * @since 2.3M1
  */
 @Role
+@Unstable
 public interface StandardURLConfiguration
 {
     /**

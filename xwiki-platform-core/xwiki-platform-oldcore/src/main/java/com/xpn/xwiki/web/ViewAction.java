@@ -40,14 +40,6 @@ public class ViewAction extends XWikiAction
      */
     public static final String VIEW_ACTION = "view";
 
-    /**
-     * Default constructor.
-     */
-    public ViewAction()
-    {
-        this.waitForXWikiInitialization = false;
-    }
-
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {

@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.TranslationBundleFactory;
@@ -61,6 +62,12 @@ public class DocumentTranslationBundleInitializer implements EventListener
     @Inject
     @Named(DocumentTranslationBundleFactory.ID)
     private Provider<TranslationBundleFactory> bundleFactoryProvider;
+
+    /**
+     * Used to log issues.
+     */
+    @Inject
+    private Logger logger;
 
     @Override
     public List<Event> getEvents()

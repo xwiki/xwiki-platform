@@ -24,13 +24,6 @@ import org.xwiki.observation.event.filter.EventFilter;
 
 /**
  * An event triggered after a wiki has been created.
- * <p>
- * The event also send the following parameters:
- * </p>
- * <ul>
- * <li>source: the wiki identifier as {@link String}</li>
- * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
- * </ul>
  * 
  * @version $Id$
  * @since 3.0M1

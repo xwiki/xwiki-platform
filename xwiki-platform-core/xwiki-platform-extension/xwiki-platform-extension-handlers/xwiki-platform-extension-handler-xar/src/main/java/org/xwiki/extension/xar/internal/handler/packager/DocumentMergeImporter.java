@@ -102,12 +102,10 @@ public class DocumentMergeImporter
                             // Indicate future author to whoever is going to answer the question
                             nextDocument.setCreatorReference(currentDocument.getCreatorReference());
                             DocumentReference userReference = configuration.getUserReference();
-                            if (userReference != null) {
-                                nextDocument.setAuthorReference(userReference);
-                                nextDocument.setContentAuthorReference(userReference);
-                                for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
-                                    attachment.setAuthor(nextDocument.getAuthor());
-                                }
+                            nextDocument.setAuthorReference(userReference);
+                            nextDocument.setContentAuthorReference(userReference);
+                            for (XWikiAttachment attachment : nextDocument.getAttachmentList()) {
+                                attachment.setAuthor(nextDocument.getAuthor());
                             }
 
                             documentToSave =
@@ -140,16 +138,8 @@ public class DocumentMergeImporter
         MergeConfiguration mergeConfiguration = new MergeConfiguration();
         mergeConfiguration.setProvidedVersionsModifiables(true);
 
-        MergeResult documentMergeResult;
-        try {
-            documentMergeResult = mergedDocument.merge(previousDocument, nextDocument, mergeConfiguration, xcontext);
-        } catch (Exception e) {
-            // Unexpected error, lets behave as if there was a conflict
-            documentMergeResult = new MergeResult();
-            documentMergeResult.getLog().error(
-                "Unexpected exception thrown. Usually means there is a bug in the merge.", e);
-            documentMergeResult.setModified(true);
-        }
+        MergeResult documentMergeResult =
+            mergedDocument.merge(previousDocument, nextDocument, mergeConfiguration, xcontext);
 
         documentMergeResult.getLog().log(this.logger);
 
@@ -323,11 +313,19 @@ public class DocumentMergeImporter
                     }
                 }
             }
-
-            // Make sure to keep the content author we want
-            currentDocument.setContentDirty(false);
-            currentDocument.setContentUpdateDate(new Date());
         }
+
+        // Set version and dates
+        if (!currentDocument.isNew()) {
+            currentDocument.setMinorEdit(false);
+            currentDocument.incrementVersion();
+            Date ndate = new Date();
+            document.setDate(ndate);
+            document.setContentUpdateDate(ndate);
+        }
+
+        currentDocument.setMetaDataDirty(false);
+        currentDocument.setContentDirty(false);
 
         saveDocumentSetContextUser(currentDocument, comment);
     }

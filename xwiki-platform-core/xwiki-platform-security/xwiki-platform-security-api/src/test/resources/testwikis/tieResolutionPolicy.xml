@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!-- Used by DefaultAuthorizationManagerIntegrationTest#testTieResolutionPolicy() -->
+<!-- Used by XWikiSecurityAuthorizationTest#testTieResolutionPolicy() -->
 <wikis>
   <wiki name="wiki" mainWiki="true" owner="XWiki.Admin" />
   <wiki name="wikiUserAllowDeny" alt="a wiki with a conflicting of userA allow/userA deny full access">

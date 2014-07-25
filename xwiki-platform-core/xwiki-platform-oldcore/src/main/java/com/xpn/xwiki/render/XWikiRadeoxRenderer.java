@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 
-import javax.inject.Named;
-
 import org.apache.commons.lang3.StringUtils;
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.api.engine.context.RenderContext;
@@ -35,11 +33,6 @@ import org.radeox.filter.FilterPipe;
 import org.radeox.util.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -47,10 +40,7 @@ import com.xpn.xwiki.render.filter.XWikiFilter;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
-@Component
-@Named("wiki")
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class XWikiRadeoxRenderer implements XWikiRenderer, Initializable
+public class XWikiRadeoxRenderer implements XWikiRenderer
 {
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiRadeoxRenderer.class);
@@ -63,6 +53,17 @@ public class XWikiRadeoxRenderer implements XWikiRenderer, Initializable
 
     public XWikiRadeoxRenderer()
     {
+        initRadeoxEngine();
+    }
+
+    public XWikiRadeoxRenderer(boolean removePre)
+    {
+        this();
+        setRemovePre(removePre);
+    }
+
+    private void initRadeoxEngine()
+    {
         // This is needed so that our local config is used
         InitialRenderContext ircontext = new BaseInitialRenderContext();
         Locale locale = new Locale("xwiki", "xwiki");
@@ -73,28 +74,6 @@ public class XWikiRadeoxRenderer implements XWikiRenderer, Initializable
 
         this.initialRenderContext = ircontext;
         this.filterPipe = initFilterPipe(ircontext);
-    }
-
-    /**
-     * @deprecated since 6.1M2, use component with role {@link XWikiRenderer} and hint <code>wiki</code> instead
-     */
-    public XWikiRadeoxRenderer(boolean removePre)
-    {
-        this();
-
-        setRemovePre(removePre);
-    }
-
-    @Override
-    public void initialize() throws InitializationException
-    {
-        setRemovePre(false);
-    }
-
-    @Override
-    public String getId()
-    {
-        return "wiki";
     }
 
     /**

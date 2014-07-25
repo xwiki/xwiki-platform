@@ -26,6 +26,7 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -33,10 +34,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.configuration.ConfigurationSource;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+import com.xpn.xwiki.internal.web.XWikiConfigurationService;
 
 /**
  * <p>
@@ -79,9 +79,15 @@ public class ActionFilter implements Filter
      */
     private static final String ATTRIBUTE_ACTION_DISPATCHED = ActionFilter.class.getName() + ".actionDispatched";
 
+    /**
+     * Use to access resources.
+     */
+    private ServletContext servletContext;
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException
     {
+        this.servletContext = filterConfig.getServletContext();
     }
 
     @SuppressWarnings("unchecked")
@@ -153,11 +159,10 @@ public class ActionFilter implements Filter
         int index = path.indexOf(PATH_SEPARATOR, 1);
 
         // We need to also get rid of the wiki name in case of a XEM in usepath mode
-        ConfigurationSource configuration =
-            Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
-        if ("1".equals(configuration.getProperty("xwiki.virtual.usepath", "1"))) {
+        if ("1".equals(XWikiConfigurationService.getProperty("xwiki.virtual.usepath", "1", this.servletContext))) {
             if (servletPath.equals(PATH_SEPARATOR
-                + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki"))) {
+                + XWikiConfigurationService.getProperty("xwiki.virtual.usepath.servletpath", "wiki",
+                    this.servletContext))) {
                 // Move the wiki name together with the servlet path
                 servletPath += path.substring(0, index);
                 index = path.indexOf(PATH_SEPARATOR, index + 1);

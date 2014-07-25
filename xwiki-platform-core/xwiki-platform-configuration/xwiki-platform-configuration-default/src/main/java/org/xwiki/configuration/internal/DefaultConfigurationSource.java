@@ -31,10 +31,11 @@ import org.xwiki.configuration.ConfigurationSource;
 /**
  * Composite Configuration Source that looks in the following sources in that order:
  * <ul>
- * <li>documents sources (space first and then wiki preferences wiki pages)</li>
+ * <li>space preferences wiki page</li>
+ * <li>wiki preferences wiki page</li>
  * <li>xwiki properties file (xwiki.properties)</li>
  * </ul>
- * Should be used when a configuration should not be overridden by the user in his/her profile (in which case the
+ * Should be used when a configuration should not be overriden by the user in his/her profile (in which case the
  * {@link AllConfigurationSource} should be used.
  * 
  * @version $Id$
@@ -49,14 +50,19 @@ public class DefaultConfigurationSource extends CompositeConfigurationSource imp
     private ConfigurationSource xwikiPropertiesSource;
 
     @Inject
-    @Named("documents")
-    private ConfigurationSource documentsSource;
+    @Named("wiki")
+    private ConfigurationSource wikiPreferencesSource;
+
+    @Inject
+    @Named("space")
+    private ConfigurationSource spacePreferencesSource;
 
     @Override
     public void initialize() throws InitializationException
     {
-        // First source is looked up first when a property value is requested.
-        addConfigurationSource(this.documentsSource);
+        // First source is looked first when a property value is requested.
+        addConfigurationSource(this.spacePreferencesSource);
+        addConfigurationSource(this.wikiPreferencesSource);
         addConfigurationSource(this.xwikiPropertiesSource);
     }
 }

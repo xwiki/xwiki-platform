@@ -195,7 +195,7 @@ public class XWikiDismaxQParserPlugin extends ExtendedDismaxQParserPlugin
      */
     private static List<String> getListParameter(String parameter, SolrParams parameters)
     {
-        String value = parameters.get(parameter);
+        String value = (String) parameters.get(parameter);
         if (value != null) {
             return Arrays.asList(LIST_SEPARATOR.split(value));
         } else {

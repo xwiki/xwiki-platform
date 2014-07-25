@@ -85,7 +85,6 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
         this.language = doc.getLanguage();
         this.deleter = deleter;
         this.date = deleteDate;
-
         setDocument(doc, context);
     }
 

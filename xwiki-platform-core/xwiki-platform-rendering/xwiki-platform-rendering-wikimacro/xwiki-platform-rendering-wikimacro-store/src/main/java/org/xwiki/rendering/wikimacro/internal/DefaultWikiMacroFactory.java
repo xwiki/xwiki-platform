@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -29,13 +30,13 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
-import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -46,8 +47,8 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
-import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -81,12 +82,6 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
      */
     @Inject
     private EntityReferenceSerializer<String> serializer;
-
-    /**
-     * Content parser used to parse the macro content.
-     */
-    @Inject
-    private ContentParser parser;
 
     /**
      * The logger to log.
@@ -246,8 +241,9 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
 
         XDOM xdom;
         try {
-            xdom = parser.parse(macroCode, doc.getSyntax(), documentReference);
-        } catch (MissingParserException ex) {
+            Parser parser = componentManager.getInstance(Parser.class, doc.getSyntax().toIdString());
+            xdom = parser.parse(new StringReader(macroCode));
+        } catch (ComponentLookupException ex) {
             throw new WikiMacroException("Could not find a parser for macro content", ex);
         } catch (ParseException ex) {
             throw new WikiMacroException("Error while parsing macro content", ex);

@@ -95,10 +95,10 @@ public class WikiResourceImpl extends XWikiResource implements WikiResource
                         "Can't access Package plugin API. Generally mean you don't have enough rights.");
             }
 
-            String database = xwikiContext.getWikiId();
+            String database = xwikiContext.getDatabase();
 
             try {
-                xwikiContext.setWikiId(wikiName);
+                xwikiContext.setDatabase(wikiName);
                 importer.setBackupPack(backup);
 
                 importer.Import(is);
@@ -130,7 +130,7 @@ public class WikiResourceImpl extends XWikiResource implements WikiResource
             } catch (IOException e) {
                 throw new WebApplicationException(e);
             } finally {
-                xwikiContext.setWikiId(database);
+                xwikiContext.setDatabase(database);
             }
 
             return DomainObjectFactory.createWiki(objectFactory, uriInfo.getBaseUri(), wikiName);

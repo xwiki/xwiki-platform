@@ -22,6 +22,7 @@ package org.xwiki.extension.script.internal.safe;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
@@ -39,7 +40,7 @@ import org.xwiki.extension.repository.search.Searchable;
  */
 @Component
 @Singleton
-public class ExtensionRepositoryScriptSafeProvider extends AbstractScriptSafeProvider<ExtensionRepository>
+public class ExtensionRepositoryScriptSafeProvider implements ScriptSafeProvider<ExtensionRepository>
 {
     /**
      * The provider of instances safe for public scripts.
@@ -54,6 +55,12 @@ public class ExtensionRepositoryScriptSafeProvider extends AbstractScriptSafePro
     @Inject
     private Execution execution;
 
+    /**
+     * Needed for checking programming rights.
+     */
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
     @Override
     public <S> S get(ExtensionRepository unsafe)
     {
@@ -62,24 +69,24 @@ public class ExtensionRepositoryScriptSafeProvider extends AbstractScriptSafePro
         if (unsafe instanceof CoreExtensionRepository) {
             safe =
                 new SafeCoreExtensionRepository<CoreExtensionRepository>((CoreExtensionRepository) unsafe,
-                    this.defaultSafeProvider, this.execution, hasProgrammingRights());
+                    this.defaultSafeProvider, this.execution, this.documentAccessBridge.hasProgrammingRights());
         } else if (unsafe instanceof InstalledExtensionRepository) {
             safe =
                 new SafeInstalledExtensionRepository<InstalledExtensionRepository>(
                     (InstalledExtensionRepository) unsafe, this.defaultSafeProvider, this.execution,
-                    hasProgrammingRights());
+                    this.documentAccessBridge.hasProgrammingRights());
         } else if (unsafe instanceof LocalExtensionRepository) {
             safe =
                 new SafeLocalExtensionRepository<LocalExtensionRepository>((LocalExtensionRepository) unsafe,
-                    this.defaultSafeProvider, this.execution, hasProgrammingRights());
+                    this.defaultSafeProvider, this.execution, this.documentAccessBridge.hasProgrammingRights());
         } else if (unsafe instanceof Searchable) {
             safe =
                 new SafeSearchableExtensionRepository<ExtensionRepository>(unsafe, this.defaultSafeProvider,
-                    this.execution, hasProgrammingRights());
+                    this.execution, this.documentAccessBridge.hasProgrammingRights());
         } else {
             safe =
                 new SafeExtensionRepository<ExtensionRepository>(unsafe, this.defaultSafeProvider, this.execution,
-                    hasProgrammingRights());
+                    this.documentAccessBridge.hasProgrammingRights());
         }
 
         return (S) safe;

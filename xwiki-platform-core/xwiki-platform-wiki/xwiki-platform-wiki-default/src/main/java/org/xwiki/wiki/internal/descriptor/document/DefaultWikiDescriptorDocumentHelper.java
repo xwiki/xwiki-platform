@@ -81,13 +81,8 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
     public String getWikiIdFromDocumentReference(DocumentReference descriptorDocumentReference)
     {
         String docName = descriptorDocumentReference.getName();
-        return StringUtils.removeStart(docName, "XWikiServer").toLowerCase();
-    }
-
-    @Override
-    public String getWikiIdFromDocumentFullname(String descriptorDocumentFullname)
-    {
-        return StringUtils.removeStart(descriptorDocumentFullname, "XWiki.XWikiServer").toLowerCase();
+        String wikiId = docName.replaceAll("XWikiServer", "");
+        return wikiId.toLowerCase();
     }
 
     @Override
@@ -143,36 +138,29 @@ public class DefaultWikiDescriptorDocumentHelper implements WikiDescriptorDocume
 
         List<XWikiDocument> result = new ArrayList<XWikiDocument>();
 
-        List<String> documentNames = getAllXWikiServerClassDocumentNames();
-        if (documentNames != null) {
-            for (String documentName : documentNames) {
-                // Resolve the document names into references
-                DocumentReference docRef = documentReferenceResolver.resolve(documentName);
-                docRef = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
-                        docRef.getLastSpaceReference().getName(), docRef.getName());
-                result.add(getDocument(docRef));
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public List<String> getAllXWikiServerClassDocumentNames() throws WikiManagerException
-    {
-        WikiDescriptorManager wikiDescriptorManager = wikiDescriptorManagerProvider.get();
-
         try {
             Query query = this.queryManager.createQuery(
                     "from doc.object(XWiki.XWikiServerClass) as descriptor where doc.name like 'XWikiServer%' "
-                            + "and doc.fullName <> 'XWiki.XWikiServerClassTemplate'",
+                    + "and doc.fullName <> 'XWiki.XWikiServerClassTemplate'",
                     Query.XWQL);
             query.setWiki(wikiDescriptorManager.getMainWikiId());
             query.addFilter(componentManager.<QueryFilter>getInstance(QueryFilter.class, "unique"));
-            return query.execute();
+            List<String> documentNames = query.execute();
+
+            if (documentNames != null && !documentNames.isEmpty()) {
+                for (String documentName : documentNames) {
+                    // Resolve the document names into references
+                    DocumentReference docRef = documentReferenceResolver.resolve(documentName);
+                    docRef = new DocumentReference(wikiDescriptorManager.getMainWikiId(),
+                            docRef.getLastSpaceReference().getName(), docRef.getName());
+                    result.add(getDocument(docRef));
+                }
+            }
         } catch (Exception e) {
             throw new WikiManagerException("Failed to locate XWiki.XWikiServerClass documents", e);
         }
+
+        return result;
     }
 
     private XWikiDocument getDocument(DocumentReference reference) throws WikiManagerException

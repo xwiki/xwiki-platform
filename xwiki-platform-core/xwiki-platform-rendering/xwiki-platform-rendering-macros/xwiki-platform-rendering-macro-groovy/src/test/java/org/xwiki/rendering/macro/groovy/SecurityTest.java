@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.jmock.Expectations;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -34,9 +33,9 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
+
+import org.junit.Assert;
 
 /**
  * Integration test to verify the security configuration of the Groovy Macro.
@@ -46,7 +45,7 @@ import org.xwiki.test.jmock.AbstractComponentTestCase;
  */
 public class SecurityTest extends AbstractComponentTestCase
 {
-    private ContextualAuthorizationManager cam;
+    private DocumentAccessBridge dab;
 
     private ConfigurationSource configurationSource;
 
@@ -54,10 +53,7 @@ public class SecurityTest extends AbstractComponentTestCase
     public void setUpMocks() throws Exception
     {
         // Mock Model dependencies.
-        registerMockComponent(DocumentAccessBridge.class);
-
-        // Mock the authorization manager.
-        this.cam = registerMockComponent(ContextualAuthorizationManager.class);
+        this.dab = registerMockComponent(DocumentAccessBridge.class);
         registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
 
         // Mock Configuration Source so that we can configure security parameters
@@ -70,7 +66,7 @@ public class SecurityTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {{
             // No PR
-            allowing(cam).hasAccess(Right.PROGRAM);
+            allowing(dab).hasProgrammingRights();
             will(returnValue(false));
 
             // Have the secure AST Customizer active!
@@ -88,7 +84,7 @@ public class SecurityTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {{
             // No PR
-            allowing(cam).hasAccess(Right.PROGRAM);
+            allowing(dab).hasProgrammingRights();
             will(returnValue(false));
 
             // The secure AST Customizer is not active
@@ -107,7 +103,7 @@ public class SecurityTest extends AbstractComponentTestCase
             macro.execute(parameters, "new Integer(0)", context);
             Assert.fail("Should have thrown an exception here!");
         } catch (MacroExecutionException expected) {
-            Assert.assertEquals("You don't have the right to execute the script macro [groovy]", expected.getMessage());
+            Assert.assertEquals("You don't have the right to execute this script", expected.getMessage());
         }
     }
 
@@ -117,7 +113,7 @@ public class SecurityTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {{
             // No PR
-            allowing(cam).hasAccess(Right.PROGRAM);
+            allowing(dab).hasProgrammingRights();
             will(returnValue(true));
 
             // The secure AST Customizer is not active
@@ -135,7 +131,7 @@ public class SecurityTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {{
             // No PR
-            allowing(cam).hasAccess(Right.PROGRAM);
+            allowing(dab).hasProgrammingRights();
             will(returnValue(true));
 
             // The secure AST Customizer is active
@@ -153,7 +149,7 @@ public class SecurityTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {{
             // No PR
-            allowing(cam).hasAccess(Right.PROGRAM);
+            allowing(dab).hasProgrammingRights();
             will(returnValue(false));
 
             // The secure AST Customizer is active

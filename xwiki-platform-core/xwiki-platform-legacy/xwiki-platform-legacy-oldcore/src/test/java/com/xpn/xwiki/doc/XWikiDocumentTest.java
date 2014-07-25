@@ -22,23 +22,40 @@ package com.xpn.xwiki.doc;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.Vector;
+
+import org.junit.Assert;
 
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.xwiki.display.internal.DisplayConfiguration;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
@@ -177,9 +194,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.registerComponents();
 
-        getContextualAuthorizationManager().stubs()
-            .method("hasAccess").with(eq(Right.PROGRAM)).will(returnValue(true));
-
         // Setup display configuration.
         this.mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
         this.mockDisplayConfiguration.stubs().method("getDocumentDisplayerHint").will(returnValue("default"));
@@ -299,13 +313,5 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.setContent("content not in section\n");
 
         assertEquals("", this.document.extractTitle());
-    }
-
-    public void testSetAbsoluteParentReference()
-    {
-        XWikiDocument doc = new XWikiDocument(new DocumentReference("docwiki", "docspace", "docpage"));
-
-        doc.setParentReference(new DocumentReference("docwiki", "docspace", "docpage2"));
-        assertEquals("docspace.docpage2", doc.getParent());
     }
 }

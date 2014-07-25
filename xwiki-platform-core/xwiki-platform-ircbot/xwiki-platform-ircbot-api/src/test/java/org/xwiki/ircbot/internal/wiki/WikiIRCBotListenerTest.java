@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.jmock.Expectations;
 import org.jmock.lib.legacy.ClassImposteriser;
-import org.junit.Assert;
 import org.junit.Test;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
@@ -40,15 +39,15 @@ import org.xwiki.ircbot.wiki.WikiIRCModel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
+
+import org.junit.Assert;
 
 /**
  * Unit tests for {@link WikiIRCBotListener}.
@@ -65,10 +64,10 @@ public class WikiIRCBotListenerTest extends AbstractComponentTestCase
         private Logger logger;
 
         public TestableWikiIRCBotListener(WikiBotListenerData listenerData, Map<String, XDOM> events, Syntax syntax,
-            RenderingContext renderingContext, Transformation macroTransformation, BlockRenderer plainTextBlockRenderer,
-            WikiIRCModel ircModel, DocumentReference executingUserReference)
+            Transformation macroTransformation, BlockRenderer plainTextBlockRenderer, WikiIRCModel ircModel,
+            DocumentReference executingUserReference)
         {
-            super(listenerData, events, syntax, renderingContext, macroTransformation, plainTextBlockRenderer, ircModel,
+            super(listenerData, events, syntax, macroTransformation, plainTextBlockRenderer, ircModel,
                 executingUserReference);
         }
 
@@ -99,7 +98,6 @@ public class WikiIRCBotListenerTest extends AbstractComponentTestCase
             "space.page", "name", "description");
         Map<String, XDOM> events = new HashMap<String, XDOM>();
         events.put("onMessage", new XDOM(Collections.<Block>emptyList()));
-        final RenderingContext renderingContext = getMockery().mock(MutableRenderingContext.class);
         final Transformation macroTransformation = getMockery().mock(Transformation.class);
         final BlockRenderer renderer = getMockery().mock(BlockRenderer.class);
         final WikiIRCModel ircModel = getMockery().mock(WikiIRCModel.class);
@@ -109,7 +107,7 @@ public class WikiIRCBotListenerTest extends AbstractComponentTestCase
 
         final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
         WikiIRCBotListener listener = new TestableWikiIRCBotListener(data, events, Syntax.XWIKI_2_1,
-            renderingContext, macroTransformation, renderer, ircModel, userReference);
+            macroTransformation, renderer, ircModel, userReference);
 
         Event event = createTestEvent();
 
@@ -142,7 +140,6 @@ public class WikiIRCBotListenerTest extends AbstractComponentTestCase
                 "space.page", "name", "description");
         Map<String, XDOM> events = new HashMap<String, XDOM>();
         events.put("onMessage", new XDOM(Collections.<Block>emptyList()));
-        final RenderingContext renderingContext = getMockery().mock(MutableRenderingContext.class);
         final Transformation macroTransformation = getMockery().mock(Transformation.class);
         final BlockRenderer renderer = getMockery().mock(BlockRenderer.class);
         final WikiIRCModel ircModel = getMockery().mock(WikiIRCModel.class);
@@ -152,7 +149,7 @@ public class WikiIRCBotListenerTest extends AbstractComponentTestCase
 
         final DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
         TestableWikiIRCBotListener listener = new TestableWikiIRCBotListener(data, events, Syntax.XWIKI_2_1,
-            renderingContext, macroTransformation, renderer, ircModel, userReference);
+            macroTransformation, renderer, ircModel, userReference);
 
         final Logger logger = getMockery().mock(Logger.class);
         listener.setLogger(logger);

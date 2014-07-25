@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.inject.Provider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,6 +44,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
@@ -68,7 +69,7 @@ public class Utils
      * The component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}. It is useful
      * for any non component code that need to initialize/access components.
      */
-    private static ComponentManager rootComponentManager;
+    private static ComponentManager componentManager;
 
     /**
      * Generate the response by parsing a velocity template and printing the result to the {@link XWikiResponse
@@ -111,7 +112,8 @@ public class Utils
         // "After using this method, the response should be considered to be committed and should not be written
         // to."
         if ((response instanceof XWikiServletResponse)
-            && ((XWikiServletResponse) response).getStatus() == HttpServletResponse.SC_FOUND) {
+            && ((XWikiServletResponse) response).getStatus() == HttpServletResponse.SC_FOUND)
+        {
             return;
         }
 
@@ -119,13 +121,6 @@ public class Utils
         response.setContentType("text/html; charset=" + context.getWiki().getEncoding());
 
         String action = context.getAction();
-        long cacheSetting = context.getWiki().getXWikiPreferenceAsLong("headers_nocache", -1, context);
-        if (cacheSetting == -1) {
-            cacheSetting = context.getWiki().ParamAsLong("xwiki.httpheaders.cache", -1);
-        }
-        if (cacheSetting == -1) {
-            cacheSetting = 1;
-        }
         if ((!"download".equals(action)) && (!"skin".equals(action))) {
             if (context.getResponse() instanceof XWikiServletResponse) {
                 // Add a last modified to tell when the page was last updated
@@ -135,18 +130,10 @@ public class Utils
                     }
                 }
                 // Set a nocache to make sure the page is reloaded after an edit
-                if (cacheSetting == 1) {
+                if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context) != 0) {
                     response.setHeader("Pragma", "no-cache");
                     response.setHeader("Cache-Control", "no-cache");
-                } else if (cacheSetting == 2) {
-                    response.setHeader("Pragma", "no-cache");
-                    response.setHeader("Cache-Control", "max-age=0, no-cache, no-store");
-                } else if (cacheSetting == 3) {
-                    response.setHeader("Cache-Control", "private");
-                } else if (cacheSetting == 4) {
-                    response.setHeader("Cache-Control", "public");
                 }
-
                 // Set an expires in one month
                 long expires = context.getWiki().getXWikiPreferenceAsLong("headers_expires", -1, context);
                 if (expires == -1) {
@@ -159,7 +146,7 @@ public class Utils
 
         if (("download".equals(action)) || ("skin".equals(action))) {
             // Set a nocache to make sure these files are not cached by proxies
-            if (cacheSetting == 1 || cacheSetting == 2) {
+            if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context) != 0) {
                 response.setHeader("Cache-Control", "no-cache");
             }
         }
@@ -207,8 +194,9 @@ public class Utils
             // We only write if the caller has asked.
             // We also make sure to verify that there hasn't been a call to sendRedirect before since it would mean the
             // response has already been written to and we shouldn't try to write in it.
-            if (write
-                && ((response instanceof XWikiServletResponse) && ((XWikiServletResponse) response).getStatus() != HttpServletResponse.SC_FOUND)) {
+            if (write && ((response instanceof XWikiServletResponse)
+                && ((XWikiServletResponse) response).getStatus() != HttpServletResponse.SC_FOUND))
+            {
                 try {
                     try {
                         response.getOutputStream().write(content.getBytes(context.getWiki().getEncoding()));
@@ -400,7 +388,7 @@ public class Utils
         context.setRequest(request);
         context.setResponse(response);
         context.setAction(action);
-        context.setWikiId(dbname);
+        context.setDatabase(dbname);
 
         int mode = 0;
         if (request instanceof XWikiServletRequest) {
@@ -637,59 +625,22 @@ public class Utils
     }
 
     /**
-     * @param componentManager the root component manager used by {@link #getComponent(Class)} and
+     * @param componentManager the component manager used by {@link #getComponent(Class)} and
      *            {@link #getComponent(Class, String)}
      */
     public static void setComponentManager(ComponentManager componentManager)
     {
-        Utils.rootComponentManager = componentManager;
+        Utils.componentManager = componentManager;
     }
 
     /**
-     * @return the root component manager
-     * @deprecated last resort way of accessing the {@link ComponentManager}, make sure you cannot do it any other way
-     *             possible since it add a strong dependency to a static to your code
-     */
-    @Deprecated
-    public static ComponentManager getRootComponentManager()
-    {
-        return rootComponentManager;
-    }
-
-    /**
-     * @return the contextual component manager used by {@link #getComponent(Class)} and
-     *         {@link #getComponent(Class, String)}
-     * @deprecated since 6.1M1, use {@link #getContextComponentManager()} instead
+     * @return the component manager used by {@link #getComponent(Class)} and {@link #getComponent(Class, String)}
+     * @deprecated starting with 4.1M2 use the Component Script Service instead
      */
     @Deprecated
     public static ComponentManager getComponentManager()
     {
-        return getContextComponentManager();
-    }
-
-    /**
-     * @return the contextual component manager used by {@link #getComponent(Class)} and
-     *         {@link #getComponent(Class, String)}
-     * @since 6.0RC1
-     * @deprecated last resort way of accessing the {@link ComponentManager}, make sure you cannot do it any other way
-     *             possible since it add a strong dependency to a static to your code
-     */
-    @Deprecated
-    public static ComponentManager getContextComponentManager()
-    {
-        ComponentManager contextComponentManager;
-
-        // Look for the Context Component Manager so that Macros can be registered for a specific user, for a
-        // specific wiki, etc. If it's not found use the Root Component Manager. This allows the Rendering module
-        // to work outside of XWiki when there's no notion of Execution Context and Wiki Model for example.
-        try {
-            contextComponentManager = rootComponentManager.getInstance(ComponentManager.class, "context");
-        } catch (ComponentLookupException e) {
-            // This means the Context CM doesn't exist, use the Root CM.
-            contextComponentManager = rootComponentManager;
-        }
-
-        return contextComponentManager;
+        return componentManager;
     }
 
     /**
@@ -738,8 +689,6 @@ public class Utils
     {
         T component;
 
-        ComponentManager componentManager = getContextComponentManager();
-
         if (componentManager != null) {
             try {
                 component = componentManager.getInstance(roleType, roleHint);
@@ -783,9 +732,6 @@ public class Utils
     public static <T> List<T> getComponentList(Class<T> role)
     {
         List<T> components;
-
-        ComponentManager componentManager = getContextComponentManager();
-
         if (componentManager != null) {
             try {
                 components = componentManager.getInstanceList(role);
@@ -813,9 +759,8 @@ public class Utils
      */
     public static XWikiContext getContext()
     {
-        Provider<XWikiContext> xcontextProvider = getComponent(XWikiContext.TYPE_PROVIDER);
-
-        return xcontextProvider != null ? xcontextProvider.get() : null;
+        ExecutionContext ec = getComponent(Execution.class).getContext();
+        return (XWikiContext) ec.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 
     /**

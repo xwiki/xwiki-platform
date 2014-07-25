@@ -41,12 +41,12 @@ public class TagsResourceImpl extends XWikiResource implements TagsResource
     @Override
     public Tags getTags(String wikiName) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getWikiId();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         try {
             Tags tags = objectFactory.createTags();
 
-            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             List<String> tagNames = getAllTags();
 
@@ -68,7 +68,7 @@ public class TagsResourceImpl extends XWikiResource implements TagsResource
         } catch (QueryException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setWikiId(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
     }
 

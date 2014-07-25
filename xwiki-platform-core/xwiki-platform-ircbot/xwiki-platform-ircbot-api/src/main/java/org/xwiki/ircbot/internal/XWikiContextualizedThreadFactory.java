@@ -113,7 +113,7 @@ public class XWikiContextualizedThreadFactory implements ThreadFactory
                 xwikiContext.setURLFactory(urlf);
 
                 // Set the current wiki
-                xwikiContext.setWikiId(currentWiki);
+                xwikiContext.setDatabase(currentWiki);
 
                 execution.pushContext(context);
             }

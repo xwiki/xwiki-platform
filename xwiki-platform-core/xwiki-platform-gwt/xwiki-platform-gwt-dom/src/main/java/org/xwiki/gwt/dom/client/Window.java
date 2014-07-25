@@ -54,8 +54,8 @@ public class Window extends JavaScriptObject
     /**
      * Stop this window from loading its document.
      */
-    public final native void stop()
-    /*-{
-        this.stop ? this.stop() : this.document.execCommand('Stop', false, null);
-    }-*/;
+    public final void stop()
+    {
+        DOMUtils.getInstance().stop(this);
+    }
 }

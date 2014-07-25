@@ -32,11 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.job.Job;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.stability.Unstable;
@@ -45,9 +45,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.XWikiInitializerJob;
-import com.xpn.xwiki.internal.XWikiInitializerJobStatus;
 import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Programming;
 import com.xpn.xwiki.web.Utils;
@@ -121,13 +120,6 @@ public class XWiki extends Api
         return null;
     }
 
-    public XWikiInitializerJobStatus getJobStatus()
-    {
-        XWikiInitializerJob job = Utils.getComponent((Type) Job.class, XWikiInitializerJob.JOBTYPE);
-
-        return job != null ? job.getStatus() : null;
-    }
-
     /**
      * @return XWiki's version in the format <code>(version).(SVN build number)</code>, or "Unknown version" if it
      *         failed to be retrieved
@@ -199,8 +191,8 @@ public class XWiki extends Api
     {
         try {
             XWikiDocument doc = this.xwiki.getDocument(reference, getXWikiContext());
-            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(),
-                doc.getPrefixedFullName(), getXWikiContext()) == false) {
+            if (this.xwiki.getRightService().hasAccessLevel("view", getXWikiContext().getUser(), doc.getPrefixedFullName(),
+                getXWikiContext()) == false) {
                 return null;
             }
 
@@ -504,6 +496,98 @@ public class XWiki extends Api
     }
 
     /**
+     * Privileged API allowing to run a search on the database returning a list of data This search is send to the store
+     * engine (Hibernate HQL, JCR XPATH or other).
+     * 
+     * @param wheresql Query to be run (HQL, XPath)
+     * @return A list of rows (Object[])
+     * @throws XWikiException
+     * @deprecated use query service instead
+     */
+    @Deprecated
+    public <T> List<T> search(String wheresql) throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return this.xwiki.search(wheresql, getXWikiContext());
+        }
+
+        return Collections.emptyList();
+    }
+
+    /**
+     * Privileged API allowing to run a search on the database returning a list of data. The HQL where clause uses
+     * parameters (question marks) instead of values, and the actual values are passed in the parameters list. This
+     * allows generating a query which will automatically encode the passed values (like escaping single quotes). This
+     * API is recommended to be used over the other similar methods where the values are passed inside the where clause
+     * and for which manual encoding/escaping is needed to avoid SQL injections or bad queries.
+     * 
+     * @param parameterizedWhereClause query to be run (HQL)
+     * @param parameterValues the where clause values that replace the question marks
+     * @return a list of rows, where each row has either the selected data type ({@link XWikiDocument}, {@code String},
+     *         {@code Integer}, etc.), or {@code Object[]} if more than one column was selected
+     * @throws XWikiException
+     * @deprecated use query service instead
+     */
+    @Deprecated
+    public <T> List<T> search(String parameterizedWhereClause, List< ? > parameterValues) throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return this.xwiki.getStore().search(parameterizedWhereClause, 0, 0, parameterValues, getXWikiContext());
+        }
+
+        return Collections.emptyList();
+    }
+
+    /**
+     * Privileged API allowing to run a search on the database returning a list of data. This search is sent to the
+     * store engine (Hibernate HQL, JCR XPATH or other)
+     * 
+     * @param wheresql Query to be run (HQL, XPath)
+     * @param nb return only 'nb' rows
+     * @param start skip the 'start' first elements
+     * @return A list of rows (Object[])
+     * @throws XWikiException
+     * @deprecated use query service instead
+     */
+    @Deprecated
+    public <T> List<T> search(String wheresql, int nb, int start) throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return this.xwiki.search(wheresql, nb, start, getXWikiContext());
+        }
+
+        return Collections.emptyList();
+    }
+
+    /**
+     * Privileged API allowing to run a search on the database returning a list of data. The HQL where clause uses
+     * parameters (question marks) instead of values, and the actual values are passed in the paremeters list. This
+     * allows generating a query which will automatically encode the passed values (like escaping single quotes). This
+     * API is recommended to be used over the other similar methods where the values are passed inside the where clause
+     * and for which manual encoding/escaping is needed to avoid sql injections or bad queries.
+     * 
+     * @param parameterizedWhereClause query to be run (HQL)
+     * @param maxResults maximum number of results to return; if 0 all results are returned
+     * @param startOffset skip the first N results; if 0 no items are skipped
+     * @param parameterValues the where clause values that replace the question marks
+     * @return a list of rows, where each row has either the selected data type ({@link XWikiDocument}, {@code String},
+     *         {@code Integer}, etc.), or {@code Object[]} if more than one column was selected
+     * @throws XWikiException
+     * @deprecated use query service instead
+     */
+    @Deprecated
+    public <T> List<T> search(String parameterizedWhereClause, int maxResults, int startOffset,
+        List< ? > parameterValues) throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return this.xwiki.getStore().search(parameterizedWhereClause, maxResults, startOffset, parameterValues,
+                getXWikiContext());
+        }
+
+        return Collections.emptyList();
+    }
+
+    /**
      * API allowing to search for document names matching a query. Examples:
      * <ul>
      * <li>Query: <code>where doc.space='Main' order by doc.creationDate desc</code>. Result: All the documents in space
@@ -536,6 +620,22 @@ public class XWiki extends Api
     public List<String> searchDocuments(String wheresql) throws XWikiException
     {
         return this.xwiki.getStore().searchDocumentsNames(wheresql, getXWikiContext());
+    }
+
+    /**
+     * API allowing to count the total number of documents that would be returned by a query.
+     * 
+     * @param wheresql Query to use, similar to the ones accepted by {@link #searchDocuments(String)}. If possible, it
+     *            should not contain <code>order by</code> or <code>group</code> clauses, since this kind of queries are
+     *            not portable.
+     * @return The number of documents that matched the query.
+     * @throws XWikiException if there was a problem executing the query.
+     * @deprecated use query service instead
+     */
+    @Deprecated
+    public int countDocuments(String wheresql) throws XWikiException
+    {
+        return this.xwiki.getStore().countDocuments(wheresql, getXWikiContext());
     }
 
     /**
@@ -657,6 +757,23 @@ public class XWiki extends Api
     }
 
     /**
+     * API allowing to count the total number of documents that would be returned by a parameterized query.
+     * 
+     * @param parameterizedWhereClause the parameterized query to use, similar to the ones accepted by
+     *            {@link #searchDocuments(String, List)}. If possible, it should not contain <code>order by</code> or
+     *            <code>group</code> clauses, since this kind of queries are not portable.
+     * @param parameterValues The parameter values that replace the question marks.
+     * @return The number of documents that matched the query.
+     * @throws XWikiException if there was a problem executing the query.
+     * @deprecated use query service instead
+     */
+    @Deprecated
+    public int countDocuments(String parameterizedWhereClause, List< ? > parameterValues) throws XWikiException
+    {
+        return this.xwiki.getStore().countDocuments(parameterizedWhereClause, parameterValues, getXWikiContext());
+    }
+
+    /**
      * Search documents in the provided wiki by passing HQL where clause values as parameters. See
      * {@link #searchDocuments(String, int, int, java.util.List)} for more details.
      * 
@@ -675,14 +792,14 @@ public class XWiki extends Api
     public List<String> searchDocumentsNames(String wikiName, String parameterizedWhereClause, int maxResults,
         int startOffset, List< ? > parameterValues) throws XWikiException
     {
-        String database = this.context.getWikiId();
+        String database = this.context.getDatabase();
 
         try {
-            this.context.setWikiId(wikiName);
+            this.context.setDatabase(wikiName);
 
             return searchDocuments(parameterizedWhereClause, maxResults, startOffset, parameterValues);
         } finally {
-            this.context.setWikiId(database);
+            this.context.setDatabase(database);
         }
     }
 
@@ -708,8 +825,8 @@ public class XWiki extends Api
 
     /**
      * Search attachments by passing HQL where clause values as parameters. See
-     * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses. You can specify
-     * properties of attach (the attachment) or doc (the document it is attached to)
+     * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses.
+     * You can specify properties of attach (the attachment) or doc (the document it is attached to)
      * 
      * @param parametrizedSqlClause The HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))"</code>
@@ -724,15 +841,14 @@ public class XWiki extends Api
     public List<Attachment> searchAttachments(String parametrizedSqlClause, int nb, int start, List< ? > parameterValues)
         throws XWikiException
     {
-        return convertAttachments(this.xwiki.searchAttachments(parametrizedSqlClause, true, nb, start, parameterValues,
-            this.context));
+        return convertAttachments(
+            this.xwiki.searchAttachments(parametrizedSqlClause, true, nb, start, parameterValues, this.context));
     }
 
     /**
      * Count attachments returned by a given parameterized query
-     * 
-     * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL see:
-     *            {@link #searchDocuments(String, int, int, List)}
+     *
+     * @param parametrizedSqlClause Everything which would follow the "WHERE" in HQL see: {@link #searchDocuments(String, int, int, List)}
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
      * @return int number of attachments found.
      * @throws XWikiException
@@ -740,7 +856,8 @@ public class XWiki extends Api
      * @since 5.0M2
      */
     @Unstable
-    public int countAttachments(String parametrizedSqlClause, List< ? > parameterValues) throws XWikiException
+    public int countAttachments(String parametrizedSqlClause, List< ? > parameterValues)
+        throws XWikiException
     {
         return this.xwiki.countAttachments(parametrizedSqlClause, parameterValues, this.context);
     }
@@ -1149,6 +1266,17 @@ public class XWiki extends Api
     }
 
     /**
+     * API to check if wiki is in multi-wiki mode (virtual)
+     * 
+     * @deprecated Virtual mode is on by default, starting with XWiki 5.0M2.
+     * @return true for multi-wiki/false for mono-wiki
+     */
+    public boolean isVirtualMode()
+    {
+        return this.xwiki.isVirtualMode();
+    }
+
+    /**
      * @return the list of all wiki names, including the main wiki, corresponding to the available wiki descriptors.
      *         Example: the descriptor for the wiki <i>wikiname</i> is a document in the main wiki, named
      *         <i>XWiki.XWikiServerWikiname</i>, containing an XWiki.XWikiServerClass object.
@@ -1189,7 +1317,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to flush the cache of the Wiki installation This flushed the cache of all wikis, all plugins, all
+     * Priviledged API to flush the cache of the Wiki installation This flushed the cache of all wikis, all plugins, all
      * renderers
      */
     public void flushCache()
@@ -1200,7 +1328,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to reset the rendering engine This would restore the rendering engine evaluation loop and take
+     * Priviledged API to reset the rendenring engine This would restore the rendering engine evaluation loop and take
      * into account new configuration parameters
      */
     public void resetRenderingEngine()
@@ -1214,7 +1342,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to create a new user from the request This API is used by RegisterNewUser wiki page
+     * Priviledged API to create a new user from the request This API is used by RegisterNewUser wiki page
      * 
      * @return true for success/false for failure
      * @throws XWikiException
@@ -1225,7 +1353,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to create a new user from the request This API is used by RegisterNewUser wiki page This version
+     * Priviledged API to create a new user from the request This API is used by RegisterNewUser wiki page This version
      * sends a validation email to the user Configuration of validation email is in the XWiki Preferences
      * 
      * @param withValidation true to send the validationemail
@@ -1238,7 +1366,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to create a new user from the request This API is used by RegisterNewUser wiki page This version
+     * Priviledged API to create a new user from the request This API is used by RegisterNewUser wiki page This version
      * sends a validation email to the user Configuration of validation email is in the XWiki Preferences
      * 
      * @param withValidation true to send the validation email
@@ -1274,7 +1402,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to validate the return code given by a user in response to an email validation email The
+     * Priviledged API to validate the return code given by a user in response to an email validation email The
      * validation information are taken from the request object
      * 
      * @param withConfirmEmail true to send a account confirmation email/false to not send it
@@ -1287,7 +1415,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to add a user to the XWiki.XWikiAllGroup
+     * Priviledged API to add a user to the XWiki.XWikiAllGroup
      * 
      * @param fullwikiname user name to add
      * @throws XWikiException
@@ -1300,7 +1428,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to send a confirmation email to a user
+     * Priviledged API to send a confirmation email to a user
      * 
      * @param xwikiname user to send the email to
      * @param password password to put in the mail
@@ -1318,7 +1446,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to send a confirmation email to a user
+     * Priviledged API to send a confirmation email to a user
      * 
      * @param xwikiname user to send the email to
      * @param password password to put in the mail
@@ -1792,6 +1920,21 @@ public class XWiki extends Api
     }
 
     /**
+     * API to access the current starts for the Wiki for a specific action It retrieves the number of times the action
+     * was performed for the whole wiki The statistics module need to be activated (xwiki.stats=1 in xwiki.cfg)
+     * 
+     * @param action action for which to retrieve statistics (view/save/download)
+     * @return A DocumentStats object with number of actions performed, unique visitors, number of visits
+     * @deprecated use {@link #getStatsService()} instead
+     */
+    @Deprecated
+    public DocumentStats getCurrentMonthXWikiStats(String action)
+    {
+        return getXWikiContext().getWiki().getStatsService(getXWikiContext())
+            .getDocMonthStats("", action, new Date(), getXWikiContext());
+    }
+
+    /**
      * API to retrieve a viewable referer text for a referer Referers are URL where users have clicked on a link to an
      * XWiki page Search engine referer URLs are transformed to a nicer view (Google: search query string) For other URL
      * the http:// part is stripped
@@ -1824,6 +1967,19 @@ public class XWiki extends Api
         } catch (Exception e) {
             return this.xwiki.getRefererText(referer, getXWikiContext());
         }
+    }
+
+    /**
+     * Deprecated API which was retrieving the SQL to represent the fullName Document field depending on the database
+     * used This is not needed anymore and returns 'doc.fullName' for all databases
+     * 
+     * @deprecated
+     * @return "doc.fullName"
+     */
+    @Deprecated
+    public String getFullNameSQL()
+    {
+        return this.xwiki.getFullNameSQL();
     }
 
     /**
@@ -1889,8 +2045,8 @@ public class XWiki extends Api
 
     /**
      * API to retrieve a text representing the user with the first name and last name of the user. With the link param
-     * set to false it will not link to the user page With the link param set to true, the link will link to the page on
-     * the wiki where the user was registered.
+     * set to false it will not link to the user page With the link param set to true, the link will link to the page
+     * on the wiki where the user was registered.
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param link false to not add an HTML link to the user profile
@@ -1902,10 +2058,10 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with a custom view With the link param set to false it will not link
-     * to the user page. With the link param set to true, the link will link to the page on the wiki where the user was
-     * registered. The formating is done using the format parameter which can contain velocity scripting and access all
-     * properties of the User profile using variables ($first_name $last_name $email $city)
+     * API to retrieve a text representing the user with a custom view With the link param set to false it will not
+     * link to the user page. With the link param set to true, the link will link to the page on the wiki where the
+     * user was registered. The formating is done using the format parameter which can contain velocity scripting
+     * and access all properties of the User profile using variables ($first_name $last_name $email $city)
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
@@ -1936,10 +2092,11 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a text representing the user with a custom view. The formating is done using the format parameter
-     * which can contain velocity scripting and access all properties of the User profile using variables ($first_name
-     * $last_name $email $city). With the link param set to false it will not link to the user page. With the link param
-     * set to true, the link will link to the page on the local wiki even if the user is registered on a different wiki.
+     * API to retrieve a text representing the user with a custom view. The formating is done using the format
+     * parameter which can contain velocity scripting and access all properties of the User profile using variables
+     * ($first_name $last_name $email $city). With the link param set to false it will not link to the user page. With
+     * the link param set to true, the link will link to the page on the local wiki even if the user is registered on a
+     * different wiki.
      * 
      * @param user Fully qualified username as retrieved from $context.user (XWiki.LudovicDubost)
      * @param format formatting to be used ("$first_name $last_name", "$first_name")
@@ -2013,7 +2170,7 @@ public class XWiki extends Api
      */
     public Api get(String name)
     {
-        return getPlugin(name);
+        return this.xwiki.getPluginApi(name, getXWikiContext());
     }
 
     /**
@@ -2024,7 +2181,7 @@ public class XWiki extends Api
      */
     public Api getPlugin(String name)
     {
-        return this.xwiki != null ? this.xwiki.getPluginApi(name, getXWikiContext()) : null;
+        return this.xwiki.getPluginApi(name, getXWikiContext());
     }
 
     /**
@@ -2608,6 +2765,16 @@ public class XWiki extends Api
     }
 
     /**
+     * @return secure {@link QueryManager} for execute queries to store.
+     * @deprecated since XE 2.4M2 use the Query Manager Script Service
+     */
+    @Deprecated
+    public QueryManager getQueryManager()
+    {
+        return Utils.getComponent(QueryManager.class, "secure");
+    }
+
+    /**
      * API to get the Servlet path for a given wiki. In mono wiki this is "bin/" or "xwiki/". In virtual mode and if
      * <tt>xwiki.virtual.usepath</tt> is enabled in xwiki.cfg, it is "wiki/wikiname/".
      * 
@@ -2627,7 +2794,7 @@ public class XWiki extends Api
      */
     public String getServletPath()
     {
-        return this.xwiki.getServletPath(this.context.getWikiId(), this.context);
+        return this.xwiki.getServletPath(this.context.getDatabase(), this.context);
     }
 
     /**
@@ -2664,7 +2831,7 @@ public class XWiki extends Api
 
         try {
             List<PrintRendererFactory> factories =
-                Utils.getContextComponentManager().getInstanceList((Type) PrintRendererFactory.class);
+                Utils.getComponentManager().getInstanceList((Type) PrintRendererFactory.class);
             for (PrintRendererFactory factory : factories) {
                 Syntax factorySyntax = factory.getSyntax();
                 if (syntaxVersion != null) {
@@ -2725,5 +2892,20 @@ public class XWiki extends Api
     public String getCurrentContentSyntaxId()
     {
         return this.xwiki.getCurrentContentSyntaxId(getXWikiContext());
+    }
+
+    /**
+     * API to parse the message being stored in the Context. A message can be an error message or an information message
+     * either as text or as a message ID pointing to ApplicationResources. The message is also parse for velocity
+     * scripts
+     * 
+     * @return Final message
+     * @deprecated use {@link org.xwiki.localization.LocalizationManager} instead. From velocity you can access it
+     *             using the {@code $services.localization} binding, see {@code LocalizationScriptService}
+     */
+    @Deprecated
+    public String parseMessage()
+    {
+        return this.xwiki.parseMessage(getXWikiContext());
     }
 }

@@ -132,7 +132,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
             }
         };
         xwiki.setConfig((this.config = new XWikiConfig()));
-        xwiki.setDatabase(getContext().getWikiId());
+        xwiki.setDatabase(getContext().getDatabase());
 
         Mock mockXWikiRequest = mock(XWikiRequest.class, new Class[] {}, new Object[] {});
         mockXWikiRequest.stubs().method("getScheme").will(returnValue("http"));
@@ -362,7 +362,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         // Reinitialize the URL factory to take into account the new request URL.
         urlFactory.init(getContext());
 
-        getContext().setWikiId("wiki2");
+        getContext().setDatabase("wiki2");
 
         String url = urlFactory.getURL(new URL("http://wiki1server/xwiki/bin/view/Space/Page"), getContext());
         assertEquals("/xwiki/bin/view/Space/Page", url);
@@ -378,11 +378,11 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
     public void testGetServerURLFromVirtualWithXWikiDotHomeEnabled() throws MalformedURLException
     {
         getContext().setURL(new URL("http://virtual1.mywiki.tld/xwiki/view/InitialSpace/InitialPage"));
-        getContext().setWikiId("subwiki");
+        getContext().setDatabase("subwiki");
 
         // This is called by XWiki#getXWiki() and is set to whatever the user asks for.
         // The test sets it to "xwiki" which is wrong for this test.
-        getContext().setOriginalWikiId("subwiki");
+        getContext().setOriginalDatabase("subwiki");
 
         config.setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
         config.setProperty("xwiki.virtual", "1");
@@ -396,11 +396,11 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
     public void testXWikiDotHomeParameterFromVirtualWiki() throws MalformedURLException
     {
         getContext().setURL(new URL("http://virtual1.mywiki.tld/xwiki/view/InitialSpace/InitialPage"));
-        getContext().setWikiId("subwiki");
+        getContext().setDatabase("subwiki");
 
         // This is called by XWiki#getXWiki() and is set to whatever the user asks for.
         // The test sets it to "xwiki" which is wrong for this test.
-        getContext().setOriginalWikiId("subwiki");
+        getContext().setOriginalDatabase("subwiki");
 
         config.setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
         config.setProperty("xwiki.virtual", "1");

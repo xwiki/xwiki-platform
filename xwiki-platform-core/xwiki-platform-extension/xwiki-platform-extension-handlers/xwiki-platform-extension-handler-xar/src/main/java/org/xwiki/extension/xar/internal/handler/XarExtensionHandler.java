@@ -28,6 +28,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -54,13 +55,13 @@ import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
 import org.xwiki.logging.marker.TranslationMarker;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarException;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * @version $Id$
@@ -79,6 +80,16 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
     protected static final String PROPERTY_CHECKRIGHTS = "checkrights";
 
+    /**
+     * The full name (space.page) of the XWikiPreference page.
+     */
+    private static final String XWIKIPREFERENCES_FULLNAME = "XWiki.XWikiPreferences";
+
+    /**
+     * The identifier of the programming right.
+     */
+    private static final String RIGHTS_ADMIN = "admin";
+
     private static final TranslationMarker LOG_EXTENSIONPLAN_BEGIN = new TranslationMarker(
         "extension.xar.log.extensionplan.begin");
 
@@ -96,10 +107,13 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     private ComponentManager componentManager;
 
     @Inject
-    private LocalExtensionRepository localReposirory;
+    private Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    private AuthorizationManager authorization;
+    private EntityReferenceSerializer<String> serializer;
+
+    @Inject
+    private LocalExtensionRepository localReposirory;
 
     /**
      * Used to access the execution context.
@@ -205,7 +219,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         PackageConfiguration configuration =
             createPackageConfiguration(newLocalExtension, request, wiki, getXARExtensionPlan());
         try {
-            this.packager.importXAR("Install extension [" + newLocalExtension + "]", new File(newLocalExtension
+            this.packager.importXAR("Install extensoin [" + newLocalExtension + "]", new File(newLocalExtension
                 .getFile().getAbsolutePath()), configuration);
         } catch (Exception e) {
             throw new InstallException("Failed to import xar for extension [" + newLocalExtension + "]", e);
@@ -241,7 +255,8 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                 }
 
                 // TODO: delete pages from the wiki which belong only to this extension (several extension could have
-                // some common pages which will cause all sort of other issues but still could happen technically)
+                // some
+                // common pages which will cause all sort of other issues but still could happen technically)
 
                 // TODO: maybe remove only unmodified page ? At least ask for sure when question/answer system will be
                 // implemented
@@ -314,25 +329,48 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         return configuration;
     }
 
-    // Check
-
-    private boolean hasAccessLevel(String wiki, Right right, Request request) throws XWikiException
+    private String getRequestUserString(String property, Request request)
     {
-        boolean hasAccess = true;
+        String str = null;
 
-        WikiReference wikiReference = wiki != null ? new WikiReference(wiki) : null;
+        if (request.containsProperty(property)) {
+            DocumentReference reference = getRequestUserReference(property, request);
 
-        if (request.getProperty(PROPERTY_CALLERREFERENCE) != null) {
-            hasAccess =
-                this.authorization.hasAccess(right, getRequestUserReference(PROPERTY_CALLERREFERENCE, request),
-                    wikiReference);
+            if (reference != null) {
+                str = this.serializer.serialize(reference);
+            } else {
+                str = XWikiRightService.GUEST_USER_FULLNAME;
+            }
         }
 
-        if (hasAccess) {
-            DocumentReference user = getRequestUserReference(PROPERTY_USERREFERENCE, request);
-            if (user != null) {
-                hasAccess = this.authorization.hasAccess(right, user, wikiReference);
+        return str;
+    }
+
+    // Check
+
+    private boolean hasAccessLevel(String wiki, String right, String document, Request request) throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        boolean hasAccess = true;
+
+        String currentWiki = xcontext.getDatabase();
+        try {
+            xcontext.setDatabase(wiki != null ? wiki : xcontext.getMainXWiki());
+
+            if (request.getProperty(PROPERTY_CALLERREFERENCE) != null) {
+                String caller = getRequestUserString(PROPERTY_CALLERREFERENCE, request);
+                hasAccess = xcontext.getWiki().getRightService().hasAccessLevel(right, caller, document, xcontext);
             }
+
+            if (hasAccess) {
+                String user = getRequestUserString(PROPERTY_USERREFERENCE, request);
+                if (user != null) {
+                    hasAccess = xcontext.getWiki().getRightService().hasAccessLevel(right, user, document, xcontext);
+                }
+            }
+        } finally {
+            xcontext.setDatabase(currentWiki);
         }
 
         return hasAccess;
@@ -352,7 +390,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
             try {
-                if (!hasAccessLevel(wiki, Right.ADMIN, request)) {
+                if (!hasAccessLevel(wiki, RIGHTS_ADMIN, XWIKIPREFERENCES_FULLNAME, request)) {
                     if (namespace == null) {
                         throw new InstallException(String.format("Admin right is required to install extension [%s]",
                             extension.getId()));
@@ -383,7 +421,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
             try {
-                if (!hasAccessLevel(wiki, Right.ADMIN, request)) {
+                if (!hasAccessLevel(wiki, RIGHTS_ADMIN, XWIKIPREFERENCES_FULLNAME, request)) {
                     if (namespace == null) {
                         throw new UninstallException(String.format(
                             "Admin right is required to uninstall extension [%s]", extension.getId()));

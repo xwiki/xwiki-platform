@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<!-- Used by DefaultAuthorizationManagerIntegrationTest#testGroupAccess() -->
+<!-- Used by XWikiSecurityAuthorizationTest#testGroupAccess() -->
 <wikis>
   <wiki name="wiki" mainWiki="true" alt="Main Wiki">
     <user name="userA" alt="a global user in local groupA and global groupA which is in local groupB and global groupB which is local group C" />

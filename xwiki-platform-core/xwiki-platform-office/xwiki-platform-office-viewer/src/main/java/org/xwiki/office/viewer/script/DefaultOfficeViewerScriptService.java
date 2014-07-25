@@ -185,7 +185,6 @@ public class DefaultOfficeViewerScriptService implements OfficeViewerScriptServi
         // Perform the transformations. This is required for office presentations which use the gallery macro to display
         // the slide images.
         TransformationContext context = new TransformationContext(xdom, fromSyntax);
-        context.setTargetSyntax(toSyntax);
         this.transformationManager.performTransformations(xdom, context);
 
         WikiPrinter printer = new DefaultWikiPrinter();

@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 
@@ -156,7 +155,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
             lru.setMaxEntries(this.capacity);
 
             try {
-                this.imageCache = Utils.getComponent(CacheManager.class).createNewLocalCache(configuration);
+                this.imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
             } catch (CacheException e) {
                 LOG.error("Error initializing the image cache.", e);
             }

@@ -46,12 +46,12 @@ public class PageTranslationHistoryResourceImpl extends XWikiResource implements
     public History getPageTranslationHistory(String wikiName, String spaceName, String pageName, String language,
             Integer start, Integer number, String order, Boolean withPrettyNames) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getWikiId();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         History history = new History();
 
         try {
-            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             String query = String.format("select doc.space, doc.name, rcs.id, rcs.date, rcs.author, rcs.comment"
                 + " from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId = doc.id and"
@@ -80,7 +80,7 @@ public class PageTranslationHistoryResourceImpl extends XWikiResource implements
         } catch (QueryException e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setWikiId(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
 
         return history;

@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.inject.Provider;
-
 import org.apache.velocity.VelocityContext;
 import org.jmock.Expectations;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -55,12 +53,8 @@ import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
@@ -82,6 +76,7 @@ import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceR
 import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseObjectReference;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 
 @ComponentList({
@@ -110,11 +105,11 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
 
     private static final DocumentReference AUTHOR_REFERENCE = new DocumentReference("xwiki", "XWiki", "Admin");
 
-    private XWiki mockXWiki;
+    private XWiki xwiki;
 
     private XWikiContext xwikiContext;
 
-    private XWikiDocument mockComponentDoc;
+    private XWikiDocument componentDoc;
 
     private WikiUIExtensionComponentBuilder builder;
 
@@ -127,32 +122,28 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
 
         Utils.setComponentManager(getComponentManager());
 
-        execution = registerMockComponent(Execution.class);
+        execution = getComponentManager().getInstance(Execution.class);
         final ExecutionContext context = new ExecutionContext();
 
-        final Provider<XWikiContext> xcontextProvider = getComponentManager().getInstance(XWikiContext.TYPE_PROVIDER);
-
-        this.mockXWiki = getMockery().mock(XWiki.class);
+        this.xwiki = getMockery().mock(XWiki.class);
 
         this.xwikiContext = new XWikiContext();
-        this.xwikiContext.setWikiId("xwiki");
-        this.xwikiContext.setWiki(this.mockXWiki);
+        this.xwikiContext.setDatabase("xwiki");
+        this.xwikiContext.setWiki(this.xwiki);
 
         context.setProperty("xwikicontext", this.xwikiContext);
 
-        this.mockComponentDoc = getMockery().mock(XWikiDocument.class);
+        this.componentDoc = getMockery().mock(XWikiDocument.class);
 
         getMockery().checking(new Expectations()
         {
             {
-                allowing(xcontextProvider).get();
-                will(returnValue(xwikiContext));
                 allowing(execution).getContext();
                 will(returnValue(context));
 
-                allowing(mockXWiki).getDocument(DOC_REF, xwikiContext);
-                will(returnValue(mockComponentDoc));
-                allowing(mockComponentDoc).getSyntax();
+                allowing(xwiki).getDocument(DOC_REF, xwikiContext);
+                will(returnValue(componentDoc));
+                allowing(componentDoc).getSyntax();
                 will(returnValue(Syntax.XWIKI_2_0));
             }
         });
@@ -163,15 +154,15 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
     @Test
     public void buildExtensionsWithoutExtensionObject() throws Exception
     {
-        final AuthorizationManager authorization = getComponentManager().getInstance(AuthorizationManager.class);
+        final XWikiRightService rightService = getMockery().mock(XWikiRightService.class);
 
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockComponentDoc).getDocumentReference();
-                will(returnValue(DOC_REF));
-                oneOf(mockComponentDoc).getXObjects(UI_EXTENSION_CLASS);
+                oneOf(componentDoc).getXObjects(UI_EXTENSION_CLASS);
                 will(returnValue(new ArrayList()));
+                oneOf(componentDoc).getPrefixedFullName();
+                will(returnValue("xwiki:XWiki.MyUIExtension"));
             }
         });
 
@@ -187,7 +178,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
     @Test
     public void buildExtensionsWithoutAdminRights() throws Exception
     {
-        final AuthorizationManager authorization = getComponentManager().getInstance(AuthorizationManager.class);
+        final XWikiRightService rightService = getMockery().mock(XWikiRightService.class);
         final BaseObject extensionObject = getMockery().mock(BaseObject.class, "uiextension");
         final Vector<BaseObject> extensionObjects = new Vector<BaseObject>();
         extensionObjects.add(extensionObject);
@@ -195,9 +186,7 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockComponentDoc).getDocumentReference();
-                will(returnValue(DOC_REF));
-                oneOf(mockComponentDoc).getXObjects(UI_EXTENSION_CLASS);
+                oneOf(componentDoc).getXObjects(UI_EXTENSION_CLASS);
                 will(returnValue(extensionObjects));
                 oneOf(extensionObject).getStringValue(ID_PROPERTY);
                 will(returnValue("name"));
@@ -209,9 +198,11 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue("key=value=foo\nkey2=value2\ninvalid=\n\n=invalid"));
                 oneOf(extensionObject).getStringValue(SCOPE_PROPERTY);
                 will(returnValue("wiki"));
-                oneOf(mockComponentDoc).getContentAuthorReference();
-                will(returnValue(AUTHOR_REFERENCE));
-                oneOf(authorization).hasAccess(Right.ADMIN, AUTHOR_REFERENCE, new WikiReference("xwiki"));
+                oneOf(componentDoc).getContentAuthor();
+                will(returnValue("XWiki.Admin"));
+                oneOf(xwiki).getRightService();
+                will(returnValue(rightService));
+                oneOf(rightService).hasAccessLevel("admin", "XWiki.Admin", "XWiki.XWikiPreferences", xwikiContext);
                 will(returnValue(false));
             }
         });
@@ -225,11 +216,51 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
     }
 
     @Test
+    public void buildComponentsWithoutRightService() throws Exception
+    {
+        final XWikiRightService rightService = getMockery().mock(XWikiRightService.class);
+        final BaseObject extensionObject = getMockery().mock(BaseObject.class, "uiextension");
+        final Vector<BaseObject> extensionObjects = new Vector<BaseObject>();
+        extensionObjects.add(extensionObject);
+
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(componentDoc).getXObjects(UI_EXTENSION_CLASS);
+                will(returnValue(extensionObjects));
+                oneOf(extensionObject).getStringValue(ID_PROPERTY);
+                will(returnValue("name"));
+                oneOf(extensionObject).getStringValue(EXTENSION_POINT_ID_PROPERTY);
+                will(returnValue("extensionPointId"));
+                oneOf(extensionObject).getStringValue(CONTENT_PROPERTY);
+                will(returnValue("content"));
+                oneOf(extensionObject).getStringValue(PARAMETERS_PROPERTY);
+                will(returnValue("key=value=foo\nkey2=value2\ninvalid=\n\n=invalid"));
+                oneOf(extensionObject).getStringValue(SCOPE_PROPERTY);
+                will(returnValue("wiki"));
+                oneOf(componentDoc).getContentAuthor();
+                will(returnValue("XWiki.Admin"));
+                oneOf(xwiki).getRightService();
+                will(returnValue(rightService));
+                oneOf(rightService).hasAccessLevel("admin", "XWiki.Admin", "XWiki.XWikiPreferences", xwikiContext);
+                will(throwException(new XWikiException()));
+            }
+        });
+
+        try {
+            this.builder.buildComponents(DOC_REF);
+            Assert.fail("Should have thrown an exception");
+        } catch (WikiComponentException expected) {
+            Assert.assertEquals("Failed to check rights required to register UI Extension(s)", expected.getMessage());
+        }
+    }
+
+
+    @Test
     public void buildComponents() throws Exception
     {
-        final AuthorizationManager authorization = getComponentManager().getInstance(AuthorizationManager.class);
+        final XWikiRightService rightService = getMockery().mock(XWikiRightService.class);
         final ComponentManager componentManager = getComponentManager().getInstance(ComponentManager.class, "wiki");
-        final RenderingContext renderingContext = getMockery().mock(MutableRenderingContext.class);
         final Transformation transformation = getMockery().mock(Transformation.class, "macro");
         final ModelContext modelContext = getMockery().mock(ModelContext.class);
         final ContentParser contentParser = getMockery().mock(ContentParser.class);
@@ -250,15 +281,17 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
         getMockery().checking(new Expectations()
         {
             {
-                allowing(mockComponentDoc).getContentAuthorReference();
-                will(returnValue(AUTHOR_REFERENCE));
-                allowing(mockComponentDoc).getDocumentReference();
+                oneOf(componentDoc).getDocumentReference();
                 will(returnValue(DOC_REF));
-                oneOf(mockComponentDoc).getXObjects(UI_EXTENSION_CLASS);
+                oneOf(componentDoc).getXObjects(UI_EXTENSION_CLASS);
                 will(returnValue(extensionObjects));
-                oneOf(mockComponentDoc).getAuthorReference();
+                oneOf(componentDoc).getAuthorReference();
                 will(returnValue(AUTHOR_REFERENCE));
-                oneOf(authorization).hasAccess(Right.ADMIN, AUTHOR_REFERENCE, new WikiReference("xwiki"));
+                oneOf(xwiki).getRightService();
+                will(returnValue(rightService));
+                oneOf(componentDoc).getContentAuthor();
+                will(returnValue("XWiki.Admin"));
+                oneOf(rightService).hasAccessLevel("admin", "XWiki.Admin", "XWiki.XWikiPreferences", xwikiContext);
                 will(returnValue(true));
                 allowing(extensionObject).getReference();
                 will(returnValue(extensionReference));
@@ -272,10 +305,8 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 will(returnValue("key=value=foo\nkey2=value2\ninvalid=\n\n=invalid"));
                 oneOf(extensionObject).getStringValue(SCOPE_PROPERTY);
                 will(returnValue("wiki"));
-                oneOf(contentParser).parse("content", Syntax.XWIKI_2_0, DOC_REF);
+                oneOf(contentParser).parse("content", Syntax.XWIKI_2_0);
                 will(returnValue(xdom));
-                oneOf(componentManager).getInstance(RenderingContext.class);
-                will(returnValue(renderingContext));
                 oneOf(componentManager).getInstance(Transformation.class, "macro");
                 will(returnValue(transformation));
                 oneOf(componentManager).getInstance(Execution.class);

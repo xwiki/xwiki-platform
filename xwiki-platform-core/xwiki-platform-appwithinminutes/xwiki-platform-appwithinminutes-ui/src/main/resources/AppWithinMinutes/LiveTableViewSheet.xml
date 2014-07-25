@@ -1,25 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
 <xwikidoc>
   <web>AppWithinMinutes</web>
   <name>LiveTableViewSheet</name>
@@ -36,6 +16,7 @@
   <contentUpdateDate>1321380065000</contentUpdateDate>
   <version>1.1</version>
   <title>#if($doc.fullName=='AppWithinMinutes.LiveTableViewSheet')LiveTable View Sheet#{else}#evaluate($doc.title)#end</title>
+  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -320,10 +301,6 @@ return XWiki;
   background-image: url("$xwiki.getSkinFile('icons/silk/application_delete.png')");
 }
 
-#actionBox .action.deleteData {
-  background-image: url("$xwiki.getSkinFile('icons/silk/application_form_delete.png')");
-}
-
 #actionBox .action.add {
   background-image: url("$xwiki.getSkinFile('icons/silk/add.png')");
 }
@@ -363,44 +340,28 @@ return XWiki;
   #set($discard = $doc.use($liveTableObj))
   #set($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableViewSheet'))
   #set($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableViewSheet'))
-  #if (!$isReadOnly)
-    ## Determine the user's rights
-    #set($classFullName = $liveTableObj.getProperty('class').value)
-    #set($className = $stringtool.removeEnd($classFullName, 'Class'))
-    #set($classRef = $services.model.resolveDocument($classFullName))
-    #set($hasCreateData = $hasCreatePage)
-    ## Also provide backwards compatibility with apps developed in a single space (code+data)
-    #set($hasDeleteData = $hasSpaceAdmin &amp;&amp; ($classRef.lastSpaceReference.name != $doc.space))
-    #set($hasEditApplication = $xwiki.hasAccessLevel('edit', $classRef))
-    #set($translationsDoc = $xwiki.getDocument("${className}Translations"))
-    #set($hasEditTranslations = $xwiki.isMultiLingual() &amp;&amp; !$translationsDoc.isNew() &amp;&amp; $translationsDoc.hasAccessLevel('edit'))
-    #set($codeSpacePreferencesRef = $services.model.createDocumentReference($doc.wiki, $classRef.lastSpaceReference.name, 'WebPreferences'))
-    #set($hasDeleteApplication = $xwiki.hasAccessLevel('admin', $services.model.serialize($codeSpacePreferencesRef, 'default')))
-    ## Display the application actions based on the user's rights
-    #if($hasCreateData || $hasDeleteData || $hasEditApplication || $hasEditTranslations || $hasDeleteApplication)
-      (% id="actionBox" class="floatinginfobox" %)
-      (((
-        = $services.localization.render('platform.appwithinminutes.appHomePageActionsHeading') =
-        #if($hasCreateData)
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
-            #set($templateName = $escapetool.url("${className}Template"))
-            #set($entryDoc = $services.model.createDocumentReference($doc.wiki, $doc.space, '__entryName__'))
-            {{html}}&lt;input type="hidden" value="$xwiki.getURL($entryDoc, 'edit', "editor=inline&amp;template=$!templateName&amp;parent=WebHome")" /&gt;{{/html}}
-        #end
-        #if($hasDeleteData)
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteEntriesLabel')&gt;&gt;path:$doc.getURL('deletespace')||class="action deleteData"]]
-        #end
-        #if($hasEditApplication)
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="appName=$escapetool.url($doc.space)" class="action edit"]]
-        #end
-        #if($hasEditTranslations)
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:$translationsDoc.getURL('edit', 'editor=wiki')||class="action translate"]]
-        #end
-        #if($hasDeleteApplication)
-          * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteAppLabel')&gt;&gt;path:$xwiki.getURL($classRef, 'deletespace')||class="action delete"]]
-        #end
-      )))
-    #end
+  #if($hasCreatePage || ($hasEdit &amp;&amp; !$isReadOnly) || $hasSpaceAdmin)
+    #set($className = $stringtool.removeEnd($liveTableObj.getProperty('class').value, 'Class'))
+    (% id="actionBox" class="floatinginfobox" %)
+    (((
+      = $services.localization.render('platform.appwithinminutes.appHomePageActionsHeading') =
+      #if($hasCreatePage)
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageAddEntryHint')&gt;&gt;||anchor="AddNewEntry" class="action add"]]##
+          #set($templateName = $escapetool.url("${className}Template"))
+          #set($entryDoc = $services.model.createDocumentReference($doc.wiki, $doc.space, '__entryName__'))
+          {{html}}&lt;input type="hidden" value="$xwiki.getURL($entryDoc, 'edit', "editor=inline&amp;template=$!templateName&amp;parent=WebHome")" /&gt;{{/html}}
+      #end
+      #if($hasEdit &amp;&amp; !$isReadOnly)
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="appName=$escapetool.url($doc.space)" class="action edit"]]
+      #end
+      #set($translationsDoc = $xwiki.getDocument("${className}Translations"))
+      #if($xwiki.isMultiLingual() &amp;&amp; !$translationsDoc.isNew() &amp;&amp; $translationsDoc.hasAccessLevel('edit'))
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:$translationsDoc.getURL('edit', 'editor=wiki')||class="action translate"]]
+      #end
+      #if($hasSpaceAdmin)
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteAppLabel')&gt;&gt;path:$doc.getURL('deletespace')||class="action delete"]]
+      #end
+    )))
   #end
   $doc.display('description')
   ## Display the live table only if it was generated.

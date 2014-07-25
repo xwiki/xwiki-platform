@@ -152,7 +152,6 @@ public class DisplayMacro extends AbstractMacro<DisplayMacroParameters>
         displayParameters.setExecutionContextIsolated(displayParameters.isContentTransformed());
         displayParameters.setSectionId(parameters.getSection());
         displayParameters.setTransformationContextIsolated(displayParameters.isContentTransformed());
-        displayParameters.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
         XDOM result;
         try {
             result = this.documentDisplayer.display(documentBridge, displayParameters);

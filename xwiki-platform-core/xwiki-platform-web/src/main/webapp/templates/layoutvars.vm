@@ -8,19 +8,13 @@
   #set($spaceprefs = $request.space)
   #set($showLeftPanels =  $xwiki.getSpacePreferenceFor("showLeftPanels", $request.space))
   #set($showRightPanels = $xwiki.getSpacePreferenceFor("showRightPanels", $request.space))
-  #set($leftPanelsWidth =  $xwiki.getSpacePreferenceFor("leftPanelsWidth", $request.space))
-  #set($rightPanelsWidth =  $xwiki.getSpacePreferenceFor("rightPanelsWidth", $request.space))
 #elseif($doc.fullName == "XWiki.XWikiPreferences" || "$!request.editor" == "globaladmin")
   #set($globalprefs = true)
   #set($showLeftPanels = $xwiki.getXWikiPreference("showLeftPanels"))
   #set($showRightPanels = $xwiki.getXWikiPreference("showRightPanels"))
-  #set($leftPanelsWidth = $xwiki.getXWikiPreference("leftPanelsWidth"))
-  #set($rightPanelsWidth = $xwiki.getXWikiPreference("rightPanelsWidth"))
 #else
   #set($showLeftPanels = $xwiki.getSpacePreference("showLeftPanels"))
   #set($showRightPanels = $xwiki.getSpacePreference("showRightPanels"))
-  #set($leftPanelsWidth = $xwiki.getSpacePreference("leftPanelsWidth"))
-  #set($rightPanelsWidth = $xwiki.getSpacePreference("rightPanelsWidth"))
 #end
 
 #if(!$showLeftPanels || $showLeftPanels == "" || $showLeftPanels == "default")
@@ -41,13 +35,6 @@
 #end
 #if($showRightPanels == "no" || !$isInServletMode)
   #set($showRightPanels = "0")
-#end
-
-#if(!$leftPanelsWidth || $leftPanelsWidth == "" || $leftPanelsWidth == "---")
-  #set($leftPanelsWidth = "Medium")
-#end
-#if(!$rightPanelsWidth || $rightPanelsWidth == "" || $rightPanelsWidth == "---")
-  #set($rightPanelsWidth = "Medium")
 #end
 
 #if($showLeftPanels)
@@ -96,8 +83,7 @@
  #end
 #end
 
-#set($displayContentMenu = true) ## header bar of the content area in 'view' mode
-#set($displayEditMenu = true) ## header bar of the content area in 'edit' mode
+#set($displayContentMenu = true)
 #set($displayMainMenu = true)
 #set($displayDocExtra = true)
 #set($displayShortcuts = true)

@@ -19,16 +19,11 @@
  */
 package com.xpn.xwiki.render;
 
-import org.xwiki.component.annotation.Role;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-@Role
 public interface XWikiRenderer
 {
-    String getId();
-
     String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc, XWikiContext context);
 
     void flushCache();

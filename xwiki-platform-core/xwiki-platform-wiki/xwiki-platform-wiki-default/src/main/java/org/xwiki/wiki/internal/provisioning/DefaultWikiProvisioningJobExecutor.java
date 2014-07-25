@@ -35,6 +35,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.job.Job;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobException;
@@ -44,7 +45,7 @@ import org.xwiki.wiki.provisioning.WikiProvisioningJobRequest;
 /**
  * Default implementation for {@link org.xwiki.wiki.provisioning.WikiProvisioningJobExecutor}.
  *
- * @since 6.0M1
+ * @since 5.3M2
  * @version $Id$
  */
 @Component
@@ -98,7 +99,7 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
             // Add it to the list of jobs
             jobs.put(jobId, job);
             // Pass it to the executor
-            jobExecutor.execute(job);
+            jobExecutor.execute(new ExecutionContextRunnable(job, this.componentManager));
             // Return the job
             return job;
         } catch (ComponentLookupException e) {
@@ -110,7 +111,12 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
     @Override
     public WikiProvisioningJob getJob(List<String> jobId) throws WikiProvisioningJobException
     {
-        WikiProvisioningJob job = jobs.get(jobId);
-        return job;
+        try {
+            WikiProvisioningJob job = jobs.get(jobId);
+            return job;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new WikiProvisioningJobException(
+                    String.format("There is no job corresponding to the jobId [%d].", jobId), e);
+        }
     }
 }

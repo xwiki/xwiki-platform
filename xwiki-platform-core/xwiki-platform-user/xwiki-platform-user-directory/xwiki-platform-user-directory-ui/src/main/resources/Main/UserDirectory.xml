@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -53,7 +52,7 @@
 #set ($fakeUser = false)
 ##
 ## Set the fixed columns that we want the user directory to always show.
-#set ($columns = ['_avatar', 'doc.name'])
+#set ($columns = ['_avatar', 'doc.fullName'])
 ##
 ## The columns that the user directory will default to when no user preferences exist or when the user resets to default.
 #set ($defaultColumns = ['first_name', 'last_name'])
@@ -194,7 +193,7 @@
     #set ($html = true)
     #set ($sortable = false)
     #set ($link = 'view')
-  #elseif ($column == 'doc.name')
+  #elseif ($column == 'doc.fullName')
     #set ($link = 'view')
   #elseif ($classPropertyType.endsWith('ListClass'))
     #set($type = 'list')

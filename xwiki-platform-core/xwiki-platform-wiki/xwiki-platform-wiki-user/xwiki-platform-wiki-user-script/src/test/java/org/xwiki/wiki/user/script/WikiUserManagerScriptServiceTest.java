@@ -47,16 +47,15 @@ import org.xwiki.wiki.user.WikiUserManagerException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -531,179 +530,4 @@ public class WikiUserManagerScriptServiceTest
         assertFalse(result.contains(candidacies.get(1)));
     }
 
-    @Test
-    public void join() throws Exception
-    {
-        String userId = "mainWiki:XWiki.User";
-        String wikiId = "wikiId";
-        boolean result = this.mocker.getComponentUnderTest().join(userId, wikiId);
-        assertTrue(result);
-
-        verify(wikiUserManager).join(userId, wikiId);
-    }
-
-    @Test
-    public void joinWhenUserIsNotCurrentUser() throws Exception
-    {
-        String userId = "mainWiki:XWiki.User2";
-        String wikiId = "wikiId";
-        boolean result = this.mocker.getComponentUnderTest().join(userId, wikiId);
-        assertFalse(result);
-        assertEquals("User [mainWiki:XWiki.User] cannot call $services.wiki.user.join() with an other userId.",
-                this.mocker.getComponentUnderTest().getLastError().getMessage());
-
-        verify(wikiUserManager, never()).join(userId, wikiId);
-    }
-
-    @Test
-    public void joinWhenError() throws Exception
-    {
-        String userId = "mainWiki:XWiki.User";
-        String wikiId = "wikiId";
-
-        WikiUserManagerException exception = new WikiUserManagerException("error in wikiUserManager#join()");
-        doThrow(exception).when(wikiUserManager).join(userId, wikiId);
-
-        boolean result = this.mocker.getComponentUnderTest().join(userId, wikiId);
-        assertFalse(result);
-
-        assertEquals(exception, this.mocker.getComponentUnderTest().getLastError());
-    }
-
-    @Test
-    public void leave() throws Exception
-    {
-        String userId = "mainWiki:XWiki.User";
-        String wikiId = "wikiId";
-        boolean result = this.mocker.getComponentUnderTest().leave(userId, wikiId);
-        assertTrue(result);
-
-        verify(wikiUserManager).leave(userId, wikiId);
-    }
-
-    @Test
-    public void leaveWhenUserIsNotCurrentUser() throws Exception
-    {
-        String userId = "mainWiki:XWiki.User2";
-        String wikiId = "wikiId";
-        boolean result = this.mocker.getComponentUnderTest().leave(userId, wikiId);
-        assertFalse(result);
-        assertEquals("User [mainWiki:XWiki.User] cannot call $services.wiki.user.leave() with an other userId.",
-                this.mocker.getComponentUnderTest().getLastError().getMessage());
-
-        verify(wikiUserManager, never()).leave(userId, wikiId);
-    }
-
-    @Test
-    public void leaveWhenError() throws Exception
-    {
-        String userId = "mainWiki:XWiki.User";
-        String wikiId = "wikiId";
-
-        WikiUserManagerException exception = new WikiUserManagerException("error in wikiUserManager#leave()");
-        doThrow(exception).when(wikiUserManager).leave(userId, wikiId);
-
-        boolean result = this.mocker.getComponentUnderTest().leave(userId, wikiId);
-        assertFalse(result);
-
-        assertEquals(exception, this.mocker.getComponentUnderTest().getLastError());
-    }
-
-    @Test
-    public void hasPendingInvitation() throws Exception
-    {
-        String wikiId = "subwiki";
-
-        // Mocks
-        when(wikiUserManager.hasPendingInvitation(userDocRef, wikiId)).thenReturn(true);
-
-        // Test
-        Boolean result = mocker.getComponentUnderTest().hasPendingInvitation(userDocRef, wikiId);
-        assertTrue(result);
-
-        // Second run
-        when(wikiUserManager.hasPendingInvitation(userDocRef, wikiId)).thenReturn(false);
-        assertFalse(mocker.getComponentUnderTest().hasPendingInvitation(userDocRef, wikiId));
-    }
-
-    @Test
-    public void hasPendingInvitationWhenError() throws Exception
-    {
-        String wikiId = "subwiki";
-
-        // Current user is not admin
-        AccessDeniedException exception = new AccessDeniedException(userDocRef, new WikiReference(wikiId));
-        doThrow(exception).when(authorizationManager).checkAccess(eq(Right.ADMIN), eq(userDocRef),
-                eq(new WikiReference(wikiId)));
-
-        DocumentReference userToTest = new DocumentReference("mainWiki", "XWiki", "UserABC");
-
-        // Test
-        Boolean result = mocker.getComponentUnderTest().hasPendingInvitation(userToTest, wikiId);
-        assertNull(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-
-    }
-
-    @Test
-    public void hasPendingInvitationWhenNoPR() throws Exception
-    {
-        String wikiId = "subwiki";
-        Exception exception = currentScriptHasNotProgrammingRight();
-        DocumentReference userToTest = new DocumentReference("mainWiki", "XWiki", "UserABC");
-
-        // Test
-        Boolean result = mocker.getComponentUnderTest().hasPendingInvitation(userToTest, wikiId);
-        assertNull(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-    }
-
-    @Test
-    public void hasPendingRequest() throws Exception
-    {
-        String wikiId = "subwiki";
-
-        // Mocks
-        when(wikiUserManager.hasPendingRequest(userDocRef, wikiId)).thenReturn(true);
-
-        // Test
-        Boolean result = mocker.getComponentUnderTest().hasPendingRequest(userDocRef, wikiId);
-        assertTrue(result);
-
-        // Second run
-        when(wikiUserManager.hasPendingRequest(userDocRef, wikiId)).thenReturn(false);
-        assertFalse(mocker.getComponentUnderTest().hasPendingRequest(userDocRef, wikiId));
-    }
-
-    @Test
-    public void hasPendingRequestWhenError() throws Exception
-    {
-        String wikiId = "subwiki";
-
-        // Current user is not admin
-        AccessDeniedException exception = new AccessDeniedException(userDocRef, new WikiReference(wikiId));
-        doThrow(exception).when(authorizationManager).checkAccess(eq(Right.ADMIN), eq(userDocRef),
-                eq(new WikiReference(wikiId)));
-
-        DocumentReference userToTest = new DocumentReference("mainWiki", "XWiki", "UserABC");
-
-        // Test
-        Boolean result = mocker.getComponentUnderTest().hasPendingRequest(userToTest, wikiId);
-        assertNull(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-
-    }
-
-    @Test
-    public void hasPendingRequestWhenNoPR() throws Exception
-    {
-        String wikiId = "subwiki";
-        Exception exception = currentScriptHasNotProgrammingRight();
-        DocumentReference userToTest = new DocumentReference("mainWiki", "XWiki", "UserABC");
-
-        // Test
-        Boolean result = mocker.getComponentUnderTest().hasPendingRequest(userToTest, wikiId);
-        assertNull(result);
-        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
-    }
 }

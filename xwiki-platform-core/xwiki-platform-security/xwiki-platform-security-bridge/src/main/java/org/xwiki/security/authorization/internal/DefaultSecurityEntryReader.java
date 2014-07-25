@@ -307,12 +307,9 @@ public class DefaultSecurityEntryReader implements SecurityEntryReader
         }
 
         if (!isGlobalRightRequested && document != null) {
-            DocumentReference creator = document.getCreatorReference();
-
-            // Allow local rights to document creator (unless it is a public creator)
-            if (creator != null && !XWikiConstants.GUEST_USER.equals(creator.getName())) {
-                rules.add(new XWikiSecurityRule(CREATOR_RIGHTS, RuleState.ALLOW, Collections.singleton(creator), null));
-            }
+            // Allow local rights to document creator
+            rules.add(new XWikiSecurityRule(CREATOR_RIGHTS, RuleState.ALLOW,
+                Collections.singleton(document.getCreatorReference()), null));
         }
 
         return rules;

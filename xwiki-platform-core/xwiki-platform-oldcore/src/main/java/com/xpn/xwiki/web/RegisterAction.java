@@ -112,8 +112,8 @@ public class RegisterAction extends XWikiAction
         }
         XWikiRequest request = context.getRequest();
         // The document where the "requirecaptcha" parameter is stored.
-        DocumentReference configRef = new DocumentReference(context.getWikiId(), WIKI_SPACE, "RegistrationConfig");
-        DocumentReference classReference = new DocumentReference(context.getWikiId(), WIKI_SPACE, "Registration");
+        DocumentReference configRef = new DocumentReference(context.getDatabase(), WIKI_SPACE, "RegistrationConfig");
+        DocumentReference classReference = new DocumentReference(context.getDatabase(), WIKI_SPACE, "Registration");
         XWikiDocument configDoc = xwiki.getDocument(configRef, context);
         //Retrieve the captcha configuration. 
         int captcha = configDoc.getIntValue(classReference, "requireCaptcha");

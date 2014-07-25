@@ -1,12 +1,10 @@
 #template('colorThemeInit.vm')
 .paginationFilter {
+  border-top: 1px solid $theme.borderColor;
   color: $theme.textPrimaryColor;
   font-size: .9em;
   overflow: hidden;
   padding: 2px 0px 5px 5px;
-}
-.skin-colibri .paginationFilter {
-  border-top: 1px solid $theme.borderColor;
 }
 .resultsNo {
   float: left;

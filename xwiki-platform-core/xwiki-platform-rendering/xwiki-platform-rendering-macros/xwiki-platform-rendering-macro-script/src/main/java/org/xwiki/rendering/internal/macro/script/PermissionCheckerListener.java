@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -34,8 +35,6 @@ import org.xwiki.rendering.macro.script.MacroPermissionPolicy;
 import org.xwiki.rendering.macro.script.PrivilegedScriptMacro;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 /**
  * Listens to {@link org.xwiki.script.event.ScriptEvaluatingEvent} and aborts execution if the user is
@@ -49,13 +48,18 @@ import org.xwiki.security.authorization.Right;
 @Singleton
 public class PermissionCheckerListener extends AbstractScriptCheckerListener
 {
+    /**
+     * Message sent when the permission to execute the script is refused.
+     */
+    private static final String CANCEL_MESSAGE = "You don't have the right to execute this script";
+
     /** Used to find the type of a Macro defined by a Macro Marker block. */
     @Inject
     private MacroManager macroManager;
 
-    /** Used to check if programming rights is allowed. */
+    /** Used to check if the current document's author has programming rights. */
     @Inject
-    private ContextualAuthorizationManager authorizationManager;
+    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * Used to get Macro Permission Policy implementations.
@@ -78,8 +82,7 @@ public class PermissionCheckerListener extends AbstractScriptCheckerListener
             MacroPermissionPolicy mpp =
                 this.componentManager.getInstance(MacroPermissionPolicy.class, currentMacroId.getId());
             if (!mpp.hasPermission(parameters, context)) {
-                event.cancel(
-                    String.format("You don't have the right to execute the script macro [%s]", currentMacroId));
+                event.cancel(CANCEL_MESSAGE);
             }
         } catch (ComponentLookupException e) {
             // Policy not found for macro, check permission using backward compatibility check
@@ -104,10 +107,9 @@ public class PermissionCheckerListener extends AbstractScriptCheckerListener
                 // no special permission needed
                 return;
             }
-            // with not protected script engine, we are testing if programming right is allowed
-            if (!this.authorizationManager.hasAccess(Right.PROGRAM)) {
-                event.cancel(
-                    String.format("You need Programming Rights to execute the script macro [%s]", macroId.getId()));
+            // with not protected script engine, we are testing if the current dcument's author has "programming" right
+            if (!this.documentAccessBridge.hasProgrammingRights()) {
+                event.cancel(CANCEL_MESSAGE);
             }
         } catch (MacroLookupException exception) {
             // should not happen, this method was called from that macro

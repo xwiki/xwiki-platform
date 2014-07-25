@@ -1,9 +1,3 @@
-###############################################################
-## Contains various standard Velocity macros automatically
-## loaded and usable everywhere (in Velocity).
-## 
-## Note that if you modify that file you will need to restart.
-###############################################################
 ##
 ## #template("name.vm")
 ## Searches for the given velocity template and interprets it.
@@ -1269,7 +1263,7 @@ ${Msz}Mb##
   #if("$!options.rowCount" != '') #set($count = $options.rowCount) #else #set($count = 15) #end
   #if("$!options.maxPages" != '') #set($maxPages = $options.maxPages) #else #set($maxPages = 10) #end
   #if("$!options.selectedColumn" != '') #set($selectedColumn = $options.selectedColumn) #end
-  #if("$!options.callback" != '') #set($callback = $options.callback) #else #set($callback = '') #end
+  #if("$!options.callback" != '') #set($callback = $options.callback) #end
   #if("$!options.tagCloud" == '' || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
   #if ($options.selectedTags && $options.selectedTags.size() > 0)
     #set ($selectedTags = $options.selectedTags)
@@ -1280,11 +1274,6 @@ ${Msz}Mb##
   #if("$!options.topFilters" != '') #set($topfilters = $options.topFilters) #end
   #if("$options.pageSize" == '' || $!options.pageSize == false) #set($hasPageSize=false) #else #set($hasPageSize = true) #end
   #if("$!options.pageSizeBounds" != '') #set($pageSizeBounds = $options.pageSizeBounds) #end
-  #if("$!options.queryFilters" != '')
-    #set ($queryFilters = $!options.queryFilters)
-  #else
-    #set ($queryFilters = 'currentlanguage,hidden')
-  #end
   #set($classname = "$!options.className")
   ##
   ## Columns informations
@@ -1310,8 +1299,7 @@ ${Msz}Mb##
       'outputSyntax': 'plain',
       'transprefix': $transprefix,
       'classname': $classname,
-      'collist': $stringtool.join($dataColumns, ','),
-      'queryFilters': $queryFilters
+      'collist': $stringtool.join($dataColumns, ',')
     })
     #set ($discard = $parameters.putAll($classParams))
     #set ($resultPage = $options.resultPage)
@@ -1471,7 +1459,6 @@ ${Msz}Mb##
     </tr>
     <tr>
       <td class="xwiki-livetable-pagination">
-        <span class="xwiki-livetable-limits"></span>
         <span class="controlPagination">
           <a title="$services.localization.render('platform.livetable.paginationPagePrevTitle')" class="prevPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPagePrevTitle')</span></a>
           <a title="$services.localization.render('platform.livetable.paginationPageNextTitle')" class="nextPagination" href="#"><span class="hidden">$services.localization.render('platform.livetable.paginationPageNextTitle')</span></a>
@@ -1498,15 +1485,14 @@ ${Msz}Mb##
         'selectedTags': $selectedTags
       })
       #if ($hasTopFilters)
-        // Specify the filter nodes using identifiers or CSS selectors.
-        #set ($discard = $liveTableParams.put('filterNodes', ["$escapetool.h$divid .xwiki-livetable-display-filters",
-          "${divid}-topfilters"]))
+        #set ($discard = $liveTableParams.put('filterNodes', ["$('$divid').down('.xwiki-livetable-display-filters')",
+          "$('${divid}-topfilters')"]))
       #end
       #if ($hasPageSize && "$!pageSizeBounds" != '')
         #set ($discard = $liveTableParams.put('pageSizeBounds', $pageSizeBounds))
       #end
       #set ($callbackParam = "#livetablecallback($divid $collist $colprops $transprefix), ")
-      #if ($!callback != '')
+      #if ($callback)
         #set ($callbackParam = "$callback, ")
       #end
       window["$jsName"] = new XWiki.widgets.LiveTable("$dataurl", "${divid}",
@@ -1983,6 +1969,8 @@ function (row, i, table) {
 ## NOTE: We can't defer the SmartClient loading because it uses document.write() to load stylesheets in IE.
 $xwiki.jsfx.use("js/smartclient/initsc.js", {'forceSkinAction': true, 'defer': false})
 $xwiki.jsfx.use("js/smartclient/modules/ISC_Core.js", {'defer': false})
+## TODO: remove the following line when http://forums.smartclient.com/showthread.php?t=3097 will be fixed
+$xwiki.jsfx.use("js/smartclient/overwritesc.js", {'defer': false})
 $xwiki.jsfx.use("js/smartclient/modules/ISC_Foundation.js", {'defer': false})
 $xwiki.jsfx.use("js/smartclient/modules/ISC_Containers.js", {'defer': false})
 $xwiki.jsfx.use("js/smartclient/modules/ISC_Grids.js", {'defer': false})
@@ -2321,16 +2309,22 @@ var $jsVarName = {
     #end
     #break($macro)
   #end
+  #set ($browserVariants = ['-moz-', '-o-', ''])
+  #set ($browserVariantsWithLegacySyntax = ['-webkit-'])
   #set ($colors = '')
   #set ($position = '')
+  #set ($legacyPosition = '')
   #if ($gradientData.angle)
     #if ($stringtool.indexOfAny($gradientData.angle, 'top', 'right', 'bottom', 'left') != -1)
       #set ($position = "to $!{gradientData.angle}")
+      #set ($legacyPosition = $stringtool.replaceEach($gradientData.angle, ['top', 'right', 'bottom', 'left'], ['bottom', 'left', 'top', 'right']))
     #else
       #set ($position = "$!{gradientData.angle}")
+      #set ($legacyPosition = "$!{gradientData.angle}")
     #end
   #elseif ($gradientData.to)
     #set ($position = "to $!{gradientData.to}")
+    #set ($legacyPosition = $stringtool.replaceEach($gradientData.to, ['top', 'right', 'bottom', 'left'], ['bottom', 'left', 'top', 'right']))
   #end
   #foreach ($colorEntry in $gradientData.colors)
     #set ($colors = "$!{colors}, $!{colorEntry.color} $!{colorEntry.position}")
@@ -2338,7 +2332,12 @@ var $jsVarName = {
   #if ("$!{colors}" != '' && "$!{position}" == '')
     #set ($colors = $colors.substring(2))
   #end
-  background-image:#if ("$!{icon}" != '') $icon,#end linear-gradient($!{position}$!{colors});
+  #foreach ($bvar in $browserVariantsWithLegacySyntax)
+    background-image:#if ("$!{icon}" != '') $icon,#end ${bvar}linear-gradient($!{legacyPosition}$!{colors});
+  #end
+  #foreach ($bvar in $browserVariants)
+    background-image:#if ("$!{icon}" != '') $icon,#end ${bvar}linear-gradient($!{position}$!{colors});
+  #end
 #end
 ##
 ##
@@ -2367,7 +2366,7 @@ var $jsVarName = {
  *#
 #macro (css3_boxSizing $value)
   #if ("$!{value}" != '')
-    #set ($browserVariants = ['-moz-', ''])
+    #set ($browserVariants = ['-moz-', '-webkit-', ''])
     #foreach ($bvar in $browserVariants)
       ${bvar}box-sizing: $value;
     #end
@@ -2488,31 +2487,3 @@ Recursive title display detected!##
   ## - Skin extension hook
   <!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->
 #end
-
-#**
- * Start a breadcrumb.
- *
- * Should be used in HTML.
- *#
-#macro(breadcrumb_start)#end
-
-#**
- * End of a breadcrumb
- *
- * Should be used in HTML.
- *#
-#macro(breadcrumb_end)#end
-
-#**
- * Display a line in the breadcrumb
- *
- * Should be used in HTML.
- *#
-#macro(breadcrumb_line $link $title)<a href="$link">$title</a> <span class="separator">&raquo;</span> #end
-
-#**
- * Display the current line in the breadcrumb
- *
- * Should be used in HTML.
- *#
-#macro(breadcrumb_current_line $title)<span class="current">$title</span>#end

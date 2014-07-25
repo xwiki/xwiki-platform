@@ -19,14 +19,11 @@
  */
 package org.xwiki.wiki.internal.manager;
 
-import java.util.Collection;
-
 import org.xwiki.component.annotation.Role;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 
 /**
  * Component that handle caching for wiki descriptors.
- * 
  * @version $Id$
  * @since 5.3M2
  */
@@ -42,7 +39,6 @@ public interface WikiDescriptorCache
 
     /**
      * Remove a descriptor from the cache.
-     * 
      * @param descriptor descriptor to remove
      */
     void remove(DefaultWikiDescriptor descriptor);
@@ -62,16 +58,4 @@ public interface WikiDescriptorCache
      * @return the descriptor related to the alias or null if there is no corresponding descriptor in the cache
      */
     DefaultWikiDescriptor getFromAlias(String wikiAlias);
-
-    /**
-     * @param wikiIds the full list of wikis identifiers
-     * @since 6.2M1
-     */
-    void setWikiIds(Collection<String> wikiIds);
-
-    /**
-     * @return the full list of wikis identifiers
-     * @since 6.2M1
-     */
-    Collection<String> getWikiIds();
 }

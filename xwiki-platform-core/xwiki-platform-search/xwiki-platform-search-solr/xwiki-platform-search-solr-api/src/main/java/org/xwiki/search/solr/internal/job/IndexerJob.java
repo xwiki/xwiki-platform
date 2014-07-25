@@ -19,20 +19,39 @@
  */
 package org.xwiki.search.solr.internal.job;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
-import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.LocaleUtils;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.job.Request;
 import org.xwiki.job.internal.AbstractJob;
 import org.xwiki.job.internal.DefaultJobStatus;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
+import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrIndexer;
-import org.xwiki.search.solr.internal.job.DiffDocumentIterator.Action;
+import org.xwiki.search.solr.internal.api.SolrIndexerException;
+import org.xwiki.search.solr.internal.api.SolrInstance;
+import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 /**
  * Provide progress information and store logging of an advanced indexing.
@@ -51,18 +70,34 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
     public static final String JOBTYPE = "solr.indexer";
 
     /**
+     * Used to resolve Solr document id from reference.
+     */
+    @Inject
+    private SolrReferenceResolver solrResolver;
+
+    /**
+     * Used to query the database.
+     */
+    @Inject
+    private QueryManager queryManager;
+
+    /**
+     * Provider for the {@link SolrInstance} that allows communication with the Solr server.
+     */
+    @Inject
+    private Provider<SolrInstance> solrInstanceProvider;
+
+    /**
+     * Used to access the current {@link XWikiContext}.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    /**
      * Used to send documents to index or delete to/from Solr index.
      */
     @Inject
-    private transient SolrIndexer indexer;
-
-    @Inject
-    @Named("database")
-    private transient DocumentIterator<String> databaseIterator;
-
-    @Inject
-    @Named("solr")
-    private transient DocumentIterator<String> solrIterator;
+    private SolrIndexer indexer;
 
     @Override
     public String getType()
@@ -86,44 +121,216 @@ public class IndexerJob extends AbstractJob<IndexerRequest, DefaultJobStatus<Ind
     @Override
     protected void runInternal() throws Exception
     {
-        if (getRequest().isOverwrite()) {
-            EntityReference rootReference = getRequest().getRootReference();
-            this.logger.info("Index documents in [{}].", rootReference);
-            this.indexer.index(rootReference, true);
-        } else {
-            updateSolrIndex();
+        if (getRequest().isRemoveMissing()) {
+            notifyPushLevelProgress(2);
+        }
+
+        try {
+            if (getRequest().isRemoveMissing()) {
+                // Remove from Solr entities not in DB anymore
+                removeMissing();
+            }
+
+            // Add in Solr entities in DB and not in Solr
+            addMissing();
+        } finally {
+            if (getRequest().isRemoveMissing()) {
+                notifyPopLevelProgress();
+            }
         }
     }
 
     /**
-     * Update the Solr index to match the current state of the database.
+     * Remove Solr documents not in the database anymore.
+     * 
+     * @throws SolrIndexerException when failing to clean the Solr index
+     * @throws SolrServerException when failing to clean the Solr index
+     * @throws IllegalArgumentException when failing to clean the Solr index
      */
-    private void updateSolrIndex()
+    private void removeMissing() throws SolrIndexerException, SolrServerException, IllegalArgumentException
     {
-        DiffDocumentIterator<String> iterator = new DiffDocumentIterator<String>(solrIterator, databaseIterator);
-        iterator.setRootReference(getRequest().getRootReference());
+        this.logger.info("Remove Solr documents not in the database anymore");
 
-        notifyPushLevelProgress((int) iterator.size());
+        SolrInstance solrInstance = this.solrInstanceProvider.get();
+
+        // Clean existing index
+        SolrQuery solrQuery = new SolrQuery(this.solrResolver.getQuery(getRequest().getRootReference()));
+        solrQuery.setFields(FieldUtils.NAME, FieldUtils.SPACE, FieldUtils.WIKI, FieldUtils.DOCUMENT_LOCALE);
+        solrQuery.addFilterQuery(FieldUtils.TYPE + ':' + EntityType.DOCUMENT.name());
+
+        // TODO: be nicer with the memory when there is a lot of indexed documents and do smaller batches or stream the
+        // results
+        QueryResponse response = solrInstance.query(solrQuery);
+
+        SolrDocumentList results = response.getResults();
+
+        notifyPushLevelProgress((int) results.getNumFound());
+
+        XWikiContext xcontext = xcontextProvider.get();
 
         try {
-            long[] counter = new long[4];
-            while (iterator.hasNext()) {
-                Pair<DocumentReference, Action> entry = iterator.next();
-                if (entry.getValue() == Action.ADD || entry.getValue() == Action.UPDATE) {
-                    // The database entry has not been indexed or the indexed version doesn't match the latest version
-                    // from the database.
-                    this.indexer.index(entry.getKey(), true);
-                } else if (entry.getValue() == Action.DELETE && getRequest().isRemoveMissing()) {
-                    // The index entry doesn't exist anymore in the database.
-                    this.indexer.delete(entry.getKey(), true);
+            for (SolrDocument solrDocument : results) {
+                DocumentReference reference =
+                    createDocumentReference((String) solrDocument.get(FieldUtils.WIKI),
+                        (String) solrDocument.get(FieldUtils.SPACE), (String) solrDocument.get(FieldUtils.NAME),
+                        (String) solrDocument.get(FieldUtils.DOCUMENT_LOCALE));
+                if (!xcontext.getWiki().exists(reference, xcontext)) {
+                    this.indexer.delete(reference, true);
                 }
-                counter[entry.getValue().ordinal()]++;
+
                 notifyStepPropress();
             }
-            logger.info("{} documents added, {} deleted and {} updated during the synchronization of the Solr index.",
-                counter[Action.ADD.ordinal()], counter[Action.DELETE.ordinal()], counter[Action.UPDATE.ordinal()]);
         } finally {
             notifyPopLevelProgress();
+        }
+    }
+
+    /**
+     * @param wiki the wiki part of the reference
+     * @param space the space part of the reference
+     * @param name the name part of the reference
+     * @param localeString the locale part of the reference as String
+     * @return the complete document reference
+     */
+    private DocumentReference createDocumentReference(String wiki, String space, String name, String localeString)
+    {
+        if (localeString == null || localeString.isEmpty()) {
+            return new DocumentReference(wiki, space, name);
+        } else {
+            return new DocumentReference(wiki, space, name, LocaleUtils.toLocale(localeString));
+        }
+    }
+
+    /**
+     * Index documents not yet indexed in the whole farm.
+     * 
+     * @throws QueryException when failing to index new documents
+     * @throws XWikiException when failing to index new documents
+     * @throws SolrIndexerException when failing to index new documents
+     * @throws IllegalArgumentException when failing to index new documents
+     * @throws SolrServerException when failing to index new documents
+     */
+    private void addMissing() throws QueryException, XWikiException, SolrIndexerException, IllegalArgumentException,
+        SolrServerException
+    {
+        if (getRequest().isOverwrite()) {
+            this.logger.info("Index documents in [{}]", getRequest().getRootReference());
+
+            this.indexer.index(getRequest().getRootReference(), true);
+        } else {
+            this.logger.info("Index documents in [{}] not yet indexed", getRequest().getRootReference());
+
+            EntityReference rootReference = getRequest().getRootReference();
+            if (rootReference == null) {
+                XWikiContext xcontext = this.xcontextProvider.get();
+
+                List<String> wikis = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
+
+                notifyPushLevelProgress(wikis.size());
+
+                try {
+                    for (String wiki : wikis) {
+                        addMissing(wiki);
+                    }
+                } finally {
+                    notifyPopLevelProgress();
+                }
+            } else {
+                EntityReference wikiReference = rootReference.extractReference(EntityType.WIKI);
+                addMissing(wikiReference.getName());
+            }
+        }
+    }
+
+    /**
+     * Index document (versions) not yet indexed in the passed wiki.
+     * 
+     * @param wiki the wiki where to search for documents to index
+     * @throws QueryException when failing to index new documents
+     * @throws SolrIndexerException when failing to index new documents
+     * @throws IllegalArgumentException when failing to index new documents
+     * @throws SolrServerException when failing to index new documents
+     */
+    private void addMissing(String wiki) throws QueryException, SolrIndexerException, IllegalArgumentException,
+        SolrServerException
+    {
+        this.logger.info("Index documents not yet indexed in wiki [{}]", wiki);
+
+        SolrInstance solrInstance = this.solrInstanceProvider.get();
+
+        EntityReference spaceReference;
+        EntityReference documentReference;
+
+        EntityReference rootReference = getRequest().getRootReference();
+        if (rootReference != null) {
+            spaceReference = rootReference.extractReference(EntityType.SPACE);
+            documentReference = rootReference.extractReference(EntityType.DOCUMENT);
+        } else {
+            spaceReference = null;
+            documentReference = null;
+        }
+
+        String q = "select doc.name, doc.space, doc.language, doc.version from Document doc";
+        if (spaceReference != null) {
+            q += " where doc.space=:space";
+        }
+        if (documentReference != null) {
+            q += ", doc.name=:name";
+        }
+
+        // TODO: be nicer with the memory when there is a lot of documents and do smaller batches
+        Query query = this.queryManager.createQuery(q, Query.XWQL);
+        query.setWiki(wiki);
+        if (spaceReference != null) {
+            query.bindValue("space", spaceReference.getName());
+        }
+        if (documentReference != null) {
+            query.bindValue("name", documentReference.getName());
+        }
+
+        List<Object[]> documents = query.<Object[]> execute();
+
+        notifyPushLevelProgress(documents.size());
+
+        try {
+            for (Object[] document : documents) {
+                addMissing(wiki, document, solrInstance);
+
+                notifyStepPropress();
+            }
+        } finally {
+            notifyPopLevelProgress();
+        }
+    }
+
+    /**
+     * Index document (versions) not yet indexed in the passed wiki.
+     * 
+     * @param wiki the wiki where to search for documents to index
+     * @param document the document found
+     * @param solrInstance used to start indexing of a document
+     * @throws SolrIndexerException when failing to index new documents
+     * @throws IllegalArgumentException when failing to index new documents
+     * @throws SolrServerException when failing to index new documents
+     */
+    private void addMissing(String wiki, Object[] document, SolrInstance solrInstance) throws SolrIndexerException,
+        IllegalArgumentException, SolrServerException
+    {
+        String name = (String) document[0];
+        String space = (String) document[1];
+        String localeString = (String) document[2];
+        String version = (String) document[3];
+
+        DocumentReference reference = createDocumentReference(wiki, space, name, localeString);
+
+        SolrQuery solrQuery =
+            new SolrQuery(FieldUtils.ID + ':' + ClientUtils.escapeQueryChars(this.solrResolver.getId(reference)));
+        solrQuery.addFilterQuery(FieldUtils.VERSION + ':' + ClientUtils.escapeQueryChars(version));
+        solrQuery.setFields(FieldUtils.ID);
+
+        QueryResponse response = solrInstance.query(solrQuery);
+        if (response.getResults().getNumFound() == 0) {
+            this.indexer.index(reference, true);
         }
     }
 }

@@ -142,7 +142,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 if (doc.getDatabase() != null) {
                     absolutePageName += doc.getDatabase().toLowerCase();
                 } else {
-                    absolutePageName += context.getWikiId().toLowerCase();
+                    absolutePageName += context.getDatabase().toLowerCase();
                 }
 
                 absolutePageName += XWikiDocument.DB_SPACE_SEP;
@@ -238,14 +238,14 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 }
 
                 FileOutputStream fos = new FileOutputStream(file);
-                String database = context.getWikiId();
+                String database = context.getDatabase();
 
                 try {
                     XWikiServletResponseStub response = new XWikiServletResponseStub();
                     response.setOutpuStream(fos);
                     context.setResponse(response);
                     if (wikiId != null) {
-                        context.setWikiId(wikiId);
+                        context.setDatabase(wikiId);
                     }
 
                     // Adjust path for links inside CSS files.
@@ -258,7 +258,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 } finally {
                     fos.close();
                     if (wikiId != null) {
-                        context.setWikiId(database);
+                        context.setDatabase(database);
                     }
                 }
 
@@ -349,7 +349,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
     public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
         XWikiContext context)
     {
-        String wikiname = xwikidb == null ? context.getWikiId().toLowerCase() : xwikidb.toLowerCase();
+        String wikiname = xwikidb == null ? context.getDatabase().toLowerCase() : xwikidb.toLowerCase();
 
         try {
             if (this.exportedPages.contains(wikiname + XWikiDocument.DB_SPACE_SEP + web + XWikiDocument.SPACE_NAME_SEP
@@ -397,7 +397,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
     private URL createAttachmentURL(String filename, String space, String name, String xwikidb, XWikiContext context)
         throws XWikiException, IOException, URISyntaxException
     {
-        String db = (xwikidb == null ? context.getWikiId() : xwikidb);
+        String db = (xwikidb == null ? context.getDatabase() : xwikidb);
         String path = "attachment/" + db + "." + space + "." + name + "." + filename;
 
         File file = new File(this.exportDir, path);

@@ -1,30 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
--->
-
 <xwikidoc>
   <web>WikiManager</web>
   <name>Translations</name>
   <language/>
-  <defaultLanguage>en</defaultLanguage>
+  <defaultLanguage/>
   <translation>0</translation>
   <parent>WikiManager.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
@@ -118,6 +98,7 @@ platform.wiki.menu.userwikis=Wikis
 platform.wiki.dependencies.wiki.missing=The "Wiki" java component is not installed. This page will not work properly. Make sure that the "Wiki API" and "Wiki Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
 platform.wiki.dependencies.template.missing=The "Wiki Template" java component is not installed. This page will not work properly. Make sure that the "Wiki Template API" and "Wiki Template Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
 platform.wiki.dependencies.user.missing=The "Wiki User" java component is not installed. This page will not work properly. Make sure that the "Wiki User API" and "Wiki User Script" extensions are installed (using the Extension Manager) or that the files 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' and 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' are present under the 'WEB-INF/lib/' web application's folder (in case of a manual installation).
+platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
 
 ## Create
 platform.wiki.create.title=Create a new wiki
@@ -135,7 +116,6 @@ platform.wiki.error.oneParameterNotSpecified=The ''{0}'' parameter was not speci
 platform.wiki.error.parameterAcceptsMultipleValues=Multiple values accepted.
 platform.wiki.error.exceptionWithMessage=Exception: {0}
 platform.wiki.form.requiredField=Required
-platform.wiki.csrf.error=The security token is invalid. Please retry your operation.
 
 ## Users
 platform.wiki.users.userAlreadyMemberOfWiki=The user {0}{1}{2} is already a member of the wiki {3}{4}{5}.
@@ -196,12 +176,6 @@ platform.wiki.delete.success=The user {0}{1}{2} successfully deleted the wiki ''
 
 ## Wiki macro
 platform.wiki.macro.noWikis=There are currently no wiki created (except the main one).
-rendering.macro.wikis.name=Wikis
-rendering.macro.wikis.description=List all wikis
-
-## LegacyWorkspaces macro
-rendering.macro.workspaces.name=Workspaces (Legacy)
-rendering.macro.workspaces.description=Deprecated macro that should not be used, here for compatibility reason. Please use the "wikis" macro instead.
 
 ## Browse
 platform.wiki.browse=Browse Wikis
@@ -210,7 +184,6 @@ platform.wiki.browse.wikiprettyname=Name
 platform.wiki.browse.description=Description
 platform.wiki.browse.owner=Owner
 platform.wiki.browse.membershipType=Membership Type
-platform.wiki.browse.doc.creationDate=Creation Date
 platform.wiki.browse._actions=Actions
 platform.wiki.browse._actions.join=Join
 platform.wiki.browse._actions.requestJoin=Request Join
@@ -221,14 +194,13 @@ platform.wiki.browse._actions.delete=Delete
 
 ## Classes
 WikiManager.WikiUserClass_membershipType_open=Open for any user to join
-WikiManager.WikiUserClass_membershipType_request=Any global user can request to join but an admin must accept
-WikiManager.WikiUserClass_membershipType_invite=Only an admin can send invitations to join this wiki
+WikiManager.WikiUserClass_membershipType_request=Any user can request to join but an admin must accept
+WikiManager.WikiUserClass_membershipType_invite=Only an admin can invite a user
 WikiManager.WikiUserClass_userScope_local_only=Only local users are available in the wiki
 WikiManager.WikiUserClass_userScope_global_only=Only global users are available in the wiki
 WikiManager.WikiUserClass_userScope_local_and_global=Both global and local users are available in the wiki
 platform.wiki.prop.wikiname=Wiki Identifier
 platform.wiki.prop.wikiprettyname=Pretty Name
-platform.wiki.prop.wikialias=Alias
 platform.wiki.prop.description=Description
 platform.wiki.prop.owner=Owner
 platform.wiki.prop.membershipType.label=Membership Type
@@ -237,35 +209,24 @@ platform.wiki.prop.membershipType.hint=The way users can join this wiki.
 ## Wizard
 platform.wiki.create.wizard.desc.wikiname=The unique identifier of the new wiki.
 platform.wiki.create.wizard.desc.wikiprettyname=The display name of the wiki.
-platform.wiki.create.wizard.desc.wikialias=The domain name that will point to the wiki.
 platform.wiki.create.wizard.desc.newTemplateHint=Template to use for this new wiki (all documents will be cloned).
 platform.wiki.create.wizard.desc.description=A brief description of the wiki and its purpose.
-platform.wiki.create.wizard.desc.owner=A user who will always have all the rights on this wiki, independently of the rights configured in the Administration.
+platform.wiki.create.wizard.desc.owner=A user who will have all the rights on the wiki.
 platform.wiki.create.wizard.desc.members=The users who can participate in the wiki.
 platform.wiki.create.wizard.step.nameAndType=Step 1 — Choose a name
 platform.wiki.create.wizard.step.nameAndType.shortname=Name
 platform.wiki.create.wizard.step.users=Step 2 — Choose members
 platform.wiki.create.wizard.step.users.shortname=Users
-platform.wiki.create.wizard.step.cleaningUp=Cleaning Up
 platform.wiki.create.wizard.step.provisioning=The system is provisioning the wiki.
 platform.wiki.create.wizard.step.provisioning.wait=Please wait while the system is provisioning the wiki.
 platform.wiki.create.wizard.step.provisioning.complete=The wiki is almost ready. Please click on "finalize" to perform the last operation.
-platform.wiki.create.wizard.step.provisioning.error=The wiki {0} has been created but some of the documents contained in the template have not been copied. You should probably delete it.
 platform.wiki.create.wizard.step.provisioning.finalize=Finalize
-platform.wiki.create.wizard.step.provisioning.cleanUp=Clean &amp; delete the wiki
-platform.wiki.create.wizard.step.cleaningup.success=The wiki {0} has been successfuly deleted.
-platform.wiki.create.wizard.step.cleaningup.error=Error, the wiki {0} has not been deleted.
-platform.wiki.create.wizard.step.cleaningUp.confirmmessage=You are about to delete wiki {0}. Please confirm.
-platform.wiki.create.wizard.step.cleaningUp.confirm=Confirm
 platform.wiki.create.wizard.setAsTemplate.label=This wiki will be a template
 platform.wiki.create.wizard.template.noTemplate=No template (default)
 platform.wiki.create.wizard.userScope.label=User Scope
 platform.wiki.create.wizard.userScope.hint=Select what kind of users can access to the wiki
 platform.wiki.create.wizard.template.label=Template
 platform.wiki.create.wizard.step.dw=After clicking on "create", the wiki will be created but then the Distribution Wizard will be started to initialize your wiki. If you skip it, your wiki will be empty.
-platform.wiki.create.wizard.step.previous=Previous Step
-platform.wiki.create.wizard.step.next=Go to next step
-platform.wiki.create.wizard.step.create=Create
 
 ## Admin
 admin.wikis=Wikis
@@ -281,7 +242,7 @@ platform.wiki.sheet.title.createnewalias=Create new alias
 platform.wiki.sheet.title.viewaliases=View aliases
 platform.wiki.sheet.desc.wikiprettyname=The display name of the wiki.
 platform.wiki.sheet.desc.owner=A global user who will have all the rights on this wiki.
-platform.wiki.sheet.desc.secure=If enabled, all this wiki's generated externals URLs will start with \"https\".
+platform.wiki.sheet.desc.secure=If enabled, all this wiki''s generated externals URLs will starting with {0}.
 platform.wiki.sheet.desc.iswikitemplate=Indicate if this wiki can be use as template when creating a new wiki.
 platform.wiki.sheet.desc.server=The alias used to access the wiki.
 platform.wiki.sheet.desc.description=A brief wiki description.
@@ -304,11 +265,6 @@ platform.wiki.sheet.aliases=An alias is an other name for the wiki. You can add 
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
-
-#######################################
-## until 6.1
-#######################################
-platform.wiki.dependencies.applicationmanager.missing=The {0}Application Manager Plugin{1} is not installed. Please install it and try again.
 
 ## Used to indicate where deprecated keys end
 #@deprecatedend

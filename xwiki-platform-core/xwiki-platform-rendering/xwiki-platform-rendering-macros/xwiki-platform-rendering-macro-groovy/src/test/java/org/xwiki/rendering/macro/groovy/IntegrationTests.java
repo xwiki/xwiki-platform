@@ -29,7 +29,6 @@ import org.junit.runner.RunWith;
 import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.script.ScriptContextManager;
-import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.test.jmock.MockingComponentManager;
 
 /**
@@ -53,15 +52,8 @@ public class IntegrationTests
         final ScriptContextManager scm = componentManager.registerMockComponent(mockery, ScriptContextManager.class);
         final SimpleScriptContext scriptContext = new SimpleScriptContext();
         scriptContext.setAttribute("var", "value", ScriptContext.ENGINE_SCOPE);
-        scriptContext.setAttribute("services", componentManager.getInstance(ScriptServiceManager.class),
-            ScriptContext.ENGINE_SCOPE);
-
-        mockery.checking(new Expectations()
-        {
-            {
-                allowing(scm).getScriptContext();
-                will(returnValue(scriptContext));
-            }
-        });
+        mockery.checking(new Expectations() {{
+            allowing(scm).getScriptContext(); will(returnValue(scriptContext));
+        }});
     }
 }

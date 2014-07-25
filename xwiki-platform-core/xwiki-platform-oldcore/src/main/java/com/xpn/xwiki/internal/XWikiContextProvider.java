@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
@@ -59,21 +58,14 @@ public class XWikiContextProvider implements Provider<XWikiContext>
      */
     private XWikiContext getXWikiContext()
     {
-        XWikiContext xcontext;
+        XWikiContext context =
+            (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
 
-        ExecutionContext econtext = this.execution.getContext();
-
-        if (econtext != null) {
-            xcontext = (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-
-            if (xcontext == null) {
-                xcontext = this.contextProvider.createStubContext();
-                this.execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
-            }
-        } else {
-            xcontext = null;
+        if (context == null) {
+            context = this.contextProvider.createStubContext();
+            this.execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, context);
         }
 
-        return xcontext;
+        return context;
     }
 }

@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
-import org.xwiki.job.JobExecutor;
+import org.xwiki.job.JobManager;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.observation.EventListener;
@@ -61,7 +61,7 @@ public class RemoteListener implements EventListener
      * Used to start new job.
      */
     @Inject
-    private JobExecutor jobExecutor;
+    private JobManager jobManager;
 
     /**
      * Used to log job related error.
@@ -87,7 +87,7 @@ public class RemoteListener implements EventListener
         RemoteJobStartedEvent jobEvent = (RemoteJobStartedEvent) event;
 
         try {
-            Job job = this.jobExecutor.execute(jobEvent.getJobType(), jobEvent.getRequest());
+            Job job = this.jobManager.addJob(jobEvent.getJobType(), jobEvent.getRequest());
 
             for (LogEvent log : job.getStatus().getLog(LogLevel.ERROR)) {
                 this.logger.error(log.getMessage(), log.getArgumentArray());

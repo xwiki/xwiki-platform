@@ -20,6 +20,7 @@
 package org.xwiki.query.jpql.internal;
 
 import junit.framework.TestCase;
+import org.xwiki.query.jpql.internal.JPQLParser;
 
 public class JPQLParserTest extends TestCase
 {

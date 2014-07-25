@@ -21,16 +21,6 @@ package com.xpn.xwiki.render;
 
 import java.util.StringTokenizer;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.ConfigurationSource;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -38,49 +28,21 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.util.Util;
 
-@Component
-@Named("wikiwiki")
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class XWikiWikiBaseRenderer implements XWikiRenderer, Initializable
+public class XWikiWikiBaseRenderer implements XWikiRenderer
 {
-    @Inject
-    @Named("xwikicfg")
-    private ConfigurationSource configuration;
-
     private boolean removePre = true;
 
     private boolean renderWiki = true;
 
     public XWikiWikiBaseRenderer()
     {
-
     }
 
-    /**
-     * @deprecated since 6.1M2, use component with role {@link XWikiRenderer} and hint <code>wikiwiki</code> instead
-     */
     public XWikiWikiBaseRenderer(boolean renderWiki, boolean removePre)
     {
         this.setRemovePre(removePre);
         this.setRenderWiki(renderWiki);
-    }
 
-    @Override
-    public void initialize() throws InitializationException
-    {
-        if (this.configuration.getProperty("xwiki.render.wikiwiki", "0").equals("1")) {
-            setRenderWiki(true);
-            setRemovePre(true);
-        } else {
-            setRenderWiki(false);
-            setRemovePre(true);
-        }
-    }
-
-    @Override
-    public String getId()
-    {
-        return "xwiki";
     }
 
     public static String makeAnchor(String text, Util util)

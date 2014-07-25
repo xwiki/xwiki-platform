@@ -70,10 +70,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     private static final String RESUBMIT_TEMPLATE = "resubmit";
 
     /** Token storage (one token per user). */
-    private final ConcurrentMap<DocumentReference, String> tokens = new ConcurrentHashMap<DocumentReference, String>();
-
-    /** Token for guest user. */
-    private String guestToken;
+    private final ConcurrentMap<String, String> tokens = new ConcurrentHashMap<String, String>();
 
     /** Random number generator. */
     private SecureRandom random;
@@ -129,16 +126,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     @Override
     public String getToken()
     {
-        DocumentReference key = getTokenKey();
-        // Handle the case where the current user is Guest
-        if (key == null) {
-            if (guestToken == null) {
-                guestToken = newToken();
-            }
-            return guestToken;
-        }
-
-        // Get the token if it has already been created
+        String key = getTokenKey();
         String token = this.tokens.get(key);
         if (token != null) {
             return token;
@@ -147,20 +135,16 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         // create fresh token if needed
         synchronized (this.tokens) {
             if (!this.tokens.containsKey(key)) {
-                this.tokens.put(key, newToken());
+                byte[] bytes = new byte[TOKEN_LENGTH];
+                this.random.nextBytes(bytes);
+                // Base64 encoded token can contain __ or -- which breaks the layout (see XWIKI-5996). Replacing them
+                // with x reduces randomness a bit, but it seems that other special characters are either used in XWiki
+                // syntax or not URL-safe
+                token = Base64.encodeBase64URLSafeString(bytes).replaceAll("[_=+-]", "x");
+                this.tokens.put(key, token);
             }
             return this.tokens.get(key);
         }
-    }
-
-    private String newToken()
-    {
-        byte[] bytes = new byte[TOKEN_LENGTH];
-        this.random.nextBytes(bytes);
-        // Base64 encoded token can contain __ or -- which breaks the layout (see XWIKI-5996). Replacing them
-        // with x reduces randomness a bit, but it seems that other special characters are either used in XWiki
-        // syntax or not URL-safe
-        return Base64.encodeBase64URLSafeString(bytes).replaceAll("[_=+-]", "x");
     }
 
     @Override
@@ -249,12 +233,12 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     }
 
     /**
-     * Get the token map key for the current user.
+     * Get the token map key for the current user. Constructs a string from user name.
      * 
      * @return key for the token map
      */
-    private DocumentReference getTokenKey()
+    private String getTokenKey()
     {
-        return this.docBridge.getCurrentUserReference();
+        return this.docBridge.getCurrentUser();
     }
 }

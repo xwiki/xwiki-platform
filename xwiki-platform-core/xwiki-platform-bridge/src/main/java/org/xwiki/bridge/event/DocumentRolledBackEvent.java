@@ -25,13 +25,6 @@ import org.xwiki.stability.Unstable;
 
 /**
  * An event triggered after a document is rolled back to a previous revision.
- * <p>
- * The event also send the following parameters:
- * </p>
- * <ul>
- * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance</li>
- * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
- * </ul>
  * 
  * @version $Id$
  * @since 5.0M2

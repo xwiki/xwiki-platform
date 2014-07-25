@@ -20,8 +20,10 @@
 package org.xwiki.extension.script.internal;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.InstallException;
@@ -30,10 +32,11 @@ import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.handler.ExtensionValidator;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Default right needed to install/uninstall an extension in XWiki.
@@ -62,8 +65,33 @@ public class XWikiExtensionValidator implements ExtensionValidator
      */
     private static final String PROPERTY_CHECKRIGHTS = "checkrights";
 
+    /**
+     * The full name (space.page) of the XWikiPreference page.
+     */
+    private static final String XWIKIPREFERENCES_FULLNAME = "XWiki.XWikiPreferences";
+
+    /**
+     * The identifier of the programming right.
+     */
+    private static final String RIGHTS_PROGRAMMING = "programming";
+
+    /**
+     * Needed for checking programming rights.
+     */
     @Inject
-    private AuthorizationManager authorization;
+    private DocumentAccessBridge documentAccessBridge;
+
+    /**
+     * Used to access the current {@link XWikiContext}.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    /**
+     * Used to serialize users references.
+     */
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
 
     /**
      * @param right the right to check
@@ -72,20 +100,24 @@ public class XWikiExtensionValidator implements ExtensionValidator
      * @return true of the action is allowed, false otherwise
      * @throws XWikiException failed to check rights
      */
-    private boolean hasProgramming(Request request) throws XWikiException
+    private boolean hasAccessLevel(String right, String document, Request request) throws XWikiException
     {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
         boolean hasAccess = true;
 
-        if (request.getProperty(PROPERTY_CALLERREFERENCE) != null) {
+        String caller = getRequestUserString(PROPERTY_CALLERREFERENCE, request);
+        if (caller != null) {
             hasAccess =
-                this.authorization.hasAccess(Right.PROGRAM, getRequestUserReference(PROPERTY_CALLERREFERENCE, request),
-                    null);
+                xcontext.getWiki().getRightService().hasAccessLevel(right, caller, XWIKIPREFERENCES_FULLNAME, xcontext);
         }
 
         if (hasAccess) {
-            DocumentReference user = getRequestUserReference(PROPERTY_USERREFERENCE, request);
+            String user = getRequestUserString(PROPERTY_USERREFERENCE, request);
             if (user != null) {
-                hasAccess = this.authorization.hasAccess(Right.PROGRAM, user, null);
+                hasAccess =
+                    xcontext.getWiki().getRightService()
+                        .hasAccessLevel(right, user, XWIKIPREFERENCES_FULLNAME, xcontext);
             }
         }
 
@@ -108,12 +140,34 @@ public class XWikiExtensionValidator implements ExtensionValidator
         return null;
     }
 
+    /**
+     * @param property the property containing a user reference
+     * @param request the request containing the property
+     * @return the user reference as String
+     */
+    private String getRequestUserString(String property, Request request)
+    {
+        String str = null;
+
+        if (request.containsProperty(property)) {
+            DocumentReference reference = getRequestUserReference(property, request);
+
+            if (reference != null) {
+                str = this.serializer.serialize(reference);
+            } else {
+                str = XWikiRightService.GUEST_USER_FULLNAME;
+            }
+        }
+
+        return str;
+    }
+
     @Override
     public void checkInstall(Extension extension, String namespace, Request request) throws InstallException
     {
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
             try {
-                if (!hasProgramming(request)) {
+                if (!hasAccessLevel(RIGHTS_PROGRAMMING, namespace + XWIKIPREFERENCES_FULLNAME, request)) {
                     if (namespace == null) {
                         throw new InstallException(String.format(
                             "Programming right is required to install extension [%s]", extension.getId()));
@@ -135,7 +189,7 @@ public class XWikiExtensionValidator implements ExtensionValidator
     {
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
             try {
-                if (!hasProgramming(request)) {
+                if (!hasAccessLevel(RIGHTS_PROGRAMMING, namespace + XWIKIPREFERENCES_FULLNAME, request)) {
                     if (namespace == null) {
                         throw new UninstallException(String.format(
                             "Programming right is required to uninstall extension [%s]", extension.getId()));

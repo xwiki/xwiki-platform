@@ -1,0 +1,2 @@
+org.xwiki.wikistream.confluence.xml.internal.input.ConfluenceInputWikiStream
+org.xwiki.wikistream.confluence.xml.internal.input.ConfluenceInputWikiStreamFactory

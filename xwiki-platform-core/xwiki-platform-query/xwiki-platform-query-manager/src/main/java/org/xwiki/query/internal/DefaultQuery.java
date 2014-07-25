@@ -125,19 +125,19 @@ public class DefaultQuery implements Query
     @Override
     public String getStatement()
     {
-        return this.statement;
+        return statement;
     }
 
     @Override
     public String getLanguage()
     {
-        return this.language;
+        return language;
     }
 
     @Override
     public boolean isNamed()
     {
-        return this.isNamed;
+        return isNamed;
     }
 
     @Override
@@ -150,20 +150,20 @@ public class DefaultQuery implements Query
     @Override
     public String getWiki()
     {
-        return this.wiki;
+        return wiki;
     }
 
     @Override
     public Query bindValue(String var, Object val)
     {
-        this.namedParameters.put(var, val);
+        namedParameters.put(var, val);
         return this;
     }
 
     @Override
     public Query bindValue(int index, Object val)
     {
-        this.positionalParameters.put(index, val);
+        positionalParameters.put(index, val);
         return this;
     }
 
@@ -189,13 +189,13 @@ public class DefaultQuery implements Query
     @Override
     public int getLimit()
     {
-        return this.limit;
+        return limit;
     }
 
     @Override
     public int getOffset()
     {
-        return this.offset;
+        return offset;
     }
 
     @Override
@@ -215,25 +215,25 @@ public class DefaultQuery implements Query
     @Override
     public Map<String, Object> getNamedParameters()
     {
-        return this.namedParameters;
+        return namedParameters;
     }
 
     @Override
     public Map<Integer, Object> getPositionalParameters()
     {
-        return this.positionalParameters;
+        return positionalParameters;
     }
 
     @Override
     public List<QueryFilter> getFilters()
     {
-        return this.filters;
+        return filters;
     }
 
     @Override
     public Query addFilter(QueryFilter filter)
     {
-        if (!this.filters.contains(filter)) {
+        if (!filters.contains(filter)) {
             this.filters.add(filter);
         } else {
             LOGGER.warn("QueryFilter [{}] already added to the query [{}]", filter.toString(), this.getStatement());
@@ -253,6 +253,6 @@ public class DefaultQuery implements Query
      */
     protected QueryExecutor getExecuter()
     {
-        return this.executer;
+        return executer;
     }
 }

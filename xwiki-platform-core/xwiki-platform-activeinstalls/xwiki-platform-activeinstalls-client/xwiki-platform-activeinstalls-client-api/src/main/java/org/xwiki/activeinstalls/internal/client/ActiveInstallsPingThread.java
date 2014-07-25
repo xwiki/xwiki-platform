@@ -24,8 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
 
-import com.xpn.xwiki.util.AbstractXWikiRunnable;
-
 /**
  * Thread that regularly sends information about the current instance (its unique id + the id and versions of all
  * installed extensions) to a central active installs Elastic Search server in order to count the number of active
@@ -34,7 +32,7 @@ import com.xpn.xwiki.util.AbstractXWikiRunnable;
  * @version $Id$
  * @since 5.2M2
  */
-public class ActiveInstallsPingThread extends AbstractXWikiRunnable
+public class ActiveInstallsPingThread extends Thread
 {
     /**
      * The logger to use when logging in this class.
@@ -67,7 +65,7 @@ public class ActiveInstallsPingThread extends AbstractXWikiRunnable
     }
 
     @Override
-    protected void runInternal()
+    public void run()
     {
         while (true) {
             try {

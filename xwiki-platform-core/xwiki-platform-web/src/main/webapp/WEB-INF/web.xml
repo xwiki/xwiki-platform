@@ -28,13 +28,13 @@
 
   <display-name>XWiki</display-name>
   <description>XWiki Application</description>
-
+  
   <!-- Main Restlet Application using Restlet's JAX-RS extension. -->
   <context-param>
     <param-name>org.restlet.application</param-name>
     <param-value>org.xwiki.rest.internal.XWikiRestletJaxRsApplication</param-value>
-  </context-param>
-
+  </context-param> 
+  
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specify
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
@@ -158,7 +158,7 @@
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
-  </filter-mapping>
+  </filter-mapping>    
 
   <!-- TODO: This should be fixed. It's not normal that the REST module depends on the WYSIWYG module.
        "XWikiXmlRpcContextInitializationFilter" points to
@@ -266,12 +266,12 @@
     <servlet-name>RestletServlet</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
-
+  
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>/bin/*</url-pattern>
   </servlet-mapping>
-
+  
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>/wiki/*</url-pattern>

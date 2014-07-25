@@ -139,16 +139,16 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             return archiveDoc;
         }
 
-        String db = context.getWikiId();
+        String db = context.getDatabase();
         try {
             if (doc.getDatabase() != null) {
-                context.setWikiId(doc.getDatabase());
+                context.setDatabase(doc.getDatabase());
             }
             archiveDoc = new XWikiDocumentArchive(doc.getId());
             loadXWikiDocArchive(archiveDoc, true, context);
             doc.setDocumentArchive(archiveDoc);
         } finally {
-            context.setWikiId(db);
+            context.setDatabase(db);
         }
         return archiveDoc;
     }

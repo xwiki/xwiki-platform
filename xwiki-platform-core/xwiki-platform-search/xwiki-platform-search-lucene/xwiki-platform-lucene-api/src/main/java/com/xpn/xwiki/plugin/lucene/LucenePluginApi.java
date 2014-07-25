@@ -70,16 +70,16 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
         if (hasAdminRights()) {
             Collection<String> wikis = null;
 
-            String database = this.context.getWikiId();
+            String database = this.context.getDatabase();
             try {
-                this.context.setWikiId(this.context.getMainXWiki());
+                this.context.setDatabase(this.context.getMainXWiki());
 
                 // if not farm administrator, the user does not have right to rebuild index of the whole farm
                 if (!hasAdminRights()) {
                     wikis = Collections.singletonList(database);
                 }
             } finally {
-                this.context.setWikiId(database);
+                this.context.setDatabase(database);
             }
 
             return getProtectedPlugin().startIndex(wikis, "", true, false, this.context);
@@ -101,15 +101,15 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
         if (hasAdminRights()) {
             // protected custom list of wikis
             Collection<String> secureWikis = wikis;
-            String currentWiki = this.context.getWikiId();
+            String currentWiki = this.context.getDatabase();
             try {
-                this.context.setWikiId(this.context.getMainXWiki());
+                this.context.setDatabase(this.context.getMainXWiki());
 
                 if (!hasAdminRights()) {
                     secureWikis = Collections.singletonList(currentWiki);
                 }
             } finally {
-                this.context.setWikiId(currentWiki);
+                this.context.setDatabase(currentWiki);
             }
 
             // protected hql custom filter

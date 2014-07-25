@@ -108,13 +108,13 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     @Override
     public boolean exists(String name)
     {
-        String database = getXWikiContext().getWikiId();
+        String database = getXWikiContext().getDatabase();
         try {
             int colonIndex = name.indexOf(":");
             if (colonIndex != -1) {
                 String db = name.substring(0, colonIndex);
                 name = name.substring(colonIndex + 1);
-                getXWikiContext().setWikiId(db);
+                getXWikiContext().setDatabase(db);
             }
 
             name = StringUtils.substringBefore(StringUtils.substringBefore(name, "?"), "#");
@@ -136,7 +136,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             return false;
         } finally {
             // Reset the current wiki to the original one
-            getXWikiContext().setWikiId(database);
+            getXWikiContext().setDatabase(database);
         }
 
     }
@@ -163,7 +163,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         if (name.length() == 0 && anchor != null) {
             appendInternalLink(buffer, view, anchor);
         } else {
-            String database = getXWikiContext().getWikiId();
+            String database = getXWikiContext().getDatabase();
             XWikiContext context = getXWikiContext();
 
             try {
@@ -172,7 +172,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 if (colonIndex != -1) {
                     db = name.substring(0, colonIndex);
                     name = name.substring(colonIndex + 1);
-                    context.setWikiId(db);
+                    context.setDatabase(db);
                 }
 
                 String querystring = null;
@@ -206,7 +206,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 buffer.append(cleanText(view));
                 buffer.append("</a></span>");
             } finally {
-                context.setWikiId(database);
+                context.setDatabase(database);
             }
         }
     }
@@ -261,7 +261,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     @Override
     public void appendCreateLink(StringBuffer buffer, String name, String view)
     {
-        String database = getXWikiContext().getWikiId();
+        String database = getXWikiContext().getDatabase();
         XWikiContext context = getXWikiContext();
 
         try {
@@ -270,7 +270,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             if (colonIndex != -1) {
                 db = name.substring(0, colonIndex);
                 name = name.substring(colonIndex + 1);
-                context.setWikiId(db);
+                context.setDatabase(db);
             }
 
             StringBuilder querystring = new StringBuilder();
@@ -308,7 +308,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             buffer.append("<span class=\"wikicreatelinkqm\">?</span>");
             buffer.append("</a>");
         } finally {
-            context.setWikiId(database);
+            context.setDatabase(database);
         }
     }
 

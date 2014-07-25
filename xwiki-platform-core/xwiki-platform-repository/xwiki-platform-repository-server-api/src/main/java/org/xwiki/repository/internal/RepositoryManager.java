@@ -38,7 +38,7 @@ public interface RepositoryManager
 
     BaseObject getExtensionVersion(XWikiDocument document, Version version);
 
-    void validateExtension(XWikiDocument document, boolean save) throws XWikiException;
+    void validateExtension(XWikiDocument document, boolean readOnly) throws XWikiException;
 
     void validateExtensions() throws QueryException, XWikiException;
 

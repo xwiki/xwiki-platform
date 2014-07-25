@@ -1,1 +1,0 @@
-org.xwiki.filter.instance.script.InstanceFilterScriptService

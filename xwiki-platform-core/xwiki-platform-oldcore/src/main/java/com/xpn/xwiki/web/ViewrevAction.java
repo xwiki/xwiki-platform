@@ -24,14 +24,6 @@ import com.xpn.xwiki.XWikiException;
 
 public class ViewrevAction extends XWikiAction
 {
-    /**
-     * Default constructor.
-     */
-    public ViewrevAction()
-    {
-        this.waitForXWikiInitialization = false;
-    }
-
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

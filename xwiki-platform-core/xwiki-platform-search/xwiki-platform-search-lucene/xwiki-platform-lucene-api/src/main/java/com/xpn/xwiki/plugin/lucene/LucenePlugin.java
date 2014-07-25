@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
@@ -82,7 +81,7 @@ import com.xpn.xwiki.web.Utils;
  * relevance), filter by one or several languages, and search in one, several or all virtual wikis.
  * 
  * @version $Id$
- * @deprecated use SOLR module instead
+ * @deprecated the plugin technology is deprecated
  */
 @Deprecated
 public class LucenePlugin extends XWikiDefaultPlugin
@@ -560,14 +559,8 @@ public class LucenePlugin extends XWikiDefaultPlugin
     {
         Directory directory = indexUpdater.getDirectory();
 
-        boolean needInitialRebuild;
-        try {
-            needInitialRebuild = !DirectoryReader.indexExists(directory);
-        } catch (IOException e) {
-            needInitialRebuild = true;
-            LOGGER.warn("Failed to determine if the index exists: [{}]. Trying to recreate the index..",
-                ExceptionUtils.getRootCauseMessage(e));
-        }
+        boolean needInitialRebuild = true;
+        needInitialRebuild = !DirectoryReader.indexExists(directory);
 
         IndexRebuilder indexRebuilder = new IndexRebuilder(indexUpdater, context);
         if (needInitialRebuild) {

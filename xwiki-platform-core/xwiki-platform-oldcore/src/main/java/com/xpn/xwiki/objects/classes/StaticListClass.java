@@ -94,7 +94,7 @@ public class StaticListClass extends ListClass
     @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
-        if (getDisplayType().equals(DISPLAYTYPE_INPUT)) {
+        if (getDisplayType().equals("input")) {
             input input = new input();
             input.setAttributeFilter(new XMLAttributeValueFilter());
             BaseProperty prop = (BaseProperty) object.safeget(name);
@@ -132,7 +132,7 @@ public class StaticListClass extends ListClass
 
             buffer.append(input.toString());
 
-        } else if (getDisplayType().equals(DISPLAYTYPE_RADIO) || getDisplayType().equals(DISPLAYTYPE_CHECKBOX)) {
+        } else if (getDisplayType().equals("radio") || getDisplayType().equals("checkbox")) {
             displayRadioEdit(buffer, name, prefix, object, context);
         } else {
             displaySelectEdit(buffer, name, prefix, object, context);

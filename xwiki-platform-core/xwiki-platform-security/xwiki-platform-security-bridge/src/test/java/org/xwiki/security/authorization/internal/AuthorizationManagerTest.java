@@ -68,7 +68,7 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "emptySubWiki.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
-        ctx.setWikiId("wiki2");
+        ctx.setDatabase("wiki2");
 
         assertAccessFalse("User from global wiki should have the same rights on empty subwiki", Right.VIEW,
             new DocumentReference("wiki", "XWiki", "user"), new DocumentReference("wiki2", "Space", "Page"), ctx);
@@ -92,7 +92,7 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
-        ctx.setWikiId("wiki");
+        ctx.setDatabase("wiki");
 
         DocumentReference user = null;
         EntityReference document = new DocumentReference("wiki", "Space", "Page");
@@ -121,7 +121,7 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
-        ctx.setWikiId("wiki");
+        ctx.setDatabase("wiki");
 
         DocumentReference user = null;
         EntityReference document = null;
@@ -150,7 +150,7 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
-        ctx.setWikiId("wiki");
+        ctx.setDatabase("wiki");
 
         DocumentReference user = new DocumentReference("wiki", "XWiki", "user");
         EntityReference document = null;
@@ -181,7 +181,7 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "usersAndGroups.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
-        ctx.setWikiId("wiki");
+        ctx.setDatabase("wiki");
 
         assertAccessTrue("User should have view right", Right.VIEW, new DocumentReference("wiki", "XWiki", "user"),
             new DocumentReference("wiki", "Space", "Page"), ctx);
@@ -202,7 +202,7 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
         LegacyTestWiki testWiki = new LegacyTestWiki(getMockery(), getComponentManager(), "empty.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
-        ctx.setWikiId("wiki");
+        ctx.setDatabase("wiki");
 
         DocumentReference user = new DocumentReference("wiki", "XWiki", "user");
 
@@ -221,7 +221,7 @@ public class AuthorizationManagerTest extends AbstractWikiTestCase
             new LegacyTestWiki(getMockery(), getComponentManager(), "accessToGlobalObjects.xml", false);
 
         XWikiContext ctx = testWiki.getXWikiContext();
-        ctx.setWikiId("wiki");
+        ctx.setDatabase("wiki");
 
         DocumentReference userA = new DocumentReference("wiki", "XWiki", "userA");
         DocumentReference userB = new DocumentReference("wiki", "XWiki", "userB");

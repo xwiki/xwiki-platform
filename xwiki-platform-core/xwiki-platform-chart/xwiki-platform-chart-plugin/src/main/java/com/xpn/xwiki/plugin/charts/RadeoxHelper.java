@@ -34,10 +34,12 @@ import com.xpn.xwiki.plugin.charts.source.TableDataSource;
 import com.xpn.xwiki.render.PreTagSubstitution;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.web.Utils;
 
 public class RadeoxHelper
 {
+    // lazily initiated single CustomXWikiRenderingEngine instance
+    static private volatile XWikiRenderingEngine customEngine;
+
     private XWikiRenderer radeoxRenderer;
 
     private XWikiContext context;
@@ -56,12 +58,16 @@ public class RadeoxHelper
     public String getPreRadeoxContent()
     {
         try {
-            XWikiRenderingEngine engine =
-                Utils.getComponentManager()
-                    .getInstance(XWikiRenderingEngine.class, CustomXWikiRenderingEngine.ROLEHINT);
-
-            return engine.renderDocument(document, context);
-        } catch (Exception e) {
+            // double checking locking
+            if (customEngine == null) {
+                synchronized (RadeoxHelper.class) {
+                    if (customEngine == null) {
+                        customEngine = new CustomXWikiRenderingEngine(context.getWiki(), context);
+                    }
+                }
+            }
+            return customEngine.renderDocument(document, context);
+        } catch (XWikiException e) {
             return document.getContent(); // this should not happen very often ... i hope
         }
     }

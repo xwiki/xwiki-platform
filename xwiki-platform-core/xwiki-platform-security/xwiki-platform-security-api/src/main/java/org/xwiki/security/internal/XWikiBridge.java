@@ -21,7 +21,6 @@ package org.xwiki.security.internal;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.authorization.Right;
 
 /**
  * Temporary interface to access XWiki information without depending on oldcore.
@@ -41,13 +40,4 @@ public interface XWikiBridge
      * @return {@code true} if the XWiki server is in read-only maintenance mode.
      */
     boolean isWikiReadOnly();
-
-    /**
-     * Check if authentication is always required for a given right.
-     *
-     * @param right the right to be checked.
-     * @return {@code true} if authentication is needed.
-     * @since 6.1RC1
-     */
-    boolean needsAuthentication(Right right);
 }

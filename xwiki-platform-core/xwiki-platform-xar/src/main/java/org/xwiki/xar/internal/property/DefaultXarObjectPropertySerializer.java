@@ -48,8 +48,6 @@ public class DefaultXarObjectPropertySerializer implements XarObjectPropertySeri
     @Override
     public void write(XMLStreamWriter writer, Object value) throws XMLStreamException
     {
-        if (value != null) {
-            writer.writeCharacters(value.toString());
-        }
+        writer.writeCharacters(value.toString());
     }
 }

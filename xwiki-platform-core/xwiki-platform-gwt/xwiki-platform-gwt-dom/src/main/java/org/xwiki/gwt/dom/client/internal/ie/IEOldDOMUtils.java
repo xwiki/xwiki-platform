@@ -62,10 +62,31 @@ public class IEOldDOMUtils extends IEDOMUtils
         Style.STYLE_ATTRIBUTE, CLASS_ATTRIBUTE}));
 
     @Override
-    public native String getComputedStyleProperty(Element element, String propertyName)
+    public String getComputedStyleProperty(Element element, String propertyName)
+    {
+        Node ancestor = element.getParentNode();
+        String computedValue = getCurrentStyleProperty(element, propertyName);
+        // IE6/7 supports "inherit" value only for direction and visibility CSS properties. For the rest, "inherit" is
+        // handled as an explicit value, e.g. if you write font-family:inherit then "inherit" is considered to be the
+        // font name. As a consequence, computed style returns "inherit" instead of the inherited value. The inherited
+        // value can be determined by iterating all the ancestors.
+        while ("inherit".equalsIgnoreCase(computedValue) && ancestor != null
+            && ancestor.getNodeType() == Node.ELEMENT_NODE) {
+            computedValue = getCurrentStyleProperty(Element.as(ancestor), propertyName);
+            ancestor = ancestor.getParentNode();
+        }
+        return computedValue;
+    }
+
+    /**
+     * @param element the element whose style is queried
+     * @param propertyName the JavaScript name of the CSS property whose current value is queried
+     * @return the value of the specified style property for the given element
+     */
+    private native String getCurrentStyleProperty(Element element, String propertyName)
     /*-{
-      // We force it to be a string because we treat it as a string in the java code.
-      return '' + element.currentStyle[propertyName];
+        // We force it to be a string because we treat it as a string in the java code.
+        return '' + element.currentStyle[propertyName];
     }-*/;
 
     @Override

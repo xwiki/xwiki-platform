@@ -25,8 +25,6 @@
 #   XWIKI_OPTS - parameters passed to the Java VM when running XWiki
 #     e.g. to increase the memory allocated to the JVM to 1GB, use
 #       set XWIKI_OPTS=-Xmx1024m
-#   JETTY_PORT - the port on which to start Jetty, 8080 by default
-#   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command, 8079 by default
 # ---------------------------------------------------------------------------
 
 # Ensure that the commands below are always started in the directory where this script is
@@ -51,27 +49,21 @@ if [ -z "$XWIKI_OPTS" ] ; then
   XWIKI_OPTS="-Xmx512m -XX:MaxPermSize=196m"
 fi
 
-# The port on which to start Jetty can be defined in an enviroment variable called JETTY_PORT
-if [ -z "$JETTY_PORT" ]; then
-  # Alternatively, it can be passed to this script as the first argument
-  if [ -n "$1" ]; then
-    JETTY_PORT=$1
-  else
-    JETTY_PORT=8080
-  fi
+# The port on which to start Jetty can be passed to this script as the first argument
+if [ -n "$1" ]; then
+  JETTY_PORT=$1
+else
+  JETTY_PORT=8080
 fi
 
-# The port on which Jetty listens for a Stop command can be defined in an enviroment variable called JETTY_STOP_PORT
-if [ -z "$JETTY_STOP_PORT" ]; then
-  # Alternatively, it can be passed to this script as the second argument
-  if [ -n "$2" ]; then
-    JETTY_STOP_PORT=$2
-  else
-    JETTY_STOP_PORT=8079
-  fi
+# The port on which to stop Jetty can be passed to this script as the second argument
+if [ -n "$2" ]; then
+  JETTY_STOPPORT=$2
+else
+  JETTY_STOPPORT=8079
 fi
 
-echo Starting Jetty on port ${JETTY_PORT}, please wait...
+echo Starting Jetty on port $JETTY_PORT ...
 
 # Location where XWiki stores generated data and where database files are.
 XWIKI_DATA_DIR=${xwikiDataDir}
@@ -90,7 +82,7 @@ XWIKI_OPTS="$XWIKI_OPTS -Djetty.port=$JETTY_PORT"
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME"
 
 # Specify port and key to stop a running Jetty instance
-XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOP_PORT"
+XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOPPORT"
 
 # Specify the encoding to use
 XWIKI_OPTS="$XWIKI_OPTS -Dfile.encoding=UTF8"
@@ -106,10 +98,7 @@ XWIKI_OPTS="$XWIKI_OPTS -Dorg.eclipse.jetty.server.Request.maxFormContentSize=10
 # Create a lock file to signify that XWiki is running
 touch xwiki.lck
 
-# If there are no optional configuration files, make bash ignore the last parameter instead of passing it verbatim
-shopt -s nullglob
-
-java $XWIKI_OPTS $3 $4 $5 $6 $7 $8 $9 -jar $JETTY_HOME/start.jar ${JETTY_HOME}/etc/jetty.xml ${JETTY_HOME}/etc/jetty-*.xml
+java $XWIKI_OPTS $3 $4 $5 $6 $7 $8 $9 -jar $JETTY_HOME/start.jar
 
 # Remove XWiki lock file
 rm -f xwiki.lck

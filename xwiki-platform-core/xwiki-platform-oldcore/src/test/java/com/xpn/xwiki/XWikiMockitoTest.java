@@ -34,7 +34,6 @@ import org.xwiki.bridge.event.DocumentRolledBackEvent;
 import org.xwiki.bridge.event.DocumentRollingBackEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -44,12 +43,11 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.ObjectReferenceResolver;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.resource.ResourceManager;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.internal.template.PrivilegedTemplateRenderer;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -101,10 +99,9 @@ public class XWikiMockitoTest
         mocker.registerMockComponent(EntityReferenceValueProvider.class);
         mocker.registerMockComponent(SyntaxFactory.class);
         mocker.registerMockComponent(PrivilegedTemplateRenderer.class);
-        mocker.registerMockComponent(ResourceReferenceManager.class);
+        mocker.registerMockComponent(ResourceManager.class);
         mocker.registerMockComponent(Environment.class);
         mocker.registerMockComponent(ObservationManager.class);
-        mocker.registerMockComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
 
         Utils.setComponentManager(mocker);
         xwiki = new XWiki();

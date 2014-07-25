@@ -183,7 +183,7 @@ public class SearchResults extends Api
         if (relResults == null) {
             relResults = new ArrayList<SearchResult>();
             TopDocs docs = this.results.topDocs();
-            String database = this.context.getWikiId();
+            String database = this.context.getDatabase();
             try {
                 for (int i = 0; i < docs.scoreDocs.length; i++) {
                     SearchResult result = null;
@@ -192,7 +192,7 @@ public class SearchResults extends Api
                             new SearchResult(this.searcher.doc(docs.scoreDocs[i].doc), docs.scoreDocs[i].score,
                                 this.xwiki);
 
-                        this.context.setWikiId(result.getWiki());
+                        this.context.setDatabase(result.getWiki());
 
                         String pageName = null;
                         if (result.isWikiContent()) {
@@ -213,7 +213,7 @@ public class SearchResults extends Api
                     }
                 }
             } finally {
-                this.context.setWikiId(database);
+                this.context.setDatabase(database);
             }
 
             return relResults;

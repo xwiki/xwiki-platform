@@ -31,7 +31,7 @@ import org.xwiki.component.phase.InitializationException;
 
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
-import io.searchbox.client.config.HttpClientConfig;
+import io.searchbox.client.config.ClientConfig;
 
 /**
  * Factory to get a singleton {@link JestClient} instance since it's threadsafe. The URL to connect to is defined in
@@ -56,9 +56,9 @@ public class DefaultJestClientManager implements JestClientManager, Initializabl
     public void initialize() throws InitializationException
     {
         String pingURL = this.configuration.getPingInstanceURL();
-        HttpClientConfig clientConfig = new HttpClientConfig.Builder(pingURL).multiThreaded(true).build();
-        JestClientFactory factory = new XWikiJestClientFactory();
-        factory.setHttpClientConfig(clientConfig);
+        ClientConfig clientConfig = new ClientConfig.Builder(pingURL).multiThreaded(true).build();
+        JestClientFactory factory = new JestClientFactory();
+        factory.setClientConfig(clientConfig);
         this.client = factory.getObject();
     }
 

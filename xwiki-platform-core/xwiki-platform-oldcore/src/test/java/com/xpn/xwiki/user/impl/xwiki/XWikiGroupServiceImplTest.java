@@ -63,7 +63,7 @@ public class XWikiGroupServiceImplTest extends AbstractBridgedXWikiComponentTest
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
                 {
-                    return new XWikiDocument(new DocumentReference(getContext().getWikiId(),
+                    return new XWikiDocument(new DocumentReference(getContext().getDatabase(),
                         (String) invocation.parameterValues.get(0), "WebPreferences"));
                 }
             });
@@ -71,7 +71,7 @@ public class XWikiGroupServiceImplTest extends AbstractBridgedXWikiComponentTest
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
 
         this.user = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user"));
-        getContext().setWikiId(this.user.getWikiName());
+        getContext().setDatabase(this.user.getWikiName());
         BaseObject userObject = new BaseObject();
         userObject.setClassName("XWiki.XWikiUser");
         this.user.addXObject(userObject);
@@ -79,7 +79,7 @@ public class XWikiGroupServiceImplTest extends AbstractBridgedXWikiComponentTest
             returnValue(this.user));
 
         this.userWithSpaces = new XWikiDocument(new DocumentReference("wiki", "XWiki", "user with spaces"));
-        getContext().setWikiId(this.userWithSpaces.getWikiName());
+        getContext().setDatabase(this.userWithSpaces.getWikiName());
         BaseObject userWithSpacesObject = new BaseObject();
         userWithSpacesObject.setClassName("XWiki.XWikiUser");
         this.userWithSpaces.addXObject(userWithSpacesObject);
@@ -87,7 +87,7 @@ public class XWikiGroupServiceImplTest extends AbstractBridgedXWikiComponentTest
             .will(returnValue(this.userWithSpaces));
         
         this.group = new XWikiDocument(new DocumentReference("wiki", "XWiki", "group"));
-        getContext().setWikiId(this.group.getWikiName());
+        getContext().setDatabase(this.group.getWikiName());
         this.groupObject = new BaseObject();
         this.groupObject.setClassName("XWiki.XWikiGroups");
         this.groupObject.setStringValue("member", this.user.getFullName());

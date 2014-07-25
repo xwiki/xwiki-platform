@@ -12,15 +12,10 @@ function debugwrite(sometext) {
 }
 
 function isPanel(el) {
-    if (el.className) {
-        var classes = el.className.split(" ");
-        for (var i=0; i<classes.length; ++i) {
-            if (classes[i] == "panel") {
-                return true;
-            }
-        }
-    }
-    return false;
+  if (el.className && ((el.className == "panel") || (el.className.indexOf("panel ") >=0) || (el.className.indexOf(" panel") >=0))) {
+     return true;
+  }
+  return false;
 }
 
 function getX(el) {
@@ -334,7 +329,6 @@ function start1() {
       }
     }
   }
-  
   window.activeWizardPage = document.getElementById("PanelListSection");
   window.activeWizardTab  = document.getElementById("firstwtab");
   document.getElementById("PageLayoutSection").style.display = "none";
@@ -372,19 +366,13 @@ function getBlocNameList(el) {
 }
 
 function save() {
-  url = window.ajaxurl;  
+  url = window.ajaxurl;
+  var leftPanelsList = getBlocNameList(leftPanels);
+  url += "&leftPanels=" + leftPanelsList;
   url += "&showLeftPanels=" + window.showLeftColumn;
+  var rightPanelsList = getBlocNameList(rightPanels);
+  url += "&rightPanels=" + rightPanelsList;
   url += "&showRightPanels=" + window.showRightColumn;
-  if (window.showLeftColumn) {
-    var leftPanelsList = getBlocNameList(leftPanels);
-    url += "&leftPanels=" + leftPanelsList;
-    url += "&leftPanelsWidth=" + leftPanelsWidthInput.value;
-  }
-  if (window.showRightColumn) {
-    var rightPanelsList = getBlocNameList(rightPanels);
-    url += "&rightPanels=" + rightPanelsList;
-    url += "&rightPanelsWidth=" + rightPanelsWidthInput.value;
-  }
   executeCommand(url, saveResult);
 }
 
@@ -446,10 +434,6 @@ function restorePanel(el, column) {
 function changePreviewLayout(element, code) {
   document.getElementById("selectedoption").id = "";
   element.id = "selectedoption";
-  mainContainer.removeClassName("hidelefthideright");
-  mainContainer.removeClassName("hideright");
-  mainContainer.removeClassName("hideleft");
-  mainContainer.removeClassName("content");
   switch (code) {
     case 0:
       //hide left; hide right;
@@ -464,9 +448,7 @@ function changePreviewLayout(element, code) {
         releasePanels(rightPanels);
       }
       // mainContainer.className = "contenthidelefthideright";
-      mainContainer.addClassName("hidelefthideright");
-      leftPanelsWidthInput.disable();
-      rightPanelsWidthInput.disable();
+      mainContainer.className = "hidelefthideright";
       break;
     case 1:
       //show left; hide right;
@@ -481,9 +463,7 @@ function changePreviewLayout(element, code) {
         releasePanels(rightPanels);
       }
       // mainContainer.className = "contenthideright";
-      mainContainer.addClassName("hideright");
-      leftPanelsWidthInput.enable();
-      rightPanelsWidthInput.disable();
+      mainContainer.className = "hideright";
       break;
     case 2:
       //hide left; show right;
@@ -498,9 +478,7 @@ function changePreviewLayout(element, code) {
         restorePanels(rightPanels);
       }
       // mainContainer.className = "contenthideleft";
-      mainContainer.addClassName("hideleft");
-      leftPanelsWidthInput.disable();
-      rightPanelsWidthInput.enable();
+      mainContainer.className = "hideleft";
       break;
     case 3:
       //show left; show right;
@@ -514,9 +492,7 @@ function changePreviewLayout(element, code) {
         rightPanels.style.display = "block";
         restorePanels(rightPanels);
       }
-      mainContainer.addClassName("content");
-      leftPanelsWidthInput.enable();
-      rightPanelsWidthInput.enable();
+      mainContainer.className = "content";
       break;
     default:
       // ignore
@@ -537,7 +513,6 @@ function revert() {
   if (rightPanels.isVisible) {
     layoutCode += 2;
   }
-  setPanelWidth();
   changePreviewLayout(layoutMaquettes[layoutCode], layoutCode);
 }
 
@@ -551,25 +526,6 @@ function switchToWizardPage(el, toShowID) {
   window.activeWizardPage = document.getElementById(toShowID)
   window.activeWizardPage.style.display = "block";
   el.blur();
-}
-
-//----------------------------------------------------------------
-
-function setPanelWidth() {
-  var classesToRemove = ['Small', 'Medium', 'Large'];
-  for (var i=0; i<classesToRemove.length; ++i) {
-    var c = classesToRemove[i];
-    mainContainer.removeClassName('panel-left-width-'+c);
-    mainContainer.removeClassName('panel-right-width-'+c);
-    window.leftPanels.removeClassName('panel-width-'+c);
-    window.rightPanels.removeClassName('panel-width-'+c);
-  }
-  var leftPanelsWidth = leftPanelsWidthInput.value != '---' ? leftPanelsWidthInput.value : 'Medium';
-  var rightPanelsWidth = rightPanelsWidthInput.value != '---' ? rightPanelsWidthInput.value : 'Medium';
-  mainContainer.addClassName('panel-left-width-'+leftPanelsWidth);
-  mainContainer.addClassName('panel-right-width-'+rightPanelsWidth);
-  window.leftPanels.addClassName('panel-width-'+leftPanelsWidth);
-  window.rightPanels.addClassName('panel-width-'+rightPanelsWidth);
 }
 
 //----------------------------------------------------------------
@@ -596,12 +552,7 @@ function panelEditorInit() {
   rightPanelsRight = rightPanelsLeft + rightPanels.offsetWidth;
   allpanelsLeft    = getX(allPanels);
   allpanelsTop     = getY(allPanels);
-  leftPanelsWidthInput  = $("XWiki.XWikiPreferences_0_leftPanelsWidth");
-  rightPanelsWidthInput = $("XWiki.XWikiPreferences_0_rightPanelsWidth");
-  
-  leftPanelsWidthInput.observe('change', setPanelWidth);
-  rightPanelsWidthInput.observe('change', setPanelWidth);
-  
+
   prevcolumn = allPanels;
 
   start1();

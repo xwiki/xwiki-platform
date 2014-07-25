@@ -29,7 +29,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -261,20 +260,5 @@ public class ModelScriptServiceTest
             reference);
 
         Assert.assertEquals(reference, this.service.resolveSpace("reference", "custom", parameters[0], parameters[1]));
-    }
-
-    @Test
-    public void resolveClassPropertyWithHintAndParameters() throws Exception
-    {
-        when(this.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "custom")).thenReturn(
-            this.stringEntityReferenceResolver);
-        ClassPropertyReference reference =
-            new ClassPropertyReference("property", new DocumentReference("wiki", "Space", "Class"));
-        Object[] parameters = new Object[] {new DocumentReference("wiki", "Space", "Page"), "extra"};
-        when(this.stringEntityReferenceResolver.resolve("Class^property", EntityType.CLASS_PROPERTY, parameters))
-            .thenReturn(reference);
-
-        Assert.assertEquals(reference,
-            this.service.resolveClassProperty("Class^property", "custom", parameters[0], parameters[1]));
     }
 }

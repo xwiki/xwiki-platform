@@ -30,9 +30,8 @@ import javax.script.ScriptException;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
@@ -65,13 +64,13 @@ public class SecureGroovyCompilationCustomizerTest extends AbstractComponentTest
     public void executeWithSecureCustomizerWhenProgrammingRights() throws Exception
     {
         final ConfigurationSource source = registerMockComponent(ConfigurationSource.class);
-        final ContextualAuthorizationManager cam = registerMockComponent(ContextualAuthorizationManager.class);
+        final DocumentAccessBridge dab = registerMockComponent(DocumentAccessBridge.class);
 
         getMockery().checking(new Expectations()
         {{
             oneOf(source).getProperty("groovy.compilationCustomizers", Collections.emptyList());
                 will(returnValue(Arrays.asList("secure")));
-            oneOf(cam).hasAccess(Right.PROGRAM);
+            oneOf(dab).hasProgrammingRights();
                 will(returnValue(true));
         }});
 
@@ -90,13 +89,13 @@ public class SecureGroovyCompilationCustomizerTest extends AbstractComponentTest
     private void setUpWhenNoProgrammingRights() throws Exception
     {
         final ConfigurationSource source = registerMockComponent(ConfigurationSource.class);
-        final ContextualAuthorizationManager cam = registerMockComponent(ContextualAuthorizationManager.class);
+        final DocumentAccessBridge dab = registerMockComponent(DocumentAccessBridge.class);
 
         getMockery().checking(new Expectations()
         {{
             oneOf(source).getProperty("groovy.compilationCustomizers", Collections.emptyList());
                 will(returnValue(Arrays.asList("secure")));
-            oneOf(cam).hasAccess(Right.PROGRAM);
+            oneOf(dab).hasProgrammingRights();
                 will(returnValue(false));
         }});
 

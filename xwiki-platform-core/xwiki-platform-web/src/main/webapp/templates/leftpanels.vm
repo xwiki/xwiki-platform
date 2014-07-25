@@ -1,7 +1,5 @@
 #if($showLeftPanels == "1" || $request.getParameter("forceLeftPanels"))
-<div id="leftPanels" class="panels left panel-width-$!{leftPanelsWidth}"#if($showLeftPanels != "1" && $request.getParameter("forceLeftPanels")) style="display: none;"#end>
-## Global Variable
-#set($xwikiPanelWidth = $leftPanelsWidth)
+<div id="leftPanels" class="panels left"#if($showLeftPanels != "1" && $request.getParameter("forceLeftPanels")) style="display: none;"#end>
 #set($panelUixs = $services.uix.getExtensions('platform.panels.leftPanels'))
 #foreach($panelUix in $panelUixs)
   ## We need to set this because the panelheader macro used in panels needs it
@@ -12,4 +10,3 @@
 #end
 </div>
 #end
-#set($xwikiPanelWidth = "Medium")

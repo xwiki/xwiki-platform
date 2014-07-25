@@ -341,6 +341,26 @@ public class Element extends com.google.gwt.dom.client.Element
     }
 
     /**
+     * @param className a {@link String} representing the CSS class to look for
+     * @return {@code true} if this element's {@code class} attribute contains the given class name, {@code false}
+     *         otherwise
+     */
+    public final boolean hasClassName(String className)
+    {
+        if (className == null) {
+            return false;
+        }
+        String trimmedClassName = className.trim();
+        String[] classNames = getClassName().split("\\s+");
+        for (int i = 0; i < classNames.length; i++) {
+            if (classNames[i].equals(trimmedClassName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Ensures this element can be edited in design mode. This method is required because in some browsers you can't
      * place the caret inside elements that don't have any visible content and thus you cannot edit them.
      */

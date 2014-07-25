@@ -21,17 +21,11 @@ package org.xwiki.rendering.macro.wikibridge;
 
 /**
  * Sent when a wiki macro finished execution.
- * <p>
- * The event also send the following parameters:
- * <ul>
- * <li>source: the related {@link org.xwiki.rendering.macro.wikibridge.WikiMacro} instance</li>
- * <li>data: null</li>
- * </ul>
  * 
  * @version $Id$
  * @since 2.6M1
  */
 public class WikiMacroExecutionFinishedEvent extends AbstractWikiMacroExecutionEvent
 {
-
+    
 }

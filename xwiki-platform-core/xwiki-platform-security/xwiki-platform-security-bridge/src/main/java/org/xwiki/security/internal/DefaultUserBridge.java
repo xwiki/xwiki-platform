@@ -102,15 +102,15 @@ public class DefaultUserBridge implements UserBridge
             throw new AuthorizationException("Failed to access the group service.",  e);
         }
 
-        String currentWiki = xwikiContext.getWikiId();
+        String currentWiki = xwikiContext.getDatabase();
         try {
-            xwikiContext.setWikiId(wiki.getName());
+            xwikiContext.setDatabase(wiki.getName());
             return groupService.getAllGroupsReferencesForMember(userOrGroupDocumentReference, 0, 0, xwikiContext);
         } catch (Exception e) {
             throw new AuthorizationException(String.format("Failed to get groups for user or group [%s] in wiki [%s]",
                 userOrGroupDocumentReference, wiki), e);
         } finally {
-            xwikiContext.setWikiId(currentWiki);
+            xwikiContext.setDatabase(currentWiki);
         }
     }
 }

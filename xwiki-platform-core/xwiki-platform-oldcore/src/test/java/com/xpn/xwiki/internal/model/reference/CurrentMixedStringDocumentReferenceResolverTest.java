@@ -53,7 +53,7 @@ public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBri
     {
         getContext().setDoc(new XWikiDocument(new DocumentReference("not used", CURRENT_SPACE, "notused")));
 
-        getContext().setWikiId("currentwiki");
+        getContext().setDatabase("currentwiki");
 
         EntityReference reference = this.resolver.resolve("", EntityType.DOCUMENT);
         Assert.assertEquals("currentwiki", reference.extractReference(EntityType.WIKI).getName());
@@ -64,7 +64,7 @@ public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBri
     @Test
     public void testResolveDocumentReferenceForDefaultWikiWhenNoContextDocument() throws Exception
     {
-        getContext().setWikiId("currentwiki");
+        getContext().setDatabase("currentwiki");
 
         EntityReference reference = this.resolver.resolve("space.page", EntityType.DOCUMENT);
 

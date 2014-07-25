@@ -77,11 +77,9 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
-        Locale.setDefault(Locale.ROOT);
-
         this.mockXWiki = getMockery().mock(XWiki.class);
         getContext().setWiki(this.mockXWiki);
-        getContext().setWikiId("xwiki");
+        getContext().setDatabase("xwiki");
 
         ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
         this.mockServletContext = environment.getServletContext();
@@ -199,15 +197,15 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
         });
 
         this.preferencesDocument =
-            new XWikiDocument(new DocumentReference(getContext().getWikiId(), "XWiki", "XWikiPreferences"));
+            new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "XWikiPreferences"));
         this.preferencesObject = new BaseObject();
-        this.preferencesObject.setXClassReference(new DocumentReference(getContext().getWikiId(), "XWiki",
+        this.preferencesObject.setXClassReference(new DocumentReference(getContext().getDatabase(), "XWiki",
             "XWikiPreferences"));
         this.preferencesDocument.addXObject(this.preferencesObject);
         this.mockXWiki.saveDocument(this.preferencesDocument, "", getContext());
 
         this.defaultWikiTranslation =
-            new XWikiDocument(new DocumentReference(getContext().getWikiId(), "XWiki", "Translations"));
+            new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "Translations"));
         this.defaultWikiTranslation.setSyntax(Syntax.PLAIN_1_0);
         this.mockXWiki.saveDocument(this.defaultWikiTranslation, "", getContext());
 
@@ -366,7 +364,7 @@ public class XWikiMessageToolBridgeTest extends AbstractBridgedComponentTestCase
         Assert.assertEquals("Default translation", this.tool.get("wiki.defaulttranslation"));
 
         XWikiDocument otherWikiTranslation =
-            new XWikiDocument(new DocumentReference(getContext().getWikiId(), "XWiki", "OtherTranslations"));
+            new XWikiDocument(new DocumentReference(getContext().getDatabase(), "XWiki", "OtherTranslations"));
         otherWikiTranslation.setSyntax(Syntax.PLAIN_1_0);
         otherWikiTranslation.setContent("wiki.othertranslation=Other translation");
         this.mockXWiki.saveDocument(otherWikiTranslation, "", getContext());

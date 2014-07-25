@@ -40,11 +40,6 @@ import com.xpn.xwiki.objects.classes.StringClass;
 public class PasswordMetaClass extends StringMetaClass
 {
     /**
-     * The name of the meta property that specifies how the password is stored.
-     */
-    public static final String STORAGE_TYPE = "storageType";
-
-    /**
      * Indicates that the password should be stored in clean.
      */
     public static final String CLEAR = "Clear";
@@ -66,7 +61,7 @@ public class PasswordMetaClass extends StringMetaClass
     public static final String SEPARATOR = "|";
 
     /**
-     * The name of the meta property that specifies which algorithm should be used for password storage.
+     * The name of the meta property that specifies how the password is stored.
      */
     public static final String ALGORITHM_KEY = "algorithm";
 
@@ -79,7 +74,7 @@ public class PasswordMetaClass extends StringMetaClass
         setName(getClass().getAnnotation(Named.class).value());
 
         StaticListClass storageTypeClass = new StaticListClass(this);
-        storageTypeClass.setName(STORAGE_TYPE);
+        storageTypeClass.setName("storageType");
         storageTypeClass.setPrettyName("Storage type");
         storageTypeClass.setValues(HASH + SEPARATOR + CLEAR);
         storageTypeClass.setRelationalStorage(false);

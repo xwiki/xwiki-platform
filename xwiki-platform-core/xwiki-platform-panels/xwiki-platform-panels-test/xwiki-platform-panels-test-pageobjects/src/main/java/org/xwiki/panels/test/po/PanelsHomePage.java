@@ -42,18 +42,8 @@ public class PanelsHomePage extends ViewPage
      */
     public static PanelsHomePage gotoPage()
     {
-        getUtil().gotoPage(getSpace(), getPage());
+        getUtil().gotoPage("Panels", "WebHome");
         return new PanelsHomePage();
-    }
-
-    public static String getSpace()
-    {
-        return "Panels";
-    }
-
-    public static String getPage()
-    {
-        return "WebHome";
     }
 
     /**

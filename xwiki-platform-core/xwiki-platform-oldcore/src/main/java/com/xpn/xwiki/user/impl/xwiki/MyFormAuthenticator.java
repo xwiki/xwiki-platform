@@ -150,7 +150,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
                     // make sure the Principal contains wiki name information
                     if (!StringUtils.contains(principal.getName(), ':')) {
-                        principal = new SimplePrincipal(context.getWikiId() + ":" + principal.getName());
+                        principal = new SimplePrincipal(context.getDatabase() + ":" + principal.getName());
                     }
 
                     request.setUserPrincipal(principal);
@@ -215,7 +215,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
             // make sure the Principal contains wiki name information
             if (!StringUtils.contains(principal.getName(), ':')) {
-                principal = new SimplePrincipal(context.getWikiId() + ":" + principal.getName());
+                principal = new SimplePrincipal(context.getDatabase() + ":" + principal.getName());
             }
 
             request.setUserPrincipal(principal);

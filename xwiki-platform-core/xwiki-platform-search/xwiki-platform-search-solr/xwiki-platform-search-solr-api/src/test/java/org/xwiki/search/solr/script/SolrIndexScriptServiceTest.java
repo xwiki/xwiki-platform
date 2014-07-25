@@ -98,7 +98,7 @@ public class SolrIndexScriptServiceTest
         this.mockCurrentDocument = mock(XWikiDocument.class);
         when(mockContext.getDoc()).thenReturn(this.mockCurrentDocument);
 
-        when(mockContext.getWikiId()).thenReturn("currentWiki");
+        when(mockContext.getDatabase()).thenReturn("currentWiki");
         when(mockContext.getUserReference()).thenReturn(userReference);
 
         // RightService

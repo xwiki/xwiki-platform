@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.cache.rendering;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -41,6 +42,8 @@ import org.xwiki.model.reference.DocumentReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.cache.DocumentCache;
 import com.xpn.xwiki.internal.cache.rendering.CachedItem.UsedExtension;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
 
 /**
  * Default implementation of {@link RenderingCache}.
@@ -78,6 +81,11 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
      */
     @Inject
     private Provider<List<RenderingCacheAware>> renderingCacheAwareProvider;
+
+    /**
+     * List of legacy plugin components implementing RenderingCacheAware.
+     */
+    private List<RenderingCacheAware> legacyRenderingCacheAware;
 
     /**
      * Actually cache object.
@@ -147,6 +155,23 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
         CachedItem cachedItem = new CachedItem();
 
         for (RenderingCacheAware component: renderingCacheAwareProvider.get()) {
+            cachedItem.extensions.put(component, component.getCacheResources(context));
+        }
+
+        // support for legacy core -> build non-blocking list (lazy)
+        if (legacyRenderingCacheAware == null) {
+            legacyRenderingCacheAware = new LinkedList<RenderingCacheAware>();
+            XWikiPluginManager pluginManager = context.getWiki().getPluginManager();
+            for (String pluginName: pluginManager.getPlugins()) {
+                XWikiPluginInterface plugin = pluginManager.getPlugin(pluginName);
+
+                if (plugin instanceof RenderingCacheAware) {
+                    legacyRenderingCacheAware.add((RenderingCacheAware) plugin);
+                }
+            }
+        }
+
+        for (RenderingCacheAware component: legacyRenderingCacheAware) {
             cachedItem.extensions.put(component, component.getCacheResources(context));
         }
 

@@ -19,7 +19,7 @@
  */
 package org.xwiki.filter.xar.internal;
 
-import org.xwiki.filter.event.model.FarmFilter;
+import org.xwiki.filter.event.model.WikiFarmFilter;
 import org.xwiki.filter.event.model.WikiClassFilter;
 import org.xwiki.filter.event.model.WikiClassPropertyFilter;
 import org.xwiki.filter.event.model.WikiFilter;
@@ -35,7 +35,7 @@ import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
  * @version $Id$
  * @since 6.2M1
  */
-public interface XARFilter extends FarmFilter, WikiFilter, WikiSpaceFilter, XWikiWikiDocumentFilter,
+public interface XARFilter extends WikiFarmFilter, WikiFilter, WikiSpaceFilter, XWikiWikiDocumentFilter,
     XWikiWikiAttachmentFilter, WikiClassFilter, WikiClassPropertyFilter, WikiObjectFilter, WikiObjectPropertyFilter
 {
 

@@ -26,19 +26,19 @@ import org.xwiki.filter.annotation.Name;
 import org.xwiki.stability.Unstable;
 
 /**
- * Farm related events.
+ * Wiki farm related events.
  * 
  * @version $Id$
  * @since 6.2M1
  */
 @Unstable
-public interface FarmFilter
+public interface WikiFarmFilter
 {
     /**
      * @param parameters the farm parameters
      * @throws FilterException when failing to send event
      */
-    void beginFarm(
+    void beginWikiFarm(
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws FilterException;
 
@@ -46,7 +46,7 @@ public interface FarmFilter
      * @param parameters the farm parameters
      * @throws FilterException when failing to send event
      */
-    void endFarm(
+    void endWikiFarm(
         @Default(FilterEventParameters.DEFAULT) @Name(FilterEventParameters.NAME) FilterEventParameters parameters)
         throws FilterException;
 }

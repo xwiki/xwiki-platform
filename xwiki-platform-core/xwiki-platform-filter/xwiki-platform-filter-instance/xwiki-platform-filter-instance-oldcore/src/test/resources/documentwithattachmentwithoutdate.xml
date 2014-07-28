@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<farm>
+<wikiFarm>
   <wiki name="wiki">
     <wikiSpace name="space">
       <wikiDocument name="page">
@@ -16,4 +16,4 @@
       </wikiDocument>
     </wikiSpace>
   </wiki>
-</farm>
+</wikiFarm>

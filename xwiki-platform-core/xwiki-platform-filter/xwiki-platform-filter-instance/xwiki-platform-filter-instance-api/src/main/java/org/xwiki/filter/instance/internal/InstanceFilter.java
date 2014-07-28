@@ -21,7 +21,7 @@
 package org.xwiki.filter.instance.internal;
 
 import org.xwiki.filter.UnknownFilter;
-import org.xwiki.filter.event.model.FarmFilter;
+import org.xwiki.filter.event.model.WikiFarmFilter;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.event.model.WikiFilter;
 import org.xwiki.filter.event.model.WikiSpaceFilter;
@@ -30,7 +30,7 @@ import org.xwiki.filter.event.model.WikiSpaceFilter;
  * @version $Id$
  * @since 6.2M1
  */
-public interface InstanceFilter extends FarmFilter, WikiFilter, WikiSpaceFilter, WikiDocumentFilter, UnknownFilter
+public interface InstanceFilter extends WikiFarmFilter, WikiFilter, WikiSpaceFilter, WikiDocumentFilter, UnknownFilter
 {
 
 }

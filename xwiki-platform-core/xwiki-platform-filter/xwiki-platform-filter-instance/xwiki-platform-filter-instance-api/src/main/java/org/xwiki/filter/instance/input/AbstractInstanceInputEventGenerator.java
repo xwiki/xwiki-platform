@@ -134,12 +134,12 @@ public abstract class AbstractInstanceInputEventGenerator<F> implements Instance
     }
 
     @Override
-    public void beginFarm(FilterEventParameters parameters) throws FilterException
+    public void beginWikiFarm(FilterEventParameters parameters) throws FilterException
     {
     }
 
     @Override
-    public void endFarm(FilterEventParameters parameters) throws FilterException
+    public void endWikiFarm(FilterEventParameters parameters) throws FilterException
     {
     }
 

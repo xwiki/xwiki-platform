@@ -119,11 +119,11 @@ public class InstanceInputFilterStream extends AbstractBeanInputFilterStream<Ins
             generator.setWikiFarmParameters(parameters);
         }
 
-        proxyFilter.beginFarm(parameters);
+        proxyFilter.beginWikiFarm(parameters);
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
             generator.setFilter(filter);
-            generator.beginFarm(parameters);
+            generator.beginWikiFarm(parameters);
         }
 
         for (String wikiName : this.instanceModel.getWikis()) {
@@ -133,10 +133,10 @@ public class InstanceInputFilterStream extends AbstractBeanInputFilterStream<Ins
         }
 
         for (InstanceInputEventGenerator generator : this.eventGenerators) {
-            generator.endFarm(parameters);
+            generator.endWikiFarm(parameters);
         }
 
-        proxyFilter.endFarm(parameters);
+        proxyFilter.endWikiFarm(parameters);
     }
 
     private void writeWiki(String wiki, Object filter, InstanceFilter proxyFilter) throws FilterException

@@ -19,7 +19,7 @@
  */
 package org.xwiki.filter.confluence.xml.internal;
 
-import org.xwiki.filter.event.model.FarmFilter;
+import org.xwiki.filter.event.model.WikiFarmFilter;
 import org.xwiki.filter.event.model.WikiAttachmentFilter;
 import org.xwiki.filter.event.model.WikiClassFilter;
 import org.xwiki.filter.event.model.WikiClassPropertyFilter;
@@ -38,7 +38,7 @@ import org.xwiki.rendering.listener.Listener;
  * @version $Id$
  * @since 6.2M1
  */
-public interface ConfluenceFilter extends FarmFilter, WikiFilter, WikiSpaceFilter, WikiDocumentFilter,
+public interface ConfluenceFilter extends WikiFarmFilter, WikiFilter, WikiSpaceFilter, WikiDocumentFilter,
     WikiAttachmentFilter, WikiClassFilter, WikiClassPropertyFilter, WikiObjectFilter, WikiObjectPropertyFilter,
     UserFilter, GroupFilter, Listener
 {

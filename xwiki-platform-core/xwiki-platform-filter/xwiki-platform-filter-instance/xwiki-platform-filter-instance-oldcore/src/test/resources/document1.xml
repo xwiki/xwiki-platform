@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<farm>
+<wikiFarm>
   <wiki name="wiki">
     <wikiSpace name="otherspace">
       <wikiDocument name="otherclass">
@@ -419,4 +419,4 @@
       </wikiDocument>
     </wikiSpace>
   </wiki>
-</farm>
+</wikiFarm>

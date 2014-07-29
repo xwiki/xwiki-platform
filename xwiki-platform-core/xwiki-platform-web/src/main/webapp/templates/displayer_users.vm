@@ -22,28 +22,7 @@
     #end
   #end
   #if ($selectedUsers.size() > 0)
-    #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
-    <ul class="users">
-    #foreach ($user in $selectedUsers)
-      #set ($userReference = $services.model.resolveDocument($user))
-      <li class="user">
-        <div class="user-avatar-wrapper">
-          #getUserAvatarURL($userReference $avatarURL 30)
-          ## The string returned by XWiki#getUserName() is XML encoded.
-          <img src="$escapetool.xml($avatarURL.url)" class="icon"
-            alt="$xwiki.getUserName($user, false)" />
-        </div>
-        <div class="user-name">$xwiki.getUserName($user)</div>
-        <div>
-          <span class="user-alias">$escapetool.xml($userReference.name)</span>
-          ## Display the wiki only for local users.
-          #if ($userReference.wikiReference.name != $xcontext.getMainWikiName())
-            <span class="user-wiki">$escapetool.xml($userReference.wikiReference.name)</span>
-          #end
-        </div>
-      </li>
-    #end
-    </ul>
+    #displayUsersProfiles($selectedUsers)
   #end
 #elseif ($type == 'hidden')
   #set($id = $escapetool.xml("${prefix}${name}"))

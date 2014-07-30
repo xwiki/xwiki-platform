@@ -539,7 +539,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             LOGGER.error("Failed to create URL", e);
         }
 
-        return relativeURL;
+        return StringUtils.defaultIfEmpty(relativeURL, "/");
     }
 
     @Override

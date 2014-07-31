@@ -1,4 +1,4 @@
-package org.xwiki.icon;/*
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,9 +17,23 @@ package org.xwiki.icon;/*
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.xwiki.icon;
 
+/**
+ * All the types that an Icon can be.
+ *
+ * @since 6.2M1
+ * @version $Id$
+ */
 public enum IconType
 {
+    /**
+     * Icon displayed with an image (an image HTML tag).
+     */
     IMAGE,
+
+    /**
+     * Icon displayed with a font.
+     */
     FONT
 }

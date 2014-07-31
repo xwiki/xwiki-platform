@@ -19,13 +19,36 @@
  */
 package org.xwiki.icon;
 
+import java.io.Reader;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
+/**
+ * Component to load an IconSet.
+ *
+ * @since 6.2M1
+ * @version $Id$
+ */
+@Role
 @Unstable
-public class IconManagerException extends Exception
+public interface IconSetLoader
 {
-    public IconManagerException(String message, Throwable source)
-    {
-        super(message, source);
-    }
+    /**
+     * Load an icon set from a document in the wiki.
+     * @param iconSetReference reference to the document holding the icon set
+     * @return the loaded icon set
+     * @throws IconException if problems occur
+     */
+    IconSet loadIconSet(DocumentReference iconSetReference) throws IconException;
+
+    /**
+     * Load an icon set from any string input.
+     * @param input string that describes an icon set
+     * @param name name of the icon set to load
+     * @return the loaded icon set
+     * @throws IconException if problems occur
+     */
+    IconSet loadIconSet(Reader input, String name) throws IconException;
 }

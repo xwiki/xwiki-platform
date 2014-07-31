@@ -17,19 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.icon.internal;
+package org.xwiki.skinx.internal;
 
-import java.io.Reader;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.skinx.AbstractWrapperSkinExtension;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.icon.IconManagerException;
-import org.xwiki.icon.IconSet;
-import org.xwiki.model.reference.DocumentReference;
-
-@Role
-public interface IconSetLoader
+/**
+ * Skin extension that provides the wrapper on the linkx extensions.
+ *
+ * @version $Id$
+ * @since 6.2M1
+ */
+@Component("linkx")
+public class LinkSkinExtension extends AbstractWrapperSkinExtension
 {
-    IconSet loadIconSet(DocumentReference iconSetReference) throws IconManagerException;
-
-    IconSet loadIconSet(Reader input, String name) throws IconManagerException;
 }

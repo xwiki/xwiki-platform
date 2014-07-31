@@ -17,20 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.icon.internal;
+package org.xwiki.icon;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.icon.IconSet;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
+/**
+ * Component to get the icon sets from the Wiki instance (from the WAR of from a wiki page).
+ *
+ * @since 6.2M1
+ * @version $Id$
+ */
 @Role
-public interface IconSetCache
+@Unstable
+public interface IconSetManager
 {
-    IconSet get(String name);
+    /**
+     * Get the icon set defined in the preferences of the wiki.
+     * @return the current icon set
+     * @throws IconException if problems occur
+     */
+    IconSet getCurrentIconSet() throws IconException;
 
-    IconSet get(DocumentReference documentReference);
-
-    void put(String name, IconSet iconSet);
-
-    void put(DocumentReference documentReference, IconSet iconSet);
+    /**
+     * Get the default icon set (from the WAR).
+     * @return the default icon set
+     * @throws IconException if problem occur
+     */
+    IconSet getDefaultIconSet() throws IconException;
 }

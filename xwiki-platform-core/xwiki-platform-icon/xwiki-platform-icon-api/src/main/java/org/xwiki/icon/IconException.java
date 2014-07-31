@@ -22,68 +22,22 @@ package org.xwiki.icon;
 import org.xwiki.stability.Unstable;
 
 /**
- * An icon that have a name and a value to help rendering it.
+ * Exception relating to icon manipulations.
  *
- * @since 6.1M2
+ * @since 6.2M2
  * @version $Id$
  */
 @Unstable
-public class Icon
+public class IconException extends Exception
 {
-    private String name;
-    
-    private String value;
-
-    /**
-     * Default constructor.
-     */
-    public Icon()
-    {
-    }
-
     /**
      * Constructor.
      *
-     * @param name name of the icon
-     * @param value value of the icon
+     * @param message message to store in the exception
+     * @param source source of the error
      */
-    public Icon(String name, String value)
+    public IconException(String message, Throwable source)
     {
-        this.name = name;
-        this.value = value;
-    }
-
-    /**
-     * @return the name of the icon
-     */
-    public String getName()
-    {
-        return name;
-    }
-
-    /**
-     * Set the name of the icon.
-     * @param name the name to set
-     */
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    /**
-     * @return the value of the icon
-     */
-    public String getValue()
-    {
-        return value;
-    }
-
-    /**
-     * Set the value of the icon.
-     * @param value the value to set
-     */
-    public void setValue(String value)
-    {
-        this.value = value;
+        super(message, source);
     }
 }

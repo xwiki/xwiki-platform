@@ -19,50 +19,34 @@
  */
 package org.xwiki.icon;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.script.service.ScriptService;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
- * Script services to render an icon from the current icon set.
+ * Component to render an icon (either with Wiki Syntax or HTML).
  *
  * @since 6.2M1
  * @version $Id$
  */
-@Component
-@Named("icon")
-public class IconManagerScriptService implements ScriptService
+@Role
+@Unstable
+public interface IconRenderer
 {
-    @Inject
-    private IconManager iconManager;
-
     /**
-     * Display an icon from the current {@link org.xwiki.icon.IconSet}.
-     * @param iconName name of the icon to display
-     * @return the wiki code that displays the icon
+     * Generate the wiki syntax to display an icon.
+     * @param iconName name of the icon to render
+     * @param iconSet icon set that contains the icon to display
+     * @return the wiki syntax that displays the icon
+     * @throws IconException if problems occur
      */
-    public String render(String iconName)
-    {
-        try {
-            return iconManager.render(iconName);
-        } catch (IconException e) {
-            return null;
-        }
-    }
+    String render(String iconName, IconSet iconSet) throws IconException;
 
     /**
-     * Display an icon from the current {@link org.xwiki.icon.IconSet}.
-     * @param iconName name of the icon to display
+     * Generate the HTML code to display an icon.
+     * @param iconName name of the icon to render
+     * @param iconSet icon set that contains the icon to display
      * @return the HTML code that displays the icon
+     * @throws IconException if problems occur
      */
-    public String renderHTML(String iconName)
-    {
-        try {
-            return iconManager.renderHTML(iconName);
-        } catch (IconException e) {
-            return null;
-        }
-    }
+    String renderHTML(String iconName, IconSet iconSet) throws IconException;
 }

@@ -19,156 +19,53 @@
  */
 package org.xwiki.icon.internal;
 
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang.StringUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.icon.Icon;
+import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconManager;
-import org.xwiki.icon.IconManagerException;
+import org.xwiki.icon.IconRenderer;
 import org.xwiki.icon.IconSet;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.skinx.SkinExtension;
+import org.xwiki.icon.IconSetManager;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-
+/**
+ * Default implementation of {@link org.xwiki.icon.IconManager}.
+ *
+ * @since 6.2M1
+ * @version $Id$
+ */
 @Component
 @Singleton
 public class DefaultIconManager implements IconManager
 {
-    private final static String DEFAULT_ICONSET_NAME = "default";
+    @Inject
+    private IconSetManager iconSetManager;
 
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
-    private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
-    @Inject
-    private IconSetCache iconSetCache;
-
-    @Inject
-    private IconSetLoader iconSetLoader;
-
-    @Inject
-    @Named("ssx")
-    private SkinExtension skinExtension;
-
-    @Inject
-    @Named("ssrx")
-    private SkinExtension externalCSS;
+    private IconRenderer iconRenderer;
 
     @Override
-    public String render(String iconName) throws IconManagerException
+    public String render(String iconName) throws IconException
     {
-        IconSet iconSet = getCurrentIconSet();
-        return render(iconSet, iconName, iconSet.getRenderWiki());
+        return iconRenderer.render(iconName, getIconSet(iconName));
     }
 
     @Override
-    public String renderHTML(String iconName) throws IconManagerException
+    public String renderHTML(String iconName) throws IconException
     {
-        IconSet iconSet = getCurrentIconSet();
-        return render(iconSet, iconName, iconSet.getRenderWiki());
+
+        return iconRenderer.renderHTML(iconName, getIconSet(iconName));
     }
 
-    private String render(IconSet iconSet, String iconName, String renderer)
+    private IconSet getIconSet(String iconName) throws IconException
     {
-        if (!StringUtils.isBlank(iconSet.getCss())) {
-            activeCSS(iconSet);
+        // First: try to render with the current icon set
+        IconSet currentIconSet = iconSetManager.getCurrentIconSet();
+        if (currentIconSet != null && currentIconSet.getIcon(iconName) != null) {
+            return currentIconSet;
+        } else {
+            return iconSetManager.getDefaultIconSet();
         }
-        if (!StringUtils.isBlank(iconSet.getSsx())) {
-            activeSSX(iconSet);
-        }
-        return renderIcon(iconSet, iconName, renderer);
     }
-
-    private void activeCSS(IconSet iconSet)
-    {
-        XWikiContext xcontext = xcontextProvider.get();
-        XWiki xwiki = xcontext.getWiki();
-
-        String url = xwiki.parseContent(iconSet.getCss(), xcontext);
-        externalCSS.use(url);
-    }
-
-    private void activeSSX(IconSet iconSet)
-    {
-        XWikiContext xcontext = xcontextProvider.get();
-        XWiki xwiki = xcontext.getWiki();
-
-        String url = xwiki.parseContent(iconSet.getCss(), xcontext);
-        skinExtension.use(url);
-    }
-
-    private String renderIcon(IconSet iconSet, String iconName, String renderer)
-    {
-        XWikiContext xcontext = xcontextProvider.get();
-        XWiki xwiki = xcontext.getWiki();
-
-        // Get the icon
-        Icon icon = iconSet.getIcon(iconName);
-
-        // Interpret the velocity command
-        StringWriter contentToParse = new StringWriter();
-        contentToParse.write("#set($icon = \"");
-        contentToParse.write(icon.getValue());
-        contentToParse.write("\")\n");
-        contentToParse.write(renderer);
-
-        return xwiki.parseContent(contentToParse.toString(), xcontext);
-    }
-
-    private IconSet getCurrentIconSet() throws IconManagerException
-    {
-        // Get the current icon theme
-        XWikiContext xcontext = xcontextProvider.get();
-        XWiki xwiki = xcontext.getWiki();
-
-        // Load the icon theme
-        String iconTheme = xwiki.getXWikiPreference("iconTheme", xcontext);
-
-        // Get the icon set
-        IconSet iconSet = null;
-        DocumentReference iconThemeDocRef = documentReferenceResolver.resolve(iconTheme);
-        if (!StringUtils.isBlank(iconTheme) && documentAccessBridge.exists(iconThemeDocRef)) {
-            iconSet = iconSetCache.get(iconThemeDocRef);
-            if (iconSet == null) {
-                // lazy loading
-                iconSet = iconSetLoader.loadIconSet(iconThemeDocRef);
-                iconSetCache.put(iconThemeDocRef, iconSet);
-            }
-        }
-        // Fallback
-        if (iconSet == null) {
-            // Get the default icon set
-            iconSet = iconSetCache.get(DEFAULT_ICONSET_NAME);
-            if (iconSet == null) {
-                try {
-                    // lazy loading
-                    iconSet = iconSetLoader.loadIconSet(new InputStreamReader(
-                        xwiki.getResourceAsStream("/resources/icons/default.iconset")), DEFAULT_ICONSET_NAME);
-                    iconSetCache.put(DEFAULT_ICONSET_NAME, iconSet);
-                } catch (IconManagerException | MalformedURLException e) {
-                    throw new IconManagerException("Failed to get the current default icon set.", e);
-                }
-            }
-        }
-
-        return iconSet;
-    }
-
 }

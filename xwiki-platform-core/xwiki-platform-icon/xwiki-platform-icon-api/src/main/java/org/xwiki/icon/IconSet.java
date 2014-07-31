@@ -22,6 +22,15 @@ package org.xwiki.icon;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.stability.Unstable;
+
+/**
+ * A collection of icons, with some properties to display them.
+ *
+ * @since 6.2M1
+ * @version $Id$
+ */
+@Unstable
 public class IconSet
 {
     private String name;
@@ -38,76 +47,130 @@ public class IconSet
 
     private IconType type;
 
+    /**
+     * Constructor.
+     * @param name name of the icon set
+     */
     public IconSet(String name)
     {
         this.name = name;
     }
 
+    /**
+     * @param name name of the icon to get
+     * @return the icon corresponding to the given name
+     */
     public Icon getIcon(String name)
     {
         return iconMap.get(name);
     }
 
+    /**
+     * Add an icon to the icon set.
+     * @param icon the icon to add
+     */
     public void addIcon(Icon icon)
     {
         iconMap.put(icon.getName(), icon);
     }
 
+    /**
+     * @return the name of the icon set
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Set the name of the icon set.
+     * @param name the name to set
+     */
     public void setName(String name)
     {
         this.name = name;
     }
 
+    /**
+     * @return the URL of a CSS file to enable to display this icon set properly, or null if it is not necessary
+     */
     public String getCss()
     {
         return css;
     }
 
+    /**
+     * Set the URL of a CSS file to enable to display this icon set properly.
+     * @param css URL of the CSS file (it can contains velocity code).
+     */
     public void setCss(String css)
     {
         this.css = css;
     }
 
+    /**
+     * @return the name of a SSX document to enable to display this icon set properly, or null if it is not necessary
+     */
     public String getSsx()
     {
         return ssx;
     }
 
+    /**
+     * Set the page name of a SSX document to enable to display the icon set properly.
+     * @param ssx the SSX document name
+     */
     public void setSsx(String ssx)
     {
         this.ssx = ssx;
     }
 
+    /**
+     * @return the wiki code (containing velocity), to display an icon from this set.
+     */
     public String getRenderWiki()
     {
         return renderWiki;
     }
 
+    /**
+     * Set the wiki code (containing velocity) to display an icon from this set.
+     * @param renderWiki wiki code to set
+     */
     public void setRenderWiki(String renderWiki)
     {
         this.renderWiki = renderWiki;
     }
 
+    /**
+     * @return the HTML code (containing velocity) to display an icon from this set
+     */
     public String getRenderHTML()
     {
         return renderHTML;
     }
 
+    /**
+     * Set the HTML code (containing velocity) to display an icon from this set.
+     * @param renderHTML the HTML code to set
+     */
     public void setRenderHTML(String renderHTML)
     {
         this.renderHTML = renderHTML;
     }
 
+    /**
+     * @return the type of icons that contains this set
+     */
     public IconType getType()
     {
         return type;
     }
 
+    /**
+     * Set the type of icons that contains this set.
+     * @param type type to set
+     */
     public void setType(IconType type)
     {
         this.type = type;

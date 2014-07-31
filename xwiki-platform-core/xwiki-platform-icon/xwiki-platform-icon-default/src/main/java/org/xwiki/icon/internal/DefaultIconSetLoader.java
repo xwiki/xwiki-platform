@@ -30,16 +30,23 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.icon.Icon;
-import org.xwiki.icon.IconManagerException;
+import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
+import org.xwiki.icon.IconSetLoader;
 import org.xwiki.icon.IconType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
+/**
+ * Default implementation of {@link org.xwiki.icon.IconSetLoader}.
+ *
+ * @since 6.2M1
+ * @version $Id$
+ */
 @Component
 public class DefaultIconSetLoader implements IconSetLoader
 {
-    private static final String CSS_PROPERTY_NAME = "xwiki.iconset.cssfile";
+    private static final String CSS_PROPERTY_NAME = "xwiki.iconset.css";
 
     private static final String SSX_PROPERTY_NAME = "xwiki.iconset.ssx";
 
@@ -57,7 +64,8 @@ public class DefaultIconSetLoader implements IconSetLoader
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
-    public IconSet loadIconSet(DocumentReference iconSetReference) throws IconManagerException
+    @Override
+    public IconSet loadIconSet(DocumentReference iconSetReference) throws IconException
     {
         String name = entityReferenceSerializer.serialize(iconSetReference);
         try {
@@ -66,12 +74,12 @@ public class DefaultIconSetLoader implements IconSetLoader
             String content = doc.getContent();
             return loadIconSet(new StringReader(content), name);
         } catch (Exception e) {
-            throw new IconManagerException(String.format(ERROR_MSG, name), e);
+            throw new IconException(String.format(ERROR_MSG, name), e);
         }
     }
 
     @Override
-    public IconSet loadIconSet(Reader input, String name) throws IconManagerException
+    public IconSet loadIconSet(Reader input, String name) throws IconException
     {
         try {
             IconSet iconSet = new IconSet(name);
@@ -91,7 +99,7 @@ public class DefaultIconSetLoader implements IconSetLoader
                 } else if (key.equals(RENDER_HTML_PROPERTY_NAME)) {
                     iconSet.setRenderHTML(value);
                 } else if (key.equals(ICON_TYPE_PROPERTY_NAME)) {
-                    iconSet.setType(IconType.valueOf(value));
+                    iconSet.setType(IconType.valueOf(value.toUpperCase()));
                 } else {
                     Icon icon = new Icon();
                     icon.setName(key);
@@ -103,9 +111,7 @@ public class DefaultIconSetLoader implements IconSetLoader
             // return
             return iconSet;
         } catch (IOException e) {
-            throw new IconManagerException(String.format(ERROR_MSG, name), e);
+            throw new IconException(String.format(ERROR_MSG, name), e);
         }
-
-
     }
 }

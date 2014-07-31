@@ -22,12 +22,30 @@ package org.xwiki.icon;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
+/**
+ * Component to render an icon, depending on the current icon theme set on the preferences.
+ *
+ * @since 6.2M1
+ * @version $Id$
+ */
 @Role
 @Unstable
 public interface IconManager
 {
-    String render(String iconName) throws IconManagerException;
+    /**
+     * Generate the wiki syntax to display an icon.
+     * @param iconName name of the icon to render
+     * @return the wiki syntax that displays the icon
+     * @throws IconException if problems occur
+     */
+    String render(String iconName) throws IconException;
 
-    String renderHTML(String iconName) throws IconManagerException;
+    /**
+     * Generate the HTML code to display an icon.
+     * @param iconName name of the icon to render
+     * @return the HTML code that displays the icon
+     * @throws IconException if problems occur
+     */
+    String renderHTML(String iconName) throws IconException;
 
 }

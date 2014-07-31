@@ -157,7 +157,7 @@
       <dependency>
         <groupId>xalan</groupId>
         <artifactId>xalan</artifactId>
-        <version>2.7.1</version>
+        <version>2.7.2</version>
       </dependency>
       <!-- Used by xwiki-platform-oldcore and xwiki-platform-captcha -->
       <dependency>
@@ -169,11 +169,6 @@
           <exclusion>
             <groupId>antlr</groupId>
             <artifactId>antlr</artifactId>
-          </exclusion>
-          <!-- We use a more recent version of Xalan (see above) -->
-          <exclusion>
-            <groupId>xalan</groupId>
-            <artifactId>xalan</artifactId>
           </exclusion>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>

@@ -24,7 +24,7 @@ import org.xwiki.stability.Unstable;
 /**
  * An icon that have a name and a value to help rendering it.
  *
- * @since 6.1M2
+ * @since 6.2M1
  * @version $Id$
  */
 @Unstable

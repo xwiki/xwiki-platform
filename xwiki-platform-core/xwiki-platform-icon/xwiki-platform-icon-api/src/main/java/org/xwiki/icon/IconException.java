@@ -24,7 +24,7 @@ import org.xwiki.stability.Unstable;
 /**
  * Exception relating to icon manipulations.
  *
- * @since 6.2M2
+ * @since 6.2M1
  * @version $Id$
  */
 @Unstable

@@ -7,7 +7,7 @@
 ## - and the wiki application has been installed.
 ## (in the future the last condition will be removed since we will use the Distribution Wizard for wiki creation)
 #set ($displayCreateWiki = $isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki)
-#set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $hasComment || $displayCreateWiki)
+#set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $displayCreateWiki)
 #if ($displayCreateSubmenu)
   #xwikicreatemenuentrystart('' $services.localization.render('core.menu.create') 'tmCreate' 'hasIcon' 'plus')
   #if ($displayCreateWiki)

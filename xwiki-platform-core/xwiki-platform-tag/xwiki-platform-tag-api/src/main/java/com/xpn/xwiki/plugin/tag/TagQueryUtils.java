@@ -184,7 +184,7 @@ public final class TagQueryUtils
         throws XWikiException
     {
         List<String> results;
-        List<Object> parameters = new ArrayList<>();
+        List<Object> parameters = new ArrayList<Object>();
         parameters.add(TagPlugin.TAG_CLASS);
         parameters.add(tag);
         String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item where obj.className=? and "

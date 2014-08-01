@@ -570,17 +570,11 @@ public class PackageMojo extends AbstractMojo
 
     private Collection<Artifact> resolveJarArtifacts() throws MojoExecutionException
     {
-        Set<Artifact> mys =
-            resolveTransitively(Collections.singleton(this.repositorySystem.createArtifact("org.xwiki.platform",
-                "xwiki-platform-chart-renderer", "5.0-SNAPSHOT", "jar")));
+        // Resolve mandatory dependencies if they're not explicitly specified
+        Set<Artifact> resolvedArtifacts = resolveTransitively(getMandatoryJarArtifacts());
 
-        Set<Artifact> artifactsToResolve = this.project.getArtifacts();
-
-        // Add mandatory dependencies if they're not explicitly specified.
-        artifactsToResolve.addAll(getMandatoryJarArtifacts());
-
-        // Resolve all artifacts transitively in one go.
-        Set<Artifact> resolvedArtifacts = resolveTransitively(artifactsToResolve);
+        // Maven is already taking care of resolving project dependencies before the plugin is executed
+        resolvedArtifacts.addAll(this.project.getArtifacts());
 
         // Remove the non JAR artifacts. Note that we need to include non JAR artifacts before the transitive resolve
         // because for example some XARs mayb depend on JARs and we need those JARs to be packaged!

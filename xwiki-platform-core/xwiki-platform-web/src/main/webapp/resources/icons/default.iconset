@@ -1,6 +1,6 @@
 ## General settings
 xwiki.iconset.type = image
-xwiki.iconset.render.wiki = image:$xwiki.getRequestURL().replaceAll($xwiki.getRelativeRequestURL(), '')$xwiki.getSkinFile("icons/silk/${icon}.png")
+xwiki.iconset.render.wiki = image:path:$xwiki.getSkinFile("icons/silk/${icon}.png")
 xwiki.iconset.render.html = <img src="$xwiki.getSkinFile("icons/silk/${icon}.png")" alt="Icon" />
 
 ## Icons

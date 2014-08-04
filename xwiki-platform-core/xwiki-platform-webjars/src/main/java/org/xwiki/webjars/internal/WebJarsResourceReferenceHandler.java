@@ -19,6 +19,7 @@
  */
 package org.xwiki.webjars.internal;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -96,6 +97,13 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
         InputStream resourceStream = getClassLoader().getResourceAsStream(resourcePath);
 
         if (resourceStream != null) {
+            // Make sure the resource stream supports mark & reset which is needed in order be able to detect the
+            // content type without affecting the stream (Tika may need to read a few bytes from the start of the
+            // stream, in which case it will mark & reset the stream).
+            if (!resourceStream.markSupported()) {
+                resourceStream = new BufferedInputStream(resourceStream);
+            }
+
             try {
                 this.container.getResponse().setContentType(tika.detect(resourceStream, resourceName));
                 IOUtils.copy(resourceStream, this.container.getResponse().getOutputStream());

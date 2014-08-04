@@ -26,10 +26,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wysiwyg.server.WysiwygEditorConfiguration;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
 /**
@@ -47,14 +51,16 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
     private static final Integer ONE = new Integer(1);
 
     /**
-     * Space of the editor configuration document.
+     * A reference to the configuration XClass.
      */
-    private static final String XWIKI_SPACE = "XWiki";
+    private static final LocalDocumentReference CONFIG_CLASS_REFERENCE = new LocalDocumentReference(XWiki.SYSTEM_SPACE,
+        "WysiwygEditorConfigClass");
 
     /**
-     * Name of the editor configuration document.
+     * A local reference to the configuration document.
      */
-    private static final String EDITOR_CONFIG_DOC = "WysiwygEditorConfig";
+    private static final LocalDocumentReference CONFIG_LOCAL_DOCUMENT_REFERENCE = new LocalDocumentReference(
+        XWiki.SYSTEM_SPACE, "WysiwygEditorConfig");
 
     /**
      * The component used to access documents. This is temporary till XWiki model is moved into components.
@@ -75,23 +81,33 @@ public class DefaultWysiwygEditorConfiguration implements WysiwygEditorConfigura
     /**
      * @param propertyName the property name
      * @return the value of the specified property of the {@link #CONFIG_CLASS_REFERENCE} object attached to
-     *         {@link #CONFIG_DOCUMENT_REFERENCE}.
+     *         {@link #CONFIG_LOCAL_DOCUMENT_REFERENCE}
      */
     private Object getProperty(String propertyName)
     {
-        String currentWiki = modelContext.getCurrentEntityReference().getName();
-        DocumentReference configDocumentReference = new DocumentReference(currentWiki, XWIKI_SPACE, EDITOR_CONFIG_DOC);
-        DocumentReference configClassReference =
-            new DocumentReference("WysiwygEditorConfigClass", configDocumentReference.getLastSpaceReference());
-        Object value = documentAccessBridge.getProperty(configDocumentReference, configClassReference, propertyName);
+        String currentWiki = modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName();
+        Object value = getProperty(propertyName, currentWiki);
         if (value == null) {
             String mainWiki = getMainWiki();
             if (!StringUtils.equals(currentWiki, mainWiki)) {
-                configDocumentReference = new DocumentReference(mainWiki, XWIKI_SPACE, EDITOR_CONFIG_DOC);
-                value = documentAccessBridge.getProperty(configDocumentReference, configClassReference, propertyName);
+                value = getProperty(propertyName, mainWiki);
             }
         }
         return value;
+    }
+
+    /**
+     * @param propertyName the property name
+     * @param wiki the name of the wiki where to look for the configuration document
+     * @return the value of the specified property of the {@link #CONFIG_CLASS_REFERENCE} object attached to
+     *         {@link #CONFIG_LOCAL_DOCUMENT_REFERENCE} in the specified wiki
+     */
+    private Object getProperty(String propertyName, String wiki)
+    {
+        WikiReference wikiRef = new WikiReference(wiki);
+        DocumentReference configDocumentReference = new DocumentReference(CONFIG_LOCAL_DOCUMENT_REFERENCE, wikiRef);
+        DocumentReference configClassReference = new DocumentReference(CONFIG_CLASS_REFERENCE, wikiRef);
+        return documentAccessBridge.getProperty(configDocumentReference, configClassReference, propertyName);
     }
 
     /**

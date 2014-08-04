@@ -35,5 +35,6 @@
     <module>xwiki-platform-icon-api</module>
     <module>xwiki-platform-icon-default</module>
     <module>xwiki-platform-icon-script</module>
+    <module>xwiki-platform-icon-ui</module>
   </modules>
 </project>

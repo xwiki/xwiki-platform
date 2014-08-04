@@ -90,6 +90,13 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
             bclass.removeField("baseskin");
             needsUpdate = true;
         }
+        needsUpdate |=
+                bclass.addDBListField("iconTheme", "Icon theme",
+                        "select doc.fullName, propName.value from XWikiDocument as doc, BaseObject as theme, "
+                                + "StringProperty propName "
+                                + "where doc.fullName=theme.name and theme.className='IconThemesCode.IconThemeClass' "
+                                + "and doc.fullName<>'IconThemesCode.IconThemeTemplate' "
+                                + "and theme.id = propName.id and propName.name = 'name'");
         needsUpdate |= bclass.addTextField("stylesheet", "Default Stylesheet", 30);
         needsUpdate |= bclass.addTextField("stylesheets", "Alternative Stylesheet", 60);
         needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");

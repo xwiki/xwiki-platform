@@ -136,20 +136,27 @@
   #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))
     #set($params = $uix.getParameters())
     #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
-      &lt;li&gt;&lt;a href="$xwiki.getURL($params.target)"&gt;&lt;span class="application-img"&gt;image:$params.icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/a&gt;&lt;/li&gt;
+      #set($icon = "image:${params.icon}")
+      #if ($params.icon.startsWith('icon:'))
+        #set($icon = $services.icon.renderHTML($params.icon.substring(5)))
+      #end
+      &lt;li&gt;&lt;a href="$xwiki.getURL($params.target)"&gt;&lt;span class="application-img"&gt;$icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/a&gt;&lt;/li&gt;
     #end
   #end
 &lt;/ul&gt;
 #if($xwiki.hasWikiAdminRights())
   &lt;ul class="applicationsPanel applicationsPanelMoreList nav nav-pills nav-stacked"&gt;
-    &lt;li&gt;&lt;a href="$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.AddExtensions')" class="applicationPanelMoreButton"&gt;&lt;span class="application-img"&gt;image:icon:add &lt;/span&gt; &lt;span class="application-label"&gt;$services.localization.render('panels.applications.more')&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="$xwiki.getURL($services.model.createDocumentReference('', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.AddExtensions')" class="applicationPanelMoreButton"&gt;&lt;span class="application-img"&gt;$services.icon.renderHTML('add') &lt;/span&gt; &lt;span class="application-label"&gt;$services.localization.render('panels.applications.more')&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
   &lt;div class="applicationPanelMoreContainer hidden"&gt;
     &lt;ul class="nav nav-pills nav-stacked"&gt;
       #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications.more', {'sortByParameter' : 'label'}))
         #set($params = $uix.getParameters())
         #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '')
-        ##class="applicationsPanel"
-          &lt;li&gt;[[&lt;span class="application-img"&gt;image:$params.icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/span&gt;&gt;&gt;$params.target]]&lt;/li&gt;
+          #set($icon = "image:$params.icon")
+          #if ($params.icon.startsWith('icon:'))
+            #set($icon = $services.icon.renderHTML($params.icon.substring(5)))
+          #end
+          &lt;li&gt;[[&lt;span class="application-img"&gt;$icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/span&gt;&gt;&gt;$params.target]]&lt;/li&gt;
         #end
       #end
     &lt;/ul&gt;
@@ -404,6 +411,8 @@ document.observe('xwiki:dom:loaded', function(e) {
 
 ul.applicationsPanel li img {
   float:left;
+  width: 16px;
+  height: 16px;
 }
 
 ul.applicationsPanel li .application-label{
@@ -437,7 +446,7 @@ div.applicationPanelMoreContainer li a {
 }
 
 .panel-width-Small .applicationsPanel li img{
-  float: none;  
+  float: none;
 }
 
 .panel-width-Small .applicationsPanel li .application-img{
@@ -469,6 +478,14 @@ div.applicationPanelMoreContainer li a {
 
 .panel-width-Small .applicationPanelMoreContainer ul li:hover a{
   color: $theme.textPrimaryColor;
+}
+
+.panel-width-Small .application-img{
+  font-size: 24px;
+}
+.panel-width-Small .application-img img{
+  width: 24px;
+  height: 24px;
 }
 
 /* for colibri */

@@ -45,6 +45,12 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>font-awesome</artifactId>
       <version>4.1.0</version>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -150,8 +149,7 @@ $services.localization.render('platform.appwithinminutes.description')
   // Add the xredirect parameter to the query string of the delete action to
   // redirect the user back to the live table after an application is deleted.
   var deleteLink = event.memo.row.down('td.actions').down('a.actiondelete');
-  // The delete URL doesn't have any query string by default.
-  deleteLink.href = deleteLink.href + '?xredirect=' + encodeURIComponent(window.location.href);
+  deleteLink.href = deleteLink.href + '&amp;xredirect=' + encodeURIComponent(window.location.href);
 });</code>
     </property>
     <property>

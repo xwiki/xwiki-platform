@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -53,19 +52,25 @@
     #set($rowDocRef = $services.model.createDocumentReference($row.get('doc_wiki'), $row.get('doc_space'), $row.get('doc_name')))
     #set($rowDoc = $xwiki.getDocument($rowDocRef))
     #set($classFullName = $rowDoc.getObject('AppWithinMinutes.LiveTableClass').getProperty('class').value)
+    #set($classRef = $services.model.resolveDocument($classFullName))
+    #set($appName = $row.get('doc_space'))
     ## Edit action
     #if($row.get('doc_hasedit'))
       ## Make sure to test edit rights on the application's class and not its homepage.
       #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $xcontext.user, $classFullName)))
     #end
-    #set($editQueryString = "appName=$escapetool.url($row.get('doc_space'))")
+    #set($editQueryString = "appName=$escapetool.url($appName)")
     #set($discard = $row.put('doc_edit_url', $xwiki.getURL('AppWithinMinutes.CreateApplication', 'view', $editQueryString)))
     ## Delete action
     #if($row.get('doc_hasdelete'))
-      ## Deleting an application requires space administration rights.
-      #set($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('admin', $xcontext.user, "${row.get('doc_space')}.WebPreferences")))
+      ## Deleting an application requires space administration rights on both data and code spaces.
+      #set($dataSpacePreferencesRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebPreferences'))
+      #set($hasDeleteData = $xwiki.hasAccessLevel('admin', $services.model.serialize($dataSpacePreferencesRef, 'default')))
+      #set($codeSpacePreferencesRef = $services.model.createDocumentReference($doc.wiki, $classRef.lastSpaceReference.name, 'WebPreferences'))
+      #set($hasDeleteApplication = $hasDeleteData &amp;&amp; $xwiki.hasAccessLevel('admin', $services.model.serialize($codeSpacePreferencesRef, 'default')))
+      #set($discard = $row.put('doc_hasdelete', $hasDeleteApplication))
     #end
-    #set($discard = $row.put('doc_delete_url', $xwiki.getURL($classFullName, 'deletespace')))
+    #set($discard = $row.put('doc_delete_url', $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', "appName=$escapetool.url($appName)")))
   #end
   $jsontool.serialize($map)
 #end

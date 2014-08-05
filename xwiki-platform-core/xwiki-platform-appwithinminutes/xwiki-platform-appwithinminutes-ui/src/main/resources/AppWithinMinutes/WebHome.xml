@@ -20,30 +20,57 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>AppWithinMinutes</web>
   <name>WebHome</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1320651745000</creationDate>
+  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1320655345000</creationDate>
-  <date>1320656877000</date>
-  <contentUpdateDate>1320656877000</contentUpdateDate>
+  <date>1407135501000</date>
+  <contentUpdateDate>1407135501000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.appwithinminutes.homePageTitle')</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity}}
+$services.localization.render('platform.appwithinminutes.description')
+
+#if($hasCreateSpace)
+  (% class="buttonwrapper" %)[[$services.localization.render('platform.appwithinminutes.createAppButtonLabel')&gt;&gt;CreateApplication||class="button"]]
+
+#end
+= $services.localization.render('platform.appwithinminutes.appsLiveTableHeading') =##
+#set($columnsProperties = {
+  'doc.space': {'type': 'text', 'link': 'view', 'size': 10, 'filterable': true, 'sortable': true},
+  'doc.author': {'type': 'text', 'link': 'author', 'size': 10, 'filterable': true, 'sortable': true},
+  'doc.date': {'type': 'text', 'size': 10, 'filterable': true, 'sortable': true},
+  '_actions': {'html': true, 'sortable': false, 'actions': ['edit', 'delete']}
+})
+#set($options = {
+  'className': 'AppWithinMinutes.LiveTableClass',
+  'resultPage' : 'AppWithinMinutes.AppsLiveTableResults',
+  'translationPrefix': 'platform.appwithinminutes.appsLiveTable.',
+  'tagCloud': true,
+  'rowCount': 15,
+  'maxPages': 10,
+  'selectedColumn': 'doc.space',
+  'defaultOrder': 'asc'
+})
+#set($columns = ['doc.space', 'doc.author', 'doc.date', '_actions'])
+#livetable('livetable' $columns $columnsProperties $options)
+{{/velocity}}</content>
   <object>
+    <name>AppWithinMinutes.WebHome</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>9bf2d1ac-8540-4d53-bbd0-91525a49c621</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -111,14 +138,10 @@
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>AppWithinMinutes.WebHome</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>9bf2d1ac-8540-4d53-bbd0-91525a49c621</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -141,31 +164,4 @@
       <use>currentPage</use>
     </property>
   </object>
-  <content>{{velocity}}
-$services.localization.render('platform.appwithinminutes.description')
-
-#if($hasCreateSpace)
-  (% class="buttonwrapper" %)[[$services.localization.render('platform.appwithinminutes.createAppButtonLabel')&gt;&gt;CreateApplication||class="button"]]
-
-#end
-= $services.localization.render('platform.appwithinminutes.appsLiveTableHeading') =##
-#set($columnsProperties = {
-  'doc.space': {'type': 'text', 'link': 'view', 'size': 10, 'filterable': true, 'sortable': true},
-  'doc.author': {'type': 'text', 'link': 'author', 'size': 10, 'filterable': true, 'sortable': true},
-  'doc.date': {'type': 'text', 'size': 10, 'filterable': true, 'sortable': true},
-  '_actions': {'html': true, 'sortable': false, 'actions': ['edit', 'delete']}
-})
-#set($options = {
-  'className': 'AppWithinMinutes.LiveTableClass',
-  'resultPage' : 'AppWithinMinutes.AppsLiveTableResults',
-  'translationPrefix': 'platform.appwithinminutes.appsLiveTable.',
-  'tagCloud': true,
-  'rowCount': 15,
-  'maxPages': 10,
-  'selectedColumn': 'doc.space',
-  'defaultOrder': 'asc'
-})
-#set($columns = ['doc.space', 'doc.author', 'doc.date', '_actions'])
-#livetable('livetable' $columns $columnsProperties $options)
-{{/velocity}}</content>
 </xwikidoc>

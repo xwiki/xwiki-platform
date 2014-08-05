@@ -488,6 +488,33 @@ div.applicationPanelMoreContainer li a {
   height: 24px;
 }
 
+/* Phone case */
+@media (max-width: 768px) {
+  .panel-width-Small .applicationsPanel li{
+    float: left;
+    width: 33%;
+  }
+  
+  /* no responsive design for colibri */
+  .skin-colibri .panel-width-Small .applicationsPanel li{
+    float: none;
+    width: inherit;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+  .panel-width-Small .applicationsPanel li{
+    float: left;
+    width: 20%;
+  }
+  
+  /* no responsive design for colibri */
+  .skin-colibri .panel-width-Small .applicationsPanel li{
+    float: none;
+    width: inherit;
+  }
+}
+
 /* for colibri */
 .skin-colibri .panel-width-Small .applicationsPanel{
   margin: 0;

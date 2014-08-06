@@ -87,12 +87,6 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-macro-include</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
     <!-- The Panels application is an optional dependency since the FAQ application can work even if it's not present but if it's
          there then it'll register in it. -->
     <dependency>

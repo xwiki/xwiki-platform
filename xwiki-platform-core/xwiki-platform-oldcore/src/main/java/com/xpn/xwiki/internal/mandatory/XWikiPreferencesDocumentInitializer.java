@@ -82,8 +82,10 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |=
             bclass.addDBListField("colorTheme", "Color theme",
                 "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
-                    + "where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' "
-                    + "and doc.fullName<>'ColorThemes.ColorThemeTemplate'");
+                + "where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' "
+                + "or theme.className='FlamingoThemesCode.ThemeClass') "
+                + "and doc.fullName<>'ColorThemes.ColorThemeTemplate' "
+                + "and doc.fullName<>'FlamingoThemesCode.ThemeTemplate'");
         // This one should not be in the prefs
         PropertyInterface baseskinProp = bclass.get("baseskin");
         if (baseskinProp != null) {

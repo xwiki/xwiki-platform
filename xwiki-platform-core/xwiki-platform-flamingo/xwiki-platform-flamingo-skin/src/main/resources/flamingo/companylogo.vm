@@ -22,5 +22,5 @@
   #end
 #end
 <a href="$!xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))" title="Home" rel="home" class="navbar-brand">
-  <img src="$!logourl" alt="Wiki Logo"/>
+  <img src="$!logourl" alt="Wiki Logo" id="companyLogo"/>
 </a>

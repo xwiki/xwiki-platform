@@ -54,6 +54,9 @@ public class SkinAndColorThemeListener implements EventListener
     private static final LocalDocumentReference COLOR_THEME_CLASS =
             new LocalDocumentReference("ColorThemes", "ColorThemeClass");
 
+    private static final LocalDocumentReference FLAMINGO_THEME_CLASS =
+            new LocalDocumentReference("FlamingoThemesCode", "ThemeClass");
+
     private static final LocalDocumentReference SKIN_CLASS = new LocalDocumentReference("XWiki", "XWikiSkins");
 
     @Inject
@@ -81,6 +84,12 @@ public class SkinAndColorThemeListener implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         XWikiDocument document = (XWikiDocument) source;
+
+        List<BaseObject> flamingoThemeObjects = document.getXObjects(FLAMINGO_THEME_CLASS);
+        if (flamingoThemeObjects != null && !flamingoThemeObjects.isEmpty()) {
+            clearCache(document);
+            return;
+        }
 
         List<BaseObject> colorThemeObjects = document.getXObjects(COLOR_THEME_CLASS);
         if (colorThemeObjects != null && !colorThemeObjects.isEmpty()) {

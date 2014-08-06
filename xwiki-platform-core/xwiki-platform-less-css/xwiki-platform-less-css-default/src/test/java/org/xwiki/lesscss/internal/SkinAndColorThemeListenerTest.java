@@ -83,6 +83,30 @@ public class SkinAndColorThemeListenerTest
     }
 
     @Test
+    public void onEventWhenFlamingoThemeChanged() throws Exception
+    {
+        // Mocks
+        Event event = mock(Event.class);
+        XWikiDocument doc = mock(XWikiDocument.class);
+        Object data = new Object();
+
+        EntityReference classReference = new LocalDocumentReference("FlamingoThemesCode", "ThemeClass");
+        List<BaseObject> objects = new ArrayList<>();
+        BaseObject object = mock(BaseObject.class);
+        objects.add(object);
+        when(doc.getXObjects(classReference)).thenReturn(objects);
+
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        when(doc.getDocumentReference()).thenReturn(documentReference);
+
+        // Test
+        mocker.getComponentUnderTest().onEvent(event, doc, data);
+
+        // Verify
+        verify(lessSkinFileCache).clear("wiki");
+    }
+
+    @Test
     public void onEventWhenColorThemeChanged() throws Exception
     {
         // Mocks

@@ -129,7 +129,7 @@
 #panelheader($doc.space)
 #foreach ($docName in $xwiki.getSpaceDocsName($doc.space))
   #set ($docReference = $services.model.createDocumentReference('', $doc.space, $docName))
-  * [[$docReference.name>>$services.model.serialize($docReference)]]
+  * [[$docReference.name&gt;&gt;$services.model.serialize($docReference)]]
 #end
 #panelfooter()
 {{/velocity}}</content>

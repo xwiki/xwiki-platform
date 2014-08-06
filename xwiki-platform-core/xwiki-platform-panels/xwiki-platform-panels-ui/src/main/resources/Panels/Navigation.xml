@@ -155,7 +155,7 @@
           #if ($doc.fullName == $page)
             * **${doc.name}**
           #else
-            * [[$pageName>>$services.model.serialize($docReference)]]
+            * [[$pageName&gt;&gt;$services.model.serialize($docReference)]]
           #end
         #end
       #end

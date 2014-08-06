@@ -3480,7 +3480,79 @@ public class XWiki implements EventListener
 
     public XWikiUser checkAuth(XWikiContext context) throws XWikiException
     {
-        return getAuthService().checkAuth(context);
+        return checkImpersonation(getAuthService().checkAuth(context), context);
+    }
+
+    public XWikiUser checkImpersonation(XWikiUser user, XWikiContext context) throws XWikiException
+    {
+        // Check impersonation
+        if ("1".equals(Param("xwiki.authentication.impersonate"))) {
+            XWikiRequest request = context.getRequest();
+            if (request != null) {
+                String cookiename = Param("xwiki.authentication.impersonate.cookiename", "impersonate");
+                String cookietype = Param("xwiki.authentication.impersonate.cookietype", "user");
+                String cookieregexp = Param("xwiki.authentication.impersonate.cookieregexp", "");
+                Cookie impersonationCookie = request.getCookie(cookiename);
+                if (impersonationCookie != null) {
+                    String userid = null;
+                    String cookievalue = impersonationCookie.getValue();
+
+                    if (!"".equals(cookieregexp)) {
+                        String[] rules = cookieregexp.split("/"); 
+                        cookievalue = cookievalue.replaceAll(rules[1], rules[2]);
+                        LOGGER.info("New value is: " + cookievalue);
+                    }
+
+                    if ("email".equals(cookietype)) {
+                        String hql = ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className='XWiki.XWikiUsers' and obj.id=prop.id.id and prop.id.name='email' and prop.value='" 
+                            + cookievalue + "'";
+                        if (context.getDatabase() != context.getMainXWiki()) {
+                            String db = context.getDatabase();
+                            try {
+                                context.setDatabase(context.getMainXWiki());
+                                List list = getStore().searchDocumentsNames(hql, 1, 0, context);
+                                if (list != null && list.size() == 1) {
+                                    userid = (String) list.get(0);
+                                    userid = "xwiki:" + userid;
+                                }
+                            } finally {
+                                context.setDatabase(db);
+                            }
+                        }
+                        if (userid == null) { 
+                            List list = getStore().searchDocumentsNames(hql, 1, 0, context);
+                            if (list != null && list.size() == 1) {
+                                userid = (String) list.get(0);
+                            }
+                        }
+                    } else {
+                        userid = cookievalue;
+                    }
+
+                    XWikiDocument userdoc = (userid == null) ? null : getDocument(userid, context);
+                    if (userdoc != null && !userdoc.isNew()) {
+                        // we only accept the user if he has programming rights
+                        String cuser = context.getUser();
+                        try {
+                            context.setUser(user.getUser());
+                            if (getRightService().hasProgrammingRights(null, context)) {
+                                // setting impersonated user
+                                LOGGER.info("SECURITY: admin user (" + user.getUser() + ") is impersonation user " + cookievalue);
+                                user.setUser(userid);
+                                return user;
+                            } else {
+                                LOGGER.error("SECURITY: non admin user (" + user.getUser() + ") has tried impersonation of user " + cookievalue);
+                            }
+                        } finally {
+                            context.setUser(cuser); 
+                        }
+                    } else {
+                        LOGGER.error("SECURITY: failed impersonation for cookie " + cookievalue);
+                    }
+                }
+            }
+        }
+        return user;
     }
 
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException

@@ -62,7 +62,7 @@ public class ExtensionProgressPane extends BaseElement
      */
     public WebElement getJobLogLabel()
     {
-        String xpath = "//*[@class = 'job-log']/parent::dd/preceding-sibling::dt[last()]/label";
+        String xpath = "//*[@class = 'log']/parent::dd/preceding-sibling::dt[last()]/label";
         return getUtil().findElementWithoutWaiting(getDriver(), container, By.xpath(xpath));
     }
 
@@ -73,7 +73,7 @@ public class ExtensionProgressPane extends BaseElement
     {
         List<LogItemPane> log = new ArrayList<LogItemPane>();
         for (WebElement element : getUtil().findElementsWithoutWaiting(getDriver(), container,
-            By.className("job-log-item"))) {
+            By.className("log-item"))) {
             log.add(new LogItemPane(element));
         }
         return log;

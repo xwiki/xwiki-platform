@@ -55,7 +55,7 @@ public class LogItemPane extends BaseElement
         if (classNames.length < 2) {
             return null;
         }
-        return classNames[1].substring("job-log-item-".length());
+        return classNames[1].substring("log-item-".length());
     }
 
     /**

@@ -3,26 +3,26 @@
 // --------------------------------------------------
 
 // Imports ====================================================================
-@import "before-bootstrap.less"; // Fixes that must be included BEFORE bootstrap
+@import "before-bootstrap"; // Fixes that must be included BEFORE bootstrap
 @import "bootstrap/bootstrap.less"; // Bootstrap
-@import "variables.less"; // Bootstrap variables overrided by flamingo
-@import "accordion.less";
-@import "action-menus.less";
-@import "admin.less";
-@import "annotations.less";
-@import "buttons.less";
-@import "edit.less";
-@import "forms.less";
-@import "general.less";
-@import "grid.less";
-@import "headers.less";
-@import "layout.less";
-@import "messages.less";
-@import "misc.less";
-@import "panels.less";
-@import "type.less";
-@import "vertical-menus.less";
-@import "xlist.less";
+@import "variables"; // Bootstrap variables overrided by flamingo
+@import "accordion";
+@import "action-menus";
+@import "admin";
+@import "annotations";
+@import "buttons";
+@import "edit";
+@import "forms";
+@import "general";
+@import "grid";
+@import "headers";
+@import "layout";
+@import "messages";
+@import "misc";
+@import "panels";
+@import "type";
+@import "vertical-menus";
+@import "xlist";
 
 // Velocity Content =============================================================
 //

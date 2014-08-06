@@ -164,7 +164,7 @@ require(['jquery'], function($) {
     // Need IE9+ or any other recent browser
     var match = navigator.userAgent.match(/(?:MSIE |Trident\/.*; rv:)(\d+)/);
     if (match &amp;&amp; parseInt(match[1]) &lt; 9) {
-      iframe.parent().replaceWith("&lt;div class=\"panel-body\"&gt;&lt;div class=\"alert alert-danger\"&gt;Sorry, the preview does not work with this version of Internet Explorer. You need to use a more recent browser.&lt;/div&gt;&lt;/div&gt;");
+      iframe.parent().replaceWith("&lt;div class=\"panel-body\"&gt;&lt;div class=\"alert alert-danger\"&gt;$services.localization.render('platform.flamingo.themes.incompatiblebrowser')&lt;/div&gt;&lt;/div&gt;");
       return;
     }
     

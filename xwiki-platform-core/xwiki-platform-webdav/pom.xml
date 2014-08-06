@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>6.2-SNAPSHOT</version>
+    <version>6.2-milestone-1</version>
   </parent>
   <artifactId>xwiki-platform-webdav</artifactId>
   <name>XWiki Platform - WebDAV - Parent POM</name>

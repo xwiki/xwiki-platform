@@ -6,6 +6,7 @@ ul.log {
   /* This should accommodate 10 items */
   max-height: 230px;
   overflow: auto;
+  padding: 0;
 }
 ul.log li:hover {
   background-color: $theme.highlightColor;

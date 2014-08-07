@@ -111,6 +111,7 @@
 dl.extension-metadata > dd > ul {
   list-style-position: inside;
   margin: 0;
+  padding: 0;
 }
 
 ul.dependencies {
@@ -120,6 +121,7 @@ ul.dependencies {
   /* This should accommodate 10 items */
   max-height: 230px;
   overflow: auto;
+  padding: 0;
 }
 ul.dependencies li:hover {
   background-color: $theme.highlightColor;
@@ -395,6 +397,7 @@ ul.document-tree {
 .document-tree ul {
   /* Reduce the default identation. */
   margin-left: 1.3em;
+  padding: 0;
 }
 .document-tree li {
   list-style-type: none;

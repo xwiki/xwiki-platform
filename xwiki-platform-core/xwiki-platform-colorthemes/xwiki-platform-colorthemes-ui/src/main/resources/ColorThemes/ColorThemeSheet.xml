@@ -752,7 +752,7 @@ $ie .colorthemewizard-trigger {
   top: 4px;
 }
 .colorthemewizard-picker input {
-    width: 160px;
+    width: 100%;
 }
 .colorthemewizard-picker .procolor {
     width: 92px;

@@ -32,6 +32,7 @@
   <artifactId>xwiki-platform-font-awesome</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Font Awesome</name>
+  <description>Having Font Awesome as Icon Theme</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Font Awesome Icon Theme</xwiki.extension.name>

@@ -652,6 +652,24 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </navbar-default-color>
+    <navbar-default-link-active-bg>
+      <disabled>0</disabled>
+      <name>navbar-default-link-active-bg</name>
+      <number>58</number>
+      <prettyName>navbar-default-link-active-bg</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </navbar-default-link-active-bg>
+    <navbar-default-link-active-color>
+      <disabled>0</disabled>
+      <name>navbar-default-link-active-color</name>
+      <number>57</number>
+      <prettyName>navbar-default-link-active-color</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+    </navbar-default-link-active-color>
     <navbar-default-link-color>
       <customDisplay/>
       <disabled>0</disabled>

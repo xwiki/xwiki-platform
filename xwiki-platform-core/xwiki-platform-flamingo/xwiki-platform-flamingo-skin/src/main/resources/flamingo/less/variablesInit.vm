@@ -135,6 +135,8 @@
       "navbar-default-link-color" : "color",
       "navbar-default-link-hover-color" : "color",
       "navbar-default-link-hover-bg" : "color",
+      "navbar-default-link-active-color" : "color",
+      "navbar-default-link-active-bg": "color",
       "navbar-height" : "size",
       "dropdown-bg" : "color",
       "dropdown-border" : "color",

@@ -123,8 +123,10 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>h1.xapp {
-  border-bottom: 0px none;
+      <code>#template('colorThemeInit.vm')
+
+h1.xapp {
+  border-bottom: 0 none;
   margin: 0;
 }
 
@@ -137,8 +139,8 @@ h1.xapp * {
 }
 
 h1.xapp .highlight {
-  background: url("$xwiki.getSkinFile('icons/silk/tag_blue.png')") no-repeat 5px 50% #FFC;
-  border: solid 1px #DDD;
+  background: url("$xwiki.getSkinFile('icons/silk/tag_blue.png')") no-repeat 5px 50% $theme.backgroundSecondaryColor;
+  border: solid 1px $theme.borderColor;
   border-radius: 10px;
   display: inline-block;
   font-weight: bold;
@@ -147,8 +149,8 @@ h1.xapp .highlight {
 }
 
 h1.xapp .button {
-  background: no-repeat 3px 50% #FFD;
-  border: solid 1px #DDD;
+  background: no-repeat 3px 50% $theme.pageContentBackgroundColor;
+  border: solid 1px $theme.borderColor;
   border-radius: 7px;
   display : inline-block;
   font-size: 50%;
@@ -166,7 +168,7 @@ h1.xapp .rename {
 }
 
 h1.xapp .button:hover {
-  background-color: #EEF;
+  background-color: $theme.highlightColor;
   text-decoration: none;
 }
 </code>

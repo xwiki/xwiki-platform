@@ -7,7 +7,7 @@
         color: $lessVar;
     }
 #end
-#mapping("borderColor", "@border-color")
+#mapping("borderColor", "@xwiki-border-color")
 #mapping("panelHeaderBackgroundColor", "@panel-default-heading-bg")
 #mapping("textColor", "@text-color")
 #mapping("linkColor", "@link-color")

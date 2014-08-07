@@ -152,6 +152,7 @@ h1.xapp .button {
   background: no-repeat 3px 50% $theme.pageContentBackgroundColor;
   border: solid 1px $theme.borderColor;
   border-radius: 7px;
+  color: $theme.linkColor;
   display : inline-block;
   font-size: 50%;
   font-weight: normal;

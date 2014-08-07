@@ -593,7 +593,7 @@ div#preview-curtain{
 ## DISPLAY HIDDEN VARIABLES
 ############################
 #macro(displayHiddenVariables)
-  &lt;form id="bt-variables"&gt;
+  &lt;div id="bt-variables" class="hidden"&gt;
   #foreach($category in $variables.keySet())
     #set($catVar = $variables.get($category))
     #foreach($var in $catVar.keySet())
@@ -602,7 +602,7 @@ div#preview-curtain{
       &lt;input type="hidden" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!doc.getValue($varName, $obj)" /&gt;
     #end
   #end
-  &lt;/form&gt;
+  &lt;/div&gt;
 #end
 ############################
 ## MAIN

@@ -41,6 +41,7 @@ import org.xwiki.lesscss.LESSSkinFileCache;
 import org.xwiki.lesscss.LESSSkinFileCompiler;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -131,11 +132,11 @@ public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> 
         alreadyVisitedSkins.add(skin);
 
         // Is the skin a Wiki Document?
-        DocumentReference skinDocRef = documentReferenceResolver.resolve(skin);
+        String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
+        DocumentReference skinDocRef = documentReferenceResolver.resolve(skin, new WikiReference(currentWikiId));
         if (skinDocRef != null && documentAccessBridge.exists(skinDocRef)) {
             // Skin class
-            DocumentReference skinClass = new DocumentReference(wikiDescriptorManager.getCurrentWikiId(),
-                "XWiki", "XWikiSkins");
+            DocumentReference skinClass = new DocumentReference(currentWikiId, "XWiki", "XWikiSkins");
             // Get the "baseskin" property of the skin
             String baseSkin = (String) documentAccessBridge.getProperty(skinDocRef, skinClass, "baseskin");
             if (StringUtils.isBlank(baseSkin)) {

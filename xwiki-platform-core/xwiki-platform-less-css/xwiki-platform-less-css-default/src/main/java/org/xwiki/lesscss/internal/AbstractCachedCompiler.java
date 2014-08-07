@@ -30,6 +30,7 @@ import org.xwiki.lesscss.LESSCompilerException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -79,7 +80,8 @@ public abstract class AbstractCachedCompiler<T>
         XWikiRequest request = context.getRequest();
 
         // Getting the full name representation of colorTheme
-        DocumentReference colorThemeReference = referenceResolver.resolve(request.getParameter("colorTheme"));
+        DocumentReference colorThemeReference = referenceResolver.resolve(request.getParameter("colorTheme"),
+                new WikiReference(wikiId));
         String colorTheme = referenceSerializer.serialize(colorThemeReference);
 
         // Check that the color theme exists, to avoid a DOS if some user tries to compile a skin file

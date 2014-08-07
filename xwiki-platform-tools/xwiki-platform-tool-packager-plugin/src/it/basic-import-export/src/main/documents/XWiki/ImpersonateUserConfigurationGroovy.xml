@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>ImpersonateUserConfigurationGroovy</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1407398162000</creationDate>
+  <date>1407398162000</date>
+  <contentUpdateDate>1407398162000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <class>
+      <name>XWiki.TagClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <tags>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>checkbox</displayType>
+        <multiSelect>1</multiSelect>
+        <name>tags</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Tags</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator>,</separator>
+        <separators>,|</separators>
+        <size>30</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </tags>
+    </class>
+    <name>XWiki.ImpersonateUserConfigurationGroovy</name>
+    <number>0</number>
+    <className>XWiki.TagClass</className>
+    <guid>9c672571-dcba-494b-9d15-aec915964d69</guid>
+  </object>
+  <content>import javax.servlet.http.Cookie;
+
+public class CookieGroovy {
+
+  public void addCookie(cookieName, cookieValue, age, request, response, xwiki) {
+    def cookie = new Cookie(cookieName.toString(), convertUserId(cookieValue.toString(), xwiki));
+    cookie.setVersion(1);
+    cookie.setMaxAge(age);
+    cookie.setPath("/");
+    if (xwiki.isVirtual()) { 
+      def serverName = request.serverName
+      def domains = xwiki.getXWiki().Param("xwiki.authentication.cookiedomains")
+      if (domains!=null) {
+       for(domain in domains.split(",")) {
+        if (serverName.endsWith(domain)) {
+          cookie.setDomain(domain)
+        }
+       }
+      }
+    }
+    response.addCookie(cookie)
+  }
+
+  public void removeCookie(cookieName, request, response, xwiki) {
+    def cookie = new Cookie(cookieName.toString(), "");
+    cookie.setVersion(1);
+    cookie.setMaxAge(0);
+    cookie.setPath("/");
+    if (xwiki.isVirtual()) { 
+      def serverName = request.serverName
+      def domains = xwiki.getXWiki().Param("xwiki.authentication.cookiedomains")
+      if (domains!=null) {
+       for(domain in domains.split(",")) {
+        if (serverName.endsWith(domain)) {
+          cookie.setDomain(domain)
+        }
+       }
+      }
+    }
+    response.addCookie(cookie)
+  }
+
+  public String convertUserId(userid, xwiki) {
+    def cookietype = xwiki.getXWiki().Param("xwiki.authentication.impersonate.cookietype", "user")
+    def cookieregexp = xwiki.getXWiki().Param("xwiki.authentication.impersonate.cookieregexp", "")
+    if ("email".equals(cookietype)) {
+       def userdoc = xwiki.getDocument(userid)
+       userdoc.use("XWiki.XWikiUsers")
+       userid = userdoc.getValue("email")
+    }
+    if (!"".equals(cookieregexp)) {
+      String[] rules = cookieregexp.split("/")
+      userid = userid.replaceAll(rules[2], rules[1])
+    }
+    return userid;
+  }
+
+  public String getCookieName(xwiki) {
+    return xwiki.getXWiki().Param("xwiki.authentication.impersonate.cookiename", "impersonate");
+  }
+}</content>
+</xwikidoc>

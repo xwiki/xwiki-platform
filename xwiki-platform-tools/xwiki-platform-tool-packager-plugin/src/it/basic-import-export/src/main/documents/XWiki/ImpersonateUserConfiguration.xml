@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>ImpersonateUserConfiguration</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent/>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1407398161000</creationDate>
+  <date>1407398161000</date>
+  <contentUpdateDate>1407398161000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Impersonate Configuration</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.0</syntaxId>
+  <hidden>false</hidden>
+  <object>
+    <class>
+      <name>XWiki.TagClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <tags>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>checkbox</displayType>
+        <multiSelect>1</multiSelect>
+        <name>tags</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>Tags</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator>,</separator>
+        <separators>,|</separators>
+        <size>30</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </tags>
+    </class>
+    <name>XWiki.ImpersonateUserConfiguration</name>
+    <number>0</number>
+    <className>XWiki.TagClass</className>
+    <guid>e8c642be-15ae-4c84-9a55-1f6c8fcf7dac</guid>
+  </object>
+  <content>{{velocity}}
+#set($cookiename = $xwiki.xWiki.Param("xwiki.authentication.impersonate.cookiename", "impersonate"))
+#set($cookie = $request.getCookie($cookiename))
+#set($cookieg = $xwiki.parseGroovyFromPage("XWiki.ImpersonateUserConfigurationGroovy"))
+ #if($request.confirm=="1")
+ {{info}}Removing cookie $cookiename{{/info}}
+ #set($ok = $cookieg.removeCookie($cookiename, $request, $response, $xwiki))
+ #set($ok = $response.sendRedirect($doc.name))
+#else
+#set($cookie = $request.getCookie($cookiename))
+#if($cookie)
+ #set($user = $cookie.value)
+ #if(!$user)
+  #set($user = "")
+ #end
+ #if($cookieg.convertUserId($context.user,$xwiki)==$user)
+ #set($username = $xwiki.getUserName($context.user, false))
+{{info}}Impersonation is activated and functionnal with user $username ($context.user) and cookie ($cookie.value){{/info}}
+#else
+{{error}}Impersonation is activated bug failing with cookie $user and current user $context.user{{/error}}
+#end
+
+[[Deactivate impersonation&gt;&gt;?confirm=1]]
+#else
+{{include document="XWiki.ImpersonateUserConfigurationSheet" /}}
+#end
+#end</content>
+</xwikidoc>

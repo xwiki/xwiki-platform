@@ -32,7 +32,7 @@
   <artifactId>xwiki-platform-flamingo-theme</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Flamingo - Theme</name>
-  <description>A Theme Editor Application for Flamingo skin.</description>
+  <description>Customize easily any skin based on Flamingo and preview the results in live.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Flamingo Theme Application</xwiki.extension.name>

@@ -26,11 +26,17 @@ Caused by: #printThrowable($throwable.cause true)
 
 #macro (displayDocumentReference $documentReference)
   #set ($path = [])
-  #set ($wikiPrettyName = $services.wiki.getById($documentReference.wikiReference.name).prettyName)
-  #if ("$!wikiPrettyName.trim()" == '')
-    #set ($wikiPrettyName = $documentReference.wikiReference.name)
+  #set($wikiReference = $documentReference.extractReference("WIKI"))
+  #set($wikiId = $wikiReference.name)
+  #if(!$wikiId)
+    #set($wikiId = $doc.wiki)
+    #set($wikiReference = $services.model.createEntityReference($wikiId, 'WIKI'))
   #end
-  #set ($wikiHomeDocRef = $services.model.resolveDocument('', 'default', $documentReference.wikiReference))
+  #set ($wikiPrettyName = $services.wiki.getById($wikiId).prettyName)
+  #if ("$!wikiPrettyName.trim()" == '')
+    #set ($wikiPrettyName = $wikiId)
+  #end
+  #set ($wikiHomeDocRef = $services.model.resolveDocument('', 'default', $wikiReference))
   #set ($discard = $path.add("<a href=""$xwiki.getURL($wikiHomeDocRef)"">$escapetool.xml($wikiPrettyName)</a>"))
   ##
   #foreach ($spaceReference in $documentReference.spaceReferences)

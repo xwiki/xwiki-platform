@@ -179,6 +179,7 @@ ul.dependencies li:hover {
   margin-bottom: .6em;
 }
 .extension-diff-options .label {
+  color: $theme.textColor;
   font-size: 0.85em;
   font-weight: 700;
   margin-right: 0.3em;

@@ -33,7 +33,7 @@
 
 #if($xcontext.action == 'view' && $viewer != 'content')
   <div class="text-right">
-  #xwikibuttonentrystart('' $services.localization.render('core.menu.moreactions') 'tmMoreActions' '' 'cog')
+  #xwikibuttonentrystart('' $services.localization.render('core.menu.moreactions') 'tmMoreActions' 'btn-default' 'cog')
 #end
 #foreach($docextralink in $docextralinks)
   #set ($extraAnchor = $docextralink.get(0))

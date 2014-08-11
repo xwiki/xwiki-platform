@@ -279,3 +279,45 @@ table {
     margin-bottom: 0;
   }
 }
+
+// Viewer = changes -----------------------------------------------------------
+#changes-info {
+  background-color: @xwiki-background-secondary-color;
+  border: @border-width solid @xwiki-border-color;
+  margin-top: (@grid-gutter-width / 2);
+  padding-top: (@grid-gutter-width / 2);
+  padding-bottom: (@grid-gutter-width / 2);
+  position: relative;
+  /* Background arrow */
+  &:before {
+    background: @xwiki-page-content-bg;
+    height: 2em;
+    right: 50%;
+    top: 4em;
+    width: 2em;
+  }
+  &:after {
+    border-bottom: 2em solid transparent;
+    border-left: 3em solid @xwiki-page-content-bg;
+    border-top: 2em solid transparent;
+    left: 50%;
+    top: 3em;
+  }
+  &:before, &:after{
+    content: "";
+    display: block;
+    position: absolute;
+  }
+}
+
+.changes-info-box {
+  .make-md-column(6, @main-padding);
+}
+
+.changes-info-box, #changes-info-comment {
+  text-align: center;
+}
+
+.changes-info-title {
+  .h3;
+}

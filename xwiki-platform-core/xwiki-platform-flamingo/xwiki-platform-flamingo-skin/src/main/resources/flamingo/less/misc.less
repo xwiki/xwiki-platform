@@ -311,7 +311,8 @@ table {
 }
 
 .changes-info-box {
-  .make-md-column(6, @main-padding);
+  .make-sm-column(6, @main-padding);
+  z-index: 100; /* Have text above the arrow in responsive mode */
 }
 
 .changes-info-box, #changes-info-comment {

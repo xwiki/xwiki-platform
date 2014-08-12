@@ -60,11 +60,30 @@
 
 #lb {
   position: absolute;
-  left: 50%;
   top:  50px;
-  margin-left: -450px;
   z-index: 100005;
-  width: 900px;
+}
+
+#lb {
+  left: 0;
+  margin-left: 0;
+  width: auto;
+}
+
+@media (min-width: 768px) { /* Should be: @screen-sm-min */
+  #lb {
+    left: 50%;
+    margin-left: -300px; /* Should be: @modal-md / 2 */
+    width: 600px; /* Should be: @modal-md */
+  }
+}
+
+@media (min-width: 992px) { /* Should be: @screen-md-min */
+  #lb {
+    left: 50%;
+    margin-left: -450px; /* Should be: @modal-lg / 2 */
+    width: 900px; /* Should be: @modal-lg */
+  }
 }
 
 .lb-content {

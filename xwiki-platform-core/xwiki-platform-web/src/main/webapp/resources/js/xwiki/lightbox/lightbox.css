@@ -157,4 +157,5 @@
   cursor: pointer;
   background-image: url("$xwiki.getSkinFile('js/xwiki/lightbox/btnClose.png')");
   background-repeat: no-repeat;
+  background-position: 5px;
 }

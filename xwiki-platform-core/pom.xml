@@ -213,26 +213,6 @@
         <artifactId>joda-time</artifactId>
         <version>2.4</version>
       </dependency>
-      <!-- Apache Velocity and Tools used in the xwiki-platform-velocity module -->
-      <dependency>
-        <groupId>org.apache.velocity</groupId>
-        <artifactId>velocity</artifactId>
-        <version>1.7</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.velocity</groupId>
-        <artifactId>velocity-tools</artifactId>
-        <version>2.0</version>
-        <exclusions>
-          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-          <!-- Note: Because of this exclusion, we need to manually add servlet-api
-                     to the dependencies list each time we depend on velocity-tools. -->
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

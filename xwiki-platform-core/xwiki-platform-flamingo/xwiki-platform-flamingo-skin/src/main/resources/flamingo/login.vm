@@ -18,7 +18,7 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">
-<form id="loginForm" action="$doc.getURL('loginsubmit')" method="post">
+<form id="loginForm" action="$doc.getURL('loginsubmit')" method="post" class="xform">
 <div class="hidden"><input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
 #if("$!request.srid" != '')
   <input type="hidden" name="srid" value="$!escapetool.xml($request.srid)"/>
@@ -31,27 +31,35 @@
   <!-- previous login errors -->
   #error($services.localization.render($message))
 #end
-<table class="xwikilogintable" summary="$services.localization.render('loginform')">
-  <tr>
-    <th><label for="j_username">$services.localization.render('username'):</label></th>
-    <td><input type="text" id="j_username" name="j_username" value=""/></td>
-  </tr>
-  <tr>
-    <th><label for="j_password">$services.localization.render('password'):</label></th>
-    <td><input type="password" id="j_password" name="j_password" value=""/></td>
-  </tr>
-  <tr>
-    <td colspan="2" style="text-align: left;">
-      <input id="rememberme" type="checkbox" name="j_rememberme" value="true"/>
-      <label for="rememberme">$services.localization.render('remembermeonthiscomp')</label>
-    </td>
-  </tr>
-</table>
-<div class="buttons"><span class="buttonwrapper"><input type="submit" class="button" value="$services.localization.render('login')"/></span></div>
-## TODO: Replace this with an interface extension once IX are implemented
-#if($xwiki.exists('XWiki.ResetPassword') && $xwiki.hasAccessLevel('view', 'XWiki.ResetPassword'))
-  <div style="font-size: 70%; margin-top: 2em;">$services.localization.render('plaform.web.login.forgotUserNameOrPassword', ["<a href='$xwiki.getURL('XWiki.ForgotUsername')'>", '</a>', "<a href='$xwiki.getURL('XWiki.ResetPassword')'>", '</a>'])</div>
-#end
+<dl>
+  <dt>
+    <label for="j_username">$services.localization.render('username')</label>
+    #if($xwiki.exists('XWiki.ForgotUsername') && $xwiki.hasAccessLevel('view', 'XWiki.ForgotUsername'))
+      <span class="xAdditional"><a href="$xwiki.getURL('XWiki.ForgotUsername')">$services.localization.render('xe.admin.forgotUsername.loginMessage')</a></span>
+    #end
+  </dt>
+  <dd class="input-group">
+    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+    <input class="form-control" type="text" id="j_username" size="60" name="j_username" value=""/>
+  </dd>
+  <dt>
+    <label for="j_password">$services.localization.render('password')</label>
+    #if($xwiki.exists('XWiki.ResetPassword') && $xwiki.hasAccessLevel('view', 'XWiki.ResetPassword'))
+      <span class="xAdditional"><a href="$xwiki.getURL('XWiki.ResetPassword')">$services.localization.render('xe.admin.passwordReset.loginMessage')</a></span>
+    #end
+  </dt>
+  <dd class="input-group">
+    <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+    <input type="password" id="j_password" size="60" name="j_password" value=""/>
+  </dd>
+  <dt></dt>
+  <dd>
+    <label class="xHint" for="rememberme">
+      <input id="rememberme" type="checkbox" name="j_rememberme" value="true"/> $services.localization.render('remembermeonthiscomp')
+    </label>
+  </dd>
+  <dt><input type="submit" class="btn btn-primary col-xs-12" value="$services.localization.render('login')"/></dt>
+</dl>
 #xwikimessageboxend()
 </form>
 </div>## mainContentArea

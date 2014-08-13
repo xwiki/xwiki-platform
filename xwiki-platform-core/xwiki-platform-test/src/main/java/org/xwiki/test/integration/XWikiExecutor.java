@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Start and stop a xwiki instance.
- * 
+ *
  * @version $Id$
  * @since 2.0RC1
  */
@@ -212,7 +212,8 @@ public class XWikiExecutor
         executor.setWatchdog(watchDog);
 
         // Inherit the current process's environment variables and add the user-defined ones
-        Map newEnvironment = EnvironmentUtils.getProcEnvironment();
+        @SuppressWarnings("unchecked")
+        Map<String, String> newEnvironment = EnvironmentUtils.getProcEnvironment();
         newEnvironment.putAll(this.environment);
 
         executor.execute(command, newEnvironment, resultHandler);

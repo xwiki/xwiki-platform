@@ -115,7 +115,7 @@ import com.xpn.xwiki.util.Util;
 
 /**
  * The XWiki Hibernate database driver.
- * 
+ *
  * @version $Id$
  */
 @Component
@@ -170,7 +170,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.
-     * 
+     *
      * @param xwiki
      * @param context
      * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
@@ -184,7 +184,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     /**
      * Initialize the storage engine with a specific path. This is used for tests.
-     * 
+     *
      * @param hibpath
      * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.class) instead.
      */
@@ -225,11 +225,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      */
     private void initValidColumTypes()
     {
-        String[] string_types = {"string", "text", "clob"};
+        String[] string_types = { "string", "text", "clob" };
         String[] number_types =
-            {"integer", "long", "float", "double", "big_decimal", "big_integer", "yes_no", "true_false"};
-        String[] date_types = {"date", "time", "timestamp"};
-        String[] boolean_types = {"boolean", "yes_no", "true_false", "integer"};
+            { "integer", "long", "float", "double", "big_decimal", "big_integer", "yes_no", "true_false" };
+        String[] date_types = { "date", "time", "timestamp" };
+        String[] boolean_types = { "boolean", "yes_no", "true_false", "integer" };
         this.validTypesMap = new HashMap<String, String[]>();
         this.validTypesMap.put("com.xpn.xwiki.objects.classes.StringClass", string_types);
         this.validTypesMap.put("com.xpn.xwiki.objects.classes.TextAreaClass", string_types);
@@ -266,7 +266,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 available = !(e.getCause() instanceof MigrationRequiredException);
             }
         } catch (Exception e) {
-            Object[] args = {wikiName};
+            Object[] args = { wikiName };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CHECK_EXISTS_DATABASE,
                 "Exception while listing databases to search for {0}", e, args);
@@ -333,7 +333,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             endTransaction(context, true);
         } catch (Exception e) {
-            Object[] args = {wikiName};
+            Object[] args = { wikiName };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE, "Exception while create wiki database {0}",
                 e, args);
@@ -373,7 +373,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             endTransaction(context, true);
         } catch (Exception e) {
-            Object[] args = {wikiName};
+            Object[] args = { wikiName };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETE_DATABASE, "Exception while delete wiki database {0}",
                 e, args);
@@ -426,7 +426,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     /**
      * Verifies if a wiki document exists
-     * 
+     *
      * @param doc
      * @param context
      * @throws XWikiException
@@ -470,7 +470,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             return false;
         } catch (Exception e) {
-            Object[] args = {doc.getFullName()};
+            Object[] args = { doc.getFullName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CHECK_EXISTS_DOC, "Exception while reading document {0}", e,
                 args);
@@ -637,10 +637,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     if (prop instanceof StaticListClass || prop instanceof DBListClass) {
                         ListClass lc = (ListClass) prop;
                         String[] classes =
-                            {DBStringListProperty.class.getName(), StringListProperty.class.getName(),
-                            StringProperty.class.getName()}; // @see ListClass#newProperty()
-                        for (int i = 0; i < classes.length; i++) {
-                            String oldclass = classes[i];
+                            { DBStringListProperty.class.getName(), StringListProperty.class.getName(),
+                            StringProperty.class.getName() }; // @see ListClass#newProperty()
+                        for (String oldclass : classes) {
                             if (!oldclass.equals(lc.newProperty().getClass().getName())) {
                                 Query q = session.createQuery("select p from " + oldclass + " as p, BaseObject as o"
                                     + " where o.className=? and p.id=o.id and p.name=?");
@@ -677,8 +676,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         NumberClass numberClass = (NumberClass) prop;
                         // @see NumberClass#newProperty()
                         String[] numberPropertyTypes =
-                            {IntegerProperty.class.getName(), LongProperty.class.getName(),
-                            FloatProperty.class.getName(), DoubleProperty.class.getName()};
+                            { IntegerProperty.class.getName(), LongProperty.class.getName(),
+                            FloatProperty.class.getName(), DoubleProperty.class.getName() };
                         for (String numberPropertyType : numberPropertyTypes) {
                             if (!numberPropertyType.equals(numberClass.newProperty().getClass().getName())) {
                                 Query q = session.createQuery("select p from " + numberPropertyType
@@ -777,7 +776,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             doc.setOriginalDocument(doc.clone());
 
         } catch (Exception e) {
-            Object[] args = {this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference())};
+            Object[] args = { this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference()) };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC, "Exception while saving document {0}", e, args);
         } finally {
@@ -955,7 +954,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 endTransaction(context, false, false);
             }
         } catch (Exception e) {
-            Object[] args = {doc.getDocumentReference()};
+            Object[] args = { doc.getDocumentReference() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_DOC, "Exception while reading document [{0}]", e,
                 args);
@@ -995,7 +994,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             session.setFlushMode(FlushMode.COMMIT);
 
             if (doc.getStore() == null) {
-                Object[] args = {doc.getDocumentReference()};
+                Object[] args = { doc.getDocumentReference() };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CANNOT_DELETE_UNLOADED_DOC,
                     "Impossible to delete document {0} if it is not loaded", null, args);
@@ -1039,7 +1038,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 endTransaction(context, true);
             }
         } catch (Exception e) {
-            Object[] args = {doc.getDocumentReference()};
+            Object[] args = { doc.getDocumentReference() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_DOC, "Exception while deleting document {0}", e,
                 args);
@@ -1067,7 +1066,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT,
                 "XObject [{0}] is an instance of an external XClass and cannot be persisted in this wiki [{1}].",
-                null, new Object[] {this.localEntityReferenceSerializer.serialize(object.getReference()), db});
+                null, new Object[] { this.localEntityReferenceSerializer.serialize(object.getReference()), db });
         }
     }
 
@@ -1155,7 +1154,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     String key = it.next();
                     BaseProperty prop = (BaseProperty) object.getField(key);
                     if (!prop.getName().equals(key)) {
-                        Object[] args = {key, object.getName()};
+                        Object[] args = { key, object.getName() };
                         throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
                             XWikiException.ERROR_XWIKI_CLASSES_FIELD_INVALID,
                             "Field {0} in object {1} has an invalid name", null, args);
@@ -1174,7 +1173,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         } catch (XWikiException xe) {
             throw xe;
         } catch (Exception e) {
-            Object[] args = {object.getName()};
+            Object[] args = { object.getName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT, "Exception while saving object {0}", e, args);
 
@@ -1312,7 +1311,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             }
                         } catch (Throwable e2) {
                             Object[] args =
-                                {object.getName(), object.getClass(), Integer.valueOf(object.getNumber() + ""), name};
+                                { object.getName(), object.getClass(), Integer.valueOf(object.getNumber() + ""), name };
                             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
                                 "Exception while loading object '{0}' of class '{1}', number '{2}' and property '{3}'",
@@ -1328,7 +1327,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 endTransaction(context, false, false);
             }
         } catch (Exception e) {
-            Object[] args = {object.getName(), object.getClass(), Integer.valueOf(object.getNumber() + "")};
+            Object[] args = { object.getName(), object.getClass(), Integer.valueOf(object.getNumber() + "") };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
                 "Exception while loading object '{0}' of class '{1}' and number '{2}'", e, args);
@@ -1414,7 +1413,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 endTransaction(context, true);
             }
         } catch (Exception e) {
-            Object[] args = {object.getName()};
+            Object[] args = { object.getName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_OBJECT, "Exception while deleting object {0}", e,
                 args);
@@ -1467,7 +1466,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
         } catch (Exception e) {
             BaseCollection obj = property.getObject();
-            Object[] args = {(obj != null) ? obj.getName() : "unknown", property.getName()};
+            Object[] args = { (obj != null) ? obj.getName() : "unknown", property.getName() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
                 "Exception while loading property {1} of object {0}", e, args);
@@ -1483,8 +1482,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     private void saveXWikiPropertyInternal(final PropertyInterface property,
-                                           final XWikiContext context,
-                                           final boolean runInOwnTransaction) throws XWikiException
+        final XWikiContext context, final boolean runInOwnTransaction) throws XWikiException
     {
         // Clone runInOwnTransaction so the value passed is not altered.
         boolean bTransaction = runInOwnTransaction;
@@ -1530,7 +1528,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         } catch (Exception e) {
             // Something went wrong, collect some information.
             final BaseCollection obj = property.getObject();
-            final Object[] args = {(obj != null) ? obj.getName() : "unknown", property.getName()};
+            final Object[] args = { (obj != null) ? obj.getName() : "unknown", property.getName() };
 
             // Try to roll back the transaction if this is in it's own transaction.
             try {
@@ -1573,7 +1571,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Object[] args = {doc.getDocumentReference()};
+            Object[] args = { doc.getDocumentReference() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCHING_ATTACHMENT,
                 "Exception while searching attachments for documents {0}", e, args);
@@ -1608,7 +1606,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 endTransaction(context, true);
             }
         } catch (Exception e) {
-            Object[] args = {doc.getDocumentReference()};
+            Object[] args = { doc.getDocumentReference() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT_LIST,
                 "Exception while saving attachments attachment list of document {0}", e, args);
@@ -1684,7 +1682,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
 
         } catch (Exception e) {
-            Object[] args = {attachment.getFilename(), attachment.getDoc().getDocumentReference()};
+            Object[] args = { attachment.getFilename(), attachment.getDoc().getDocumentReference() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_ATTACHMENT,
                 "Exception while saving attachments for attachment {0} of document {1}", e, args);
@@ -1814,7 +1812,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             @Override
             public List<Event> getEvents()
             {
-                return Collections.<Event> singletonList(this.ev);
+                return Collections.<Event>singletonList(this.ev);
             }
 
             @Override
@@ -2128,7 +2126,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     /**
      * Add values into named query.
-     * 
+     *
      * @param parameterId the parameter id to increment.
      * @param query the query to fill.
      * @param parameterValues the values to add to query.
@@ -2149,7 +2147,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     /**
      * Add value into named query.
-     * 
+     *
      * @param parameterId the parameter id to increment.
      * @param query the query to fill.
      * @param parameterValue the values to add to query.
@@ -2283,8 +2281,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             int parameterId = injectParameterListToQuery(0, query, parameterValues);
 
             if (whereParams != null) {
-                for (int i = 0; i < whereParams.length; i++) {
-                    query.setString(parameterId++, (String) whereParams[i][1]);
+                for (Object[] whereParam : whereParams) {
+                    query.setString(parameterId++, (String) whereParam[1]);
                 }
             }
 
@@ -2298,7 +2296,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             list.addAll(query.list());
             return list;
         } catch (Exception e) {
-            Object[] args = {sql};
+            Object[] args = { sql };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH, "Exception while searching documents with sql {0}",
                 e, args);
@@ -2379,7 +2377,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             return list;
         } catch (Exception e) {
-            Object[] args = {query.toString()};
+            Object[] args = { query.toString() };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH, "Exception while searching documents with sql {0}",
                 e, args);
@@ -2482,7 +2480,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
-                "Exception while searching documents with SQL [{0}]", e, new Object[] {sql});
+                "Exception while searching documents with SQL [{0}]", e, new Object[] { sql });
         } finally {
             try {
                 if (bTransaction) {
@@ -2552,7 +2550,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
-                "Exception while searching documents with SQL [{0}]", e, new Object[] {wheresql});
+                "Exception while searching documents with SQL [{0}]", e, new Object[] { wheresql });
         } finally {
             try {
                 if (bTransaction) {
@@ -2985,7 +2983,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     /**
      * This is in response to the fact that Hibernate interprets backslashes differently from the database. Our solution
      * is to simply replace all instances of \ with \\ which makes the first backslash escape the second.
-     * 
+     *
      * @param sql the uncleaned sql.
      * @return same as sql except it is guarenteed not to contain groups of odd numbers of backslashes.
      * @since 2.4M1

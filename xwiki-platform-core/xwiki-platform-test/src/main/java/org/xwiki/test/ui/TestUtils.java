@@ -68,7 +68,7 @@ import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 /**
  * Helper methods for testing, not related to a specific Page Object. Also made available to tests classes.
- * 
+ *
  * @version $Id$
  * @since 3.2M3
  */
@@ -258,7 +258,7 @@ public class TestUtils
     /**
      * After successful completion of this function, you are guaranteed to be logged in as the given user and on the
      * page passed in pageURL.
-     * 
+     *
      * @param pageURL
      */
     public void assertOnPage(final String pageURL)
@@ -356,7 +356,7 @@ public class TestUtils
         gotoPage(space, page, action, toQueryString(queryParameters));
     }
 
-    public void gotoPage(String space, String page, String action, Map<String, ? > queryParameters)
+    public void gotoPage(String space, String page, String action, Map<String, ?> queryParameters)
     {
         gotoPage(space, page, action, toQueryString(queryParameters));
     }
@@ -469,7 +469,7 @@ public class TestUtils
 
     /**
      * Accesses the URL to delete the specified space.
-     * 
+     *
      * @param space the name of the space to delete
      * @since 4.5
      */
@@ -493,7 +493,7 @@ public class TestUtils
 
     /**
      * Get the URL to view a page.
-     * 
+     *
      * @param space the space in which the page resides.
      * @param page the name of the page.
      */
@@ -504,7 +504,7 @@ public class TestUtils
 
     /**
      * Get the URL of an action on a page.
-     * 
+     *
      * @param space the space in which the page resides.
      * @param page the name of the page.
      * @param action the action to do on the page.
@@ -516,7 +516,7 @@ public class TestUtils
 
     /**
      * Get the URL of an action on a page with a specified query string.
-     * 
+     *
      * @param space the space in which the page resides.
      * @param page the name of the page.
      * @param action the action to do on the page.
@@ -524,7 +524,7 @@ public class TestUtils
      */
     public String getURL(String space, String page, String action, String queryString)
     {
-        return getURL(new String[] {space, page}, action, queryString);
+        return getURL(new String[] { space, page }, action, queryString);
     }
 
     private String getURL(String[] path, String action, String queryString)
@@ -532,8 +532,8 @@ public class TestUtils
         StringBuilder builder = new StringBuilder(TestUtils.BASE_BIN_URL);
 
         builder.append(action);
-        for (int i = 0; i < path.length; i++) {
-            builder.append('/').append(escapeURL(path[i]));
+        for (String element : path) {
+            builder.append('/').append(escapeURL(element));
         }
 
         boolean needToAddSecretToken = !Arrays.asList("view", "register", "download").contains(action);
@@ -554,13 +554,13 @@ public class TestUtils
     /**
      * Get the URL of an action on a page with specified parameters. If you need to pass multiple parameters with the
      * same key, this function will not work.
-     * 
+     *
      * @param space the space in which the page resides.
      * @param page the name of the page.
      * @param action the action to do on the page.
      * @param queryParameters the parameters to pass in the URL, these will be automatically URL encoded.
      */
-    public String getURL(String space, String page, String action, Map<String, ? > queryParameters)
+    public String getURL(String space, String page, String action, Map<String, ?> queryParameters)
     {
         return getURL(space, page, action, toQueryString(queryParameters));
     }
@@ -575,7 +575,7 @@ public class TestUtils
      */
     public String getAttachmentURL(String space, String page, String attachment, String action, String queryString)
     {
-        return getURL(new String[] {space, page, attachment}, action, queryString);
+        return getURL(new String[] { space, page, attachment }, action, queryString);
     }
 
     /**
@@ -604,7 +604,7 @@ public class TestUtils
     /**
      * (Re)-cache the secret token used for CSRF protection. A user with edit rights on Main.WebHome must be logged in.
      * This method must be called before {@link #getSecretToken()} is called and after each re-login.
-     * 
+     *
      * @see #getSecretToken()
      */
     public void recacheSecretToken()
@@ -630,7 +630,7 @@ public class TestUtils
 
     /**
      * Get the secret token used for CSRF protection. Remember to call {@link #recacheSecretToken()} first.
-     * 
+     *
      * @return anti-CSRF secret token, or empty string if the token was not cached
      * @see #recacheSecretToken()
      */
@@ -648,7 +648,7 @@ public class TestUtils
      * Encodes a given string so that it may be used as a URL component. Compatable with javascript decodeURIComponent,
      * though more strict than encodeURIComponent: all characters except [a-zA-Z0-9], '.', '-', '*', '_' are converted
      * to hexadecimal, and spaces are substituted by '+'.
-     * 
+     *
      * @param s
      */
     public String escapeURL(String s)
@@ -786,7 +786,7 @@ public class TestUtils
         gotoPage(space, page, "objectadd", toQueryParameters(className, null, properties));
     }
 
-    public void addObject(String space, String page, String className, Map<String, ? > properties)
+    public void addObject(String space, String page, String className, Map<String, ?> properties)
     {
         gotoPage(space, page, "objectadd", toQueryParameters(className, null, properties));
     }
@@ -804,7 +804,7 @@ public class TestUtils
         gotoPage(space, page, "objectremove", queryString.toString());
     }
 
-    public void updateObject(String space, String page, String className, int objectNumber, Map<String, ? > properties)
+    public void updateObject(String space, String page, String className, int objectNumber, Map<String, ?> properties)
     {
         gotoPage(space, page, "save", toQueryParameters(className, objectNumber, properties));
     }
@@ -832,11 +832,11 @@ public class TestUtils
     /**
      * @since 3.5M1
      */
-    public String toQueryString(Map<String, ? > queryParameters)
+    public String toQueryString(Map<String, ?> queryParameters)
     {
         StringBuilder builder = new StringBuilder();
 
-        for (Map.Entry<String, ? > entry : queryParameters.entrySet()) {
+        for (Map.Entry<String, ?> entry : queryParameters.entrySet()) {
             addQueryStringEntry(builder, entry.getKey(), entry.getValue());
             builder.append('&');
         }
@@ -851,7 +851,7 @@ public class TestUtils
     {
         if (value != null) {
             if (value instanceof Iterable) {
-                for (Object element : (Iterable< ? >) value) {
+                for (Object element : (Iterable<?>) value) {
                     addQueryStringEntry(builder, key, element.toString());
                     builder.append('&');
                 }
@@ -878,12 +878,12 @@ public class TestUtils
     /**
      * @since 3.5M1
      */
-    public Map<String, ? > toQueryParameters(Object... properties)
+    public Map<String, ?> toQueryParameters(Object... properties)
     {
         return toQueryParameters(null, null, properties);
     }
 
-    public Map<String, ? > toQueryParameters(String className, Integer objectNumber, Object... properties)
+    public Map<String, ?> toQueryParameters(String className, Integer objectNumber, Object... properties)
     {
         Map<String, Object> queryParameters = new HashMap<String, Object>();
 
@@ -898,7 +898,7 @@ public class TestUtils
         return queryParameters;
     }
 
-    public Map<String, ? > toQueryParameters(String className, Integer objectNumber, Map<String, ? > properties)
+    public Map<String, ?> toQueryParameters(String className, Integer objectNumber, Map<String, ?> properties)
     {
         Map<String, Object> queryParameters = new HashMap<String, Object>();
 
@@ -906,7 +906,7 @@ public class TestUtils
             queryParameters.put("classname", className);
         }
 
-        for (Map.Entry<String, ? > entry : properties.entrySet()) {
+        for (Map.Entry<String, ?> entry : properties.entrySet()) {
             queryParameters.put(toQueryParameterKey(className, objectNumber, entry.getKey()), entry.getValue());
         }
 
@@ -1129,13 +1129,9 @@ public class TestUtils
     public <T> T getRESTResource(String resourceUri, Map<String, Object[]> queryParams, Object... elements)
         throws Exception
     {
-        InputStream is = getRESTInputStream(resourceUri, queryParams, elements);
-
         T resource;
-        try {
+        try (InputStream is = getRESTInputStream(resourceUri, queryParams, elements)) {
             resource = (T) unmarshaller.unmarshal(is);
-        } finally {
-            is.close();
         }
 
         return resource;

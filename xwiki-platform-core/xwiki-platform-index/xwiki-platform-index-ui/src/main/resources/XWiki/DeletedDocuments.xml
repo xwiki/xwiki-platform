@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,30 +19,127 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>DeletedDocuments</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.AllDocs</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1404731556000</creationDate>
+  <parent>Main.AllDocs</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1253204449000</creationDate>
-  <date>1301566279000</date>
-  <contentUpdateDate>1301566279000</contentUpdateDate>
+  <date>1408034089000</date>
+  <contentUpdateDate>1408034089000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.index.documentsTrash')</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity}}##
+#if(!$xwiki.hasProgrammingRights())
+  {{warning}}This document requires programming rights and needs to be saved by an administrator of this Wiki{{/warning}}
+#else
+#set($dateFormat = 'yyyy MMMM d, HH:mm')
+$xwiki.ssx.use('XWiki.DeletedDocuments')##
+$xwiki.jsx.use('XWiki.DeletedDocuments')##
+##
+#set($columns = ["ddoc.fullName", "ddoc.title", "ddoc.date", "ddoc.deleter", 'actions'])
+#set($columnProperties = {
+    'ddoc.fullName'  : { 'type' : 'text', 'size' : 10 },
+    'ddoc.title'     : { 'type' : 'text', 'filterable' : false, 'sortable' : false },
+    'ddoc.date'      : { 'type' : 'date', 'filterable' : false },
+    'ddoc.deleter'   : { 'type' : 'text', 'size' : 10 },
+    'actions'        : { 'type' : 'text', 'filterable' : false, 'sortable' : false }
+  })##
+#set($options = {
+    'url'               : "$xwiki.getURL('XWiki.DeletedDocumentsJSON', 'view', 'list=1&amp;xpage=plain&amp;outputSyntax=plain')",
+    'callback'          : 'XWiki.index.trash.documents.displayEntry',
+    'translationPrefix' : 'platform.index.trashDocuments.'
+  })##
+##
+##
+##
+{{html wiki="true" clean="false"}}
+&lt;div class="hidden"&gt;
+#livetable('documentsTrash' $columns $columnProperties $options)
+&lt;/div&gt;
+{{/html}}
+##
+##
+##
+
+{{html wiki="true" clean="false"}}
+&lt;noscript&gt;
+  #set($deletedDocuments = $services.query.hql('select count(ddoc.id) from XWikiDeletedDocument as ddoc').execute().get(0))
+  #if($deletedDocuments == 0)
+
+    {{info}}$services.localization.render('platform.index.trashDocumentsEmpty'){{/info}}
+
+  #else
+  #macro(displayDeletedDoc $id)
+    #set($ddoc = $xwiki.getDeletedDocument('', '', "$id"))
+    #set($originalDocument = $ddoc.getDocument())
+    &lt;tr&gt;
+      &lt;td&gt;&lt;a href="$originalDocument.getURL('view', "viewer=recyclebin&amp;amp;id=${id}")"&gt;$escapetool.xml($ddoc.fullName)&lt;/a&gt;&lt;/td&gt;
+      &lt;td&gt;$escapetool.xml($originalDocument.plainTitle)&lt;/td&gt;
+      &lt;td&gt;$xwiki.formatDate($ddoc.getDate(), $dateFormat)&lt;/td&gt;
+      &lt;td&gt;$xwiki.getUserName($ddoc.getDeleter())&lt;/td&gt;
+      &lt;td class="itemActions"&gt;
+        #if($xwiki.getDocument($ddoc.fullName).isNew())
+          #if($ddoc.canUndelete())
+            &lt;a href="${originalDocument.getURL('undelete', "id=${id}")}" class="tool restore" title="$services.localization.render('platform.index.trashDocumentsActionsRestoreTooltip')"&gt;$services.localization.render('platform.index.trashDocumentsActionsRestoreText')&lt;/a&gt;
+          #end
+        #else
+          &lt;a href="${originalDocument.getURL()}" class="tool cannot-restore" title="$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreTooltip')"&gt;$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreText')&lt;/a&gt;
+        #end
+        #if($ddoc.canDelete())
+          &lt;a href="${originalDocument.getURL('delete', "id=${id}&amp;amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$services.localization.render('platform.index.trashDocumentsActionsDeleteTooltip')"&gt;$services.localization.render('platform.index.trashDocumentsActionsDeleteText')&lt;/a&gt;
+        #end
+      &lt;/td&gt;
+    &lt;/tr&gt;
+  #end
+##
+  #if("$!{request.view}" == '')
+    #set($queryParams = '')
+  #else
+    #set($queryParams = "view=$!{escapetool.url($request.view)}")
+  #end
+  #set($paginationParameters = {
+    'totalItems' : $services.query.hql('select count(ddoc.id) from XWikiDeletedDocument as ddoc').execute().get(0),
+    'defaultItemsPerPage' : 15,
+    'url' : $doc.getURL('view', $queryParams)
+  })
+  #pagination($paginationParameters)
+  &lt;table id="searchResults" class="xwiki-livetable xwiki-livetable-display"&gt;
+    &lt;thead class="xwiki-livetable-display-header"&gt;&lt;tr&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text selected asc"&gt;$services.localization.render('platform.index.trashDocuments.ddoc.fullName')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashDocuments.ddoc.title')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashDocuments.ddoc.date')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashDocuments.ddoc.deleter')&lt;/th&gt;
+      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashDocuments.actions')&lt;/th&gt;
+    &lt;/tr&gt;&lt;/thead&gt;
+    &lt;tbody class="xwiki-livetable-display-body"&gt;
+    #set ($statement = 'select ddoc.id from XWikiDeletedDocument as ddoc order by ddoc.fullName asc')
+    #foreach ($item in $services.query.hql($statement).setLimit($paginationParameters.itemsPerPage).setOffset($paginationParameters.firstItem).execute())
+      #displayDeletedDoc($item)
+    #end
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+  #set($discard = $paginationParameters.put('position', 'bottom'))
+  #pagination($paginationParameters)
+  #end ## deletedDocuments.size
+&lt;/noscript&gt;
+{{/html}}##
+#end## hasProgramR
+{{/velocity}}</content>
   <object>
+    <name>XWiki.DeletedDocuments</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>222ca0ed-b042-41d5-9d7e-942c4cc8a94b</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -111,14 +207,10 @@
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.DeletedDocuments</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>222ca0ed-b042-41d5-9d7e-942c4cc8a94b</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -251,6 +343,10 @@ document.observe('xwiki:dom:loaded', function() {
     </property>
   </object>
   <object>
+    <name>XWiki.DeletedDocuments</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>8de78194-f5ba-4cd8-8f0e-69b9d554e31c</guid>
     <class>
       <name>XWiki.RequiredRightClass</name>
       <customClass/>
@@ -281,15 +377,15 @@ document.observe('xwiki:dom:loaded', function() {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </level>
     </class>
-    <name>XWiki.DeletedDocuments</name>
-    <number>0</number>
-    <className>XWiki.RequiredRightClass</className>
-    <guid>8de78194-f5ba-4cd8-8f0e-69b9d554e31c</guid>
     <property>
       <level>programming</level>
     </property>
   </object>
   <object>
+    <name>XWiki.DeletedDocuments</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>aa8c7e27-a767-4e44-ac29-7809763dff56</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -357,14 +453,10 @@ document.observe('xwiki:dom:loaded', function() {
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.DeletedDocuments</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>aa8c7e27-a767-4e44-ac29-7809763dff56</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -399,6 +491,10 @@ document.observe('xwiki:dom:loaded', function() {
     </property>
   </object>
   <object>
+    <name>XWiki.DeletedDocuments</name>
+    <number>1</number>
+    <className>XWiki.XWikiRights</className>
+    <guid>f31fc0c5-7569-4716-8529-b30d3d6a9d9b</guid>
     <class>
       <name>XWiki.XWikiRights</name>
       <customClass/>
@@ -464,10 +560,6 @@ document.observe('xwiki:dom:loaded', function() {
         <classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
       </users>
     </class>
-    <name>XWiki.DeletedDocuments</name>
-    <number>1</number>
-    <className>XWiki.XWikiRights</className>
-    <guid>f31fc0c5-7569-4716-8529-b30d3d6a9d9b</guid>
     <property>
       <allow>1</allow>
     </property>
@@ -477,102 +569,8 @@ document.observe('xwiki:dom:loaded', function() {
     <property>
       <levels>view,edit</levels>
     </property>
+    <property>
+      <users/>
+    </property>
   </object>
-  <content>{{velocity}}##
-#if(!$xwiki.hasProgrammingRights())
-  {{warning}}This document requires programming rights and needs to be saved by an administrator of this Wiki{{/warning}}
-#else
-#set($dateFormat = 'yyyy MMMM d, HH:mm')
-$xwiki.ssx.use('XWiki.DeletedDocuments')##
-$xwiki.jsx.use('XWiki.DeletedDocuments')##
-##
-#set($columns = ["ddoc.fullName", "ddoc.title", "ddoc.date", "ddoc.deleter", 'actions'])
-#set($columnProperties = {
-    'ddoc.fullName'  : { 'type' : 'text', 'size' : 10 },
-    'ddoc.title'     : { 'type' : 'text', 'filterable' : false, 'sortable' : false },
-    'ddoc.date'      : { 'type' : 'date', 'filterable' : false },
-    'ddoc.deleter'   : { 'type' : 'text', 'size' : 10 },
-    'actions'        : { 'type' : 'text', 'filterable' : false, 'sortable' : false }
-  })##
-#set($options = {
-    'url'               : "$xwiki.getURL('XWiki.DeletedDocumentsJSON', 'view', 'list=1&amp;xpage=plain&amp;outputSyntax=plain')",
-    'callback'          : 'XWiki.index.trash.documents.displayEntry',
-    'translationPrefix' : 'platform.index.trashDocuments.'
-  })##
-##
-##
-##
-{{html wiki="true" clean="false"}}
-&lt;div class="hidden"&gt;
-#livetable('documentsTrash' $columns $columnProperties $options)
-&lt;/div&gt;
-{{/html}}
-##
-##
-##
-
-{{html wiki="true" clean="false"}}
-&lt;noscript&gt;
-  #set($deletedDocuments = $services.query.hql('select count(ddoc.id) from XWikiDeletedDocument as ddoc').execute().get(0))
-  #if($deletedDocuments == 0)
-
-    {{info}}$services.localization.render('platform.index.trashDocumentsEmpty'){{/info}}
-
-  #else
-  #macro(displayDeletedDoc $id)
-    #set($ddoc = $xwiki.getDeletedDocument('', '', "$id"))
-    #set($originalDocument = $ddoc.getDocument())
-    &lt;tr&gt;
-      &lt;td&gt;&lt;a href="$originalDocument.getURL('view', "viewer=recyclebin&amp;amp;id=${id}")"&gt;$escapetool.xml($ddoc.fullName)&lt;/a&gt;&lt;/td&gt;
-      &lt;td&gt;$escapetool.xml($originalDocument.plainTitle)&lt;/td&gt;
-      &lt;td&gt;$xwiki.formatDate($ddoc.getDate(), $dateFormat)&lt;/td&gt;
-      &lt;td&gt;$xwiki.getUserName($ddoc.getDeleter())&lt;/td&gt;
-      &lt;td class="itemActions"&gt;
-        #if($xwiki.getDocument($ddoc.fullName).isNew())
-          #if($ddoc.canUndelete())
-            &lt;a href="${originalDocument.getURL('undelete', "id=${id}")}" class="tool restore" title="$services.localization.render('platform.index.trashDocumentsActionsRestoreTooltip')"&gt;$services.localization.render('platform.index.trashDocumentsActionsRestoreText')&lt;/a&gt;
-          #end
-        #else
-          &lt;a href="${originalDocument.getURL()}" class="tool cannot-restore" title="$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreTooltip')"&gt;$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreText')&lt;/a&gt;
-        #end
-        #if($ddoc.canDelete())
-          &lt;a href="${originalDocument.getURL('delete', "id=${id}&amp;amp;xredirect=$escapetool.url($!request.getRequestURI())?$escapetool.url($!request.getQueryString())")}" class="tool delete" title="$services.localization.render('platform.index.trashDocumentsActionsDeleteTooltip')"&gt;$services.localization.render('platform.index.trashDocumentsActionsDeleteText')&lt;/a&gt;
-        #end
-      &lt;/td&gt;
-    &lt;/tr&gt;
-  #end
-##
-  #if("$!{request.view}" == '')
-    #set($queryParams = '')
-  #else
-    #set($queryParams = "view=$!{escapetool.url($request.view)}")
-  #end
-  #set($paginationParameters = {
-    'totalItems' : $services.query.hql('select count(ddoc.id) from XWikiDeletedDocument as ddoc').execute().get(0),
-    'defaultItemsPerPage' : 15,
-    'url' : $doc.getURL('view', $queryParams)
-  })
-  #pagination($paginationParameters)
-  &lt;table id="searchResults" class="xwiki-livetable xwiki-livetable-display"&gt;
-    &lt;thead class="xwiki-livetable-display-header"&gt;&lt;tr&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text selected asc"&gt;$services.localization.render('platform.index.trashDocuments.ddoc.fullName')&lt;/th&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashDocuments.ddoc.title')&lt;/th&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashDocuments.ddoc.date')&lt;/th&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashDocuments.ddoc.deleter')&lt;/th&gt;
-      &lt;th scope="col" class="xwiki-livetable-display-header-text"&gt;$services.localization.render('platform.index.trashDocuments.actions')&lt;/th&gt;
-    &lt;/tr&gt;&lt;/thead&gt;
-    &lt;tbody class="xwiki-livetable-display-body"&gt;
-    #set ($statement = 'select ddoc.id from XWikiDeletedDocument as ddoc order by ddoc.fullName asc')
-    #foreach ($item in $services.query.hql($statement).setLimit($paginationParameters.itemsPerPage).setOffset($paginationParameters.firstItem).execute())
-      #displayDeletedDoc($item)
-    #end
-    &lt;/tbody&gt;
-  &lt;/table&gt;
-  #set($discard = $paginationParameters.put('position', 'bottom'))
-  #pagination($paginationParameters)
-  #end ## deletedDocuments.size
-&lt;/noscript&gt;
-{{/html}}##
-#end## hasProgramR
-{{/velocity}}</content>
 </xwikidoc>

@@ -2823,4 +2823,14 @@ public class Document extends Api
         context.setProperty(XWikiConstant.DROPPED_PERMISSIONS,
                             System.identityHashCode(context));
     }
+
+    /**
+     * @return true if this document is a translation of the main document (i.e. returned by
+     *         {@link #getTranslatedDocument(String)}); false if this is actually the main document (i.e. returned by
+     *         {@link com.xpn.xwiki.api.XWiki#getDocument(DocumentReference)}.
+     */
+    public boolean isTranslation()
+    {
+        return 1 == this.getDoc().getTranslation();
+    }
 }

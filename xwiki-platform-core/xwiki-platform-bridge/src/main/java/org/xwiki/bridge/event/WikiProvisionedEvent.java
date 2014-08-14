@@ -23,7 +23,7 @@ import org.xwiki.observation.event.EndFoldEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
- * An event triggered just before a provisioning job is started for a wiki.
+ * An event triggered just after a provisioning job is finished.
  * <p>
  * The event also send the following parameters:
  * </p>

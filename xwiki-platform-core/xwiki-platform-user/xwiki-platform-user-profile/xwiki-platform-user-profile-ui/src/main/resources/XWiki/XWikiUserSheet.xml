@@ -641,7 +641,8 @@ span#avatarUpload {
 ## --------------------------------------
 ## Dashboard
 /* prevent the clearfloats between buttons &amp; dashboard gadgets from clearing the tabs as well, only the buttons float */
-.dashboard .clearfloats {
+.dashboard .clearfloats, 
+.dashboard .clearfloats:after, .dashboard .clearfloats:before {
   clear: right;
 }</code>
     </property>

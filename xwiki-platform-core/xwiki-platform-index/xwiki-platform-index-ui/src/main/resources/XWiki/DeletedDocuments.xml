@@ -238,8 +238,15 @@ if (typeof XWiki.index.trash.documents == "undefined") {
  */
 XWiki.index.trash.documents.displayEntry = function (row, i, table) {
   var tr = new Element('tr'); // The resulting table row
+  var pageTd = new Element('td');
   var page = new Element('a', {'href' : row.url}).update(row.fullname);
-  tr.appendChild(new Element('td').update(page));
+  pageTd.appendChild(page);
+  if (row.language &amp;&amp; row.language.trim().length != 0) {
+    var language = new Element('span').update('(' + row.language.trim() + ')');
+    pageTd.appendChild(document.createTextNode(' '));
+    pageTd.appendChild(language);
+  }
+  tr.appendChild(pageTd);
   tr.appendChild(new Element('td').update(row.title));
   tr.appendChild(new Element('td').update(row.date));
   var deleter = new Element('a', {'href' : row.deleterurl}).update(row.deletername);
@@ -247,14 +254,27 @@ XWiki.index.trash.documents.displayEntry = function (row, i, table) {
   var actions = new Element('td', {'class' : 'itemActions'});
   if(!row.alreadyExists) {
     if(row.canRestore) {
-      var restore = new Element('a', {
-          'href' : row.restoreUrl,
-          'class' : 'tool restore',
-          'title' : "$services.localization.render('platform.index.trashDocumentsActionsRestoreTooltip')"
-        }).update("$services.localization.render('platform.index.trashDocumentsActionsRestoreText')");
-      actions.appendChild(restore);
+      if (row.causesOrphanedTranslation) {
+        // Can not restore: It would cause the translation to be inaccessible from the UI until the main document is restored/created.
+        var restore = new Element('a', {
+            'href' : row.originalUrl,
+            'class' : 'tool cannot-restore',
+            'title' : "$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreCausesOrphanedTranslationTooltip')"
+          }).update("$services.localization.render('platform.index.trashDocumentsActionsCannotRestoreText')");
+        actions.appendChild(restore);
+      } else {
+        // Restore the document.
+        var restore = new Element('a', {
+            'href' : row.restoreUrl,
+            'class' : 'tool restore',
+            'title' : "$services.localization.render('platform.index.trashDocumentsActionsRestoreTooltip')"
+          }).update("$services.localization.render('platform.index.trashDocumentsActionsRestoreText')");
+        actions.appendChild(restore);
+      }
     }
   } else {
+    // Can not restore: A document was already restored at that location.
+    // TODO: Add an overwrite dialog here.
     var restore = new Element('a', {
         'href' : row.originalUrl,
         'class' : "tool cannot-restore",

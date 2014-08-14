@@ -482,11 +482,6 @@ return XWiki;
   margin-left: 14em;
 }
 
-#user-page-content h1{
-  margin: 0 0 20px 0;
-}
-
-
 .column h1 {
   font-weight:bold;
   font-size:115%;

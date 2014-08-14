@@ -39,6 +39,7 @@
   margin: 0;
 }
 .progress-info {
+  clear: right;
   opacity: 0.5;
 }
 .upload-inprogress .progress-info {

@@ -127,7 +127,7 @@
     {{html clean='false' wiki='true'}}
     &lt;form class='xform half' action="$doc.getURL($xcontext.action, $request.queryString)" method='post'&gt;
       &lt;dl&gt;
-        &lt;dt class='label'&gt;
+        &lt;dt&gt;
           &lt;label&gt;{{translation key="xe.userdirectory.customizeAvailableColumnsLabel"/}}&lt;/label&gt;
           &lt;span class='xHint'&gt;{{translation key="xe.userdirectory.customizeAvailableColumnsHint"/}}&lt;/span&gt;
         &lt;/dt&gt;

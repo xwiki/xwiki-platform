@@ -25,17 +25,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-icon</artifactId>
     <groupId>org.xwiki.platform</groupId>
     <version>6.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-font-awesome</artifactId>
+  <artifactId>xwiki-platform-icon-font-awesome</artifactId>
   <packaging>xar</packaging>
-  <name>XWiki Platform - Font Awesome</name>
+  <name>XWiki Platform - Icon - Font Awesome</name>
   <description>Having Font Awesome as Icon Theme</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Makes Font Awesome available as an Icon Theme</xwiki.extension.name>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>
+    <!-- only used in 6.2M1 -->
+    org.xwiki.platform:xwiki-platform-font-awesome
+    </xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

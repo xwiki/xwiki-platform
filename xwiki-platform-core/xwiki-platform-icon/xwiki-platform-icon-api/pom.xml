@@ -28,7 +28,7 @@
     <version>6.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-icon-api</artifactId>
-  <name>XWiki Platform Icon - API</name>
+  <name>XWiki Platform - Icon - API</name>
   <description>XWiki Platform - Icon - API</description>
   <dependencies>
     <dependency>

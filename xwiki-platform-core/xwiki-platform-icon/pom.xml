@@ -28,7 +28,7 @@
     <version>6.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-icon</artifactId>
-  <name>XWiki Platform Icon Module</name>
+  <name>XWiki Platform - Icon - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Icon - Parent POM</description>
   <modules>

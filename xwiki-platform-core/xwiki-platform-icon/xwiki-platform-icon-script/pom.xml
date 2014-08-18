@@ -28,7 +28,7 @@
     <version>6.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-icon-script</artifactId>
-  <name>XWiki Platform Icon - Script services</name>
+  <name>XWiki Platform - Icon - Script services</name>
   <description>Script services for the XWiki Platform Icon Module.</description>
   <dependencies>
     <dependency>

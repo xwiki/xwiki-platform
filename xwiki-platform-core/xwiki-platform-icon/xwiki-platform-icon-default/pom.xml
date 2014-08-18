@@ -28,7 +28,7 @@
     <version>6.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-icon-default</artifactId>
-  <name>XWiki Platform Icon - Default implementation</name>
+  <name>XWiki Platform - Icon - Default implementation</name>
   <description>XWiki Platform - Icon - Default implementation</description>
   <dependencies>
     <dependency>

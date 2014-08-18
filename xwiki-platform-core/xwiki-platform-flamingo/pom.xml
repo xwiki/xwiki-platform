@@ -28,7 +28,7 @@
     <version>6.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo</artifactId>
-  <name>XWiki Platform - Flamingo</name>
+  <name>XWiki Platform - Flamingo - Parent POM</name>
   <packaging>pom</packaging>
   <description>Provide a fresh, responsive and modern skin for XWiki, based on Bootstrap.</description>
   <modules>

@@ -50,6 +50,8 @@ public class DefaultIconSetLoader implements IconSetLoader
 
     private static final String SSX_PROPERTY_NAME = "xwiki.iconset.ssx";
 
+    private static final String JSX_PROPERTY_NAME = "xwiki.iconset.jsx";
+
     private static final String RENDER_WIKI_PROPERTY_NAME = "xwiki.iconset.render.wiki";
 
     private static final String RENDER_HTML_PROPERTY_NAME = "xwiki.iconset.render.html";
@@ -94,6 +96,8 @@ public class DefaultIconSetLoader implements IconSetLoader
                     iconSet.setCss(value);
                 } else if (key.equals(SSX_PROPERTY_NAME)) {
                     iconSet.setSsx(value);
+                } else if (key.equals(JSX_PROPERTY_NAME)) {
+                    iconSet.setJsx(value);
                 } else if (key.equals(RENDER_WIKI_PROPERTY_NAME)) {
                     iconSet.setRenderWiki(value);
                 } else if (key.equals(RENDER_HTML_PROPERTY_NAME)) {
@@ -102,9 +106,8 @@ public class DefaultIconSetLoader implements IconSetLoader
                     iconSet.setType(IconType.valueOf(value.toUpperCase()));
                 } else {
                     Icon icon = new Icon();
-                    icon.setName(key);
                     icon.setValue(properties.getProperty(key));
-                    iconSet.addIcon(icon);
+                    iconSet.addIcon(key, icon);
                 }
             }
 

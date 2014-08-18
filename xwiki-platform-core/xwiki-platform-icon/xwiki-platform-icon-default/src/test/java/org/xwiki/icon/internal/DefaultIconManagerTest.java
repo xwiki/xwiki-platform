@@ -58,7 +58,7 @@ public class DefaultIconManagerTest
     public void render() throws Exception
     {
         IconSet iconSet = new IconSet("silk");
-        iconSet.addIcon(new Icon("test", "hello"));
+        iconSet.addIcon("test", new Icon("hello"));
         when(iconSetManager.getCurrentIconSet()).thenReturn(iconSet);
         when(iconRenderer.render("test", iconSet)).thenReturn("rendered icon");
 
@@ -86,7 +86,7 @@ public class DefaultIconManagerTest
     public void renderHTML() throws Exception
     {
         IconSet iconSet = new IconSet("silk");
-        iconSet.addIcon(new Icon("test", "hello"));
+        iconSet.addIcon("test", new Icon("hello"));
         when(iconSetManager.getCurrentIconSet()).thenReturn(iconSet);
         when(iconRenderer.renderHTML("test", iconSet)).thenReturn("rendered icon");
 

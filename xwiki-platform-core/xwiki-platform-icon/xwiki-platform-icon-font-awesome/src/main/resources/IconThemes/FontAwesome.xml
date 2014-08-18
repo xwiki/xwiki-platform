@@ -42,6 +42,7 @@
   <content>## General settings
 xwiki.iconset.type = font
 xwiki.iconset.ssx = IconThemes.FontAwesome
+xwiki.iconset.jsx = IconThemes.FontAwesome
 xwiki.iconset.render.wiki = {{html clean="false"}}&lt;span class="fa fa-$icon"&gt;&lt;/span&gt;{{/html}}
 xwiki.iconset.render.html = &lt;span class="fa fa-$icon"&gt;&lt;/span&gt;
 
@@ -191,6 +192,107 @@ transmit = rss</content>
   <object>
     <name>IconThemes.FontAwesome</name>
     <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>f8945ea9-36bd-46a9-ab6e-414ffa902988</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>// Reload stylesheet on document ready if IE8
+require(['jquery'], function($) {
+  if (navigator.userAgent.indexOf('MSIE 8.0') &gt; -1) {
+    $(function() {
+      var link = $("link[href*='IconThemes/FontAwesome']");
+      link[0].href = link[0].href;
+    });
+  }
+});
+</code>
+    </property>
+    <property>
+      <name>IE8 fix</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>IconThemes.FontAwesome</name>
+    <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>8b5cb416-e129-4063-9c8f-67c6a31d2e1d</guid>
     <class>
@@ -277,7 +379,7 @@ transmit = rss</content>
 @font-face {
   font-family: 'FontAwesome';
   src: url('$services.webjars.url('font-awesome/4.1.0/fonts')/fontawesome-webfont.eot');
-  src: url('$services.webjars.url('font-awesome/4.1.0/fonts')/fontawesome-webfont.eot') format('embedded-opentype'), url('$services.webjars.url('font-awesome/4.1.0/fonts')/fontawesome-webfont.woff') format('woff'), url('$services.webjars.url('font-awesome/4.1.0/fonts')/fontawesome-webfont.ttf') format('truetype'), url('$services.webjars.url('font-awesome/4.1.0/fonts')/fontawesome-webfont.svg#fontawesomeregular') format('svg');
+  src: url('$services.webjars.url('font-awesome/4.1.0/fonts')/fontawesome-webfont.eot#iefix') format('embedded-opentype'), url('$services.webjars.url('font-awesome/4.1.0/fonts')/fontawesome-webfont.woff') format('woff'), url('$services.webjars.url('font-awesome/4.1.0/fonts')/fontawesome-webfont.ttf') format('truetype'), url('$services.webjars.url('font-awesome/4.1.0/fonts')/fontawesome-webfont.svg#fontawesomeregular') format('svg');
   font-weight: normal;
   font-style: normal;
 }

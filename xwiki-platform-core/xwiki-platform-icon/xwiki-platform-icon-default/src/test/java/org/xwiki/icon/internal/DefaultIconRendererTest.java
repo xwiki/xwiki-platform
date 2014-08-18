@@ -62,6 +62,8 @@ public class DefaultIconRendererTest
 
     private SkinExtension linkExtension;
 
+    private SkinExtension jsExtension;
+
     private XWikiContext xcontext;
 
     private XWiki xwiki;
@@ -76,6 +78,7 @@ public class DefaultIconRendererTest
         when(xcontext.getWiki()).thenReturn(xwiki);
         skinExtension = mocker.getInstance(SkinExtension.class, "ssx");
         linkExtension = mocker.getInstance(SkinExtension.class, "linkx");
+        jsExtension = mocker.getInstance(SkinExtension.class, "jsx");
     }
 
     @Test
@@ -83,7 +86,7 @@ public class DefaultIconRendererTest
     {
         IconSet iconSet = new IconSet("default");
         iconSet.setRenderWiki("image:$icon.png");
-        iconSet.addIcon(new Icon("test", "blabla"));
+        iconSet.addIcon("test", new Icon("blabla"));
         when(xwiki.parseContent("#set($icon = \"blabla\")\nimage:$icon.png", xcontext)).thenReturn("image:blabla.png");
 
         // Test
@@ -93,6 +96,7 @@ public class DefaultIconRendererTest
         assertEquals("image:blabla.png", result);
         verify(linkExtension, never()).use(anyString());
         verify(skinExtension, never()).use(anyString());
+        verify(jsExtension, never()).use(anyString());
     }
 
     @Test
@@ -100,7 +104,7 @@ public class DefaultIconRendererTest
     {
         IconSet iconSet = new IconSet("default");
         iconSet.setCss("css");
-        iconSet.addIcon(new Icon("test", "blabla"));
+        iconSet.addIcon("test", new Icon("blabla"));
         when(xwiki.parseContent("css", xcontext)).thenReturn("velocityParsedCSS");
 
         // Test
@@ -111,6 +115,7 @@ public class DefaultIconRendererTest
         parameters.put("rel", "stylesheet");
         verify(linkExtension).use(eq("velocityParsedCSS"), eq(parameters));
         verify(skinExtension, never()).use(anyString());
+        verify(jsExtension, never()).use(anyString());
     }
 
     @Test
@@ -118,7 +123,7 @@ public class DefaultIconRendererTest
     {
         IconSet iconSet = new IconSet("default");
         iconSet.setSsx("ssx");
-        iconSet.addIcon(new Icon("test", "blabla"));
+        iconSet.addIcon("test", new Icon("blabla"));
 
         // Test
         mocker.getComponentUnderTest().render("test", iconSet);
@@ -126,6 +131,23 @@ public class DefaultIconRendererTest
         // Verify
         verify(skinExtension).use("ssx");
         verify(linkExtension, never()).use(anyString());
+        verify(jsExtension, never()).use(anyString());
+    }
+
+    @Test
+    public void renderWithJSX() throws Exception
+    {
+        IconSet iconSet = new IconSet("default");
+        iconSet.setJsx("jsx");
+        iconSet.addIcon("test", new Icon("blabla"));
+
+        // Test
+        mocker.getComponentUnderTest().render("test", iconSet);
+
+        // Verify
+        verify(jsExtension).use("jsx");
+        verify(linkExtension, never()).use(anyString());
+        verify(skinExtension, never()).use(anyString());
     }
 
     @Test
@@ -133,7 +155,7 @@ public class DefaultIconRendererTest
     {
         IconSet iconSet = new IconSet("default");
         iconSet.setRenderHTML("<img src=\"$icon.png\" />");
-        iconSet.addIcon(new Icon("test", "blabla"));
+        iconSet.addIcon("test", new Icon("blabla"));
 
         when(xwiki.parseContent("#set($icon = \"blabla\")\n<img src=\"$icon.png\" />", xcontext))
                 .thenReturn("<img src=\"blabla.png\" />");
@@ -150,7 +172,7 @@ public class DefaultIconRendererTest
     {
         IconSet iconSet = new IconSet("default");
         iconSet.setCss("css");
-        iconSet.addIcon(new Icon("test", "blabla"));
+        iconSet.addIcon("test", new Icon("blabla"));
         when(xwiki.parseContent("css", xcontext)).thenReturn("velocityParsedCSS");
 
         // Test
@@ -161,6 +183,7 @@ public class DefaultIconRendererTest
         parameters.put("rel", "stylesheet");
         verify(linkExtension).use(eq("velocityParsedCSS"), eq(parameters));
         verify(skinExtension, never()).use(anyString());
+        verify(jsExtension, never()).use(anyString());
     }
 
     @Test
@@ -168,7 +191,7 @@ public class DefaultIconRendererTest
     {
         IconSet iconSet = new IconSet("default");
         iconSet.setSsx("ssx");
-        iconSet.addIcon(new Icon("test", "blabla"));
+        iconSet.addIcon("test", new Icon("blabla"));
 
         // Test
         mocker.getComponentUnderTest().renderHTML("test", iconSet);
@@ -176,6 +199,23 @@ public class DefaultIconRendererTest
         // Verify
         verify(skinExtension).use("ssx");
         verify(linkExtension, never()).use(anyString());
+        verify(jsExtension, never()).use(anyString());
+    }
+
+    @Test
+    public void renderHTMLWithJSX() throws Exception
+    {
+        IconSet iconSet = new IconSet("default");
+        iconSet.setJsx("jsx");
+        iconSet.addIcon("test", new Icon("blabla"));
+
+        // Test
+        mocker.getComponentUnderTest().renderHTML("test", iconSet);
+
+        // Verify
+        verify(jsExtension).use("jsx");
+        verify(linkExtension, never()).use(anyString());
+        verify(skinExtension, never()).use(anyString());
     }
 
 }

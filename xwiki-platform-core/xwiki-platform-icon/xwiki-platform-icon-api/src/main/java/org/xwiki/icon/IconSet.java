@@ -41,6 +41,8 @@ public class IconSet
 
     private String ssx;
 
+    private String jsx;
+
     private String renderWiki;
 
     private String renderHTML;
@@ -67,11 +69,12 @@ public class IconSet
 
     /**
      * Add an icon to the icon set.
+     * @param name name of the icon
      * @param icon the icon to add
      */
-    public void addIcon(Icon icon)
+    public void addIcon(String name, Icon icon)
     {
-        iconMap.put(icon.getName(), icon);
+        iconMap.put(name, icon);
     }
 
     /**
@@ -123,6 +126,23 @@ public class IconSet
     public void setSsx(String ssx)
     {
         this.ssx = ssx;
+    }
+
+    /**
+     * @return the name of a JSX document to enable to display this icon set properly, or null if it is not necessary
+     */
+    public String getJsx()
+    {
+        return jsx;
+    }
+
+    /**
+     * Set the page name of a JSX document to enable to display the icon set properly.
+     * @param jsx the JSX document name
+     */
+    public void setJsx(String jsx)
+    {
+        this.jsx = jsx;
     }
 
     /**

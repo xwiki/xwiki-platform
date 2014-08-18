@@ -73,6 +73,7 @@ public class DefaultIconSetLoaderTest
         assertNotNull(result);
         assertEquals("http://url_to_css", result.getCss());
         assertEquals("IconThemes.Default", result.getSsx());
+        assertEquals("IconThemes.JS", result.getJsx());
         assertEquals("{{html clean=\"false\"}}<span class=\"fa fa-$icon\"></span>{{/html}}", result.getRenderWiki());
         assertEquals("<span class=\"fa fa-$icon\"></span>", result.getRenderHTML());
         assertEquals("anchor", result.getIcon("transmit").getValue());

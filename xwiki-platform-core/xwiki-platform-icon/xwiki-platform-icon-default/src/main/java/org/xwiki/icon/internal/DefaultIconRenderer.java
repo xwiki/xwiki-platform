@@ -56,6 +56,11 @@ public class DefaultIconRenderer implements IconRenderer
     @Named("linkx")
     private SkinExtension linkExtension;
 
+    @Inject
+    @Named("jsx")
+    private SkinExtension jsExtension;
+
+
     @Override
     public String render(String iconName, IconSet iconSet) throws IconException
     {
@@ -76,6 +81,9 @@ public class DefaultIconRenderer implements IconRenderer
         if (!StringUtils.isBlank(iconSet.getSsx())) {
             activeSSX(iconSet);
         }
+        if (!StringUtils.isBlank(iconSet.getJsx())) {
+            activeJSX(iconSet);
+        }
         return renderIcon(iconSet, iconName, renderer);
     }
 
@@ -92,6 +100,11 @@ public class DefaultIconRenderer implements IconRenderer
     private void activeSSX(IconSet iconSet)
     {
         skinExtension.use(iconSet.getSsx());
+    }
+
+    private void activeJSX(IconSet iconSet)
+    {
+        jsExtension.use(iconSet.getJsx());
     }
 
     private String renderIcon(IconSet iconSet, String iconName, String renderer)

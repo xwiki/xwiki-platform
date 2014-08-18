@@ -30,8 +30,6 @@ import org.xwiki.stability.Unstable;
 @Unstable
 public class Icon
 {
-    private String name;
-    
     private String value;
 
     /**
@@ -43,31 +41,12 @@ public class Icon
 
     /**
      * Constructor.
-     *
-     * @param name name of the icon
+
      * @param value value of the icon
      */
-    public Icon(String name, String value)
+    public Icon(String value)
     {
-        this.name = name;
         this.value = value;
-    }
-
-    /**
-     * @return the name of the icon
-     */
-    public String getName()
-    {
-        return name;
-    }
-
-    /**
-     * Set the name of the icon.
-     * @param name the name to set
-     */
-    public void setName(String name)
-    {
-        this.name = name;
     }
 
     /**

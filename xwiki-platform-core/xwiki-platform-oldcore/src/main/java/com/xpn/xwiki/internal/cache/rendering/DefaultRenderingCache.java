@@ -192,12 +192,14 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     }
 
     @Override
-    public void flushCache(DocumentReference documentReference) {
+    public void flushCache(DocumentReference documentReference)
+    {
         this.cache.removeAll(documentReference);
     }
 
     @Override
-    public void flushWholeCache() {
+    public void flushWholeCache()
+    {
         this.cache.removeAll();
     }
 }

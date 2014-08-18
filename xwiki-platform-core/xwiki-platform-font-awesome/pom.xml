@@ -35,7 +35,7 @@
   <description>Having Font Awesome as Icon Theme</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Font Awesome Icon Theme</xwiki.extension.name>
+    <xwiki.extension.name>Makes Font Awesome available as an Icon Theme</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

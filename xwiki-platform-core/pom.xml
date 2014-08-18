@@ -518,7 +518,6 @@
     <module>xwiki-platform-feed</module>
     <module>xwiki-platform-filter</module>
     <module>xwiki-platform-flamingo</module>
-    <module>xwiki-platform-font-awesome</module>
     <module>xwiki-platform-formula</module>
     <module>xwiki-platform-git</module>
     <module>xwiki-platform-groovy</module>

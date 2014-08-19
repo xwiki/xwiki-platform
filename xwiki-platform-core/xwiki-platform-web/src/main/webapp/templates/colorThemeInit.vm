@@ -99,4 +99,14 @@
   #if ("$!{themeObj.getProperty('submenuContentBackgroundColor').value}" == '')
     #set ($discard = $theme.put('submenuContentBackgroundColor', "$!{themeObj.getProperty('menuBackgroundColor').value}"))
   #end
+#else
+  ## This is not a standard color theme
+  #set($flamingoThemeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
+  #if("$!flamingoThemeObj" != '')
+    ## It is a flamingo theme!
+    #set($theme2 = $services.lesscss.getColorThemeFromSkinFile("style.less.vm", "flamingo"))
+    #foreach($key in $theme2.keySet())
+      #set($discard = $theme.put($key, $theme2.get($key)))
+    #end
+  #end
 #end

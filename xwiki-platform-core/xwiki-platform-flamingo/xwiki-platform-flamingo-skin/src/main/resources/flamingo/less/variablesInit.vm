@@ -173,7 +173,6 @@
   @xwiki-border-color:                  $theme.borderColor;
   @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
   @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
-  @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
 #end
 

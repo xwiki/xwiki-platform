@@ -63,6 +63,13 @@ public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<Color
         return this.compileFromSkinFile(fileName, force);
     }
 
+    @Override
+    public ColorTheme getColorThemeFromSkinFile(String fileName, String skin, boolean force)
+        throws LESSCompilerException
+    {
+        return this.compileFromSkinFile(fileName, skin, force);
+    }
+
     /**
      * Parse a CSS and returns a Color Theme.
      * @param css code to parse
@@ -82,9 +89,9 @@ public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<Color
     }
 
     @Override
-    protected ColorTheme compile(String fileName, boolean force) throws LESSCompilerException
+    protected ColorTheme compile(String fileName, String skin, boolean force) throws LESSCompilerException
     {
-        return getColorThemeFromCSS(lessSkinFileCompiler.compileSkinFile(fileName, false));
+        return getColorThemeFromCSS(lessSkinFileCompiler.compileSkinFile(fileName, skin, false));
     }
 
 }

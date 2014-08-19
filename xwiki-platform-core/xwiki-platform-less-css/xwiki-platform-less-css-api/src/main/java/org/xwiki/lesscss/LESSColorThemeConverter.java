@@ -33,11 +33,21 @@ import org.xwiki.component.annotation.Role;
 public interface LESSColorThemeConverter
 {
     /**
-     * Get a color theme form a LESS skin file.
+     * Get a color theme from a LESS file, located in the current skin.
      * @param fileName name of the LESS file
      * @param force force the computation, even if the output is already in the cache (not recommended)
      * @return the computed Color Theme
      * @throws LESSCompilerException if problem occurs
      */
     ColorTheme getColorThemeFromSkinFile(String fileName, boolean force) throws LESSCompilerException;
+
+    /**
+     * Get a color theme from a LESS file, located in the specified skin.
+     * @param fileName name of the LESS file
+     * @param skin name of the skin where the LESS file is located
+     * @param force force the computation, even if the output is already in the cache (not recommended)
+     * @return the computed Color Theme
+     * @throws LESSCompilerException if problem occurs
+     */
+    ColorTheme getColorThemeFromSkinFile(String fileName, String skin, boolean force) throws LESSCompilerException;
 }

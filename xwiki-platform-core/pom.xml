@@ -474,6 +474,8 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <exclude>**/LESSColorThemeConverter</exclude>
+            <exclude>**/LESSSkinFileCompiler</exclude>
           </excludes>
         </configuration>
       </plugin>

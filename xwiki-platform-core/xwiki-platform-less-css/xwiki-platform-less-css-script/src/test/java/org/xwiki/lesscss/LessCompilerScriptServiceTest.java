@@ -98,6 +98,30 @@ public class LessCompilerScriptServiceTest
     }
 
     @Test
+    public void compileSkinFileWithOtherSkin() throws Exception
+    {
+        // Test
+        mocker.getComponentUnderTest().compileSkinFile("style4.less", "skin1");
+        // Verify
+        verify(lessCompiler).compileSkinFile("style4.less", "skin1", false);
+
+        // Test
+        mocker.getComponentUnderTest().compileSkinFile("style4.less", "skin2");
+        // Verify
+        verify(lessCompiler).compileSkinFile("style4.less", "skin2", false);
+
+        // Test
+        mocker.getComponentUnderTest().compileSkinFile("style.less", "skin3", false);
+        // Verify
+        verify(lessCompiler).compileSkinFile("style.less", "skin3", false);
+
+        // Test
+        mocker.getComponentUnderTest().compileSkinFile("style.less", "skin4", true);
+        // Verify
+        verify(lessCompiler).compileSkinFile("style.less", "skin4", true);
+    }
+
+    @Test
     public void compileSkinFileWhenException() throws Exception
     {
         // Mocks
@@ -106,6 +130,20 @@ public class LessCompilerScriptServiceTest
 
         // Test
         String result = mocker.getComponentUnderTest().compileSkinFile("style.less", false);
+
+        // Verify
+        assertEquals(exception.getMessage(), result);
+    }
+
+    @Test
+    public void compileSkinFileWithOtherSkinWhenException() throws Exception
+    {
+        // Mocks
+        Exception exception = new LESSCompilerException("Exception with LESS", null);
+        when(lessCompiler.compileSkinFile("style.less", "flamingo", false)).thenThrow(exception);
+
+        // Test
+        String result = mocker.getComponentUnderTest().compileSkinFile("style.less", "flamingo", false);
 
         // Verify
         assertEquals(exception.getMessage(), result);
@@ -121,6 +159,15 @@ public class LessCompilerScriptServiceTest
     }
 
     @Test
+    public void getColorThemeFromSkinFileWithOtherSkin() throws Exception
+    {
+        // Test
+        mocker.getComponentUnderTest().getColorThemeFromSkinFile("style.less", "flamingo");
+        // Verify
+        verify(lessColorThemeConverter).getColorThemeFromSkinFile("style.less", "flamingo", false);
+    }
+
+    @Test
     public void getColorThemeFromSkinFileWithException() throws Exception
     {
         // Mocks
@@ -129,6 +176,20 @@ public class LessCompilerScriptServiceTest
 
         // Test
         ColorTheme result = mocker.getComponentUnderTest().getColorThemeFromSkinFile("style.less");
+
+        // Verify
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    public void getColorThemeFromSkinFileWithOtherSkinAndException() throws Exception
+    {
+        // Mocks
+        Exception exception = new LESSCompilerException("Exception with LESS", null);
+        when(lessColorThemeConverter.getColorThemeFromSkinFile("style.less", "flamingo", false)).thenThrow(exception);
+
+        // Test
+        ColorTheme result = mocker.getComponentUnderTest().getColorThemeFromSkinFile("style.less", "flamingo");
 
         // Verify
         assertEquals(0, result.size());

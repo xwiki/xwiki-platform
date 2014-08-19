@@ -56,6 +56,8 @@ import com.xpn.xwiki.XWikiContext;
 public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> implements LESSSkinFileCompiler,
         Initializable
 {
+    private static final String SKIN_CONTEXT_KEY = "skin";
+
     @Inject
     private LESSCompiler lessCompiler;
 
@@ -75,15 +77,16 @@ public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> 
     }
 
     @Override
-    protected String compile(String fileName, boolean force) throws LESSCompilerException
+    protected String compile(String fileName, String skin, boolean force) throws LESSCompilerException
     {
         // Get the XWiki object
         XWikiContext xcontext = xcontextProvider.get();
         XWiki xwiki = xcontext.getWiki();
+        String currentSkin = xwiki.getSkin(xcontext);
 
         try {
             // First, get the skin directory
-            String path = "/skins/" + getSkinDirectory() +  "/less";
+            String path = "/skins/" + getSkinDirectory(skin) +  "/less";
             Path lessFilesPath = Paths.get(xwiki.getEngineContext().getRealPath(path));
             Path[] includePaths = {lessFilesPath};
 
@@ -93,6 +96,12 @@ public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> 
             StringWriter source = new StringWriter();
             IOUtils.copy(is, source);
 
+            // Trick: change the current skin in order to compile the LESS file as if the specified skin
+            // was the current skin
+            if (!currentSkin.equals(skin)) {
+                xcontext.put(SKIN_CONTEXT_KEY, skin);
+            }
+
             // Parse the LESS content with Velocity
             String velocityParsedSource = xwiki.parseContent(source.toString(), xcontext);
 
@@ -100,6 +109,11 @@ public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> 
             return lessCompiler.compile(velocityParsedSource, includePaths);
         } catch (LESSCompilerException | IOException e) {
             throw new LESSCompilerException(String.format("Failed to compile the file [%s] with LESS.", fileName), e);
+        } finally {
+            // Reset the current skin to the old value
+            if (!currentSkin.equals(skin)) {
+                xcontext.put(SKIN_CONTEXT_KEY, currentSkin);
+            }
         }
     }
 
@@ -109,15 +123,14 @@ public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> 
         return this.compileFromSkinFile(fileName, force);
     }
 
-    private String getSkinDirectory() throws LESSCompilerException
+    @Override
+    public String compileSkinFile(String fileName, String skin, boolean force) throws LESSCompilerException
     {
-        // Get the XWiki object
-        XWikiContext xcontext = xcontextProvider.get();
-        XWiki xwiki = xcontext.getWiki();
+        return this.compileFromSkinFile(fileName, skin, force);
+    }
 
-        // Get the skin
-        String skin = xwiki.getSkin(xcontext);
-
+    private String getSkinDirectory(String skin) throws LESSCompilerException
+    {
         // Is the skin a Wiki Document?
         return getSkinDirectory(skin, new ArrayList<String>());
     }

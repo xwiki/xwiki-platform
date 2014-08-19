@@ -131,6 +131,20 @@ public class DefaultLESSSkinFileCompilerTest
                 eq(expectedPaths))).thenReturn("OUTPUT");
     }
 
+    private void prepareMocksForCompilationOnFlamingo() throws Exception
+    {
+        when(engineContext.getRealPath("/skins/flamingo/less")).thenReturn("~/");
+
+        FileInputStream is = new FileInputStream(getClass().getResource("/style2.less").getFile());
+        when(engineContext.getResourceAsStream("/skins/flamingo/less/style2.less")).thenReturn(is);
+
+        when(xwiki.parseContent("// My LESS file", xcontext)).thenReturn("// My LESS file pre-parsed by Velocity");
+
+        Path[] expectedPaths = { Paths.get("~/") };
+        when(lessCompiler.compile(eq("// My LESS file pre-parsed by Velocity"),
+                eq(expectedPaths))).thenReturn("OUTPUT");
+    }
+
     @Test
     public void compileSkinFile() throws Exception
     {
@@ -212,6 +226,7 @@ public class DefaultLESSSkinFileCompilerTest
         assertNotNull(exceptionCaught);
         assertEquals(exception, exceptionCaught.getCause());
         assertEquals("Failed to compile the file [style2.less] with LESS.", exceptionCaught.getMessage());
+        verify(xcontext, never()).put(anyString(), anyString());
     }
 
     @Test
@@ -235,6 +250,7 @@ public class DefaultLESSSkinFileCompilerTest
                 eq("wikiId:ColorTheme.MyColorTheme"));
         verify(cache).set(eq("style2.less"), eq("wikiId"), eq("XWiki.DefaultSkin"),
                 eq("wikiId:ColorTheme.MyColorTheme"), eq("OUTPUT"));
+        verify(xcontext, never()).put(anyString(), anyString());
     }
 
     @Test
@@ -269,6 +285,7 @@ public class DefaultLESSSkinFileCompilerTest
         assertNotNull(exception);
         assertEquals("Infinite loop of 'baseskin' dependencies [[XWiki.DefaultSkin, XWiki.DefaultSkin2]].",
                 exception.getCause().getMessage());
+        verify(xcontext, never()).put(anyString(), anyString());
     }
 
     @Test
@@ -296,6 +313,7 @@ public class DefaultLESSSkinFileCompilerTest
         // Verify
         assertNotNull(exception);
         assertEquals("Failed to get the base skin of the skin [XWiki.DefaultSkin].", exception.getCause().getMessage());
+        verify(xcontext, never()).put(anyString(), anyString());
     }
 
     @Test
@@ -303,18 +321,64 @@ public class DefaultLESSSkinFileCompilerTest
     {
         // Mocks
         prepareMocksForCompilation();
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(xwiki.getSkin(xcontext)).thenReturn("XWiki.DefaultSkin");
-        WikiReference currentWikiReference = new WikiReference("subwiki");
-        DocumentReference colorThemeRef = new DocumentReference("subwiki", "ColorTheme", "MyColorTheme");
+        WikiReference currentWikiReference = new WikiReference("wikiId");
+        DocumentReference colorThemeRef = new DocumentReference("wikiId", "ColorTheme", "MyColorTheme");
         when(referenceResolver.resolve(eq("myColorTheme"), eq(currentWikiReference))).thenReturn(colorThemeRef);
-        when(referenceSerializer.serialize(colorThemeRef)).thenReturn("subwiki:ColorTheme.MyColorTheme");
+        when(referenceSerializer.serialize(colorThemeRef)).thenReturn("wikiId:ColorTheme.MyColorTheme");
         when(xwiki.exists(colorThemeRef, xcontext)).thenReturn(true);
 
-        when(cache.get(eq("style.less"), eq("subwiki"), eq("XWiki.DefaultSkin"), eq("subwiki:ColorTheme.MyColorTheme"))).
+        when(cache.get(eq("style.less"), eq("wikiId"), eq("XWiki.DefaultSkin"), eq("wikiId:ColorTheme.MyColorTheme"))).
                 thenReturn("SUBWIKI OUTPUT");
 
         // Test
         assertEquals("SUBWIKI OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style.less", false));
+    }
+
+    @Test
+    public void compileSkinFileOnOtherSkin() throws Exception
+    {
+        // Mocks
+        prepareMocksForCompilationOnFlamingo();
+        WikiReference currentWikiReference = new WikiReference("wikiId");
+        DocumentReference colorThemeRef = new DocumentReference("wikiId", "ColorTheme", "MyColorTheme");
+        when(referenceResolver.resolve(eq("myColorTheme"), eq(currentWikiReference))).thenReturn(colorThemeRef);
+        when(referenceSerializer.serialize(colorThemeRef)).thenReturn("wikiId:ColorTheme.MyColorTheme");
+        when(xwiki.exists(colorThemeRef, xcontext)).thenReturn(true);
+
+        // Test
+        assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", "flamingo", false));
+
+        // Verify
+        verify(xcontext).put("skin", "flamingo");
+        verify(xcontext).put("skin", "skin");
+    }
+
+    @Test
+    public void compileSkinFileOnOtherSkinWithException() throws Exception
+    {
+        // Mocks
+        prepareMocksForCompilationOnFlamingo();
+        WikiReference currentWikiReference = new WikiReference("wikiId");
+        DocumentReference colorThemeRef = new DocumentReference("wikiId", "ColorTheme", "MyColorTheme");
+        when(referenceResolver.resolve(eq("myColorTheme"), eq(currentWikiReference))).thenReturn(colorThemeRef);
+        when(referenceSerializer.serialize(colorThemeRef)).thenReturn("wikiId:ColorTheme.MyColorTheme");
+        when(xwiki.exists(colorThemeRef, xcontext)).thenReturn(true);
+
+        Exception exception = new LESSCompilerException("Exception with LESS", null);
+        when(lessCompiler.compile(anyString(), any(Path[].class))).thenThrow(exception);
+
+        // Test
+        Exception exceptionCaught = null;
+        try {
+            mocker.getComponentUnderTest().compileSkinFile("style2.less", "flamingo", true);
+        } catch(LESSCompilerException e) {
+            exceptionCaught = e;
+        }
+
+        // Verify
+        assertNotNull(exceptionCaught);
+        assertEquals(exception, exceptionCaught.getCause());
+        assertEquals("Failed to compile the file [style2.less] with LESS.", exceptionCaught.getMessage());
     }
 }

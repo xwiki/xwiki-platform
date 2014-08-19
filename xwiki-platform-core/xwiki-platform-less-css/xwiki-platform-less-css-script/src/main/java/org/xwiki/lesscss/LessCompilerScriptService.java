@@ -89,6 +89,39 @@ public class LessCompilerScriptService implements ScriptService
     }
 
     /**
+     * Compile a LESS file located in the "less" directory of the specified skin directory.
+     * Velocity will also be parsed on the file, but not on the files included via the @import directive.
+     * The result is cached by XWiki until the skin or the color theme is changed.
+     *
+     * @param fileName name of the file to compile
+     * @param skin name of the skin where the LESS file is located
+     * @return the generated CSS, or an error message if some problem occurs
+     */
+    public String compileSkinFile(String fileName, String skin)
+    {
+        return compileSkinFile(fileName, skin, false);
+    }
+
+    /**
+     * Compile a LESS file located in the "less" directory of the specified skin directory.
+     * Velocity will also be parsed on the file, but not on the files included via the @import directive.
+     * The result is cached by XWiki until the skin or the color theme is changed.
+     *
+     * @param fileName name of the file to compile
+     * @param skin name of the skin where the LESS file is located
+     * @param force force the computation, even if the output is already in the cache (not recommended)
+     * @return the generated CSS, or an error message if some problem occurs
+     */
+    public String compileSkinFile(String fileName, String skin, boolean force)
+    {
+        try {
+            return lessCompiler.compileSkinFile(fileName, skin, force);
+        } catch (LESSCompilerException e) {
+            return e.getMessage();
+        }
+    }
+
+    /**
      * Return a color theme from a LESS file located in the "less" directory of the current skin.
      *
      * @param filename name of the LESS file
@@ -98,6 +131,22 @@ public class LessCompilerScriptService implements ScriptService
     {
         try {
             return lessColorThemeConverter.getColorThemeFromSkinFile(filename, false);
+        } catch (LESSCompilerException e) {
+            return new ColorTheme();
+        }
+    }
+
+    /**
+     * Return a color theme from a LESS file located in the "less" directory of the specified skin.
+     *
+     * @param filename name of the LESS file
+     * @param skin name of the skin where the LESS file is located
+     * @return the corresponding Color Theme.
+     */
+    public ColorTheme getColorThemeFromSkinFile(String filename, String skin)
+    {
+        try {
+            return lessColorThemeConverter.getColorThemeFromSkinFile(filename, skin, false);
         } catch (LESSCompilerException e) {
             return new ColorTheme();
         }

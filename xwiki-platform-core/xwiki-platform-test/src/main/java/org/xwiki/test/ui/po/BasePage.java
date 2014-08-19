@@ -276,7 +276,7 @@ public class BasePage extends BaseElement
      */
     public void togglePageMenu()
     {
-        getDriver().findElement(By.xpath("//li[@id='tmPage']//a[@data-toggle='dropdown']")).click();
+        getDriver().findElement(By.xpath("//li[@id='tmPage']//a[contains(@class, 'dropdown-toggle')]")).click();
     }
 
     /**
@@ -284,7 +284,7 @@ public class BasePage extends BaseElement
      */
     public void toggleUserMenu()
     {
-        getDriver().findElement(By.xpath("//li[@id='tmUser']//a[@data-toggle='dropdown']")).click();
+        getDriver().findElement(By.xpath("//li[@id='tmUser']//a[contains(@class, 'dropdown-toggle')]")).click();
     }
 
     /**
@@ -292,7 +292,7 @@ public class BasePage extends BaseElement
      */
     public void toggleSpaceMenu()
     {
-        getDriver().findElement(By.xpath("//li[@id='tmSpace']//a[@data-toggle='dropdown']")).click();
+        getDriver().findElement(By.xpath("//li[@id='tmSpace']//a[contains(@class, 'dropdown-toggle')]")).click();
     }
 
     /**
@@ -300,7 +300,7 @@ public class BasePage extends BaseElement
      */
     public void toggleWikiMenu()
     {
-        getDriver().findElement(By.xpath("//li[@id='tmMainWiki']//a[@data-toggle='dropdown']")).click();
+        getDriver().findElement(By.xpath("//li[@id='tmMainWiki']//a[contains(@class, 'dropdown-toggle')]")).click();
     }
 
     /**
@@ -348,7 +348,7 @@ public class BasePage extends BaseElement
      */
     public boolean canDelete()
     {
-        if (getUtil().hasElement(By.xpath("//li[@id='tmPage']//a[@data-toggle='dropdown']"))) {
+        if (getUtil().hasElement(By.xpath("//li[@id='tmPage']//a[contains(@class, 'dropdown-toggle')]"))) {
             togglePageMenu();
             return getUtil().hasElement(By.id("tmActionDelete"));
         } else {

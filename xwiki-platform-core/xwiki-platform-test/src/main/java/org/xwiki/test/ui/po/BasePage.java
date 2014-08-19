@@ -142,11 +142,11 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * Perform a click on a "content menu" sub-menu entry.
+     * Perform a click on a "edit menu" sub-menu entry.
      * 
      * @param id The id of the entry to follow
      */
-    protected void clickContentMenuEditSubMenuEntry(String id)
+    protected void clickEditSubMenuEntry(String id)
     {
         // Open the edit menu
         getDriver().findElement(By.xpath("//div[@id='tmEdit']//button")).click();
@@ -155,7 +155,7 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * Performs a click on the "edit" entry of the content menu.
+     * Performs a click on the "edit" button.
      */
     public void edit()
     {
@@ -175,7 +175,7 @@ public class BasePage extends BaseElement
      */
     public WikiEditPage editWiki()
     {
-        clickContentMenuEditSubMenuEntry("tmEditWiki");
+        clickEditSubMenuEntry("tmEditWiki");
         return new WikiEditPage();
     }
 
@@ -184,7 +184,7 @@ public class BasePage extends BaseElement
      */
     public WYSIWYGEditPage editWYSIWYG()
     {
-        clickContentMenuEditSubMenuEntry("tmEditWysiwyg");
+        clickEditSubMenuEntry("tmEditWysiwyg");
         return new WYSIWYGEditPage();
     }
 
@@ -193,7 +193,7 @@ public class BasePage extends BaseElement
      */
     public <T extends InlinePage> T editInline()
     {
-        clickContentMenuEditSubMenuEntry("tmEditInline");
+        clickEditSubMenuEntry("tmEditInline");
         return createInlinePage();
     }
 
@@ -211,7 +211,7 @@ public class BasePage extends BaseElement
      */
     public RightsEditPage editRights()
     {
-        clickContentMenuEditSubMenuEntry("tmEditRights");
+        clickEditSubMenuEntry("tmEditRights");
         return new RightsEditPage();
     }
 
@@ -220,7 +220,7 @@ public class BasePage extends BaseElement
      */
     public ObjectEditPage editObjects()
     {
-        clickContentMenuEditSubMenuEntry("tmEditObject");
+        clickEditSubMenuEntry("tmEditObject");
         return new ObjectEditPage();
     }
 
@@ -229,7 +229,7 @@ public class BasePage extends BaseElement
      */
     public ClassEditPage editClass()
     {
-        clickContentMenuEditSubMenuEntry("tmEditClass");
+        clickEditSubMenuEntry("tmEditClass");
         return new ClassEditPage();
     }
 
@@ -328,7 +328,7 @@ public class BasePage extends BaseElement
      */
     public CopyPage copy()
     {
-        toggleCreateMenu();
+        togglePageMenu();
         this.copyPageLink.click();
         return new CopyPage();
     }
@@ -338,7 +338,7 @@ public class BasePage extends BaseElement
      */
     public ConfirmationPage delete()
     {
-        toggleCreateMenu();
+        togglePageMenu();
         this.deletePageLink.click();
         return new ConfirmationPage();
     }

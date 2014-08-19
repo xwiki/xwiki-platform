@@ -70,7 +70,7 @@
     #if($tocreate == 'space')
         $services.localization.render('core.create.space.error.docalreadyexists', [$space])
     #else
-        $services.localization.render('core.create.page.error.docalreadyexists', ["${space}.${page}"])
+        $services.localization.render('core.create.page.error.docalreadyexists', ["${space}.${page}",$xwiki.getURL("${space}.${page}", 'view'),$xwiki.getURL("${space}.${page}", 'edit')]])
     #end
   </div>
   ## reset the space & page, user will have to fill in again

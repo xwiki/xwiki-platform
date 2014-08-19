@@ -71,7 +71,7 @@
         $services.localization.render('core.create.space.error.docalreadyexists', [$space])
     #else
       #set ($DocAlreadyExistsRef = $services.model.createDocumentReference($doc.wiki, $space, $page))
-	    $services.localization.render('core.create.page.error.docalreadyexists',  ["${space}.${page}", $xwiki.getURL("$DocAlreadyExistsRef",  'view'), $xwiki.getURL("$DocAlreadyExistsRef", 'edit')])
+      $services.localization.render('core.create.page.error.docalreadyexists',  ["${space}.${page}", $xwiki.getURL("$DocAlreadyExistsRef",  'view'), $xwiki.getURL("$DocAlreadyExistsRef", 'edit')])
     #end
   </div>
   ## reset the space & page, user will have to fill in again

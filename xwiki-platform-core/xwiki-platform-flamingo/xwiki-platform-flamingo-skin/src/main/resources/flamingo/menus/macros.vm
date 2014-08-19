@@ -83,8 +83,8 @@
     #set($linkName = $linkWords.get(1))
     #set($linkTitle = "${linkWords.get(0)}: ${linkWords.get(1)}")
   #end
-  <li class="dropdown text-left">
-      <a href="$actionurl" #if(!$stringtool.isBlank($id))id="$id"#end class="$!class" title="$linkTitle">#glyphicon($icon) $!iconImg $linkName</a>
+  <li class="dropdown text-left" #if(!$stringtool.isBlank($id))id="$id"#end>
+      <a href="$actionurl" class="$!class" title="$linkTitle">#glyphicon($icon) $!iconImg $linkName</a>
       <a href="$actionurl" class="hasCaret dropdown-toggle" data-toggle="dropdown"><b class="caret"></b></a>
       <ul class="dropdown-menu">
 #end
@@ -161,14 +161,14 @@
 #end
 
 #macro(xwikibuttonentrystart $actionurl $linktext $id $class $icon)
-  <div class="btn-group text-left">
-    <button type="button" class="btn $!class dropdown-toggle" data-toggle="dropdown" #if(!$stringtool.isBlank($id))id="$id"#end>#glyphicon($icon) $linktext <span class="caret"></span>
+  <div class="btn-group text-left" #if(!$stringtool.isBlank($id))id="$id"#end>
+    <button type="button" class="btn $!class dropdown-toggle" data-toggle="dropdown">#glyphicon($icon) $linktext <span class="caret"></span>
     </button>
     <ul class="dropdown-menu" role="menu">
 #end
 
 #macro(xwikisplitbuttonentrystart $actionurl $linktext $id $class $icon)
-  <div class="btn-group text-left">
+  <div class="btn-group text-left" #if(!$stringtool.isBlank($id))id="$id"#end>
     <a href="$actionurl" class="btn $!class">#glyphicon($icon) $linktext</a>
     <button type="button" class="btn $!class dropdown-toggle" data-toggle="dropdown">
       <span class="caret"></span>

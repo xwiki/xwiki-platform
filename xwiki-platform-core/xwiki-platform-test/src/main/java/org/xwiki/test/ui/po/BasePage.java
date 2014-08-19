@@ -51,12 +51,6 @@ public class BasePage extends BaseElement
     @FindBy(id = "contentmenu")
     private WebElement contentMenuBar;
 
-    /**
-     * The entry on the content menu bar that allows us to edit the current page.
-     */
-    @FindBy(id = "tmEdit")
-    private WebElement editMenu;
-
     @FindBy(id = "tmCreatePage")
     private WebElement createPageMenuLink;
 
@@ -87,7 +81,7 @@ public class BasePage extends BaseElement
     @FindBys({@FindBy(id = "tmLogout"), @FindBy(tagName = "a")})
     private WebElement logoutLink;
 
-    @FindBys({@FindBy(id = "tmUser"), @FindBy(tagName = "a")})
+    @FindBy(xpath = "//li[@id='tmUser']/a[0]")
     private WebElement userLink;
 
     @FindBy(id = "document-title")
@@ -148,31 +142,16 @@ public class BasePage extends BaseElement
     }
 
     /**
-     * Perform a click on a "content menu" top entry.
-     * 
-     * @param id The id of the entry to follow
-     */
-    protected void clickContentMenuTopEntry(String id)
-    {
-        // The content menu bar is floating when the page is scrolled, but it is hidden. What's visible is a 'handle'
-        // that is implemented using :after CSS pseudo element. The user has to hover this handle in order to view the
-        // content menu. Unfortunately Selenium cannot interact with pseudo elements so the solution is to scroll the
-        // page up to the top and then hover the menu. We scroll the page by moving the mouse over the logo image.
-        new Actions(getDriver()).moveToElement(logo).moveToElement(contentMenuBar).perform();
-        getDriver().findElement(By.xpath("//div[@id='" + id + "']//strong")).click();
-    }
-
-    /**
      * Perform a click on a "content menu" sub-menu entry.
      * 
      * @param id The id of the entry to follow
      */
     protected void clickContentMenuEditSubMenuEntry(String id)
     {
-        // Scroll the page to the top by moving the mouse over the logo image (see #clickContentMenuTopEntry(String) for
-        // the reason), hover the top content menu bar then the edit menu.
-        new Actions(getDriver()).moveToElement(logo).moveToElement(contentMenuBar).moveToElement(editMenu).perform();
-        getDriver().findElement(By.xpath("//a[@id='" + id + "']")).click();
+        // Open the edit menu
+        getDriver().findElement(By.xpath("//div[@id='tmEdit']//button")).click();
+        // Click on the specified entry
+        getDriver().findElement(By.id(id)).click();
     }
 
     /**
@@ -180,7 +159,7 @@ public class BasePage extends BaseElement
      */
     public void edit()
     {
-        clickContentMenuTopEntry("tmEdit");
+        getDriver().findElement(By.xpath("//div[@id='tmEdit']//a")).click();
     }
 
     /**
@@ -284,11 +263,52 @@ public class BasePage extends BaseElement
     }
 
     /**
+     * On Flamingo, we have to click to open the menu (hovering it is not enough).
+     * @since 6.2M2
+     */
+    public void toggleCreateMenu()
+    {
+        this.createMenu.click();
+    }
+
+    /**
+     * @since 6.2M2
+     */
+    public void togglePageMenu()
+    {
+        getDriver().findElement(By.xpath("//li[@id='tmPage']//a[@data-toggle='dropdown']")).click();
+    }
+
+    /**
+     * @since 6.2M2
+     */
+    public void toggleUserMenu()
+    {
+        getDriver().findElement(By.xpath("//li[@id='tmUser']//a[@data-toggle='dropdown']")).click();
+    }
+
+    /**
+     * @since 6.2M2
+     */
+    public void toggleSpaceMenu()
+    {
+        getDriver().findElement(By.xpath("//li[@id='tmSpace']//a[@data-toggle='dropdown']")).click();
+    }
+
+    /**
+     * @since 6.2M2
+     */
+    public void toggleWikiMenu()
+    {
+        getDriver().findElement(By.xpath("//li[@id='tmMainWiki']//a[@data-toggle='dropdown']")).click();
+    }
+
+    /**
      * @since 4.5M1
      */
     public CreatePagePage createPage()
     {
-        moveToCreateMenu();
+        toggleCreateMenu();
         this.createPageMenuLink.click();
         return new CreatePagePage();
     }
@@ -298,7 +318,7 @@ public class BasePage extends BaseElement
      */
     public CreateSpacePage createSpace()
     {
-        moveToCreateMenu();
+        toggleCreateMenu();
         this.createSpaceMenuLink.click();
         return new CreateSpacePage();
     }
@@ -308,7 +328,7 @@ public class BasePage extends BaseElement
      */
     public CopyPage copy()
     {
-        new Actions(getDriver()).moveToElement(pageMenu).perform();
+        toggleCreateMenu();
         this.copyPageLink.click();
         return new CopyPage();
     }
@@ -318,7 +338,7 @@ public class BasePage extends BaseElement
      */
     public ConfirmationPage delete()
     {
-        new Actions(getDriver()).moveToElement(pageMenu).perform();
+        toggleCreateMenu();
         this.deletePageLink.click();
         return new ConfirmationPage();
     }
@@ -328,8 +348,8 @@ public class BasePage extends BaseElement
      */
     public boolean canDelete()
     {
-        if (getUtil().hasElement(By.xpath("//div[@id='tmPage']//span[@class='menuarrow']"))) {
-            new Actions(getDriver()).moveToElement(pageMenu).perform();
+        if (getUtil().hasElement(By.xpath("//li[@id='tmPage']//a[@data-toggle='dropdown']"))) {
+            togglePageMenu();
             return getUtil().hasElement(By.id("tmActionDelete"));
         } else {
             return false;
@@ -341,7 +361,7 @@ public class BasePage extends BaseElement
      */
     public void watchDocument()
     {
-        new Actions(getDriver()).moveToElement(pageMenu).perform();
+        togglePageMenu();
         this.watchDocumentLink.click();
     }
 
@@ -377,6 +397,7 @@ public class BasePage extends BaseElement
      */
     public void logout()
     {
+        toggleUserMenu();
         this.logoutLink.click();
         // Update the CSRF token because the context user has changed (it's guest user now). Otherwise, APIs like
         // TestUtils#createUser*(), which expect the currently cached token to be valid, will fail because they would be
@@ -406,7 +427,7 @@ public class BasePage extends BaseElement
      */
     public void watchSpace()
     {
-        new Actions(getDriver()).moveToElement(spaceMenu).perform();
+        toggleSpaceMenu();
         this.watchSpaceLink.click();
     }
 
@@ -415,7 +436,7 @@ public class BasePage extends BaseElement
      */
     public void watchWiki()
     {
-        new Actions(getDriver()).moveToElement(wikiMenu).perform();
+        toggleWikiMenu();
         this.watchWikiLink.click();
     }
 
@@ -425,6 +446,6 @@ public class BasePage extends BaseElement
      */
     public String getPageMenuLink()
     {
-        return this.pageMenu.findElement(By.xpath(".//a[contains(@class, 'tme')]")).getAttribute("href");
+        return this.pageMenu.findElement(By.xpath(".//a[0]")).getAttribute("href");
     }
 }

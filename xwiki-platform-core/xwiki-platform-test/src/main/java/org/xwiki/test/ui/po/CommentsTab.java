@@ -101,7 +101,8 @@ public class CommentsTab extends ViewPage
 
     public void deleteCommentByID(int id)
     {
-        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='delete']")).click();
+        getDriver().findElement(By.xpath("//div[@id='xwikicomment_" + id
+            + "']//a[contains(@class, 'delete')]")).click();
         this.confirmDelete = new ConfirmationModal();
         this.confirmDelete.clickOk();
         waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-done') and text()='Comment deleted']"));
@@ -118,7 +119,7 @@ public class CommentsTab extends ViewPage
     public CommentForm replyToCommentByID(int id)
     {
         getUtil().findElementWithoutWaiting(getDriver(),
-            By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='commentreply']")).click();
+            By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'commentreply')]")).click();
         return getAddCommentForm();
     }
 
@@ -138,7 +139,7 @@ public class CommentsTab extends ViewPage
     public CommentForm editCommentByID(int id)
     {
         getUtil().findElementWithoutWaiting(getDriver(),
-            By.xpath("//div[@id='xwikicomment_" + id + "']//a[@class='edit']")).click();
+            By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'edit')]")).click();
         waitUntilElementIsVisible(By.id("XWiki.XWikiComments_" + id + "_comment"));
         return new CommentForm(By.className("edit-xcomment"));
     }
@@ -169,6 +170,6 @@ public class CommentsTab extends ViewPage
     public boolean hasEditButtonForCommentByID(int commentId)
     {
         return getUtil().findElementsWithoutWaiting(getDriver(),
-            By.xpath("//div[@id='xwikicomment_" + commentId + "']//a[@class='edit']")).size() > 0;
+            By.xpath("//div[@id='xwikicomment_" + commentId + "']//a[contains(@class, 'edit')]")).size() > 0;
     }
 }

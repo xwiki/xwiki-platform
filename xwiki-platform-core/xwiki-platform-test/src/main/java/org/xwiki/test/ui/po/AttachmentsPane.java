@@ -149,7 +149,8 @@ public class AttachmentsPane extends BaseElement
     public String getLatestVersionOfAttachment(String attachmentName)
     {
         return getDriver().findElement(
-            By.xpath("//div[@id='attachmentscontent']//a[text()= '" + attachmentName + "']/../../span[3]/a")).getText();
+            By.xpath("//div[@id='attachmentscontent']//a[text()= '" + attachmentName
+                + "']/../../span[@class='version']/a")).getText();
     }
 
     public String getSizeOfAttachment(String attachmentName)

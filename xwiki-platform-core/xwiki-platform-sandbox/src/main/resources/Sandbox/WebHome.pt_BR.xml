@@ -41,7 +41,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <content>O espaço de teste é uma parte de sua wiki que você pode modificar à vontade. É para treinar e  alterar. Você vai descobrir como funciona a alteração de páginas e criar novas páginas. Basta clicar em **Editar** para começar!
 

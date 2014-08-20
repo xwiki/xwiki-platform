@@ -78,7 +78,7 @@ import com.xpn.xwiki.tool.backup.Importer;
 
 /**
  * Create a runnable XWiki instance using Jetty as the Servlet Container and HSQLDB as the Database.
- * 
+ *
  * @version $Id$
  * @since 3.4M1
  * @goal package
@@ -91,7 +91,7 @@ public class PackageMojo extends AbstractMojo
 {
     /**
      * The directory where to create the packaging.
-     * 
+     *
      * @parameter default-value="${project.build.directory}/xartmp"
      * @required
      */
@@ -99,7 +99,7 @@ public class PackageMojo extends AbstractMojo
 
     /**
      * The directory where to create the packaging.
-     * 
+     *
      * @parameter default-value="${project.build.directory}/xwiki"
      * @required
      */
@@ -107,7 +107,7 @@ public class PackageMojo extends AbstractMojo
 
     /**
      * The directory where classes are put.
-     * 
+     *
      * @parameter default-value="${project.build.outputDirectory}"
      * @required
      */
@@ -115,7 +115,7 @@ public class PackageMojo extends AbstractMojo
 
     /**
      * The directory where the HSQLDB database is generated.
-     * 
+     *
      * @parameter default-value="${project.build.directory}/database"
      * @required
      */
@@ -123,7 +123,7 @@ public class PackageMojo extends AbstractMojo
 
     /**
      * The maven project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -132,7 +132,7 @@ public class PackageMojo extends AbstractMojo
 
     /**
      * Project builder -- builds a model from a pom.xml.
-     * 
+     *
      * @component role="org.apache.maven.project.ProjectBuilder"
      * @required
      * @readonly
@@ -141,7 +141,7 @@ public class PackageMojo extends AbstractMojo
 
     /**
      * Used to look up Artifacts in the remote repository.
-     * 
+     *
      * @component
      */
     protected RepositorySystem repositorySystem;
@@ -156,14 +156,14 @@ public class PackageMojo extends AbstractMojo
 
     /**
      * Local repository to be used by the plugin to resolve dependencies.
-     * 
+     *
      * @parameter expression="${localRepository}"
      */
     protected ArtifactRepository localRepository;
 
     /**
      * List of remote repositories to be used by the plugin to resolve dependencies.
-     * 
+     *
      * @parameter expression="${project.remoteArtifactRepositories}"
      */
     protected List<ArtifactRepository> remoteRepositories;
@@ -171,21 +171,21 @@ public class PackageMojo extends AbstractMojo
     /**
      * The user under which the import should be done. If not user is specified then we import with backup pack. For
      * example {@code superadmin}.
-     * 
+     *
      * @parameter
      */
     private String importUser;
 
     /**
      * The platform version to be used by the packager plugin.
-     * 
+     *
      * @parameter expression="${platform.version}" default-value="${platform.version}"
      */
     private String platformVersion;
 
     /**
      * List of skin artifacts to include in the packaging.
-     * 
+     *
      * @parameter
      */
     private List<SkinArtifactItem> skinArtifactItems;
@@ -195,7 +195,7 @@ public class PackageMojo extends AbstractMojo
      * artifact is extracted. WARs that share the same context path are merged. The order of the WAR artifacts in the
      * dependency list is important because the last one can overwrite files from the previous ones if they share the
      * same context path.
-     * 
+     *
      * @parameter
      */
     private Map<String, String> contextPathMapping;
@@ -203,7 +203,7 @@ public class PackageMojo extends AbstractMojo
     /**
      * Indicate of the package mojo is used for tests. Among other things it means it's then possible to skip it using
      * skipTetsts system property.
-     * 
+     *
      * @parameter default-value="true"
      * @since 6.0M2
      */
@@ -280,7 +280,7 @@ public class PackageMojo extends AbstractMojo
         getLog().info("Extracting SmartClient ...");
         String smartGWTVersion = getDependencyManagementVersion(getTopLevelPOMProject(), "com.smartgwt", "smartgwt");
         Artifact smartGWTArtifact = resolveArtifact("com.smartgwt", "smartgwt", smartGWTVersion, "jar");
-        File smartGWTOutputDirectory = new File(project.getBuild().getDirectory(), "smartgwt");
+        File smartGWTOutputDirectory = new File(this.project.getBuild().getDirectory(), "smartgwt");
         unzip(smartGWTArtifact.getFile(), smartGWTOutputDirectory);
         File smartClientDirectory = new File(xwikiWebappDirectory, "resources/js/smartclient");
         copyDirectory(new File(smartGWTOutputDirectory, "com/smartclient/public/sc"), smartClientDirectory);
@@ -680,10 +680,10 @@ public class PackageMojo extends AbstractMojo
     {
         AndArtifactFilter filter =
             new AndArtifactFilter(Arrays.asList(new ScopeArtifactFilter("runtime"),
-            // - Exclude JCL and LOG4J since we want all logging to go through SLF4J. Note that we're excluding
-            // log4j-<version>.jar but keeping log4j-over-slf4j-<version>.jar
-            // - Exclude batik-js to prevent conflict with the patched version of Rhino used by yuicompressor used
-            // for JSX. See http://jira.xwiki.org/jira/browse/XWIKI-6151 for more details.
+                // - Exclude JCL and LOG4J since we want all logging to go through SLF4J. Note that we're excluding
+                // log4j-<version>.jar but keeping log4j-over-slf4j-<version>.jar
+                // - Exclude batik-js to prevent conflict with the patched version of Rhino used by yuicompressor used
+                // for JSX. See http://jira.xwiki.org/jira/browse/XWIKI-6151 for more details.
                 new ExcludesArtifactFilter(Arrays.asList("org.apache.xmlgraphic:batik-js",
                     "commons-logging:commons-logging", "commons-logging:commons-logging-api", "log4j:log4j"))));
 
@@ -734,7 +734,7 @@ public class PackageMojo extends AbstractMojo
         try {
             ProjectBuildingRequest request =
                 new DefaultProjectBuildingRequest(this.session.getProjectBuildingRequest())
-                // We don't want to execute any plugin here
+                    // We don't want to execute any plugin here
                     .setProcessPlugins(false)
                     // It's not this plugin job to validate this pom.xml
                     .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
@@ -786,7 +786,7 @@ public class PackageMojo extends AbstractMojo
 
     /**
      * Create the passed directory if it doesn't already exist.
-     * 
+     *
      * @param directory the directory to create
      */
     private void createDirectory(File directory)

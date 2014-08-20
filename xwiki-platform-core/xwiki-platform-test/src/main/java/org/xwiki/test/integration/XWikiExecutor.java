@@ -119,7 +119,8 @@ public class XWikiExecutor
         this.rmiPort =
             rmiPortString != null ? Integer.valueOf(rmiPortString) : (Integer.valueOf(DEFAULT_RMIPORT) + index);
 
-        // resolve execution directory
+        // Resolve the execution directory, which should point to a location where an XWiki distribution is located
+        // and can be started (directory where the start_xwiki.sh|bat files are located).
         this.executionDirectory = System.getProperty("xwikiExecutionDirectory" + index);
         if (this.executionDirectory == null) {
             this.executionDirectory = DEFAULT_EXECUTION_DIRECTORY;
@@ -230,7 +231,14 @@ public class XWikiExecutor
         if (dir.exists()) {
             this.startedProcessHandler = executeCommand(getDefaultStartCommand(getPort(), getStopPort(), getRMIPort()));
         } else {
-            throw new Exception("Invalid directory from where to start XWiki [" + this.executionDirectory + "]");
+            throw new Exception(String.format("Invalid directory from where to start XWiki [%s]. If you're starting "
+                + "a functional test from your IDE, make sure to either have started an XWiki instance beforehand or "
+                + "configure your IDE so that either the [basedir] or [xwikiExecutionDirectory] properties have been "
+                + "defined so that the test framework can start XWiki for you. If you set [basedir] make it point to "
+                + "the directory containing the [target/] directory of your project. The test framework will then try "
+                + "to locate an XWiki instance in [<basedir>/target/xwiki]. If the XWiki instance you wish to start is "
+                + "elsewhere then define the [xwikiExecutionDirectory] System property to point to it.",
+                this.executionDirectory));
         }
     }
 

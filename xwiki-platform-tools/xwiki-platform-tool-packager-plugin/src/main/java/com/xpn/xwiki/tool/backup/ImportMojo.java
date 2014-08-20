@@ -60,6 +60,7 @@ import org.xwiki.extension.repository.LocalExtensionRepositoryException;
 import org.xwiki.extension.repository.internal.local.DefaultLocalExtension;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.properties.ConverterManager;
+import org.xwiki.tool.utils.LogUtils;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -144,6 +145,7 @@ public class ImportMojo extends AbstractMojo
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
+        LogUtils.configureXWikiLogs();
         Importer importer = new Importer();
 
         System.setProperty("xwiki.data.dir", this.xwikiDataDir.getAbsolutePath());

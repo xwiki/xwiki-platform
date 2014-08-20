@@ -71,6 +71,7 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.hibernate.cfg.Environment;
+import org.xwiki.tool.utils.LogUtils;
 import org.xwiki.velocity.internal.log.SLF4JLogChute;
 
 import com.xpn.xwiki.XWikiContext;
@@ -217,6 +218,7 @@ public class PackageMojo extends AbstractMojo
 
             return;
         }
+        LogUtils.configureXWikiLogs();
 
         getLog().info("Using platform version: " + getXWikiPlatformVersion());
 

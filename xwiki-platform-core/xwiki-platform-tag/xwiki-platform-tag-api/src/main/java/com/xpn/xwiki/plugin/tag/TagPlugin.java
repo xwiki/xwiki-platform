@@ -469,7 +469,9 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     protected TagOperationResult renameTag(String tag, String newTag, XWikiContext context) throws XWikiException
     {
-        List<String> docNamesToProcess = getDocumentsWithTag(tag, context);
+        // Since we're renaming a tag, we want to rename it even if the document is hidden. A hidden document is still
+        // accessible to users, it's just not visible for simple users; it doesn't change permissions.
+        List<String> docNamesToProcess = getDocumentsWithTag(tag, true, context);
         if (StringUtils.equals(tag, newTag) || docNamesToProcess.size() == 0 || StringUtils.isBlank(newTag)) {
             return TagOperationResult.NO_EFFECT;
         }

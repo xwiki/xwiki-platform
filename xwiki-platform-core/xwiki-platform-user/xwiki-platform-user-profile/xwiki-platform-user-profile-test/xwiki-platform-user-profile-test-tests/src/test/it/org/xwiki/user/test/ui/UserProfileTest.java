@@ -61,7 +61,7 @@ public class UserProfileTest extends AbstractTest
 
     private static final String USER_BLOG = "http://xwiki.org/";
 
-    private static final String USER_BLOGFEED = "http://xwiki.org/";
+    private static final String USER_BLOGFEED = "http://xwiki.org/feed";
 
     private static final String WYSIWYG_EDITOR = "Wysiwyg";
 

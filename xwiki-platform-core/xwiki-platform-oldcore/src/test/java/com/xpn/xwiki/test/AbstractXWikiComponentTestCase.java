@@ -24,6 +24,8 @@ import org.jmock.cglib.MockObjectTestCase;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.jmock.XWikiComponentInitializer;
 
@@ -38,6 +40,9 @@ import org.xwiki.test.jmock.XWikiComponentInitializer;
 public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
 {
     private XWikiComponentInitializer initializer = new XWikiComponentInitializer();
+
+    private Mock contextualAuthorizationManager;
+    private Mock authorizationManager;
 
     public AbstractXWikiComponentTestCase()
     {
@@ -71,7 +76,13 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
      */
     protected void registerComponents() throws Exception
     {
-        // Empty voluntarily. Extending classes can override to provide custom component registration.
+        this.contextualAuthorizationManager = this.registerMockComponent(ContextualAuthorizationManager.class);
+        this.authorizationManager = this.registerMockComponent(AuthorizationManager.class);
+
+        this.contextualAuthorizationManager.stubs().method("hasAccess").will(returnValue(true));
+        this.authorizationManager.stubs().method("hasAccess").will(returnValue(true));
+
+        // Extending classes can override to provide custom component registration.
     }
 
     @Override
@@ -95,6 +106,22 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
     public MockConfigurationSource getConfigurationSource()
     {
         return this.initializer.getConfigurationSource();
+    }
+
+    /**
+     * @return a modifiable mock contextual authorization manager.
+     */
+    public Mock getContextualAuthorizationManager()
+    {
+        return contextualAuthorizationManager;
+    }
+
+    /**
+     * @return a modifiable mock authorization manager.
+     */
+    public Mock getAuthorizationManager()
+    {
+        return authorizationManager;
     }
 
     /**

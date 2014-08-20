@@ -19,10 +19,14 @@
  */
 package org.xwiki.webjars;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import org.junit.*;
+import org.junit.Rule;
+import org.junit.Test;
 import org.xwiki.container.Container;
 import org.xwiki.container.Response;
 import org.xwiki.model.reference.DocumentReference;
@@ -31,9 +35,6 @@ import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.webjars.internal.TestableWebJarsResourceReferenceHandler;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link org.xwiki.webjars.internal.WebJarsResourceReferenceHandler}.
@@ -90,5 +91,7 @@ public class WebJarsResourceReferenceHandlerTest
 
         // Verify that the resource content has been copied to the Response output stream.
         assertEquals("content", baos.toString());
+        // Verify that the correct Content Type has been set.
+        verify(response).setContentType("application/javascript");
     }
 }

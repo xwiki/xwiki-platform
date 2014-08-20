@@ -41,7 +41,7 @@ public class ViewPage extends BasePage
     private WebElement content;
 
     @FindBy(id = "hierarchy")
-    private WebElement breadcrumbDiv;
+    private WebElement breadcrumbOl;
 
     /**
      * Opens the comments tab.
@@ -125,18 +125,18 @@ public class ViewPage extends BasePage
 
     public String getBreadcrumbContent()
     {
-        return this.breadcrumbDiv.getText();
+        return this.breadcrumbOl.getText();
     }
 
     public boolean hasBreadcrumbContent(String breadcrumbItem, boolean isCurrent)
     {
         List<WebElement> result;
         if (isCurrent) {
-            result = getUtil().findElementsWithoutWaiting(getDriver(), this.breadcrumbDiv,
-                By.xpath("span[@class = 'current' and text() ='" + breadcrumbItem + "']"));
+            result = getUtil().findElementsWithoutWaiting(getDriver(), this.breadcrumbOl,
+                By.xpath("li[@class = 'active' and text() ='" + breadcrumbItem + "']"));
         } else {
-            result = getUtil().findElementsWithoutWaiting(getDriver(), this.breadcrumbDiv,
-                By.xpath("a[text() = '" + breadcrumbItem + "']"));
+            result = getUtil().findElementsWithoutWaiting(getDriver(), this.breadcrumbOl,
+                By.xpath("//a[text() = '" + breadcrumbItem + "']"));
         }
         return result.size() > 0;
     }
@@ -149,7 +149,7 @@ public class ViewPage extends BasePage
      */
     public ViewPage clickBreadcrumbLink(String linkText)
     {
-        this.breadcrumbDiv.findElement(By.linkText(linkText)).click();
+        this.breadcrumbOl.findElement(By.linkText(linkText)).click();
         return new ViewPage();
     }
 

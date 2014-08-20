@@ -19,6 +19,9 @@
  */
 package org.xwiki.extension.script;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +30,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
@@ -36,14 +38,13 @@ import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
-import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 @AllComponents
@@ -58,8 +59,6 @@ public class ExtensionManagerScriptServiceTest
 
     private XWiki mockXWiki;
 
-    private XWikiRightService mockRightService;
-
     private Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
 
     private DocumentReference contextUser;
@@ -67,13 +66,11 @@ public class ExtensionManagerScriptServiceTest
     private ExtensionManagerScriptService scriptService;
 
     @Before
-    public void setUp() throws Exception
+    public void before() throws Exception
     {
         // mock
 
-        this.mockRightService = Mockito.mock(XWikiRightService.class);
-        this.mockXWiki = Mockito.mock(XWiki.class);
-        Mockito.when(this.mockXWiki.getRightService()).thenReturn(this.mockRightService);
+        this.mockXWiki = mock(XWiki.class);
 
         this.xwikiBridge.getXWikiContext().setWiki(this.mockXWiki);
         this.xwikiBridge.getXWikiContext().setWikiId("xwiki");
@@ -140,10 +137,9 @@ public class ExtensionManagerScriptServiceTest
     @Test
     public void testInstallOnRoot() throws Throwable
     {
-        Mockito.when(mockRightService.hasProgrammingRights(Mockito.any(XWikiContext.class))).thenReturn(true);
-        Mockito.when(
-            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
-                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(true);
+        when(
+            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
+                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(true);
 
         install("extension", "version", null);
     }
@@ -151,10 +147,9 @@ public class ExtensionManagerScriptServiceTest
     @Test
     public void testInstallOnNamespace() throws Throwable
     {
-        Mockito.when(mockRightService.hasProgrammingRights(Mockito.any(XWikiContext.class))).thenReturn(true);
-        Mockito.when(
-            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
-                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(true);
+        when(
+            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
+                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(true);
 
         install("extension", "version", "namespace");
     }
@@ -162,10 +157,9 @@ public class ExtensionManagerScriptServiceTest
     @Test(expected = InstallException.class)
     public void testInstallOnRootWithoutProgrammingRigths() throws Throwable
     {
-        Mockito.when(mockRightService.hasProgrammingRights(Mockito.any(XWikiContext.class))).thenReturn(true);
-        Mockito.when(
-            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
-                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(false);
+        when(
+            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
+                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(false);
 
         install("extension", "version", null);
     }
@@ -173,10 +167,9 @@ public class ExtensionManagerScriptServiceTest
     @Test(expected = InstallException.class)
     public void testInstallOnNamespaceWithoutProgrammingRigths() throws Throwable
     {
-        Mockito.when(mockRightService.hasProgrammingRights(Mockito.any(XWikiContext.class))).thenReturn(true);
-        Mockito.when(
-            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
-                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(false);
+        when(
+            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
+                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(false);
 
         install("extension", "version", "namespace");
     }
@@ -186,9 +179,9 @@ public class ExtensionManagerScriptServiceTest
     @Test
     public void testUninstallFromRoot() throws Throwable
     {
-        Mockito.when(
-            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
-                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(true);
+        when(
+            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
+                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(true);
 
         uninstall("installedonroot", null);
     }
@@ -196,9 +189,9 @@ public class ExtensionManagerScriptServiceTest
     @Test
     public void testUninstallOnNamespace() throws Throwable
     {
-        Mockito.when(
-            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
-                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(true);
+        when(
+            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
+                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(true);
 
         uninstall("installedonnamespace", "namespace");
     }
@@ -206,10 +199,9 @@ public class ExtensionManagerScriptServiceTest
     @Test(expected = UninstallException.class)
     public void testUninstallOnRootWithoutProgrammingRigths() throws Throwable
     {
-        Mockito.when(mockRightService.hasProgrammingRights(Mockito.any(XWikiContext.class))).thenReturn(true);
-        Mockito.when(
-            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
-                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(false);
+        when(
+            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
+                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(false);
 
         uninstall("installedonroot", null);
     }
@@ -217,10 +209,9 @@ public class ExtensionManagerScriptServiceTest
     @Test(expected = UninstallException.class)
     public void testUninstallOnNamespaceWithoutProgrammingRigths() throws Throwable
     {
-        Mockito.when(mockRightService.hasProgrammingRights(Mockito.any(XWikiContext.class))).thenReturn(true);
-        Mockito.when(
-            mockRightService.hasAccessLevel(Mockito.eq("programming"), Mockito.eq("xwiki:XWiki.ExtensionUser"),
-                Mockito.eq("XWiki.XWikiPreferences"), Mockito.any(XWikiContext.class))).thenReturn(false);
+        when(
+            this.xwikiBridge.getMockAuthorizationManager().hasAccess(Right.PROGRAM,
+                new DocumentReference("xwiki", "XWiki", "ExtensionUser"), null)).thenReturn(false);
 
         uninstall("installedonnamespace", "namespace");
     }

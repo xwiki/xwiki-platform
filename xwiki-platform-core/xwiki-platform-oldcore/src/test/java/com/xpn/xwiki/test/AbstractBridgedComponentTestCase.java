@@ -33,6 +33,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -51,6 +53,9 @@ import com.xpn.xwiki.web.Utils;
 public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
 {
     private XWikiContext context;
+
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+    private AuthorizationManager authorizationManager;
 
     protected AbstractBridgedComponentTestCase()
     {
@@ -109,6 +114,15 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
     }
 
     @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        this.contextualAuthorizationManager = this.registerMockComponent(ContextualAuthorizationManager.class);
+        this.authorizationManager = this.registerMockComponent(AuthorizationManager.class);
+    }
+
+    @Override
     @After
     public void tearDown() throws Exception
     {
@@ -119,5 +133,21 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
     public XWikiContext getContext()
     {
         return this.context;
+    }
+
+    /**
+     * @return a modifiable mock contextual authorization manager.
+     */
+    public ContextualAuthorizationManager getContextualAuthorizationManager()
+    {
+        return contextualAuthorizationManager;
+    }
+
+    /**
+     * @return a modifiable mock authorization manager.
+     */
+    public AuthorizationManager getAuthorizationManager()
+    {
+        return authorizationManager;
     }
 }

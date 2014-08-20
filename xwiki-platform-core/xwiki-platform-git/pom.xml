@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>6.1-SNAPSHOT</version>
+    <version>6.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-git</artifactId>
   <name>XWiki Platform - Git</name>
@@ -58,7 +58,6 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <version>2.2</version>
     </dependency>
     <!-- Test Dependencies -->
     <dependency>

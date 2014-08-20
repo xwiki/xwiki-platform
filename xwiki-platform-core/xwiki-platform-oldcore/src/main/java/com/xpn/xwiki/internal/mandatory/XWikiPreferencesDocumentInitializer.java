@@ -82,14 +82,23 @@ public class XWikiPreferencesDocumentInitializer extends AbstractMandatoryDocume
         needsUpdate |=
             bclass.addDBListField("colorTheme", "Color theme",
                 "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
-                    + "where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' "
-                    + "and doc.fullName<>'ColorThemes.ColorThemeTemplate'");
+                + "where doc.fullName=theme.name and (theme.className='ColorThemes.ColorThemeClass' "
+                + "or theme.className='FlamingoThemesCode.ThemeClass') "
+                + "and doc.fullName<>'ColorThemes.ColorThemeTemplate' "
+                + "and doc.fullName<>'FlamingoThemesCode.ThemeTemplate'");
         // This one should not be in the prefs
         PropertyInterface baseskinProp = bclass.get("baseskin");
         if (baseskinProp != null) {
             bclass.removeField("baseskin");
             needsUpdate = true;
         }
+        needsUpdate |=
+                bclass.addDBListField("iconTheme", "Icon theme",
+                        "select doc.fullName, propName.value from XWikiDocument as doc, BaseObject as theme, "
+                                + "StringProperty propName "
+                                + "where doc.fullName=theme.name and theme.className='IconThemesCode.IconThemeClass' "
+                                + "and doc.fullName<>'IconThemesCode.IconThemeTemplate' "
+                                + "and theme.id = propName.id and propName.name = 'name'");
         needsUpdate |= bclass.addTextField("stylesheet", "Default Stylesheet", 30);
         needsUpdate |= bclass.addTextField("stylesheets", "Alternative Stylesheet", 60);
         needsUpdate |= bclass.addBooleanField("accessibility", "Enable extra accessibility features", "yesno");

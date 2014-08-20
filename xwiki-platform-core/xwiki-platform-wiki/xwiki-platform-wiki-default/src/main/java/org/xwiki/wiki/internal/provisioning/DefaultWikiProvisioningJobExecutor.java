@@ -35,7 +35,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.job.Job;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobException;
@@ -99,7 +98,7 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
             // Add it to the list of jobs
             jobs.put(jobId, job);
             // Pass it to the executor
-            jobExecutor.execute(new ExecutionContextRunnable(job, this.componentManager));
+            jobExecutor.execute(job);
             // Return the job
             return job;
         } catch (ComponentLookupException e) {

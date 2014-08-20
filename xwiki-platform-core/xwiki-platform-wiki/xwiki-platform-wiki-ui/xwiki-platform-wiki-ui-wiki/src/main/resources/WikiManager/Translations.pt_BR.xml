@@ -92,5 +92,10 @@ platform.wiki.currentwiki.invite.username.hint=Nome do usuário para adicionar �
 platform.wiki.currentwiki.invite.username.label=Nome de usuário
 platform.wiki.currentwiki.inviteNotification=Você foi convidado a se juntar à wiki "{0}".
 platform.wiki.currentwiki.inviteRequestAlreadyExists={0} já tem uma requisição pendente. Por favor, responda a essa requisição.
+platform.wiki.currentwiki.joinreques.request.label=Solicitar Entrada
+platform.wiki.currentwiki.panel.information.name.label=Nome
+platform.wiki.currentwiki.prop.description.label=Descrição
+platform.wiki.currentwiki.prop.owner.label=Dono
+platform.wiki.currentwiki.prop.wikiprettyname.label=Nome de Exibição
 </content>
 </xwikidoc>

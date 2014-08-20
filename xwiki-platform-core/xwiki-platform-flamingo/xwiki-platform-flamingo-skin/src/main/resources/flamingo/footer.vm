@@ -1,0 +1,16 @@
+#if($isInServletMode)## Visible only in a page
+<div id="footerglobal">
+  <div id="xwikilicence">$!copyright</div>
+  #set ($version = $xwiki.getSpacePreference('version'))
+  #if ("$!version" == "")
+    #set ($version = $xwiki.getXWikiPreference("version"))
+  #end
+  #if ("$!version" != "")
+    #set ($version = $xwiki.parseContent($version))
+  #else
+    #set ($version = $!xwiki.version)
+  #end
+  <div id="xwikiplatformversion">$version</div>
+</div>
+#end
+### TODO: Format the footer for pdf output

@@ -19,21 +19,20 @@
  */
 package org.xwiki.wiki.internal.manager;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.wiki.internal.manager.DefaultWikiDescriptorCache}.
@@ -44,8 +43,8 @@ import static org.mockito.Mockito.when;
 public class DefaultWikiDescriptorCacheTest
 {
     @Rule
-    public MockitoComponentMockingRule<DefaultWikiDescriptorCache> mocker =
-            new MockitoComponentMockingRule(DefaultWikiDescriptorCache.class);
+    public MockitoComponentMockingRule<WikiDescriptorCache> mocker =
+        new MockitoComponentMockingRule<WikiDescriptorCache>(DefaultWikiDescriptorCache.class);
 
     private Cache<WikiDescriptor> wikiAliasCache;
 
@@ -59,10 +58,8 @@ public class DefaultWikiDescriptorCacheTest
         wikiAliasCache = mock(Cache.class);
         wikiIdCache = mock(Cache.class);
         cacheManager = this.mocker.getInstance(CacheManager.class);
-        CacheFactory cacheFactory = mock(CacheFactory.class);
-        when(cacheManager.getCacheFactory()).thenReturn(cacheFactory);
-        when(cacheFactory.<WikiDescriptor>newCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
-                wikiIdCache);
+        when(cacheManager.<WikiDescriptor> createNewCache(any(CacheConfiguration.class))).thenReturn(wikiAliasCache,
+            wikiIdCache);
     }
 
     @Test

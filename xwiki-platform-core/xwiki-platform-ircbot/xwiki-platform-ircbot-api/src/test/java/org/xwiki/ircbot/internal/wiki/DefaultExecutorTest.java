@@ -46,6 +46,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 /**
@@ -63,6 +64,8 @@ public class DefaultExecutorTest extends AbstractComponentTestCase
     {
         getMockery().setImposteriser(ClassImposteriser.INSTANCE);
         super.setUp();
+
+        registerMockComponent(ContextualAuthorizationManager.class);
     }
 
     @Test

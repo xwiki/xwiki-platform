@@ -43,7 +43,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.job.Job;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -406,6 +405,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
             // For the current contiguous operations queue, group the changes
             try {
+                this.ecim.initialize(new ExecutionContext());
+
                 if (IndexOperation.INDEX.equals(operation)) {
                     LengthSolrInputDocument solrDocument = getSolrDocument(batchEntry.reference);
                     if (solrDocument != null) {
@@ -424,6 +425,8 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
                 }
             } catch (Throwable e) {
                 this.logger.error("Failed to process entry [{}]", batchEntry, e);
+            } finally {
+                this.execution.removeContext();
             }
 
             // Commit the index changes so that they become available to queries. This is a costly operation and that is
@@ -495,13 +498,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
         // If the entity type is supported, use the extractor to get the SolrInputDocuent.
         if (metadataExtractor != null) {
-            this.ecim.initialize(new ExecutionContext());
-
-            try {
-                return metadataExtractor.getSolrDocument(reference);
-            } finally {
-                this.execution.removeContext();
-            }
+            return metadataExtractor.getSolrDocument(reference);
         }
 
         return null;
@@ -568,7 +565,7 @@ public class DefaultSolrIndexer implements SolrIndexer, Initializable, Disposabl
 
         job.initialize(request);
 
-        this.indexerJobs.execute(new ExecutionContextRunnable(job, this.componentManager));
+        this.indexerJobs.execute(job);
 
         return job;
     }

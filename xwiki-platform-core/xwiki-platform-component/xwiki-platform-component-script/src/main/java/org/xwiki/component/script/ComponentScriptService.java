@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -55,7 +56,7 @@ public class ComponentScriptService implements ScriptService
      */
     @Inject
     @Named("context")
-    private ComponentManager componentManager;
+    private Provider<ComponentManager> componentManagerProvider;
 
     /**
      * Used to access the component manager corresponding to a specific namespace.
@@ -80,7 +81,7 @@ public class ComponentScriptService implements ScriptService
      */
     public ComponentManager getComponentManager()
     {
-        return this.bridge.hasProgrammingRights() ? this.componentManager : null;
+        return this.bridge.hasProgrammingRights() ? this.componentManagerProvider.get() : null;
     }
 
     /**

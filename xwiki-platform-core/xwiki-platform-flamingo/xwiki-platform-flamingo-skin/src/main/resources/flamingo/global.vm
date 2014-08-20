@@ -1,0 +1,36 @@
+###
+### Global header
+###
+### The uppermost area of each page
+### Contains the company logo, links to global actions and the search facility
+###
+#if($isInServletMode) ## Visible only in a page
+<div id="headerglobal">
+  <div id="globallinks">
+#if ($displayLanguageChoice && $xwiki.isMultiLingual())
+  <span class="glink" id="headerlanguages">
+  #set($defaultLanguage = "$!{doc.getDefaultLanguage()}")
+  #if($defaultLanguage == '')
+    #set($defaultLanguage = "$!{doc.getLanguage()}")
+  #end
+  #if($defaultLanguage == '')
+    #set($defaultLanguage = "default")
+  #end
+  <a href="$!doc.getURL("view", "language=$defaultLanguage")" class="language-default#if($tdoc.realLanguage == $defaultLanguage || ($defaultLanguage == 'default' && $tdoc.realLanguage == '')) language-current#end">$defaultLanguage</a>
+  #set ($wikiSettingsLanguages = $!xwiki.getXWikiPreference('languages').trim().split('\s*[,| ]\s*'))
+  #set ($hasLanguagesSet = $wikiSettingsLanguages.size() > 1 || "$!wikiSettingsLanguages.get(0)" != '')
+  #foreach($lang in $doc.translationList)
+    #if(!$hasLanguagesSet || $wikiSettingsLanguages.contains($lang))
+      <a href="$!doc.getURL("view", "language=$lang")" class="language-translation#if($tdoc.realLanguage == $lang) language-current#end">$!lang</a>
+    #end
+  #end
+  </span>
+#end
+  </div> ## globallinks
+  <div class="clearfloats"></div>
+  #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.template.header.after'))
+    $services.rendering.render($uix.execute(), 'xhtml/1.0')
+  #end
+</div> ## headerglobal
+#end
+### TODO: Format the header for pdf output

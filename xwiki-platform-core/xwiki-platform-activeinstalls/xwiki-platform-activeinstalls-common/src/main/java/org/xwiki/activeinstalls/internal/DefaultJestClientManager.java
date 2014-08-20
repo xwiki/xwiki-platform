@@ -57,7 +57,7 @@ public class DefaultJestClientManager implements JestClientManager, Initializabl
     {
         String pingURL = this.configuration.getPingInstanceURL();
         HttpClientConfig clientConfig = new HttpClientConfig.Builder(pingURL).multiThreaded(true).build();
-        JestClientFactory factory = new JestClientFactory();
+        JestClientFactory factory = new XWikiJestClientFactory();
         factory.setHttpClientConfig(clientConfig);
         this.client = factory.getObject();
     }

@@ -76,7 +76,8 @@
   white-space: normal;
 }
 /* This overrides a rule for the Object Editor that is supposed to resize text inputs. */
-#body .fullScreenWrapper .buttons .buttonwrapper input {
+#body .fullScreenWrapper .buttons .buttonwrapper input, 
+#body .fullScreenWrapper .btn {
   width: auto;
 }
 #xwikiobjects .fullScreenWrapper textarea:focus, #xwikiclassproperties .fullScreenWrapper textarea:focus {

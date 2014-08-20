@@ -1,0 +1,64 @@
+.#------------------------------------------------------------------------------
+.expect|xwiki+xar/1.1
+.#------------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc version="1.1">
+  <web>space</web>
+  <name>page</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <version>1.1</version>
+  <object>
+    <name>space.page</name>
+    <number>0</number>
+    <className>space.class</className>
+    <class>
+      <name>space.class</name>
+      <nullbooleanproperty>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </nullbooleanproperty>
+    </class>
+    <property>
+      <nullbooleanproperty></nullbooleanproperty>
+    </property>
+  </object>
+</xwikidoc>
+
+.#------------------------------------------------------------------------------
+.input|filter+xml
+.#------------------------------------------------------------------------------
+<wikiSpace name="space">
+  <wikiDocument name="page">
+    <p>
+      <parameters>
+        <entry>
+          <string>locale</string>
+          <locale></locale>
+        </entry>
+      </parameters>
+    </p>
+    <wikiDocumentLocale>
+      <wikiDocumentRevision revision="1.1">
+        <wikiObject name="space.class[0]">
+          <p>
+            <parameters>
+              <entry>
+                <string>number</string>
+                <int>0</int>
+              </entry>
+              <entry>
+                <string>class_reference</string>
+                <string>space.class</string>
+              </entry>
+            </parameters>
+          </p>
+          <wikiClass>
+            <wikiClassProperty name="nullbooleanproperty" type="com.xpn.xwiki.objects.classes.BooleanClass"></wikiClassProperty>
+          </wikiClass>
+          <wikiObjectProperty name="nullbooleanproperty"></wikiObjectProperty>
+        </wikiObject>
+      </wikiDocumentRevision>
+    </wikiDocumentLocale>
+  </wikiDocument>
+</wikiSpace>

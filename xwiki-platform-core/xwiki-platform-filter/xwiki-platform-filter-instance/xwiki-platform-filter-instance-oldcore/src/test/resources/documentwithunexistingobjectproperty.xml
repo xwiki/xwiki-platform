@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wikiFarm>
+  <wiki name="wiki">
+    <wikiSpace name="space">
+      <wikiDocument name="page">
+        <wikiDocumentLocale>
+          <wikiDocumentRevision>
+            <wikiObject name="wiki:space.page[0]">
+              <wikiClass>
+                <wikiClassProperty name="prop1" type="com.xpn.xwiki.objects.classes.NumberClass">
+                  <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
+                  <wikiClassPropertyField name="name" value="prop1"></wikiClassPropertyField>
+                  <wikiClassPropertyField name="number" value="1"></wikiClassPropertyField>
+                  <wikiClassPropertyField name="numberType" value="long"></wikiClassPropertyField>
+                  <wikiClassPropertyField name="prettyName" value="Prop1"></wikiClassPropertyField>
+                  <wikiClassPropertyField name="size" value="30"></wikiClassPropertyField>
+                  <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
+                </wikiClassProperty>
+              </wikiClass>
+              <wikiObjectProperty name="prop1" value="1"/>
+              <wikiObjectProperty name="unexisting" value="value"/>
+            </wikiObject>
+          </wikiDocumentRevision>
+        </wikiDocumentLocale>
+      </wikiDocument>
+    </wikiSpace>
+  </wiki>
+</wikiFarm>

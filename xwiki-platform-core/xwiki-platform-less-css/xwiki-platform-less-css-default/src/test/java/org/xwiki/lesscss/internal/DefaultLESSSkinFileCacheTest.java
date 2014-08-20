@@ -46,7 +46,7 @@ public class DefaultLESSSkinFileCacheTest
 {
     @Rule
     public MockitoComponentMockingRule<DefaultLESSSkinFileCache> mocker =
-            new MockitoComponentMockingRule(DefaultLESSSkinFileCache.class);
+            new MockitoComponentMockingRule<>(DefaultLESSSkinFileCache.class);
 
     private CacheManager cacheManager;
 

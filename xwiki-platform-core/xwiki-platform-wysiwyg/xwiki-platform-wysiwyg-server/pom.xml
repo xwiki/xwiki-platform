@@ -23,14 +23,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-wysiwyg</artifactId>
-    <version>6.1-SNAPSHOT</version>
+    <version>6.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-wysiwyg-server</artifactId>
   <name>XWiki Platform - WYSIWYG Editor - Server Side</name>
   <packaging>jar</packaging>
   <description>The server side of XWiki's WYSIWYG editor.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.19</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.23</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>

@@ -44,6 +44,11 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>## XWiki Translation for language pt_BR generated from http://www.l10n.xwiki.org
+platform.wiki.browse._actions=Ações
+platform.wiki.browse._actions.requestJoin=Solicitar Entrada
+platform.wiki.browse.description=Descrição
+platform.wiki.browse.owner=Dono
+platform.wiki.browse.wikiprettyname=Nome
 platform.wiki.create.error=Criação da divisão "{0}" falhou\: {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=Uma base de dados com esse identificador já existe
 platform.wiki.create.error.wikiname.empty=O identificador não pode ser vazio
@@ -51,6 +56,7 @@ platform.wiki.create.error.wikiname.wikialreadyexists=Esse identificador já foi
 platform.wiki.create.members=MEMBROS
 platform.wiki.create.prettyname.empty=Nome de exibição não pode ser vazio
 platform.wiki.create.title=Criar uma nova divisão
+platform.wiki.create.wizard.step.nameAndType.shortname=Nome
 platform.wiki.dependencies.applicationmanager.missing=O plugin {0}Gerenciador de Aplicações{1} não está instalado. Por favor instale-o e tente novamente.
 platform.wiki.dependencies.wiki.missing=O componente java do Gerenciador de Divisões não está instalado. Esta página não funcionará corretamente. Verifique se o arquivo 'wiki30-components-workspace-manager-&lt;version&gt;.jar' está presente no diretório 'webapps/xwiki/WEB-INF/lib/'.
 platform.wiki.error.exceptionWithMessage=Exceção\: {0}
@@ -61,6 +67,9 @@ platform.wiki.form.requiredField=Obrigatório
 platform.wiki.menu.deletewiki=Remover
 platform.wiki.menu.userwikis=Divisões
 platform.wiki.menu.wikiindex=Diretório de Divisões
+platform.wiki.prop.description=Descrição
+platform.wiki.prop.owner=Dono
+platform.wiki.sheet.prop.owner=Dono
 platform.wiki.sheet.title.createnewalias=Criar novo apelido
 platform.wiki.users.delete.empty=Remover Divisão
 platform.wiki.users.delete.title=Remover Divisão "{0}"

@@ -103,7 +103,7 @@
 
     #getEntriesForCategory($doc.fullName $entries $totalEntries)
     #if ($totalEntries == 0)
-      {{info}}No entries in this category{{/info}}
+      {{info}}{{translation key="xe.blog.categories.noentries"/}}{{/info}}
     #else
       #displayBlog($entries 'category' true true)
       ## displayNavigationLinks requires a blog document, to determine how should the entries be split into pages. Return this

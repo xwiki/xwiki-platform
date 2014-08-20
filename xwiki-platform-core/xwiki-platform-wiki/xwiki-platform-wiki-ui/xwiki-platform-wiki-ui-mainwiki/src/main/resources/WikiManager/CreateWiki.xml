@@ -757,17 +757,12 @@ return XWiki;
 #########################
 ## PLUGINS DEPENDENCIES
 #########################
-#if (!$services.wiki)
+## If all dependancies are OK, we call the controller
+#if ($services.wiki)
+  #controller()
+#else
   {{error}}{{translation key="platform.wiki.dependencies.wiki.missing"/}}{{/error}}
 
-#end
-#if (!$services.applicationmanager)
-  {{error}}$services.localization.render('platform.wiki.dependencies.applicationmanager.missing', ['[[', '&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Application+Manager+Plugin]]']){{/error}}
-
-#end
-## If all dependancies are OK, we call the controller
-#if($services.wiki &amp;&amp; $services.applicationmanager)
-  #controller()
 #end
 ##################################
 ##         CONTROLLER
@@ -1171,6 +1166,7 @@ return XWiki;
       #if($fromTemplate)
         #templateProvisioning($wikiDescriptor)
       #else
+        #setDefaultRights($wikiDescriptor.id)
         #setMembers($wikiDescriptor)
       #end
     #end
@@ -1182,6 +1178,28 @@ return XWiki;
     
     #stepMembers()
   #end
+#end
+##################################
+##      SET DEFAULT RIGHTS
+##################################
+#macro(setDefaultRights $wikiId)
+  #set ($preferencesDoc = $xwiki.getDocument($services.model.createDocumentReference($wikiId, 'XWiki', 'XWikiPreferences')))
+  #set ($rightObj1 = $preferencesDoc.newObject("${wikiId}:XWiki.XWikiGlobalRights"))
+  #set ($discard = $rightObj1.set('allow', 1))
+  #set ($discard = $rightObj1.set('groups', 'XWiki.XWikiAdminGroup'))
+  #set ($discard = $rightObj1.set('users', ''))
+  #set ($discard = $rightObj1.set('levels', 'admin'))
+  #set ($rightObj2 = $preferencesDoc.newObject("${wikiId}:XWiki.XWikiGlobalRights"))
+  #set ($discard = $rightObj2.set('allow', 1))
+  #set ($discard = $rightObj2.set('groups', 'XWiki.XWikiAllGroup'))
+  #set ($discard = $rightObj2.set('users', ''))
+  #set ($discard = $rightObj2.set('levels', 'comment,edit,register'))
+  #set ($rightObj3 = $preferencesDoc.newObject("${wikiId}:XWiki.XWikiGlobalRights"))
+  #set ($discard = $rightObj3.set('allow', 1))
+  #set ($discard = $rightObj3.set('groups', ''))
+  #set ($discard = $rightObj3.set('users', 'XWiki.XWikiGuest'))
+  #set ($discard = $rightObj3.set('levels', 'register'))
+  #set ($discard = $preferencesDoc.save('Set default rights.'))
 #end
 ##################################
 ##        SET MEMBERS

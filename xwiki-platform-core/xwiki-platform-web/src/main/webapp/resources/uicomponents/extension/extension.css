@@ -111,27 +111,29 @@
 dl.extension-metadata > dd > ul {
   list-style-position: inside;
   margin: 0;
+  padding: 0;
 }
 
-ul.dependencies, ul.job-log {
+ul.dependencies {
   border-top: 1px dotted #E8E8E8;
   list-style-type: none;
   margin: .5em 0 0;
   /* This should accommodate 10 items */
   max-height: 230px;
   overflow: auto;
+  padding: 0;
 }
-ul.dependencies li:hover, ul.job-log li:hover {
+ul.dependencies li:hover {
   background-color: $theme.highlightColor;
 }
-.dependency-item, .job-log-item {
+.dependency-item {
   background: transparent none no-repeat left;
   border-bottom: 1px dotted #E8E8E8;
   border-right: 7px solid $theme.pageContentBackgroundColor;
   padding: 0.3em 0 0.3em 20px;
   position: relative;
 }
-.dependency-item, .job-log-item > div {
+.dependency-item {
   line-height: 1.4em;
 }
 .extension-item-core .extension-title, .extension-item-remote-core .extension-title,
@@ -177,6 +179,7 @@ ul.dependencies li:hover, ul.job-log li:hover {
   margin-bottom: .6em;
 }
 .extension-diff-options .label {
+  color: $theme.textColor;
   font-size: 0.85em;
   font-weight: 700;
   margin-right: 0.3em;
@@ -185,29 +188,6 @@ ul.dependencies li:hover, ul.job-log li:hover {
 .extension-diff-options select {
   margin-right: 0.3em;
   width: auto;
-}
-
-.job-log-item {
-  background-position: left .3em;
-}
-.job-log-item-info {
-  background-image: url("$xwiki.getSkinFile('icons/silk/information.png')");
-  color: $theme.notificationInfoColor;
-}
-.job-log-item-loading {
-  background-image: url("$xwiki.getSkinFile('icons/xwiki/spinner.gif')");
-  color: $theme.notificationInfoColor;
-}
-.job-log-item-warn {
-  background-image: url("$xwiki.getSkinFile('icons/silk/error.png')");
-  color: $theme.notificationWarningColor;
-}
-.job-log-item-error {
-  background-image: url("$xwiki.getSkinFile('icons/silk/exclamation.png')");
-  color: $theme.notificationErrorColor;
-}
-.job-log-item .stacktrace {
-  white-space: pre-wrap;
 }
 
 .extension-search-bar {
@@ -411,21 +391,6 @@ ul.dependencies li:hover, ul.job-log li:hover {
   margin: 0.3em 0;
 }
 
-.xform label.collapsible {
-  cursor: pointer;
-}
-.xform label.collapsible:before {
-  color: $theme.textSecondaryColor;
-  content: "\25BC";
-  margin: 0 .5em 0 -1.5em;
-}
-.xform label.collapsible:hover:before {
-  color: $theme.textColor;
-}
-.xform label.collapsible.collapsed:before {
-  content: "\25B6";
-}
-
 /* Document Tree */
 ul.document-tree {
   margin: 0;
@@ -433,6 +398,7 @@ ul.document-tree {
 .document-tree ul {
   /* Reduce the default identation. */
   margin-left: 1.3em;
+  padding: 0;
 }
 .document-tree li {
   list-style-type: none;

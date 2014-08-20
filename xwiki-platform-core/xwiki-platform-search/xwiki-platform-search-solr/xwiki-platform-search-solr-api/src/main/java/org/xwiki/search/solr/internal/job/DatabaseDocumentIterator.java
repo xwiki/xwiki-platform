@@ -21,7 +21,6 @@ package org.xwiki.search.solr.internal.job;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.LocaleUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.xwiki.component.annotation.Component;
@@ -43,7 +43,6 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
-import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -127,7 +126,7 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
         String locale = (String) result[2];
         String version = (String) result[3];
         DocumentReference documentReference = new DocumentReference(wiki, space, name);
-        if (!locale.isEmpty()) {
+        if (!StringUtils.isEmpty(locale)) {
             documentReference = new DocumentReference(documentReference, LocaleUtils.toLocale(locale));
         }
         return new ImmutablePair<DocumentReference, String>(documentReference, version);
@@ -257,16 +256,15 @@ public class DatabaseDocumentIterator extends AbstractDocumentIterator<String>
     private List<String> getWikis()
     {
         if (rootReference == null) {
-            List<String> wikis = new ArrayList<String>();
-            Collection<WikiDescriptor> wikiDescriptors = Collections.emptyList();
+            List<String> wikis;
             try {
-                wikiDescriptors = wikiDescriptorManager.getAll();
+                wikis = new ArrayList<String>(wikiDescriptorManager.getAllIds());
             } catch (WikiManagerException e) {
                 logger.error("Failed to get the list of available wikis.", e);
+
+                wikis = Collections.emptyList();
             }
-            for (WikiDescriptor wikiDescriptor : wikiDescriptors) {
-                wikis.add(wikiDescriptor.getId());
-            }
+
             return wikis;
         } else {
             return Arrays.asList(rootReference.extractReference(EntityType.WIKI).getName());

@@ -47,4 +47,18 @@ public interface LESSSkinFileCompiler
      * @throws LESSCompilerException if problems occur
      */
     String compileSkinFile(String fileName, boolean force) throws LESSCompilerException;
+
+    /**
+     * Compile a LESS file located in the "less" directory of the specified skin directory.
+     * Velocity will also be parsed on the file, but not on the files included via the @import directive.
+     * Since the result is cached, do not put velocity code that needs to be always executed, unless you use the force
+     * parameter.
+     *
+     * @param fileName name of the file to compile
+     * @param skin name of the skin where the LESS file is located
+     * @param force force the computation, even if the output is already in the cache (not recommended)
+     * @return the generated CSS
+     * @throws LESSCompilerException if problems occur
+     */
+    String compileSkinFile(String fileName, String skin, boolean force) throws LESSCompilerException;
 }

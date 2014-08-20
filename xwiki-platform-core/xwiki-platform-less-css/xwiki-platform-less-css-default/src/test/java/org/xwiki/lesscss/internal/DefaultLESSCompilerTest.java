@@ -41,7 +41,7 @@ public class DefaultLESSCompilerTest
 {
     @Rule
     public MockitoComponentMockingRule<DefaultLESSCompiler> mocker =
-            new MockitoComponentMockingRule(DefaultLESSCompiler.class);
+            new MockitoComponentMockingRule<>(DefaultLESSCompiler.class);
 
     @Test
     public void compile() throws Exception

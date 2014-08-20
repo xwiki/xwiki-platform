@@ -85,6 +85,9 @@ public class DefaultWikiDescriptorManagerTest
         cache = this.mocker.getInstance(WikiDescriptorCache.class);
         descriptorDocumentHelper = mocker.getInstance(WikiDescriptorDocumentHelper.class);
 
+        // Cache is supposed to return null and nul empty list by default
+        when(cache.getWikiIds()).thenReturn(null);
+
         // Frequent uses
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);

@@ -2013,7 +2013,7 @@ public class XWiki extends Api
      */
     public Api get(String name)
     {
-        return this.xwiki.getPluginApi(name, getXWikiContext());
+        return getPlugin(name);
     }
 
     /**
@@ -2024,7 +2024,7 @@ public class XWiki extends Api
      */
     public Api getPlugin(String name)
     {
-        return this.xwiki.getPluginApi(name, getXWikiContext());
+        return this.xwiki != null ? this.xwiki.getPluginApi(name, getXWikiContext()) : null;
     }
 
     /**

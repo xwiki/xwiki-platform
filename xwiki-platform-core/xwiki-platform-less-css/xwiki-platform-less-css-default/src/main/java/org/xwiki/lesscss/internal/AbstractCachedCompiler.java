@@ -30,6 +30,7 @@ import org.xwiki.lesscss.LESSCompilerException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -62,7 +63,7 @@ public abstract class AbstractCachedCompiler<T>
     private Map<String, Object> mutexList = new HashMap<>();
 
     /**
-     * Compile an output corresponding to a LESS filename.
+     * Compile an output corresponding to a LESS filename, located on the current skin.
      * @param fileName name of the file
      * @param force force the computation, even if the output is already in the cache (not recommended)
      * @return the desired object
@@ -70,16 +71,31 @@ public abstract class AbstractCachedCompiler<T>
      */
     public T compileFromSkinFile(String fileName, boolean force) throws LESSCompilerException
     {
+        XWikiContext context = xcontextProvider.get();
+        String skin = context.getWiki().getSkin(context);
+        return compileFromSkinFile(fileName, skin, force);
+    }
+
+    /**
+     * Compile an output corresponding to a LESS filename.
+     * @param fileName name of the file
+     * @param force force the computation, even if the output is already in the cache (not recommended)
+     * @param skin name of the skin where the LESS file is located
+     * @return the desired object
+     * @throws LESSCompilerException if problems occur
+     */
+    public T compileFromSkinFile(String fileName, String skin, boolean force) throws LESSCompilerException
+    {
         T result;
 
         // Get information about the context
         String wikiId = wikiDescriptorManager.getCurrentWikiId();
         XWikiContext context = xcontextProvider.get();
-        String skin = context.getWiki().getBaseSkin(context);
         XWikiRequest request = context.getRequest();
 
         // Getting the full name representation of colorTheme
-        DocumentReference colorThemeReference = referenceResolver.resolve(request.getParameter("colorTheme"));
+        DocumentReference colorThemeReference = referenceResolver.resolve(request.getParameter("colorTheme"),
+                new WikiReference(wikiId));
         String colorTheme = referenceSerializer.serialize(colorThemeReference);
 
         // Check that the color theme exists, to avoid a DOS if some user tries to compile a skin file
@@ -101,7 +117,7 @@ public abstract class AbstractCachedCompiler<T>
             }
 
             // Either the result was in the cache or the force flag is set to true, we need to compile
-            result = compile(fileName, force);
+            result = compile(fileName, skin, force);
             cache.set(fileName, wikiId, skin, colorTheme, result);
 
         }
@@ -109,7 +125,7 @@ public abstract class AbstractCachedCompiler<T>
         return result;
     }
 
-    protected abstract T compile(String fileName, boolean force) throws LESSCompilerException;
+    protected abstract T compile(String fileName, String skin, boolean force) throws LESSCompilerException;
 
     private synchronized Object getMutex(String wikiId)
     {

@@ -100,7 +100,7 @@
       <description/>
     </property>
     <property>
-      <name>Blog categories</name>
+      <name>xe.blog.code.blogcategories</name>
     </property>
   </object>
   <object>

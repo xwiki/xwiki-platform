@@ -19,6 +19,7 @@
  */
 package org.xwiki.webjars.internal;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.tika.Tika;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
 import org.xwiki.resource.AbstractResourceReferenceHandler;
@@ -67,12 +69,17 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
     public static final EntityResourceAction ACTION = new EntityResourceAction("webjars");
 
     /**
-     * Prefix for locating JS resources in the classloader.
+     * Prefix for locating resource files (JavaScript, CSS) in the classloader.
      */
     private static final String WEBJARS_RESOURCE_PREFIX = "META-INF/resources/webjars/";
 
     @Inject
     private Container container;
+
+    /**
+     * Used to determine the Content Type of the requested resource files.
+     */
+    private Tika tika = new Tika();
 
     @Override
     public List<EntityResourceAction> getSupportedResourceReferences()
@@ -90,7 +97,15 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
         InputStream resourceStream = getClassLoader().getResourceAsStream(resourcePath);
 
         if (resourceStream != null) {
+            // Make sure the resource stream supports mark & reset which is needed in order be able to detect the
+            // content type without affecting the stream (Tika may need to read a few bytes from the start of the
+            // stream, in which case it will mark & reset the stream).
+            if (!resourceStream.markSupported()) {
+                resourceStream = new BufferedInputStream(resourceStream);
+            }
+
             try {
+                this.container.getResponse().setContentType(tika.detect(resourceStream, resourceName));
                 IOUtils.copy(resourceStream, this.container.getResponse().getOutputStream());
             } catch (IOException e) {
                 throw new ResourceReferenceHandlerException(

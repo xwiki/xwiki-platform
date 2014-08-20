@@ -25,14 +25,13 @@ import java.util.Arrays;
 
 import javax.inject.Singleton;
 
+import org.lesscss.LessCompiler;
+import org.lesscss.LessException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.lesscss.LESSCompiler;
 import org.xwiki.lesscss.LESSCompilerException;
-
-import de.sandroboehme.lesscss.LessCompiler;
-import de.sandroboehme.lesscss.LessException;
 
 /**
  * Default implementation of {@link LESSCompiler}.

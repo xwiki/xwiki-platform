@@ -35,7 +35,7 @@
   <date>1384420003000</date>
   <contentUpdateDate>1384420003000</contentUpdateDate>
   <version>1.1</version>
-  <title>Search FAQs</title>
+  <title>$services.localization.render('platform.faq.searchPageTitle')</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>

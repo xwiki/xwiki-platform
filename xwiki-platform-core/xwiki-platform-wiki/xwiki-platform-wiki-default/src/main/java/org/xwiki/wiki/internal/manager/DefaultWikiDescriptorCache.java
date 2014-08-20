@@ -19,22 +19,23 @@
  */
 package org.xwiki.wiki.internal.manager;
 
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 
 /**
  * Default implementation of {@link WikiDescriptorCache}.
+ * 
  * @version $Id$
  * @since 5.3M2
  */
@@ -49,6 +50,8 @@ public class DefaultWikiDescriptorCache implements WikiDescriptorCache, Initiali
 
     private Cache<DefaultWikiDescriptor> wikiIdCache;
 
+    private Collection<String> wikiIds;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -58,22 +61,14 @@ public class DefaultWikiDescriptorCache implements WikiDescriptorCache, Initiali
 
     private Cache<DefaultWikiDescriptor> createCache(String cacheId) throws InitializationException
     {
-        Cache<DefaultWikiDescriptor> cache;
-
         CacheConfiguration configuration = new CacheConfiguration(cacheId);
 
-        final String errorMessage = "Failed to initialize wiki descriptor caches [%s]";
-
         try {
-            CacheFactory cacheFactory = cacheManager.getCacheFactory();
-            cache = cacheFactory.newCache(configuration);
+            return this.cacheManager.createNewCache(configuration);
         } catch (CacheException e) {
-            throw new InitializationException(String.format(errorMessage, configuration.getConfigurationId()), e);
-        } catch (ComponentLookupException e) {
-            throw new InitializationException(String.format(errorMessage, configuration.getConfigurationId()), e);
+            throw new InitializationException(String.format("Failed to initialize wiki descriptor caches [%s]",
+                configuration.getConfigurationId()), e);
         }
-
-        return cache;
     }
 
     @Override
@@ -110,5 +105,17 @@ public class DefaultWikiDescriptorCache implements WikiDescriptorCache, Initiali
     public DefaultWikiDescriptor getFromAlias(String wikiAlias)
     {
         return wikiAliasCache.get(wikiAlias);
+    }
+
+    @Override
+    public void setWikiIds(Collection<String> wikiIds)
+    {
+        this.wikiIds = wikiIds;
+    }
+
+    @Override
+    public Collection<String> getWikiIds()
+    {
+        return this.wikiIds;
     }
 }

@@ -508,7 +508,7 @@ public class XWiki implements EventListener
                     Collections.<String, Object> singletonMap("ignorePrefix", context.getRequest().getContextPath()));
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
-                String.format("Failed to extract Entity Resource from URL [%s]", url), e);
+                String.format("Failed to extract Entity Resource Reference from URL [%s]", url), e);
         }
         Utils.getComponent(Execution.class).getContext()
             .setProperty(ResourceReferenceManager.RESOURCE_CONTEXT_PROPERTY, entityResourceReference);
@@ -869,24 +869,19 @@ public class XWiki implements EventListener
      *         Note: the wiki name is commonly also the name of the databse where the wiki's data is stored. However, if
      *         configured accordingly, the database can be diferent from the wiki name, like for example when setting a
      *         wiki database prefix.
-     * @deprecated since 5.3, use {@link WikiDescriptorManager#getAll()} instead
+     * @deprecated since 5.3, use {@link WikiDescriptorManager#getAllIds()} instead
      */
     @Deprecated
     public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
     {
-        List<String> wikis = new ArrayList<String>();
-
         WikiDescriptorManager descriptorManager = Utils.getComponent(WikiDescriptorManager.class);
+
         try {
-            for (WikiDescriptor descriptor : descriptorManager.getAll()) {
-                wikis.add(descriptor.getId());
-            }
+            return new ArrayList<String>(descriptorManager.getAllIds());
         } catch (WikiManagerException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to get the list of wikis", e);
         }
-
-        return wikis;
     }
 
     /**
@@ -1481,7 +1476,8 @@ public class XWiki implements EventListener
     @Deprecated
     public void setRenderingEngine(XWikiRenderingEngine renderingEngine)
     {
-        DefaultComponentDescriptor<XWikiRenderingEngine> descriptor = new DefaultComponentDescriptor<XWikiRenderingEngine>();
+        DefaultComponentDescriptor<XWikiRenderingEngine> descriptor =
+            new DefaultComponentDescriptor<XWikiRenderingEngine>();
 
         descriptor.setImplementation(renderingEngine.getClass());
         descriptor.setRoleType(XWikiRenderingEngine.class);
@@ -1633,7 +1629,8 @@ public class XWiki implements EventListener
                     doc.getXObject(new DocumentReference(doc.getDocumentReference().getWikiReference().getName(),
                         SYSTEM_SPACE, "XWikiSkins"));
                 if (object != null) {
-                    String content = object.getStringValue(template);
+                    String escapedTemplateName = template.replaceAll("/", ".");
+                    String content = object.getStringValue(escapedTemplateName);
                     if (StringUtils.isNotBlank(content)) {
                         // Let's use this template
                         // Use "" as namespace to register macros in global namespace. That way it
@@ -3687,14 +3684,11 @@ public class XWiki implements EventListener
 
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
-        String server = null, database = null;
-        try {
-            server = doc.getDocumentReference().getWikiReference().getName();
+        String currentWiki = null;
 
-            if (server != null) {
-                database = context.getWikiId();
-                context.setWikiId(server);
-            }
+        currentWiki = context.getWikiId();
+        try {
+            context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
 
             ObservationManager om = Utils.getComponent(ObservationManager.class);
 
@@ -3722,11 +3716,10 @@ public class XWiki implements EventListener
                 if (om != null) {
                     XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
                     // Again to follow general event policy, new document author is the user who modified the document
-                    // (here
-                    // the modification is delete)
+                    // (here the modification is delete)
                     blankDoc.setOriginalDocument(doc);
-                    blankDoc.setAuthor(context.getUser());
-                    blankDoc.setContentAuthor(context.getUser());
+                    blankDoc.setAuthorReference(context.getUserReference());
+                    blankDoc.setContentAuthorReference(context.getUserReference());
                     om.notify(new DocumentDeletedEvent(doc.getDocumentReference()), blankDoc, context);
                 }
             } catch (Exception ex) {
@@ -3734,9 +3727,7 @@ public class XWiki implements EventListener
                     doc.getDocumentReference(), ex);
             }
         } finally {
-            if ((server != null) && (database != null)) {
-                context.setWikiId(database);
-            }
+            context.setWikiId(currentWiki);
         }
     }
 
@@ -5344,22 +5335,6 @@ public class XWiki implements EventListener
         return list;
     }
 
-    public String getFlash(String url, String width, String height, XWikiContext context)
-    {
-        VelocityContext vorigcontext = ((VelocityContext) context.get("vcontext"));
-        try {
-            VelocityContext vcontext = (VelocityContext) vorigcontext.clone();
-            vcontext.put("flashurl", url);
-            vcontext.put("width", width);
-            vcontext.put("height", height);
-            context.put("vcontext", vcontext);
-
-            return parseTemplate("flash.vm", context);
-        } finally {
-            context.put("vcontext", vorigcontext);
-        }
-    }
-
     /**
      * accessor for the isReadOnly instance var.
      * 
@@ -5380,15 +5355,16 @@ public class XWiki implements EventListener
         deleteAllDocuments(doc, true, context);
     }
 
-    public void deleteAllDocuments(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
+    public void deleteAllDocuments(XWikiDocument doc, boolean toTrash, XWikiContext context) throws XWikiException
     {
-        // Delete all documents
-        for (String lang : doc.getTranslationList(context)) {
-            XWikiDocument tdoc = doc.getTranslatedDocument(lang, context);
-            deleteDocument(tdoc, totrash, context);
+        // Delete all translation documents
+        for (Locale locale : doc.getTranslationLocales(context)) {
+            XWikiDocument tdoc = doc.getTranslatedDocument(locale, context);
+            deleteDocument(tdoc, toTrash, context);
         }
 
-        deleteDocument(doc, context);
+        // Delete the default document
+        deleteDocument(doc, toTrash, context);
     }
 
     public void refreshLinks(XWikiContext context) throws XWikiException

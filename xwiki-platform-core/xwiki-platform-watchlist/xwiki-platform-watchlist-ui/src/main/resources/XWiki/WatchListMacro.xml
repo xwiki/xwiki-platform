@@ -328,7 +328,11 @@ $xwiki.ssx.use("XWiki.WatchListMacro")
                       tr.insert(new Element('td').insert(deleteLink));
                       return tr;
                    }" })
-  #livetable("mywatchlist" $collist $colprops $options)
+
+  #set($watchlistCtr = $request.getAttribute('XWiki.WatchListMacro:counter'))
+  #if(!$watchlistCtr) #set($watchlistCtr = 0) #else #set($watchlistCtr = $watchlistCtr + 1) #end
+  #set($discard = $request.setAttribute('XWiki.WatchListMacro:counter', $watchlistCtr))
+  #livetable("mywatchlist-$watchlistCtr" $collist $colprops $options)
 &lt;/div&gt;
 {{/html}}
 #end

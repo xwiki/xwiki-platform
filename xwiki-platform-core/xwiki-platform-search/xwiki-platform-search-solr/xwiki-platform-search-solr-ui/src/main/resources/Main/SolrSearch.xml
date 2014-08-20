@@ -1290,7 +1290,6 @@ blockquote.search-result-highlight {
 dl.search-result-highlights &gt; dt {
   color: $theme.textSecondaryColor;
   font-weight: normal;
-  text-transform: capitalize;
 }
 
 dl.search-result-highlights.preview dt,

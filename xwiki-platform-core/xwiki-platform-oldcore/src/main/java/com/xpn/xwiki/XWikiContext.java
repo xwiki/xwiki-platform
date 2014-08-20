@@ -573,7 +573,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 6.0M1, use {@link #setInterfaceLanguage(String)} instead
+     * @deprecated since 6.0M1, use {@link #setInterfaceLocale(Locale)} instead
      */
     @Deprecated
     public void setInterfaceLanguage(String interfaceLanguage)

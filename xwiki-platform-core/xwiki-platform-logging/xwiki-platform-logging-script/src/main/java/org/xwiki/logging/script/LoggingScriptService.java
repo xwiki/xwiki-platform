@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
@@ -65,6 +66,18 @@ public class LoggingScriptService implements ScriptService
     @Inject
     private ContextualLocalizationManager localization;
 
+    /**
+     * Return a logger named according to the name parameter.
+     * 
+     * @param name The name of the logger.
+     * @return logger
+     * @since 6.1RC1
+     */
+    public Logger getLogger(String name)
+    {
+        return LoggerFactory.getLogger(name);
+    }
+
     // Get/Set log levels
 
     /**
@@ -72,12 +85,12 @@ public class LoggingScriptService implements ScriptService
      */
     public Map<String, LogLevel> getLevels()
     {
-        Collection<Logger> loggers = this.loggerManager.getLoggers();
+        Collection<Logger> registeredLoggers = this.loggerManager.getLoggers();
 
-        Map<String, LogLevel> levels = new HashMap<String, LogLevel>(loggers.size());
+        Map<String, LogLevel> levels = new HashMap<String, LogLevel>(registeredLoggers.size());
 
-        for (Logger logger : loggers) {
-            levels.put(logger.getName(), getLevel(logger.getName()));
+        for (Logger registeredLogger : registeredLoggers) {
+            levels.put(registeredLogger.getName(), getLevel(registeredLogger.getName()));
         }
 
         return levels;

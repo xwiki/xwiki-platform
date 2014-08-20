@@ -45,7 +45,7 @@ import org.xwiki.properties.ConverterManager;
  * Looks for configuration data in {@code /WEB-INF/xwiki.cfg}.
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 6.1M2
  */
 @Component
 @Named(XWikiCfgConfigurationSource.ROLEHINT)

@@ -55,11 +55,11 @@
  * NOTE: This macro is not fully encapsulated because it defines a few Velocity variables that are used in subsequent macros.
  *#
 #macro(gridresultwithfilter_buildQuery $className $collist $filterfrom $filterwhere $filterParams)
-  ## Additional columns, should *not* contain parameters, all added column names must be filtered
+  ## Additional columns; should *not* contain raw parameters, all added column names must be filtered
   #set($fromSql = '')
-  ## parametrized filter part of the query
+  ## Parametrized filter part of the query
   #set($whereSql = '')
-  ## list of parameters to use with $whereSql
+  ## List of values to use with $whereSql
   #set($whereParams = [])
   #set($class = $xwiki.getDocument($className).getxWikiClass())
   ##
@@ -92,6 +92,7 @@
   ## Order
   ##
   #set($order = "$!request.sort")
+  #set ($orderSql = '')
   #if($order != '')
     #set($orderDirection = "$!{request.get('dir').toLowerCase()}")
     #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
@@ -102,7 +103,7 @@
     #else
       #set($tableAlias = $order)
     #end
-    ## only safe version should be used in SQL queries
+    ## Only safe version should be used in SQL queries
     #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
     ##
     #if($order.startsWith('doc.'))
@@ -123,6 +124,7 @@
       #if("$multiselect" != '1')
         #livetable_getTableName($order)
         #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
+        ## FIXME: Check if this is indeed a property of the class
         #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
         #set($discard = $whereParams.add("${order}"))
         #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
@@ -138,7 +140,7 @@
   #set($allMatchingParams = [])
   #if("$!className" != '')
     ## Class query
-    #set($countSql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
+    #set($sql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
     #set($discard = $sqlParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))
     #set($discard = $sqlParams.addAll($whereParams))
     ##
@@ -158,7 +160,7 @@
     #end
   #else
     ## Document query
-    #set($countSql = "$!fromSql $!filterfrom where 1=1 $!whereSql $!filterwhere")
+    #set($sql = "$!fromSql $!filterfrom where 1=1 $!whereSql $!filterwhere")
     #set($discard = $sqlParams.addAll($whereParams))
     ##
     #set($tagsMatchingFiltersFrom = "$!fromSql $!filterfrom")
@@ -174,7 +176,9 @@
       #set($discard = $allMatchingParams.addAll($filterParams))
     #end
   #end
-  #set($sql = "$countSql $!{orderSql}")
+  #if ($orderSql != '')
+    #set($sql = "$sql $!{orderSql}")
+  #end
 #end
 
 
@@ -217,7 +221,7 @@
  *#
 #macro(gridresult_buildRowsJSON $map)
   #set($offset = $mathtool.toInteger($request.get('offset')))
-  ## offset starts from 0 in velocity and 1 in javascript
+  ## Offset starts from 0 in velocity and 1 in javascript
   #set($offset = $offset - 1)
   #if (!$offset || $offset &lt; 0)
     #set($offset = 0)
@@ -229,7 +233,7 @@
   #set($query = $services.query.hql($sql))
   ## Apply query filters if defined. Otherwise use default.
   #foreach ($queryFilter in $stringtool.split($!request.queryFilters, ', '))
-    #set ($query = $query.addFilter($queryFilter)) 
+    #set ($query = $query.addFilter($queryFilter))
   #end
   #set ($query = $query.setLimit($limit).setOffset($offset).bindValues($sqlParams))
   #set($items = $query.execute())
@@ -294,6 +298,8 @@
     #set($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
     #set($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $xcontext.user, $fullname)))
     #set($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('delete', $xcontext.user, $fullname)))
+    #set($discard = $row.put('doc_hasrename', $row.doc_hasdelete))
+    #set($row.doc_hasrights = $row.doc_hasedit &amp;&amp; $isAdvancedUser)
     #set($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
     #set($discard = $row.put('doc_copy_url', $itemDoc.getURL('view', 'xpage=copy')))
     #set($discard = $row.put('doc_delete_url', $itemDoc.getURL('delete')))
@@ -352,7 +358,7 @@
       #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))
     #end
     #set($fieldUrl = '')
-    ## only retrieve an URL for a DBListClass item
+    ## Only retrieve an URL for a DBListClass item
     #if($propType == 'DBListClass' &amp;&amp; $propClass.get($colname).getProperty('multiSelect').value != 1)
       #set($fieldUrl = $xwiki.getURL($fieldValue))
       #if($fieldUrl == $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
@@ -362,7 +368,7 @@
     #set($discard = $row.put($colname, $fieldDisplayValue.replaceFirst($regextool.quote('{{html clean="false" wiki="false"}}'), '').replaceAll("$regextool.quote('{{/html}}')$", '')))
     #set($discard = $row.put("${colname}_value", $fieldValue))
     #set($discard = $row.put("${colname}_url", $fieldUrl))
-    ## reset to the default class
+    ## Reset to the default class
     #set($discard = $itemDoc.use($className))
   #end
 #end
@@ -377,7 +383,6 @@
   #gridresultwithfilter_buildQuery($className $collist $filterfrom $filterwhere $filterParams)
   #if("$!request.sql" == '1')
     #set($discard = $map.put('sql', $sql))
-    #set($discard = $map.put('countsql', $countSql))
     #set($discard = $map.put('params', $sqlParams))
   #end
   #set($discard = $map.put('reqNo', $mathtool.toInteger($request.reqNo)))
@@ -548,7 +553,7 @@
   #else
     #set($tableAlias = $colname)
   #end
-  ## only safe versions should be used in SQL queries
+  ## Only safe versions should be used in SQL queries
   #set($safe_colname = "$!{colname.replaceAll('[^a-zA-Z0-9_.]','')}")
   #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
   ##

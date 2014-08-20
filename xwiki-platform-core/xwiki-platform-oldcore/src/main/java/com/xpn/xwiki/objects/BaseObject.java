@@ -38,6 +38,8 @@ import org.xwiki.model.reference.SpaceReference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.web.Utils;
@@ -444,5 +446,27 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         if (this.ownerDocument != null) {
             setDocumentReference(this.ownerDocument.getDocumentReference());
         }
+    }
+
+    @Override
+    protected void mergeField(PropertyInterface currentElement, ElementInterface previousElement,
+        ElementInterface newElement, MergeConfiguration configuration, XWikiContext context, MergeResult mergeResult)
+    {
+        BaseClass baseClass = getXClass(context);
+        if (baseClass != null) {
+            PropertyClass propertyClass = (PropertyClass) baseClass.get(currentElement.getName());
+            if (propertyClass != null) {
+                try {
+                    propertyClass.mergeProperty((BaseProperty) currentElement, (BaseProperty) previousElement,
+                        (BaseProperty) newElement, configuration, context, mergeResult);
+                } catch (Exception e) {
+                    mergeResult.getLog().error("Failed to merge field [{}]", currentElement.getName(), e);
+                }
+
+                return;
+            }
+        }
+
+        super.mergeField(currentElement, previousElement, newElement, configuration, context, mergeResult);
     }
 }

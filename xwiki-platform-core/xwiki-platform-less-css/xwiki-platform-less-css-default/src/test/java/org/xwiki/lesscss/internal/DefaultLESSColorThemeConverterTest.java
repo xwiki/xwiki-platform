@@ -41,7 +41,7 @@ public class DefaultLESSColorThemeConverterTest
 {
     @Rule
     public MockitoComponentMockingRule<DefaultLESSColorThemeConverter> mocker =
-            new MockitoComponentMockingRule(DefaultLESSColorThemeConverter.class);
+            new MockitoComponentMockingRule<>(DefaultLESSColorThemeConverter.class);
 
     private LESSSkinFileCompiler lessSkinFileCompiler;
 

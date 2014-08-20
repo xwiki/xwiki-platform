@@ -36,7 +36,7 @@ import org.xwiki.extension.script.ExtensionManagerScriptService;
 import org.xwiki.extension.xar.internal.job.RepairXarJob;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
-import org.xwiki.job.JobManager;
+import org.xwiki.job.JobExecutor;
 
 /**
  * Various XAR oriented APIs for scripts.
@@ -55,11 +55,8 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
-    /**
-     * Handles and provides status feedback on extension operations (installation, upgrade, removal).
-     */
     @Inject
-    private JobManager jobManager;
+    private JobExecutor jobExecutor;
 
     /**
      * Make sure the provided XAR extension properly is registered in the installed extensions index.
@@ -92,7 +89,7 @@ public class XarExtensionScriptService extends AbstractExtensionScriptService
 
         Job job = null;
         try {
-            job = this.jobManager.addJob(RepairXarJob.JOBTYPE, installRequest);
+            job = this.jobExecutor.execute(RepairXarJob.JOBTYPE, installRequest);
         } catch (Exception e) {
             setError(e);
         }

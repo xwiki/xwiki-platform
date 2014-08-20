@@ -20,15 +20,21 @@ REM 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 REM -------------------------------------------------------------------------
 
 set JETTY_HOME=jetty
-set JETTY_STOP_PORT=8079
+REM The port on which Jetty listens for a Stop command can be defined in an enviroment variable called JETTY_STOP_PORT
+if not defined JETTY_STOP_PORT (
+  REM Alternatively, it can be passed to this script as the first argument
+  set JETTY_STOP_PORT=%1
+  if not defined JETTY_STOP_PORT (
+    set JETTY_STOP_PORT=8079
+  )
+)
 
 REM Get javaw.exe from the latest properly installed JRE
 for /f tokens^=2^ delims^=^" %%i in ('reg query HKEY_CLASSES_ROOT\jarfile\shell\open\command /ve') do set JAVAW_PATH=%%i
 set JAVA_PATH=%JAVAW_PATH:\javaw.exe=%\java.exe
 if "%JAVA_PATH%"=="" set JAVA_PATH=java
 
-REM The port on which to stop Jetty can be passed to this script as the first argument
-IF NOT [%1]==[] set JETTY_STOP_PORT=%1
+REM Specify port and key to stop a running Jetty instance
 set XWIKI_OPTS=-DSTOP.KEY=xwiki -DSTOP.PORT=%JETTY_STOP_PORT%
 
 "%JAVA_PATH%" %XWIKI_OPTS% -Djetty.home=%JETTY_HOME% -jar %JETTY_HOME%/start.jar --stop

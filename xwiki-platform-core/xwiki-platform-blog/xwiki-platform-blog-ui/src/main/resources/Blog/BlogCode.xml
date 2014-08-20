@@ -660,6 +660,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayEntryContent $entryDoc $entryObj $onlyExtract)
   (% class="#if($onlyExtract)entry-summary#{else}entry-content#end" %)(((
   #getEntryContent($entryDoc $entryObj $onlyExtract $entryContent)
+  $xcontext.dropPermissions()
   {{html wiki="false"}}$entryDoc.getRenderedContent($entryContent, $entryDoc.syntax.toIdString()){{/html}}
   ))) ## entry-content
   &lt;div class='clearfloats'&gt;&lt;/div&gt;

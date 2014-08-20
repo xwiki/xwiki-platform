@@ -20,9 +20,9 @@
 package org.xwiki.search.solr.internal;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -115,6 +115,16 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public static final int SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT = 100000;
 
     /**
+     * The name of the configuration property indicating if a synchronization should be run at startup.
+     */
+    public static final String SOLR_SYNCHRONIZE_AT_STARTUP = "solr.synchronizeAtStartup";
+
+    /**
+     * Indicate if a synchronization should be run at startup by default.
+     */
+    public static final boolean SOLR_SYNCHRONIZE_AT_STARTUP_DEFAULT = true;
+
+    /**
      * The Solr configuration source.
      */
     @Inject
@@ -146,7 +156,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
         }
 
         // Core directory
-        Set<URL> solrCoreResourcess = ClasspathHelper.forPackage(HOME_DIRECTORY_CORE_PACKAGE);
+        Collection<URL> solrCoreResourcess = ClasspathHelper.forPackage(HOME_DIRECTORY_CORE_PACKAGE);
         Reflections reflections =
             new Reflections(new ConfigurationBuilder().setScanners(new ResourcesScanner()).setUrls(solrCoreResourcess)
                 .filterInputsBy(new FilterBuilder.Include(FilterBuilder.prefix(HOME_DIRECTORY_CORE_PACKAGE))));
@@ -179,5 +189,11 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     {
         return this.configuration
             .getProperty(SOLR_INDEXER_QUEUE_CAPACITY_PROPERTY, SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT);
+    }
+
+    @Override
+    public boolean synchronizeAtStartup()
+    {
+        return this.configuration.getProperty(SOLR_SYNCHRONIZE_AT_STARTUP, SOLR_SYNCHRONIZE_AT_STARTUP_DEFAULT);
     }
 }

@@ -1,0 +1,4 @@
+org.xwiki.filter.instance.internal.input.InstanceInputFilterStream
+org.xwiki.filter.instance.internal.input.InstanceInputFilterStreamFactory
+org.xwiki.filter.instance.internal.output.InstanceOutputFilterStream
+org.xwiki.filter.instance.internal.output.InstanceOutputFilterStreamFactory

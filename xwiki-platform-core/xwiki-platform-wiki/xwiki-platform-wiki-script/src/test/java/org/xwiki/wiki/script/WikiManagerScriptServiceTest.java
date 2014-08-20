@@ -19,7 +19,18 @@
  */
 package org.xwiki.wiki.script;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import javax.inject.Provider;
@@ -31,7 +42,6 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.script.service.ScriptServiceManager;
@@ -49,21 +59,11 @@ import org.xwiki.wiki.manager.WikiManagerException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 public class WikiManagerScriptServiceTest
 {
     @Rule
     public MockitoComponentMockingRule<WikiManagerScriptService> mocker =
-            new MockitoComponentMockingRule(WikiManagerScriptService.class);
+        new MockitoComponentMockingRule<WikiManagerScriptService>(WikiManagerScriptService.class);
 
     private WikiManager wikiManager;
 
@@ -74,8 +74,6 @@ public class WikiManagerScriptServiceTest
     private Execution execution;
 
     private AuthorizationManager authorizationManager;
-
-    private DocumentReferenceResolver<String> documentReferenceResolver;
 
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
@@ -100,8 +98,8 @@ public class WikiManagerScriptServiceTest
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
         scriptServiceManager = mocker.getInstance(ScriptServiceManager.class);
-        entityReferenceSerializer = mocker.getInstance(new DefaultParameterizedType(null,
-                EntityReferenceSerializer.class, String.class));
+        entityReferenceSerializer =
+            mocker.getInstance(new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class));
         standardURLConfiguration = mocker.getInstance(StandardURLConfiguration.class);
         wikiConfiguration = mocker.getInstance(WikiConfiguration.class);
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
@@ -280,12 +278,33 @@ public class WikiManagerScriptServiceTest
     }
 
     @Test
+    public void getAllIds() throws Exception
+    {
+        Collection<String> wikiIds = Arrays.asList("wikiId1", "wikiId2");
+        when(wikiDescriptorManager.getAllIds()).thenReturn(wikiIds);
+
+        Collection<String> result = mocker.getComponentUnderTest().getAllIds();
+        assertEquals(wikiIds, result);
+    }
+
+    @Test
     public void getAllError() throws Exception
     {
         Exception exception = new WikiManagerException("error in getAll");
         when(wikiDescriptorManager.getAll()).thenThrow(exception);
 
         Collection<WikiDescriptor> result = mocker.getComponentUnderTest().getAll();
+        assertTrue(result.isEmpty());
+        assertEquals(exception, mocker.getComponentUnderTest().getLastError());
+    }
+
+    @Test
+    public void getAllIdsError() throws Exception
+    {
+        Exception exception = new WikiManagerException("error in getAllIds");
+        when(wikiDescriptorManager.getAllIds()).thenThrow(exception);
+
+        Collection<String> result = mocker.getComponentUnderTest().getAllIds();
         assertTrue(result.isEmpty());
         assertEquals(exception, mocker.getComponentUnderTest().getLastError());
     }
@@ -396,8 +415,7 @@ public class WikiManagerScriptServiceTest
         assertTrue(result);
 
         // The right has been checked
-        verify(authorizationManager).checkAccess(eq(Right.ADMIN), eq(currentUserRef),
-                eq(new WikiReference("wikiId")));
+        verify(authorizationManager).checkAccess(eq(Right.ADMIN), eq(currentUserRef), eq(new WikiReference("wikiId")));
         // The descriptor has been saved
         verify(wikiDescriptorManager).saveDescriptor(descriptor);
     }
@@ -411,7 +429,7 @@ public class WikiManagerScriptServiceTest
 
         Exception exception = new AccessDeniedException(Right.ADMIN, currentUserRef, new WikiReference("wikiId"));
         doThrow(exception).when(authorizationManager).checkAccess(eq(Right.ADMIN), eq(currentUserRef),
-                eq(new WikiReference("wikiId")));
+            eq(new WikiReference("wikiId")));
 
         WikiDescriptor descriptor = new WikiDescriptor("wikiId", "wikiAlias");
         boolean result = mocker.getComponentUnderTest().saveDescriptor(descriptor);
@@ -438,8 +456,8 @@ public class WikiManagerScriptServiceTest
         assertTrue(result);
 
         // Verify the rights have been checked
-        verify(authorizationManager).checkAccess(eq(Right.ADMIN), eq(currentUserRef),
-                eq(new WikiReference("mainWiki")));
+        verify(authorizationManager)
+            .checkAccess(eq(Right.ADMIN), eq(currentUserRef), eq(new WikiReference("mainWiki")));
 
         // The descriptor has been saved
         verify(wikiDescriptorManager).saveDescriptor(descriptor);

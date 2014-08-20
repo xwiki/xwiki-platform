@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tool-jetty</artifactId>
-    <version>6.1-SNAPSHOT</version>
+    <version>6.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty-listener</artifactId>
   <name>XWiki Platform - Tools - Jetty - Jetty Lifecycle Listener</name>
@@ -35,6 +35,7 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-util</artifactId>
       <version>${jetty.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

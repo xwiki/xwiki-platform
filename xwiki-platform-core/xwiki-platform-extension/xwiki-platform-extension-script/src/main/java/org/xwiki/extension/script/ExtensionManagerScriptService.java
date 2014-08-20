@@ -43,6 +43,7 @@ import org.xwiki.extension.LocalExtension;
 import org.xwiki.extension.job.AbstractExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.job.UninstallRequest;
+import org.xwiki.extension.job.internal.AbstractExtensionJob;
 import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.InstallPlanJob;
 import org.xwiki.extension.job.internal.UninstallJob;
@@ -59,10 +60,13 @@ import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.extension.version.internal.DefaultVersionRange;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
-import org.xwiki.job.JobManager;
+import org.xwiki.job.JobExecutor;
+import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -131,17 +135,20 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     @Inject
     private ExtensionRepositoryManager repositoryManager;
 
-    /**
-     * Handles and provides status feedback on extension operations (installation, upgrade, removal).
-     */
     @Inject
-    private JobManager jobManager;
+    private JobExecutor jobExecutor;
+
+    @Inject
+    private JobStatusStore jobStore;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
     private ScriptServiceManager scriptServiceManager;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     /**
      * @param <S> the type of the {@link ScriptService}
@@ -368,14 +375,14 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
+        if (!this.authorization.hasAccess(Right.PROGRAM)) {
             // Make sure only PR user can remove the right checking or change the users
             setRightsProperties(installRequest);
         }
 
         Job job = null;
         try {
-            job = this.jobManager.addJob(InstallJob.JOBTYPE, installRequest);
+            job = this.jobExecutor.execute(InstallJob.JOBTYPE, installRequest);
         } catch (JobException e) {
             setError(e);
         }
@@ -433,14 +440,14 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
+        if (!this.authorization.hasAccess(Right.PROGRAM)) {
             // Make sure only PR user can remove the right checking or change the users
             setRightsProperties(installRequest);
         }
 
         Job job = null;
         try {
-            job = this.jobManager.addJob(InstallPlanJob.JOBTYPE, installRequest);
+            job = this.jobExecutor.execute(InstallPlanJob.JOBTYPE, installRequest);
         } catch (JobException e) {
             setError(e);
         }
@@ -506,14 +513,14 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
+        if (!this.authorization.hasAccess(Right.PROGRAM)) {
             // Make sure only PR user can remove the right checking or change the users
             setRightsProperties(uninstallRequest);
         }
 
         Job job = null;
         try {
-            job = this.jobManager.addJob(UninstallJob.JOBTYPE, uninstallRequest);
+            job = this.jobExecutor.execute(UninstallJob.JOBTYPE, uninstallRequest);
         } catch (JobException e) {
             setError(e);
         }
@@ -617,14 +624,14 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
+        if (!this.authorization.hasAccess(Right.PROGRAM)) {
             // Make sure only PR user can remove the right checking or change the users
             setRightsProperties(uninstallRequest);
         }
 
         Job job = null;
         try {
-            job = this.jobManager.addJob(UninstallPlanJob.JOBTYPE, uninstallRequest);
+            job = this.jobExecutor.execute(UninstallPlanJob.JOBTYPE, uninstallRequest);
         } catch (JobException e) {
             setError(e);
         }
@@ -682,7 +689,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
         Job job = null;
         try {
-            job = safe(this.jobManager.addJob(UpgradePlanJob.JOBTYPE, request));
+            job = safe(this.jobExecutor.execute(UpgradePlanJob.JOBTYPE, request));
         } catch (JobException e) {
             setError(e);
         }
@@ -728,19 +735,26 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
+        if (!this.authorization.hasAccess(Right.PROGRAM)) {
             setError(new JobException("Need programming right to get current job"));
             return null;
         }
 
-        return this.jobManager.getCurrentJob();
+        return this.jobExecutor.getCurrentJob(AbstractExtensionJob.ROOT_GROUP);
     }
 
     private JobStatus getJobStatus(List<String> jobId)
     {
-        JobStatus jobStatus = this.jobManager.getJobStatus(jobId);
+        JobStatus jobStatus;
 
-        if (!this.documentAccessBridge.hasProgrammingRights()) {
+        Job job = this.jobExecutor.getJob(jobId);
+        if (job == null) {
+            jobStatus = this.jobStore.getJobStatus(jobId);
+        } else {
+            jobStatus = job.getStatus();
+        }
+
+        if (jobStatus != null && !this.authorization.hasAccess(Right.PROGRAM)) {
             jobStatus = safe(jobStatus);
         }
 
@@ -778,11 +792,12 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public JobStatus getCurrentJobStatus()
     {
-        Job job = this.jobManager.getCurrentJob();
+        Job job = this.jobExecutor.getCurrentJob(AbstractExtensionJob.ROOT_GROUP);
+
         JobStatus jobStatus;
         if (job != null) {
             jobStatus = job.getStatus();
-            if (!this.documentAccessBridge.hasProgrammingRights()) {
+            if (!this.authorization.hasAccess(Right.PROGRAM)) {
                 jobStatus = safe(jobStatus);
             }
         } else {

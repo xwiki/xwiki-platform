@@ -59,6 +59,8 @@ import org.slf4j.LoggerFactory;
  */
 public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 {
+    private static final long serialVersionUID = -8454351828032103173L;
+
     /**
      * The string used to separate the fields in the hashed validation message.
      */
@@ -407,8 +409,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
             byte[] array = md5.digest();
             StringBuffer sb = new StringBuffer();
-            for (int j = 0; j < array.length; ++j) {
-                int b = array[j] & 0xFF;
+            for (byte element : array) {
+                int b = element & 0xFF;
                 if (b < 0x10) {
                     sb.append('0');
                 }

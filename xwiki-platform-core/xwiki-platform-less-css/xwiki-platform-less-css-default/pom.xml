@@ -20,20 +20,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-less-css</artifactId>
-    <version>6.1-SNAPSHOT</version>
+    <version>6.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-less-css-default</artifactId>
   <name>XWiki Platform - LESS CSS - Default</name>
   <packaging>jar</packaging>
   <description>Default implementation for XWiki Platform - LESS CSS - API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.89</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -42,9 +41,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>de.sandroboehme.lesscss</groupId>
+      <groupId>org.lesscss</groupId>
       <artifactId>lesscss</artifactId>
-      <version>1.6.1.1.0</version>
+      <version>1.7.0.1.1</version>
       <exclusions>
         <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
         <exclusion>

@@ -978,6 +978,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             parameters.setTransformationContextIsolated(isolateVelocityMacros);
             // Render the translated content (matching the current language) using this document's syntax.
             parameters.setContentTranslated(tdoc != this);
+            parameters.setTargetSyntax(targetSyntax);
             XDOM contentXDOM = getDocumentDisplayer().display(this, parameters);
             renderedContent = renderXDOM(contentXDOM, targetSyntax);
             getRenderingCache().setRenderedContent(getDocumentReference(), content, renderedContent, context);
@@ -1064,6 +1065,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                 DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
                 parameters.setTransformationContextIsolated(true);
                 parameters.setTransformationContextRestricted(restrictedTransformationContext);
+                parameters.setTargetSyntax(this.syntaxFactory.createSyntaxFromIdString(targetSyntaxId));
                 XDOM contentXDOM = getDocumentDisplayer().display(fakeDocument, parameters);
                 result = renderXDOM(contentXDOM, this.syntaxFactory.createSyntaxFromIdString(targetSyntaxId));
 
@@ -1262,6 +1264,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
         parameters.setTitleDisplayed(true);
         parameters.setExecutionContextIsolated(true);
+        parameters.setTargetSyntax(outputSyntax);
         XDOM titleXDOM = getDocumentDisplayer().display(this, parameters);
         try {
             return renderXDOM(titleXDOM, outputSyntax);
@@ -5211,6 +5214,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * @since 6.2M1
+     */
+    public String getStringValue(EntityReference classReference, String fieldName)
+    {
+        return getStringValue(resolveClassReference(classReference), fieldName);
+    }
+
+    /**
      * @since 2.2M2
      */
     public String getStringValue(DocumentReference classReference, String fieldName)
@@ -8201,7 +8212,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * 
      * @param previousDocument the previous version of the document
      * @param newDocument the next version of the document
-     * @param configuration the configuration of the merge Indicate how to deal with some conflicts use cases, etc.
+     * @param configuration the configuration of the merge indicates how to deal with some conflicts use cases, etc.
      * @param context the XWiki context
      * @return a repport of what happen during the merge (errors, etc.)
      * @since 3.2M1
@@ -8212,8 +8223,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         MergeResult mergeResult = new MergeResult();
 
         // Title
-        setTitle(MergeUtils.mergeCharacters(previousDocument.getTitle(), newDocument.getTitle(), getTitle(),
-            mergeResult));
+        setTitle(MergeUtils.mergeOject(previousDocument.getTitle(), newDocument.getTitle(), getTitle(), mergeResult));
 
         // Content
         setContent(MergeUtils.mergeLines(previousDocument.getContent(), newDocument.getContent(), getContent(),

@@ -371,6 +371,17 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         assertEquals("http://wiki2server/xwiki/bin/view/Space/Page", url);
     }
 
+    /** When the URL contains only the hostname, without a path, / is returned instead of the empty string. */
+    public void testGetURLWithEmptyPathReturnsSlash() throws MalformedURLException
+    {
+        getContext().setURL(new URL("http://wiki1server/xwiki/view/InitialSpace/InitialPage"));
+        // Reinitialize the URL factory to take into account the new request URL.
+        this.urlFactory.init(getContext());
+
+        String url = this.urlFactory.getURL(new URL("http://wiki1server/"), getContext());
+        assertEquals("/", url);
+    }
+
     /**
      * When getServerURL is called on a resource from the main wiki, the user is in a subwiki, and xwiki.home is set,
      * xwiki.home should be returned. see: XWIKI-5981

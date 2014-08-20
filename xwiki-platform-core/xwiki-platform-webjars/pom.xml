@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>6.1-SNAPSHOT</version>
+    <version>6.2-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-webjars</artifactId>
   <name>XWiki Platform - Webjars Support</name>
@@ -57,6 +57,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <!-- Used to determine the Content Type of the requested resource. -->
+      <groupId>org.apache.tika</groupId>
+      <artifactId>tika-core</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
@@ -69,4 +74,3 @@
     </dependency>
   </dependencies>
 </project>
-       

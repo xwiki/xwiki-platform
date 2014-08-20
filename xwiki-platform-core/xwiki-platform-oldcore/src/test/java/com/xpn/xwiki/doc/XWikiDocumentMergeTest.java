@@ -163,8 +163,9 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     @Test
     public void testMergeObjectModified() throws Exception
     {
-        this.xobject.setStringValue("test", "");
-        this.previousDocument.addXObject(this.xobject);
+        BaseObject previousobj = this.xobject;
+        previousobj.setStringValue("test", "test1");
+        this.previousDocument.addXObject(previousobj);
 
         BaseObject obj = this.xobject.clone();
         obj.setStringValue("test", "test1");
@@ -179,7 +180,7 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
         BaseObject mergedobj = this.currentDocument.getXObject(this.xclass.getReference(), 0);
 
         Assert.assertNotNull(mergedobj);
-        Assert.assertEquals("test12", mergedobj.getStringValue("test"));
+        Assert.assertEquals("test2", mergedobj.getStringValue("test"));
     }
 
     @Test

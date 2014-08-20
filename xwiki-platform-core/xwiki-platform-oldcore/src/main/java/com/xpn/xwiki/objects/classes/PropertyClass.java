@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.ClassPropertyReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -40,6 +41,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.DeprecatedContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -754,5 +757,25 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference> implem
     private String getTypeName()
     {
         return StringUtils.substringBeforeLast(this.getClass().getSimpleName(), "Class").toLowerCase();
+    }
+
+    /**
+     * Apply a 3 ways merge on passed current, previous and new version of the same property. The passed current version
+     * is modified as result of the merge.
+     * 
+     * @param currentProperty the current version of the element and the one to modify
+     * @param previousProperty the previous version of the element
+     * @param newProperty the new version of the property
+     * @param configuration the configuration of the merge Indicate how to deal with some conflicts use cases, etc.
+     * @param context the XWiki context
+     * @param mergeResult the merge report
+     * @return the merged version
+     * @since 6.2M1
+     */
+    public <T extends EntityReference> void mergeProperty(BaseProperty<T> currentProperty,
+        BaseProperty<T> previousProperty, BaseProperty<T> newProperty, MergeConfiguration configuration,
+        XWikiContext context, MergeResult mergeResult)
+    {
+        currentProperty.merge(previousProperty, newProperty, configuration, context, mergeResult);
     }
 }

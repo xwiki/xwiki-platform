@@ -319,6 +319,25 @@ public class WikiManagerScriptService implements ScriptService
     }
 
     /**
+     * Get all the wiki identifiers.
+     * 
+     * @return the list of all wiki identifiers
+     * @since 6.2M1
+     */
+    public Collection<String> getAllIds()
+    {
+        Collection<String> wikis;
+        try {
+            wikis = wikiDescriptorManager.getAllIds();
+        } catch (WikiManagerException e) {
+            error(e);
+            wikis = new ArrayList<String>();
+        }
+
+        return wikis;
+    }
+
+    /**
      * Test if a wiki exists.
      * 
      * @param wikiId unique identifier to test

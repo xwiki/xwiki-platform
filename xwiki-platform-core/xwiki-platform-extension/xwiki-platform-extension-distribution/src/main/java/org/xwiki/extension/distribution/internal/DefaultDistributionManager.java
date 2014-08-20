@@ -48,8 +48,8 @@ import org.xwiki.extension.distribution.internal.job.WikiDistributionJobStatus;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.extension.version.internal.DefaultVersion;
 import org.xwiki.job.Job;
-import org.xwiki.job.JobManager;
-import org.xwiki.job.internal.JobStatusStorage;
+import org.xwiki.job.JobStatusStore;
+import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.WikiReference;
@@ -79,7 +79,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     private CoreExtensionRepository coreExtensionRepository;
 
     @Inject
-    private JobManager jobManager;
+    private JobStatusStore jobStore;
 
     /**
      * Used to lookup components dynamically.
@@ -121,7 +121,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
      * USed to manipulated jobs statuses.
      */
     @Inject
-    private JobStatusStorage jobStatusStorage;
+    private JobStatusStore jobStatusStorage;
 
     @Inject
     private Logger logger;
@@ -318,8 +318,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     @Override
     public FarmDistributionJobStatus getPreviousFarmJobStatus()
     {
-        DistributionJobStatus<DistributionRequest> jobStatus =
-            (DistributionJobStatus<DistributionRequest>) this.jobManager.getJobStatus(getFarmJobId());
+        JobStatus jobStatus = this.jobStore.getJobStatus(getFarmJobId());
 
         FarmDistributionJobStatus farmJobStatus;
         if (jobStatus != null) {
@@ -341,7 +340,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
     @Override
     public WikiDistributionJobStatus getPreviousWikiJobStatus(String wiki)
     {
-        return (WikiDistributionJobStatus) this.jobManager.getJobStatus(getWikiJobId(wiki));
+        return (WikiDistributionJobStatus) this.jobStore.getJobStatus(getWikiJobId(wiki));
     }
 
     @Override

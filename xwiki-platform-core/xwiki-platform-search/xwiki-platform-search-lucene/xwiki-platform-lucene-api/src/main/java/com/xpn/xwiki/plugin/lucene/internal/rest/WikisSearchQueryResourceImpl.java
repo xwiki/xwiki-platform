@@ -30,7 +30,7 @@ import org.xwiki.rest.internal.resources.search.SearchSource;
 import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.resources.wikis.WikisSearchQueryResource;
 
-@Component("org.xwiki.rest.internal.resources.wikis.WikisSearchQueryResourceImpl")
+@Component("com.xpn.xwiki.plugin.lucene.internal.rest.WikisSearchQueryResourceImpl")
 public class WikisSearchQueryResourceImpl extends BaseSearchResult implements WikisSearchQueryResource
 {
     private static final String MULTIWIKI_QUERY_TEMPLATE_INFO =

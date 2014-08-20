@@ -160,7 +160,7 @@
       <itemsPerPage>10</itemsPerPage>
     </property>
     <property>
-      <title>The Wiki Blog</title>
+      <title>$services.localization.render('xe.blog.code.title')</title>
     </property>
   </object>
   <content/>

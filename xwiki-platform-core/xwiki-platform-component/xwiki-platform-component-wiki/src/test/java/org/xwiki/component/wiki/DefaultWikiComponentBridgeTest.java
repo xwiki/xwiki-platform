@@ -22,6 +22,8 @@ package org.xwiki.component.wiki;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import javax.inject.Provider;
+
 import org.jmock.Expectations;
 import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Assert;
@@ -75,7 +77,7 @@ import com.xpn.xwiki.web.Utils;
     CompactWikiStringEntityReferenceSerializer.class
 })
 @MockingRequirement(value = DefaultWikiComponentBridge.class,
-    exceptions = {EntityReferenceSerializer.class, Parser.class})
+exceptions = {EntityReferenceSerializer.class, Parser.class})
 public class DefaultWikiComponentBridgeTest extends AbstractMockingComponentTestCase implements WikiComponentConstants
 {
     private static final DocumentReference DOC_REFERENCE = new DocumentReference("xwiki", "XWiki", "MyComponent");
@@ -99,8 +101,10 @@ public class DefaultWikiComponentBridgeTest extends AbstractMockingComponentTest
 
         Utils.setComponentManager(getComponentManager());
 
-        final Execution execution = getComponentManager().getInstance(Execution.class);
+        final Execution execution = registerMockComponent(Execution.class);
         final ExecutionContext context = new ExecutionContext();
+
+        final Provider<XWikiContext> xcontextProvider = getComponentManager().getInstance(XWikiContext.TYPE_PROVIDER);
 
         this.xwiki = getMockery().mock(XWiki.class);
 
@@ -116,7 +120,8 @@ public class DefaultWikiComponentBridgeTest extends AbstractMockingComponentTest
         getMockery().checking(new Expectations()
         {
             {
-
+                allowing(xcontextProvider).get();
+                will(returnValue(xwikiContext));
                 allowing(execution).getContext();
                 will(returnValue(context));
                 allowing(xwiki).getDocument(DOC_REFERENCE, xwikiContext);

@@ -198,16 +198,8 @@ public class DBTreeListClass extends DBListClass
     @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
-        List<String> selectlist;
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop == null) {
-            selectlist = new ArrayList<String>();
-        } else if (prop instanceof ListProperty) {
-            selectlist = ((ListProperty) prop).getList();
-        } else {
-            selectlist = new ArrayList<String>();
-            selectlist.add(String.valueOf(prop.getValue()));
-        }
+        List<String> selectlist = toList(prop);
 
         if (isPicker()) {
             String result = displayTree(name, prefix, selectlist, "edit", context);

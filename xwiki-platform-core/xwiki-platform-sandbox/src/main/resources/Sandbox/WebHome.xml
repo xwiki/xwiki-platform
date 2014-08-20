@@ -89,7 +89,7 @@ Here are a number of test pages you can play with:
 * [[Sandbox Test Page 2&gt;&gt;Sandbox.TestPage2]]
 * [[Sandbox Test Page 3&gt;&gt;Sandbox.TestPage3]]
 
-Below is a demonstration of the [[XWiki Syntax&gt;&gt;XWiki.XWikiSyntax]] you can use in wiki pages (headings, images, tables). 
+Below is a demonstration of the [[XWiki Syntax&gt;&gt;XWiki.XWikiSyntax]] you can use in wiki pages (headings, images, tables).
 
 = Headings =
 
@@ -155,13 +155,13 @@ You can create simple tables right into wiki pages:
 
 == Table with headers in the top row ==
 
-|= table header |= table header |= table header 
+|= table header |= table header |= table header
 | cell | cell | cell
 | cell | cell | cell
 
 == Table with headers in the top row and left column ==
 
-|= table header |= table header |= table header 
+|= table header |= table header |= table header
 |= table header | cell | cell
 |= table header | cell | cell
 

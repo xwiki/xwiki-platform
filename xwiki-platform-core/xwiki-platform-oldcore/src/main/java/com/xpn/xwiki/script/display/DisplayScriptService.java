@@ -92,14 +92,7 @@ public class DisplayScriptService implements ScriptService
     @Inject
     private SyntaxFactory syntaxFactory;
 
-    /**
-     * Displays a document.
-     * 
-     * @param document the document to display
-     * @param parameters the display parameters
-     * @return the result of displaying the given document
-     */
-    private String document(Document document, Map<String, Object> parameters)
+    private Syntax getOutputSyntax(Map<String, Object> parameters)
     {
         Syntax outputSyntax = (Syntax) parameters.get("outputSyntax");
         if (outputSyntax == null) {
@@ -115,11 +108,24 @@ public class DisplayScriptService implements ScriptService
                 outputSyntax = Syntax.XHTML_1_0;
             }
         }
-
+        
+        return outputSyntax;
+    }
+    
+    /**
+     * Displays a document.
+     * 
+     * @param document the document to display
+     * @param parameters the display parameters
+     * @return the result of displaying the given document
+     */
+    private String document(Document document, Map<String, Object> parameters, Syntax outputSyntax)
+    {
         DocumentDisplayerParameters displayerParameters =
             (DocumentDisplayerParameters) parameters.get(DISPLAYER_PARAMETERS_KEY);
         if (displayerParameters == null) {
             displayerParameters = new DocumentDisplayerParameters();
+            displayerParameters.setTargetSyntax(outputSyntax);
         }
 
         String displayerHint = (String) parameters.get("displayerHint");
@@ -186,8 +192,10 @@ public class DisplayScriptService implements ScriptService
             }
             // Ensure the content is displayed.
             displayerParameters.setTitleDisplayed(false);
+            Syntax outputSyntax = getOutputSyntax(parameters);
+            displayerParameters.setTargetSyntax(outputSyntax);
             actualParameters.put(DISPLAYER_PARAMETERS_KEY, displayerParameters);
-            renderedContent = document(document, actualParameters);
+            renderedContent = document(document, actualParameters, outputSyntax);
             if (renderedContent != null) {
                 renderingCache.setRenderedContent(document.getDocumentReference(), content, renderedContent, context);
             }
@@ -219,8 +227,10 @@ public class DisplayScriptService implements ScriptService
         }
         // Ensure the title is displayed.
         displayerParameters.setTitleDisplayed(true);
+        Syntax outputSyntax = getOutputSyntax(parameters);
+        displayerParameters.setTargetSyntax(outputSyntax);
         actualParameters.put(DISPLAYER_PARAMETERS_KEY, displayerParameters);
-        return document(document, actualParameters);
+        return document(document, actualParameters, outputSyntax);
     }
 
     /**

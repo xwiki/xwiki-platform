@@ -175,14 +175,11 @@ public class XWikiDavContext
     {
         try {
             CacheManager cacheManager = Utils.getComponent(CacheManager.class, "default");
-            CacheFactory factory = cacheManager.getCacheFactory();
             CacheConfiguration conf = new CacheConfiguration();
             LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
             lec.setTimeToLive(300);
             conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
-            davCache = factory.newCache(conf);
-        } catch (ComponentLookupException ex) {
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+            davCache = cacheManager.createNewCache(conf);
         } catch (CacheException ex) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
         }

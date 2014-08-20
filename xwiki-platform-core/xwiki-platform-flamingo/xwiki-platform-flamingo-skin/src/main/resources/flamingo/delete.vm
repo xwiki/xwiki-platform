@@ -1,0 +1,100 @@
+###
+### Delete page confirm message
+###
+###
+#template("startpage.vm")
+<div class="main">
+<div id="mainContentArea">
+#if($message)
+  <div id="xwikimessage">$message</div>
+#end
+#if("$!{request.id}" == '')
+#set($links = $doc.getBacklinks())
+#set($childrenStatement = 'where doc.fullName <> :parentFullName and (doc.parent = :parentFullName or (doc.parent = :parentName and doc.space = :parentSpace))')
+#set($childrenQuery = $services.query.xwql($childrenStatement))
+#set($discard = $childrenQuery.bindValue('parentFullName', $doc.fullName).bindValue('parentName', $doc.name).bindValue('parentSpace', $doc.space))
+#set($children = $childrenQuery.addFilter('unique').execute())
+#set($quote = '"')
+#set($hasInlinks = false)
+#set($fullmsg = '')
+#if($links && $links.size() > 0)
+  #set($tmpmsg = '</p><ul>')
+  #foreach($docname in $links)
+    #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+    #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>$escapetool.xml(${rdoc.getPlainTitle()})</a></li>")
+  #end
+  #set($tmpmsg = "${tmpmsg}</ul><p class='xwikimessage'>")
+  #set($tmpmsg = $services.localization.render('core.delete.backlinksWarning', [$tmpmsg]))
+  #set($fullmsg = "${fullmsg}${tmpmsg}</p><p class='xwikimessage'>")
+  #set($hasInlinks = true)
+#end
+#if($children && $children.size() > 0)
+  #set($tmpmsg = '</p><ul>')
+  #foreach($docname in $children)
+    #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+    #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>$escapetool.xml(${rdoc.getPlainTitle()})</a></li>")
+  #end
+  #set($tmpmsg = "${tmpmsg}</ul><p class='xwikimessage'>")
+  #set($tmpmsg = $services.localization.render('core.delete.orphansWarning', [$tmpmsg]))
+  #set($fullmsg = "${fullmsg}${tmpmsg}</p><p class='xwikimessage'>")
+  #set($hasInlinks = true)
+#end
+#if($xwiki.hasRecycleBin())
+  #if($hasInlinks)
+    #set($fullmsg = "${fullmsg}${services.localization.render('core.recyclebin.confirmWithInlinks')}")
+  #else
+    #set($fullmsg = $services.localization.render('core.recyclebin.confirm'))
+  #end
+#else
+  #if($hasInlinks)
+    #set($fullmsg = "${fullmsg}${services.localization.render('core.delete.confirmWithInlinks')}")
+  #else
+    #set($fullmsg = $services.localization.render('core.delete.confirm'))
+  #end
+#end
+  #xwikimessageboxstart($services.localization.render('core.delete') $fullmsg)
+    <form action="$doc.getURL('delete', "$!{languageparams}")" method="post">
+      <div class="hidden">
+        <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+        <input type="hidden" name="confirm" value="1"/>
+        #if("$!{request.xredirect}" != '')
+          <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
+        #end
+      </div>
+      <div class="buttonwrapper"> 
+        <input type="submit" class="button" value="$services.localization.render('yes')"/>
+        #if("$!{request.xredirect}" != '')
+          #set($cancelUrl = "$request.xredirect")
+        #else
+          #set($cancelUrl = $doc.getURL())
+        #end
+        <a class="secondary button" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('no')</a>
+      </div>
+    </form>
+  #xwikimessageboxend()
+#else ## request.id
+  #xwikimessageboxstart($services.localization.render('core.delete') $services.localization.render('core.recyclebin.completelyDeleteConfirm'))
+    <form action="" method="post">
+      <div class="hidden">
+        ## CSRF prevention
+        <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+        <input type="hidden" name="confirm" value="1"/>
+        <input type="hidden" name="id" value="$!{escapetool.xml($request.id)}"/>
+        #if("$!{request.xredirect}" != '')
+          <input type="hidden" name="xredirect" value="$!{escapetool.xml($request.xredirect)}"/>
+        #end
+      </div>
+      <div class="buttonwrapper"><input type="submit" class="button" value="$services.localization.render('yes')"/></div>
+      #if("$!{request.xredirect}" != '')
+        #set($cancelUrl = "$request.xredirect")
+      #else
+        #set($cancelUrl = $doc.getURL())
+      #end
+      <div class="buttonwrapper"><a class="secondary button" href="$!{escapetool.xml(${cancelUrl})}">$services.localization.render('no')</a></div>
+    </form>
+  #xwikimessageboxend()
+#end
+<div class="clearfloats"></div>
+</div>## mainContentArea
+</div>## main
+#template("endpage.vm")

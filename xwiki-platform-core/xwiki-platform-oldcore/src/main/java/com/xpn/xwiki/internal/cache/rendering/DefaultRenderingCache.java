@@ -21,11 +21,14 @@ package com.xpn.xwiki.internal.cache.rendering;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.cache.CacheException;
@@ -38,6 +41,9 @@ import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.cache.DocumentCache;
+import com.xpn.xwiki.internal.cache.rendering.CachedItem.UsedExtension;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
 
 /**
  * Default implementation of {@link RenderingCache}.
@@ -71,10 +77,21 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
     private RenderingCacheConfiguration configuration;
 
     /**
+     * Provider of all components implementing RenderingCacheAware.
+     */
+    @Inject
+    private Provider<List<RenderingCacheAware>> renderingCacheAwareProvider;
+
+    /**
+     * List of legacy plugin components implementing RenderingCacheAware.
+     */
+    private List<RenderingCacheAware> legacyRenderingCacheAware;
+
+    /**
      * Actually cache object.
      */
     @Inject
-    private DocumentCache<String> cache;
+    private DocumentCache<CachedItem> cache;
 
     @Override
     public void initialize() throws InitializationException
@@ -106,9 +123,12 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
             String refresh = context.getRequest() != null ? context.getRequest().getParameter(PARAMETER_REFRESH) : null;
 
             if (!"1".equals(refresh)) {
-                renderedContent =
+                CachedItem cachedItem =
                         this.cache.get(documentReference, source, getAction(context), context.getLanguage(),
                                 getRequestParameters(context));
+                if (cachedItem != null) {
+                    renderedContent = restoreCachedItem(context, cachedItem);
+                }
             }
         }
 
@@ -117,12 +137,61 @@ public class DefaultRenderingCache implements RenderingCache, Initializable
 
     @Override
     public void setRenderedContent(DocumentReference documentReference, String source, String renderedContent,
-            XWikiContext context)
-    {
+            XWikiContext context) {
         if (this.configuration.isCached(documentReference)) {
-            this.cache.set(renderedContent, documentReference, source, getAction(context), context.getLanguage(),
-                    getRequestParameters(context));
+            this.cache.set(buildCachedItem(context, renderedContent), documentReference, source, getAction(context),
+                           context.getLanguage(), getRequestParameters(context));
         }
+    }
+
+    /**
+     * Create cached item with all dependencies.
+     *
+     * @param context current xwiki context
+     * @param renderedContent rendered page content
+     * @return properly cached item
+     */
+    private CachedItem buildCachedItem(XWikiContext context, String renderedContent) {
+        CachedItem cachedItem = new CachedItem();
+
+        for (RenderingCacheAware component: renderingCacheAwareProvider.get()) {
+            cachedItem.extensions.put(component, component.getCacheResources(context));
+        }
+
+        // support for legacy core -> build non-blocking list (lazy)
+        if (legacyRenderingCacheAware == null) {
+            legacyRenderingCacheAware = new LinkedList<RenderingCacheAware>();
+            XWikiPluginManager pluginManager = context.getWiki().getPluginManager();
+            for (String pluginName: pluginManager.getPlugins()) {
+                XWikiPluginInterface plugin = pluginManager.getPlugin(pluginName);
+
+                if (plugin instanceof RenderingCacheAware) {
+                    legacyRenderingCacheAware.add((RenderingCacheAware) plugin);
+                }
+            }
+        }
+
+        for (RenderingCacheAware component: legacyRenderingCacheAware) {
+            cachedItem.extensions.put(component, component.getCacheResources(context));
+        }
+
+        cachedItem.rendered = renderedContent;
+        return cachedItem;
+    }
+
+    /**
+     * Restore component state from a cache entry and return correct content.
+     *
+     * @param context the current xwiki context
+     * @param cachedItem The cache item to return
+     * @return the rendered text
+     */
+    private String restoreCachedItem(XWikiContext context, CachedItem cachedItem) {
+        for (Map.Entry<RenderingCacheAware, UsedExtension> item : cachedItem.extensions.entrySet()) {
+            item.getKey().restoreCacheResources(context, item.getValue());
+        }
+
+        return cachedItem.rendered;
     }
 
     /**

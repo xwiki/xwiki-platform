@@ -19,19 +19,26 @@
  */
 package org.xwiki.component.script;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.internal.multi.ComponentManagerManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 /**
@@ -40,6 +47,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
  * @version $Id$
  * @since 4.1M2
  */
+@ComponentList(ContextComponentManagerProvider.class)
 public class ComponentScriptServiceTest
 {
     /**
@@ -50,8 +58,8 @@ public class ComponentScriptServiceTest
     }
 
     @Rule
-    public MockitoComponentMockingRule<ComponentScriptService> mocker =
-        new MockitoComponentMockingRule<>(ComponentScriptService.class);
+    public MockitoComponentMockingRule<ComponentScriptService> mocker = new MockitoComponentMockingRule<>(
+        ComponentScriptService.class);
 
     /**
      * Used to check programming rights.
@@ -69,7 +77,7 @@ public class ComponentScriptServiceTest
     public void configure() throws Exception
     {
         this.dab = this.mocker.getInstance(DocumentAccessBridge.class);
-        this.contextComponentManager = this.mocker.getInstance(ComponentManager.class, "context");
+        this.contextComponentManager = this.mocker.registerMockComponent(ComponentManager.class, "context");
         this.execution = this.mocker.getInstance(Execution.class);
     }
 
@@ -158,8 +166,7 @@ public class ComponentScriptServiceTest
     public void getComponentInstanceWhenComponentDoesntExist() throws Exception
     {
         when(this.dab.hasProgrammingRights()).thenReturn(true);
-        when(this.contextComponentManager.getInstance(SomeRole.class)).thenThrow(
-            new ComponentLookupException("error"));
+        when(this.contextComponentManager.getInstance(SomeRole.class)).thenThrow(new ComponentLookupException("error"));
         ExecutionContext context = new ExecutionContext();
         when(this.execution.getContext()).thenReturn(context);
 

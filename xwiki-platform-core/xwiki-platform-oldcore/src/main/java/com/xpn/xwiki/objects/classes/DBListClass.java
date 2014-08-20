@@ -469,7 +469,7 @@ public class DBListClass extends ListClass
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         // input display
-        if (getDisplayType().equals("input")) {
+        if (getDisplayType().equals(DISPLAYTYPE_INPUT)) {
             input input = new input();
             input.setAttributeFilter(new XMLAttributeValueFilter());
             input.setType("text");
@@ -541,7 +541,7 @@ public class DBListClass extends ListClass
 
             input.setDisabled(isDisabled());
             buffer.append(input.toString());
-        } else if (getDisplayType().equals("radio") || getDisplayType().equals("checkbox")) {
+        } else if (getDisplayType().equals(DISPLAYTYPE_RADIO) || getDisplayType().equals(DISPLAYTYPE_CHECKBOX)) {
             displayRadioEdit(buffer, name, prefix, object, context);
         } else {
             displaySelectEdit(buffer, name, prefix, object, context);

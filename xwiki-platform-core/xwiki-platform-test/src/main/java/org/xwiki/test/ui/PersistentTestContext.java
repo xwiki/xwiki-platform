@@ -57,7 +57,6 @@ public class PersistentTestContext
     public PersistentTestContext() throws Exception
     {
         this(new XWikiExecutor(0));
-        this.executor.start();
     }
 
     /**
@@ -88,6 +87,11 @@ public class PersistentTestContext
         return this.driver;
     }
 
+    public XWikiExecutor getExecutor()
+    {
+        return this.executor;
+    }
+
     /**
      * @return Utility class with functions not specific to any test or element.
      */
@@ -109,7 +113,7 @@ public class PersistentTestContext
 
     /**
      * Get a clone of this context which cannot be stopped by calling shutdown. this is needed so that individual tests
-     * don't shutdown when AllTests ware being run.
+     * don't shutdown when AllTests are being run.
      */
     public PersistentTestContext getUnstoppable()
     {

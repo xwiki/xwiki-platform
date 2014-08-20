@@ -57,7 +57,12 @@ public class PageObjectSuite extends XWikiExecutorSuite
 
         try {
             this.context = new PersistentTestContext(getExecutors().get(0));
-            AbstractTest.setContext(context.getUnstoppable());
+            AbstractTest.setContext(this.context.getUnstoppable());
+
+            // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
+            // in TestUtils), including the login form. Whenever a new user logs in we need to recache.
+            // Note that this requires a running XWiki instance.
+            AbstractTest.context.getUtil().recacheSecretToken();
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize PersistentTestContext", e);
         }

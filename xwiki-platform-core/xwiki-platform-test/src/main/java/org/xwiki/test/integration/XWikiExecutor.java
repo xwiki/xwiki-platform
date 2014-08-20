@@ -98,6 +98,12 @@ public class XWikiExecutor
      */
     private boolean wasStarted;
 
+    /**
+     * If true we've been successful in starting XWiki and we can stop it when the test exits. If not then we shouldn't
+     * try to stop XWiki since it's been started successfully.
+     */
+    private boolean hasXWikiBeenStartedProperly;
+
     private class Response
     {
         public boolean timedOut;
@@ -180,6 +186,7 @@ public class XWikiExecutor
                 LOGGER.info("Starting XWiki server at [{}:{}]", URL, getPort());
                 startXWiki();
                 waitForXWikiToLoad();
+                this.hasXWikiBeenStartedProperly = true;
             } else {
                 LOGGER.info("XWiki server is already started!");
             }
@@ -312,6 +319,11 @@ public class XWikiExecutor
 
     public void stop() throws Exception
     {
+        // Do not try to stop XWiki if we've not been successful in starting it!
+        if (!this.hasXWikiBeenStartedProperly) {
+            return;
+        }
+
         // Stop XWiki if it was started by start()
         if (!this.wasStarted) {
             DefaultExecuteResultHandler stopProcessHandler = executeCommand(getDefaultStopCommand(getStopPort()));

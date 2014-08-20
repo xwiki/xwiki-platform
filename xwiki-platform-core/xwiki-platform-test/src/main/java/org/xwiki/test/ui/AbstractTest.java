@@ -66,10 +66,6 @@ public abstract class AbstractTest
         AbstractTest.context = context;
         BaseElement.setContext(context);
         TestUtils.setContext(context);
-
-        // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
-        // in TestUtils), including the login form. Whenever a new user logs in we need to recache
-        getUtil().recacheSecretToken();
     }
 
     @BeforeClass
@@ -77,7 +73,16 @@ public abstract class AbstractTest
     {
         // This will not be null if we are in the middle of allTests
         if (context == null) {
-            setContext(new PersistentTestContext());
+            PersistentTestContext persistentTestContext = new PersistentTestContext();
+            setContext(persistentTestContext);
+
+            // Start XWiki
+            persistentTestContext.getExecutor().start();
+
+            // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
+            // in TestUtils), including the login form. Whenever a new user logs in we need to recache.
+            // Note that this requires a running XWiki instance.
+            getUtil().recacheSecretToken();
         }
     }
 

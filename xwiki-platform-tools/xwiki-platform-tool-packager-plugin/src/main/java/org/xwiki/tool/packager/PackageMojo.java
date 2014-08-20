@@ -49,6 +49,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.plugin.AbstractMojo;
@@ -70,7 +71,6 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.hibernate.cfg.Environment;
-import org.sonatype.aether.RepositorySystemSession;
 import org.xwiki.velocity.internal.log.SLF4JLogChute;
 
 import com.xpn.xwiki.XWikiContext;
@@ -147,12 +147,12 @@ public class PackageMojo extends AbstractMojo
     protected RepositorySystem repositorySystem;
 
     /**
-     * The current repository/network configuration of Maven.
-     * 
-     * @parameter default-value="${repositorySystemSession}"
+     * The current Maven session being executed.
+     *
+     * @parameter default-value="${session}"
      * @readonly
      */
-    private RepositorySystemSession repositorySystemSession;
+    private MavenSession session;
 
     /**
      * Local repository to be used by the plugin to resolve dependencies.
@@ -733,11 +733,13 @@ public class PackageMojo extends AbstractMojo
     {
         try {
             ProjectBuildingRequest request =
-                new DefaultProjectBuildingRequest().setRepositorySession(this.repositorySystemSession)
+                new DefaultProjectBuildingRequest(this.session.getProjectBuildingRequest())
                 // We don't want to execute any plugin here
                     .setProcessPlugins(false)
                     // It's not this plugin job to validate this pom.xml
-                    .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+                    .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
+                    // Use the repositories configured for the built project instead of the default Maven ones
+                    .setRemoteRepositories(this.session.getCurrentProject().getRemoteArtifactRepositories());
             // Note: build() will automatically get the POM artifact corresponding to the passed artifact.
             ProjectBuildingResult result = this.projectBuilder.build(artifact, request);
             return result.getProject();

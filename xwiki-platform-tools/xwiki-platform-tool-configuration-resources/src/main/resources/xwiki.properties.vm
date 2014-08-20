@@ -270,17 +270,28 @@ rendering.transformations = $xwikiRenderingTransformations
 # Velocity
 #-------------------------------------------------------------------------------------
 
-#-# [Since 2.0M1]
+#-# [Since 2.0M1 - Format changed in 6.2M2]
 #-# Velocity Tools that will be available from your scripts. The format is
-#-# velocity.tools = <name under which it'll be available in the context> = <class name>
+#-# velocity.tools = <scope>.<name under which it'll be available in the context> = <class name>
+#-#
+#-# See this example for more details on the syntax:
+#-# http://velocity.apache.org/tools/releases/2.0/config.properties.html
+#-#
 #-# Default values (no need to add them)
-#-#   velocity.tools = listtool = org.apache.velocity.tools.generic.ListTool
-#-#   velocity.tools = numbertool = org.apache.velocity.tools.generic.NumberTool
-#-#   velocity.tools = datetool = org.apache.velocity.tools.generic.ComparisonDateTool
-#-#   velocity.tools = mathtool = org.apache.velocity.tools.generic.MathTool
-#-#   velocity.tools = sorttool = org.apache.velocity.tools.generic.SortTool     
-#-#   velocity.tools = escapetool = org.apache.velocity.tools.generic.EscapeTool
-#-#   velocity.tools = regextool = org.xwiki.velocity.tools.RegexTool
+#-#
+#-#   velocity.tools = toolbox = request,application
+#-#
+#-#   velocity.tools = application.listtool = org.apache.velocity.tools.generic.ListTool
+#-#   velocity.tools = application.numbertool = org.apache.velocity.tools.generic.NumberTool
+#-#   velocity.tools = application.datetool = org.apache.velocity.tools.generic.ComparisonDateTool
+#-#   velocity.tools = application.mathtool = org.apache.velocity.tools.generic.MathTool
+#-#   velocity.tools = application.sorttool = org.apache.velocity.tools.generic.SortTool
+#-#   velocity.tools = application.escapetool = org.apache.velocity.tools.generic.EscapeTool
+#-#   velocity.tools = application.regextool = org.xwiki.velocity.tools.RegexTool
+#-#   velocity.tools = application.collectionstool = org.xwiki.velocity.tools.CollectionsTool
+#-#   velocity.tools = application.stringtool = org.apache.commons.lang3.StringUtils
+#-#   velocity.tools = application.jsontool = org.xwiki.velocity.tools.JSONTool
+#-#   velocity.tools = request.cookietool = org.apache.velocity.tools.view.CookieTool
 
 #-# [Since 2.0M1]
 #-# Velocity configuration properties. The format is

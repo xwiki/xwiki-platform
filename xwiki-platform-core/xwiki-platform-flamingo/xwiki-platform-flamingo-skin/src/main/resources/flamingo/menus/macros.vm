@@ -157,7 +157,7 @@
 #end
 
 #macro(xwikibutton $actionurl $linktext $id $class $icon)
-  <a href="$actionurl" class="btn $!class" role="button">#glyphicon($icon) $linktext</a>
+  <a href="$actionurl" class="btn $!class" role="button" #if(!$stringtool.isBlank($id))id="$id"#end>#glyphicon($icon) $linktext</a>
 #end
 
 #macro(xwikibuttonentrystart $actionurl $linktext $id $class $icon)

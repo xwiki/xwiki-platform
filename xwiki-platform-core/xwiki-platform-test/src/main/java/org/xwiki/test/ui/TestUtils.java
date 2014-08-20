@@ -990,6 +990,16 @@ public class TestUtils
         }
     }
 
+    public boolean hasElementWithoutWaiting(By by)
+    {
+        try {
+            findElementWithoutWaiting(getDriver(), by);
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
     /**
      * Should be used when the result is supposed to be true (otherwise you'll incur the timeout).
      */

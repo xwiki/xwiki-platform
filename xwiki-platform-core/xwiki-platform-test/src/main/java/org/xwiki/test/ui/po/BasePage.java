@@ -57,7 +57,7 @@ public class BasePage extends BaseElement
     @FindBy(id = "tmCreateSpace")
     private WebElement createSpaceMenuLink;
 
-    @FindBy(id = "tmCreate")
+    @FindBy(xpath = "//div[@id='tmCreate']//button[contains(@class, 'dropdown-toggle')]")
     private WebElement createMenu;
 
     @FindBy(id = "tmActionCopy")
@@ -156,7 +156,12 @@ public class BasePage extends BaseElement
      */
     public void edit()
     {
-        getDriver().findElement(By.xpath("//div[@id='tmEdit']//a")).click();
+        // The edit button is not the same depending on the user is advanced or not
+        if (getUtil().hasElementWithoutWaiting(By.xpath("//div[@id='tmEdit']//a"))) {
+            getDriver().findElement(By.xpath("//div[@id='tmEdit']//a")).click();
+        } else {
+            getDriver().findElement(By.xpath("//a[@id='tmEdit']")).click();
+        }
     }
 
     /**

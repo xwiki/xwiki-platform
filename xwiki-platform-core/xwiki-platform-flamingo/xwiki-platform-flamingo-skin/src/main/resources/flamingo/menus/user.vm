@@ -15,7 +15,7 @@
 ##
 #if (!$isGuest)
 #if ($isSuperAdmin)
-  #xwikitopmenuentrystart('', $!services.localization.render('superadmin'), 'tmUser', 'hasIcon navbar-avatar', $userGlyphIcon, '')
+  #xwikitopmenuentrystart('', $!services.localization.render('superadmin'), 'tmUser', 'hasIcon navbar-avatar', 'user', '')
     ## LOGOUT
     #set ($logouturl = $xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
     #xwikitopmenuentry($!logouturl $!services.localization.render('logout') 'tmLogout', '', 'log-out')

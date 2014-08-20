@@ -65,7 +65,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * Maven 2 plugin to import aset of XWiki documents into an existing database.
- * 
+ *
  * @version $Id$
  * @goal import
  * @requiresDependencyResolution compile
@@ -109,7 +109,7 @@ public class ImportMojo extends AbstractMojo
 
     /**
      * The maven project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -118,7 +118,7 @@ public class ImportMojo extends AbstractMojo
 
     /**
      * Project builder -- builds a model from a pom.xml.
-     * 
+     *
      * @component role="org.apache.maven.project.ProjectBuilder"
      * @required
      * @readonly
@@ -127,7 +127,7 @@ public class ImportMojo extends AbstractMojo
 
     /**
      * Used to look up Artifacts in the remote repository.
-     * 
+     *
      * @component
      * @required
      */
@@ -267,7 +267,7 @@ public class ImportMojo extends AbstractMojo
         if (StringUtils.isNotBlank(featuresString)) {
             featuresString = featuresString.replaceAll("[\r\n]", "");
             ConverterManager converter = componentManager.getInstance(ConverterManager.class);
-            extension.setFeatures(converter.<Collection<String>> convert(List.class, featuresString));
+            extension.setFeatures(converter.<Collection<String>>convert(List.class, featuresString));
         }
 
         // dependencies

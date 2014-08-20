@@ -42,7 +42,7 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 /**
  * Common code for importing and exporting.
- * 
+ *
  * @version $Id$
  */
 public abstract class AbstractPackager
@@ -125,7 +125,7 @@ public abstract class AbstractPackager
 
     /**
      * Free resources initialized by {@link #createXWikiContext(String, File)}.
-     * 
+     *
      * @param xcontext the XWiki context
      * @throws ComponentLookupException when failing to dispose component manager
      */

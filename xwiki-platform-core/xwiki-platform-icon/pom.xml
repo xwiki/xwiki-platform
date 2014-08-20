@@ -37,6 +37,6 @@
     <module>xwiki-platform-icon-script</module>
     <module>xwiki-platform-icon-ui</module>
     <!-- Icon Themes -->
-    <module>xwiki-platform-icon-font-awesome</module>
+    <module>xwiki-platform-icon-fontawesome</module>
   </modules>
 </project>

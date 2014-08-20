@@ -208,12 +208,6 @@
   .make-xs-column(12);
 }
 
-<<<<<<< HEAD:xwiki-platform-core/xwiki-platform-flamingo/src/main/resources/flamingo/less/layout.less
-#xdocAuthors {
-  padding: 3px 0;
-  text-align: right;
-}
-=======
 .rightmenu{
   display: inline;
 }
@@ -223,7 +217,7 @@
 .main {
   background-color: @xwiki-page-content-bg;
    div& { // Do not apply on WYSIWYG body.main
-    box-shadow: 0 1px 2px @xwiki-border-color;
+    box-shadow: 0 1px 2px @border-color;
   }
 }
 
@@ -236,10 +230,6 @@
 
 #mainContentArea > .xcontent {
   margin-top: @line-height-computed / 2;
-}
-
-#xwikicontent {
-  overflow: auto;
 }
 
 .document-header {
@@ -257,12 +247,12 @@
   .clearfix;
   border-bottom-left-radius: @border-radius-base;
   border-bottom-right-radius: @border-radius-base;
-  box-shadow: 0px 1px 1px @xwiki-border-color;
+  box-shadow: 0px 1px 1px @border-color;
   margin: (@grid-gutter-width / 2) 0;
   padding: @breadcrumb-padding-vertical @breadcrumb-padding-horizontal;
 }
 
-#xdocAuthors {
+#xdocCreator {
   text-align: right;
 }
 
@@ -282,4 +272,3 @@
     }
   }
 }
->>>>>>> upstream/master:xwiki-platform-core/xwiki-platform-flamingo/xwiki-platform-flamingo-skin/src/main/resources/flamingo/less/layout.less

@@ -131,7 +131,7 @@
          pom.xml that uses this packager plugin is built after those deps are built -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-colibri</artifactId>
+      <artifactId>xwiki-platform-flamingo-skin</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
       <scope>runtime</scope>
@@ -161,6 +161,24 @@
       <artifactId>xwiki-platform-tool-rootwebapp</artifactId>
       <version>${project.version}</version>
       <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-less-css-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-less-css-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

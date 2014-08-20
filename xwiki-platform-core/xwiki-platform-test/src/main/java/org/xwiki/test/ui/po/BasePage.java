@@ -78,9 +78,6 @@ public class BasePage extends BaseElement
     @FindBys({@FindBy(id = "tmLogin"), @FindBy(tagName = "a")})
     private WebElement loginLink;
 
-    @FindBys({@FindBy(id = "tmLogout"), @FindBy(tagName = "a")})
-    private WebElement logoutLink;
-
     @FindBy(xpath = "//li[@id='tmUser']/a[0]")
     private WebElement userLink;
 
@@ -300,7 +297,12 @@ public class BasePage extends BaseElement
      */
     public void toggleWikiMenu()
     {
-        getDriver().findElement(By.xpath("//li[@id='tmMainWiki']//a[contains(@class, 'dropdown-toggle')]")).click();
+        // Depending on if the current wiki is a subwiki or not
+        String wikiMenuId = "tmWiki";
+        if (!getUtil().hasElement(By.id(wikiMenuId))) {
+            wikiMenuId = "tmMainWiki";
+        }
+        getDriver().findElement(By.xpath("//li[@id='"+wikiMenuId+"']//a[contains(@class, 'dropdown-toggle')]")).click();
     }
 
     /**
@@ -398,7 +400,7 @@ public class BasePage extends BaseElement
     public void logout()
     {
         toggleUserMenu();
-        this.logoutLink.click();
+        getDriver().findElement(By.id("tmLogout")).click();
         // Update the CSRF token because the context user has changed (it's guest user now). Otherwise, APIs like
         // TestUtils#createUser*(), which expect the currently cached token to be valid, will fail because they would be
         // using the token of the previously logged in user.

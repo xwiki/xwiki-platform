@@ -264,7 +264,7 @@ public class PackageMojo extends AbstractMojo
         Artifact hsqldbArtifact = resolveHSQLDBArtifact();
         copyFile(hsqldbArtifact.getFile(), libDirectory);
 
-        // Step 7: Unzip the specified Skins. If no skin is specified then unzip the Colibri skin only.
+        // Step 7: Unzip the specified Skins. If no skin is specified then unzip the Flamingo skin only.
         getLog().info("Copying Skins ...");
         File skinsDirectory = new File(xwikiWebappDirectory, "skins");
         if (this.skinArtifactItems != null) {
@@ -273,9 +273,9 @@ public class PackageMojo extends AbstractMojo
                 unzip(skinArtifact.getFile(), skinsDirectory);
             }
         } else {
-            Artifact colibriArtifact =
-                resolveArtifact("org.xwiki.platform", "xwiki-platform-colibri", getXWikiPlatformVersion(), "zip");
-            unzip(colibriArtifact.getFile(), skinsDirectory);
+            Artifact flamingoArtifact =
+                resolveArtifact("org.xwiki.platform", "xwiki-platform-flamingo-skin", getXWikiPlatformVersion(), "zip");
+            unzip(flamingoArtifact.getFile(), skinsDirectory);
         }
 
         // Step 8: Extract SmartClient library from smartGWT to be used by the XWiki Explorer Tree.
@@ -659,6 +659,14 @@ public class PackageMojo extends AbstractMojo
             "xwiki-platform-url-standard", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-wiki-default", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-less-css-default", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-less-css-script", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-webjars", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.webjars",
+            "bootstrap", "3.2.0", null, "jar"));
 
         // Ensures all logging goes through SLF4J and Logback.
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.commons",
@@ -906,8 +914,8 @@ public class PackageMojo extends AbstractMojo
             + "        com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin");
         props.setProperty("xwikiCfgVirtualUsepath", "1");
         props.setProperty("xwikiCfgEditCommentMandatory", "0");
-        props.setProperty("xwikiCfgDefaultSkin", "colibri");
-        props.setProperty("xwikiCfgDefaultBaseSkin", "colibri");
+        props.setProperty("xwikiCfgDefaultSkin", "flamingo");
+        props.setProperty("xwikiCfgDefaultBaseSkin", "flamingo");
         props.setProperty("xwikiCfgEncoding", "UTF-8");
 
         // Other default configuration properties

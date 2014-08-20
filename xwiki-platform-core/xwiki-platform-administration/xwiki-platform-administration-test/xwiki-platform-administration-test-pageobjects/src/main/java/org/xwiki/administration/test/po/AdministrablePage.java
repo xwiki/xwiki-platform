@@ -20,7 +20,6 @@
 package org.xwiki.administration.test.po;
 
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -32,9 +31,6 @@ import org.xwiki.test.ui.po.ViewPage;
  */
 public class AdministrablePage extends ViewPage
 {
-    @FindBy(id = "tmWiki")
-    private WebElement wikiMenu;
-
     @FindBy(id = "tmAdminWiki")
     private WebElement administerWikiLink;
 
@@ -43,7 +39,7 @@ public class AdministrablePage extends ViewPage
      */
     public AdministrationPage clickAdministerWiki()
     {
-        new Actions(getDriver()).moveToElement(wikiMenu).perform();
+        toggleWikiMenu();
         this.administerWikiLink.click();
         return new AdministrationPage();
     }

@@ -43,7 +43,7 @@
     <!-- LESS Module -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-less-css-script</artifactId>
+      <artifactId>xwiki-platform-lesscss-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

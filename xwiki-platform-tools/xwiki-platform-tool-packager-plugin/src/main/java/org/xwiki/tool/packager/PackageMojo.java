@@ -660,9 +660,9 @@ public class PackageMojo extends AbstractMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-wiki-default", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-less-css-default", getXWikiPlatformVersion(), null, "jar"));
+            "xwiki-platform-lesscss-default", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-less-css-script", getXWikiPlatformVersion(), null, "jar"));
+            "xwiki-platform-lesscss-script", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-webjars", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.webjars",

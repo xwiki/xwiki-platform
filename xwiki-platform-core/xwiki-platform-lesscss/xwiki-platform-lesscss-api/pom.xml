@@ -24,22 +24,29 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-lesscss</artifactId>
     <version>6.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-less-css</artifactId>
-  <packaging>pom</packaging>
-  <name>XWiki Platform - LESS CSS</name>
+  <artifactId>xwiki-platform-lesscss-api</artifactId>
+  <name>XWiki Platform - LESS CSS - API</name>
+  <packaging>jar</packaging>
   <description>TODO</description>
+  <properties>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>
+    org.xwiki.platform:xwiki-platform-less-css-api
+    </xwiki.extension.features>
+  </properties>
   <dependencies>
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-stability</artifactId>
+      <version>${commons.version}</version>
     </dependency>
   </dependencies>
-  <modules>
-    <module>xwiki-platform-less-css-api</module>
-    <module>xwiki-platform-less-css-default</module>
-    <module>xwiki-platform-less-css-script</module>
-  </modules>
 </project>

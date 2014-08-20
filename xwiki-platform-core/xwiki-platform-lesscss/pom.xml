@@ -24,23 +24,22 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-less-css</artifactId>
+    <artifactId>xwiki-platform-core</artifactId>
     <version>6.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-less-css-api</artifactId>
-  <name>XWiki Platform - LESS CSS - API</name>
-  <packaging>jar</packaging>
+  <artifactId>xwiki-platform-lesscss</artifactId>
+  <packaging>pom</packaging>
+  <name>XWiki Platform - LESS CSS</name>
   <description>TODO</description>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-stability</artifactId>
-      <version>${commons.version}</version>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
     </dependency>
   </dependencies>
+  <modules>
+    <module>xwiki-platform-lesscss-api</module>
+    <module>xwiki-platform-lesscss-default</module>
+    <module>xwiki-platform-lesscss-script</module>
+  </modules>
 </project>

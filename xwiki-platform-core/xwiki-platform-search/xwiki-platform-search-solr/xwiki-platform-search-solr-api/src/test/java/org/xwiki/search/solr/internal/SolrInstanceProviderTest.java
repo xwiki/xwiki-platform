@@ -19,7 +19,8 @@
  */
 package org.xwiki.search.solr.internal;
 
-import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.net.URL;
@@ -29,7 +30,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 import org.xwiki.search.solr.internal.api.SolrInstance;
@@ -56,12 +56,13 @@ public class SolrInstanceProviderTest
     public void setUp() throws Exception
     {
         URL url = this.getClass().getClassLoader().getResource("solrhome");
-        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, url.getPath());
+
+        this.mockConfig = this.mocker.getInstance(SolrConfiguration.class);
+        when(this.mockConfig.getInstanceConfiguration(eq(EmbeddedSolrInstance.TYPE), eq("home"), anyString()))
+            .thenReturn(url.getPath());
 
         this.embedded = this.mocker.registerMockComponent(SolrInstance.class, "embedded");
         this.remote = this.mocker.registerMockComponent(SolrInstance.class, "remote");
-
-        this.mockConfig = this.mocker.getInstance(SolrConfiguration.class);
     }
 
     @Test

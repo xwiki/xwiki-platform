@@ -57,11 +57,6 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
     public static final String TYPE = "embedded";
 
     /**
-     * Solr home directory system property.
-     */
-    public static final String SOLR_HOME_SYSTEM_PROPERTY = "solr.solr.home";
-
-    /**
      * Default directory name for Solr's configuration and index files.
      */
     public static final String DEFAULT_SOLR_DIRECTORY_NAME = "solr";
@@ -93,11 +88,10 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
 
             // Start embedded Solr server.
             this.logger.info("Starting embedded Solr server...");
-            System.setProperty(SOLR_HOME_SYSTEM_PROPERTY, solrHome);
             this.logger.info("Using Solr home directory: [{}]", solrHome);
 
             // Initialize the SOLR back-end using an embedded server.
-            this.container = createCoreContainer();
+            this.container = createCoreContainer(solrHome);
             // If we get here then there is at least one core found. We there are more, we use the first one.
             String coreName = this.container.getCores().iterator().next().getName();
             this.server = new EmbeddedSolrServer(container, coreName);
@@ -109,9 +103,9 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
         }
     }
 
-    private CoreContainer createCoreContainer() throws SolrServerException
+    private CoreContainer createCoreContainer(String solrHome) throws SolrServerException
     {
-        CoreContainer coreContainer = new CoreContainer();
+        CoreContainer coreContainer = new CoreContainer(solrHome);
         coreContainer.load();
         if (coreContainer.getCores().size() == 0) {
             throw new SolrServerException("Failed to initialize the Solr core. "
@@ -167,8 +161,8 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
             if (!solrHomeDirectory.mkdirs()) {
                 // Does not exist and can not be created.
                 throw new IllegalArgumentException(String.format(
-                    "The given path [%s] could not be created due to insufficient filesystem permissions",
-                    solrHomeDirectory));
+                    "The given path [%s] could not be created due to and invalid value %s", solrHomeDirectory,
+                    "or to insufficient filesystem permissions"));
             }
 
             // Initialize the Solr Home with the default configuration files if the folder does not already exist.
@@ -182,15 +176,10 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
     }
 
     /**
-     * @return the home directory determined from the {@value #SOLR_HOME_SYSTEM_PROPERTY} system property, configuration
-     *         or default location (in that order).
+     * @return the configured home directory location or the default value if no configuration is present.
      */
     private String determineHomeDirectory()
     {
-        if (StringUtils.isNotBlank(System.getProperty(SOLR_HOME_SYSTEM_PROPERTY))) {
-            return System.getProperty(SOLR_HOME_SYSTEM_PROPERTY);
-        }
-
         String defaultValue = getDefaultHomeDirectory();
 
         return this.solrConfiguration.getInstanceConfiguration(TYPE, "home", defaultValue);

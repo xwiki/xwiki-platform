@@ -126,7 +126,6 @@
       <plugin>
         <groupId>com.github.searls</groupId>
         <artifactId>jasmine-maven-plugin</artifactId>
-        <version>1.0.2-beta-5</version>
         <executions>
           <execution>
             <goals>

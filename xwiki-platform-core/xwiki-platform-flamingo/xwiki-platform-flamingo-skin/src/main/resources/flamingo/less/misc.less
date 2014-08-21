@@ -259,6 +259,12 @@ table {
   }
 }
 
+// FIX: do no use .hidden (see: XWIKI-10827) but must be invisible
+#docextraanchors{
+  .invisible();
+  font-size: 0px;
+}
+
 // Export ---------------------------------------------------------------------
 #exportModal{
   .modal-body{

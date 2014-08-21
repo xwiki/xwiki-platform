@@ -101,7 +101,7 @@
 #set($displayMainMenu = true)
 #set($displayDocExtra = true)
 #set($displayShortcuts = true)
-
+#set($displayPageHeader = false) ## page header containing the logo and the banner taken from ColorTheme
 #set ($displayQuickSearch = true)
 #set ($displayLanguageChoice = true)
 

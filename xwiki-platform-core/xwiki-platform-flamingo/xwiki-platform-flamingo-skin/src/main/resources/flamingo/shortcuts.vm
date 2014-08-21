@@ -8,7 +8,7 @@
   #if($xcontext.action == 'view' && $viewer != 'content')
     #set ($discard = $docextralinks.add(['content', $services.localization.render('core.links.content'), -1, 'file']))
   #end
-  #if($viewer != 'comments' && $showcomments)
+  #if($viewer != 'comments' && $showcomments && $hasComment)
     #set ($discard = $docextralinks.add(['comments', $services.localization.render('docextra.comments'), $doc.getObjects('XWiki.XWikiComments').size(), 'comment']))
   #end
   #if($showannotations)

@@ -41,7 +41,7 @@
   <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
   <content>La zona de pruebas es una parte de su wiki que puede modificar líbremente. Esta pendasa para permitirle practicar la edición. Podrá escribir como funciona la creación y edición de páginas. Para empezar simplemente pinche en **Editar**.
 

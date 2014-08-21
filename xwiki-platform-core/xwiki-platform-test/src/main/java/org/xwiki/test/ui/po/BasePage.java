@@ -156,7 +156,7 @@ public class BasePage extends BaseElement
      */
     public void edit()
     {
-        // The edit button is not the same depending on the user is advanced or not
+        // The edit button is not the same depending on whether the user is advanced or not
         if (getUtil().hasElementWithoutWaiting(By.xpath("//div[@id='tmEdit']//a"))) {
             getDriver().findElement(By.xpath("//div[@id='tmEdit']//a")).click();
         } else {

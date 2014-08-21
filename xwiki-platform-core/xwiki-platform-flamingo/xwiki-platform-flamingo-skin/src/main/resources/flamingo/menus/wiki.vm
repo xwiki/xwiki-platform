@@ -1,7 +1,6 @@
 ##################################
 ##          WIKI MENU
 ##################################
-#set ($discard = $xwiki.ssfx.use('uicomponents/wiki/wiki.css', true))
 #set ($WikiManagerMainDocReference = $services.model.createDocumentReference($mainWikiId, 'WikiManager', 'WebHome'))
 #set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
 #set ($wikiEntryId = 'tmWiki')

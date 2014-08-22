@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.net.BindException;
+import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -44,7 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Start and stop a xwiki instance.
+ * Start and stop an XWiki instance.
  *
  * @version $Id$
  * @since 2.0RC1
@@ -53,7 +55,11 @@ public class XWikiExecutor
 {
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiExecutor.class);
 
-    public static final String SKIP_STARTING_XWIKI_INSTANCE = System.getProperty("xwiki.test.skipStart", "false");
+    /**
+     * If defined then we check for an existing running XWiki instance before trying to start XWiki.
+     */
+    public static final String VERIFY_RUNNING_XWIKI_AT_START =
+        System.getProperty("xwiki.test.verifyRunningXWikiAtStart", "true");
 
     public static final String BASEDIR = System.getProperty("basedir");
 
@@ -173,23 +179,40 @@ public class XWikiExecutor
         this.environment.put(key, value);
     }
 
+    /**
+     * Start XWiki using the following strategy:
+     * <ul>
+     *   <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set then checks if an XWiki instance is already
+     *       running before trying to start XWiki and if so, reuse it and don't start XWiki</li>
+     *   <li>If the {@link #VERIFY_RUNNING_XWIKI_AT_START} property is set to false then verify if some XWiki instance
+     *       is already running by verifying if the port is free and fail if so. Otherwise start XWiki.</li>
+     * </ul>
+     */
     public void start() throws Exception
     {
-        if (SKIP_STARTING_XWIKI_INSTANCE.equals("true")) {
-            LOGGER.info("Using running instance at [{}:{}]", URL, getPort());
-        }
-        else {
-            LOGGER.info("Checking if an XWiki server is already started at [{}:{}]", URL, getPort());
+        this.wasStarted = false;
+        if (VERIFY_RUNNING_XWIKI_AT_START.equals("true")) {
+            LOGGER.info("Checking if an XWiki server is already started at [{}]", getURL());
             // First, verify if XWiki is started. If it is then don't start it again.
             this.wasStarted = !isXWikiStarted(getURL(), 15).timedOut;
-            if (!this.wasStarted) {
-                LOGGER.info("Starting XWiki server at [{}:{}]", URL, getPort());
-                startXWiki();
-                waitForXWikiToLoad();
-                this.hasXWikiBeenStartedProperly = true;
-            } else {
-                LOGGER.info("XWiki server is already started!");
+        } else {
+            try {
+                ServerSocket socket = new ServerSocket(getPort());
+                socket.close();
+            } catch (BindException e) {
+                // Assume an XWiki instance is already running!
+                throw new Exception(String.format("An XWiki server is already started at [%s], failing test",
+                    getURL()));
             }
+        }
+
+        if (!this.wasStarted) {
+            LOGGER.info("Starting XWiki server at [{}]", getURL());
+            startXWiki();
+            waitForXWikiToLoad();
+            this.hasXWikiBeenStartedProperly = true;
+        } else {
+            LOGGER.info("XWiki server is already started at [{}]", getURL());
         }
     }
 

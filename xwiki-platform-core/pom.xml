@@ -276,7 +276,7 @@
             <excludes>
               <exclude>**/gwt/**/client/**/*.java</exclude>
             </excludes>
-            <systemProperties>
+            <systemProperties combine.children="append">
               <!-- Tells XWiki Platform Test module to generate screenshots in the target dir when a test is failing -->
               <property>
                 <name>screenshotDirectory</name>

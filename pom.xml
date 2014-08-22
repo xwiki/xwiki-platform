@@ -26,7 +26,14 @@
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
     <version>6.2-SNAPSHOT</version>
-    <relativePath>../xwiki-commons/xwiki-commons-pom/</relativePath>
+    <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
+         Jenkins and you have the following directory structure:
+             workspace/xwiki-commons
+             workspace/xwiki-platform_Quality_Checks
+         When the "xwiki-platform_Quality_Checks" module is built you definitely don't want its pom.xml to point to
+         workspace/xwiki-commons since that job may not have been built for some time (and thus it might not be up to
+         date with the latest code from the SCM, thus causing build failures that are hard to track.
+    -->
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform</artifactId>

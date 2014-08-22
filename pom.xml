@@ -33,7 +33,11 @@
          When the "xwiki-platform_Quality_Checks" module is built you definitely don't want its pom.xml to point to
          workspace/xwiki-commons since that job may not have been built for some time (and thus it might not be up to
          date with the latest code from the SCM, thus causing build failures that are hard to track.
+
+         By using an empty value we force Maven to resolve the parent from the Maven repositories,
+         see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent
     -->
+    <relativePath></relativePath>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform</artifactId>

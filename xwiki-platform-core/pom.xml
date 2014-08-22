@@ -469,6 +469,13 @@
               <to>org.xwiki.mail.internal.ExtendedMimeMessage</to>
               <justification>Mail Sender API is still a young API.</justification>
             </difference>
+            <!-- 5001 (Removed class from the set of superclasses): className, to (as a path expression) -->
+            <difference>
+              <differenceType>5001</differenceType>
+              <className>org/xwiki/velocity/XWikiWebappResourceLoader</className>
+              <to>org/apache/velocity/tools/view/servlet/WebappLoader</to>
+              <justification>The extended class got moved to a new package with the upgrade to velocity-tools 2.0 and the old location got deprecated.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

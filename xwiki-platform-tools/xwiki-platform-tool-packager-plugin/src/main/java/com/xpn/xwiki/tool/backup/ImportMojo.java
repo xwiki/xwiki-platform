@@ -61,6 +61,7 @@ import org.xwiki.extension.repository.internal.local.DefaultLocalExtension;
 import org.xwiki.extension.version.internal.DefaultVersionConstraint;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.tool.utils.LogUtils;
+import org.hibernate.cfg.Environment;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -149,6 +150,9 @@ public class ImportMojo extends AbstractMojo
         Importer importer = new Importer();
 
         System.setProperty("xwiki.data.dir", this.xwikiDataDir.getAbsolutePath());
+        // If the package mojo was executed before, it might have left a different database connection URL in the
+        // environment, which apparently overrides the value in the configuration file
+        System.clearProperty(Environment.URL);
 
         if (this.sourceDirectory != null) {
             try {

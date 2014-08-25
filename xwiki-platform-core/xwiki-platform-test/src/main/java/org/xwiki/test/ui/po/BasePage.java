@@ -75,7 +75,7 @@ public class BasePage extends BaseElement
     @FindBys({@FindBy(id = "tmRegister"), @FindBy(tagName = "a")})
     private WebElement registerLink;
 
-    @FindBys({@FindBy(id = "tmLogin"), @FindBy(tagName = "a")})
+    @FindBy(xpath = "//a[@id='tmLogin']")
     private WebElement loginLink;
 
     @FindBy(xpath = "//li[@id='tmUser']/a[contains(@title, 'Profile:')]")
@@ -453,6 +453,6 @@ public class BasePage extends BaseElement
      */
     public String getPageMenuLink()
     {
-        return this.pageMenu.findElement(By.xpath(".//a[0]")).getAttribute("href");
+        return this.pageMenu.findElement(By.xpath(".//a[contains(@title, 'Page: ')]")).getAttribute("href");
     }
 }

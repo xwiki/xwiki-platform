@@ -62,7 +62,7 @@ public class ApplicationClassEditPage extends InlinePage
     @FindBy(id = "palette")
     private WebElement palette;
 
-    @FindBy(id = "fields")
+    @FindBy(xpath = "div[@id='canvas']/p[@class='hint']")
     private WebElement fields;
 
     @FindBy(id = "updateClassSheet")

@@ -77,6 +77,6 @@ public class LoginPage extends ViewPage
 
     public boolean hasInvalidCredentialsErrorMessage()
     {
-        return this.loginErrorDiv.getText().equals("Invalid credentials");
+        return this.loginErrorDiv.getText().equals("Error: Invalid credentials");
     }
 }

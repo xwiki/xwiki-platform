@@ -684,7 +684,7 @@ XWiki.Annotation = Class.create({
   hookMenuButton : function() {
     // Flamingo case
     if (window.document.body.hasClassName('skin-flamingo')) {
-      var moreActionsMenu = $('tmMoreActions').adjacent('ul')[0];
+      var moreActionsMenu = $('tmMoreActions').getElementsBySelector('ul')[0];
       var annContainer = new Element('li');
       var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
       annLink.update("&lt;span class=\"glyphicon glyphicon-edit\"&gt;&lt;/span&gt; $services.localization.render('annotations.title')");

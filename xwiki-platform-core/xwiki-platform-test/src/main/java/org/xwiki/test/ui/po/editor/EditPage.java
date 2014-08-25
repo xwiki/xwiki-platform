@@ -45,8 +45,8 @@ public class EditPage extends BasePage
     @FindBy(name = "action_cancel")
     protected WebElement cancel;
 
-    @FindBy(xpath = "//*[@id = 'tmCurrentEditor']//*[@class = 'tme hastype']")
-    protected WebElement selectedEditMenuItem;
+    @FindBy(id = "editcolumn")
+    protected WebElement currentEditorDiv;
 
     @FindBy(id = "xwikidocsyntaxinput2")
     protected WebElement syntaxIdSelect;
@@ -153,7 +153,15 @@ public class EditPage extends BasePage
      */
     public Editor getEditor()
     {
-        return Editor.valueOf(this.selectedEditMenuItem.getText().toUpperCase());
+        String editor = "";
+        String[] CSSClasses = this.currentEditorDiv.getAttribute("class").split(" ");
+        for (int i = 0; i < CSSClasses.length; ++i) {
+            if (CSSClasses[i].startsWith("editor-")) {
+                editor = CSSClasses[i].substring(7);
+                break;
+            }
+        }
+        return Editor.valueOf(editor.toUpperCase());
     }
 
     /**

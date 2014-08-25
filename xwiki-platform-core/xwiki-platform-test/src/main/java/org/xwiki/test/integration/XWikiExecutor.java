@@ -87,6 +87,8 @@ public class XWikiExecutor
 
     private static final int TIMEOUT_SECONDS = 120;
 
+    private static final long PROCESS_FINISH_TIMEOUT = 5 * 60L * 1000L;
+
     private int port;
 
     private int stopPort;
@@ -353,16 +355,36 @@ public class XWikiExecutor
 
             // First wait for the stop process to have stopped, waiting a max of 5 minutes!
             // It's going to stop the start process...
-            stopProcessHandler.waitFor(5 * 60L * 1000L);
+            waitForProcessToFinish(stopProcessHandler, PROCESS_FINISH_TIMEOUT);
 
             // Now wait for the start process to be stopped, waiting a max of 5 minutes!
             if (this.startedProcessHandler != null) {
-                this.startedProcessHandler.waitFor(5 * 60L * 1000L);
+                waitForProcessToFinish(stopProcessHandler, PROCESS_FINISH_TIMEOUT);
             }
 
             LOGGER.info("XWiki server stopped");
         } else {
             LOGGER.info("XWiki server not stopped since we didn't start it (it was already started)");
+        }
+    }
+
+    private void waitForProcessToFinish(DefaultExecuteResultHandler handler, long timeout) throws Exception
+    {
+        // Wait for the process to finish.
+        handler.waitFor(timeout);
+
+        // Check the exit value and fail the test if the process has not properly finished.
+        if (handler.getExitValue() != 0 || !handler.hasResult()) {
+            String message =
+                String.format("Process failed to close properly after [%d] seconds, process ended [%b].", timeout,
+                    handler.hasResult());
+            if (handler.hasResult()) {
+                message =
+                    String.format("%s Exit code [%d], message [%s].", message, handler.getExitValue(), handler
+                        .getException().getMessage());
+            }
+            message = String.format("%s Failing test.", message);
+            throw new RuntimeException(message);
         }
     }
 

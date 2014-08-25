@@ -94,7 +94,7 @@ public class AttachmentsPane extends BaseElement
     {
         getDriver().findElement(
             By.xpath("//div[@id='attachmentscontent']//a[text()='" + attachmentName
-                + "']/../../span[2]/a[@class='deletelink']")).click();
+                + "']/../../div[contains(@class, 'xwikibuttonlinks')]/a[contains(@class,'deletelink')]")).click();
         getDriver().findElement(By.xpath("//*[@class='xdialog-modal-container']//input[@value='Yes']")).click();
         waitUntilElementDisappears(By
             .xpath("//*[@class='xdialog-modal-container']/*[contains(@class, 'xdialog-box-confirmation')]"));

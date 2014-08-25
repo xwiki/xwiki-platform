@@ -717,12 +717,12 @@ public class TestUtils
     public boolean isInWYSIWYGEditMode()
     {
         return getDriver()
-            .findElements(By.xpath("//div[@id='tmCurrentEditor']//a/strong[contains(text(), 'WYSIWYG')]")).size() > 0;
+            .findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wysiwyg')]")).size() > 0;
     }
 
     public boolean isInWikiEditMode()
     {
-        return getDriver().findElements(By.xpath("//div[@id='tmCurrentEditor']//a/strong[contains(text(), 'Wiki')]"))
+        return getDriver().findElements(By.xpath("//div[@id='editcolumn' and contains(@class, 'editor-wiki')]"))
             .size() > 0;
     }
 

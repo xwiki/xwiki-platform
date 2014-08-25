@@ -78,7 +78,7 @@ public class BasePage extends BaseElement
     @FindBys({@FindBy(id = "tmLogin"), @FindBy(tagName = "a")})
     private WebElement loginLink;
 
-    @FindBy(xpath = "//li[@id='tmUser']/a[0]")
+    @FindBy(xpath = "//li[@id='tmUser']/a[contains(@title, 'Profile:')]")
     private WebElement userLink;
 
     @FindBy(id = "document-title")

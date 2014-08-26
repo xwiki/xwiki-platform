@@ -550,7 +550,7 @@ ul.activityList {
 
 .activityList .message {
   /* Preserve the white-space because messages are written in plain text. */
-  white-space: pre;
+  white-space: pre-wrap;
 }
 /** &lt;end&gt; **/
 

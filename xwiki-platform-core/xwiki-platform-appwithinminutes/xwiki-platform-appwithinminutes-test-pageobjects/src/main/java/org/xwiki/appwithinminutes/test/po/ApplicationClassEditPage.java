@@ -43,7 +43,7 @@ public class ApplicationClassEditPage extends InlinePage
     @FindBy(id = "wizard-next")
     private WebElement nextStepButton;
 
-    @FindBy(linkText = "PREVIOUS STEP")
+    @FindBy(linkText = "Previous Step")
     private WebElement previousStepButton;
 
     /**

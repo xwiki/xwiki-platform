@@ -45,7 +45,7 @@ public class AnnotationsPane extends BaseElement
             click();
         // Click on the annotations button
         WebElement annotationsPane = getDriver().findElement(
-            By.xpath("//div[@id='tmMoreActions]//a[contains(., 'Annotations')]"));
+            By.xpath("//div[@id='tmMoreActions']//a[contains(., 'Annotations')]"));
         annotationsPane.click();
         // Verify that the annotationssettings panel is open
         waitUntilElementIsVisible(By.className("annotationsettings"));
@@ -61,7 +61,7 @@ public class AnnotationsPane extends BaseElement
                 click();
         // Click on the annotations button
         WebElement annotationsPane = getDriver().findElement(
-                By.xpath("//div[@id='tmMoreActions]//a[contains(., 'Annotations')]"));
+                By.xpath("//div[@id='tmMoreActions']//a[contains(., 'Annotations')]"));
         annotationsPane.click();
         // Verify that the annotationssettings panel is close
         waitUntilElementDisappears(By.className("annotationsettings"));

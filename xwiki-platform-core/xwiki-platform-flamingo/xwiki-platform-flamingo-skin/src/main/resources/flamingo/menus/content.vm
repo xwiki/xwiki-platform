@@ -50,7 +50,7 @@
 ##
 ## Actions menu
 ##
-#if(!$doc.isNew())
+#if($displayMoreActionsMenu && !$doc.isNew())
   #xwikibuttonentrystart('' $services.localization.render('core.menu.moreactions') 'tmMoreActions' 'btn-default' 'cog')
     ## Export
     #submenuitem('' $services.localization.render('core.menu.export') 'tmExport', '', 'download-alt', 'data-toggle="modal" data-target="#exportModal"')

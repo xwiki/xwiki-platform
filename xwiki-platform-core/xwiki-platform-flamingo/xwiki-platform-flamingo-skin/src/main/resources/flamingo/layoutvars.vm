@@ -99,6 +99,7 @@
 #set($displayContentMenu = true) ## menu on the top of the page with create/edit/more actions
 #set($displayCreateMenu = true) ## create menu
 #set($displayEditMenu = true) ## edit menu
+#set($displayMoreActionsMenu = true) ## more actions menu
 #set($displayMainMenu = true)
 #set($displayDocExtra = true)
 #set($displayShortcuts = true)

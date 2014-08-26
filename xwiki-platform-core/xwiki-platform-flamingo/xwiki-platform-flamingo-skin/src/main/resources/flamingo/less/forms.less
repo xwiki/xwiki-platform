@@ -51,15 +51,25 @@ select[size="0"], select[size="1"] {
   dl {
     dt {
       margin-top: floor(@font-size-base * 1.4);
+      position: relative;
       &:first-of-type {
         margin-top: 0;
       }
-      label{
+      label {
         color: #636B75;
         font-size: 0.85em;
         font-weight: 700;
         margin-bottom: 0.3em;
         text-transform: uppercase;
+        .buttonwrapper a {
+          .btn-xs;
+          line-height: 1.3em;
+          margin: 0;
+          position: absolute;
+          right: 0;
+          text-transform: none;
+          top: 0;
+        }
       }
     }
   }

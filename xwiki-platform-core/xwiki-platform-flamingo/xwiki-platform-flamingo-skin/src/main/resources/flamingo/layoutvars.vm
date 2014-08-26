@@ -96,8 +96,9 @@
  #end
 #end
 
-#set($displayContentMenu = true) ## header bar of the content area in 'view' mode
-#set($displayEditMenu = true) ## header bar of the content area in 'edit' mode
+#set($displayContentMenu = true) ## menu on the top of the page with create/edit/more actions
+#set($displayCreateMenu = true) ## create menu
+#set($displayEditMenu = true) ## edit menu
 #set($displayMainMenu = true)
 #set($displayDocExtra = true)
 #set($displayShortcuts = true)

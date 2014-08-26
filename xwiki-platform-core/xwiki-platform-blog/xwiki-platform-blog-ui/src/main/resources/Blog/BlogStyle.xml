@@ -244,6 +244,13 @@ div.hide-message {
   background-image: url("$xwiki.getSkinFile('icons/silk/lock_open.png')");
   background-position: 6px center;
 }
+.publish-message, .hide-message {
+  padding: 8px 28px;
+}
+.publish-message label, .publish-message input, .hide-message input {
+  margin-top: 0;
+  margin-bottom: 0;
+}
 div.edit-categories {
   font-size: 75%;
 }

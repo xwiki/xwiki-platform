@@ -29,7 +29,6 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.localization.Translation;
@@ -39,6 +38,8 @@ import org.xwiki.logging.LogUtils;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Provide logging related script oriented APIs.
@@ -61,7 +62,7 @@ public class LoggingScriptService implements ScriptService
      * Used to check rights.
      */
     @Inject
-    private DocumentAccessBridge bridge;
+    private ContextualAuthorizationManager authorization;
 
     @Inject
     private ContextualLocalizationManager localization;
@@ -113,7 +114,7 @@ public class LoggingScriptService implements ScriptService
     {
         // Not allow anyone to set log level or it could be a window to produce a real mess even if not exactly a
         // security issue
-        if (!this.bridge.hasProgrammingRights()) {
+        if (!this.authorization.hasAccess(Right.PROGRAM)) {
             return;
         }
 

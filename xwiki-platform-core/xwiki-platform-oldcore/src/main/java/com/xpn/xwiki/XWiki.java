@@ -224,7 +224,7 @@ public class XWiki implements EventListener
     /** The default encoding, and the internally used encoding when dealing with byte representation of strings. */
     public static final String DEFAULT_ENCODING = "UTF-8";
 
-    /** A string that represents no value */
+    /** Represents no value (ie the default value will be used) in xproperties */
     private static final String NO_VALUE = "---";
 
     /** The main document storage. */

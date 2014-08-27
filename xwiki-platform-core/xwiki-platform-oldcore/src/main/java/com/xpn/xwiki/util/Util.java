@@ -62,6 +62,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xwiki.container.Container;
+import org.xwiki.environment.Environment;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -800,7 +801,9 @@ public class Util
      * 
      * @param resource resource path to load
      * @return InputStream of resource or null if not found
+     * @deprecated last resort only, should use {@link Environment} as much as possible instead
      */
+    @Deprecated
     public static InputStream getResourceAsStream(String resource)
     {
         File file = new File(resource);

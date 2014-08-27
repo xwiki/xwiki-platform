@@ -224,6 +224,9 @@ public class XWiki implements EventListener
     /** The default encoding, and the internally used encoding when dealing with byte representation of strings. */
     public static final String DEFAULT_ENCODING = "UTF-8";
 
+    /** A string that represents no value */
+    private static final String NO_VALUE = "---";
+
     /** The main document storage. */
     private XWikiStoreInterface store;
 
@@ -1914,21 +1917,21 @@ public class XWiki implements EventListener
             String skin = getSkin(context);
             String oldskin = skin;
             String value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
-            // TODO: remove the '---' test when XWIKI-10853 is fixed
-            if (value == null || "".equals(value) || "---".equals(value)) {
+            // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
+            if (StringUtils.isEmpty(value)  || NO_VALUE.equals(value)) {
                 skin = getBaseSkin(context);
                 if (!oldskin.equals(skin)) {
                     value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
                     oldskin = skin;
                 }
             }
-            if (value == null || "".equals(value) || "---".equals(value)) {
+            if (StringUtils.isEmpty(value)  || NO_VALUE.equals(value)) {
                 skin = getDefaultBaseSkin(context);
                 if (!oldskin.equals(skin)) {
                     value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
                 }
             }
-            if (value == null || "".equals(value) || "---".equals(value)) {
+            if (StringUtils.isEmpty(value)  || NO_VALUE.equals(value)) {
                 value = default_value;
             }
             return value;
@@ -2098,9 +2101,8 @@ public class XWiki implements EventListener
                     result = object.getStringValue(preference);
                 }
 
-                // "---" value is considered as empty value
-                // TODO: remove the "---" test when XWIKI-10853 is fixed
-                if (!result.equals("") && !result.equals("---")) {
+                // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
+                if (!result.equals("") && !result.equals(NO_VALUE)) {
                     return result;
                 }
             } catch (Exception e) {
@@ -2116,8 +2118,8 @@ public class XWiki implements EventListener
             XWikiDocument userdoc = getDocument(context.getUserReference(), context);
             if (userdoc != null) {
                 String result = userdoc.getStringValue("XWiki.XWikiUsers", prefname);
-                // TODO: remove the '---' test when XWIKI-10853 is fixed
-                if ((!result.equals("")) && (!result.equals("---"))) {
+                // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
+                if ((!result.equals("")) && (!result.equals(NO_VALUE))) {
                     return result;
                 }
             }
@@ -5619,7 +5621,8 @@ public class XWiki implements EventListener
     public String getEditorPreference(XWikiContext context)
     {
         String pref = getUserPreference("editor", context);
-        if (pref.equals("---")) {
+        // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
+        if (pref.equals(NO_VALUE)) {
             pref = getSpacePreference("editor", context);
         }
 

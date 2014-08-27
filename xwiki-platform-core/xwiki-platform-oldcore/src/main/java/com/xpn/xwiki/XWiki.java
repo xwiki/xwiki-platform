@@ -1914,20 +1914,21 @@ public class XWiki implements EventListener
             String skin = getSkin(context);
             String oldskin = skin;
             String value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
-            if (value == null || "".equals(value)) {
+            // TODO: remove the '---' test when XWIKI-10853 is fixed
+            if (value == null || "".equals(value) || "---".equals(value)) {
                 skin = getBaseSkin(context);
                 if (!oldskin.equals(skin)) {
                     value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
                     oldskin = skin;
                 }
             }
-            if (value == null || "".equals(value)) {
+            if (value == null || "".equals(value) || "---".equals(value)) {
                 skin = getDefaultBaseSkin(context);
                 if (!oldskin.equals(skin)) {
                     value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
                 }
             }
-            if (value == null || "".equals(value)) {
+            if (value == null || "".equals(value) || "---".equals(value)) {
                 value = default_value;
             }
             return value;
@@ -2097,7 +2098,9 @@ public class XWiki implements EventListener
                     result = object.getStringValue(preference);
                 }
 
-                if (!result.equals("")) {
+                // "---" value is considered as empty value
+                // TODO: remove the "---" test when XWIKI-10853 is fixed
+                if (!result.equals("") && !result.equals("---")) {
                     return result;
                 }
             } catch (Exception e) {
@@ -2113,6 +2116,7 @@ public class XWiki implements EventListener
             XWikiDocument userdoc = getDocument(context.getUserReference(), context);
             if (userdoc != null) {
                 String result = userdoc.getStringValue("XWiki.XWikiUsers", prefname);
+                // TODO: remove the '---' test when XWIKI-10853 is fixed
                 if ((!result.equals("")) && (!result.equals("---"))) {
                     return result;
                 }

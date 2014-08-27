@@ -27,15 +27,17 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Attribute;
-import org.dom4j.Element;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.util.xml.XmlDocument;
+import org.dom4j.Attribute;
+import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+
+import com.xpn.xwiki.util.Util;
 
 /**
  * Default implementation for {@link HibernateSessionFactory}.
@@ -59,7 +61,7 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
      */
     @Inject
     private org.xwiki.environment.Environment environment;
-    
+
     /**
      * Hibernate configuration object.
      */
@@ -195,7 +197,7 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
         @Override
         protected InputStream getConfigurationInputStream(String resource) throws HibernateException
         {
-            InputStream stream = environment.getResourceAsStream(resource);
+            InputStream stream = Util.getResourceAsStream(resource);
             if (stream == null) {
                 throw new HibernateException(String.format("Can't find [%s] for hibernate configuration", resource));
             }

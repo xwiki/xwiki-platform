@@ -33,7 +33,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
-import org.xwiki.environment.Environment;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
@@ -44,6 +43,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
+import com.xpn.xwiki.util.Util;
 
 /**
  * QueryExecutor implementation for Hibernate Store.
@@ -62,9 +62,6 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Inject
     private HibernateSessionFactory sessionFactory;
 
-    @Inject
-    private Environment environment;
-
     /**
      * Path to hibernate mapping with named queries. Configured via component manager.
      */
@@ -79,7 +76,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        this.sessionFactory.getConfiguration().addInputStream(this.environment.getResourceAsStream(this.mappingPath));
+        this.sessionFactory.getConfiguration().addInputStream(Util.getResourceAsStream(this.mappingPath));
     }
 
     @Override

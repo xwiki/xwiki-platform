@@ -63,14 +63,56 @@
   margin: @padding-base-vertical 0 @padding-base-vertical @padding-base-horizontal;
 }
 
-// Bugs =======================================================================
+// AllDocs Tree ===============================================================
 
-// FIX: AllDocs: Tree 
-table {
-  &.listTable table { // PROBLEM: General styling reset
-    width: auto;
+.dropdown-menu {
+  z-index: 200000 + @zindex-dropdown; // The AllDocs Tree uses very high inline values to display its content TODO: Remove to delete me when we replace the Tree
+}
+
+#XWEWrapper {
+  margin: 2px 0 (30px + @input-height-base);
+  .listGrid {
+    border-width: 0;
+    display: block !important; // Some browsers display this element distanced from the input
+    & div:first-child {
+      outline: none;
+      top: 0 !important; // Some browsers have this element distanced with 8px from the main container
+      left: 0 !important;
+    }
+    .gridBody {
+      overflow: hidden; // IE11
+    } 
+    table {
+      width: auto;
+    }
+    tr > td:first-child { // IE11 - the first column is too large
+      width: 0;
+    }
+    td {
+      vertical-align: baseline;
+    }
+    #isc_4 { // Scrollbar area
+      background-image: -ms-linear-gradient(left, #f5f5f5 0%, #e8e8e9 50%, #d7d9da 50%, #caccce 82%, #c0c2c4 100%); // IE10
+      border: 1px solid #ababab; // IE10
+      width: 15px !important; // IE10
+      table {
+        width: 100%; // IE10
+      }
+    }
+    #isc_3 {
+      width: 15px !important; // IE10
+      height: auto !important; // IE10
+    }
   }
 }
+
+#Treeview_Input {
+  box-sizing: content-box;
+  padding: 1px;
+}
+
+
+// Bugs =======================================================================
 
 // FIX: Administration: Panel Wizard
 .xwikitabbar {
@@ -200,19 +242,6 @@ table {
   }
 }
 
-// FIX: Tree view (see XWIKI-10514).
-#XWEWrapper{
-  // Fix for IE11 (the first column is too large)
-  tr > td:first-child{
-    width: 0;
-  }
-  td{
-    vertical-align: middle;
-  }
-  // The input field that displays the selected page name should not override the tags section
-  margin-bottom: @input-height-base;
-}
-
 // FIX: User profile
 .skin-flamingo{
   #user-menu-col{
@@ -228,26 +257,6 @@ table {
       margin-left: 0;
     }
   }
-}
-
-// FIX: Drop down must be on front of Tree View (XWIKI-10633)
-.dropdown-menu{
-  z-index: 500000;
-}
-
-// Fix the Tree view (XWIKI-10633)
-#XWEWrapper{
-  .gridBody{
-    overflow: hidden;
-  }
-  
-  .normal table, .normalOver table, .normalDown table{
-    background-color: transparent;
-  }
-  
-  .vScrollThumbGrip, .vScrollThumbGripOver, .vScrollThumbGripDisabled, .vScrollThumbGripDown{
-    margin-left: 2px\0; // IE hack: this rule only occurs on IE.
-  }  
 }
 
 // FIX: Syntax help page (XWIKI-10675)

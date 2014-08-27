@@ -19,16 +19,20 @@
  */
 package org.xwiki.query.internal;
 
-import java.util.Collections;
+import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
@@ -42,19 +46,17 @@ import org.xwiki.query.QueryExecutorManager;
 // Note that we force the Component annotation so that this component is only registered as a
 // QueryExecutorManager and not a QueryExecutor too since we don't want this manager to be visible
 // to users as a valid QueryExecutor component.
-@Component(roles = { QueryExecutorManager.class })
+@Component(roles = {QueryExecutorManager.class })
 @Singleton
 public class DefaultQueryExecutorManager implements QueryExecutorManager
 {
-    /**
-     * Map from language to its executor.
-     */
     @Inject
-    private Map<String, QueryExecutor> executors;
+    @Named("context")
+    private ComponentManager componentManager;
 
     /**
-     * Executor provider for named queries.
-     * This provider will give us an executor which is native to the type of storage engine used.
+     * Executor provider for named queries. This provider will give us an executor which is native to the type of
+     * storage engine used.
      */
     @Inject
     private Provider<QueryExecutor> namedQueryExecutorProvider;
@@ -65,13 +67,26 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
         if (query.isNamed()) {
             return this.namedQueryExecutorProvider.get().execute(query);
         } else {
-            return this.executors.get(query.getLanguage()).execute(query);
+            try {
+                return this.componentManager.<QueryExecutor>getInstance(QueryExecutor.class, query.getLanguage())
+                    .execute(query);
+            } catch (ComponentLookupException e) {
+                throw new QueryException("Fail to lookup query executor", query, e);
+            }
         }
     }
 
     @Override
     public Set<String> getLanguages()
     {
-        return Collections.unmodifiableSet(this.executors.keySet());
+        List<ComponentDescriptor<QueryExecutor>> executors =
+            this.componentManager.getComponentDescriptorList((Type) QueryExecutor.class);
+
+        Set<String> executorNames = new HashSet<String>(executors.size());
+        for (ComponentDescriptor<QueryExecutor> executor : executors) {
+            executorNames.add(executor.getRoleHint());
+        }
+
+        return executorNames;
     }
 }

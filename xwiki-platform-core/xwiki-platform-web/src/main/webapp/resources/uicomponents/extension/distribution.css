@@ -13,8 +13,6 @@
   #else
     background-image: url("header.png");
   #end
-  border-radius: 4px 4px 0 0;
-  margin: -1px;
 }
 #distributionWizard .errormessage, #distributionWizard .warningmessage, #distributionWizard .infomessage {
   background-color: transparent;

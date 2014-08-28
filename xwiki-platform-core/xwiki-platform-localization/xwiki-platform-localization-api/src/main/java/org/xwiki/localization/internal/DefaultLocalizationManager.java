@@ -99,7 +99,7 @@ public class DefaultLocalizationManager implements LocalizationManager
                 return this.componentManagerProvider.get().<TranslationBundle> getInstance(TranslationBundle.class,
                     bundleType + ':' + bundleId);
             } catch (ComponentLookupException e) {
-                // Shoul never happen since we test it before
+                // Should never happen since we test it before
             }
         }
 

@@ -283,7 +283,7 @@
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>fop</artifactId>
-      <version>1.0</version>
+      <version>1.1</version>
       <exclusions>
         <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
         <exclusion>
@@ -294,6 +294,15 @@
         <exclusion>
           <groupId>org.apache.xmlgraphics</groupId>
           <artifactId>batik-js</artifactId>
+        </exclusion>
+        <!-- FOP 1.1's POM is wrong, see https://issues.apache.org/jira/browse/FOP-2255 -->
+        <exclusion>
+          <groupId>org.apache.avalon.framework</groupId>
+          <artifactId>avalon-framework-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.avalon.framework</groupId>
+          <artifactId>avalon-framework-impl</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

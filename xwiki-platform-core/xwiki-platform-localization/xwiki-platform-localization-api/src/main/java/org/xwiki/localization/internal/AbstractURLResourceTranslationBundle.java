@@ -140,15 +140,13 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
         // Parse resource
         Properties properties = new Properties();
 
-        try {
-            InputStream componentListStream = localeURL.openStream();
-
+        try (InputStream componentListStream = localeURL.openStream()) {
             properties.load(componentListStream);
         } catch (FileNotFoundException e) {
             // No translation files for the passed locale
             return null;
         } catch (IOException e) {
-            this.logger.error("Failed to parse resource [{}] as translation budle", localeURL, e);
+            this.logger.error("Failed to parse resource [{}] as translation bundle", localeURL, e);
         }
 
         // Convert to LocalBundle

@@ -2390,8 +2390,10 @@ Recursive title display detected!##
 #macro (styleSheetExtensionHooks)
   ## - Skin JAR extension hook. Placed first to allow other skin extensions to override it.
   <!-- com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin -->
-  <!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin -->
+  ## - Skin file extension hook.
   <!-- com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin -->
+  ## - Skin extension hook
+  <!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin -->
 #end
 
 #**

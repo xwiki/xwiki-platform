@@ -52,7 +52,7 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
 {
     @Inject
     @Named("context")
-    private ComponentManager componentManager;
+    private Provider<ComponentManager> componentManagerProvider;
 
     /**
      * Executor provider for named queries. This provider will give us an executor which is native to the type of
@@ -68,8 +68,8 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
             return this.namedQueryExecutorProvider.get().execute(query);
         } else {
             try {
-                return this.componentManager.<QueryExecutor>getInstance(QueryExecutor.class, query.getLanguage())
-                    .execute(query);
+                return this.componentManagerProvider.get()
+                    .<QueryExecutor>getInstance(QueryExecutor.class, query.getLanguage()).execute(query);
             } catch (ComponentLookupException e) {
                 throw new QueryException("Fail to lookup query executor", query, e);
             }
@@ -80,7 +80,7 @@ public class DefaultQueryExecutorManager implements QueryExecutorManager
     public Set<String> getLanguages()
     {
         List<ComponentDescriptor<QueryExecutor>> executors =
-            this.componentManager.getComponentDescriptorList((Type) QueryExecutor.class);
+            this.componentManagerProvider.get().getComponentDescriptorList((Type) QueryExecutor.class);
 
         Set<String> executorNames = new HashSet<String>(executors.size());
         for (ComponentDescriptor<QueryExecutor> executor : executors) {

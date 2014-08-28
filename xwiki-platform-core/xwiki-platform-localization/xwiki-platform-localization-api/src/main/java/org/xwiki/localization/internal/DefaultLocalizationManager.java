@@ -70,9 +70,13 @@ public class DefaultLocalizationManager implements LocalizationManager
     public Translation getTranslation(String key, Locale locale)
     {
         for (TranslationBundle bundle : this.bundleContext.getBundles()) {
-            Translation translation = bundle.getTranslation(key, locale);
-            if (translation != null && translation.getLocale().equals(locale)) {
-                return translation;
+            try {
+                Translation translation = bundle.getTranslation(key, locale);
+                if (translation != null && translation.getLocale().equals(locale)) {
+                    return translation;
+                }
+            } catch (Exception e) {
+                this.logger.error("Failed to get translation", e);
             }
         }
 

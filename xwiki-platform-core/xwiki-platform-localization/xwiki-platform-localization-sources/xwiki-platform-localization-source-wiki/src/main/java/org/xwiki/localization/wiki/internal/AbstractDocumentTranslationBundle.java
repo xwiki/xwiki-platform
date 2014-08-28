@@ -20,7 +20,6 @@
 package org.xwiki.localization.wiki.internal;
 
 import java.io.StringReader;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -38,7 +37,6 @@ import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Disposable;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.internal.AbstractCachedTranslationBundle;
@@ -97,9 +95,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         this.idPrefix = idPrefix;
         this.bundleContext = componentManager.getInstance(TranslationBundleContext.class);
         this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        this.contextProvider =
-            componentManager.getInstance(new DefaultParameterizedType(null, Provider.class,
-                new Type[] {XWikiContext.class}));
+        this.contextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
         this.observation = componentManager.getInstance(ObservationManager.class);
 
         this.translationMessageParser = translationMessageParser;
@@ -176,18 +172,9 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     }
 
     @Override
-    protected LocalizedTranslationBundle createBundle(Locale locale)
+    protected LocalizedTranslationBundle createBundle(Locale locale) throws Exception
     {
-        LocalizedTranslationBundle localeBundle;
-        try {
-            localeBundle = loadDocumentLocaleBundle(locale);
-        } catch (Exception e) {
-            this.logger.error("Failed to get localization bundle", e);
-
-            localeBundle = null;
-        }
-
-        return localeBundle;
+        return loadDocumentLocaleBundle(locale);
     }
 
     // DisposableCacheValue Disposable
@@ -201,12 +188,12 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     // EventListener
 
     @Override
-    public void onEvent(Event arg0, Object arg1, Object arg2)
+    public void onEvent(Event event, Object source, Object data)
     {
-        if (arg0 instanceof WikiDeletedEvent) {
-            bundleCache.clear();
+        if (event instanceof WikiDeletedEvent) {
+            this.bundleCache.clear();
         } else {
-            XWikiDocument document = (XWikiDocument) arg1;
+            XWikiDocument document = (XWikiDocument) source;
 
             this.bundleCache.remove(document.getLocale());
 

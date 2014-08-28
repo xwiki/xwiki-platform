@@ -151,6 +151,20 @@
         <p>
           <parameters>
             <entry>
+              <string>syntax</string>
+              <org.xwiki.rendering.syntax.Syntax>
+                <type>
+                  <name>syntax</name>
+                  <id>syntax</id>
+                </type>
+                <version>1.0</version>
+              </org.xwiki.rendering.syntax.Syntax>
+            </entry>
+            <entry>
+              <string>hidden</string>
+              <boolean>true</boolean>
+            </entry>
+            <entry>
               <string>parent_reference</string>
               <org.xwiki.model.reference.EntityReference>
                 <name>parent</name>
@@ -196,20 +210,6 @@
             <entry>
               <string>revision_minor</string>
               <boolean>false</boolean>
-            </entry>
-            <entry>
-              <string>syntax</string>
-              <org.xwiki.rendering.syntax.Syntax>
-                <type>
-                  <name>syntax</name>
-                  <id>syntax</id>
-                </type>
-                <version>1.0</version>
-              </org.xwiki.rendering.syntax.Syntax>
-            </entry>
-            <entry>
-              <string>hidden</string>
-              <boolean>true</boolean>
             </entry>
             <entry>
               <string>content</string>

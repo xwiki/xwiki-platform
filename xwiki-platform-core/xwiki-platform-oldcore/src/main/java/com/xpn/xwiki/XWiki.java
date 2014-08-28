@@ -673,6 +673,10 @@ public class XWiki implements EventListener
             setEngineContext(engine_context);
             context.setWiki(this);
 
+            // "Pre-initialize" XWikiStubContextProvider with a XWikiContext containing a XWiki instance as soon as
+            // possible
+            Utils.<XWikiStubContextProvider>getComponent((Type) XWikiStubContextProvider.class).initialize(context);
+
             // Prepare the store
             if (config != null) {
                 setConfig(config);

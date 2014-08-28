@@ -52,6 +52,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xar.internal.model.XarDocumentModel;
 
 /**
@@ -291,6 +292,10 @@ public class DocumentLocaleReader extends AbstractReader
     private void readDocument(XMLStreamReader xmlReader, Object filter, XARInputFilter proxyFilter)
         throws XMLStreamException, FilterException, ParseException, IOException
     {
+        // Initialize with a few defaults (thing that don't exist in old XAR format)
+        this.currentDocumentRevisionParameters.put(XWikiWikiDocumentFilter.PARAMETER_SYNTAX, Syntax.XWIKI_1_0);
+        this.currentDocumentRevisionParameters.put(XWikiWikiDocumentFilter.PARAMETER_HIDDEN, false);
+
         for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
             String elementName = xmlReader.getLocalName();
 

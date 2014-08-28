@@ -2392,7 +2392,7 @@ Recursive title display detected!##
   <!-- com.xpn.xwiki.plugin.skinx.CssResourceSkinExtensionPlugin -->
   ## - Skin file extension hook.
   <!-- com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin -->
-  ## - Skin extension hook
+  ## - Skin extension hook, placed at the last to be able to override previous css rules with a Skin Extension Object
   <!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin -->
 #end
 

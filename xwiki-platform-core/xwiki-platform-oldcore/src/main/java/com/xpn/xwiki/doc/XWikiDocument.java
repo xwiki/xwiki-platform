@@ -253,10 +253,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         Pattern
             .compile("</?+(html|img|a|i|br?|embed|script|form|input|textarea|object|font|li|[dou]l|table|center|hr|p) ?([^>]*+)>");
 
-    public static final LocalDocumentReference COMMENTSCLASS_REFERENCE = new LocalDocumentReference("XWiki",
+    public static final EntityReference COMMENTSCLASS_REFERENCE = new LocalDocumentReference("XWiki",
         "XWikiComments");
 
-    public static final LocalDocumentReference SHEETCLASS_REFERENCE = new LocalDocumentReference("XWiki", "SheetClass");
+    public static final EntityReference SHEETCLASS_REFERENCE = new LocalDocumentReference("XWiki", "SheetClass");
 
     private String title;
 

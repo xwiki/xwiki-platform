@@ -41,13 +41,14 @@ public interface LESSCache<T>
 
     /**
      * Add an object in the cache.
+     *
      * @param fileName name of the LESS source
-     * @param wiki if og the wiki
+     * @param wikiId if of the wiki
      * @param fileSystemSkin name of the skin
      * @param colorThemeName name of the color theme
      * @param object the object to cache
      */
-    void set(String fileName, String wiki, String fileSystemSkin, String colorThemeName, T object);
+    void set(String fileName, String wikiId, String fileSystemSkin, String colorThemeName, T object);
 
     /**
      * Clear the cache.
@@ -56,7 +57,8 @@ public interface LESSCache<T>
 
     /**
      * Clear all the cached files related to a wiki.
-     * @param wiki name of the wiki
+     *
+     * @param wikiId id of the wiki
      */
-    void clear(String wiki);
+    void clear(String wikiId);
 }

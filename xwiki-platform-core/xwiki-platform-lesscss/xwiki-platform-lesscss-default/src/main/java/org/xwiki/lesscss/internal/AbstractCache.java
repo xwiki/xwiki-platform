@@ -56,24 +56,24 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     private Map<String, List<String>> cachedFilesKeysMap = new HashMap<>();
 
     @Override
-    public T get(String fileName, String wiki, String fileSystemSkin, String colorTheme)
+    public T get(String fileName, String wikiId, String fileSystemSkin, String colorTheme)
     {
-        return cache.get(getCacheKey(fileName, wiki, fileSystemSkin, colorTheme));
+        return cache.get(getCacheKey(fileName, wikiId, fileSystemSkin, colorTheme));
     }
 
     @Override
-    public void set(String fileName, String wiki, String fileSystemSkin, String colorTheme, T content)
+    public void set(String fileName, String wikiId, String fileSystemSkin, String colorTheme, T content)
     {
         // Store the content in the cache
-        String cacheKey = getCacheKey(fileName, wiki, fileSystemSkin, colorTheme);
+        String cacheKey = getCacheKey(fileName, wikiId, fileSystemSkin, colorTheme);
         cache.set(cacheKey, content);
 
         // Add the new key to cachedFilesKeysMap.
-        List<String> cachedFilesKeys = cachedFilesKeysMap.get(wiki);
+        List<String> cachedFilesKeys = cachedFilesKeysMap.get(wikiId);
         if (cachedFilesKeys == null) {
             // if the list of cached files keys corresponding to the wiki does not exist, we create it
             cachedFilesKeys = new ArrayList<>();
-            cachedFilesKeysMap.put(wiki, cachedFilesKeys);
+            cachedFilesKeysMap.put(wikiId, cachedFilesKeys);
         }
         if (!cachedFilesKeys.contains(cacheKey)) {
             cachedFilesKeys.add(cacheKey);
@@ -88,10 +88,10 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     }
 
     @Override
-    public void clear(String wiki)
+    public void clear(String wikiId)
     {
         // Get the list of cached files keys corresponding to the wiki
-        List<String> cachedFilesKeys = cachedFilesKeysMap.get(wiki);
+        List<String> cachedFilesKeys = cachedFilesKeysMap.get(wikiId);
         if (cachedFilesKeys == null) {
             return;
         }
@@ -100,12 +100,12 @@ public abstract class AbstractCache<T> implements LESSCache<T>
             cache.remove(cachedFileKey);
         }
         // Remove the list of cached keys corresponding to the wiki
-        cachedFilesKeysMap.remove(wiki);
+        cachedFilesKeysMap.remove(wikiId);
     }
 
-    private String getCacheKey(String fileName, String wiki, String skin, String colorTheme)
+    private String getCacheKey(String fileName, String wikiId, String skin, String colorTheme)
     {
-        return wiki.length() + wiki + CACHE_KEY_SEPARATOR + skin.length() + skin + CACHE_KEY_SEPARATOR
+        return wikiId.length() + wikiId + CACHE_KEY_SEPARATOR + skin.length() + skin + CACHE_KEY_SEPARATOR
             + colorTheme.length() + colorTheme + CACHE_KEY_SEPARATOR + fileName.length() + fileName;
     }
 }

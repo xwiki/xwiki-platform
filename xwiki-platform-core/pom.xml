@@ -477,6 +477,97 @@
               <to>org/apache/velocity/tools/view/servlet/WebappLoader</to>
               <justification>The extended class got moved to a new package with the upgrade to velocity-tools 2.0 and the old location got deprecated.</justification>
             </difference>
+            <!-- Not really APIs -->
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>compactEntityReferenceSerializer</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>compactWikiEntityReferenceSerializer</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>currentDocumentReferenceResolver</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>currentMixedDocumentReferenceResolver</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>currentReferenceDocumentReferenceResolver</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>currentReferenceObjectReferenceResolver</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>defaultEntityReferenceSerializer</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>explicitDocumentReferenceResolver</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>explicitReferenceDocumentReferenceResolver</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>localEntityReferenceSerializer</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>localUidStringEntityReferenceSerializer</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>relativeEntityReferenceResolver</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>syntaxFactory</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>uidStringEntityReferenceSerializer</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
+            <difference>
+              <differenceType>6001</differenceType>
+              <className>com/xpn/xwiki/doc/XWikiDocument</className>
+              <field>xClassEntityReferenceResolver</field>
+              <justification>Not really an APIs.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

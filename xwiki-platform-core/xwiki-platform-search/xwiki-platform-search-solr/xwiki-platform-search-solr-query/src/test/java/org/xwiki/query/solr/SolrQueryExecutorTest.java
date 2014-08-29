@@ -32,6 +32,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.xwiki.component.internal.ContextComponentManagerProvider;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryManager;
@@ -52,7 +53,7 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@ComponentList({DefaultQueryManager.class, DefaultQueryExecutorManager.class})
+@ComponentList({DefaultQueryManager.class, DefaultQueryExecutorManager.class, ContextComponentManagerProvider.class})
 public class SolrQueryExecutorTest
 {
 

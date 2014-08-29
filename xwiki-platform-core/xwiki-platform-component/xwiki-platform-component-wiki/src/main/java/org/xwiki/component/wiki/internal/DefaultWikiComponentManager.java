@@ -88,7 +88,7 @@ public class DefaultWikiComponentManager implements WikiComponentManager
             // Get the component role interface
             Type roleType = component.getRoleType();
             Class< ? > roleTypeClass = ReflectionUtils.getTypeClass(roleType);
-            ComponentDescriptor componentDescriptor = createComponentDescriptor(roleType, component.getRoleHint(), component.getClass());
+            ComponentDescriptor componentDescriptor = createComponentDescriptor(roleType, component.getRoleHint());
 
             // Set the proper information so the component manager use the proper keys to find components to register
             this.wikiComponentManagerContext.setCurrentUserReference(component.getAuthorReference());
@@ -189,13 +189,11 @@ public class DefaultWikiComponentManager implements WikiComponentManager
      * @param roleHint the hint of the implementation for the descriptor to create
      * @return the constructed {@link ComponentDescriptor}
      */
-    private ComponentDescriptor createComponentDescriptor(Type roleType, String roleHint, Class<?> implementation)
+    private ComponentDescriptor createComponentDescriptor(Type roleType, String roleHint)
     {
         DefaultComponentDescriptor cd = new DefaultComponentDescriptor();
         cd.setRoleType(roleType);
         cd.setRoleHint(roleHint);
-        //cd.setImplementation(implementation);
-
         return cd;
     }
 
@@ -205,9 +203,9 @@ public class DefaultWikiComponentManager implements WikiComponentManager
      * @param interfaces the array of interfaces to test
      * @return true if at least one of the passed interfaces is the is the {@link Initializable} class.
      */
-    private boolean isInitializable(Class<?>[] interfaces)
+    private boolean isInitializable(Class< ? >[] interfaces)
     {
-        for (Class<?> iface : interfaces) {
+        for (Class< ? > iface : interfaces) {
             if (Initializable.class.equals(iface)) {
                 return true;
             }

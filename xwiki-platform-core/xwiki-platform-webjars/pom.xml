@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Adds support for packaging JS files using WebJars</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.83</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>WebJars Integration</xwiki.extension.name>
   </properties>
@@ -70,6 +70,13 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Used by the Test -->
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>angular-paginate-anything</artifactId>
+      <version>2.5.3</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

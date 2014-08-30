@@ -4,3 +4,4 @@ org.xwiki.lesscss.internal.DefaultLESSCompiler
 org.xwiki.lesscss.internal.DefaultLESSSkinFileCache
 org.xwiki.lesscss.internal.DefaultLESSSkinFileCompiler
 org.xwiki.lesscss.internal.SkinAndColorThemeListener
+org.xwiki.lesscss.internal.LESSExportActionListener

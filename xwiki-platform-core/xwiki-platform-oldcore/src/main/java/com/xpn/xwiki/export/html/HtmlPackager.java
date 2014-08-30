@@ -313,13 +313,14 @@ public class HtmlPackager
         renderDocuments(zos, tempdir, urlf, context);
 
         // Add required skins to ZIP file
-        for (String skinName : urlf.getNeededSkins()) {
-            addSkinToZip(skinName, zos, urlf.getExportedSkinFiles(), context);
+        for (String skinName : urlf.getExportURLFactoryContext().getNeededSkins()) {
+            addSkinToZip(skinName, zos, urlf.getExportURLFactoryContext().getExportedSkinFiles(), context);
         }
 
         // add "resources" folder
         File file = new File(context.getWiki().getEngineContext().getRealPath("/resources/"));
-        addDirToZip(file, zos, "resources" + ZIPPATH_SEPARATOR, urlf.getExportedSkinFiles());
+        addDirToZip(file, zos, "resources" + ZIPPATH_SEPARATOR,
+            urlf.getExportURLFactoryContext().getExportedSkinFiles());
 
         // Add attachments and generated skin files files to ZIP file
         addDirToZip(tempdir, zos, "", null);

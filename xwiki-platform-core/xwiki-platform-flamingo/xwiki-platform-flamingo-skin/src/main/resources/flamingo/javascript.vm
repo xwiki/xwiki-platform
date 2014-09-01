@@ -81,7 +81,8 @@ require.config({
     ## Requirejs will automatically add a ".js" suffix if the generated URL doesn't contain a "?". It happens that we
     ## don't generate a URL with "?" when we export in HTML for example. In this case we remove the ".js" suffix since
     ## requirejs will add one...
-    ## Note that we cannot do this generically in the webjars module when exporting in HTML because
+    ## Note that we cannot do this generically in the webjars module when exporting in HTML because the webjars module
+    ## provide generic URLs and they don't all go through requirejs...
     #set ($bootstrapURL = $services.webjars.url('bootstrap/3.2.0/js/bootstrap.js'))
     #if (!$bootstrapURL.contains('?'))
       #set ($bootstrapURL = $stringtool.removeEnd($bootstrapURL, ".js"))

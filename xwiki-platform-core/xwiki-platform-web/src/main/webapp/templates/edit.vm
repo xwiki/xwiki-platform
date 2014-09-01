@@ -60,7 +60,11 @@
   #template("xwikivars.vm")
   #template("layoutvars.vm")
   #template("htmlheader.vm")
-  #template("menuview.vm")
+  #if($displayMainMenu)
+    <div id="menuview">
+      #template("menuview.vm")
+    </div>
+  #end
   #template("header.vm")
   #if($editor == 'wiki' || $editor == 'wysiwyg')
     <form id="edit" method="post" action="$doc.getURL('preview')" class="withLock">
@@ -84,9 +88,11 @@
   <div class="leftsidecolumns">
   <div id="editcolumn" class="editor editor-${editor}">
   <div class="alleditcontent">
-  <div id="editmenu" class="actionmenu">
-  #template("editmenu.vm")
-  </div>
+  #if($displayEditMenu)
+    <div id="editmenu" class="actionmenu">
+      #template("editmenu.vm")
+    </div>
+  #end
   <div id="mainEditArea">
   #template("hierarchy.vm")
   #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)

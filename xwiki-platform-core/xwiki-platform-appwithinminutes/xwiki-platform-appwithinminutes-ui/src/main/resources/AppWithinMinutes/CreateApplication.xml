@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>AppWithinMinutes</web>
   <name>CreateApplication</name>
@@ -16,7 +36,6 @@
   <contentUpdateDate>1322394814000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.appwithinminutes.appNamePageTitle')</title>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -332,7 +351,7 @@ return XWiki;
       <use>currentPage</use>
     </property>
   </object>
-  <content>{{include document="AppWithinMinutes.WizardStep"/}}
+  <content>{{include reference="AppWithinMinutes.WizardStep"/}}
 
 {{velocity output="false"}}
 #macro(showStep)
@@ -375,12 +394,12 @@ return XWiki;
     #set($classRef = $services.model.resolveDocument($classStringRef, 'explicit', $appDescriptor.documentReference))
   #else
     ## Create a new application. Use the default class name.
-    #set($classRef = $services.model.createDocumentReference($doc.wiki, $request.appName, "#toXMLName($request.appName)Class"))
+    #set($classRef = $services.model.createDocumentReference($doc.wiki, "${request.appName}Code", "#toXMLName($request.appName)Class"))
   #end
   #set($queryString = 'wizard=true')
   #if(!$xwiki.exists($classRef))
     #set($classTitle = "$request.appName Class")
-    #set($queryString = "$queryString&amp;editor=inline&amp;template=AppWithinMinutes.ClassTemplate&amp;parent=WebHome&amp;title=$escapetool.url($classTitle)")
+    #set($queryString = "$queryString&amp;editor=inline&amp;template=AppWithinMinutes.ClassTemplate&amp;parent=${request.appName}.WebHome&amp;title=$escapetool.url($classTitle)")
   #end
   $response.sendRedirect($xwiki.getURL($classRef, 'edit', $queryString))
 #end
@@ -400,13 +419,15 @@ return XWiki;
       (% class="xErrorMsg" %)$services.localization.render('platform.appwithinminutes.appNameInvalidClassNameError')
     #end
     #set($appHomeRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
-    #set($appClassRef = $services.model.createDocumentReference($doc.wiki, $appName, "$!{className}Class"))
+    #set($appClassRef = $services.model.createDocumentReference($doc.wiki, "$!{appName}Code", "$!{className}Class"))
   #end
   #set($appHomeURL = $stringtool.removeEnd($xwiki.getDocument($appHomeRef).getExternalURL(), 'WebHome'))
   ; $services.localization.render('platform.appwithinminutes.appNamePreviewHomePageUrlLabel')
   : {{{$!appHomeURL}}}
   ; $services.localization.render('platform.appwithinminutes.appNamePreviewDataSpaceLabel')
   : {{{$doc.wiki}}} » {{{$appName}}}
+  ; $services.localization.render('platform.appwithinminutes.appNamePreviewCodeSpaceLabel')
+  : {{{$doc.wiki}}} » {{{${appName}Code}}}
   ; $services.localization.render('platform.appwithinminutes.appNamePreviewClassReferenceLabel')
   : {{{$appClassRef.wikiReference.name}}} » {{{$appClassRef.lastSpaceReference.name}}} » {{{$appClassRef.name}}}
   #if($appDescriptor || $xwiki.exists($appHomeRef) || $xwiki.exists($appClassRef))

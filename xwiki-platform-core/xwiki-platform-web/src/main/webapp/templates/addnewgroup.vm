@@ -3,7 +3,7 @@
 <form method="post" onsubmit="return false;">
 <div>
 <span style="padding-left:13px;"><input type="text" name="newgroup" value="" id="newgroupi" /></span>
-<span class="buttonwrapper"><input class="button" type="submit" value="$services.localization.render('rightsmanager.creategroup')" onclick="new Ajax.Request('$xwiki.getURL("XWiki.__groupname__", "save", "form_token=$!{services.csrf.getToken()}&template=XWiki.XWikiGroupTemplate")'.replace('__groupname__', this.form.newgroup.value), { onFailure: function(transport) { alert('$services.localization.render('rightsmanager.groupexist').replaceAll('"', '&quot;')'.replace('__name__', $('newgroupi').value)); }, onSuccess: function(transport) { window.lb.lbSaveForm(); } });" /></span>
+<span class="buttonwrapper"><input class="button" type="submit" value="$services.localization.render('rightsmanager.creategroup')" onclick="new Ajax.Request(new XWiki.Document(this.form.newgroup.value, 'XWiki').getURL('save', 'form_token=$!services.csrf.token&template=XWiki.XWikiGroupTemplate'), { onFailure: function(transport) { alert('$services.localization.render('rightsmanager.groupexist').replaceAll('"', '&quot;')'.replace('__name__', $('newgroupi').value)); }, onSuccess: function(transport) { window.lb.lbSaveForm(); } });" /></span>
 <span class="buttonwrapper"><input class="button" type="submit" name="formactioncancel" value="$services.localization.render('cancel')" onclick=" window.lb.lbHide(); window.lb.lbClearData(); return false;"/></span>
 </div>
 </form>

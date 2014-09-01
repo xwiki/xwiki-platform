@@ -43,7 +43,7 @@ public class ApplicationClassEditPage extends InlinePage
     @FindBy(id = "wizard-next")
     private WebElement nextStepButton;
 
-    @FindBy(linkText = "PREVIOUS STEP")
+    @FindBy(xpath = "//*[@title='Go to previous step']")
     private WebElement previousStepButton;
 
     /**
@@ -64,6 +64,9 @@ public class ApplicationClassEditPage extends InlinePage
 
     @FindBy(id = "fields")
     private WebElement fields;
+
+    @FindBy(id = "canvas")
+    private WebElement fieldsCanvas;
 
     @FindBy(id = "updateClassSheet")
     private WebElement updateClassSheetCheckbox;
@@ -108,7 +111,23 @@ public class ApplicationClassEditPage extends InlinePage
     @Override
     public void clickSaveAndContinue()
     {
+        clickSaveAndContinue(true);
+    }
+
+    /**
+     * Clicks on the Save & Continue button. Use this instead of {@link #clickSaveAndContinue()} when you want to wait
+     * for a different message (e.g. an error message).
+     * 
+     * @param wait {@code true} to wait for the page to be saved, {@code false} otherwise
+     */
+    public void clickSaveAndContinue(boolean wait)
+    {
         saveAndContinueButton.click();
+
+        if (wait) {
+            // Wait until the page is really saved.
+            waitForNotificationSuccessMessage("Saved");
+        }
     }
 
     /**
@@ -120,12 +139,11 @@ public class ApplicationClassEditPage extends InlinePage
     {
         String fieldXPath = "//span[@class = 'field' and normalize-space(.) = '%s']";
         WebElement field = palette.findElement(By.xpath(String.format(fieldXPath, fieldType)));
-        int fieldCount = getUtil().findElementsWithoutWaiting(getDriver(), fields, By.xpath("li")).size();
         // NOTE: We scroll the page up because the drag&drop fails sometimes if the dragged field and the canvas (drop
         // target) are not fully visible. See https://code.google.com/p/selenium/issues/detail?id=3075 .
         palette.sendKeys(Keys.HOME);
-        new Actions(getDriver()).dragAndDrop(field, fields).perform();
-        final WebElement addedField = fields.findElement(By.xpath("li[" + (fieldCount + 1) + "]"));
+        new Actions(getDriver()).dragAndDrop(field, fieldsCanvas).perform();
+        final WebElement addedField = fieldsCanvas.findElement(By.xpath("./ul[@id='fields']/li[last()]"));
 
         getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
@@ -155,7 +173,7 @@ public class ApplicationClassEditPage extends InlinePage
     public void moveFieldBefore(String fieldToMove, String beforeField)
     {
         // Drag the field slightly before the target field (vertically). For some reason it doesn't work if we use x=0.
-        new ClassFieldEditPane(fieldToMove).dragTo(fields.findElement(By.id("field-" + beforeField)), 1, -3);
+        new ClassFieldEditPane(fieldToMove).dragTo(fieldsCanvas.findElement(By.id("field-" + beforeField)), 1, -30);
     }
 
     /**

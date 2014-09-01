@@ -25,7 +25,7 @@ import org.xwiki.job.AbstractRequest;
  * @version $Id$
  * @since 4.2M3
  */
-public class DistributionRequest extends AbstractRequest
+public class DistributionRequest extends AbstractRequest implements Cloneable
 {
     private static final long serialVersionUID = 1L;
 
@@ -42,5 +42,11 @@ public class DistributionRequest extends AbstractRequest
     public String getWiki()
     {
         return getProperty(PROPERTY_WIKI);
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException
+    {
+        return super.clone();
     }
 }

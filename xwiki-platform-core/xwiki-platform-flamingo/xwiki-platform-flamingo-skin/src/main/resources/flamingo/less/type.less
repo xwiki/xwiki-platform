@@ -1,0 +1,60 @@
+//
+// Typography
+// --------------------------------------------------
+
+// Local Mixins ===========================================================
+
+.text-smaller {
+  font-size: floor(@font-size-base * 0.9);
+}
+
+.text-muted-smaller {
+  .text-muted;
+  .text-smaller;
+}
+
+// Headings ===============================================================
+
+@font-size-h1:            ceil((@font-size-base * 2)); // ~28px
+@font-size-h2:            ceil((@font-size-base * 1.78)); // ~25px
+@font-size-h3:            ceil((@font-size-base * 1.57)); // ~22px
+@font-size-h4:            ceil((@font-size-base * 1.28)); // ~18px
+@font-size-h5:            @font-size-base; // ~14px
+@font-size-h6:            ceil((@font-size-base * 0.85)); // ~12px
+
+#document-title h1 {
+  font-size: ceil((@font-size-base * 2.42)); // ~34px
+}
+
+h1.xwikipaneltitle {
+  font-size: ceil((@font-size-base * 1.42)); // ~18px;
+}
+
+// Muted Usage ============================================================
+
+.separator, .itemCount {
+  .text-muted;
+}
+
+.noitems {
+  .text-muted-smaller;
+}
+
+#hierarchy, 
+#xdocAuthors,
+.xdocLastModification,
+#xdocFooter,
+#historyform td, #changes-info {
+  .text-muted-smaller;
+}
+
+ul.xlist li.create a {
+  .text-muted;
+}
+
+// Verbatim ===============================================================
+
+tt.wikimodel-verbatim {
+  font-family: sans-serif;
+  white-space: pre-wrap;
+}

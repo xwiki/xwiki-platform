@@ -94,7 +94,7 @@ public class StaticListClass extends ListClass
     @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
-        if (getDisplayType().equals("input")) {
+        if (getDisplayType().equals(DISPLAYTYPE_INPUT)) {
             input input = new input();
             input.setAttributeFilter(new XMLAttributeValueFilter());
             BaseProperty prop = (BaseProperty) object.safeget(name);
@@ -132,11 +132,13 @@ public class StaticListClass extends ListClass
 
             buffer.append(input.toString());
 
-        } else if (getDisplayType().equals("radio") || getDisplayType().equals("checkbox")) {
+        } else if (getDisplayType().equals(DISPLAYTYPE_RADIO) || getDisplayType().equals(DISPLAYTYPE_CHECKBOX)) {
             displayRadioEdit(buffer, name, prefix, object, context);
         } else {
             displaySelectEdit(buffer, name, prefix, object, context);
 
+            // We need a hidden input with an empty value to be able to clear the selected values from the above select
+            // when it has multiple selection enabled and no value selected.
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
             hidden.setAttributeFilter(new XMLAttributeValueFilter());
             hidden.setDisabled(isDisabled());

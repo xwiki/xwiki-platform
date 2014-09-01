@@ -27,6 +27,7 @@ import java.util.Map;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.block.Block;
@@ -36,6 +37,7 @@ import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.script.NestedScriptMacroEnabled;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
@@ -47,6 +49,7 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionStartsEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 
@@ -194,13 +197,25 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
             // TODO: maybe log something
         }
 
+        // Get XWiki context
+        Map<String, Object> xwikiContext = null;
+        try {
+            Execution execution = this.componentManager.getInstance(Execution.class);
+            ExecutionContext econtext = execution.getContext();
+            if (econtext != null) {
+                xwikiContext = (Map<String, Object>) execution.getContext().getProperty("xwikicontext");
+            }
+        } catch (ComponentLookupException e) {
+            // TODO: maybe log something
+        }
+
         try {
             Transformation macroTransformation = this.componentManager.getInstance(Transformation.class, MACRO_HINT);
 
-            // Place macro context inside xwiki context ($context.macro).
-            Execution execution = this.componentManager.getInstance(Execution.class);
-            Map<String, Object> xwikiContext = (Map<String, Object>) execution.getContext().getProperty("xwikicontext");
-            xwikiContext.put(MACRO_KEY, macroBinding);
+            if (xwikiContext != null) {
+                // Place macro context inside xwiki context ($context.macro).
+                xwikiContext.put(MACRO_KEY, macroBinding);
+            }
 
             MacroBlock wikiMacroBlock = context.getCurrentMacroBlock();
 
@@ -222,12 +237,19 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
             // Perform internal macro transformations.
             TransformationContext txContext = new TransformationContext(context.getXDOM(), this.syntax);
             txContext.setId(context.getId());
-            macroTransformation.transform(wikiMacroMarker, txContext);
+
+            RenderingContext renderingContext = componentManager.getInstance(RenderingContext.class);
+            ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext,
+                wikiMacroMarker);
 
             return extractResult(wikiMacroMarker.getChildren(), macroBinding, context);
         } catch (Exception ex) {
             throw new MacroExecutionException("Error while performing internal macro transformations", ex);
         } finally {
+            if (xwikiContext != null) {
+                xwikiContext.remove(MACRO_KEY);
+            }
+
             if (observation != null) {
                 observation.notify(ENDEXECUTION_EVENT, this);
             }
@@ -372,11 +394,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
     @Override
     public int compareTo(Macro< ? > macro)
     {
-        if (getPriority() != macro.getPriority()) {
-            return getPriority() - macro.getPriority();
-        }
-
-        return this.getClass().getSimpleName().compareTo(macro.getClass().getSimpleName());
+        return getPriority() - macro.getPriority();
     }
 
     @Override

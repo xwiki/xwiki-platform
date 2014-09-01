@@ -19,6 +19,8 @@
  */
 package org.xwiki.search.solr.internal;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -27,12 +29,15 @@ import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.core.CoreContainer;
+import org.apache.solr.core.SolrCore;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.test.annotation.AllComponents;
@@ -51,6 +56,10 @@ public class EmbeddedSolrInstanceInitializationTest
 
     protected File PERMANENT_DIRECTORY = new File("target", "data-" + new Date().getTime());
 
+    protected ConfigurationSource mockXWikiProperties;
+
+    protected static String solrHomeProperty = String.format("%s.%s.%s", "solr", EmbeddedSolrInstance.TYPE, "home");
+
     @Before
     public void setup() throws Exception
     {
@@ -60,19 +69,21 @@ public class EmbeddedSolrInstanceInitializationTest
 
         FileUtils.deleteDirectory(PERMANENT_DIRECTORY);
         PERMANENT_DIRECTORY.mkdirs();
+
+        this.mockXWikiProperties = this.mocker.registerMockComponent(ConfigurationSource.class, "xwikiproperties");
     }
 
     @After
     public void tearDown() throws Exception
     {
-        //FileUtils.deleteDirectory(PERMANENT_DIRECTORY);
+        FileUtils.deleteDirectory(PERMANENT_DIRECTORY);
     }
 
     @Test
     public void testInitialization() throws Exception
     {
         URL url = this.getClass().getClassLoader().getResource("solrhome");
-        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, url.getPath());
+        when(this.mockXWikiProperties.getProperty(eq(solrHomeProperty), anyString())).thenReturn(url.getPath());
 
         getInstanceAndAssertHomeDirectory(url.getPath());
     }
@@ -81,18 +92,25 @@ public class EmbeddedSolrInstanceInitializationTest
     public void testInstantiationNewHome() throws Exception
     {
         String newHome = new File(PERMANENT_DIRECTORY, "doesNotExist").getAbsolutePath();
-        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, newHome);
+        when(this.mockXWikiProperties.getProperty(eq(solrHomeProperty), anyString())).thenReturn(newHome);
 
         getInstanceAndAssertHomeDirectory(newHome);
     }
 
     @Test
-    public void testInstantiationNoHome() throws ComponentLookupException, Exception
+    public void testInstantiationInvalidHome() throws ComponentLookupException, Exception
     {
-        System.setProperty(EmbeddedSolrInstance.SOLR_HOME_SYSTEM_PROPERTY, "");
+        when(this.mockXWikiProperties.getProperty(eq(solrHomeProperty), anyString())).thenReturn("");
 
-        // Not actually expecting null, just trying to reuse code. Actually expecting default directory.
-        getInstanceAndAssertHomeDirectory(null);
+        // Not actually expecting anything. This will throw an exception.
+        try {
+            getInstanceAndAssertHomeDirectory(null);
+
+            Assert.fail("Specify a valid directory. Empty values are not accepted.");
+        } catch (ComponentLookupException e) {
+            Assert.assertTrue(e.getCause() instanceof InitializationException);
+            Assert.assertTrue(e.getCause().getCause() instanceof IllegalArgumentException);
+        }
     }
 
     /**
@@ -115,10 +133,11 @@ public class EmbeddedSolrInstanceInitializationTest
         }
 
         Assert.assertEquals(expected + File.separator, container.getSolrHome());
-        Assert.assertTrue(new File(new File(container.getSolrHome(), DefaultSolrConfiguration.CONF_DIRECTORY),
-            "schema.xml").exists());
-        Assert.assertTrue(new File(new File(container.getSolrHome(), DefaultSolrConfiguration.CONF_DIRECTORY),
-            "solrconfig.xml").exists());
+        Assert.assertEquals(1, container.getCores().size());
+        SolrCore core = container.getCores().iterator().next();
+        File coreBaseDirectory = new File(container.getSolrHome(), core.getName());
+        File configDirectory = new File(coreBaseDirectory, DefaultSolrConfiguration.CONF_DIRECTORY);
+        Assert.assertTrue(new File(configDirectory, core.getSchemaResource()).exists());
+        Assert.assertTrue(new File(configDirectory, core.getConfigResource()).exists());
     }
-
 }

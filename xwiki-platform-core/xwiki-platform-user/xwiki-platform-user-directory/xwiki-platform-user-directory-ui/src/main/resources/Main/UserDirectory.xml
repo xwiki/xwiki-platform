@@ -1,19 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<xwikidoc>
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
   <web>Main</web>
   <name>UserDirectory</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1385047494000</creationDate>
+  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1364502215000</creationDate>
-  <date>1364569715000</date>
-  <contentUpdateDate>1364569684000</contentUpdateDate>
+  <date>1385065244000</date>
+  <contentUpdateDate>1385065244000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('xe.userdirectory.title')</title>
   <defaultTemplate/>
@@ -22,93 +42,6 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <object>
-    <class>
-      <name>XWiki.UIExtensionClass</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <content>
-        <disabled>0</disabled>
-        <name>content</name>
-        <number>3</number>
-        <prettyName>Extension Content</prettyName>
-        <rows>10</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </content>
-      <extensionPointId>
-        <disabled>0</disabled>
-        <name>extensionPointId</name>
-        <number>1</number>
-        <prettyName>Extension Point ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </extensionPointId>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>2</number>
-        <prettyName>Extension ID</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parameters>
-        <disabled>0</disabled>
-        <name>parameters</name>
-        <number>4</number>
-        <prettyName>Extension Parameters</prettyName>
-        <rows>10</rows>
-        <size>40</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </parameters>
-      <scope>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>scope</name>
-        <number>5</number>
-        <prettyName>Extension Scope</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators> ,|</separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>wiki=Current Wiki|user=Current User|global=Global</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </scope>
-    </class>
-    <name>Main.UserDirectory</name>
-    <number>0</number>
-    <className>XWiki.UIExtensionClass</className>
-    <guid>391472d5-30e8-4351-ae7f-a4d72394a4ce</guid>
-    <property>
-      <content/>
-    </property>
-    <property>
-      <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>
-    </property>
-    <property>
-      <name>platform.panels.userDirectoryApplication</name>
-    </property>
-    <property>
-      <parameters>label=$services.localization.render('xe.panels.quicklinks.userdirectory')
-target=Main.UserDirectory
-icon=icon:group</parameters>
-    </property>
-    <property>
-      <scope>wiki</scope>
-    </property>
-  </object>
   <content>{{velocity}}
 #set ($xwikiUsersClassReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'XWikiUsers'))
 #set ($xwikiUsersClassName = $services.model.serialize($xwikiUsersClassReference))
@@ -120,7 +53,7 @@ icon=icon:group</parameters>
 #set ($fakeUser = false)
 ##
 ## Set the fixed columns that we want the user directory to always show.
-#set ($columns = ['_avatar', 'doc.fullName'])
+#set ($columns = ['_avatar', 'doc.name'])
 ##
 ## The columns that the user directory will default to when no user preferences exist or when the user resets to default.
 #set ($defaultColumns = ['first_name', 'last_name'])
@@ -194,7 +127,7 @@ icon=icon:group</parameters>
     {{html clean='false' wiki='true'}}
     &lt;form class='xform half' action="$doc.getURL($xcontext.action, $request.queryString)" method='post'&gt;
       &lt;dl&gt;
-        &lt;dt class='label'&gt;
+        &lt;dt&gt;
           &lt;label&gt;{{translation key="xe.userdirectory.customizeAvailableColumnsLabel"/}}&lt;/label&gt;
           &lt;span class='xHint'&gt;{{translation key="xe.userdirectory.customizeAvailableColumnsHint"/}}&lt;/span&gt;
         &lt;/dt&gt;
@@ -261,7 +194,7 @@ icon=icon:group</parameters>
     #set ($html = true)
     #set ($sortable = false)
     #set ($link = 'view')
-  #elseif ($column == 'doc.fullName')
+  #elseif ($column == 'doc.name')
     #set ($link = 'view')
   #elseif ($classPropertyType.endsWith('ListClass'))
     #set($type = 'list')
@@ -269,6 +202,8 @@ icon=icon:group</parameters>
     #set($type = 'number')
   #elseif ($classPropertyType.endsWith('PasswordClass'))
     #set($sortable = false)
+  #elseif ($classPropertyType.endsWith('TextAreaClass'))
+    #set($html = true)
   #end
   #set ($columnValue = { 'type' : $type, 'link' : $link, 'html' : $html, 'sortable' : $sortable, 'displayName' : $displayName })
   #set ($discard = $columnsProperties.put($column, $columnValue))
@@ -280,12 +215,46 @@ icon=icon:group</parameters>
   ## If no override is present, use the default data source.
   #set ($userDirectoryLivetableResultsReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'UserDirectoryLivetableResults'))
 #end
+## Note that we specify the class name even though we use a custom results page (which hard-codes it) because the class
+## name is needed by the live table filters, to have a proper drop down list for Static List fields for instance
+## (see XWIKI-9660).
 #set ($options = {
+   'className': $services.model.serialize($xwikiUsersClassReference, 'local'),
    'resultPage' : "$services.model.serialize($userDirectoryLivetableResultsReference)",
    'translationPrefix' : 'xe.userdirectory.',
    'tagCloud' : true,
    'rowCount': 10
 })
+## Add a filter for subwikis
+#if ($xcontext.database != $xcontext.mainWikiName &amp;&amp; "$!services.wiki" != '' &amp;&amp; "$!services.wiki.user" != '')
+  #set($userScope = $services.wiki.user.getUserScope($services.wiki.currentWikiId))
+  #if ($userScope == 'GLOBAL_ONLY')
+    #set($discard = $options.put('extraParams', 'userScope=global'))
+  #else
+    #set($discard = $options.put('extraParams', 'userScope=local'))
+  #end
+  #if ($userScope == 'LOCAL_AND_GLOBAL')
+    #set($discard = $xwiki.jsx.use('Main.UserDirectory'))
+
+    {{html}}
+      &lt;form class="xform third" action=""&gt;
+        &lt;dl&gt;
+          &lt;dt&gt;
+            &lt;label for="userScopeFilter"&gt;$services.localization.render('userdirectory.userScopeFilter')&lt;/label&gt;
+            &lt;span class="xHint"&gt;$services.localization.render('userdirectory.userScopeFilter.hint')&lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+            &lt;select name="userScope" id="userScopeFilter"&gt;
+              &lt;option value="local"&gt;$services.localization.render('userdirectory.userScopeFilter.local')&lt;/option&gt;
+              &lt;option value="global"&gt;$services.localization.render('userdirectory.userScopeFilter.global')&lt;/option&gt;
+            &lt;/select&gt;
+          &lt;/dd&gt;
+        &lt;/dl&gt;
+      &lt;/form&gt;
+    {{/html}}
+
+  #end
+#end
 #livetable('userdirectory' $columns $columnsProperties $options)
 ##
 ## Clean up any existing fake user from the current in-memory document to avoid side-effects
@@ -293,4 +262,223 @@ icon=icon:group</parameters>
   #set ($discard = $doc.removeObject($fakeUser))
 #end
 {{/velocity}}</content>
+  <object>
+    <name>Main.UserDirectory</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>b88f66f2-98d2-4e84-9fb7-edad89c0b19f</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>(function(){
+
+  /**
+   * Init
+   */
+  function init() {
+    var userScope = $('userScopeFilter');
+    if (userScope === null) {
+      // Nothing to do
+      return;
+    }
+    userScope.observe('change', onUserScopeChange);
+  }
+  
+  function onUserScopeChange(event) {
+    var value = $('userScopeFilter').value;
+    var livetable = window["livetable_userdirectory"];
+    var url = livetable.getUrl;
+    if (url.search("userScope=") &gt;= 0) {
+      // Replace the old value
+      if (value == 'local') {
+        url = url.replace("userScope=global", "userScope=local");
+      } else {
+        url = url.replace("userScope=local", "userScope=global");
+      }
+    } else {
+      url = url + "&amp;userScope=" + value;
+    }
+    livetable.getUrl = url;
+    // Reload the livetable
+    livetable.clearCache();
+    livetable.showRows(1, livetable.limit);
+  }
+  
+  /**
+   * Call Init
+   */
+  (XWiki &amp;&amp; XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
+
+})();
+</code>
+    </property>
+    <property>
+      <name>Dynamic filter for user scope</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>Main.UserDirectory</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>391472d5-30e8-4351-ae7f-a4d72394a4ce</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <content>
+        <disabled>0</disabled>
+        <name>content</name>
+        <number>3</number>
+        <prettyName>Extension Content</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>1</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <disabled>0</disabled>
+        <name>parameters</name>
+        <number>4</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>5</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <content/>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.platform.panels.Applications</extensionPointId>
+    </property>
+    <property>
+      <name>platform.panels.userDirectoryApplication</name>
+    </property>
+    <property>
+      <parameters>label=$services.localization.render('xe.panels.quicklinks.userdirectory')
+target=Main.UserDirectory
+icon=icon:group</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
+    </property>
+  </object>
 </xwikidoc>

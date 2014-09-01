@@ -25,7 +25,7 @@ import javax.jcr.query.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.query.internal.QueryManagerScriptService;
+import org.xwiki.query.script.QueryManagerScriptService;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

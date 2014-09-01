@@ -25,6 +25,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 import java.util.List;
 
+import org.xwiki.component.annotation.Role;
+
+@Role
 public interface XWikiRenderingEngine
 {
     void virtualInit(XWikiContext context);

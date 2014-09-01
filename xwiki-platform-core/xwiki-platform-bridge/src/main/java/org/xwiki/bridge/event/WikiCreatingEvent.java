@@ -19,16 +19,23 @@
  */
 package org.xwiki.bridge.event;
 
-import org.xwiki.observation.event.BeginEvent;
+import org.xwiki.observation.event.BeginFoldEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
  * An event triggered just before a wiki is about to be created.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the wiki identifier as {@link String}</li>
+ * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
+ * </ul>
  * 
  * @version $Id$
  * @since 3.2M1
  */
-public class WikiCreatingEvent extends AbstractWikiEvent implements BeginEvent
+public class WikiCreatingEvent extends AbstractWikiEvent implements BeginFoldEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class

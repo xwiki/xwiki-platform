@@ -22,7 +22,7 @@ package org.xwiki.extension.xar.internal.script;
 import javax.inject.Inject;
 
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
-import org.xwiki.extension.xar.internal.handler.ConflictQuestion;
+import org.xwiki.extension.xar.question.ConflictQuestion;
 
 /**
  * @version $Id$

@@ -30,6 +30,8 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -116,27 +118,7 @@ public class ConversionFilter implements Filter
             }
 
             if (!errors.isEmpty()) {
-                // In case of a conversion exception we have to redirect the request back and provide a key to access
-                // the exception and the value before the conversion from the session.
-                // Redirect to the error page specified on the request.
-                String redirectURL = mreq.getParameter("xerror");
-                if (redirectURL == null) {
-                    // Redirect to the referrer page.
-                    redirectURL = mreq.getReferer();
-                }
-                // Extract the query string.
-                String queryString = StringUtils.substringAfterLast(redirectURL, String.valueOf('?'));
-                // Remove the query string.
-                redirectURL = StringUtils.substringBeforeLast(redirectURL, String.valueOf('?'));
-                // Remove the previous key from the query string. We have to do this since this might not be the first
-                // time the conversion fails for this redirect URL.
-                queryString = queryString.replaceAll("key=.*&?", "");
-                if (queryString.length() > 0 && !queryString.endsWith(String.valueOf('&'))) {
-                    queryString += '&';
-                }
-                // Save the output and the caught exceptions on the session.
-                queryString += "key=" + save(mreq, output, errors);
-                mreq.sendRedirect(res, redirectURL + '?' + queryString);
+                handleConversionErrors(errors, output, mreq, res);
             } else {
                 chain.doFilter(mreq, res);
             }
@@ -148,6 +130,45 @@ public class ConversionFilter implements Filter
     @Override
     public void init(FilterConfig config) throws ServletException
     {
+    }
+
+    private void handleConversionErrors(Map<String, Throwable> errors, Map<String, String> output,
+        MutableServletRequest mreq, ServletResponse res) throws IOException
+    {
+        ServletRequest req = mreq.getRequest();
+        if (req instanceof HttpServletRequest
+            && "XMLHttpRequest".equals(((HttpServletRequest) req).getHeader("X-Requested-With"))) {
+            // If this is an AJAX request then we should simply send back the error.
+            StringBuilder errorMessage = new StringBuilder();
+            // Aggregate all error messages (for all fields that have conversion errors).
+            for (Map.Entry<String, Throwable> entry : errors.entrySet()) {
+                errorMessage.append(entry.getKey()).append(": ");
+                errorMessage.append(entry.getValue().getLocalizedMessage()).append('\n');
+            }
+            ((HttpServletResponse) res).sendError(400, errorMessage.substring(0, errorMessage.length() - 1));
+            return;
+        }
+        // Otherwise, if this is a normal request, we have to redirect the request back and provide a key to
+        // access the exception and the value before the conversion from the session.
+        // Redirect to the error page specified on the request.
+        String redirectURL = mreq.getParameter("xerror");
+        if (redirectURL == null) {
+            // Redirect to the referrer page.
+            redirectURL = mreq.getReferer();
+        }
+        // Extract the query string.
+        String queryString = StringUtils.substringAfterLast(redirectURL, String.valueOf('?'));
+        // Remove the query string.
+        redirectURL = StringUtils.substringBeforeLast(redirectURL, String.valueOf('?'));
+        // Remove the previous key from the query string. We have to do this since this might not be the first
+        // time the conversion fails for this redirect URL.
+        queryString = queryString.replaceAll("key=.*&?", "");
+        if (queryString.length() > 0 && !queryString.endsWith(String.valueOf('&'))) {
+            queryString += '&';
+        }
+        // Save the output and the caught exceptions on the session.
+        queryString += "key=" + save(mreq, output, errors);
+        mreq.sendRedirect(res, redirectURL + '?' + queryString);
     }
 
     /**

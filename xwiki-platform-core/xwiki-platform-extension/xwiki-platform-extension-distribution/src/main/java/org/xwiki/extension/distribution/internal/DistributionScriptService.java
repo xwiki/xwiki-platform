@@ -19,6 +19,9 @@
  */
 package org.xwiki.extension.distribution.internal;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -28,16 +31,19 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.DistributionManager.DistributionState;
+import org.xwiki.extension.distribution.internal.DocumentsModifiedDuringDistributionListener.DocumentStatus;
 import org.xwiki.extension.distribution.internal.job.DistributionJob;
 import org.xwiki.extension.distribution.internal.job.DistributionJobStatus;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.extension.internal.safe.ScriptSafeProvider;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.job.event.status.JobStatus.State;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.observation.EventListener;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.script.service.ScriptService;
 
 import com.xpn.xwiki.XWikiContext;
@@ -64,6 +70,18 @@ public class DistributionScriptService implements ScriptService
     public static final String EXTENSIONERROR_KEY = "scriptservice.distribution.error";
 
     /**
+     * The component used to get information about the current distribution.
+     */
+    @Inject
+    protected DistributionManager distributionManager;
+
+    /**
+     * Used to access current {@link XWikiContext}.
+     */
+    @Inject
+    protected Provider<XWikiContext> xcontextProvider;
+
+    /**
      * Provides safe objects for scripts.
      */
     @Inject
@@ -71,23 +89,18 @@ public class DistributionScriptService implements ScriptService
     private ScriptSafeProvider scriptProvider;
 
     /**
-     * The component used to get information about the current distribution.
-     */
-    @Inject
-    private DistributionManager distributionManager;
-
-    /**
-     * Used to access current {@link XWikiContext}.
-     */
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    /**
      * Used to access HTML renderer.
      */
     @Inject
     @Named("xhtml/1.0")
     private BlockRenderer xhtmlRenderer;
+
+    @Inject
+    @Named(DocumentsModifiedDuringDistributionListener.NAME)
+    private EventListener modifiedDocumentsListener;
+
+    @Inject
+    private RenderingContext renderingContext;
 
     /**
      * @param <T> the type of the object
@@ -109,8 +122,18 @@ public class DistributionScriptService implements ScriptService
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.isMainWiki() ? this.distributionManager.getFarmDistributionState() : this.distributionManager
-            .getWikiDistributionState(xcontext.getDatabase());
+        return getState(xcontext.getWikiId());
+    }
+
+    /**
+     * @return the current distribution state
+     */
+    public DistributionState getState(String wiki)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki(wiki) ? this.distributionManager.getFarmDistributionState()
+            : this.distributionManager.getWikiDistributionState(wiki);
     }
 
     /**
@@ -122,25 +145,49 @@ public class DistributionScriptService implements ScriptService
     }
 
     /**
-     * @return the recommended user interface for {@link #getDistributionExtension()}
+     * @return the recommended user interface for current wiki
      */
     public ExtensionId getUIExtensionId()
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.isMainWiki() ? this.distributionManager.getMainUIExtensionId() : this.distributionManager
+        return getUIExtensionId(xcontext.getWikiId());
+    }
+
+    /**
+     * @param wiki the wiki
+     * @return the recommended user interface for passed wiki
+     */
+    public ExtensionId getUIExtensionId(String wiki)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki(wiki) ? this.distributionManager.getMainUIExtensionId() : this.distributionManager
             .getWikiUIExtensionId();
     }
 
     /**
-     * @return the previous status of the distribution job (e.g. from last time the distribution was upgraded)
+     * @return the previous status of the distribution job for the current wiki (e.g. from last time the distribution
+     *         was upgraded)
      */
     public DistributionJobStatus< ? > getPreviousJobStatus()
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.isMainWiki() ? this.distributionManager.getPreviousFarmJobStatus() : this.distributionManager
-            .getPreviousWikiJobStatus(xcontext.getDatabase());
+        return getPreviousJobStatus(xcontext.getWikiId());
+    }
+
+    /**
+     * @param wiki the wiki for which to retrieve the previous status of the distribution job
+     * @return the previous status of the distribution job for the specified wiki (e.g. from last time the distribution
+     *         was upgraded)
+     */
+    public DistributionJobStatus< ? > getPreviousJobStatus(String wiki)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        return xcontext.isMainWiki(wiki) ? this.distributionManager.getPreviousFarmJobStatus()
+            : this.distributionManager.getPreviousWikiJobStatus(wiki);
     }
 
     /**
@@ -166,6 +213,11 @@ public class DistributionScriptService implements ScriptService
      */
     public String renderCurrentStepToXHTML()
     {
+        return renderCurrentStepToXHTML(this.renderingContext.getTransformationId());
+    }
+
+    public String renderCurrentStepToXHTML(String transformationId)
+    {
         DistributionJob job = this.distributionManager.getCurrentDistributionJob();
 
         if (job != null) {
@@ -175,7 +227,7 @@ public class DistributionScriptService implements ScriptService
                 State jobState = jobStatus.getState();
 
                 if (jobState == State.RUNNING || jobState == State.WAITING) {
-                    Block block = job.getCurrentStep().render();
+                    Block block = job.getCurrentStep().execute();
 
                     WikiPrinter printer = new DefaultWikiPrinter();
 
@@ -190,11 +242,59 @@ public class DistributionScriptService implements ScriptService
     }
 
     /**
-     * @return the upgrade mode
-     * @since 5.0RC1
+     * @return the document modified during the Distribution Wizard execution
+     * @since 5.4RC1
      */
-    public UpgradeMode getUpgradeMode()
+    public Map<DocumentReference, DocumentStatus> getModifiedDocuments()
     {
-        return this.distributionManager.getUpgradeMode();
+        return ((DocumentsModifiedDuringDistributionListener) this.modifiedDocumentsListener).getDocuments().get(
+            this.xcontextProvider.get().getWikiId());
+    }
+
+    /**
+     * @return the document modified during the Distribution Wizard execution
+     * @since 5.4RC1
+     */
+    public Map<String, Map<String, Map<String, Map<String, DocumentStatus>>>> getModifiedDocumentsTree()
+    {
+        Map<DocumentReference, DocumentStatus> documents =
+            ((DocumentsModifiedDuringDistributionListener) this.modifiedDocumentsListener).getDocuments().get(
+                this.xcontextProvider.get().getWikiId());
+
+        Map<String, Map<String, Map<String, Map<String, DocumentStatus>>>> tree =
+            new TreeMap<String, Map<String, Map<String, Map<String, DocumentStatus>>>>();
+
+        if (documents != null) {
+            for (Map.Entry<DocumentReference, DocumentStatus> document : documents.entrySet()) {
+                DocumentReference reference = document.getKey();
+                String wiki = reference.getWikiReference().getName();
+                // TODO: add support for subspaces
+                String space = reference.getLastSpaceReference().getName();
+                String page = reference.getName();
+                String locale = reference.getLocale() != null ? reference.getLocale().toString() : "";
+
+                Map<String, Map<String, Map<String, DocumentStatus>>> spaces = tree.get(wiki);
+                if (spaces == null) {
+                    spaces = new TreeMap<String, Map<String, Map<String, DocumentStatus>>>();
+                    tree.put(wiki, spaces);
+                }
+
+                Map<String, Map<String, DocumentStatus>> pages = spaces.get(space);
+                if (pages == null) {
+                    pages = new TreeMap<String, Map<String, DocumentStatus>>();
+                    spaces.put(space, pages);
+                }
+
+                Map<String, DocumentStatus> locales = pages.get(page);
+                if (locales == null) {
+                    locales = new TreeMap<String, DocumentStatus>();
+                    pages.put(page, locales);
+                }
+
+                locales.put(locale, document.getValue());
+            }
+        }
+
+        return tree;
     }
 }

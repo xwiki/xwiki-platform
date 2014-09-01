@@ -253,8 +253,8 @@ public class DocumentModifiedEventListener implements EventListener
     {
         String url;
 
+        String queryString = null;
         try {
-            String queryString = null;
             if (!(event instanceof DocumentCreatedEvent || event instanceof DocumentDeletedEvent)) {
                 // Return a diff URL since the action done was a modification
                 queryString = String.format("viewer=changes&amp;rev2=%s", source.getVersion());
@@ -262,8 +262,9 @@ public class DocumentModifiedEventListener implements EventListener
             url = source.getExternalURL("view", queryString, xcontext);
         } catch (Exception e) {
             // Ensures that an error in computing the URL won't prevent sending a message on the IRC channel
-            url = "Failed to compute URL";
-            this.logger.debug("Failed to compute URL for Document Modified Event Listener", e);
+            url = String.format("Failed to compute URL for document [%s] and query string [%s]",
+                source.getDocumentReference(), queryString);
+            this.logger.warn(url, e);
         }
 
         return url;

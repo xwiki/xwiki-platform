@@ -32,8 +32,16 @@ public interface DistributionJob extends Job
     DistributionStep getCurrentStep();
 
     @Override
-    public DistributionRequest getRequest();
+    DistributionRequest getRequest();
 
     @Override
-    public DistributionJobStatus< ? > getStatus();
+    DistributionJobStatus< ? > getStatus();
+
+    /**
+     * Wait until the job is fully initialized.
+     * 
+     * @throws InterruptedException if the current thread is interrupted (and interruption of thread suspension is
+     *             supported)
+     */
+    void awaitReady() throws InterruptedException;
 }

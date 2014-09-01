@@ -1,0 +1,38 @@
+$xwiki.jsfx.use('uicomponents/widgets/upload.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
+$xwiki.ssfx.use('uicomponents/widgets/upload.css', true)
+$xwiki.jsfx.use('js/xwiki/viewers/attachments.js', {'forceSkinAction': true, 'language': ${xcontext.language}})
+$xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)
+###
+### List document attachments
+###
+### TODO: web service?
+###
+#set($showactions = 0)
+<div id="attachmentscontent" class="xwikiintracontent">
+<div id="attw">
+<div id="_attachments">
+#template("attachmentslist.vm")
+</div> ## attachments
+#if($hasEdit || $hasAdmin)
+  <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" id="AddAttachment">
+  <div>
+  ## CSRF prevention
+  <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
+  ## $redirect is defined in attachmentslist.vm
+  <input type="hidden" name="xredirect" value="$escapetool.xml($redirect)" />
+  <fieldset id="attachform">
+    <legend>$services.localization.render('core.viewers.attachments.upload.title')</legend>
+    ## Temporarily disabled, until we fix attachment name handling
+    ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$services.localization.render('core.viewers.attachments.upload.filename')</label></div>
+    ## <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
+    <div class="fileupload-field"><label class="hidden" for="xwikiuploadfile">$services.localization.render('core.viewers.attachments.upload.file')</label><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40" class="uploadFileInput"/></div>
+    <div>
+      <span class="buttonwrapper"><input type="submit" value="$services.localization.render('core.viewers.attachments.upload.submit')" class="button btn btn-primary"/></span>
+      <span class="buttonwrapper"><a class="cancel secondary button btn btn-primary" href="$doc.getURL()">$services.localization.render('core.viewers.attachments.upload.cancel')</a></span>
+    </div>
+  </fieldset>
+  </div>
+  </form>
+#end
+</div> ## attw
+</div> ## attachmentscontent

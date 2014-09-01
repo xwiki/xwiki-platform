@@ -154,7 +154,7 @@ public class FileSystemURLFactory extends XWikiServletURLFactory
             XWikiDocument doc =
                 context.getWiki()
                     .getDocument(
-                        new DocumentReference(StringUtils.defaultString(wiki, context.getDatabase()), space, name),
+                        new DocumentReference(StringUtils.defaultString(wiki, context.getWikiId()), space, name),
                         context);
             XWikiAttachment attachment = doc.getAttachment(filename);
             if (StringUtils.isNotEmpty(revision)) {

@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Configuration options specific to the "Standard" URL implementation scheme.
+ * Default implementation reading data from the {@code xwiki.properties} file.
  *
  * @version $Id$
  * @since 2.3M1
@@ -37,12 +37,12 @@ import org.xwiki.configuration.ConfigurationSource;
 public class DefaultStandardURLConfiguration implements StandardURLConfiguration
 {
     /**
-     * Prefix for configuration keys for the Core module.
+     * Prefix for configuration keys for the Resource module.
      */
     private static final String PREFIX = "url.standard.";
 
     /**
-     * Defines from where to read the URL configuration data.
+     * Defines from where to read the Resource configuration data.
      */
     @Inject
     @Named("xwikiproperties")
@@ -71,6 +71,18 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
         return getWikiPathPrefix("wiki");
     }
 
+    @Override
+    public WikiNotFoundBehavior getWikiNotFoundBehavior()
+    {
+        return getWikiNotFoundBehavior(WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI);
+    }
+
+    @Override
+    public String getEntityPathPrefix()
+    {
+        return getEntityPathPrefix("bin");
+    }
+
     /**
      * Makes it easy for this class to be extended.
      *
@@ -80,5 +92,27 @@ public class DefaultStandardURLConfiguration implements StandardURLConfiguration
     protected String getWikiPathPrefix(String defaultValue)
     {
         return this.configuration.getProperty(PREFIX + "multiwiki.wikiPathPrefix", defaultValue);
+    }
+
+    /**
+     * Makes it easy for this class to be extended.
+     *
+     * @param defaultValue the default value to use if the key is not found in the configuration
+     * @return see {@link #getEntityPathPrefix()} ()}
+     */
+    protected String getEntityPathPrefix(String defaultValue)
+    {
+        return this.configuration.getProperty(PREFIX + "entityPathPrefix", defaultValue);
+    }
+
+    /**
+     * Makes it easy for this class to be extended.
+     *
+     * @param defaultValue the default value to use if the key is not found in the configuration
+     * @return see {@link #getWikiNotFoundBehavior()}
+     */
+    protected WikiNotFoundBehavior getWikiNotFoundBehavior(WikiNotFoundBehavior defaultValue)
+    {
+        return this.configuration.getProperty(PREFIX + "multiwiki.notFoundBehavior", defaultValue);
     }
 }

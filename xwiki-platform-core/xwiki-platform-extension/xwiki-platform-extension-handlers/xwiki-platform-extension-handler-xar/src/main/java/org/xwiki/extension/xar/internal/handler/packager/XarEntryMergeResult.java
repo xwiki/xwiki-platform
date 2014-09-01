@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
+import org.xwiki.xar.XarEntry;
+
 import com.xpn.xwiki.doc.merge.MergeResult;
 
 /**

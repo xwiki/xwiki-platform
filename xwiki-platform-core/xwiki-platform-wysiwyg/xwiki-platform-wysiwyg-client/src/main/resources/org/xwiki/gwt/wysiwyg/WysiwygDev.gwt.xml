@@ -23,7 +23,7 @@
   <inherits name="org.xwiki.gwt.wysiwyg.Wysiwyg" />
   <!-- Normally we wouldn't need to specify the entry point but GWT Maven plug-in doesn't compile the module otherwise -->
   <entry-point class="org.xwiki.gwt.wysiwyg.client.Wysiwyg" />
-  <!-- user.agent from {gecko1_8, ie6, ie8, safari, opera} -->
+  <!-- user.agent from {gecko1_8, ie8, safari, opera} -->
   <!-- <set-property name="user.agent" value="gecko1_8" /> -->
   <!-- locale from {default, fr, de, ...} -->
   <set-property name="locale" value="default" />

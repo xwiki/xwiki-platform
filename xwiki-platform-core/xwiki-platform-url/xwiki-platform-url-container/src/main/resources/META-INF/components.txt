@@ -1,2 +1,2 @@
-org.xwiki.url.internal.XWikiURLExecutionContextInitializer
-org.xwiki.url.internal.XWikiURLRequestInitializer
+org.xwiki.url.internal.container.ExtendedURLURLNormalizer
+org.xwiki.url.internal.container.URLURLNormalizer

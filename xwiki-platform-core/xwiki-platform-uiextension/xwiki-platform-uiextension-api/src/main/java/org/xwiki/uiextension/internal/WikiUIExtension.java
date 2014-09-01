@@ -20,9 +20,9 @@
 package org.xwiki.uiextension.internal;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.Map;
 
-import org.apache.commons.collections.MapUtils;
 import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
@@ -157,7 +157,7 @@ public class WikiUIExtension implements UIExtension, WikiComponent
         if (this.parameters != null) {
             return this.parameters.get();
         } else {
-            return MapUtils.EMPTY_MAP;
+            return Collections.emptyMap();
         }
     }
 

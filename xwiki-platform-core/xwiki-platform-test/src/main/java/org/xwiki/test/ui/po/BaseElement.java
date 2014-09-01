@@ -80,6 +80,28 @@ public class BaseElement
     }
 
     /**
+     * Wait until the element given by the locator is displayed. Give up after specified timeout
+     * (in seconds).
+     * <p></p>
+     * Only use this API if you absolutely need a longer timeout than the default, otherwise use
+     * {@link #waitUntilElementIsVisible(org.openqa.selenium.By)}.
+     *
+     * @param locator the locator for the element to look for
+     * @param timeout the timeout after which to give up
+     * @since 5.4RC1
+     */
+    public void waitUntilElementIsVisible(final By locator, int timeout)
+    {
+        int currentTimeout = getUtil().getTimeout();
+        try {
+            getUtil().setTimeout(timeout);
+            waitUntilElementsAreVisible(new By[] {locator}, true);
+        } finally {
+            getUtil().setTimeout(currentTimeout);
+        }
+    }
+
+    /**
      * Wait until one or all of a array of element locators are displayed.
      * 
      * @param locators the array of element locators to look for.
@@ -168,6 +190,32 @@ public class BaseElement
     }
 
     /**
+     * Waits until the given element has a non-empty value for an attribute.
+     *
+     * @param locator the element to wait on
+     * @param attributeName the name of the attribute to check
+     */
+    public void waitUntilElementHasNonEmptyAttributeValue(final By locator, final String attributeName)
+    {
+        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                try {
+                    WebElement element = driver.findElement(locator);
+                    return !element.getAttribute(attributeName).isEmpty();
+                } catch (NotFoundException e) {
+                    return false;
+                } catch (StaleElementReferenceException e) {
+                    // The element was removed from DOM in the meantime
+                    return false;
+                }
+            }
+        });
+    }
+
+    /**
      * Waits until the given element has a certain value for an attribute.
      * 
      * @param locator the element to wait on
@@ -225,7 +273,7 @@ public class BaseElement
 
     /**
      * Waits until the given element has a certain value as its inner text.
-     * 
+     *
      * @param locator the element to wait on
      * @param expectedValue the content value to wait for
      * @since 3.2M3

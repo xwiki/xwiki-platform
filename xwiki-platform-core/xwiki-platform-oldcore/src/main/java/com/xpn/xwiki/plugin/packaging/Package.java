@@ -705,15 +705,25 @@ public class Package
                     localExtension = localRepository.storeExtension(extension);
                 }
 
-                // Register the extension as installed
                 InstalledExtensionRepository installedRepository =
                     Utils.getComponent(InstalledExtensionRepository.class);
-                String namespace = "wiki:" + context.getDatabase();
-                InstalledExtension installedExtension =
-                    installedRepository.getInstalledExtension(localExtension.getId());
-                if (installedExtension == null || !installedExtension.isInstalled(namespace)) {
-                    installedRepository.installExtension(localExtension, namespace, false);
+
+                String namespace = "wiki:" + context.getWikiId();
+
+                // Make sure it's not already there
+                if (installedRepository.getInstalledExtension(localExtension.getId().getId(), namespace) == null) {
+                    for (String feature : localExtension.getFeatures()) {
+                        if (installedRepository.getInstalledExtension(feature, namespace) != null) {
+                            // Already exist so don't register it or it could create a mess
+                            return;
+                        }
+                    }
+                } else {
+                    return;
                 }
+
+                // Register the extension as installed
+                installedRepository.installExtension(localExtension, namespace, false);
             } catch (Exception e) {
                 LOGGER.error("Failed to register extenion [{}] from the XAR", extensionId, e);
             }
@@ -728,14 +738,14 @@ public class Package
      */
     private boolean isFarmAdmin(XWikiContext context)
     {
-        String wiki = context.getDatabase();
+        String wiki = context.getWikiId();
 
         try {
-            context.setDatabase(context.getMainXWiki());
+            context.setWikiId(context.getMainXWiki());
 
             return context.getWiki().getRightService().hasWikiAdminRights(context);
         } finally {
-            context.setDatabase(wiki);
+            context.setWikiId(wiki);
         }
     }
 
@@ -794,6 +804,23 @@ public class Package
                         }
                     }
                 }
+                else if(previousdoc.hasElement(XWikiDocument.HAS_ATTACHMENTS))
+                {
+                    // We conserve the old attachments in the new documents
+                    List<XWikiAttachment> newDocAttachments = doc.getDoc().getAttachmentList();
+                    for (XWikiAttachment att : previousdoc.getAttachmentList())
+                    {
+                        if (doc.getDoc().getAttachment(att.getFilename()) == null)
+                        {
+                            // We add the attachment to new document
+                            newDocAttachments.add(att);
+                            // But then we add it in the "to remove list" of the document
+                            // So the attachment will be removed from the database when XWiki#saveDocument
+                            // will be called
+                            doc.getDoc().removeAttachment(att);
+                        }
+                    }
+                }
                 doc.getDoc().addXObjectsToRemoveFromVersion(previousdoc);
                 doc.getDoc().setOriginalDocument(previousdoc);
             }
@@ -840,15 +867,8 @@ public class Package
                     }
                 }
 
-                // Attachment saving should not generate additional saving
-                for (XWikiAttachment xa : doc.getDoc().getAttachmentList()) {
-                    xa.setMetaDataDirty(false);
-                    xa.getAttachment_content().setContentDirty(false);
-                }
-
                 String saveMessage = context.getMessageTool().get("core.importer.saveDocumentComment");
                 context.getWiki().saveDocument(doc.getDoc(), saveMessage, context);
-                doc.getDoc().saveAllAttachments(false, true, context);
                 addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
 
                 if ((this.withVersions && packageHasHistory) || conserveExistingHistory) {

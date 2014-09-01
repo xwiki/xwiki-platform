@@ -42,13 +42,13 @@ public class WikiSearchResourceImpl extends BaseSearchResult implements WikiSear
                 SEARCH_TEMPLATE_INFO));
 
             if (wikiName != null) {
-                Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+                Utils.getXWikiContext(componentManager).setWikiId(wikiName);
             }
 
             List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
 
             searchResults.getSearchResults().addAll(
-                search(searchScopes, keywords, getXWikiContext().getDatabase(), null, Utils.getXWiki(componentManager)
+                search(searchScopes, keywords, getXWikiContext().getWikiId(), null, Utils.getXWiki(componentManager)
                     .getRightService().hasProgrammingRights(Utils.getXWikiContext(componentManager)), number, start,
                     true, orderField, order, withPrettyNames));
 

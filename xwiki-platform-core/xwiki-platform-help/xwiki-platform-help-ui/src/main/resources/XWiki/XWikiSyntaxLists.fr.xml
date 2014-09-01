@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxLists</name>
+  <language>fr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497917000</date>
+  <contentUpdateDate>1301497917000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxLists</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Listes ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Lists ===
+
+|=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
+|Liste à puces|(((
+{{{* élément 1
+** élément 2
+*** élément 3
+* élément 4}}}
+)))|(((
+* élément 1
+** élément 2
+*** élément 3
+* élément 4
+)))
+|Liste numérotée|(((
+{{{1. élément 1
+11. élément 2
+111. élément 3
+1. élément 4}}}
+)))|(((
+1. élément 1
+11. élément 2
+111. élément 3
+1. élément 4
+)))
+|Liste mixte|(((
+{{{1. élément 1
+1*. élément 2
+1*. élément 3
+1. élément 4}}}
+)))|(((
+1. élément 1
+1*. élément 2
+1*. élément 3
+1. élément 4
+)))
+|Liste aux carrés|(((
+{{{- élément 1
+- élément 2}}}
+)))|(((
+(% style="list-style-type: square;" %)
+* élément 1
+* élément 2
+)))
+|Liste aux disques|(((
+&lt;ul style="list-style-type: disc"&gt;
+  &lt;li&gt;élément 1&lt;/li&gt;
+  &lt;li&gt;élément 2&lt;/li&gt;
+&lt;/ul&gt;
+)))|(((
+(% style="list-style-type: disc;" %)
+* élément 1
+* élément 2
+)))
+|Liste alphabétique en minuscules|(((
+{{{a. élément 1
+a. élément 2}}}
+)))|(((
+(% style="list-style-type: lower-alpha;" %)
+* élément 1
+* élément 2
+)))
+|Liste alphabétique en majuscules|(((
+{{{A. élément 1
+A. élément 2}}}
+)))|(((
+(% style="list-style-type: upper-alpha;" %)
+* élément 1
+* élément 2
+)))
+|Liste Romaine en minuscules|(((
+{{{i. élément 1
+i. élément 2}}}
+)))|(((
+(% style="list-style-type: lower-roman;" %)
+* élément 1
+* élément 2
+)))
+|Liste Romaine en majuscules|(((
+{{{I. élément 1
+I. élément 2}}}
+)))|(((
+(% style="list-style-type: upper-roman;" %)
+* élément 1
+* élément 2
+)))
+|Liste Grecque en minuscules|(((
+{{{g. élément 1
+g. élément 2}}}
+)))|(((
+(% style="list-style-type: lower-greek;" %)
+* élément 1
+* élément 2
+)))
+|Liste Grecque en majuscules|(((
+{{{G. élément 1
+G. élément 2}}}
+)))|(((
+* élément 1
+* élément 2
+)))
+|Liste Hiragana|(((
+{{{h. élément 1
+h. élément 2}}}
+)))|(((
+(% style="list-style-type: hiragana;" %)
+* élément 1
+* élément 2
+)))
+|Liste Hiragana Iroha|(((
+{{{H. élément 1
+H. élément 2}}}
+)))|(((
+(% style="list-style-type: hiragana-iroha;" %)
+* élément 1
+* élément 2
+)))
+|Liste Katakana|(((
+{{{k. élément 1
+k. élément 2}}}
+)))|(((
+(% style="list-style-type: katakana;" %)
+* élément 1
+* élément 2
+)))
+|Liste Katakana Iroha|(((
+{{{K. élément 1
+K. élément 2}}}
+)))|(((
+(% style="list-style-type: katakana-iroha;" %)
+* élément 1
+* élément 2
+)))
+|Liste Arménienne|(((
+&lt;ul style="list-style-type: armenian"&gt;
+ &lt;li&gt;élément 1&lt;/li&gt;
+ &lt;li&gt;élément 2&lt;/li&gt;
+&lt;/ul&gt;
+)))|(((
+(% style="list-style-type: armenian;" %)
+* élément 1
+* élément 2
+)))
+|Liste Hébraïque|(((
+{{{j. élément 1
+j. élément 2}}}
+)))|(((
+(% style="list-style-type: hebrew;" %)
+* élément 1
+* élément 2
+)))
+|Liste Géorgienne|(((
+{{{&lt;ul style="list-style-type: }}}
+
+georgian"&gt;
+ &lt;li&gt;élément 1&lt;/li&gt;
+ &lt;li&gt;élément 2&lt;/li&gt;
+&lt;/ul&gt;
+)))|(((
+(% style="list-style-type: georgian;" %)
+* élément 1
+* élément 2
+)))
+|Liste CJK idéographique|(((
+{{{&lt;ul style="list-style-type: }}}
+
+cjk-ideographic"&gt;
+ &lt;li&gt;élément 1&lt;/li&gt;
+ &lt;li&gt;élément 2&lt;/li&gt;
+&lt;/ul&gt;
+)))|(((
+(% style="list-style-type: cjk-ideographic;" %)
+* élément 1
+* élément 2
+)))
+
+=== 2.0 Lists ===
+
+
+|=Feature|=XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|Liste à puces|((({{{
+* élément 1
+** élément 2
+*** élément 3
+* élément 4
+}}})))|(((
+* élément 1
+** élément 2
+*** élément 3
+* élément 4
+)))
+|Liste numérotée|((({{{
+1. élément 1
+11. élément 2
+111. élément 3
+1. élément 4
+}}})))|(((
+1. élément 1
+11. élément 2
+111. élément 3
+1. élément 4
+)))
+|Liste mixte|((({{{
+1. élément 1
+1*. élément 2
+1*. élément 3
+1. élément 4
+}}})))|(((
+1. élément 1
+1*. élément 2
+1*. élément 3
+1. élément 4
+)))
+|Liste aux carrés|((({{{
+(% style="list-style-type: square" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: square" %)
+* élément 1
+* élément 2
+)))
+|Liste aux disques|((({{{
+(% style="list-style-type: disc" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: disc" %)
+* élément 1
+* élément 2
+)))
+|Liste alphabétique en minuscules|((({{{
+(% style="list-style-type: lower-alpha" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: lower-alpha" %)
+* élément 1
+* élément 2
+)))
+|Liste alphabétique en majuscules|((({{{
+(% style="list-style-type: upper-alpha" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: upper-alpha" %)
+* élément 1
+* élément 2
+)))
+|Liste Romaine en minuscules|((({{{
+(% style="list-style-type: lower-roman" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: lower-roman" %)
+* élément 1
+* élément 2
+)))
+|Liste Romaine en majuscules|((({{{
+(% style="list-style-type: upper-roman" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: upper-roman" %)
+* élément 1
+* élément 2
+)))
+|Liste Grecque en minuscules|((({{{
+(% style="list-style-type: lower-greek" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: lower-greek" %)
+* élément 1
+* élément 2
+)))
+|Liste Grecque en majuscules|((({{{
+(% style="list-style-type: upper-greek" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: upper-greek" %)
+* élément 1
+* élément 2
+)))
+|Liste Hiragana|((({{{
+(% style="list-style-type: hiragana" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: hiragana" %)
+* élément 1
+* élément 2
+)))
+|Liste Hiragana Iroah|((({{{
+(% style="list-style-type: hiragana-iroha" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: hiragana-iroha" %)
+* élément 1
+* élément 2
+)))
+|Liste Katakana|((({{{
+(% style="list-style-type: katakana" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: katakana" %)
+* élément 1
+* élément 2
+)))
+|Liste Katakana Iroha|((({{{
+(% style="list-style-type: katakana-iroha" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: katakana-iroha" %)
+* élément 1
+* élément 2
+)))
+|Liste Arménienne|((({{{
+(% style="list-style-type: armenian" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: armenian" %)
+* élément 1
+* élément 2
+)))
+|Liste Hébraïque|((({{{
+(% style="list-style-type: hebrew" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: hebrew" %)
+* élément 1
+* élément 2
+)))
+|Liste Géorgienne|((({{{
+(% style="list-style-type: georgian" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: georgian" %)
+* élément 1
+* élément 2
+)))
+|Liste CJK idéographique|((({{{
+(% style="list-style-type: cjk-ideographic" %)
+* élément 1
+* élément 2
+}}})))|(((
+(% style="list-style-type: cjk-ideographic" %)
+* élément 1
+* élément 2
+)))</content>
+</xwikidoc>

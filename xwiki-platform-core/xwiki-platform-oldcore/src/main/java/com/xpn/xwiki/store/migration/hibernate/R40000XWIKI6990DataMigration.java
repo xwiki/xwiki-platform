@@ -907,7 +907,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
         {
             private void fillDocumentIdConversion(Session session, Map<Long, Long> map)
             {
-                String database = getXWikiContext().getDatabase();
+                String database = getXWikiContext().getWikiId();
                 @SuppressWarnings("unchecked")
                 List<Object[]> results = session.createQuery(
                     "select doc.id, doc.space, doc.name, doc.defaultLanguage, doc.language from "
@@ -989,7 +989,7 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
                     Integer number = (Integer) result[2];
 
                     // Do not try to convert broken records which would cause duplicated ids
-                    if (!statsName.startsWith(".") && !statsName.endsWith(".")) {
+                    if (statsName != null && !statsName.startsWith(".") && !statsName.endsWith(".")) {
                         long newId = R40000XWIKI6990DataMigration.this.statsIdComputer.getId(statsName, number);
 
                         if (oldId != newId) {

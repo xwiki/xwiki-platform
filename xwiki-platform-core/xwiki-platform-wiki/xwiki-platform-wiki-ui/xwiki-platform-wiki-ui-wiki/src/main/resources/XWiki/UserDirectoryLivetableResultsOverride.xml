@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>UserDirectoryLivetableResultsOverride</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1332517363000</creationDate>
+  <date>1332517956000</date>
+  <contentUpdateDate>1332517956000</contentUpdateDate>
+  <version>1.1</version>
+  <title>UserDirectoryLivetableResults - Workspaces Application Override</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output='false'}}
+#*
+ * Recursively retrieve the all that subgroups of a group.
+ *
+ * @param baseGroupDocument input group document. This can be a group from another wiki, other than the current one.
+ * @param visitedGroupDocuments output list of group document instances that are directly or indirectly subgroups of the input one. Also, this list is limited to groups that are located in the same wiki as the input one.
+ *#
+#macro (getAllSubGroupsRecursively $baseGroupDocument $visitedGroupDocuments)
+  #if ($visitedGroupDocuments.contains($baseGroupDocument))
+    ## Already visited, skip and avoid cycles.
+    #break
+  #end
+  ## Mark the base group as visited to avoid going trough it twice.
+  #set ($discard = $visitedGroupDocuments.add($baseGroupDocument))
+  ##
+  ## Get the base group's members.
+  #set ($groupMemberObjects = $baseGroupDocument.getObjects('XWiki.XWikiGroups'))
+  ##
+  #foreach ($groupMemberObject in $groupMemberObjects)
+    #set ($groupMember = $groupMemberObject.getProperty('member').value)
+    #set ($groupMemberReference = $services.model.resolveDocument($groupMember))
+    ## Check if the member was specified relatively (no wiki prefix) and it was mistakingly resolved as local to the current wiki. Force to use the base group document's wiki name.
+    #if ("$!{groupMemberReference.wikiReference.name}" == $xcontext.database &amp;&amp; !$groupMember.startsWith("${xcontext.database}:"))
+      #set ($groupMemberReference = $services.model.createDocumentReference($baseGroupDocument.documentReference.wikiReference.name, $groupMemberReference.lastSpaceReference.name, $groupMemberReference.name))
+    #end
+    ## Handle only members from the base group's wiki (ignore references to other members from other wikis).
+    #if ("$!{groupMemberReference.wikiReference}" == $baseGroupDocument.documentReference.wikiReference)
+      #set ($groupMemberDocument = $xwiki.getDocument($groupMemberReference))
+      ## Skip users, handle only subgroups.
+      #if ($groupMemberDocument.getObject('XWiki.XWikiGroups'))
+        ## Recursivity is recursive.
+        #getAllSubGroupsRecursively($groupMemberDocument, $visitedGroupDocuments)
+      #end
+    #end
+  #end
+#end
+#if($request.userScope == 'global')
+  #set ($currentWiki = $services.wiki.currentWikiId)
+  ##
+  ## Enhance the livetable query to return all the global users that are either directly or indirectly members of the wiki.
+  ##
+  #set ($extraFromClause = '')
+  #set ($extraWhereClause = '')
+  #set ($extraWhereClauseParameters = [])
+  ##
+  ## Step1: Get the wiki members from the wiki's members group.
+  #set ($wikiMembers = $services.wiki.user.getMembers($currentWiki))
+  ##
+  ## Differentiate between users and groups
+  #set ($wikiMemberUsers = [])
+  #set ($wikiMemberGroups = [])
+  #foreach ($wikiMember in $wikiMembers)
+    #set ($wikiMemberReference = $services.model.resolveDocument($wikiMember))
+    ## We are interested only in main wiki users and groups.
+    #set ($wikiMemberDocument = $xwiki.getDocument($wikiMemberReference))
+    ## A document can represent both a user and a group.
+    ## Is it a global user?
+    #if ($wikiMemberDocument.getObject('XWiki.XWikiUsers') &amp;&amp; $wikiMember.startsWith("${services.wiki.mainWikiId}:"))
+      #set ($discard = $wikiMemberUsers.add($wikiMember))
+    #end
+    ## Is it a group?
+    #if ($wikiMemberDocument.getObject('XWiki.XWikiGroups'))
+      ## Recursively get all referenced groups from the main wiki.
+      #getAllSubGroupsRecursively($wikiMemberDocument, $wikiMemberGroups)
+    #end
+  #end
+  ##
+  ## Extend the livetable query to display only the direct users of the wiki and the indirect users (that are members of subgroups of the wiki group)
+  #if ($wikiMemberUsers.size() &gt; 0 || $wikiMemberGroups.size() &gt; 0)
+    #set ($extraWhereClause = "AND ")
+    #if ($wikiMemberUsers.size() &gt; 0 &amp;&amp; $wikiMemberGroups.size() &gt; 0)
+      ## Begin both clauses group
+      #set ($extraWhereClause = "${extraWhereClause}(")
+    #end
+    ##
+    ## Users
+    #if ($wikiMemberUsers.size() &gt; 0)
+      #set ($extraWhereClause = "${extraWhereClause}CONCAT('${services.wiki.mainWikiId}:', doc.fullName) IN (")
+      #foreach ($wikiMemberUser in $wikiMemberUsers)
+        #if ($velocityCount &gt; 1)
+          #set ($extraWhereClause = "${extraWhereClause},")
+        #end
+        #set ($extraWhereClause = "${extraWhereClause}?")
+        #set ($discard = $extraWhereClauseParameters.add("$!{wikiMemberUser}"))
+      #end
+      #set ($extraWhereClause = "${extraWhereClause})")
+    #end
+    ## Groups
+    #if ($wikiMemberGroups.size() &gt; 0)
+      #if ($wikiMemberUsers.size() &gt; 0)
+        ## This is grouped with the users clause from above.
+        #set ($extraWhereClause = "${extraWhereClause} OR ")
+      #end
+      #set ($extraWhereClause = "${extraWhereClause}doc.fullName IN (SELECT prop.value FROM BaseObject as obj, StringProperty as prop WHERE obj.className='XWiki.XWikiGroups' AND prop.id.id=obj.id AND prop.name='member' AND obj.name IN (")
+      #foreach ($wikiMemberGroup in $wikiMemberGroups)
+        #if ($velocityCount &gt; 1)
+          #set ($extraWhereClause = "${extraWhereClause},")
+        #end
+        #set ($extraWhereClause = "${extraWhereClause}?")
+        #set ($discard = $extraWhereClauseParameters.add("$!{wikiMemberGroup.fullName}"))
+      #end
+      #set ($extraWhereClause = "${extraWhereClause}))")
+    #end
+    ##
+    ## Close both clauses group
+    #if ($wikiMemberUsers.size() &gt; 0 &amp;&amp; $wikiMemberGroups.size() &gt; 0)
+      #set ($extraWhereClause = "${extraWhereClause})")
+    #end
+   ## Step2: Set the database to the main wiki so that the query will be performed on the right wiki.
+    #set ($discard = $xcontext.setDatabase($services.wiki.mainWikiId))
+  #end
+#end
+{{/velocity}}
+
+{{comment}}Call the default user directory data source that we have just enhanced.{{/comment}}
+
+{{include reference='XWiki.UserDirectoryLivetableResults' /}}
+
+{{velocity output='false'}}
+#if($request.userScope == 'global')
+  ## Reset the context database to the initial one, in case this page gets included somewhere.
+  #set ($discard = $xcontext.setDatabase($currentWiki))
+#end
+{{/velocity}}</content>
+</xwikidoc>

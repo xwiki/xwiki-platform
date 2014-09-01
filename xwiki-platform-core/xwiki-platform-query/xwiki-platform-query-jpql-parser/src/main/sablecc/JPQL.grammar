@@ -180,6 +180,9 @@ select_expression =
 
 aggregate_expression =
     {func} aggregate_func lbr distinct? path rbr |
+    {count} count_expression;
+
+count_expression =
     {count} count lbr distinct? count_arg rbr;
 
 count_arg =
@@ -196,7 +199,7 @@ groupby_list =
     groupby_list comma groupby_item;
 
 groupby_item =
-    path;
+    comparable_item;
 
 having_clause =
     having conditional_expression;
@@ -209,7 +212,13 @@ orderby_list =
     orderby_item comma orderby_list;
 
 orderby_item =
-    path orderby_spec?;
+    comparable_item orderby_spec?;
+
+comparable_item =
+    {path} path |
+    {funcnum} functions_returning_numerics |
+    {functime} functions_returning_datetime |
+    {funcstr} functions_returning_strings ;
 
 subquery =
     simple_select_clause subquery_from_clause where_clause? groupby_clause? having_clause?;
@@ -340,7 +349,8 @@ functions_returning_numerics =
     {abs} abs lbr simple_arithmetic_expression rbr |
     {sqrt} sqrt lbr simple_arithmetic_expression rbr |
     {mod} mod lbr [dividend]:simple_arithmetic_expression comma [divisor]:simple_arithmetic_expression rbr |
-    {size} size lbr path rbr;
+    {size} size lbr path rbr |
+    {agr} aggregate_expression;
 
 string_primary =
     {const} string_literal |

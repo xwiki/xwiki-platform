@@ -51,7 +51,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
       <div id="_history">
       ## CSRF prevention
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />
-      <input type="hidden" name="language" value="$!{context.language}" />
+      <input type="hidden" name="language" value="$!xcontext.language" />
       <div class="centered">
       <table class="xwikidatatable" summary="$services.localization.render('core.viewers.history.summary', [$escapetool.xml($doc.displayTitle), $versions.get($mathtool.sub($versions.size(), 1)), $versions.get(0)])">
 ## Print the table header
@@ -130,7 +130,7 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
           #end
         #end
         #if ($xwiki.hasMinorEdit())
-          #if (!$request.getParameter('showminor'))
+          #if ("$!request.showminor" != 'true')
             <div class="buttonwrapper"><input class="button" type="submit" name="viewminorversions" value="$services.localization.render('core.viewers.history.showMinorEdits')"
               onclick="document.forms.${formname}.action='$tdoc.getURL('view', "viewer=history&amp;showminor=true&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" /></div>
           #else

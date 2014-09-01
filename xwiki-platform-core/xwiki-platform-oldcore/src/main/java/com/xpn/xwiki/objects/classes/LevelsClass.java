@@ -20,6 +20,8 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,10 +31,13 @@ import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -109,7 +114,7 @@ public class LevelsClass extends ListClass
             }
         }
         BaseProperty prop = newProperty();
-        prop.setValue(StringUtils.join(list, ","));
+        fromList(prop, list);
         return prop;
     }
 
@@ -135,14 +140,9 @@ public class LevelsClass extends ListClass
         select.setDisabled(isDisabled());
 
         List<String> list = getList(context);
-        List<String> selectlist;
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop == null) {
-            selectlist = new ArrayList<String>();
-        } else {
-            selectlist = getListFromString((String) prop.getValue());
-        }
+        List<String> selectlist = toList(prop);
 
         // Add options from Set
         for (String value : list) {
@@ -174,5 +174,35 @@ public class LevelsClass extends ListClass
     {
         String value = ppcel.getText();
         return fromString(value);
+    }
+
+    @Override
+    public List<String> toList(BaseProperty< ? > property)
+    {
+        List<String> selectlist;
+
+        if (property == null) {
+            selectlist = Collections.emptyList();
+        } else {
+            selectlist = getListFromString((String) property.getValue());
+        }
+
+        return selectlist;
+    }
+
+    @Override
+    public void fromList(BaseProperty< ? > property, List<String> list)
+    {
+        property.setValue(list != null ? StringUtils.join(list, ',') : null);
+    }
+
+    @Override
+    public <T extends EntityReference> void mergeProperty(BaseProperty<T> currentProperty,
+        BaseProperty<T> previousProperty, BaseProperty<T> newProperty, MergeConfiguration configuration,
+        XWikiContext xcontext, MergeResult mergeResult)
+    {
+        // always a not ordered list
+        mergeNotOrderedListProperty(currentProperty, previousProperty, newProperty, configuration, xcontext,
+            mergeResult);
     }
 }

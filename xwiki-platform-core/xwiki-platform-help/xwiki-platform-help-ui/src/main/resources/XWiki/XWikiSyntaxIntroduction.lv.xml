@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxIntroduction</name>
+  <language>lv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300892851000</creationDate>
+  <date>1301497886000</date>
+  <contentUpdateDate>1301497886000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxIntroduction</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= General =
+
+== Ievads ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Introduction ===
+
+Sākot ar XWiki Enterprise versiju 1.7 ir ieviesta jauna viki sintakse. Līdz ar to, vecā viki sintakse tiek saukta par //XWiki 1.0 sintaksi//, bet jaunā par //XWiki 2.0 sintaksi//.
+
+Papildus šīm divām XWiki sintaksēm mēs bijušā //Radeox// dzinēja vietā esam ieviesuši īpašu sintakses apstrādes infrastruktūru, kas apstrādā  [[//Wikimodel//&gt;&gt;http://code.google.com/p/wikimodel/]], [[//Doxia//&gt;&gt;http://maven.apache.org/doxia/]] un nākotnē iespējams arī citus modeļus. Tas mums ļauj izmantot arī citas viki sintakses kā {{velocity}}[[//MediaWiki, Confluence, JSPWiki, Creole, TWiki// un citas&gt;&gt;||queryString="syntax=1.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
+
+=== 2.0 Introduction ===
+
+Sākot ar XWiki Enterprise versiju 1.7 ir ieviesta jauna viki sintakse. Līdz ar to, vecā viki sintakse tiek saukta par //XWiki 1.0 sintaksi//, bet jaunā par //XWiki 2.0 sintaksi//. Galvenie jaunās sintakses ieviešanas cēloņi bija:
+
+* Novērst 1.0 versijas ierobežojumus un nenoteiktību (kuru cēlonis bija līdz tam izmantotais //Radeox// sintakses izpildes dzinējs un //TWiki// sintakse).
+** Neoptimāls kontroles simbolu pielietojums. Piemēram zvaigznītes simbols, kas tika izmantots trenknraksta apzīmēšanai. Bieži vien lietotāji ievietoja viki lapās gatavu tekstu ar zvaigznītēm un tāpēc vietām teksts tika parādīts treknrakstā, lai gan lietotāji to nevēlējās. Tāpēc, lai minimizētu ievietota teksta izskata salaušanu, jaunajā sintaksē visi kontroles simboli ir vismaz dubultā.
+** Nenoteiktība. Atkal kā piemēru var minēt zvaigznītes, kas apzīmē gan treknrakstu, gan aizzīmētu sarakstu. Nenoteiktības bija nepieciešams novērst, lai varētu izstrādāt noformējuma redaktoru, kas darbojas stingri determinēti.
+* Nepieciešamība tuvināties [[//Creole// 1.0 sintaksei&gt;&gt;http://www.wikicreole.org/]], kas iedibinās par standarta viki sistēmu sintaksi. //Creole// izstrādes komūna ir veikusi visu vadošo viki sistēmu sintaksi analīzi un salīdzināšanu, izvēloties ērtākos un izplatītākos apzīmējumus. Mūsu 1.0 versijā ieviestā sintakse ne visur bija tāda.
+
+Papildus šīm divām XWiki sintaksēm mēs bijušā //Radeox// dzinēja vietā esam ieviesuši īpašu sintakses apstrādes infrastruktūru, kas apstrādā  [[//Wikimodel//&gt;&gt;http://code.google.com/p/wikimodel/]], [[//Doxia//&gt;&gt;http://maven.apache.org/doxia/]] un nākotnē iespējams arī citus modeļus. Tas mums ļauj izmantot arī citas viki sintakses kā {{velocity}}[[//MediaWiki, Confluence, JSPWiki, Creole, TWiki// un citas&gt;&gt;||queryString="syntax=2.0&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.
+
+=== 2.1 Introduction ===
+
+Sākot ar XWiki Enterprise versiju 1.7 ir ieviesta jauna viki sintakse. Līdz ar to, vecā viki sintakse tiek saukta par //XWiki 1.0 sintaksi//, bet jaunā par //XWiki 2.0 sintaksi//. Galvenie jaunās sintakses ieviešanas cēloņi bija:
+
+* Novērst 1.0 versijas ierobežojumus un nenoteiktību (kuru cēlonis bija līdz tam izmantotais //Radeox// sintakses izpildes dzinējs un //TWiki// sintakse).
+** Neoptimāls kontroles simbolu pielietojums. Piemēram zvaigznītes simbols, kas tika izmantots trenknraksta apzīmēšanai. Bieži vien lietotāji ievietoja viki lapās gatavu tekstu ar zvaigznītēm un tāpēc vietām teksts tika parādīts treknrakstā, lai gan lietotāji to nevēlējās. Tāpēc, lai minimizētu ievietota teksta izskata salaušanu, jaunajā sintaksē visi kontroles simboli ir vismaz dubultā.
+** Nenoteiktība. Atkal kā piemēru var minēt zvaigznītes, kas apzīmē gan treknrakstu, gan aizzīmētu sarakstu. Nenoteiktības bija nepieciešams novērst, lai varētu izstrādāt noformējuma redaktoru, kas darbojas stingri determinēti.
+* Nepieciešamība tuvināties [[//Creole// 1.0 sintaksei&gt;&gt;http://www.wikicreole.org/]], kas iedibinās par standarta viki sistēmu sintaksi. //Creole// izstrādes komūna ir veikusi visu vadošo viki sistēmu sintaksi analīzi un salīdzināšanu, izvēloties ērtākos un izplatītākos apzīmējumus. Mūsu 1.0 versijā ieviestā sintakse ne visur bija tāda.
+
+Papildus šīm divām XWiki sintaksēm mēs bijušā //Radeox// dzinēja vietā esam ieviesuši īpašu sintakses apstrādes infrastruktūru, kas apstrādā  [[//Wikimodel//&gt;&gt;http://code.google.com/p/wikimodel/]], [[//Doxia//&gt;&gt;http://maven.apache.org/doxia/]] un nākotnē iespējams arī citus modeļus. Tas mums ļauj izmantot arī citas viki sintakses kā {{velocity}}[[//MediaWiki, Confluence, JSPWiki, Creole, TWiki// un citas&gt;&gt;||queryString="syntax=2.1&amp;section=OtherSyntaxes#if($request.xpage)&amp;xpage=$escapetool.url($request.xpage)#end"]]{{/velocity}}.</content>
+</xwikidoc>

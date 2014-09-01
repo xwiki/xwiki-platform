@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -36,8 +37,9 @@ import org.xwiki.component.wiki.WikiComponent;
 import org.xwiki.component.wiki.WikiComponentBuilder;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.bridge.WikiComponentBridge;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -63,18 +65,21 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
      */
     @Inject
     private ComponentManager rootComponentManager;
-    
+
     /**
-     * Execution context, needed to access the XWiki context map.
+     * Used to access the current {@link XWikiContext}.
      */
     @Inject
-    private Execution execution;
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * Bridge to isolate the old model.
      */
     @Inject
     private WikiComponentBridge componentBridge;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     @Override
     public List<DocumentReference> getDocumentReferences()
@@ -89,8 +94,8 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
         parameters.add(COMPONENT_ROLE_TYPE_FIELD);
 
         try {
-            results.addAll(getXWikiContext().getWiki().getStore().searchDocumentReferences(query, parameters,
-                getXWikiContext()));
+            XWikiContext xcontext = xcontextProvider.get();
+            results.addAll(xcontext.getWiki().getStore().searchDocumentReferences(query, parameters, xcontext));
         } catch (XWikiException e) {
             this.logger.error("Failed to search for existing wiki components [{}]", e.getMessage());
         }
@@ -103,7 +108,7 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
     {
         List<WikiComponent> components = new ArrayList<WikiComponent>();
 
-        if (!this.componentBridge.hasProgrammingRights(reference)) {
+        if (!this.authorization.hasAccess(Right.PROGRAM, reference)) {
             throw new WikiComponentException("Registering wiki components requires programming rights");
         }
 
@@ -138,13 +143,5 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
         components.add(component);
 
         return components;
-    }
-
-    /**
-     * @return the XWikiContext extracted from the execution.
-     */
-    public XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 }

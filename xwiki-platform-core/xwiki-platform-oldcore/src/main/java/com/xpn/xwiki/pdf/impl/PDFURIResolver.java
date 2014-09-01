@@ -19,8 +19,7 @@
  */
 package com.xpn.xwiki.pdf.impl;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
+import java.io.ByteArrayInputStream;
 import java.util.Map;
 
 import javax.xml.transform.Source;
@@ -28,12 +27,15 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
+import org.xwiki.formula.ImageData;
+import org.xwiki.formula.ImageStorage;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Resolves URIs sent by Apache FOP to embed images in the exported PDF. The strategy is the following:
@@ -51,6 +53,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class PDFURIResolver implements URIResolver
 {
+    private static final String TEX_ACTION = "/tex/";
+
     /**
      * @see #PDFURIResolver(com.xpn.xwiki.XWikiContext)
      */
@@ -76,15 +80,25 @@ public class PDFURIResolver implements URIResolver
     {
         if (this.attachmentMap != null) {
 
-            // Decode the URL before comparing it since FOP will pass an encoded URL.
-            String decodedHref;
-            try {
-                decodedHref = URLDecoder.decode(href, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException("Failed to locate UTF-8 encoding");
+            // TODO: HACK
+            // We're going through the getAttachmentURL() API so that when the PdfURLFactory is used, the generated
+            // image is saved and then embedded in the exported PDF thanks to PDFURIResolver. In the future we need
+            // to remove this hack by introduce a proper Resource for generated image (say TemporaryResource),
+            // implement a TemporaryResourceSerializer<URL> and introduce a ResourceLoader interface and have it
+            // implemented for TemporaryResource...
+            if (href.contains(TEX_ACTION)) {
+                // Note: See the comments in FormulaMacro to understand why we do a replace...
+                AttachmentReference reference = this.attachmentMap.get(href.replace(TEX_ACTION, "/download/"));
+                if (reference != null) {
+                    // Get the generated image's input stream
+                    ImageStorage storage = Utils.getComponent(ImageStorage.class);
+                    ImageData image = storage.get(reference.getName());
+                    return new StreamSource(new ByteArrayInputStream(image.getData()));
+                }
             }
+            // TODO: end HACK
 
-            AttachmentReference reference = this.attachmentMap.get(decodedHref);
+            AttachmentReference reference = this.attachmentMap.get(href);
             if (reference != null) {
                 try {
                     XWikiDocument xdoc = this.context.getWiki().getDocument(
@@ -94,8 +108,7 @@ public class PDFURIResolver implements URIResolver
                         reference.extractReference(EntityType.ATTACHMENT).getName());
                     return new StreamSource(attachment.getContentInputStream(this.context));
                 } catch (Exception e) {
-                    throw new TransformerException(
-                        String.format("Failed to resolve export URI [%s]", href), e);
+                    throw new TransformerException(String.format("Failed to resolve export URI [%s]", href), e);
                 }
             }
         }

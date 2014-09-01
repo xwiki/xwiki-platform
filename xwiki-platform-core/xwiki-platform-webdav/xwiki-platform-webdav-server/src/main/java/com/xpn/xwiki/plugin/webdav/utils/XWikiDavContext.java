@@ -131,7 +131,7 @@ public class XWikiDavContext
 
             xwikiContext = Utils.prepareContext("", xwikiRequest, xwikiResponse, xwikiEngine);
             xwikiContext.setMode(XWikiContext.MODE_SERVLET);
-            xwikiContext.setDatabase("xwiki");
+            xwikiContext.setWikiId("xwiki");
 
             ServletContainerInitializer containerInitializer = Utils.getComponent(ServletContainerInitializer.class);
             containerInitializer.initializeRequest(xwikiContext.getRequest().getHttpServletRequest(), xwikiContext);
@@ -175,14 +175,11 @@ public class XWikiDavContext
     {
         try {
             CacheManager cacheManager = Utils.getComponent(CacheManager.class, "default");
-            CacheFactory factory = cacheManager.getCacheFactory();
             CacheConfiguration conf = new CacheConfiguration();
             LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
             lec.setTimeToLive(300);
             conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
-            davCache = factory.newCache(conf);
-        } catch (ComponentLookupException ex) {
-            throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
+            davCache = cacheManager.createNewCache(conf);
         } catch (CacheException ex) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
         }
@@ -339,7 +336,12 @@ public class XWikiDavContext
     {
         try {
             // Delete the current attachment
-            attachment.getDoc().deleteAttachment(attachment, xwikiContext);
+            XWikiDocument document = attachment.getDoc();
+            document.removeAttachment(attachment);
+            this.xwikiContext.getWiki().saveDocument(
+                document,
+                "Move attachment [" + attachment.getFilename() + "] to document ["
+                    + destinationDoc.getDocumentReference() + "]", this.xwikiContext);
             // Rename the (in memory) attachment.
             attachment.setFilename(newAttachmentName);
             // Add the attachment to destination doc.
@@ -362,7 +364,11 @@ public class XWikiDavContext
     public void deleteAttachment(XWikiAttachment attachment) throws DavException
     {
         try {
-            attachment.getDoc().deleteAttachment(attachment, xwikiContext);
+            XWikiDocument document = attachment.getDoc();
+
+            document.removeAttachment(attachment);
+            this.xwikiContext.getWiki().saveDocument(document, "Deleted attachment [" + attachment.getFilename() + "]",
+                this.xwikiContext);
         } catch (XWikiException ex) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
         }

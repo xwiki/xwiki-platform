@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxScripts</name>
+  <language>lv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497979000</date>
+  <contentUpdateDate>1301497979000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxScripts</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Programming =
+
+== Skripti ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Scripts ===
+
+{{info}}XWiki 1.0 sintaksē Velocity skriptus varēja izsaukt jebkurā viki dokumenta vietā. Tā rezultātā gadījās, ka lietotāji negribot ievadīja tekstu, kas tika izpildīts kā Velocity skripts. Tas arī palēnināja lapu parādīšanu pat tajos gadījumos, ja lapā nebija Velocity skriptu, un radīja arī citas tehniskas problēmas. Tieši tas pats attiecas arī uz Groovy skriptiem.{{/info}}
+
+|=Piemērs|=XWiki 1.0 sintakse
+|Velocity skripts|(((
+{{{
+#set ($mainigais = "vērtība")
+}}}
+)))|
+|Groovy skripts|(((
+{{{
+&lt;%
+def mainigais = "vērtība"
+%&gt;
+}}}
+)))|
+
+=== 2.0 Scripts ===
+
+{{info}}XWiki 1.0 sintaksē Velocity skriptus varēja izsaukt jebkurā viki dokumenta vietā. Tā rezultātā gadījās, ka lietotāji negribot ievadīja tekstu, kas tika izpildīts kā Velocity skripts. Tas arī palēnināja lapu parādīšanu pat tajos gadījumos, ja lapā nebija Velocity skriptu, un radīja arī citas tehniskas problēmas. Tāpēc XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintaksē Velocity skripti ir jāiekļauj, izmantojot tieši norādītu ##velocity## makrosu. Tieši tas pats attiecas arī uz Groovy skriptiem.{{/info}}
+
+|=Piemērs|=XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintakse
+|Velocity skripts|(((
+{{{
+{{velocity}}
+#set ($mainigais = "vērtība")
+{{/velocity}}
+}}}
+)))
+|Groovy skripts|(((
+{{{
+{{groovy}}
+def mainigais = "vērtība"
+{{/groovy}}
+}}}
+)))</content>
+</xwikidoc>

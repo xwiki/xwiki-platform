@@ -34,6 +34,18 @@ XWiki.EntityReference = Class.create({
   },
 
   /**
+   * Extract the value identifying the entity with the given type from this reference. The name of this entity may be
+   * returned if it has the type requested.
+   *
+   * @param type the type of the entity to be extracted
+   * @return the value corresponding to the entity of the given type
+   */
+  extractReferenceValue: function(type) {
+    var reference = this.extractReference(type);
+    return reference ? reference.name : null;
+  },
+
+  /**
    * @return a new reference pointing to the same entity but relative to the given reference
    */
   relativeTo: function(baseReference) {

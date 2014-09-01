@@ -20,16 +20,14 @@
 package org.xwiki.url.internal.standard;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
- * Configuration options specific to the "Standard" URL implementation scheme.
+ * Configuration options specific to the {@code standard} URL implementation scheme.
  *
  * @version $Id$
  * @since 2.3M1
  */
 @Role
-@Unstable
 public interface StandardURLConfiguration
 {
     /**
@@ -43,4 +41,16 @@ public interface StandardURLConfiguration
      *         {@code http://server/xwiki/&lt;prefix&gt;/mywiki/...})
      */
     String getWikiPathPrefix();
+
+    /**
+     * @return the path prefix used for signifying that a URL is pointing at a Model Entity (Document, Space, Object,
+     *         etc): {@code http://server/xwiki/&lt;prefix&gt;/...}.
+     *         For example: {@code http://server/xwiki/bin/...}.
+     */
+    String getEntityPathPrefix();
+
+    /**
+     * @return the action to take when a subwiki is not found (ie there's no wiki descriptor for it)
+     */
+    WikiNotFoundBehavior getWikiNotFoundBehavior();
 }

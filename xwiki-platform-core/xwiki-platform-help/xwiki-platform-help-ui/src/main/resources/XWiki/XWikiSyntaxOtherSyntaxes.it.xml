@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxOtherSyntaxes</name>
+  <language>it</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300892851000</creationDate>
+  <date>1301497886000</date>
+  <contentUpdateDate>1301497886000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Other Wiki Syntaxes</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= General =
+
+== Altre sintassi ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Other Syntaxes ===
+
+A partire da XWiki Enterprise 1.6 sono implementate anche queste altre sintassi:
+* [[JSPWiki&gt;&gt;http://www.jspwiki.org/wiki/TextFormattingRules]]
+* [[MediaWiki&gt;&gt;http://en.wikipedia.org/wiki/Help:Editing]]
+* [[Confluence&gt;&gt;http://confluence.atlassian.com/display/CONF20/Confluence+Notation+Guide+Overview]]
+* [[TWiki&gt;&gt;http://twiki.org/cgi-bin/view/TWiki/WikiSyntax]]
+* [[Creole 1.0&gt;&gt;http://www.wikicreole.org/wiki/Creole1.0]]
+* [[XHTML 1.0&gt;&gt;http://www.w3.org/TR/xhtml1/]]
+
+{{warning}}L'implementazione di queste sintassi non è stata ancora completata. Per esempio il supporto ai link non funziona ancora perfettamente. Dobbiamo anche definire se estendere le sintassi originali per supportare le caratteristiche specifiche di XWiki come la possibilità di fare un link ad un altro sub-wiki.{{/warning}}</content>
+</xwikidoc>

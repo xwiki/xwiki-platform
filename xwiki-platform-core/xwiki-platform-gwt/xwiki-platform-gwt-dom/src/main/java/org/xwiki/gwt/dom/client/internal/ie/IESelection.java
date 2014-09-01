@@ -24,7 +24,7 @@ import org.xwiki.gwt.dom.client.internal.DefaultSelection;
 import org.xwiki.gwt.dom.client.internal.mozilla.NativeSelection;
 
 /**
- * Although Internet Explorer 9 implements the Selection and Range API it still doesn't support separate selections per
+ * Although Internet Explorer 9+ implements the Selection and Range API it still doesn't support separate selections per
  * window. If you have an in-line frame, any selection you make inside it will be lost when you focus its parent window.
  * The child and parent windows have different selection objects but these objects can't have rangeCount greater than 0
  * at the same time. If one of them contains a range, the other is empty.
@@ -99,20 +99,21 @@ public class IESelection extends DefaultSelection
                     }
                 }
             };
-            var focusInListener = function() {
+            var beforeActivateListener = function() {
                 view.__fakeSelection.__restore();
             };
-            var focusOutListener = function() {
+            // Note that both blur and focusOut are fired after the selection is lost so they are not useful here.
+            var beforeDeactivateListener = function() {
                 view.__fakeSelection.__save();
             };
             var unloadListener = function() {
-                view.removeEventListener('focusin', focusInListener, false);
-                view.removeEventListener('focusout', focusOutListener, false);
+                view.removeEventListener('beforeactivate', beforeActivateListener, false);
+                view.removeEventListener('beforedeactivate', beforeDeactivateListener, false);
                 view.removeEventListener('unload', arguments.callee, false);
-                view = view.__fakeSelection = focusInListener = focusOutListener = undefined;
+                view = view.__fakeSelection = beforeActivateListener = beforeDeactivateListener = undefined;
             }
-            view.addEventListener('focusin', focusInListener, false);
-            view.addEventListener('focusout', focusOutListener, false);
+            view.addEventListener('beforeactivate', beforeActivateListener, false);
+            view.addEventListener('beforedeactivate', beforeDeactivateListener, false);
             view.addEventListener('unload', unloadListener, false);
         }
         return view.__fakeSelection;

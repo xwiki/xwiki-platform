@@ -27,17 +27,18 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
-import org.xwiki.script.event.ScriptEvaluatedEvent;
-import org.xwiki.script.event.ScriptEvaluatingEvent;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
+import org.xwiki.script.event.ScriptEvaluatedEvent;
+import org.xwiki.script.event.ScriptEvaluatingEvent;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Replaces the context class loader by a custom one that takes into account the "jars" Script parameter that allows
@@ -64,9 +65,9 @@ public class ScriptClassLoaderHandlerListener implements EventListener
     /** Key under which the jar params used for the last macro execution are cached in the Execution Context. */
     private static final String EXECUTION_CONTEXT_JARPARAMS_KEY = "scriptJarParams";
 
-    /** Used to find if the current document's author has programming rights. */
+    /** Used to check if programming rights is allowed. */
     @Inject
-    private DocumentAccessBridge documentAccessBridge;
+    private ContextualAuthorizationManager authorizationManager;
 
     /**
      * Used to set the classLoader to be used by scripts across invocations. We save it in the Execution Context to be
@@ -215,7 +216,7 @@ public class ScriptClassLoaderHandlerListener implements EventListener
      */
     private boolean canHaveJarsParameters()
     {
-        return this.documentAccessBridge.hasProgrammingRights();
+        return this.authorizationManager.hasAccess(Right.PROGRAM);
     }
 }
 

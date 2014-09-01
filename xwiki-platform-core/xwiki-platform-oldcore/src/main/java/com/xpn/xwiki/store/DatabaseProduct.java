@@ -80,6 +80,11 @@ public final class DatabaseProduct
     public static final DatabaseProduct UNKNOWN = new DatabaseProduct("Unknown");
 
     /**
+     * The product name for H2 databases.
+     */
+    public static final DatabaseProduct H2 = new DatabaseProduct("H2");
+
+    /**
      * @see #getProductName()
      */
     private String productName;
@@ -133,6 +138,8 @@ public final class DatabaseProduct
             product = DERBY;
         } else if (productNameAsString.equalsIgnoreCase(HSQLDB.getProductName())) {
             product = HSQLDB;
+        } else if (productNameAsString.equalsIgnoreCase(H2.getProductName())) {
+            product = H2;
         } else if (productNameAsString.startsWith(DB2.getProductName())) {
             // See documentation above on why we check starts with for DB2
             product = DB2;

@@ -28,6 +28,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -42,6 +44,8 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -80,9 +84,22 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Inject
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
+    /**
+     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
+     * wiki).
+     */
+    @Inject
+    @Named("compactwiki")
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+
+    @Inject
+    private Provider<ContextualAuthorizationManager> authorizationProvider;
+
     private XWikiContext getContext()
     {
-        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        ExecutionContext econtext = this.execution.getContext();
+
+        return econtext != null ? (XWikiContext) econtext.getProperty("xwikicontext") : null;
     }
 
     @Override
@@ -236,9 +253,11 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
-        doc.setParentReference(parentReference);
-        saveDocument(doc, String.format("Changed document parent to [%s].",
-            this.defaultEntityReferenceSerializer.serialize(parentReference)), true);
+        doc.setParent(this.compactWikiEntityReferenceSerializer.serialize(parentReference, doc.getDocumentReference()));
+        saveDocument(
+            doc,
+            String.format("Changed document parent to [%s].",
+                this.defaultEntityReferenceSerializer.serialize(parentReference)), true);
     }
 
     @Override
@@ -608,11 +627,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         if (isFullURL) {
             XWikiContext xcontext = getContext();
             url =
-                xcontext.getURLFactory().getURL(
-                    xcontext.getURLFactory().createAttachmentURL(attachmentReference.getName(),
-                        attachmentReference.getDocumentReference().getLastSpaceReference().getName(),
-                        attachmentReference.getDocumentReference().getName(), "download", queryString,
-                        attachmentReference.getDocumentReference().getWikiReference().getName(), xcontext), xcontext);
+                xcontext.getURLFactory().createAttachmentURL(attachmentReference.getName(),
+                    attachmentReference.getDocumentReference().getLastSpaceReference().getName(),
+                    attachmentReference.getDocumentReference().getName(), "download", queryString,
+                    attachmentReference.getDocumentReference().getWikiReference().getName(), xcontext).toString();
         } else {
             XWikiContext xcontext = getContext();
             String documentReference =
@@ -672,9 +690,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Override
     public boolean hasProgrammingRights()
     {
-        XWikiContext xcontext = getContext();
-
-        return xcontext.getWiki().getRightService().hasProgrammingRights(xcontext);
+        return this.authorizationProvider.get().hasAccess(Right.PROGRAM);
     }
 
     @Override
@@ -694,7 +710,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Override
     public DocumentReference getCurrentUserReference()
     {
-        return getContext().getUserReference();
+        XWikiContext xcontext = getContext();
+        return xcontext != null ? xcontext.getUserReference() : null;
     }
 
     @Override
@@ -751,7 +768,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public String getCurrentWiki()
     {
         XWikiContext xcontext = getContext();
-        return xcontext.getDatabase();
+        return xcontext.getWikiId();
     }
 
     /**

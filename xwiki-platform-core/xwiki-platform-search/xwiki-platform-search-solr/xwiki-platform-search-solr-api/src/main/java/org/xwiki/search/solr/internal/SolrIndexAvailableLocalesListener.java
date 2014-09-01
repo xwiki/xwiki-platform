@@ -76,7 +76,7 @@ public class SolrIndexAvailableLocalesListener implements EventListener
      */
     private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentUpdatedEvent(new RegexEventFilter(
         PREFERENCEDOCUMENT_REGEX)), new DocumentUpdatedEvent(new RegexEventFilter(PREFERENCEDOCUMENT_REGEX)),
-        new ApplicationReadyEvent(), new WikiReadyEvent());
+        new ApplicationReadyEvent(), new WikiReadyEvent(), new ApplicationReadyEvent());
 
     /**
      * The currently available locales for each running wiki.
@@ -120,7 +120,7 @@ public class SolrIndexAvailableLocalesListener implements EventListener
     {
         XWikiContext xcontext = (XWikiContext) data;
 
-        String wiki = xcontext.getDatabase();
+        String wiki = xcontext.getWikiId();
 
         Set<Locale> oldLocales = this.localesCache.get(wiki);
         List<Locale> availableLocales = xcontext.getWiki().getAvailableLocales(xcontext);
@@ -129,7 +129,9 @@ public class SolrIndexAvailableLocalesListener implements EventListener
         this.localesCache.put(wiki, new HashSet<Locale>(availableLocales));
 
         try {
-            if (event instanceof AbstractDocumentEvent) {
+            // oldLocales may be null in case the XWikiPreferences has been modified as part of a mandatory document
+            // initialization
+            if (oldLocales != null && event instanceof AbstractDocumentEvent) {
                 Collection<Locale> newLocales = CollectionUtils.subtract(availableLocales, oldLocales);
 
                 if (!newLocales.isEmpty()) {

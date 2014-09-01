@@ -34,7 +34,6 @@ import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
-import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.EntityTreeElement;
 import org.xwiki.test.ui.po.LiveTableElement;
 
@@ -51,12 +50,14 @@ public class AllDocsTest extends AbstractTest
     {
         // Test 1: Verify that the Action column is displayed only for logged in users
         // Create a test user
-        getUtil().createUser(getClass().getSimpleName() + "_" + getTestMethodName(), "password");
+        getUtil().createUserAndLogin(getClass().getSimpleName() + "_" + getTestMethodName(), "password");
         AllDocsPage page = AllDocsPage.gotoPage();
         LiveTableElement livetable = page.clickIndexTab();
         assertTrue("No Actions column found", livetable.hasColumn("Actions"));
-        // Logs out to be guest
-        page.logout();
+
+        // Logs out to be guest to verify that the Action columns is no longer displayed
+        getUtil().forceGuestUser();
+
         livetable = page.clickIndexTab();
         assertFalse("Actions column shouldn't be visible for guests", livetable.hasColumn("Actions"));
 
@@ -75,8 +76,10 @@ public class AllDocsTest extends AbstractTest
         AllDocsPage page = AllDocsPage.gotoPage();
         assertTrue("Deleted documents tab is not visible to Admin", page.hasDeletedDocsTab());
         assertTrue("Deleted attachments tab is not visible to Admin", page.hasDeletedAttachmentsTab());
-        // Logs out to be guest
-        page.logout();
+
+        // Logs out to be guest to verify that Deleted attachments/documents are not visible to guests
+        getUtil().forceGuestUser();
+
         assertFalse("Deleted documents shouldn't be visible to guests", page.hasDeletedDocsTab());
         assertFalse("Deleted attachments shouldn't be visible to guests", page.hasDeletedAttachmentsTab());
 

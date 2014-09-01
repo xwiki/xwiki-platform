@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -102,6 +103,8 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
     private static final List<Event> EVENTS = Arrays.<Event> asList(new XObjectPropertyAddedEvent(
         XWIKIPREFERENCE_PROPERTY_REFERENCE), new XObjectPropertyDeletedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE),
         new XObjectPropertyUpdatedEvent(XWIKIPREFERENCE_PROPERTY_REFERENCE));
+
+    private static final Pattern PATTERN_NEWLINE = Pattern.compile("[\n\r]");
 
     /**
      * Get the reference of the class in the current wiki.
@@ -213,7 +216,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        return xcontext.getWiki().getDocument(new DocumentReference(xcontext.getDatabase(), space, name), xcontext);
+        return xcontext.getWiki().getDocument(new DocumentReference(xcontext.getWikiId(), space, name), xcontext);
     }
 
     @Override
@@ -235,7 +238,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
             if (!documentNames.isEmpty()) {
                 cachedDocumentReference =
-                    new DocumentReference[] {new DocumentReference(this.xcontextProvider.get().getDatabase(),
+                    new DocumentReference[] {new DocumentReference(this.xcontextProvider.get().getWikiId(),
                         (String) documentNames.get(0)[0], (String) documentNames.get(0)[1])};
             } else {
                 cachedDocumentReference = new DocumentReference[1];
@@ -269,7 +272,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
     }
 
     @Override
-    public void validateExtension(XWikiDocument document, boolean readOnly) throws XWikiException
+    public void validateExtension(XWikiDocument document, boolean save) throws XWikiException
     {
         BaseObject extensionObject = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
 
@@ -282,7 +285,6 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        XWikiDocument documentToSave = null;
         BaseObject extensionObjectToSave = null;
 
         // Update last version field
@@ -291,10 +293,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         if (lastVersion != null
             && !StringUtils.equals(lastVersion,
                 getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, (String) null))) {
-            // FIXME: We can't save directly the provided document coming from the event
-            documentToSave = xcontext.getWiki().getDocument(document, xcontext);
-            extensionObjectToSave = documentToSave.getXObject(extensionObject.getReference());
-
+            extensionObjectToSave = document.getXObject(extensionObject.getReference());
             extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_LASTVERSION, lastVersion, xcontext);
 
             needSave = true;
@@ -313,12 +312,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         int currentValue = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, 0);
 
         if ((currentValue == 1) != valid) {
-            if (documentToSave == null) {
-                // FIXME: We can't save directly the provided document coming from the event
-                documentToSave = xcontext.getWiki().getDocument(document, xcontext);
-                extensionObjectToSave = documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-            }
-
+            extensionObjectToSave = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
             extensionObjectToSave.set(XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, valid ? "1" : "0", xcontext);
 
             needSave = true;
@@ -331,13 +325,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         if (valid) {
             for (String fieldName : AbstractExtensionRESTResource.EPROPERTIES_EXTRA) {
                 if (extensionObject.safeget(fieldName) == null) {
-                    if (extensionObjectToSave == null) {
-                        // FIXME: We can't save directly the provided document coming from the event
-                        documentToSave = xcontext.getWiki().getDocument(document, xcontext);
-                        extensionObjectToSave =
-                            documentToSave.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
-                    }
-
+                    extensionObjectToSave = document.getXObject(XWikiRepositoryModel.EXTENSION_CLASSREFERENCE);
                     extensionObjectToSave.set(fieldName, "", xcontext);
                     needSave = true;
                 }
@@ -346,8 +334,8 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
         // Save document
 
-        if (needSave) {
-            xcontext.getWiki().saveDocument(documentToSave, "Validated extension", true, xcontext);
+        if (save && needSave) {
+            xcontext.getWiki().saveDocument(document, "Validated extension", true, xcontext);
         }
     }
 
@@ -490,7 +478,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
                 + XWikiRepositoryModel.EXTENSION_CLASSNAME + ") as extension", Query.XWQL);
 
         for (Object[] documentName : query.<Object[]> execute()) {
-            validateExtension(getDocument(documentName), false);
+            validateExtension(getDocument(documentName), true);
         }
     }
 
@@ -593,12 +581,12 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
             // Create document
             document =
                 xcontext.getWiki().getDocument(
-                    new DocumentReference(xcontext.getDatabase(), "Extension", extension.getName()), xcontext);
+                    new DocumentReference(xcontext.getWikiId(), "Extension", extension.getName()), xcontext);
 
             for (int i = 1; !document.isNew(); ++i) {
                 document =
                     xcontext.getWiki().getDocument(
-                        new DocumentReference(xcontext.getDatabase(), "Extension", extension.getName() + ' ' + i),
+                        new DocumentReference(xcontext.getWikiId(), "Extension", extension.getName() + ' ' + i),
                         xcontext);
             }
 
@@ -688,12 +676,14 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         }
 
         needSave |=
-            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYID, repository.getId().getId());
+            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYID, repository.getDescriptor()
+                .getId());
         needSave |=
-            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYTYPE, repository.getId().getType());
+            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYTYPE, repository.getDescriptor()
+                .getType());
         needSave |=
-            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYURI, repository.getId().getURI()
-                .toString());
+            update(extensionProxyObject, XWikiRepositoryModel.PROP_PROXY_REPOSITORYURI, repository.getDescriptor()
+                .getURI().toString());
 
         if (needSave) {
             document.setAuthorReference(xcontext.getUserReference());
@@ -702,10 +692,9 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
                 document.setCreatorReference(xcontext.getUserReference());
             }
 
-            xcontext.getWiki()
-                .saveDocument(document,
-                    "Imported extension [" + extensionId + "] from repository [" + repository.getId() + "]", true,
-                    xcontext);
+            xcontext.getWiki().saveDocument(document,
+                "Imported extension [" + extensionId + "] from repository [" + repository.getDescriptor() + "]", true,
+                xcontext);
         }
 
         return document.getDocumentReference();
@@ -724,7 +713,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_NAME, extension.getName());
 
         // Summary
-        needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, extension.getSummary());
+        needSave |= update(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY, getSummary(extension));
 
         // Website
         /*
@@ -734,8 +723,8 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
         // Description
         if (StringUtils.isEmpty(getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION,
-            (String) null)) && StringUtils.isNotEmpty(extension.getDescription())) {
-            extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION, extension.getDescription(), xcontext);
+            (String) null))) {
+            extensionObject.set(XWikiRepositoryModel.PROP_EXTENSION_DESCRIPTION, getDescription(extension), xcontext);
             needSave = true;
         }
 
@@ -759,6 +748,47 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         return needSave;
     }
 
+    private String getSummary(Extension extension)
+    {
+        String summary = extension.getSummary();
+        if (summary != null) {
+            // Extract first not blank line
+            Matcher matcher = PATTERN_NEWLINE.matcher(summary);
+            int previousIndex = 0;
+            while (matcher.find()) {
+                int index = matcher.start();
+                String str = summary.substring(previousIndex, index);
+                if (StringUtils.isNotBlank(str)) {
+                    summary = str.trim();
+                    break;
+                }
+            }
+            // truncated to 255 in case it's too long, TODO: should probably be handled at a lower level)
+            if (summary.length() > 255) {
+                summary = summary.substring(0, 255);
+            }
+        } else {
+            summary = "";
+        }
+
+        return summary;
+    }
+
+    private String getDescription(Extension extension)
+    {
+        String description;
+
+        if (extension.getDescription() != null) {
+            description = extension.getDescription();
+        } else if (extension.getSummary() != null) {
+            description = extension.getSummary();
+        } else {
+            description = "";
+        }
+
+        return description;
+    }
+
     private boolean updateAuthors(BaseObject extensionObject, Collection<ExtensionAuthor> authors)
     {
         List<String> authorIds = new ArrayList<String>(authors.size());
@@ -776,7 +806,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        String authorId = resolveAuthorIdOnWiki(xcontext.getDatabase(), authorName, authorElements, xcontext);
+        String authorId = resolveAuthorIdOnWiki(xcontext.getWikiId(), authorName, authorElements, xcontext);
 
         if (authorId == null && !xcontext.isMainWiki()) {
             authorId = resolveAuthorIdOnWiki(xcontext.getMainXWiki(), authorName, authorElements, xcontext);
@@ -805,11 +835,11 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
             List<String> documentNames = query.execute();
 
             if (!documentNames.isEmpty()) {
-                String currentWiki = xcontext.getDatabase();
+                String currentWiki = xcontext.getWikiId();
                 try {
                     for (String documentName : documentNames) {
 
-                        xcontext.setDatabase(wiki);
+                        xcontext.setWikiId(wiki);
 
                         String userName = xcontext.getWiki().getUserName(documentName, null, false, xcontext);
 
@@ -818,7 +848,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
                         }
                     }
                 } finally {
-                    xcontext.setDatabase(currentWiki);
+                    xcontext.setWikiId(currentWiki);
                 }
             }
         } catch (QueryException e) {
@@ -909,7 +939,7 @@ public class DefaultRepositoryManager implements RepositoryManager, Initializabl
         // Download
         ExtensionResourceReference resource =
             new ExtensionResourceReference(extension.getId().getId(), extension.getId().getVersion().getValue(),
-                extension.getRepository().getId().getId());
+                extension.getRepository().getDescriptor().getId());
         String download = this.resourceReferenceSerializer.serialize(resource);
         needSave |= update(versionObject, XWikiRepositoryModel.PROP_VERSION_DOWNLOAD, download);
 

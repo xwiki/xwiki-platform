@@ -19,13 +19,23 @@
  */
 package com.xpn.xwiki.render;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+@Component
+@Named("plugin")
+@Singleton
 public class XWikiPluginRenderer implements XWikiRenderer
 {
-    public XWikiPluginRenderer()
+    @Override
+    public String getId()
     {
+        return "plugin";
     }
 
     @Override

@@ -57,7 +57,7 @@ public class SecureQueryManager extends AbstractQueryManager
      * @return Query
      * @throws QueryException if any errors
      * @see #createQuery(String, String)
-     * @deprecated it's now available from {@link org.xwiki.query.internal.QueryManagerScriptService} since 2.4M2
+     * @deprecated it's now available from {@link org.xwiki.query.script.QueryManagerScriptService} since 2.4M2
      */
     @Deprecated
     public Query xwql(String statement) throws QueryException

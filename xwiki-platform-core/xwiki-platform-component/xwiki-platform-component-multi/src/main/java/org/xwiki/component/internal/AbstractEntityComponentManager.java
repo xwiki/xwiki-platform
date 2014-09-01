@@ -20,12 +20,11 @@
 package org.xwiki.component.internal;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.xwiki.component.internal.multi.AbstractGenericComponentManager;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Proxy Component Manager that creates and queries individual Component Managers specific to the current entity in the
@@ -37,32 +36,17 @@ import org.xwiki.model.reference.EntityReferenceValueProvider;
  */
 public abstract class AbstractEntityComponentManager extends AbstractGenericComponentManager implements Initializable
 {
-    /**
-     * Used to access the current space in the Execution Context.
-     */
     @Inject
-    @Named("current")
-    private EntityReferenceValueProvider currentProvider;
+    private EntityReferenceSerializer<String> serializer;
 
-    /**
-     * The type of entity associated to this {@link org.xwiki.component.manager.ComponentManager}.
-     */
-    private EntityType type;
-
-    /**
-     * @param type the type of entity associated to this {@link org.xwiki.component.manager.ComponentManager}
-     */
-    public AbstractEntityComponentManager(EntityType type)
-    {
-        this.type = type;
-    }
+    protected abstract EntityReference getCurrentReference();
 
     @Override
     protected String getKey()
     {
-        String entity = this.currentProvider.getDefaultValue(this.type);
+        EntityReference reference = getCurrentReference();
 
-        return entity != null ? this.type.name().toLowerCase() + ":" + this.currentProvider.getDefaultValue(this.type)
-            : null;
+        return reference != null ? reference.getType().toString().toLowerCase() + ":"
+            + this.serializer.serialize(reference) : null;
     }
 }

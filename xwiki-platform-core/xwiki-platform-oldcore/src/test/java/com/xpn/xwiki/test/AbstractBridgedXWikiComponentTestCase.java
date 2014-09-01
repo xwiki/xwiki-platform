@@ -23,6 +23,8 @@ import java.io.File;
 import javax.servlet.ServletContext;
 
 import org.jmock.Mock;
+import org.jmock.core.Invocation;
+import org.jmock.core.stub.CustomStub;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
@@ -33,6 +35,7 @@ import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiResponse;
 
 /**
  * Extension of {@link AbstractXWikiComponentTestCase} that sets up a bridge between the new Execution
@@ -59,8 +62,22 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         
         this.context = new XWikiContext();
 
-        this.context.setDatabase("xwiki");
+        this.context.setWikiId("xwiki");
         this.context.setMainXWiki("xwiki");
+
+        // Make sure response.encodeURL() calls don't fail
+        Mock xwikiResponse = mock(XWikiResponse.class);
+        xwikiResponse.stubs().method("setLocale");
+        xwikiResponse.stubs().method("encodeURL").will(
+            new CustomStub("Implements XWikiResponse.encodeURL")
+            {
+                @Override
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return invocation.parameterValues.get(0);
+                }
+            });
+        this.context.setResponse((XWikiResponse) xwikiResponse.proxy());
 
         // We need to initialize the Component Manager so that the components can be looked up
         getContext().put(ComponentManager.class.getName(), getComponentManager());
@@ -74,13 +91,15 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
 
         // Since the oldcore module draws the Servlet Environment in its dependencies we need to ensure it's set up
         // correctly with a Servlet Context.
-        ServletEnvironment environment = (ServletEnvironment) getComponentManager().getInstance(Environment.class);
+        ServletEnvironment environment = getComponentManager().getInstance(Environment.class);
         Mock mockServletContext = mock(ServletContext.class); 
         environment.setServletContext((ServletContext) mockServletContext.proxy());
         mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/cache/infinispan/config.xml"))
             .will(returnValue(null));
         mockServletContext.stubs().method("getAttribute").with(eq("javax.servlet.context.tempdir"))
             .will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/xwiki.cfg"))
+        .will(returnValue(null));
 
         Mock mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
         mockCoreConfiguration.stubs().method("getDefaultDocumentSyntax").will(returnValue(Syntax.XWIKI_1_0));

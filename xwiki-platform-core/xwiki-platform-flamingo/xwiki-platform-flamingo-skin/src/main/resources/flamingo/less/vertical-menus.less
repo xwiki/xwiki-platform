@@ -1,0 +1,63 @@
+//
+// Vertical Menus
+// --------------------------------------------------
+
+.vertical-menu {
+  margin: 10px 0;
+  ul {
+    margin-left: 0;
+    .list-group;
+    li {
+      display: block;
+      font-size: @font-size-small;
+      .group {
+        .list-group-item;
+        text-transform: uppercase;
+        font-weight: 700;
+        background-color: @navbar-default-bg;
+        background-repeat: no-repeat;
+        padding: 5px 30px;
+        &:hover, &.current-group {
+          background-color: @navbar-inverse-bg;
+          & a {
+            color: @navbar-inverse-link-color;
+          }
+        }
+        a {
+          color: @navbar-default-link-color;
+        }
+      }
+      ul {
+        margin-left: 0;
+        li {
+          .list-group-item;
+          padding: 0;
+          &:first-child {
+            border-radius: 0;
+          }
+          .current, 
+          .current a, 
+          .current a:hover,
+          .current a:focus {
+            color: @list-group-active-color;
+            background-color: @list-group-active-bg;
+          }
+          a {
+            display: block;
+            padding: 5px;
+            color: @list-group-link-color;
+            &:hover,
+            &:focus {
+              text-decoration: none;
+              background-color: @list-group-hover-bg;
+            }
+            &:before {
+              margin: 0 1px;
+              content: "";
+            }
+          }
+        }
+      }
+    }
+  }
+}

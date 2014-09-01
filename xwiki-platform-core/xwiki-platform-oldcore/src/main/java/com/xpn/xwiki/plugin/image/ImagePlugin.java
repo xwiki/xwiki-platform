@@ -21,20 +21,19 @@ package com.xpn.xwiki.plugin.image;
 
 import java.awt.Image;
 import java.awt.image.RenderedImage;
-import java.io.OutputStream;
 import java.io.IOException;
-import java.lang.reflect.Type;
+import java.io.OutputStream;
 import java.util.Arrays;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
-import org.xwiki.environment.Environment;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -82,11 +81,6 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * The object used to process images.
      */
     private final ImageProcessor imageProcessor = Utils.getComponent(ImageProcessor.class);
-
-    /**
-     * Used to get the temporary directory.
-     */
-    private Environment environment = Utils.getComponent((Type) Environment.class);
 
     /**
      * Creates a new instance of this plugin.
@@ -162,7 +156,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
             lru.setMaxEntries(this.capacity);
 
             try {
-                this.imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
+                this.imageCache = Utils.getComponent(CacheManager.class).createNewLocalCache(configuration);
             } catch (CacheException e) {
                 LOG.error("Error initializing the image cache.", e);
             }

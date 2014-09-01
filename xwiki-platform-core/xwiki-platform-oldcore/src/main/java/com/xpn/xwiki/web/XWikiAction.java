@@ -21,6 +21,7 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -28,6 +29,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -38,6 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.bridge.event.ActionExecutedEvent;
 import org.xwiki.bridge.event.ActionExecutingEvent;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
@@ -47,12 +51,25 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.rendering.internal.parser.MissingParserException;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.resource.NotFoundResourceHandlerException;
+import org.xwiki.resource.ResourceReference;
+import org.xwiki.resource.ResourceReferenceHandler;
+import org.xwiki.resource.ResourceReferenceManager;
+import org.xwiki.resource.ResourceType;
+import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.template.WikiTemplateRenderer;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
@@ -102,6 +119,11 @@ public abstract class XWikiAction extends Action
         "download");
 
     /**
+     * Indicate if the action is blocked until XWiki is initialized.
+     */
+    protected boolean waitForXWikiInitialization = true;
+
+    /**
      * Handle server requests.
      * 
      * @param mapping The ActionMapping used to select this instance
@@ -145,24 +167,36 @@ public abstract class XWikiAction extends Action
             String action = context.getAction();
 
             // Initialize context.getWiki() with the main wiki
-            XWiki xwiki = XWiki.getMainXWiki(context);
-
-            // Initialize the url factory
-            XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
-            context.setURLFactory(urlf);
-
-            // Initialize the velocity context and its bindings so that it may be used in the velocity templates that we
-            // are parsing below.
-            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-            VelocityContext vcontext = velocityManager.getVelocityContext();
+            XWiki xwiki;
 
             // Verify that the requested wiki exists
             try {
-                xwiki = XWiki.getXWiki(context);
+                xwiki = XWiki.getXWiki(this.waitForXWikiInitialization, context);
+
+                // If XWiki is still initializing display initialization template
+                if (xwiki == null) {
+                    // Display initialization template
+                    renderInit(context);
+
+                    // Initialization template has been displayed, stop here.
+                    return null;
+                }
             } catch (XWikiException e) {
                 // If the wiki asked by the user doesn't exist, then we first attempt to use any existing global
                 // redirects. If there are none, then we display the specific error template.
                 if (e.getCode() == XWikiException.ERROR_XWIKI_DOES_NOT_EXIST) {
+                    xwiki = XWiki.getMainXWiki(context);
+
+                    // Initialize the url factory
+                    XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
+                    context.setURLFactory(urlf);
+
+                    // Initialize the velocity context and its bindings so that it may be used in the velocity templates
+                    // that we
+                    // are parsing below.
+                    VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+                    VelocityContext vcontext = velocityManager.getVelocityContext();
+
                     if (!sendGlobalRedirect(context.getResponse(), context.getURL().toString(), context)) {
                         // Starting XWiki 5.0M2, 'xwiki.virtual.redirect' was removed. Warn users still using it.
                         if (!StringUtils.isEmpty(context.getWiki().Param("xwiki.virtual.redirect"))) {
@@ -180,10 +214,10 @@ public abstract class XWikiAction extends Action
                             // since we cannot set the non existing one as it would generate errors obviously...
                             EntityReferenceValueProvider valueProvider =
                                 Utils.getComponent(EntityReferenceValueProvider.class);
-                            xwiki.setPhonyDocument(new DocumentReference(
-                                valueProvider.getDefaultValue(EntityType.WIKI),
-                                valueProvider.getDefaultValue(EntityType.SPACE),
-                                valueProvider.getDefaultValue(EntityType.DOCUMENT)), context, vcontext);
+                            xwiki.setPhonyDocument(
+                                new DocumentReference(valueProvider.getDefaultValue(EntityType.WIKI), valueProvider
+                                    .getDefaultValue(EntityType.SPACE), valueProvider
+                                    .getDefaultValue(EntityType.DOCUMENT)), context, vcontext);
 
                             // Parse the error template
                             Utils.parseTemplate(context.getWiki().Param("xwiki.wiki_exception", "wikidoesnotexist"),
@@ -214,6 +248,9 @@ public abstract class XWikiAction extends Action
                 return null;
             }
 
+            XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
+            context.setURLFactory(urlf);
+
             String sajax = context.getRequest().get("ajax");
             boolean ajax = false;
             if (sajax != null && !sajax.trim().equals("") && !sajax.equals("0")) {
@@ -226,6 +263,9 @@ public abstract class XWikiAction extends Action
             if (monitor != null) {
                 monitor.startTimer("request");
             }
+
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
+            VelocityContext vcontext = velocityManager.getVelocityContext();
 
             boolean eventSent = false;
             try {
@@ -278,6 +318,30 @@ public abstract class XWikiAction extends Action
                     monitor.endTimer("prenotify");
                 }
 
+                // Call the Actions
+
+                // Call the new Entity Resource Reference Handler.
+                ResourceReferenceHandler entityResourceReferenceHandler =
+                    Utils.getComponent(new DefaultParameterizedType(null, ResourceReferenceHandler.class,
+                        ResourceType.class), "bin");
+                ResourceReference resourceReference =
+                    Utils.getComponent(ResourceReferenceManager.class).getResourceReference();
+                try {
+                    entityResourceReferenceHandler.handle(resourceReference, new DefaultResourceReferenceHandlerChain(
+                        Collections.<ResourceReferenceHandler> emptyList()));
+                    // Don't let the old actions kick in!
+                    return null;
+                } catch (NotFoundResourceHandlerException e) {
+                    // No Entity Resource Action has been found. Don't do anything and let it go through
+                    // so that the old Action system kicks in...
+                } catch (Throwable e) {
+                    // Some real failure, log it since it's a problem but still allow the old Action system a chance
+                    // to do something...
+                    LOGGER.error("Failed to handle Action for Resource [{}]", resourceReference, e);
+                }
+
+                // Then call the old Actions for backward compatibility (and because a lot of them have not been
+                // migrated to new Actions yet).
                 String renderResult = null;
                 XWikiDocument doc = context.getDoc();
                 docName = doc.getFullName();
@@ -339,6 +403,12 @@ public abstract class XWikiAction extends Action
                     }
                     vcontext.put("exp", e);
                     if (LOGGER.isWarnEnabled()) {
+                        // Don't log "Broken Pipe" exceptions since they're not real errors and we don't want to pollute
+                        // the logs with unnecessary stack traces. It just means the client side has cancelled the
+                        // connection.
+                        if (ExceptionUtils.getRootCauseMessage(e).equals("IOException: Broken pipe")) {
+                            return null;
+                        }
                         LOGGER.warn("Uncaught exception: " + e.getMessage(), e);
                     }
                     // If the request is an AJAX request, we don't return a whole HTML page, but just the exception
@@ -406,6 +476,34 @@ public abstract class XWikiAction extends Action
                 }
             }
         }
+    }
+
+    private void renderInit(XWikiContext xcontext) throws IOException, ParseException,
+        MissingParserException, XWikiVelocityException
+    {
+        RenderingContext renderingContext = Utils.getComponent(RenderingContext.class);
+        MutableRenderingContext mutableRenderingContext =
+            renderingContext instanceof MutableRenderingContext ? (MutableRenderingContext) renderingContext : null;
+
+        if (mutableRenderingContext != null) {
+            mutableRenderingContext.push(renderingContext.getTransformation(), renderingContext.getXDOM(),
+                renderingContext.getDefaultSyntax(), "init.vm", renderingContext.isRestricted(), Syntax.XHTML_1_0);
+        }
+
+        xcontext.getResponse().setStatus(503);
+        xcontext.getResponse().setContentType("text/html; charset=UTF-8");
+
+        try {
+            Utils.getComponent(WikiTemplateRenderer.class).render("init.vm", xcontext.getResponse().getWriter());
+        } finally {
+            if (mutableRenderingContext != null) {
+                mutableRenderingContext.pop();
+            }
+        }
+
+        xcontext.getResponse().flushBuffer();
+
+        xcontext.setFinished(true);
     }
 
     protected XWikiContext initializeXWikiContext(ActionMapping mapping, ActionForm form, HttpServletRequest req,
@@ -550,7 +648,7 @@ public abstract class XWikiAction extends Action
     {
         try {
             if (url != null) {
-                response.sendRedirect(url);
+                response.sendRedirect(response.encodeRedirectURL(url));
             }
         } catch (IOException e) {
             Object[] args = {url};

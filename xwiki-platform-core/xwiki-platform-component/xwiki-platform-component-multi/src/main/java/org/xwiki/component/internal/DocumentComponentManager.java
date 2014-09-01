@@ -28,6 +28,9 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 
 /**
  * Proxy Component Manager that creates and queries individual Component Managers specific to the current document in
@@ -48,18 +51,25 @@ public class DocumentComponentManager extends AbstractEntityComponentManager imp
     public static final String ID = "document";
 
     /**
+     * Used to access the current entities.
+     */
+    @Inject
+    @Named("current")
+    private EntityReferenceValueProvider currentProvider;
+
+    /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
     @Inject
     @Named(SpaceComponentManager.ID)
     private ComponentManager spaceComponentManager;
 
-    /**
-     * Default constructor.
-     */
-    public DocumentComponentManager()
+    @Override
+    protected EntityReference getCurrentReference()
     {
-        super(EntityType.DOCUMENT);
+        return new DocumentReference(this.currentProvider.getDefaultValue(EntityType.WIKI),
+            this.currentProvider.getDefaultValue(EntityType.SPACE),
+            this.currentProvider.getDefaultValue(EntityType.DOCUMENT));
     }
 
     @Override

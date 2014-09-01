@@ -27,9 +27,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,29 +62,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
     // TODO: use real css parser
     private static Pattern CSSIMPORT = Pattern.compile("^\\s*@import\\s*\"(.*)\"\\s*;$", Pattern.MULTILINE);
 
-    /**
-     * When there are relative links to resources inside CSS files they are resolved based on the location of the CSS
-     * file itself. When we export we put all resources and attachments in the root of the exported directory and thus
-     * in order to have valid relative links we need to make them match. We use this variable to do this.
-     */
-    private Stack cssPathAdjustementStack = new Stack();
-
-    /**
-     * Pages for which to convert URL to local.
-     */
-    protected Set<String> exportedPages = new HashSet<String>();
-
-    /**
-     * Directory where to export attachment.
-     */
-    protected File exportDir;
-
-    /**
-     * Names of skins needed by rendered page(s).
-     */
-    private Set<String> neededSkins = new HashSet<String>();
-
-    Set<String> exporteSkinFiles = new HashSet<String>();
+    private ExportURLFactoryContext factoryContext = new ExportURLFactoryContext();
 
     /**
      * ExportURLFactory constructor.
@@ -96,20 +71,9 @@ public class ExportURLFactory extends XWikiServletURLFactory
     {
     }
 
-    /**
-     * @return the list skins names used.
-     */
-    public Collection<String> getNeededSkins()
+    public ExportURLFactoryContext getExportURLFactoryContext()
     {
-        return this.neededSkins;
-    }
-
-    /**
-     * @return the list of custom skin files.
-     */
-    public Collection<String> getExportedSkinFiles()
-    {
-        return this.exporteSkinFiles;
+        return this.factoryContext;
     }
 
     /**
@@ -124,7 +88,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         super.init(context);
 
         if (exportDir != null) {
-            this.exportDir = exportDir;
+            getExportURLFactoryContext().setExportDir(exportDir);
         }
 
         if (exportedPages != null) {
@@ -142,14 +106,14 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 if (doc.getDatabase() != null) {
                     absolutePageName += doc.getDatabase().toLowerCase();
                 } else {
-                    absolutePageName += context.getDatabase().toLowerCase();
+                    absolutePageName += context.getWikiId().toLowerCase();
                 }
 
                 absolutePageName += XWikiDocument.DB_SPACE_SEP;
 
                 absolutePageName += doc.getFullName();
 
-                this.exportedPages.add(absolutePageName);
+                getExportURLFactoryContext().addExportedPage(absolutePageName);
             }
         }
     }
@@ -158,23 +122,19 @@ public class ExportURLFactory extends XWikiServletURLFactory
     public URL createSkinURL(String filename, String skin, XWikiContext context)
     {
         try {
-            getNeededSkins().add(skin);
+            getExportURLFactoryContext().addNeededSkin(skin);
 
-            StringBuffer newpath = new StringBuffer();
+            StringBuffer newPath = new StringBuffer("file://");
 
-            newpath.append("file://");
+            // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
+            getExportURLFactoryContext().adjustCSSPath(newPath);
 
-            // Adjust path for links inside CSS files.
-            if (!this.cssPathAdjustementStack.empty()) {
-                newpath.append(this.cssPathAdjustementStack.peek());
-            }
+            newPath.append("skins/");
+            newPath.append(skin);
 
-            newpath.append("skins/");
-            newpath.append(skin);
+            addFileName(newPath, filename, false, context);
 
-            addFileName(newpath, filename, false, context);
-
-            return new URL(newpath.toString());
+            return new URL(newPath.toString());
         } catch (Exception e) {
             LOGGER.error("Failed to create skin URL", e);
         }
@@ -214,7 +174,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
 
         try {
-            getNeededSkins().add(name);
+            getExportURLFactoryContext().addNeededSkin(name);
 
             StringBuffer filePathBuffer = new StringBuffer();
             if (!skipSkinDirectory) {
@@ -226,10 +186,10 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             String filePath = filePathBuffer.toString();
 
-            if (!this.exporteSkinFiles.contains(filePath)) {
-                this.exporteSkinFiles.add(filePath);
+            if (!getExportURLFactoryContext().hasExportedSkinFile(filePath)) {
+                getExportURLFactoryContext().addExportedSkinFile(filePath);
 
-                File file = new File(this.exportDir, filePath);
+                File file = new File(getExportURLFactoryContext().getExportDir(), filePath);
 
                 // Make sure the folder exists
                 File folder = file.getParentFile();
@@ -238,44 +198,41 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 }
 
                 FileOutputStream fos = new FileOutputStream(file);
-                String database = context.getDatabase();
+                String database = context.getWikiId();
 
                 try {
                     XWikiServletResponseStub response = new XWikiServletResponseStub();
                     response.setOutpuStream(fos);
                     context.setResponse(response);
                     if (wikiId != null) {
-                        context.setDatabase(wikiId);
+                        context.setWikiId(wikiId);
                     }
 
                     // Adjust path for links inside CSS files.
-                    this.cssPathAdjustementStack.push(StringUtils.repeat("../", StringUtils.countMatches(filePath, "/")));
+                    getExportURLFactoryContext().pushCSSPathAdjustment(StringUtils.countMatches(filePath, "/"));
                     try {
                         SKINACTION.render(skinURL.getPath(), context);
                     } finally {
-                        this.cssPathAdjustementStack.pop();
+                        getExportURLFactoryContext().popCSSPathAdjustement();
                     }
                 } finally {
                     fos.close();
                     if (wikiId != null) {
-                        context.setDatabase(database);
+                        context.setWikiId(database);
                     }
                 }
 
                 followCssImports(file, web, name, wikiId, context);
             }
 
-            StringBuffer newpath = new StringBuffer();
-            newpath.append("file://");
+            StringBuffer newPath = new StringBuffer("file://");
 
-            // Adjust path for links inside CSS files.
-            if (!this.cssPathAdjustementStack.empty()) {
-                newpath.append(this.cssPathAdjustementStack.peek());
-            }
+            // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
+            getExportURLFactoryContext().adjustCSSPath(newPath);
 
-            newpath.append(filePath);
+            newPath.append(filePath);
 
-            skinURL = new URL(newpath.toString());
+            skinURL = new URL(newPath.toString());
         } catch (Exception e) {
             LOGGER.error("Failed to create skin URL", e);
         }
@@ -324,20 +281,16 @@ public class ExportURLFactory extends XWikiServletURLFactory
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
         try {
-            StringBuffer newpath = new StringBuffer();
+            StringBuffer newPath = new StringBuffer("file://");
 
-            newpath.append("file://");
+            // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
+            getExportURLFactoryContext().adjustCSSPath(newPath);
 
-            // Adjust path for links inside CSS files.
-            if (!this.cssPathAdjustementStack.empty()) {
-                newpath.append(this.cssPathAdjustementStack.peek());
-            }
+            newPath.append("resources");
 
-            newpath.append("resources");
+            addFileName(newPath, filename, false, context);
 
-            addFileName(newpath, filename, false, context);
-
-            return new URL(newpath.toString());
+            return new URL(newPath.toString());
         } catch (Exception e) {
             LOGGER.error("Failed to create skin URL", e);
         }
@@ -349,12 +302,23 @@ public class ExportURLFactory extends XWikiServletURLFactory
     public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
         XWikiContext context)
     {
-        String wikiname = xwikidb == null ? context.getDatabase().toLowerCase() : xwikidb.toLowerCase();
-
         try {
-            if (this.exportedPages.contains(wikiname + XWikiDocument.DB_SPACE_SEP + web + XWikiDocument.SPACE_NAME_SEP
-                + name)
-                && "view".equals(action) && context.getLinksAction() == null) {
+            // Look for a special handler for the passed action
+            try {
+                ExportURLFactoryActionHandler handler = Utils.getComponent(ExportURLFactoryActionHandler.class, action);
+                return handler.createURL(web, name, querystring, anchor, xwikidb, context,
+                    getExportURLFactoryContext());
+            } catch (Exception e) {
+                // Failed to find such a component or it doesn't work, simply ignore it and continue with the default
+                // behavior!
+            }
+
+            String wikiname = xwikidb == null ? context.getWikiId().toLowerCase() : xwikidb.toLowerCase();
+
+            if (getExportURLFactoryContext().hasExportedPage(wikiname + XWikiDocument.DB_SPACE_SEP + web
+                + XWikiDocument.SPACE_NAME_SEP + name)
+                && "view".equals(action) && context.getLinksAction() == null)
+            {
                 StringBuffer newpath = new StringBuffer();
 
                 newpath.append("file://");
@@ -397,10 +361,10 @@ public class ExportURLFactory extends XWikiServletURLFactory
     private URL createAttachmentURL(String filename, String space, String name, String xwikidb, XWikiContext context)
         throws XWikiException, IOException, URISyntaxException
     {
-        String db = (xwikidb == null ? context.getDatabase() : xwikidb);
+        String db = (xwikidb == null ? context.getWikiId() : xwikidb);
         String path = "attachment/" + db + "." + space + "." + name + "." + filename;
 
-        File file = new File(this.exportDir, path);
+        File file = new File(getExportURLFactoryContext().getExportDir(), path);
         if (!file.exists()) {
             XWikiDocument doc =
                 context.getWiki().getDocument(
@@ -411,12 +375,14 @@ public class ExportURLFactory extends XWikiServletURLFactory
             fos.close();
         }
 
-        // Adjust path for links inside CSS files.
-        if (!this.cssPathAdjustementStack.empty()) {
-            path = this.cssPathAdjustementStack.peek() + path;
-        }
+        StringBuffer newPath = new StringBuffer("file://");
 
-        return new URI("file://" + path.replace(" ", "%20")).toURL();
+        // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).
+        getExportURLFactoryContext().adjustCSSPath(newPath);
+
+        newPath.append(path.replace(" ", "%20"));
+
+        return new URI(newPath.toString()).toURL();
     }
 
     @Override

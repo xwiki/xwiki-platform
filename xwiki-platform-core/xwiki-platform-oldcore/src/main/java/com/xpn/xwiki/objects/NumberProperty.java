@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.objects;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 public abstract class NumberProperty extends BaseProperty
 {
     private Number value;
@@ -50,20 +52,13 @@ public abstract class NumberProperty extends BaseProperty
     @Override
     public boolean equals(Object obj)
     {
-        // Same Java object, they sure are equal
-        if (this == obj) {
-            return true;
-        }
-
-        if (!super.equals(obj)) {
+        if (obj == null) {
             return false;
         }
 
-        if ((getValue() == null) && (((NumberProperty) obj).getValue() == null)) {
-            return true;
-        }
-
-        return getValue().equals(((NumberProperty) obj).getValue());
+        return new EqualsBuilder().appendSuper(super.equals(obj))
+            .append(getValue(), ((NumberProperty) obj).getValue())
+            .isEquals();
     }
 
     @Override

@@ -40,7 +40,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 
 /**
  * Import a set of XWiki documents into an existing database.
- * 
+ *
  * @version $Id$
  */
 public class Importer extends AbstractPackager
@@ -52,7 +52,7 @@ public class Importer extends AbstractPackager
      * Note: I would have liked to call this method "import" but it's a reserved keyword... Strange that it's not
      * allowed for method names though.
      * </p>
-     * 
+     *
      * @param sourceDirectory the directory where the package.xml file is located and where the documents to import are
      *            located
      * @param databaseName some database name (TODO: find out what this name is really)
@@ -73,7 +73,7 @@ public class Importer extends AbstractPackager
      * Note: I would have liked to call this method "import" but it's a reserved keyword... Strange that it's not
      * allowed for method names though.
      * </p>
-     * 
+     *
      * @param sourceDirectory the directory where the package.xml file is located and where the documents to import are
      *            located
      * @param databaseName some database name (TODO: find out what this name is really)
@@ -117,10 +117,11 @@ public class Importer extends AbstractPackager
      * @param importUser optionally the user under which to perform the import (useful for example when importing pages
      *            that need to have Programming Rights and the page author is not the same as the importing user)
      * @param context the XWiki context
+     * @return the number of imported documents
      * @throws XWikiException failed to import the XAR file
      * @throws IOException failed to parse the XAR file
      */
-    public void importXAR(File file, String importUser, XWikiContext context) throws XWikiException, IOException
+    public int importXAR(File file, String importUser, XWikiContext context) throws XWikiException, IOException
     {
         Package pack = new Package();
         pack.setWithVersions(false);
@@ -134,12 +135,16 @@ public class Importer extends AbstractPackager
         }
 
         // Import into the database
-        installWithUser(importUser, pack, context);
+        if (!pack.getFiles().isEmpty()) {
+            installWithUser(importUser, pack, context);
+        }
+
+        return pack.getFiles().size();
     }
 
     /**
      * Install a Package as a backup pack or with the passed user (if any).
-     * 
+     *
      * @param importUser the user to import with or null if it should be imported as a backup pack
      * @param pack the Package instance performing the import
      * @param context the XWiki Context
@@ -169,7 +174,7 @@ public class Importer extends AbstractPackager
 
     /**
      * Shutdowns HSQLDB.
-     * 
+     *
      * @param context the XWiki Context object from which we can retrieve the Store implementation
      * @throws XWikiException in case of shutdown error
      */

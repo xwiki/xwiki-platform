@@ -20,12 +20,27 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.filter.FilterException;
+import org.xwiki.filter.input.InputFilterStream;
+import org.xwiki.filter.input.InputFilterStreamFactory;
+import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
+import org.xwiki.filter.output.BeanOutputFilterStreamFactory;
+import org.xwiki.filter.output.DefaultOutputStreamOutputTarget;
+import org.xwiki.filter.output.OutputFilterStream;
+import org.xwiki.filter.output.OutputFilterStreamFactory;
+import org.xwiki.filter.type.FilterStreamType;
+import org.xwiki.filter.xar.output.XAROutputProperties;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSet;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -106,7 +121,7 @@ public class ExportAction extends XWikiAction
                     wikiName = pattern.substring(0, index);
                     pattern = pattern.substring(index + 1);
                 } else {
-                    wikiName = context.getDatabase();
+                    wikiName = context.getWikiId();
                 }
 
                 StringBuffer where;
@@ -131,7 +146,7 @@ public class ExportAction extends XWikiAction
                 params.add(pattern);
             }
 
-            String database = context.getDatabase();
+            String database = context.getWikiId();
             try {
                 for (Map.Entry<String, Object[]> entry : wikiQueries.entrySet()) {
                     String wikiName = entry.getKey();
@@ -140,7 +155,7 @@ public class ExportAction extends XWikiAction
                     @SuppressWarnings("unchecked")
                     List<String> params = (List<String>) query[1];
 
-                    context.setDatabase(wikiName);
+                    context.setWikiId(wikiName);
                     List<String> docsNames = context.getWiki().getStore().searchDocumentsNames(where, params, context);
                     for (String docName : docsNames) {
                         String pageReference = wikiName + XWikiDocument.DB_SPACE_SEP + docName;
@@ -151,7 +166,7 @@ public class ExportAction extends XWikiAction
                     }
                 }
             } finally {
-                context.setDatabase(database);
+                context.setWikiId(database);
             }
         }
 
@@ -210,19 +225,19 @@ public class ExportAction extends XWikiAction
         return null;
     }
 
-    private String exportXAR(XWikiContext context) throws XWikiException, IOException
+    private String exportXAR(XWikiContext context) throws XWikiException, IOException, FilterException
     {
         XWikiRequest request = context.getRequest();
 
-        String history = request.get("history");
-        String backup = request.get("backup");
+        boolean history = Boolean.valueOf(request.get("history"));
+        boolean backup = Boolean.valueOf(request.get("backup"));
         String author = request.get("author");
         String description = request.get("description");
         String licence = request.get("licence");
         String version = request.get("version");
         String name = request.get("name");
         String[] pages = request.getParameterValues("pages");
-        boolean isBackup = ((pages == null) || (pages.length == 0));
+        boolean all = ArrayUtils.isEmpty(pages);
 
         if (!context.getWiki().getRightService().hasWikiAdminRights(context)) {
             context.put("message", "needadminrights");
@@ -233,65 +248,130 @@ public class ExportAction extends XWikiAction
             return "export";
         }
 
-        PackageAPI export = ((PackageAPI) context.getWiki().getPluginApi("package", context));
-        if (export == null) {
-            // No Packaging plugin configured
-            return "exception";
-        }
-
-        if ("true".equals(history)) {
-            export.setWithVersions(true);
-        } else {
-            export.setWithVersions(false);
-        }
-
-        if (author != null) {
-            export.setAuthorName(author);
-        }
-
-        if (description != null) {
-            export.setDescription(description);
-        }
-
-        if (licence != null) {
-            export.setLicence(licence);
-        }
-
-        if (version != null) {
-            export.setVersion(version);
-        }
-
-        if (name.trim().equals("")) {
-            if (isBackup) {
+        if (StringUtils.isBlank(name)) {
+            if (all) {
                 name = "backup";
             } else {
                 name = "export";
             }
         }
 
-        if ("true".equals(backup)) {
-            export.setBackupPack(true);
-        }
+        if (context.getWiki().ParamAsLong("xwiki.action.export.xar.usefilter", 1) == 1) {
+            // Create input wiki stream
+            DocumentInstanceInputProperties inputProperties = new DocumentInstanceInputProperties();
 
-        export.setName(name);
+            inputProperties.setWithJRCSRevisions(history);
+            inputProperties.setWithRevisions(false);
 
-        if (isBackup) {
-            export.backupWiki();
-        } else {
-            if (pages != null) {
-                for (int i = 0; i < pages.length; i++) {
-                    String pageName = pages[i];
-                    String defaultAction = request.get("action_" + pageName);
-                    int iAction;
-                    try {
-                        iAction = Integer.parseInt(defaultAction);
-                    } catch (Exception e) {
-                        iAction = 0;
+            EntityReferenceSet entities = new EntityReferenceSet();
+
+            if (all) {
+                entities.includes(new WikiReference(context.getWikiId()));
+            } else {
+                if (pages != null) {
+                    DocumentReferenceResolver<String> resolver =
+                        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+                    for (String pageName : pages) {
+                        entities.includes(resolver.resolve(pageName));
                     }
-                    export.add(pageName, iAction);
                 }
             }
-            export.export();
+
+            inputProperties.setEntities(entities);
+
+            InputFilterStreamFactory inputFilterStreamFactory =
+                Utils.getComponent(InputFilterStreamFactory.class, FilterStreamType.XWIKI_INSTANCE.serialize());
+
+            InputFilterStream inputFilterStream = inputFilterStreamFactory.createInputFilterStream(inputProperties);
+
+            // Create output wiki stream
+            XAROutputProperties xarProperties = new XAROutputProperties();
+
+            XWikiResponse response = context.getResponse();
+
+            xarProperties.setTarget(new DefaultOutputStreamOutputTarget(response.getOutputStream()));
+            xarProperties.setPackageName(name);
+            if (description != null) {
+                xarProperties.setPackageDescription(description);
+            }
+            if (licence != null) {
+                xarProperties.setPackageLicense(licence);
+            }
+            if (author != null) {
+                xarProperties.setPackageAuthor(author);
+            }
+            if (version != null) {
+                xarProperties.setPackageVersion(version);
+            }
+            xarProperties.setPackageBackupPack(backup);
+            xarProperties.setPreserveVersion(backup || history);
+
+            BeanOutputFilterStreamFactory<XAROutputProperties> xarFilterStreamFactory =
+                Utils.getComponent((Type) OutputFilterStreamFactory.class, FilterStreamType.XWIKI_XAR_11.serialize());
+
+            OutputFilterStream outputFilterStream = xarFilterStreamFactory.createOutputFilterStream(xarProperties);
+
+            // Export
+            response.setContentType("application/zip");
+            response.addHeader("Content-disposition", "attachment; filename=" + Util.encodeURI(name, context) + ".xar");
+
+            inputFilterStream.read(outputFilterStream.getFilter());
+
+            inputFilterStream.close();
+            outputFilterStream.close();
+
+            // Flush
+            response.getOutputStream().flush();
+
+            // Indicate that we are done with the response so no need to add anything
+            context.setFinished(true);
+        } else {
+            PackageAPI export = ((PackageAPI) context.getWiki().getPluginApi("package", context));
+            if (export == null) {
+                // No Packaging plugin configured
+                return "exception";
+            }
+
+            export.setWithVersions(history);
+
+            if (author != null) {
+                export.setAuthorName(author);
+            }
+
+            if (description != null) {
+                export.setDescription(description);
+            }
+
+            if (licence != null) {
+                export.setLicence(licence);
+            }
+
+            if (version != null) {
+                export.setVersion(version);
+            }
+
+            export.setBackupPack(backup);
+
+            export.setName(name);
+
+            if (all) {
+                export.backupWiki();
+            } else {
+                if (pages != null) {
+                    for (int i = 0; i < pages.length; i++) {
+                        String pageName = pages[i];
+                        String defaultAction = request.get("action_" + pageName);
+                        int iAction;
+                        try {
+                            iAction = Integer.parseInt(defaultAction);
+                        } catch (Exception e) {
+                            iAction = 0;
+                        }
+                        export.add(pageName, iAction);
+                    }
+                }
+                export.export();
+            }
         }
 
         return null;

@@ -19,11 +19,11 @@
  */
 package org.xwiki.panels.test.ui;
 
-import org.junit.Test;
+import org.junit.*;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
-
-import org.junit.Assert;
+import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 
 /**
  * Tests related to the Panel Wizard.
@@ -31,8 +31,11 @@ import org.junit.Assert;
  * @version $Id$
  * @since 5.0M2
  */
-public class PanelWizardTest extends AbstractAdminAuthenticatedTest
+public class PanelWizardTest extends AbstractTest
 {
+    @Rule
+    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil(), getDriver());
+
     @Test
     public void verifyPanelWizardPresentInAdministration()
     {

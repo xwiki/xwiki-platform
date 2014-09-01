@@ -68,9 +68,7 @@ public class IncludeMacroParameters
     private String section;
 
     /**
-     * Note: should be mandatory but would break retro compatibility for older macro using {@link #setDocument(String)}.
-     * 
-     * @param reference the reference to display
+     * @param reference the reference of the resource to include
      * @since 3.4M1
      */
     @PropertyDescription("the reference of the resource to display")
@@ -80,7 +78,7 @@ public class IncludeMacroParameters
     }
 
     /**
-     * @return the reference of the resource to display
+     * @return the reference of the resource to include
      * @since 3.4M1
      */
     public String getReference()
@@ -105,27 +103,6 @@ public class IncludeMacroParameters
     public void setType(EntityType type)
     {
         this.type = type;
-    }
-
-    /**
-     * @param document the name of the document to include.
-     * @deprecated since 3.4M1 use {@link #setReference(String)} instead
-     */
-    @PropertyDescription("the name of the document to include")
-    @Deprecated
-    public void setDocument(String document)
-    {
-        this.reference = document;
-    }
-
-    /**
-     * @return the name of the document to include.
-     * @deprecated since 3.4M1 use {@link #getReference()} instead
-     */
-    @Deprecated
-    public String getDocument()
-    {
-        return this.reference;
     }
 
     /**

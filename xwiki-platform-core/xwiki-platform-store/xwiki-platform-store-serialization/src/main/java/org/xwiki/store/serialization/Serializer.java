@@ -32,6 +32,8 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 3.0M2
  */
+// Note: We cannot replace @ComponentRole with @Role ATM since @Role supports generics and we have
+// Serializer<R, P extends R>. Changing it will thus break all code looking up components implementing this role.
 @ComponentRole
 public interface Serializer<R, P extends R>
 {

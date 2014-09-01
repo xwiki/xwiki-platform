@@ -51,7 +51,7 @@ public class ReleaseTest extends AbstractTest
     {
         // Create a user and log in with it so that we test the application with a standard user
         // Note that using the superadmin user would also fail since the uservatar macro doesn't work with it.
-        getUtil().createUser(getTestClassName() + "User", "password");
+        getUtil().createUserAndLogin(getTestClassName() + "User", "password");
 
         // Delete pages that we create in the test (we have to be logged in).
         getUtil().deletePage("Release", RELEASE_PAGE_NAME);

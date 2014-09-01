@@ -107,7 +107,7 @@ public class SolrIndexEventListener implements EventListener
             if (event instanceof DocumentUpdatedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
 
-                this.solrIndexer.get().index(document.getDocumentReference(), false);
+                this.solrIndexer.get().index(document.getDocumentReferenceWithLocale(), false);
             } else if (event instanceof DocumentCreatedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
 
@@ -117,14 +117,22 @@ public class SolrIndexEventListener implements EventListener
                     // anyway)
                     this.solrIndexer.get().index(new DocumentReference(document.getDocumentReference(), null), true);
                 } else {
-                    this.solrIndexer.get().index(
-                        new DocumentReference(document.getDocumentReference(), document.getLocale()), false);
+                    this.solrIndexer.get().index(document.getDocumentReferenceWithLocale(), false);
                 }
             } else if (event instanceof DocumentDeletedEvent) {
                 XWikiDocument document = ((XWikiDocument) source).getOriginalDocument();
 
+                // We must pass the document reference with the REAL locale because when the indexer is going to delete
+                // the document from the Solr index (later, on a different thread) the real locale won't be accessible
+                // anymore since the XWiki document has been already deleted from the database. The real locale (taken
+                // from the XWiki document) is used to compute the id of the Solr document when the document reference
+                // locale is ROOT (i.e. for default document translations).
+                // Otherwise the document won't be deleted from the Solr index (because the computed id won't match any
+                // document from the Solr index) and we're going to have deleted documents that are still in the Solr
+                // index. These documents will be filtered from the search results but not from the facet counts.
+                // See XWIKI-10003: Cache problem with Solr facet filter results count
                 this.solrIndexer.get().delete(
-                    new DocumentReference(document.getDocumentReference(), document.getLocale()), false);
+                    new DocumentReference(document.getDocumentReference(), document.getRealLocale()), false);
             } else if (event instanceof AttachmentUpdatedEvent || event instanceof AttachmentAddedEvent) {
                 XWikiDocument document = (XWikiDocument) source;
                 String fileName = ((AbstractAttachmentEvent) event).getName();

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxTextFormatting</name>
+  <language>it</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497998000</date>
+  <contentUpdateDate>1301497998000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxTextFormatting</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Formattazione Testo ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Text Formatting ===
+
+|=Caratteristica|=Sintassi XWiki 1.0|=Risultato
+|Grassetto|{{{*Grassetto*}}}|**Grassetto**
+|Sottolineato|{{{__Sottolineato___}}}|__Sottolineato__
+|Corsivo|{{{~~Corsivo~~}}}|//Corsivo//
+|Sbarrato|{{{--Sbarrato--}}}|--Sbarrato--
+|Monospazio|&lt;tt&gt;Monospazio&lt;/tt&gt;|##Monospazio##
+|Apice|testo &lt;sup&gt;in apice&lt;/sup&gt;|testo ^^in apice^^
+|Pedice|testo &lt;sub&gt;in pedice&lt;/sub&gt;|testo ,,in pedice,,
+
+
+=== 2.0 Text Formatting ===
+
+{{info}}
+Novità della Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}} rispetto alla Sintassi XWiki 1.0:
+* Sono consentiti degli spazi subito dopo il simbolo sintattico (per esempio in Sintassi XWiki 1.0, questo non era possibile: * grassetto *).
+* Uso di doppi simboli quando nella Sintassi XWiki 1.0 ce n'era solo uno cosicché è meno probabile che l'utente li usi erroneamente nel testo.
+* Possibilità di dividere il testo su più righe (non era possibile con la Sintassi XWiki 1.0).
+{{/info}}
+
+|=Caratteristica|=Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Risultato
+|Grassetto|{{{**Grassetto**}}}|**Grassetto**
+|Sottolineato|{{{__Sottolineato__}}}|__Sottolineato__
+|Corsivo|{{{//Corsivo//}}}|//Corsivo//
+|Sbarrato|{{{--Sbarrato--}}}|--Sbarrato--
+|Monospazio|{{{##Monospazio##}}}|##Monospazio##
+|Apice|{{{testo ^^in apice^^}}}|testo ^^in apice^^
+|Pedice|{{{testo ,,in pedice,,}}}|testo ,,in pedice,,</content>
+</xwikidoc>

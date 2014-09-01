@@ -26,28 +26,20 @@
    http://wiki.apache.org/solr/CoreAdmin
 -->
 
-<!--
- All (relative) paths are relative to the Solr Home Directory
-
-  persistent: Save changes made via the API to this file
-  sharedLib: path to a lib directory that will be shared across all cores
--->
-<solr persistent="false">
-  <!-- by default, this is 50 @ WARN
-  <logging enabled="true">
-        <watcher size="100" threshold="INFO" />
-  </logging>
-  -->
-
+<solr>
   <!--
-  adminPath: RequestHandler path to manage cores.
-    If 'null' (or absent), cores will not be manageable via request handler
-  defaultCoreName: (optional) core to use when no core name is specified in an access url
+  <solrcloud>
+    <str name="host">${host:}</str>
+    <int name="hostPort">${jetty.port:8983}</int>
+    <str name="hostContext">${hostContext:solr}</str>
+    <int name="zkClientTimeout">${zkClientTimeout:30000}</int>
+    <bool name="genericCoreNodeNames">${genericCoreNodeNames:true}</bool>
+  </solrcloud>
 
-  All of the attributes in cores after defaultCoreName only apply when running in SolrCloud mode.
-  You can read more about SolrCloud mode at http://wiki.apache.org/solr/SolrCloud
+  <shardHandlerFactory name="shardHandlerFactory"
+    class="HttpShardHandlerFactory">
+    <int name="socketTimeout">${socketTimeout:0}</int>
+    <int name="connTimeout">${connTimeout:0}</int>
+  </shardHandlerFactory>
   -->
-  <cores defaultCoreName="xwiki">
-    <core name="xwiki" instanceDir="." />
-  </cores>
 </solr>

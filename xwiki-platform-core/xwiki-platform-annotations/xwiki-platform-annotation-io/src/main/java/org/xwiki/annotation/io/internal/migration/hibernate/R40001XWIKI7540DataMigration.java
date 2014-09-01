@@ -129,17 +129,17 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
         try {
             EntityReference currentAnnotationClassReference = configuration.getAnnotationClassReference();
             currentAnnotationClassReference =
-                currentAnnotationClassReference.removeParent(new WikiReference(context.getDatabase()));
+                currentAnnotationClassReference.removeParent(new WikiReference(context.getWikiId()));
             if (!XWIKI_ANNOTATION_CLASS_REFERENCE.equals(currentAnnotationClassReference)) {
                 logger.warn("Skipping database [{}] because it uses a custom annotation class. "
-                    + resultOfSkippingDatabase, context.getDatabase());
+                    + resultOfSkippingDatabase, context.getWikiId());
                 return false;
             }
 
             BaseClass commentsClass = context.getWiki().getCommentsClass(context);
             if (commentsClass.hasCustomMapping()) {
                 logger.warn("Skipping database [{}] because it uses a custom mapping for comments. "
-                    + resultOfSkippingDatabase, context.getDatabase());
+                    + resultOfSkippingDatabase, context.getWikiId());
                 return false;
             }
         } catch (Exception e) {

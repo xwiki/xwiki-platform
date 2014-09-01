@@ -19,9 +19,12 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.velocity.VelocityContext;
+import org.xwiki.localization.LocaleUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -96,9 +99,10 @@ public class SaveAction extends PreviewAction
         }
 
         if (doc.isNew()) {
-            doc.setLanguage("");
-            if ((doc.getDefaultLanguage() == null) || (doc.getDefaultLanguage().equals(""))) {
-                doc.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
+            doc.setLocale(Locale.ROOT);
+            if (doc.getDefaultLocale() == Locale.ROOT) {
+                doc.setDefaultLocale(LocaleUtils
+                    .toLocale(context.getWiki().getLanguagePreference(context), Locale.ROOT));
             }
         }
 

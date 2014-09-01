@@ -19,16 +19,23 @@
  */
 package org.xwiki.bridge.event;
 
-import org.xwiki.observation.event.EndEvent;
+import org.xwiki.observation.event.EndFoldEvent;
 import org.xwiki.observation.event.filter.EventFilter;
 
 /**
  * An event triggered after a wiki has been created.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the wiki identifier as {@link String}</li>
+ * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
+ * </ul>
  * 
  * @version $Id$
  * @since 3.0M1
  */
-public class WikiCreatedEvent extends AbstractWikiEvent implements EndEvent
+public class WikiCreatedEvent extends AbstractWikiEvent implements EndFoldEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class

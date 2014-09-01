@@ -111,7 +111,7 @@ public class HistoryPane extends BaseElement
         makeConfirmDialogSilent(true);
 
         pane.findElement(
-            By.xpath(".//table[@class='xwikidatatable']//tr[contains(., '" + version
+            By.xpath(".//table//tr[contains(., '" + version
                 + "')]//td[@class='xwikibuttonlink']/a[contains(.,'Rollback')]")).click();
 
         // A new page is loaded after the dialog is accepted, thus we need to wait that it's loaded before returning
@@ -127,7 +127,7 @@ public class HistoryPane extends BaseElement
         makeConfirmDialogSilent(true);
 
         pane.findElement(
-            By.xpath(".//table[@class='xwikidatatable']//tr[contains(., '" + version
+            By.xpath(".//table//tr[contains(., '" + version
                 + "')]//td[@class='xwikibuttonlink']/a[contains(.,'Delete')]")).click();
 
         return new HistoryPane();

@@ -1,6 +1,17 @@
-var XWiki = (function(XWiki) {
+var XWiki = (function defineUserPicker(XWiki) {
+
 // Start XWiki augmentation.
-var widgets = XWiki.widgets = XWiki.widgets || {};
+var widgets = XWiki.widgets;
+// TODO: Use require.js here when we move away from Prototype.js
+if (!widgets || !widgets.SuggestPicker) {
+  var tryCount = arguments[1] || 0;
+  if (tryCount > 5) {
+    console.error('Failed to define the UserPicker module: required dependency SuggestPicker is missing.');
+  } else {
+    setTimeout(defineUserPicker.bind(window, XWiki, tryCount + 1), 0);
+  }
+  return XWiki;
+}
 
 /**
  * Extends the SuggestPicker to customize the way the selected users are displayed.

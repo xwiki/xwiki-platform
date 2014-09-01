@@ -66,7 +66,7 @@ public class MetaClass extends BaseClass
     {
         try {
             List<PropertyClassProvider> providers =
-                Utils.getComponentManager().getInstanceList(PropertyClassProvider.class);
+                Utils.getContextComponentManager().getInstanceList(PropertyClassProvider.class);
             for (PropertyClassProvider provider : providers) {
                 PropertyInterface property = provider.getDefinition();
                 safeput(property.getName(), property);

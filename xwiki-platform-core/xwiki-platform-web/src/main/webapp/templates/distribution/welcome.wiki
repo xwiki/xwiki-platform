@@ -1,4 +1,4 @@
-##syntax=xwiki/2.1
+##source.syntax=xwiki/2.1
 {{velocity}}
 #if ("$!request.action" == '')
   ## Display the step.

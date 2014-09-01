@@ -20,17 +20,23 @@
 package com.xpn.xwiki.internal.event;
 
 import org.xwiki.observation.event.AbstractFilterableEvent;
-import org.xwiki.observation.event.BeginEvent;
+import org.xwiki.observation.event.BeginFoldEvent;
 
 /**
  * Event to notify of the starting import of a XAR package.
  * <p>
- * TODO: this event should take the name of the imported xar as a parameter, and listeners should be able to match on
- * it. For the moment, I cannot figure out how to get the name of the imported xar from the Package plugin.
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: null (TODO: this event should take the name of the imported xar as a parameter, and listeners should be
+ * able to match on it. For the moment, I cannot figure out how to get the name of the imported xar from the Package
+ * plugin)</li>
+ * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
+ * </ul>
  * 
  * @version $Id$
  */
-public class XARImportingEvent extends AbstractFilterableEvent implements BeginEvent
+public class XARImportingEvent extends AbstractFilterableEvent implements BeginFoldEvent
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class

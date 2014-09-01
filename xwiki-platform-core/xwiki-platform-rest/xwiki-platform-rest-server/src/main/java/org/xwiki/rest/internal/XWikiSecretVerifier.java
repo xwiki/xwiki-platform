@@ -68,7 +68,8 @@ public class XWikiSecretVerifier extends SecretVerifier
         XWiki xwiki = Utils.getXWiki(this.componentManager);
 
         try {
-            Principal principal = xwiki.getAuthService().authenticate(identifier, new String(secret), xwikiContext);
+            Principal principal = (secret == null) ? null : xwiki.getAuthService().authenticate(identifier,
+                    new String(secret), xwikiContext);
             if (principal != null) {
                 String xwikiUser = principal.getName();
 

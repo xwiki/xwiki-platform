@@ -20,11 +20,14 @@
 package com.xpn.xwiki.api;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
@@ -33,6 +36,9 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 
 public class Attachment extends Api
 {
+    /** Logging helper object. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Attachment.class);
+
     private Document doc;
 
     private XWikiAttachment attachment;
@@ -140,6 +146,17 @@ public class Attachment extends Api
         } catch (IOException ex) {
             // This really shouldn't happen, but it's not nice to throw exceptions from scriptable APIs
             return new byte[0];
+        }
+    }
+
+    public InputStream getContentInputStream()
+    {
+        try {
+            return this.attachment.getContentInputStream(getXWikiContext());
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to get attachment input stream", e);
+
+            return null;
         }
     }
 

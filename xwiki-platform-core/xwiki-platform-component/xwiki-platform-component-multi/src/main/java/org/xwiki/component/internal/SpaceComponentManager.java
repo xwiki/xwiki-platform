@@ -28,6 +28,10 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 /**
  * Proxy Component Manager that creates and queries individual Component Managers specific to the current space in the
@@ -48,18 +52,24 @@ public class SpaceComponentManager extends AbstractEntityComponentManager implem
     public static final String ID = "space";
 
     /**
+     * Used to access the current entities.
+     */
+    @Inject
+    @Named("current")
+    private EntityReferenceValueProvider currentProvider;
+
+    /**
      * The Component Manager to be used as parent when a component is not found in the current Component Manager.
      */
     @Inject
     @Named(WikiComponentManager.ID)
     private ComponentManager wikiComponentManager;
 
-    /**
-     * Default constructor.
-     */
-    public SpaceComponentManager()
+    @Override
+    protected EntityReference getCurrentReference()
     {
-        super(EntityType.SPACE);
+        return new SpaceReference(this.currentProvider.getDefaultValue(EntityType.SPACE), new WikiReference(
+            this.currentProvider.getDefaultValue(EntityType.WIKI)));
     }
 
     @Override

@@ -27,8 +27,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.xwiki.bridge.event.DocumentCreatedEvent;
-import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.bridge.event.DocumentCreatingEvent;
+import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -44,8 +44,8 @@ public class ExtensionUpdaterListener implements EventListener
     /**
      * Listened events.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentCreatedEvent(),
-        new DocumentUpdatedEvent());
+    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentCreatingEvent(),
+        new DocumentUpdatingEvent());
 
     /**
      * The logger to log.
@@ -77,7 +77,7 @@ public class ExtensionUpdaterListener implements EventListener
 
         if (extensionObject != null) {
             try {
-                this.repositoryManagerProvider.get().validateExtension(document, true);
+                this.repositoryManagerProvider.get().validateExtension(document, false);
             } catch (XWikiException e) {
                 this.logger.error("Failed to validate extension in document [{}]", document.getDocumentReference(), e);
             }

@@ -27,20 +27,19 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.data.category.CategoryDataset;
-import org.xwiki.chart.model.ChartModel;
 import org.xwiki.chart.PlotGeneratorException;
+import org.xwiki.chart.model.ChartModel;
 
 /**
  * Generate Plots for Category data sets.
- *
+ * 
  * @version $Id$
  * @since 4.1M1
  */
 public abstract class AbstractCategoryPlotGenerator implements PlotGenerator
 {
     @Override
-    public Plot generate(ChartModel model, Map<String, String> parameters)
-        throws PlotGeneratorException
+    public Plot generate(ChartModel model, Map<String, String> parameters) throws PlotGeneratorException
     {
         CategoryDataset dataset;
         CategoryAxis domainAxis;
@@ -56,20 +55,21 @@ public abstract class AbstractCategoryPlotGenerator implements PlotGenerator
             domainAxis = (CategoryAxis) model.getAxis(0);
         } else {
             throw new PlotGeneratorException("Incompatible axis 0 for category plot.");
-        } 
+        }
 
         if (model.getAxis(1) instanceof ValueAxis) {
-            rangeAxis  = (ValueAxis) model.getAxis(1);
+            rangeAxis = (ValueAxis) model.getAxis(1);
         } else {
             throw new PlotGeneratorException("Incompatible axis 1 for category plot.");
         }
 
-        return new CategoryPlot(dataset, domainAxis, rangeAxis, getRenderer());
+        return new CategoryPlot(dataset, domainAxis, rangeAxis, getRenderer(parameters));
     }
 
     /**
+     * @param parameters used to configure the renderer
      * @return an {@link CategoryItemRenderer} to be used for plotting the chart.
      */
-    protected abstract CategoryItemRenderer getRenderer();
+    protected abstract CategoryItemRenderer getRenderer(Map<String, String> parameters);
 
 }

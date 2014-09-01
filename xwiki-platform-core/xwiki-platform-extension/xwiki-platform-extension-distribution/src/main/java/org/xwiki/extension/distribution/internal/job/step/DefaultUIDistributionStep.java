@@ -29,6 +29,12 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
+/**
+ * Install the default UI extension of the wiki.
+ * 
+ * @version $Id$
+ * @since 5.0RC1
+ */
 @Component
 @Named(DefaultUIDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)

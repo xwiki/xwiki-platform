@@ -28,6 +28,12 @@ import java.util.Properties;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+
+/**
+ * @deprecated since 6.1M2, use {@link XWikiCfgConfigurationSource} component instead
+ */
+@Deprecated
 public class XWikiConfig extends Properties
 {
     public XWikiConfig()

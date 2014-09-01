@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 
@@ -195,7 +196,7 @@ public class Document extends Api
     }
 
     /**
-     * return the name of a document. for exemple if the fullName of a document is "MySpace.Mydoc", the name is MyDoc.
+     * return the name of a document. for example if the fullName of a document is "MySpace.Mydoc", the name is MyDoc.
      * 
      * @return the name of the document
      */
@@ -224,19 +225,6 @@ public class Document extends Api
     public String getWiki()
     {
         return this.doc.getDocumentReference().getWikiReference().getName();
-    }
-
-    /**
-     * Get the name of the space of the document for exemple if the fullName of a document is "MySpace.Mydoc", the name
-     * is MySpace.
-     * 
-     * @return The name of the space of the document.
-     * @deprecated use {@link #getSpace()} instead of this function.
-     */
-    @Deprecated
-    public String getWeb()
-    {
-        return this.doc.getSpace();
     }
 
     /**
@@ -485,11 +473,26 @@ public class Document extends Api
      * Get the language of the document. If the document is a translation it returns the language set for it, otherwise,
      * it returns the default language in the wiki where the document is stored.
      * 
-     * @return The language of the document.
+     * @return the language of the document.
+     * @deprecated since 5.4M1 use {@link #getLocale()} instead
+     * @todo Add a @Deprecated annotation too but be prepared to fix all the resulting Velocity warnings that will
+     *       appear in the logs
      */
     public String getLanguage()
     {
         return this.doc.getLanguage();
+    }
+
+    /**
+     * Get the locale of the document. If the document is a translation it returns the locale set for it, otherwise,
+     * it returns the root locale.
+     *
+     * @return the locale of the document
+     * @since 5.4M1
+     */
+    public Locale getLocale()
+    {
+        return this.doc.getLocale();
     }
 
     /**
@@ -2573,15 +2576,6 @@ public class Document extends Api
     }
 
     /**
-     * @deprecated use {@link #rename(String)} instead
-     */
-    @Deprecated
-    public void renameDocument(String newDocumentName) throws XWikiException
-    {
-        rename(newDocumentName);
-    }
-
-    /**
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
      * which list the document we are renaming as their parent. See
      * {@link #rename(String, java.util.List, java.util.List)} for more details.
@@ -2610,15 +2604,6 @@ public class Document extends Api
             this.context.getWiki().getDocument(newReference, this.context), this.context)) {
             this.getDoc().rename(newReference, getXWikiContext());
         }
-    }
-
-    /**
-     * @deprecated use {@link #rename(String, java.util.List)} instead
-     */
-    @Deprecated
-    public void renameDocument(String newDocumentName, List<String> backlinkDocumentNames) throws XWikiException
-    {
-        rename(newDocumentName, backlinkDocumentNames);
     }
 
     /**
@@ -2837,5 +2822,16 @@ public class Document extends Api
         final ExecutionContext context = Utils.getComponent(Execution.class).getContext();
         context.setProperty(XWikiConstant.DROPPED_PERMISSIONS,
                             System.identityHashCode(context));
+    }
+
+    /**
+     * @return true if this document is a translation of the main document (i.e. returned by
+     *         {@link #getTranslatedDocument(String)}); false if this is actually the main document (i.e. returned by
+     *         {@link com.xpn.xwiki.api.XWiki#getDocument(DocumentReference)}.
+     * @since 6.2M2
+     */
+    public boolean isTranslation()
+    {
+        return 1 == this.getDoc().getTranslation();
     }
 }

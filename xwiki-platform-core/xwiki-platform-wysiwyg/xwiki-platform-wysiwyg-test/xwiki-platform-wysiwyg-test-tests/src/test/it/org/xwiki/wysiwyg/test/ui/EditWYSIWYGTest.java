@@ -268,4 +268,31 @@ public class EditWYSIWYGTest extends AbstractWYSIWYGEditorTest
 
         Assert.assertEquals("foo.\nbar", textArea.getText());
     }
+
+    /**
+     * @see "XWIKI-3039: Changes are lost if an exception is thrown during saving"
+     * @see "XWIKI-9750: User Input in WYSIWYG Editor is lost after conversion error"
+     */
+    @Test
+    public void testRecoverAfterConversionException()
+    {
+        EditorElement editor = this.editPage.getContentEditor();
+
+        // We removed the startwikilink comment to force a parsing failure.
+        String html = "<span class=\"wikiexternallink\"><a href=\"mailto:x@y.z\">xyz</a></span><!--stopwikilink-->";
+        editor.getRichTextArea().setContent(html);
+
+        // Test to see if the HTML was accepted by the rich text area.
+        Assert.assertEquals("xyz", editor.getRichTextArea().getText());
+
+        // Save & Continue should notify us about the conversion error.
+        this.editPage.clickSaveAndContinue(false);
+        this.editPage.waitForNotificationErrorMessage("Failed to save the document. "
+            + "Reason: content: Exception while parsing HTML");
+
+        // Save & View should redirect us back to the edit mode, but the unsaved changes shouldn't be lost.
+        this.editPage.clickSaveAndView();
+        this.editPage = new WYSIWYGEditPage().waitUntilPageIsLoaded();
+        Assert.assertEquals("xyz", this.editPage.getContentEditor().getRichTextArea().getText());
+    }
 }

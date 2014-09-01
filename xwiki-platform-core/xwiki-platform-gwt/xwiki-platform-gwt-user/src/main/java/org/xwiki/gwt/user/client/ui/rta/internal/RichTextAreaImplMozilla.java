@@ -65,7 +65,7 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
 
         var outer = this;
         iframe.contentWindow.addEventListener('unload', function(event) {
-            event.target.defaultView.removeEventListener('unload', arguments.callee, false);
+            event.target.defaultView && event.target.defaultView.removeEventListener('unload', arguments.callee, false);
             iframe[@org.xwiki.gwt.user.client.ui.rta.RichTextArea::LOADED] = false;
             // Uninitialize the iframe element only if the event listeners are still attached.
             if (iframe.__gwt_handler) {

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,7 +18,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -27,13 +25,25 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>6.2-SNAPSHOT</version>
+    <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
+         Jenkins and you have the following directory structure:
+             workspace/xwiki-commons
+             workspace/xwiki-platform_Quality_Checks
+         When the "xwiki-platform_Quality_Checks" module is built you definitely don't want its pom.xml to point to
+         workspace/xwiki-commons since that job may not have been built for some time (and thus it might not be up to
+         date with the latest code from the SCM, thus causing build failures that are hard to track.
+
+         By using an empty value we force Maven to resolve the parent from the Maven repositories,
+         see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent
+    -->
+    <relativePath></relativePath>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>5.2-SNAPSHOT</version>
+  <version>6.2-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -41,9 +51,7 @@
     <!-- Versions of XWiki dependencies used in Platform modules -->
     <rendering.version>${platform.version}</rendering.version>
     <!-- Version of HSQLDB that we use in Platform when import XARs for creating functional test environments -->
-    <hsqldb.version>2.2.9</hsqldb.version>
-    <!-- Version of SmartGWT that we use in platform for the XWiki Explorer Tree. -->
-    <smartgwt.version>3.1</smartgwt.version>
+    <hsqldb.version>2.3.1</hsqldb.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -68,15 +76,15 @@
       </plugin>
       <!-- Check license headers -->
       <plugin>
-        <groupId>com.mycila.maven-license-plugin</groupId>
-        <artifactId>maven-license-plugin</artifactId>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
         <configuration>
           <includes>
-            <!-- At the moment, only check the license headers in Java file since we need to fix other types of files
-                 first -->
+            <!-- At the moment, only check the following list of files for license headers -->
             <include>**/*.java</include>
             <include>**/*.bat</include>
             <include>**/*.sh</include>
+            <include>**/ApplicationResources.properties</include>
           </includes>
         </configuration>
       </plugin>
@@ -84,13 +92,13 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
-          <!-- Verify that all org.xwiki.commons dependencies in Commons have a version specified either as:
+          <!-- Verify that all org.xwiki.commons dependencies have a version specified either as:
                - ${commons.version}
                - a value not starting with $ (we want to allow supporting ranges)
-               Also verifies that all org.xwiki.rendering dependencies in Commons have a version specified either as:
+               Also verifies that all org.xwiki.rendering dependencies have a version specified either as:
                - ${rendering.version}
                - a value not starting with $ (we want to allow supporting ranges)
-               Also verifies that all org.xwiki.platform dependencies in Commons have a version specified either as:
+               Also verifies that all org.xwiki.platform dependencies have a version specified either as:
                - ${project.version}
                - a value not starting with $ (we want to allow supporting ranges)
           -->
@@ -119,6 +127,16 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+            <include>**/*IntegrationTests.java</include>
+          </includes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

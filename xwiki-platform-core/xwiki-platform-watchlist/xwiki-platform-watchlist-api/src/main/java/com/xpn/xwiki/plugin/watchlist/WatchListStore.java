@@ -20,7 +20,6 @@
 package com.xpn.xwiki.plugin.watchlist;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -418,12 +417,61 @@ public class WatchListStore implements EventListener
     {
         BaseObject watchListObject = getWatchListObject(user, context);
         String watchedItems = watchListObject.getLargeStringValue(getWatchListClassPropertyForType(type)).trim();
-        List<String> elements = new ArrayList<String>();
+        return unescapeList(watchedItems);
+    }
+
+    /**
+     * @param watchedItems the items to watch as a String with entries separated by the WATCHLIST_ELEMENT_SEP separator
+     * @return the items as a List (handles escapes so that items can contain the WATCHLIST_ELEMENT_SEP char)
+     * @todo Move this code to a central location so that other modules can reuse this too
+     */
+    private List<String> unescapeList(String watchedItems)
+    {
         if (StringUtils.isBlank(watchedItems)) {
-            return elements;
+            return Collections.EMPTY_LIST;
         }
-        elements.addAll(Arrays.asList(StringUtils.split(watchedItems, WATCHLIST_ELEMENT_SEP)));
+
+        List<String> elements = new ArrayList<String>();
+        StringBuilder currentElement = new StringBuilder();
+        int previousPos = 0;
+        int newPos;
+        while ((newPos = StringUtils.indexOf(watchedItems, WATCHLIST_ELEMENT_SEP, previousPos)) > -1) {
+            if (newPos > 0 && watchedItems.charAt(newPos - 1) != '\\') {
+                currentElement.append(watchedItems.substring(previousPos, newPos));
+                elements.add(currentElement.toString());
+                currentElement.setLength(0);
+            } else if (newPos > previousPos) {
+                currentElement.append(watchedItems.substring(previousPos, newPos - 1)).append(WATCHLIST_ELEMENT_SEP);
+            }
+            previousPos = newPos + 1;
+        }
+        currentElement.append(watchedItems.substring(previousPos));
+        elements.add(currentElement.toString());
         return elements;
+    }
+    
+    /**
+     * the inverse to {@link #unescapeList(String)}.
+     * @param watchedItems the list of watched items, each unescaped
+     * @return a string comma separated, escaped items 
+     */
+    private String escapeList(List<String> watchedItems)
+    {
+        if (watchedItems == null || watchedItems.isEmpty()) {
+            return StringUtils.EMPTY;
+        }
+        StringBuilder currentElement = new StringBuilder();
+        boolean empty = true;
+        for (String item : watchedItems) {
+            if (!empty) {
+                currentElement.append(WATCHLIST_ELEMENT_SEP);
+            }
+            // Escape the element to watch in case it contains the WATCHLIST_ELEMENT_SEP separator
+            String escapedItem = item.replaceAll(WATCHLIST_ELEMENT_SEP, "\\\\" + WATCHLIST_ELEMENT_SEP);
+            currentElement.append(escapedItem);
+            empty = false;
+        }
+        return currentElement.toString();
     }
 
     /**
@@ -465,11 +513,11 @@ public class WatchListStore implements EventListener
     /**
      * Add the specified element (document or space) to the corresponding list in the user's WatchList.
      * 
-     * @param user XWikiUser
-     * @param newWatchedElement The name of the element to add (document of space)
+     * @param user the reference to the user
+     * @param newWatchedElement The name of the element to add (document, space, wiki, user)
      * @param type type of the element to remove
      * @param context Context of the request
-     * @return True if the element was'nt already in list
+     * @return true if the element wasn't already in watched list or false otherwise
      * @throws XWikiException if the modification hasn't been saved
      */
     public boolean addWatchedElement(String user, String newWatchedElement, ElementType type, XWikiContext context)
@@ -478,14 +526,16 @@ public class WatchListStore implements EventListener
         String elementToWatch = newWatchedElement;
 
         if (!ElementType.WIKI.equals(type) && !newWatchedElement.contains(WIKI_SPACE_SEP)) {
-            elementToWatch = context.getDatabase() + WIKI_SPACE_SEP + newWatchedElement;
+            elementToWatch = context.getWikiId() + WIKI_SPACE_SEP + newWatchedElement;
         }
 
         if (isWatched(elementToWatch, user, type, context)) {
             return false;
         }
 
-        List<String> watchedElements = getWatchedElements(user, type, context);
+        // Copy the list of watched elements because it could be unmodifiable.
+        List<String> watchedElements = new ArrayList<String>(getWatchedElements(user, type, context));
+
         watchedElements.add(elementToWatch);
 
         setWatchListElementsProperty(user, type, watchedElements, context);
@@ -500,7 +550,7 @@ public class WatchListStore implements EventListener
      * @param type type of the element to remove
      * @param context Context of the request
      * @return True if the element was in list and has been removed, false if the element was'nt in the list
-     * @throws XWikiException If the WatchList Object cannot be retreived or if the user's profile cannot be saved
+     * @throws XWikiException If the WatchList Object cannot be retrieved or if the user's profile cannot be saved
      */
     public boolean removeWatchedElement(String user, String watchedElement, ElementType type, XWikiContext context)
         throws XWikiException
@@ -508,7 +558,7 @@ public class WatchListStore implements EventListener
         String elementToRemove = watchedElement;
 
         if (!ElementType.WIKI.equals(type) && !watchedElement.contains(WIKI_SPACE_SEP)) {
-            elementToRemove = context.getDatabase() + WIKI_SPACE_SEP + watchedElement;
+            elementToRemove = context.getWikiId() + WIKI_SPACE_SEP + watchedElement;
         }
 
         if (!this.isWatched(elementToRemove, user, type, context)) {
@@ -578,7 +628,7 @@ public class WatchListStore implements EventListener
     {
         XWikiDocument userDocument = context.getWiki().getDocument(user, context);
         userDocument.setLargeStringValue(WATCHLIST_CLASS, getWatchListClassPropertyForType(type),
-            StringUtils.join(elements, WATCHLIST_ELEMENT_SEP));
+            escapeList(elements));
         userDocument.isMinorEdit();
         context.getWiki().saveDocument(userDocument, context.getMessageTool().get("watchlist.save.object"), true,
             context);
@@ -606,12 +656,12 @@ public class WatchListStore implements EventListener
             LOGGER.error("error getting list of wiki servers", e);
         }
 
-        String oriDatabase = context.getDatabase();
+        String oriDatabase = context.getWikiId();
 
         try {
             for (String wiki : wikiServers) {
                 String wikiPrefix = wiki + WIKI_SPACE_SEP;
-                context.setDatabase(wiki);
+                context.setWikiId(wiki);
                 try {
                     List<String> upDocsInWiki =
                         context.getWiki().getStore().searchDocumentsNames(request, 0, 0, values, context);
@@ -624,7 +674,7 @@ public class WatchListStore implements EventListener
                 }
             }
         } finally {
-            context.setDatabase(oriDatabase);
+            context.setWikiId(oriDatabase);
         }
 
         return results;
@@ -678,7 +728,7 @@ public class WatchListStore implements EventListener
      */
     private void watchListObjectsEventHandler(XWikiDocument originalDoc, XWikiDocument currentDoc, XWikiContext context)
     {
-        String wiki = context.getDatabase();
+        String wiki = context.getWikiId();
         BaseObject originalWatchListObj = originalDoc.getObject(WATCHLIST_CLASS);
         BaseObject currentWatchListObj = currentDoc.getObject(WATCHLIST_CLASS);
 

@@ -38,7 +38,7 @@ import org.xwiki.model.EntityType;
  * @version $Id$
  * @since 3.2M1
  */
-public class RegexEntityReference extends EntityReference
+public class RegexEntityReference extends PartialEntityReference
 {
     /**
      * 
@@ -77,41 +77,8 @@ public class RegexEntityReference extends EntityReference
     }
 
     @Override
-    public int hashCode()
+    protected boolean isNameEqual(String name)
     {
-        return super.hashCode();
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This equals method actually matches provided reference using patterns.
-     * 
-     * @see org.xwiki.model.reference.EntityReference#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (obj == this) {
-            return true;
-        }
-
-        if (!(obj instanceof EntityReference)) {
-            return false;
-        }
-
-        EntityReference reference = (EntityReference) obj;
-
-        for (EntityReference entity = reference; entity != null; entity = entity.getParent()) {
-            if (getType().equals(entity.getType())) {
-                if (this.pattern != null && !this.pattern.matcher(entity.getName()).matches()) {
-                    return false;
-                } else {
-                    return getParent() != null ? getParent().equals(entity.getParent()) : true;
-                }
-            }
-        }
-
-        return true;
+        return this.pattern == null || this.pattern.matcher(name).matches();
     }
 }

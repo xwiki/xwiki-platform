@@ -23,6 +23,23 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.hibernate.Session;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.store.FileDeleteTransactionRunnable;
+import org.xwiki.store.FileSaveTransactionRunnable;
+import org.xwiki.store.StreamProvider;
+import org.xwiki.store.TransactionRunnable;
+import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
+import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
+import org.xwiki.store.legacy.doc.internal.ListAttachmentArchive;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
@@ -30,20 +47,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import org.hibernate.Session;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.store.FileDeleteTransactionRunnable;
-import org.xwiki.store.FileSaveTransactionRunnable;
-import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
-import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
-import org.xwiki.store.legacy.doc.internal.ListAttachmentArchive;
-import org.xwiki.store.StreamProvider;
-import org.xwiki.store.TransactionRunnable;
 
 /**
  * Filesystem based implementation of XWikiAttachmentStoreInterface.
@@ -56,10 +59,12 @@ import org.xwiki.store.TransactionRunnable;
 @Singleton
 public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 {
+    @Inject
+    private Provider<FilesystemStoreTools> fileToolsProvider;
+
     /**
      * Tools for getting files to store given content in.
      */
-    @Inject
     private FilesystemStoreTools fileTools;
 
     /**
@@ -77,6 +82,14 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
      */
     public FilesystemAttachmentStore()
     {
+    }
+
+    private FilesystemStoreTools getFilesystemStoreTools()
+    {
+        if (fileTools != null) {
+            return fileTools;
+        }
+        return fileToolsProvider.get();
     }
 
     /**
@@ -148,15 +161,16 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
 
         // This is the permanent location where the attachment content will go.
         final File attachFile =
-            this.fileTools.getAttachmentFileProvider(attachment).getAttachmentContentFile();
+            getFilesystemStoreTools().getAttachmentFileProvider(attachment).getAttachmentContentFile();
+        final FilesystemStoreTools ft = getFilesystemStoreTools();
 
         return new AttachmentSaveTransactionRunnable(attachment,
             updateDocument,
             context,
             attachFile,
-            this.fileTools.getTempFile(attachFile),
-            this.fileTools.getBackupFile(attachFile),
-            this.fileTools.getLockForFile(attachFile));
+            ft.getTempFile(attachFile),
+            ft.getBackupFile(attachFile),
+            ft.getLockForFile(attachFile));
     }
 
     /**
@@ -213,7 +227,7 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         throws XWikiException
     {
         final File attachFile =
-            this.fileTools.getAttachmentFileProvider(attachment).getAttachmentContentFile();
+            getFilesystemStoreTools().getAttachmentFileProvider(attachment).getAttachmentContentFile();
 
         if (attachFile.exists()) {
             FilesystemAttachmentContent content = new FilesystemAttachmentContent(attachFile);
@@ -277,14 +291,15 @@ public class FilesystemAttachmentStore implements XWikiAttachmentStoreInterface
         throws XWikiException
     {
         final File attachFile =
-            this.fileTools.getAttachmentFileProvider(attachment).getAttachmentContentFile();
+            getFilesystemStoreTools().getAttachmentFileProvider(attachment).getAttachmentContentFile();
+        final FilesystemStoreTools ft = getFilesystemStoreTools();
 
         return new AttachmentDeleteTransactionRunnable(attachment,
             updateDocument,
             context,
             attachFile,
-            this.fileTools.getBackupFile(attachFile),
-            this.fileTools.getLockForFile(attachFile));
+            ft.getBackupFile(attachFile),
+            ft.getLockForFile(attachFile));
     }
 
     @Override

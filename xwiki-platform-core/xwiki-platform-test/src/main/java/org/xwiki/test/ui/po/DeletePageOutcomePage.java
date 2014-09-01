@@ -36,6 +36,9 @@ public class DeletePageOutcomePage extends ViewPage
     @FindBy(xpath = "//p[@class='xwikimessage']")
     private WebElement message;
 
+    @FindBy(xpath = "//*[@id = 'mainContentArea']//a[. = 'Restore']")
+    private WebElement restoreLink;
+
     /**
      * @since 3.2M3
      */
@@ -52,4 +55,15 @@ public class DeletePageOutcomePage extends ViewPage
         return this.message.getText();
     }
 
+    /**
+     * Clicks on the link to restore the deleted page from the recycle bin.
+     * 
+     * @return the restored view page
+     * @since 5.2M2
+     */
+    public ViewPage clickRestore()
+    {
+        this.restoreLink.click();
+        return new ViewPage();
+    }
 }

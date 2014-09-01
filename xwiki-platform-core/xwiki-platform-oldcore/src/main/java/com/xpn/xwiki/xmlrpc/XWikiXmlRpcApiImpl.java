@@ -950,9 +950,10 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
              */
             XWikiDocument baseXWikiDocument = this.xwiki.getDocument(extendedId.getBasePageId(), this.xwikiContext);
             XWikiAttachment baseXWikiAttachment = baseXWikiDocument.getAttachment(fileName);
-            baseXWikiDocument.deleteAttachment(baseXWikiAttachment, this.xwikiContext);
+            baseXWikiDocument.removeAttachment(baseXWikiAttachment);
 
-            this.xwiki.saveDocument(baseXWikiDocument, this.xwikiContext);
+            this.xwiki.saveDocument(baseXWikiDocument,
+                "Deleted attachment [" + baseXWikiAttachment.getFilename() + "]", this.xwikiContext);
         } else {
             throw new Exception(String.format("Attachment '%s' does not exist on page '%s'", fileName,
                 extendedId.getBasePageId()));
@@ -1434,7 +1435,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
         List<String> syntaxes = new ArrayList<String>();
         List<Parser> parsers;
-        ComponentManager componentManager = Utils.getComponentManager();
+        ComponentManager componentManager = Utils.getContextComponentManager();
         try {
             parsers = componentManager.getInstanceList(Parser.class);
             for (Parser parser : parsers) {
@@ -1459,7 +1460,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
         List<String> syntaxes = new ArrayList<String>();
         List<PrintRendererFactory> renderers;
-        ComponentManager componentManager = Utils.getComponentManager();
+        ComponentManager componentManager = Utils.getContextComponentManager();
         try {
             // TODO: use BlockRenderer
             renderers = componentManager.getInstanceList(PrintRendererFactory.class);

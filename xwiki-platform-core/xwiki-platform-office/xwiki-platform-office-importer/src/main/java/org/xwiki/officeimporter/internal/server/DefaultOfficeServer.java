@@ -123,7 +123,15 @@ public class DefaultOfficeServer implements OfficeServer
 
             configuration.setMaxTasksPerProcess(this.config.getMaxTasksPerProcess());
             configuration.setTaskExecutionTimeout(this.config.getTaskExecutionTimeout());
-            this.jodManager = configuration.buildOfficeManager();
+
+            try {
+                this.jodManager = configuration.buildOfficeManager();
+            } catch (Exception e) {
+                // Protect against exceptions raised by JodManager. For example if it cannot autodetect the office home,
+                // it'll throw an java.lang.IllegalStateException exception...
+                // We wrap this in an OfficeServerException in order to display some nicer message to the user.
+                throw new OfficeServerException("Failed to start Office server. Reason: " + e.getMessage(), e);
+            }
         } else if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
             ExternalOfficeManagerConfiguration externalProcessOfficeManager = new ExternalOfficeManagerConfiguration();
             externalProcessOfficeManager.setPortNumber(this.config.getServerPort());

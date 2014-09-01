@@ -2,6 +2,10 @@
 ### Resubmission page
 ###
 $response.setStatus(401)##
+##
+## This page shouldn't be displayed in an IFRAME, in order to prevent clickjacking.
+##
+$response.addHeader( "X-FRAME-OPTIONS", "DENY" )
 #template("startpage.vm")
 <div class="main layoutsubsection">
 <div id="mainContentArea">

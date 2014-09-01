@@ -32,6 +32,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -41,7 +43,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Wiki UI Extension renderer.
+ * Parse the UI Extension content as an XDOM, cache it and when asked, apply Rendering Transformations on the XDOM
+ * and return the modified XDOM.
  *
  * @version $Id$
  * @since 5.0M1
@@ -56,12 +59,17 @@ public class WikiUIExtensionRenderer
     /**
      * Role hint of the UI extension this renderer is bound to.
      */
-    private String roleHint;
+    private final String roleHint;
+
+    /**
+     * Used to update the rendering context.
+     */
+    private final RenderingContext renderingContext;
 
     /**
      * Used to transform the macros within the extension content.
      */
-    private Transformation macroTransformation;
+    private final Transformation macroTransformation;
 
     /**
      * Used to retrieve the XWiki context.
@@ -76,7 +84,7 @@ public class WikiUIExtensionRenderer
     /**
      * Reference to the document holding the extension.
      */
-    private DocumentReference documentReference;
+    private final DocumentReference documentReference;
 
     /**
      * Default constructor.
@@ -94,17 +102,18 @@ public class WikiUIExtensionRenderer
 
         try {
             this.execution = cm.getInstance(Execution.class);
+            this.renderingContext = cm.getInstance(RenderingContext.class);
             this.macroTransformation = cm.<Transformation>getInstance(Transformation.class, "macro");
             ContentParser contentParser = cm.getInstance(ContentParser.class);
             XWikiDocument xdoc = getXWikiContext().getWiki().getDocument(documentReference, getXWikiContext());
-            this.xdom = contentParser.parse(content, xdoc.getSyntax());
+            this.xdom = contentParser.parse(content, xdoc.getSyntax(), documentReference);
             this.documentReference = documentReference;
         } catch (ComponentLookupException ex) {
             throw new WikiComponentException(
                 "Failed to get an instance for a component role required by Wiki Components.", ex);
-        } catch (Exception e) {
+        } catch (XWikiException e) {
             throw new WikiComponentException(String.format(
-                "Failed to retrieve document syntax for document [%s]", documentReference), e);
+                "Failed to retrieve document [%s]", documentReference), e);
         }
     }
 
@@ -127,10 +136,11 @@ public class WikiUIExtensionRenderer
             // Put the UIX context in the XWiki context
             getXWikiContext().put(WikiUIExtension.CONTEXT_UIX_KEY, uixContext);
 
-            // Tranform the macros
+            // Transform the macros
             TransformationContext transformationContext = new TransformationContext(xdom, xdoc.getSyntax());
             transformationContext.setId(roleHint);
-            macroTransformation.transform(transformedXDOM, transformationContext);
+            ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation,
+                transformationContext, transformedXDOM);
         } catch (TransformationException e) {
             LOGGER.warn("Error while executing wiki component macro transformation for extension [{}]", roleHint);
         } catch (XWikiException ex) {

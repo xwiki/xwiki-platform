@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxGeneralRemarks</name>
+  <language>it</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895311000</creationDate>
+  <date>1301497824000</date>
+  <contentUpdateDate>1301497824000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxGeneralRemarks</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= General =
+
+== Considerazioni Generali ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 2.0 General Remarks ===
+La sintassi XWiki 2.0 corregge alcuni errori o ambiguità che gli utenti potevano inserire come mostrato negli esempi della tabella seguente.
+
+|=Descrizione|=Esempio di sintassi non valida o ambigua|=Risolto con Sintassi XWiki 2.0
+|Stili di testo non chiusi|{{{**grassetto}}}|{{{**grassetto**}}}
+|Due elementi isolati non separati da 2 nuove righe|{{{| cella tabella}}}\\{{{* voce elenco}}}|{{{| cella tabella}}}\\\\{{{* voce elenco}}}
+|Due elementi isolati non separati da 2 nuove righe|{{{paragrafo}}}\\{{{----}}}\\{{{paragrafo}}}|{{{paragrafo}}}\\\\{{{----}}}\\\\{{{paragrafo}}}
+|Nuova riga ignorata all'inizio del documento|&lt;nuova riga all'inizio del documento&gt;\\paragrafo|paragrafo
+|Sintassi dei titoli non chiusa|{{{=== titolo}}}|{{{=== titolo ===}}}</content>
+</xwikidoc>

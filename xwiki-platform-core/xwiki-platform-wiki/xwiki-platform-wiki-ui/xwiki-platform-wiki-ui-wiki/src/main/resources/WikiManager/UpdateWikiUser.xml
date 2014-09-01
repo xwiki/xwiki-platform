@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>WikiManager</web>
+  <name>UpdateWikiUser</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>WikiManager.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1302123147000</creationDate>
+  <date>1308327207000</date>
+  <contentUpdateDate>1308327207000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#if($services.csrf.isTokenValid($request.form_token))
+  #set($userConfRef = $services.model.createDocumentReference('', 'WikiManager', 'WikiUserConfiguration'))
+  #set($userConfDoc = $xwiki.getDocument($userConfRef))
+  #set($discard = $userConfDoc.updateObjectFromRequest("WikiManager.WikiUserClass"))
+  #set($discard = $userConfDoc.save())
+  #if($request.xredirect)
+    $response.sendRedirect($request.xredirect)
+  #end
+#elseif("$!request.form_token" != '')
+
+    {{warning}}
+      {{translation key="platform.wiki.csrf.error" /}}
+    {{/warning}}
+
+#else
+  Updates the wiki user configuration by using values from the request.
+
+  The 'xredirect' parameter is also accepted, currently used in the administration section of a wiki.
+#end
+{{/velocity}}</content>
+</xwikidoc>

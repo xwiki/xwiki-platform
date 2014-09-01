@@ -20,6 +20,7 @@
 package com.xpn.xwiki.test;
 
 import java.io.File;
+
 import javax.servlet.ServletContext;
 
 import org.jmock.Expectations;
@@ -32,6 +33,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -41,13 +44,18 @@ import com.xpn.xwiki.web.Utils;
 
 /**
  * Same as {@link com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase} but for JUnit 4.x and JMock 2.x.
- *
+ * 
  * @version $Id$
  * @since 2.2M2
+ * @deprecated sine 5.2M1 use {@link MockitoOldcoreRule} instead
  */
+@Deprecated
 public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
 {
     private XWikiContext context;
+
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+    private AuthorizationManager authorizationManager;
 
     protected AbstractBridgedComponentTestCase()
     {
@@ -72,7 +80,7 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
 
         this.context = new XWikiContext();
 
-        this.context.setDatabase("xwiki");
+        this.context.setWikiId("xwiki");
         this.context.setMainXWiki("xwiki");
 
         // We need to initialize the Component Manager so that the components can be looked up
@@ -93,6 +101,8 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         getMockery().checking(new Expectations() {{
             allowing(mockServletContext).getResourceAsStream("/WEB-INF/cache/infinispan/config.xml");
             will(returnValue(null));
+            allowing(mockServletContext).getResourceAsStream("/WEB-INF/xwiki.cfg");
+            will(returnValue(null));
             allowing(mockServletContext).getAttribute("javax.servlet.context.tempdir");
                 will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
         }});
@@ -101,6 +111,15 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
         getMockery().checking(new Expectations() {{
             allowing(mockCoreConfiguration).getDefaultDocumentSyntax(); will(returnValue(Syntax.XWIKI_1_0));
         }});
+    }
+
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        super.registerComponents();
+
+        this.contextualAuthorizationManager = this.registerMockComponent(ContextualAuthorizationManager.class);
+        this.authorizationManager = this.registerMockComponent(AuthorizationManager.class);
     }
 
     @Override
@@ -114,5 +133,21 @@ public class AbstractBridgedComponentTestCase extends AbstractComponentTestCase
     public XWikiContext getContext()
     {
         return this.context;
+    }
+
+    /**
+     * @return a modifiable mock contextual authorization manager.
+     */
+    public ContextualAuthorizationManager getContextualAuthorizationManager()
+    {
+        return contextualAuthorizationManager;
+    }
+
+    /**
+     * @return a modifiable mock authorization manager.
+     */
+    public AuthorizationManager getAuthorizationManager()
+    {
+        return authorizationManager;
     }
 }

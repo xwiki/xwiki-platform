@@ -55,7 +55,7 @@ public class CurrentStringEntityReferenceResolverTest extends AbstractBridgedCom
     {
         super.setUp();
 
-        getContext().setDatabase(CURRENT_WIKI);
+        getContext().setWikiId(CURRENT_WIKI);
 
         this.resolver = getComponentManager().getInstance(EntityReferenceResolver.TYPE_STRING, "current");
     }
@@ -75,7 +75,7 @@ public class CurrentStringEntityReferenceResolverTest extends AbstractBridgedCom
     @Test
     public void testResolveDocumentReferenceWhenNoContextDocument() throws Exception
     {
-        getContext().setDatabase(null);
+        getContext().setWikiId(null);
         getContext().setDoc(null);
 
         EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
@@ -126,7 +126,7 @@ public class CurrentStringEntityReferenceResolverTest extends AbstractBridgedCom
     @Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
-        getContext().setDatabase(CURRENT_WIKI);
+        getContext().setWikiId(CURRENT_WIKI);
         getContext().setDoc(new XWikiDocument(new DocumentReference("docwiki", CURRENT_SPACE, CURRENT_PAGE)));
 
         EntityReference reference = resolver.resolve("filename", EntityType.ATTACHMENT);

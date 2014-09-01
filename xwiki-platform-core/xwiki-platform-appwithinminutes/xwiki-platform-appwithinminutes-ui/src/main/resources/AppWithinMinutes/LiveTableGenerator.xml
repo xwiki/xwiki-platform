@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>AppWithinMinutes</web>
   <name>LiveTableGenerator</name>
@@ -24,6 +44,10 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false" filter="none"}}
+#macro(escapeSingleQuotes $string)
+$string.replace("'", "''")##
+#end
+
 #macro(prepareColumnProperties)
   #set ($columnProperties = {})
   #set ($genericColumns = ['doc.title', 'doc.name', 'doc.space', 'doc.fullName', 'doc.author', 'doc.date', 'doc.creator', 'doc.creationDate'])
@@ -91,7 +115,7 @@
 #set ($discard = "#prepareColumnProperties()")
 ${escapetool.h}set (${escapetool.d}columnsProperties = {
 #foreach($entry in $columnProperties.entrySet())
-  '$entry.key': $jsontool.serialize($entry.value)#if ($foreach.hasNext),#end
+  '#escapeSingleQuotes($entry.key)': $jsontool.serialize($entry.value)#if ($foreach.hasNext),#end
 
 #end
 })
@@ -124,24 +148,24 @@ ${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}xwiki.ssfx.use('uico
 {{velocity}}
 #set($className = $liveTableObj.getProperty('class').value)
 #set($translationBundleId = "$stringtool.removeEnd($className, 'Class')Translations")
-${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}services.localization.use('document', '$translationBundleId'))
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}services.localization.use('document', '#escapeSingleQuotes($translationBundleId)'))
 #set($classDoc = $xwiki.getDocument($className))
 #set($xclass = $classDoc.getxWikiClass())
 #set($shortName = $classDoc.name.replaceAll("Class", "").toLowerCase())
 #generateColumnExtraSSX()
 #generateColumnProperties()
 ${escapetool.h}set (${escapetool.d}options = {
-  'className': '$className',
-  'resultPage': '$stringtool.removeEnd($className, 'Class')LiveTableResults',
-  'translationPrefix': '${shortName}.livetable.',
+  'className': '#escapeSingleQuotes($className)',
+  'resultPage': '#escapeSingleQuotes($stringtool.removeEnd($className, 'Class'))LiveTableResults',
+  'translationPrefix': '#escapeSingleQuotes($shortName).livetable.',
   'tagCloud': true,
   'rowCount': 15,
   'maxPages': 10,
-  'selectedColumn': '$columns.get(0)',
+  'selectedColumn': '#escapeSingleQuotes($columns.get(0))',
   'defaultOrder': 'asc'
 })
-${escapetool.h}set (${escapetool.d}columns = [#foreach($column in $columns)#if($velocityCount &gt; 1), #end'$column'#end])
-${escapetool.h}livetable('$shortName' ${escapetool.d}columns ${escapetool.d}columnsProperties ${escapetool.d}options)
+${escapetool.h}set (${escapetool.d}columns = [#foreach($column in $columns)#if($velocityCount &gt; 1), #end'#escapeSingleQuotes($column)'#end])
+${escapetool.h}livetable('#escapeSingleQuotes($shortName)' ${escapetool.d}columns ${escapetool.d}columnsProperties ${escapetool.d}options)
 {{/velocity}}##
 }}}
 #end
@@ -166,7 +190,7 @@ ${escapetool.h}livetable('$shortName' ${escapetool.d}columns ${escapetool.d}colu
 #set ($isLiveTableResultsRequest = $xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
 ## We do the include separately because the wiki syntax is evaluated after the Velocity code.
 #if ($isLiveTableResultsRequest)
-  {{include document="XWiki.LiveTableResultsMacros" /}}
+  {{include reference="XWiki.LiveTableResultsMacros" /}}
 #end
 {{/velocity}}{{velocity wiki="false"}}
 ## Old applications need custom live table results just because they don't have a document translation bundle generated.

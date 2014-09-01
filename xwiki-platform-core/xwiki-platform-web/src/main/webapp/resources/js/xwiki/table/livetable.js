@@ -19,14 +19,13 @@ XWiki.widgets.LiveTable = Class.create({
     * <ul>
     * <li>"limit" the maximum number of row entries in the table</li>
     * <li>"maxPages" the maximum number of pages to display at the same time in the pagination section.</li>
+    * <li>"selectedTags" the list of tags that should be selected initially in the tag cloud</li>
     * </ul>
     * @todo Make this a valid ARIA table: http://www.w3.org/TR/aria-role/#structural
     */
   initialize: function(url, domNodeName, handler, options)
   {
-    if (!options) {
-      var options = {};
-    }
+    options = options || {};
 
     // id of the root element that encloses this livetable
     this.domNodeName = domNodeName;
@@ -44,20 +43,21 @@ XWiki.widgets.LiveTable = Class.create({
 
     // Nodes under which all forms controls (input, selects, etc.) will be filters for this table
     this.filtersNodes = [
-          options.filterNodes     // Option API to precise filter nodes (single node or array of nodes)
+          options.filterNodes     // Option that specifies an array of filter nodes. Each item is either a reference to a
+                                  // DOM element or a String that is either the identifier of an element or a CSS selector.
        || $(options.filtersNode)  // Deprecated option (kept for backward compatibility)
        || $(domNodeName).down(".xwiki-livetable-display-filters") // Default filter node when none precised
     ].flatten().compact();
+    this.filtersNodes = this.filtersNodes.collect(function(item) {
+      // If it's a String then the item must be either the identifier of an element or a CSS selector.
+      return typeof item === 'string' ? ($(item) || $(document.body).down(item)) : item;
+    });
 
     // Array of nodes under which pagination for this livetable will be displayed.
     this.paginationNodes = options.paginationNodes || $(this.domNodeName).select(".xwiki-livetable-pagination");
 
      // Array of nodes under which a page size control will be displayed
     this.pageSizeNodes = options.pageSizeNodes || $(this.domNodeName).select(".xwiki-livetable-pagesize");
-
-    if (typeof options == "undefined") {
-       options = {};
-    }
 
     this.action = options.action || "view"; // FIXME check if this can be removed safely.
 
@@ -98,12 +98,12 @@ XWiki.widgets.LiveTable = Class.create({
       });
     }
 
-    if ($(domNodeName + "-tagcloud"))
-    {
-       this.tagCloud = new LiveTableTagCloud(this, domNodeName + "-tagcloud");
+    if ($(domNodeName + "-tagcloud")) {
+      this.tags = options.selectedTags;
+      this.tagCloud = new LiveTableTagCloud(this, domNodeName + "-tagcloud");
     }
     this.loadingStatus = $(this.domNodeName + '-ajax-loader') || $('ajax-loader');
-    this.limitsDisplay = $(this.domNodeName + '-limits') || new Element("div");
+    this.limitsDisplays = $(this.domNodeName).select('.xwiki-livetable-limits') || [];
     this.filters = "";
     this.handler = handler || function(){};
     this.totalRows = -1;
@@ -277,7 +277,9 @@ XWiki.widgets.LiveTable = Class.create({
     var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $services.localization.render('platform.livetable.paginationResultsOf') <strong>" + this.totalRows + "</strong>";
     msg = msg.toLowerCase();
 
-    this.limitsDisplay.innerHTML = "$services.localization.render('platform.livetable.paginationResults') " + msg;
+    this.limitsDisplays.each(function(limitsDisplay) {
+      limitsDisplay.innerHTML = "$services.localization.render('platform.livetable.paginationResults') " + msg;
+    });
     this.clearDisplay();
 
     for (var i = off; i <= f; i++) {
@@ -1009,6 +1011,10 @@ var LiveTableTagCloud = Class.create({
       this.table = table;
       this.domNode = $(domNodeName);
       this.cloudFilter = false;
+      this.selectedTags = {};
+      for (var i = 0; i < table.tags.size(); i++) {
+        this.selectedTags[table.tags[i]] = {};
+      }
       if (typeof tags == "array") {
          this.tags = tags;
          if (tags.length > 0) {
@@ -1025,7 +1031,7 @@ var LiveTableTagCloud = Class.create({
    /**
     * Tags matching the current filters
     */
-   matchingTags: [],
+   matchingTags: {},
 
    /**
     * Tags selected as filters
@@ -1048,7 +1054,8 @@ var LiveTableTagCloud = Class.create({
         this.hasTags = true;
         this.domNode.removeClassName("hidden");
       }
-      this.matchingTags = matchingTags;
+      // Normalize the list of matching tags (all lower case).
+      this.matchingTags = Object.toJSON(matchingTags || {}).toLowerCase().evalJSON();
       this.displayTagCloud();
    },
 
@@ -1068,7 +1075,9 @@ var LiveTableTagCloud = Class.create({
          var tagLabel = this.tags[i].tag;
          var tagSpan = new Element("span").update(tagLabel.escapeHTML());
          var tag = new Element("li", {'class':liClass}).update(tagSpan);
-         if (typeof this.matchingTags[tagLabel] != "undefined") {
+         // Determine if the tag is selectable (matched) ignoring the case because multiple documents can be tagged with
+         // the same tag but in different cases (e.g. tag, Tag, TAG etc.)
+         if (typeof this.matchingTags[tagLabel.toLowerCase()] != "undefined") {
             tag.addClassName("selectable");
             Event.observe(tagSpan, "click", function(event) {
                 var tag = event.element().up("li").down("span").innerHTML.unescapeHTML();

@@ -238,10 +238,10 @@ public class XWikiRightServiceImpl implements XWikiRightService
         try {
             // Verify access rights and return if ok
             String docname;
-            if (context.getDatabase() != null) {
-                docname = context.getDatabase() + ":" + doc.getFullName();
+            if (context.getWikiId() != null) {
+                docname = context.getWikiId() + ":" + doc.getFullName();
                 if (username.indexOf(":") == -1) {
-                    username = context.getDatabase() + ":" + username;
+                    username = context.getWikiId() + ":" + username;
                 }
             } else {
                 docname = doc.getFullName();
@@ -405,7 +405,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                             }
                         }
 
-                        if ((context.getDatabase() != null) && (ArrayUtils.contains(userarray, userOrGroupName))) {
+                        if ((context.getWikiId() != null) && (ArrayUtils.contains(userarray, userOrGroupName))) {
                             LOGGER.debug("Found matching right in [{}] for [{}]", users, userOrGroupName);
                             return true;
                         }
@@ -433,7 +433,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         addMemberGroups(doc.getWikiName(), prefixedFullName, userOrGroupDocumentReference, grouplist, context);
 
         // Get member groups from member's wiki
-        if (!context.getDatabase().equalsIgnoreCase(userOrGroupDocumentReference.getWikiReference().getName())) {
+        if (!context.getWikiId().equalsIgnoreCase(userOrGroupDocumentReference.getWikiReference().getName())) {
             addMemberGroups(userOrGroupDocumentReference.getWikiReference().getName(), prefixedFullName,
                 userOrGroupDocumentReference, grouplist, context);
         }
@@ -482,9 +482,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         Collection<String> tmpGroupList = grouplistcache.get(key);
         if (tmpGroupList == null) {
-            String currentWiki = context.getDatabase();
+            String currentWiki = context.getWikiId();
             try {
-                context.setDatabase(wiki);
+                context.setWikiId(wiki);
 
                 Collection<DocumentReference> groupReferences =
                     groupService.getAllGroupsReferencesForMember(userOrGroupDocumentReference, 0, 0, context);
@@ -497,7 +497,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 LOGGER.error("Failed to get groups for user or group [{}] in wiki [{}]", prefixedFullName, wiki, e);
                 tmpGroupList = Collections.emptyList();
             } finally {
-                context.setDatabase(currentWiki);
+                context.setWikiId(currentWiki);
             }
 
             grouplistcache.put(key, tmpGroupList);
@@ -514,7 +514,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         DocumentReference userOrGroupNameReference =
             this.currentMixedDocumentReferenceResolver.resolve(userOrGroupName);
 
-        if (!userOrGroupNameReference.getName().equals(XWikiRightService.GUEST_USER) && context.getDatabase() != null) {
+        if (!userOrGroupNameReference.getName().equals(XWikiRightService.GUEST_USER) && context.getWikiId() != null) {
             // Make sure to have the prefixed full name of the user or group
             userOrGroupName =
                 this.entityReferenceSerializer.serialize(this.currentMixedDocumentReferenceResolver.resolve(
@@ -531,7 +531,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         boolean allow_found = false;
         boolean deny_found = false;
         boolean isReadOnly = context.getWiki().isReadOnly();
-        String database = context.getDatabase();
+        String database = context.getWikiId();
         XWikiDocument currentdoc = null;
 
         if (isReadOnly) {
@@ -579,7 +579,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             }
 
             // We need to make sure we are in the context of the document which rights is being checked
-            context.setDatabase(currentdoc.getDatabase());
+            context.setWikiId(currentdoc.getDatabase());
 
             // Verify Wiki Owner
             String wikiOwner = context.getWiki().getWikiOwner(currentdoc.getDatabase(), context);
@@ -777,7 +777,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
             return false;
         } finally {
-            context.setDatabase(database);
+            context.setWikiId(database);
         }
     }
 
@@ -810,7 +810,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             return false;
         }
 
-        String database = context.getDatabase();
+        String database = context.getWikiId();
         boolean allow;
 
         if (isSuperAdmin(name)) {
@@ -820,7 +820,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         try {
             // The master user and programming rights are checked in the main wiki
-            context.setDatabase(context.getMainXWiki());
+            context.setWikiId(context.getMainXWiki());
             XWikiDocument xwikimasterdoc = context.getWiki().getDocument(XWIKIPREFERENCES_REFERENCE, context);
             // Verify XWiki Master super user
             try {
@@ -859,7 +859,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             }
         } finally {
             // The next rights are checked in the virtual wiki
-            context.setDatabase(database);
+            context.setWikiId(database);
         }
 
         return false;

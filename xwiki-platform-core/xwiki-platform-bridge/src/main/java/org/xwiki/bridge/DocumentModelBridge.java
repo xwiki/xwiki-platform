@@ -43,7 +43,7 @@ public interface DocumentModelBridge
     String getFullName();
 
     /**
-     * @return the document's reference
+     * @return the document's reference (without the document locale)
      * @since 2.2M1
      */
     DocumentReference getDocumentReference();

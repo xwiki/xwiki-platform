@@ -52,7 +52,10 @@ public class InlinePage extends ViewPage
 
     public void clickSaveAndContinue()
     {
-        saveandcontinue.click();
+        this.saveandcontinue.click();
+
+        // Wait until the page is really saved.
+        waitForNotificationSuccessMessage("Saved");
     }
 
     public <T extends ViewPage> T clickSaveAndView()
@@ -84,7 +87,7 @@ public class InlinePage extends ViewPage
     /**
      * @return the form element
      */
-    protected WebElement getForm()
+    public WebElement getForm()
     {
         return form;
     }

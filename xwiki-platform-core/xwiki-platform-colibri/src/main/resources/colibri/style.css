@@ -1,2 +1,15 @@
 @import "$xwiki.getSkinFile('css/microformats.css')";
-@import "$xwiki.getSkinFile('colibri.css', true)#if ("$!{request.colorTheme}" != '')?colorTheme=${request.colorTheme}#end";
+########################################################
+### Import the colibri CSS file with good parameters 
+########################################################
+## 1. Get the parameters
+#set ($urlParametersMap = {})
+#if ($request.colorTheme)
+  #set ($discard = $urlParametersMap.put("colorTheme", "$!request.colorTheme"))
+#end
+#if ($request.skin)
+  #set ($discard = $urlParametersMap.put("skin", "$!request.skin"))
+#end
+#set ($urlParameters = $escapetool.url($urlParametersMap))
+## 2. Import colibri.css
+@import "$xwiki.getSkinFile('colibri.css', true)#if (!$urlParametersMap.isEmpty())?${urlParameters}#end";

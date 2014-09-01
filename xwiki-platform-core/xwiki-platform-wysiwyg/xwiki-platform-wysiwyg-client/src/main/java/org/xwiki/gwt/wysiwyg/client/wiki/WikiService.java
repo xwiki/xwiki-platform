@@ -43,6 +43,7 @@ public interface WikiService extends RemoteService
      * @deprecated Multiwiki is on by default, starting with XWiki 5.0.
      * @return {@code true} if we are in a multiwiki environment, {@code false} otherwise
      */
+    @Deprecated
     Boolean isMultiWiki();
 
     /**

@@ -62,7 +62,7 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
         try {
             return getProtectedPlugin().getStore().getWatchedElements(this.context.getUser(), ElementType.SPACE,
                 this.context).contains(
-                this.context.getDatabase() + WatchListStore.WIKI_SPACE_SEP + this.context.getDoc().getSpace());
+                this.context.getWikiId() + WatchListStore.WIKI_SPACE_SEP + this.context.getDoc().getSpace());
         } catch (XWikiException ex) {
             return false;
         }
@@ -165,7 +165,7 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
         try {
             return getProtectedPlugin().getStore().getWatchedElements(this.context.getUser(), ElementType.SPACE,
                 this.context).contains(
-                this.context.getDatabase() + WatchListStore.WIKI_SPACE_SEP + this.context.getDoc().getSpace());
+                this.context.getWikiId() + WatchListStore.WIKI_SPACE_SEP + this.context.getDoc().getSpace());
         } catch (XWikiException ex) {
             return false;
         }
@@ -251,7 +251,7 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
     {
         try {
             return getProtectedPlugin().getStore().getWatchedElements(this.context.getUser(), ElementType.WIKI,
-                this.context).contains(this.context.getDatabase());
+                this.context).contains(this.context.getWikiId());
         } catch (XWikiException ex) {
             return false;
         }

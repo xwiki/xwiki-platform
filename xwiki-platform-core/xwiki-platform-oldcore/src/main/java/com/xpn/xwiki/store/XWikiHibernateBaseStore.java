@@ -21,12 +21,10 @@ package com.xpn.xwiki.store;
 
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -165,35 +163,64 @@ public class XWikiHibernateBaseStore implements Initializable
     }
 
     /**
-     * Retrieve the current database product name. If no current session is available, obtains a connection from the
-     * Hibernate connection provider attached to the current Session Factory.
+     * Retrieve metadata about the database used (name, version, etc).
+     * <p>
+     * Note that the database metadata is not cached and it's retrieved at each call. If all you need is the database
+     * product name you should use {@link #getDatabaseProductName()} instead, which is cached.
+     * </p>
+     *
+     * @return the database meta data or null if an error occurred
+     * @since 6.1M1
+     */
+    public DatabaseMetaData getDatabaseMetaData()
+    {
+        DatabaseMetaData result;
+        Connection connection = null;
+        // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
+        // See http://bit.ly/QAJXlr
+        ConnectionProvider connectionProvider =
+            ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
+        try {
+            connection = connectionProvider.getConnection();
+            result = connection.getMetaData();
+        } catch (SQLException ignored) {
+            result = null;
+        } finally {
+            if (connection != null) {
+                try {
+                    connectionProvider.closeConnection(connection);
+                } catch (SQLException ignored) {
+                    // Ignore
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Retrieve the current database product name.
+     * <p>
+     * Note that the database product name is cached for improved performances.
+     * </p>
      *
      * @return the database product name, see {@link DatabaseProduct}
      * @since 4.0M1
      */
     public DatabaseProduct getDatabaseProductName()
     {
-        Connection connection = null;
         DatabaseProduct product = this.databaseProduct;
 
         if (product == DatabaseProduct.UNKNOWN) {
-            // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
-            // See http://bit.ly/QAJXlr
-            ConnectionProvider connectionProvider =
-                ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
-            try {
-                connection = connectionProvider.getConnection();
-                product = DatabaseProduct.toProduct(connection.getMetaData().getDatabaseProductName());
-            } catch (SQLException ignored) {
-                // do not care, return UNKNOWN
-            } finally {
-                if (connection != null) {
-                    try {
-                        connectionProvider.closeConnection(connection);
-                    } catch (SQLException ignored) {
-                        // do not care, return UNKNOWN
-                    }
+            DatabaseMetaData metaData = getDatabaseMetaData();
+            if (metaData != null) {
+                try {
+                    product = DatabaseProduct.toProduct(metaData.getDatabaseProductName());
+                } catch (SQLException ignored) {
+                    // do not care, return UNKNOWN
                 }
+            } else {
+                // do not care, return UNKNOWN
             }
         }
 
@@ -333,17 +360,17 @@ public class XWikiHibernateBaseStore implements Initializable
         if ((!force) && (context.getWiki() != null)
             && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema"))))
         {
-            LOGGER.debug("Schema update deactivated for wiki [{}]", context.getDatabase());
+            LOGGER.debug("Schema update deactivated for wiki [{}]", context.getWikiId());
             return;
         }
 
-        LOGGER.info("Updating schema for wiki [{}]...", context.getDatabase());
+        LOGGER.info("Updating schema for wiki [{}]...", context.getWikiId());
 
         try {
             String[] sql = getSchemaUpdateScript(getConfiguration(), context);
             updateSchema(sql, context);
         } finally {
-            LOGGER.info("Schema update for wiki [{}] done", context.getDatabase());
+            LOGGER.info("Schema update for wiki [{}] done", context.getWikiId());
         }
     }
 
@@ -370,7 +397,7 @@ public class XWikiHibernateBaseStore implements Initializable
             if (schema == null) {
                 if (databaseProduct == DatabaseProduct.DERBY) {
                     schema = "APP";
-                } else if (databaseProduct == DatabaseProduct.HSQLDB) {
+                } else if (databaseProduct == DatabaseProduct.HSQLDB || databaseProduct == DatabaseProduct.H2) {
                     schema = "PUBLIC";
                 } else if (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode()) {
                     schema = "public";
@@ -382,9 +409,9 @@ public class XWikiHibernateBaseStore implements Initializable
             // virtual
             schema = wikiName.replace('-', '_');
 
-            // For HSQLDB we only support uppercase schema names. This is because Hibernate doesn't properly generate
+            // For HSQLDB/H2 we only support uppercase schema names. This is because Hibernate doesn't properly generate
             // quotes around schema names when it qualifies the table name when it generates the update script.
-            if (databaseProduct == DatabaseProduct.HSQLDB) {
+            if (DatabaseProduct.HSQLDB == databaseProduct || DatabaseProduct.H2 == databaseProduct) {
                 schema = StringUtils.upperCase(schema);
             }
         }
@@ -430,7 +457,7 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     public String getSchemaFromWikiName(XWikiContext context)
     {
-        return getSchemaFromWikiName(context.getDatabase(), context);
+        return getSchemaFromWikiName(context.getWikiId(), context);
     }
 
     /**
@@ -448,7 +475,6 @@ public class XWikiHibernateBaseStore implements Initializable
         Session session;
         Connection connection;
         DatabaseMetadata meta;
-        Statement stmt = null;
         Dialect dialect = Dialect.getDialect(getConfiguration().getProperties());
         boolean bTransaction = true;
         String dschema = null;
@@ -464,6 +490,7 @@ public class XWikiHibernateBaseStore implements Initializable
             DatabaseProduct databaseProduct = getDatabaseProductName();
             if (databaseProduct == DatabaseProduct.ORACLE
                 || databaseProduct == DatabaseProduct.HSQLDB
+                || databaseProduct == DatabaseProduct.H2
                 || databaseProduct == DatabaseProduct.DERBY
                 || databaseProduct == DatabaseProduct.DB2
                 || (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode()))
@@ -478,26 +505,20 @@ public class XWikiHibernateBaseStore implements Initializable
             }
 
             meta = new DatabaseMetadata(connection, dialect);
-            stmt = connection.createStatement();
             schemaSQL = config.generateSchemaUpdateScript(dialect, meta);
 
-            // In order to circumvent a bug in Hibernate (See the javadoc of XWHS#createSequence for details), we need
-            // to ensure that Hibernate will create the "hibernate_sequence" sequence.
-            // Note: We only add the sequence if there are some SQL to execute in the passed schema SQL parameter.
-            // This is to protect against several calls to update the schema (for the same schema name).
-            if (schemaSQL.length > 0) {
-                schemaSQL = addHibernateSequenceIfRequired(schemaSQL, contextSchema, session);
-            }
+            // In order to circumvent a bug in Hibernate (See the javadoc of XWHS#createHibernateSequenceIfRequired for
+            // details), we need to ensure that Hibernate will create the "hibernate_sequence" sequence.
+            createHibernateSequenceIfRequired(schemaSQL, contextSchema, session);
 
         } catch (Exception e) {
             throw new HibernateException("Failed creating schema update script", e);
         } finally {
             try {
-                if (stmt != null) {
-                    stmt.close();
-                }
                 if (bTransaction) {
-                    endTransaction(context, false, false);
+                    // Use "true" so that the hibernate sequence that was possibly created above can be committed
+                    // properly (and not be rolled back!).
+                    endTransaction(context, true);
                 }
                 if (dschema != null) {
                     config.setProperty(Environment.DEFAULT_SCHEMA, dschema);
@@ -514,7 +535,7 @@ public class XWikiHibernateBaseStore implements Initializable
      * deleted attachments for example - The reason we use generated ids and not custom computed ones is because
      * we don't need to address rows from these tables). For a lot of database the Dialect uses an Identity
      * Generator (when the DB supports it). PostgreSQL and Oracle don't support it and Hibernate defaults to
-     * a Sequence Generate which uses a sequence named "hibernate_sequence" by default. Hibernate will normally
+     * a Sequence Generator which uses a sequence named "hibernate_sequence" by default. Hibernate will normally
      * create such a sequence automatically when updating the schema (see #getSchemaUpdateScript).
      * However the problem is that Hibernate maintains a cache of sequence names per catalog and will only
      * generate the sequence creation SQL if the sequence is not in this cache. Since the main wiki is updated
@@ -522,31 +543,48 @@ public class XWikiHibernateBaseStore implements Initializable
      * automatically create sequence with the same name (see also
      * https://hibernate.atlassian.net/browse/HHH-1672). As a workaround, we create the required sequence here.
      *
-     * @param schemaSQL the list of SQL commands to execute to update the schema and to which we're adding the sequence
-     *        creation if need be (only for DBs using a SequenceGenerator)
+     * @param schemaSQL the list of SQL commands to execute to update the schema, possibly containing the
+     *        "hibernate_sequence" sequence creation
      * @param schemaName the schema name corresponding to the subwiki being updated
      * @param session the Hibernate session, used to get the Dialect object
-     * @since 5.0RC1
+     * @since 5.2RC1
      */
-    protected String[] addHibernateSequenceIfRequired(String[] schemaSQL, String schemaName, Session session)
+    protected void createHibernateSequenceIfRequired(String[] schemaSQL, String schemaName, Session session)
     {
-        String[] result = schemaSQL;
-
         // There's no issue when in database mode, only in schema mode.
         if (isInSchemaMode()) {
             Dialect dialect = ((SessionFactoryImplementor) session.getSessionFactory()).getDialect();
             if (dialect.getNativeIdentifierGeneratorClass().equals(SequenceGenerator.class)) {
-                List<String> sql = new ArrayList<String>();
-                Collections.addAll(sql, schemaSQL);
+                // We create the sequence only if it's not already in the SQL to execute as otherwise we would get an
+                // error that the sequence already exists ("relation "hibernate_sequence" already exists").
+                boolean hasSequence = false;
                 String sequenceSQL = String.format("create sequence %s.hibernate_sequence", schemaName);
-                if (!sql.contains(sequenceSQL)) {
-                    sql.add(sequenceSQL);
+                for (String sql : schemaSQL) {
+                    if (sequenceSQL.equals(sql)) {
+                        hasSequence = true;
+                        break;
+                    }
                 }
-                result = sql.toArray(new String[sql.size()]);
+                if (!hasSequence) {
+                    // Ideally we would need to check if the sequence exists for the current schema.
+                    // Since there's no way to do that in a generic way that would work on all DBs and since calling
+                    // dialect.getQuerySequencesString() will get the native SQL query to find out all sequences BUT
+                    // only for the default schema, we need to find another way. The solution we're implementing is to
+                    // try to create the sequence and if it fails then we consider it already exists.
+                    try {
+                        // Ignore errors in the log during the creation of the sequence since we know it can fail and we
+                        // don't want to show false positives to the user.
+                        this.loggerManager.pushLogListener(null);
+                        session.createSQLQuery(sequenceSQL).executeUpdate();
+                    } catch (HibernateException e) {
+                        // Sequence failed to be created, we assume it already exists and that's why an exception was
+                        // raised!
+                    } finally {
+                        this.loggerManager.popLogListener();
+                    }
+                }
             }
         }
-
-        return result;
     }
 
     /**
@@ -652,13 +690,10 @@ public class XWikiHibernateBaseStore implements Initializable
      * @param context the XWiki context.
      * @return true if multi-wiki, false otherwise.
      */
+    @Deprecated
     protected boolean isVirtual(XWikiContext context)
     {
-        if ((context == null) || (context.getWiki() == null)) {
-            return true;
-        }
-
-        return context.getWiki().isVirtualMode();
+        return true;
     }
 
     /**
@@ -672,10 +707,10 @@ public class XWikiHibernateBaseStore implements Initializable
     {
         try {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Switch database to [{}]", context.getDatabase());
+                LOGGER.debug("Switch database to [{}]", context.getWikiId());
             }
 
-            if (context.getDatabase() != null) {
+            if (context.getWikiId() != null) {
                 String schemaName = getSchemaFromWikiName(context);
                 String escapedSchemaName = escapeSchema(schemaName, context);
 
@@ -683,7 +718,7 @@ public class XWikiHibernateBaseStore implements Initializable
                 if (DatabaseProduct.ORACLE == databaseProduct) {
                     executeSQL("alter session set current_schema = " + escapedSchemaName, session);
                 } else if (DatabaseProduct.DERBY == databaseProduct || DatabaseProduct.HSQLDB == databaseProduct
-                    || DatabaseProduct.DB2 == databaseProduct) {
+                    || DatabaseProduct.DB2 == databaseProduct || DatabaseProduct.H2 == databaseProduct) {
                     executeSQL("SET SCHEMA " + escapedSchemaName, session);
                 } else if (DatabaseProduct.POSTGRESQL == databaseProduct && isInSchemaMode()) {
                     executeSQL("SET search_path TO " + escapedSchemaName, session);
@@ -694,13 +729,13 @@ public class XWikiHibernateBaseStore implements Initializable
                         session.connection().setCatalog(schemaName);
                     }
                 }
-                setCurrentDatabase(context, context.getDatabase());
+                setCurrentDatabase(context, context.getWikiId());
             }
 
             this.dataMigrationManager.checkDatabase();
         } catch (Exception e) {
             endTransaction(context, false); // close session with rollback to avoid further usage
-            Object[] args = {context.getDatabase()};
+            Object[] args = {context.getWikiId()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE,
                 "Exception while switching to database {0}", e, args);

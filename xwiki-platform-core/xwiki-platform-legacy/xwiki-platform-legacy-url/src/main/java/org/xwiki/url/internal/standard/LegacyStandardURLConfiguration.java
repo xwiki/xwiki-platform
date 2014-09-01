@@ -20,18 +20,17 @@
 package org.xwiki.url.internal.standard;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-
-import com.xpn.xwiki.XWikiContext;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
  * Replaces {@link DefaultStandardURLConfiguration} with fallbacks to configuration properties defined in the
  * {@code xwiki.cfg} configuration file.
- *
+ * 
  * @version $Id$
  * @since 5.1M1
  */
@@ -40,30 +39,44 @@ import com.xpn.xwiki.XWikiContext;
 public class LegacyStandardURLConfiguration extends DefaultStandardURLConfiguration
 {
     @Inject
-    private Execution execution;
+    @Named("xwikicfg")
+    private ConfigurationSource xwikicfg;
 
     @Override
     public boolean isPathBasedMultiWiki()
     {
-        return super.isPathBasedMultiWiki("1".equals(getLegacyValue("xwiki.virtual.usepath", "1")));
+        return super.isPathBasedMultiWiki("1".equals(this.xwikicfg.getProperty("xwiki.virtual.usepath", "1")));
     }
 
     @Override
     public String getWikiPathPrefix()
     {
-        return super.getWikiPathPrefix(getLegacyValue("xwiki.virtual.usepath.servletpath", "wiki"));
+        return super.getWikiPathPrefix(this.xwikicfg.getProperty("xwiki.virtual.usepath.servletpath", "wiki"));
     }
 
-    private String getLegacyValue(String oldKey, String oldDefault)
+    @Override
+    public String getEntityPathPrefix()
     {
-        String result = null;
-        ExecutionContext econtext = this.execution.getContext();
-        if (econtext != null) {
-            XWikiContext xcontext = (XWikiContext) econtext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-            if (xcontext != null) {
-                result = xcontext.getWiki().Param(oldKey, oldDefault);
-            }
+        String prefix = super.getWikiPathPrefix(this.xwikicfg.getProperty("xwiki.defaultservletpath", "bin"));
+
+        // Remove potential trailing "/" since the documentation in xwiki.cfg says it should contain a trailing "/" but
+        // getEntityPathPrefix should return the prefix without "/"...
+        prefix = StringUtils.removeEnd(prefix, "/");
+
+        return prefix;
+    }
+
+    @Override
+    public WikiNotFoundBehavior getWikiNotFoundBehavior()
+    {
+        WikiNotFoundBehavior legacyBehavior = WikiNotFoundBehavior.DISPLAY_ERROR;
+
+        String legacyValue = this.xwikicfg.getProperty("xwiki.virtual.failOnWikiDoesNotExist", "0");
+
+        if (!"1".equals(legacyValue)) {
+            legacyBehavior = WikiNotFoundBehavior.REDIRECT_TO_MAIN_WIKI;
         }
-        return result;
+
+        return super.getWikiNotFoundBehavior(legacyBehavior);
     }
 }

@@ -32,7 +32,7 @@ import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep;
+import org.xwiki.extension.distribution.internal.job.step.WikisDefaultUIDistributionStep;
 
 /**
  * @version $Id$
@@ -57,13 +57,13 @@ public class FarmDistributionJob extends AbstractDistributionJob<DistributionReq
             this.logger.error("Failed to get default UI step instance");
         }
 
-        // Step 2: Upgrade mode
+        // Step 2: Upgrade other wikis
 
         try {
             steps.add(this.componentManager.<DistributionStep> getInstance(DistributionStep.class,
-                UpgradeModeDistributionStep.ID));
+                WikisDefaultUIDistributionStep.ID));
         } catch (ComponentLookupException e) {
-            this.logger.error("Failed to get upgrade mode step instance");
+            this.logger.error("Failed to get all in one default UI step instance");
         }
 
         // Step 3: Upgrade outdated extensions

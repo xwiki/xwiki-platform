@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wiki name="wiki1">
+  <user name="user1">
+    <p>
+      <parameters>
+        <entry>
+          <string>firstname</string>
+          <string>user1 first name</string>
+        </entry>
+        <entry>
+          <string>lastname</string>
+          <string>user1 last name</string>
+        </entry>
+        <entry>
+          <string>email</string>
+          <string>user1@email.ext</string>
+        </entry>
+        <entry>
+          <string>active</string>
+          <boolean>true</boolean>
+        </entry>
+        <entry>
+          <string>creation_date</string>
+          <date>2000-01-10 00:00:00.0 UTC</date>
+        </entry>
+        <entry>
+          <string>revision_date</string>
+          <date>2000-01-11 00:00:00.0 UTC</date>
+        </entry>
+      </parameters>
+    </p>
+  </user>
+  <user name="user2">
+    <p>
+      <parameters>
+        <entry>
+          <string>firstname</string>
+          <string>user2 first name</string>
+        </entry>
+        <entry>
+          <string>lastname</string>
+          <string>user2 last name</string>
+        </entry>
+        <entry>
+          <string>email</string>
+          <string>user2@email.ext</string>
+        </entry>
+        <entry>
+          <string>active</string>
+          <boolean>false</boolean>
+        </entry>
+        <entry>
+          <string>creation_date</string>
+          <date>2000-01-20 00:00:00.0 UTC</date>
+        </entry>
+        <entry>
+          <string>revision_date</string>
+          <date>2000-01-21 00:00:00.0 UTC</date>
+        </entry>
+      </parameters>
+    </p>
+  </user>
+  <group name="group1">
+    <groupMemberUser name="user1" />
+    <groupMemberUser name="user2" />
+  </group>
+  <group name="group2">
+    <groupMemberGroup name="group1" />
+  </group>
+  <group name="emptygroup" />
+</wiki>

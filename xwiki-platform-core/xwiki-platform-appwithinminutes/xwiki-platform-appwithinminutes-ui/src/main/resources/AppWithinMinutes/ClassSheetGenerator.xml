@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>AppWithinMinutes</web>
   <name>ClassSheetGenerator</name>
@@ -24,17 +44,20 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity filter="none"}}
+#macro(escapeSingleQuotes $string)
+$string.replace("'", "''")##
+#end
 #**
  * Generic property display.
  *#
 #macro(displayProperty $property $indentation)
-${indentation}; &lt;label for="${doc.fullName}_0_$property.name"&gt;${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('$property.name', false, false))&lt;/label&gt;##
+${indentation}; &lt;label for="$escapetool.xml("${doc.fullName}_0_$property.name")"&gt;${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('#escapeSingleQuotes($property.name)', false, false))&lt;/label&gt;##
 #if ("$!property.hint" != '')${escapetool.h}${escapetool.h}
-${indentation}  (% class="xHint" %)${escapetool.d}services.localization.render('$property.hint')
+${indentation}  (% class="xHint" %)${escapetool.d}services.localization.render('#escapeSingleQuotes($property.hint)')
 #else
 
 #end
-${indentation}: ${escapetool.d}doc.display('$property.name')
+${indentation}: ${escapetool.d}doc.display('#escapeSingleQuotes($property.name)')
 #end
 #**
  * Unfortunately the custom display mechanism for properties doesn't offer a clean way to overwrite the display only when
@@ -42,9 +65,9 @@ ${indentation}: ${escapetool.d}doc.display('$property.name')
  *#
 #macro(displayBooleanProperty $property)
   ${escapetool.h}if (${escapetool.d}context.display == 'edit')
-    ; &lt;label for="${doc.fullName}_0_$property.name"&gt;${escapetool.d}doc.display('$property.name')${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('$property.name', false, false))&lt;/label&gt;
+    ; &lt;label for="$escapetool.xml("${doc.fullName}_0_$property.name")"&gt;${escapetool.d}doc.display('#escapeSingleQuotes($property.name)')${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('#escapeSingleQuotes($property.name)', false, false))&lt;/label&gt;
 #if ("$!property.hint" != '')
-    : (% class="xHint" %)${escapetool.d}services.localization.render('$property.hint')
+    : (% class="xHint" %)${escapetool.d}services.localization.render('#escapeSingleQuotes($property.hint)')
 #end
   ${escapetool.h}else
 #displayProperty($property '    ')
@@ -53,9 +76,9 @@ ${indentation}: ${escapetool.d}doc.display('$property.name')
 {{{##
 {{velocity}}
 {{html wiki="true"}}
-${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}doc.use('$doc.fullName'))
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}doc.use('#escapeSingleQuotes($doc.fullName)'))
 #set ($translationBundleId = "$stringtool.removeEnd($doc.fullName, 'Class')Translations")
-${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}services.localization.use('document', '$translationBundleId'))
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}services.localization.use('document', '#escapeSingleQuotes($translationBundleId)'))
 ## We don't have access to the form element to set the CSS class for the vertical form layout standard.
 (% class="xform" %)
 (((

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxTextFormatting</name>
+  <language>sv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497998000</date>
+  <contentUpdateDate>1301497998000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxTextFormatting</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Textformatering ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Text Formatting ===
+
+|=Formateringstyp|=XWiki syntax 1.0|=Resultat
+|Fetstil|{{{*fetstil*}}}|**fetstil**
+|Understruken|{{{__understruken___}}}|__understruken__
+|Kursiv|{{{~~kursiv~~}}}|//kursiv//
+|Genomstruken|{{{--genomstruken--}}}|--genomstruken--
+|Fastbredd|&lt;tt&gt;fastbredd&lt;/tt&gt;|##fastbredd##
+|Upphöjd|lite &lt;sup&gt;upphöjd text&lt;/sup&gt;|lite ^^upphöjd text^^
+|Nedsänkt|lite &lt;sub&gt;nedsänkt text&lt;/sub&gt;|lite ,,nedsänkt text,,
+
+=== 2.0 Text Formatting ===
+
+{{info}}
+Nytt i XWiki syntax {{velocity}}$crtSyntaxVer{{/velocity}} jämfört med XWiki syntax 1.0:
+* Blanktecken är tillåtna omedelbart efter syntaxsymbolerna (i XWiki syntax 1.0 var exempelvis * detta inte fetstil *).
+* Användning av symboldubblering där det var enkla symboler i XWiki syntax 1.0 för att minska risken att användarna av misstag lägger in textformatering.
+* Möjlighet att låta formatering sträcka sig över flera rader.
+{{/info}}
+
+|=Formateringstyp|=XWiki syntax 2.0|=Resultat
+|Fetstil|{{{**fetstil**}}}|**fetstil**
+|Understruken|{{{__understruken__}}}|__understruken__
+|Kursiv|{{{//kursiv//}}}|//kursiv//
+|Genomstruken|{{{--genomstruken--}}}|--genomstruken--
+|Fastbredd|{{{##fastbredd##}}}|##fastbredd##
+|Upphöjd|{{{lite ^^upphöjd text^^}}}|lite ^^upphöjd text^^
+|Nedsänkt|{{{lite ,,nedsänkt text,,}}}|lite ,,nedsänkt text,,</content>
+</xwikidoc>

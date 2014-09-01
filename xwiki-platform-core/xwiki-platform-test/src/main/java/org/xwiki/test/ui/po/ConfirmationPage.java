@@ -31,10 +31,11 @@ import org.openqa.selenium.support.FindBy;
  */
 public class ConfirmationPage extends ViewPage
 {
-    @FindBy(xpath = "//fieldset[@class = 'xwikimessage']//input[@value = 'Yes']")
+    @FindBy(xpath = "//div[contains(@class, 'panel')]//*[contains(@class, 'button')"
+        + " and (@value = 'Yes' or text() = 'Yes')]")
     private WebElement yesButton;
 
-    @FindBy(xpath = "//fieldset[@class = 'xwikimessage']//*[contains(@class, 'button')"
+    @FindBy(xpath = "//div[contains(@class, 'panel')]//*[contains(@class, 'button')"
         + " and (@value = 'No' or text() = 'No')]")
     private WebElement noButton;
 

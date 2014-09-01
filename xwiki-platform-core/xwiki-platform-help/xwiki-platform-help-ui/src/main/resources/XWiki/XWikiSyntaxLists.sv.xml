@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxLists</name>
+  <language>sv</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497917000</date>
+  <contentUpdateDate>1301497917000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxLists</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Listor ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Lists ===
+
+|=Formateringstyp|=XWiki syntax 1.0|=Resultat
+|Punktlista|((({{{
+* element 1
+** element 2
+*** element 3
+* element 4
+}}})))|(((
+* element 1
+** element 2
+*** element 3
+* element 4
+)))
+|Numrerad lista|((({{{
+1. element 1
+11. element 2
+111. element 3
+1. element 4
+}}})))|(((
+1. element 1
+11. element 2
+111. element 3
+1. element 4
+)))
+|Blandad lista|((({{{
+1. element 1
+1*. element 2
+1*. element 3
+1. element 4
+}}})))|(((
+1. element 1
+1*. element 2
+1*. element 3
+1. element 4
+)))
+|Kvadratmarkerad lista|((({{{
+- element 1
+- element 2
+}}})))|(((
+(% style="list-style-type: square" %)
+* element 1
+* element 2
+)))
+|Diskmarkerad lista|(((
+&lt;ul style="list-style-type: disc"&gt;
+  &lt;li&gt;element1&lt;/li&gt;
+  &lt;li&gt;element2&lt;/li&gt;
+&lt;/ul&gt;
+)))|(((
+(% style="list-style-type: disc" %)
+* element 1
+* element 2
+)))
+|Alfabetisk lista av gemener|((({{{
+a. element 1
+a. element 2
+}}})))|(((
+(% style="list-style-type: lower-alpha" %)
+* element1
+* element2
+)))
+|Alfabetisk lista av versaler|((({{{
+A. element 1
+A. element 2
+}}})))|(((
+(% style="list-style-type: upper-alpha" %)
+* element1
+* element2
+)))
+|Romerska siffror av gemener|((({{{
+i. element 1
+i. element 2
+}}})))|(((
+(% style="list-style-type: lower-roman" %)
+* element1
+* element2
+)))
+|Romerska siffror av versaler|((({{{
+I. element 1
+I. element 2
+}}})))|(((
+(% style="list-style-type: upper-roman" %)
+* element1
+* element2
+)))
+|Grekiska gemener|((({{{
+g. element 1
+g. element 2
+}}})))|(((
+(% style="list-style-type: lower-greek" %)
+* element1
+* element2
+)))
+|Grekiska versaler|((({{{
+G. element 1
+G. element 2
+}}})))|(((
+(% style="list-style-type: upper-greek" %)
+* element1
+* element2
+)))
+|Hiragana|((({{{
+h. element 1
+h. element 2
+}}})))|(((
+(% style="list-style-type: hiragana" %)
+* element1
+* element2
+)))
+|Hiragana iroha|((({{{
+H. element 1
+H. element 2
+}}})))|(((
+(% style="list-style-type: hiragana-iroha" %)
+* element1
+* element2
+)))
+|Katakana|((({{{
+k. element 1
+k. element 2
+}}})))|(((
+(% style="list-style-type: katakana" %)
+* element1
+* element2
+)))
+|Katakana iroha|((({{{
+K. element 1
+K. element 2
+}}})))|(((
+(% style="list-style-type: katakana-iroha" %)
+* element1
+* element2
+)))
+|Armenisk lista|((({{{
+&lt;ul style="list-style-type: armenian"&gt;
+  &lt;li&gt;element1&lt;/li&gt;
+  &lt;li&gt;element2&lt;/li&gt;
+&lt;/ul&gt;
+}}})))|(((
+(% style="list-style-type: armenian" %)
+* element1
+* element2
+)))
+|Hebreisk lista|((({{{
+j. element1
+j. element2
+}}})))|(((
+(% style="list-style-type: hebrew" %)
+* element1
+* element2
+)))
+|Georgisk lista|((({{{
+&lt;ul style="list-style-type: georgian"&gt;
+  &lt;li&gt;element1&lt;/li&gt;
+  &lt;li&gt;element2&lt;/li&gt;
+&lt;/ul&gt;
+}}})))|(((
+(% style="list-style-type: georgian" %)
+* element1
+* element2
+)))
+|CJK ideografisk lista|((({{{
+&lt;ul style="list-style-type: cjk-ideographic"&gt;
+  &lt;li&gt;element1&lt;/li&gt;
+  &lt;li&gt;element2&lt;/li&gt;
+&lt;/ul&gt;
+}}})))|(((
+(% style="list-style-type: cjk-ideographic" %)
+* element1
+* element2
+)))
+
+=== 2.0 Lists ===
+
+
+|=Formateringstyp|=XWiki syntax  {{velocity}}$crtSyntaxVer{{/velocity}}|=Resultat
+|Punktlista|((({{{
+* element 1
+** element 2
+*** element 3
+* element 4
+}}})))|(((
+* element 1
+** element 2
+*** element 3
+* element 4
+)))
+|Numrerad lista|((({{{
+1. element 1
+11. element 2
+111. element 3
+1. element 4
+}}})))|(((
+1. element 1
+11. element 2
+111. element 3
+1. element 4
+)))
+|Blandad lista|((({{{
+1. element 1
+1*. element 2
+1*. element 3
+1. element 4
+}}})))|(((
+1. element 1
+1*. element 2
+1*. element 3
+1. element 4
+)))
+|Kvadratmarkerad lista|((({{{
+(% style="list-style-type: square" %)
+* element 1
+* element 2
+}}})))|(((
+(% style="list-style-type: square" %)
+* element 1
+* element 2
+)))
+|Diskmarkerad lista|((({{{
+(% style="list-style-type: disc" %)
+* element 1
+* element 2
+}}})))|(((
+(% style="list-style-type: disc" %)
+* element 1
+* element 2
+)))
+|Alfabetisk lista av gemener|((({{{
+(% style="list-style-type: lower-alpha" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: lower-alpha" %)
+* element1
+* element2
+)))
+|Alfabetisk lista av versaler|((({{{
+(% style="list-style-type: upper-alpha" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: upper-alpha" %)
+* element1
+* element2
+)))
+|Romerska siffror av gemener|((({{{
+(% style="list-style-type: lower-roman" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: lower-roman" %)
+* element1
+* element2
+)))
+|Romerska siffror av versaler|((({{{
+(% style="list-style-type: upper-roman" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: upper-roman" %)
+* element1
+* element2
+)))
+|Grekiska gemener|((({{{
+(% style="list-style-type: lower-greek" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: lower-greek" %)
+* element1
+* element2
+)))
+|Grekiska versaler|((({{{
+(% style="list-style-type: upper-greek" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: upper-greek" %)
+* element1
+* element2
+)))
+|Hiragana|((({{{
+(% style="list-style-type: hiragana" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: hiragana" %)
+* element1
+* element2
+)))
+|Hiragana iroha|((({{{
+(% style="list-style-type: hiragana-iroha" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: hiragana-iroha" %)
+* element1
+* element2
+)))
+|Katakana|((({{{
+(% style="list-style-type: katakana" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: katakana" %)
+* element1
+* element2
+)))
+|Katakana iroha|((({{{
+(% style="list-style-type: katakana-iroha" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: katakana-iroha" %)
+* element1
+* element2
+)))
+|Armenisk lista|((({{{
+(% style="list-style-type: armenian" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: armenian" %)
+* element1
+* element2
+)))
+|Hebreisk lista|((({{{
+(% style="list-style-type: hebrew" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: hebrew" %)
+* element1
+* element2
+)))
+|Georgisk lista|((({{{
+(% style="list-style-type: georgian" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: georgian" %)
+* element1
+* element2
+)))
+|CJK ideografisk lista)|((({{{
+(% style="list-style-type: cjk-ideographic" %)
+* element1
+* element2
+}}})))|(((
+(% style="list-style-type: cjk-ideographic" %)
+* element1
+* element2
+)))</content>
+</xwikidoc>

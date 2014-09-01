@@ -21,7 +21,7 @@ package org.xwiki.officeimporter.openoffice;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
-import org.xwiki.officeimporter.internal.server.script.OfficeServerScriptService;
+import org.xwiki.officeimporter.server.script.OfficeServerScriptService;
 import org.xwiki.script.service.ScriptService;
 
 /**

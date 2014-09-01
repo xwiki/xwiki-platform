@@ -108,4 +108,10 @@ public class MessageFormatTranslationMessage implements TranslationMessage
     {
         return this.message;
     }
+
+    @Override
+    public String toString()
+    {
+        return getRawSource();
+    }
 }

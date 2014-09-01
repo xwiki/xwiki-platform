@@ -56,7 +56,11 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
       // Create the Suggest.
       new XWiki.widgets.Suggest(this.input, {
         // This document also provides the suggestions.
-        script: "${request.contextPath}/rest/wikis/${xcontext.database}/search?scope=name&number=10&",
+        // Trick so that Velocity will get executed but Javascript lint will not choke on it... Note that we cannot
+        // use a standard javascript comment ("//") since the minification process removes comments ;)
+        // We use the special construct ("/*!") which tells yuicompressor to not compress this part...
+        /*!#set ($restURL = "${request.contextPath}/rest/wikis/${xcontext.database}/search?scope=name&number=10&")*/
+        script: "$response.encodeURL($restURL)",
         // Prefixed with & since the current (as of 1.7) Suggest code does not automatically append it.
         varname: "q",
         noresults: "$services.localization.render('core.viewers.jump.suggest.noResults')",
@@ -90,7 +94,8 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
   openDocument : function(event, mode) {
     if (!$('as_jmp_target') && this.input.value != "") {
       Event.stop(event);
-      window.self.location = this.urlTemplate.replace("__space__/__document__", this.input.value.replace(".", "/")).replace("__action__", mode);
+      var reference = XWiki.Model.resolve(this.input.value, XWiki.EntityType.DOCUMENT);
+      window.self.location = this.urlTemplate.replace("__space__", reference.parent.name).replace("__document__", reference.name).replace("__action__", mode);
     }
   },
   addQuickLinksEntry : function() {

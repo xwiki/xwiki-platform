@@ -25,10 +25,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -38,12 +43,33 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
+@Component
+@Named("velocity")
+@Singleton
 public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
 {
     /** Anything which doesn't contain any of these characters cannot be velocity code */
     private static final String VELOCITY_CHARACTERS = "$#";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiVelocityRenderer.class);
+
+    @Inject
+    private VelocityManager velocityManager;
+
+    @Override
+    public String getId()
+    {
+        return "velocity";
+    }
+
+    private VelocityManager getVelocityManager()
+    {
+        if (this.velocityManager == null) {
+            this.velocityManager = Utils.getComponent(VelocityManager.class);
+        }
+
+        return this.velocityManager;
+    }
 
     @Override
     public String interpret(String content, XWikiDocument contextdoc, XWikiContext context)
@@ -59,8 +85,8 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         if (StringUtils.containsNone(content, VELOCITY_CHARACTERS)) {
             return content;
         }
-        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
-        VelocityContext vcontext = velocityManager.getVelocityContext();
+
+        VelocityContext vcontext = getVelocityManager().getVelocityContext();
         Document previousdoc = (Document) vcontext.get("doc");
 
         content = context.getUtil().substitute("s/#include\\(/\\\\#include\\(/go", content);

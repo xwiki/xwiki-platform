@@ -131,17 +131,16 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         // process any persistent login information, if user is not already logged in,
         // persistent logins are enabled, and the persistent login info is present in this request
         if (this.persistentLoginManager != null) {
-            String username =
-                convertUsername(this.persistentLoginManager.getRememberedUsername(request, response), context);
-            String password = this.persistentLoginManager.getRememberedPassword(request, response);
-
             Principal principal = request.getUserPrincipal();
 
+            // If cookies are turned on:
             // 1) if user is not already authenticated, authenticate
-            // 2) if authenticated user for this session does not have the same name, authenticate
-            // 3) if xwiki.authentication.always is set to 1 in xwiki.cfg file, authenticate
-            if (principal == null || !StringUtils.endsWith(principal.getName(), "XWiki." + username)
-                || context.getWiki().ParamAsLong("xwiki.authentication.always", 0) == 1) {
+            // 2) if xwiki.authentication.always is set to 1 in xwiki.cfg file, authenticate
+            if (principal == null || context.getWiki().ParamAsLong("xwiki.authentication.always", 0) == 1) {
+                String username =
+                    convertUsername(this.persistentLoginManager.getRememberedUsername(request, response), context);
+                String password = this.persistentLoginManager.getRememberedPassword(request, response);
+
                 principal = authenticate(username, password, context);
 
                 if (principal != null) {
@@ -151,7 +150,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
                     // make sure the Principal contains wiki name information
                     if (!StringUtils.contains(principal.getName(), ':')) {
-                        principal = new SimplePrincipal(context.getDatabase() + ":" + principal.getName());
+                        principal = new SimplePrincipal(context.getWikiId() + ":" + principal.getName());
                     }
 
                     request.setUserPrincipal(principal);
@@ -216,7 +215,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
             // make sure the Principal contains wiki name information
             if (!StringUtils.contains(principal.getName(), ':')) {
-                principal = new SimplePrincipal(context.getDatabase() + ":" + principal.getName());
+                principal = new SimplePrincipal(context.getWikiId() + ":" + principal.getName());
             }
 
             request.setUserPrincipal(principal);

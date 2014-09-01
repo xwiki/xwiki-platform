@@ -46,5 +46,7 @@ public class LocaleUtilsTest
         Assert.assertEquals(Locale.ROOT, LocaleUtils.toLocale(""));
         Assert.assertEquals(Locale.ENGLISH, LocaleUtils.toLocale("en"));
         Assert.assertEquals(Locale.US, LocaleUtils.toLocale("en_US"));
+
+        Assert.assertEquals(Locale.FRENCH, LocaleUtils.toLocale("badLocale", Locale.FRENCH));
     }
 }

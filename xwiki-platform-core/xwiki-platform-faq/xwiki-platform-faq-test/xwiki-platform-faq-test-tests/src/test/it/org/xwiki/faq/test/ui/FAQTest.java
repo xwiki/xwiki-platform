@@ -38,8 +38,9 @@ import org.junit.Assert;
  */
 public class FAQTest extends AbstractTest
 {
-    // Note: we use a dot in the page name to verify it's supported by the FAQ application
-    private static final String FAQ_TEST_PAGE = "Test.FAQ";
+    // Note: we use a dot in the page name to verify it's supported by the FAQ application and we use an accent to
+    // verify encoding.
+    private static final String FAQ_TEST_PAGE = "Test.entrée de FAQ";
 
     @Before
     public void setUp()

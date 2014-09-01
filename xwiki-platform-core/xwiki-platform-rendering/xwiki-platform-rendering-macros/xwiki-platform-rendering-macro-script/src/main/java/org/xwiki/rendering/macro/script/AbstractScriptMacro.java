@@ -27,12 +27,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.macro.AbstractMacro;
+import org.xwiki.rendering.macro.AbstractSignableMacro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -56,7 +55,7 @@ import org.xwiki.script.event.ScriptEvaluatingEvent;
  * @version $Id$
  * @since 1.7M3
  */
-public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> extends AbstractMacro<P> implements
+public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> extends AbstractSignableMacro<P> implements
     ScriptMacro
 {
     /**
@@ -78,12 +77,6 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      */
     @Inject
     protected Execution execution;
-
-    /**
-     * Used to get the current syntax parser.
-     */
-    @Inject
-    private ComponentManager componentManager;
 
     /**
      * Used to parse the result of the script execution into a XDOM object when the macro is configured by the user to
@@ -168,15 +161,6 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
         super(macroName, macroDescription, contentDescriptor, parametersBeanClass);
 
         setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
-    }
-
-    /**
-     * @return the component manager
-     * @since 2.0M1
-     */
-    protected ComponentManager getComponentManager()
-    {
-        return this.componentManager;
     }
 
     @Override

@@ -128,7 +128,7 @@ public class DefaultPrivilegedTemplateRendererTest
         executionContext.newProperty(XWikiContext.EXECUTIONCONTEXT_KEY).initial(context).declare();
 
         when(execution.getContext()).thenReturn(executionContext);
-        when(context.getDatabase()).thenReturn("xwiki");
+        when(context.getWikiId()).thenReturn("xwiki");
 
         // XWikiVelocityRenderer.evaluate is going to fail and print a stack trace to stderr.
         privilegedTemplateRenderer.evaluateTemplate("content", "/templates/suggest.vm");

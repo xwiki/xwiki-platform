@@ -64,5 +64,11 @@ public enum EntityType
      * Represents a class property entity.
      * @since 3.2M1
      */
-    CLASS_PROPERTY
+    CLASS_PROPERTY,
+
+    /**
+     * Represents a structured part of the content of a document or an object property.
+     * @since 6.0M1
+     */
+    BLOCK
 }

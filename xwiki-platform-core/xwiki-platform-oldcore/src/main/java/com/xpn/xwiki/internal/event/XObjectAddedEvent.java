@@ -23,6 +23,13 @@ import org.xwiki.model.reference.EntityReference;
 
 /**
  * An event triggered when an object is added.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the current {com.xpn.xwiki.doc.XWikiDocument} instance</li>
+ * <li>data: the current {com.xpn.xwiki.XWikiContext} instance</li>
+ * </ul>
  * 
  * @version $Id$
  * @since 3.2M1

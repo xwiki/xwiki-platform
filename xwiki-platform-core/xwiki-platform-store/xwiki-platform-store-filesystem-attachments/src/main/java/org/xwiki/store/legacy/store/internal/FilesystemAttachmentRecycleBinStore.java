@@ -31,29 +31,33 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 
-import com.xpn.xwiki.doc.DeletedAttachment;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.AttachmentRecycleBinStore;
-import com.xpn.xwiki.store.AttachmentVersioningStore;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.store.FileDeleteTransactionRunnable;
 import org.xwiki.store.FileSaveTransactionRunnable;
+import org.xwiki.store.StartableTransactionRunnable;
 import org.xwiki.store.filesystem.internal.DeletedAttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.legacy.doc.internal.DeletedFilesystemAttachment;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
 import org.xwiki.store.legacy.doc.internal.MutableDeletedFilesystemAttachment;
-import org.xwiki.store.serialization.Serializer;
 import org.xwiki.store.serialization.SerializationStreamProvider;
-import org.xwiki.store.StartableTransactionRunnable;
+import org.xwiki.store.serialization.Serializer;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DeletedAttachment;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.store.AttachmentRecycleBinStore;
+import com.xpn.xwiki.store.AttachmentVersioningStore;
 
 /**
  * Realization of {@link AttachmentRecycleBinStore} for filesystem storage.
@@ -100,6 +104,13 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
     @Inject
     @Named("file")
     private AttachmentVersioningStore attachmentVersionStore;
+
+    /**
+     * Used to extract the {@link DocumentReference} from the path to the deleted attachment.
+     */
+    @Inject
+    @Named("path")
+    private DocumentReferenceResolver<String> pathDocumentReferenceResolver;
 
     /**
      * This is required because deleted attachments may be looked up by a database id number
@@ -252,8 +263,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
         }
 
         try {
-            return this.deletedAttachmentFromProvider(
-                this.fileTools.getDeletedAttachmentFileProvider(path));
+            return this.deletedAttachmentFromProvider(this.fileTools.getDeletedAttachmentFileProvider(path), context);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.MODULE_XWIKI,
@@ -302,7 +312,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
         final List<DeletedAttachment> out = new ArrayList<DeletedAttachment>(deleteDatesList.size());
         try {
             for (Date date : deleteDatesList) {
-                out.add(this.deletedAttachmentFromProvider(attachMap.get(date)));
+                out.add(this.deletedAttachmentFromProvider(attachMap.get(date), context));
             }
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
@@ -345,7 +355,7 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
             for (Date date : allDates) {
                 for (Map<Date, DeletedAttachmentFileProvider> map : attachMap.values()) {
                     if (map.get(date) != null) {
-                        out.add(this.deletedAttachmentFromProvider(map.get(date)));
+                        out.add(this.deletedAttachmentFromProvider(map.get(date), context));
                         map.remove(date);
                         break;
                     }
@@ -427,17 +437,19 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
     }
 
     /**
-     * Get a deleted attachment by it's filesystem location.
-     * This returns a DeletedAttachment which is not attached to any document!
-     * It is the job of the caller to get the attachment and any version of it and attach them
-     * to a document.
-     *
+     * Get a deleted attachment by it's filesystem location. This returns a DeletedAttachment which is not attached to
+     * any document! It is the job of the caller to get the attachment and any version of it and attach them to a
+     * document.
+     * 
      * @param provider a means to get the files which store the deleted attachment content and metadata.
+     * @param context the XWiki context
      * @return the deleted attachment for that directory.
      * @throws IOException if deserialization fails or there is a problem loading the archive.
+     * @throws XWikiException if we fail to load the document associated with the deleted attachment (the document that
+     *             was holding the attachment before it was deleted)
      */
-    private DeletedAttachment deletedAttachmentFromProvider(
-        final DeletedAttachmentFileProvider provider) throws IOException
+    private DeletedAttachment deletedAttachmentFromProvider(final DeletedAttachmentFileProvider provider,
+        final XWikiContext context) throws IOException, XWikiException
     {
         final File deletedMeta = provider.getDeletedAttachmentMetaFile();
 
@@ -455,6 +467,10 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
             lock.readLock().unlock();
         }
 
+        // Bind the deleted attachment to the associated document in order to be able to restore it.
+        DocumentReference documentReference = getDocumentReference(provider);
+        delAttach.getAttachment().setDoc(context.getWiki().getDocument(documentReference, context));
+
         final File contentFile = provider.getAttachmentContentFile();
         final XWikiAttachment attachment = delAttach.getAttachment();
         attachment.setAttachment_content(new FilesystemAttachmentContent(contentFile, attachment));
@@ -464,6 +480,24 @@ public class FilesystemAttachmentRecycleBinStore implements AttachmentRecycleBin
                 .loadArchive(attachment, provider));
 
         return delAttach.getImmutable();
+    }
+
+    /**
+     * FIXME: This method works with the default implementation of {@link FilesystemStoreTools}. It should probably be
+     * moved there but then we need to add a new method to the {@link FilesystemStoreTools} interface, thus breaking
+     * backward compatibility.
+     * 
+     * @param provider a means to get the files which store the deleted attachment content and metadata
+     * @return the reference to the document that was holding the deleted attachment
+     */
+    private DocumentReference getDocumentReference(DeletedAttachmentFileProvider provider)
+    {
+        String absolutePath = provider.getDeletedAttachmentMetaFile().getAbsolutePath();
+        int documentPathStart = this.fileTools.getStorageLocationPath().length() + 1;
+        // See DefaultFilesystemStoreTools#DOCUMENT_DIR_NAME
+        int documentPathEnd = absolutePath.indexOf("/~this/");
+        String documentPath = absolutePath.substring(documentPathStart, documentPathEnd);
+        return pathDocumentReferenceResolver.resolve(documentPath);
     }
 
     /* ---------------------------- Nested Classes. ---------------------------- */

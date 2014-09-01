@@ -159,8 +159,7 @@ public class XWikiAttachmentArchive implements Cloneable
             } catch (Exception e) {
                 Object[] args = {getAttachment().getFilename()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                    GENERIC_EXCEPTION_MESSAGE, e, args);
+                    XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT, GENERIC_EXCEPTION_MESSAGE, e, args);
             }
         }
     }
@@ -191,8 +190,7 @@ public class XWikiAttachmentArchive implements Cloneable
         } catch (Exception e) {
             Object[] args = {getAttachment().getFilename()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                GENERIC_EXCEPTION_MESSAGE, e, args);
+                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT, GENERIC_EXCEPTION_MESSAGE, e, args);
         }
     }
 
@@ -216,14 +214,22 @@ public class XWikiAttachmentArchive implements Cloneable
     }
 
     /**
-     * @return an array of versions which are available for this attachment, ordered by version number decending.
+     * @return an array of versions which are available for this attachment, ordered by version number descending.
      */
     public Version[] getVersions()
     {
-        final Node[] nodes = getRCSArchive().changeLog();
-        final Version[] versions = new Version[nodes.length];
-        for (int i = 0; i < nodes.length; i++) {
-            versions[i] = nodes[i].getVersion();
+        final Archive rcsArchive = getRCSArchive();
+
+        Version[] versions;
+        if (rcsArchive != null) {
+            final Node[] nodes = rcsArchive.changeLog();
+            versions = new Version[nodes.length];
+            for (int i = 0; i < nodes.length; i++) {
+                versions[i] = nodes[i].getVersion();
+            }
+        } else {
+            // No archive means there is no history and only the current version
+            versions = new Version[] {this.attachment.getRCSVersion()};
         }
 
         return versions;
@@ -238,20 +244,20 @@ public class XWikiAttachmentArchive implements Cloneable
      * @return an XWikiAttachment for the given revision.
      * @throws XWikiException if any Exception is thrown while getting the revision.
      */
-    public XWikiAttachment getRevision(final XWikiAttachment attachment,
-        final String rev,
-        final XWikiContext context)
+    public XWikiAttachment getRevision(final XWikiAttachment attachment, final String rev, final XWikiContext context)
         throws XWikiException
     {
         try {
             final Archive rcsArchive = getRCSArchive();
 
             if (rcsArchive == null) {
-                return null;
+                // No archive means there is no history and only the current version.
+                return this.attachment.getVersion().equals(rev) ? this.attachment : null;
             }
 
             final Version version = rcsArchive.getRevisionVersion(rev);
             if (version == null) {
+                // The requested revision doesn't exist.
                 return null;
             }
             final Object[] lines = rcsArchive.getRevision(version);
@@ -273,8 +279,7 @@ public class XWikiAttachmentArchive implements Cloneable
         } catch (Exception e) {
             final Object[] args = {attachment.getFilename()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                GENERIC_EXCEPTION_MESSAGE, e, args);
+                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT, GENERIC_EXCEPTION_MESSAGE, e, args);
         }
     }
 }

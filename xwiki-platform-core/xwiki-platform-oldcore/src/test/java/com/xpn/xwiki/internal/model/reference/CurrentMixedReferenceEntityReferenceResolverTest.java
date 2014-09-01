@@ -55,7 +55,7 @@ public class CurrentMixedReferenceEntityReferenceResolverTest extends AbstractBr
     @Test
     public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
-        getContext().setDatabase(CURRENT_WIKI);
+        getContext().setWikiId(CURRENT_WIKI);
         getContext().setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
 
         EntityReference reference =

@@ -39,7 +39,6 @@ import org.xwiki.observation.event.Event;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Produce comments related events based on {@link XObjectEvent object events}.
@@ -70,6 +69,9 @@ public class CommentEventGeneratorListener implements EventListener
     @Inject
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
+    @Inject
+    private ObservationManager observation;
+
     @Override
     public String getName()
     {
@@ -89,8 +91,6 @@ public class CommentEventGeneratorListener implements EventListener
         XWikiDocument originalDoc = doc.getOriginalDocument();
         XWikiContext context = (XWikiContext) data;
 
-        ObservationManager observation = Utils.getComponent(ObservationManager.class);
-
         XObjectEvent objectEvent = (XObjectEvent) event;
 
         String reference = this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference());
@@ -98,14 +98,14 @@ public class CommentEventGeneratorListener implements EventListener
         if (event instanceof XObjectDeletedEvent) {
             BaseObject obj = originalDoc.getXObject((ObjectReference) objectEvent.getReference());
             String number = String.valueOf(obj.getNumber());
-            observation.notify(new CommentDeletedEvent(reference, number), source, context);
+            this.observation.notify(new CommentDeletedEvent(reference, number), source, context);
         } else {
             BaseObject obj = doc.getXObject((ObjectReference) objectEvent.getReference());
             String number = String.valueOf(obj.getNumber());
             if (event instanceof XObjectAddedEvent) {
-                observation.notify(new CommentAddedEvent(reference, number), source, context);
+                this.observation.notify(new CommentAddedEvent(reference, number), source, context);
             } else {
-                observation.notify(new CommentUpdatedEvent(reference, number), source, context);
+                this.observation.notify(new CommentUpdatedEvent(reference, number), source, context);
             }
         }
     }

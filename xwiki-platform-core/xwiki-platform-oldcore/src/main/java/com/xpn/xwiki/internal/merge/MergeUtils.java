@@ -45,7 +45,7 @@ public final class MergeUtils
     /**
      * Used to do the actual merge.
      */
-    private static DiffManager diffManager = Utils.getComponent(DiffManager.class);
+    private static final DiffManager DIFFMANAGER = Utils.getComponent(DiffManager.class);
 
     /**
      * Utility class.
@@ -68,7 +68,7 @@ public final class MergeUtils
     {
         org.xwiki.diff.MergeResult<String> result;
         try {
-            result = diffManager.merge(toLines(previousStr), toLines(newStr), toLines(currentStr), null);
+            result = DIFFMANAGER.merge(toLines(previousStr), toLines(newStr), toLines(currentStr), null);
 
             mergeResult.getLog().addAll(result.getLog());
 
@@ -125,7 +125,7 @@ public final class MergeUtils
     {
         org.xwiki.diff.MergeResult<Character> result;
         try {
-            result = diffManager.merge(toCharacters(previousStr), toCharacters(newStr), toCharacters(currentStr), null);
+            result = DIFFMANAGER.merge(toCharacters(previousStr), toCharacters(newStr), toCharacters(currentStr), null);
 
             mergeResult.getLog().addAll(result.getLog());
 
@@ -156,7 +156,7 @@ public final class MergeUtils
     {
         org.xwiki.diff.MergeResult<T> result;
         try {
-            result = diffManager.merge(commonAncestor, next, current, null);
+            result = DIFFMANAGER.merge(commonAncestor, next, current, null);
 
             current.clear();
             current.addAll(result.getMerged());

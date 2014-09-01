@@ -8,32 +8,41 @@ $xwiki.jsfx.use('js/xwiki/usersandgroups/usersandgroups.js', true)
 $xwiki.ssfx.use('js/xwiki/usersandgroups/usersandgroups.css', true)
 $xwiki.jsfx.use('js/xwiki/table/livetable.js', true)
 $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
-#set ($rightsLevels = {'view': 0, 'comment': 1, 'edit': 2, 'delete': 3, 'admin': 4, 'register': 5, 'programming': 6})
+#if("$!request.section"=='Wikis')
+  #set ($rightsLevels = {'createwiki': 0})
+#else
+  #set ($rightsLevels = {'view': 0, 'comment': 1, 'edit': 2, 'delete': 3, 'admin': 4, 'register': 5, 'programming': 6})  
+#end
 #set ($levelsRights = {})
 #foreach ($r in $rightsLevels.keySet())
   #set ($discard = $levelsRights.put($rightsLevels.get($r), $r))
 #end
 #set ($maxlevel = $rightsLevels.get('delete')) ## Default: view, comment, edit, delete
-#if($doc.fullName == 'XWiki.XWikiPreferences')
-  #if (("$!{request.editor}" == 'globaladmin') || "$!{editor}" == 'globaladmin')
-    #set ($clsname = 'XWiki.XWikiGlobalRights')
-    #if ($xcontext.database == 'xwiki')
-      #set ($maxlevel = $rightsLevels.get('programming')) ## base + admin, register, programming
+#if("$!request.section"=='Wikis')
+  #set ($maxlevel = $rightsLevels.get('createwiki'))
+  #set ($clsname = 'XWiki.XWikiGlobalRights')
+#else
+  #if($doc.fullName == 'XWiki.XWikiPreferences')
+    #if (("$!{request.editor}" == 'globaladmin') || "$!{editor}" == 'globaladmin')
+      #set ($clsname = 'XWiki.XWikiGlobalRights')
+      #if ($xcontext.database == 'xwiki')
+        #set ($maxlevel = $rightsLevels.get('programming')) ## base + admin, register, programming
+      #else
+        #set ($maxlevel = $rightsLevels.get('register')) ## base + admin, register
+      #end
     #else
-      #set ($maxlevel = $rightsLevels.get('register')) ## base + admin, register
+      #set($clsname = 'XWiki.XWikiRights')
     #end
-  #else
-    #set($clsname = 'XWiki.XWikiRights')
-  #end
-#elseif ($doc.name == 'WebPreferences')
-  #if ("$!{request.editor}" == 'spaceadmin' || "$!{editor}" == 'spaceadmin')
-    #set ($clsname = 'XWiki.XWikiGlobalRights')
-    #set ($maxlevel = $rightsLevels.get('admin')) ## base + admin
+  #elseif ($doc.name == 'WebPreferences')
+    #if ("$!{request.editor}" == 'spaceadmin' || "$!{editor}" == 'spaceadmin')
+      #set ($clsname = 'XWiki.XWikiGlobalRights')
+      #set ($maxlevel = $rightsLevels.get('admin')) ## base + admin
+    #else
+      #set ($clsname = 'XWiki.XWikiRights')
+    #end
   #else
     #set ($clsname = 'XWiki.XWikiRights')
   #end
-#else
-  #set ($clsname = 'XWiki.XWikiRights')
 #end
 
 ## url to take the users and groups to display in the ajax-based table
@@ -56,7 +65,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
     #end
     #set ($specifiedRights = $!obj.getProperty('levels').getValue().split(','))
     #foreach ($right in $specifiedRights)
-      #if ($maxlevel >= $rightsLevels.get($right))
+      #if ($rightsLevels.containsKey($right) && $maxlevel >= $rightsLevels.get($right))
         #set ($discard = $r.set($rightsLevels.get($right), $rightValue))
       #end
     #end
@@ -148,53 +157,65 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
         </table>
       </td>
     </tr>
-    ## Global settings: mandatory authentication for view/edit, captcha
-    #set ($guest_comment_captcha_prop = $doc.getObject('XWiki.XWikiPreferences').getxWikiClass().get('guest_comment_requires_captcha'))
-    #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop)
-      <tr>
-        <td>
-          <table>
-          #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin')
-            #set ($auth_view = $doc.getObject('XWiki.XWikiPreferences').getProperty('authenticate_view').getValue())
-            #if ("$!auth_view" == '1')
-              #set ($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
-              #set ($view_alt = 'yes')
-            #else
-              #set ($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
-              #set ($view_alt = 'no')
-            #end
-            <tr><td>$services.localization.render('authenticate_view')</td><td><img id="authenticate_view" alt="$view_alt" src="${view_icon}" /></td></tr>
-            #set ($auth_edit = $doc.getObject('XWiki.XWikiPreferences').getProperty('authenticate_edit').getValue())
-            #if ("$!auth_edit" == '1')
-              #set ($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
-              #set ($edit_alt = 'yes')
-            #else
-              #set ($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
-              #set ($edit_alt = 'no')
-            #end
-            <tr><td>$services.localization.render('authenticate_edit')</td><td><img id="authenticate_edit" alt="$edit_alt" src="${edit_icon}" /></td></tr>
-          #end
-          #if ($guest_comment_captcha_prop)
-            ## If we are in globaladmin, we don't want to get the setting from XWiki.WebPreferences...
-            #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin')
-              #set ($guest_comment_requires_captcha = $xwiki.getXWikiPreferenceAsInt('guest_comment_requires_captcha', 0))
-            #else
-              #set ($guest_comment_requires_captcha = $xwiki.getSpacePreferenceAsInt('guest_comment_requires_captcha', 0))
-            #end
-            #if($guest_comment_requires_captcha == 1)
-              #set ($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
-              #set ($guest_comment_requires_captcha_alt = 'yes')
-            #else
-              #set ($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
-              #set ($guest_comment_requires_captcha_alt = 'no')
-            #end
-            <tr><td>$services.localization.render('rightsmanager.guestcommentrequirescaptcha')</td><td><img id="guest_comment_requires_captcha" alt="$guest_comment_requires_captcha_alt" src="$guest_comment_requires_captcha_icon" /></td></tr>
-          #end
-          </table>
-        </td>
-      </tr>
-    #end
-    </table>
+  </table>
+  ## Global settings: mandatory authentication for view/edit, captcha
+  #set ($guest_comment_captcha_prop = $doc.getObject('XWiki.XWikiPreferences').getxWikiClass().get('guest_comment_requires_captcha'))
+  #if (("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin' || $guest_comment_captcha_prop) && $request.section != 'Wikis')
+    <dl class="rights-settings">
+      #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin')
+        #set ($auth_view = $doc.getObject('XWiki.XWikiPreferences').getProperty('authenticate_view').getValue())
+        #if ("$!auth_view" == '1')
+          #set ($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
+          #set ($view_alt = 'yes')
+        #else
+          #set ($view_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
+          #set ($view_alt = 'no')
+        #end
+        <dt>
+          <label for="authenticate_view">
+            <input type="image" id="authenticate_view" alt="$view_alt" src="$view_icon" class="icon" />
+            $services.localization.render('authenticate_view')
+          </label>
+        </dt>
+        #set ($auth_edit = $doc.getObject('XWiki.XWikiPreferences').getProperty('authenticate_edit').getValue())
+        #if ("$!auth_edit" == '1')
+          #set ($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
+          #set ($edit_alt = 'yes')
+        #else
+          #set ($edit_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
+          #set ($edit_alt = 'no')
+        #end
+        <dt>
+          <label for="authenticate_edit">
+            <input type="image" id="authenticate_edit" alt="$edit_alt" src="$edit_icon" class="icon" />
+            $services.localization.render('authenticate_edit')
+          </label>
+        </dt>
+      #end
+      #if ($guest_comment_captcha_prop)
+        ## If we are in globaladmin, we don't want to get the setting from XWiki.WebPreferences...
+        #if ("$!request.editor" == 'globaladmin' || "$!editor" == 'globaladmin')
+          #set ($guest_comment_requires_captcha = $xwiki.getXWikiPreferenceAsInt('guest_comment_requires_captcha', 0))
+        #else
+          #set ($guest_comment_requires_captcha = $xwiki.getSpacePreferenceAsInt('guest_comment_requires_captcha', 0))
+        #end
+        #if($guest_comment_requires_captcha == 1)
+          #set ($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png'))
+          #set ($guest_comment_requires_captcha_alt = 'yes')
+        #else
+          #set ($guest_comment_requires_captcha_icon = $xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png'))
+          #set ($guest_comment_requires_captcha_alt = 'no')
+        #end
+        <dt>
+          <label for="guest_comment_requires_captcha">
+            <input type="image" id="guest_comment_requires_captcha" alt="$guest_comment_requires_captcha_alt"
+                src="$guest_comment_requires_captcha_icon" class="icon" />
+            $services.localization.render('rightsmanager.guestcommentrequirescaptcha')
+          </label>
+        </dt>
+      #end
+    </dl>
+  #end
 
     <script type="text/javascript">
     //<![CDATA[

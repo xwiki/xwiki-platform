@@ -19,9 +19,12 @@
  */
 package com.xpn.xwiki.objects;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -51,7 +54,7 @@ public class BaseObjectTest extends AbstractBridgedComponentTestCase
     @Test
     public void testSetName() throws Exception
     {
-        String database = getContext().getDatabase();
+        String database = getContext().getWikiId();
         BaseObject baseObject = new BaseObject();
 
         baseObject.setName("space.page");
@@ -64,13 +67,13 @@ public class BaseObjectTest extends AbstractBridgedComponentTestCase
     @Test
     public void testSetNameAloneWithChangingContext() throws Exception
     {
-        String database = getContext().getDatabase();
+        String database = getContext().getWikiId();
         BaseObject baseObject = new BaseObject();
 
         baseObject.setName("space.page");
 
         try {
-            getContext().setDatabase("otherwiki");
+            getContext().setWikiId("otherwiki");
 
             Assert.assertEquals(database, baseObject.getDocumentReference().getWikiReference().getName());
             Assert.assertEquals("space", baseObject.getDocumentReference().getLastSpaceReference().getName());
@@ -78,7 +81,7 @@ public class BaseObjectTest extends AbstractBridgedComponentTestCase
 
             baseObject.setName("otherspace.otherpage");
         } finally {
-            getContext().setDatabase(database);
+            getContext().setWikiId(database);
         }
 
         Assert.assertEquals(database, baseObject.getDocumentReference().getWikiReference().getName());
@@ -87,10 +90,10 @@ public class BaseObjectTest extends AbstractBridgedComponentTestCase
 
         baseObject = new BaseObject();
         try {
-            getContext().setDatabase("otherwiki");
+            getContext().setWikiId("otherwiki");
             baseObject.setName("space.page");
         } finally {
-            getContext().setDatabase(database);
+            getContext().setWikiId(database);
         }
 
         Assert.assertEquals("otherwiki", baseObject.getDocumentReference().getWikiReference().getName());
@@ -137,22 +140,23 @@ public class BaseObjectTest extends AbstractBridgedComponentTestCase
     public void testMerge()
     {
         BaseObject previousObject = new BaseObject();
-        previousObject.setStringValue("str", "");
+        previousObject.setStringValue("str", "value");
         BaseObject nextObject = new BaseObject();
-        nextObject.setStringValue("str", "Panels.Applications,Panels.QuickLinks,Panels.RecentModifications");
+        nextObject.setStringValue("str", "newvalue");
         BaseObject currentObject = new BaseObject();
-        currentObject.setStringValue("str", "Panels.QuickLinks,Panels.RecentModifications");
+        currentObject.setStringValue("str", "value");
 
         MergeConfiguration mergeConfiguration = new MergeConfiguration();
         MergeResult mergeResult = new MergeResult();
 
         currentObject.merge(previousObject, nextObject, mergeConfiguration, getContext(), mergeResult);
 
-        if (mergeResult.getLog().getLogsFrom(LogLevel.WARN).size() > 0) {
-            Assert.fail("Found error or warning during the merge");
+        List<LogEvent> errors = mergeResult.getLog().getLogsFrom(LogLevel.WARN);
+        if (errors.size() > 0) {
+            Assert.fail("Found error or warning during the merge (" + errors.get(0) + ")");
         }
 
-        Assert.assertEquals("Panels.Applications,Panels.QuickLinks,Panels.RecentModifications",
+        Assert.assertEquals("newvalue",
             currentObject.getStringValue("str"));
     }
 }

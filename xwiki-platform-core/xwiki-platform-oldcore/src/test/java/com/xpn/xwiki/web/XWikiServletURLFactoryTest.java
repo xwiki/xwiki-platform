@@ -38,6 +38,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
+import junit.framework.Assert;
+
 public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
 {
     private static final String MAIN_WIKI_NAME = "xwiki";
@@ -130,7 +132,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
             }
         };
         xwiki.setConfig((this.config = new XWikiConfig()));
-        xwiki.setDatabase(getContext().getDatabase());
+        xwiki.setDatabase(getContext().getWikiId());
 
         Mock mockXWikiRequest = mock(XWikiRequest.class, new Class[] {}, new Object[] {});
         mockXWikiRequest.stubs().method("getScheme").will(returnValue("http"));
@@ -360,13 +362,24 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         // Reinitialize the URL factory to take into account the new request URL.
         urlFactory.init(getContext());
 
-        getContext().setDatabase("wiki2");
+        getContext().setWikiId("wiki2");
 
         String url = urlFactory.getURL(new URL("http://wiki1server/xwiki/bin/view/Space/Page"), getContext());
         assertEquals("/xwiki/bin/view/Space/Page", url);
 
         url = urlFactory.getURL(new URL("http://wiki2server/xwiki/bin/view/Space/Page"), getContext());
         assertEquals("http://wiki2server/xwiki/bin/view/Space/Page", url);
+    }
+
+    /** When the URL contains only the hostname, without a path, / is returned instead of the empty string. */
+    public void testGetURLWithEmptyPathReturnsSlash() throws MalformedURLException
+    {
+        getContext().setURL(new URL("http://wiki1server/xwiki/view/InitialSpace/InitialPage"));
+        // Reinitialize the URL factory to take into account the new request URL.
+        this.urlFactory.init(getContext());
+
+        String url = this.urlFactory.getURL(new URL("http://wiki1server/"), getContext());
+        assertEquals("/", url);
     }
 
     /**
@@ -376,11 +389,11 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
     public void testGetServerURLFromVirtualWithXWikiDotHomeEnabled() throws MalformedURLException
     {
         getContext().setURL(new URL("http://virtual1.mywiki.tld/xwiki/view/InitialSpace/InitialPage"));
-        getContext().setDatabase("subwiki");
+        getContext().setWikiId("subwiki");
 
         // This is called by XWiki#getXWiki() and is set to whatever the user asks for.
         // The test sets it to "xwiki" which is wrong for this test.
-        getContext().setOriginalDatabase("subwiki");
+        getContext().setOriginalWikiId("subwiki");
 
         config.setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
         config.setProperty("xwiki.virtual", "1");
@@ -394,11 +407,11 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
     public void testXWikiDotHomeParameterFromVirtualWiki() throws MalformedURLException
     {
         getContext().setURL(new URL("http://virtual1.mywiki.tld/xwiki/view/InitialSpace/InitialPage"));
-        getContext().setDatabase("subwiki");
+        getContext().setWikiId("subwiki");
 
         // This is called by XWiki#getXWiki() and is set to whatever the user asks for.
         // The test sets it to "xwiki" which is wrong for this test.
-        getContext().setOriginalDatabase("subwiki");
+        getContext().setOriginalWikiId("subwiki");
 
         config.setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
         config.setProperty("xwiki.virtual", "1");
@@ -455,5 +468,15 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki", getContext());
         assertEquals(new URL("http://mainwiki.mywiki.tld/xwiki/bin/view/Space/Page?param1=1#anchor"), url);
         assertEquals("/xwiki/bin/view/Space/Page?param1=1#anchor", urlFactory.getURL(url, getContext()));
+    }
+
+    /**
+     * Verify that jsessionid is removed from URL.
+     */
+    public void testNormalizeURL() throws Exception
+    {
+        assertEquals(new URL("http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35?language=en"),
+            urlFactory.normalizeURL("http://www.xwiki.org/xwiki/bin/view/Blog/Bug+Fixing+Day+35"
+                + ";jsessionid=0AF95AFB8997826B936C0397DF6A0C7F?language=en", getContext()));
     }
 }

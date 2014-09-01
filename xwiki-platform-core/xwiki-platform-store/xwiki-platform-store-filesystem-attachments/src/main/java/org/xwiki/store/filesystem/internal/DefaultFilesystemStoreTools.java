@@ -102,6 +102,9 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     @Named("path")
     private EntityReferenceSerializer<String> pathSerializer;
 
+    @Inject
+    private FilesystemAttachmentsConfiguration config;
+
     /**
      * We need to get the XWiki object in order to get the work directory.
      */
@@ -156,28 +159,39 @@ public class DefaultFilesystemStoreTools implements FilesystemStoreTools, Initia
     public void initialize()
     {
         this.storageDir = new File(this.environment.getPermanentDirectory(), STORAGE_DIR_NAME);
-        deleteEmptyDirs(this.storageDir);
+        if (config.cleanOnStartup()) {
+            final File dir = this.storageDir;
+            new Thread(new Runnable() {
+                public void run()
+                {
+                    deleteEmptyDirs(dir, 0);
+                }
+            }).start();
+        }
     }
 
     /**
      * Delete all empty directories under the given directory.
      * A directory which contains only empty directories is also considered an empty ditectory.
+     * This function will not delete *location* unless depth is non-zero.
      *
      * @param location a directory to delete.
+     * @param depth used for recursion, should always be zero.
      * @return true if the directory existed, was empty and was deleted.
      */
-    private static boolean deleteEmptyDirs(final File location)
+    private static boolean deleteEmptyDirs(final File location, int depth)
     {
         if (location != null && location.exists() && location.isDirectory()) {
             final File[] dirs = location.listFiles();
             boolean empty = true;
             for (int i = 0; i < dirs.length; i++) {
-                if (!deleteEmptyDirs(dirs[i])) {
+                if (!deleteEmptyDirs(dirs[i], depth + 1)) {
                     empty = false;
                 }
             }
-            if (empty) {
+            if (empty && depth != 0) {
                 location.delete();
+                return true;
             }
         }
         return false;

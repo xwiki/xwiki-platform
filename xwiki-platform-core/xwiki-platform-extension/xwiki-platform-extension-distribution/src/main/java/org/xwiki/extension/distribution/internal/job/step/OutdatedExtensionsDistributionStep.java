@@ -28,9 +28,14 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.extension.InstalledExtension;
-import org.xwiki.extension.distribution.internal.job.step.UpgradeModeDistributionStep.UpgradeMode;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
+/**
+ * List and allow to upgrade outdated extensions.
+ * 
+ * @version $Id$
+ * @since 5.0RC1
+ */
 @Component
 @Named(OutdatedExtensionsDistributionStep.ID)
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
@@ -52,16 +57,14 @@ public class OutdatedExtensionsDistributionStep extends AbstractDistributionStep
         if (getState() == null) {
             setState(State.COMPLETED);
 
-            UpgradeMode upgradeMode = this.distributionManager.getUpgradeMode();
-
             Collection<InstalledExtension> installedExtensions;
-            if (upgradeMode == UpgradeMode.ALLINONE) {
+            if (isMainWiki()) {
                 installedExtensions = this.installedRepository.getInstalledExtensions();
             } else {
                 installedExtensions = this.installedRepository.getInstalledExtensions(getNamespace());
             }
 
-            // Upgrade outdated extensions only when there is outdated extensions
+            // Upgrade outdated extensions only when there is invalid extensions
             for (InstalledExtension extension : installedExtensions) {
                 Collection<String> installedNamespaces = extension.getNamespaces();
                 if (installedNamespaces == null) {

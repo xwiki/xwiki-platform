@@ -36,10 +36,14 @@ public enum PlotType
     AREA("area", DatasetType.CATEGORY, AxisType.CATEGORY, AxisType.NUMBER),
     /** Bar plot type. */
     BAR("bar", DatasetType.CATEGORY, AxisType.CATEGORY, AxisType.NUMBER),
+    /** Stacked Bar plot type. */
+    STACKEDBAR("stackedbar", DatasetType.CATEGORY, AxisType.CATEGORY, AxisType.NUMBER),
     /** Pie plot type. */
     PIE("pie", DatasetType.PIE),
     /** 3D bar plot type. */
     BAR3D("bar3D", DatasetType.CATEGORY, AxisType.CATEGORY, AxisType.NUMBER),
+    /** Stacked 3D bar plot type. */
+    STACKEDBAR3D("stackedbar3D", DatasetType.CATEGORY, AxisType.CATEGORY, AxisType.NUMBER),
     /** 3D line plot type. */
     LINE3D("line3D", DatasetType.CATEGORY, AxisType.CATEGORY, AxisType.NUMBER),
     /** xy area plot type. */

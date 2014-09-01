@@ -1,0 +1,2 @@
+org.xwiki.filter.script.FilterScriptService
+500:org.xwiki.filter.script.internal.ScriptFilterStreamConverterJob

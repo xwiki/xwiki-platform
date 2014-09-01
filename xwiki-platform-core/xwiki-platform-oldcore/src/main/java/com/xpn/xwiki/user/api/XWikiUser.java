@@ -69,6 +69,7 @@ public class XWikiUser
 
     /**
      * Check if the user belongs to a group or not.
+     * This method only check direct membership (no recursive checking) in the current wiki.
      * 
      * @param groupName The group to check.
      * @param context The current {@link XWikiContext context}.

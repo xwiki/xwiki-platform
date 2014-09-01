@@ -22,8 +22,9 @@ package org.xwiki.chart.internal.plot;
 import java.util.Map;
 
 import org.jfree.chart.plot.Plot;
-import org.xwiki.chart.model.ChartModel;
 import org.xwiki.chart.PlotGeneratorException;
+import org.xwiki.chart.model.ChartModel;
+import org.xwiki.component.annotation.Role;
 
 /**
  * Interface for defining various jfreechart {@link Plot} generators.
@@ -31,6 +32,7 @@ import org.xwiki.chart.PlotGeneratorException;
  * @version $Id$
  * @since 2.0M1
  */
+@Role
 public interface PlotGenerator
 {
     /**

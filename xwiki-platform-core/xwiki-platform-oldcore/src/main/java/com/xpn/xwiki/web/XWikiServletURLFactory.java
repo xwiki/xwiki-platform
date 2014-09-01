@@ -143,7 +143,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         final String surl = getXWikiHomeParameterAsString(context);
         if (!StringUtils.isEmpty(surl)) {
             try {
-                return new URL(surl);
+                return normalizeURL(surl, context);
             } catch (MalformedURLException e) {
                 LOGGER.warn("Could not create URL from xwiki.cfg xwiki.home parameter: " + surl
                     + " Ignoring parameter.");
@@ -161,7 +161,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     @Override
     public URL getServerURL(XWikiContext context) throws MalformedURLException
     {
-        return getServerURL(context.getDatabase(), context);
+        return getServerURL(context.getWikiId(), context);
     }
 
     /**
@@ -178,7 +178,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      */
     public URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException
     {
-        if (xwikidb == null || xwikidb.equals(context.getOriginalDatabase())) {
+        if (xwikidb == null || xwikidb.equals(context.getOriginalWikiId())) {
             // This is the case if we are getting a URL for a page which is in
             // the same wiki as the page which is now being displayed.
             return this.serverURL;
@@ -236,18 +236,21 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             newpath.append(encode(anchor, context));
         }
 
+        URL result;
         try {
-            return new URL(getServerURL(xwikidb, context), newpath.toString());
+            result = normalizeURL(new URL(getServerURL(xwikidb, context), newpath.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
-            return null;
+            result = null;
         }
+
+        return result;
     }
 
     private void addServletPath(StringBuffer newpath, String xwikidb, XWikiContext context)
     {
         if (xwikidb == null) {
-            xwikidb = context.getDatabase();
+            xwikidb = context.getWikiId();
         }
 
         String spath = context.getWiki().getServletPath(xwikidb, context);
@@ -320,7 +323,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         newpath.append(skin);
         addFileName(newpath, filename, false, context);
         try {
-            return new URL(getServerURL(context), newpath.toString());
+            return normalizeURL(new URL(getServerURL(context), newpath.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -337,7 +340,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         addName(newpath, name, "skin", context);
         addFileName(newpath, filename, false, context);
         try {
-            return new URL(getServerURL(xwikidb, context), newpath.toString());
+            return normalizeURL(new URL(getServerURL(xwikidb, context), newpath.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -349,13 +352,13 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         StringBuffer newpath = new StringBuffer(this.contextPath);
         if (forceSkinAction) {
-            addServletPath(newpath, context.getDatabase(), context);
+            addServletPath(newpath, context.getWikiId(), context);
             addAction(newpath, "skin", context);
         }
         newpath.append("resources");
         addFileName(newpath, filename, false, context);
         try {
-            return new URL(getServerURL(context), newpath.toString());
+            return normalizeURL(new URL(getServerURL(context), newpath.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -368,7 +371,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         newpath.append("templates");
         addFileName(newpath, filename, false, context);
         try {
-            return new URL(getServerURL(context), newpath.toString());
+            return normalizeURL(new URL(getServerURL(context), newpath.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -412,7 +415,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         try {
-            return new URL(getServerURL(xwikidb, context), newpath.toString());
+            return normalizeURL(new URL(getServerURL(xwikidb, context), newpath.toString()), context);
         } catch (Exception e) {
             return null;
         }
@@ -469,7 +472,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         newpath.append(StringUtils.removeEnd(StringUtils.removeEnd(qstring, "&"), "&amp;"));
 
         try {
-            return new URL(getServerURL(xwikidb, context), newpath.toString());
+            return normalizeURL(new URL(getServerURL(xwikidb, context), newpath.toString()), context);
         } catch (MalformedURLException e) {
             // This should not happen
             return null;
@@ -536,7 +539,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             LOGGER.error("Failed to create URL", e);
         }
 
-        return relativeURL;
+        return StringUtils.defaultIfEmpty(relativeURL, "/");
     }
 
     @Override
@@ -547,7 +550,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         try {
             final URL servurl = getServerURL(context);
             // if use apache mod_proxy we needed to know external host address
-            return new URL(servurl.getProtocol(), servurl.getHost(), servurl.getPort(), url.getFile());
+            return normalizeURL(new URL(servurl.getProtocol(), servurl.getHost(), servurl.getPort(), url.getFile()),
+                context);
         } catch (MalformedURLException e) {
             // This should not happen
             LOGGER.error("Failed to create request URL", e);
@@ -589,5 +593,66 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         return -1;
+    }
+
+    /**
+     * Encodes the passed URL and offers the possibility for Servlet Filter to perform URL rewriting (this is used
+     * for example by Tuckey's URLRewriteFilter for rewriting outbound URLs, see
+     * http://platform.xwiki.org/xwiki/bin/view/Main/ShortURLs).
+     * <p/>
+     * However Servlet Container will also add a ";jsessionid=xxx" content to the URL while encoding the URL and we
+     * strip it since we don't want to have that in our URLs as it can cause issues with:
+     * <ul>
+     *   <li>security</li>
+     *   <li>SEO</li>
+     *   <li>clients not expecting jsessionid in URL, for example RSS feed readers which will think that articles are
+     *       different as they'll get different URLs everytime they call the XWiki server</li>
+     * </ul>
+     * See why jsessionid are considered harmful
+     * <a href="https://randomcoder.org/articles/jsessionid-considered-harmful">here</a> and
+     * <a href="http://java.dzone.com/articles/java-jsessionid-harmful">here</a>
+     *
+     * @param url the URL to encode and normalize
+     * @param context the XWiki Context used to get access to the Response for encoding the URL
+     * @return the normalized URL
+     * @throws MalformedURLException if the passed URL is invalid
+     */
+    protected static URL normalizeURL(URL url, XWikiContext context) throws MalformedURLException
+    {
+        return normalizeURL(url.toExternalForm(), context);
+    }
+
+    /**
+     * Encodes the passed URL and offers the possibility for Servlet Filter to perform URL rewriting (this is used
+     * for example by Tuckey's URLRewriteFilter for rewriting outbound URLs, see
+     * http://platform.xwiki.org/xwiki/bin/view/Main/ShortURLs).
+     * <p/>
+     * However Servlet Container will also add a ";jsessionid=xxx" content to the URL while encoding the URL and we
+     * strip it since we don't want to have that in our URLs as it can cause issues with:
+     * <ul>
+     *   <li>security</li>
+     *   <li>SEO</li>
+     *   <li>clients not expecting jsessionid in URL, for example RSS feed readers which will think that articles are
+     *       different as they'll get different URLs everytime they call the XWiki server</li>
+     * </ul>
+     * See why jsessionid are considered harmful
+     * <a href="https://randomcoder.org/articles/jsessionid-considered-harmful">here</a> and
+     * <a href="http://java.dzone.com/articles/java-jsessionid-harmful">here</a>
+     *
+     * @param url the URL to encode and normalize
+     * @param context the XWiki Context used to get access to the Response for encoding the URL
+     * @return the normalized URL
+     * @throws MalformedURLException if the passed URL is invalid
+     */
+    protected static URL normalizeURL(String url, XWikiContext context) throws MalformedURLException
+    {
+        // For robust session tracking, all URLs emitted by a servlet should be encoded. Otherwise, URL rewriting
+        // cannot be used with browsers which do not support cookies.
+        String encodedURLAsString = context.getResponse().encodeURL(url);
+
+        // Remove a potential jsessionid in the URL
+        encodedURLAsString = encodedURLAsString.replaceAll(";jsessionid=.*?(?=\\?|$)", "");
+
+        return new URL(encodedURLAsString);
     }
 }

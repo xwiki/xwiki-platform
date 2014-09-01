@@ -26,6 +26,8 @@ import org.junit.runner.RunWith;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.formula.ImageData;
 import org.xwiki.formula.ImageStorage;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
 import org.xwiki.test.jmock.MockingComponentManager;
 
@@ -58,8 +60,15 @@ public class IntegrationTests
         mockery.checking(new Expectations()
         {
             {
-                atLeast(2).of(mockDocumentAccessBridge).getDocumentURL(null, "tex", null, null);
-                will(returnValue("/xwiki/bin/view/Main/"));
+                atLeast(1).of(mockDocumentAccessBridge).getCurrentDocumentReference();
+                DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+                will(returnValue(documentReference));
+
+                AttachmentReference attachmentReference = new AttachmentReference(
+                    "06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966", documentReference);
+                atLeast(2).of(mockDocumentAccessBridge).getAttachmentURL(attachmentReference, false);
+                will(returnValue(
+                    "/xwiki/bin/view/space/page/06fbba0acf130efd9e147fdfe91a943cc4f3e29972c6cd1d972e9aabf0900966"));
 
                 atLeast(2).of(mockConfiguration).getRenderer();
                 will(returnValue("snuggletex"));

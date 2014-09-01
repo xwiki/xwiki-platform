@@ -26,6 +26,8 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.wiki.WikiModel;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.jmock.MockingComponentManager;
 
 /**
@@ -37,7 +39,9 @@ import org.xwiki.test.jmock.MockingComponentManager;
 public class ScriptMockSetup
 {
     public DocumentAccessBridge bridge;
-    
+
+    public ContextualAuthorizationManager authorizationManager;
+
     public AttachmentReferenceResolver<String> attachmentReferenceResolver;
     
     public DocumentReferenceResolver<String> documentReferenceResolver;
@@ -55,6 +59,12 @@ public class ScriptMockSetup
         this.bridge = cm.registerMockComponent(mockery, DocumentAccessBridge.class);
         mockery.checking(new Expectations() {{
             allowing(bridge).hasProgrammingRights(); will(returnValue(true));
+        }});
+
+        // Contextual Authorization Manager Mock setup
+        this.authorizationManager = cm.registerMockComponent(mockery, ContextualAuthorizationManager.class);
+        mockery.checking(new Expectations() {{
+            allowing(authorizationManager).hasAccess(Right.PROGRAM); will(returnValue(true));
         }});
 
         // Register a WikiModel mock so that we're in wiki mode (otherwise links will be considered as URLs for ex).

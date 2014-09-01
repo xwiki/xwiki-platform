@@ -102,8 +102,12 @@ $response.setContentType("application/x-json")
   #if($wikiname != "xwiki" || $wikiname == $xcontext.database) #set($wikiname = "local") #end
   #if($wikiname == "xwiki")
     #set($username = $user.getPrefixedFullName())
+    #set($usermatch = ${regextool.quote($username)})
   #else
     #set($username = $user.fullName)
+    ## in subwikis users may be referenced by wiki:Space.Username or Space.Username
+    ## try to match both with one regexp. See XWIKI-9730
+    #set($usermatch = "("+${regextool.quote($user.getWiki())}+":)?"+${regextool.quote($username)} )
   #end
   #set($allows = {})
   #set($denys = {})
@@ -111,7 +115,7 @@ $response.setContentType("application/x-json")
   ## Get the rights for that user or group
   #foreach($obj in $doc.getObjects($clsname)) ## $clsname = XWiki.XWikiGlobalRights or XWiki.XWikiRights
     #set($pers = "$!obj.getProperty($uorg).getValue()")
-    #if(($pers != "") && ($pers.matches("^(.*,)?${regextool.quote($username)}(,.*)?$")) )  
+    #if(($pers != "") && (($pers.matches("^(.*,)?${usermatch}(,.*)?$")) ) )  
       #foreach($right in $!obj.getProperty('levels').getValue().split(","))
         #set($right = $right.trim())
         #if($right != "")

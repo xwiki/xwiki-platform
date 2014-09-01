@@ -32,11 +32,11 @@ import org.xwiki.store.UnexpectedException;
 
 /**
  * The content of an attachment. This implementation is based on a file on the filesystem.
- * This implementation is immutable and is only created by the
- * {@link com.xpn.xwiki.store.FilesystemAttachmentStore}.
+ * This implementation is mutable but the underlying file is left alone.
  *
  * @version $Id$
  * @since 3.0M2
+ * @see {@link com.xpn.xwiki.store.FilesystemAttachmentStore}.
  */
 public class FilesystemAttachmentContent extends XWikiAttachmentContent
 {
@@ -53,9 +53,7 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
      */
     public FilesystemAttachmentContent(final File storage, final XWikiAttachment attachment)
     {
-        // TODO This will cause a new FileItem to be created in XWikiAttachmentContent
-        // but it is the only constructor available. This should be fixed in XAC.
-        super(attachment);
+        super(attachment, null);
         this.storageFile = storage;
     }
 
@@ -68,9 +66,7 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
      */
     public FilesystemAttachmentContent(final File storage)
     {
-        // TODO This will cause a new FileItem to be created in XWikiAttachmentContent
-        // but it is the only constructor available. This should be fixed in XAC.
-        super();
+        super(null, null);
         this.storageFile = storage;
     }
 
@@ -84,6 +80,8 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     @Deprecated
     public byte[] getContent()
     {
+        if (this.getFileItem() != null) { return super.getContent(); }
+
         final InputStream is = this.getContentInputStream();
         try {
             return IOUtils.toByteArray(is);
@@ -97,6 +95,8 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     @Override
     public InputStream getContentInputStream()
     {
+        if (this.getFileItem() != null) { return super.getContentInputStream(); }
+
         try {
             return new AutoCloseInputStream(new FileInputStream(this.storageFile));
         } catch (IOException e) {
@@ -105,19 +105,10 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
     }
 
     @Override
-    public void setContent(final InputStream is) throws IOException
-    {
-        // This should be immutable but XWikiAttachment calls this when an attachment is being
-        // saved which already exists. Disconnect this content from the attachment since it
-        // might be being used by another instance of the same attachment, then let the attachment
-        // create a new XWikiAttachmentContent instance with a new file.
-        this.getAttachment().setAttachment_content(null);
-        this.getAttachment().setContent(is);
-    }
-
-    @Override
     public int getSize()
     {
+        if (this.getFileItem() != null) { return super.getSize(); }
+
         long size = this.storageFile.length();
         // The most important thing is that it doesn't roll over into the negative space.
         if (size > ((long) Integer.MAX_VALUE)) {
@@ -125,12 +116,4 @@ public class FilesystemAttachmentContent extends XWikiAttachmentContent
         }
         return (int) size;
     }
-
-    /*
-     * Despite being an immutable implementation, setContentDirty(boolean) is not overridden,
-     * this is because there is the possibility that the attachment will be moved from one
-     * document to another, from versioning store to main store, or from deleted attachments to
-     * main store and the core uses setContentDirty and isContentDirty as a way to signal
-     * that there is reason to want to save the attachment.
-     */
 }

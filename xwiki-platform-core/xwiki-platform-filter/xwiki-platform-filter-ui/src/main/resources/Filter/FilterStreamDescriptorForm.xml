@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Filter</web>
+  <name>FilterStreamDescriptorForm</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1395934584000</creationDate>
+  <parent>WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1396260007000</date>
+  <contentUpdateDate>1396260007000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#macro(filterDescriptorForm $descriptor $id)
+  &lt;dl#if ($id) id="$id"#end&gt;
+    #foreach($descriptor in $descriptor.properties)
+      #if ($id)
+        #set($descriptorId = "${id}_descriptor_${descriptor.id}")
+      #else
+        #set($descriptorId = "descriptor_${descriptor.id}")
+      #end
+      &lt;dt&gt;
+        &lt;label for="$descriptorId"&gt;$descriptor.name&lt;/label&gt;
+        &lt;span class="xHint"&gt;$descriptor.description&lt;/span&gt;
+        &lt;span class="xHint"&gt;&lt;tt&gt;$descriptor.type.getName()&lt;/tt&gt;&lt;/span&gt;
+        #if ($descriptor.type.getName() == 'org.xwiki.filter.output.OutputTarget')
+          &lt;span class="xHint"&gt;&lt;tt&gt;Supported format is &lt;strong&gt;file:&amp;lt;path in server&amp;gt;&lt;/strong&gt; (e.g. &lt;strong&gt;file:/home/myuser/target.xml&lt;/strong&gt;). When empty it send a file named &lt;strong&gt;target&lt;/strong&gt; to the browser.&lt;/tt&gt;&lt;/span&gt;
+        #elseif ($descriptor.type.getName() == 'org.xwiki.filter.input.InputSource')
+          &lt;span class="xHint"&gt;&lt;tt&gt;Supported formats are &lt;strong&gt;file:&amp;lt;path in server&amp;gt;&lt;/strong&gt; (e.g. &lt;strong&gt;file:/home/myuser/target.ext&lt;/strong&gt;) and &lt;strong&gt;url:&amp;lt;url&amp;gt;&lt;/strong&gt; (e.g. &lt;strong&gt;url:http://myserver/some/file/to/parse.ext&lt;/strong&gt;). When empty it read the request input stream.&lt;/tt&gt;&lt;/span&gt;
+        #end
+      &lt;/dt&gt;
+      &lt;dd&gt;
+        ## TODO: design a real framework to generate form by type
+        #if (($descriptor.defaultValue || "$!descriptor.defaultValue" != '') &amp;&amp; ($descriptor.type.getName() == 'boolean' || $descriptor.type.getName() == 'int' || $descriptor.type.getName() == 'java.lang.String'))
+          &lt;input type="text" id="$descriptorId" name="$descriptorId" value="#if($request.get($descriptorId))$request.get($descriptorId)#else$descriptor.defaultValue#end"/&gt;
+        #else
+          &lt;input type="text" id="$descriptorId" name="$descriptorId"#if($request.get($descriptorId))value="$request.get($descriptorId)"#end/&gt;
+        #end
+      &lt;/dd&gt;
+    #end
+  &lt;/dl&gt;
+#end
+{{/velocity}}
+
+{{velocity wiki=false}}
+#if ($xcontext.action == 'get' &amp;&amp; $request.type)
+  #if ($request.input == 'true')
+    #filterDescriptorForm($services.filter.getInputFilterStreamDescriptor($request.type), $request.id)
+  #else
+    #filterDescriptorForm($services.filter.getOutputFilterStreamDescriptor($request.type), $request.id)
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

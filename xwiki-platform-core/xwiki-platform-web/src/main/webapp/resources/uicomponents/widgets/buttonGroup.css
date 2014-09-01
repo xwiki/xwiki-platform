@@ -5,7 +5,8 @@
   position: relative;
 }
 
-a.dropdown-toggle > span {
+#distributionWizard a.dropdown-toggle > span, 
+#contentcontainer a.dropdown-toggle > span {
   /* Draw the down arrow/triangle using the border. */
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
@@ -14,7 +15,8 @@ a.dropdown-toggle > span {
   vertical-align: middle;
 }
 
-a.dropdown-toggle.secondary > span {
+#distributionWizard a.dropdown-toggle.secondary > span,
+#contentcontainer a.dropdown-toggle.secondary > span {
   border-top: 4px solid $theme.buttonSecondaryTextColor;
 }
 

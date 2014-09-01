@@ -59,21 +59,6 @@
   opacity:0.4;
 }
 
-/* XWIKI-2915: WYSIWYG editor crashes on key press in IE6 */
-html>body .xToolbar .gwt-PushButton-up-disabled,
-html>body .xToolbar .gwt-PushButton-down-disabled,
-html>body .xToolbar .gwt-ToggleButton-up-disabled,
-html>body .xToolbar .gwt-ToggleButton-down-disabled {
-  filter:alpha(opacity=40);
-  zoom:1;
-}
-* html .xToolbar .gwt-PushButton-up-disabled,
-* html .xToolbar .gwt-PushButton-down-disabled,
-* html .xToolbar .gwt-ToggleButton-up-disabled,
-* html .xToolbar .gwt-ToggleButton-down-disabled {
-  background-color:#E6E6E6;
-}
-
 .xToolbar .gwt-ListBox {
   background:#F0F0EE none repeat scroll 0% !important;
   border:2px inset white !important;

@@ -19,19 +19,47 @@
  */
 package com.xpn.xwiki.doc;
 
+import org.xwiki.diff.Delta;
+
 public class AttachmentDiff
 {
     private String fileName;
 
+    private Delta.Type type;
+
+    private XWikiAttachment origAttachment;
+
+    private XWikiAttachment newAttachment;
+
+    @Deprecated
     private String origVersion;
 
+    @Deprecated
     private String newVersion;
 
+    @Deprecated
     public AttachmentDiff(String fileName, String origVersion, String newVersion)
     {
-        setFileName(fileName);
+        this(fileName, newVersion == null ? Delta.Type.DELETE : (origVersion == null ? Delta.Type.INSERT
+            : Delta.Type.CHANGE), null, null);
+
         setOrigVersion(origVersion);
         setNewVersion(newVersion);
+    }
+
+    /**
+     * @since 5.4M1
+     */
+    public AttachmentDiff(String fileName, Delta.Type type, XWikiAttachment origAttachment,
+        XWikiAttachment newAttachment)
+    {
+        this.fileName = fileName;
+        this.type = type;
+        this.origAttachment = origAttachment;
+        this.newAttachment = newAttachment;
+
+        this.origVersion = origAttachment != null ? origAttachment.getVersion() : null;
+        this.newVersion = newAttachment != null ? newAttachment.getVersion() : null;
     }
 
     public String getFileName()
@@ -44,21 +72,49 @@ public class AttachmentDiff
         this.fileName = fileName;
     }
 
+    /**
+     * @since 5.4M1
+     */
+    public Delta.Type getType()
+    {
+        return this.type;
+    }
+
+    /**
+     * @since 5.4M1
+     */
+    public XWikiAttachment getOrigAttachment()
+    {
+        return origAttachment;
+    }
+
+    /**
+     * @since 5.4M1
+     */
+    public XWikiAttachment getNewAttachment()
+    {
+        return newAttachment;
+    }
+
+    @Deprecated
     public String getOrigVersion()
     {
         return this.origVersion;
     }
 
+    @Deprecated
     public void setOrigVersion(String origVersion)
     {
         this.origVersion = origVersion;
     }
 
+    @Deprecated
     public String getNewVersion()
     {
         return this.newVersion;
     }
 
+    @Deprecated
     public void setNewVersion(String newVersion)
     {
         this.newVersion = newVersion;

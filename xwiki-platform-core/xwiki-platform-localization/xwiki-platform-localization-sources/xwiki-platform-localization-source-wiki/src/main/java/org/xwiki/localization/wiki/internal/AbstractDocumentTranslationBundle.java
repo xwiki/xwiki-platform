@@ -20,7 +20,6 @@
 package org.xwiki.localization.wiki.internal;
 
 import java.io.StringReader;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -38,7 +37,6 @@ import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Disposable;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.internal.AbstractCachedTranslationBundle;
@@ -64,7 +62,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @since 4.3M2
  */
 public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTranslationBundle implements
-    TranslationBundle, DisposableCacheValue, Disposable, EventListener
+    DisposableCacheValue, Disposable, EventListener
 {
     /**
      * Make default wiki document based translation priority a bit higher than the default one.
@@ -97,9 +95,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         this.idPrefix = idPrefix;
         this.bundleContext = componentManager.getInstance(TranslationBundleContext.class);
         this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
-        this.contextProvider =
-            componentManager.getInstance(new DefaultParameterizedType(null, Provider.class,
-                new Type[] {XWikiContext.class}));
+        this.contextProvider = componentManager.getInstance(XWikiContext.TYPE_PROVIDER);
         this.observation = componentManager.getInstance(ObservationManager.class);
 
         this.translationMessageParser = translationMessageParser;
@@ -136,15 +132,13 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
 
         XWikiDocument document = context.getWiki().getDocument(this.documentReference, context);
 
-        if (locale != null && !locale.equals(Locale.ROOT)) {
-            XWikiDocument tdocument = document.getTranslatedDocument(locale, context);
+        if (locale != null && !locale.equals(Locale.ROOT) && !locale.equals(document.getDefaultLocale())) {
+            document = context.getWiki().getDocument(new DocumentReference(document.getDocumentReference(), locale), context);
 
-            if (tdocument == document) {
+            if (document.isNew()) {
                 // No document found for this locale
                 return null;
             }
-
-            document = tdocument;
         }
 
         String content = document.getContent();
@@ -178,18 +172,9 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     }
 
     @Override
-    protected LocalizedTranslationBundle createBundle(Locale locale)
+    protected LocalizedTranslationBundle createBundle(Locale locale) throws Exception
     {
-        LocalizedTranslationBundle localeBundle;
-        try {
-            localeBundle = loadDocumentLocaleBundle(locale);
-        } catch (Exception e) {
-            this.logger.error("Failed to get localization bundle", e);
-
-            localeBundle = null;
-        }
-
-        return localeBundle;
+        return loadDocumentLocaleBundle(locale);
     }
 
     // DisposableCacheValue Disposable
@@ -203,14 +188,18 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     // EventListener
 
     @Override
-    public void onEvent(Event arg0, Object arg1, Object arg2)
+    public void onEvent(Event event, Object source, Object data)
     {
-        if (arg0 instanceof WikiDeletedEvent) {
-            bundleCache.clear();
+        if (event instanceof WikiDeletedEvent) {
+            this.bundleCache.clear();
         } else {
-            XWikiDocument document = (XWikiDocument) arg1;
+            XWikiDocument document = (XWikiDocument) source;
 
-            bundleCache.remove(document.getLocale() != null ? document.getLocale() : Locale.ROOT);
+            this.bundleCache.remove(document.getLocale());
+
+            if (document.getLocale().equals(Locale.ROOT)) {
+                this.bundleCache.remove(document.getDefaultLocale());
+            }
         }
     }
 

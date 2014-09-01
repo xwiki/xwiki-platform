@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxTextFormatting</name>
+  <language>fr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301497998000</date>
+  <contentUpdateDate>1301497998000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxTextFormatting</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Editing =
+
+== Formatage du texte ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Text Formatting ===
+
+|=Fonctionnalité|=Syntaxe XWiki 1.0|=Résultat
+|Gras|{{{*gras*}}}|**gras**
+|Souligné|{{{__souligné___}}}|__souligné__
+|Italique|{{{~~italique~~}}}|//italique//
+|Barré|{{{--barré--}}}|--barré--
+|Espacement fixe|&lt;tt&gt;espacement fixe&lt;/tt&gt;|##espacement fixe##
+|Puissance|utilisation de la &lt;sup&gt;puissance&lt;/sup&gt;|utilisation de la ^^puissance^^
+|Indice|utilisation de l'&lt;sub&gt;indice&lt;/sub&gt;|utilisation de l',,indice,,
+
+=== 2.0 Text Formatting ===
+
+{{info}}
+Nouveau en syntaxe XWiki  {{velocity}}$crtSyntaxVer{{/velocity}} sur la syntaxe XWiki 1.0:
+* Les espaces sont autorisés, juste après les symboles de syntaxe.
+* L'utilisation des symboles doubles au cas où il y avait seulement un symbole en syntaxe XWiki 1.0, de sorte qu'il soit moins probable que l'utilisateur s'en serve dans le texte de manière erronée.
+* La possibilité d'avoir plusieurs lignes.
+{{/info}}
+
+|=Fonctionnalité|=Syntaxe XWiki  {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
+|Gras|{{{**gras**}}}|**gras**
+|Souligné|{{{__souligné__}}}|__souligné__
+|Italique|{{{//italique//}}}|//italique//
+|Barré|{{{--barré--}}}|--barré--
+|Espacement fixe|{{{##espacement fixe##}}}|##espacement fixe##
+|Puissance|{{{utilisation de la ^^puissance^^}}}|utilisation de la ^^puissance^^
+|Indice|{{{utilisation de l',,indice,,}}}|utilisation de l',,indice,,</content>
+</xwikidoc>

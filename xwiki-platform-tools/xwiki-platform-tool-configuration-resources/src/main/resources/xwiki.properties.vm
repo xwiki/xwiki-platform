@@ -181,11 +181,19 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# rendering.transformation.icon.mappings = (off) = lightbulb_off
 #-# rendering.transformation.icon.mappings = (*) = star
 
+#-------------------------------------------------------------------------------------
+# LinkChecker Transformation
+#-------------------------------------------------------------------------------------
+
 #-# [Since 3.3M2]
-#-# LinkChecker Transformation Configuration
 #-# Defines the time (in ms) after which an external link should be checked again for validity.
 #-# the default configuration is:
 # rendering.transformation.linkchecker.timeout = 3600000
+
+#-# [Since 5.3RC1]
+#-# List of document references that are excluded from link checking, specified using regexes.
+#-# the default configuration is:
+# rendering.transformation.linkchecker.excludedReferencePatterns = .*:XWiki\.ExternalLinksJSON
 
 #-------------------------------------------------------------------------------------
 # Rendering Macros
@@ -285,7 +293,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.properties = resource.manager.logwhenfound = false
 #-#   velocity.properties = velocimacro.permissions.allow.inline.local.scope = true
 #-#   velocity.properties = runtime.introspector.uberspect = org.xwiki.velocity.introspection.ChainingUberspector
-#-#   velocity.properties = runtime.introspector.uberspect.chainClasses = org.apache.velocity.util.introspection.SecureUberspector,org.xwiki.velocity.introspection.DeprecatedCheckUberspector,org.xwiki.velocity.introspection.MethodArgumentsUberspector
+#-#   velocity.properties = runtime.introspector.uberspect.chainClasses = org.xwiki.velocity.introspection.SecureUberspector\,org.xwiki.velocity.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
 
 #-------------------------------------------------------------------------------------
 # Groovy
@@ -451,9 +459,12 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# And an example to add the XWiki Maven Snapshot Repository
 # extension.repositories=maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots
 #-#
-#-# The default is:
+#-# When not set the following is taken:
 # extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
 # extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/
+#-# 
+#-# To not have any repository enabled (including disabling default repositories) you can explicitly make this list empty:
+# extension.repositories=
 
 #-# [Since 2.5]
 #-# The directory where extensions are stored after being downloaded.
@@ -501,6 +512,12 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The maximum number of elements in the background queue of elements to index/delete
 #-# The default is 10000.
 # solr.indexer.queue.capacity=100000
+
+#-# [Since 6.1M2]
+#-# Indicating if a synchronization between SOLR index and XWiki database should be run at startup.
+#-# Synchronization can be started from search administration.
+#-# The default is true.
+# solr.synchronizeAtStartup=false
 
 #-------------------------------------------------------------------------------------
 # Security
@@ -554,5 +571,124 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#
 #-# The default is:
 # url.standard.multiwiki.wikiPathPrefix=wiki
+
+#-# [Since 5.2M1]
+#-# Defines the URL path prefix used for Entity URLs, i.e. URLs pointing to a Document, Space, Object, etc.
+#-# For example this is the "bin" part in the following URL:
+#-#   http://server/xwiki/bin/view/space/page
+#-# Note that this replaces the old xwiki.defaultservletpath property in the old xwiki.cfg file.
+#-#
+#-# The default is:
+# url.standard.getEntityPathPrefix=bin
+
+#-# [Since 5.3M1]
+#-# The action to take when a subwiki is not found (ie there's no wiki descriptor for it). Valid values are:
+#-# - redirect_to_main_wiki: default to displaying the main wiki
+#-# - display_error: redirect to a vm to display an error
+#-#
+#-# The default is:
+# url.standard.multiwiki.notFoundBehavior=redirect_to_main_wiki
+
+#-------------------------------------------------------------------------------------
+# Attachment
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.2M2]
+#-# Define the kind of attachment that can be displayed inline. You can either choose to do it through a whitelist (only
+#-# the mimetypes defined in this list would be displayed inline) or a blacklist (every mimetype that is not in this list
+#-# would be displayed inline if possible)
+#-#
+#-# By default we use the following whitelist (coma separated list of values).
+# attachment.download.whitelist=audio/basic,audio/L24,audio/mp4,audio/mpeg,audio/ogg,audio/vorbis,audio/vnd.rn-realaudio,audio/vnd.wave,audio/webm,image/gif,image/jpeg,image/pjpeg,image/png,image/svg+xml,image/tiff,text/csv,text/plain,text/xml,text/rtf,video/mpeg,video/ogg,video/quicktime,video/webm,video/x-matroska,video/x-ms-wmv,video/x-flv 
+#-#
+#-# If you prefer to use a blacklist instead, you can define the forbidden types here, as a coma separated list of values.
+#-# We advise you to forbid at least the following mimetypes : text/html, text/javascript
+# attachment.download.blacklist=text/html,text/javascript 
+
+#-------------------------------------------------------------------------------------
+# Active Installs
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.2M2]
+#-# The URL of where the Active Installs module should connect to in order to send a ping of activity. This feature
+#-# regularly sends the following information to xwiki.org about the current instance:
+#-# - its unique id
+#-# - the id and versions of all installed extensions)
+#-# The goal is to count the number of active installs of XWiki out there and provide statistics on xwiki.org
+#-#
+#-# The default is:
+# activeinstalls.pingURL=http://extensions.xwiki.org/activeinstalls
+
+#-------------------------------------------------------------------------------------
+# Wikis
+#-------------------------------------------------------------------------------------
+
+#-# [Since 5.4.4]
+#-# Add a default suffix to the alias of a new wiki in the wiki creation wizard, only when the path mode is used
+#-# (see url.standard.multiwiki.isPathBased). If this value is empty, XWiki will try to compute it automatically from
+#-# request URL.
+#-#
+#-# eg: if wiki.alias.suffix is "xwiki.org" and the wiki name is "playground"
+#-#     then the computed alias will be: "playground.xwiki.org".
+#-#
+#-# The default is:
+# wiki.alias.suffix=
+
+#-------------------------------------------------------------------------------------
+# Store
+#-------------------------------------------------------------------------------------
+
+#-# [Since 6.1M2]
+#-# If active, the Filesystem Attachment Store will automatically clear empty directories on startup,
+#-# in some cases this may create undue load on the server and may need to be disabled. To do that,
+#-# set the following to false.
+#-# Note that if you disable this feature, empty directories will accumulate and you are responsible
+#-# for cleaning them up.
+# store.fsattach.cleanOnStartup=true
+
+#-------------------------------------------------------------------------------------
+# Mail
+#-------------------------------------------------------------------------------------
+
+#-# [Since 6.1M2]
+#-# SMTP host when sending emails, defaults to "localhost".
+#-# This configuration property can be overridden in XWikiPreferences objects, by using the "smtp_server" property name.
+# mail.sender.host = localhost
+
+#-# [Since 6.1M2]
+#-# SMTP port when sending emails, defaults to 25.
+#-# This configuration property can be overridden in XWikiPreferences objects, by using the "smtp_port" property name.
+# mail.sender.port = 25
+
+#-# [Since 6.1M2]
+#-# From email address to use. Not defined by default and needs to be set up when calling the mail API.
+#-# This configuration property can be overridden in XWikiPreferences objects, by using the "admin_email" property name.
+# mail.sender.from = john@doe.com
+
+#-# [Since 6.1M2]
+#-# Username to authenticate on the SMTP server, if needed. By default no authentication is performed.
+#-# This configuration property can be overridden in XWikiPreferences objects, by using the "smtp_server_username"
+#-# property name.
+# mail.sender.username = someuser
+
+#-# [Since 6.1M2]
+#-# Password to authenticate on the SMTP server, if needed. By default no authentication is performed.
+#-# This configuration property can be overridden in XWikiPreferences objects, by using the "smtp_server_password"
+#-# property name.
+# mail.sender.password = somepassword
+
+#-# [Since 6.1M2]
+#-# Password to authenticate on the SMTP server, if needed. By default no authentication is performed.
+#-# This configuration property can be overridden in XWikiPreferences objects, by using the "javamail_extra_props"
+#-# property name.
+#-# By default the following properties are set automatically:
+#-#   mail.transport.protocol = smtp
+#-#   mail.smtp.host = <value of the mail.sender.host property>
+#-#   mail.smtp.port = <value of the mail.sender.port property>
+#-#   mail.smtp.user = <value of the mail.sender.username property>
+#-#   mail.smtp.from = <value of the mail.sender.from property>
+#-# Example:
+# mail.sender.properties = mail.smtp.starttls.enable = true
+# mail.sender.properties = mail.smtp.socks.host = someserver
 
 $!xwikiPropertiesAdditionalProperties

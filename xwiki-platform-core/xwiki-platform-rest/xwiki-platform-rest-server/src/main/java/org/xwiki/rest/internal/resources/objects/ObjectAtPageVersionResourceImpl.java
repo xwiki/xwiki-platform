@@ -50,7 +50,7 @@ public class ObjectAtPageVersionResourceImpl extends XWikiResource implements Ob
             Document doc = documentInfo.getDocument();
 
             XWikiDocument xwikiDocument = Utils.getXWiki(componentManager)
-                    .getDocument(doc.getPrefixedFullName(), Utils.getXWikiContext(componentManager));
+                    .getDocument(doc.getDocumentReference(), Utils.getXWikiContext(componentManager));
 
             xwikiDocument = Utils.getXWiki(componentManager)
                     .getDocument(xwikiDocument, doc.getVersion(), Utils.getXWikiContext(componentManager));

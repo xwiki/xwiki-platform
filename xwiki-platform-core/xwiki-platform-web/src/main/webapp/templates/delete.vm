@@ -10,7 +10,10 @@
 #end
 #if("$!{request.id}" == '')
 #set($links = $doc.getBacklinks())
-#set($orphans = $xwiki.searchDocuments(' where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))', [${doc.fullName}, ${doc.fullName}, ${doc.name}, ${doc.space}]))
+#set($childrenStatement = 'where doc.fullName <> :parentFullName and (doc.parent = :parentFullName or (doc.parent = :parentName and doc.space = :parentSpace))')
+#set($childrenQuery = $services.query.xwql($childrenStatement))
+#set($discard = $childrenQuery.bindValue('parentFullName', $doc.fullName).bindValue('parentName', $doc.name).bindValue('parentSpace', $doc.space))
+#set($children = $childrenQuery.addFilter('unique').execute())
 #set($quote = '"')
 #set($hasInlinks = false)
 #set($fullmsg = '')
@@ -25,9 +28,9 @@
   #set($fullmsg = "${fullmsg}${tmpmsg}</p><p class='xwikimessage'>")
   #set($hasInlinks = true)
 #end
-#if($orphans && $orphans.size() > 0)
+#if($children && $children.size() > 0)
   #set($tmpmsg = '</p><ul>')
-  #foreach($docname in $orphans)
+  #foreach($docname in $children)
     #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
     #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>$escapetool.xml(${rdoc.getPlainTitle()})</a></li>")
   #end

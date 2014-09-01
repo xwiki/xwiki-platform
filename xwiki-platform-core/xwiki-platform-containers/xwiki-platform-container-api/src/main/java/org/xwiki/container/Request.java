@@ -23,11 +23,6 @@ import java.util.List;
 
 public interface Request
 {
-    /**
-     * Key under which the XWIKI URL is put in the Request.
-     */
-    public static final String XWIKI_URL = "xwikiurl";
-
     void setProperty(String key, Object value);
 
     Object getProperty(String key);

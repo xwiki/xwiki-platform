@@ -19,19 +19,28 @@
  */
 package org.xwiki.chart.internal.plot;
 
+import java.util.Map;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.renderer.category.LineRenderer3D;
+import org.xwiki.component.annotation.Component;
 
 /**
  * A {@link org.xwiki.chart.internal.plot.PlotGenerator} for generating 3D line charts.
- *
+ * 
  * @version $Id$
  * @since 4.1M1
  */
+@Component
+@Named("line3D")
+@Singleton
 public class Line3DPlotGenerator extends AbstractCategoryPlotGenerator
 {
     @Override
-    protected CategoryItemRenderer getRenderer()
+    protected CategoryItemRenderer getRenderer(Map<String, String> parameters)
     {
         return new LineRenderer3D();
     }

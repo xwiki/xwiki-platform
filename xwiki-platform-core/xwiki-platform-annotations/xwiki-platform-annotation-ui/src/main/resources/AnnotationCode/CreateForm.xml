@@ -43,7 +43,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{include document="AnnotationCode.Macros" /}}
+  <content>{{include reference="AnnotationCode.Macros" /}}
 
 {{velocity}}
 #if("$!{request.wiki}" == "" || "$!{request.space}" == "" || "$!{request.page}" == "")
@@ -68,7 +68,7 @@
 ## pretend that annotation author is current user, and annotation date is now
 ##Even if they get sent to the server, the server will overwrite with anything's logged in in there anyway
 #set($dispose = $annData.put("author", $xcontext.user))
-#set($dispose = $annData.put("date", $util.date))
+#set($dispose = $annData.put("date", $datetool.date))
 #displayCreateBox("$!{request.wiki}", "$!{request.space}", "$!{request.page}", $annData)
 {{/html}}
 #end

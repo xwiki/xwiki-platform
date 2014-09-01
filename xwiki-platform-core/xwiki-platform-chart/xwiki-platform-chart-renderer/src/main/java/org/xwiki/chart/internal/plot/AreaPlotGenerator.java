@@ -19,19 +19,28 @@
  */
 package org.xwiki.chart.internal.plot;
 
+import java.util.Map;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.jfree.chart.renderer.category.AreaRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.xwiki.component.annotation.Component;
 
 /**
  * A {@link PlotGenerator} for generating area charts.
- *
+ * 
  * @version $Id$
  * @since 2.0M1
  */
+@Component
+@Named("area")
+@Singleton
 public class AreaPlotGenerator extends AbstractCategoryPlotGenerator
 {
     @Override
-    protected CategoryItemRenderer getRenderer()
+    protected CategoryItemRenderer getRenderer(Map<String, String> parameters)
     {
         return new AreaRenderer();
     }

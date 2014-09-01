@@ -82,6 +82,9 @@
     #set ($steps = $services.distribution.jobStatus.steps)
     ## Ignore the welcome step.
     #set ($steps = $steps.subList(1, $steps.size()))
+    ## Ignore the report step
+    #set($lastElement = $steps.size() - 1)
+    #set ($steps = $steps.subList(0, $lastElement))
     <ul class="steps">
       #foreach ($step in $steps)
         <li>
@@ -112,19 +115,23 @@
     ## Normally we shouldn't generate the buttons that are not supposed to be visible but we want to simplify the
     ## JavaScript code and to avoid duplicating the HTML by adding the buttons dynamically.
     <span class="buttonwrapper#if (!$showCompleteStepButton) hidden#end">
-      <button type="submit" name="action" value="COMPLETE_STEP">
+      <button type="submit" name="action" value="COMPLETE_STEP"#if ($disableStepButtons) disabled="disabled"#end>
         $services.localization.render('platform.extension.distributionWizard.continueLabel')
       </button>
     </span>
     <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
       <button class="secondary" type="submit" name="action" value="SKIP#if(!$canCloseWizard)_STEP#end"
-        title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.skipHint'))">
-        $services.localization.render('platform.extension.distributionWizard.skipLabel')</button>
+          title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.skipHint'))"
+          #if ($disableStepButtons) disabled="disabled"#end>
+        $services.localization.render('platform.extension.distributionWizard.skipLabel')
+      </button>
     </span>
     <span class="buttonwrapper#if ($showCompleteStepButton && !$canCloseWizard) hidden#end">
       <button class="secondary" type="submit" name="action" value="CANCEL#if(!$canCloseWizard)_STEP#end"
-        title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.cancelHint'))">
-        $services.localization.render('platform.extension.distributionWizard.cancelLabel')</button>
+          title="$escapetool.xml($services.localization.render('platform.extension.distributionWizard.cancelHint'))"
+          #if ($disableStepButtons) disabled="disabled"#end>
+        $services.localization.render('platform.extension.distributionWizard.cancelLabel')
+      </button>
     </span>
   </div>
 #end
@@ -145,10 +152,11 @@
   #end
   $response.sendRedirect($redirectURL)
 #else
-  ## NOTE: We use #parse instead of #template because the later currently registers the Velocity macros in a different
-  ## namespace which makes them unavailable in the current wiki page or the current template. Switch back to #template
-  ## when this problem is fixed because #parse doesn't allow the template to be overridden from the skin.
-  #parse('extension.vm')
+  ## NOTE: We don't use #template because it currently registers the Velocity macros in a different namespace which
+  ## makes them unavailable in the current wiki page or the current template. We also tried #parse but it "randomly"
+  ## fails to register the Velocity macros from the parsed template. The only solution we found is to use #evaluate with
+  ## #include but unfortunately this doesn't allow the template to be overridden from the skin.
+  #evaluate("#include('extension.vm')")
   #if ("$!request.action" != '')
     #handleStepAction($request.action)
   #elseif ($isAjaxRequest)

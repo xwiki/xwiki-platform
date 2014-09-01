@@ -41,7 +41,7 @@ public class BaseObjectsResource extends XWikiResource
     protected BaseObject getBaseObject(Document doc, String className, int objectNumber) throws XWikiException
     {
         XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+            Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
                 Utils.getXWikiContext(componentManager));
 
         return xwikiDocument.getObject(className, objectNumber);
@@ -52,7 +52,7 @@ public class BaseObjectsResource extends XWikiResource
         List<BaseObject> objectList = new ArrayList<BaseObject>();
 
         XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+            Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
                 Utils.getXWikiContext(componentManager));
 
         Map<DocumentReference, List<BaseObject>> classToObjectsMap = xwikiDocument.getXObjects();
@@ -70,7 +70,7 @@ public class BaseObjectsResource extends XWikiResource
     {
         List<BaseObject> objectList = new ArrayList<BaseObject>();
 
-        XWikiDocument xwikiDocument = Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+        XWikiDocument xwikiDocument = Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
             Utils.getXWikiContext(componentManager));
 
         Map<DocumentReference, List<BaseObject>> classToObjectsMap = xwikiDocument.getXObjects();

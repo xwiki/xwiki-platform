@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+
+<!-- =============================================================== -->
+<!-- Add a ContextProvider to the deployment manager                 -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- This scans the etc/contexts/ directory for xml files describing -->
+<!-- applications to deploy.                                         -->
+<!-- This configuration must be used with jetty-deploy.xml, which    -->
+<!-- creates the deployment manager instance                         -->
+<!-- =============================================================== -->
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+
+  <Ref id="DeploymentManager">
+    <Call name="addAppProvider">
+      <Arg>
+        <New class="org.eclipse.jetty.deploy.providers.ContextProvider">
+          <Set name="monitoredDirName"><Property name="jetty.home" default="." />/contexts</Set>
+          <Set name="defaultsDescriptor"><Property name="jetty.home" default="."/>/etc/webdefault.xml</Set>
+          <Set name="scanInterval">60</Set>
+        </New>
+      </Arg>
+    </Call>
+  </Ref>
+
+</Configure>

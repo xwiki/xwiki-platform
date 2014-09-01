@@ -40,8 +40,14 @@ public class AnnotationsPane extends BaseElement
      */
     public void showAnnotationsPane()
     {
-        WebElement annotationsPane = getDriver().findElement(By.xpath("//div[@id='tmAnnotations']//a[@class='tme']"));
+        // Open the page menu
+        getDriver().findElement(By.xpath("//div[@id='tmMoreActions']/button[contains(@class, 'dropdown-toggle')]")).
+            click();
+        // Click on the annotations button
+        WebElement annotationsPane = getDriver().findElement(
+            By.xpath("//div[@id='tmMoreActions']//a[contains(., 'Annotations')]"));
         annotationsPane.click();
+        // Verify that the annotationssettings panel is open
         waitUntilElementIsVisible(By.className("annotationsettings"));
     }
 
@@ -50,8 +56,14 @@ public class AnnotationsPane extends BaseElement
      */
     public void hideAnnotationsPane()
     {
-        WebElement annotationsPane = getDriver().findElement(By.xpath("//div[@id='tmAnnotations']//a[@class='tme']"));
+        // Open the page menu
+        getDriver().findElement(By.xpath("//div[@id='tmMoreActions']/button[contains(@class, 'dropdown-toggle')]")).
+                click();
+        // Click on the annotations button
+        WebElement annotationsPane = getDriver().findElement(
+                By.xpath("//div[@id='tmMoreActions']//a[contains(., 'Annotations')]"));
         annotationsPane.click();
+        // Verify that the annotationssettings panel is close
         waitUntilElementDisappears(By.className("annotationsettings"));
     }
 

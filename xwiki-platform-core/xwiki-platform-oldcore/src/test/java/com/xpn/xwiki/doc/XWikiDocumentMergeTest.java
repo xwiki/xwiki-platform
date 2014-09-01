@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.logging.LogLevel;
@@ -45,11 +44,11 @@ import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
  */
 public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
 {
-    private XWikiDocument document;
+    private XWikiDocument currentDocument;
 
     private XWikiDocument previousDocument;
 
-    private XWikiDocument newDocument;
+    private XWikiDocument nextDocument;
 
     private BaseObject xobject;
 
@@ -63,9 +62,9 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     {
         super.setUp();
 
-        this.document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
-        this.previousDocument = this.document.clone();
-        this.newDocument = this.document.clone();
+        this.currentDocument = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        this.previousDocument = this.currentDocument.clone();
+        this.nextDocument = this.currentDocument.clone();
 
         this.xclass = new BaseClass();
         this.xclass.setDocumentReference(new DocumentReference("wiki", "classspace", "class"));
@@ -91,15 +90,17 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
         this.configuration = new MergeConfiguration();
     }
 
-    private void merge() throws Exception
+    private MergeResult merge() throws Exception
     {
         MergeResult result =
-            this.document.merge(this.previousDocument, this.newDocument, this.configuration, getContext());
+            this.currentDocument.merge(this.previousDocument, this.nextDocument, this.configuration, getContext());
 
         List<LogEvent> exception = result.getLog().getLogs(LogLevel.ERROR);
         if (!exception.isEmpty()) {
             throw new MergeException(exception.get(0).getFormattedMessage(), exception.get(0).getThrowable());
         }
+
+        return result;
     }
 
     // Tests
@@ -110,75 +111,241 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     public void testMergeContent() throws Exception
     {
         this.previousDocument.setContent("some content");
-        this.newDocument.setContent("some new content");
-        this.document.setContent("some content");
+        this.nextDocument.setContent("some new content");
+        this.currentDocument.setContent("some content");
 
         merge();
 
-        Assert.assertEquals("some new content", this.document.getContent());
+        Assert.assertEquals("some new content", this.currentDocument.getContent());
     }
 
     @Test
     public void testMergeContentModified() throws Exception
     {
         this.previousDocument.setContent("some content");
-        this.newDocument.setContent("some content\nafter");
-        this.document.setContent("before\nsome content");
+        this.nextDocument.setContent("some content\nafter");
+        this.currentDocument.setContent("before\nsome content");
 
         merge();
 
-        Assert.assertEquals("before\nsome content\nafter", this.document.getContent());
+        Assert.assertEquals("before\nsome content\nafter", this.currentDocument.getContent());
 
         this.previousDocument.setContent("some content");
-        this.newDocument.setContent("some content\nafter");
-        this.document.setContent("some content");
+        this.nextDocument.setContent("some content\nafter");
+        this.currentDocument.setContent("some content");
 
         merge();
 
-        Assert.assertEquals("some content\nafter", this.document.getContent());
+        Assert.assertEquals("some content\nafter", this.currentDocument.getContent());
     }
 
     @Test
     public void testMergeNewObjectAdded() throws Exception
     {
-        this.newDocument.addXObject(this.xobject);
+        this.nextDocument.addXObject(this.xobject);
 
         merge();
 
-        Assert.assertSame(this.xobject, this.document.getXObject(this.xclass.getReference(), 0));
+        Assert.assertSame(this.xobject, this.currentDocument.getXObject(this.xclass.getReference(), 0));
     }
 
     @Test
     public void testMergeNewObjectRemoved() throws Exception
     {
         this.previousDocument.addXObject(this.xobject);
-        this.document.addXObject(this.xobject.clone());
+        this.currentDocument.addXObject(this.xobject.clone());
 
         merge();
 
-        Assert.assertNull(this.document.getXObject(this.xclass.getReference(), 0));
+        Assert.assertNull(this.currentDocument.getXObject(this.xclass.getReference(), 0));
     }
 
     @Test
     public void testMergeObjectModified() throws Exception
     {
-        this.xobject.setStringValue("test", "");
-        this.previousDocument.addXObject(this.xobject);
+        BaseObject previousobj = this.xobject;
+        previousobj.setStringValue("test", "test1");
+        this.previousDocument.addXObject(previousobj);
 
         BaseObject obj = this.xobject.clone();
         obj.setStringValue("test", "test1");
-        this.document.addXObject(obj);
+        this.currentDocument.addXObject(obj);
 
         BaseObject newobj = this.xobject.clone();
         newobj.setStringValue("test", "test2");
-        this.newDocument.addXObject(newobj);
+        this.nextDocument.addXObject(newobj);
 
         merge();
 
-        BaseObject mergedobj = this.document.getXObject(this.xclass.getReference(), 0);
-        
+        BaseObject mergedobj = this.currentDocument.getXObject(this.xclass.getReference(), 0);
+
         Assert.assertNotNull(mergedobj);
-        Assert.assertEquals("test12", mergedobj.getStringValue("test"));
+        Assert.assertEquals("test2", mergedobj.getStringValue("test"));
+    }
+
+    @Test
+    public void testMergeCurrentObjectRemoved() throws Exception
+    {
+        this.xobject.setStringValue("test", "");
+        this.xobject.setStringValue("previoustest", "previoustest");
+        this.previousDocument.addXObject(this.xobject);
+
+        BaseObject newobj = this.xobject.clone();
+        newobj.setStringValue("test", "test2");
+        newobj.setStringValue("newtest", "newtest");
+        this.nextDocument.addXObject(newobj);
+
+        merge();
+
+        BaseObject mergedobj = this.currentDocument.getXObject(this.xclass.getReference(), 0);
+
+        Assert.assertNull(mergedobj);
+    }
+
+    @Test
+    public void testMergeAttachmentEquals() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.previousDocument.addAttachment(attachment);
+        this.nextDocument.addAttachment((XWikiAttachment) attachment.clone());
+        this.currentDocument.addAttachment((XWikiAttachment) attachment.clone());
+
+        MergeResult result = merge();
+
+        Assert.assertFalse(result.isModified());
+    }
+
+    @Test
+    public void testMergeAttachmentEqualsDeletedCurrent() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.previousDocument.addAttachment(attachment);
+        this.nextDocument.addAttachment((XWikiAttachment) attachment.clone());
+
+        MergeResult result = merge();
+
+        Assert.assertFalse(result.isModified());
+    }
+
+    @Test
+    public void testMergeAttachmentEqualsAddedCurrent() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.currentDocument.addAttachment(attachment);
+
+        MergeResult result = merge();
+
+        Assert.assertFalse(result.isModified());
+    }
+
+    @Test
+    public void testMergeAttachmentEqualsModifiedCurrent() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.previousDocument.addAttachment(attachment);
+        this.nextDocument.addAttachment((XWikiAttachment) attachment.clone());
+
+        attachment = (XWikiAttachment) attachment.clone();
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8});
+        attachment.setFilesize(9);
+
+        this.currentDocument.addAttachment(attachment);
+
+        MergeResult result = merge();
+
+        Assert.assertFalse(result.isModified());
+    }
+
+    @Test
+    public void testMergeAttachmentNew() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.nextDocument.addAttachment(attachment);
+
+        MergeResult result = merge();
+
+        Assert.assertTrue(result.isModified());
+
+        XWikiAttachment newAttachment = this.currentDocument.getAttachment("file");
+
+        Assert.assertNotNull(newAttachment);
+        Assert.assertEquals(10, newAttachment.getFilesize());
+        Assert.assertArrayEquals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, newAttachment.getContent(null));
+    }
+
+    @Test
+    public void testMergeAttachmentDeleted() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.currentDocument.addAttachment(attachment);
+        this.previousDocument.addAttachment((XWikiAttachment) attachment.clone());
+
+        MergeResult result = merge();
+
+        Assert.assertTrue(result.isModified());
+
+        XWikiAttachment newAttachment = this.currentDocument.getAttachment("file");
+
+        Assert.assertNull(newAttachment);
+    }
+
+    @Test
+    public void testMergeAttachmentModified() throws Exception
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9});
+        attachment.setFilesize(10);
+        attachment.setFilename("file");
+
+        this.currentDocument.addAttachment(attachment);
+        this.previousDocument.addAttachment((XWikiAttachment) attachment.clone());
+
+        attachment = (XWikiAttachment) attachment.clone();
+        attachment.setContent(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8});
+        attachment.setFilesize(9);
+
+        this.nextDocument.addAttachment(attachment);
+
+        MergeResult result = merge();
+
+        Assert.assertTrue(result.isModified());
+
+        XWikiAttachment newAttachment = this.currentDocument.getAttachment("file");
+
+        Assert.assertNotNull(newAttachment);
+        Assert.assertEquals(9, newAttachment.getFilesize());
+        Assert.assertArrayEquals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8}, newAttachment.getContent(null));
     }
 
     // #apply
@@ -187,9 +354,9 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
     public void testApplyWithUnmodifiedObject()
     {
         this.previousDocument.addXObject(this.xobject);
-        this.document.addXObject(this.xobject.clone());
+        this.currentDocument.addXObject(this.xobject.clone());
 
-        Assert.assertFalse(this.previousDocument.apply(this.document, true));
+        Assert.assertFalse(this.previousDocument.apply(this.currentDocument, true));
     }
 
     @Test
@@ -198,9 +365,9 @@ public class XWikiDocumentMergeTest extends AbstractBridgedComponentTestCase
         this.previousDocument.addXObject(this.xobject);
         BaseObject modifiedObject = this.xobject.clone();
         modifiedObject.setStringValue("string", "string2");
-        this.document.addXObject(modifiedObject);
+        this.currentDocument.addXObject(modifiedObject);
 
-        Assert.assertTrue(this.previousDocument.apply(this.document, true));
+        Assert.assertTrue(this.previousDocument.apply(this.currentDocument, true));
         Assert.assertEquals("string2", this.xobject.getStringValue("string"));
     }
 }

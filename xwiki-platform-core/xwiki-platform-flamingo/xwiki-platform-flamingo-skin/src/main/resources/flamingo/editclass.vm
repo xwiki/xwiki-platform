@@ -1,0 +1,156 @@
+$xwiki.jsfx.use('js/scriptaculous/dragdrop.js')##
+$xwiki.ssfx.use('js/xwiki/editors/dataeditors.css', true)##
+$xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
+##
+##
+## The edited XClass
+#set($class = $doc.getxWikiClass())
+## These meta-properties are not fully implemented, or almost never used
+#set($hiddenProperties = ['tooltip', 'unmodifiable', 'contenttype', 'disabled'])
+## Some additional details for a few unclear meta-properties
+#set($propertyDetails = {
+  'values' : "(separated by '|'; Example: <tt>value1=Text displayed for value 1|value2=Text displayed for value 2|value3|value4</tt>)",
+  'size' : 'of the corresponding form element in edit mode'
+})
+##
+##
+##
+#**
+ * Display the class switcher
+ *#
+#macro(classSwitcher)
+<form id="switch-xclass" method="post" action="$doc.getURL('redirect')">
+  <div>
+    <select id="classname" name="xredirect" size="1">
+      <option value="-" selected='selected'>$services.localization.render('core.editors.class.switchClass')</option>
+      ##
+      ## Existing classes are enumerated, grouped by space name.
+      ## The list is already sorted alphabetically
+      ##
+      #set($prevSpace = '')
+      #foreach ($classname in $xwiki.classList)
+        #if($!xwiki.hasAccessLevel('edit', $classname))
+          #set($classdoc = $xwiki.getDocument($classname))
+          #if($classdoc.space != $prevSpace)
+            #if($prevSpace != '')
+              </optgroup>
+            #end
+            <optgroup label="${escapetool.xml($classdoc.space)}">
+            #set($prevSpace = ${classdoc.space})
+          #end
+          <option value="$classdoc.getURL('edit', 'editor=class')">${escapetool.xml($classdoc.name)}</option>
+        #end
+      #end
+      #if($prevSpace != '')
+        </optgroup>
+      #end
+    </select>
+    <span class="buttonwrapper"><input class="button" type="submit" value="$services.localization.render('core.editors.class.switchClass.submit')"/></span>
+  </div>
+  #warning($services.localization.render('core.editors.class.switchClass.warning'))
+</form>
+#end
+##
+##
+##
+##
+##
+#**
+ * Display a class property
+ *#
+#macro(displayProperty $field)
+  <div id="xproperty_${field.name}" class="xproperty #if($field.disabled)disabled#end">
+    <div id="xproperty_${field.name}_title" class="xproperty-title ${field.type}">
+      <h2>$!{escapetool.xml($doc.displayView($field.xWikiClass.get('prettyName'), "${field.name}_" , $field))}
+      ($doc.displayView($field.xWikiClass.get('name'), "${field.name}_" , $field): $xwiki.metaclass.get($field.classType).prettyName)</h2>
+      <div class="tools propertyTools"><a href='$doc.getURL('propdelete', "propname=${field.name}&amp;form_token=$!{services.csrf.getToken()}")' title="$services.localization.render('core.editors.class.deleteProperty.tooltip', [${field.name}])" class="tool delete">$services.localization.render('core.editors.class.deleteProperty.text')</a></div>
+    </div>
+    <div id="xproperty_${field.name}_content" class="xproperty-content"><div>
+      <div class="disabletool">
+        #set($propDef = $field.xWikiClass.get('disabled'))
+        <label for="${field.name}_disabled">$doc.displayEdit($propDef, "${field.name}_" , $field) $propDef.getPrettyName()</label>
+      </div>
+      <dl>
+        #foreach ($classprop in $field.xWikiClass.propertyNames)
+          #set($propDef = $field.xWikiClass.get($classprop))
+          #if($hiddenProperties.indexOf($propDef.name) == -1)
+            #if($propDef.type.indexOf('Boolean') != -1)
+              <dt class="boolean-property"><label class="hidden" for="${field.name}_$classprop">${escapetool.xml($propDef.getPrettyName())}</label>$doc.displayEdit($propDef, "${field.name}_" , $field) $propDef.getPrettyName()</dt>
+            #else
+              <dt><label for="${field.name}_$classprop">${escapetool.xml($propDef.getPrettyName())} $!{propertyDetails.get($classprop)}</label></dt>
+              <dd>$doc.displayEdit($propDef, "${field.name}_" , $field)</dd>
+            #end
+          #end
+        #end
+      </dl>
+    </div></div> ## noname, xproperty-content
+  </div> ## xproperty
+#end
+##
+##
+#**
+ * Inline form for adding a new property to the class.
+ *#
+#macro(addPropertyForm)
+  <div id="add_xproperty">
+    <label for="propname" class="property-name-label">$services.localization.render('core.editors.class.addProperty.name.label')</label>
+    <input type="text" id="propname" name="propname" value="name" size="20" class='withTip'/>
+    <label for="proptype" class="property-type-label">$services.localization.render('core.editors.class.addProperty.type.label'):</label>
+    <select id="proptype" name="proptype" size="1">
+      #foreach($prop in $xwiki.metaclass.properties)
+        <option value="${prop.name}">${escapetool.xml($prop.prettyName)}</option>
+      #end
+    </select>
+    <span class="buttonwrapper">
+      <input type="submit" class="button" value="$services.localization.render('core.editors.class.addProperty.submit')" name="action_propadd"/>
+    </span>
+  </div>
+#end
+##
+##---------------------------------
+## Done with macro definitions, now the actual content
+##
+##
+#if("$!{request.xaction}" == 'displayProperty')
+  ## AJAX request for displaying the HTML code for a property
+  #displayProperty($class.get($request.getParameter('propName').replace(' ', '')))
+#elseif("$!request.xpage" == 'editclass')
+  ## Old (pre 1.0) way of using this template
+  $response.sendRedirect($doc.getURL('edit', 'editor=class'))
+#else
+## The actual class editor
+#set($formname = 'propupdate')
+#set($saveaction = 'propupdate')
+#set($redirect = $xwiki.relativeRequestURL)
+##
+##
+#classSwitcher()
+##
+##
+<form id="$formname" method="post" action="$doc.getURL('preview')" class="withLock">
+<div id="xwikieditcontent" class="clear">
+##
+##
+<div class="hidden">
+  ## CSRF prevention
+  <input type="hidden" id="form_token" name="form_token" value="$!{services.csrf.getToken()}" />
+  <input type="hidden" name="xcontinue" value="$doc.getURL('edit', 'editor=class')"/>
+  ## A submit button that captures "enter" on the form, placed before the "propadd" submit button,
+  ## to prevent from accidentally adding properties when pressing enter.
+  #editActionButton('preview', 'preview')
+</div>
+<div id="xwikiclassproperties">
+  <div id="xclass_${escapetool.xml($class.name)}" class="xclass">
+    <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title"><h2>${escapetool.xml($class.name)}</h2></div>
+    #addPropertyForm()
+    <div id="xclass_${escapetool.xml($class.name)}_content" class="xclass-content"><div id="xclassContent">
+      #foreach ($field in $class.properties)
+        #displayProperty($field)
+      #end
+    </div></div>
+  </div>
+</div> ## properties
+<div class="bottombuttons">#template("editactions.vm")</div>
+</div> ## xwikieditcontent
+</form>
+#end

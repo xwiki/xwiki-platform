@@ -161,6 +161,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
                 DocumentModelBridge document = this.docBridge.getDocument(this.documentReference);
                 DocumentDisplayerParameters parameters = new DocumentDisplayerParameters();
                 parameters.setContentTranslated(true);
+                parameters.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
                 xdom = this.documentDisplayer.display(document, parameters);
             } catch (Exception e) {
                 throw new MacroExecutionException(String.format("Error getting Chart table from document [%s]",

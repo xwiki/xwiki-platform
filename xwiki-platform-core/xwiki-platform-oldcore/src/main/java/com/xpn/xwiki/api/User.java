@@ -89,6 +89,7 @@ public class User extends Api
 
     /**
      * Check if the user belongs to a group or not.
+     * This method only check direct membership (no recursive checking) in the current wiki.
      * 
      * @param groupName The group to check.
      * @return <tt>true</tt> if the user does belong to the specified group, false otherwise or if

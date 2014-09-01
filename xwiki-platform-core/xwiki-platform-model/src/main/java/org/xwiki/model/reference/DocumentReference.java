@@ -37,7 +37,7 @@ public class DocumentReference extends EntityReference
     /**
      * Parameter key for the locale.
      */
-    private static final String LOCALE = "LOCALE";
+    static final String LOCALE = "LOCALE";
 
     /**
      * Special constructor that transforms a generic entity reference into a {@link DocumentReference}. It checks the

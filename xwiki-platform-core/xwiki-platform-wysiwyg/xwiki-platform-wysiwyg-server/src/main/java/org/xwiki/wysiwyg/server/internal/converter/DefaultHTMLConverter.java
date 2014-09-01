@@ -31,6 +31,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.gwt.wysiwyg.client.cleaner.HTMLCleaner;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
@@ -40,6 +41,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 
@@ -83,6 +85,12 @@ public class DefaultHTMLConverter implements HTMLConverter
      */
     @Inject
     private SyntaxFactory syntaxFactory;
+
+    /**
+     * Used to update the rendering context.
+     */
+    @Inject
+    private RenderingContext renderingContext;
 
     /**
      * The component used to execute the XDOM macro transformations before rendering to XHTML.
@@ -145,7 +153,7 @@ public class DefaultHTMLConverter implements HTMLConverter
             TransformationContext txContext = new TransformationContext();
             txContext.setXDOM(xdom);
             txContext.setSyntax(syntaxFactory.createSyntaxFromIdString(syntaxId));
-            macroTransformation.transform(xdom, txContext);
+            ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext, xdom);
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
@@ -178,7 +186,7 @@ public class DefaultHTMLConverter implements HTMLConverter
             TransformationContext txContext = new TransformationContext();
             txContext.setXDOM(xdom);
             txContext.setSyntax(syntax);
-            macroTransformation.transform(xdom, txContext);
+            ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, txContext, xdom);
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();

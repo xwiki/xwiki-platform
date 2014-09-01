@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>XWikiSyntaxVerbatim</name>
+  <language>it</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>XWiki.XWikiSyntax</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1300895617000</creationDate>
+  <date>1301498008000</date>
+  <contentUpdateDate>1301498008000</contentUpdateDate>
+  <version>1.1</version>
+  <title>XWikiSyntaxVerbatim</title>
+  <template/>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>= Avanzato =
+
+== Verbatim ==
+
+{{comment}}please do not translate the sub headlines{{/comment}}
+=== 1.0 Verbatim ===
+
+{{velocity}}$subHeading Contenuto testuale, //verbatim// cioè //parola per parola// $subHeading{{/velocity}}
+
+Consente di inserire del contenuto che non sarà formattato (in altre parole non viene considerata la sintassi XWiki).
+
+{{info}}
+Con la Sintassi XWiki 1.0 la [[Pre macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Pre+Macro+%28Radeox%29]] preserva solo la sintassi XWiki e le macro Radeox. Per cui gli snippets HTML e gli script Groovy/Velocity sono comunque eseguiti.
+{{/info}}
+
+|=Caratteristica|=Sintassi XWiki 1.0|=Risultati
+|Verbatim in una riga|{{{Testo verbatim {pre}*[not rendered]*{/pre} contenuto}}}|Testo verbatim {{{*[not rendered]*}}}contenuto
+|Verbatim in un blocco|((({{{
+{pre}
+contenuto
+*verbatim*
+su più righe
+{/pre}
+}}}
+{{info}}È anche possibile usare la [[Code macro&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Code+Macro+%28Radeox%29]] ma essa visualizza per default il contenuto in una casella.{{/info}}
+)))|((({{{
+contenuto
+*verbatim*
+su più righe
+}}})))
+
+=== 2.0 Verbatim ===
+
+{{velocity}}$subHeading Contenuto testuale, //verbatim// cioè //parola per parola// $subHeading{{/velocity}}
+
+Consente di inserire del contenuto che non sarà formattato (in altre parole non viene considerata la sintassi XWiki).
+
+|=Caratteristica|=Sintassi XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Risultati
+|Verbatim in una riga|{{{Testo verbatim {{{**[[not rendered]]**}}} contenuto}}}|Testo verbatim {{{**[[not rendered]]**}}}contenuto
+|Verbatim in un blocco|((({{{
+{{{
+contenuto
+**verbatim**
+su più righe
+}}}
+}}})))|((({{{
+contenuto
+**verbatim**
+su più righe
+}}})))
+</content>
+</xwikidoc>

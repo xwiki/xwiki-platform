@@ -14,7 +14,7 @@ $response.setStatus(500)##
 #else
   #set ($parameter = $mathtool.add($failedFiles.size(), $wrongFileNames.size()))
 #end
-#xwikimessageboxstart($services.localization.render('notice') $services.localization.render($message, $parameter))
+#xwikimessageboxstart($services.localization.render('notice') $services.localization.render($message, [$parameter]))
 #if ($wrongFileNames && $wrongFileNames.size() > 0)
   <p>$services.localization.render('core.action.upload.failure.wrongFileNames')</p>
   <ul>

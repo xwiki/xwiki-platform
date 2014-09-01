@@ -48,11 +48,11 @@ public final class ObjectMethodsProxy
     public static Object invoke(Object proxy, Method method, Object[] args)
     {
         try {
-            if (method.equals(Object.class.getMethod("hashCode", null))) {
+            if (method.equals(Object.class.getMethod("hashCode"))) {
                 return proxyHashCode(proxy);
             } else if (method.equals(Object.class.getMethod("equals", new Class[] {Object.class}))) {
                 return proxyEquals(proxy, args[0]);
-            } else if (method.equals(Object.class.getMethod("toString", null))) {
+            } else if (method.equals(Object.class.getMethod("toString"))) {
                 return proxyToString(proxy);
             } else {
                 throw new InternalError("unexpected Object method dispatched: " + method);

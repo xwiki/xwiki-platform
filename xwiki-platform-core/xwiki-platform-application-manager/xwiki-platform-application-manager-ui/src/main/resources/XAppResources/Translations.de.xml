@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <xwikidoc>
   <web>XAppResources</web>
   <name>Translations</name>
   <language>de</language>
-  <defaultLanguage/>
+  <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <parent>XAppResources.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
@@ -27,31 +47,31 @@
 xapp.action.exportnonrecurse=Export (nicht rekursiv)
 xapp.action.exportrecurse=Export
 xapp.action.reloadapp=Neu laden
-xapp.answer.deleteapp.msg=Sind Sie sicher, dass Sie Applikation "{0}" löschen wollen.
-xapp.answer.deleteapp.title=Applikation "{0}" löschen
+xapp.answer.deleteapp.msg=Sind Sie sicher, dass Sie Anwendung "{0}" löschen wollen?
+xapp.answer.deleteapp.title=Anwendung "{0}" löschen
 xapp.answer.exportapp.recursive=Rekursiv
-xapp.answer.exportapp.title=Applikation "{0}" exportieren
+xapp.answer.exportapp.title=Anwendung "{0}" exportieren
 xapp.answer.exportapp.withdetails=Mit Historie
-xapp.appmanager=Applikationmanager
-xapp.appname=Applikationname
+xapp.appmanager=Anwendungsmanager
+xapp.appname=Name der Anwendung
 xapp.availablefilestoimport=Für den Import verfügbare Dateien.
-xapp.createapplication=Neue Applikation erstellen
+xapp.createapplication=Neue Anwendung erstellen
 xapp.description=Beschreibung
 xapp.docname=Dokumentname
-xapp.errorcreateapp=Beim Erstellen von Applikation "{0}" trat ein Fehler auf (Code "{1}"}.
-xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=Applikation "{0}" existiert bereits. Wählen Sie einen anderen Namen.
-xapp.errordeleteapp=Beim Löschen von Applikation "{0}" trat ein Fehler auf (Code "{1}"}.
-xapp.errorexportapp=Beim Exportieren von Applikation "{0}" trat ein Fehler auf (Code "{1}"}.
-xapp.errorimportapp=Beim Importieren von Applikation "{0}" trat ein Fehler auf (Code "{1}"}.
-xapp.errorreloadapp=Beim Neu laden von Applikation "{0}" trat ein Fehler auf (Code "{1}"}.
-xapp.legend.application=Applikation
+xapp.errorcreateapp=Beim Erstellen von Anwendung "{0}" trat ein Fehler auf (Code "{1}"}.
+xapp.errorcreateapp.ERROR_AM_APPDOCALREADYEXISTS=Anwendung "{0}" existiert bereits. Wählen Sie einen anderen Namen.
+xapp.errordeleteapp=Beim Löschen von Anwendung "{0}" trat ein Fehler auf (Code "{1}"}.
+xapp.errorexportapp=Beim Exportieren von Anwendung "{0}" trat ein Fehler auf (Code "{1}"}.
+xapp.errorimportapp=Beim Importieren von Anwendung "{0}" trat ein Fehler auf (Code "{1}"}.
+xapp.errorreloadapp=Beim Neuladen von Anwendung "{0}" trat ein Fehler auf (Code "{1}"}.
+xapp.legend.application=Anwendung
 xapp.legend.validate=Prüfen
-xapp.pluginnotenabled=Das Applikationmanager-Plugin ist nicht aktiv. Diese Seite wird nicht korrekt funktionieren. Stellen Sie sicher, dass "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" im xwiki.plugins-Parameter in der xwiki.cfg-Datei aufscheint.
-xapp.successcreateapp=Applikation “{0}" wurde erstellt. Sie können Sie unter [{1}] erreichen.
-xapp.successdeleteapp=Applikation “{0}" erfolgreich gelöscht.
-xapp.successexportapp=Applikation “{0}" erfolgreich exportiert.
-xapp.successimportapp=Applikationpaket “{0}" erfolgreich importiert.
-xapp.successreloadapp=Applikation “{0}" erfolgreich neu geladen.
-xapp.totalnumberofapp=Gesamtzahl der Applikationen
+xapp.pluginnotenabled=Das Anwendungsmanager-Plugin ist nicht aktiv. Diese Seite wird nicht korrekt funktionieren. Stellen Sie sicher, dass "com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin" im xwiki.plugins-Parameter in der xwiki.cfg-Datei aufscheint.
+xapp.successcreateapp=Anwendung “{0}" wurde erstellt. Sie können Sie unter [{1}] erreichen.
+xapp.successdeleteapp=Anwendung “{0}" erfolgreich gelöscht.
+xapp.successexportapp=Anwendung “{0}" erfolgreich exportiert.
+xapp.successimportapp=Anwendungspaket “{0}" erfolgreich importiert.
+xapp.successreloadapp=Anwendung “{0}" erfolgreich neu geladen.
+xapp.totalnumberofapp=Anzahl der Anwendungen
 </content>
 </xwikidoc>

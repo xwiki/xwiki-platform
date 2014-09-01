@@ -31,6 +31,23 @@ import org.openqa.selenium.support.FindBy;
 public class CopyPage extends ViewPage
 {
     /**
+     * The value attribute name.
+     */
+    private static final String VALUE = "value";
+
+    /**
+     * The hidden input containing the space name of the source page.
+     */
+    @FindBy(id = "sourceSpaceName")
+    private WebElement sourceSpaceName;
+
+    /**
+     * The hidden input containing the source page name.
+     */
+    @FindBy(id = "sourcePageName")
+    private WebElement sourcePageName;
+
+    /**
      * The select box containing the list of available spaces.
      */
     @FindBy(id = "targetSpaceName")
@@ -49,6 +66,27 @@ public class CopyPage extends ViewPage
     private WebElement copyButton;
 
     /**
+     * @return the name of the space where the source page should be.
+     */
+    public String getSourceSpaceName() {
+        return this.sourceSpaceName.getAttribute(VALUE);
+    }
+
+    /**
+     * @return the name of the source page.
+     */
+    public String getSourcePageName() {
+        return this.sourcePageName.getAttribute(VALUE);
+    }
+
+    /**
+     * @return the current name of the space where the page should be copied.
+     */
+    public String getTargetSpaceName() {
+        return this.targetSpaceName.getAttribute(VALUE);
+    }
+
+    /**
      * Sets the name of the space where the page should be copied.
      * 
      * @param targetSpaceName the name of the space where the page should be copied
@@ -57,6 +95,13 @@ public class CopyPage extends ViewPage
     {
         this.targetSpaceName.clear();
         this.targetSpaceName.sendKeys(targetSpaceName);
+    }
+
+    /**
+     * @return the current name of the target page.
+     */
+    public String getTargetPageName() {
+        return this.targetPageName.getAttribute(VALUE);
     }
 
     /**
@@ -79,5 +124,16 @@ public class CopyPage extends ViewPage
     {
         this.copyButton.submit();
         return new CopyConfirmationPage();
+    }
+
+    /**
+     * Submit the copy page form and expect to receive an overwrite warning.
+     *
+     * @return the overwrite warning page
+     */
+    public CopyOverwritePromptPage clickCopyButtonExpectingOverwritePrompt()
+    {
+        this.copyButton.submit();
+        return new CopyOverwritePromptPage();
     }
 }

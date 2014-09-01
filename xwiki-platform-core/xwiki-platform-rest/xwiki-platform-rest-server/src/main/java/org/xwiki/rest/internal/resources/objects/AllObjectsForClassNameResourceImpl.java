@@ -45,12 +45,12 @@ public class AllObjectsForClassNameResourceImpl extends XWikiResource implements
     public Objects getObjects(String wikiName, String className, Integer start, Integer number, String order,
             Boolean withPrettyNames) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getWikiId();
 
         try {
             Objects objects = new Objects();
 
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             String query =
                     "select doc, obj from BaseObject as obj, XWikiDocument as doc where obj.name=doc.fullName and obj.className=:className";
@@ -83,7 +83,7 @@ public class AllObjectsForClassNameResourceImpl extends XWikiResource implements
         } catch (Exception e) {
             throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
+            Utils.getXWikiContext(componentManager).setWikiId(database);
         }
     }
 }

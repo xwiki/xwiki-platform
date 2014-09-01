@@ -191,13 +191,9 @@ widgets.ModalPopup = Class.create({
    */
   registerShortcuts : function(action) {
     var shortcuts = this.shortcuts[action].keys;
-    var method = this.shortcuts[action].method;
+    var method = this.shortcuts[action].method.bindAsEventListener(this, action);
     for (var i = 0; i < shortcuts.size(); ++i) {
-      if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
-        shortcut.add(shortcuts[i], method.bindAsEventListener(this, action), {type: 'keyup'});
-      } else {
-        shortcut.add(shortcuts[i], method.bindAsEventListener(this, action), {type: 'keypress'});
-      }
+      shortcut.add(shortcuts[i], method);
     }
   },
   /**
@@ -210,7 +206,7 @@ widgets.ModalPopup = Class.create({
       shortcut.remove(this.shortcuts[action].keys[i]);
     }
   },
-  createButton : function(type, text, title, id) {
+  createButton : function(type, text, title, id, extraClass) {
     var wrapper = new Element("span", {"class" : "buttonwrapper"});
     var button = new Element("input", {
       "type" : type,
@@ -219,6 +215,9 @@ widgets.ModalPopup = Class.create({
       "title" : title,
       "id" : id
     });
+    if (extraClass) {
+      button.addClassName(extraClass);
+    }
     wrapper.update(button);
     return wrapper;
   }

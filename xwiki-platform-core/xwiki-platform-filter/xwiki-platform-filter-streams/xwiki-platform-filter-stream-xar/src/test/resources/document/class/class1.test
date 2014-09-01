@@ -1,0 +1,100 @@
+.#------------------------------------------------------------------------------
+.input|xwiki+xar/1.1
+.#------------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc version="1.1">
+  <web>space</web>
+  <name>page</name>
+  <class>
+    <name>space.page</name>
+    <customClass>customClass</customClass>
+    <customMapping>customMapping</customMapping>
+    <defaultViewSheet>defaultViewSheet</defaultViewSheet>
+    <defaultEditSheet>defaultEditSheet</defaultEditSheet>
+    <defaultWeb>defaultWeb</defaultWeb>
+    <nameField>nameField</nameField>
+    <validationScript>validationScript</validationScript>
+    <name>
+      <disabled>0</disabled>
+      <name>prop1</name>
+      <number>1</number>
+      <numberType>long</numberType>
+      <prettyName>Prop1</prettyName>
+      <size>30</size>
+      <unmodifiable>0</unmodifiable>
+      <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+    </name>
+  </class>
+</xwikidoc>
+.#------------------------------------------------------------------------------
+.expect|filter+xml
+.#------------------------------------------------------------------------------
+<wikiSpace name="space">
+  <wikiDocument name="page">
+    <wikiDocumentLocale>
+      <wikiDocumentRevision>
+        <p>
+          <parameters>
+            <entry>
+              <string>syntax</string>
+              <org.xwiki.rendering.syntax.Syntax>
+                <type>
+                  <name>XWiki</name>
+                  <id>xwiki</id>
+                </type>
+                <version>1.0</version>
+              </org.xwiki.rendering.syntax.Syntax>
+            </entry>
+            <entry>
+              <string>hidden</string>
+              <boolean>false</boolean>
+            </entry>
+          </parameters>
+        </p>
+        <wikiClass>
+          <p>
+            <parameters>
+              <entry>
+                <string>customclass</string>
+                <string>customClass</string>
+              </entry>
+              <entry>
+                <string>custommapping</string>
+                <string>customMapping</string>
+              </entry>
+              <entry>
+                <string>sheet_defaultview</string>
+                <string>defaultViewSheet</string>
+              </entry>
+              <entry>
+                <string>sheet_defaultedit</string>
+                <string>defaultEditSheet</string>
+              </entry>
+              <entry>
+                <string>defaultspace</string>
+                <string>defaultWeb</string>
+              </entry>
+              <entry>
+                <string>namefield</string>
+                <string>nameField</string>
+              </entry>
+              <entry>
+                <string>validationscript</string>
+                <string>validationScript</string>
+              </entry>
+            </parameters>
+          </p>
+          <wikiClassProperty name="name" type="com.xpn.xwiki.objects.classes.NumberClass">
+            <wikiClassPropertyField name="disabled" value="0"></wikiClassPropertyField>
+            <wikiClassPropertyField name="name" value="prop1"></wikiClassPropertyField>
+            <wikiClassPropertyField name="number" value="1"></wikiClassPropertyField>
+            <wikiClassPropertyField name="numberType" value="long"></wikiClassPropertyField>
+            <wikiClassPropertyField name="prettyName" value="Prop1"></wikiClassPropertyField>
+            <wikiClassPropertyField name="size" value="30"></wikiClassPropertyField>
+            <wikiClassPropertyField name="unmodifiable" value="0"></wikiClassPropertyField>
+          </wikiClassProperty>
+        </wikiClass>
+      </wikiDocumentRevision>
+    </wikiDocumentLocale>
+  </wikiDocument>
+</wikiSpace>

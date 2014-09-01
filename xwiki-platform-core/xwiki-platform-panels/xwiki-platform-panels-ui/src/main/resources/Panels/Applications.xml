@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Panels</web>
   <name>Applications</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Panels.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1346768961000</creationDate>
-  <date>1346768961000</date>
-  <contentUpdateDate>1346768961000</contentUpdateDate>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1409592268000</date>
+  <contentUpdateDate>1409232327000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>Panels.Applications</name>
+    <number>0</number>
+    <className>Panels.PanelClass</className>
+    <guid>cbe1606c-2ad6-4a85-8f76-4c2d65829623</guid>
     <class>
       <name>Panels.PanelClass</name>
       <customClass/>
@@ -76,7 +77,7 @@
         <number>4</number>
         <prettyName>Content</prettyName>
         <rows>25</rows>
-        <size>60</size>
+        <size>120</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </content>
@@ -117,10 +118,6 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
-    <name>Panels.Applications</name>
-    <number>0</number>
-    <className>Panels.PanelClass</className>
-    <guid>cbe1606c-2ad6-4a85-8f76-4c2d65829623</guid>
     <property>
       <category>Information</category>
     </property>
@@ -129,16 +126,17 @@
 #set($discard = $xwiki.ssx.use('Panels.Applications'))
 #set($discard = $xwiki.jsx.use('Panels.Applications'))
 
-## I need the HTML macro here because otherwise I am not able to put the class "active" to the first &lt;li&gt;.
-{{html wiki="true"}}
 #panelheader($services.localization.render('panels.applications.title'))
+
+{{html}}
 &lt;ul class="applicationsPanel nav nav-pills nav-stacked"&gt;
   #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications', {'sortByParameter' : 'label'}))
     #set($params = $uix.getParameters())
     #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '' &amp;&amp; $xwiki.hasAccessLevel('view', $xcontext.user, $params.target))
-      #set($icon = "image:${params.icon}")
       #if ($params.icon.startsWith('icon:'))
         #set($icon = $services.icon.renderHTML($params.icon.substring(5)))
+      #else
+        #set($icon = $services.rendering.render($services.rendering.parse("image:${params.icon}", 'xwiki/2.1'), 'xhtml/1.0'))
       #end
       &lt;li&gt;&lt;a href="$xwiki.getURL($params.target)"&gt;&lt;span class="application-img"&gt;$icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/a&gt;&lt;/li&gt;
     #end
@@ -152,9 +150,10 @@
       #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications.more', {'sortByParameter' : 'label'}))
         #set($params = $uix.getParameters())
         #if("$!params.icon" != '' &amp;&amp; "$!params.label" != '' &amp;&amp; "$!params.target" != '')
-          #set($icon = "image:$params.icon")
           #if ($params.icon.startsWith('icon:'))
             #set($icon = $services.icon.renderHTML($params.icon.substring(5)))
+          #else
+            #set($icon = $services.rendering.render($services.rendering.parse("image:${params.icon}", 'xwiki/2.1'), 'xhtml/1.0'))
           #end
           &lt;li&gt;[[&lt;span class="application-img"&gt;$icon &lt;/span&gt; &lt;span class="application-label"&gt;$params.label&lt;/span&gt;&gt;&gt;$params.target]]&lt;/li&gt;
         #end
@@ -163,9 +162,9 @@
   &lt;/div&gt;
   &lt;/ul&gt;
 #end
-#panelfooter()
 {{/html}}
 
+#panelfooter()
 {{/velocity}}</content>
     </property>
     <property>
@@ -179,6 +178,10 @@
     </property>
   </object>
   <object>
+    <name>Panels.Applications</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>12aa5bbf-26ee-4bc2-b649-1b508cdec8df</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -246,14 +249,10 @@
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Panels.Applications</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>12aa5bbf-26ee-4bc2-b649-1b508cdec8df</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -324,6 +323,10 @@ document.observe('xwiki:dom:loaded', function(e) {
     </property>
   </object>
   <object>
+    <name>Panels.Applications</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>4511aeeb-4b3d-4c11-b76f-dc434d4cc9b0</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -391,14 +394,10 @@ document.observe('xwiki:dom:loaded', function(e) {
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Panels.Applications</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>4511aeeb-4b3d-4c11-b76f-dc434d4cc9b0</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -550,5 +549,4 @@ div.applicationPanelMoreContainer li a {
       <use>onDemand</use>
     </property>
   </object>
-  <content/>
 </xwikidoc>

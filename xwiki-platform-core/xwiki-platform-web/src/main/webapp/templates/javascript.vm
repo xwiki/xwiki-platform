@@ -70,7 +70,6 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)##
 <script type="text/javascript">
 // <![CDATA[
 require.config({
-  baseUrl: '/',
   ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
   paths: { 'jquery': "$xwiki.getSkinFile('js/amd/')jquery" },
   map: {

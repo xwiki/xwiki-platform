@@ -27,6 +27,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,6 +64,20 @@ public class ExportURLFactory extends XWikiServletURLFactory
     // TODO: use real css parser
     private static Pattern CSSIMPORT = Pattern.compile("^\\s*@import\\s*\"(.*)\"\\s*;$", Pattern.MULTILINE);
 
+    /**
+     * Pages for which to convert URL to local.
+     * @deprecated since 6.2RC1, use {link #getExportURLFactoryContext} instead
+     */
+    @Deprecated
+    protected Set<String> exportedPages = new HashSet<String>();
+
+    /**
+     * Directory where to export attachment.
+     * @deprecated since 6.2RC1, use {link #getExportURLFactoryContext} instead
+     */
+    @Deprecated
+    protected File exportDir;
+
     private ExportURLFactoryContext factoryContext = new ExportURLFactoryContext();
 
     /**
@@ -77,6 +93,26 @@ public class ExportURLFactory extends XWikiServletURLFactory
     }
 
     /**
+     * @return the list skins names used.
+     * @deprecated since 6.2RC1, use {@link #getExportURLFactoryContext()}
+     */
+    @Deprecated
+    public Collection<String> getNeededSkins()
+    {
+        return getExportURLFactoryContext().getNeededSkins();
+    }
+
+    /**
+     * @return the list of custom skin files.
+     * @deprecated since 6.2RC1, use {@link #getExportURLFactoryContext()}
+     */
+    @Deprecated
+    public Collection<String> getExportedSkinFiles()
+    {
+        return getExportURLFactoryContext().getExportedSkinFiles();
+    }
+
+    /**
      * Init the url factory.
      * 
      * @param exportedPages the pages that will be exported.
@@ -89,6 +125,9 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
         if (exportDir != null) {
             getExportURLFactoryContext().setExportDir(exportDir);
+
+            // Backward-compatibility, also set the exportDir deprecated variable.
+            this.exportDir = getExportURLFactoryContext().getExportDir();
         }
 
         if (exportedPages != null) {
@@ -114,6 +153,9 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 absolutePageName += doc.getFullName();
 
                 getExportURLFactoryContext().addExportedPage(absolutePageName);
+
+                // Backward-compatibility, also set the exportedPages deprecated variable.
+                this.exportedPages.addAll(getExportURLFactoryContext().getExportedPages());
             }
         }
     }

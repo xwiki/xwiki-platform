@@ -169,6 +169,7 @@ text_align_justify = align-justify
 text_align_left = align-left
 text_align_right = align-right
 text_bold = bold
+transmit = rss
 weather_clouds = cloud</content>
   <object>
     <name>IconThemes.FontAwesome</name>

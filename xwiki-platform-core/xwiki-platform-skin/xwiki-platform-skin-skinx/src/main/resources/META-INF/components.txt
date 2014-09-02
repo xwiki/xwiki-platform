@@ -5,3 +5,5 @@ org.xwiki.skinx.internal.JsFileSkinExtension
 org.xwiki.skinx.internal.CssResourceSkinExtension
 org.xwiki.skinx.internal.JsResourceSkinExtension
 org.xwiki.skinx.internal.LinkSkinExtension
+org.xwiki.skinx.internal.SsxExportURLFactoryActionHandler
+org.xwiki.skinx.internal.JsxExportURLFactoryActionHandler

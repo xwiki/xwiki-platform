@@ -40,7 +40,7 @@ public interface ExportURLFactoryActionHandler
     /**
      * @param web the space name pointed to
      * @param name the page name pointed to
-     * @param querystring the optional query string
+     * @param queryString the optional query string
      * @param anchor the optional anchor
      * @param wikiId the wiki id pointed to
      * @param context the XWiki Context
@@ -48,6 +48,6 @@ public interface ExportURLFactoryActionHandler
      * @return the URL to generate at export
      * @throws Exception in case of an error
      */
-    URL createURL(String web, String name, String querystring, String anchor, String wikiId,
+    URL createURL(String web, String name, String queryString, String anchor, String wikiId,
         XWikiContext context, ExportURLFactoryContext factoryContext) throws Exception;
 }

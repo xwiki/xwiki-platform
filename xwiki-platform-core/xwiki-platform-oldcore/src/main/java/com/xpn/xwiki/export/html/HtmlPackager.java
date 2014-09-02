@@ -216,13 +216,28 @@ public class HtmlPackager
             context.put(CONTEXT_TDOC, tdoc);
             vcontext.put(VCONTEXT_TDOC, tdoc.newDocument(context));
 
-            String content = context.getWiki().evaluateTemplate("view.vm", context);
+            String content = evaluateDocumentContent(context);
 
             zos.write(content.getBytes(context.getWiki().getEncoding()));
             zos.closeEntry();
         } finally {
             context.setWikiId(originalDatabase);
         }
+    }
+
+    private String evaluateDocumentContent(XWikiContext context) throws IOException
+    {
+        context.getWiki().getPluginManager().beginParsing(context);
+        Utils.enablePlaceholders(context);
+        String content;
+        try {
+            content = context.getWiki().evaluateTemplate("view.vm", context);
+            content = Utils.replacePlaceholders(content, context);
+        } finally {
+            Utils.disablePlaceholders(context);
+        }
+        content = context.getWiki().getPluginManager().endParsing(content.trim(), context);
+        return content;
     }
 
     /**

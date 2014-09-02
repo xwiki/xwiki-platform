@@ -20,8 +20,10 @@
 package com.xpn.xwiki.web.sx;
 
 import java.io.StringWriter;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,8 +111,9 @@ public class SxDocumentSource implements SxSource
     {
         StringBuilder resultBuilder = new StringBuilder();
 
-        if (this.document.getObjects(this.extension.getClassName()) != null) {
-            for (BaseObject sxObj : this.document.getObjects(this.extension.getClassName())) {
+        List<BaseObject> objects = this.document.getObjects(this.extension.getClassName());
+        if (objects != null) {
+            for (BaseObject sxObj : objects) {
                 if (sxObj == null) {
                     continue;
                 }
@@ -131,8 +134,8 @@ public class SxDocumentSource implements SxSource
                             engine.stoppedUsingMacroNamespace(this.document.getPrefixedFullName());
                         }
                     } catch (XWikiVelocityException ex) {
-                        LOGGER.warn("Velocity errors while parsing skin extension [{}]: ",
-                            this.document.getPrefixedFullName(), ex.getMessage());
+                        LOGGER.warn("Velocity errors while parsing skin extension [{}] with content [{}]: ",
+                            this.document.getPrefixedFullName(), sxContent, ExceptionUtils.getRootCauseMessage(ex));
                     }
                 }
                 // Also add a newline, in case the different object contents don't end with a blank

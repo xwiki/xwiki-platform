@@ -1,1 +1,4 @@
-body {}
+/* Fix XWIKI-10664 */
+.gwt-TabPanelBottom{
+  margin-right: -4px;
+}

@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 
@@ -34,6 +35,7 @@ import com.xpn.xwiki.util.XWikiStubContextProvider;
  * 
  * @version $Id$
  */
+@Component
 public class XWikiContextProvider implements Provider<XWikiContext>
 {
     /**

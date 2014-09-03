@@ -88,6 +88,7 @@ building = building
 bullet_arrow_down = caret-down
 bullet_arrow_up = caret-up
 bullet_go = caret-right
+calculator = calculator
 calendar = calendar
 camera = camera
 cancel = times-circle

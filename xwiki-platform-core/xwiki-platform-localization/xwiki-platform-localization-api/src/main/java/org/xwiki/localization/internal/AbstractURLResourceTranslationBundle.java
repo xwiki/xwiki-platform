@@ -134,7 +134,7 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
         URL localeURL = getLocaleURL(locale);
 
         if (localeURL == null) {
-            return null;
+            return LocalizedTranslationBundle.EMPTY;
         }
 
         // Parse resource
@@ -144,7 +144,7 @@ public abstract class AbstractURLResourceTranslationBundle extends AbstractCache
             properties.load(componentListStream);
         } catch (FileNotFoundException e) {
             // No translation files for the passed locale
-            return null;
+            return LocalizedTranslationBundle.EMPTY;
         } catch (IOException e) {
             this.logger.error("Failed to parse resource [{}] as translation bundle", localeURL, e);
         }

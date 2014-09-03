@@ -71,7 +71,7 @@ public class RootClassLoaderTranslationBundle extends AbstractCachedTranslationB
         Properties properties = getResourceProperties(locale);
 
         if (properties == null) {
-            return null;
+            return LocalizedTranslationBundle.EMPTY;
         }
 
         // Convert to LocalBundle

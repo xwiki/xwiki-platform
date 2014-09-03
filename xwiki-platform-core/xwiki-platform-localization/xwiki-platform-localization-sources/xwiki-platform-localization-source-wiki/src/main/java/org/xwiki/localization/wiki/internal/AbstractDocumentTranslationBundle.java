@@ -51,6 +51,7 @@ import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -112,7 +113,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     private void initialize()
     {
         this.events =
-            Arrays.<Event> asList(new DocumentUpdatedEvent(this.documentReference), new DocumentCreatedEvent(
+            Arrays.<Event>asList(new DocumentUpdatedEvent(this.documentReference), new DocumentCreatedEvent(
                 this.documentReference), new DocumentDeletedEvent(this.documentReference), new WikiDeletedEvent(
                 this.documentReference.getWikiReference().getName()));
 
@@ -130,14 +131,26 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     {
         XWikiContext context = this.contextProvider.get();
 
-        XWikiDocument document = context.getWiki().getDocument(this.documentReference, context);
+        if (context == null) {
+            // No context for some reason, lets try later
+            return null;
+        }
+
+        XWiki xwiki = context.getWiki();
+
+        if (xwiki == null) {
+            // No XWiki instance ready, lets try later
+            return null;
+        }
+
+        XWikiDocument document = xwiki.getDocument(this.documentReference, context);
 
         if (locale != null && !locale.equals(Locale.ROOT) && !locale.equals(document.getDefaultLocale())) {
-            document = context.getWiki().getDocument(new DocumentReference(document.getDocumentReference(), locale), context);
+            document = xwiki.getDocument(new DocumentReference(document.getDocumentReference(), locale), context);
 
             if (document.isNew()) {
                 // No document found for this locale
-                return null;
+                return LocalizedTranslationBundle.EMPTY;
             }
         }
 

@@ -1142,7 +1142,7 @@ return XWiki;
     #if("$!request.template" != '' &amp;&amp; $request.template != 'xwikinotemplate')
       ## check if the wiki is already in creation
       #set ($jobId = ["wiki", "provisioning", "wikiprovisioning.template", $request.wikiname])
-      #if("$!services.wiki.template.getWikiProvisioningJobStatus($jobId)" == '')
+      #if(!$services.wiki.exists($request.wikiname))
         #set($discard = $services.wiki.template.createWikiFromTemplate($request.wikiname, $wikialias, $request.template, $request.ownerId, true))
       #end
       #set($wikiDescriptor = $services.wiki.getById($request.wikiname))

@@ -27,7 +27,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,6 +38,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -253,7 +256,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
                     // Adjust path for links inside CSS files.
                     getExportURLFactoryContext().pushCSSPathAdjustment(StringUtils.countMatches(filePath, "/"));
                     try {
-                        SKINACTION.render(skinURL.getPath(), context);
+                        renderWithSkinAction(web, name, wikiId, skinURL.getPath(), context);
                     } finally {
                         getExportURLFactoryContext().popCSSPathAdjustement();
                     }
@@ -280,6 +283,28 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
 
         return skinURL;
+    }
+
+    private void renderWithSkinAction(String space, String name, String wikiId, String path, XWikiContext context)
+        throws IOException, XWikiException
+    {
+        // We're simulating a Skin Action below. However we need to ensure that we set the right doc
+        // in the XWiki Context since this is what XWikiAction does and if we don't do this it generates
+        // issues since the current doc is put in the context instead of the skin. Specifically we'll
+        // get for example "Main.WebHome" as the current doc instead of "Main.flamingo".
+        // See http://jira.xwiki.org/browse/XWIKI-10922 for details.
+
+        DocumentReference dummyDocumentReference = new DocumentReference(wikiId, space, name);
+        XWikiDocument dummyDocument = context.getWiki().getDocument(dummyDocumentReference, context);
+
+        Map<String, Object> backup = new HashMap<>();
+        XWikiDocument.backupContext(backup, context);
+        try {
+            dummyDocument.setAsContextDoc(context);
+            SKINACTION.render(path, context);
+        } finally {
+            XWikiDocument.restoreContext(backup, context);
+        }
     }
 
     /**

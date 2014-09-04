@@ -332,12 +332,7 @@ public class HtmlPackager
             addSkinToZip(skinName, zos, urlf.getExportURLFactoryContext().getExportedSkinFiles(), context);
         }
 
-        // add "resources" folder
-        File file = new File(context.getWiki().getEngineContext().getRealPath("/resources/"));
-        addDirToZip(file, zos, "resources" + ZIPPATH_SEPARATOR,
-            urlf.getExportURLFactoryContext().getExportedSkinFiles());
-
-        // Add attachments and generated skin files files to ZIP file
+        // Copy generated files in the ZIP file.
         addDirToZip(tempdir, zos, "", null);
 
         zos.setComment(this.description);

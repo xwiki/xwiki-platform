@@ -77,7 +77,9 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
 require.config({
   ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
   paths: {
-    'jquery': "$xwiki.getSkinFile('js/amd/')jquery",
+## We add "?noext" in order to prevent requirejs to add ".js" (since requiresjs will not modify the path if it contians
+## a question mark...)
+    'jquery': "$xwiki.getSkinFile('js/amd/jquery.js')?noext",
 ## Requirejs will automatically add a ".js" suffix if the generated URL doesn't contain a "?". It happens that we
 ## don't generate a URL with "?" when we export in HTML for example. In this case we remove the ".js" suffix since
 ## requirejs will add one...

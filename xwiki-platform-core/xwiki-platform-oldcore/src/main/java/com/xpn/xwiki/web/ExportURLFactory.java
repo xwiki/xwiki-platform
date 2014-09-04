@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -242,30 +243,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
                     folder.mkdirs();
                 }
 
-                FileOutputStream fos = new FileOutputStream(file);
-                String database = context.getWikiId();
-
-                try {
-                    XWikiServletResponseStub response = new XWikiServletResponseStub();
-                    response.setOutpuStream(fos);
-                    context.setResponse(response);
-                    if (wikiId != null) {
-                        context.setWikiId(wikiId);
-                    }
-
-                    // Adjust path for links inside CSS files.
-                    getExportURLFactoryContext().pushCSSPathAdjustment(StringUtils.countMatches(filePath, "/"));
-                    try {
-                        renderWithSkinAction(web, name, wikiId, skinURL.getPath(), context);
-                    } finally {
-                        getExportURLFactoryContext().popCSSPathAdjustement();
-                    }
-                } finally {
-                    fos.close();
-                    if (wikiId != null) {
-                        context.setWikiId(database);
-                    }
-                }
+                renderSkinFile(skinURL.getPath(), web, name, wikiId, file, StringUtils.countMatches(filePath, "/"),
+                    context);
 
                 followCssImports(file, web, name, wikiId, context);
             }
@@ -283,6 +262,38 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
 
         return skinURL;
+    }
+
+    /**
+     * Results go in the passed {@code outputFile}.
+     */
+    private void renderSkinFile(String path, String web, String name, String wikiId, File outputFile,
+        int cssPathAdjustmentValue, XWikiContext context) throws IOException, XWikiException
+    {
+        FileOutputStream fos = new FileOutputStream(outputFile);
+        String database = context.getWikiId();
+
+        try {
+            XWikiServletResponseStub response = new XWikiServletResponseStub();
+            response.setOutpuStream(fos);
+            context.setResponse(response);
+            if (wikiId != null) {
+                context.setWikiId(wikiId);
+            }
+
+            // Adjust path for links inside CSS files.
+            getExportURLFactoryContext().pushCSSPathAdjustment(cssPathAdjustmentValue);
+            try {
+                renderWithSkinAction(web, name, wikiId, path, context);
+            } finally {
+                getExportURLFactoryContext().popCSSPathAdjustement();
+            }
+        } finally {
+            fos.close();
+            if (wikiId != null) {
+                context.setWikiId(database);
+            }
+        }
     }
 
     private void renderWithSkinAction(String space, String name, String wikiId, String path, XWikiContext context)
@@ -348,6 +359,27 @@ public class ExportURLFactory extends XWikiServletURLFactory
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
         try {
+            File targetFile = new File(getExportURLFactoryContext().getExportDir(), "resources/" + filename);
+            if (!targetFile.getParentFile().exists()) {
+                targetFile.getParentFile().mkdirs();
+            }
+
+            // Step 1: Copy the resource
+            // If forceSkinAction is false then there's no velocity in the resource and we can just copy it simply.
+            // Otherwise we need to go through the Skin Action to perform the rendering.
+            if (forceSkinAction) {
+                // Extract the first path as the wiki page
+                int pos = filename.indexOf('/', 0);
+                String page = filename.substring(0, pos);
+                renderSkinFile("resource/" + filename, "resources", page, context.getDatabase(), targetFile,
+                    StringUtils.countMatches(filename, "/") + 1, context);
+            } else {
+                FileOutputStream fos = new FileOutputStream(targetFile);
+                InputStream source = context.getEngineContext().getResourceAsStream("/resources/" + filename);
+                IOUtils.copy(source, fos);
+                fos.close();
+            }
+
             StringBuffer newPath = new StringBuffer("file://");
 
             // Adjust path for links inside CSS files (since they need to be relative to the CSS file they're in).

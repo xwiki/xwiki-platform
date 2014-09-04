@@ -1154,6 +1154,7 @@ return XWiki;
   position: absolute;
   right: 0.5em;
   top: 0.5em;
+  z-index: 1000;
 }
 
 #fields .icon-move {

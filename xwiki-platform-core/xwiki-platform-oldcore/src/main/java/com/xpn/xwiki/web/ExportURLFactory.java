@@ -236,15 +236,15 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 getExportURLFactoryContext().addExportedSkinFile(filePath);
 
                 File file = new File(getExportURLFactoryContext().getExportDir(), filePath);
-
-                // Make sure the folder exists
-                File folder = file.getParentFile();
-                if (!folder.exists()) {
-                    folder.mkdirs();
+                if (!file.exists()) {
+                    // Make sure the folder exists
+                    File folder = file.getParentFile();
+                    if (!folder.exists()) {
+                        folder.mkdirs();
+                    }
+                    renderSkinFile(skinURL.getPath(), web, name, wikiId, file, StringUtils.countMatches(filePath, "/"),
+                        context);
                 }
-
-                renderSkinFile(skinURL.getPath(), web, name, wikiId, file, StringUtils.countMatches(filePath, "/"),
-                    context);
 
                 followCssImports(file, web, name, wikiId, context);
             }
@@ -360,24 +360,26 @@ public class ExportURLFactory extends XWikiServletURLFactory
     {
         try {
             File targetFile = new File(getExportURLFactoryContext().getExportDir(), "resources/" + filename);
-            if (!targetFile.getParentFile().exists()) {
-                targetFile.getParentFile().mkdirs();
-            }
+            if (!targetFile.exists()) {
+                if (!targetFile.getParentFile().exists()) {
+                    targetFile.getParentFile().mkdirs();
+                }
 
-            // Step 1: Copy the resource
-            // If forceSkinAction is false then there's no velocity in the resource and we can just copy it simply.
-            // Otherwise we need to go through the Skin Action to perform the rendering.
-            if (forceSkinAction) {
-                // Extract the first path as the wiki page
-                int pos = filename.indexOf('/', 0);
-                String page = filename.substring(0, pos);
-                renderSkinFile("resource/" + filename, "resources", page, context.getDatabase(), targetFile,
-                    StringUtils.countMatches(filename, "/") + 1, context);
-            } else {
-                FileOutputStream fos = new FileOutputStream(targetFile);
-                InputStream source = context.getEngineContext().getResourceAsStream("/resources/" + filename);
-                IOUtils.copy(source, fos);
-                fos.close();
+                // Step 1: Copy the resource
+                // If forceSkinAction is false then there's no velocity in the resource and we can just copy it simply.
+                // Otherwise we need to go through the Skin Action to perform the rendering.
+                if (forceSkinAction) {
+                    // Extract the first path as the wiki page
+                    int pos = filename.indexOf('/', 0);
+                    String page = filename.substring(0, pos);
+                    renderSkinFile("resource/" + filename, "resources", page, context.getDatabase(), targetFile,
+                        StringUtils.countMatches(filename, "/") + 1, context);
+                } else {
+                    FileOutputStream fos = new FileOutputStream(targetFile);
+                    InputStream source = context.getEngineContext().getResourceAsStream("/resources/" + filename);
+                    IOUtils.copy(source, fos);
+                    fos.close();
+                }
             }
 
             StringBuffer newPath = new StringBuffer("file://");

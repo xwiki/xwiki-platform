@@ -101,10 +101,10 @@
     <script type="text/javascript">
       var hashviewer = self.document.location.hash.substring(1);
       #foreach($docextra in $docextras)
-        #set ($extraAnchor = $listtool.get($docextra, 0))
-        #set ($extraName = $listtool.get($docextra, 1))
-        #set ($extraTemplate = $listtool.get($docextra, 4))
-        #set ($extraShortcut = $listtool.get($docextra, 5))
+        #set ($extraAnchor = $docextra[0])
+        #set ($extraName = $docextra[1])
+        #set ($extraTemplate = $docextra[4])
+        #set ($extraShortcut = $docextra[5])
         ##
         ## Set the extra to load
         ##

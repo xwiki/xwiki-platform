@@ -349,7 +349,7 @@
     #end
     ## Retrieve the property type as it might be usefull
     #set($propType = '')
-    #if($listtool.contains($propClass.getPropertyNames(), $colname))
+    #if($propClass.getPropertyNames().contains($colname))
       #set($propType = "$!propClass.get($colname).type")
     #end
     #set($fieldValue = "$!itemDoc.getValue($colname)")
@@ -429,7 +429,7 @@
     #set($propClass = $class)
   #end
   #set($propType = '')
-  #if($listtool.contains($propClass.getPropertyNames(), $colname))
+  #if($propClass.getPropertyNames().contains($colname))
     #set($propType = "$!{propClass.get($colname).type}")
   #end
   #if($propType == 'NumberClass')
@@ -564,7 +564,7 @@
   #else
     #set($propClass = $class)
   #end
-  #if($propClass &amp;&amp; $listtool.contains($propClass.getPropertyNames(), $colname))
+  #if($propClass &amp;&amp; $propClass.getPropertyNames().contains($colname))
     #set($propType = "$!{propClass.get($colname).type}")
   #end
   ##

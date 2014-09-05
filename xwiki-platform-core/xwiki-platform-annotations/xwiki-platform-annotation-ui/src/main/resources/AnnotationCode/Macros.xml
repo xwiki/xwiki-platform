@@ -151,7 +151,8 @@
  * @param $mode view (default), list, create or edit
  *#
 #macro(displayAnnotation $ann $mode $docWiki $docSpace $docPage)
-  #if(!$listtool.contains(['view', 'list', 'create', 'edit'], "$!{mode}"))
+  #set ($availableModes = ['view', 'list', 'create', 'edit'])
+  #if(!$availableModes.contains("$!{mode}"))
     #set($mode = 'view')
   #end
   &lt;div class="annotation $!{ann.state}" id="annotation_${mode}_$!{ann.id}"&gt;
@@ -258,7 +259,7 @@
     ## get the only property that is to be displayed
     #set($onlyProperty = '')
     #foreach($prop in $properties)
-      #if(!$listtool.contains($hiddenProperties, $prop.name))
+      #if(!$hiddenProperties.contains($prop.name))
         #set($onlyProperty = $prop)
         #break
       #end
@@ -274,7 +275,7 @@
   #else
   &lt;dl&gt;
   #foreach($prop in $properties)
-    #if (!$listtool.contains($hiddenProperties, $prop.name))
+    #if (!$hiddenProperties.contains($prop.name))
       #set($discard = $fakeObj.set($prop.name, "$!{ann.get($prop.name)}"))
       &lt;dt class="annotationLabel"&gt;&lt;label for="$prop.name"&gt;$prop.prettyName&lt;/label&gt;&lt;/dt&gt;
       #if($mode == 'edit' || $mode == 'create')

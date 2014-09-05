@@ -23,7 +23,7 @@
         <input type="hidden" name="format" value="pdf" />
       </div>
       <dl>
-        #if($xwiki.isMultiLingual() && $listtool.size($doc.translationList) > 0)
+        #if($xwiki.isMultiLingual() && $doc.translationList.size() > 0)
           <dt>
             <label for="language">$services.localization.render('language')</label>
             <span class="xHint">$services.localization.render('core.export.pdf.options.language.hint')</span>

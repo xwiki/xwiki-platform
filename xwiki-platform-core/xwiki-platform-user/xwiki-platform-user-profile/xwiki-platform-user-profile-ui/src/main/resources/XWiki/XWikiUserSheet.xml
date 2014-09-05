@@ -81,7 +81,7 @@
 #########################
 #set($currentCategory = "$!request.category")
 #if($currentCategory == "")
-  #set($currentCategory = $listtool.get($categories, 0).get('id'))
+  #set($currentCategory = $categories[0].get('id'))
 #end
 #########################
 ## Creating vertical menu

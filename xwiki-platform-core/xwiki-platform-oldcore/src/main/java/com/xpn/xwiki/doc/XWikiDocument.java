@@ -8305,7 +8305,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                 : newObject.clone());
                             mergeResult.setModified(true);
                         } else {
-                            // XXX: collision between DB and new: object to add but already exists in the DB
+                            // collision between DB and new: object to add but already exists in the DB
                             mergeResult.getLog().error("Collision found on object [{}]", objectResult.getReference());
                         }
                     } else if (diff.getAction() == ObjectDiff.ACTION_OBJECTREMOVED) {
@@ -8314,7 +8314,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                 removeXObject(objectResult);
                                 mergeResult.setModified(true);
                             } else {
-                                // XXX: collision between DB and new: object to remove but not the same as previous
+                                // collision between DB and new: object to remove but not the same as previous
                                 // version
                                 mergeResult.getLog().error("Collision found on object [{}]",
                                     objectResult.getReference());
@@ -8330,7 +8330,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                     objectResult.addField(diff.getPropName(), newProperty);
                                     mergeResult.setModified(true);
                                 } else {
-                                    // XXX: collision between DB and new: property to add but already exists in the DB
+                                    // collision between DB and new: property to add but already exists in the DB
                                     mergeResult.getLog().error("Collision found on object property [{}]",
                                         propertyResult.getReference());
                                 }
@@ -8340,8 +8340,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                         objectResult.removeField(diff.getPropName());
                                         mergeResult.setModified(true);
                                     } else {
-                                        // XXX: collision between DB and new: supposed to be removed but the DB version
-                                        // is
+                                        // collision between DB and new: supposed to be removed but the DB version is
                                         // not the same as the previous version
                                         mergeResult.getLog().error("Collision found on object property [{}]",
                                             propertyResult.getReference());
@@ -8362,7 +8361,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                             mergeResult);
                                     }
                                 } else {
-                                    // XXX: collision between DB and new: property to modify but does not exists in DB
+                                    // collision between DB and new: property to modify but does not exists in DB
                                     // Lets assume it's a mistake to fix
                                     mergeResult.getLog()
                                         .warn("Object [{}] does not exists", newProperty.getReference());
@@ -8404,7 +8403,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                     removeAttachment(attachment);
                                     mergeResult.setModified(true);
                                 } else {
-                                    // XXX: collision between DB and new: attachment modified by user
+                                    // collision between DB and new: attachment modified by user
                                     mergeResult.getLog().error("Collision found on attachment [{}]",
                                         attachment.getReference());
                                 }
@@ -8422,7 +8421,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                         if (attachment != null) {
                             try {
                                 if (!attachment.equalsData(nextAttachment, context)) {
-                                    // XXX: collision between DB and new: attachment to add but a different one already
+                                    // collision between DB and new: attachment to add but a different one already
                                     // exists in the DB
                                     mergeResult.getLog().error("Collision found on attachment [{}]",
                                         attachment.getReference());
@@ -8445,7 +8444,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                         if (attachment != null) {
                             attachment.merge(previousAttachment, nextAttachment, configuration, context, mergeResult);
                         } else {
-                            // XXX: collision between DB and new: attachment modified but does not exist in the DB
+                            // collision between DB and new: attachment modified but does not exist in the DB
                             mergeResult.getLog().error("Collision found on attachment [{}]",
                                 previousAttachment.getReference());
                         }

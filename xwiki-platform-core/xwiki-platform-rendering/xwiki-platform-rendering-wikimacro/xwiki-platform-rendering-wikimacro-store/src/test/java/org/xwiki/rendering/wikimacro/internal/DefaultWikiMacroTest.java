@@ -44,6 +44,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -81,10 +82,14 @@ public class DefaultWikiMacroTest extends AbstractBridgedComponentTestCase
 
     private XWikiDocument user;
 
+    private WikiDescriptorManager mockWikiDescriptorManager;
+
     @Override
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
+
+        this.mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
     }
 
     @Override

@@ -54,6 +54,11 @@
       <artifactId>xwiki-platform-rendering-macro-script</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Test dependencies -->
     <!-- Make sure the Multi Components components are available for the tests -->

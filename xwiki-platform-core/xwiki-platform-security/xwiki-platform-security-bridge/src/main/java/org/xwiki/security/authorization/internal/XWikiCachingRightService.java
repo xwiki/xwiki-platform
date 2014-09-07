@@ -68,7 +68,7 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction(DELETE_ACTION, Right.DELETE)
             .putAction("distribution", Right.VIEW)
             .putAction("admin", Right.ADMIN)
-            .putAction("programing", Right.PROGRAM)
+            .putAction("programming", Right.PROGRAM)
             .putAction("edit", Right.EDIT)
             .putAction("register", Right.REGISTER)
             .putAction("logout", Right.LOGIN)

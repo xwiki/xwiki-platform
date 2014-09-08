@@ -79,6 +79,7 @@ public class DefaultDocumentTranslationBundle extends AbstractDocumentTranslatio
         if (this.factory != null) {
             // FIXME: do something cleaner
             if (event instanceof WikiDeletedEvent) {
+                // Clean the cache
                 this.factory.clear(this.uid);
             }
         }

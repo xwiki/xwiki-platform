@@ -303,7 +303,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         try {
             XWikiContext xcontext = getContext();
 
-            if (xcontext != null) {
+            if (xcontext != null && xcontext.getWiki() != null) {
                 DocumentReference documentReference =
                     (DocumentReference) objectReference.extractReference(EntityType.DOCUMENT);
                 XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
@@ -330,7 +330,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         try {
             XWikiContext xcontext = getContext();
 
-            if (xcontext != null) {
+            if (xcontext != null && xcontext.getWiki() != null) {
                 XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
                 BaseObject object = doc.getObject(className, objectNumber);
                 if (object != null) {
@@ -356,7 +356,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         try {
             XWikiContext xcontext = getContext();
 
-            if (xcontext != null) {
+            if (xcontext != null && xcontext.getWiki() != null) {
                 XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
                 BaseObject object = doc.getObject(className);
                 if (object != null) {
@@ -381,7 +381,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         try {
             XWikiContext xcontext = getContext();
 
-            if (xcontext != null) {
+            if (xcontext != null && xcontext.getWiki() != null) {
                 XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
                 BaseObject object = doc.getXObject(classReference);
                 if (object != null) {
@@ -407,7 +407,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         try {
             XWikiContext xcontext = getContext();
 
-            if (xcontext != null) {
+            if (xcontext != null && xcontext.getWiki() != null) {
                 XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
                 BaseObject object = doc.getXObject(classReference, objectNumber);
                 if (object != null) {
@@ -432,7 +432,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         try {
             XWikiContext xcontext = getContext();
 
-            if (xcontext != null) {
+            if (xcontext != null && xcontext.getWiki() != null) {
                 XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
                 BaseObject object = doc.getFirstObject(propertyName, xcontext);
                 if (object != null) {

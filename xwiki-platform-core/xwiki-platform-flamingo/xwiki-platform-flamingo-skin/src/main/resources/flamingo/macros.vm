@@ -1388,6 +1388,7 @@ ${Msz}Mb##
       </td>
     </tr>
     <tr>
+      <span class="xwiki-livetable-limits"></span>
       <td class="xwiki-livetable-pagination">
         <span class="xwiki-livetable-limits"></span>
         <span class="controlPagination">

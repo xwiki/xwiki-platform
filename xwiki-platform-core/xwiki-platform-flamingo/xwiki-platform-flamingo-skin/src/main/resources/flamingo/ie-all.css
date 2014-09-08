@@ -2,3 +2,8 @@
 .gwt-TabPanelBottom{
   margin-right: -4px;
 }
+
+/* XWIKI-10940 */
+.breadcrumb > li{
+  display: inline;
+}

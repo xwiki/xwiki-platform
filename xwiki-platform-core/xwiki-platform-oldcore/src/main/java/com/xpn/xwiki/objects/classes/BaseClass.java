@@ -574,16 +574,18 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                 Element pcel = list.get(i);
                 String name = pcel.getName();
                 String classType = pcel.element("classType").getText();
+
                 PropertyClassProvider provider = null;
-                try {
-                    // First try to use the specified class type as hint.
+                // First try to use the specified class type as hint.
+                if (Utils.getComponentManager().hasComponent(PropertyClassProvider.class, classType)) {
                     provider = Utils.getComponent(PropertyClassProvider.class, classType);
-                } catch (Exception e) {
+                } else {
                     // In previous versions the class type was the full Java class name of the property class
                     // implementation. Extract the hint by removing the Java package prefix and the Class suffix.
                     classType = StringUtils.removeEnd(StringUtils.substringAfterLast(classType, "."), "Class");
                     provider = Utils.getComponent(PropertyClassProvider.class, classType);
                 }
+
                 // We should use PropertyClassInterface (instead of PropertyClass, its default implementation) but it
                 // doesn't have the fromXML method and adding it breaks the backwards compatibility. We make the
                 // assumption that all property classes extend PropertyClass.

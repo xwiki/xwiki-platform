@@ -7,7 +7,9 @@
       <div class="input-group">
         <input type="text" name="text" class="form-control" placeholder="$services.localization.render('panels.search.inputText')" id="headerglobalsearchinput" />
         <span class="input-group-btn">
-          <input class="button btn" type="image" value="$services.localization.render('panels.search.submit')" alt="$services.localization.render('panels.search.submit')" src="$xwiki.getSkinFile('icons/xwiki/search.png')"/>
+          <button type="submit" class="btn btn-primary">
+            <span class="glyphicon glyphicon-search"></span>
+          </button>
         </span>
       </div>
     </div>

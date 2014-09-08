@@ -9,7 +9,7 @@
   #template("startpage.vm")
   <div class="main">
   <div id="contentmenu" class="actionmenu">
-    #template("menus/content.vm")
+    #template("menus_content.vm")
   </div>
   <div id="mainContentArea">
   #if($xwiki.exists("XWiki.DocumentDoesNotExist"))

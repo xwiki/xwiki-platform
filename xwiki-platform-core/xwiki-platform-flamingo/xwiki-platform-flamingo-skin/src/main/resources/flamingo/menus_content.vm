@@ -45,7 +45,7 @@
 ## Create menu
 ##
 #if($displayCreateMenu)
-  #template("menus/create.vm")
+  #template("menus_create.vm")
 #end
 ##
 ## Actions menu

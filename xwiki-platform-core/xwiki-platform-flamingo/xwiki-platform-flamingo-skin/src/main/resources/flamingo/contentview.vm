@@ -37,7 +37,7 @@
     </div>
     #if($displayContentMenu)
       <div class="document-menu col-xs-12 col-md-5">
-        #template("menus/content.vm")
+        #template("menus_content.vm")
       </div>
     #end
   </div>

@@ -2,22 +2,22 @@
 ##        MENU VIEW
 ################################
 #if ($isInServletMode)## Visible only in a page
-  #template("menus/macros.vm") ## must be provided by the skin
+  #template("menus_macros.vm") ## must be provided by the skin
   
   ## Top Menu
   #xwikitopmenustart()
     
     ## Right menu
     #xwikitopmenurightstart()
-      #template("menus/user.vm")
+      #template("menus_user.vm")
     #xwikitopmenurightend()
     
     ## Left menu
     #xwikitopmenuleftstart()
-      #template("menus/home.vm")
-      #template("menus/wiki.vm")
-      #template("menus/space.vm")
-      #template("menus/page.vm")
+      #template("menus_home.vm")
+      #template("menus_wiki.vm")
+      #template("menus_space.vm")
+      #template("menus_page.vm")
     #xwikitopmenuleftend()
     #template("quicksearch.vm")
     

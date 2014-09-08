@@ -212,6 +212,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     @Override
     public void dispose()
     {
+        this.disable = true;
         this.observation.removeListener(getName());
     }
 

@@ -37,6 +37,7 @@ import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Disposable;
+import org.xwiki.localization.Translation;
 import org.xwiki.localization.TranslationBundle;
 import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.internal.AbstractCachedTranslationBundle;
@@ -81,6 +82,12 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     protected TranslationMessageParser translationMessageParser;
 
     protected List<Event> events;
+
+    /**
+     * Indicate if it should try to access translations or not. A document bundle is usually disable because the
+     * associated document does not exist anymore but something is still holding a reference to it.
+     */
+    protected boolean disable;
 
     protected DocumentReference documentReference;
 
@@ -190,6 +197,16 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         return loadDocumentLocaleBundle(locale);
     }
 
+    @Override
+    public Translation getTranslation(String key, Locale locale)
+    {
+        if (this.disable) {
+            return null;
+        }
+
+        return super.getTranslation(key, locale);
+    }
+
     // DisposableCacheValue Disposable
 
     @Override
@@ -205,6 +222,8 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     {
         if (event instanceof WikiDeletedEvent) {
             this.bundleCache.clear();
+
+            this.disable = false;
         } else {
             XWikiDocument document = (XWikiDocument) source;
 
@@ -212,6 +231,12 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
 
             if (document.getLocale().equals(Locale.ROOT)) {
                 this.bundleCache.remove(document.getDefaultLocale());
+            }
+
+            if (event instanceof DocumentDeletedEvent) {
+                this.disable = true;
+            } else {
+                this.disable = false;
             }
         }
     }

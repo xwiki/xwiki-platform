@@ -95,7 +95,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
      */
     public static final String ID_PREFIX = ID + ':';
 
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentUpdatedEvent(),
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new DocumentUpdatedEvent(),
         new DocumentDeletedEvent(), new DocumentCreatedEvent());
 
     @Inject
@@ -365,6 +365,14 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
             // Remove from cache
             this.bundlesCache.remove(this.uidSerializer.serialize(document.getDocumentReference()));
         }
+    }
+
+    /**
+     * @param uid remove the bundle from the cache
+     */
+    void clear(String uid)
+    {
+        this.bundlesCache.remove(uid);
     }
 
     /**

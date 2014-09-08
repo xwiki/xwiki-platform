@@ -83,6 +83,12 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
 
     protected List<Event> events;
 
+    /**
+     * Indicate if it should try to access translations or not. A document bundle is usually disable because the
+     * associated document does not exist anymore but something is still holding a reference to it.
+     */
+    protected boolean disable;
+
     protected DocumentReference documentReference;
 
     /**
@@ -190,6 +196,16 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         return localeBundle;
     }
 
+    @Override
+    public Translation getTranslation(String key, Locale locale)
+    {
+        if (this.disable) {
+            return null;
+        }
+
+        return super.getTranslation(key, locale);
+    }
+
     // DisposableCacheValue Disposable
 
     @Override
@@ -203,8 +219,10 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     @Override
     public void onEvent(Event arg0, Object arg1, Object arg2)
     {
-        if (arg0 instanceof WikiDeletedEvent) {
-            bundleCache.clear();
+        if (event instanceof WikiDeletedEvent) {
+            this.bundleCache.clear();
+
+            this.disable = false;
         } else {
             XWikiDocument document = (XWikiDocument) arg1;
 
@@ -212,6 +230,12 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
 
             if (document.getLocale().equals(Locale.ROOT)) {
                 this.bundleCache.remove(document.getDefaultLocale());
+            }
+
+            if (event instanceof DocumentDeletedEvent) {
+                this.disable = true;
+            } else {
+                this.disable = false;
             }
         }
     }

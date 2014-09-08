@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -59,24 +60,39 @@ public class DefaultDocumentDisplayer implements DocumentDisplayer
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private Logger logger;
+
     @Override
     public XDOM display(DocumentModelBridge document, DocumentDisplayerParameters parameters)
     {
         String syntaxId = document.getSyntax().toIdString();
+
         DocumentDisplayer displayer;
         if (parameters.isTitleDisplayed()) {
-            try {
-                displayer = componentManager.getInstance(DocumentDisplayer.class, "title/" + syntaxId);
-            } catch (ComponentLookupException e) {
-                displayer = titleDisplayer;
+            displayer = this.titleDisplayer;
+
+            String titleHint = "title/" + syntaxId;
+            if (this.componentManager.hasComponent(DocumentDisplayer.class, titleHint)) {
+                try {
+                    displayer = this.componentManager.getInstance(DocumentDisplayer.class, titleHint);
+                } catch (ComponentLookupException e) {
+                    this.logger.error("Failed to load title document displayer", e);
+                }
             }
         } else {
-            try {
-                displayer = componentManager.getInstance(DocumentDisplayer.class, "content/" + syntaxId);
-            } catch (ComponentLookupException e) {
-                displayer = contentDisplayer;
+            displayer = this.contentDisplayer;
+
+            String contentHint = "content/" + syntaxId;
+            if (this.componentManager.hasComponent(DocumentDisplayer.class, contentHint)) {
+                try {
+                    displayer = this.componentManager.getInstance(DocumentDisplayer.class, contentHint);
+                } catch (ComponentLookupException e) {
+                    this.logger.error("Failed to load content document displayer", e);
+                }
             }
         }
+
         return displayer.display(document, parameters);
     }
 }

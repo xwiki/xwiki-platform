@@ -222,7 +222,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
         if (event instanceof WikiDeletedEvent) {
             this.bundleCache.clear();
 
-            this.disable = false;
+            this.disable = true;
         } else {
             XWikiDocument document = (XWikiDocument) arg1;
 

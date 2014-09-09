@@ -408,8 +408,11 @@ var XWiki = (function(XWiki){
       // FIXME this should be computed instead, since border might not always be 1px.
       var fieldWidth = this.fld.offsetWidth - 2;
       var containerWidth = this.options.width || fieldWidth;
+      var inputPositionLeft = this.fld.viewportOffset().left;
+      var browserWidth = $('body').getWidth();
 
-      if (this.options.align == 'left') {
+      // if the option is 'auto', we make sure that we have enough place to display it on the left. If not, it will go on the right.
+      if (this.options.align == 'left' || (this.options.align == 'auto' && inputPositionLeft + this.options.width < browserWidth)) {
         // Align the box on the left
         div.style.left = pos.left + "px";
       } else if (this.options.align == "center") {

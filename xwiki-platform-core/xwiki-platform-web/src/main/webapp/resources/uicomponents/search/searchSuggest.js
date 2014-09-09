@@ -135,7 +135,7 @@ var XWiki = (function (XWiki) {
         parentContainer: $('searchSuggest'),
         className: 'searchSuggest horizontalLayout',
         fadeOnClear: false,
-        align: "right",
+        align: "auto",
         minchars: 3,
         sources : this.sources,
         insertBeforeSuggestions : new Element("div", {'class' : 'results'}).update( allResults ),

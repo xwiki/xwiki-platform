@@ -31,7 +31,6 @@ import javax.inject.Inject;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -45,6 +44,9 @@ import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Default implementation for {@link org.xwiki.lesscss.LESSSkinFileCompiler}.
@@ -66,9 +68,6 @@ public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> 
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
-
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
 
     @Override
     public void initialize() throws InitializationException
@@ -144,20 +143,34 @@ public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> 
         }
         alreadyVisitedSkins.add(skin);
 
+        // Get the xwiki objects
+        XWikiContext xcontext = xcontextProvider.get();
+        XWiki xwiki = xcontext.getWiki();
+
         // Is the skin a Wiki Document?
         String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
         DocumentReference skinDocRef = documentReferenceResolver.resolve(skin, new WikiReference(currentWikiId));
-        if (skinDocRef != null && documentAccessBridge.exists(skinDocRef)) {
+        if (skinDocRef != null && xwiki.exists(skinDocRef, xcontext)) {
             // Skin class
             DocumentReference skinClass = new DocumentReference(currentWikiId, "XWiki", "XWikiSkins");
-            // Get the "baseskin" property of the skin
-            String baseSkin = (String) documentAccessBridge.getProperty(skinDocRef, skinClass, "baseskin");
-            if (StringUtils.isBlank(baseSkin)) {
-                throw new LESSCompilerException(String.format("Failed to get the base skin of the skin [%s].", skin),
-                        null);
+            // Verify that the document is a skin by checking if a skin object is attached or not
+            try {
+                XWikiDocument skinDoc = xwiki.getDocument(skinDocRef, xcontext);
+                BaseObject skinObj = skinDoc.getXObject(skinClass);
+                if (skinObj != null) {
+                    // Get the "baseskin" property of the skin
+                    String baseSkin = skinObj.getStringValue("baseskin");
+                    if (StringUtils.isBlank(baseSkin)) {
+                        throw new LESSCompilerException(
+                                String.format("Failed to get the base skin of the skin [%s].", skin),
+                                null);
+                    }
+                    // Recursively get the skin directory from the baseskin
+                    return getSkinDirectory(baseSkin, alreadyVisitedSkins);
+                }
+            } catch (XWikiException e) {
+                throw new LESSCompilerException(String.format("Failed to get the document [%s].", skinDocRef), e);
             }
-            // Recursively get the skin directory from the baseskin
-            return getSkinDirectory(baseSkin, alreadyVisitedSkins);
         }
         // If not, we assume it is a skin on the filesystem
         return skin;

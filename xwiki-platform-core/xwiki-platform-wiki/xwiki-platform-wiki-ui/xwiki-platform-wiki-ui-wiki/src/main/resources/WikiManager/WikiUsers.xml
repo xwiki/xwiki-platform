@@ -427,7 +427,7 @@
 ## Use XWikiAllGroup as the group target.
 #set($groupDoc = $xwiki.getDocument('XWiki.XWikiAllGroup'))
 #macro(hasGroupRight $right $hasGroupRight)
-  #set($result = $xwiki.hasAccessLevel($right, $xcontext.user, $groupDoc.fullName) &amp;&amp; $groupDoc.getObject('XWiki.XWikiGroups', false))
+  #set($result = $xwiki.hasAccessLevel($right, $xcontext.user, $groupDoc.fullName))
   #set($hasGroupRight = $NULL)
   #setVariable("$hasGroupRight" $result)
 #end

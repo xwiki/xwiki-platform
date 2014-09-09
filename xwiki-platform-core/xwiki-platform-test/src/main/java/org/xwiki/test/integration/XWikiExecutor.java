@@ -198,14 +198,10 @@ public class XWikiExecutor
             // First, verify if XWiki is started. If it is then don't start it again.
             this.wasStarted = !isXWikiStarted(getURL(), 15).timedOut;
         } else {
-            try {
-                ServerSocket socket = new ServerSocket(getPort());
-                socket.close();
-            } catch (BindException e) {
-                // Assume an XWiki instance is already running!
-                throw new Exception(String.format("An XWiki server is already started at [%s], failing test",
-                    getURL()));
-            }
+            // Check the main jetty port
+            checkPortAvailability(getPort());
+            // Check the jetty stop port too
+            checkPortAvailability(getStopPort());
         }
 
         if (!this.wasStarted) {
@@ -215,6 +211,16 @@ public class XWikiExecutor
             this.hasXWikiBeenStartedProperly = true;
         } else {
             LOGGER.info("XWiki server is already started at [{}]", getURL());
+        }
+    }
+
+    private void checkPortAvailability(int port) throws Exception
+    {
+        try {
+            ServerSocket socket = new ServerSocket(getPort());
+            socket.close();
+        } catch (BindException e) {
+            throw new Exception(String.format("Some server is already started at port [%s], failing test", port), e);
         }
     }
 

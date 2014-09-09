@@ -43,6 +43,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -106,6 +107,8 @@ public class MockitoOldcoreRule implements MethodRule
 
     private boolean notifyDocumentUpdatedEvent;
 
+    private boolean notifyDocumentDeletedEvent;
+
     public MockitoOldcoreRule()
     {
         this(new MockitoComponentManagerRule());
@@ -135,6 +138,11 @@ public class MockitoOldcoreRule implements MethodRule
     public void notifyDocumentUpdatedEvent(boolean notifyDocumentUpdatedEvent)
     {
         this.notifyDocumentUpdatedEvent = notifyDocumentUpdatedEvent;
+    }
+
+    public void notifyDocumentDeletedEvent(boolean notifyDocumentDeletedEvent)
+    {
+        this.notifyDocumentDeletedEvent = notifyDocumentDeletedEvent;
     }
 
     public Statement apply(final Statement base, final FrameworkMethod method, final Object target)
@@ -288,6 +296,12 @@ public class MockitoOldcoreRule implements MethodRule
                         }
                     }
 
+                    XWikiDocument originalDocument = document.getOriginalDocument();
+                    if (originalDocument == null) {
+                        originalDocument = mockXWiki.getDocument(document.getDocumentReferenceWithLocale(), context);
+                        document.setOriginalDocument(originalDocument);
+                    }
+
                     documents.put(document.getDocumentReferenceWithLocale(), document.clone());
 
                     if (isNew) {
@@ -328,9 +342,61 @@ public class MockitoOldcoreRule implements MethodRule
 
                 documents.remove(document.getDocumentReferenceWithLocale());
 
+                if (notifyDocumentDeletedEvent) {
+                    getObservationManager().notify(new DocumentDeletedEvent(document.getDocumentReference()), document,
+                        getXWikiContext());
+                }
+
+                return null;
+            }
+        }).when(getMockXWiki()).deleteDocument(any(XWikiDocument.class), any(Boolean.class), any(XWikiContext.class));
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+                XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
+
+                mockXWiki.deleteDocument(document, true, context);
+
                 return null;
             }
         }).when(getMockXWiki()).deleteDocument(any(XWikiDocument.class), any(XWikiContext.class));
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+                XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
+
+                DocumentReference reference = document.getDocumentReference();
+
+                List<Locale> locales = document.getTranslationLocales(context);
+
+                for (Locale locale : locales) {
+                    XWikiDocument translation =
+                        mockXWiki.getDocument(new DocumentReference(reference, locale), context);
+                    mockXWiki.deleteDocument(translation, context);
+                }
+
+                mockXWiki.deleteDocument(document, context);
+
+                return null;
+            }
+        }).when(getMockXWiki()).deleteAllDocuments(any(XWikiDocument.class), any(Boolean.class),
+            any(XWikiContext.class));
+        doAnswer(new Answer()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+                XWikiDocument document = (XWikiDocument) invocation.getArguments()[0];
+
+                mockXWiki.deleteAllDocuments(document, true, context);
+
+                return null;
+            }
+        }).when(getMockXWiki()).deleteAllDocuments(any(XWikiDocument.class), any(XWikiContext.class));
         when(getMockXWiki().getXClass(any(DocumentReference.class), any(XWikiContext.class))).then(
             new Answer<BaseClass>()
             {
@@ -484,7 +550,7 @@ public class MockitoOldcoreRule implements MethodRule
      */
     public ExecutionContext getExecutionContext() throws ComponentLookupException
     {
-        return this.componentManager.<Execution> getInstance(Execution.class).getContext();
+        return this.componentManager.<Execution>getInstance(Execution.class).getContext();
     }
 
     /**

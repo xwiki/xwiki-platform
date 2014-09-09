@@ -81,6 +81,9 @@
   <content>###############################################################################
 # WikiManager Manager translation page
 #
+# The translations contained in this document are used in the default UI (see xwiki-platform-web),
+# that can be displayed in subwikis too. That is why the scope of this document is GLOBAL.
+#
 # This contains the translations of the module in the default language
 # (generally English).
 # 

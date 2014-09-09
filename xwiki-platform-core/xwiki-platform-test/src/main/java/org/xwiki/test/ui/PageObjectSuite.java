@@ -53,8 +53,31 @@ public class PageObjectSuite extends XWikiExecutorSuite
     @Override
     protected void beforeTests()
     {
+        // Construct the executors and start the XWiki instances.
         super.beforeTests();
 
+        try {
+            initializePersistentTestContext();
+
+            // Callback to setup executors in the suite class after containers have been started
+            for (Method method : getTestClass().getJavaClass().getMethods()) {
+                PostStart postStartAnnotation = method.getAnnotation(PostStart.class);
+                if (postStartAnnotation != null) {
+                    // Call it!
+                    Object instance = getTestClass().getJavaClass().newInstance();
+                    method.invoke(instance, this.context);
+                }
+            }
+        } catch (Exception e) {
+            // Make sure to stop the executors if anything goes wrong
+            afterTests();
+
+            throw new RuntimeException("Failed to initialize PO suite", e);
+        }
+    }
+
+    private void initializePersistentTestContext()
+    {
         try {
             this.context = new PersistentTestContext(getExecutors().get(0));
             AbstractTest.setContext(this.context.getUnstoppable());
@@ -65,23 +88,6 @@ public class PageObjectSuite extends XWikiExecutorSuite
             AbstractTest.context.getUtil().recacheSecretToken();
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize PersistentTestContext", e);
-        }
-
-        // Callback to setup executors in the suite class after containers have been started
-        try {
-            for (Method method : getTestClass().getJavaClass().getMethods()) {
-                PostStart postStartAnnotation = method.getAnnotation(PostStart.class);
-                if (postStartAnnotation != null) {
-                    // Call it!
-                    Object instance = getTestClass().getJavaClass().newInstance();
-                    method.invoke(instance, this.context);
-                }
-            }
-        } catch (Exception e) {
-            // Make sure to stop the executor if anything goes wrong
-            afterTests();
-
-            throw new RuntimeException("Failed to initialize PO suite", e);
         }
     }
 

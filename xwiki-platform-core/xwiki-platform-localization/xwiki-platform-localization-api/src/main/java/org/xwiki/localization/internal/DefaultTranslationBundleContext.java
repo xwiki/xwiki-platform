@@ -50,7 +50,7 @@ public class DefaultTranslationBundleContext implements TranslationBundleContext
     /**
      * The key associated to the list of bundles in the {@link ExecutionContext}.
      */
-    private static final String CKEY_BUNDLES = "localization.bundles";
+    public static final String CKEY_BUNDLES = "localization.bundles";
 
     /**
      * Used to access the current context.

@@ -105,6 +105,7 @@ platform.wiki.create.wizard.template.label=Modèle
 platform.wiki.create.wizard.template.noTemplate=Aucun modèle (défaut)
 platform.wiki.create.wizard.userScope.hint=Sélectionnez le type d'utilisateurs pouvant accéder à ce wiki
 platform.wiki.create.wizard.userScope.label=Portée de l'utilisateur
+platform.wiki.csrf.error=Le jeton de sécurité est invalide. Merci de recommencer.
 platform.wiki.delete.confirmation=Êtes-vous sûr de vouloir supprimer le wiki {0}{1}{2}?
 platform.wiki.delete.confirmation.no=Non
 platform.wiki.delete.confirmation.yes=Oui
@@ -201,5 +202,6 @@ platform.wiki.users.userAlreadyMemberOfWiki=L''utilisateur {0}{1}{2} est déjà 
 platform.wiki.users.userNotMemberOfWiki=L''utilisateur {0}{1}{2} n''est pas un membre du wiki {3}{4}{5}.
 rendering.macro.wikis.description=Liste de tous les wikis
 rendering.macro.wikis.name=Wikis
+rendering.macro.workspaces.description=Cette macro est dépréciée et ne doit plus être utilisée pour des raisons de compatibilité. Merci de la remplacer par un macro "wikis".
 </content>
 </xwikidoc>

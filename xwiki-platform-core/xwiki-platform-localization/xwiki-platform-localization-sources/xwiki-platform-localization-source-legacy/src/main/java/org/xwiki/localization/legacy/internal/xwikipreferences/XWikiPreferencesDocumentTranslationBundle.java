@@ -17,28 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization.wiki.internal;
+package org.xwiki.localization.legacy.internal.xwikipreferences;
 
-import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.message.TranslationMessageParser;
+import org.xwiki.localization.wiki.internal.AbstractDocumentTranslationBundle;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.event.Event;
 
 /**
  * Wiki document based implementation of Bundle.
  * 
  * @see AbstractDocumentTranslationBundle
  * @version $Id$
- * @since 4.3M2
+ * @since 6.2RC1
  */
-public class DefaultDocumentTranslationBundle extends AbstractDocumentTranslationBundle
+public class XWikiPreferencesDocumentTranslationBundle extends AbstractDocumentTranslationBundle
 {
-    private DocumentTranslationBundleFactory factory;
-
-    private String uid;
-
     /**
      * @param idPrefix the prefix to use when generating the bundle unique identifier
      * @param documentReference the document reference
@@ -46,42 +41,10 @@ public class DefaultDocumentTranslationBundle extends AbstractDocumentTranslatio
      * @param translationMessageParser the parser to use for each message
      * @throws ComponentLookupException failed to lookup some required components
      */
-    public DefaultDocumentTranslationBundle(String idPrefix, DocumentReference documentReference,
+    public XWikiPreferencesDocumentTranslationBundle(String idPrefix, DocumentReference documentReference,
         ComponentManager componentManager, TranslationMessageParser translationMessageParser)
         throws ComponentLookupException
     {
         super(idPrefix, documentReference, componentManager, translationMessageParser);
-    }
-
-    /**
-     * @param idPrefix the prefix to use when generating the bundle unique identifier
-     * @param documentReference the document reference
-     * @param componentManager used to lookup components needed to manipulate wiki documents
-     * @param translationMessageParser the parser to use for each message
-     * @param factory the factory
-     * @throws ComponentLookupException failed to lookup some required components
-     */
-    DefaultDocumentTranslationBundle(String idPrefix, DocumentReference documentReference,
-        ComponentManager componentManager, TranslationMessageParser translationMessageParser,
-        DocumentTranslationBundleFactory factory, String uid) throws ComponentLookupException
-    {
-        super(idPrefix, documentReference, componentManager, translationMessageParser);
-
-        this.factory = factory;
-        this.uid = uid;
-    }
-
-    @Override
-    public void onEvent(Event event, Object source, Object data)
-    {
-        super.onEvent(event, source, data);
-
-        if (this.factory != null) {
-            // FIXME: do something cleaner
-            if (event instanceof WikiDeletedEvent) {
-                // Clean the cache
-                this.factory.clear(this.uid);
-            }
-        }
     }
 }

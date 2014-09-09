@@ -39,7 +39,6 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.internal.AbstractTranslationBundle;
 import org.xwiki.localization.message.TranslationMessageParser;
-import org.xwiki.localization.wiki.internal.DefaultDocumentTranslationBundle;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -107,7 +106,7 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
     /**
      * The cache of bundles by document id.
      */
-    private Cache<DefaultDocumentTranslationBundle> documentBundlesCache;
+    private Cache<XWikiPreferencesDocumentTranslationBundle> documentBundlesCache;
 
     /**
      * Default constructor.
@@ -197,11 +196,11 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
      * @param document the document reference
      * @return the document bundle
      */
-    protected DefaultDocumentTranslationBundle getDocumentTranslationBundle(DocumentReference document)
+    protected XWikiPreferencesDocumentTranslationBundle getDocumentTranslationBundle(DocumentReference document)
     {
         String uid = this.uidSerializer.serialize(document);
 
-        DefaultDocumentTranslationBundle documentBundle = this.documentBundlesCache.get(uid);
+        XWikiPreferencesDocumentTranslationBundle documentBundle = this.documentBundlesCache.get(uid);
         if (documentBundle == null) {
             documentBundle = getDocumentTranslationBundleSynchronized(uid, document);
         }
@@ -216,14 +215,14 @@ public class XWikiPreferencesTranslationBundle extends AbstractTranslationBundle
      * @param document the document reference
      * @return the document bundle
      */
-    private synchronized DefaultDocumentTranslationBundle getDocumentTranslationBundleSynchronized(String uid,
+    private synchronized XWikiPreferencesDocumentTranslationBundle getDocumentTranslationBundleSynchronized(String uid,
         DocumentReference document)
     {
-        DefaultDocumentTranslationBundle documentBundle = this.documentBundlesCache.get(uid);
+        XWikiPreferencesDocumentTranslationBundle documentBundle = this.documentBundlesCache.get(uid);
         if (documentBundle == null) {
             try {
                 documentBundle =
-                    new DefaultDocumentTranslationBundle(IDPREFIX, document, this.componentManager,
+                    new XWikiPreferencesDocumentTranslationBundle(IDPREFIX, document, this.componentManager,
                         this.translationMessageParser);
                 this.documentBundlesCache.set(uid, documentBundle);
             } catch (ComponentLookupException e) {

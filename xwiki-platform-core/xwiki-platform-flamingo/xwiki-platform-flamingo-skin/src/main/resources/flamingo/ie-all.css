@@ -1,9 +1,10 @@
-/* Fix XWIKI-10664 */
-.gwt-TabPanelBottom{
+/* Fix a rendering bug with the panels layout and the WYSIWYG editor, on IE 9
+ (see: http://jira.xwiki.org/browse/XWIKI-10664). */
+.gwt-TabPanelBottom {
   margin-right: -4px;
 }
 
-/* XWIKI-10940 */
-.breadcrumb > li{
+/* Fix a rendering bug with the breadcrumb on IE 8 (see: http://jira.xwiki.org/browse/XWIKI-10940). */
+.breadcrumb > li {
   display: inline;
 }

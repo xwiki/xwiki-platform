@@ -282,7 +282,8 @@ TTblp5ECixqHCAX8AEonFxlHq+tGuw3SAAAAAElFTkSuQmCC
     </property>
     <property>
       <parameters>label=$services.localization.render('extensions.applicationsPanel.install')
-target=XWiki.XWikiPreferences||queryString="editor=globaladmin&amp;section=XWiki.AddExtensions"
+target=XWiki.XWikiPreferences
+targetQueryString=editor=globaladmin&amp;section=XWiki.AddExtensions
 icon=icon:bullet_go</parameters>
     </property>
     <property>

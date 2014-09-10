@@ -219,7 +219,7 @@ public abstract class AbstractDocumentTranslationBundle extends AbstractCachedTr
     // EventListener
 
     @Override
-    public void onEvent(Event arg0, Object arg1, Object arg2)
+    public void onEvent(Event event, Object arg1, Object arg2)
     {
         if (event instanceof WikiDeletedEvent) {
             this.bundleCache.clear();

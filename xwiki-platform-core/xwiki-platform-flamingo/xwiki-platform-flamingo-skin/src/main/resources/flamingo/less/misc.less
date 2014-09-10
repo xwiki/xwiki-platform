@@ -3,7 +3,7 @@
 // --------------------------------------------------
 
 // Left menu2 =================================================================
-.leftmenu2{
+.leftmenu2 {
   background-color: #F0F0EE; 
   padding: 5px;
   a {
@@ -41,8 +41,8 @@
 
 // XDialogs ===================================================================
 
-.xdialog-content{
-  .buttonwrapper{
+.xdialog-content {
+  .buttonwrapper {
     input.button{
       margin: 2px;
     }
@@ -51,7 +51,7 @@
 
 // Wiki Code =================================================================
 
-.wiki-code{
+.wiki-code {
   width: 100%;
 }
 
@@ -197,32 +197,32 @@
 }
 
 // FIX: Auto-save
-.skin-flamingo #autosaveControl input.autosave-frequency{
+.skin-flamingo #autosaveControl input.autosave-frequency {
   width: 3em;
 }
 
 // FIX: user profile
-.skin-flamingo{
-  .user-menu-profile:before, .user-menu-preferences:before, .user-menu-watchlist:before, .user-menu-network:before, .user-menu-wikis:before, .user-menu-dashboard:before{
+.skin-flamingo {
+  .user-menu-profile:before, .user-menu-preferences:before, .user-menu-watchlist:before, .user-menu-network:before, .user-menu-wikis:before, .user-menu-dashboard:before {
     display: none;
   }
 }
 
 // FIX: file upload
-.skin-flamingo{
-  .upload-status-container{
-    .buttonwrapper a, .upload-canceled-label{
+.skin-flamingo {
+  .upload-status-container {
+    .buttonwrapper a, .upload-canceled-label {
       .btn-xs();
     }
   }
 }
 
 // FIX: app bar
-.applicationPanelMoreContainer ul li > span > a{
+.applicationPanelMoreContainer ul li > span > a {
   &:extend(.nav > li > a);
   &:extend(.nav-pills > li > a);
   
-  &:hover{
+  &:hover {
     &:extend(.nav > li > a:hover);
   }
 }
@@ -243,8 +243,8 @@
 }
 
 // FIX: User profile
-.skin-flamingo{
-  #user-menu-col{
+.skin-flamingo {
+  #user-menu-col {
     width: 13em;
     @media (max-width: @screen-xs-min) {
       float: none;
@@ -252,7 +252,7 @@
     }
   }
 
-  #user-page-content{
+  #user-page-content {
     @media (max-width: @screen-xs-min) {
       margin-left: 0;
     }
@@ -260,24 +260,24 @@
 }
 
 // FIX: Syntax help page (XWIKI-10675)
-.syntax-menu:extend(.admin-menu all){}
-#syntax-page-content:extend(#admin-page-content all){}
-.skin-flamingo{
-  #syntax-page-content{
+.syntax-menu:extend(.admin-menu all) {}
+#syntax-page-content:extend(#admin-page-content all) {}
+.skin-flamingo {
+  #syntax-page-content {
     margin-left: 0;
   }
 }
 
 // FIX: do no use .hidden (see: XWIKI-10827) but must be invisible
-#docextraanchors{
+#docextraanchors {
   .invisible();
   font-size: 0px;
 }
 
 // Export ---------------------------------------------------------------------
-#exportModal{
-  .modal-body{
-    a, button{
+#exportModal {
+  .modal-body {
+    a, button {
       margin: 2px;
     }
   }
@@ -289,14 +289,14 @@
 }
 
 // Importer -------------------------------------------------------------------
-#package .checkbox{
+#package .checkbox {
   min-height: 10px;
   margin: 0;
   padding: 0.3em;
 }
 
 // Importer options
-.historyStrategyOption{
+.historyStrategyOption {
   input[type="radio"], input[type="checkbox"] {
     min-height: 10px;
     margin-top: 0;
@@ -327,7 +327,7 @@
     left: 50%;
     top: 3em;
   }
-  &:before, &:after{
+  &:before, &:after {
     content: "";
     display: block;
     position: absolute;

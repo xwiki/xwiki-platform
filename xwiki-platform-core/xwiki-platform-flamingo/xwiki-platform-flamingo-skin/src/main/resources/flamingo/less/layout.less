@@ -1,7 +1,7 @@
 //
 // Layout
 // --------------------------------------------------
-#xwikimaincontainer{
+#xwikimaincontainer {
   .container-fluid();
 }
 
@@ -11,104 +11,104 @@
 
 @main-padding: @grid-gutter-width * 2;
 
-#body{
+#body {
   // Both left and right panels are displayed
-  &.content{
+  &.content {
     // Left panels are small
-    &.panel-left-width-Small{
-      .main{
+    &.panel-left-width-Small {
+      .main {
         .make-md-column-push(1);
       }
       // Left panels are small and right panels are small
-      &.panel-right-width-Small{
-        .main{
+      &.panel-right-width-Small {
+        .main {
           .make-md-column(10, @main-padding);
         }
-        #leftPanels{
+        #leftPanels {
           .make-md-column-pull(10);
         }
       }
       // Left panels are small and right panels are medium
-      &.panel-right-width-Medium{
-        .main{
+      &.panel-right-width-Medium {
+        .main {
           .make-md-column(9, @main-padding);
         }
-        #leftPanels{
+        #leftPanels {
           .make-md-column-pull(9);
         }
       }
       // Left panels are small and right panels are large
-      &.panel-right-width-Large{
-        .main{
+      &.panel-right-width-Large {
+        .main {
           .make-md-column(8, @main-padding);
         }
-        #leftPanels{
+        #leftPanels {
           .make-md-column-pull(8);
         }
       }
     }
     // Left panels are medium
-    &.panel-left-width-Medium{
-      .main{
+    &.panel-left-width-Medium {
+      .main {
         .make-md-column-push(2);
       }
       // Left panels are medium and right panels are small
-      &.panel-right-width-Small{
-        .main{
+      &.panel-right-width-Small {
+        .main {
           .make-md-column(9, @main-padding);
         }
-        #leftPanels{
+        #leftPanels {
           .make-md-column-pull(9);
         }
       }
       // Left panels are medium and right panels are medium
-      &.panel-right-width-Medium{
-        .main{
+      &.panel-right-width-Medium {
+        .main {
           .make-md-column(8, @main-padding);
         }
-        #leftPanels{
+        #leftPanels {
           .make-md-column-pull(8);
         }
       }
       // Left panels are medium and right panels are large
-      &.panel-right-width-Large{
-        .main{
+      &.panel-right-width-Large {
+        .main {
           .make-md-column(7, @main-padding);
         }
-        #leftPanels{
+        #leftPanels {
           .make-md-column-pull(7);
         }
       }
     }
     // // Left panels are large
-    &.panel-left-width-Large{
-      .main{
+    &.panel-left-width-Large {
+      .main {
         .make-md-column-push(3);
       }
       // Left panels are large and right panels are small
-      &.panel-right-width-Small{
-        .main{
+      &.panel-right-width-Small {
+        .main {
           .make-md-column(8, @main-padding);
         }
-        #leftPanels{
+        #leftPanels {
           .make-md-column-pull(8);
         }
       }
       // Left panels are large and right panels are medium
-      &.panel-right-width-Medium{
-        .main{
+      &.panel-right-width-Medium {
+        .main {
           .make-md-column(7, @main-padding);
         }
-        #leftPanels{
+        #leftPanels {
           .make-md-column-pull(7);
         }
       }
       // Left panels are large and right panels are large
-      &.panel-right-width-Large{
-        .main{
+      &.panel-right-width-Large {
+        .main {
           .make-md-column(6, @main-padding);
         }
-        #leftPanels{
+        #leftPanels {
           .make-md-column-pull(6);
         }
       }
@@ -116,89 +116,89 @@
   }
   
   // Only right panels
-  &.hideleft{
-    &.panel-right-width-Small{
-      .main{
+  &.hideleft {
+    &.panel-right-width-Small {
+      .main {
         .make-md-column(11, @main-padding);
       }
     }
-    &.panel-right-width-Medium{
-      .main{
+    &.panel-right-width-Medium {
+      .main {
         .make-md-column(10, @main-padding);
       }
     }
-    &.panel-right-width-Large{
-      .main{
+    &.panel-right-width-Large {
+      .main {
         .make-md-column(9, @main-padding);
       }
     }
   }
 
   // Only left panels
-  &.hideright{
-    &.panel-left-width-Small{
-      .main{
+  &.hideright {
+    &.panel-left-width-Small {
+      .main {
         .make-md-column(11, @main-padding);
         .make-md-column-push(1);
       }
-      #leftPanels{
+      #leftPanels {
         .make-md-column-pull(11);
       }
     }
-    &.panel-left-width-Medium{
-      .main{
+    &.panel-left-width-Medium {
+      .main {
         .make-md-column(10, @main-padding);
         .make-md-column-push(2);
       }
-      #leftPanels{
+      #leftPanels {
         .make-md-column-pull(10);
       }
     }
-    &.panel-left-width-Large{
-      .main{
+    &.panel-left-width-Large {
+      .main {
         .make-md-column(9, @main-padding);
         .make-md-column-push(3);
       }
-      #leftPanels{
+      #leftPanels {
         .make-md-column-pull(9);
       }
     }
   }
   
   // No Panels
-  &.hidelefthideright{
-    .main{
+  &.hidelefthideright {
+    .main {
       .make-md-column(12, @main-padding);
     }
   }
   
-  &.panel-left-width-Small{
-    #leftPanels{
+  &.panel-left-width-Small {
+    #leftPanels {
       .make-md-column(1);
     }
   }
-  &.panel-left-width-Medium{
-    #leftPanels{
+  &.panel-left-width-Medium {
+    #leftPanels {
       .make-md-column(2);
     }
   }
-  &.panel-left-width-Large{
-    #leftPanels{
+  &.panel-left-width-Large {
+    #leftPanels {
       .make-md-column(3);
     }
   }
-  &.panel-right-width-Small{
-    #rightPanels, #editPanels{
+  &.panel-right-width-Small {
+    #rightPanels, #editPanels {
       .make-md-column(1);
     }
   }
-  &.panel-right-width-Medium{
-    #rightPanels, #editPanels{
+  &.panel-right-width-Medium {
+    #rightPanels, #editPanels {
       .make-md-column(2);
     }
   }
-  &.panel-right-width-Large{
-    #rightPanels, #editPanels{
+  &.panel-right-width-Large {
+    #rightPanels, #editPanels {
       .make-md-column(3);
     }
   }
@@ -208,7 +208,7 @@
   .make-xs-column(12);
 }
 
-.rightmenu{
+.rightmenu {
   display: inline;
 }
 
@@ -277,7 +277,7 @@
   
   a {
     color: @navbar-default-link-color;
-    &:hover{
+    &:hover {
       color: @navbar-default-link-hover-color;
     }
   }

@@ -94,10 +94,12 @@ public class PageObjectSuite extends XWikiExecutorSuite
     @Override
     protected void afterTests()
     {
-        try {
-            context.shutdown();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to shutdown PersistentTestContext", e);
+        if (context != null) {
+            try {
+                context.shutdown();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to shutdown PersistentTestContext", e);
+            }
         }
 
         // Note: Don't call super.afterTests() since XWiki will be stopped twice otherwise!

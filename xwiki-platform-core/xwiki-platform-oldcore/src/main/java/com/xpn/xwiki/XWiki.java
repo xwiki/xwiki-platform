@@ -364,11 +364,17 @@ public class XWiki implements EventListener
      */
     private Boolean hasBacklinks;
 
+    private ConfigurationSource xwikicfg;
+
     private static XWikiInitializerJob job;
 
-    private static ConfigurationSource getConfiguration()
+    private ConfigurationSource getConfiguration()
     {
-        return Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
+        if (this.xwikicfg == null) {
+            this.xwikicfg = Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
+        }
+
+        return this.xwikicfg;
     }
 
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException

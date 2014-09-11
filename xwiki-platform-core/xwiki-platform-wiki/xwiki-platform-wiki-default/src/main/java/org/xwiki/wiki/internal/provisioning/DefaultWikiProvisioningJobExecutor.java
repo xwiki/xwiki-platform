@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -40,6 +41,8 @@ import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobException;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobExecutor;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobRequest;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Default implementation for {@link org.xwiki.wiki.provisioning.WikiProvisioningJobExecutor}.
@@ -68,6 +71,12 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
     @Inject
     private ComponentManager componentManager;
 
+    /**
+     * Provider to get the xwiki context.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
     @Override
     public void initialize() throws InitializationException
     {
@@ -85,6 +94,8 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
             WikiProvisioningJobException
     {
         try {
+            // Get the context
+            XWikiContext xcontext = xcontextProvider.get();
             // Create the job
             WikiProvisioningJob job = componentManager.getInstance(Job.class, provisioningJobName);
             // Id of the new job
@@ -94,7 +105,7 @@ public class DefaultWikiProvisioningJobExecutor implements WikiProvisioningJobEx
             jobId.add(provisioningJobName);
             jobId.add(wikiId);
             // Initialize it
-            job.initialize(new WikiProvisioningJobRequest(jobId, wikiId, parameter));
+            job.initialize(new WikiProvisioningJobRequest(jobId, wikiId, parameter, xcontext.getUserReference()));
             // Add it to the list of jobs
             jobs.put(jobId, job);
             // Pass it to the executor

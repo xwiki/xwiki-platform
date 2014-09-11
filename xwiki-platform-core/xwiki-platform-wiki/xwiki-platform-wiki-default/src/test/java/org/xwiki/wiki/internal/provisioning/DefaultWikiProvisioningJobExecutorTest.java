@@ -22,20 +22,28 @@ package org.xwiki.wiki.internal.provisioning;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Provider;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.job.Job;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.provisioning.WikiProvisioningJob;
 import org.xwiki.wiki.provisioning.WikiProvisioningJobRequest;
+
+import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link org.xwiki.wiki.internal.provisioning.DefaultWikiProvisioningJobExecutor}.
@@ -49,6 +57,18 @@ public class DefaultWikiProvisioningJobExecutorTest
     public MockitoComponentMockingRule<DefaultWikiProvisioningJobExecutor> mocker =
             new MockitoComponentMockingRule(DefaultWikiProvisioningJobExecutor.class);
 
+    private Provider<XWikiContext> xcontextProvider;
+
+    private XWikiContext xcontext;
+
+    @Before
+    public void setUp() throws Exception
+    {
+        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        xcontext = mock(XWikiContext.class);
+        when(xcontextProvider.get()).thenReturn(xcontext);
+    }
+
     @Test
     public void createAndExecuteJob() throws Exception
     {
@@ -59,6 +79,8 @@ public class DefaultWikiProvisioningJobExecutorTest
         mocker.registerComponent(ExecutionContextManager.class, executionContextManager);
         Execution execution = mock(Execution.class);
         mocker.registerComponent(Execution.class, execution);
+        DocumentReference user = new DocumentReference("xwiki", "XWiki", "User");
+        when(xcontext.getUserReference()).thenReturn(user);
 
         // Execute
         WikiProvisioningJob job = mocker.getComponentUnderTest().createAndExecuteJob("wikiid", "wikiprovisioning.test",
@@ -71,7 +93,7 @@ public class DefaultWikiProvisioningJobExecutorTest
         jobId.add("provisioning");
         jobId.add("wikiprovisioning.test");
         jobId.add("wikiid");
-        verify(provisioningJob).initialize(eq(new WikiProvisioningJobRequest(jobId, "wikiid", "templateid")));
+        verify(provisioningJob).initialize(eq(new WikiProvisioningJobRequest(jobId, "wikiid", "templateid", user)));
         Thread.sleep(100);
         verify(provisioningJob).run();
 

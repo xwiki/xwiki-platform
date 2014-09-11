@@ -121,7 +121,7 @@ public class UserPicker extends BaseElement
          */
         public void moveBefore(UserElement user)
         {
-            new Actions(getDriver()).clickAndHold(container).moveToElement(user.container, 1, -3).release().perform();
+            new Actions(getDriver()).clickAndHold(container).moveToElement(user.container, 0, 0).release().perform();
         }
     }
 

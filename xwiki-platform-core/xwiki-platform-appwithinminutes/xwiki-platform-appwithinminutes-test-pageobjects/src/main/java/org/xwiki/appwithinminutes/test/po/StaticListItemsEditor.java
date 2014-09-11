@@ -135,7 +135,7 @@ public class StaticListItemsEditor extends BaseElement
     public void moveBefore(String valueToMove, String beforeValue)
     {
         new Actions(getDriver()).clickAndHold(getItem(valueToMove))
-            .moveToElement(getItem(beforeValue), -3, 0).release().perform();
+            .moveToElement(getItem(beforeValue), 0, 0).release().perform();
     }
 
     /**

@@ -172,8 +172,7 @@ public class ApplicationClassEditPage extends InlinePage
      */
     public void moveFieldBefore(String fieldToMove, String beforeField)
     {
-        // Drag the field slightly before the target field (vertically). For some reason it doesn't work if we use x=0.
-        new ClassFieldEditPane(fieldToMove).dragTo(fieldsCanvas.findElement(By.id("field-" + beforeField)), 1, -30);
+        new ClassFieldEditPane(fieldToMove).dragTo(fieldsCanvas.findElement(By.id("field-" + beforeField)), 0, 0);
     }
 
     /**

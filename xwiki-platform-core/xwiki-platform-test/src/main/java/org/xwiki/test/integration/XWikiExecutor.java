@@ -23,8 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.net.BindException;
-import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -197,11 +195,6 @@ public class XWikiExecutor
             LOGGER.info("Checking if an XWiki server is already started at [{}]", getURL());
             // First, verify if XWiki is started. If it is then don't start it again.
             this.wasStarted = !isXWikiStarted(getURL(), 15).timedOut;
-        } else {
-            // Check the main jetty port
-            checkPortAvailability(getPort());
-            // Check the jetty stop port too
-            checkPortAvailability(getStopPort());
         }
 
         if (!this.wasStarted) {
@@ -211,16 +204,6 @@ public class XWikiExecutor
             this.hasXWikiBeenStartedProperly = true;
         } else {
             LOGGER.info("XWiki server is already started at [{}]", getURL());
-        }
-    }
-
-    private void checkPortAvailability(int port) throws Exception
-    {
-        try {
-            ServerSocket socket = new ServerSocket(getPort());
-            socket.close();
-        } catch (BindException e) {
-            throw new Exception(String.format("Some server is already started at port [%s], failing test", port), e);
         }
     }
 
@@ -357,7 +340,8 @@ public class XWikiExecutor
 
         // Stop XWiki if it was started by start()
         if (!this.wasStarted) {
-            DefaultExecuteResultHandler stopProcessHandler = executeCommand(getDefaultStopCommand(getStopPort()));
+            DefaultExecuteResultHandler stopProcessHandler =
+                executeCommand(getDefaultStopCommand(getPort(), getStopPort()));
 
             // First wait for the stop process to have stopped, waiting a max of 5 minutes!
             // It's going to stop the start process...
@@ -528,7 +512,11 @@ public class XWikiExecutor
             if (SystemUtils.IS_OS_WINDOWS) {
                 startCommand = String.format("cmd /c start_xwiki.bat %s %s", port, stopPort);
             } else {
-                startCommand = String.format("sh start_xwiki.sh %s %s", port, stopPort);
+                startCommand = String.format("sh start_xwiki.sh -p %s -sp %s", port, stopPort);
+                if (!VERIFY_RUNNING_XWIKI_AT_START.equals("true")) {
+                    // Kill any already running XWiki instance
+                    startCommand = startCommand + " -k";
+                }
             }
         } else {
             startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(port));
@@ -539,14 +527,14 @@ public class XWikiExecutor
         return startCommand;
     }
 
-    private String getDefaultStopCommand(int stopPort)
+    private String getDefaultStopCommand(int port, int stopPort)
     {
         String stopCommand = STOP_COMMAND;
         if (stopCommand == null) {
             if (SystemUtils.IS_OS_WINDOWS) {
                 stopCommand = String.format("cmd /c stop_xwiki.bat %s", stopPort);
             } else {
-                stopCommand = String.format("sh stop_xwiki.sh %s", stopPort);
+                stopCommand = String.format("sh stop_xwiki.sh -p %s -sp %s", port, stopPort);
             }
         } else {
             stopCommand = stopCommand.replaceFirst(DEFAULT_STOPPORT, String.valueOf(stopPort));

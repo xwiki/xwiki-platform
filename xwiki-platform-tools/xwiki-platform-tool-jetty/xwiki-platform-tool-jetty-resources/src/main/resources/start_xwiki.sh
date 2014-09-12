@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # ---------------------------------------------------------------------------
 # See the NOTICE file distributed with this work for additional
 # information regarding copyright ownership.
@@ -19,18 +19,29 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-# ---------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------
 # Optional ENV vars
 # -----------------
-#   XWIKI_OPTS - parameters passed to the Java VM when running XWiki
-#     e.g. to increase the memory allocated to the JVM to 1GB, use
-#       set XWIKI_OPTS=-Xmx1024m
-#   JETTY_PORT - the port on which to start Jetty, 8080 by default
-#   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command, 8079 by default
-# ---------------------------------------------------------------------------
+#   XWIKI_OPTS - parameters passed to the Java VM when running XWiki e.g. to increase the memory allocated to the
+#       JVM to 1GB, use set XWIKI_OPTS=-Xmx1024m
+#   JETTY_PORT - the port on which to start Jetty.
+#   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command.
+#
+# Optional Parameters
+# -------------------
+#   -p, --port: The Jetty HTTP port to use. Overrides any value from JETTY_PORT. Defaults to 8080.
+#   -sp, --stopport: The Jetty stop port to use. Overrides any value from JETTY_STOP_PORT. Defaults to 8079.
+#   -ld, --lockdir: The directory where the executing process id is stored to verify that that only one instance is
+#       started. Defaults to /var/tmp.
+#   -k, --kill: If set then kills any already executing XWiki instance before starting a new one.
+#
+# Example
+# -------
+#   start_xwiki.sh -p 8080 -sp 8079 -k
+# ----------------------------------------------------------------------------------------------------------------
 
-# Ensure that the commands below are always started in the directory where this script is
-# located. To do this we compute the location of the current script.
+# Ensure that the commands below are always started in the directory where this script is located.
+# To do this we compute the location of the current script.
 PRG="$0"
 while [ -h "$PRG" ]; do
   ls=`ls -ld "$PRG"`
@@ -51,23 +62,62 @@ if [ -z "$XWIKI_OPTS" ] ; then
   XWIKI_OPTS="-Xmx512m -XX:MaxPermSize=196m"
 fi
 
-# The port on which to start Jetty can be defined in an enviroment variable called JETTY_PORT
+# The port on which to start Jetty can be defined in an environment variable called JETTY_PORT
 if [ -z "$JETTY_PORT" ]; then
-  # Alternatively, it can be passed to this script as the first argument
-  if [ -n "$1" ]; then
-    JETTY_PORT=$1
-  else
-    JETTY_PORT=8080
-  fi
+  JETTY_PORT=8080
 fi
 
-# The port on which Jetty listens for a Stop command can be defined in an enviroment variable called JETTY_STOP_PORT
+# The port on which Jetty listens for a Stop command can be defined in an environment variable called JETTY_STOP_PORT
 if [ -z "$JETTY_STOP_PORT" ]; then
-  # Alternatively, it can be passed to this script as the second argument
-  if [ -n "$2" ]; then
-    JETTY_STOP_PORT=$2
+  JETTY_STOP_PORT=8079
+fi
+
+# The location where to store the process id
+XWIKI_LOCK_DIR="/var/tmp"
+
+# Parse script parameters
+while [[ $# > 0 ]]; do
+  key="$1"
+  shift
+  case $key in
+    -p|--port)
+      JETTY_PORT="$1"
+      shift
+      ;;
+    -sp|--stopport)
+      JETTY_STOP_PORT="$1"
+      shift
+      ;;
+    -ld|--lockdir)
+      XWIKI_LOCK_DIR="$1"
+      shift
+      ;;
+    -k|--kill)
+      XWIKI_KILL="true"
+      ;;
+    *)
+      # unknown option
+      ;;
+  esac
+done
+
+# Check if a lock file already exists for the specified port  which means an XWiki instance is already running
+XWIKI_LOCK_FILE="${XWIKI_LOCK_DIR}/xwiki-${JETTY_PORT}.lck"
+
+if [ -e $XWIKI_LOCK_FILE ]; then
+  if ps -p `cat $XWIKI_LOCK_FILE` > /dev/null; then
+    # An XWiki instance is still running
+    if [ "$XWIKI_KILL" == "true" ]; then
+      echo An XWiki instance is already running on port ${JETTY_PORT}, stopping it!
+      /bin/bash stop_xwiki.sh $JETTY_STOP_PORT
+    else
+      echo An XWiki instance is already running on port ${JETTY_PORT}. Aborting...
+      echo Consider calling stop_xwiki.sh to stop it.
+      exit 1
+    fi
   else
-    JETTY_STOP_PORT=8079
+    echo An XWiki lock file exists at ${XWIKI_LOCK_FILE} but no XWiki is executing. Removing lock file...
+    rm -f $XWIKI_LOCK_FILE
   fi
 fi
 
@@ -95,18 +145,20 @@ XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOP_PORT"
 # Specify the encoding to use
 XWIKI_OPTS="$XWIKI_OPTS -Dfile.encoding=UTF8"
 
-# In order to avoid getting a "java.lang.IllegalStateException: Form too large" error
-# when editing large page in XWiki we need to tell Jetty to allow for large content
-# since by default it only allows for 20K. We do this by passing the
-# org.eclipse.jetty.server.Request.maxFormContentSize property.
-# Note that setting this value too high can leave your server vulnerable to denial of
-# service attacks.
+# In order to avoid getting a "java.lang.IllegalStateException: Form too large" error when editing large page in
+# XWiki we need to tell Jetty to allow for large content since by default it only allows for 20K. We do this by
+# passing the org.eclipse.jetty.server.Request.maxFormContentSize property.
+# Note that setting this value too high can leave your server vulnerable to denial of service attacks.
 XWIKI_OPTS="$XWIKI_OPTS -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1000000"
 
-# Create a lock file to signify that XWiki is running
-touch xwiki.lck
-
-java $XWIKI_OPTS $3 $4 $5 $6 $7 $8 $9 -jar $JETTY_HOME/start.jar ${JETTY_HOME}/etc/jetty.xml ${JETTY_HOME}/etc/jetty-*.xml
+# In order to get the PID, start java in the background , get the PID and wait for it to be finished.
+# However doing this prevents sending any signal to the JVM (since it's running in the background).
+# Thus we trap the INT signal (which is sent when the user presses ctrl-c) to the JVM process with the trap command.
+java $XWIKI_OPTS -jar $JETTY_HOME/start.jar ${JETTY_HOME}/etc/jetty.xml ${JETTY_HOME}/etc/jetty-*.xml &
+XWIKI_PID=$!
+echo $XWIKI_PID > $XWIKI_LOCK_FILE
+trap "kill ${XWIKI_PID}; exit 1" INT
+wait $XWIKI_PID 
 
 # Remove XWiki lock file
-rm -f xwiki.lck
+rm -f $XWIKI_LOCK_FILE

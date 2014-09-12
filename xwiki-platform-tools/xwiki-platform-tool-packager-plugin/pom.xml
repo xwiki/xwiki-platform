@@ -36,6 +36,7 @@
    </description>
   <properties>
     <mavenVersion>3.0.5</mavenVersion>
+    <xwiki.jacoco.instructionRatio>0.01</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Maven -->

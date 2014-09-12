@@ -59,8 +59,7 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.xar.XarEntry;
 import org.xwiki.xar.XarException;
-
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.xar.XarPackage;
 
 /**
  * @version $Id$
@@ -126,10 +125,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             ExtensionPlan plan = (ExtensionPlan) context.getProperty(AbstractExtensionJob.CONTEXTKEY_PLAN);
 
             if (plan != null) {
-                XarExtensionPlan xarPlan =
-                    (XarExtensionPlan) context.getProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN);
-
-                if (xarPlan == null) {
+                if (context.getProperty(XarExtensionPlan.CONTEXTKEY_XARINSTALLPLAN) == null) {
                     if (request.isVerbose()) {
                         this.logger.info(LOG_EXTENSIONPLAN_BEGIN, "Preparing XAR extension plan");
                     }
@@ -227,7 +223,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         if (!request.isRemote()) {
             Job currentJob;
             try {
-                currentJob = this.componentManager.<JobContext> getInstance(JobContext.class).getCurrentJob();
+                currentJob = this.componentManager.<JobContext>getInstance(JobContext.class).getCurrentJob();
             } catch (ComponentLookupException e1) {
                 currentJob = null;
             }
@@ -277,7 +273,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         configuration.setXarExtensionPlan(xarExtensionPlan);
 
         try {
-            Job currentJob = this.componentManager.<JobContext> getInstance(JobContext.class).getCurrentJob();
+            Job currentJob = this.componentManager.<JobContext>getInstance(JobContext.class).getCurrentJob();
             if (currentJob != null) {
                 configuration.setJobStatus(currentJob.getStatus());
             }
@@ -285,9 +281,9 @@ public class XarExtensionHandler extends AbstractExtensionHandler
             this.logger.error("Failed to lookup JobContext, it will be impossible to do interactive install");
         }
 
-        // Entries to import
-        if (extension != null) {
-            Map<String, Map<XarEntry, LocalExtension>> nextXAREntries = getXARExtensionPlan().nextXAREntries;
+        // Filter entries to import if there is a plan
+        if (extension != null && xarExtensionPlan != null) {
+            Map<String, Map<XarEntry, LocalExtension>> nextXAREntries = xarExtensionPlan.nextXAREntries;
 
             Set<String> entriesToImport = new HashSet<String>();
 
@@ -316,7 +312,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
 
     // Check
 
-    private boolean hasAccessLevel(String wiki, Right right, Request request) throws XWikiException
+    private boolean hasAccessLevel(String wiki, Right right, Request request)
     {
         boolean hasAccess = true;
 
@@ -351,19 +347,15 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         // TODO: check for edit right on each page of the extension ?
 
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
-            try {
-                if (!hasAccessLevel(wiki, Right.ADMIN, request)) {
-                    if (namespace == null) {
-                        throw new InstallException(String.format("Admin right is required to install extension [%s]",
-                            extension.getId()));
-                    } else {
-                        throw new InstallException(String.format(
-                            "Admin right is required to install extension [%s] on namespace [%s]", extension.getId(),
-                            namespace));
-                    }
+            if (!hasAccessLevel(wiki, Right.ADMIN, request)) {
+                if (namespace == null) {
+                    throw new InstallException(String.format("Admin right is required to install extension [%s]",
+                        extension.getId()));
+                } else {
+                    throw new InstallException(String.format(
+                        "Admin right is required to install extension [%s] on namespace [%s]", extension.getId(),
+                        namespace));
                 }
-            } catch (XWikiException e) {
-                throw new InstallException("Failed to check rights", e);
             }
         }
     }
@@ -382,19 +374,15 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         // TODO: check for delete right on each page of the extension ?
 
         if (request.getProperty(PROPERTY_CHECKRIGHTS) == Boolean.TRUE) {
-            try {
-                if (!hasAccessLevel(wiki, Right.ADMIN, request)) {
-                    if (namespace == null) {
-                        throw new UninstallException(String.format(
-                            "Admin right is required to uninstall extension [%s]", extension.getId()));
-                    } else {
-                        throw new UninstallException(String.format(
-                            "Admin right is required to uninstall extension [%s] from namespace [%s]",
-                            extension.getId(), namespace));
-                    }
+            if (!hasAccessLevel(wiki, Right.ADMIN, request)) {
+                if (namespace == null) {
+                    throw new UninstallException(String.format("Admin right is required to uninstall extension [%s]",
+                        extension.getId()));
+                } else {
+                    throw new UninstallException(String.format(
+                        "Admin right is required to uninstall extension [%s] from namespace [%s]", extension.getId(),
+                        namespace));
                 }
-            } catch (XWikiException e) {
-                throw new UninstallException("Failed to check rights", e);
             }
         }
     }

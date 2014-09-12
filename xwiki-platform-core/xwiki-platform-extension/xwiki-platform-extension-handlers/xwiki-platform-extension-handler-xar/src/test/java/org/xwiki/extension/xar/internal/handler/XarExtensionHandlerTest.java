@@ -36,6 +36,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.bridge.event.WikiCreatedEvent;
+import org.xwiki.bridge.event.WikiCreatingEvent;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.UninstallException;
@@ -90,6 +92,8 @@ public class XarExtensionHandlerTest
 
     private InstalledExtensionRepository xarExtensionRepository;
 
+    private ObservationManager observation;
+
     private Map<String, BaseClass> classes = new HashMap<String, BaseClass>();
 
     private DocumentReference contextUser;
@@ -126,9 +130,10 @@ public class XarExtensionHandlerTest
         this.jobExecutor = this.componentManager.getInstance(JobExecutor.class);
         this.xarExtensionRepository =
             this.componentManager.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
+        this.observation = this.repositoryUtil.getComponentManager().getInstance(ObservationManager.class);
 
         // Get rid of wiki macro listener
-        this.componentManager.<ObservationManager> getInstance(ObservationManager.class).removeListener(
+        this.componentManager.<ObservationManager>getInstance(ObservationManager.class).removeListener(
             "RegisterMacrosOnImportListener");
     }
 
@@ -1084,5 +1089,32 @@ public class XarExtensionHandlerTest
 
         Assert.assertFalse(pageWiki2.isNew());
         Assert.assertEquals("1.1", pageWiki2.getVersion());
+    }
+
+    @Test
+    public void testCreateNewWiki() throws Throwable
+    {
+        mockHasAdminRight(true);
+        when(this.oldcore.getMockXWiki().getVirtualWikisDatabaseNames(any(XWikiContext.class))).thenReturn(
+            Arrays.asList("wiki1", "wiki2"));
+
+        install(this.localXarExtensiontId1, null, this.contextUser);
+
+        Assert.assertFalse(this.oldcore.getMockXWiki()
+            .getDocument(new DocumentReference("wiki1", "space1", "page1"), getXWikiContext()).isNew());
+        Assert.assertFalse(this.oldcore.getMockXWiki()
+            .getDocument(new DocumentReference("wiki2", "space1", "page1"), getXWikiContext()).isNew());
+        Assert.assertTrue(this.oldcore.getMockXWiki()
+            .getDocument(new DocumentReference("newwiki", "space1", "page1"), getXWikiContext()).isNew());
+
+        this.observation.notify(new WikiCreatingEvent("newwiki"), null, this.oldcore.getXWikiContext());
+        this.observation.notify(new WikiCreatedEvent("newwiki"), null, this.oldcore.getXWikiContext());
+
+        Assert.assertFalse(this.oldcore.getMockXWiki()
+            .getDocument(new DocumentReference("wiki1", "space1", "page1"), getXWikiContext()).isNew());
+        Assert.assertFalse(this.oldcore.getMockXWiki()
+            .getDocument(new DocumentReference("wiki2", "space1", "page1"), getXWikiContext()).isNew());
+        Assert.assertFalse(this.oldcore.getMockXWiki()
+            .getDocument(new DocumentReference("newwiki", "space1", "page1"), getXWikiContext()).isNew());
     }
 }

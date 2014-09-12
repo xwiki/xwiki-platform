@@ -80,7 +80,7 @@ public class PageDataSource extends DataSource
             var config = this.@com.smartgwt.client.core.BaseClass::getConfig()();
             return $wnd.isc.XWEPageDataSource.create(config);
         }-*/;
-    
+
     /**
      * @param wiki wiki, Default value is "xwiki".
      */

@@ -329,6 +329,7 @@ public class PackageMojo extends AbstractMojo
                 String content = org.apache.commons.io.FileUtils.readFileToString(startFile);
                 OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(startFile));
                 writer.write(replaceProperty(content, velocityContext));
+                writer.close();
             } catch (Exception e) {
                 // Failed to read or write file...
                 throw new MojoExecutionException(String.format("Failed to process start shell script [%s]", startFile),
@@ -339,11 +340,12 @@ public class PackageMojo extends AbstractMojo
 
     protected String replaceProperty(String content, VelocityContext velocityContext)
     {
+        String result = content;
         for (Object key : velocityContext.getKeys()) {
             Object value = velocityContext.get(key.toString());
-            content = StringUtils.replace(content, String.format("${%s}", key.toString()), value.toString());
+            result = StringUtils.replace(result, String.format("${%s}", key.toString()), value.toString());
         }
-        return content;
+        return result;
     }
 
     private Artifact resolveArtifactItem(ArtifactItem artifactItem) throws MojoExecutionException

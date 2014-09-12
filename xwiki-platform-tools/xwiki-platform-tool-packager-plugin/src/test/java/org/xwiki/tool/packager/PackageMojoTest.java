@@ -38,14 +38,23 @@ public class PackageMojoTest
         VelocityContext context = new VelocityContext();
         context.put("xwikiDataDir", "/some/path");
         PackageMojo mojo = new PackageMojo();
+
+        // We test 2 several things here:
+        // - that ${xwikiDataDir} is going to be replaced
+        // - that $XWIKI_OPTS, $XWIKI_DATA_DIR and $XWIKI_PID are not going to be modified
+        // - that $! is not going to be modified either
         String content = ""
             + "# Location where XWiki stores generated data and where database files are.\n"
             + "XWIKI_DATA_DIR=${xwikiDataDir}\n"
-            + "XWIKI_OPTS=\"$XWIKI_OPTS -Dxwiki.data.dir=$XWIKI_DATA_DIR\"\n";
+            + "XWIKI_OPTS=\"$XWIKI_OPTS -Dxwiki.data.dir=$XWIKI_DATA_DIR\"\n"
+            + "XWIKI_PID=$!\n"
+            + "whatever";
         String expected = ""
             + "# Location where XWiki stores generated data and where database files are.\n"
             + "XWIKI_DATA_DIR=/some/path\n"
-            + "XWIKI_OPTS=\"$XWIKI_OPTS -Dxwiki.data.dir=$XWIKI_DATA_DIR\"\n";
+            + "XWIKI_OPTS=\"$XWIKI_OPTS -Dxwiki.data.dir=$XWIKI_DATA_DIR\"\n"
+            + "XWIKI_PID=$!\n"
+            + "whatever";
         assertEquals(expected, mojo.replaceProperty(content, context));
     }
 }

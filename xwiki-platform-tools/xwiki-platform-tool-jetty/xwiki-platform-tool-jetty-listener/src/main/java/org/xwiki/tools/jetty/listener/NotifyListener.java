@@ -19,6 +19,7 @@
  */
 package org.xwiki.tools.jetty.listener;
 
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.eclipse.jetty.util.component.AbstractLifeCycle.AbstractLifeCycleListener;
@@ -27,9 +28,9 @@ import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
 /**
- * Jetty lifecycle listener that prints a message to open a browser when the server is started.
- * This is to provide information to newbies so that they know what to do after the server is started.
- * 
+ * Jetty lifecycle listener that prints a message to open a browser when the server is started. This is to provide
+ * information to newbies so that they know what to do after the server is started.
+ *
  * @version $Id$
  * @since 3.5M1
  */
@@ -48,7 +49,7 @@ public class NotifyListener extends AbstractLifeCycleListener
     {
         LOGGER.info(DELIMITER);
         try {
-            String serverUrl = "http://" + java.net.Inet4Address.getLocalHost().getCanonicalHostName() + ":"
+            String serverUrl = "http://" + InetAddress.getLocalHost().getCanonicalHostName() + ":"
                 + System.getProperty("jetty.port", "8080") + "/";
             LOGGER.info(Messages.getString("jetty.startup.notification"), serverUrl);
         } catch (UnknownHostException ex) {

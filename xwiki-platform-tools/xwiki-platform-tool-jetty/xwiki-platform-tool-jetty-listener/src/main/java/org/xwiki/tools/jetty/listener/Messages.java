@@ -24,7 +24,7 @@ import java.util.ResourceBundle;
 
 /**
  * Localization helper.
- * 
+ *
  * @version $Id$
  * @since 3.5M1
  */
@@ -46,7 +46,7 @@ public final class Messages
 
     /**
      * Get translation corresponding to the given key.
-     * 
+     *
      * @param key the localization key to translate
      * @return the translation for the given key, in the current system locale
      */

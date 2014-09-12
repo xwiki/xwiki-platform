@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Role;
 
 /**
  * Provide configuration for remote observation manager.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */

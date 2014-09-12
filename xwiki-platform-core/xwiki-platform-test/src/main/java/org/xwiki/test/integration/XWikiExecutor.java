@@ -512,7 +512,7 @@ public class XWikiExecutor
             if (SystemUtils.IS_OS_WINDOWS) {
                 startCommand = String.format("cmd /c start_xwiki.bat %s %s", port, stopPort);
             } else {
-                startCommand = String.format("sh start_xwiki.sh -p %s -sp %s", port, stopPort);
+                startCommand = String.format("bash start_xwiki.sh -p %s -sp %s", port, stopPort);
                 if (!VERIFY_RUNNING_XWIKI_AT_START.equals("true")) {
                     // Kill any already running XWiki instance
                     startCommand = startCommand + " -k";
@@ -534,7 +534,7 @@ public class XWikiExecutor
             if (SystemUtils.IS_OS_WINDOWS) {
                 stopCommand = String.format("cmd /c stop_xwiki.bat %s", stopPort);
             } else {
-                stopCommand = String.format("sh stop_xwiki.sh -p %s -sp %s", port, stopPort);
+                stopCommand = String.format("bash stop_xwiki.sh -p %s -sp %s", port, stopPort);
             }
         } else {
             stopCommand = stopCommand.replaceFirst(DEFAULT_STOPPORT, String.valueOf(stopPort));

@@ -317,28 +317,33 @@ public class PackageMojo extends AbstractMojo
         Artifact jettyArtifact = resolveJettyArtifact();
         unzip(jettyArtifact.getFile(), this.outputPackageDirectory);
 
-        // Replace maven properties in start shell scripts
-        VelocityContext context = createVelocityContext();
+        // Replace properties in start shell scripts
         Collection<File> startFiles =
             org.apache.commons.io.FileUtils.listFiles(this.outputPackageDirectory, new WildcardFileFilter(
                 "start_xwiki*.*"), null);
 
-        // Note: Init is done once even if this method is called several times...
-        Velocity.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, new SLF4JLogChute());
-        Velocity.init();
+        VelocityContext velocityContext = createVelocityContext();
         for (File startFile : startFiles) {
             getLog().info(String.format("  Replacing variables in [%s]...", startFile));
             try {
                 String content = org.apache.commons.io.FileUtils.readFileToString(startFile);
                 OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(startFile));
-                Velocity.evaluate(context, writer, "", content);
-                writer.close();
+                writer.write(replaceProperty(content, velocityContext));
             } catch (Exception e) {
                 // Failed to read or write file...
                 throw new MojoExecutionException(String.format("Failed to process start shell script [%s]", startFile),
                     e);
             }
         }
+    }
+
+    protected String replaceProperty(String content, VelocityContext velocityContext)
+    {
+        for (Object key : velocityContext.getKeys()) {
+            Object value = velocityContext.get(key.toString());
+            content = StringUtils.replace(content, String.format("${%s}", key.toString()), value.toString());
+        }
+        return content;
     }
 
     private Artifact resolveArtifactItem(ArtifactItem artifactItem) throws MojoExecutionException

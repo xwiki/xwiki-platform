@@ -29,12 +29,12 @@
   </parent>
   <artifactId>xwiki-platform-filter-stream-xar</artifactId>
   <name>XWiki Platform - Filter - XAR</name>
-  <description>Wiki stream extension to read and write XAR packages</description>
+  <description>Filter stream extension to read and write XAR packages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
 
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Filter Confluence XAR module</xwiki.extension.name>
+    <xwiki.extension.name>Filter XAR module</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

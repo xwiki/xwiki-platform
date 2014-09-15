@@ -150,7 +150,7 @@ XWiki.Gallery = Class.create({
     var width = dimensions.width - 20;
     var height = dimensions.height - 20;
     if (!this._isIE6()) {
-      this.container.setStyle({width: width + 'px', height: height + 'px'});
+      this.container.setStyle({width: dimensions.width + 'px', height: dimensions.height + 'px'});
     }
     this.currentImage.up().setStyle({height: height + 'px', lineHeight: height + 'px'});
     // Remove width reserved for the navigation arrows.

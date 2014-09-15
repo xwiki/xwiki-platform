@@ -220,6 +220,12 @@ public class DBCPConnectionProvider implements ConnectionProvider
     @Override
     public Connection getConnection() throws SQLException
     {
+        // Check if the database has not been already stopped to avoid NPE. This could also possibly happen if the init
+        // has not been already executed and some code calls getConnection().
+        if (ds == null) {
+            throw new SQLException("Database Connection Pool has not been started or is already stopped!");
+        }
+
         Connection conn = null;
         try {
             conn = ds.getConnection();

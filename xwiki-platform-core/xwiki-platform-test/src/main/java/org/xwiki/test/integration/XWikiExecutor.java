@@ -352,7 +352,7 @@ public class XWikiExecutor
                 waitForProcessToFinish(stopProcessHandler, PROCESS_FINISH_TIMEOUT);
             }
 
-            LOGGER.info("XWiki server stopped");
+            LOGGER.info("XWiki server running at [{}] has been stopped", getURL());
         } else {
             LOGGER.info("XWiki server not stopped since we didn't start it (it was already started)");
         }

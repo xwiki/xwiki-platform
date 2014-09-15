@@ -250,7 +250,9 @@ public class XWikiExecutor
     {
         File dir = new File(getExecutionDirectory());
         if (dir.exists()) {
-            this.startedProcessHandler = executeCommand(getDefaultStartCommand(getPort(), getStopPort(), getRMIPort()));
+            String startCommand = getDefaultStartCommand(getPort(), getStopPort(), getRMIPort());
+            LOGGER.debug("Executing command: [{}]", startCommand);
+            this.startedProcessHandler = executeCommand(startCommand);
         } else {
             throw new Exception(String.format("Invalid directory from where to start XWiki [%s]. If you're starting "
                 + "a functional test from your IDE, make sure to either have started an XWiki instance beforehand or "
@@ -333,6 +335,8 @@ public class XWikiExecutor
 
     public void stop() throws Exception
     {
+        LOGGER.debug("Checking if we need to stop the XWiki server running at [{}]...", getURL());
+
         // Do not try to stop XWiki if we've not been successful in starting it!
         if (!this.hasXWikiBeenStartedProperly) {
             return;
@@ -340,8 +344,9 @@ public class XWikiExecutor
 
         // Stop XWiki if it was started by start()
         if (!this.wasStarted) {
-            DefaultExecuteResultHandler stopProcessHandler =
-                executeCommand(getDefaultStopCommand(getPort(), getStopPort()));
+            String stopCommand = getDefaultStopCommand(getPort(), getStopPort());
+            LOGGER.debug("Executing command: [{}]", stopCommand);
+            DefaultExecuteResultHandler stopProcessHandler = executeCommand(stopCommand);
 
             // First wait for the stop process to have stopped, waiting a max of 5 minutes!
             // It's going to stop the start process...
@@ -537,6 +542,7 @@ public class XWikiExecutor
                 stopCommand = String.format("bash stop_xwiki.sh -p %s -sp %s", port, stopPort);
             }
         } else {
+            stopCommand = stopCommand.replaceFirst(DEFAULT_PORT, String.valueOf(port));
             stopCommand = stopCommand.replaceFirst(DEFAULT_STOPPORT, String.valueOf(stopPort));
         }
 

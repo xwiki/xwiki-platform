@@ -114,7 +114,7 @@ XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME"
 
 [ ! -e $XWIKI_LOCK_FILE ] && echo "Lock [${XWIKI_LOCK_FILE}] missing" && exit 0;
 
-echo 'Attempting to stop XWiki cleanly...';
+echo 'Attempting to stop XWiki cleanly on port ${JETTY_PORT}...';
 
 java $XWIKI_OPTS -jar $JETTY_HOME/start.jar --stop
 waitForLockDeletion $XWIKI_LOCK_FILE && exit 0;

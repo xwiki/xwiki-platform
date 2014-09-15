@@ -13,12 +13,33 @@
   </div>## main
   #template("endpage.vm")
 #else
+  #set($queryString='')
+  #set($urlSafe=$regextool.compile('([-a-zA-Z0-9._~+]|%[0-9a-fA-F]{2})*'))
+  #if($request.qs)
+    #set($queryParams=[])
+    #foreach($param in $request.qs.split('&'))
+      #foreach($item in $param.split('='))
+        ## here we should only escape if really needed, or we escape twice
+        #if($urlSafe.matcher($item).matches())
+          #set($queryString=$queryString+$item)
+        #else
+          #set($queryString=$queryString+$escapetool.url($item))
+        #end
+        #if($foreach.hasNext)
+          #set($queryString=$queryString+'=')
+        #end
+      #end
+      #if($foreach.hasNext)
+        #set($queryString=$queryString+'&')
+      #end
+    #end
+  #end
   #template("startpage.vm")
   <div class="main layoutsubsection">
   <div id="mainContentArea">
     <div id="document-title"><h1>$services.localization.render('core.export.pdf.options.title')</h1></div>
     ## Submit using POST method to preserve the query string parameters of the action URL.
-    <form id="pdfExportOptions" method="post" class="xform half" action="$escapetool.html($doc.getURL('export', $request.qs))">
+    <form id="pdfExportOptions" method="post" class="xform half" action="$escapetool.html($doc.getURL('export', $queryString))">
       <div class="hidden">
         <input type="hidden" name="format" value="pdf" />
       </div>
@@ -89,7 +110,7 @@
       </dl>
       <div class="buttons">
         <span class="buttonwrapper"><input type="submit" value="$services.localization.render('export')" class="button" /></span>
-        <span class="buttonwrapper"><a class="secondary button" href="$escapetool.html($doc.getURL('view', $request.qs))">$services.localization.render('cancel')</a></span>
+        <span class="buttonwrapper"><a class="secondary button" href="$escapetool.html($doc.getURL('view', $queryString))">$services.localization.render('cancel')</a></span>
       </div>
     </form>
     <div class="clearfloats"></div>

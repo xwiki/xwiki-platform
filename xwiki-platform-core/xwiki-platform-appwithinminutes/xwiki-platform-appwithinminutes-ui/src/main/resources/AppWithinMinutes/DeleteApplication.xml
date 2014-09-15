@@ -66,7 +66,7 @@
         ## Delete only the application's entries (just data) from the data space.
         ##
         ## Note: XWQL does not support parametrised object class, so we just have to push it directly in the query string.    
-        #set ($deleteQueryString = "FROM doc.object($classFullName) as obj $deleteQueryString")
+        #set ($deleteQueryString = "FROM doc.object('"+$classFullName+"') as obj $deleteQueryString")
       #else
         ## Delete the entire application (code + data spaces).
         ##

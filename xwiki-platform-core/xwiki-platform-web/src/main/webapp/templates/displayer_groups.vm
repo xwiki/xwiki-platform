@@ -21,7 +21,7 @@
     #end
   #end
   #if ($selectedGroups.size() > 0)
-    #displayGroupsProfiles($selectedGroups)
+    #displayGroup($selectedGroups)
   #end
 #elseif ($type == 'hidden')
   #set($id = $escapetool.xml("${prefix}${name}"))

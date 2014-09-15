@@ -22,7 +22,7 @@
     #end
   #end
   #if ($selectedUsers.size() > 0)
-    #displayUsersProfiles($selectedUsers)
+    #displayUser($selectedUsers)
   #end
 #elseif ($type == 'hidden')
   #set($id = $escapetool.xml("${prefix}${name}"))

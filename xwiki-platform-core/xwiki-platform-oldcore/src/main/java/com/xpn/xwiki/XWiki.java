@@ -318,17 +318,15 @@ public class XWiki implements EventListener
      */
     private static final String VERSION_FILE_PROPERTY = "version";
 
-    /**
-     * List of configured syntax ids.
-     */
+    /** List of configured syntax ids. */
     private List<String> configuredSyntaxes;
 
-    /**
-     * Used to convert a proper Document Reference to string (standard form).
-     */
+    /** Used to convert a proper Document Reference to string (standard form). */
+    @SuppressWarnings("deprecation")
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer = Utils
         .getComponent(EntityReferenceSerializer.TYPE_STRING);
 
+    @SuppressWarnings("deprecation")
     private EntityReferenceValueProvider defaultEntityReferenceValueProvider = Utils
         .getComponent((Type) EntityReferenceValueProvider.class);
 
@@ -336,24 +334,31 @@ public class XWiki implements EventListener
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
      * blanks, except for the page name for which the default page name is used instead.
      */
+    @SuppressWarnings("deprecation")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_STRING, "currentmixed");
 
+    @SuppressWarnings("deprecation")
     private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils.getComponent(
         DocumentReferenceResolver.TYPE_REFERENCE, "current");
 
+    @SuppressWarnings("deprecation")
     private EntityReferenceResolver<String> currentMixedEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.TYPE_STRING, "currentmixed");
 
+    @SuppressWarnings("deprecation")
     private EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
         EntityReferenceResolver.TYPE_STRING, "relative");
 
+    @SuppressWarnings("deprecation")
     private SyntaxFactory syntaxFactory = Utils.getComponent((Type) SyntaxFactory.class);
 
     /** Renderer for elevating privileges for selected file system templates. */
+    @SuppressWarnings("deprecation")
     private PrivilegedTemplateRenderer privilegedTemplateRenderer = Utils
         .getComponent(PrivilegedTemplateRenderer.class);
 
+    @SuppressWarnings("deprecation")
     private ResourceReferenceManager resourceReferenceManager = Utils
         .getComponent((Type) ResourceReferenceManager.class);
 
@@ -508,6 +513,7 @@ public class XWiki implements EventListener
         // TODO: This code should be put in an ExecutionContextInitializer but we couldn't do yet since this code
         // requires that the XWiki object be initialized first (the line above). Thus we'll be able to to move it only
         // after the XWiki init is done also in an ExecutionContextInitializer (and with priorities).
+        @SuppressWarnings("deprecation")
         ResourceReferenceResolver<URL> urlResolver = Utils.getComponent(ResourceReferenceResolver.TYPE_URL);
         URL url = context.getURL();
         EntityResourceReference entityResourceReference;
@@ -768,6 +774,7 @@ public class XWiki implements EventListener
     private void initializeMandatoryClasses(XWikiContext context) throws XWikiException
     {
         if (context.get("initdone") == null) {
+            @SuppressWarnings("deprecation")
             List<MandatoryDocumentInitializer> initializers =
                 Utils.getComponentList(MandatoryDocumentInitializer.class);
 
@@ -853,6 +860,7 @@ public class XWiki implements EventListener
                     context.put("initdone", "1");
 
                     // Send event to notify listeners that the subwiki is ready
+                    @SuppressWarnings("deprecation")
                     ObservationManager observationManager = Utils.getComponent((Type) ObservationManager.class);
                     observationManager.notify(new WikiReadyEvent(wikiName), wikiName, context);
                 }
@@ -997,6 +1005,7 @@ public class XWiki implements EventListener
     /**
      * @return the XWiki core version as specified in the {@link #VERSION_FILE} file
      */
+    @SuppressWarnings("deprecation")
     public String getVersion()
     {
         if (this.version == null) {
@@ -1225,6 +1234,7 @@ public class XWiki implements EventListener
                 document.setOriginalDocument(originalDocument);
             }
 
+            @SuppressWarnings("deprecation")
             ObservationManager om = Utils.getComponent((Type) ObservationManager.class);
 
             // Notify listeners about the document about to be created or updated
@@ -2754,6 +2764,7 @@ public class XWiki implements EventListener
         XWikiDocument document = getDocument(classReference, context);
 
         if (context.get("initdone") == null) {
+            @SuppressWarnings("deprecation")
             MandatoryDocumentInitializer initializer =
                 Utils.getComponent(MandatoryDocumentInitializer.class, document.getFullName());
 
@@ -3392,7 +3403,7 @@ public class XWiki implements EventListener
      *             {@link #createUser(String, Map, String, String, String, String, XWikiContext)} instead
      */
     @Deprecated
-    public int createUser(String xwikiname, Map map, String parent, String content, String userRights,
+    public int createUser(String xwikiname, Map<String, ? > map, String parent, String content, String userRights,
         XWikiContext context) throws XWikiException
     {
         return createUser(xwikiname, map, parent, content, Syntax.XWIKI_1_0.toIdString(), userRights, context);
@@ -3706,6 +3717,7 @@ public class XWiki implements EventListener
         try {
             context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
 
+            @SuppressWarnings("deprecation")
             ObservationManager om = Utils.getComponent(ObservationManager.class);
 
             // Inform notification mechanisms that a document is about to be deleted
@@ -4647,6 +4659,7 @@ public class XWiki implements EventListener
 
                 try {
                     // Get the current ClassLoader
+                    @SuppressWarnings("deprecation")
                     ClassLoaderManager clManager = Utils.getComponent(ClassLoaderManager.class);
                     ClassLoader classloader = null;
                     if (clManager != null) {
@@ -5133,6 +5146,7 @@ public class XWiki implements EventListener
         return adclientid;
     }
 
+    @Deprecated
     public XWikiPluginInterface getPlugin(String name, XWikiContext context)
     {
         XWikiPluginManager plugins = getPluginManager();
@@ -5146,6 +5160,7 @@ public class XWiki implements EventListener
         return null;
     }
 
+    @Deprecated
     public Api getPluginApi(String name, XWikiContext context)
     {
         XWikiPluginInterface plugin = getPlugin(name, context);
@@ -5387,6 +5402,7 @@ public class XWiki implements EventListener
     {
         try {
             // refreshes all Links of each doc of the wiki
+            @SuppressWarnings("deprecation")
             List<String> docs =
                 getStore().getQueryManager().getNamedQuery("getAllDocuments")
                     .addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, "hidden")).execute();

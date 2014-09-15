@@ -198,15 +198,17 @@ public class ExportAction extends XWikiAction
         PdfExport exporter = new OfficeExporter();
         // Check if the office exporter supports the specified format.
         ExportType exportType = ((OfficeExporter) exporter).getExportType(format);
-        if ("pdf".equalsIgnoreCase(format) || exportType == null) {
+        // Note 1: exportType will be null if no office server is started or it doesn't support the passed format
+        // Note 2: we don't use the office server for PDF exports since it doesn't work OOB. Instead we use FOP.
+        if ("pdf".equalsIgnoreCase(format)) {
             // The export format is PDF or the office converter can't be used (either it doesn't support the specified
             // format or the office server is not started).
             urlFactory = new PdfURLFactory();
             exporter = new PdfExportImpl();
             exportType = ExportType.PDF;
-            if ("rtf".equalsIgnoreCase(format)) {
-                exportType = ExportType.RTF;
-            }
+        } else if (exportType == null) {
+            context.put("message", "core.export.formatUnknown");
+            return "exception";
         }
 
         urlFactory.init(context);

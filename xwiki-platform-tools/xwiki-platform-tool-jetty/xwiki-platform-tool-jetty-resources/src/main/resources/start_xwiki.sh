@@ -109,7 +109,7 @@ if [ -e $XWIKI_LOCK_FILE ]; then
     # An XWiki instance is still running
     if [ "$XWIKI_KILL" == "true" ]; then
       echo An XWiki instance is already running on port ${JETTY_PORT}, stopping it!
-      /bin/bash stop_xwiki.sh $JETTY_STOP_PORT
+      /bin/bash stop_xwiki.sh -p $JETTY_PORT -sp $JETTY_STOP_PORT -ld $XWIKI_LOCK_DIR
     else
       echo An XWiki instance is already running on port ${JETTY_PORT}. Aborting...
       echo Consider calling stop_xwiki.sh to stop it.

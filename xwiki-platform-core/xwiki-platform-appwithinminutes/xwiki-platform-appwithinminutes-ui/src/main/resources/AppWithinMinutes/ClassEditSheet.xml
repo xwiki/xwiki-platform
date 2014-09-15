@@ -1469,7 +1469,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
             #set($formFieldIconURL = $formFieldDoc.getAttachmentURL($formFieldIcon))
           #end
           ** (% class="field" %){{html}}
-              &lt;img src="$formFieldIconURL" alt="$escapetool.xml($formFieldDoc.title)" class="icon" /&gt;
+              &lt;img src="$formFieldIconURL" alt="$escapetool.xml($formFieldDoc.plainTitle)" class="icon" /&gt;
               $escapetool.xml($formFieldDoc.plainTitle)
               ## FIXME: We should use the 'get' action instead to prevent the stats module from recording this AJAX request.
               ## The 'edit' action is a temporary solution until the sheet module is modified to allow a sheet to be enforced through

@@ -13,27 +13,7 @@
   </div>## main
   #template("endpage.vm")
 #else
-  #set($queryString='')
-  #set($urlSafe=$regextool.compile('([-a-zA-Z0-9._~+]|%[0-9a-fA-F]{2})*'))
-  #if($request.qs)
-    #set($queryParams=[])
-    #foreach($param in $request.qs.split('&'))
-      #foreach($item in $param.split('='))
-        ## here we should only escape if really needed, or we escape twice
-        #if($urlSafe.matcher($item).matches())
-          #set($queryString=$queryString+$item)
-        #else
-          #set($queryString=$queryString+$escapetool.url($item))
-        #end
-        #if($foreach.hasNext)
-          #set($queryString=$queryString+'=')
-        #end
-      #end
-      #if($foreach.hasNext)
-        #set($queryString=$queryString+'&')
-      #end
-    #end
-  #end
+  #set($queryString = "$!escapetool.url($urltool.parseQuery($request.qs))")
   #template("startpage.vm")
   <div class="main layoutsubsection">
   <div id="mainContentArea">

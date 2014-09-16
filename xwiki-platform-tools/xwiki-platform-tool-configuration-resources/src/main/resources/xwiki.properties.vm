@@ -281,6 +281,11 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.tools = sorttool = org.apache.velocity.tools.generic.SortTool     
 #-#   velocity.tools = escapetool = org.apache.velocity.tools.generic.EscapeTool
 #-#   velocity.tools = regextool = org.xwiki.velocity.tools.RegexTool
+#-#   velocity.tools = collectionstool = org.xwiki.velocity.tools.CollectionsTool
+#-#   velocity.tools = stringtool = org.apache.commons.lang3.StringUtils
+#-#   velocity.tools = jsontool = org.xwiki.velocity.tools.JSONTool
+#-#   velocity.tools = urltool = org.xwiki.velocity.tools.URLTool
+#-#   velocity.tools = cookietool = org.apache.velocity.tools.view.CookieTool
 
 #-# [Since 2.0M1]
 #-# Velocity configuration properties. The format is

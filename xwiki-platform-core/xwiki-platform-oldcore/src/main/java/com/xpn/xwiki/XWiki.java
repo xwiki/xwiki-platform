@@ -1607,9 +1607,9 @@ public class XWiki implements EventListener
             }
 
             // If we could not find the template in the skin
-            // let's try in the base skin (as long as the base skin is not the same as the skin)
+            // let's try in the base skin (as long as the base skin is not the same as the skin and is not empty)
             String baseskin = getBaseSkin(context);
-            if (!skin.equals(baseskin)) {
+            if (StringUtils.isNotEmpty(baseskin) && !skin.equals(baseskin)) {
                 result = parseTemplate(template, baseskin, context);
                 if (result != null) {
                     return result;
@@ -1618,9 +1618,10 @@ public class XWiki implements EventListener
 
             // If we still could not find the template in the skin or in the base skin
             // let's try in the default base skin (as long as the default base skin is not the same
-            // as the skin or the base skin
+            // as the skin or the base skin and is not empty
             String defaultbaseskin = getDefaultBaseSkin(context);
-            if ((!baseskin.equals(defaultbaseskin)) && (!skin.equals(defaultbaseskin))) {
+            if (StringUtils.isNotEmpty(defaultbaseskin) && !baseskin.equals(defaultbaseskin)
+                && !skin.equals(defaultbaseskin)) {
                 result = parseTemplate(template, defaultbaseskin, context);
                 if (result != null) {
                     return result;
@@ -1775,9 +1776,10 @@ public class XWiki implements EventListener
             if (result != null) {
                 return result;
             }
+
             // Try in the parent skin
             String baseskin = getBaseSkin(context);
-            if (!skin.equals(baseskin)) {
+            if (StringUtils.isNotEmpty(baseskin) && !skin.equals(baseskin)) {
                 result = getSkinFile(filename, baseskin, forceSkinAction, context);
                 if (result != null) {
                     return result;
@@ -1876,33 +1878,33 @@ public class XWiki implements EventListener
             if (context.getRequest() != null) {
                 skin = context.getRequest().getParameter("skin");
                 if (LOGGER.isDebugEnabled()) {
-                    if (skin != null && !skin.equals("")) {
-                        LOGGER.debug("Requested skin in the URL: [" + skin + "]");
+                    if (StringUtils.isNotEmpty(skin)) {
+                        LOGGER.debug("Requested skin in the URL: [{}]", skin);
                     }
                 }
             }
 
-            if ((skin == null) || (skin.equals(""))) {
+            if (StringUtils.isEmpty(skin)) {
                 skin = getUserPreference("skin", context);
                 if (LOGGER.isDebugEnabled()) {
-                    if (skin != null && !skin.equals("")) {
-                        LOGGER.debug("Configured skin in user preferences: [" + skin + "]");
+                    if (StringUtils.isNotEmpty(skin)) {
+                        LOGGER.debug("Configured skin in user preferences: [{}]", skin);
                     }
                 }
             }
-            if (skin == null || skin.equals("")) {
+            if (StringUtils.isEmpty(skin)) {
                 skin = getConfiguration().getProperty("xwiki.defaultskin");
                 if (LOGGER.isDebugEnabled()) {
-                    if (skin != null && !skin.equals("")) {
-                        LOGGER.debug("Configured default skin in preferences: [" + skin + "]");
+                    if (StringUtils.isNotEmpty(skin)) {
+                        LOGGER.debug("Configured default skin in preferences: [{}]", skin);
                     }
                 }
             }
-            if (skin == null || skin.equals("")) {
+            if (StringUtils.isEmpty(skin)) {
                 skin = getDefaultBaseSkin(context);
                 if (LOGGER.isDebugEnabled()) {
-                    if (skin != null && !skin.equals("")) {
-                        LOGGER.debug("Configured default base skin in preferences: [" + skin + "]");
+                    if (StringUtils.isNotEmpty(skin)) {
+                        LOGGER.debug("Configured default base skin in preferences: [{}]", skin);
                     }
                 }
             }
@@ -1910,6 +1912,7 @@ public class XWiki implements EventListener
             LOGGER.debug("Exception while determining current skin", e);
             skin = getDefaultBaseSkin(context);
         }
+
         try {
             if (skin.indexOf('.') != -1) {
                 if (!getRightService().hasAccessLevel("view", context.getUser(), skin, context)) {

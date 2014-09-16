@@ -94,7 +94,7 @@ public abstract class Collection extends Element
     /**
      * @param name the name of the property
      * @return the value of the passed property
-     * @since 6.3M1
+     * @since 6.2
      */
     public java.lang.Object getValue(String name)
     {

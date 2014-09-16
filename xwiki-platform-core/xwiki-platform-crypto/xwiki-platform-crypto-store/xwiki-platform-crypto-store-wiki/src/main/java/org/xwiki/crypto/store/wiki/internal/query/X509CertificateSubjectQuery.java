@@ -75,7 +75,7 @@ public class X509CertificateSubjectQuery extends AbstractX509SubjectQuery
         try {
             for (String cert : this.<String>execute(subject)) {
                 try {
-                    result.add(factory.decode(getEncoder().decode(cert)));
+                    result.add(this.factory.decode(getEncoder().decode(cert)));
                 } catch (Exception e) {
                     // Ignored
                 }

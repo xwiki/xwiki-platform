@@ -68,13 +68,13 @@ public class X509CertificateProvider implements CertificateProvider
     @Override
     public CertifiedPublicKey getCertificate(byte[] keyIdentifier)
     {
-        return keyIdentifierQuery.getCertificate(keyIdentifier);
+        return this.keyIdentifierQuery.getCertificate(keyIdentifier);
     }
 
     @Override
     public CertifiedPublicKey getCertificate(PrincipalIndentifier issuer, BigInteger serial)
     {
-        return issuerAndSerialQuery.getCertificate(issuer, serial);
+        return this.issuerAndSerialQuery.getCertificate(issuer, serial);
     }
 
     @Override
@@ -90,6 +90,6 @@ public class X509CertificateProvider implements CertificateProvider
     @Override
     public Collection<CertifiedPublicKey> getCertificate(PrincipalIndentifier subject)
     {
-        return subjectQuery.getCertificates(subject);
+        return this.subjectQuery.getCertificates(subject);
     }
 }

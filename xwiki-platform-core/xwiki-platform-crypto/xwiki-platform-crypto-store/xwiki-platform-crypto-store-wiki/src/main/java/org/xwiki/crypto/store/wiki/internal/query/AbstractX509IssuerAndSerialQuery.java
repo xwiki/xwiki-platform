@@ -39,9 +39,11 @@ import org.xwiki.query.QueryManager;
 public abstract class AbstractX509IssuerAndSerialQuery extends AbstractX509StoreQuery
 {
     private static final String ISSUER = "issuer";
+
     private static final String SERIAL = "serial";
 
     private static final String AND_OBJ = " and obj.";
+
     private static final String EQUAL = "=:";
 
     private static final String WHERE_STATEMENT =

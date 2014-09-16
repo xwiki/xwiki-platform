@@ -36,9 +36,11 @@ public class WikiStoreReference implements StoreReference
 
     /**
      * Wrap a document reference or a space reference as a store reference.
+     *
      * @param reference the reference to a document or a space.
      */
-    public WikiStoreReference(EntityReference reference) {
+    public WikiStoreReference(EntityReference reference)
+    {
         if (reference.getType() != EntityType.DOCUMENT && reference.getType() != EntityType.SPACE) {
             throw new IllegalArgumentException("Certificates could only be stored into document or space.");
         }
@@ -48,7 +50,8 @@ public class WikiStoreReference implements StoreReference
     /**
      * @return the wrapped entity reference.
      */
-    public EntityReference getReference() {
-        return reference;
+    public EntityReference getReference()
+    {
+        return this.reference;
     }
 }

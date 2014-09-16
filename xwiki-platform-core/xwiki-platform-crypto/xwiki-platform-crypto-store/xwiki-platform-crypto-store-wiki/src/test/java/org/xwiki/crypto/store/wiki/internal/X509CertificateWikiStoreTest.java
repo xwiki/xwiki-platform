@@ -131,7 +131,7 @@ public class X509CertificateWikiStoreTest
             } finally {
                 field.setAccessible(isAccessible);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -387,12 +387,12 @@ public class X509CertificateWikiStoreTest
     {
         CertifiedPublicKey certificate = mockSingleCertQuery();
 
-        assertThat(store.getCertificateProvider(DOC_STORE_REF).getCertificate(SUBJECT_KEYID),
+        assertThat(this.store.getCertificateProvider(DOC_STORE_REF).getCertificate(SUBJECT_KEYID),
             equalTo(certificate));
 
-        verify(query).bindValue(BIND_KEYID, ENCODED_SUBJECTKEYID);
-        verify(query, times(3)).bindValue(BIND_SPACE, SPACE);
-        verify(query, times(3)).bindValue(BIND_DOCNAME, DOCUMENT);
+        verify(this.query).bindValue(BIND_KEYID, ENCODED_SUBJECTKEYID);
+        verify(this.query, times(3)).bindValue(BIND_SPACE, SPACE);
+        verify(this.query, times(3)).bindValue(BIND_DOCNAME, DOCUMENT);
     }
 
     @Test
@@ -400,11 +400,11 @@ public class X509CertificateWikiStoreTest
     {
         CertifiedPublicKey certificate = mockSingleCertQuery();
 
-        assertThat(store.getCertificateProvider(SPACE_STORE_REF).getCertificate(SUBJECT_KEYID),
+        assertThat(this.store.getCertificateProvider(SPACE_STORE_REF).getCertificate(SUBJECT_KEYID),
             equalTo(certificate));
 
-        verify(query).bindValue(BIND_KEYID, ENCODED_SUBJECTKEYID);
-        verify(query, times(3)).bindValue(BIND_SPACE, SPACE);
+        verify(this.query).bindValue(BIND_KEYID, ENCODED_SUBJECTKEYID);
+        verify(this.query, times(3)).bindValue(BIND_SPACE, SPACE);
     }
 
     @Test
@@ -441,15 +441,15 @@ public class X509CertificateWikiStoreTest
         String encodedCert2 = "encoded_certificate2";
         certs[0] = getMockedCertificate(true);
         certs[1] = getMockedCertificate(false);
-        CertificateFactory factory = mocker.getInstance(CertificateFactory.class, "X509");
+        CertificateFactory factory = this.mocker.getInstance(CertificateFactory.class, "X509");
         when(factory.decode(CERTIFICATE)).thenReturn(certs[0]);
         when(factory.decode(cert2)).thenReturn(certs[1]);
 
-        BinaryStringEncoder encoder = mocker.getInstance(BinaryStringEncoder.class, "Base64");
+        BinaryStringEncoder encoder = this.mocker.getInstance(BinaryStringEncoder.class, "Base64");
         when(encoder.encode(cert2, 64)).thenReturn(encodedCert2);
         when(encoder.decode(encodedCert2)).thenReturn(cert2);
 
-        when(query.<String>execute()).thenReturn(Arrays.asList(ENCODED_CERTIFICATE, encodedCert2));
+        when(this.query.<String>execute()).thenReturn(Arrays.asList(ENCODED_CERTIFICATE, encodedCert2));
 
         return certs;
     }
@@ -459,12 +459,12 @@ public class X509CertificateWikiStoreTest
     {
         CertifiedPublicKey[] certs = mockMultiCertsQuery();
 
-        assertThat(store.getCertificateProvider(DOC_STORE_REF).getCertificate(new DistinguishedName(SUBJECT)),
+        assertThat(this.store.getCertificateProvider(DOC_STORE_REF).getCertificate(new DistinguishedName(SUBJECT)),
             contains(certs));
 
-        verify(query).bindValue(BIND_SUBJECT, SUBJECT);
-        verify(query, times(3)).bindValue(BIND_SPACE, SPACE);
-        verify(query, times(3)).bindValue(BIND_DOCNAME, DOCUMENT);
+        verify(this.query).bindValue(BIND_SUBJECT, SUBJECT);
+        verify(this.query, times(3)).bindValue(BIND_SPACE, SPACE);
+        verify(this.query, times(3)).bindValue(BIND_DOCNAME, DOCUMENT);
     }
 
     @Test
@@ -472,11 +472,11 @@ public class X509CertificateWikiStoreTest
     {
         CertifiedPublicKey[] certs = mockMultiCertsQuery();
 
-        assertThat(store.getCertificateProvider(SPACE_STORE_REF).getCertificate(new DistinguishedName(SUBJECT)),
+        assertThat(this.store.getCertificateProvider(SPACE_STORE_REF).getCertificate(new DistinguishedName(SUBJECT)),
             contains(certs));
 
-        verify(query).bindValue(BIND_SUBJECT, SUBJECT);
-        verify(query, times(3)).bindValue(BIND_SPACE, SPACE);
+        verify(this.query).bindValue(BIND_SUBJECT, SUBJECT);
+        verify(this.query, times(3)).bindValue(BIND_SPACE, SPACE);
     }
 
     @Test
@@ -484,10 +484,10 @@ public class X509CertificateWikiStoreTest
     {
         CertifiedPublicKey[] certs = mockMultiCertsQuery();
 
-        assertThat(store.getAllCertificates(DOC_STORE_REF), contains(certs));
+        assertThat(this.store.getAllCertificates(DOC_STORE_REF), contains(certs));
 
-        verify(query).bindValue(BIND_SPACE, SPACE);
-        verify(query).bindValue(BIND_DOCNAME, DOCUMENT);
+        verify(this.query).bindValue(BIND_SPACE, SPACE);
+        verify(this.query).bindValue(BIND_DOCNAME, DOCUMENT);
     }
 
     @Test
@@ -495,9 +495,9 @@ public class X509CertificateWikiStoreTest
     {
         CertifiedPublicKey[] certs = mockMultiCertsQuery();
 
-        assertThat(store.getAllCertificates(SPACE_STORE_REF), contains(certs));
+        assertThat(this.store.getAllCertificates(SPACE_STORE_REF), contains(certs));
 
-        verify(query).bindValue(BIND_SPACE, SPACE);
+        verify(this.query).bindValue(BIND_SPACE, SPACE);
     }
 
 }

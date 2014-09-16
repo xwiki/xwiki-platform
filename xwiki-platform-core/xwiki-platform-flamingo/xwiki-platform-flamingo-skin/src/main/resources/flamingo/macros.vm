@@ -215,6 +215,94 @@ $xwiki.getUserName("xwiki:${username}")
 
 
 ###
+###    displayUser
+###
+### Display the profile of a user (or a list of users) with an image
+###
+### @param arg Could be either a string, a reference or a list of them
+###
+#macro(displayUser $arg)
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css'))
+  #if ($arg.iterator())
+    #set ($usersList = $arg)
+  #else
+    #set ($usersList = [$arg])
+  #end
+  <ul class="users">
+    #foreach($user in $usersList)
+      #set ($userReference = $user.extractReference('DOCUMENT'))
+      #if (!$userReference)
+        #set ($userReference = $services.model.resolveDocument($user, 'explicit', $xcontext.userReference))
+      #end
+      #set ($userName = ${userReference.name})
+      #getUserAvatarURL($userReference $avatarURL 30)
+      <li class="user">
+       <div class="user-avatar-wrapper">
+         ## The string returned by XWiki#getUserName() is XML encoded.
+         <img src="${escapetool.xml($avatarURL.url)}" class="icon"
+           alt="${xwiki.getUserName("XWiki.${userName}", false)}" />
+      </div>
+      <div class="user-name">${xwiki.getUserName("XWiki.${userName}")}</div>
+        <div>
+          <span class="user-alias">${escapetool.xml($userReference.name)}</span>
+          ## Display the wiki only for local users.
+          #if ($userReference.wikiReference.name != $xcontext.getMainWikiName())
+            <span class="user-wiki">${escapetool.xml($userReference.wikiReference.name)}</span>
+          #end
+        </div>
+      </li>
+    #end
+  </ul>
+#end
+
+
+###
+###    displayGroup
+###
+### Display the profile of a group (or a list of groups) with an image
+###
+### @param arg Could be either a string, a reference or a list of them
+###
+#macro(displayGroup $arg)
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/userpicker/userPicker.css', true))
+  #if ($arg.iterator())
+    #set ($groupsList = $arg)
+  #else
+    #set ($groupsList = [$arg])
+  #end
+  <ul class="users">
+    #foreach ($group in $groupsList)
+      #set ($groupReference = $group.extractReference('DOCUMENT'))
+      #if (!$groupReference)
+        #set ($groupReference = $services.model.resolveDocument($group, 'explicit', $xcontext.userReference))
+      #end
+      #set ($groupTitle = $xwiki.getDocument($groupReference).plainTitle)
+      #if ("$!groupTitle" == '')
+        #set ($groupTitle = $groupReference.name)
+      #end
+      <li class="user">
+        <div class="user-avatar-wrapper">
+          #getUserAvatarURL($groupReference $avatarURL 30)
+          <img src="${escapetool.xml($avatarURL.url)}" class="icon"
+            alt="${escapetool.xml($groupTitle)}" />
+        </div>
+        <div class="user-name">
+          <a href="${escapetool.xml($xwiki.getURL($groupReference))}">${escapetool.xml($groupTitle)}</a>
+        </div>
+    <div>
+    <span class="user-alias">${escapetool.xml($groupReference.name)}</span>
+      ## Display the wiki only for local groups.
+      #if ($groupReference.wikiReference.name != $xcontext.getMainWikiName())
+        <span class="user-wiki">${escapetool.xml($groupReference.wikiReference.name)}</span>
+      #end
+    </div>
+  </li>
+  #end
+  </ul>
+#end
+
+
+###
 ###    useravatar
 ###
 ### Display the avatar of a user, or a standard image if the user has no avatar

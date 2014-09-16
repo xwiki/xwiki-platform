@@ -37,8 +37,8 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
   #if($searchSuggestConfigObject.getProperty('activated').value == 1)
     #set($searchSuggestConfigHash = '')
     #foreach($source in $searchSuggestConfigDocument.getObjects('XWiki.SearchSuggestSourceClass'))
-      #if($source.getProperty('activated').value == 1)
-        #set($sourceId = "${source.get('name')}:${source.get('url')}:${source.get('highlight')}:${source.get('icon')}}")
+      #if($source.getValue('activated') == 1)
+        #set($sourceId = "${source.getValue('name')}:${source.getValue('url')}:${source.getValue('highlight')}:${source.getValue('icon')}}")
         #set($searchSuggestConfigHash = "${searchSuggestConfigHash}|${sourceId}")
       #end
     #end

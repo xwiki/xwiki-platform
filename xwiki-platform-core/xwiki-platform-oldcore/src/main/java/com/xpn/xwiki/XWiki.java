@@ -1963,9 +1963,12 @@ public class XWiki implements EventListener
 
     public String getDefaultBaseSkin(XWikiContext context)
     {
-        String defaultbaseskin = getConfiguration().getProperty("xwiki.defaultbaseskin", "");
-        if (defaultbaseskin.equals("")) {
-            defaultbaseskin = getConfiguration().getProperty("xwiki.defaultskin", "colibri");
+        // We do not pass a default value, because we want to know if the property is set to an empty value (and so it
+        // would be intended) or if it is not set at all
+        String defaultbaseskin = getConfiguration().getProperty("xwiki.defaultbaseskin");
+        if (defaultbaseskin == null) {
+            // if the property is not set, we fallback to the default skin
+            defaultbaseskin = getConfiguration().getProperty("xwiki.defaultskin", "flamingo");
         }
         return defaultbaseskin;
     }

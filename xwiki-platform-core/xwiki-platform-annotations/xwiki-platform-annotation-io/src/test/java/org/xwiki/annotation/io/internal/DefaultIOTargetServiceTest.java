@@ -19,13 +19,20 @@
  */
 package org.xwiki.annotation.io.internal;
 
-import static org.junit.Assert.assertEquals;
-
 import org.jmock.Expectations;
 import org.junit.Test;
 import org.xwiki.annotation.io.IOTargetService;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
+
+import com.xpn.xwiki.web.Utils;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the default implementation of {@link IOTargetService}, and integration with target resolvers, up to the
@@ -46,6 +53,11 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
      */
     private DocumentAccessBridge dabMock;
 
+    /**
+     * Mock for DocumentReferenceResolver<String> used by BaseObjectReference
+     */
+    private DocumentReferenceResolver<String> classResolver;
+
     @Override
     protected void registerComponents() throws Exception
     {
@@ -53,6 +65,13 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
 
         // register the dab
         this.dabMock = registerMockComponent(DocumentAccessBridge.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                allowing(dabMock).getCurrentUserReference();
+            }
+        });
+        this.classResolver = registerMockComponent(DocumentReferenceResolver.TYPE_STRING);
     }
 
     @Override
@@ -62,18 +81,22 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
 
         // get the default io target service
         ioTargetService = getComponentManager().getInstance(IOTargetService.class);
+        Utils.setComponentManager(getComponentManager());
     }
 
     @Test
     public void testGettersWhenTargetIsTypedDocument() throws Exception
     {
+        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(dabMock).getDocumentContent("wiki:Space.Page");
+                allowing(dabMock).getDocument(new DocumentReference("wiki", "Space", "Page"));
+                will(returnValue(dmb));
+                oneOf(dmb).getContent();
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocumentSyntaxId("wiki:Space.Page");
-                will(returnValue("xwiki/2.0"));
+                oneOf(dmb).getSyntax();
+                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
             }
         });
 
@@ -85,13 +108,16 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGettersWhenTargetIsNonTypedDocument() throws Exception
     {
+        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(dabMock).getDocumentContent("wiki:Space.Page");
+                allowing(dabMock).getDocument(new DocumentReference("wiki", "Space", "Page"));
+                will(returnValue(dmb));
+                oneOf(dmb).getContent();
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocumentSyntaxId("wiki:Space.Page");
-                will(returnValue("xwiki/2.0"));
+                oneOf(dmb).getSyntax();
+                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
             }
         });
 
@@ -103,14 +129,17 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGettersWhenTargetIsNonTypedRelativeDocument() throws Exception
     {
+        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
         getMockery().checking(new Expectations()
         {
             {
                 // default resolver should be used
-                oneOf(dabMock).getDocumentContent("xwiki:Space.Page");
+                allowing(dabMock).getDocument(new DocumentReference("xwiki", "Space", "Page"));
+                will(returnValue(dmb));
+                oneOf(dmb).getContent();
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocumentSyntaxId("xwiki:Space.Page");
-                will(returnValue("xwiki/2.0"));
+                oneOf(dmb).getSyntax();
+                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
             }
         });
 
@@ -122,14 +151,17 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGettersWhenTargetIsTypedRelativeDocument() throws Exception
     {
+        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
         getMockery().checking(new Expectations()
         {
             {
                 // default resolver should be used
-                oneOf(dabMock).getDocumentContent("xwiki:Space.Page");
+                allowing(dabMock).getDocument(new DocumentReference("xwiki", "Space", "Page"));
+                will(returnValue(dmb));
+                oneOf(dmb).getContent();
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocumentSyntaxId("xwiki:Space.Page");
-                will(returnValue("xwiki/2.0"));
+                oneOf(dmb).getSyntax();
+                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
             }
         });
 
@@ -141,6 +173,7 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGettersWhenTargetIsTypedSpace() throws Exception
     {
+        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -161,15 +194,18 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGettersWhenTargetIsEmptyString() throws Exception
     {
+        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
         getMockery().checking(new Expectations()
         {
             {
                 // default resolver should be used. Note that this will fail if default values change, not very well
                 // isolated
-                oneOf(dabMock).getDocumentContent("xwiki:Main.WebHome");
+                allowing(dabMock).getDocument(new DocumentReference("xwiki", "Main", "WebHome"));
+                will(returnValue(dmb));
+                oneOf(dmb).getContent();
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocumentSyntaxId("xwiki:Main.WebHome");
-                will(returnValue("xwiki/2.0"));
+                oneOf(dmb).getSyntax();
+                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
             }
         });
 
@@ -182,13 +218,19 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGetterWhenTargetIsTypedIndexedObjectProperty() throws Exception
     {
+        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(dabMock).getProperty("wiki:Space.Page", "XWiki.Class", 1, "property");
+                allowing(classResolver).resolve("XWiki.Class");
+                will(returnValue(new DocumentReference("wiki", "XWiki", "Class")));
+                oneOf(dabMock).getProperty(new DocumentReference("wiki", "Space", "Page"),
+                                           new DocumentReference("wiki", "XWiki", "Class"), 1, "property");
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocumentSyntaxId("wiki:Space.Page");
-                will(returnValue("xwiki/2.0"));
+                oneOf(dabMock).getDocument(new DocumentReference("wiki", "Space", "Page"));
+                will(returnValue(dmb));
+                oneOf(dmb).getSyntax();
+                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
             }
         });
 
@@ -200,13 +242,19 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGetterWhenTargetIsTypedDefaultObjectProperty() throws Exception
     {
+        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(dabMock).getProperty("wiki:Space.Page", "XWiki.Class", "property");
+                allowing(classResolver).resolve("XWiki.Class");
+                will(returnValue(new DocumentReference("wiki", "XWiki", "Class")));
+                oneOf(dabMock).getProperty(new DocumentReference("wiki", "Space", "Page"),
+                                           new DocumentReference("wiki", "XWiki", "Class"), "property");
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocumentSyntaxId("wiki:Space.Page");
-                will(returnValue("xwiki/2.0"));
+                oneOf(dabMock).getDocument(new DocumentReference("wiki", "Space", "Page"));
+                will(returnValue(dmb));
+                oneOf(dmb).getSyntax();
+                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
             }
         });
 
@@ -218,13 +266,19 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGetterWhenTargetIsTypedObjectPropertyInRelativeDocument() throws Exception
     {
+        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(dabMock).getProperty("xwiki:Main.Page", "XWiki.Class", "property");
+                allowing(classResolver).resolve("XWiki.Class");
+                will(returnValue(new DocumentReference("xwiki", "XWiki", "Class")));
+                oneOf(dabMock).getProperty(new DocumentReference("xwiki", "Main", "Page"),
+                    new DocumentReference("xwiki", "XWiki", "Class"), "property");
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocumentSyntaxId("xwiki:Main.Page");
-                will(returnValue("xwiki/2.0"));
+                oneOf(dabMock).getDocument(new DocumentReference("xwiki", "Main", "Page"));
+                will(returnValue(dmb));
+                oneOf(dmb).getSyntax();
+                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
             }
         });
 
@@ -236,14 +290,17 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGetterWhenTargetIsNonTypedObjectProperty() throws Exception
     {
+        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
         getMockery().checking(new Expectations()
         {
             {
                 // target will be parsed as document, because document is the default
-                oneOf(dabMock).getDocumentContent("wiki:Space\\.Page^XWiki\\.Class.property");
+                allowing(dabMock).getDocument(new DocumentReference("wiki", "Space.Page^XWiki.Class", "property"));
+                will(returnValue(dmb));
+                oneOf(dmb).getContent();
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocumentSyntaxId("wiki:Space\\.Page^XWiki\\.Class.property");
-                will(returnValue("xwiki/2.0"));
+                oneOf(dmb).getSyntax();
+                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
             }
         });
 
@@ -255,14 +312,20 @@ public class DefaultIOTargetServiceTest extends AbstractComponentTestCase
     @Test
     public void testGetterWhenTargetIsTypedIndexedRelativeObjectProperty() throws Exception
     {
+        final DocumentModelBridge dmb = getMockery().mock(DocumentModelBridge.class);
         getMockery().checking(new Expectations()
         {
             {
                 // this will fail if defaults fail, not very well isolated
-                oneOf(dabMock).getProperty("xwiki:Main.WebHome", "Classes.Class", 3, "property");
+                allowing(classResolver).resolve("Classes.Class");
+                will(returnValue(new DocumentReference("xwiki", "Classes", "Class")));
+                oneOf(dabMock).getProperty(new DocumentReference("xwiki", "Main", "WebHome"),
+                    new DocumentReference("xwiki", "Classes", "Class"), 3, "property");
                 will(returnValue("defcontent"));
-                oneOf(dabMock).getDocumentSyntaxId("xwiki:Main.WebHome");
-                will(returnValue("xwiki/2.0"));
+                oneOf(dabMock).getDocument(new DocumentReference("xwiki", "Main", "WebHome"));
+                will(returnValue(dmb));
+                oneOf(dmb).getSyntax();
+                will(returnValue(new Syntax(SyntaxType.XWIKI,"2.0")));
             }
         });
 

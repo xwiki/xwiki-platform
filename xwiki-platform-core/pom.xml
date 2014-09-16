@@ -568,6 +568,20 @@
               <field>xClassEntityReferenceResolver</field>
               <justification>Not really an APIs.</justification>
             </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/annotation/io/IOTargetService</className>
+              <method>org.xwiki.rendering.block.XDOM getXDOM(java.lang.String)</method>
+              <justification>The annotation API already needs a larger refactoring, this small fix stay in line
+                with the existing API and does not deserve the creation of a new (temporary) API.</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/annotation/io/IOTargetService</className>
+              <method>org.xwiki.rendering.block.XDOM getXDOM(java.lang.String, java.lang.String)</method>
+              <justification>The annotation API already needs a larger refactoring, this small fix stay in line
+                with the existing API and does not deserve the creation of a new (temporary) API.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

@@ -20,6 +20,7 @@
 package org.xwiki.annotation.io;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.rendering.block.XDOM;
 
 /**
  * This service provides functions to operate with annotations targets. It operates with string serialized references to
@@ -36,7 +37,9 @@ public interface IOTargetService
      * @param reference serialized string reference of the content to get the source for
      * @return the source of the referenced content
      * @throws IOServiceException if any exception occurs when manipulating sources
+     * @deprecated use {@link #getXDOM(String)}
      */
+    @Deprecated
     String getSource(String reference) throws IOServiceException;
 
     /**
@@ -45,4 +48,27 @@ public interface IOTargetService
      * @throws IOServiceException if any exception occurs when manipulating sources
      */
     String getSourceSyntax(String reference) throws IOServiceException;
+
+    /**
+     * @param reference serialized string reference of the content to get the XDOM for
+     * @return the XDOM of the referenced content
+     * @throws IOServiceException if any exception occurs when manipulating sources
+     * @since 6.2
+     *
+     * TODO: While we use String for reference to stay in the style of the existing API, it would be better to use
+     *       EntityReference when this API get more largely refactored.
+     */
+    XDOM getXDOM(String reference) throws IOServiceException;
+
+    /**
+     * @param reference serialized string reference of the content to get the XDOM for
+     * @param syntax the syntax of the source of the referenced content
+     * @return the XDOM of the referenced content
+     * @throws IOServiceException if any exception occurs when manipulating sources
+     * @since 6.2
+     *
+     * TODO: While we use String for reference and syntax to stay in the style of the existing API, it would be
+     *       better to use EntityReference and SyntaxId when this API get more largely refactored.
+     */
+    XDOM getXDOM(String reference, String syntax) throws IOServiceException;
 }

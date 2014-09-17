@@ -336,6 +336,7 @@
       <code>#template('colorThemeInit.vm')
 ul.searchEngines {
   margin-top: 1.2em;
+  text-transform: capitalize;
 }
 ul.searchSuggestSources {
   border: 1px solid $theme.borderColor;

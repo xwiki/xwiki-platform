@@ -190,7 +190,8 @@ public class X509KeyWikiStore extends AbstractX509WikiStore implements KeyStore
             byte[] key = getEncoder().decode(pkObj.getLargeStringValue(PRIVATEKEYCLASS_PROP_KEY));
 
             if (password != null) {
-                return new CertifiedKeyPair(this.encryptor.decrypt(password, key), getCertificateFactory().decode(cert));
+                return new CertifiedKeyPair(
+                    this.encryptor.decrypt(password, key), getCertificateFactory().decode(cert));
             } else {
                 return new CertifiedKeyPair(this.keyFactory.fromPKCS8(key), getCertificateFactory().decode(cert));
             }

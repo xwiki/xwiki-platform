@@ -1296,11 +1296,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         parameters.setTitleDisplayed(true);
         parameters.setExecutionContextIsolated(true);
         parameters.setTargetSyntax(outputSyntax);
-        XDOM titleXDOM = getDocumentDisplayer().display(this, parameters);
         try {
+            XDOM titleXDOM = getDocumentDisplayer().display(this, parameters);
             return renderXDOM(titleXDOM, outputSyntax);
-        } catch (XWikiException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            // We've failed to extract the Document's title or to render it. We log an error but we use the page name
+            // as the returned title in order to not generate errors in lots of places in the wiki (e.g. Activity
+            // Stream, menus, etc). The title is used in a lots of places...
+            return getDocumentReference().getName();
         }
     }
 

@@ -92,7 +92,7 @@ public class ContextTest extends AbstractComponentTestCase
     }
 
     /**
-     * Tests that pages can override the default property display mode using {@code $context.setDisplayMode}.
+     * Tests that pages can override the default property display mode using {@code $xcontext.setDisplayMode}.
      *
      * @see "XWIKI-2436."
      */

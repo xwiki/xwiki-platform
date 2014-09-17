@@ -233,8 +233,7 @@ public class MockitoOldcoreRule implements MethodRule
                     XWikiDocument document = documents.get(target);
 
                     if (document == null) {
-                        document = new XWikiDocument(target);
-                        document.setLocale(target.getLocale());
+                        document = new XWikiDocument(target, target.getLocale());
                         document.setSyntax(Syntax.PLAIN_1_0);
                         document.setOriginalDocument(document.clone());
                     }

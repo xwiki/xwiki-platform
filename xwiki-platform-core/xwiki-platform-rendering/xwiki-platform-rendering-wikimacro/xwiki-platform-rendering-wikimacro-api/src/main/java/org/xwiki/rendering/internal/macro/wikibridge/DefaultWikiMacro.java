@@ -213,7 +213,7 @@ public class DefaultWikiMacro implements WikiMacro, NestedScriptMacroEnabled
             Transformation macroTransformation = this.componentManager.getInstance(Transformation.class, MACRO_HINT);
 
             if (xwikiContext != null) {
-                // Place macro context inside xwiki context ($context.macro).
+                // Place macro context inside xwiki context ($xcontext.macro).
                 xwikiContext.put(MACRO_KEY, macroBinding);
             }
 

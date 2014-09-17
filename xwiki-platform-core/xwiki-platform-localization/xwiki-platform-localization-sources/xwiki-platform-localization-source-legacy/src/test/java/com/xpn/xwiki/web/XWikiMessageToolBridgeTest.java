@@ -111,9 +111,8 @@ public class XWikiMessageToolBridgeTest
         if (!locale.equals(Locale.ROOT)) {
             XWikiDocument translatedDocument = document.getTranslatedDocument(locale, this.oldcore.getXWikiContext());
             if (translatedDocument == document) {
-                translatedDocument = new XWikiDocument(document.getDocumentReference());
+                translatedDocument = new XWikiDocument(document.getDocumentReference(), locale);
                 translatedDocument.setDefaultLocale(document.getDefaultLocale());
-                translatedDocument.setLocale(locale);
                 translatedDocument.setTranslation(1);
             }
             document = translatedDocument;

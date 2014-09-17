@@ -59,7 +59,12 @@ public class ClassFieldEditPane extends BaseElement
     public ClassFieldEditPane(String fieldName)
     {
         this.fieldName = fieldName;
-        container = getDriver().findElement(By.id("field-" + fieldName));
+
+        // Wait for the element to become visible.
+        By containerLocator = By.id("field-" + fieldName);
+        waitUntilElementIsVisible(containerLocator);
+
+        container = getDriver().findElement(containerLocator);
         toolBox = container.findElement(By.className("toolBox"));
     }
 

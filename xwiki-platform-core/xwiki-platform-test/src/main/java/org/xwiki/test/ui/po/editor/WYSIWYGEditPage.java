@@ -23,6 +23,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseElement;
+import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.editor.wysiwyg.EditorElement;
 import org.xwiki.test.ui.po.editor.wysiwyg.RichTextAreaElement;
 
@@ -102,5 +103,59 @@ public class WYSIWYGEditPage extends PreviewableEditPage
     {
         editor.waitToLoad();
         return this;
+    }
+
+    @Override
+    public WikiEditPage editWiki()
+    {
+        // Make sure the editor is loaded before we try to click the edit menu entry.
+        this.waitUntilPageIsLoaded();
+
+        return super.editWiki();
+    }
+
+    @Override
+    public WYSIWYGEditPage editWYSIWYG()
+    {
+        // Make sure the editor is loaded before we try to click the edit menu entry.
+        this.waitUntilPageIsLoaded();
+
+        return super.editWYSIWYG();
+    }
+
+    @Override
+    public <T extends InlinePage> T editInline()
+    {
+        // Make sure the editor is loaded before we try to click the edit menu entry.
+        this.waitUntilPageIsLoaded();
+
+        return super.editInline();
+    }
+
+    @Override
+    public RightsEditPage editRights()
+    {
+        // Make sure the editor is loaded before we try to click the edit menu entry.
+        this.waitUntilPageIsLoaded();
+
+        return super.editRights();
+    }
+
+    @Override
+    public ObjectEditPage editObjects()
+    {
+        // Make sure the editor is loaded before we try to click the edit menu entry.
+        this.waitUntilPageIsLoaded();
+
+        return super.editObjects();
+    }
+
+    @Override
+    public ClassEditPage editClass()
+    {
+        // Make sure the editor is loaded before we try to click the edit menu entry.
+        this.waitUntilPageIsLoaded();
+
+        return super.editClass();
     }
 }

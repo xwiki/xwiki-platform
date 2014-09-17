@@ -1580,9 +1580,7 @@ public class XWiki implements EventListener
         try {
             result = evaluateTemplate(template, context);
         } catch (Exception e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Exception while parsing template [" + template + "] from /templates/", e);
-            }
+            LOGGER.debug("Exception while parsing template [{}] from /templates/", template, e);
         }
 
         return result;

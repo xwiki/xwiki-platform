@@ -69,17 +69,29 @@ public class EditorElement extends BaseElement
             public WebElement apply(WebDriver driver)
             {
                 try {
+                    // Source tab in WYSIWYG editor 2.x syntax
                     getContainer(driver).findElement(
                         By.xpath("//div[@class = 'gwt-TabBarItem gwt-TabBarItem-selected']/div[. = 'Source']"));
                     WebElement sourceTextArea = getContainer(driver).findElement(By.className("xPlainTextEditor"));
                     return sourceTextArea.isEnabled() ? sourceTextArea : null;
                 } catch (NotFoundException sourceNotFound) {
-                    WebElement richTextEditor = getContainer(driver).findElement(By.className("xRichTextEditor"));
                     try {
-                        richTextEditor.findElement(By.className("loading"));
-                        return null;
-                    } catch (NotFoundException loadingNotFound) {
-                        return richTextEditor;
+                        // WYSIWYG editor 2.x syntax
+                        WebElement richTextEditor = getContainer(driver).findElement(By.className("xRichTextEditor"));
+                        try {
+                            richTextEditor.findElement(By.className("loading"));
+                            return null;
+                        } catch (NotFoundException loadingNotFound) {
+                            return richTextEditor;
+                        }
+                    } catch (NotFoundException xRichTextEditorNotFound) {
+                        try {
+                            // TinyMCE editor 1.x syntax
+                            WebElement mceEditor = driver.findElement(By.className("mceEditor"));
+                            return mceEditor;
+                        } catch (NotFoundException mceNotFound) {
+                            return null;
+                        }
                     }
                 }
             }

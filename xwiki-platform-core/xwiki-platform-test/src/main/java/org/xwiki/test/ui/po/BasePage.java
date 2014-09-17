@@ -147,8 +147,8 @@ public class BasePage extends BaseElement
     {
         // Open the edit menu
         getDriver().findElement(By.xpath("//div[@id='tmEdit']//button")).click();
-        // Wait for the dropdown menu to be visible
-        waitUntilElementIsVisible(By.xpath("//div[@id='tmEdit']//ul[@class='dropdown-menu']"));
+        // Wait for the submenu entry to be visible
+        waitUntilElementIsVisible(By.id(id));
         // Click on the specified entry
         getDriver().findElement(By.id(id)).click();
     }

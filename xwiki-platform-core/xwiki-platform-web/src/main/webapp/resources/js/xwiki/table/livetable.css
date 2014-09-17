@@ -232,18 +232,23 @@ tbody.xwiki-livetable-display-body td a.action:hover {
 }
 tbody.xwiki-livetable-display-body td a.actioncopy {
   background-image: url($xwiki.getSkinFile("icons/silk/page_white_copy.png"));
+  text-transform: capitalize;
 }
 tbody.xwiki-livetable-display-body td a.actionrename {
   background-image: url($xwiki.getSkinFile("icons/silk/textfield_rename.png"));
+  text-transform: capitalize;
 }
 tbody.xwiki-livetable-display-body td a.actiondelete {
   background-image: url($xwiki.getSkinFile("icons/silk/cross.png"));
+  text-transform: capitalize;
 }
 tbody.xwiki-livetable-display-body td a.actionrights {
   background-image: url($xwiki.getSkinFile("icons/silk/lock_edit.png"));
+  text-transform: capitalize;
 }
 tbody.xwiki-livetable-display-body td a.actionedit {
   background-image: url($xwiki.getSkinFile("icons/silk/page_white_edit.png"));
+  text-transform: capitalize;
 }
 tbody.xwiki-livetable-display-body td._images img {
   margin-right: 2px;

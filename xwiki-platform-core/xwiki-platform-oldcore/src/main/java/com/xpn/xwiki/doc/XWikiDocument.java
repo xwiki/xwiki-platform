@@ -6414,9 +6414,22 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * 
      * @return the default edit mode for this document ("edit" or "inline" usually)
      * @param context the context of the request for this document
-     * @throws XWikiException if an error happens when computing the edit mode
+     * @throws XWikiException since XWiki 6.3M1 it's not used anymore and "edit" is returned in case of error, with an
+     *         error log
      */
     public String getDefaultEditMode(XWikiContext context) throws XWikiException
+    {
+        try {
+            return getDefaultEditModeInternal(context);
+        } catch (Exception e) {
+            // If an error happens then we default to the "edit" mode. We don't want to fail by throwing an exception
+            // since it'll lead to several errors in the UI (such as when evaluating contentview.vm for example).
+            LOGGER.error("Failed to get the default edit mode for [{}]", getDocumentReference(), e);
+            return "edit";
+        }
+    }
+
+    private String getDefaultEditModeInternal(XWikiContext context) throws XWikiException
     {
         String editModeProperty = "defaultEditMode";
         DocumentReference editModeClass =

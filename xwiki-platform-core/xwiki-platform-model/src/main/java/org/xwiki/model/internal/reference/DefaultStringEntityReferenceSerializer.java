@@ -19,16 +19,14 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.apache.commons.lang3.StringUtils;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
-
-import static org.xwiki.model.internal.reference.StringReferenceSeparators.DBLESCAPE;
-import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPE;
 import static org.xwiki.model.internal.reference.StringReferenceSeparators.ESCAPES;
 import static org.xwiki.model.internal.reference.StringReferenceSeparators.REPLACEMENTS;
 import static org.xwiki.model.internal.reference.StringReferenceSeparators.WIKISEP;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.text.StringUtils;
 
 /**
  * Generate a string representation of an entity reference (eg "wiki:space.page" for a document reference in the "wiki"
@@ -62,7 +60,7 @@ public class DefaultStringEntityReferenceSerializer extends AbstractStringEntity
             representation.append(StringUtils.replaceEach(currentReference.getName(), currentEscapeChars,
                 REPLACEMENTS.get(currentType)));
         } else {
-            representation.append(currentReference.getName().replace(ESCAPE, DBLESCAPE));
+            representation.append(StringUtils.doubleChar(currentReference.getName(), '\\'));
         }
     }
 }

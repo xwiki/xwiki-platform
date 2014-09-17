@@ -128,9 +128,8 @@ public class DocumentTranslationBundleFactoryTest
         if (!locale.equals(Locale.ROOT)) {
             XWikiDocument tdocument = document.getTranslatedDocument(locale, this.oldcore.getXWikiContext());
             if (tdocument == document) {
-                tdocument = new XWikiDocument(document.getDocumentReference());
+                tdocument = new XWikiDocument(document.getDocumentReference(), locale);
                 tdocument.setDefaultLocale(document.getDefaultLocale());
-                tdocument.setLocale(locale);
                 tdocument.setTranslation(1);
             }
             document = tdocument;

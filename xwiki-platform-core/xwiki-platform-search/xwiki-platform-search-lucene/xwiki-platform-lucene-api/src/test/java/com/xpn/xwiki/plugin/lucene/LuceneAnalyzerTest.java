@@ -75,10 +75,10 @@ public class LuceneAnalyzerTest
             f.mkdirs();
         }
 
-        this.document = new XWikiDocument(new DocumentReference("xwiki", "space", "lucene analyzer test page"));
+        this.document =
+            new XWikiDocument(new DocumentReference("xwiki", "space", "lucene analyzer test page"), Locale.GERMAN);
         this.document.setSyntax(Syntax.XWIKI_2_1);
         this.document.setContent("Paris Iasi Berlin München");
-        this.document.setLocale(Locale.GERMAN);
     }
 
     private void prepareAndIndexWithAnalyzer(Class analyzer) throws Exception

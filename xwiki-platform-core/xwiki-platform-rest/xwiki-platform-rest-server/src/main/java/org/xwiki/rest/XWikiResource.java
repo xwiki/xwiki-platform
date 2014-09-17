@@ -202,8 +202,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
                     throw new WebApplicationException(Status.NOT_FOUND);
                 } else {
                     XWikiDocument xwikiDocument =
-                            new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName));
-                    xwikiDocument.setLocale(locale);
+                        new XWikiDocument(new DocumentReference(wikiName, spaceName, pageName), locale);
                     doc = new Document(xwikiDocument, getXWikiContext());
 
                     existed = false;

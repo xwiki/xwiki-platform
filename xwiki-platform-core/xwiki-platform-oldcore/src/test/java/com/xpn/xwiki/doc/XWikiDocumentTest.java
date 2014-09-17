@@ -947,8 +947,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("<b>bold</b>", this.document.getRenderedContent(getContext()));
 
-        this.translatedDocument = new XWikiDocument(this.document.getDocumentReference());
-        this.translatedDocument.setLocale(Locale.FRENCH);
+        this.translatedDocument = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
         this.translatedDocument.setContent("~italic~");
         this.translatedDocument.setSyntax(Syntax.XWIKI_2_0);
         this.translatedDocument.setNew(false);
@@ -968,8 +967,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent(getContext()));
 
-        this.translatedDocument = new XWikiDocument(this.document.getDocumentReference());
-        this.translatedDocument.setLocale(Locale.FRENCH);
+        this.translatedDocument = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
         this.translatedDocument.setContent("//italic//");
         this.translatedDocument.setSyntax(Syntax.XWIKI_1_0);
         this.translatedDocument.setNew(false);

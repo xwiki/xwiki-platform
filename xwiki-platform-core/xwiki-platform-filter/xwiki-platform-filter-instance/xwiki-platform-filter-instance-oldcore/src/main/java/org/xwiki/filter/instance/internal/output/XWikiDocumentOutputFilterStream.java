@@ -273,7 +273,7 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
     {
         this.document =
             new XWikiDocument(this.entityResolver.resolve(this.currentEntityReference, this.properties != null
-                ? this.properties.getDefaultReference() : null));
+                ? this.properties.getDefaultReference() : null), this.currentLocale);
 
         this.document.setCreationDate(getDate(WikiDocumentFilter.PARAMETER_CREATION_DATE, this.currentLocaleParameters,
             null));
@@ -284,8 +284,6 @@ public class XWikiDocumentOutputFilterStream implements XWikiDocumentFilter
         this.document.setDefaultLocale(this.currentDefaultLocale);
 
         this.document.setSyntax(getSyntax(WikiDocumentFilter.PARAMETER_SYNTAX, parameters, null));
-
-        this.document.setLocale(this.currentLocale);
 
         this.document.setParentReference(getEntityReference(WikiDocumentFilter.PARAMETER_PARENT, parameters, null));
         this.document.setCustomClass(getString(WikiDocumentFilter.PARAMETER_CUSTOMCLASS, parameters, null));

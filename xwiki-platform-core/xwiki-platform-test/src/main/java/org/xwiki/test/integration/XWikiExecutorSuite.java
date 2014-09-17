@@ -28,22 +28,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.extensions.cpsuite.ClasspathSuite;
+import org.junit.runner.Description;
 import org.junit.runner.Runner;
+import org.junit.runner.manipulation.Filter;
+import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Starts/Stop XWiki before/after all tests and run all tests found in the current classloader using <a
  * href="http://www.johanneslink.net/projects/cpsuite.jsp">cpsuite</a> (we extend it). Tests can be filtered by passing
  * the "pattern" System Property.
+ * <p>
+ * More details on the "pattern" System Property, it's syntax and examples are found in the
+ * {@link XWikiExecutorTestMethodFilter} class.
  * 
  * @version $Id$
  * @since 3.0RC1
  */
 public class XWikiExecutorSuite extends ClasspathSuite
 {
-    public static final String PATTERN = ".*" + System.getProperty("pattern", "");
+    public static final String PATTERN = String.format(".*(%s)", System.getProperty("pattern", ""));
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(XWikiExecutorSuite.class);
+
+    private static final Filter METHOD_FILTER = new XWikiExecutorTestMethodFilter(PATTERN);
 
     private List<XWikiExecutor> executors = new ArrayList<XWikiExecutor>();
 
@@ -84,10 +96,23 @@ public class XWikiExecutorSuite extends ClasspathSuite
     {
         List<Runner> runners = new ArrayList<Runner>();
 
-        // Filter classes to run
+        // Filter the test classes to run.
         for (Runner runner : super.getChildren()) {
-            if (runner.getDescription().getClassName().matches(PATTERN)) {
+            Description description = runner.getDescription();
+            String runnerName = description.getClassName();
+
+            if (runnerName.matches(PATTERN)) {
+                // If the entire test class matches, add it.
                 runners.add(runner);
+            } else {
+                // Otherwise, filter the test methods to run.
+                try {
+                    METHOD_FILTER.apply(runner);
+                    // If the runner still has tests remaining after the filtering, add it.
+                    runners.add(runner);
+                } catch (NoTestsRemainException e) {
+                    LOGGER.info("Skipping test class: {}", description.getClassName());
+                }
             }
         }
 

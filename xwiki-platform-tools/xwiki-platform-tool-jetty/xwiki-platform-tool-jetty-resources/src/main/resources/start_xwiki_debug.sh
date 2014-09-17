@@ -169,14 +169,23 @@ XWIKI_OPTS="$XWIKI_OPTS -Dfile.encoding=UTF8"
 # Note that setting this value too high can leave your server vulnerable to denial of service attacks.
 XWIKI_OPTS="$XWIKI_OPTS -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1000000"
 
-# In order to get the PID, start java in the background , get the PID and wait for it to be finished.
-# However doing this prevents sending any signal to the JVM (since it's running in the background).
-# Thus we trap the INT signal (which is sent when the user presses ctrl-c) to the JVM process with the trap command.
-java $XWIKI_OPTS -jar $JETTY_HOME/start.jar ${JETTY_HOME}/etc/jetty.xml ${JETTY_HOME}/etc/jetty-*.xml &
-XWIKI_PID=$!
+# We save the shell PID here because we do an exec below and exec will replace the shell with the executed command
+# and thus the java process PID will actually be the shell PID.
+XWIKI_PID=$$
 echo $XWIKI_PID > $XWIKI_LOCK_FILE
-trap "kill ${XWIKI_PID}; exit 1" INT
-wait $XWIKI_PID 
 
-# Remove XWiki lock file
-rm -f $XWIKI_LOCK_FILE
+(
+  # Wait till the java process doesn't exist anymore (which will happen if the user presses crtl-c or
+  # if stop_xwiki.sh is called.
+  while :; do
+    # Break the loop when kill returns non 0 results, i.e. when the java process doesn't exist anymore
+    kill -0 $XWIKI_PID 2>/dev/null || break
+    sleep 1
+  done
+  # Remove XWiki lock file
+  rm -f $XWIKI_LOCK_FILE
+) &
+
+# This replaces the shell with the java process without starting a new process. This must be the last line
+# of this script as anything after won't be executed.
+exec java $XWIKI_OPTS -jar $JETTY_HOME/start.jar ${JETTY_HOME}/etc/jetty.xml ${JETTY_HOME}/etc/jetty-*.xml

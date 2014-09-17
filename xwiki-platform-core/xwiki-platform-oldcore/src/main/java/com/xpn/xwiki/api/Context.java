@@ -325,7 +325,7 @@ public class Context extends Api
      * form <code>XWiki.UserLogin</code>. If the user comes from another wiki the full prefixed name will be returned as
      * in <code>wikiid:XWiki.UserLogin</code>. At the same time this method returns the name of the document containing
      * the current user's profile so in Velocity you can do, for instance,
-     * <code>$xwiki.getDocument($context.user)</code> to find out more about the current user, like his/hers real name
+     * <code>$xwiki.getDocument($xcontext.user)</code> to find out more about the current user, like his/hers real name
      * or e-mail address.
      * 
      * @return The current user which made the request.

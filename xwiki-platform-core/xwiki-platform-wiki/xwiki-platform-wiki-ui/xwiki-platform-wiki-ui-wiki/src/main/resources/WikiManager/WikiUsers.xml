@@ -611,7 +611,7 @@
     &lt;/dl&gt;
     &lt;p class="buttons"&gt;
       &lt;span class='buttonwrapper'&gt;
-        &lt;input type="submit" class="button" value="save"/&gt;
+        &lt;input type="submit" class="button" value="$services.localization.render('admin.save')"/&gt;
       &lt;/span&gt;
     &lt;/p&gt;
 {{/html}}

@@ -131,7 +131,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
             velocityManager.getVelocityEngine().evaluate(vcontext, writer, name, content);
             return writer.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error while parsing velocity template namespace [{}]", name, e);
             Object[] args = {name};
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,

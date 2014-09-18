@@ -2606,3 +2606,17 @@ Recursive title display detected!##
  * Should be used in HTML.
  *#
 #macro(breadcrumb_current_line $title)<span class="current">$title</span>#end
+
+###
+### Displays an exception.
+###
+### @param exception The exception to format for displaying
+#macro(displayException $exception)
+<div class="xwikirenderingerror" title="Read technical information related to this error" style="cursor: pointer;">
+    Unexpected error: Failed to render content. Contact your administrator or
+    <a href="http://jira.xwiki.org">report the issue</a>. Click this box to get technical details.
+</div>
+<div class="xwikirenderingerrordescription hidden">
+    <pre>$exceptiontool.getStackTrace($exception)</pre>
+</div>
+#end

@@ -1398,6 +1398,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // We've failed to extract the Document's title or to render it. We log an error but we use the page name
             // as the returned title in order to not generate errors in lots of places in the wiki (e.g. Activity
             // Stream, menus, etc). The title is used in a lots of places...
+            LOGGER.error("Failed to render title for [{}]", getDocumentReference(), e);
             return getDocumentReference().getName();
         }
     }
@@ -5083,6 +5084,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     public List<String> getIncludedPages(XWikiContext context)
+    {
+        try {
+            return getIncludedPagesInternal(context);
+        } catch (Exception e) {
+            // If an error happens then we return an empty list of included pages. We don't want to fail by throwing an
+            // exception since it'll lead to several errors in the UI (such as in the Information Panel in edit mode).
+            LOGGER.error("Failed to get included pages for [{}]", getDocumentReference(), e);
+            return Collections.emptyList();
+        }
+    }
+
+    private List<String> getIncludedPagesInternal(XWikiContext context)
     {
         if (is10Syntax()) {
             return getIncludedPagesForXWiki10Syntax(getContent(), context);

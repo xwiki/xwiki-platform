@@ -51,8 +51,7 @@ public class BaseElement
 
     public BaseElement()
     {
-        ElementLocatorFactory finder =
-            new AjaxElementLocatorFactory(getDriver(), getUtil().getTimeout());
+        ElementLocatorFactory finder = new AjaxElementLocatorFactory(getDriver(), getUtil().getTimeout());
         PageFactory.initElements(finder, this);
     }
 
@@ -80,9 +79,8 @@ public class BaseElement
     }
 
     /**
-     * Wait until the element given by the locator is displayed. Give up after specified timeout
-     * (in seconds).
-     * <p></p>
+     * Wait until the element given by the locator is displayed. Give up after specified timeout (in seconds).
+     * <p/>
      * Only use this API if you absolutely need a longer timeout than the default, otherwise use
      * {@link #waitUntilElementIsVisible(org.openqa.selenium.By)}.
      *
@@ -366,5 +364,39 @@ public class BaseElement
         } catch (WebDriverException e) {
             // Ignore.
         }
+    }
+
+    /**
+     * Waits until the provided javascript expression returns {@code true}.
+     * <p/>
+     * The wait is done while the expression returns {@code false}.
+     * 
+     * @param booleanExpression the javascript expression to wait for to return {@code true}. The expression must have a
+     *            {@code return} statement on the last line, e.g. {@code "return window.jQuery != null"}
+     * @param arguments any arguments passed to the javascript expression
+     * @throws IllegalArgumentException if the evaluated expression does not return a boolean result
+     * @see #executeJavascript(String, Object...)
+     * @since 6.2
+     */
+    public void waitUntilJavascriptCondition(final String booleanExpression, final Object... arguments)
+        throws IllegalArgumentException
+    {
+        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                boolean result = false;
+
+                Object rawResult = executeJavascript(booleanExpression, arguments);
+                if (rawResult instanceof Boolean) {
+                    result = (Boolean) rawResult;
+                } else {
+                    throw new IllegalArgumentException("The executed javascript does not return a boolean value");
+                }
+
+                return result;
+            }
+        });
     }
 }

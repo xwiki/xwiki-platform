@@ -1832,8 +1832,7 @@ public class XWiki implements EventListener
             }
 
             // Look for a skin file
-            String path = "/skins/" + skin + "/" + filename;
-            if (resourceExists(path)) {
+            if (resourceExists("/skins/" + skin + "/" + filename)) {
                 URL url;
 
                 if (forceSkinAction) {
@@ -1845,8 +1844,7 @@ public class XWiki implements EventListener
             }
 
             // Look for a resource file
-            path = "/resources/" + filename;
-            if (resourceExists(path)) {
+            if (resourceExists("/resources/" + filename)) {
                 URL url;
                 url = urlf.createResourceURL(filename, forceSkinAction, context);
                 return urlf.getURL(url, context);

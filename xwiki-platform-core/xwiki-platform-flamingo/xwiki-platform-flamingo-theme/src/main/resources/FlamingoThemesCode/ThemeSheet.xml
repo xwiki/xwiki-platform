@@ -562,7 +562,7 @@ div#preview-curtain{
                 &lt;div class="alert alert-warning"&gt;$services.localization.render("platform.flamingo.themes.lessCode.warning")&lt;/div&gt;
               #end
               &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="form-control" rows="6"&gt;
-                $!doc.getValue($varName, $obj)
+                $escapetool.xml($!doc.getValue($varName, $obj))
               &lt;/textarea&gt;
             #else
               &lt;input type="text" class="form-control #if($varType=='color')procolor#end" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$escapetool.xml($!doc.getValue($varName, $obj))"&gt;

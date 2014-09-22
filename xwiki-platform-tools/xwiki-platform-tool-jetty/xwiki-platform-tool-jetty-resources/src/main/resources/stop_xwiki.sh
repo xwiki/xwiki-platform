@@ -112,24 +112,27 @@ XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOP_PORT"
 # Specify Jetty's home directory
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME"
 
-[ ! -e $XWIKI_LOCK_FILE ] && echo "Lock [${XWIKI_LOCK_FILE}] missing" && exit 0;
-
-echo Attempting to stop XWiki cleanly on port ${JETTY_PORT}...;
-
-java $XWIKI_OPTS -jar $JETTY_HOME/start.jar --stop
-waitForLockDeletion $XWIKI_LOCK_FILE && exit 0;
-
-echo 'Failed to stop XWiki cleanly, attempting kill...';
-
-kill `cat $XWIKI_LOCK_FILE`
-waitForLockDeletion $XWIKI_LOCK_FILE && exit 0;
-
-echo 'Failed to kill XWiki, attempting kill -9...';
-
-kill -9 `cat $XWIKI_LOCK_FILE`
-waitForLockDeletion $XWIKI_LOCK_FILE && exit 0;
+[ ! -e $XWIKI_LOCK_FILE ] && echo "Lock file [${XWIKI_LOCK_FILE}] is missing. Aborting stop." && exit 0
 
 if ps -p `cat $XWIKI_LOCK_FILE` > /dev/null; then
-  echo Failed to kill XWiki, giving up!
+  # An XWiki instance is still running
+
+  echo Attempting to stop XWiki cleanly on port ${JETTY_PORT}...
+  java $XWIKI_OPTS -jar $JETTY_HOME/start.jar --stop
+  waitForLockDeletion $XWIKI_LOCK_FILE && exit 0
+
+  echo 'Failed to stop XWiki cleanly, attempting kill...'
+  kill `cat $XWIKI_LOCK_FILE`
+  waitForLockDeletion $XWIKI_LOCK_FILE && exit 0
+
+  echo 'Failed to kill XWiki, attempting kill -9...'
+  kill -9 `cat $XWIKI_LOCK_FILE`
+  waitForLockDeletion $XWIKI_LOCK_FILE && exit 0
+
+  if ps -p `cat $XWIKI_LOCK_FILE` > /dev/null; then
+    echo "Failed to kill XWiki, giving up!"
+  fi
+  rm -f $XWIKI_LOCK_FILE
+else
+  echo "Lock file [${XWIKI_LOCK_FILE}] doesn't point to any running XWiki instance. Aborting stop." && exit 0
 fi
-rm -f $XWIKI_LOCK_FILE

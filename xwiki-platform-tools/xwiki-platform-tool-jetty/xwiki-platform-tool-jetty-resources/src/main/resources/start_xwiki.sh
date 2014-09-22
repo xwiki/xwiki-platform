@@ -33,7 +33,6 @@
 #   -sp, --stopport: The Jetty stop port to use. Overrides any value from JETTY_STOP_PORT. Defaults to 8079.
 #   -ld, --lockdir: The directory where the executing process id is stored to verify that that only one instance is
 #       started. Defaults to /var/tmp.
-#   -k, --kill: If set then kills any already executing XWiki instance before starting a new one.
 #
 # Example
 # -------
@@ -92,9 +91,6 @@ while [[ $# > 0 ]]; do
       XWIKI_LOCK_DIR="$1"
       shift
       ;;
-    -k|--kill)
-      XWIKI_KILL="true"
-      ;;
     *)
       # unknown option
       ;;
@@ -106,15 +102,9 @@ XWIKI_LOCK_FILE="${XWIKI_LOCK_DIR}/xwiki-${JETTY_PORT}.lck"
 
 if [ -e $XWIKI_LOCK_FILE ]; then
   if ps -p `cat $XWIKI_LOCK_FILE` > /dev/null; then
-    # An XWiki instance is still running
-    if [ "$XWIKI_KILL" == "true" ]; then
-      echo An XWiki instance is already running on port ${JETTY_PORT}, stopping it!
-      /bin/bash stop_xwiki.sh -p $JETTY_PORT -sp $JETTY_STOP_PORT -ld $XWIKI_LOCK_DIR
-    else
-      echo An XWiki instance is already running on port ${JETTY_PORT}. Aborting...
-      echo Consider calling stop_xwiki.sh to stop it.
-      exit 1
-    fi
+    echo An XWiki instance is already running on port ${JETTY_PORT}. Aborting...
+    echo Consider calling stop_xwiki.sh to stop it.
+    exit 1
   else
     echo An XWiki lock file exists at ${XWIKI_LOCK_FILE} but no XWiki is executing. Removing lock file...
     rm -f $XWIKI_LOCK_FILE

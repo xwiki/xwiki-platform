@@ -123,9 +123,22 @@
       #set($multiselect = $class.get($order).getProperty('multiSelect').getValue())
       #if("$multiselect" != '1')
         #livetable_getTableName($order)
+        ##If the sort column has a _class specified, join that object in
+        #set($orderObjectAlias = 'obj')
+        #if ($propClassName != '' &amp;&amp; "$!propClass" != '')
+          ## prepare the alias of the BaseObject table that corresponds to the class of this column
+          #set($orderObjectAlias = "$!{propClassName.replaceAll('[^a-zA-Z0-9_]','')}_obj")
+          ## if the object for the classname of the order column is not already in the from sql, put it
+          #if ($fromSql.indexOf($orderObjectAlias) &lt; 0)
+            #set($fromSql = "${fromSql}, BaseObject $orderObjectAlias")
+            #set($whereSql = "${whereSql} and ${orderObjectAlias}.name = doc.fullName and ${orderObjectAlias}.className = ?")
+            #set($discard = $whereParams.add($propClassName))
+          #end
+        #end
         #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
         ## FIXME: Check if this is indeed a property of the class
-        #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
+        ##Conditions are put on the object coresponding to the column of the order ($orderObjectAlias), which depends on which is the class of the $order
+        #set($whereSql = "${whereSql} and ${orderObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
         #set($discard = $whereParams.add("${order}"))
         #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
       #end
@@ -570,6 +583,19 @@
   ##
   ## Filter values
   #if("$!filterValue" != '')
+    ## If the column is not from $class, we need to make sure we join with the proper table
+    #set($filterObjectAlias = 'obj')
+    #if ($propClassName != '' &amp;&amp; "$!propClass" != '')
+      ## prepare the alias of the BaseObject table that corresponds to the class of this column
+      ## Property table is to be joined with its object, determined depending on $propClassName
+      #set($filterObjectAlias = "$!{propClassName.replaceAll('[^a-zA-Z0-9_]','')}_obj")
+      ## if the object for the classname of the order column is not already in the from sql, put it
+      #if ($fromSql.indexOf($filterObjectAlias) &lt; 0)
+        #set($fromSql = "${fromSql}, BaseObject $filterObjectAlias")
+        #set($whereSql = "${whereSql} and ${filterObjectAlias}.name = doc.fullName and ${filterObjectAlias}.className = ?")
+        #set($discard = $whereParams.add($propClassName))
+      #end
+    #end
     #set($discard = $tablelist.add($tableAlias))
     #if($colname.startsWith('doc.'))
       #set($whereSql = "${whereSql} and upper(str(${safe_colname.replace('_','.')})) like upper(?)")
@@ -577,7 +603,7 @@
     #elseif($propType == 'NumberClass' || $propType == 'BooleanClass')
       #livetable_getTableName($colname)
       #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
+      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
       #set($numberValue = $mathtool.toInteger(${filterValue}))
       ## Handle long properties specially, explicitly converting the value to java long values. See http://jira.xwiki.org/browse/XWIKI-11000
       #if($tableName == 'LongProperty')
@@ -586,11 +612,11 @@
       #set($discard = $whereParams.addAll(["${colname}", $numberValue]))
     #elseif($propType == 'DateClass')
       #set($fromSql = "${fromSql}, DateProperty ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(str(${safe_tableAlias}.value)) like upper(?)")
+      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(str(${safe_tableAlias}.value)) like upper(?)")
       #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
     #elseif($propType == 'TextAreaClass' || $propType == 'UsersClass' || $propType == 'GroupsClass')
       #set($fromSql = "${fromSql}, LargeStringProperty ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
+      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
       #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
     #elseif($propType == 'StaticListClass' || $propType == 'DBListClass' || $propType == 'DBTreeListClass')
       #set($multiSelect = $propClass.get($colname).getProperty('multiSelect').getValue())
@@ -604,7 +630,7 @@
           #foreach ($filterValue in $request.getParameterValues($colname))
             #if ($foreach.isFirst())
               #set ($fromSql = "${fromSql}, DBStringListProperty ${safe_tableAlias}")
-              #set ($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and (")
+              #set ($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and (")
               #set ($discard = $whereParams.add("${colname}"))
             #else
               #set ($whereSql = "${whereSql} ${joinOperator}")
@@ -617,17 +643,17 @@
           #end
         #else
           #set($fromSql = "${fromSql}, StringListProperty ${safe_tableAlias}")
-          #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) like upper(?)")
+          #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) like upper(?)")
           #set($discard = $whereParams.addAll(["${colname}", "%|${filterValue}|%"]))
         #end
       #else
         #set($fromSql = "${fromSql}, StringProperty ${safe_tableAlias}")
-        #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
+        #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
         #set($discard = $whereParams.addAll(["${colname}", "${filterValue}"]))
       #end
     #else
       #set($fromSql = "${fromSql}, StringProperty ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
+      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
       #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
     #end
   #end

@@ -917,7 +917,7 @@
       <link-color>#0088CC</link-color>
     </property>
     <property>
-      <logo>default</logo>
+      <logo />
     </property>
     <property>
       <navbar-default-bg>#222222</navbar-default-bg>

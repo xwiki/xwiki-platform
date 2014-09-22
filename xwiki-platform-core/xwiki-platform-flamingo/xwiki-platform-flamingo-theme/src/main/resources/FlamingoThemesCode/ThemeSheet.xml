@@ -243,7 +243,7 @@ require(['jquery'], function($) {
     var setLogo = function(event) {
       var value = $("#var-logo").val();
       var iFrameLogo = iframe.contents().find("#companylogo &gt; a &gt; img");
-      if (value == "default") {
+      if (value == "") {
         var url = "$xwiki.getSkinFile('logo.png')";
         iFrameLogo.attr("src", url);
       } else {
@@ -549,7 +549,7 @@ div#preview-curtain{
             #if($varType == 'logo')
               #set($currentLogo = $obj.getValue('logo'))
               &lt;select name="FlamingoThemesCode.ThemeClass_0_$varName" id="var-$varName"&gt;
-                &lt;option value="default"&gt;$services.localization.render("platform.flamingo.themes.defaultvalue")&lt;/option&gt;
+                &lt;option value=""&gt;$services.localization.render("platform.flamingo.themes.defaultvalue")&lt;/option&gt;
                 #foreach($attachment in $doc.getAttachmentList())
                   #if($attachment.isImage())
                     &lt;option value="$attachment.filename" #if($currentLogo==$attachment.filename)selected="selected"#{end}&gt;$attachment.filename&lt;/option&gt;

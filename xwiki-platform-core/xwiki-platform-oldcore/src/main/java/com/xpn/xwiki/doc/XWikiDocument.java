@@ -3516,7 +3516,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             classNumberAsString = matcher.group(2);
             classPropertyName = matcher.group(3);
             try {
-                DocumentReference classReference = currentDocumentReferenceResolver.resolve(className);
+                DocumentReference classReference = getCurrentDocumentReferenceResolver().resolve(className);
                 BaseClass xClass = xcontext.getWiki().getDocument(classReference, xcontext).getXClass();
                 if (xClass == null) {
                     continue;
@@ -3567,7 +3567,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         for (Entry<String, SortedMap<Integer, Map<String, String[]>>> requestClassEntries : fromRequest.entrySet()) {
             WikiReference wikiRef = this.getDocumentReference().getWikiReference();
             DocumentReference requestClassReference =
-                currentDocumentReferenceResolver.resolve(requestClassEntries.getKey(), wikiRef);
+                getCurrentDocumentReferenceResolver().resolve(requestClassEntries.getKey(), wikiRef);
             SortedMap<Integer, Map<String, String[]>> requestObjectMap = requestClassEntries.getValue();
             List<BaseObject> newObjects = new ArrayList<BaseObject>();
             // for (int requestObjectNumber = 0; requestObjectNumber < requestObjectList.size(); requestObjectNumber++)

@@ -198,6 +198,8 @@ public class XWikiExecutor
         }
 
         if (!this.wasStarted) {
+            LOGGER.info("Stopping any potentially running XWiki server at [{}]", getURL());
+            stopInternal();
             LOGGER.info("Starting XWiki server at [{}]", getURL());
             startXWiki();
             waitForXWikiToLoad();
@@ -344,23 +346,28 @@ public class XWikiExecutor
 
         // Stop XWiki if it was started by start()
         if (!this.wasStarted) {
-            String stopCommand = getDefaultStopCommand(getPort(), getStopPort());
-            LOGGER.debug("Executing command: [{}]", stopCommand);
-            DefaultExecuteResultHandler stopProcessHandler = executeCommand(stopCommand);
-
-            // First wait for the stop process to have stopped, waiting a max of 5 minutes!
-            // It's going to stop the start process...
-            waitForProcessToFinish(stopProcessHandler, PROCESS_FINISH_TIMEOUT);
+            stopInternal();
 
             // Now wait for the start process to be stopped, waiting a max of 5 minutes!
             if (this.startedProcessHandler != null) {
-                waitForProcessToFinish(stopProcessHandler, PROCESS_FINISH_TIMEOUT);
+                waitForProcessToFinish(this.startedProcessHandler, PROCESS_FINISH_TIMEOUT);
             }
 
             LOGGER.info("XWiki server running at [{}] has been stopped", getURL());
         } else {
             LOGGER.info("XWiki server not stopped since we didn't start it (it was already started)");
         }
+    }
+
+    private void stopInternal() throws Exception
+    {
+        String stopCommand = getDefaultStopCommand(getPort(), getStopPort());
+        LOGGER.debug("Executing command: [{}]", stopCommand);
+        DefaultExecuteResultHandler stopProcessHandler = executeCommand(stopCommand);
+
+        // First wait for the stop process to have stopped, waiting a max of 5 minutes!
+        // It's going to stop the start process...
+        waitForProcessToFinish(stopProcessHandler, PROCESS_FINISH_TIMEOUT);
     }
 
     private void waitForProcessToFinish(DefaultExecuteResultHandler handler, long timeout) throws Exception
@@ -518,10 +525,6 @@ public class XWikiExecutor
                 startCommand = String.format("cmd /c start_xwiki.bat %s %s", port, stopPort);
             } else {
                 startCommand = String.format("bash start_xwiki.sh -p %s -sp %s", port, stopPort);
-                if (!VERIFY_RUNNING_XWIKI_AT_START.equals("true")) {
-                    // Kill any already running XWiki instance
-                    startCommand = startCommand + " -k";
-                }
             }
         } else {
             startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(port));

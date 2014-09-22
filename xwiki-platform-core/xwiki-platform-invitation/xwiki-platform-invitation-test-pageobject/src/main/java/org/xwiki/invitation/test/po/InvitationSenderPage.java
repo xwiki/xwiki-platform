@@ -55,12 +55,11 @@ public class InvitationSenderPage extends BasePage
 
     public static InvitationSenderPage gotoPage()
     {
-        InvitationSenderPage page = new InvitationSenderPage();
-        page.getDriver().get(page.getURL());
-        return page;
+        getUtil().gotoPage(getURL());
+        return new InvitationSenderPage();
     }
 
-    public String getURL()
+    public static String getURL()
     {
         return getUtil().getURL("Invitation", "WebHome");
     }

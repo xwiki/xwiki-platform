@@ -115,6 +115,12 @@ public class DefaultIconRenderer implements IconRenderer
         // Get the icon
         Icon icon = iconSet.getIcon(iconName);
 
+        // The icon may not exist
+        if (icon == null) {
+            // return an empty string. Idea: fallback on a different icon instead?
+            return "";
+        }
+
         // Interpret the velocity command
         StringWriter contentToParse = new StringWriter();
         contentToParse.write("#set($icon = \"");

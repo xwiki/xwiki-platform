@@ -35,7 +35,7 @@ public interface IconManager
     /**
      * Generate the wiki syntax to display an icon.
      * @param iconName name of the icon to render
-     * @return the wiki syntax that displays the icon
+     * @return the wiki syntax that displays the icon or an empty string if the icon does not exist
      * @throws IconException if problems occur
      */
     String render(String iconName) throws IconException;
@@ -43,7 +43,7 @@ public interface IconManager
     /**
      * Generate the HTML code to display an icon.
      * @param iconName name of the icon to render
-     * @return the HTML code that displays the icon
+     * @return the HTML code that displays the icon or an empty string if the icon does not exist
      * @throws IconException if problems occur
      */
     String renderHTML(String iconName) throws IconException;

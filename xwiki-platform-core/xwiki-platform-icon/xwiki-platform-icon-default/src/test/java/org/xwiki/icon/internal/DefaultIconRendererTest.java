@@ -218,4 +218,16 @@ public class DefaultIconRendererTest
         verify(skinExtension, never()).use(anyString());
     }
 
+    @Test
+    public void renderNonExistentIcon() throws Exception
+    {
+        IconSet iconSet = new IconSet("default");
+
+        // Test
+        String result = mocker.getComponentUnderTest().render("non-existent-icon", iconSet);
+
+        // Verify
+        assertEquals("", result);
+    }
+
 }

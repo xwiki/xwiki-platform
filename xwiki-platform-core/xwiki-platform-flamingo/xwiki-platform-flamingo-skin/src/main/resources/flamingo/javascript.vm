@@ -74,12 +74,6 @@ $xwiki.jsfx.use('js/scriptaculous/effects.js', true)
 <![endif]-->
 <script type="text/javascript">
 // <![CDATA[
-require.config({
-  ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
-  paths: {
-## We add "?noext" in order to prevent requirejs to add ".js" (since requiresjs will not modify the path if it contians
-## a question mark...)
-    'jquery': "$xwiki.getSkinFile('js/amd/jquery.js')?noext",
 ## Requirejs will automatically add a ".js" suffix if the generated URL doesn't contain a "?". It happens that we
 ## don't generate a URL with "?" when we export in HTML for example. In this case we remove the ".js" suffix since
 ## requirejs will add one...
@@ -87,11 +81,21 @@ require.config({
 ## provide generic URLs and they don't all go through requirejs...
 ## Note that this comment and code below are not correctly indentend voluntarily in order to generate nicely formatted
 ## code at runtime!
-#set ($bootstrapURL = $services.webjars.url('bootstrap/3.2.0/js/bootstrap.js'))
-#if (!$bootstrapURL.contains('?'))
-  #set ($bootstrapURL = $stringtool.removeEnd($bootstrapURL, ".js"))
+#macro(removeJsSuffix $url)#if (!$url.contains('?'))$stringtool.removeEnd($url, '.js'))#else$url#{end}#end
+##
+## Start the requirejs config.
+##
+require.config({
+## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
+  paths: {
+## We handle the ability to disable the minification, by choosing the file extension to add to the script paths.
+#if($request.minify == 'false')
+  #set($jsExtension = '.js')
+#else
+  #set($jsExtension = '.min.js')
 #end
-    'bootstrap': "$bootstrapURL"
+    'jquery': '#removeJsSuffix($services.webjars.url("jquery/1.11.1/jquery${jsExtension}"))',
+    'bootstrap': '#removeJsSuffix($services.webjars.url("bootstrap/3.2.0/js/bootstrap${jsExtension}"))'
   },
   shim: {
     'bootstrap' : ['jquery']

@@ -26,21 +26,20 @@
 #       JVM to 1GB, use set XWIKI_OPTS=-Xmx1024m
 #   JETTY_PORT - the port on which to start Jetty.
 #   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command.
-#
-# Optional Parameters
-# -------------------
-#   -p, --port: The Jetty HTTP port to use. Overrides any value from JETTY_PORT. Defaults to 8080.
-#   -sp, --stopport: The Jetty stop port to use. Overrides any value from JETTY_STOP_PORT. Defaults to 8079.
-#   -ld, --lockdir: The directory where the executing process id is stored to verify that that only one instance is
-#       started. Defaults to /var/tmp.
-#   -yp, --yourkitpath: The path where Yourkit can find the agent. If not passed then YourKit won't be enabled.
-#       For example: "/Applications/YourKit Java Profiler 7.0.11.app/bin/mac"
-#       or "/home/User/yjp-11.0.8/bin/linux-x86-64/"
-#
-# Example
-# -------
-#   start_xwiki_debug.sh -yp "/Applications/YourKit Java Profiler 7.0.11.app/bin/mac"
 # ----------------------------------------------------------------------------------------------------------------
+
+usage() {
+  echo "Usage: start_xwiki.sh <optional parameters>"
+  echo "-p, --port: The Jetty HTTP port to use. Overrides any value from JETTY_PORT. Defaults to 8080."
+  echo "-sp, --stopport: The Jetty stop port to use. Overrides any value from JETTY_STOP_PORT. Defaults to 8079."
+  echo "-ld, --lockdir: The directory where the executing process id is stored to verify that that only one instance"
+  echo "    is started. Defaults to /var/tmp."
+  echo "-yp, --yourkitpath: The path where Yourkit can find the agent. If not passed then YourKit won't be enabled."
+  echo "    For example: \"/Applications/YourKit Java Profiler 7.0.11.app/bin/mac\""
+  echo "    or \"/home/User/yjp-11.0.8/bin/linux-x86-64/\""
+  echo ""
+  echo "Example: start_xwiki_debug.sh -yp \"/Applications/YourKit Java Profiler 7.0.11.app/bin/mac\""
+}
 
 # Ensure that the commands below are always started in the directory where this script is located.
 # To do this we compute the location of the current script.
@@ -100,8 +99,14 @@ while [[ $# > 0 ]]; do
       YOURKIT_PATH="$1"
       shift
       ;;
+    -h|--help)
+      usage
+      exit 1
+      ;;
     *)
       # unknown option
+      usage
+      exit 1
       ;;
   esac
 done

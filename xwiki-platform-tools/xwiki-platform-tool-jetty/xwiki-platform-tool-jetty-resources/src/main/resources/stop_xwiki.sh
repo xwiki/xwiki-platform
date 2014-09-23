@@ -24,19 +24,19 @@
 # -----------------
 #   XWIKI_OPTS - parameters passed to the Java VM when running XWiki e.g. to increase the memory allocated to the
 #       JVM to 1GB, use set XWIKI_OPTS=-Xmx1024m
+#   JETTY_PORT - the port on which Jetty was started.
 #   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command.
-#
-# Optional Parameters
-# -------------------
-#   -p, --port: The Jetty HTTP port that was used to start XWiki. Defaults to 8080.
-#   -sp, --stopport: The Jetty stop port to use. Overrides any value from JETTY_STOP_PORT. Defaults to 8079.
-#   -ld, --lockdir: The directory where the executing process id is stored to verify that that only one instance is
-#       started. Defaults to /var/tmp.
-#
-# Example
-# -------
-#   stop_xwiki.sh -sp 8079
 # ----------------------------------------------------------------------------------------------------------------
+
+usage() {
+  echo "Usage: stop_xwiki.sh <optional parameters>"
+  echo "-p, --port: The Jetty HTTP port that was used to start XWiki. Defaults to 8080."
+  echo "-sp, --stopport: The Jetty stop port to use. Overrides any value from JETTY_STOP_PORT. Defaults to 8079."
+  echo "-ld, --lockdir: The directory where the executing process id is stored to verify that that only one instance"
+  echo "    is started. Defaults to /var/tmp."
+  echo ""
+  echo "Example: stop_xwiki.sh -p 8080 -sp 8079"
+}
 
 waitForLockDeletion() {
   # Wait till the XWiki lock file is removed by the start script
@@ -97,8 +97,14 @@ while [[ $# > 0 ]]; do
       XWIKI_LOCK_DIR="$1"
       shift
       ;;
+    -h|--help)
+      usage
+      exit 1
+      ;;
     *)
       # unknown option
+      usage
+      exit 1
       ;;
   esac
 done

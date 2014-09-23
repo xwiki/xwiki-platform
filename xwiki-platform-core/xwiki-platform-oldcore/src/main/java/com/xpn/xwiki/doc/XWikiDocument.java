@@ -5929,6 +5929,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             list.add(new MetaDataDiff("defaultLanguage", fromDoc.getDefaultLanguage(), toDoc.getDefaultLanguage()));
         }
 
+        if (ObjectUtils.notEqual(fromDoc.getSyntax(), toDoc.getSyntax())) {
+            list.add(new MetaDataDiff("syntax", fromDoc.getSyntax(), toDoc.getSyntax()));
+        }
+
         if (fromDoc.isHidden() != toDoc.isHidden()) {
             list.add(new MetaDataDiff("hidden", fromDoc.isHidden(), toDoc.isHidden()));
         }

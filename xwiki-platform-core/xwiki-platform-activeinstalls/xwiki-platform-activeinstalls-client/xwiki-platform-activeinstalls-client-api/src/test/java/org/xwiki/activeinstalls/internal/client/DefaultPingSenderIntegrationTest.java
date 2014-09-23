@@ -71,7 +71,7 @@ public class DefaultPingSenderIntegrationTest
     {
         ActiveInstallsConfiguration configuration =
             this.componentManager.registerMockComponent(ActiveInstallsConfiguration.class);
-        when(configuration.getPingInstanceURL()).thenReturn("http://host");
+        when(configuration.getPingInstanceURL()).thenReturn("http://unknownhostforxwikitest");
     }
 
     @Test

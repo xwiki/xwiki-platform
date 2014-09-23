@@ -4506,43 +4506,53 @@ public class XWiki implements EventListener
             }
         }
 
-        // We need to check rights before we look for translations
-        // Otherwise we don't have the user language
-        if (checkAccess(context.getAction(), doc, context) == false) {
-            Object[] args = {doc.getFullName(), context.getUser()};
-            setPhonyDocument(reference, context, vcontext);
-            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "Access to document {0} has been denied to user {1}", null, args);
-        } else if (checkActive(context) == 0) { // if auth_active_check, check if user is inactive
-            boolean allow = false;
-            String action = context.getAction();
-            /*
-             * Allow inactive users to see skins, ressources, SSX, JSX and downloads they could have seen as guest. The
-             * rational behind this behaviour is that inactive users should be able to access the same UI that guests
-             * are used to see, including custom icons, panels, and so on...
-             */
-            if ((action.equals("skin") && (doc.getSpace().equals("skins") || doc.getSpace().equals("resources")))
-                || ((action.equals("skin") || action.equals("download") || action.equals("ssx") || action.equals("jsx")) && getRightService()
-                    .hasAccessLevel("view", XWikiRightService.GUEST_USER_FULLNAME, doc.getPrefixedFullName(), context))
-                || ((action.equals("view") && doc.getFullName().equals("XWiki.AccountValidation")))) {
-                allow = true;
-            } else {
-                String allowed = getConfiguration().getProperty("xwiki.inactiveuser.allowedpages", "");
-                if (context.getAction().equals("view") && !allowed.equals("")) {
-                    String[] allowedList = StringUtils.split(allowed, " ,");
-                    for (String element : allowedList) {
-                        if (element.equals(doc.getFullName())) {
-                            allow = true;
-                            break;
+        // TODO: This is a big hack and needs to be fixed ASAP. ATM the WebJAR feature is bound as an Entity Resource
+        // Handler which is not correct. It should be using its own Resource Type (since it's not a Resource Entity).
+        // For this we need to introduce a new Servlet/Filter to be able to hook in new Resource Types. When this
+        // is done remove this. See also http://jira.xwiki.org/browse/XWIKI-11056
+        // Note: The action is "unknown" for webjars since it's not defined in struts-config.xml.
+        // Note: Be careful to not add other unknown actions since permissions wouldn't be checked for those either...
+        if (!context.getAction().equals("unknown")) {
+            // We need to check rights before we look for translations
+            // Otherwise we don't have the user language
+            if (checkAccess(context.getAction(), doc, context) == false) {
+                Object[] args = { doc.getFullName(), context.getUser() };
+                setPhonyDocument(reference, context, vcontext);
+                throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    "Access to document {0} has been denied to user {1}", null, args);
+            } else if (checkActive(context) == 0) { // if auth_active_check, check if user is inactive
+                boolean allow = false;
+                String action = context.getAction();
+                /*
+                 * Allow inactive users to see skins, ressources, SSX, JSX and downloads they could have seen as guest. The
+                 * rational behind this behaviour is that inactive users should be able to access the same UI that guests
+                 * are used to see, including custom icons, panels, and so on...
+                 */
+                if ((action.equals("skin") && (doc.getSpace().equals("skins") || doc.getSpace().equals("resources")))
+                    || ((action.equals("skin") || action.equals("download") || action.equals("ssx")
+                    || action.equals("jsx")) && getRightService().hasAccessLevel("view",
+                        XWikiRightService.GUEST_USER_FULLNAME, doc.getPrefixedFullName(), context))
+                    || ((action.equals("view") && doc.getFullName().equals("XWiki.AccountValidation"))))
+                {
+                    allow = true;
+                } else {
+                    String allowed = getConfiguration().getProperty("xwiki.inactiveuser.allowedpages", "");
+                    if (context.getAction().equals("view") && !allowed.equals("")) {
+                        String[] allowedList = StringUtils.split(allowed, " ,");
+                        for (String element : allowedList) {
+                            if (element.equals(doc.getFullName())) {
+                                allow = true;
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            if (!allow) {
-                Object[] args = {context.getUser()};
-                setPhonyDocument(reference, context, vcontext);
-                throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INACTIVE,
-                    "User {0} account is inactive", null, args);
+                if (!allow) {
+                    Object[] args = { context.getUser() };
+                    setPhonyDocument(reference, context, vcontext);
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INACTIVE,
+                        "User {0} account is inactive", null, args);
+                }
             }
         }
 

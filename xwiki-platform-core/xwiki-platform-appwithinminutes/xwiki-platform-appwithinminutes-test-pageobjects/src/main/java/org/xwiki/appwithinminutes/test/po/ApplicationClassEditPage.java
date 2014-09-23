@@ -186,4 +186,15 @@ public class ApplicationClassEditPage extends InlinePage
             updateClassSheetCheckbox.click();
         }
     }
+
+    /**
+     * Use this method instead of {@link #clickSaveAndView()} and call {@link WebElement#click()} when you know that the
+     * next page is not a standard XWiki {@link ViewPage}.
+     *
+     * @return the save and view button used to submit the form.
+     */
+    public WebElement getSaveAndViewButton()
+    {
+        return saveButton;
+    }
 }

@@ -80,7 +80,7 @@ public class DefaultPingSenderIntegrationTest
         PingSender pingSender = this.componentManager.getInstance(PingSender.class);
 
         // First call the Ping Sender but since we haven't set up any proxy our Mock HTTP Server is not going to be
-        // called (since http://host will lead to nowhere...
+        // called (since http://unknownhostforxwikitest will lead to nowhere...
         try {
             pingSender.sendPing();
             fail("Should have raised an exception here");

@@ -63,7 +63,7 @@
   #set ($syntaxElements = $confluence10Elements)
 #end
 // <![CDATA[
-document.writeln("<div class='leftmenu2'>");
+document.writeln("<div class='leftmenu2 clearfix'>");
 #foreach($item in $syntaxElements)
   #set($imageFile = $xwiki.getSkinFile("icons/silk/${item.get(3)}.png"))
   #set($speedTip = $escapetool.javascript($services.localization.render("core.edit.wikiToolbar.${item.get(0)}")))

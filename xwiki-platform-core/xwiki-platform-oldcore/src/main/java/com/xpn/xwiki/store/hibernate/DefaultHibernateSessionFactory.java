@@ -31,11 +31,16 @@ import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import org.hibernate.connection.ConnectionProvider;
+import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.util.xml.XmlDocument;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.DisposePriority;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
 
 import com.xpn.xwiki.util.Util;
 
@@ -48,7 +53,8 @@ import com.xpn.xwiki.util.Util;
 // TODO: This was coded by Artem. Find out why we need this as a component.
 @Component
 @Singleton
-public class DefaultHibernateSessionFactory implements HibernateSessionFactory
+@DisposePriority(10000)
+public class DefaultHibernateSessionFactory implements HibernateSessionFactory, Disposable
 {
     /**
      * The logger to log.
@@ -61,6 +67,27 @@ public class DefaultHibernateSessionFactory implements HibernateSessionFactory
      */
     @Inject
     private org.xwiki.environment.Environment environment;
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        // TODO: See http://jira.xwiki.org/jira/browse/XWIKI-471. Note that this code currently duplicates
+        // XWikiHibernateBaseStore.shutdownHibernate() which is not public and getting a Store implementation from
+        // this component is very difficult since there's no XWikiContext and the store used is defined in xwiki.cfg
+        SessionFactory sessionFactory = getSessionFactory();
+        if (sessionFactory != null) {
+            // Close all connections in the Connection Pool.
+            // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
+            // See http://bit.ly/QAJXlr
+            ConnectionProvider provider = ((SessionFactoryImplementor) sessionFactory).getConnectionProvider();
+            // If the user has specified a Data Source we shouldn't close it. Fortunately the way Hibernate works is
+            // the following: if the user has configured Hibernate to use a Data Source then Hibernate will use
+            // the DatasourceConnectionProvider class which has a close() method that doesn't do anything...
+            if (provider != null) {
+                provider.close();
+            }
+        }
+    }
 
     /**
      * Hibernate configuration object.

@@ -411,6 +411,10 @@
 
 .reviewerPrivateComment textarea {
   width: 100%;
+}
+
+.xformInline label {
+  text-transform: capitalize;
 }</code>
     </property>
     <property>

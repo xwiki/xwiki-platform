@@ -46,6 +46,9 @@ public class XWikiLink implements Serializable
         this.setFullName(fullName);
     }
 
+    /**
+     * @return the id of the document containing the link
+     */
     public long getDocId()
     {
         return this.docId;
@@ -61,11 +64,18 @@ public class XWikiLink implements Serializable
         this.link = link;
     }
 
+    /**
+     * @return the serialized document reference of the link target (compact form without the wiki part if it matches
+     *         the current wiki)
+     */
     public String getLink()
     {
         return this.link;
     }
 
+    /**
+     * @return the serialized reference of the document which contains the link (without the wiki part)
+     */
     public String getFullName()
     {
         return this.fullName;

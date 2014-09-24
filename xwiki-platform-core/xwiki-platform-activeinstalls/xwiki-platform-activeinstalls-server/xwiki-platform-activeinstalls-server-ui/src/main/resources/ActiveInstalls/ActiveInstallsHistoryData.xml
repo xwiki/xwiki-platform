@@ -53,7 +53,7 @@
         ""activeinstalls_over_time"" : {
             ""date_histogram"" : {
                 ""field"" : ""_timestamp"",
-                ""interval"" : ""day""
+                ""interval"" : ""week""
             },
             ""aggs"" : {
                 ""instanceId_count"" : {

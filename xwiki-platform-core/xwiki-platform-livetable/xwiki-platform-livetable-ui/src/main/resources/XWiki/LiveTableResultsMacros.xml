@@ -91,6 +91,14 @@
   ##
   ## Order
   ##
+  ## if the object for the classname of the order column is not already in the from sql, put it
+  #macro(addObjectClause $objectAlias)
+	  #if($fromSql.indexOf($objectAlias) &lt; 0)
+		#set($fromSql = "${fromSql}, BaseObject $objectAlias")
+		#set($whereSql = "${whereSql} and ${objectAlias}.name = doc.fullName and ${objectAlias}.className = ?")
+		#set($discard = $whereParams.add($propClassName))
+	   #end
+  #end
   #set($order = "$!request.sort")
   #set ($orderSql = '')
   #if($order != '')
@@ -110,7 +118,7 @@
       #set($orderSql = " order by ${safe_tableAlias.replace('_','.')} ${orderDirection}")
     #elseif($tablelist.contains($tableAlias))
       #set ($multiselect = "$!{class.get($order).getProperty('multiSelect').getValue()}")
-      #if ($multiselect != '1')
+      #if($multiselect != '1')
         #set ($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
       #end
     #elseif($order == 'averagevote')
@@ -125,15 +133,10 @@
         #livetable_getTableName($order)
         ##If the sort column has a _class specified, join that object in
         #set($orderObjectAlias = 'obj')
-        #if ($propClassName != '' &amp;&amp; "$!propClass" != '')
+        #if($propClassName != '' &amp;&amp; "$!propClass" != '')
           ## prepare the alias of the BaseObject table that corresponds to the class of this column
           #set($orderObjectAlias = "$!{propClassName.replaceAll('[^a-zA-Z0-9_]','')}_obj")
-          ## if the object for the classname of the order column is not already in the from sql, put it
-          #if ($fromSql.indexOf($orderObjectAlias) &lt; 0)
-            #set($fromSql = "${fromSql}, BaseObject $orderObjectAlias")
-            #set($whereSql = "${whereSql} and ${orderObjectAlias}.name = doc.fullName and ${orderObjectAlias}.className = ?")
-            #set($discard = $whereParams.add($propClassName))
-          #end
+          #addObjectClause($orderObjectAlias)
         #end
         #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
         ## FIXME: Check if this is indeed a property of the class
@@ -189,7 +192,7 @@
       #set($discard = $allMatchingParams.addAll($filterParams))
     #end
   #end
-  #if ($orderSql != '')
+  #if($orderSql != '')
     #set($sql = "$sql $!{orderSql}")
   #end
 #end
@@ -236,11 +239,11 @@
   #set($offset = $mathtool.toInteger($request.get('offset')))
   ## Offset starts from 0 in velocity and 1 in javascript
   #set($offset = $offset - 1)
-  #if (!$offset || $offset &lt; 0)
+  #if(!$offset || $offset &lt; 0)
     #set($offset = 0)
   #end
   #set($limit = $mathtool.toInteger($request.get('limit')))
-  #if (!$limit)
+  #if(!$limit)
     #set ($limit = 15)
   #end
   #set($query = $services.query.hql($sql))
@@ -271,7 +274,7 @@
 #macro(gridresult_buildRowJSON $item $rows)
   ## Handle both the case where the "language" filter is used and thus languages are returned too and the case where
   ## only the document name is returned. When more than the document name is returned the $item variable is a list.
-  #if ($item.size())
+  #if($item.size())
     ## Extract doc name and doc language from $item
     #set($docName = $item[0])
     #set($docLanguage = $item[1])
@@ -287,7 +290,7 @@
     #set($itemDoc = $xwiki.getDocument($docName))
     ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
     ## result is a translation.
-    #if ("$!docLanguage" != "" &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)
+    #if("$!docLanguage" != "" &amp;&amp; $xwiki.getLanguagePreference() != $docLanguage)
       #set($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
       #set($isTranslation = true)
     #else
@@ -296,7 +299,7 @@
     #end
     #set($fullname = $services.model.serialize($itemDoc.documentReference, 'default'))
     #set($discard = $itemDoc.use($className))
-    #if ($isTranslation)
+    #if($isTranslation)
       ## Display the language after the document name so that not all translated documents have the same name displayed
       #set($discard = $row.put('doc_name', "$itemDoc.name ($docLanguage)"))
     #else
@@ -559,7 +562,7 @@
 #macro(livetable_addColumnToQuery $colname)
  ## Safe because / is not allowed in property names
  #set ($joinModeMarker = "/join_mode")
- #if (!$colname.endsWith($joinModeMarker))
+ #if(!$colname.endsWith($joinModeMarker))
   #set ($filterValue = "$!{request.get($colname)}")
   #if($colname == 'description')
     #set($tableAlias = 'dtable')
@@ -585,16 +588,11 @@
   #if("$!filterValue" != '')
     ## If the column is not from $class, we need to make sure we join with the proper table
     #set($filterObjectAlias = 'obj')
-    #if ($propClassName != '' &amp;&amp; "$!propClass" != '')
+    #if($propClassName != '' &amp;&amp; "$!propClass" != '')
       ## prepare the alias of the BaseObject table that corresponds to the class of this column
       ## Property table is to be joined with its object, determined depending on $propClassName
       #set($filterObjectAlias = "$!{propClassName.replaceAll('[^a-zA-Z0-9_]','')}_obj")
-      ## if the object for the classname of the order column is not already in the from sql, put it
-      #if ($fromSql.indexOf($filterObjectAlias) &lt; 0)
-        #set($fromSql = "${fromSql}, BaseObject $filterObjectAlias")
-        #set($whereSql = "${whereSql} and ${filterObjectAlias}.name = doc.fullName and ${filterObjectAlias}.className = ?")
-        #set($discard = $whereParams.add($propClassName))
-      #end
+      #addObjectClause($filterObjectAlias)
     #end
     #set($discard = $tablelist.add($tableAlias))
     #if($colname.startsWith('doc.'))
@@ -624,11 +622,11 @@
       #if($multiSelect == 1)
         #if($relationalStorage == 1)
           #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
-          #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
+          #if($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
             #set ($joinOperator = 'AND')
           #end
           #foreach ($filterValue in $request.getParameterValues($colname))
-            #if ($foreach.isFirst())
+            #if($foreach.isFirst())
               #set ($fromSql = "${fromSql}, DBStringListProperty ${safe_tableAlias}")
               #set ($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and (")
               #set ($discard = $whereParams.add("${colname}"))
@@ -637,7 +635,7 @@
             #end
             #set ($whereSql = "${whereSql} ? in elements(${safe_tableAlias}.list)")
             #set ($discard = $whereParams.add("${filterValue}"))
-            #if ($foreach.isLast())
+            #if($foreach.isLast())
               #set ($whereSql = "${whereSql})")
             #end
           #end

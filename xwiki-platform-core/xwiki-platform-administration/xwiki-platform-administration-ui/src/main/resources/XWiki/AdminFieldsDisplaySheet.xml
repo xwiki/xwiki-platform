@@ -75,7 +75,7 @@
         &lt;label #if($prop)for="${prefsClassName}_${obj.number}_${prop.name}"#end class="$field"&gt;$title
         #if($field == 'skin')
           #set ($skin = $xwiki.skin)
-          &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($skin)"#if ($skin.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
+          &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($skin, 'edit')"#if ($skin.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
         #end
         #if($field == 'colorTheme')
           #if ($editor == 'globaladmin')
@@ -90,7 +90,7 @@
           #if($xwiki.exists('ColorThemes.WebHome'))
             #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL('ColorThemes.WebHome')""&gt;$services.localization.render('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
           #end
-          &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'inline')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
+          &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'edit')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
         #end
         &lt;/label&gt;
         #if($hint)&lt;span class="xHint"&gt;$hint&lt;/span&gt;#end

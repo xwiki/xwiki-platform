@@ -93,11 +93,11 @@
   ##
   ## if the object for the classname of the order column is not already in the from sql, put it
   #macro(addObjectClause $objectAlias)
-	  #if($fromSql.indexOf($objectAlias) &lt; 0)
-		#set($fromSql = "${fromSql}, BaseObject $objectAlias")
-		#set($whereSql = "${whereSql} and ${objectAlias}.name = doc.fullName and ${objectAlias}.className = ?")
-		#set($discard = $whereParams.add($propClassName))
-	   #end
+    #if($fromSql.indexOf($objectAlias) &lt; 0)
+      #set($fromSql = "${fromSql}, BaseObject $objectAlias")
+      #set($whereSql = "${whereSql} and ${objectAlias}.name = doc.fullName and ${objectAlias}.className = ?")
+      #set($discard = $whereParams.add($propClassName))
+    #end
   #end
   #set($order = "$!request.sort")
   #set ($orderSql = '')

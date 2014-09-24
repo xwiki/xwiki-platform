@@ -578,7 +578,12 @@
       #livetable_getTableName($colname)
       #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
       #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
-      #set($discard = $whereParams.addAll(["${colname}", $mathtool.toInteger(${filterValue})]))
+      #set($numberValue = $mathtool.toInteger(${filterValue}))
+      ## Handle long properties specially, explicitly converting the value to java long values. See http://jira.xwiki.org/browse/XWIKI-11000
+      #if($tableName == 'LongProperty')
+        #set($numberValue = $numbertool.toNumber("${filterValue}L"))
+      #end
+      #set($discard = $whereParams.addAll(["${colname}", $numberValue]))
     #elseif($propType == 'DateClass')
       #set($fromSql = "${fromSql}, DateProperty ${safe_tableAlias}")
       #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(str(${safe_tableAlias}.value)) like upper(?)")

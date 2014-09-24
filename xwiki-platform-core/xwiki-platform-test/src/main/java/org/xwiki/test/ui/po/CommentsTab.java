@@ -31,7 +31,7 @@ import org.openqa.selenium.support.FindBy;
  * @version $Id$
  * @since 3.2M3
  */
-public class CommentsTab extends ViewPage
+public class CommentsTab extends BaseElement
 {
     @FindBy(xpath = "//fieldset[@id='commentform']/label/span")
     private WebElement commentAuthor;

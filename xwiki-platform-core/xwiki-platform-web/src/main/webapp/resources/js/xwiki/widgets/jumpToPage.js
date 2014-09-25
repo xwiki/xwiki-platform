@@ -38,6 +38,7 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
       },
       {
         title : "$services.localization.render('core.viewers.jump.dialog.content')",
+        extraClassName: "jump-dialog",
         verticalPosition : "top"
       }
     );

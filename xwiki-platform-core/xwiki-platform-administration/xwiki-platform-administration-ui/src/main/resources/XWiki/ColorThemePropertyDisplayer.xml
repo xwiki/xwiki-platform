@@ -43,7 +43,8 @@
 ################################
 ## Display an &lt;option&gt; line
 ################################
-#macro(displayLine $themeDoc)
+#macro(displayLine $theme)
+  #set($themeDoc = $xwiki.getDocument($theme))
   #set($fullName = $themeDoc.fullName)
   &lt;option value="$fullName"#if ($fullName.equals($value)) selected="selected"#end&gt;$themeDoc.plainTitle&lt;/option&gt;
 #end
@@ -53,8 +54,8 @@
 #macro(displaySkinLines $themes $name)
   #if(!$themes.empty())
     &lt;optgroup label="$name"&gt;
-    #foreach($themeDoc in $themes)
-      #displayLine($themeDoc)
+    #foreach($theme in $themes)
+      #displayLine($theme)
     #end
     &lt;/optgroup&gt;
   #end
@@ -63,22 +64,18 @@
 ## Displayer
 ################################
 {{html}}
-  #set($xclass = $object.getxWikiClass())
-  #set($values = $xclass.get($name).getListValues())
-  #set($flamingoThemes = [])
-  #set($colibriThemes = [])
-  #foreach($theme in $values)
-    #set($themeDoc = $xwiki.getDocument($theme))
-    #if($themeDoc.getObjectNumbers('FlamingoThemesCode.ThemeClass')&gt;0)
-      #set($discard = $flamingoThemes.add($themeDoc))
-    #else
-      #set($discard = $colibriThemes.add($themeDoc))
-    #end
-  #end
   &lt;select name="${prefix}${name}" id="${prefix}${name}"&gt;
-    #if ($editor != 'globaladmin')&lt;option value=""#if ("$!value" == '') selected="selected"#end&gt;---&lt;/option&gt;#end
-    #displaySkinLines($flamingoThemes, $services.localization.render('admin.colorthemes.flamingothemes'))
-    #displaySkinLines($colibriThemes, $services.localization.render('admin.colorthemes.colibrithemes'))
+    #if ($editor != 'globaladmin')
+      &lt;option value=""#if ("$!value" == '') selected="selected"#end&gt;---&lt;/option&gt;
+    #end
+    ## Display the Flamingo themes
+    #set($xwql = "from doc.object(FlamingoThemesCode.ThemeClass) obj WHERE doc.fullName &lt;&gt; 'FlamingoThemesCode.ThemeTemplate'")
+    #set($themes = $services.query.xwql($xwql).execute())
+    #displaySkinLines($themes, $services.localization.render('admin.colorthemes.flamingothemes'))
+    ## Display the Colibri themes
+    #set($xwql = "from doc.object(ColorThemes.ColorThemeClass) obj WHERE doc.fullName &lt;&gt; 'ColorThemes.ColorThemeTemplate'")
+    #set($themes = $services.query.xwql($xwql).execute())
+    #displaySkinLines($themes, $services.localization.render('admin.colorthemes.colibrithemes'))
   &lt;/select&gt;
 {{/html}}
 {{/velocity}}</content>

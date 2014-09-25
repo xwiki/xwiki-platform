@@ -31,6 +31,25 @@ table {
   }
 }
 
+// Links ======================================================================
+
+.wikicreatelink a { /* Non-exiting links */
+  span {
+    text-decoration: underline;
+  }
+  &:after { /* Mark with a rounded question mark */
+    background-color: @link-color;
+    border-radius: 8px;
+    color: @xwiki-page-content-bg;
+    content: "?";
+    display: inline-block;
+    font-size: 80%;
+    margin-left: 4px;
+    padding: 0 4px;
+    text-decoration: none;
+  }
+}
+
 // Avatars ====================================================================
 
 .avatar_30, .avatar_50 {

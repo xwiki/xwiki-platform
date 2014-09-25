@@ -157,8 +157,8 @@ public abstract class AbstractSolrMetadataExtractor implements SolrMetadataExtra
     protected SolrReferenceResolver getResolver(EntityReference entityReference) throws SolrIndexerException
     {
         try {
-            return this.componentManager.getInstance(SolrReferenceResolver.class, entityReference.getType().toString()
-                .toLowerCase());
+            return this.componentManager.getInstance(SolrReferenceResolver.class, entityReference.getType()
+                .getLowerCase());
         } catch (ComponentLookupException e) {
             throw new SolrIndexerException("Faile to find solr reference resolver for type reference ["
                 + entityReference + "]");

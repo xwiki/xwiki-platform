@@ -398,7 +398,7 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
     public String toString()
     {
         StringBuilder sb = new StringBuilder(64);
-        sb.append(StringUtils.capitalize(StringUtils.lowerCase(getType().toString())));
+        sb.append(StringUtils.capitalize(getType().getLowerCase()));
         sb.append(' ');
         sb.append(TOSTRING_SERIALIZER.serialize(this));
         return sb.toString();

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>XWiki</web>
+  <name>ColorThemePropertyDisplayer</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>XWiki.AdminSheet</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1410941687000</creationDate>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1410941704000</date>
+  <contentUpdateDate>1410941704000</contentUpdateDate>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+################################
+## Display an &lt;option&gt; line
+################################
+#macro(displayLine $theme)
+  #set($themeDoc = $xwiki.getDocument($theme))
+  #set($fullName = $themeDoc.fullName)
+  &lt;option value="$fullName"#if ($fullName.equals($value)) selected="selected"#end&gt;$themeDoc.plainTitle&lt;/option&gt;
+#end
+################################
+## Display lines for a skin
+################################
+#macro(displaySkinLines $themes $name)
+  #if(!$themes.empty())
+    &lt;optgroup label="$name"&gt;
+    #foreach($theme in $themes)
+      #displayLine($theme)
+    #end
+    &lt;/optgroup&gt;
+  #end
+#end
+################################
+## Displayer
+################################
+{{html}}
+  &lt;select name="${prefix}${name}" id="${prefix}${name}"&gt;
+    #if ($editor != 'globaladmin')
+      &lt;option value=""#if ("$!value" == '') selected="selected"#end&gt;---&lt;/option&gt;
+    #end
+    ## Display the Flamingo themes
+    #set($xwql = "from doc.object(FlamingoThemesCode.ThemeClass) obj WHERE doc.fullName &lt;&gt; 'FlamingoThemesCode.ThemeTemplate'")
+    #set($themes = $services.query.xwql($xwql).execute())
+    #displaySkinLines($themes, $services.localization.render('admin.colorthemes.flamingothemes'))
+    ## Display the Colibri themes
+    #set($xwql = "from doc.object(ColorThemes.ColorThemeClass) obj WHERE doc.fullName &lt;&gt; 'ColorThemes.ColorThemeTemplate'")
+    #set($themes = $services.query.xwql($xwql).execute())
+    #displaySkinLines($themes, $services.localization.render('admin.colorthemes.colibrithemes'))
+  &lt;/select&gt;
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

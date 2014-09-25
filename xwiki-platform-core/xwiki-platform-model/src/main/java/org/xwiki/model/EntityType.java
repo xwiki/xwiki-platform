@@ -19,6 +19,8 @@
  */
 package org.xwiki.model;
 
+import java.util.Locale;
+
 /**
  * Represents a type of entity (ie a Model Object such as a Wiki, a Space, a Document, an Attachment, etc).
  * 
@@ -79,7 +81,7 @@ public enum EntityType
 
     EntityType()
     {
-        this.lowerCase = name().toLowerCase();
+        this.lowerCase = name().toLowerCase(Locale.US);
     }
 
     /**

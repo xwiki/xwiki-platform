@@ -32,6 +32,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.velocity.VelocityConfiguration;
 import org.xwiki.velocity.VelocityEngine;
@@ -68,6 +69,8 @@ public class DefaultVelocityManager implements VelocityManager
      */
     private static final String RESOURCE_LOADER_CLASS = "xwiki.resource.loader.class";
 
+    private static final String VELOCITYENGINE_CACHEKEY_NAME = "velocity.engine.key";
+
     /**
      * Used to access the current {@link org.xwiki.context.ExecutionContext}.
      */
@@ -93,7 +96,6 @@ public class DefaultVelocityManager implements VelocityManager
     private VelocityConfiguration velocityConfiguration;
 
     @Override
-    @SuppressWarnings("unchecked")
     public VelocityContext getVelocityContext()
     {
         // The Velocity Context is set in VelocityRequestInterceptor, when the XWiki Request is initialized so we are
@@ -112,7 +114,7 @@ public class DefaultVelocityManager implements VelocityManager
             }
         }
 
-        XWikiContext xcontext = xcontextProvider.get();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         // Add the "context" binding which is deprecated since 1.9.1.
         vcontext.put("context", new DeprecatedContext(xcontext));
@@ -130,45 +132,60 @@ public class DefaultVelocityManager implements VelocityManager
      */
     private String getVelocityEngineCacheKey(String skin, XWikiContext context)
     {
-        // We need the path relative to the webapp's home folder so we need to remove all path before
-        // the skins/ directory. This is a bit of a hack and should be improved with a proper api.
-        String skinMacros = context.getWiki().getSkinFile("macros.vm", skin, context);
-        // If we can't reach a filesystem based macros.vm with the current skin, then use a "default" cache id
-        String cacheKey = "default";
-        if (skinMacros != null) {
-            // We're only using the path starting with the skin name since sometimes we'll
-            // get ".../skins/skins/<skinname>/...", sometimes we get ".../skins/<skinname>/...",
-            // sometimes we get "skins/<skinname>/..." and if the skin is done in wiki pages
-            // we get ".../skin/...".
-            int pos = skinMacros.indexOf("skins/");
-            if (pos > -1) {
-                cacheKey = skinMacros.substring(pos);
-            }
+        String cacheKey = null;
+
+        // Generating this key is very expensive so we cache it in the context
+        ExecutionContext econtext = execution.getContext();
+        if (econtext != null) {
+            cacheKey = (String) econtext.getProperty(VELOCITYENGINE_CACHEKEY_NAME);
         }
-        // If no macros.vm file has been found for the passed skin, we can try to get a baseskin -
-        // this only if the skin is a wiki page skin.
-        // We first need to make sure the skin is actually a wiki page skin since otherwise
-        // the notion of baseskin is meaningless.
-        // We also need to ensure the presence of a dot in the skin name,
-        // otherwise XWiki#exists will assume the context's space is the skin's space
-        // (as in "XWiki.albatross" if the context space is XWiki) which can lead to misbehavior.
-        else if (skin.indexOf(".") > 0 && context.getWiki().exists(skin, context)) {
-            // If the macros.vm file is stored in a wiki page (in a macros.vm property in
-            // a XWikiSkins object) then we use the parent skin's macros.vm since we
-            // currently don't support having global velocimacros defined in wiki pages.
-            String baseSkin = context.getWiki().getBaseSkin(skin, context);
-            // Avoid plain recursive calls
-            if (StringUtils.equals(baseSkin, skin)) {
-                baseSkin = context.getWiki().getDefaultBaseSkin(context);
-            }
-            if (!StringUtils.equals(baseSkin, skin)) {
-                try {
-                    cacheKey = getVelocityEngineCacheKey(baseSkin, context);
-                } catch (StackOverflowError ex) {
-                    // Circular dependency, just return the default key
+
+        if (cacheKey == null) {
+            // We need the path relative to the webapp's home folder so we need to remove all path before
+            // the skins/ directory. This is a bit of a hack and should be improved with a proper api.
+            String skinMacros = context.getWiki().getSkinFile("macros.vm", skin, context);
+            // If we can't reach a filesystem based macros.vm with the current skin, then use a "default" cache id
+            cacheKey = "default";
+            if (skinMacros != null) {
+                // We're only using the path starting with the skin name since sometimes we'll
+                // get ".../skins/skins/<skinname>/...", sometimes we get ".../skins/<skinname>/...",
+                // sometimes we get "skins/<skinname>/..." and if the skin is done in wiki pages
+                // we get ".../skin/...".
+                int pos = skinMacros.indexOf("skins/");
+                if (pos > -1) {
+                    cacheKey = skinMacros.substring(pos);
                 }
             }
+            // If no macros.vm file has been found for the passed skin, we can try to get a baseskin -
+            // this only if the skin is a wiki page skin.
+            // We first need to make sure the skin is actually a wiki page skin since otherwise
+            // the notion of baseskin is meaningless.
+            // We also need to ensure the presence of a dot in the skin name,
+            // otherwise XWiki#exists will assume the context's space is the skin's space
+            // (as in "XWiki.albatross" if the context space is XWiki) which can lead to misbehavior.
+            else if (skin.indexOf(".") > 0 && context.getWiki().exists(skin, context)) {
+                // If the macros.vm file is stored in a wiki page (in a macros.vm property in
+                // a XWikiSkins object) then we use the parent skin's macros.vm since we
+                // currently don't support having global velocimacros defined in wiki pages.
+                String baseSkin = context.getWiki().getBaseSkin(skin, context);
+                // Avoid plain recursive calls
+                if (StringUtils.equals(baseSkin, skin)) {
+                    baseSkin = context.getWiki().getDefaultBaseSkin(context);
+                }
+                if (!StringUtils.equals(baseSkin, skin)) {
+                    try {
+                        cacheKey = getVelocityEngineCacheKey(baseSkin, context);
+                    } catch (StackOverflowError ex) {
+                        // Circular dependency, just return the default key
+                    }
+                }
+            }
+
+            if (econtext != null) {
+                econtext.setProperty(VELOCITYENGINE_CACHEKEY_NAME, cacheKey);
+            }
         }
+
         return cacheKey;
     }
 

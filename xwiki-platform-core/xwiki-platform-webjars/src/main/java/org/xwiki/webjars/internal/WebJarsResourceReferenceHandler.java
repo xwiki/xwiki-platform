@@ -23,16 +23,23 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.container.Container;
+import org.xwiki.container.Request;
+import org.xwiki.container.Response;
+import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.container.servlet.ServletResponse;
 import org.xwiki.resource.AbstractResourceReferenceHandler;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
@@ -91,33 +98,69 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
     public void handle(ResourceReference reference, ResourceReferenceHandlerChain chain)
         throws ResourceReferenceHandlerException
     {
-        String resourceName = reference.getParameterValue("value");
-        String resourcePath = String.format("%s%s", WEBJARS_RESOURCE_PREFIX, resourceName);
+        if (!shouldBrowserUseCachedContent()) {
+            String resourceName = reference.getParameterValue("value");
+            String resourcePath = String.format("%s%s", WEBJARS_RESOURCE_PREFIX, resourceName);
 
-        InputStream resourceStream = getClassLoader().getResourceAsStream(resourcePath);
+            InputStream resourceStream = getClassLoader().getResourceAsStream(resourcePath);
 
-        if (resourceStream != null) {
-            // Make sure the resource stream supports mark & reset which is needed in order be able to detect the
-            // content type without affecting the stream (Tika may need to read a few bytes from the start of the
-            // stream, in which case it will mark & reset the stream).
-            if (!resourceStream.markSupported()) {
-                resourceStream = new BufferedInputStream(resourceStream);
-            }
+            if (resourceStream != null) {
+                // Make sure the resource stream supports mark & reset which is needed in order be able to detect the
+                // content type without affecting the stream (Tika may need to read a few bytes from the start of the
+                // stream, in which case it will mark & reset the stream).
+                if (!resourceStream.markSupported()) {
+                    resourceStream = new BufferedInputStream(resourceStream);
+                }
 
-            try {
-                this.container.getResponse().setContentType(tika.detect(resourceStream, resourceName));
-                IOUtils.copy(resourceStream, this.container.getResponse().getOutputStream());
-            } catch (IOException e) {
-                throw new ResourceReferenceHandlerException(
-                    String.format("Failed to read resource [%s]", resourceName), e);
-            } finally {
-                IOUtils.closeQuietly(resourceStream);
+                try {
+                    Response response = this.container.getResponse();
+                    setResponseHeaders(response);
+                    response.setContentType(tika.detect(resourceStream, resourceName));
+                    IOUtils.copy(resourceStream, this.container.getResponse().getOutputStream());
+                } catch (IOException e) {
+                    throw new ResourceReferenceHandlerException(
+                        String.format("Failed to read resource [%s]", resourceName), e);
+                } finally {
+                    IOUtils.closeQuietly(resourceStream);
+                }
             }
         }
 
         // Be a good citizen, continue the chain, in case some lower-priority Handler has something to do for this
         // Resource Reference.
         chain.handleNext(reference);
+    }
+
+    private void setResponseHeaders(Response response)
+    {
+        // Send back the "Last-Modified" header in the response so that the browser will send us an
+        // "If-Modified-Since" request for any subsequent call for this resource. When this happens we return
+        // a 304 to tell the browser to use its cached version.
+        if (response instanceof ServletResponse) {
+            HttpServletResponse httpResponse = ((ServletResponse) response).getHttpServletResponse();
+            httpResponse.setDateHeader("Last-Modified", new Date().getTime() / 1000 * 1000);
+        }
+    }
+
+    private boolean shouldBrowserUseCachedContent()
+    {
+        // If the request contains a "If-Modified-Since" then return a 304 so to tell the browser to use its cached
+        // version.
+        Request request = this.container.getRequest();
+        if (request instanceof ServletRequest) {
+            HttpServletRequest httpRequest = ((ServletRequest) request).getHttpServletRequest();
+            if (httpRequest.getHeader("If-Modified-Since") != null) {
+                // Return the 304
+                Response response = this.container.getResponse();
+                if (response instanceof ServletResponse) {
+                    HttpServletResponse httpResponse = ((ServletResponse) response).getHttpServletResponse();
+                    httpResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

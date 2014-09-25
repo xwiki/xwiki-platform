@@ -25,10 +25,14 @@ import static org.mockito.Mockito.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.container.Container;
-import org.xwiki.container.Response;
+import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.container.servlet.ServletResponse;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.entity.EntityResourceAction;
@@ -81,7 +85,9 @@ public class WebJarsResourceReferenceHandlerTest
             bais);
 
         Container container = this.componentManager.getInstance(Container.class);
-        Response response = mock(Response.class);
+        ServletResponse response = mock(ServletResponse.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        when(response.getHttpServletResponse()).thenReturn(httpResponse);
         when(container.getResponse()).thenReturn(response);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         when(response.getOutputStream()).thenReturn(baos);
@@ -93,5 +99,37 @@ public class WebJarsResourceReferenceHandlerTest
         assertEquals("content", baos.toString());
         // Verify that the correct Content Type has been set.
         verify(response).setContentType("application/javascript");
+
+        // Also verify that the "Last-Modified" header has been set in the response so that the browser will send
+        // an If-Modified-Since header for the next request and we can tell it to use its cache.
+        verify(httpResponse).setDateHeader(eq("Last-Modified"), anyLong());
     }
+
+    @Test
+    public void return304WhenIfModifiedSinceHeader() throws Exception
+    {
+        EntityResourceReference reference = new EntityResourceReference(new DocumentReference("wiki", "space", "page"),
+            EntityResourceAction.VIEW);
+        ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
+        TestableWebJarsResourceReferenceHandler handler = this.componentManager.getComponentUnderTest();
+
+        Container container = this.componentManager.getInstance(Container.class);
+
+        ServletResponse response = mock(ServletResponse.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        when(response.getHttpServletResponse()).thenReturn(httpResponse);
+        when(container.getResponse()).thenReturn(response);
+
+        ServletRequest request = mock(ServletRequest.class);
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        when(httpRequest.getHeader("If-Modified-Since")).thenReturn("some value");
+        when(request.getHttpServletRequest()).thenReturn(httpRequest);
+        when(container.getRequest()).thenReturn(request);
+
+        handler.handle(reference, chain);
+
+        // This the test: we verify that 304 is returned when the "If-Modified-Since" header is found in the request
+        verify(httpResponse).setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+    }
+
 }

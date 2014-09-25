@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Adds support for packaging JS files using WebJars</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.83</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.86</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>WebJars Integration</xwiki.extension.name>
   </properties>
@@ -66,12 +66,11 @@
       <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- Test dependencies -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <scope>test</scope>
     </dependency>
+    <!-- Test dependencies -->
     <!-- Used by the Test -->
     <dependency>
       <groupId>org.webjars</groupId>

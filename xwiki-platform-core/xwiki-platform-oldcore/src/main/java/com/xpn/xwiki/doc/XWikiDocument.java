@@ -404,8 +404,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     private Locale defaultLocale;
 
-    private int translation;
-
     /**
      * Indicates whether the document is 'hidden', meaning that it should not be returned in public search results.
      * WARNING: this is a temporary hack until the new data model is designed and implemented. No code should rely on or
@@ -3527,13 +3525,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         setNew(document.isNew());
         setStore(document.getStore());
         setTemplateDocumentReference(document.getTemplateDocumentReference());
-        setParent(document.getParent());
+        setParentReference(document.getRelativeParentReference());
         setCreatorReference(document.getCreatorReference());
         setDefaultLocale(document.getDefaultLocale());
         setDefaultTemplate(document.getDefaultTemplate());
         setValidationScript(document.getValidationScript());
         setLocale(document.getLocale());
-        setTranslation(document.getTranslation());
         setXClass(document.getXClass().clone());
         setXClassXML(document.getXClassXML());
         setComment(document.getComment());
@@ -3601,7 +3598,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             doc.setDefaultTemplate(getDefaultTemplate());
             doc.setValidationScript(getValidationScript());
             doc.setLocale(getLocale());
-            doc.setTranslation(getTranslation());
             doc.setComment(getComment());
             doc.setMinorEdit(isMinorEdit());
             doc.setSyntax(getSyntax());
@@ -4427,13 +4423,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         String hidden = getElement(docel, XarDocumentModel.ELEMENT_HIDDEN);
         setHidden(Boolean.valueOf(hidden).booleanValue());
-
-        String strans = getElement(docel, XarDocumentModel.ELEMENT_ISTRANSLATION);
-        if ((strans == null) || strans.equals("")) {
-            setTranslation(0);
-        } else {
-            setTranslation(Integer.parseInt(strans));
-        }
 
         String archive = getElement(docel, XarDocumentModel.ELEMENT_REVISIONS);
         if (withArchive && archive != null && archive.length() > 0) {
@@ -5651,14 +5640,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
     public int getTranslation()
     {
-        return this.translation;
+        return getLocale().equals(Locale.ROOT) ? 0 : 1;
     }
 
+    /**
+     * Note that this method cannot be removed for now since it's called by Hibernate when loading a XWikiDocument.
+     * 
+     * @deprecated since 5.4.6, stored in the database to speedup some queries (really ?) but in {@link XWikiDocument} it's
+     *             calculated based on the document locale
+     */
     public void setTranslation(int translation)
     {
-        this.translation = translation;
-
-        setMetaDataDirty(true);
+        // Do nothing
     }
 
     public String getTranslatedContent(XWikiContext context) throws XWikiException

@@ -130,7 +130,6 @@ public class DocumentTranslationBundleFactoryTest
             if (tdocument == document) {
                 tdocument = new XWikiDocument(document.getDocumentReference(), locale);
                 tdocument.setDefaultLocale(document.getDefaultLocale());
-                tdocument.setTranslation(1);
             }
             document = tdocument;
         }

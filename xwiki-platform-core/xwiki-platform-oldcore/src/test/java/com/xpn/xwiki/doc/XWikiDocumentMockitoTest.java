@@ -19,11 +19,16 @@
  */
 package com.xpn.xwiki.doc;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.velocity.VelocityContext;
 import org.junit.Assert;
@@ -187,7 +192,7 @@ public class XWikiDocumentMockitoTest
         VelocityContext velocityContext = mock(VelocityContext.class);
         when(velocityManager.getVelocityContext()).thenReturn(velocityContext);
 
-        this.document.setTranslation(1);
+        this.document.setLocale(Locale.US);
         XWikiDocument defaultTranslation = new XWikiDocument(this.document.getDocumentReference());
         when(context.getWiki().getDocument(this.document.getDocumentReference(), context)).thenReturn(
             defaultTranslation);

@@ -113,7 +113,6 @@ public class XWikiMessageToolBridgeTest
             if (translatedDocument == document) {
                 translatedDocument = new XWikiDocument(document.getDocumentReference(), locale);
                 translatedDocument.setDefaultLocale(document.getDefaultLocale());
-                translatedDocument.setTranslation(1);
             }
             document = translatedDocument;
         }

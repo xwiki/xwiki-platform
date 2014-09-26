@@ -214,6 +214,12 @@ public class XWiki implements EventListener
     /** Name of the default space homepage. */
     public static final String DEFAULT_SPACE_HOMEPAGE = "WebHome";
 
+    public static final String CKEY_SKIN = "skin";
+
+    public static final String CKEY_BASESKIN = "baseskin";
+
+    public static final String DEFAULT_SKIN = "flamingo";
+
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
 
@@ -1629,14 +1635,15 @@ public class XWiki implements EventListener
         }
 
         // Prevent inclusion of templates from other directories
-        template = URI.create("/templates/" + template).normalize().toString();
-        if (!template.startsWith("/templates/")) {
-            LOGGER.warn("Direct access to template file [{}] refused. Possible break-in attempt!", template);
+        String templatePath = URI.create("/templates/" + template).normalize().toString();
+        if (!templatePath.startsWith("/templates/")) {
+            LOGGER.warn("Direct access to template file [{}] refused. Possible break-in attempt!", templatePath);
             return "";
         }
 
-        String content = getResourceContent(template);
-        return this.privilegedTemplateRenderer.evaluateTemplate(content, template);
+        String content = getResourceContent(templatePath);
+
+        return this.privilegedTemplateRenderer.evaluateTemplate(content, templatePath);
     }
 
     public String parseTemplate(String template, String skin, XWikiContext context)
@@ -1864,7 +1871,7 @@ public class XWiki implements EventListener
         String skin = "";
         try {
             // Try to get it from context
-            skin = (String) context.get("skin");
+            skin = (String) context.get(CKEY_SKIN);
             if (skin != null) {
                 return skin;
             }
@@ -1920,7 +1927,7 @@ public class XWiki implements EventListener
             LOGGER.debug("Exception while determining current skin", e);
         }
 
-        context.put("skin", skin);
+        context.put(CKEY_SKIN, skin);
         return skin;
     }
 
@@ -1966,7 +1973,7 @@ public class XWiki implements EventListener
         String defaultbaseskin = getConfiguration().getProperty("xwiki.defaultbaseskin");
         if (defaultbaseskin == null) {
             // if the property is not set, we fallback to the default skin
-            defaultbaseskin = getConfiguration().getProperty("xwiki.defaultskin", "flamingo");
+            defaultbaseskin = getConfiguration().getProperty("xwiki.defaultskin", DEFAULT_SKIN);
         }
         return defaultbaseskin;
     }
@@ -1981,7 +1988,7 @@ public class XWiki implements EventListener
         String baseskin = "";
         try {
             // Try to get it from context
-            baseskin = (String) context.get("baseskin");
+            baseskin = (String) context.get(CKEY_BASESKIN);
             if (baseskin != null) {
                 return baseskin;
             } else {
@@ -1998,14 +2005,18 @@ public class XWiki implements EventListener
                 String skin = getSkin(context);
                 baseskin = getBaseSkin(skin, context);
             }
+
             if (baseskin.equals("")) {
                 baseskin = getDefaultBaseSkin(context);
             }
         } catch (Exception e) {
             baseskin = getDefaultBaseSkin(context);
+
             LOGGER.debug("Exception while determining base skin", e);
         }
-        context.put("baseskin", baseskin);
+
+        context.put(CKEY_BASESKIN, baseskin);
+
         return baseskin;
     }
 
@@ -2027,6 +2038,7 @@ public class XWiki implements EventListener
                 // Do nothing and let return the empty string.
             }
         }
+
         return "";
     }
 

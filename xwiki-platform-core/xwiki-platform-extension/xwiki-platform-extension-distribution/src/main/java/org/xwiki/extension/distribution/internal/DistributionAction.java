@@ -56,6 +56,10 @@ public class DistributionAction extends XWikiAction
     {
         context.put("action", DISTRIBUTION_ACTION);
 
+        // Make sure DW skip all skins
+        context.put(XWiki.CKEY_SKIN, XWiki.DEFAULT_SKIN);
+        context.put(XWiki.CKEY_BASESKIN, "");
+
         // Disallow template override with xpage parameter.
         if (!DISTRIBUTION_ACTION.equals(Utils.getPage(context.getRequest(), DISTRIBUTION_ACTION))) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_ACCESS_DENIED,

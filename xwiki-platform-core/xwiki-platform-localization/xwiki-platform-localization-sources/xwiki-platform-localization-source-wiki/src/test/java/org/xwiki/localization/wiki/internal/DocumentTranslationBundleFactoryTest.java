@@ -229,7 +229,6 @@ public class DocumentTranslationBundleFactoryTest extends AbstractBridgedCompone
             if (tdocument == document) {
                 tdocument = new XWikiDocument(document.getDocumentReference());
                 tdocument.setLocale(locale);
-                tdocument.setTranslation(1);
             }
             document = tdocument;
         }

@@ -160,7 +160,6 @@ public class EditAction extends XWikiAction
             // Mark the translation. It's important to know whether a document is a translation or not, especially
             // for the sheet manager which needs to access the objects using the default document not one of its
             // translations.
-            tdoc.setTranslation(1);
             tdoc.setTitle(doc.getTitle());
             tdoc.setContent(doc.getContent());
             tdoc.setSyntax(doc.getSyntax());

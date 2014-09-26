@@ -2608,15 +2608,26 @@ Recursive title display detected!##
 #macro(breadcrumb_current_line $title)<span class="current">$title</span>#end
 
 ###
-### Displays an unexpectd exception.
+### Displays an exception.
 ###
-### @param exception The exception to format for displaying
-#macro(displayException $exception)
+### @param title the message to display to the user
+### @param exception the exception to display when the user clicks on the message
+#macro(displayException $title $exception)
 <div class="xwikirenderingerror" title="Click to get more details about the error" style="cursor: pointer;">
-    Unexpected error. Contact your administrator or <a href="http://jira.xwiki.org">report the issue</a>.
-    Click this box to get technical details.
+  $title
 </div>
 <div class="xwikirenderingerrordescription hidden">
-    <pre>$exceptiontool.getStackTrace($exception)</pre>
+  <pre>$exceptiontool.getStackTrace($exception)</pre>
 </div>
+#end
+
+###
+### Displays an unexpected exception with a default message.
+###
+### @param exception The exception to format for displaying
+#macro(displayUnexpectedException $exception)
+  #set ($sentence1 = 'Unexpected error.')
+  #set ($sentence2 = 'Contact your administrator or <a href="http://jira.xwiki.org">report the issue</a>.')
+  #set ($sentence3 = 'Click this box to get technical details.')
+  #displayException("${sentence1} ${sentence2} ${sentence3}", $exception)
 #end

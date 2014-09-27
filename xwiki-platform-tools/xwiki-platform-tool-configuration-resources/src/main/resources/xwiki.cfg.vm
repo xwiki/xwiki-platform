@@ -527,6 +527,10 @@ xwiki.authentication.ldap.trylocal=1
 #-# The default is 1000
 # xwiki.authentication.ldap.timeout=1000
 
+#-# [Since 6.3M1, XWikiLDAPAuthServiceImpl]
+#-# The maximum number of search results to be returned from a search operation.
+#-# The default is 1000
+# xwiki.authentication.ldap.maxresults=1000
 
 #---------------------------------------
 # WYSIWYG Editor configuration

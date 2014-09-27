@@ -39,6 +39,7 @@ import com.novell.ldap.LDAPDN;
 import com.novell.ldap.LDAPEntry;
 import com.novell.ldap.LDAPException;
 import com.novell.ldap.LDAPJSSESecureSocketFactory;
+import com.novell.ldap.LDAPSearchConstraints;
 import com.novell.ldap.LDAPSearchResults;
 import com.novell.ldap.LDAPSocketFactory;
 import com.xpn.xwiki.XWikiContext;
@@ -71,6 +72,17 @@ public class XWikiLDAPConnection
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
         return config.getLDAPTimeout(context);
+    }
+
+    /**
+     * @param context the XWiki context.
+     * @return the maximum number of search results to be returned from a search operation.
+     */
+    private int getMaxResults(XWikiContext context)
+    {
+        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
+
+        return config.getLDAPMaxResults(context);
     }
 
     /**
@@ -170,8 +182,9 @@ public class XWikiLDAPConnection
             connect(ldapHost, port);
 
             // set referral following
-            LDAPConstraints constraints = this.connection.getConstraints();
+            LDAPSearchConstraints constraints = new LDAPSearchConstraints(this.connection.getConstraints());
             constraints.setTimeLimit(getTimeout(context));
+            constraints.setMaxResults(getMaxResults(context));
             constraints.setReferralFollowing(true);
             constraints.setReferralHandler(new LDAPPluginReferralHandler(loginDN, password, context));
             this.connection.setConstraints(constraints);

@@ -26,6 +26,7 @@ import java.sql.Statement;
 
 import javax.inject.Named;
 
+import org.apache.commons.io.IOUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
@@ -79,11 +80,15 @@ public class R54600TranslationDataMigration extends AbstractHibernateDataMigrati
         @Override
         public void execute(Connection connection) throws SQLException
         {
-            try (Statement statement = connection.createStatement()) {
+            Statement statement = connection.createStatement();
+
+            try {
                 statement.execute("UPDATE xwikidoc set XWD_TRANSLATION = 1"
                     + " where XWD_TRANSLATION = 0 and (XWD_LANGUAGE is not null and XWD_LANGUAGE <> '')");
                 statement.execute("UPDATE xwikidoc set XWD_TRANSLATION = 0"
                     + " where XWD_TRANSLATION = 1 and (XWD_LANGUAGE is null or XWD_LANGUAGE = '')");
+            } finally {
+                IOUtils.closeQuietly(statement.close());
             }
         }
     }

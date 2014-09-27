@@ -121,7 +121,8 @@ public class XWikiCachingRightService implements XWikiRightService
             .putAction("create", Right.VIEW)
             .putAction("deleteversions", Right.ADMIN)
             .putAction("deletespace", Right.ADMIN)
-            .putAction("temp", Right.VIEW);
+            .putAction("temp", Right.VIEW)
+            .putAction("webjars", Right.VIEW);
     }
 
     /** Resolver for document references. */

@@ -84,6 +84,12 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 
 {{velocity output="false"}}
 #**
+ * Constants
+ *#
+## Magic date used to mark in AWM that the date field is not set for the current entry. See http://jira.xwiki.org/browse/XWIKI-10296
+#set($MAGIC_DATE = $datetool.toDate('yyyy-MM-dd', '9999-12-31'))
+
+#**
  * Displays the field palette.
  *#
 #macro(displayFieldPalette)
@@ -472,9 +478,17 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   ## Handle field renames.
   ##
   #if(!$errorMessage &amp;&amp; !$fieldsToRename.isEmpty())
-    ## We need to load all documents that have objects of this class and rename their properties.
-    #set($instancesStatement = "from doc.object($doc.fullName) as obj where doc.fullName &lt;&gt; :className")
-    #set($instancesQuery = $services.query.xwql($instancesStatement).bindValue('className', $doc.fullName))
+    ## We need to load all documents (except the class and template, which we handle below) that have objects of this class and rename their properties.
+    ## If we don`t skip the template, we can not control the behaviour of emptyIsToday for date fields, which we want to handle in #updateAndSaveTemplate only once.
+    ##
+    ## FIXME: even if it is not a good practice to have an object in the class document, it is still possible. We should handle field renames for the class document
+    ## as well. Note that there is a possibility that objects in the class' document are automatically updated. Needs checking.
+    ##
+    #set($instancesStatement = "from doc.object($doc.fullName) as obj where doc.fullName not in (:className,:templateName)")
+    #set($className = $stringtool.removeEnd($doc.name, 'Class'))
+    #set($templateRef = $services.model.createDocumentReference($doc.wiki, $doc.space, "${className}Template"))
+    #set($templateFullName = $services.model.serialize($templateRef, 'local'))
+    #set($instancesQuery = $services.query.xwql($instancesStatement).bindValue('className', $doc.fullName).bindValue('templateName', $templateFullName))
     #foreach($instanceDocName in $instancesQuery.execute())
       #set($instanceDoc = $xwiki.getDocument($instanceDocName))
       #set($discard = $instanceDoc.document.renameProperties($doc.documentReference, $fieldsToRename))
@@ -486,6 +500,21 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
   ##
   #if(!$errorMessage)
     #set($discard = $xwiki.getXWiki().flushCache($xcontext.context))
+  #end
+#end
+
+#**
+ * Handle Date fields that have the "Empty is today" option checked in the class edit form. See http://jira.xwiki.org/browse/XWIKI-10296
+ **#
+#macro(handleEmptyIsTodayDateFields $templateDoc)
+  #foreach($property in $doc.xWikiClass.properties)
+    ## We check directly on the request if the user provided an empty date. We can not check from the template document's object that we've just
+    ## parsed from the request using the updateObjectFromRequest method because it already applies the emtpyIsToday mechanism and that would not be good for us.
+    #set($newValueRequestParameterName = "${doc.fullName}_0_${property.name}")
+    #set($newDateStringValue = "$!{request.getParameter($newValueRequestParameterName)}")
+    #if($property.classType == 'Date' &amp;&amp; $property.getValue('emptyIsToday') == 1 &amp;&amp; $newDateStringValue == '')
+      #set($discard = $templateDoc.set($property.name, $MAGIC_DATE))
+    #end
   #end
 #end
 
@@ -504,7 +533,12 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #if ($request.templateContent)
       #set($discard = $templateDoc.setContent($request.templateContent))
     #end
+    ## Rename the properties of the template's object, if applicable.
+    #set($discard = $templateDoc.document.renameProperties($doc.documentReference, $fieldsToRename))
+    ## Fill the template's object with the default values from the class editor's form.
     #set($discard = $templateDoc.updateObjectFromRequest($doc.fullName))
+    ## 
+    #handleEmptyIsTodayDateFields($templateDoc)
     #set($discard = $templateDoc.setHidden(true))
     #set($discard = $templateDoc.save($services.localization.render('platform.appwithinminutes.classEditorTemplateSaveComment'), $minorEdit))
   #end

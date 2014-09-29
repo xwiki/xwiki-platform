@@ -1,0 +1,30 @@
+##################################
+##        LANGUAGE MENU
+##################################
+#if ($displayLanguageChoice && $xwiki.isMultiLingual())
+  #set ($currentLanguage = $services.localization.currentLocale)
+  #set ($translations = [])
+  #set ($wikiSettingsLanguages = $!xwiki.getXWikiPreference('languages').trim().split('\s*[,| ]\s*'))
+  #if ($wikiSettingsLanguages.size() > 1 || "$!wikiSettingsLanguages.get(0)" != '')
+    #foreach ($lang in $doc.translationList)
+      #if ($wikiSettingsLanguages.contains($lang))
+        #set($discard = $translations.add({'code':$lang, 'name':"#displayLanguagePrettyName($lang)"}))
+      #end
+    #end
+  #end
+  #if ($translations.size() == 0)
+    #xwikitopmenuentry($doc.getURL('view', "language=$currentLanguage"), "#displayLanguagePrettyName($currentLanguage)" 'tmLanguages')
+  #else
+    ## The sort may not be good for performances, but without it, it is unusable when there is a lot of translations
+    #set ($translations = $sorttool.sort($translations, 'name'))
+    #xwikitopmenuentrystart ($doc.getURL('view', "language=$currentLanguage"), "#displayLanguagePrettyName($currentLanguage)", 'tmLanguages', '', '', '')
+      #foreach ($lang in $translations)
+        #submenuitem ($doc.getURL('view', "language=$lang.code"), "$lang.name", '', '', '')
+      #end
+    #xwikitopmenuentryend()
+  #end
+#end
+##########################################
+## Display the pretty name of a language
+##########################################
+#macro(displayLanguagePrettyName $language)$stringtool.capitalize($services.localization.toLocale($language).getDisplayName($currentLanguage))#end

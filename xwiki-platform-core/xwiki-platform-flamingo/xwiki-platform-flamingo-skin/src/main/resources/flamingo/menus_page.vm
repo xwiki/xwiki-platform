@@ -8,9 +8,9 @@
 #set ($displayPageSubmenu = $canWatch || $canCopy || $canDelete)
 #xwikitopmenuseparator()
 #if (!$displayPageSubmenu)
-  #xwikitopmenuentry($xwiki.getURL($doc.documentReference, 'view') "$services.localization.render('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' 'hasIcon' 'file')
+  #xwikitopmenuentry($xwiki.getURL($doc.documentReference, 'view') "$services.localization.render('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' '' 'file')
 #else
-  #xwikitopmenuentrystart($xwiki.getURL($doc.documentReference, 'view') "$services.localization.render('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' 'hasIcon' 'file')
+  #xwikitopmenuentrystart($xwiki.getURL($doc.documentReference, 'view') "$services.localization.render('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' '' 'file')
     ## WATCH /UNWATCH
     #if ($canWatch)
      #set ($watchClasses = '')

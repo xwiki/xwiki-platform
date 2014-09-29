@@ -6,7 +6,7 @@
 ## - The current wiki is the main wiki OR the current wiki has support for local users only
 #set ($displayHomeMenu = $isWikiUIAvailable && ($xcontext.isMainWiki() || ("$!services.wiki.user" != '' && $services.wiki.user.getUserScope()=='GLOBAL_ONLY')))
 #if ($displayHomeMenu)
-  #xwikitopmenuentrystart($xwiki.getURL($mainWikiHomeDocumentReference) $services.localization.render('core.menu.type.home') 'tmMainWiki' 'hasIcon' 'home')
+  #xwikitopmenuentrystart($xwiki.getURL($mainWikiHomeDocumentReference) $services.localization.render('core.menu.type.home') 'tmMainWiki' '' 'home')
     #set ($hasPreviousMenuSection = false)
     ## WATCH / UNWATCH WIKI -- TODO EXTENSION POINT
     #if ($hasWatch && $xcontext.isMainWiki())

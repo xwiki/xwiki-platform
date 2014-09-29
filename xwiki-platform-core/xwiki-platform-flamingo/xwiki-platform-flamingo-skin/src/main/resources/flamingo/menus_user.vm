@@ -15,7 +15,7 @@
 ##
 #if (!$isGuest)
 #if ($isSuperAdmin)
-  #xwikitopmenuentrystart('', $!services.localization.render('superadmin'), 'tmUser', 'hasIcon navbar-avatar', 'user', '')
+  #xwikitopmenuentrystart('', $!services.localization.render('superadmin'), 'tmUser', 'navbar-avatar', 'user', '')
     ## LOGOUT
     #set ($logouturl = $xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$escapetool.url($xwiki.relativeRequestURL)"))
     #xwikitopmenuentry($!logouturl $!services.localization.render('logout') 'tmLogout', '', 'log-out')
@@ -29,7 +29,7 @@
     #set($currentUserAvatar = "")
     #set($userGlyphIcon = 'user')
   #end
-  #xwikitopmenuentrystart($xwiki.getURL($xcontext.user, 'view') "$services.localization.render('core.menu.type.profile')__SEPARATOR__$!xwiki.getUserName($xcontext.user, false)" 'tmUser' 'hasIcon navbar-avatar' $userGlyphIcon $currentUserAvatar)
+  #xwikitopmenuentrystart($xwiki.getURL($xcontext.user, 'view') "$services.localization.render('core.menu.type.profile')__SEPARATOR__$!xwiki.getUserName($xcontext.user, false)" 'tmUser' 'navbar-avatar' $userGlyphIcon $currentUserAvatar)
     #submenuitem($xwiki.getURL($xcontext.user, 'view') $services.localization.render('core.menu.profile') 'tmProfile', '', 'user')
     #submenuitem($xwiki.getURL($xcontext.user, 'view', 'category=preferences') $services.localization.render('core.menu.userPreferences') 'tmUserPreferences', '', 'wrench')
     #if ($hasWatch)

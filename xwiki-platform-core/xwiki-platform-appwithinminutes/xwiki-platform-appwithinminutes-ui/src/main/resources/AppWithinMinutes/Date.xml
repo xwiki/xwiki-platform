@@ -72,7 +72,7 @@
     <nameField/>
     <validationScript/>
     <date>
-      <customDisplay/>
+      <customDisplay>{{include reference="AppWithinMinutes.DateDisplayer" /}}</customDisplay>
       <dateFormat>dd/MM/yyyy HH:mm:ss</dateFormat>
       <disabled>0</disabled>
       <emptyIsToday>1</emptyIsToday>

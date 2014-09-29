@@ -219,8 +219,8 @@
       ******************************************************************************************************************
    -->
 
-   <!-- Formula cache -->
-   <namedCache name="xwiki.plugin.formula">
+   <!-- Equation plugin cache -->
+   <namedCache name="xwiki.plugin.equation">
       <loaders>
          <loader class="org.infinispan.loaders.file.FileCacheStore" purgeOnStartup="true">
            <!-- Let XWiki cache module set the proper location -->

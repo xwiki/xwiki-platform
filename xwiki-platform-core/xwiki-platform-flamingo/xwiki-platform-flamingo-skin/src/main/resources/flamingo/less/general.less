@@ -34,11 +34,9 @@ table {
 
 // Links ======================================================================
 
-.wikicreatelink a { /* Non-exiting links */
-  span {
-    text-decoration: underline;
-  }
-  &:after { /* Mark with a rounded question mark */
+.wikicreatelink { /* Non-exiting links */
+  text-decoration: underline;
+  a:after { /* Mark with a rounded question mark */
     background-color: @link-color;
     border-radius: 8px;
     color: @xwiki-page-content-bg;

@@ -9,6 +9,7 @@
   cursor: pointer;
   display: block;
   margin-top: -1.4em;
+  position: relative;
   text-align: right;
 }
 

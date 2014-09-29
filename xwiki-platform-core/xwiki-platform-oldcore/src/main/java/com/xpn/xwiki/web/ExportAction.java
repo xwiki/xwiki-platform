@@ -262,6 +262,9 @@ public class ExportAction extends XWikiAction
             // Create input wiki stream
             DocumentInstanceInputProperties inputProperties = new DocumentInstanceInputProperties();
 
+            // We don't want to log the details
+            inputProperties.setVerbose(false);
+
             inputProperties.setWithJRCSRevisions(history);
             inputProperties.setWithRevisions(false);
 
@@ -288,6 +291,9 @@ public class ExportAction extends XWikiAction
 
             // Create output wiki stream
             XAROutputProperties xarProperties = new XAROutputProperties();
+
+            // We don't want to log the details
+            xarProperties.setVerbose(false);
 
             XWikiResponse response = context.getResponse();
 

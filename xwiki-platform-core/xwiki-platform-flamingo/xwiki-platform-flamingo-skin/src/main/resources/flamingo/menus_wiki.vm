@@ -22,10 +22,10 @@
   #end
   #if(!$displayWikiSubmenu)
     ## Only display a link to the wiki
-    #xwikitopmenuentry($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))) $wikiEntryText $wikiEntryId 'hasIcon', 'globe')
+    #xwikitopmenuentry($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))) $wikiEntryText $wikiEntryId '', 'globe')
   #else
     ## Display a complete menu
-    #xwikitopmenuentrystart($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))) $wikiEntryText $wikiEntryId 'hasIcon' 'globe')
+    #xwikitopmenuentrystart($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))) $wikiEntryText $wikiEntryId '' 'globe')
       #set ($hasPreviousMenuSection = false)
       ## WATCH / UNWATCH
       #if ($hasWatch)

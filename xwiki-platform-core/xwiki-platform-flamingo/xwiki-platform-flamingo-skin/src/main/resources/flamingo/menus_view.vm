@@ -9,6 +9,7 @@
     
     ## Right menu
     #xwikitopmenurightstart()
+      #template("menus_language.vm")
       #template("menus_user.vm")
     #xwikitopmenurightend()
     

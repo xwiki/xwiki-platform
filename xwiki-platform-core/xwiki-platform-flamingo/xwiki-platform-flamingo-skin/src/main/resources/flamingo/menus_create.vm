@@ -9,7 +9,7 @@
 #set ($displayCreateWiki = $isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki)
 #set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $displayCreateWiki)
 #if ($displayCreateSubmenu)
-  #xwikisplitbuttonentrystart($doc.getURL('create') $services.localization.render('core.menu.create') 'tmCreate' 'btn-success hasIcon' 'plus')
+  #xwikisplitbuttonentrystart($doc.getURL('create') $services.localization.render('core.menu.create') 'tmCreate' 'btn-success' 'plus')
   #if ($displayCreateWiki)
     #set ($createWikiDocReference = $services.model.createDocumentReference('xwiki', 'WikiManager', 'CreateWiki'))
     #submenuitem($xwiki.getURL($createWikiDocReference) $services.localization.render('core.menu.create.wiki') 'tmCreateWiki', '', 'globe')

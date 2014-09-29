@@ -5,9 +5,9 @@
 #set ($displaySpaceSubmenu = $hasWatch || $hasSpaceAdmin || $xwiki.exists('Main.SpaceIndex'))
 #xwikitopmenuseparator()
 #if (!$displaySpaceSubmenu)
-  #xwikitopmenuentry($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('SPACE'))) "$services.localization.render('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' 'hasIcon' 'folder-open')
+  #xwikitopmenuentry($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('SPACE'))) "$services.localization.render('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' '' 'folder-open')
 #else
-  #xwikitopmenuentrystart($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('SPACE'))) "$services.localization.render('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' 'hasIcon' 'folder-open')
+  #xwikitopmenuentrystart($xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('SPACE'))) "$services.localization.render('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' '' 'folder-open')
     #set ($hasPreviousMenuSection = false)
     ## WATCH / UNWATCH
     #if ($hasWatch)

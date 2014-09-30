@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * href="http://www.johanneslink.net/projects/cpsuite.jsp">cpsuite</a> (we extend it). Tests can be filtered by passing
  * the "pattern" System Property.
  * <p>
- * More details on the "pattern" System Property, it's syntax and examples are found in the
+ * More details on the "pattern" System Property, its syntax and examples are found in the
  * {@link XWikiExecutorTestMethodFilter} class.
  * 
  * @version $Id$

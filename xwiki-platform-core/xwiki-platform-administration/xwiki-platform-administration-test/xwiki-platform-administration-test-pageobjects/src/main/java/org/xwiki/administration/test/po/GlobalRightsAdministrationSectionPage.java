@@ -76,12 +76,14 @@ public class GlobalRightsAdministrationSectionPage extends AdministrationSection
             // Wait for the setting to apply. Wait longer than usual in this case in an attempt to avoid some false
             // positives in the tests.
             int defaultTimeout = getUtil().getTimeout();
-            getUtil().setTimeout(defaultTimeout * 2);
-            waitUntilElementHasAttributeValue(By.id(this.forceAuthenticatedViewLink.getAttribute("id")), "alt",
-                desiredAltValue);
-
-            // Restore the utils timeout for other tests.
-            getUtil().setTimeout(defaultTimeout);
+            try {
+                getUtil().setTimeout(defaultTimeout * 2);
+                waitUntilElementHasAttributeValue(By.id(this.forceAuthenticatedViewLink.getAttribute("id")), "alt",
+                    desiredAltValue);
+            } finally {
+                // Restore the utils timeout for other tests.
+                getUtil().setTimeout(defaultTimeout);
+            }
         }
     }
 

@@ -601,11 +601,24 @@
     #elseif($propType == 'NumberClass' || $propType == 'BooleanClass')
       #livetable_getTableName($colname)
       #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
-      #set($numberValue = $mathtool.toInteger(${filterValue}))
-      ## Handle long properties specially, explicitly converting the value to java long values. See http://jira.xwiki.org/browse/XWIKI-11000
-      #if($tableName == 'LongProperty')
-        #set($numberValue = $numbertool.toNumber("${filterValue}L"))
+      #set($numberValue = $numbertool.toNumber(${filterValue}))
+      #if($tableName == 'IntegerProperty' || $tableName == 'LongProperty')
+        #if($tableName == 'LongProperty')
+          #set($numberValue = $numberValue.longValue())
+        #else
+          ## IntegerProperty
+          #set($numberValue = $numberValue.intValue())
+        #end
+        #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
+      #else
+        #if($tableName == 'FloatProperty')
+          #set($numberValue = $numberValue.floatValue())
+        #else
+          ## DoubleProperty
+          #set($numberValue = $numberValue.doubleValue())
+        #end
+        #set($precision = 0.000001)
+        #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and abs(? - ${safe_tableAlias}.value) &lt;= ${precision}")
       #end
       #set($discard = $whereParams.addAll(["${colname}", $numberValue]))
     #elseif($propType == 'DateClass')

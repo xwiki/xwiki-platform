@@ -22,7 +22,7 @@
 
 <xwikidoc>
   <web>ColorThemes</web>
-  <name>DefaultColorTheme</name>
+  <name>Azure</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -35,7 +35,7 @@
   <date>1324487404000</date>
   <contentUpdateDate>1324487404000</contentUpdateDate>
   <version>1.1</version>
-  <title>Default color theme</title>
+  <title>Azure</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -1267,7 +1267,7 @@ RK5CYII=
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </titleColor>
     </class>
-    <name>ColorThemes.DefaultColorTheme</name>
+    <name>ColorThemes.Azure</name>
     <number>0</number>
     <className>ColorThemes.ColorThemeClass</className>
     <guid>bbe5fb61-f931-4d4d-a905-568487cb8296</guid>

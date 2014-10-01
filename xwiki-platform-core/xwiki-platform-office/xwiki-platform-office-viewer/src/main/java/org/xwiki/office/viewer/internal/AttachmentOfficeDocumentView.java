@@ -22,6 +22,8 @@ package org.xwiki.office.viewer.internal;
 import java.io.File;
 import java.util.Set;
 
+import org.xwiki.cache.DisposableCacheValue;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 
@@ -32,58 +34,58 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
  * @since 5.4.6/6.2.2
  * @version $Id$
  */
-public class OfficeDocumentView
+public class AttachmentOfficeDocumentView extends OfficeDocumentView implements DisposableCacheValue
 {
     /**
-     * @see #getResourceReference()
+     * Reference to the office attachment to which this view belongs.
      */
-    private final ResourceReference resourceReference;
+    private final AttachmentReference attachmentReference;
 
     /**
-     * @see #getXDOM()
+     * Specific version of the attachment to which this view corresponds.
      */
-    private final XDOM xdom;
+    private final String version;
 
     /**
-     * @see #getTemporaryFiles()
-     */
-    private final Set<File> temporaryFiles;
-
-    /**
-     * Creates a new {@link OfficeDocumentView} instance.
+     * Creates a new {@link AttachmentOfficeDocumentView} instance.
      * 
      * @param reference the reference to the office file to which this view belongs
+     * @param attachmentReference reference to the office attachment to which this view belongs
+     * @param version version of the attachment to which this view corresponds
      * @param xdom {@link XDOM} representation of the office document
      * @param temporaryFiles temporary files used by this view
      */
-    public OfficeDocumentView(ResourceReference reference, XDOM xdom, Set<File> temporaryFiles)
+    public AttachmentOfficeDocumentView(ResourceReference reference, AttachmentReference attachmentReference,
+        String version, XDOM xdom, Set<File> temporaryFiles)
     {
-        this.resourceReference = reference;
-        this.xdom = xdom;
-        this.temporaryFiles = temporaryFiles;
+        super(reference, xdom, temporaryFiles);
+
+        this.attachmentReference = attachmentReference;
+        this.version = version;
     }
 
     /**
-     * @return a reference to the office file that is the source of this view
+     * @return a reference to the office attachment that is the source of this view
      */
-    public ResourceReference getResourceReference()
+    public AttachmentReference getAttachmentReference()
     {
-        return this.resourceReference;
+        return this.attachmentReference;
     }
 
     /**
-     * @return {@link XDOM} representation of the office document
+     * @return the version of the attachment that is the source of this view
      */
-    public XDOM getXDOM()
+    public String getVersion()
     {
-        return this.xdom;
+        return this.version;
     }
 
-    /**
-     * @return the temporary files used by this view.
-     */
-    public Set<File> getTemporaryFiles()
+    @Override
+    public void dispose() throws Exception
     {
-        return this.temporaryFiles;
+        // Cleanup all the temporary files.
+        for (File file : getTemporaryFiles()) {
+            file.delete();
+        }
     }
 }

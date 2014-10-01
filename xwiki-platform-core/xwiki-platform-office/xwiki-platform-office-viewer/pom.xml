@@ -29,7 +29,7 @@
   <name>XWiki Platform - Office - Viewer</name>
   <description>A module providing support for viewing office documents attached to wiki pages.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.72</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -63,4 +63,18 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            org/xwiki/office/viewer/internal/DefaultOfficeResourceViewer.java
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

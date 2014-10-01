@@ -19,34 +19,18 @@
  */
 package org.xwiki.office.viewer.internal;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.artofsolving.jodconverter.document.DocumentFamily;
-import org.artofsolving.jodconverter.document.DocumentFormat;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.officeimporter.builder.PresentationBuilder;
-import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
-import org.xwiki.officeimporter.converter.OfficeConverter;
-import org.xwiki.officeimporter.document.XDOMOfficeDocument;
-import org.xwiki.officeimporter.server.OfficeServer;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.ImageBlock;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.office.viewer.OfficeResourceViewer;
+import org.xwiki.office.viewer.OfficeViewer;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.match.ClassBlockMatcher;
-import org.xwiki.rendering.listener.reference.ResourceReference;
-import org.xwiki.rendering.listener.reference.ResourceType;
+import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 
 /**
  * Default implementation of {@link org.xwiki.office.viewer.OfficeViewer}.
@@ -56,135 +40,19 @@ import org.xwiki.rendering.listener.reference.ResourceType;
  */
 @Component
 @Singleton
-public class DefaultOfficeViewer extends AbstractOfficeViewer
+public class DefaultOfficeViewer implements OfficeViewer
 {
-    /**
-     * Used to build XDOM documents from office documents.
-     */
     @Inject
-    private XDOMOfficeDocumentBuilder documentBuilder;
+    private OfficeResourceViewer officeViewer;
 
-    /**
-     * Used to build XDOM documents from office presentations.
-     */
     @Inject
-    private PresentationBuilder presentationBuilder;
+    private EntityReferenceSerializer<String> serializer;
 
-    /**
-     * Used to access the document converter.
-     */
-    @Inject
-    private OfficeServer officeServer;
-
-    /**
-     * The logger to log.
-     */
-    @Inject
-    private Logger logger;
-
-    /**
-     * {@inheritDoc}
-     * <p/>
-     * Note that currently only the {@code filterStyles} parameter is supported and if "true" it means that styles will
-     * be filtered to the maximum and the focus will be put on importing only the content.
-     */
     @Override
-    protected OfficeDocumentView createOfficeDocumentView(AttachmentReference attachmentReference,
-        Map<String, String> parameters) throws Exception
+    public XDOM createView(AttachmentReference attachmentReference, Map<String, String> parameters) throws Exception
     {
-        XDOMOfficeDocument xdomOfficeDocument = createXDOM(attachmentReference, parameters);
-        String attachmentVersion = documentAccessBridge.getAttachmentVersion(attachmentReference);
-        XDOM xdom = xdomOfficeDocument.getContentDocument();
-        Set<File> temporaryFiles = processImages(xdom, xdomOfficeDocument.getArtifacts(), attachmentReference);
-        return new OfficeDocumentView(attachmentReference, attachmentVersion, xdom, temporaryFiles);
-    }
+        String reference = this.serializer.serialize(attachmentReference);
 
-    /**
-     * Processes all the image blocks in the given XDOM and changes image URL to point to a temporary file for those
-     * images that are view artifacts.
-     * 
-     * @param xdom the XDOM whose image blocks are to be processed
-     * @param artifacts specify which of the image blocks should be processed; only the image blocks that were generated
-     *            during the office import process should be processed
-     * @param attachmentReference a reference to the office file that is being viewed; this reference is used to compute
-     *            the path to the temporary directory holding the image artifacts
-     * @return the set of temporary files corresponding to image artifacts
-     */
-    private Set<File> processImages(XDOM xdom, Map<String, byte[]> artifacts, AttachmentReference attachmentReference)
-    {
-        // Process all image blocks.
-        Set<File> temporaryFiles = new HashSet<File>();
-        List<ImageBlock> imgBlocks = xdom.getBlocks(new ClassBlockMatcher(ImageBlock.class), Block.Axes.DESCENDANT);
-        for (ImageBlock imgBlock : imgBlocks) {
-            String imageReference = imgBlock.getReference().getReference();
-
-            // Check whether there is a corresponding artifact.
-            if (artifacts.containsKey(imageReference)) {
-                try {
-                    // Write the image into a temporary file.
-                    File tempFile = getTemporaryFile(attachmentReference, imageReference);
-                    createTemporaryFile(tempFile, artifacts.get(imageReference));
-
-                    // Create a URL image reference which links to above temporary image file.
-                    ResourceReference urlImageReference =
-                        new ResourceReference(buildURL(attachmentReference, imageReference), ResourceType.URL);
-                    // XWiki 2.0 doesn't support typed image references. Note that the URL is absolute.
-                    urlImageReference.setTyped(false);
-
-                    // Replace the old image block with a new one that uses the above URL image reference.
-                    Block newImgBlock = new ImageBlock(urlImageReference, false, imgBlock.getParameters());
-                    imgBlock.getParent().replaceChild(Arrays.asList(newImgBlock), imgBlock);
-
-                    // Collect the temporary file so that it can be cleaned up when the view is disposed from cache.
-                    temporaryFiles.add(tempFile);
-                } catch (Exception ex) {
-                    String message = "Error while processing artifact image [%s].";
-                    this.logger.error(String.format(message, imageReference), ex);
-                }
-            }
-        }
-
-        return temporaryFiles;
-    }
-
-    /**
-     * Creates a {@link XDOM} representation of the specified office attachment.
-     * 
-     * @param attachmentReference a reference to the office file to be parsed into XDOM
-     * @param parameters the build parameters. Note that currently only {@code filterStyles} is supported and if "true"
-     *        it means that styles will be filtered to the maximum and the focus will be put on importing only the
-     *        content
-     * @return the {@link XDOMOfficeDocument} corresponding to the specified office file
-     * @throws Exception if building the XDOM fails
-     */
-    private XDOMOfficeDocument createXDOM(AttachmentReference attachmentReference, Map<String, String> parameters)
-        throws Exception
-    {
-        DocumentReference documentReference = attachmentReference.getDocumentReference();
-        InputStream officeFileStream = documentAccessBridge.getAttachmentContent(attachmentReference);
-        String officeFileName = attachmentReference.getName();
-        if (isPresentation(officeFileName)) {
-            return presentationBuilder.build(officeFileStream, officeFileName, documentReference);
-        } else {
-            boolean filterStyles = Boolean.valueOf(parameters.get("filterStyles"));
-            return documentBuilder.build(officeFileStream, officeFileName, documentReference, filterStyles);
-        }
-    }
-
-    /**
-     * Utility method for checking if a file name corresponds to an office presentation.
-     * 
-     * @param fileName attachment file name
-     * @return {@code true} if the file extension represents an office presentation format, {@code false} otherwise
-     */
-    private boolean isPresentation(String fileName)
-    {
-        String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-        OfficeConverter officeConverter = officeServer.getConverter();
-        if (officeConverter != null) {
-            DocumentFormat format = officeConverter.getFormatRegistry().getFormatByExtension(extension);
-            return format != null && format.getInputFamily() == DocumentFamily.PRESENTATION;
-        }
-        return false;
+        return this.officeViewer.createView(new AttachmentResourceReference(reference), parameters);
     }
 }

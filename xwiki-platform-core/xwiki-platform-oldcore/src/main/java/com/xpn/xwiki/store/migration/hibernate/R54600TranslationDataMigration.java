@@ -88,7 +88,7 @@ public class R54600TranslationDataMigration extends AbstractHibernateDataMigrati
                 statement.execute("UPDATE xwikidoc set XWD_TRANSLATION = 0"
                     + " where XWD_TRANSLATION = 1 and (XWD_LANGUAGE is null or XWD_LANGUAGE = '')");
             } finally {
-                IOUtils.closeQuietly(statement;
+                IOUtils.closeQuietly(statement);
             }
         }
     }

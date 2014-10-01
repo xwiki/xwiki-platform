@@ -163,7 +163,7 @@ public class DefaultOfficeResourceViewerTest
             mocker.getInstance(AttachmentReferenceResolver.TYPE_STRING, "current");
         when(attachmentReferenceResolver.resolve(STRING_ATTACHMENT_REFERENCE)).thenReturn(ATTACHMENT_REFERENCE);
 
-        this.resourceReferenceSerializer = mocker.getInstance(ResourceReferenceSerializer.class);
+        this.resourceReferenceSerializer = mocker.getInstance(ResourceReferenceTypeSerializer.class);
         when(this.resourceReferenceSerializer.serialize(ATTACHMENT_RESOURCE_REFERENCE)).thenReturn(
             STRING_ATTACHMENT_RESOURCE_REFERENCE);
 

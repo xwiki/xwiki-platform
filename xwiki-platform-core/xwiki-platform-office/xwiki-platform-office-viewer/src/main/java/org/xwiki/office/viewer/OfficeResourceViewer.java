@@ -22,27 +22,25 @@ package org.xwiki.office.viewer;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
- * The component responsible for creating XDOM views from office attachments.
+ * The component responsible for creating XDOM views from office resource.
  * 
- * @since 2.5M2
  * @version $Id$
- * @deprecated since 5.4.6/6.2.2, use {@link OfficeResourceViewer} instead
+ * @since 5.4.6/6.2.2
  */
 @Role
-@Deprecated
-public interface OfficeViewer
+public interface OfficeResourceViewer
 {
     /**
-     * Creates a {@link XDOM} view of the specified office attachment.
+     * Creates a {@link XDOM} view of the specified office file.
      * 
-     * @param attachmentReference reference to the office attachment to be viewed
+     * @param reference reference to the office file to be viewed
      * @param parameters implementation specific view parameters
      * @return {@link XDOM} representation of the specified office document
      * @throws Exception if an error occurs while accessing the office attachment or while creating the view
      */
-    XDOM createView(AttachmentReference attachmentReference, Map<String, String> parameters) throws Exception;
+    XDOM createView(ResourceReference reference, Map<String, ?> parameters) throws Exception;
 }

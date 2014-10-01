@@ -1563,7 +1563,7 @@ function (row, i, table) {
       ## Is the td element bound to a link ?
       #if("$!colprop.link" != "" && "$!colname" != "_actions")
         #set($tdClass = "${jscolname} link$!{colprop.link} type$!{colprop.type}")
-        var td = new Element("td", {'class':"$tdClass"});
+        var td = new Element("td", {'class':"$tdClass", 'data-title': "$services.localization.render("${transprefix}${colname}")"});
         var link = #if("$!colprop.link" != "editor") new Element("a"); #else new Element("span"); #end
         ## Automatic: the link url is in JSON results, with key column name + "_url"
         #if("$!colprop.link"=="auto")
@@ -1606,7 +1606,7 @@ function (row, i, table) {
         tr.appendChild(td);
       #elseif("$colname" == "_actions")
         var adminActions = ['admin', 'rename', 'rights'];
-        var td = new Element("td", {'class' : 'actions'});
+        var td = new Element("td", {'class' : 'actions', 'data-title': "$services.localization.render("${transprefix}${colname}")"});
         #foreach($action in $colprop.get("actions"))
           if (row["doc_has${action}"] || '${action}' == 'view' || (row["doc_has${action}"] === undefined && (row["doc_hasadmin"] || adminActions.indexOf('${action}') < 0))) {
             #if($velocityCount > 1)
@@ -1636,7 +1636,7 @@ function (row, i, table) {
         tr.appendChild(td);
       #else
         #set($tdClass = "${jscolname} link$!{colprop.link} type$!{colprop.type}")
-        var fieldel = new Element("td", {'class':"$tdClass"});
+        var fieldel = new Element("td", {'class':"$tdClass", 'data-title': "$services.localization.render("${transprefix}${colname}")"});
         #if($colprop.html && $colprop.html==true)
           fieldel.innerHTML = row["${jscolname}"];
         #else

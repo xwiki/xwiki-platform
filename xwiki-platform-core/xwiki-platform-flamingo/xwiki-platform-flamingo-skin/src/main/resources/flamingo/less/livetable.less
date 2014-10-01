@@ -1,0 +1,87 @@
+//
+// Livetable
+// 
+// Some adaptations to make the livetable responsive to the screen size
+// --------------------------------------------------
+
+@media only screen and (max-width: @screen-xs-max) {
+
+  .skin-flamingo { // Needed to override the rules from livetable.css
+
+    .xwiki-livetable-display {
+      table, thead, tbody, th, td, tr {
+       display: block;
+      }
+    }
+     
+    .xwiki-livetable-display-header tr {
+      width: 50%;
+      float: left;
+      border: 1px solid #ccc;
+      
+      &:first-child{
+        border-right: 0;
+      }
+      
+      &.xwiki-livetable-display-filters{
+        border-left: 0;
+      }
+    }
+    
+    .xwiki-livetable-display-header{ // I'm forced to be that specific to override the rules of livetable.css
+    
+      .xwiki-livetable-display-header-text, .xwiki-livetable-display-header-filter {
+        height: @input-height-base + @padding-base-vertical;
+        vertical-align: middle;
+      }
+      
+      .xwiki-livetable-display-header-text {
+        &, label, a {
+          font-weight: bold;
+          vertical-align: middle;
+        }
+      }
+    }
+
+    .xwiki-livetable-display-body {
+      clear: left;
+      
+      tr {
+        border: 1px solid #ccc;
+        border-top: 0;
+      }
+      
+      td {
+        // Behave like a "row"
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+        white-space: normal;
+        text-align:left;
+        
+        &:before {
+          // Now like a table header
+          position: absolute;
+          // Top/left values mimic padding
+          top: 6px;
+          left: 6px;
+          width: 45%;
+          padding-right: 10px;
+          white-space: nowrap;
+          text-align: left;
+          font-weight: bold;
+          content: attr(data-title);
+        }
+        
+        &:last-child {
+          border: 0;
+        }
+        
+      }
+      
+    }
+  }
+}
+
+

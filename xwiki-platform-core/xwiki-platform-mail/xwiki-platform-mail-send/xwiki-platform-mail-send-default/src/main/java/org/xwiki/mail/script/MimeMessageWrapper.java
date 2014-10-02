@@ -233,6 +233,8 @@ public class MimeMessageWrapper
 
     /**
      * @return a queue containing top errors raised during the send of all emails in the queue for the current thread
+     *         when the sending was done asynchronously. If the send was done synchronously and an error happened
+     *         then it's available through the script service's {@code #getLastError()} method.
      */
     public BlockingQueue<Exception> getErrors()
     {

@@ -44,7 +44,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include reference="XWiki.LiveTableResultsMacros" /}}
-{{velocity}}
+{{velocity wiki="false"}}
 ##
 ## Override the blacklisted spaces preference since we want to display users from the entire wiki (all spaces).
 #set ($blacklistedSpaces = [])

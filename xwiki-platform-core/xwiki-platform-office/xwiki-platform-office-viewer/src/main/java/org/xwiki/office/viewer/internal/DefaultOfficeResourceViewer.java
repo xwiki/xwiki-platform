@@ -266,7 +266,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             if (isPresentation(officeFileName)) {
                 return this.presentationBuilder.build(officeFileStream, officeFileName, ownerDocument);
             } else {
-                boolean filterStyles = this.converter.convert(boolean.class, parameters.get("filterStyles"));
+                Boolean filterStyles = this.converter.convert(Boolean.class, parameters.get("filterStyles"));
                 return this.documentBuilder.build(officeFileStream, officeFileName, ownerDocument, filterStyles);
             }
         } finally {

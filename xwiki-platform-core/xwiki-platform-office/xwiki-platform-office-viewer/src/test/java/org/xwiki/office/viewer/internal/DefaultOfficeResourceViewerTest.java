@@ -168,7 +168,7 @@ public class DefaultOfficeResourceViewerTest
             STRING_ATTACHMENT_RESOURCE_REFERENCE);
 
         ConverterManager converterManager = mocker.getInstance(ConverterManager.class);
-        when(converterManager.convert(boolean.class, null)).thenReturn(false);
+        when(converterManager.convert(Boolean.class, null)).thenReturn(Boolean.FALSE);
         when(converterManager.convert(DocumentReference.class, ATTACHMENT_REFERENCE.getDocumentReference()))
             .thenReturn(ATTACHMENT_REFERENCE.getDocumentReference());
 

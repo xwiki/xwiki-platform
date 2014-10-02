@@ -269,6 +269,9 @@ require(['jquery'], function($) {
     
     // Initialize the iframe
     waitUntilIFrameIsLoaded(initIframe);
+    // The user can navigate to an other page inside the iframe, so when the page changes (onload),
+    // we re-init the iframe to use LESS
+    iframe.load(initIframe);
     // Initialize the event handlers
     $("#refresh").click(refreshPreview);
     for (var i=0; i&lt;variableInputs.length; ++i) {

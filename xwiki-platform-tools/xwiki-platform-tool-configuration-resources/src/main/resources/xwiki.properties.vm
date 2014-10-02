@@ -697,4 +697,14 @@ rendering.transformations = $xwikiRenderingTransformations
 # mail.sender.properties = mail.smtp.starttls.enable = true
 # mail.sender.properties = mail.smtp.socks.host = someserver
 
+#-------------------------------------------------------------------------------------
+# LESS
+#-------------------------------------------------------------------------------------
+
+#-# [Since 6.3M1]
+#-# LESS CSS compiler to use. Valid values are:
+#-# - "javascript" : to use the official LESS compiler.
+#-# - "less4j" : (default) to use a Java version of LESS which has better performances.
+# less.compiler =
+
 $!xwikiPropertiesAdditionalProperties

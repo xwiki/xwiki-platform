@@ -21,52 +21,32 @@ package org.xwiki.lesscss.internal;
 
 import java.nio.file.Path;
 
-import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.lesscss.LESSCompiler;
 import org.xwiki.lesscss.LESSCompilerException;
 
 /**
- * Default implementation for {@link LESSCompiler}. Actually use the good implementation depending on the configuration.
+ * Implementation of {@link LESSCompiler} that uses https://github.com/SomMeri/less4j, a LESS compiler written in Java
+ * for better performances.
  *
  * @since 6.3M1
  * @version $Id$
  */
 @Component
-public class DefaultLESSCompiler implements LESSCompiler
+@Named("less4j")
+public class LESS4jCompiler implements LESSCompiler
 {
-    @Inject
-    private ComponentManager componentManager;
-
-    @Inject
-    private ConfigurationSource configurationSource;
-
-    private LESSCompiler getLessCompiler() throws LESSCompilerException
-    {
-        String compilerName = configurationSource.getProperty("less.compiler", "less4j");
-        try {
-            return componentManager.getInstance(LESSCompiler.class, compilerName);
-        } catch (ComponentLookupException e) {
-            throw new LESSCompilerException(String.format("Unable to get the LESS Compiler component [%s].",
-                    compilerName), e);
-        }
-    }
-
     @Override
     public String compile(String lessCode) throws LESSCompilerException
     {
-        LESSCompiler lessCompiler = getLessCompiler();
-        return lessCompiler.compile(lessCode);
+        return null;
     }
 
     @Override
     public String compile(String lessCode, Path[] includePaths) throws LESSCompilerException
     {
-        LESSCompiler lessCompiler = getLessCompiler();
-        return lessCompiler.compile(lessCode, includePaths);
+        return null;
     }
 }

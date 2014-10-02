@@ -84,5 +84,10 @@
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.github.sommeri</groupId>
+      <artifactId>less4j</artifactId>
+      <version>1.8.2</version>
+    </dependency>
   </dependencies>
 </project>

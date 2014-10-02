@@ -246,11 +246,11 @@ public class WikiManagerScriptService implements ScriptService
             }
             // Get the full reference of the given user
             DocumentReference userReference = documentReferenceResolver.resolve(userId);
-            userId = entityReferenceSerializer.serialize(userReference);
+            String fullUserId = entityReferenceSerializer.serialize(userReference);
 
             // If the user is the owner
             String owner = descriptor.getOwnerId();
-            if (userId.equals(owner)) {
+            if (fullUserId.equals(owner)) {
                 return true;
             }
 

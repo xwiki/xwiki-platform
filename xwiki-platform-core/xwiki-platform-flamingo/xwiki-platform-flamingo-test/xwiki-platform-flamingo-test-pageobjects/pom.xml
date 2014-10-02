@@ -24,23 +24,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-flamingo-test</artifactId>
     <version>6.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-flamingo</artifactId>
-  <name>XWiki Platform - Flamingo - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>Provide a fresh, responsive and modern skin for XWiki, based on Bootstrap.</description>
-  <modules>
-    <module>xwiki-platform-flamingo-skin</module>
-    <module>xwiki-platform-flamingo-theme</module>
-  </modules>
-  <profiles>
-    <profile>
-      <id>integration-tests</id>
-      <modules>
-        <module>xwiki-platform-flamingo-test</module>
-      </modules>
-    </profile>
-  </profiles>
+  <artifactId>xwiki-platform-flamingo-test-pageobjects</artifactId>
+  <name>XWiki Platform - Flamingo - Test - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Flamingo - Test - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

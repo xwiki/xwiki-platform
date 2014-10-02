@@ -202,7 +202,7 @@
     #set($type = 'number')
   #elseif ($classPropertyType.endsWith('PasswordClass'))
     #set($sortable = false)
-  #elseif ($classPropertyType.endsWith('TextAreaClass'))
+  #elseif ($classPropertyType.endsWith('TextAreaClass') || $column == 'email')
     #set($html = true)
   #end
   #set ($columnValue = { 'type' : $type, 'link' : $link, 'html' : $html, 'sortable' : $sortable, 'displayName' : $displayName })

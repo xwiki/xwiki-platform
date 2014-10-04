@@ -236,6 +236,9 @@
   font-size: 75%;
   font-weight: normal;
 }
+.entry-author-label {
+  display: inline;
+}
 /* Pseudo-tools visible in the edit mode */
 div.publish-message {
   background-image: url("$xwiki.getSkinFile('icons/silk/page_white_world.png')");

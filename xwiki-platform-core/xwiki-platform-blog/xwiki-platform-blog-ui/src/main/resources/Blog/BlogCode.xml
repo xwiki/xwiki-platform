@@ -657,9 +657,9 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   (% class="#if($onlyExtract)entry-summary#{else}entry-content#end" %)(((
   #getEntryContent($entryDoc $entryObj $onlyExtract $entryContent)
   $xcontext.dropPermissions()
-  {{html wiki="false"}}$entryDoc.getRenderedContent($entryContent, $entryDoc.syntax.toIdString()){{/html}}
+  $entryContent
   ))) ## entry-content
-  &lt;div class='clearfloats'&gt;&lt;/div&gt;
+  (% class="clearfloats" %)((()))
 #end
 ##
 ##
@@ -708,19 +708,18 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(displayEntryFooter $entryDoc $entryObj)
   (% class="entry-footer" %)(((
   #isPublished($entryObj $isPublished)
+  (% class='entry-author-label' %)
   #if($isPublished)
     {{translation key='xe.blog.code.postedby'/}} ##
   #else
     {{translation key='xe.blog.code.createdby'/}} ##
   #end
-  {{html wiki="false"}}
-  &lt;address class="author vcard"&gt;#userfn($entryDoc.creator)&lt;/address&gt; ##
+  {{html wiki="false" clean="false"}}&lt;address class='author vcard'&gt;#userfn($entryDoc.creator)&lt;/address&gt;{{/html}} ##
   #getEntryDate($entryDoc $entryObj $entryDate)
-  #listCategories($entryObj) ##
+  #listCategories($entryObj) #*
   ## Since the publish date and update date are not set at the exact same time, there could be a small difference that
   ## we assume cannot be more than 3 seconds.
-  {{/html}}
-  (% class="separator" %)·(%%) [[{{translation key='xe.blog.code.permalink'/}}&gt;&gt;$entryDoc||rel="bookmark"]] ##
+  *#(% class="separator" %)·(%%) [[{{translation key='xe.blog.code.permalink'/}}&gt;&gt;$entryDoc||rel="bookmark"]] ##
   (% class="separator" %)·(%%) [[{{translation key='xe.blog.code.comments'/}}&gt;&gt;$entryDoc||anchor="Comments"]] (% class="itemCount" %)($entryDoc.comments.size())(%%) ##
   )))## entry-footer
 #end
@@ -738,16 +737,17 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
     #set($first = true)
     #if($categories.size() &gt; 0)
       #foreach($category in $categories)
-## Do not indent
-#set($categoryDoc = $!xwiki.getDocument($category))
-#if(!$categoryDoc.isNew() &amp;&amp; $categoryDoc.getObject(${blogCategoryClassname}))
-#if($first)
- &lt;span class="separator"&gt;&amp;#183;&lt;/span&gt; $services.localization.render('xe.blog.code.categories')
-#set($first = false)
-#else, #end## if first
-&lt;a rel="tag" href="$xwiki.getURL(${category})"&gt;$!{escapetool.xml($!xwiki.getDocument($category).getObject($blogCategoryClassname).getProperty('name').value)}&lt;/a&gt;##
-#end## if isNew
-#end## foreach
+        ## Do not indent
+        #set($categoryDoc = $!xwiki.getDocument($category))
+        #if(!$categoryDoc.isNew() &amp;&amp; $categoryDoc.getObject(${blogCategoryClassname}))
+          #if($foreach.count == 1)
+            (% class='separator' %)·(%%) $services.localization.render('xe.blog.code.categories') ##
+          #else
+            , ##
+          #end##
+          [[$!{escapetool.xml($!categoryDoc.getObject($blogCategoryClassname).getValue('name'))}&gt;&gt;${category}||rel='tag']]##
+        #end##
+      #end##
     #end
   #end
 #end

@@ -19,9 +19,11 @@
  */
 package org.xwiki.configuration.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -38,10 +40,21 @@ import org.xwiki.model.reference.LocalDocumentReference;
 @Singleton
 public class UserPreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
+    static final String SPACE_NAME = "XWiki";
+
     /**
      * The local reference of the class containing user preferences.
      */
-    private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiUsers");
+    static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(SPACE_NAME, "XWikiUsers");
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    @Override
+    protected String getCacheId()
+    {
+        return "configuration.document.user";
+    }
 
     @Override
     protected LocalDocumentReference getClassReference()
@@ -52,6 +65,6 @@ public class UserPreferencesConfigurationSource extends AbstractDocumentConfigur
     @Override
     protected DocumentReference getDocumentReference()
     {
-        return getDocumentAccessBridge().getCurrentUserReference();
+        return this.documentAccessBridge.getCurrentUserReference();
     }
 }

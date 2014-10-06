@@ -19,46 +19,38 @@
  */
 package org.xwiki.configuration.internal;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.model.ModelContext;
+import org.xwiki.configuration.internal.test.AbstractTestDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
- * Unit tests for {@link org.xwiki.configuration.internal.WikiPreferencesConfigurationSource}.
+ * Unit tests for {@link WikiPreferencesConfigurationSource}.
  * 
- * @version $Id: 31e2e0d488d6f5dbc1fcec1211d30dc30000b5eb 
+ * @version $Id: 31e2e0d488d6f5dbc1fcec1211d30dc30000b5eb
  */
-public class WikiPreferencesConfigurationSourceTest
+public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
 {
-    @Rule
-    public final MockitoComponentMockingRule<ConfigurationSource> componentManager =
-        new MockitoComponentMockingRule<ConfigurationSource>(WikiPreferencesConfigurationSource.class);
+    public WikiPreferencesConfigurationSourceTest()
+    {
+        super(WikiPreferencesConfigurationSource.class);
+    }
+
+    @Override
+    protected LocalDocumentReference getClassReference()
+    {
+        return WikiPreferencesConfigurationSource.CLASS_REFERENCE;
+    }
 
     @Test
     public void getPropertyForStringWhenExists() throws Exception
     {
-        final DocumentReference xwikiPreferencesReference = new DocumentReference("wiki", "XWiki", "XWikiPreferences");
-
-        final DocumentAccessBridge dab = this.componentManager.getInstance(DocumentAccessBridge.class);
-        final ModelContext modelContext = this.componentManager.getInstance(ModelContext.class);
-
-        when(dab.getCurrentDocumentReference()).thenReturn(xwikiPreferencesReference);
-        when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("wiki"));
-
-        when(dab.getProperty(xwikiPreferencesReference, xwikiPreferencesReference, "key")).thenReturn("value");
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.SPACE_NAME,
+            WikiPreferencesConfigurationSource.PAGE_NAME), "key", "value");
 
         String result = this.componentManager.getComponentUnderTest().getProperty("key", String.class);
 
-        verify(dab).getProperty(xwikiPreferencesReference, xwikiPreferencesReference, "key");
         Assert.assertEquals("value", result);
     }
 }

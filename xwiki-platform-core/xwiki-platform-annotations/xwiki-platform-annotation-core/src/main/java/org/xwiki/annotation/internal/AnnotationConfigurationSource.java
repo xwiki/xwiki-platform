@@ -49,10 +49,21 @@ public class AnnotationConfigurationSource extends AbstractDocumentConfiguration
         AnnotationConfiguration.CONFIGURATION_PAGE_SPACE_NAME, AnnotationConfiguration.CONFIGURATION_PAGE_NAME);
 
     @Override
+    protected String getCacheId()
+    {
+        return "configuration.document.annotation";
+    }
+
+    @Override
+    protected String getCacheKeyPrefix()
+    {
+        return this.wikiManager.getCurrentWikiId();
+    }
+
+    @Override
     protected DocumentReference getDocumentReference()
     {
-        return new DocumentReference(getCurrentWikiReference().getName(),
-            AnnotationConfiguration.CONFIGURATION_PAGE_SPACE_NAME, AnnotationConfiguration.CONFIGURATION_PAGE_NAME);
+        return new DocumentReference(CLASS_REFERENCE, getCurrentWikiReference());
     }
 
     @Override

@@ -39,6 +39,7 @@ import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
@@ -68,7 +69,7 @@ public class WikiTemplateRendererTest
     private VelocityEngine velocityEngineMock;
 
     @Before
-    public void before() throws XWikiVelocityException
+    public void before() throws Exception
     {
         this.velocityEngineMock = mock(VelocityEngine.class);
 
@@ -81,6 +82,7 @@ public class WikiTemplateRendererTest
     {
         this.environmentmMock = this.mocker.registerMockComponent(Environment.class);
         this.velocityManagerMock = this.mocker.registerMockComponent(VelocityManager.class);
+        this.mocker.registerMockComponent(ConfigurationSource.class);
     }
 
     private void setTemplateContent(String content) throws UnsupportedEncodingException

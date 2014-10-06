@@ -42,13 +42,26 @@ public class WikiPreferencesConfigurationSource extends AbstractDocumentConfigur
     /**
      * The name of the space where wiki preferences are located.
      */
-    private static final String SPACE_NAME = "XWiki";
+    static final String SPACE_NAME = "XWiki";
+
+    static final String PAGE_NAME = "XWikiPreferences";
 
     /**
      * The local reference of the class containing wiki preferences.
      */
-    private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(SPACE_NAME,
-        "XWikiPreferences");
+    static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(SPACE_NAME, PAGE_NAME);
+
+    @Override
+    protected String getCacheId()
+    {
+        return "configuration.document.wiki";
+    }
+
+    @Override
+    protected String getCacheKeyPrefix()
+    {
+        return this.wikiManager.getCurrentWikiId();
+    }
 
     @Override
     protected LocalDocumentReference getClassReference()

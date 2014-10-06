@@ -1008,6 +1008,12 @@ public class XarExtensionHandlerTest
         pageWiki1.setContent("modified content");
         this.oldcore.getMockXWiki().saveDocument(pageWiki1, getXWikiContext());
 
+        pageWiki1 =
+            this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
+
+        Assert.assertFalse(pageWiki1.isNew());
+        Assert.assertEquals("2.1", pageWiki1.getVersion());
+
         // install on root
 
         install(this.localXarExtensiontId1, null, this.contextUser);
@@ -1018,7 +1024,9 @@ public class XarExtensionHandlerTest
             this.oldcore.getMockXWiki().getDocument(new DocumentReference("wiki1", "space", "page"), getXWikiContext());
 
         Assert.assertFalse(pageWiki1.isNew());
-        Assert.assertEquals("1.1", pageWiki1.getVersion());
+        Assert.assertEquals("2.1", pageWiki1.getVersion());
+        // Make sure modifications are kept
+        Assert.assertEquals("modified content", pageWiki1.getContent());
     }
 
     @Test

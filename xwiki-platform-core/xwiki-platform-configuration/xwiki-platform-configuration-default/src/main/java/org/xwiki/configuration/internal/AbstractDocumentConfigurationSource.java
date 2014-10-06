@@ -19,18 +19,43 @@
  */
 package org.xwiki.configuration.internal;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
-import org.xwiki.bridge.DocumentAccessBridge;
+import org.slf4j.Logger;
+import org.xwiki.bridge.event.WikiDeletedEvent;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelConfiguration;
-import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
+import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 
 /**
  * Common features for all Document sources (ie configuration data coming from wiki pages).
@@ -38,21 +63,30 @@ import org.xwiki.model.reference.WikiReference;
  * @version $Id$
  * @since 2.0M2
  */
-public abstract class AbstractDocumentConfigurationSource extends AbstractConfigurationSource
+public abstract class AbstractDocumentConfigurationSource extends AbstractConfigurationSource implements Initializable,
+    Disposable
 {
-    /**
-     * @see #getDocumentAccessBridge()
-     */
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
+    protected static final String NULL = new String();
 
-    /** @see #getCurrentWikiReference() */
     @Inject
-    private ModelContext modelContext;
+    protected WikiDescriptorManager wikiManager;
 
-    /** @see #getCurrentWikiReference() */
     @Inject
-    private ModelConfiguration modelConfig;
+    protected CacheManager cacheManager;
+
+    @Inject
+    protected EntityReferenceSerializer<String> referenceSerializer;
+
+    @Inject
+    protected ObservationManager observation;
+
+    @Inject
+    protected Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    protected Logger logger;
+
+    protected Cache<Object> cache;
 
     /**
      * @return the document reference of the document containing an XWiki Object with configuration data or null if
@@ -66,11 +100,71 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     protected abstract LocalDocumentReference getClassReference();
 
     /**
-     * @return the bridge used to access Object properties
+     * @return the identifier to use for the cache
      */
-    protected DocumentAccessBridge getDocumentAccessBridge()
+    protected abstract String getCacheId();
+
+    /**
+     * @return the prefix used to generate a cache key combined to the actual configuration property name
+     */
+    protected String getCacheKeyPrefix()
     {
-        return this.documentAccessBridge;
+        return this.referenceSerializer.serialize(getDocumentReference());
+    }
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        // Initialize cache
+        try {
+            this.cache = this.cacheManager.createNewCache(new CacheConfiguration(getCacheId()));
+        } catch (CacheException e) {
+            throw new InitializationException("Failed to initialize cache", e);
+        }
+
+        // Start listening to configuration modifications
+        this.observation.addListener(new EventListener()
+        {
+            @Override
+            public void onEvent(Event event, Object source, Object data)
+            {
+                onCacheCleanup(event, source, data);
+            }
+
+            @Override
+            public String getName()
+            {
+                return getCacheId();
+            }
+
+            @Override
+            public List<Event> getEvents()
+            {
+                return getCacheCleanupEvents();
+            }
+        });
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        this.cache.removeAll();
+    }
+
+    protected List<Event> getCacheCleanupEvents()
+    {
+        RegexEntityReference classMatcher =
+            new RegexEntityReference(Pattern.compile(".*:" + this.referenceSerializer.serialize(getClassReference())
+                + "\\[\\d*\\]"), EntityType.OBJECT);
+
+        return Arrays.<Event>asList(new XObjectDeletedEvent(classMatcher), new XObjectUpdatedEvent(classMatcher),
+            new WikiDeletedEvent());
+    }
+
+    protected void onCacheCleanup(Event event, Object source, Object data)
+    {
+        // TODO: do finer grain cache invalidation
+        this.cache.removeAll();
     }
 
     /**
@@ -78,11 +172,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
      */
     protected WikiReference getCurrentWikiReference()
     {
-        if (this.modelContext.getCurrentEntityReference() != null) {
-            return (WikiReference) this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
-        }
-
-        return new WikiReference(this.modelConfig.getDefaultReferenceValue(EntityType.WIKI));
+        return new WikiReference(this.wikiManager.getCurrentWikiId());
     }
 
     @Override
@@ -91,15 +181,58 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         // Since a single XObject holds all the properties we need to be careful here, overriding one property will put
         // all the default keys in the source. To determine that the source contains the given key we check that the
         // value is both not-null and not empty.
-        Object value = getPropertyObject(key);
+        Object value = getPropertyValue(key);
         return value != null && !"".equals(value);
+    }
+
+    protected BaseObject getBaseObject() throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        if (xcontext != null && xcontext.getWiki() != null) {
+            DocumentReference documentReference = getFailsafeDocumentReference();
+            LocalDocumentReference classReference = getFailsafeClassReference();
+
+            if (documentReference != null && classReference != null) {
+                XWikiDocument document = xcontext.getWiki().getDocument(getDocumentReference(), xcontext);
+
+                return document.getXObject(getClassReference());
+            }
+        }
+
+        return null;
+    }
+
+    protected Object getBaseProperty(String propertyName) throws XWikiException
+    {
+        BaseObject baseObject = getBaseObject();
+
+        if (baseObject != null) {
+            BaseProperty property = (BaseProperty) baseObject.getField(propertyName);
+
+            return property != null ? property.getValue() : null;
+        }
+
+        return null;
     }
 
     @Override
     public List<String> getKeys()
     {
-        // TODO: introduce a DocumentAccessBridge#getXClassPropertyNames(DocumentReference) to properly implement that
-        return Collections.emptyList();
+        List<String> keys = Collections.emptyList();
+
+        BaseObject baseObject;
+        try {
+            baseObject = getBaseObject();
+
+            if (baseObject != null) {
+                keys = new ArrayList<String>(baseObject.getPropertyList());
+            }
+        } catch (XWikiException e) {
+            this.logger.error("Failed to access configuration", e);
+        }
+
+        return keys;
     }
 
     @Override
@@ -132,21 +265,32 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key)
     {
-        return (T) getPropertyObject(key);
+        return (T) getPropertyValue(key);
     }
 
-    private Object getPropertyObject(String key)
+    private Object getPropertyValue(String key)
     {
-        Object result;
+        String cacheKey = getCacheKeyPrefix() + ':' + key;
 
-        DocumentReference documentReference = getFailsafeDocumentReference();
-        LocalDocumentReference classReference = getFailsafeClassReference();
-        if (documentReference != null && classReference != null) {
-            // TODO: use an API taking a local reference for the class instead
-            result =
-                getDocumentAccessBridge().getProperty(documentReference,
-                    new DocumentReference(classReference, documentReference.getWikiReference()), key);
-        } else {
+        Object result = this.cache.get(cacheKey);
+
+        if (result == null) {
+            XWikiContext xcontext = this.xcontextProvider.get();
+
+            if (xcontext != null && xcontext.getWiki() != null) {
+                try {
+                    result = getBaseProperty(key);
+
+                    // Void.TYPE is used to keep track of fields that don't exist
+                    this.cache.set(cacheKey, result == null ? Void.TYPE : result);
+                } catch (XWikiException e) {
+                    this.logger.error("Failed to access configuration property", e);
+                }
+            }
+        }
+
+        // Void.TYPE is used to keep track of fields that don't exist
+        if (result == Void.TYPE) {
             result = null;
         }
 

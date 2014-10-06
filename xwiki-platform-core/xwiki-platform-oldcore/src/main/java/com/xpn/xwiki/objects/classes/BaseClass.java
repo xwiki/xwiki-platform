@@ -40,6 +40,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 
+import com.google.common.base.Objects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -91,8 +92,17 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
+
+    private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
+    {
+        if (this.currentMixedDocumentReferenceResolver == null) {
+            this.currentMixedDocumentReferenceResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        }
+
+        return this.currentMixedDocumentReferenceResolver;
+    }
 
     @Override
     public DocumentReference getReference()
@@ -133,13 +143,13 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
             if (reference != null) {
                 EntityReference relativeReference =
-                    this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
+                    getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
                 reference =
                     new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
                         new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(), reference
                             .getParent().getParent()));
             } else {
-                reference = this.currentMixedDocumentReferenceResolver.resolve(name);
+                reference = getCurrentMixedDocumentReferenceResolver().resolve(name);
             }
             setDocumentReference(reference);
         }
@@ -361,14 +371,14 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      * @deprecated since 2.2.3 use {@link #fromMap(java.util.Map, com.xpn.xwiki.objects.BaseCollection)}
      */
     @Deprecated
-    public BaseCollection fromMap(Map<String, ? > map, XWikiContext context) throws XWikiException
+    public BaseCollection fromMap(Map<String, ?> map, XWikiContext context) throws XWikiException
     {
         BaseCollection object = newObject(context);
 
         return fromMap(map, object);
     }
 
-    public BaseCollection fromMap(Map<String, ? > map, BaseCollection object)
+    public BaseCollection fromMap(Map<String, ?> map, BaseCollection object)
     {
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
@@ -391,7 +401,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         return object;
     }
 
-    public BaseCollection fromValueMap(Map<String, ? > map, BaseCollection object)
+    public BaseCollection fromValueMap(Map<String, ?> map, BaseCollection object)
     {
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
@@ -443,7 +453,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return false;
         }
 
-        if (!getCustomMapping().equals(bclass.getCustomMapping())) {
+        if (!Objects.equal(this.customMapping, bclass.customMapping)
+            && !getCustomMapping().equals(bclass.getCustomMapping())) {
             return false;
         }
 

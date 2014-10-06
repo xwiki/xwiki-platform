@@ -19,68 +19,51 @@
  */
 package org.xwiki.configuration.internal;
 
-import org.jmock.Expectations;
+import static org.mockito.Mockito.when;
+
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.model.ModelContext;
+import org.xwiki.configuration.internal.test.AbstractTestDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
  * Unit tests for {@link UserPreferencesConfigurationSource}.
  *
  * @version $Id$
- * @since 4.0RC1
  */
-@MockingRequirement(UserPreferencesConfigurationSource.class)
-public class UserPreferencesConfigurationSourceTest extends AbstractMockingComponentTestCase
+public class UserPreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
 {
-    private ConfigurationSource source;
+    private static final DocumentReference USER_DOCUMENT = new DocumentReference(CURRENT_WIKI,
+        UserPreferencesConfigurationSource.SPACE_NAME, "user");
 
-    @Before
-    public void configure() throws Exception
+    public UserPreferencesConfigurationSourceTest()
     {
-        this.source = getComponentManager().getInstance(ConfigurationSource.class, "user");
+        super(UserPreferencesConfigurationSource.class);
+    }
 
-        final DocumentReference userPreferencesReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
-        final DocumentReference currentUserReference = new DocumentReference("xwiki", "XWiki", "User");
-        final DocumentAccessBridge dab = getComponentManager().getInstance(DocumentAccessBridge.class);
+    @Override
+    public void before() throws Exception
+    {
+        super.before();
 
-        getMockery().checking(new Expectations() {{
-            allowing(dab).getCurrentUserReference();
-                will(returnValue(currentUserReference));
-            oneOf(dab).getProperty(currentUserReference, userPreferencesReference, "key");
-                will(returnValue("value"));
-        }});
+        DocumentAccessBridge documentAccessBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
+        when(documentAccessBridge.getCurrentUserReference()).thenReturn(USER_DOCUMENT);
+    }
+
+    @Override
+    protected LocalDocumentReference getClassReference()
+    {
+        return UserPreferencesConfigurationSource.CLASS_REFERENCE;
     }
 
     @Test
-    public void getStringPropertyWhenUserInTheSameWiki() throws Exception
+    public void getPropertyForStringWhenExists() throws Exception
     {
-        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
-        getMockery().checking(new Expectations() {{
-            allowing(modelContext).getCurrentEntityReference();
-                will(returnValue(new WikiReference("xwiki")));
-        }});
-        String result = this.source.getProperty("key", String.class);
+        setStringProperty(USER_DOCUMENT, "key", "value");
 
-        Assert.assertEquals("value", result);
-    }
-
-    @Test
-    public void getStringPropertyWhenUserInADifferentWiki() throws Exception
-    {
-        final ModelContext modelContext = getComponentManager().getInstance(ModelContext.class);
-        getMockery().checking(new Expectations() {{
-            allowing(modelContext).getCurrentEntityReference();
-                will(returnValue(new WikiReference("subwiki")));
-        }});
-        String result = this.source.getProperty("key", String.class);
+        String result = this.componentManager.getComponentUnderTest().getProperty("key", String.class);
 
         Assert.assertEquals("value", result);
     }

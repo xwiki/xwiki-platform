@@ -2309,7 +2309,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public BaseObject getXObject(EntityReference reference)
     {
-        if (reference.getType() == EntityType.DOCUMENT) {
+        if (reference instanceof DocumentReference) {
+            return getXObject((DocumentReference) reference);
+        } else if (reference.getType() == EntityType.DOCUMENT) {
             // class reference
             return getXObject(getCurrentReferenceDocumentReferenceResolver().resolve(reference, getDocumentReference()));
         } else if (reference.getType() == EntityType.OBJECT) {
@@ -3509,6 +3511,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     private void clone(XWikiDocument document)
     {
+        this.id = document.id;
+
         setDocumentReference(document.getDocumentReference());
         setRCSVersion(document.getRCSVersion());
         setDocumentArchive(document.getDocumentArchive());
@@ -3523,7 +3527,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         setFormat(document.getFormat());
         setFromCache(document.isFromCache());
         setElements(document.getElements());
-        setId(document.getId());
         setMeta(document.getMeta());
         setMostRecent(document.isMostRecent());
         setNew(document.isNew());
@@ -3578,6 +3581,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
             // use version field instead of getRCSVersion because it returns "1.1" if version==null.
             doc.version = this.version;
+            doc.id = this.id;
             doc.setDocumentArchive(getDocumentArchive());
             doc.setAuthorReference(getAuthorReference());
             doc.setContentAuthorReference(getContentAuthorReference());
@@ -3590,7 +3594,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             doc.setFormat(getFormat());
             doc.setFromCache(isFromCache());
             doc.setElements(getElements());
-            doc.setId(getId());
             doc.setMeta(getMeta());
             doc.setMostRecent(isMostRecent());
             doc.setNew(isNew());
@@ -3607,15 +3610,16 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             doc.setSyntax(getSyntax());
             doc.setHidden(isHidden());
 
-            BaseClass bClass = getXClass().clone();
-            doc.setXClass(bClass);
+            if (this.xClass != null) {
+                doc.setXClass(this.xClass.clone());
+            }
 
             if (keepsIdentity) {
                 doc.setXClassXML(getXClassXML());
                 doc.cloneXObjects(this);
                 doc.cloneAttachments(this);
             } else {
-                bClass.setCustomMapping(null);
+                doc.getXClass().setCustomMapping(null);
                 doc.duplicateXObjects(this);
                 doc.copyAttachments(this);
             }
@@ -5662,8 +5666,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     /**
      * Note that this method cannot be removed for now since it's called by Hibernate when loading a XWikiDocument.
      * 
-     * @deprecated since 5.4.6, stored in the database to speedup some queries (really ?) but in {@link XWikiDocument} it's
-     *             calculated based on the document locale
+     * @deprecated since 5.4.6, stored in the database to speedup some queries (really ?) but in {@link XWikiDocument}
+     *             it's calculated based on the document locale
      */
     public void setTranslation(int translation)
     {
@@ -7151,11 +7155,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public boolean isProgrammaticContent()
     {
         String[] matches =
-            {"<%", "\\$xwiki.xWiki", "$xcontext.context", "$doc.document", "$xwiki.getXWiki()", "$xcontext.getContext()",
-            "$doc.getDocument()", "WithProgrammingRights(", "/* Programmatic content */", "## Programmatic content",
-            "$xwiki.search(", "$xwiki.createUser", "$xwiki.createNewWiki", "$xwiki.addToAllGroup",
-            "$xwiki.sendMessage", "$xwiki.copyDocument", "$xwiki.copyWikiWeb", "$xwiki.copySpaceBetweenWikis",
-            "$xwiki.parseGroovyFromString", "$doc.toXML()", "$doc.toXMLDocument()",};
+            {"<%", "\\$xwiki.xWiki", "$xcontext.context", "$doc.document", "$xwiki.getXWiki()",
+            "$xcontext.getContext()", "$doc.getDocument()", "WithProgrammingRights(", "/* Programmatic content */",
+            "## Programmatic content", "$xwiki.search(", "$xwiki.createUser", "$xwiki.createNewWiki",
+            "$xwiki.addToAllGroup", "$xwiki.sendMessage", "$xwiki.copyDocument", "$xwiki.copyWikiWeb",
+            "$xwiki.copySpaceBetweenWikis", "$xwiki.parseGroovyFromString", "$doc.toXML()", "$doc.toXMLDocument()",};
         String content2 = getContent().toLowerCase();
         for (int i = 0; i < matches.length; i++) {
             if (content2.indexOf(matches[i].toLowerCase()) != -1) {
@@ -8271,33 +8275,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // If there's no parser available for the specified syntax default to XWiki 2.1 syntax
         Syntax syntax = Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax();
 
-        try {
-            Utils.getComponent(Parser.class, syntax.toIdString());
-        } catch (Exception e) {
-            LOGGER.warn("Failed to find parser for the default syntax [{}]. Defaulting to xwiki/2.1 syntax.",
-                syntax.toIdString());
+        if (syntax == null || !Utils.getComponentManager().hasComponent(Parser.class, syntax.toIdString())) {
+            LOGGER.warn("Failed to find parser for the default syntax [{}]. Defaulting to xwiki/2.1 syntax.", syntax);
             syntax = Syntax.XWIKI_2_1;
         }
 
         return syntax;
-    }
-
-    private String serializeReference(DocumentReference reference, EntityReferenceSerializer<String> serializer,
-        DocumentReference defaultReference)
-    {
-        XWikiContext xcontext = getXWikiContext();
-
-        String originalWikiName = xcontext.getWikiId();
-        XWikiDocument originalCurentDocument = xcontext.getDoc();
-        try {
-            xcontext.setWikiId(defaultReference.getWikiReference().getName());
-            xcontext.setDoc(new XWikiDocument(defaultReference));
-
-            return serializer.serialize(reference);
-        } finally {
-            xcontext.setDoc(originalCurentDocument);
-            xcontext.setWikiId(originalWikiName);
-        }
     }
 
     /**

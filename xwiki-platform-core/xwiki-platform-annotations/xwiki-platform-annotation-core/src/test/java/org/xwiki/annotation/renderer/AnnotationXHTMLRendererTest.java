@@ -31,12 +31,13 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.xwiki.annotation.TestDocumentFactory;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.test.MockWikiModel;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.test.MockWikiModel;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
@@ -192,8 +193,11 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
+
         // register wiki model mock so that we can use documents / attachments information
         getComponentManager().registerComponent(MockWikiModel.getComponentDescriptor());
+        // make sure to use the default link label generator
+        registerComponent(DefaultLinkLabelGenerator.class);
     }
 
     @Override

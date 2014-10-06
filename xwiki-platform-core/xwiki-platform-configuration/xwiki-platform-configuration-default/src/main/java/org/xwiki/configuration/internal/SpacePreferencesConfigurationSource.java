@@ -19,12 +19,15 @@
  */
 package org.xwiki.configuration.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 
 /**
  * Configuration source taking its data in the Space Preferences wiki document (using data from the
@@ -41,13 +44,32 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
     /**
      * The name of the document containing space preferences.
      */
-    private static final String DOCUMENT_NAME = "WebPreferences";
+    static final String PAGE_NAME = "WebPreferences";
 
     /**
      * The local reference of the class containing space preferences.
      */
-    private static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference("XWiki",
-        "XWikiPreferences");
+    static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiPreferences");
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    @Override
+    protected String getCacheId()
+    {
+        return "configuration.document.space";
+    }
+
+    @Override
+    protected String getCacheKeyPrefix()
+    {
+        DocumentReference currentDocumentReference = this.documentAccessBridge.getCurrentDocumentReference();
+        if (currentDocumentReference != null) {
+            return this.referenceSerializer.serialize(currentDocumentReference.getParent());
+        }
+
+        return null;
+    }
 
     @Override
     protected LocalDocumentReference getClassReference()
@@ -61,17 +83,15 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
         // Note: We would normally use a Reference Resolver here but since the Model module uses the Configuration
         // module we cannot use one as otherwise we would create a cyclic build dependency...
 
-        DocumentReference documentReference = null;
-
         // Get the current document reference to extract the wiki and space names.
-        DocumentReference currentDocumentReference = getDocumentAccessBridge().getCurrentDocumentReference();
+        DocumentReference currentDocumentReference = this.documentAccessBridge.getCurrentDocumentReference();
 
         if (currentDocumentReference != null) {
             // Add the current spaces and current wiki references to the Web Preferences document reference to form
             // an absolute reference.
-            documentReference = new DocumentReference(DOCUMENT_NAME, currentDocumentReference.getLastSpaceReference());
+            return new DocumentReference(PAGE_NAME, (SpaceReference) currentDocumentReference.getParent());
         }
 
-        return documentReference;
+        return null;
     }
 }

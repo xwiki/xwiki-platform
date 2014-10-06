@@ -109,14 +109,38 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
      * Used to resolve XClass references in the way they are stored externally (database, xml, etc), ie relative or
      * absolute.
      */
-    protected EntityReferenceResolver<String> relativeEntityReferenceResolver = Utils.getComponent(
-        EntityReferenceResolver.TYPE_STRING, "relative");
+    protected EntityReferenceResolver<String> relativeEntityReferenceResolver;
 
     /**
      * Used to normalize references.
      */
-    protected DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver = Utils
-        .getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+    protected DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver;
+
+    /**
+     * @return the component used to resolve XClass references in the way they are stored externally (database, xml,
+     *         etc), ie relative or absolute
+     */
+    protected EntityReferenceResolver<String> getRelativeEntityReferenceResolver()
+    {
+        if (this.relativeEntityReferenceResolver == null) {
+            this.relativeEntityReferenceResolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
+        }
+
+        return this.relativeEntityReferenceResolver;
+    }
+
+    /**
+     * @return the component used to normalize references
+     */
+    protected DocumentReferenceResolver<EntityReference> getCurrentReferenceDocumentReferenceResolver()
+    {
+        if (this.currentReferenceDocumentReferenceResolver == null) {
+            this.currentReferenceDocumentReferenceResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+        }
+
+        return this.currentReferenceDocumentReferenceResolver;
+    }
 
     public int getNumber()
     {
@@ -149,7 +173,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         if (this.xClassReferenceCache == null && getRelativeXClassReference() != null) {
             this.xClassReferenceCache =
-                this.currentReferenceDocumentReferenceResolver.resolve(getRelativeXClassReference(),
+                getCurrentReferenceDocumentReferenceResolver().resolve(getRelativeXClassReference(),
                     getDocumentReference());
         }
 
@@ -176,7 +200,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
     {
         String xClassAsString;
         if (getXClassReference() != null) {
-            xClassAsString = this.localEntityReferenceSerializer.serialize(getXClassReference());
+            xClassAsString = getLocalEntityReferenceSerializer().serialize(getXClassReference());
         } else {
             xClassAsString = "";
         }
@@ -222,7 +246,7 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
             // of "internal". We now check for a null Class Reference instead wherever we were previously checking for
             // "internal".
             if (!"internal".equals(name)) {
-                xClassReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
+                xClassReference = getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
             }
         }
         setXClassReference(xClassReference);
@@ -433,17 +457,17 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
         safeput(name, property);
     }
 
-    public Set< ? > getSetValue(String name)
+    public Set<?> getSetValue(String name)
     {
         ListProperty prop = (ListProperty) safeget(name);
         if (prop == null) {
             return new HashSet<Object>();
         } else {
-            return new HashSet<Object>((Collection< ? >) prop.getValue());
+            return new HashSet<Object>((Collection<?>) prop.getValue());
         }
     }
 
-    public void setSetValue(String name, Set< ? > value)
+    public void setSetValue(String name, Set<?> value)
     {
         ListProperty property = new ListProperty();
         property.setValue(value);

@@ -26,46 +26,49 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.ResourceReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.url.ExtendedURL;
-import org.xwiki.url.internal.standard.entity.ExtendedURLEntityResourceReferenceResolver;
+import org.xwiki.url.internal.standard.entity.BinEntityResourceReferenceResolver;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link org.xwiki.url.internal.standard.entity.ExtendedURLEntityResourceReferenceResolver}.
+ * Unit tests for {@link BinEntityResourceReferenceResolver}.
  *
  * @version $Id$
  * @since 6.1M2
  */
-public class ExtendedURLEntityResourceReferenceResolverTest
+public class BinEntityResourceReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ExtendedURLEntityResourceReferenceResolver> mocker =
-        new MockitoComponentMockingRule(ExtendedURLEntityResourceReferenceResolver.class);
+    private BinEntityResourceReferenceResolver resolver;
 
     private WikiReference wikiReference = new WikiReference("wiki");
+
+    private WikiReferenceExtractor wikiReferenceExtractor;
+
+    private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
     @Before
     public void setUp() throws Exception
     {
-        WikiReferenceExtractor wikiReferenceExtractor = this.mocker.getInstance(WikiReferenceExtractor.class);
-        when(wikiReferenceExtractor.extract(any(ExtendedURL.class))).thenReturn(
-            new ImmutablePair<>(this.wikiReference, false));
+        this.resolver = new BinEntityResourceReferenceResolver();
 
-        StandardURLConfiguration configuration = this.mocker.getInstance(StandardURLConfiguration.class);
-        when(configuration.getEntityPathPrefix()).thenReturn("entity");
+        this.wikiReferenceExtractor = mock(WikiReferenceExtractor.class);
+        when(wikiReferenceExtractor.extract(any(ExtendedURL.class))).thenReturn(this.wikiReference);
+        ReflectionUtils.setFieldValue(this.resolver, "wikiExtractor", this.wikiReferenceExtractor);
+
+        this.entityReferenceResolver = mock(EntityReferenceResolver.class);
+        ReflectionUtils.setFieldValue(this.resolver, "defaultReferenceEntityReferenceResolver",
+            this.entityReferenceResolver);
     }
 
     @Test
@@ -160,39 +163,21 @@ public class ExtendedURLEntityResourceReferenceResolverTest
             EntityType.DOCUMENT);
     }
 
-    @Test
-    public void createResourceWhenInPathBasedSubWiki() throws Exception
-    {
-        WikiReferenceExtractor wikiReferenceExtractor = this.mocker.getInstance(WikiReferenceExtractor.class);
-        when(wikiReferenceExtractor.extract(any(ExtendedURL.class))).thenReturn(
-            new ImmutablePair<>(new WikiReference("somewiki"), true));
-
-        EntityReference reference = buildEntityReference("somewiki", "space", "page");
-        testCreateResource("http://localhost/wiki/somewiki/view/space/page", "view",
-            reference, reference, EntityType.DOCUMENT);
-    }
-    
     private ResourceReference testCreateResource(String testURL, String expectedActionName,
         EntityReference expectedReference, EntityReference returnedReference, EntityType expectedEntityType)
         throws Exception
     {
-        setUpEntityReferenceResolverMock(expectedReference, returnedReference, expectedEntityType);
+        when(this.entityReferenceResolver.resolve(expectedReference, expectedEntityType)).thenReturn(returnedReference);
         ExtendedURL url = new ExtendedURL(new URL(testURL));
+        // Remove the resource type segment since this is what gets passed to specific Reference Resolvers.
+        url.getSegments().remove(0);
         EntityResourceReference entityResource =
-            (EntityResourceReference) this.mocker.getComponentUnderTest().resolve(url, Collections.EMPTY_MAP);
+            (EntityResourceReference) this.resolver.resolve(url, Collections.EMPTY_MAP);
 
         assertEquals(expectedActionName, entityResource.getAction().getActionName());
         assertEquals(returnedReference, entityResource.getEntityReference());
 
         return entityResource;
-    }
-
-    private void setUpEntityReferenceResolverMock(EntityReference expectedReference, EntityReference returnedReference,
-        EntityType expectedEntityType) throws Exception
-    {
-        EntityReferenceResolver<EntityReference> resolver =
-            this.mocker.getInstance(EntityReferenceResolver.TYPE_REFERENCE);
-        when(resolver.resolve(expectedReference, expectedEntityType)).thenReturn(returnedReference);
     }
 
     private EntityReference buildEntityReference(String wiki, String space, String page)

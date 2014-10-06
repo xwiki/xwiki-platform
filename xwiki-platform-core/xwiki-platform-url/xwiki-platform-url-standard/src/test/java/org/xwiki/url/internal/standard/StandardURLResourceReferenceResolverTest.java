@@ -23,14 +23,15 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceResolver;
-import org.xwiki.resource.UnsupportedResourceReferenceException;
+import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.url.ExtendedURL;
 
@@ -56,37 +57,68 @@ public class StandardURLResourceReferenceResolverTest
         Map<String, Object> parameters = Collections.singletonMap("ignorePrefix", (Object) "xwiki");
 
         ResourceReferenceResolver resolver = mock(ResourceReferenceResolver.class);
-        ExtendedURL extendedURL = new ExtendedURL(url, "xwiki");
 
         ComponentManager componentManager = this.mocker.getInstance(ComponentManager.class, "context");
         when(componentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceResolver.class,
             ExtendedURL.class), "standard/bin")).thenReturn(resolver);
 
+        this.mocker.registerMockComponent(WikiReferenceExtractor.class, "domain");
+        this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_REFERENCE);
+
         this.mocker.getComponentUnderTest().resolve(url, parameters);
 
-        // Verify the Entity URL Reference Resolver is called and with the proper parameters
-        verify(resolver).resolve(eq(extendedURL), eq(parameters));
+        // Verify that the Entity URL Reference Resolver is called and with the proper parameters
+        ExtendedURL expectedExtendedURL = new ExtendedURL(url, "xwiki");
+        expectedExtendedURL.getSegments().remove(0);
+        verify(resolver).resolve(eq(expectedExtendedURL), eq(parameters));
     }
 
     @Test
-    @Ignore("Put back when StandardURLResourceReferenceResolver.resolve() has its TODO/FIXME removed")
-    public void resolveWhenNoMatchingResolver() throws Exception
+    public void resolveWhenWikiPathSegment() throws Exception
     {
+        URL url = new URL("http://localhost:8080/xwiki/wiki/testwiki/view/Space/Page");
+        Map<String, Object> parameters = Collections.singletonMap("ignorePrefix", (Object) "xwiki");
+
+        ResourceReferenceResolver resolver = mock(ResourceReferenceResolver.class);
+
         ComponentManager componentManager = this.mocker.getInstance(ComponentManager.class, "context");
         when(componentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceResolver.class,
+            ExtendedURL.class), "standard/wiki")).thenReturn(resolver);
+
+        this.mocker.registerMockComponent(WikiReferenceExtractor.class, "domain");
+        this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_REFERENCE);
+
+        this.mocker.getComponentUnderTest().resolve(url, parameters);
+
+        // Verify that the Entity URL Reference Resolver is called and with the proper parameters
+        ExtendedURL expectedExtendedURL = new ExtendedURL(url, "xwiki");
+        expectedExtendedURL.getSegments().remove(0);
+        verify(resolver).resolve(eq(expectedExtendedURL), eq(parameters));
+    }
+
+    @Test
+    public void resolveWhenNoMatchingResolver() throws Exception
+    {
+        // Throw an exception when looking for a specific resource type resolver.
+        ComponentManager contextComponentManager = this.mocker.getInstance(ComponentManager.class, "context");
+        when(contextComponentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceResolver.class,
             ExtendedURL.class), "standard/unknown")).thenThrow(new ComponentLookupException("error"));
-        when(componentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceResolver.class,
+        when(contextComponentManager.getInstance(new DefaultParameterizedType(null, ResourceReferenceResolver.class,
             ExtendedURL.class), "unknown")).thenThrow(new ComponentLookupException("error"));
+
+        // Set up a mock bin Entity Reference Resolver
+        StandardURLConfiguration configuration = this.mocker.getInstance(StandardURLConfiguration.class);
+        when(configuration.getEntityPathPrefix()).thenReturn("binprefix");
+        when(configuration.getWikiPathPrefix()).thenReturn("wikiprefix");
+        this.mocker.registerMockComponent(WikiReferenceExtractor.class, "domain");
+        this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_REFERENCE);
 
         URL url = new URL("http://localhost:8080/xwiki/unknown");
         Map<String, Object> parameters = Collections.singletonMap("ignorePrefix", (Object) "xwiki");
 
-        try {
-            this.mocker.getComponentUnderTest().resolve(url, parameters);
-            fail("Should have thrown an exception here");
-        } catch (UnsupportedResourceReferenceException expected) {
-            assertEquals("Failed to find a Resolver for Resource Reference of type [unknown] for URL "
-                + "[http://localhost:8080/xwiki/unknown]", expected.getMessage());
-        }
+        ResourceReference reference = this.mocker.getComponentUnderTest().resolve(url, parameters);
+
+        assertEquals(EntityResourceReference.TYPE, reference.getType());
+        assertEquals("view", ((EntityResourceReference) reference).getAction().toString());
     }
 }

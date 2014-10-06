@@ -23,61 +23,33 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.CreateResourceReferenceException;
-import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
+import org.xwiki.resource.entity.EntityResourceAction;
+import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.url.ExtendedURL;
-import org.xwiki.url.internal.standard.StandardURLConfiguration;
-import org.xwiki.url.internal.standard.WikiReferenceExtractor;
 
 /**
- * Resolver that generates {@link org.xwiki.resource.entity.EntityResourceReference} out of {@link ExtendedURL} URLs.
- * <p/>
- * Handles:
- * <ul>
- *   <li>Path-based multiwiki: {@code http://server/(ignorePrefix)/wiki/wikiname/type/action/space/page/attachment}</li>
- *   <li>Domain-based multiwiki: {@code http://server/(ignorePrefix)/type/action/space/page/attachment}</li>
- * </ul>
+ * Common code for Entity Resource Reference Resolvers.
  *
  * @version $Id$
- * @since 6.1M2
+ * @since 6.3M1
  */
-@Component
-@Named("standard/bin")
-@Singleton
-public class ExtendedURLEntityResourceReferenceResolver implements ResourceReferenceResolver<ExtendedURL>
+public abstract class AbstractEntityResourceReferenceResolver implements ResourceReferenceResolver<ExtendedURL>
 {
-    /**
-     * Used to extract the wiki reference from the URL.
-     */
-    @Inject
-    private WikiReferenceExtractor wikiExtractor;
-
     /**
      * Used to resolve blanks in entity references when the URL doesn't specify all parts of an entity reference.
      */
-    @Inject
     private EntityReferenceResolver<EntityReference> defaultReferenceEntityReferenceResolver;
 
-    /**
-     * Used to get the configured entity path prefix from the URL to allow for short URLs.
-     */
-    @Inject
-    private StandardURLConfiguration configuration;
+    protected abstract WikiReference extractWikiReference(ExtendedURL url);
 
     @Override
     public ResourceReference resolve(ExtendedURL url, Map<String, Object> parameters)
@@ -85,16 +57,8 @@ public class ExtendedURLEntityResourceReferenceResolver implements ResourceRefer
     {
         EntityResourceReference entityURL;
 
-        // Extract the wiki part.
-        // The location of the wiki name depends on whether the wiki is configured to use domain-based multiwiki or
-        // path-based multiwiki. If domain-based multiwiki then extract the wiki reference from the domain, otherwise
-        // extract it from the path.
-        Pair<WikiReference, Boolean> extractionResult = this.wikiExtractor.extract(url);
-        WikiReference wikiReference = extractionResult.getLeft();
-        boolean isActuallyPathBased = extractionResult.getRight();
-
-        // Remove all required segments till we are at the level of the action part.
-        normalizeSegments(url, isActuallyPathBased);
+        // Extract the wiki reference from the URL
+        WikiReference wikiReference = extractWikiReference(url);
 
         // Rules based on counting the url segments:
         // - 0 segments (e.g. ""): default document reference, "view" action
@@ -165,35 +129,7 @@ public class ExtendedURLEntityResourceReferenceResolver implements ResourceRefer
     }
 
     /**
-     * Removes path segments till we reach the level of the action to perform on the Entity.
-     *
-     * @param url the URL containing the path segments and that will get modified
-     * @param isActuallyPathBased if true then the passed URL represents a path-based URL
-     */
-    private void normalizeSegments(ExtendedURL url, boolean isActuallyPathBased)
-    {
-        // In Path based it means removing 2 segments:
-        // Example of path-based URL: wiki/wikiname/action/space/page
-        // Thus removing 2 segments means keeping: action/space/page
-        if (isActuallyPathBased) {
-            url.getSegments().remove(0);
-            url.getSegments().remove(0);
-        } else {
-            // In Domain based, we still need to remove one segment since the first segment will contain the type
-            // (e.g. "bin"). However, since we want to support Short URLs and allow the user to not specify the type
-            // prefix, we only remove the segment if its value is of the configured value.
-            // Note that we also always support "bin" in order to make it easy for the user so that he doesn't have to
-            // change all the URLs everywhere (like the error page URL in web.xml, etc).
-            String entityPathPrefix = this.configuration.getEntityPathPrefix();
-            String firstSegment = url.getSegments().get(0);
-            if (firstSegment.equals(entityPathPrefix) || firstSegment.equals("bin")) {
-                url.getSegments().remove(0);
-            }
-        }
-    }
-
-    /**
-     * Copies query string parameters from the passed {@link ExtendedURL} to the passed {@link org.xwiki.resource.entity.EntityResourceReference}.
+     * Copies query string parameters from the passed {@link org.xwiki.url.ExtendedURL} to the passed {@link org.xwiki.resource.entity.EntityResourceReference}.
      *
      * @param source the source URL from where to get the query string parameters
      * @param target the {@link org.xwiki.resource.entity.EntityResourceReference} on which to copy the query string parameters

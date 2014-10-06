@@ -20,14 +20,24 @@
 package org.xwiki.url.internal.standard;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.descriptor.DefaultComponentDependency;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.manager.ComponentRepositoryException;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceResolver;
 import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.internal.standard.entity.BinEntityResourceReferenceResolver;
+import org.xwiki.url.internal.standard.entity.WikiEntityResourceReferenceResolver;
 
 import java.net.URL;
 import java.util.Map;
@@ -45,7 +55,7 @@ import javax.inject.Singleton;
 @Component
 @Named("standard")
 @Singleton
-public class StandardURLResourceReferenceResolver implements ResourceReferenceResolver<URL>
+public class StandardURLResourceReferenceResolver implements ResourceReferenceResolver<URL>, Initializable
 {
     /**
      * @see #resolve(java.net.URL, java.util.Map)
@@ -56,15 +66,74 @@ public class StandardURLResourceReferenceResolver implements ResourceReferenceRe
     @Named("context")
     private ComponentManager componentManager;
 
+    @Inject
+    private ComponentManager rootComponentManager;
+
     /**
      * Used to know if the wiki is in path-based configuration or not.
      */
     @Inject
     private StandardURLConfiguration configuration;
 
-    @Inject
-    @Named("standard/bin")
-    private ResourceReferenceResolver<ExtendedURL> entityResourceReferenceResolver;
+    private ResourceReferenceResolver<ExtendedURL> binEntityResourceReferenceResolver;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        // Step 1: Dynamically register a WikiEntityResourceReferenceResolver since the user can choose the Resource
+        // type name when specifying an Entity Resource Reference in path-based multiwiki, see
+        // StandardURLConfiguration#getWikiPathPrefix()
+        registerEntityResourceReferenceResolver(this.configuration.getWikiPathPrefix(),
+            WikiEntityResourceReferenceResolver.class, "path");
+
+        // Step 2: Dynamically register a BinEntityResourceReferenceResolver since the user can choose the Resource
+        // type name for Entities, see StandardURLConfiguration#getEntityPathPrefix()
+        registerEntityResourceReferenceResolver(this.configuration.getEntityPathPrefix(),
+            BinEntityResourceReferenceResolver.class, "domain");
+
+        // Step 3: Cache the registered BinEntityResourceReferenceResolver for later use below
+        try {
+            this.binEntityResourceReferenceResolver = this.rootComponentManager.getInstance(
+                new DefaultParameterizedType(null, ResourceReferenceResolver.class, ExtendedURL.class),
+                computeHint(this.configuration.getEntityPathPrefix()));
+        } catch (ComponentLookupException e) {
+            throw new InitializationException("Failed to initialize Standard Resource Reference Resolver", e);
+        }
+    }
+
+    private void registerEntityResourceReferenceResolver(String registrationHint,
+        Class<? extends ResourceReferenceResolver<ExtendedURL>> registrationImplementation,
+        String wikiExtractorHint) throws InitializationException
+    {
+        DefaultComponentDescriptor<ResourceReferenceResolver<ExtendedURL>> resolverDescriptor =
+            new DefaultComponentDescriptor<>();
+        resolverDescriptor.setImplementation(registrationImplementation);
+        resolverDescriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
+        String hint = computeHint(registrationHint);
+        resolverDescriptor.setRoleHint(hint);
+        resolverDescriptor.setRoleType(
+            new DefaultParameterizedType(null, ResourceReferenceResolver.class, ExtendedURL.class));
+        // Register dependencies
+        DefaultComponentDependency<WikiReferenceExtractor> wikiReferenceExtractorDependency =
+            new DefaultComponentDependency<>();
+        wikiReferenceExtractorDependency.setRoleType(WikiReferenceExtractor.class);
+        wikiReferenceExtractorDependency.setRoleHint(wikiExtractorHint);
+        wikiReferenceExtractorDependency.setName("wikiExtractor");
+        resolverDescriptor.addComponentDependency(wikiReferenceExtractorDependency);
+        DefaultComponentDependency<EntityReferenceResolver<EntityReference>> entityReferenceResolverDependency =
+            new DefaultComponentDependency<>();
+        entityReferenceResolverDependency.setRoleType(new DefaultParameterizedType(null, EntityReferenceResolver.class,
+            EntityReference.class));
+        entityReferenceResolverDependency.setName("defaultReferenceEntityReferenceResolver");
+        resolverDescriptor.addComponentDependency(entityReferenceResolverDependency);
+
+        try {
+            this.rootComponentManager.registerComponent(resolverDescriptor);
+        } catch (ComponentRepositoryException e) {
+            throw new InitializationException(String.format(
+                "Failed to dynamically register Resource Reference Resolver for hint [%s]", hint), e);
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -94,30 +163,46 @@ public class StandardURLResourceReferenceResolver implements ResourceReferenceRe
         // Step 2: Find the right Resolver for the passed Resource type and call it.
         ResourceReferenceResolver<ExtendedURL> resolver;
 
-        // Find the URL Factory for the type, which is the first segment in the ExtendedURL
+        // Find the URL Factory for the type, which is the first segment in the ExtendedURL.
+        //
+        // Note that we need to remove it from the ExtendedURL instance since it's passed to the specific resolvers
+        // and they shouldn't be aware of where it was located since they need to be able to resolve the rest of the
+        // URL independently of the URL scheme, in case they wish to have a single URL syntax for all URL schemes.
+        // Example:
+        // - scheme 1: /<type>/something
+        // - scheme 2: /something?type=<type>
+        // The specific resolver for type <type> needs to be passed an ExtendedURL independent of the type, in this
+        // case: /something
+        //
+        // However since we also want this code to work when short URLs are enabled, we only remove the segment part
+        // if a Resource type has been identified (see below) and if not, we assume the URL is pointing to an Entity
+        // Resource.
         String type = extendedURL.getSegments().get(0);
 
         // First, try to locate a URL Resolver registered only for this URL scheme
         try {
-            resolver = this.componentManager.getInstance(
-                new DefaultParameterizedType(null, ResourceReferenceResolver.class,
-                    ExtendedURL.class), String.format("standard/%s", type));
+            resolver = this.componentManager.getInstance(new DefaultParameterizedType(null,
+                ResourceReferenceResolver.class, ExtendedURL.class), computeHint(type));
+            extendedURL.getSegments().remove(0);
         } catch (ComponentLookupException e) {
             // Second, if not found, try to locate a URL Resolver registered for all URL schemes
             try {
                 resolver = this.componentManager.getInstance(
                     new DefaultParameterizedType(null, ResourceReferenceResolver.class, ExtendedURL.class), type);
+                extendedURL.getSegments().remove(0);
             } catch (ComponentLookupException cle) {
-                // TODO: Fix this. In the future throw an exception as in:
-                // throw new UnsupportedResourceReferenceException(
-                //     String.format("Failed to find a Resolver for Resource Reference of type [%s] for URL [%s]", type,
-                //        url), e);
-                // However for now we need to ensure we always return something since in XWiki.getXWiki() we call this
-                // method and we use the returned EntityResourceReference to extract the wiki id!
-                resolver = this.entityResourceReferenceResolver;
+                // No specific Resource Type Resolver had been found. In order to support short URLs (ie. without the
+                // "bin" or "wiki" part specified), we assume the URL is pointing to an Entity Resource Reference.
+                // Since the "wiki" type was not selected, we're assuming that the we'll use the "bin" entity resolver.
+                resolver = this.binEntityResourceReferenceResolver;
             }
         }
 
         return resolver.resolve(extendedURL, parameters);
+    }
+
+    private String computeHint(String type)
+    {
+        return String.format("standard/%s", type);
     }
 }

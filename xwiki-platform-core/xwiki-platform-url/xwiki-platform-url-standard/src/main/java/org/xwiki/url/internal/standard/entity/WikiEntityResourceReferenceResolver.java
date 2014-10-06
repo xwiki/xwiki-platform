@@ -17,27 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.url.internal.standard;
+package org.xwiki.url.internal.standard.entity;
 
-import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.url.internal.standard.WikiReferenceExtractor;
 
 /**
- * Extracts the reference to the wiki pointed to by the specified {@link ExtendedURL} object.
+ * Resolver that generates {@link org.xwiki.resource.entity.EntityResourceReference} out of {@link ExtendedURL} URLs
+ * when the Resource Type is {@code wiki}, i.e. when XWiki is configured for path-based multiwiki
+ * (e.g. {@code http://server/(ignorePrefix)/wiki/wikiname/action/space/page/attachment}).
  *
  * @version $Id$
- * @since 5.1M1
+ * @since 6.3M1
  */
-@Role
-public interface WikiReferenceExtractor
+public class WikiEntityResourceReferenceResolver extends AbstractEntityResourceReferenceResolver
 {
     /**
-     * Extract the name of the wiki the URL is pointing to.
-     *
-     * @param url the URL from which to extract the wiki reference
-     * @return the reference to the wiki pointed to by the passed URL
-     * @since 6.3M1 returns only a WikiReference (whereas before it was returning both a WikiReference and a boolean)
+     * Used to extract the wiki reference from the URL.
      */
-    WikiReference extract(ExtendedURL url);
+    private WikiReferenceExtractor wikiExtractor;
+
+    @Override
+    protected WikiReference extractWikiReference(ExtendedURL url)
+    {
+        WikiReference wikiReference = this.wikiExtractor.extract(url);
+
+        // Remove the first path segment since it contains the wiki name and we need the first segment to be the
+        // action name
+        url.getSegments().remove(0);
+
+        return wikiReference;
+    }
 }

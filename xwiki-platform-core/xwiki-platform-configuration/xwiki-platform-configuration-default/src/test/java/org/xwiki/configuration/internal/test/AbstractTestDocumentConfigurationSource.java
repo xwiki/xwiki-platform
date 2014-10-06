@@ -19,13 +19,20 @@
  */
 package org.xwiki.configuration.internal.test;
 
+import static org.hamcrest.CoreMatchers.anything;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Type;
+
+import org.apache.poi.ss.formula.functions.T;
 import org.junit.Before;
 import org.junit.Rule;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -36,6 +43,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -61,6 +69,8 @@ public abstract class AbstractTestDocumentConfigurationSource
 
     protected Cache<Object> mockCache;
 
+    protected ConverterManager mockConverter;
+
     public AbstractTestDocumentConfigurationSource(Class<? extends ConfigurationSource> clazz)
     {
         this.componentManager = new MockitoComponentMockingRule<ConfigurationSource>(clazz);
@@ -73,6 +83,16 @@ public abstract class AbstractTestDocumentConfigurationSource
     public void before() throws Exception
     {
         this.mockCache = mock(Cache.class);
+        this.mockConverter = this.componentManager.getInstance(ConverterManager.class);
+
+        when(this.mockConverter.convert(any(Type.class), anyObject())).then(new Answer<Object>()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+                return invocation.getArguments()[1];
+            }
+        });
 
         CacheManager cacheManager = this.componentManager.getInstance(CacheManager.class);
 

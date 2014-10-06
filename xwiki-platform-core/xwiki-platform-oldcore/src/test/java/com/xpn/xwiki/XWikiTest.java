@@ -89,7 +89,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
         mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
-        
+
         this.xwiki = new XWiki(new XWikiConfig(), getContext())
         {
             // Avoid all the error at XWiki initialization
@@ -380,17 +380,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         });
 
         // Set the wiki to multilingual mode.
-        XWikiDocument preferences = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "XWikiPreferences")) {
-            @Override
-            public BaseObject getXObject()
-            {
-                BaseObject preferencesObject = new BaseObject();
-                preferencesObject.setIntValue("multilingual", 1);
-
-                return preferencesObject;
-            }
-        };
-        this.xwiki.saveDocument(preferences, getContext());
+        getConfigurationSource().setProperty("multilingual", "1");
 
         assertEquals("fr", this.xwiki.getLanguagePreference(getContext()));
     }

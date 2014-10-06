@@ -111,7 +111,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.RegexEntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -377,6 +376,12 @@ public class XWiki implements EventListener
 
     private ConfigurationSource xwikicfg;
 
+    private ConfigurationSource wikiConfiguration;
+
+    private ConfigurationSource spaceConfiguration;
+
+    private ConfigurationSource userConfiguration;
+
     private static XWikiInitializerJob job;
 
     private ConfigurationSource getConfiguration()
@@ -386,6 +391,33 @@ public class XWiki implements EventListener
         }
 
         return this.xwikicfg;
+    }
+
+    private ConfigurationSource getWikiConfiguration()
+    {
+        if (this.wikiConfiguration == null) {
+            this.wikiConfiguration = Utils.getComponent(ConfigurationSource.class, "wiki");
+        }
+
+        return this.wikiConfiguration;
+    }
+
+    private ConfigurationSource getSpaceConfiguration()
+    {
+        if (this.spaceConfiguration == null) {
+            this.spaceConfiguration = Utils.getComponent(ConfigurationSource.class, "space");
+        }
+
+        return this.spaceConfiguration;
+    }
+
+    private ConfigurationSource getUserConfiguration()
+    {
+        if (this.userConfiguration == null) {
+            this.userConfiguration = Utils.getComponent(ConfigurationSource.class, "space");
+        }
+
+        return this.userConfiguration;
     }
 
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException
@@ -2058,9 +2090,8 @@ public class XWiki implements EventListener
      * on a config parameter when the first lookup gives an empty string, then returning the default value if the config
      * parameter returned itself an empty string.
      * 
-     * @param prefname the parameter to look for in the XWiki.XWikiPreferences object corresponding to the context's
-     *            language in the XWiki.XWikiPreferences document of the wiki (or the first XWiki.XWikiPreferences
-     *            object contained, if the one for the context'ds language could not be found).
+     * @param prefname the parameter to look for in the XWiki.XWikiPreferences object in the XWiki.XWikiPreferences
+     *            document of the wiki.
      * @param fallback_param the parameter in xwiki.cfg to fallback on, in case the XWiki.XWikiPreferences object gave
      *            no result
      * @param default_value the default value to fallback on, in case both XWiki.XWikiPreferences and the fallback
@@ -2068,36 +2099,25 @@ public class XWiki implements EventListener
      */
     public String getXWikiPreference(String prefname, String fallback_param, String default_value, XWikiContext context)
     {
-        try {
-            DocumentReference xwikiPreferencesReference = getPreferencesDocumentReference(context);
-            XWikiDocument doc = getDocument(xwikiPreferencesReference, context);
-            // First we try to get a translated preference object
-            BaseObject object =
-                doc.getXObject(xwikiPreferencesReference, "default_language", context.getLanguage(), true);
-            String result = "";
+        return getPreference(prefname, fallback_param, default_value, getWikiConfiguration());
+    }
 
-            if (object != null) {
-                try {
-                    result = object.getStringValue(prefname);
-                } catch (Exception e) {
-                    LOGGER.warn("Exception while getting wiki preference [{}]", prefname, e);
-                }
-            }
-            // If empty we take it from the default pref object
-            if (result.equals("")) {
-                object = doc.getXObject();
-                if (object != null) {
-                    result = object.getStringValue(prefname);
-                }
-            }
+    private String getPreference(String prefname, String fallbackParam, String defaultValue,
+        ConfigurationSource configuration)
+    {
+        String result = configuration.getProperty(prefname, String.class);
 
-            if (!result.equals("")) {
-                return result;
-            }
-        } catch (Exception e) {
-            LOGGER.debug("Exception while getting wiki preference [{}]", prefname, e);
+        // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
+        if ((StringUtils.isEmpty(result) || result.equals(NO_VALUE)) && StringUtils.isNotEmpty(fallbackParam)) {
+            result = configuration.getProperty(fallbackParam, String.class);
         }
-        return getConfiguration().getProperty(fallback_param, default_value);
+
+       // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
+        if ((StringUtils.isEmpty(result) || result.equals(NO_VALUE))) {
+            result = defaultValue;
+        }
+
+        return result != null ? result : "";
     }
 
     public String getXWikiPreference(String prefname, String default_value, XWikiContext context)
@@ -2119,48 +2139,24 @@ public class XWiki implements EventListener
 
     public String getSpacePreference(String preference, String space, String defaultValue, XWikiContext context)
     {
-        // If there's no space defined then don't return space preferences (since it'll usually mean that the current
-        // doc is not set).
-        if (space != null) {
-            try {
-                XWikiDocument doc = getDocument(new LocalDocumentReference(space, "WebPreferences"), context);
+        String result = getPreference(preference, null, null, getSpaceConfiguration());
 
-                // First we try to get a translated preference object
-                DocumentReference xwikiPreferencesReference = getPreferencesDocumentReference(context);
-                BaseObject object =
-                    doc.getXObject(xwikiPreferencesReference, "default_language", context.getLanguage(), true);
-                String result = "";
-                if (object != null) {
-                    result = object.getStringValue(preference);
-                }
-
-                // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
-                if (!result.equals("") && !result.equals(NO_VALUE)) {
-                    return result;
-                }
-            } catch (Exception e) {
-                LOGGER.debug("Exception while getting space preference [" + preference + "]", e);
-            }
+        if (StringUtils.isEmpty(result)) {
+            result = getXWikiPreference(preference, defaultValue, context);
         }
-        return getXWikiPreference(preference, defaultValue, context);
+
+        return result;
     }
 
     public String getUserPreference(String prefname, XWikiContext context)
     {
-        try {
-            XWikiDocument userdoc = getDocument(context.getUserReference(), context);
-            if (userdoc != null) {
-                String result = userdoc.getStringValue("XWiki.XWikiUsers", prefname);
-                // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
-                if ((!result.equals("")) && (!result.equals(NO_VALUE))) {
-                    return result;
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.debug("Exception while getting user preference [" + prefname + "]", e);
+        String result = getPreference(prefname, null, null, getUserConfiguration());
+
+        if (StringUtils.isEmpty(result)) {
+            result = getSpacePreference(prefname, context);
         }
 
-        return getSpacePreference(prefname, context);
+        return result;
     }
 
     public String getUserPreferenceFromCookie(String prefname, XWikiContext context)
@@ -3291,7 +3287,7 @@ public class XWiki implements EventListener
      *         </ul>
      * @throws XWikiException failed to create the new user
      */
-    public int createUser(String userName, Map<String, ? > map, XWikiContext context) throws XWikiException
+    public int createUser(String userName, Map<String, ?> map, XWikiContext context) throws XWikiException
     {
         return createUser(userName, map, "edit", context);
     }
@@ -3309,7 +3305,7 @@ public class XWiki implements EventListener
      *         </ul>
      * @throws XWikiException failed to create the new user
      */
-    public int createUser(String userName, Map<String, ? > map, String userRights, XWikiContext context)
+    public int createUser(String userName, Map<String, ?> map, String userRights, XWikiContext context)
         throws XWikiException
     {
         BaseClass userClass = context.getWiki().getUserClass(context);
@@ -3333,7 +3329,7 @@ public class XWiki implements EventListener
      *             {@link #createUser(String, Map, EntityReference, String, Syntax, String, XWikiContext)} instead
      */
     @Deprecated
-    public int createUser(String userName, Map<String, ? > map, String parent, String content, String syntaxId,
+    public int createUser(String userName, Map<String, ?> map, String parent, String content, String syntaxId,
         String userRights, XWikiContext context) throws XWikiException
     {
         Syntax syntax;
@@ -3371,7 +3367,7 @@ public class XWiki implements EventListener
      *         </ul>
      * @throws XWikiException failed to create the new user
      */
-    public int createUser(String userName, Map<String, ? > map, EntityReference parentReference, String content,
+    public int createUser(String userName, Map<String, ?> map, EntityReference parentReference, String content,
         Syntax syntax, String userRights, XWikiContext context) throws XWikiException
     {
         BaseClass userClass = getUserClass(context);
@@ -3416,7 +3412,7 @@ public class XWiki implements EventListener
      *             {@link #createUser(String, Map, String, String, String, String, XWikiContext)} instead
      */
     @Deprecated
-    public int createUser(String xwikiname, Map<String, ? > map, String parent, String content, String userRights,
+    public int createUser(String xwikiname, Map<String, ?> map, String parent, String content, String userRights,
         XWikiContext context) throws XWikiException
     {
         return createUser(xwikiname, map, parent, content, Syntax.XWIKI_1_0.toIdString(), userRights, context);
@@ -4528,7 +4524,7 @@ public class XWiki implements EventListener
             // We need to check rights before we look for translations
             // Otherwise we don't have the user language
             if (checkAccess(context.getAction(), doc, context) == false) {
-                Object[] args = { doc.getFullName(), context.getUser() };
+                Object[] args = {doc.getFullName(), context.getUser()};
                 setPhonyDocument(reference, context, vcontext);
                 throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                     "Access to document {0} has been denied to user {1}", null, args);
@@ -4536,16 +4532,15 @@ public class XWiki implements EventListener
                 boolean allow = false;
                 String action = context.getAction();
                 /*
-                 * Allow inactive users to see skins, ressources, SSX, JSX and downloads they could have seen as guest. The
-                 * rational behind this behaviour is that inactive users should be able to access the same UI that guests
-                 * are used to see, including custom icons, panels, and so on...
+                 * Allow inactive users to see skins, ressources, SSX, JSX and downloads they could have seen as guest.
+                 * The rational behind this behaviour is that inactive users should be able to access the same UI that
+                 * guests are used to see, including custom icons, panels, and so on...
                  */
                 if ((action.equals("skin") && (doc.getSpace().equals("skins") || doc.getSpace().equals("resources")))
-                    || ((action.equals("skin") || action.equals("download") || action.equals("ssx")
-                    || action.equals("jsx")) && getRightService().hasAccessLevel("view",
+                    || ((action.equals("skin") || action.equals("download") || action.equals("ssx") || action
+                        .equals("jsx")) && getRightService().hasAccessLevel("view",
                         XWikiRightService.GUEST_USER_FULLNAME, doc.getPrefixedFullName(), context))
-                    || ((action.equals("view") && doc.getFullName().equals("XWiki.AccountValidation"))))
-                {
+                    || ((action.equals("view") && doc.getFullName().equals("XWiki.AccountValidation")))) {
                     allow = true;
                 } else {
                     String allowed = getConfiguration().getProperty("xwiki.inactiveuser.allowedpages", "");
@@ -4560,10 +4555,10 @@ public class XWiki implements EventListener
                     }
                 }
                 if (!allow) {
-                    Object[] args = { context.getUser() };
+                    Object[] args = {context.getUser()};
                     setPhonyDocument(reference, context, vcontext);
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INACTIVE,
-                        "User {0} account is inactive", null, args);
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
+                        XWikiException.ERROR_XWIKI_USER_INACTIVE, "User {0} account is inactive", null, args);
                 }
             }
         }
@@ -4812,7 +4807,7 @@ public class XWiki implements EventListener
                             }
                             factoryService =
                                 (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
-                                    .getConstructor(new Class< ? >[] {XWiki.class}).newInstance(new Object[] {this});
+                                    .getConstructor(new Class<?>[] {XWiki.class}).newInstance(new Object[] {this});
                         } catch (Exception e) {
                             factoryService = null;
                             LOGGER.warn("Failed to initialize URLFactory Service [" + urlFactoryServiceClass + "]", e);
@@ -5339,7 +5334,7 @@ public class XWiki implements EventListener
     {
         try {
             return getStore().getQueryManager().getNamedQuery("getSpaces")
-                .addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, "hidden")).execute();
+                .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
@@ -5357,7 +5352,7 @@ public class XWiki implements EventListener
     {
         try {
             return getStore().getQueryManager().getNamedQuery("getSpaceDocsName")
-                .addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, "hidden")).bindValue("space", spaceName)
+                .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).bindValue("space", spaceName)
                 .execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
@@ -5426,7 +5421,7 @@ public class XWiki implements EventListener
             @SuppressWarnings("deprecation")
             List<String> docs =
                 getStore().getQueryManager().getNamedQuery("getAllDocuments")
-                    .addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, "hidden")).execute();
+                    .addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, "hidden")).execute();
             for (int i = 0; i < docs.size(); i++) {
                 XWikiDocument myDoc = this.getDocument(docs.get(i), context);
                 myDoc.getStore().saveLinks(myDoc, context, true);
@@ -6448,7 +6443,7 @@ public class XWiki implements EventListener
      */
     @Unstable
     public List<XWikiAttachment> searchAttachments(String parametrizedSqlClause, boolean checkRight, int nb, int start,
-        List< ? > parameterValues, XWikiContext context) throws XWikiException
+        List<?> parameterValues, XWikiContext context) throws XWikiException
     {
         parametrizedSqlClause = parametrizedSqlClause.trim().replaceFirst("^and ", "").replaceFirst("^where ", "");
 
@@ -6504,7 +6499,7 @@ public class XWiki implements EventListener
      * @since 5.0M2
      */
     @Unstable
-    public int countAttachments(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
+    public int countAttachments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
         parametrizedSqlClause = parametrizedSqlClause.trim().replaceFirst("^and ", "").replaceFirst("^where ", "");

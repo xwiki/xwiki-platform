@@ -19,11 +19,19 @@
  */
 package org.xwiki.configuration.internal;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.internal.test.AbstractTestDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
+
+import com.xpn.xwiki.XWikiException;
 
 /**
  * Unit tests for {@link WikiPreferencesConfigurationSource}.
@@ -43,14 +51,67 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
         return WikiPreferencesConfigurationSource.CLASS_REFERENCE;
     }
 
+    @Override
+    public void before() throws Exception
+    {
+        super.before();
+
+        this.oldcore.getXWikiContext().setLocale(Locale.ENGLISH);
+    }
+
+    // Tests
+
     @Test
-    public void getPropertyForStringWhenExists() throws Exception
+    public void testGetProperty() throws Exception
+    {
+        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key", String.class));
+        Assert.assertEquals("default", this.componentManager.getComponentUnderTest().getProperty("key", "default"));
+        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key"));
+
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.SPACE_NAME,
+            WikiPreferencesConfigurationSource.PAGE_NAME), "key", "value");
+
+        Assert.assertEquals("value", this.componentManager.getComponentUnderTest().getProperty("key", String.class));
+        Assert.assertEquals("value", this.componentManager.getComponentUnderTest().getProperty("key", "default"));
+        Assert.assertEquals("value", this.componentManager.getComponentUnderTest().getProperty("key"));
+
+        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("wrongkey", String.class));
+        Assert
+            .assertEquals("default", this.componentManager.getComponentUnderTest().getProperty("wrongkey", "default"));
+        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("wrongkey"));
+    }
+
+    @Test
+    public void testGetKeys() throws ComponentLookupException, XWikiException
+    {
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.SPACE_NAME,
+            WikiPreferencesConfigurationSource.PAGE_NAME), "key1", "value");
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.SPACE_NAME,
+            WikiPreferencesConfigurationSource.PAGE_NAME), "key2", "value");
+
+        List<String> result = this.componentManager.getComponentUnderTest().getKeys();
+
+        Assert.assertEquals(new HashSet<String>(Arrays.asList("key1", "key2")), new HashSet<String>(result));
+    }
+
+    @Test
+    public void testContainsKey() throws XWikiException, ComponentLookupException
     {
         setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.SPACE_NAME,
             WikiPreferencesConfigurationSource.PAGE_NAME), "key", "value");
 
-        String result = this.componentManager.getComponentUnderTest().getProperty("key", String.class);
+        Assert.assertTrue(this.componentManager.getComponentUnderTest().containsKey("key"));
+        Assert.assertFalse(this.componentManager.getComponentUnderTest().containsKey("wrongkey"));
+    }
 
-        Assert.assertEquals("value", result);
+    @Test
+    public void testIsEmpty() throws ComponentLookupException, XWikiException
+    {
+        Assert.assertTrue(this.componentManager.getComponentUnderTest().isEmpty());
+
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.SPACE_NAME,
+            WikiPreferencesConfigurationSource.PAGE_NAME), "key", "value");
+
+        Assert.assertFalse(this.componentManager.getComponentUnderTest().isEmpty());
     }
 }

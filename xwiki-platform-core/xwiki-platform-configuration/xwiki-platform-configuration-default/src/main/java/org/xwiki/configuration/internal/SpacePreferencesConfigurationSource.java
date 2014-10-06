@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 
 /**
@@ -39,18 +38,8 @@ import org.xwiki.model.reference.SpaceReference;
 @Component
 @Named("space")
 @Singleton
-public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigurationSource
+public class SpacePreferencesConfigurationSource extends AbstractXWikiPreferencesConfigurationSource
 {
-    /**
-     * The name of the document containing space preferences.
-     */
-    static final String PAGE_NAME = "WebPreferences";
-
-    /**
-     * The local reference of the class containing space preferences.
-     */
-    static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiPreferences");
-
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
@@ -69,12 +58,6 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
         }
 
         return null;
-    }
-
-    @Override
-    protected LocalDocumentReference getClassReference()
-    {
-        return CLASS_REFERENCE;
     }
 
     @Override

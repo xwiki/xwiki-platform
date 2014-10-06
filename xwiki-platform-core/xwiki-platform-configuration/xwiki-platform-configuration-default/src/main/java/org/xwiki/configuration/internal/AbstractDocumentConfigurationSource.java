@@ -47,11 +47,13 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObject;
@@ -82,6 +84,9 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
 
     @Inject
     protected Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    protected ConverterManager converter;
 
     @Inject
     protected Logger logger;
@@ -157,8 +162,8 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
             new RegexEntityReference(Pattern.compile(".*:" + this.referenceSerializer.serialize(getClassReference())
                 + "\\[\\d*\\]"), EntityType.OBJECT);
 
-        return Arrays.<Event>asList(new XObjectDeletedEvent(classMatcher), new XObjectUpdatedEvent(classMatcher),
-            new WikiDeletedEvent());
+        return Arrays.<Event>asList(new XObjectAddedEvent(classMatcher), new XObjectDeletedEvent(classMatcher),
+            new XObjectUpdatedEvent(classMatcher), new WikiDeletedEvent());
     }
 
     protected void onCacheCleanup(Event event, Object source, Object data)
@@ -181,23 +186,21 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         // Since a single XObject holds all the properties we need to be careful here, overriding one property will put
         // all the default keys in the source. To determine that the source contains the given key we check that the
         // value is both not-null and not empty.
-        Object value = getPropertyValue(key);
+        Object value = getPropertyValue(key, null);
         return value != null && !"".equals(value);
     }
 
     protected BaseObject getBaseObject() throws XWikiException
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference documentReference = getFailsafeDocumentReference();
+        LocalDocumentReference classReference = getFailsafeClassReference();
 
-        if (xcontext != null && xcontext.getWiki() != null) {
-            DocumentReference documentReference = getFailsafeDocumentReference();
-            LocalDocumentReference classReference = getFailsafeClassReference();
+        if (documentReference != null && classReference != null) {
+            XWikiContext xcontext = this.xcontextProvider.get();
 
-            if (documentReference != null && classReference != null) {
-                XWikiDocument document = xcontext.getWiki().getDocument(getDocumentReference(), xcontext);
+            XWikiDocument document = xcontext.getWiki().getDocument(getDocumentReference(), xcontext);
 
-                return document.getXObject(getClassReference());
-            }
+            return document.getXObject(classReference);
         }
 
         return null;
@@ -221,15 +224,19 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     {
         List<String> keys = Collections.emptyList();
 
-        BaseObject baseObject;
-        try {
-            baseObject = getBaseObject();
+        XWikiContext xcontext = this.xcontextProvider.get();
 
-            if (baseObject != null) {
-                keys = new ArrayList<String>(baseObject.getPropertyList());
+        if (xcontext != null && xcontext.getWiki() != null) {
+            BaseObject baseObject;
+            try {
+                baseObject = getBaseObject();
+
+                if (baseObject != null) {
+                    keys = new ArrayList<String>(baseObject.getPropertyList());
+                }
+            } catch (XWikiException e) {
+                this.logger.error("Failed to access configuration", e);
             }
-        } catch (XWikiException e) {
-            this.logger.error("Failed to access configuration", e);
         }
 
         return keys;
@@ -238,8 +245,10 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     @Override
     public <T> T getProperty(String key, T defaultValue)
     {
-        T result = getProperty(key);
+        T result = getPropertyValue(key, defaultValue != null ? (Class<T>) defaultValue.getClass() : null);
 
+        // Make sure we don't return null values for List and Properties (they must return empty elements
+        // when using the typed API).
         if (result == null) {
             result = defaultValue;
         }
@@ -250,7 +259,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     @Override
     public <T> T getProperty(String key, Class<T> valueClass)
     {
-        T result = getProperty(key);
+        T result = getPropertyValue(key, valueClass);
 
         // Make sure we don't return null values for List and Properties (they must return empty elements
         // when using the typed API).
@@ -265,10 +274,10 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key)
     {
-        return (T) getPropertyValue(key);
+        return (T) getPropertyValue(key, null);
     }
 
-    private Object getPropertyValue(String key)
+    protected <T> T getPropertyValue(String key, Class<T> valueClass)
     {
         String cacheKey = getCacheKeyPrefix() + ':' + key;
 
@@ -280,6 +289,10 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
             if (xcontext != null && xcontext.getWiki() != null) {
                 try {
                     result = getBaseProperty(key);
+
+                    if (valueClass != null) {
+                        result = this.converter.convert(valueClass, result);
+                    }
 
                     // Void.TYPE is used to keep track of fields that don't exist
                     this.cache.set(cacheKey, result == null ? Void.TYPE : result);
@@ -294,7 +307,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
             result = null;
         }
 
-        return result;
+        return (T) result;
     }
 
     @Override
@@ -303,7 +316,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         return getKeys().isEmpty();
     }
 
-    private DocumentReference getFailsafeDocumentReference()
+    protected DocumentReference getFailsafeDocumentReference()
     {
         DocumentReference documentReference;
 
@@ -318,7 +331,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         return documentReference;
     }
 
-    private LocalDocumentReference getFailsafeClassReference()
+    protected LocalDocumentReference getFailsafeClassReference()
     {
         LocalDocumentReference classReference;
 

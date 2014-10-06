@@ -2440,6 +2440,23 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     }
 
     /**
+     * @return 6.3M1
+     */
+    public BaseObject getXObject(EntityReference reference, String key, String value, boolean failover)
+    {
+        if (reference instanceof DocumentReference) {
+            return getXObject((DocumentReference) reference, key, value, failover);
+        } else if (reference.getType() == EntityType.DOCUMENT) {
+            // class reference
+            return getXObject(
+                getCurrentReferenceDocumentReferenceResolver().resolve(reference, getDocumentReference()), key, value,
+                failover);
+        }
+
+        return null;
+    }
+
+    /**
      * @since 2.2M1
      */
     public BaseObject getXObject(DocumentReference classReference, String key, String value, boolean failover)

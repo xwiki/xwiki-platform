@@ -183,11 +183,18 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     @Override
     public boolean containsKey(String key)
     {
-        // Since a single XObject holds all the properties we need to be careful here, overriding one property will put
-        // all the default keys in the source. To determine that the source contains the given key we check that the
-        // value is both not-null and not empty.
-        Object value = getPropertyValue(key, null);
-        return value != null && !"".equals(value);
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        if (xcontext != null && xcontext.getWiki() != null) {
+            // Since a single XObject holds all the properties we need to be careful here, overriding one property will
+            // put
+            // all the default keys in the source. To determine that the source contains the given key we check that the
+            // value is both not-null and not empty.
+            Object value = getPropertyValue(key, null);
+            return value != null && !"".equals(value);
+        }
+
+        return false;
     }
 
     protected BaseObject getBaseObject() throws XWikiException

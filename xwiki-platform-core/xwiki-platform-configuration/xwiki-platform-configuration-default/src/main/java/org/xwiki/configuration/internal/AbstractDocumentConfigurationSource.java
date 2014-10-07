@@ -206,14 +206,14 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         return null;
     }
 
-    protected Object getBaseProperty(String propertyName) throws XWikiException
+    protected Object getBaseProperty(String propertyName, boolean text) throws XWikiException
     {
         BaseObject baseObject = getBaseObject();
 
         if (baseObject != null) {
             BaseProperty property = (BaseProperty) baseObject.getField(propertyName);
 
-            return property != null ? property.getValue() : null;
+            return property != null ? (text ? property.toText() : property.getValue()) : null;
         }
 
         return null;
@@ -288,7 +288,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
 
             if (xcontext != null && xcontext.getWiki() != null) {
                 try {
-                    result = getBaseProperty(key);
+                    result = getBaseProperty(key, valueClass == String.class);
 
                     if (valueClass != null) {
                         result = this.converter.convert(valueClass, result);

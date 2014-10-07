@@ -133,7 +133,7 @@ public abstract class AbstractXWikiPreferencesConfigurationSource extends Abstra
         return null;
     }
 
-    protected Object getBaseProperty(String propertyName, String language) throws XWikiException
+    protected Object getBaseProperty(String propertyName, String language, boolean text) throws XWikiException
     {
         // First we try to get a translated preference object
         BaseObject baseObject = getBaseObject(language);
@@ -141,23 +141,23 @@ public abstract class AbstractXWikiPreferencesConfigurationSource extends Abstra
         if (baseObject != null) {
             BaseProperty property = (BaseProperty) baseObject.getField(propertyName);
 
-            return property != null ? property.getValue() : null;
+            return property != null ? (text ? property.toText() : property.getValue()) : null;
         }
 
         return null;
     }
 
     @Override
-    protected Object getBaseProperty(String propertyName) throws XWikiException
+    protected Object getBaseProperty(String propertyName, boolean text) throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
         // First we try to get a translated preference object
-        Object propertyValue = getBaseProperty(propertyName, xcontext.getLanguage());
+        Object propertyValue = getBaseProperty(propertyName, xcontext.getLanguage(), text);
 
         // If empty we take it from the default pref object
         if (propertyValue == null || (propertyValue instanceof String && propertyValue.equals(""))) {
-            propertyValue = getBaseProperty(propertyName, null);
+            propertyValue = getBaseProperty(propertyName, null, text);
         }
 
         // TODO: In the future we would need the notion of initialized/not-initialized property values in the wiki.

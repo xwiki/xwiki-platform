@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -39,6 +38,221 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity}}
+############################
+## JS, CSS AND TRANSLATIONS TO USE
+############################
+#set($discard = $xwiki.jsx.use('FlamingoThemesCode.ThemeSheet', {'minify': false}))
+#set($discard = $xwiki.ssx.use('FlamingoThemesCode.ThemeSheet'))
+#set($discard = $services.localization.use('document', 'FlamingoThemesCode.Translations'))
+#set($discard = $xwiki.linkx.use($services.webjars.url('colpick/2.0.2/css/colpick.css'), {'rel': 'stylesheet'}))
+############################
+## GLOBALS
+############################
+#set($obj = $doc.getObject('FlamingoThemesCode.ThemeClass'))
+#set($isEdit = ($xcontext.action == 'edit'))
+############################
+## VARIABLES TO CUSTOMIZE
+############################
+#set($variables = {
+  "logos": {
+    "logo": "logo"
+  },
+  "base-colors": {
+    "text-color": "color",
+    "body-bg": "color",
+    "xwiki-page-content-bg" : "color",
+    "link-color": "color",
+    "brand-primary": "color",
+    "brand-success": "color",
+    "brand-info": "color",
+    "brand-warning": "color",
+    "brand-danger": "color",
+    "component-active-color" : "color",
+    "component-active-bg" : "color"
+  },
+  "typography" : {
+    "font-family-base": "font",
+    "font-family-sans-serif": "font",
+    "font-family-serif": "font",
+    "font-family-monospace": "font",
+    "font-size-base" : "size"
+  },
+  "buttons": {
+    "btn-font-weight" : "text",
+    "btn-default-color" : "color",
+    "btn-default-bg" : "color",
+    "btn-primary-color" : "color",
+    "btn-primary-bg" : "color",
+    "btn-success-color" : "color",
+    "btn-success-bg" : "color",
+    "btn-info-color" : "color",
+    "btn-info-bg" : "color",
+    "btn-warning-color" : "color",
+    "btn-warning-bg" : "color",
+    "btn-danger-color" : "color",
+    "btn-danger-bg" : "color",
+    "btn-default-border" : "color"
+  },
+  "navbar": {
+    "navbar-default-color" : "color",
+    "navbar-default-bg" : "color",
+    "navbar-default-link-color" : "color",
+    "navbar-default-link-hover-color" : "color",
+    "navbar-default-link-hover-bg" : "color",
+    "navbar-default-link-active-color":  "color",
+    "navbar-default-link-active-bg": "color",
+    "navbar-height" : "size"
+  },
+  "dropdowns" : {
+    "dropdown-bg" : "color",
+    "dropdown-border" : "color",
+    "dropdown-link-color" : "color",
+    "dropdown-link-hover-color" : "color",
+    "dropdown-link-hover-bg" : "color",
+    "dropdown-divider-bg" : "color"
+  },
+  "forms": {
+    "input-bg" : "color",
+    "input-border" : "color",
+    "input-color" : "color",
+    "input-border-focus" : "color",
+    "input-color-placeholder" : "color",
+    "legend-color" : "color",
+    "legend-border-color": "color"
+   },
+  "panels": {
+    "panel-bg" : "color",
+    "panel-default-text" : "color"
+  },
+  "breadcrumb": {
+    "breadcrumb-bg": "color",
+    "breadcrumb-color": "color",
+    "breadcrumb-separator": "text"
+  },
+  "advanced": {
+    "lessCode": "textarea"
+  }
+})
+############################
+## DISPLAY VARIABLES PANEL
+############################
+#macro(displayVariablesPanel)
+  &lt;div class="col-xs-12 col-md-5"&gt;
+    &lt;div class="panel panel-primary"&gt;
+      &lt;div class="panel-heading"&gt;$services.localization.render("platform.flamingo.themes.title.variables")&lt;/div&gt;
+        &lt;div class="panel-body"&gt;
+          #displayVariablesTabs()
+          #displayVariablesPanes()
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  ## Special input for computing URLs
+  &lt;input type="hidden" id="attachmentsURL" value="$xwiki.getAttachmentURL($doc.fullName, '__tochange__')" /&gt;
+#end
+############################
+## DISPLAY VARIABLES TABS
+############################
+#macro(displayVariablesTabs)
+  &lt;ul class="nav nav-pills nav-stacked col-xs-4"&gt;
+    #foreach($category in $variables.keySet())
+      &lt;li #if($velocityCount==1)class="active"#end&gt;&lt;a href="#cat-${category}" data-toggle="tab"&gt;$services.localization.render("platform.flamingo.themes.category.${category}")&lt;/li&gt;
+    #end
+  &lt;/ul&gt;
+#end
+############################
+## DISPLAY VARIABLES PANES
+############################
+#macro(displayVariablesPanes)
+  &lt;div class="tab-content col-xs-8" id="bt-variables"&gt;
+    #foreach($category in $variables.keySet())
+      &lt;div class="tab-pane fade #if($velocityCount==1)in active#end" id="cat-$category"&gt;
+      &lt;h2&gt;$services.localization.render("platform.flamingo.themes.category.${category}")&lt;/h2&gt;
+      #set($catVar = $variables.get($category))
+      #foreach($var in $catVar.keySet())
+        #set($varName = $var)
+        #set($varType = $catVar.get($varName))
+        &lt;div class="form-group"&gt;
+          &lt;label for="var-$varName" class="col-xs-12"&gt;@$varName&lt;/label&gt;
+          &lt;div class="col-xs-12"&gt;
+            #if($varType == 'logo')
+              #set($currentLogo = $obj.getValue('logo'))
+              &lt;select name="FlamingoThemesCode.ThemeClass_0_$varName" id="var-$varName"&gt;
+                &lt;option value=""&gt;$services.localization.render("platform.flamingo.themes.defaultvalue")&lt;/option&gt;
+                #foreach($attachment in $doc.getAttachmentList())
+                  #if($attachment.isImage())
+                    &lt;option value="$escapetool.xml($attachment.filename)" #if($currentLogo==$attachment.filename)selected="selected"#{end}&gt;$attachment.filename&lt;/option&gt;
+                  #end
+                #end
+              &lt;/select&gt;
+            #elseif($varType == 'textarea')
+              #if($varName == 'lessCode')
+                &lt;div class="alert alert-info"&gt;$services.localization.render("platform.flamingo.themes.lessCode.description")&lt;/div&gt;
+                &lt;div class="alert alert-warning"&gt;$services.localization.render("platform.flamingo.themes.lessCode.warning")&lt;/div&gt;
+              #end
+              &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="form-control" rows="6"&gt;
+                $escapetool.xml($!doc.getValue($varName, $obj))
+              &lt;/textarea&gt;
+            #else
+              &lt;div class="input-group"&gt;
+                &lt;input type="text" class="form-control #if($varType=='color')color-picker#end" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$escapetool.xml($!doc.getValue($varName, $obj))"&gt;
+              &lt;/div&gt;
+            #end
+          &lt;/div&gt;
+        &lt;/div&gt;
+      #end
+      &lt;/div&gt;
+    #end
+  &lt;/div&gt;
+#end
+############################
+## DISPLAY VARIABLES PANEL
+############################
+#macro(displayPreviewPanel)
+  &lt;div class="col-xs-12 #if($isEdit)col-md-7#end"&gt;
+    &lt;div class="panel panel-primary"&gt;
+      &lt;div class="panel-heading"&gt;$services.localization.render("platform.flamingo.themes.title.preview")&lt;/div&gt;
+        &lt;div class="panel-body"&gt;
+          #if($isEdit)
+            &lt;p&gt;&lt;input type="checkbox" id="autosync" checked="checked"/&gt; &lt;label for="autosync"&gt;$services.localization.render("platform.flamingo.themes.autorefresh")&lt;/label&gt;&lt;/p&gt;
+          #end
+          &lt;p class="alert alert-info"&gt;&lt;input type="button" id="refresh" value="$services.localization.render("platform.flamingo.themes.refresh")" class="btn btn-primary" /&gt; $services.localization.render("platform.flamingo.themes.refreshwarning")&lt;/p&gt;
+          &lt;iframe src="$xwiki.getURL('Main.WebHome', 'view', 'colortheme=no')" class="col-xs-12" id="iframe" height="400"&gt;
+          &lt;/iframe&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+############################
+## DISPLAY HIDDEN VARIABLES
+############################
+#macro(displayHiddenVariables)
+  &lt;div id="bt-variables" class="hidden"&gt;
+  #foreach($category in $variables.keySet())
+    #set($catVar = $variables.get($category))
+    #foreach($var in $catVar.keySet())
+      #set($varName = $var)
+      #set($varType = $catVar.get($varName))
+      &lt;input type="hidden" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!doc.getValue($varName, $obj)" /&gt;
+    #end
+  #end
+  &lt;/div&gt;
+#end
+############################
+## MAIN
+############################
+{{html}}
+  #if($isEdit)
+    #displayVariablesPanel()
+  #else
+    #displayHiddenVariables()
+  #end
+  #displayPreviewPanel()
+{{/html}}
+{{/velocity}}
+</content>
   <object>
     <name>FlamingoThemesCode.ThemeSheet</name>
     <number>0</number>
@@ -666,219 +880,4 @@ div#preview-curtain{
       <use>currentPage</use>
     </property>
   </object>
-  <content>{{velocity}}
-############################
-## JS, CSS AND TRANSLATIONS TO USE
-############################
-#set($discard = $xwiki.jsx.use('FlamingoThemesCode.ThemeSheet', {'minify': false}))
-#set($discard = $xwiki.ssx.use('FlamingoThemesCode.ThemeSheet'))
-#set($discard = $services.localization.use('document', 'FlamingoThemesCode.Translations'))
-#set($discard = $xwiki.linkx.use($services.webjars.url('colpick/2.0.2/css/colpick.css'), {'rel': 'stylesheet'}))
-############################
-## GLOBALS
-############################
-#set($obj = $doc.getObject('FlamingoThemesCode.ThemeClass'))
-#set($isEdit = ($xcontext.action == 'edit'))
-############################
-## VARIABLES TO CUSTOMIZE
-############################
-#set($variables = {
-  "logos": {
-    "logo": "logo"
-  },
-  "base-colors": {
-    "text-color": "color",
-    "body-bg": "color",
-    "xwiki-page-content-bg" : "color",
-    "link-color": "color",
-    "brand-primary": "color",
-    "brand-success": "color",
-    "brand-info": "color",
-    "brand-warning": "color",
-    "brand-danger": "color",
-    "component-active-color" : "color",
-    "component-active-bg" : "color"
-  },
-  "typography" : {
-    "font-family-base": "font",
-    "font-family-sans-serif": "font",
-    "font-family-serif": "font",
-    "font-family-monospace": "font",
-    "font-size-base" : "size"
-  },
-  "buttons": {
-    "btn-font-weight" : "text",
-    "btn-default-color" : "color",
-    "btn-default-bg" : "color",
-    "btn-primary-color" : "color",
-    "btn-primary-bg" : "color",
-    "btn-success-color" : "color",
-    "btn-success-bg" : "color",
-    "btn-info-color" : "color",
-    "btn-info-bg" : "color",
-    "btn-warning-color" : "color",
-    "btn-warning-bg" : "color",
-    "btn-danger-color" : "color",
-    "btn-danger-bg" : "color",
-    "btn-default-border" : "color"
-  },
-  "navbar": {
-    "navbar-default-color" : "color",
-    "navbar-default-bg" : "color",
-    "navbar-default-link-color" : "color",
-    "navbar-default-link-hover-color" : "color",
-    "navbar-default-link-hover-bg" : "color",
-    "navbar-default-link-active-color":  "color",
-    "navbar-default-link-active-bg": "color",
-    "navbar-height" : "size"
-  },
-  "dropdowns" : {
-    "dropdown-bg" : "color",
-    "dropdown-border" : "color",
-    "dropdown-link-color" : "color",
-    "dropdown-link-hover-color" : "color",
-    "dropdown-link-hover-bg" : "color",
-    "dropdown-divider-bg" : "color"
-  },
-  "forms": {
-    "input-bg" : "color",
-    "input-border" : "color",
-    "input-color" : "color",
-    "input-border-focus" : "color",
-    "input-color-placeholder" : "color",
-    "legend-color" : "color",
-    "legend-border-color": "color"
-   },
-  "panels": {
-    "panel-bg" : "color",
-    "panel-default-text" : "color"
-  },
-  "breadcrumb": {
-    "breadcrumb-bg": "color",
-    "breadcrumb-color": "color",
-    "breadcrumb-separator": "text"
-  },
-  "advanced": {
-    "lessCode": "textarea"
-  }
-})
-############################
-## DISPLAY VARIABLES PANEL
-############################
-#macro(displayVariablesPanel)
-  &lt;div class="col-xs-12 col-md-5"&gt;
-    &lt;div class="panel panel-primary"&gt;
-      &lt;div class="panel-heading"&gt;$services.localization.render("platform.flamingo.themes.title.variables")&lt;/div&gt;
-        &lt;div class="panel-body"&gt;
-          #displayVariablesTabs()
-          #displayVariablesPanes()
-        &lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-  ## Special input for computing URLs
-  &lt;input type="hidden" id="attachmentsURL" value="$xwiki.getAttachmentURL($doc.fullName, '__tochange__')" /&gt;
-#end
-############################
-## DISPLAY VARIABLES TABS
-############################
-#macro(displayVariablesTabs)
-  &lt;ul class="nav nav-pills nav-stacked col-xs-4"&gt;
-    #foreach($category in $variables.keySet())
-      &lt;li #if($velocityCount==1)class="active"#end&gt;&lt;a href="#cat-${category}" data-toggle="tab"&gt;$services.localization.render("platform.flamingo.themes.category.${category}")&lt;/li&gt;
-    #end
-  &lt;/ul&gt;
-#end
-############################
-## DISPLAY VARIABLES PANES
-############################
-#macro(displayVariablesPanes)
-  &lt;div class="tab-content col-xs-8" id="bt-variables"&gt;
-    #foreach($category in $variables.keySet())
-      &lt;div class="tab-pane fade #if($velocityCount==1)in active#end" id="cat-$category"&gt;
-      &lt;h2&gt;$services.localization.render("platform.flamingo.themes.category.${category}")&lt;/h2&gt;
-      #set($catVar = $variables.get($category))
-      #foreach($var in $catVar.keySet())
-        #set($varName = $var)
-        #set($varType = $catVar.get($varName))
-        &lt;div class="form-group"&gt;
-          &lt;label for="var-$varName" class="col-xs-12"&gt;@$varName&lt;/label&gt;
-          &lt;div class="col-xs-12"&gt;
-            #if($varType == 'logo')
-              #set($currentLogo = $obj.getValue('logo'))
-              &lt;select name="FlamingoThemesCode.ThemeClass_0_$varName" id="var-$varName"&gt;
-                &lt;option value=""&gt;$services.localization.render("platform.flamingo.themes.defaultvalue")&lt;/option&gt;
-                #foreach($attachment in $doc.getAttachmentList())
-                  #if($attachment.isImage())
-                    &lt;option value="$escapetool.xml($attachment.filename)" #if($currentLogo==$attachment.filename)selected="selected"#{end}&gt;$attachment.filename&lt;/option&gt;
-                  #end
-                #end
-              &lt;/select&gt;
-            #elseif($varType == 'textarea')
-              #if($varName == 'lessCode')
-                &lt;div class="alert alert-info"&gt;$services.localization.render("platform.flamingo.themes.lessCode.description")&lt;/div&gt;
-                &lt;div class="alert alert-warning"&gt;$services.localization.render("platform.flamingo.themes.lessCode.warning")&lt;/div&gt;
-              #end
-              &lt;textarea id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" class="form-control" rows="6"&gt;
-                $escapetool.xml($!doc.getValue($varName, $obj))
-              &lt;/textarea&gt;
-            #else
-              &lt;div class="input-group"&gt;
-                &lt;input type="text" class="form-control #if($varType=='color')color-picker#end" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$escapetool.xml($!doc.getValue($varName, $obj))"&gt;
-              &lt;/div&gt;
-            #end
-          &lt;/div&gt;
-        &lt;/div&gt;
-      #end
-      &lt;/div&gt;
-    #end
-  &lt;/div&gt;
-#end
-############################
-## DISPLAY VARIABLES PANEL
-############################
-#macro(displayPreviewPanel)
-  &lt;div class="col-xs-12 #if($isEdit)col-md-7#end"&gt;
-    &lt;div class="panel panel-primary"&gt;
-      &lt;div class="panel-heading"&gt;$services.localization.render("platform.flamingo.themes.title.preview")&lt;/div&gt;
-        &lt;div class="panel-body"&gt;
-          #if($isEdit)
-            &lt;p&gt;&lt;input type="checkbox" id="autosync" checked="checked"/&gt; &lt;label for="autosync"&gt;$services.localization.render("platform.flamingo.themes.autorefresh")&lt;/label&gt;&lt;/p&gt;
-          #end
-          &lt;p class="alert alert-info"&gt;&lt;input type="button" id="refresh" value="$services.localization.render("platform.flamingo.themes.refresh")" class="btn btn-primary" /&gt; $services.localization.render("platform.flamingo.themes.refreshwarning")&lt;/p&gt;
-          &lt;iframe src="$xwiki.getURL('Main.WebHome', 'view', 'colortheme=no')" class="col-xs-12" id="iframe" height="400"&gt;
-          &lt;/iframe&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-#end
-############################
-## DISPLAY HIDDEN VARIABLES
-############################
-#macro(displayHiddenVariables)
-  &lt;div id="bt-variables" class="hidden"&gt;
-  #foreach($category in $variables.keySet())
-    #set($catVar = $variables.get($category))
-    #foreach($var in $catVar.keySet())
-      #set($varName = $var)
-      #set($varType = $catVar.get($varName))
-      &lt;input type="hidden" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!doc.getValue($varName, $obj)" /&gt;
-    #end
-  #end
-  &lt;/div&gt;
-#end
-############################
-## MAIN
-############################
-{{html}}
-  #if($isEdit)
-    #displayVariablesPanel()
-  #else
-    #displayHiddenVariables()
-  #end
-  #displayPreviewPanel()
-{{/html}}
-{{/velocity}}
-</content>
 </xwikidoc>

@@ -243,6 +243,7 @@
 ############################
 ## MAIN
 ############################
+(%class="row"%)(((
 {{html}}
   #if($isEdit)
     #displayVariablesPanel()
@@ -251,6 +252,7 @@
   #end
   #displayPreviewPanel()
 {{/html}}
+)))
 {{/velocity}}
 </content>
   <object>
@@ -749,13 +751,13 @@ require(['jquery', 'colpick'], function($, Colpick) {
       <cache>long</cache>
     </property>
     <property>
-      <code>div#bt-variables{
+      <code>#bt-variables {
   border-left: 1px solid #ddd;
   height: 525px;
   overflow-y: auto;
 }
 
-div#preview-curtain{
+#preview-curtain {
   background-color: #ddd;
   opacity: 0.9;
   position: absolute;

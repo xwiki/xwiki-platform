@@ -36,7 +36,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 public class SpacePreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
 {
     private static final DocumentReference SPACE_DOCUMENT = new DocumentReference(CURRENT_WIKI, "currentspace",
-        SpacePreferencesConfigurationSource.PAGE_NAME);
+        SpacePreferencesConfigurationSource.DOCUMENT_NAME);
 
     public SpacePreferencesConfigurationSourceTest()
     {

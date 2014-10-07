@@ -40,14 +40,14 @@ public abstract class AbstractXWikiPreferencesConfigurationSource extends Abstra
     /**
      * The name of the space where wiki preferences are located.
      */
-    static final String SPACE_NAME = "XWiki";
+    static final String CLASS_SPACE_NAME = "XWiki";
 
-    static final String PAGE_NAME = "XWikiPreferences";
+    static final String CLASS_PAGE_NAME = "XWikiPreferences";
 
     /**
      * The local reference of the class containing wiki preferences.
      */
-    static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(SPACE_NAME, PAGE_NAME);
+    static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(CLASS_SPACE_NAME, CLASS_PAGE_NAME);
 
     @Override
     protected String getCacheId()
@@ -70,7 +70,7 @@ public abstract class AbstractXWikiPreferencesConfigurationSource extends Abstra
     @Override
     protected DocumentReference getDocumentReference()
     {
-        return new DocumentReference(CLASS_REFERENCE.getName(), new SpaceReference(SPACE_NAME,
+        return new DocumentReference(CLASS_REFERENCE.getName(), new SpaceReference(CLASS_SPACE_NAME,
             getCurrentWikiReference()));
     }
 

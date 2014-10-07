@@ -378,9 +378,9 @@ public class XWiki implements EventListener
 
     private ConfigurationSource wikiConfiguration;
 
-    private ConfigurationSource spaceConfiguration;
-
     private ConfigurationSource userConfiguration;
+
+    private ConfigurationSource spaceConfiguration;
 
     private static XWikiInitializerJob job;
 
@@ -414,7 +414,7 @@ public class XWiki implements EventListener
     private ConfigurationSource getUserConfiguration()
     {
         if (this.userConfiguration == null) {
-            this.userConfiguration = Utils.getComponent(ConfigurationSource.class, "space");
+            this.userConfiguration = Utils.getComponent(ConfigurationSource.class, "user");
         }
 
         return this.userConfiguration;
@@ -446,7 +446,7 @@ public class XWiki implements EventListener
 
                         if (job.getStatus() == null) {
                             // "Pre-initialize" XWikiStubContextProvider so that XWiki initializer can find one
-                            Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class)
+                            Utils.<XWikiStubContextProvider>getComponent((Type) XWikiStubContextProvider.class)
                                 .initialize(context);
 
                             job.startAsync();
@@ -558,7 +558,7 @@ public class XWiki implements EventListener
         try {
             entityResourceReference =
                 (EntityResourceReference) urlResolver.resolve(url,
-                    Collections.<String, Object> singletonMap("ignorePrefix", context.getRequest().getContextPath()));
+                    Collections.<String, Object>singletonMap("ignorePrefix", context.getRequest().getContextPath()));
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
                 String.format("Failed to extract Entity Resource Reference from URL [%s]", url), e);
@@ -590,7 +590,7 @@ public class XWiki implements EventListener
         return callPrivateMethod(obj, methodName, null, null);
     }
 
-    public static Object callPrivateMethod(Object obj, String methodName, Class< ? >[] classes, Object[] args)
+    public static Object callPrivateMethod(Object obj, String methodName, Class<?>[] classes, Object[] args)
     {
         try {
             Method method = obj.getClass().getDeclaredMethod(methodName, classes);
@@ -748,33 +748,33 @@ public class XWiki implements EventListener
             setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
                 "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
 
-            setAttachmentStore(Utils.<XWikiAttachmentStoreInterface> getComponent(
+            setAttachmentStore(Utils.<XWikiAttachmentStoreInterface>getComponent(
                 (Type) XWikiAttachmentStoreInterface.class,
                 getConfiguration().getProperty("xwiki.store.attachment.hint", "hibernate")));
 
-            setVersioningStore(Utils.<XWikiVersioningStoreInterface> getComponent(
+            setVersioningStore(Utils.<XWikiVersioningStoreInterface>getComponent(
                 (Type) XWikiVersioningStoreInterface.class,
                 getConfiguration().getProperty("xwiki.store.versioning.hint", "hibernate")));
 
-            setAttachmentVersioningStore(Utils.<AttachmentVersioningStore> getComponent(
+            setAttachmentVersioningStore(Utils.<AttachmentVersioningStore>getComponent(
                 (Type) AttachmentVersioningStore.class, hasAttachmentVersioning(context) ? getConfiguration()
                     .getProperty("xwiki.store.attachment.versioning.hint", "hibernate") : "void"));
 
             if (hasRecycleBin(context)) {
-                setRecycleBinStore(Utils.<XWikiRecycleBinStoreInterface> getComponent(
+                setRecycleBinStore(Utils.<XWikiRecycleBinStoreInterface>getComponent(
                     (Type) XWikiRecycleBinStoreInterface.class,
                     getConfiguration().getProperty("xwiki.store.recyclebin.hint", "hibernate")));
             }
 
             if (hasAttachmentRecycleBin(context)) {
-                setAttachmentRecycleBinStore(Utils.<AttachmentRecycleBinStore> getComponent(
+                setAttachmentRecycleBinStore(Utils.<AttachmentRecycleBinStore>getComponent(
                     (Type) AttachmentRecycleBinStore.class,
                     getConfiguration().getProperty("xwiki.store.attachment.recyclebin.hint", "hibernate")));
             }
 
             // "Pre-initialize" XWikiStubContextProvider so that rendering engine, plugins or listeners reacting to
             // potential document changes can use it
-            Utils.<XWikiStubContextProvider> getComponent((Type) XWikiStubContextProvider.class).initialize(context);
+            Utils.<XWikiStubContextProvider>getComponent((Type) XWikiStubContextProvider.class).initialize(context);
 
             progress.stepPropress(this);
 
@@ -995,7 +995,7 @@ public class XWiki implements EventListener
     {
         String storeclass = getConfiguration().getProperty(param, defClass);
         try {
-            Class< ? >[] classes = new Class< ? >[] {XWikiContext.class};
+            Class<?>[] classes = new Class<?>[] {XWikiContext.class};
             Object[] args = new Object[] {context};
             Object result = Class.forName(storeclass).getConstructor(classes).newInstance(args);
             return result;
@@ -1975,20 +1975,20 @@ public class XWiki implements EventListener
             String oldskin = skin;
             String value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
             // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
-            if (StringUtils.isEmpty(value)  || NO_VALUE.equals(value)) {
+            if (StringUtils.isEmpty(value) || NO_VALUE.equals(value)) {
                 skin = getBaseSkin(context);
                 if (!oldskin.equals(skin)) {
                     value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
                     oldskin = skin;
                 }
             }
-            if (StringUtils.isEmpty(value)  || NO_VALUE.equals(value)) {
+            if (StringUtils.isEmpty(value) || NO_VALUE.equals(value)) {
                 skin = getDefaultBaseSkin(context);
                 if (!oldskin.equals(skin)) {
                     value = context.getWiki().getDocument(skin, context).getStringValue("XWiki.XWikiSkins", prefname);
                 }
             }
-            if (StringUtils.isEmpty(value)  || NO_VALUE.equals(value)) {
+            if (StringUtils.isEmpty(value) || NO_VALUE.equals(value)) {
                 value = default_value;
             }
             return value;
@@ -2099,22 +2099,10 @@ public class XWiki implements EventListener
      */
     public String getXWikiPreference(String prefname, String fallback_param, String default_value, XWikiContext context)
     {
-        return getPreference(prefname, fallback_param, default_value, getWikiConfiguration());
-    }
+        String result = getWikiConfiguration().getProperty(prefname, String.class);
 
-    private String getPreference(String prefname, String fallbackParam, String defaultValue,
-        ConfigurationSource configuration)
-    {
-        String result = configuration.getProperty(prefname, String.class);
-
-        // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
-        if ((StringUtils.isEmpty(result) || result.equals(NO_VALUE)) && StringUtils.isNotEmpty(fallbackParam)) {
-            result = configuration.getProperty(fallbackParam, String.class);
-        }
-
-       // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
-        if ((StringUtils.isEmpty(result) || result.equals(NO_VALUE))) {
-            result = defaultValue;
+        if (StringUtils.isEmpty(result)) {
+            result = getConfiguration().getProperty(fallback_param, default_value);
         }
 
         return result != null ? result : "";
@@ -2132,31 +2120,40 @@ public class XWiki implements EventListener
 
     public String getSpacePreference(String preference, String defaultValue, XWikiContext context)
     {
-        XWikiDocument currentdoc = (XWikiDocument) context.get("doc");
-        return getSpacePreference(preference, (currentdoc == null) ? null : currentdoc.getSpace(), defaultValue,
-            context);
+        return getSpacePreference(preference, null, defaultValue, context);
     }
 
     public String getSpacePreference(String preference, String space, String defaultValue, XWikiContext context)
     {
-        String result = getPreference(preference, null, null, getSpaceConfiguration());
+        XWikiDocument currentDocument = context.getDoc();
 
-        if (StringUtils.isEmpty(result)) {
-            result = getXWikiPreference(preference, defaultValue, context);
+        try {
+            if (space != null) {
+                context.setDoc(new XWikiDocument(new DocumentReference(context.getWikiId() != null ? context
+                    .getWikiId() : context.getMainXWiki(), space, "WebPreferences")));
+            }
+
+            String result = getSpaceConfiguration().getProperty(preference, String.class);
+
+            if (StringUtils.isEmpty(result)) {
+                result = getXWikiPreference(preference, defaultValue, context);
+            }
+
+            return result != null ? result : "";
+        } finally {
+            context.setDoc(currentDocument);
         }
-
-        return result;
     }
 
     public String getUserPreference(String prefname, XWikiContext context)
     {
-        String result = getPreference(prefname, null, null, getUserConfiguration());
+        String result = getSpaceConfiguration().getProperty(prefname, String.class);
 
         if (StringUtils.isEmpty(result)) {
             result = getSpacePreference(prefname, context);
         }
 
-        return result;
+        return result != null ? result : "";
     }
 
     public String getUserPreferenceFromCookie(String prefname, XWikiContext context)

@@ -68,8 +68,8 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
         Assert.assertEquals("default", this.componentManager.getComponentUnderTest().getProperty("key", "default"));
         Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key"));
 
-        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.SPACE_NAME,
-            WikiPreferencesConfigurationSource.PAGE_NAME), "key", "value");
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
+            WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", "value");
 
         Assert.assertEquals("value", this.componentManager.getComponentUnderTest().getProperty("key", String.class));
         Assert.assertEquals("value", this.componentManager.getComponentUnderTest().getProperty("key", "default"));
@@ -84,10 +84,10 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
     @Test
     public void testGetKeys() throws ComponentLookupException, XWikiException
     {
-        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.SPACE_NAME,
-            WikiPreferencesConfigurationSource.PAGE_NAME), "key1", "value");
-        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.SPACE_NAME,
-            WikiPreferencesConfigurationSource.PAGE_NAME), "key2", "value");
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
+            WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key1", "value");
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
+            WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key2", "value");
 
         List<String> result = this.componentManager.getComponentUnderTest().getKeys();
 
@@ -97,8 +97,8 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
     @Test
     public void testContainsKey() throws XWikiException, ComponentLookupException
     {
-        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.SPACE_NAME,
-            WikiPreferencesConfigurationSource.PAGE_NAME), "key", "value");
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
+            WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", "value");
 
         Assert.assertTrue(this.componentManager.getComponentUnderTest().containsKey("key"));
         Assert.assertFalse(this.componentManager.getComponentUnderTest().containsKey("wrongkey"));
@@ -109,8 +109,8 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
     {
         Assert.assertTrue(this.componentManager.getComponentUnderTest().isEmpty());
 
-        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.SPACE_NAME,
-            WikiPreferencesConfigurationSource.PAGE_NAME), "key", "value");
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
+            WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", "value");
 
         Assert.assertFalse(this.componentManager.getComponentUnderTest().isEmpty());
     }

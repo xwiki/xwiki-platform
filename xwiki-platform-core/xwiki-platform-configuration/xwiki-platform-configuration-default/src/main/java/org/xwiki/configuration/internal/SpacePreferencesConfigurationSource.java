@@ -40,6 +40,8 @@ import org.xwiki.model.reference.SpaceReference;
 @Singleton
 public class SpacePreferencesConfigurationSource extends AbstractXWikiPreferencesConfigurationSource
 {
+    static final String DOCUMENT_NAME = "WebPreferences";
+
     @Inject
     private DocumentAccessBridge documentAccessBridge;
 
@@ -72,7 +74,7 @@ public class SpacePreferencesConfigurationSource extends AbstractXWikiPreference
         if (currentDocumentReference != null) {
             // Add the current spaces and current wiki references to the Web Preferences document reference to form
             // an absolute reference.
-            return new DocumentReference(PAGE_NAME, (SpaceReference) currentDocumentReference.getParent());
+            return new DocumentReference(DOCUMENT_NAME, (SpaceReference) currentDocumentReference.getParent());
         }
 
         return null;

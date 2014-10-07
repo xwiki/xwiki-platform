@@ -53,7 +53,7 @@ public class WikiPreferencesConfigurationSource extends AbstractXWikiPreferences
     @Override
     protected DocumentReference getDocumentReference()
     {
-        return new DocumentReference(CLASS_REFERENCE.getName(), new SpaceReference(SPACE_NAME,
+        return new DocumentReference(CLASS_REFERENCE.getName(), new SpaceReference(CLASS_SPACE_NAME,
             getCurrentWikiReference()));
     }
 }

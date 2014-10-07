@@ -30,9 +30,11 @@
   <artifactId>xwiki-platform-git</artifactId>
   <name>XWiki Platform - Git</name>
   <packaging>jar</packaging>
-  <description>Script Service to make it easy to run Git commands in wiki pages</description>
+  <description>Make it easy to run Git commands in Java and from wiki pages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Git API</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

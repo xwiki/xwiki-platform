@@ -35,6 +35,8 @@
     <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Git API</xwiki.extension.name>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>vincentmassol:git-module</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

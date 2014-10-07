@@ -751,7 +751,7 @@ require(['jquery', 'colpick'], function($, Colpick) {
     <property>
       <code>div#bt-variables{
   border-left: 1px solid #ddd;
-  height:500px;
+  height: 525px;
   overflow-y: auto;
 }
 

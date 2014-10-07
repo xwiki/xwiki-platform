@@ -409,12 +409,12 @@ document.observe('xwiki:dom:loaded', function(e) {
 }
 
 ul.applicationsPanel li img {
-  float:left;
+  float: left; 
   width: 16px;
   height: 16px;
 }
 
-ul.applicationsPanel li .application-img {
+.panel-width-Medium ul.applicationsPanel li .application-img, .panel-width-Large ul.applicationsPanel li .application-img {
   display: block;
   float: left;
   width: 16px;

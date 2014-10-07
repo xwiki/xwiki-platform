@@ -61,6 +61,16 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            org/xwiki/rest/model/jaxb/*.java
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

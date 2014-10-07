@@ -25,20 +25,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Helper to manager LDAP profile XClass and XObject.
@@ -84,19 +80,6 @@ public class LDAPProfileXClass
 
         boolean needsUpdate = this.ldapClass.addTextField(LDAP_XFIELD_DN, LDAP_XFIELDPN_DN, 80);
         needsUpdate |= this.ldapClass.addTextField(LDAP_XFIELD_UID, LDAP_XFIELDPN_UID, 80);
-
-        if (ldapClassDoc.getCreatorReference() == null) {
-            needsUpdate = true;
-            ldapClassDoc.setCreator(XWikiRightService.SUPERADMIN_USER);
-        }
-        if (ldapClassDoc.getAuthorReference() == null) {
-            needsUpdate = true;
-            ldapClassDoc.setAuthorReference(ldapClassDoc.getCreatorReference());
-        }
-        if (!ldapClassDoc.isHidden()) {
-            needsUpdate = true;
-            ldapClassDoc.setHidden(true);
-        }
 
         if (needsUpdate) {
             context.getWiki().saveDocument(ldapClassDoc, "Update LDAP user profile class", context);

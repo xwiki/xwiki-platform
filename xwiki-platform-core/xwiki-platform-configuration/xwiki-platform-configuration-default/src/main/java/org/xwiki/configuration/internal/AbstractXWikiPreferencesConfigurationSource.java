@@ -50,12 +50,6 @@ public abstract class AbstractXWikiPreferencesConfigurationSource extends Abstra
     static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(CLASS_SPACE_NAME, CLASS_PAGE_NAME);
 
     @Override
-    protected String getCacheId()
-    {
-        return "configuration.document.wiki";
-    }
-
-    @Override
     protected String getCacheKeyPrefix()
     {
         return this.wikiManager.getCurrentWikiId();

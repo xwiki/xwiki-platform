@@ -6,7 +6,7 @@
 #set ($canDelete = !$doc.isNew() && $xwiki.hasAccessLevel('delete'))
 #set ($canWatch = !$doc.isNew() && $hasWatch)
 #set ($displayPageSubmenu = $canWatch || $canCopy || $canDelete)
-#set ($pageURL = $xwiki.getURL($doc.documentReference, 'view')))
+#set ($pageURL = $xwiki.getURL($doc.documentReference, 'view'))
 #xwikitopmenuseparator()
 #if (!$displayPageSubmenu)
   #xwikitopmenuentry($pageURL "$services.localization.render('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' '' 'file')

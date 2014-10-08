@@ -7,7 +7,7 @@
 #set($homeURL = $xwiki.getURL($mainWikiHomeDocumentReference))
 #set ($displayHomeMenu = $isWikiUIAvailable && ($xcontext.isMainWiki() || ("$!services.wiki.user" != '' && $services.wiki.user.getUserScope()=='GLOBAL_ONLY')))
 #if ($displayHomeMenu)
-  #xwikitopmenuentrystart($homeURL $services.localization.render('core.menu.type.home') 'tmMainWiki' 'hasIcon' 'home')
+  #xwikitopmenuentrystart($homeURL $services.localization.render('core.menu.type.home') 'tmMainWiki' '' 'home')
     ## GO TO
     #submenuitem($homeURL $services.localization.render('core.menu.goto.wiki') '', '', 'arrow-right')
     ## WATCH / UNWATCH WIKI -- TODO EXTENSION POINT

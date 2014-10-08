@@ -4,10 +4,12 @@
 ## This menu is displayed if:
 ## - Wiki UI is available
 ## - The current wiki is the main wiki OR the current wiki has support for local users only
+#set($homeURL = $xwiki.getURL($mainWikiHomeDocumentReference))
 #set ($displayHomeMenu = $isWikiUIAvailable && ($xcontext.isMainWiki() || ("$!services.wiki.user" != '' && $services.wiki.user.getUserScope()=='GLOBAL_ONLY')))
 #if ($displayHomeMenu)
-  #xwikitopmenuentrystart($xwiki.getURL($mainWikiHomeDocumentReference) $services.localization.render('core.menu.type.home') 'tmMainWiki' '' 'home')
-    #set ($hasPreviousMenuSection = false)
+  #xwikitopmenuentrystart($homeURL $services.localization.render('core.menu.type.home') 'tmMainWiki' 'hasIcon' 'home')
+    ## GO TO
+    #submenuitem($homeURL $services.localization.render('core.menu.goto.wiki') '', '', 'arrow-right')
     ## WATCH / UNWATCH WIKI -- TODO EXTENSION POINT
     #if ($hasWatch && $xcontext.isMainWiki())
       #set ($watchClasses = '')
@@ -39,10 +41,8 @@
       #end
       #set ($hasPreviousMenuSection = true)
     #end
-    #if ($hasPreviousMenuSection)
-      #submenuseparator()
-    #end
-    ## WIKI INDEX  
+    ## WIKI INDEX
+    #submenuseparator()
     #submenuitem("$xwiki.getURL($WikiManagerMainDocReference)" $services.localization.render('platform.wiki.menu.wikiindex') 'tmWikiIndex' '' 'list')
     ## DOCUMENT INDEX
     #set($homeDocumentIndexRef = $services.model.createDocumentReference($mainWikiId, 'Main', 'AllDocs'))

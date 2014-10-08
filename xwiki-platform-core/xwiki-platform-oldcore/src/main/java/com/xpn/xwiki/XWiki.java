@@ -2147,7 +2147,7 @@ public class XWiki implements EventListener
 
     public String getUserPreference(String prefname, XWikiContext context)
     {
-        String result = getSpaceConfiguration().getProperty(prefname, String.class);
+        String result = getUserConfiguration().getProperty(prefname, String.class);
 
         if (StringUtils.isEmpty(result)) {
             result = getSpacePreference(prefname, context);

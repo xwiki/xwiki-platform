@@ -299,7 +299,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
                 try {
                     result = getBaseProperty(key, valueClass == String.class);
 
-                    if (valueClass != null) {
+                    if (valueClass != null && result != null) {
                         result = this.converter.convert(valueClass, result);
                     }
 

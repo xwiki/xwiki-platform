@@ -118,28 +118,33 @@ public class DefaultLESSSkinFileCompilerTest
 
     private void prepareMocksForCompilation() throws Exception
     {
-        when(engineContext.getRealPath("/skins/skin/less")).thenReturn("~/");
+        when(engineContext.getRealPath("/skins/skin/less")).thenReturn(getClass().getResource("/").getPath());
+        when(engineContext.getRealPath("/skins/skin/less/style2.less")).thenReturn(
+                getClass().getResource("/style2.less").getPath());
 
         FileInputStream is = new FileInputStream(getClass().getResource("/style2.less").getFile());
         when(engineContext.getResourceAsStream("/skins/skin/less/style2.less")).thenReturn(is);
 
         when(xwiki.parseContent("// My LESS file", xcontext)).thenReturn("// My LESS file pre-parsed by Velocity");
 
-        Path[] expectedPaths = { Paths.get("~/") };
+        Path[] expectedPaths = { Paths.get(getClass().getResource("/").getPath()) };
         when(lessCompiler.compile(eq("// My LESS file pre-parsed by Velocity"),
                 eq(expectedPaths))).thenReturn("OUTPUT");
     }
 
     private void prepareMocksForCompilationOnFlamingo() throws Exception
     {
-        when(engineContext.getRealPath("/skins/flamingo/less")).thenReturn("~/");
+        when(engineContext.getRealPath("/skins/flamingo/less")).thenReturn(getClass().getResource("/").getPath());
+        when(engineContext.getRealPath("/skins/flamingo/less/style2.less")).thenReturn(
+                getClass().getResource("/style2.less").getPath());
+
 
         FileInputStream is = new FileInputStream(getClass().getResource("/style2.less").getFile());
         when(engineContext.getResourceAsStream("/skins/flamingo/less/style2.less")).thenReturn(is);
 
         when(xwiki.parseContent("// My LESS file", xcontext)).thenReturn("// My LESS file pre-parsed by Velocity");
 
-        Path[] expectedPaths = { Paths.get("~/") };
+        Path[] expectedPaths = { Paths.get(getClass().getResource("/").getPath()) };
         when(lessCompiler.compile(eq("// My LESS file pre-parsed by Velocity"),
                 eq(expectedPaths))).thenReturn("OUTPUT");
     }
@@ -359,6 +364,7 @@ public class DefaultLESSSkinFileCompilerTest
     public void compileSkinFileWhenSkinDocumentHasNoObject() throws Exception
     {
         // Mocks
+        prepareMocksForCompilationOnFlamingo();
         when(xwiki.getSkin(xcontext)).thenReturn("flamingo");
         DocumentReference skinDocRef = new DocumentReference("wikiId", "Main", "flamingo");
         WikiReference wikiReference = new WikiReference("wikiId");
@@ -366,14 +372,6 @@ public class DefaultLESSSkinFileCompilerTest
         when(xwiki.exists(skinDocRef, xcontext)).thenReturn(true);
         XWikiDocument skinDoc = mock(XWikiDocument.class);
         when(xwiki.getDocument(eq(skinDocRef), eq(xcontext))).thenReturn(skinDoc);
-
-        when(engineContext.getRealPath("/skins/flamingo/less")).thenReturn("~/");
-        FileInputStream is = new FileInputStream(getClass().getResource("/style2.less").getFile());
-        when(engineContext.getResourceAsStream("/skins/flamingo/less/style2.less")).thenReturn(is);
-        when(xwiki.parseContent("// My LESS file", xcontext)).thenReturn("// My LESS file pre-parsed by Velocity");
-        Path[] expectedPaths = { Paths.get("~/") };
-        when(lessCompiler.compile(eq("// My LESS file pre-parsed by Velocity"),
-                eq(expectedPaths))).thenReturn("OUTPUT");
 
         // Test
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", false));
@@ -449,5 +447,53 @@ public class DefaultLESSSkinFileCompilerTest
         assertNotNull(exceptionCaught);
         assertEquals(exception, exceptionCaught.getCause());
         assertEquals("Failed to compile the file [style2.less] with LESS.", exceptionCaught.getMessage());
+    }
+
+    @Test
+    public void compileSkinFileWhenDirectoryDoesNotExist() throws Exception
+    {
+        when(engineContext.getRealPath("/skins/flamingo/less")).thenReturn("ighgzuheubigvugvbzekvbzekvuzkkkhguiiiii");
+
+        WikiReference currentWikiReference = new WikiReference("wikiId");
+        DocumentReference colorThemeRef = new DocumentReference("wikiId", "ColorTheme", "MyColorTheme");
+        when(referenceResolver.resolve(eq("myColorTheme"), eq(currentWikiReference))).thenReturn(colorThemeRef);
+        when(referenceSerializer.serialize(colorThemeRef)).thenReturn("wikiId:ColorTheme.MyColorTheme");
+        when(xwiki.exists(colorThemeRef, xcontext)).thenReturn(true);
+
+        // Test
+        Exception exceptionCaught = null;
+        try {
+            mocker.getComponentUnderTest().compileSkinFile("style2.less", "flamingo", true);
+        } catch(LESSCompilerException e) {
+            exceptionCaught = e;
+        }
+
+        // Verify
+        assertNotNull(exceptionCaught);
+        assertEquals("The path [/skins/flamingo/less] is not a directory or does not exists.",
+                exceptionCaught.getCause().getMessage());
+        assertEquals("Failed to compile the file [style2.less] with LESS.", exceptionCaught.getMessage());
+    }
+
+    @Test
+    public void compileSkinFileWhenFileDoesNotExist() throws Exception
+    {
+        prepareMocksForCompilation();
+
+        when(engineContext.getRealPath("/skins/skin/less/style3.less")).thenReturn("ezuizfgyzyfgzerkyfgzerukygfzerkuy");
+
+        // Test
+        Exception exceptionCaught = null;
+        try {
+            mocker.getComponentUnderTest().compileSkinFile("style3.less", true);
+        } catch(LESSCompilerException e) {
+            exceptionCaught = e;
+        }
+
+        // Verify
+        assertNotNull(exceptionCaught);
+        assertEquals("The path [/skins/skin/less/style3.less] is not a file or does not exists.",
+                exceptionCaught.getCause().getMessage());
+        assertEquals("Failed to compile the file [style3.less] with LESS.", exceptionCaught.getMessage());
     }
 }

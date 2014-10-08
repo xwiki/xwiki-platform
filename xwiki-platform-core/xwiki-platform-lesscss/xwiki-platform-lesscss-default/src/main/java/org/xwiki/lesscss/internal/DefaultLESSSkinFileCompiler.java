@@ -19,6 +19,7 @@
  */
 package org.xwiki.lesscss.internal;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -86,11 +87,22 @@ public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> 
         try {
             // First, get the skin directory
             String path = "/skins/" + getSkinDirectory(skin) +  "/less";
+            String realPath = xwiki.getEngineContext().getRealPath(path);
+            File lessDirectory = new File(realPath);
+            if (!lessDirectory.exists() || !lessDirectory.isDirectory()) {
+                throw new LESSCompilerException(String.format("The path [%s] is not a directory or does not exists.",
+                        path));
+            }
             Path lessFilesPath = Paths.get(xwiki.getEngineContext().getRealPath(path));
             Path[] includePaths = {lessFilesPath};
 
             // Get the file content
             String fullFileName = path + "/" + fileName;
+            File lessFile = new File(xwiki.getEngineContext().getRealPath(fullFileName));
+            if (!lessFile.exists() || !lessFile.isFile()) {
+                throw new LESSCompilerException(String.format("The path [%s] is not a file or does not exists.",
+                        fullFileName));
+            }
             InputStream is = xwiki.getEngineContext().getResourceAsStream(fullFileName);
             StringWriter source = new StringWriter();
             IOUtils.copy(is, source);

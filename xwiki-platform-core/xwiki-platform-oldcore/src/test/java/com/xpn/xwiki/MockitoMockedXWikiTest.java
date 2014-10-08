@@ -19,6 +19,12 @@
  */
 package com.xpn.xwiki;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.Date;
 
 import org.junit.Before;
@@ -38,12 +44,9 @@ import org.xwiki.resource.ResourceReferenceManager;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.template.PrivilegedTemplateRenderer;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
-
-import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.XWiki}, using only Mockito Mocks. Supposed to be better than
@@ -80,8 +83,6 @@ public class MockitoMockedXWikiTest
         EntityReferenceResolver<String> currentMixedStringEntityReferenceResolver =
             this.componentManager.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "currentmixed");
         SyntaxFactory syntaxFactory = this.componentManager.registerMockComponent(SyntaxFactory.class);
-        PrivilegedTemplateRenderer privilegedTemplateRenderer =
-            this.componentManager.registerMockComponent(PrivilegedTemplateRenderer.class);
         ResourceReferenceManager resourceReferenceManager =
             this.componentManager.registerMockComponent(ResourceReferenceManager.class);
         ObservationManager observationManager = this.componentManager.registerMockComponent(ObservationManager.class);

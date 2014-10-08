@@ -28,8 +28,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,14 +49,14 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
-import org.xwiki.filter.input.DefaultInputStreamInputSource;
-import org.xwiki.filter.input.InputSource;
-import org.xwiki.filter.input.InputStreamInputSource;
-import org.xwiki.filter.input.ReaderInputSource;
-import org.xwiki.filter.input.StringInputSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.properties.BeanManager;
+import org.xwiki.properties.PropertyException;
+import org.xwiki.properties.RawProperties;
+import org.xwiki.properties.annotation.PropertyId;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.RawBlock;
@@ -62,13 +64,13 @@ import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.parser.MissingParserException;
+import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.printer.WriterWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
@@ -83,6 +85,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Internal toolkit to experiment on wiki bases templates.
@@ -94,18 +97,21 @@ import com.xpn.xwiki.objects.BaseProperty;
 @Singleton
 public class WikiTemplateRenderer
 {
-    private static final Pattern FIRSTLINE = Pattern.compile("^##(source|raw)\\.syntax=(.*)$\r?\n?", Pattern.MULTILINE);
+    private static final Pattern PROPERTY_LINE = Pattern.compile("^##!(.+)=(.*)$\r?\n?", Pattern.MULTILINE);
 
     private static final LocalDocumentReference SKINCLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiSkins");
+
+    /**
+     * The reference of the superadmin user.
+     */
+    private static final DocumentReference SUPERADMIN_REFERENCE = new DocumentReference("xwiki", XWiki.SYSTEM_SPACE,
+        XWikiRightService.SUPERADMIN_USER);
 
     @Inject
     private Environment environment;
 
     @Inject
     private ContentParser parser;
-
-    @Inject
-    private SyntaxFactory syntaxFactory;
 
     @Inject
     private VelocityManager velocityManager;
@@ -135,25 +141,116 @@ public class WikiTemplateRenderer
     private ConfigurationSource xwikicfg;
 
     @Inject
+    @Named("all")
+    private ConfigurationSource allConfiguration;
+
+    @Inject
     @Named("currentmixed")
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
     @Inject
+    private EntityReferenceSerializer<String> referenceSerializer;
+
+    @Inject
+    private BeanManager beanManager;
+
+    @Inject
+    private SUExecutor suExecutor;
+
+    @Inject
     private Logger logger;
 
-    private class StringContent
+    private static class FilesystemTemplateContent extends TemplateContent
     {
-        public String content;
+        public FilesystemTemplateContent(String content, String path)
+        {
+            super(content, path);
+        }
 
+        /**
+         * {@inheritDoc}
+         * <p>
+         * Allow filesystem template to indicate the user to executed them with.
+         * 
+         * @see #setAuthorReference(DocumentReference)
+         */
+        @Override
+        public void setAuthorReference(DocumentReference authorReference)
+        {
+            super.setAuthorReference(authorReference);
+        }
+
+        /**
+         * Made public to be seen as bean property.
+         */
+        @SuppressWarnings("unused")
+        public boolean isPriviledged()
+        {
+            return SUPERADMIN_REFERENCE.equals(getAuthorReference());
+        }
+
+        /**
+         * Made public to be seen as bean property.
+         */
+        @SuppressWarnings("unused")
+        public void setPriviledged(boolean priviledged)
+        {
+            if (priviledged) {
+                setAuthorReference(SUPERADMIN_REFERENCE);
+            }
+        }
+    }
+
+    private static class TemplateContent implements RawProperties
+    {
+        // TODO: work with steams instead
+        protected String content;
+
+        protected boolean authorProvided;
+
+        protected DocumentReference authorReference;
+
+        protected final String path;
+
+        @PropertyId("source.syntax")
         public Syntax sourceSyntax;
 
+        @PropertyId("raw.syntax")
         public Syntax rawSyntax;
 
-        public StringContent(String content, Syntax sourceSyntax, Syntax rawSyntax)
+        public Map<String, Object> properties = new HashMap<String, Object>();
+
+        public TemplateContent(String content, String path)
         {
             this.content = content;
-            this.sourceSyntax = sourceSyntax;
-            this.rawSyntax = rawSyntax;
+            this.path = path;
+        }
+
+        public TemplateContent(String content, String path, DocumentReference authorReference)
+        {
+            this(content, path);
+
+            setAuthorReference(authorReference);
+        }
+
+        @PropertyId("author")
+        public DocumentReference getAuthorReference()
+        {
+            return this.authorReference;
+        }
+
+        protected void setAuthorReference(DocumentReference authorReference)
+        {
+            this.authorReference = authorReference;
+            this.authorProvided = true;
+        }
+
+        // RawProperties
+
+        @Override
+        public void set(String propertyName, Object value)
+        {
+            this.properties.put(propertyName, value);
         }
     }
 
@@ -183,32 +280,17 @@ public class WikiTemplateRenderer
                 }
             }
 
-            // Try to get it from user preferences
-            skin = getSkinFromUser();
+            // Try to get it from preferences (user -> space -> wiki -> xwiki.properties)
+            skin = this.allConfiguration.getProperty("skin");
             if (skin != null) {
                 return skin;
             }
         }
 
         // Try to get it from xwiki.cfg
-        skin = this.xwikicfg.getProperty("xwiki.defaultskin", "colibri");
+        skin = this.xwikicfg.getProperty("xwiki.defaultskin", XWiki.DEFAULT_SKIN);
 
         return StringUtils.isNotEmpty(skin) ? skin : null;
-    }
-
-    private String getSkinFromUser()
-    {
-        XWikiContext xcontext = this.xcontextProvider.get();
-
-        XWiki xwiki = xcontext.getWiki();
-        if (xwiki != null && xwiki.getStore() != null) {
-            String skin = xwiki.getUserPreference("skin", xcontext);
-            if (StringUtils.isEmpty(skin)) {
-                return null;
-            }
-        }
-
-        return null;
     }
 
     // TODO: put that in some SkinContext component
@@ -241,7 +323,7 @@ public class WikiTemplateRenderer
         }
 
         // Try to get it from xwiki.cfg
-        baseskin = this.xwikicfg.getProperty("xwiki.defaultbaseskin", "colibri");
+        baseskin = this.xwikicfg.getProperty("xwiki.defaultbaseskin");
 
         return StringUtils.isNotEmpty(baseskin) ? baseskin : null;
     }
@@ -277,26 +359,22 @@ public class WikiTemplateRenderer
         return skinDocument != null ? skinDocument.getXObject(SKINCLASS_REFERENCE) : null;
     }
 
-    @SuppressWarnings("resource")
-    private InputSource getTemplateStreamFromSkin(String skin, String template)
+    private TemplateContent getTemplateContentFromSkin(String template, String skin)
     {
-        InputSource source = null;
+        TemplateContent source = null;
 
         // Try from wiki pages
-        source = getTemplateStreamFromDocumentSkin(skin, template);
+        source = getTemplateContentFromDocumentSkin(template, skin);
 
         // Try from filesystem skins
-        if (skin != null) {
-            InputStream stream = this.environment.getResourceAsStream("/skins/" + skin + "/" + template);
-            if (stream != null) {
-                return new DefaultInputStreamInputSource(stream, true);
-            }
+        if (source == null) {
+            source = getResourceAsStringContent("/skins/" + skin + "/" + template);
         }
 
         return source;
     }
 
-    private InputSource getTemplateStreamFromDocumentSkin(String skin, String template)
+    private TemplateContent getTemplateContentFromDocumentSkin(String template, String skin)
     {
         XWikiDocument skinDocument = getSkinDocument(skin);
 
@@ -304,12 +382,19 @@ public class WikiTemplateRenderer
             // Try parsing the object property
             BaseObject skinObject = skinDocument.getXObject(SKINCLASS_REFERENCE);
             if (skinObject != null) {
-                String escapedTemplateName = template.replaceAll("/", ".");
-                BaseProperty templateProperty = (BaseProperty) skinObject.safeget(escapedTemplateName);
+                BaseProperty templateProperty = (BaseProperty) skinObject.safeget(template);
+
+                // If not found try by replacing '/' with '.'
+                if (templateProperty == null) {
+                    String escapedTemplateName = StringUtils.replaceChars(template, '/', '.');
+                    templateProperty = (BaseProperty) skinObject.safeget(escapedTemplateName);
+                }
+
                 if (templateProperty != null) {
                     Object value = templateProperty.getValue();
                     if (value instanceof String && StringUtils.isNotEmpty((String) value)) {
-                        return new StringInputSource((String) value);
+                        return new TemplateContent((String) value, this.referenceSerializer.serialize(templateProperty
+                            .getReference()), skinDocument.getAuthorReference());
                     }
                 }
             }
@@ -320,9 +405,11 @@ public class WikiTemplateRenderer
                 // It's impossible to know the real attachment encoding, but let's assume that they respect the
                 // standard and use UTF-8 (which is required for the files located on the filesystem)
                 try {
-                    return new DefaultInputStreamInputSource(attachment.getContentInputStream(this.xcontextProvider
-                        .get()), true);
-                } catch (XWikiException e) {
+                    return new TemplateContent(IOUtils.toString(
+                        attachment.getContentInputStream(this.xcontextProvider.get()), "UTF-8"),
+                        this.referenceSerializer.serialize(attachment.getReference()),
+                        skinDocument.getAuthorReference());
+                } catch (Exception e) {
                     this.logger.error("Faied to get attachment content [{}]", skinDocument.getDocumentReference(), e);
                 }
             }
@@ -331,22 +418,21 @@ public class WikiTemplateRenderer
         return null;
     }
 
-    @SuppressWarnings("resource")
-    private InputSource getTemplateStream(String template)
+    private TemplateContent getTemplateStream(String template)
     {
-        InputSource source = null;
+        TemplateContent source = null;
 
         // Try from skin
         String skin = getSkin();
         if (skin != null) {
-            source = getTemplateStreamFromSkin(skin, template);
+            source = getTemplateContentFromSkin(template, skin);
         }
 
         // Try from base skin
         if (source == null) {
             String baseSkin = getBaseSkin();
             if (baseSkin != null) {
-                source = getTemplateStreamFromSkin(baseSkin, template);
+                source = getTemplateContentFromSkin(template, baseSkin);
             }
         }
 
@@ -363,60 +449,63 @@ public class WikiTemplateRenderer
                 return null;
             }
 
-            InputStream inputStream = this.environment.getResourceAsStream(templatePath);
-            if (inputStream != null) {
-                source = new DefaultInputStreamInputSource(inputStream, true);
-            }
+            source = getResourceAsStringContent(templatePath);
         }
 
         return source;
     }
 
-    private StringContent getStringContent(String template) throws IOException, ParseException
+    private TemplateContent getResourceAsStringContent(String path)
     {
-        InputSource source = getTemplateStream(template);
+        InputStream inputStream = this.environment.getResourceAsStream(path);
+        if (inputStream != null) {
+            try {
+                return new FilesystemTemplateContent(IOUtils.toString(inputStream, "UTF-8"), path);
+            } catch (IOException e) {
+                this.logger.error("Faied to get content if resource [{}]", path, e);
+            } finally {
+                IOUtils.closeQuietly(inputStream);
+            }
+        }
 
-        if (source == null) {
+        return null;
+    }
+
+    private TemplateContent getTemplateContent(String template, String skin)
+    {
+        TemplateContent content =
+            skin != null ? getTemplateContentFromSkin(template, skin) : getTemplateStream(template);
+
+        if (content == null) {
             return null;
         }
 
-        String content;
-        try {
-            if (source instanceof StringInputSource) {
-                content = source.toString();
-            } else if (source instanceof ReaderInputSource) {
-                content = IOUtils.toString(((ReaderInputSource) source).getReader());
-            } else if (source instanceof InputStreamInputSource) {
-                content = IOUtils.toString(((InputStreamInputSource) source).getInputStream(), "UTF-8");
-            } else {
-                // Unsupported type
-                return null;
-            }
-        } finally {
-            source.close();
+        Matcher matcher = PROPERTY_LINE.matcher(content.content);
+
+        Map<String, String> properties = new HashMap<String, String>();
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            String value = matcher.group(2);
+
+            properties.put(key, value);
+
+            // Remove the line from the content
+            content.content = content.content.substring(matcher.end());
         }
 
-        Matcher matcher = FIRSTLINE.matcher(content);
-
-        if (matcher.find()) {
-            content = content.substring(matcher.end());
-
-            String syntaxString = matcher.group(2);
-            Syntax syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxString);
-
-            String mode = matcher.group(1);
-            switch (mode) {
-                case "source":
-                    return new StringContent(content, syntax, null);
-                case "raw":
-                    return new StringContent(content, null, syntax);
-                default:
-                    break;
-            }
+        try {
+            this.beanManager.populate(content, properties);
+        } catch (PropertyException e) {
+            // Should never happen
+            this.logger.error("Failed to populate properties of template [{}]", template, e);
         }
 
         // The default is xhtml to support old templates
-        return new StringContent(content, null, Syntax.XHTML_1_0);
+        if (content.rawSyntax == null && content.sourceSyntax == null) {
+            content.rawSyntax = Syntax.XHTML_1_0;
+        }
+
+        return content;
     }
 
     private void renderError(Throwable throwable, Writer writer)
@@ -432,7 +521,7 @@ public class WikiTemplateRenderer
 
         // Add short message
         Map<String, String> errorBlockParams = Collections.singletonMap("class", "xwikirenderingerror");
-        errorBlocks.add(new GroupBlock(Arrays.<Block> asList(new WordBlock("Failed to render step content")),
+        errorBlocks.add(new GroupBlock(Arrays.<Block>asList(new WordBlock("Failed to render step content")),
             errorBlockParams));
 
         // Add complete error
@@ -479,7 +568,7 @@ public class WikiTemplateRenderer
         return xdom;
     }
 
-    private XDOM getXDOM(StringContent content) throws ParseException, MissingParserException, XWikiVelocityException
+    private XDOM getXDOM(TemplateContent content) throws ParseException, MissingParserException, XWikiVelocityException
     {
         XDOM xdom;
 
@@ -487,20 +576,19 @@ public class WikiTemplateRenderer
             if (content.sourceSyntax != null) {
                 xdom = this.parser.parse(content.content, content.sourceSyntax);
             } else {
-                String result = evaluateString(content.content);
+                String result = evaluateContent(content);
                 xdom = new XDOM(Arrays.asList(new RawBlock(result, content.rawSyntax)));
             }
         } else {
-            xdom = new XDOM(Collections.<Block> emptyList());
+            xdom = new XDOM(Collections.<Block>emptyList());
         }
 
         return xdom;
     }
 
-    public XDOM getXDOM(String template) throws IOException, ParseException, MissingParserException,
-        XWikiVelocityException
+    public XDOM getXDOM(String template) throws ParseException, MissingParserException, XWikiVelocityException
     {
-        StringContent content = getStringContent(template);
+        TemplateContent content = getTemplateContent(template, null);
 
         return getXDOM(content);
     }
@@ -523,29 +611,56 @@ public class WikiTemplateRenderer
         }
     }
 
-    public String render(String template) throws IOException, ParseException, MissingParserException,
-        XWikiVelocityException
+    public String render(String template) throws Exception
+    {
+        return renderFromSkin(template, null);
+    }
+
+    public String renderFromSkin(String template, String skin) throws Exception
     {
         Writer writer = new StringWriter();
 
-        render(template, writer);
+        renderFromSkin(template, skin, writer);
 
         return writer.toString();
     }
 
-    public void render(String template, Writer writer) throws IOException, ParseException, MissingParserException,
-        XWikiVelocityException
+    public void render(String template, Writer writer) throws Exception
     {
-        StringContent content = getStringContent(template);
+        renderFromSkin(template, null, writer);
+    }
+
+    public void renderFromSkin(final String template, final String skin, final Writer writer) throws Exception
+    {
+        final TemplateContent content = getTemplateContent(template, skin);
 
         if (content != null) {
-            if (content.sourceSyntax != null) {
-                XDOM xdom = execute(content);
+            if (content.authorProvided) {
+                this.suExecutor.call(new Callable<Void>()
+                {
+                    @Override
+                    public Void call() throws Exception
+                    {
+                        renderFromSkin(content, writer);
 
-                render(xdom, writer);
+                        return null;
+                    }
+                }, content.getAuthorReference());
             } else {
-                evaluateString(content.content, writer);
+                renderFromSkin(content, writer);
             }
+        }
+    }
+
+    private void renderFromSkin(TemplateContent content, Writer writer) throws ParseException, MissingParserException,
+        XWikiVelocityException
+    {
+        if (content.sourceSyntax != null) {
+            XDOM xdom = execute(content);
+
+            render(xdom, writer);
+        } else {
+            evaluateContent(content, writer);
         }
     }
 
@@ -577,7 +692,7 @@ public class WikiTemplateRenderer
         return xdom;
     }
 
-    private XDOM execute(StringContent content) throws ParseException, MissingParserException, XWikiVelocityException
+    private XDOM execute(TemplateContent content) throws ParseException, MissingParserException, XWikiVelocityException
     {
         XDOM xdom = getXDOM(content);
 
@@ -586,41 +701,67 @@ public class WikiTemplateRenderer
         return xdom;
     }
 
-    public XDOM execute(String template) throws IOException, ParseException, MissingParserException,
-        XWikiVelocityException
+    public XDOM execute(String template) throws Exception
     {
-        StringContent content = getStringContent(template);
+        final TemplateContent content = getTemplateContent(template, null);
 
-        return execute(content);
+        if (content.authorProvided) {
+            return this.suExecutor.call(new Callable<XDOM>()
+            {
+                @Override
+                public XDOM call() throws Exception
+                {
+                    return execute(content);
+                }
+            }, content.getAuthorReference());
+        } else {
+            return execute(content);
+        }
     }
 
-    private String evaluateString(String content) throws XWikiVelocityException
+    private String evaluateContent(TemplateContent content) throws XWikiVelocityException
     {
         Writer writer = new StringWriter();
 
-        evaluateString(content, writer);
+        evaluateContent(content, writer);
 
         return writer.toString();
     }
 
-    private void evaluateString(String content, Writer writer) throws XWikiVelocityException
+    private void evaluateContent(TemplateContent content, Writer writer) throws XWikiVelocityException
     {
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
 
         // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally
         // by Velocity as a cache index key for caching macros.
         String namespace = this.renderingContext.getTransformationId();
+
+        boolean renderingContextPushed = false;
         if (namespace == null) {
-            namespace = "unknown namespace";
+            namespace = content.path != null ? content.path : "unknown namespace";
+
+            if (this.renderingContext instanceof MutableRenderingContext) {
+                // Make the current velocity template id available
+                ((MutableRenderingContext) this.renderingContext).push(this.renderingContext.getTransformation(),
+                    this.renderingContext.getXDOM(), this.renderingContext.getDefaultSyntax(), namespace,
+                    this.renderingContext.isRestricted(), this.renderingContext.getTargetSyntax());
+
+                renderingContextPushed = true;
+            }
         }
 
         VelocityEngine velocityEngine = this.velocityManager.getVelocityEngine();
 
         velocityEngine.startedUsingMacroNamespace(namespace);
         try {
-            velocityEngine.evaluate(velocityContext, writer, namespace, content);
+            velocityEngine.evaluate(velocityContext, writer, namespace, content.content);
         } finally {
             velocityEngine.stoppedUsingMacroNamespace(namespace);
+
+            // Get rid of temporary rendering context
+            if (renderingContextPushed) {
+                ((MutableRenderingContext) this.renderingContext).pop();
+            }
         }
     }
 

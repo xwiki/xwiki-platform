@@ -55,6 +55,11 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
+/**
+ * Validate {@link WikiTemplateRenderer}.
+ * 
+ * @version $Id$
+ */
 @AllComponents
 public class WikiTemplateRendererTest
 {
@@ -97,7 +102,7 @@ public class WikiTemplateRendererTest
     public void testRender() throws Exception
     {
         when(
-            this.velocityEngineMock.evaluate(Matchers.<Context> any(), Matchers.<Writer> any(), anyString(),
+            this.velocityEngineMock.evaluate(Matchers.<Context>any(), Matchers.<Writer>any(), anyString(),
                 eq("<html>$toto</html>"))).then(new Answer<Boolean>()
         {
             @Override
@@ -111,17 +116,16 @@ public class WikiTemplateRendererTest
             }
         });
 
-        setTemplateContent("##raw.syntax=plain/1.0\n<html>$toto</html>");
+        setTemplateContent("##!raw.syntax=plain/1.0\n<html>$toto</html>");
 
         assertEquals("<html>value</html>", mocker.getComponentUnderTest().render("template"));
     }
 
     @Test
-    public void testRenderWithoutRawSyntax() throws ComponentLookupException, ParseException, MissingParserException,
-        IOException, XWikiVelocityException
+    public void testRenderWithoutRawSyntax() throws Exception
     {
         when(
-            this.velocityEngineMock.evaluate(Matchers.<Context> any(), Matchers.<Writer> any(), anyString(),
+            this.velocityEngineMock.evaluate(Matchers.<Context>any(), Matchers.<Writer>any(), anyString(),
                 eq("<html>$toto</html>"))).then(new Answer<Boolean>()
         {
             @Override
@@ -137,10 +141,10 @@ public class WikiTemplateRendererTest
 
         setTemplateContent("<html>$toto</html>");
 
-        this.mocker.<Execution> getInstance(Execution.class).pushContext(new ExecutionContext());
+        this.mocker.<Execution>getInstance(Execution.class).pushContext(new ExecutionContext());
         ((MutableRenderingContext) this.mocker.getInstance(RenderingContext.class)).push(null, null, null, null, false,
             Syntax.XHTML_1_0);
 
-        assertEquals("<html>value</html>", mocker.getComponentUnderTest().render("template"));
+        assertEquals("<html>value</html>", this.mocker.getComponentUnderTest().render("template"));
     }
 }

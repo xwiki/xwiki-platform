@@ -19,8 +19,13 @@
  */
 package com.xpn.xwiki;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -50,7 +55,6 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
-import com.xpn.xwiki.internal.template.PrivilegedTemplateRenderer;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
@@ -100,7 +104,6 @@ public class XWikiMockitoTest
         mocker.registerMockComponent(ObjectReferenceResolver.TYPE_REFERENCE, "current");
         mocker.registerMockComponent(EntityReferenceValueProvider.class);
         mocker.registerMockComponent(SyntaxFactory.class);
-        mocker.registerMockComponent(PrivilegedTemplateRenderer.class);
         mocker.registerMockComponent(ResourceReferenceManager.class);
         mocker.registerMockComponent(Environment.class);
         mocker.registerMockComponent(ObservationManager.class);

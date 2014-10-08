@@ -238,6 +238,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         attachment.setDoc(skin);
         this.xwiki.saveDocument(skin, getContext());
         getContext().put("skin", "XWiki.Skin");
+
         assertEquals("XWiki.Skin", this.xwiki.getSkin(getContext()));
         assertFalse(this.xwiki.getDocument("XWiki.Skin", getContext()).isNew());
         assertEquals(skin, this.xwiki.getDocument("XWiki.Skin", getContext()));

@@ -32,7 +32,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -156,7 +155,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
-import com.xpn.xwiki.internal.template.PrivilegedTemplateRenderer;
+import com.xpn.xwiki.internal.template.WikiTemplateRenderer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -357,11 +356,6 @@ public class XWiki implements EventListener
 
     @SuppressWarnings("deprecation")
     private SyntaxFactory syntaxFactory = Utils.getComponent((Type) SyntaxFactory.class);
-
-    /** Renderer for elevating privileges for selected file system templates. */
-    @SuppressWarnings("deprecation")
-    private PrivilegedTemplateRenderer privilegedTemplateRenderer = Utils
-        .getComponent(PrivilegedTemplateRenderer.class);
 
     @SuppressWarnings("deprecation")
     private ResourceReferenceManager resourceReferenceManager = Utils
@@ -1635,109 +1629,35 @@ public class XWiki implements EventListener
     public String evaluateTemplate(String template, XWikiContext context) throws IOException
     {
         try {
-            String skin = getSkin(context);
-            String result = parseTemplate(template, skin, context);
-            if (result != null) {
-                return result;
-            }
+            return Utils.getComponent(WikiTemplateRenderer.class).render(template);
+        } catch (Exception e) {
+            LOGGER.error("Error while evaluating velocity template [{}]", template, e);
 
-            // If we could not find the template in the skin
-            // let's try in the base skin (as long as the base skin is not the same as the skin and is not empty)
-            String baseskin = getBaseSkin(context);
-            if (StringUtils.isNotEmpty(baseskin) && !skin.equals(baseskin)) {
-                result = parseTemplate(template, baseskin, context);
-                if (result != null) {
-                    return result;
-                }
-            }
+            Object[] args = {template};
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
+                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while evaluating velocity template {0}",
+                    e, args);
 
-            // If we still could not find the template in the skin or in the base skin
-            // let's try in the default base skin (as long as the default base skin is not the same
-            // as the skin or the base skin and is not empty
-            String defaultbaseskin = getDefaultBaseSkin(context);
-            if (StringUtils.isNotEmpty(defaultbaseskin) && !baseskin.equals(defaultbaseskin)
-                && !skin.equals(defaultbaseskin)) {
-                result = parseTemplate(template, defaultbaseskin, context);
-                if (result != null) {
-                    return result;
-                }
-            }
-        } catch (Exception ex) {
-            LOGGER.debug("Exception while parsing template [{}] from skin", template, ex);
+            return Util.getHTMLExceptionMessage(xe, context);
         }
-
-        // Prevent inclusion of templates from other directories
-        String templatePath = URI.create("/templates/" + template).normalize().toString();
-        if (!templatePath.startsWith("/templates/")) {
-            LOGGER.warn("Direct access to template file [{}] refused. Possible break-in attempt!", templatePath);
-            return "";
-        }
-
-        String content = getResourceContent(templatePath);
-
-        return this.privilegedTemplateRenderer.evaluateTemplate(content, templatePath);
     }
 
     public String parseTemplate(String template, String skin, XWikiContext context)
     {
         try {
-            DocumentReference skinReference = this.currentMixedDocumentReferenceResolver.resolve(skin);
-            XWikiDocument doc = getDocument(skinReference, context);
-            if (!doc.isNew()) {
-                // Try parsing the object property
-                BaseObject object =
-                    doc.getXObject(new DocumentReference(doc.getDocumentReference().getWikiReference().getName(),
-                        SYSTEM_SPACE, "XWikiSkins"));
-                if (object != null) {
-                    String escapedTemplateName = template.replaceAll("/", ".");
-                    String content = object.getStringValue(escapedTemplateName);
-                    if (StringUtils.isNotBlank(content)) {
-                        // Let's use this template
-                        // Use "" as namespace to register macros in global namespace. That way it
-                        // can be used in a renderer content not parsed at the same level.
-                        return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext) context.get("vcontext"),
-                            context);
-                    }
-                }
-                // Try parsing a document attachment
-                XWikiAttachment attachment = doc.getAttachment(template);
-                if (attachment != null) {
-                    // It's impossible to know the real attachemtn encoding, but let's assume that they respect the
-                    // standard and use UTF-8 (which is required for the files located on the filesystem)
-                    String content = IOUtils.toString(attachment.getContentInputStream(context), DEFAULT_ENCODING);
-                    if (StringUtils.isNotBlank(content)) {
-                        // Let's use this template
-                        // Use "" as namespace to register macros in global namespace. That way it
-                        // can be used in a renderer content not parsed at the same level.
-                        return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext) context.get("vcontext"),
-                            context);
-                    }
-                }
-            }
+            return Utils.getComponent(WikiTemplateRenderer.class).renderFromSkin(template, skin);
         } catch (Exception e) {
-        }
+            LOGGER.error("Error while evaluating velocity template [{}] skin [{}]", template, skin, e);
 
-        // Try parsing a file located in the directory with the same name.
-        try {
-            String path = "/skins/" + skin + "/" + template;
-            // We must make sure the file is taken from the skins directory, otherwise people might
-            // try to read things from WEB-INF.
-            path = URI.create(path).normalize().toString();
-            // This is a safe assumption, as templates found under /templates/ are treated
-            // separately, and there is no need to have templates in another place.
-            if (path.startsWith("/skins/")) {
-                String content = getResourceContent(path);
-                // Use "" as namespace to register macros in global namespace. That way it can be
-                // used in a renderer content not parsed at the same level.
-                return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext) context.get("vcontext"), context);
-            } else {
-                LOGGER.warn("Illegal access, tried to use file [" + path + "] as a template."
-                    + " Possible break-in attempt!");
-            }
-        } catch (Exception e) {
-        }
+            Object[] args = {template, skin};
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
+                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while evaluating velocity template [{0}] from skin [{1}]",
+                    e, args);
 
-        return null;
+            return Util.getHTMLExceptionMessage(xe, context);
+        }
     }
 
     public String renderTemplate(String template, String skin, XWikiContext context)

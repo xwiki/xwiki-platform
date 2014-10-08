@@ -477,8 +477,7 @@ public abstract class XWikiAction extends Action
         }
     }
 
-    private void renderInit(XWikiContext xcontext) throws IOException, ParseException,
-        MissingParserException, XWikiVelocityException
+    private void renderInit(XWikiContext xcontext) throws Exception
     {
         RenderingContext renderingContext = Utils.getComponent(RenderingContext.class);
         MutableRenderingContext mutableRenderingContext =

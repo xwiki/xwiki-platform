@@ -47,7 +47,7 @@ public class PreviewAction extends EditAction
      */
     public PreviewAction()
     {
-        this.waitForXWikiInitialization = false;
+        this.waitForXWikiInitialization = true;
     }
 
     /**

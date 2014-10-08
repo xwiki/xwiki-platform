@@ -6,9 +6,9 @@
 #xwikitopmenuseparator()
 #set($spaceURL = $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('SPACE'))))
 #if (!$displaySpaceSubmenu)
-  #xwikitopmenuentry($spaceURL "$services.localization.render('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' 'hasIcon' 'folder-open')
+  #xwikitopmenuentry($spaceURL "$services.localization.render('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' '' 'folder-open')
 #else
-  #xwikitopmenuentrystart($spaceURL "$services.localization.render('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' 'hasIcon' 'folder-open')
+  #xwikitopmenuentrystart($spaceURL "$services.localization.render('core.menu.type.space')__SEPARATOR__$!{escapetool.xml($doc.space)}" 'tmSpace' '' 'folder-open')
     ## GO TO
     #submenuitem($spaceURL $services.localization.render('core.menu.goto.space') '', '', 'arrow-right')
     ## WATCH / UNWATCH

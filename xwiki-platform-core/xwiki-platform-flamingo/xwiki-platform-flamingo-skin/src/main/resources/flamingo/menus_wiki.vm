@@ -23,10 +23,10 @@
   #set($wikiURL = $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
   #if(!$displayWikiSubmenu)
     ## Only display a link to the wiki
-    #xwikitopmenuentry($wikiURL $wikiEntryText $wikiEntryId 'hasIcon', 'globe')
+    #xwikitopmenuentry($wikiURL $wikiEntryText $wikiEntryId '', 'globe')
   #else
     ## Display a complete menu
-    #xwikitopmenuentrystart($wikiURL $wikiEntryText $wikiEntryId 'hasIcon' 'globe')
+    #xwikitopmenuentrystart($wikiURL $wikiEntryText $wikiEntryId '' 'globe')
       ## GO TO
       #submenuitem($wikiURL $services.localization.render('core.menu.goto.wiki') '', '', 'arrow-right')
       ## WATCH / UNWATCH

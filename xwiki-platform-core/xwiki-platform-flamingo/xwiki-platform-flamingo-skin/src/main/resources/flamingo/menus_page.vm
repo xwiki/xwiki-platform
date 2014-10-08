@@ -9,9 +9,9 @@
 #set ($pageURL = $xwiki.getURL($doc.documentReference, 'view')))
 #xwikitopmenuseparator()
 #if (!$displayPageSubmenu)
-  #xwikitopmenuentry($pageURL "$services.localization.render('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' 'hasIcon' 'file')
+  #xwikitopmenuentry($pageURL "$services.localization.render('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' '' 'file')
 #else
-  #xwikitopmenuentrystart($pageURL "$services.localization.render('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' 'hasIcon' 'file')
+  #xwikitopmenuentrystart($pageURL "$services.localization.render('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' '' 'file')
     ## GO TO
     #submenuitem($pageURL $services.localization.render('core.menu.goto.page') '', '', 'arrow-right')
     ## WATCH /UNWATCH

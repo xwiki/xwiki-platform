@@ -106,6 +106,13 @@ a:hover:-moz-read-write {
   white-space: nowrap;
 }
 
+/* Make sure that a double click inside the macro selects only inner text, otherwise the user can't edit the macro. */
+.macro-inline > .selectionBoundary {
+  /* We want to hide the selection boundary but we can't use display:none so we rely on width:0. */
+  display: inline-block;
+  width: 0;
+}
+
 .xEmbeddedObject {
   background-image: url(../images/embed.gif);
   background-position: center center;

@@ -65,6 +65,11 @@ public class MacroDisplayer implements InnerHTMLListener
     public static final String COLLAPSED_MACRO_STYLE_NAME = MACRO_STYLE_NAME + "-collapsed";
 
     /**
+     * The CSS class name used on the macro content place-holder.
+     */
+    public static final String MACRO_PLACEHOLDER_STYLE_NAME = "macro-placeholder";
+
+    /**
      * The prefix of the start macro comment node.
      */
     public static final String START_MACRO_COMMENT_PREFIX = "startmacro:";
@@ -199,6 +204,7 @@ public class MacroDisplayer implements InnerHTMLListener
 
         MacroCall call = new MacroCall(start.getNodeValue());
         container.setTitle(call.getName() + " macro");
+
         // Use a place holder when the macro is collapsed or when it is empty.
         // The place holder is hidden when the macro is expanded.
         container.appendChild(createPlaceHolder(call));
@@ -217,6 +223,13 @@ public class MacroDisplayer implements InnerHTMLListener
 
         // Insert the macro container before the start macro comment node, which will be removed.
         start.getParentNode().insertBefore(container, start);
+
+        if (inLine) {
+            // We need to make sure that a double click inside the macro output or its placeholder doesn't select the
+            // nearby text (to the left or to the right of the macro) because this may prevent the user from editing the
+            // macro. See XWIKI-11057: Unable to double click to edit an inline macro in WYSIWYG
+            limitTextSelectionOnDoubleClick(container);
+        }
 
         return container;
     }
@@ -299,21 +312,40 @@ public class MacroDisplayer implements InnerHTMLListener
         // we couldn't find a way to hide the image selection when a collapsed macro is selected.
         Element macroIcon = Element.as(document.createSpanElement());
         macroIcon.setClassName("macro-icon");
-        // HACK: Insert a Non-Breaking Space in the element used to display the macro icon in order to overcome the
-        // following problem: Firefox leaves the caret inside the hidden macro place-holder if you delete the text
-        // before an expanded macro; obviously the caret disappears. Another solution would be to put the macro
-        // place-holder in the DOM only when the macro is collapsed but this complicates the code that toggles the
-        // collapsed state (and we'd need to recreate the macro place-holder after undo/redo operations).
-        macroIcon.appendChild(document.createTextNode("\u00A0"));
 
         Element placeHolder = document.createSpanElement().cast();
         placeHolder.appendChild(macroIcon);
         placeHolder.appendChild(document.createTextNode(call.getName()));
-        placeHolder.setClassName("macro-placeholder");
+        placeHolder.setClassName(MACRO_PLACEHOLDER_STYLE_NAME);
 
         DocumentFragment output = document.createDocumentFragment();
         output.appendChild(placeHolder);
         return output;
+    }
+
+    /**
+     * Make sure that a double click inside the given in-line element selects only text that is inside the element.
+     * 
+     * @param container the element for which to limit the text selection on double click
+     */
+    protected void limitTextSelectionOnDoubleClick(Element container)
+    {
+        container.insertFirst(createSelectionBoundary());
+        container.appendChild(createSelectionBoundary());
+    }
+
+    /**
+     * @return an in-line element that limits the text selection on double click
+     */
+    private Element createSelectionBoundary()
+    {
+        Document document = textArea.getDocument();
+        Element boundary = Element.as(document.createSpanElement());
+        // The element must contain a space, otherwise the selection goes over it. We tried to add the space from CSS
+        // but it doesn't work. The space must be present in the DOM (as a text node).
+        boundary.appendChild(document.createTextNode("\u00A0"));
+        boundary.setClassName("selectionBoundary");
+        return boundary;
     }
 
     /**
@@ -453,7 +485,11 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     protected Element getPlaceHolder(Element container)
     {
-        return (Element) container.getFirstChild();
+        Element placeHolder = Element.as(container.getFirstChildElement());
+        while (placeHolder != null && !placeHolder.hasClassName(MACRO_PLACEHOLDER_STYLE_NAME)) {
+            placeHolder = Element.as(placeHolder.getNextSiblingElement());
+        }
+        return placeHolder;
     }
 
     /**

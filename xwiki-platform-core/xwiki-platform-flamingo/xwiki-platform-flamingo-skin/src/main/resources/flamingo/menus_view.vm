@@ -20,9 +20,7 @@
       #template("menus_wiki.vm")
       #template("menus_space.vm")
       #template("menus_page.vm")
-      #if($displayCreateMenu)
-        #template("menus_create.vm")
-      #end
+      #template("menus_create.vm")
     #xwikitopmenuleftend()
     
   ## End of Top Menu

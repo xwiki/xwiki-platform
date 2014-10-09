@@ -1,6 +1,7 @@
 ##################################
 ##         CREATE MENU
 ##################################
+#if($displayCreateMenu)
 ## $displayCreateWiki is determined by:
 ## - the wiki app is installed
 ## - and the user has the right to create a wiki
@@ -31,4 +32,5 @@
   #end
   #xwikibuttonentryend()
   </div>
+#end
 #end

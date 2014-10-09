@@ -206,11 +206,17 @@ ul.dependencies li:hover {
 #extensionSearchInput {
   background: url("$xwiki.getSkinFile('icons/xwiki/search.png')") no-repeat scroll left center $theme.pageContentBackgroundColor;
   padding-left: 18px;
-  width: 340px;
 }
 
 #extensionSearchRepositoryList {
   padding: 3px;
+}
+
+@media (max-width: 480px) {
+  #extensionSearchInput, #extensionSearchRepositoryList {
+    margin: 0 0 .3em;
+    width: 100%;
+  }
 }
 
 #extension-search-advanced {

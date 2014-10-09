@@ -203,3 +203,13 @@ form.edit-xcomment .commentcontent textarea {
   /* fix for IE7 */
   width: 98%;
 }
+@media (max-width: 480px) {
+  .commentdate {
+    display: block;
+  }
+  .commenttools {
+    display: inline-block;
+    float: none;
+    margin: 0;
+  }
+}

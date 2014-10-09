@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal;
+package org.xwiki.lesscss.internal.less4j;
 
 import java.nio.file.Path;
 
@@ -26,6 +26,11 @@ import javax.inject.Named;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.LESSCompiler;
 import org.xwiki.lesscss.LESSCompilerException;
+
+import com.github.sommeri.less4j.Less4jException;
+import com.github.sommeri.less4j.LessCompiler;
+import com.github.sommeri.less4j.core.DefaultLessCompiler;
+import com.github.sommeri.less4j.core.problems.BugHappened;
 
 /**
  * Implementation of {@link LESSCompiler} that uses https://github.com/SomMeri/less4j, a LESS compiler written in Java
@@ -38,15 +43,36 @@ import org.xwiki.lesscss.LESSCompilerException;
 @Named("less4j")
 public class LESS4jCompiler implements LESSCompiler
 {
+    private static final String ERROR_MESSAGE = "Failed to compile the LESS code: [%s]";
+
     @Override
     public String compile(String lessCode) throws LESSCompilerException
     {
-        return null;
+        LessCompiler lessCompiler = new DefaultLessCompiler();
+        LessCompiler.Configuration options = new LessCompiler.Configuration();
+        options.setCompressing(true);
+        try {
+            LessCompiler.CompilationResult result = lessCompiler.compile(lessCode, options);
+            return result.getCss();
+        } catch (Less4jException e) {
+            throw new LESSCompilerException(ERROR_MESSAGE, e);
+        }
     }
 
     @Override
     public String compile(String lessCode, Path[] includePaths) throws LESSCompilerException
     {
-        return null;
+        LessCompiler lessCompiler = new DefaultLessCompiler();
+        LessCompiler.Configuration options = new LessCompiler.Configuration();
+        options.setCompressing(true);
+        try {
+            CustomLESSSource source = new CustomLESSSource(lessCode, includePaths);
+            LessCompiler.CompilationResult result = lessCompiler.compile(source, options);
+            return result.getCss();
+        } catch (Less4jException | BugHappened e) {
+            throw new LESSCompilerException(String.format(ERROR_MESSAGE, e.getMessage()), e);
+        }
     }
+
+
 }

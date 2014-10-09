@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.lesscss.internal;
+package org.xwiki.lesscss.internal.less4j;
 
 import java.io.FileInputStream;
 import java.io.StringWriter;
@@ -32,16 +32,16 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test class for {@link JavaScriptLESSCompiler}.
+ * Test class for {@link org.xwiki.lesscss.internal.less4j.LESS4jCompiler}.
  *
- * @since 6.1M1
+ * @since 6.3M1
  * @version $Id$
  */
-public class JavaScriptLESSCompilerTest
+public class LESS4jCompilerTest
 {
     @Rule
-    public MockitoComponentMockingRule<JavaScriptLESSCompiler> mocker =
-            new MockitoComponentMockingRule<>(JavaScriptLESSCompiler.class);
+    public MockitoComponentMockingRule<LESS4jCompiler> mocker =
+            new MockitoComponentMockingRule<>(LESS4jCompiler.class);
 
     @Test
     public void compile() throws Exception
@@ -55,7 +55,7 @@ public class JavaScriptLESSCompilerTest
 
         // Get the expected result
         StringWriter expectedResult = new StringWriter();
-        IOUtils.copy(new FileInputStream(getClass().getResource("/style.css").getFile()), expectedResult);
+        IOUtils.copy(new FileInputStream(getClass().getResource("/style.less4j.css").getFile()), expectedResult);
 
         // Compare
         assertEquals(expectedResult.toString(), result);
@@ -69,12 +69,13 @@ public class JavaScriptLESSCompilerTest
         IOUtils.copy(new FileInputStream(getClass().getResource("/styleWithImports.less").getFile()), source);
 
         // Compile
-        Path[] paths = {Paths.get(getClass().getResource("/").getPath())};
+        Path[] paths = { Paths.get(getClass().getResource("/").getPath())};
         String result = mocker.getComponentUnderTest().compile(source.toString(), paths);
 
         // Get the expected result
         StringWriter expectedResult = new StringWriter();
-        IOUtils.copy(new FileInputStream(getClass().getResource("/styleWithImports.css").getFile()), expectedResult);
+        IOUtils.copy(new FileInputStream(getClass().getResource("/styleWithImports.less4j.css").getFile()),
+                expectedResult);
 
         // Compare
         assertEquals(expectedResult.toString(), result);

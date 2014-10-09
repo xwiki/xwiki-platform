@@ -224,7 +224,8 @@ public class DefaultLESSSkinFileCompilerTest
         // Verify
         assertNotNull(exceptionCaught);
         assertEquals(exception, exceptionCaught.getCause());
-        assertEquals("Failed to compile the file [style2.less] with LESS.", exceptionCaught.getMessage());
+        assertEquals("Failed to compile the file [style2.less] with LESS: [Exception with LESS].",
+                exceptionCaught.getMessage());
         verify(xcontext, never()).put(anyString(), anyString());
     }
 
@@ -448,6 +449,7 @@ public class DefaultLESSSkinFileCompilerTest
         // Verify
         assertNotNull(exceptionCaught);
         assertEquals(exception, exceptionCaught.getCause());
-        assertEquals("Failed to compile the file [style2.less] with LESS.", exceptionCaught.getMessage());
+        assertEquals("Failed to compile the file [style2.less] with LESS: [Exception with LESS].",
+                exceptionCaught.getMessage());
     }
 }

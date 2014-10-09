@@ -1,6 +1,8 @@
+org.xwiki.lesscss.internal.less4j.LESS4jCompiler
+org.xwiki.lesscss.internal.lessjs.JavaScriptLESSCompiler
 org.xwiki.lesscss.internal.DefaultColorThemeCache
 org.xwiki.lesscss.internal.DefaultLESSColorThemeConverter
-org.xwiki.lesscss.internal.JavaScriptLESSCompiler
+org.xwiki.lesscss.internal.DefaultLESSCompiler
 org.xwiki.lesscss.internal.DefaultLESSSkinFileCache
 org.xwiki.lesscss.internal.DefaultLESSSkinFileCompiler
 org.xwiki.lesscss.internal.SkinAndColorThemeListener

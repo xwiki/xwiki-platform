@@ -107,7 +107,8 @@ public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> 
             // Compile the LESS code
             return lessCompiler.compile(velocityParsedSource, includePaths);
         } catch (LESSCompilerException | IOException e) {
-            throw new LESSCompilerException(String.format("Failed to compile the file [%s] with LESS.", fileName), e);
+            throw new LESSCompilerException(String.format("Failed to compile the file [%s] with LESS: [%s].", fileName,
+                e.getMessage()), e);
         } finally {
             // Reset the current skin to the old value
             if (!currentSkin.equals(skin)) {

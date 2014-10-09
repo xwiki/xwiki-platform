@@ -874,7 +874,7 @@ $doc.display("content", $obj)
 
 #macro(xwikimessagebox $title $message $urlyes $urlno $msgyes $msgno)
 #xwikimessageboxstart($title $message)
-      <div class="buttons"><a href="$urlyes" class="buttonwrapper"><input type="button" class="button" value="$msgyes" onclick="location='$urlyes'; return false;"/></a><a href="$urlno" class="buttonwrapper"><input type="button" class="button" value="$msgno" onclick="location='$urlno'; return false;"/></a></div>
+      <div class="buttons"><a href="$urlyes" class="buttonwrapper"><input type="button" class="button" value="$msgyes" onclick="location='$urlyes'; return false;"/></a> <a href="$urlno" class="buttonwrapper"><input type="button" class="button secondary" value="$msgno" onclick="location='$urlno'; return false;"/></a></div>
 #xwikimessageboxend()
 #end
 

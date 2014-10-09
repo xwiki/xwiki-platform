@@ -213,7 +213,7 @@
             #set($xredirect = "$xwiki.getURL($annDocReference, 'view', $!{request.queryString})")
           #end
           ## add "comment reply" button
-          &lt;span class="tool annotationReply commenttool commentreply"&gt;&lt;a class="commentreply" href="${xredirect}#xwikicomment_${ann.id}" title="$services.localization.render('core.viewers.comments.reply')"&gt;$services.localization.render('core.viewers.comments.reply')&lt;/a&gt;&lt;/span&gt;
+          &lt;span class="tool annotationReply"&gt;&lt;a class="reply" href="${xredirect}#xwikicomment_${ann.id}" title="$services.localization.render('core.viewers.comments.reply')"&gt;$services.localization.render('core.viewers.comments.reply')&lt;/a&gt;&lt;/span&gt;
         #end
         ## use an edit url just for the fanciness of it, it won't really be used in this case. An edit form will be loaded
         &lt;span class="tool annotationEdit"&gt;&lt;a class="edit" href="${editURL}" title="$services.localization.render('annotations.action.edit.tooltip')"&gt;$services.localization.render('annotations.action.edit.text')&lt;/a&gt;&lt;/span&gt;

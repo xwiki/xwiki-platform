@@ -422,6 +422,10 @@
   text-indent: -9999px;
   width: 16px;
 }
+.annotationTools .reply {
+  background-image: #imgURL('comments_add');
+  padding-left: 0px;
+}
 .annotationTools .edit {
   background-image: #imgURL('pencil');
 }

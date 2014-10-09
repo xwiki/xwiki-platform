@@ -92,7 +92,7 @@ ul.commentreplies, .reply {
 .commenttools {
   display: block;
   float: right;
-  margin-top: -1.2em;
+  margin-top: -1.5em;
 }
 .commenttool a {
   background: transparent left top no-repeat;

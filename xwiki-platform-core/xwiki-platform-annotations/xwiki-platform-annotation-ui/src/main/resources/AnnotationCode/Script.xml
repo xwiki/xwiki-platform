@@ -195,7 +195,7 @@ XWiki.Selection = Class.create({
         this.selectionText = this.range.text;
       }
     }
-    if (this.selectionText == '') {
+    if (this.selectionText.trim() == '') {
       this.selectionText = false;
     }
   },

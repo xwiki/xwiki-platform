@@ -324,7 +324,6 @@
 
 .changes-info-box {
   .make-sm-column(6, @main-padding);
-  z-index: 100; /* Have text above the arrow in responsive mode */
 }
 
 .changes-info-box, #changes-info-comment {
@@ -333,4 +332,35 @@
 
 .changes-info-title {
   .h3;
+}
+
+@media (max-width: @screen-xs-max) {
+  #changes-info:before, #changes-info:after {
+    display: none; /* Hide the arrow for small resolutions */
+  }
+}
+
+// Panels Layout --------------------------------------------------------------
+/* Content Panels are defined in macros.vm in #displayPanelLayout and used in applications like Statistics */
+
+.panellayoutcol {
+  .panellayoutcontainer-1col &, .panellayoutcontainer-2col &, .panellayoutcontainer-3col &, .panellayoutcontainer-4col & {
+    .make-xs-column(12);
+    & .xwikipanelcontents {
+      overflow: auto;
+    }
+  }
+  .panellayoutcontainer-2col & {
+    .make-sm-column(6);
+  }
+  .panellayoutcontainer-3col & {
+    .make-sm-column(4);
+  }
+  .panellayoutcontainer-4col & {
+    .make-sm-column(3);
+  }
+}
+
+.panellayoutcontainer-1col, .panellayoutcontainer-2col, .panellayoutcontainer-3col, .panellayoutcontainer-4col {
+  .clearfix();
 }

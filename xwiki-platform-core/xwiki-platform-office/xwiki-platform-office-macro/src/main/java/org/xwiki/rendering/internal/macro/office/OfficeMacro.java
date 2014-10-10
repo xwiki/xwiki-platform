@@ -35,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.office.viewer.OfficeResourceViewer;
+import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
@@ -61,6 +62,9 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
      */
     @Inject
     private OfficeResourceViewer officeViewer;
+
+    @Inject
+    private OfficeServer officeServer;
 
     /**
      * Used to transform the passed attachment reference macro parameter into a typed {@link AttachmentReference}
@@ -92,6 +96,12 @@ public class OfficeMacro extends AbstractMacro<OfficeMacroParameters>
     public List<Block> execute(OfficeMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
+        // Check if the office server is started and if not, generate an error.
+        if (!this.officeServer.getState().equals(OfficeServer.ServerState.CONNECTED)) {
+            throw new MacroExecutionException("The wiki needs to be connected to an office server in order to view "
+                + "office files. Ask your administrator to configure such a server.");
+        }
+
         ResourceReference resourceReference = getResourceReference(context.getCurrentMacroBlock(), parameters);
 
         Map<String, Object> viewParameters = new HashMap<String, Object>();

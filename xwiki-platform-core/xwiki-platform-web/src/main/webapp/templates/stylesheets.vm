@@ -12,7 +12,7 @@
 #if ($themeDoc)
   #set ($discard = $urlParametersMap.put("colorTheme", "$!themeDocFullName"))
 #end
-#set ($urlParameters = $escapetool.url($urlParametersMap))
+#set ($urlParameters = $escapetool.xml($escapetool.url($urlParametersMap)))
 #set ($defaultStyleURL = $xwiki.getSkinFile($defaultstyle, true))
 <link href="${defaultStyleURL}?${urlParameters}" rel="stylesheet" type="text/css" media="all" />
 <link href="$xwiki.getSkinFile('print.css', true)?${urlParameters}" rel="stylesheet" type="text/css" media="#if ($printss)all#{else}print#{end}" />

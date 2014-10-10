@@ -18,7 +18,7 @@
       ## config document. This however should not happen.
       #set($annotationCount = $doc.getObjects('AnnotationCode.AnnotationClass').size())
     #end
-    #set ($discard = $docextralinks.add(['annotations', $services.localization.render('docextra.annotations'), $annotationCount]))
+    #set ($discard = $docextralinks.add(['annotations', $services.localization.render('docextra.annotations'), $annotationCount, 'pushpin']))
   #end
   #if($viewer != 'attachments' && $showattachments)
     #set ($discard = $docextralinks.add(['attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(), 'paperclip']))

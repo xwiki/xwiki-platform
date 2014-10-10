@@ -20,11 +20,10 @@
 package org.xwiki.annotation.internal;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -39,7 +38,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
  */
 @Component
 @Named("annotation")
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+@Singleton
 public class AnnotationConfigurationSource extends AbstractDocumentConfigurationSource
 {
     /**

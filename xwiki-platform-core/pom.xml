@@ -347,6 +347,12 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <differenceType>6010</differenceType>
+              <className>com/xpn/xwiki/objects/BaseElement</className>
+              <field>localEntityReferenceSerializer</field>
+              <justification>Never really been supposed to be exposed as an API.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

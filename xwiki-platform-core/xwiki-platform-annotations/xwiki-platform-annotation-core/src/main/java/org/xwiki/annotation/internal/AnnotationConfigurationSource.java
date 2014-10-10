@@ -29,9 +29,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
- * Provides configuration from the Annotation Application's configuration document, for the current wiki. Clients of
- * this component should use lazy injection (@see {@link javax.inject.Provider}) in order to always receive the
- * configuration of the current wiki.
+ * Provides configuration from the Annotation Application's configuration document, for the current wiki.
  * 
  * @version $Id$
  * @since 4.0M2

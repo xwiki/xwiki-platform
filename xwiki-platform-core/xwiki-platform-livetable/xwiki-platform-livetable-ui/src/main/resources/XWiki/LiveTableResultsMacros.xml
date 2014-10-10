@@ -548,14 +548,28 @@
  * Macro to extend the query to select the properties for the livetable columns.
  * NOTE $colname is filtered (all characters but [a-zA-Z0-9_.] are removed) before use
  *#
-#macro(livetable_addColumnToQuery $colname)
- ## Safe because / is not allowed in property names
- #set ($joinModeMarker = "/join_mode")
- #if(!$colname.endsWith($joinModeMarker))
-  #set ($filterValue = "$!{request.get($colname)}")
+#macro (livetable_addColumnToQuery $colName)
+  ## Safe because / is not allowed in property names
+  #set ($joinModeMarker = "/join_mode")
+  #if (!$colName.endsWith($joinModeMarker))
+    #set ($filterValue = "$!request.getParameter($colName)")
+    #if ("$!filterValue" != '')
+      #set ($discard = $tablelist.add($colName))
+      #if ($colName.startsWith('doc.'))
+        #set ($safeColName = $colName.replaceAll('[^a-zA-Z0-9_.]', '').replace('_', '.'))
+        #set ($whereSql = "${whereSql} and upper(str($safeColName)) like upper(?)")
+        #set ($discard = $whereParams.add("%$filterValue%"))
+      #else
+        #livetable_filterProperty($colName $filterValue)
+      #end
+    #end
+  #end
+#end
+
+
+#macro (livetable_filterProperty $colname $filterValue)
   ## Only safe version should be used in SQL queries
-  #set($safe_tableAlias = $colname.replaceAll('[^a-zA-Z0-9_.]', ''))
-  ##
+  #set ($safe_tableAlias = $colname.replaceAll('[^a-zA-Z0-9_.]', ''))
   #set($propType = '')
   #set($propClassName = "$!request.get(${colname.concat('_class')})")
   #if($propClassName != '')
@@ -566,92 +580,83 @@
   #if($propClass &amp;&amp; $propClass.getPropertyNames().contains($colname))
     #set($propType = "$!{propClass.get($colname).type}")
   #end
-  ##
-  ## Filter values
-  #if("$!filterValue" != '')
-    ## If the column is not from $class, we need to make sure we join with the proper table
-    #set($filterObjectAlias = 'obj')
-    #if($propClassName != '' &amp;&amp; "$!propClass" != '')
-      ## prepare the alias of the BaseObject table that corresponds to the class of this column
-      ## Property table is to be joined with its object, determined depending on $propClassName
-      #set($filterObjectAlias = "$!{propClassName.replaceAll('[^a-zA-Z0-9_]','')}_obj")
-      #addObjectClause($filterObjectAlias)
-    #end
-    #set($discard = $tablelist.add($colname))
-    #if($colname.startsWith('doc.'))
-      #set($whereSql = "${whereSql} and upper(str($safe_tableAlias.replace('_', '.'))) like upper(?)")
-      #set($discard = $whereParams.add("%${filterValue}%"))
-    #elseif($propType == 'NumberClass' || $propType == 'BooleanClass')
-      #livetable_getTableName($colname)
-      #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
-      #set($numberValue = $numbertool.toNumber(${filterValue}))
-      #if($tableName == 'IntegerProperty' || $tableName == 'LongProperty')
-        #if($tableName == 'LongProperty')
-          #set($numberValue = $numberValue.longValue())
-        #else
-          ## IntegerProperty
-          #set($numberValue = $numberValue.intValue())
-        #end
-        #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
+  ## If the column is not from $class, we need to make sure we join with the proper table
+  #set($filterObjectAlias = 'obj')
+  #if($propClassName != '' &amp;&amp; "$!propClass" != '')
+    ## prepare the alias of the BaseObject table that corresponds to the class of this column
+    ## Property table is to be joined with its object, determined depending on $propClassName
+    #set($filterObjectAlias = "$!{propClassName.replaceAll('[^a-zA-Z0-9_]','')}_obj")
+    #addObjectClause($filterObjectAlias)
+  #end
+  #if($propType == 'NumberClass' || $propType == 'BooleanClass')
+    #livetable_getTableName($colname)
+    #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
+    #set($numberValue = $numbertool.toNumber(${filterValue}))
+    #if($tableName == 'IntegerProperty' || $tableName == 'LongProperty')
+      #if($tableName == 'LongProperty')
+        #set($numberValue = $numberValue.longValue())
       #else
-        #if($tableName == 'FloatProperty')
-          #set($numberValue = $numberValue.floatValue())
-        #else
-          ## DoubleProperty
-          #set($numberValue = $numberValue.doubleValue())
-        #end
-        #set($precision = 0.000001)
-        #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and abs(? - ${safe_tableAlias}.value) &lt;= ${precision}")
+        ## IntegerProperty
+        #set($numberValue = $numberValue.intValue())
       #end
-      #set($discard = $whereParams.addAll(["${colname}", $numberValue]))
-    #elseif($propType == 'DateClass')
-      #set($fromSql = "${fromSql}, DateProperty ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(str(${safe_tableAlias}.value)) like upper(?)")
-      #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
-    #elseif($propType == 'TextAreaClass' || $propType == 'UsersClass' || $propType == 'GroupsClass')
-      #set($fromSql = "${fromSql}, LargeStringProperty ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
-      #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
-    #elseif($propType == 'StaticListClass' || $propType == 'DBListClass' || $propType == 'DBTreeListClass')
-      #set($multiSelect = $propClass.get($colname).getProperty('multiSelect').getValue())
-      #set($relationalStorage = $propClass.get($colname).getProperty('relationalStorage').getValue())
-      #if($multiSelect == 1)
-        #if($relationalStorage == 1)
-          #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
-          #if($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
-            #set ($joinOperator = 'AND')
+      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
+    #else
+      #if($tableName == 'FloatProperty')
+        #set($numberValue = $numberValue.floatValue())
+      #else
+        ## DoubleProperty
+        #set($numberValue = $numberValue.doubleValue())
+      #end
+      #set($precision = 0.000001)
+      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and abs(? - ${safe_tableAlias}.value) &lt;= ${precision}")
+    #end
+    #set($discard = $whereParams.addAll(["${colname}", $numberValue]))
+  #elseif($propType == 'DateClass')
+    #set($fromSql = "${fromSql}, DateProperty ${safe_tableAlias}")
+    #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(str(${safe_tableAlias}.value)) like upper(?)")
+    #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
+  #elseif($propType == 'TextAreaClass' || $propType == 'UsersClass' || $propType == 'GroupsClass')
+    #set($fromSql = "${fromSql}, LargeStringProperty ${safe_tableAlias}")
+    #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
+    #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
+  #elseif($propType == 'StaticListClass' || $propType == 'DBListClass' || $propType == 'DBTreeListClass')
+    #set($multiSelect = $propClass.get($colname).getProperty('multiSelect').getValue())
+    #set($relationalStorage = $propClass.get($colname).getProperty('relationalStorage').getValue())
+    #if($multiSelect == 1)
+      #if($relationalStorage == 1)
+        #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
+        #if($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
+          #set ($joinOperator = 'AND')
+        #end
+        #foreach ($filterValue in $request.getParameterValues($colname))
+          #if($foreach.isFirst())
+            #set ($fromSql = "${fromSql}, DBStringListProperty ${safe_tableAlias}")
+            #set ($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and (")
+            #set ($discard = $whereParams.add("${colname}"))
+          #else
+            #set ($whereSql = "${whereSql} ${joinOperator}")
           #end
-          #foreach ($filterValue in $request.getParameterValues($colname))
-            #if($foreach.isFirst())
-              #set ($fromSql = "${fromSql}, DBStringListProperty ${safe_tableAlias}")
-              #set ($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and (")
-              #set ($discard = $whereParams.add("${colname}"))
-            #else
-              #set ($whereSql = "${whereSql} ${joinOperator}")
-            #end
-            #set ($whereSql = "${whereSql} ? in elements(${safe_tableAlias}.list)")
-            #set ($discard = $whereParams.add("${filterValue}"))
-            #if($foreach.isLast())
-              #set ($whereSql = "${whereSql})")
-            #end
+          #set ($whereSql = "${whereSql} ? in elements(${safe_tableAlias}.list)")
+          #set ($discard = $whereParams.add("${filterValue}"))
+          #if($foreach.isLast())
+            #set ($whereSql = "${whereSql})")
           #end
-        #else
-          #set($fromSql = "${fromSql}, StringListProperty ${safe_tableAlias}")
-          #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) like upper(?)")
-          #set($discard = $whereParams.addAll(["${colname}", "%|${filterValue}|%"]))
         #end
       #else
-        #set($fromSql = "${fromSql}, StringProperty ${safe_tableAlias}")
-        #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
-        #set($discard = $whereParams.addAll(["${colname}", "${filterValue}"]))
+        #set($fromSql = "${fromSql}, StringListProperty ${safe_tableAlias}")
+        #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) like upper(?)")
+        #set($discard = $whereParams.addAll(["${colname}", "%|${filterValue}|%"]))
       #end
     #else
       #set($fromSql = "${fromSql}, StringProperty ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
-      #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
+      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
+      #set($discard = $whereParams.addAll(["${colname}", "${filterValue}"]))
     #end
+  #else
+    #set($fromSql = "${fromSql}, StringProperty ${safe_tableAlias}")
+    #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
+    #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
   #end
- #end
 #end
 
 

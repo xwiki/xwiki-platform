@@ -229,7 +229,12 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
 
                 XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
 
-                registerTranslationBundle(document);
+                try {
+                    registerTranslationBundle(document);
+                } catch (Exception e) {
+                    this.logger.error("Failed to register translation bundle from document [{}]",
+                        document.getDocumentReference(), e);
+                }
             }
         } catch (Exception e) {
             this.logger.error("Failed to load existing translations", e);

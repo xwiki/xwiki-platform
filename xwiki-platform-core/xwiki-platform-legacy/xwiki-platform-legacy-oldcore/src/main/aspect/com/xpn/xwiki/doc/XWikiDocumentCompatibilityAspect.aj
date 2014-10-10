@@ -35,6 +35,7 @@ import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -388,6 +389,24 @@ privileged public aspect XWikiDocumentCompatibilityAspect
         if (saveDocument) {
             // Save the document
             context.getWiki().saveDocument(this, "Deleted attachment [" + attachment.getFilename() + "]", context);
+        }
+    }
+
+    private String XWikiDocument.serializeReference(DocumentReference reference, EntityReferenceSerializer<String> serializer,
+        DocumentReference defaultReference)
+    {
+        XWikiContext xcontext = getXWikiContext();
+
+        String originalWikiName = xcontext.getWikiId();
+        XWikiDocument originalCurentDocument = xcontext.getDoc();
+        try {
+            xcontext.setWikiId(defaultReference.getWikiReference().getName());
+            xcontext.setDoc(new XWikiDocument(defaultReference));
+
+            return serializer.serialize(reference);
+        } finally {
+            xcontext.setDoc(originalCurentDocument);
+            xcontext.setWikiId(originalWikiName);
         }
     }
 

@@ -588,6 +588,8 @@
     #set($filterObjectAlias = "$!{propClassName.replaceAll('[^a-zA-Z0-9_]','')}_obj")
     #addObjectClause($filterObjectAlias)
   #end
+  #set ($joinObjectTable = "${filterObjectAlias}.id = ${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ?")
+  #set ($discard = $whereParams.add($colname))
   #if($propType == 'NumberClass' || $propType == 'BooleanClass')
     #livetable_getTableName($colname)
     #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
@@ -599,7 +601,7 @@
         ## IntegerProperty
         #set($numberValue = $numberValue.intValue())
       #end
-      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
+      #set($whereSql = "${whereSql} and $joinObjectTable and ${safe_tableAlias}.value = ?")
     #else
       #if($tableName == 'FloatProperty')
         #set($numberValue = $numberValue.floatValue())
@@ -608,17 +610,17 @@
         #set($numberValue = $numberValue.doubleValue())
       #end
       #set($precision = 0.000001)
-      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and abs(? - ${safe_tableAlias}.value) &lt;= ${precision}")
+      #set($whereSql = "${whereSql} and $joinObjectTable and abs(? - ${safe_tableAlias}.value) &lt;= ${precision}")
     #end
-    #set($discard = $whereParams.addAll(["${colname}", $numberValue]))
+    #set($discard = $whereParams.add($numberValue))
   #elseif($propType == 'DateClass')
     #set($fromSql = "${fromSql}, DateProperty ${safe_tableAlias}")
-    #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(str(${safe_tableAlias}.value)) like upper(?)")
-    #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
+    #set($whereSql = "${whereSql} and $joinObjectTable and upper(str(${safe_tableAlias}.value)) like upper(?)")
+    #set($discard = $whereParams.add("%$filterValue%"))
   #elseif($propType == 'TextAreaClass' || $propType == 'UsersClass' || $propType == 'GroupsClass')
     #set($fromSql = "${fromSql}, LargeStringProperty ${safe_tableAlias}")
-    #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
-    #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
+    #set($whereSql = "${whereSql} and $joinObjectTable and upper(${safe_tableAlias}.value) like upper(?)")
+    #set($discard = $whereParams.add("%$filterValue%"))
   #elseif($propType == 'StaticListClass' || $propType == 'DBListClass' || $propType == 'DBTreeListClass')
     #set($multiSelect = $propClass.get($colname).getProperty('multiSelect').getValue())
     #set($relationalStorage = $propClass.get($colname).getProperty('relationalStorage').getValue())
@@ -631,31 +633,30 @@
         #foreach ($filterValue in $request.getParameterValues($colname))
           #if($foreach.isFirst())
             #set ($fromSql = "${fromSql}, DBStringListProperty ${safe_tableAlias}")
-            #set ($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and (")
-            #set ($discard = $whereParams.add("${colname}"))
+            #set ($whereSql = "${whereSql} and $joinObjectTable and (")
           #else
             #set ($whereSql = "${whereSql} ${joinOperator}")
           #end
           #set ($whereSql = "${whereSql} ? in elements(${safe_tableAlias}.list)")
-          #set ($discard = $whereParams.add("${filterValue}"))
+          #set ($discard = $whereParams.add($filterValue))
           #if($foreach.isLast())
             #set ($whereSql = "${whereSql})")
           #end
         #end
       #else
         #set($fromSql = "${fromSql}, StringListProperty ${safe_tableAlias}")
-        #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) like upper(?)")
-        #set($discard = $whereParams.addAll(["${colname}", "%|${filterValue}|%"]))
+        #set($whereSql = "${whereSql} and $joinObjectTable and concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) like upper(?)")
+        #set($discard = $whereParams.add("%|$filterValue|%"))
       #end
     #else
       #set($fromSql = "${fromSql}, StringProperty ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and ${safe_tableAlias}.value = ?")
-      #set($discard = $whereParams.addAll(["${colname}", "${filterValue}"]))
+      #set($whereSql = "${whereSql} and $joinObjectTable and ${safe_tableAlias}.value = ?")
+      #set($discard = $whereParams.add($filterValue))
     #end
   #else
     #set($fromSql = "${fromSql}, StringProperty ${safe_tableAlias}")
-    #set($whereSql = "${whereSql} and ${filterObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ? and upper(${safe_tableAlias}.value) like upper(?)")
-    #set($discard = $whereParams.addAll(["${colname}", "%${filterValue}%"]))
+    #set($whereSql = "${whereSql} and $joinObjectTable and upper(${safe_tableAlias}.value) like upper(?)")
+    #set($discard = $whereParams.add("%$filterValue%"))
   #end
 #end
 

@@ -69,8 +69,6 @@ import com.xpn.xwiki.objects.BaseProperty;
 public abstract class AbstractDocumentConfigurationSource extends AbstractConfigurationSource implements Initializable,
     Disposable
 {
-    protected static final String NULL = new String();
-
     /**
      * Represents no value (ie the default value will be used) in xproperties.
      */

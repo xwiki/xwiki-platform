@@ -118,6 +118,10 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key1", "value");
         setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key2", "value");
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
+            WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "emptykey", "");
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
+            WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "emptykey2", "---");
 
         List<String> result = this.componentManager.getComponentUnderTest().getKeys();
 

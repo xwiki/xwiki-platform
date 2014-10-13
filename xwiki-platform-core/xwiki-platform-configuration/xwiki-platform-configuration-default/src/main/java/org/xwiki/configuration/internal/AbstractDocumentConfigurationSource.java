@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -194,12 +195,8 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         XWikiContext xcontext = this.xcontextProvider.get();
 
         if (xcontext != null && xcontext.getWiki() != null) {
-            // Since a single XObject holds all the properties we need to be careful here, overriding one property will
-            // put
-            // all the default keys in the source. To determine that the source contains the given key we check that the
-            // value is both not-null and not empty.
             Object value = getPropertyValue(key, null);
-            return value != null && !"".equals(value);
+            return value != null;
         }
 
         return false;
@@ -255,7 +252,15 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
                 baseObject = getBaseObject();
 
                 if (baseObject != null) {
-                    keys = new ArrayList<String>(baseObject.getPropertyList());
+                    Set<String> properties = baseObject.getPropertyList();
+                    keys = new ArrayList<String>(properties.size());
+                    for (String key : properties) {
+                        // We need to check if the key really have a value as otherwise it does not really make sense to
+                        // return it
+                        if (containsKey(key)) {
+                            keys.add(key);
+                        }
+                    }
                 }
             } catch (XWikiException e) {
                 this.logger.error("Failed to access configuration", e);

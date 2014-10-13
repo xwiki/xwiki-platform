@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.render;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -133,11 +134,18 @@ public class DefaultVelocityManager implements VelocityManager
     private String getVelocityEngineCacheKey(String skin, XWikiContext context)
     {
         String cacheKey = null;
+        Map<String, String> cacheKeyCache = null;
 
         // Generating this key is very expensive so we cache it in the context
-        ExecutionContext econtext = execution.getContext();
+        ExecutionContext econtext = this.execution.getContext();
         if (econtext != null) {
-            cacheKey = (String) econtext.getProperty(VELOCITYENGINE_CACHEKEY_NAME);
+            cacheKeyCache = (Map<String, String>) econtext.getProperty(VELOCITYENGINE_CACHEKEY_NAME);
+            if (cacheKeyCache == null) {
+                cacheKeyCache = new HashMap<String, String>();
+                econtext.setProperty(VELOCITYENGINE_CACHEKEY_NAME, cacheKeyCache);
+            } else {
+                cacheKey = cacheKeyCache.get(skin);
+            }
         }
 
         if (cacheKey == null) {
@@ -181,8 +189,8 @@ public class DefaultVelocityManager implements VelocityManager
                 }
             }
 
-            if (econtext != null) {
-                econtext.setProperty(VELOCITYENGINE_CACHEKEY_NAME, cacheKey);
+            if (cacheKeyCache != null) {
+                cacheKeyCache.put(skin, cacheKey);
             }
         }
 

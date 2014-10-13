@@ -40,14 +40,15 @@ public abstract class AbstractXWikiPreferencesConfigurationSource extends Abstra
     /**
      * The name of the space where wiki preferences are located.
      */
-    static final String CLASS_SPACE_NAME = "XWiki";
+    protected static final String CLASS_SPACE_NAME = "XWiki";
 
-    static final String CLASS_PAGE_NAME = "XWikiPreferences";
+    protected static final String CLASS_PAGE_NAME = "XWikiPreferences";
 
     /**
      * The local reference of the class containing wiki preferences.
      */
-    static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(CLASS_SPACE_NAME, CLASS_PAGE_NAME);
+    protected static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(CLASS_SPACE_NAME,
+        CLASS_PAGE_NAME);
 
     @Override
     protected String getCacheKeyPrefix()
@@ -150,13 +151,13 @@ public abstract class AbstractXWikiPreferencesConfigurationSource extends Abstra
         Object propertyValue = getBaseProperty(propertyName, xcontext.getLanguage(), text);
 
         // If empty we take it from the default pref object
-        if (propertyValue == null || (propertyValue instanceof String && propertyValue.equals(""))) {
+        if (propertyValue == null || isEmpty(propertyValue)) {
             propertyValue = getBaseProperty(propertyName, null, text);
         }
 
         // TODO: In the future we would need the notion of initialized/not-initialized property values in the wiki.
         // When this is implemented modify the code below.
-        if (propertyValue instanceof String && propertyValue.equals("")) {
+        if (isEmpty(propertyValue)) {
             propertyValue = null;
         }
 

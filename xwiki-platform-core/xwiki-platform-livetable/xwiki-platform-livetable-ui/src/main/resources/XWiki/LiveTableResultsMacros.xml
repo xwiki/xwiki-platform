@@ -106,27 +106,16 @@
     #if("$!orderDirection" != '' &amp;&amp; "$!orderDirection" != 'asc')
       #set($orderDirection = 'desc')
     #end
-    #if($order == 'description')
-      #set($tableAlias = 'dtable')
-    #else
-      #set($tableAlias = $order)
-    #end
     ## Only safe version should be used in SQL queries
-    #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
+    #set($safe_tableAlias = $order.replaceAll('[^a-zA-Z0-9_.]', ''))
     ##
     #if($order.startsWith('doc.'))
       #set($orderSql = " order by ${safe_tableAlias.replace('_','.')} ${orderDirection}")
-    #elseif($tablelist.contains($tableAlias))
+    #elseif($tablelist.contains($order))
       #set ($multiselect = "$!{class.get($order).getProperty('multiSelect').getValue()}")
       #if($multiselect != '1')
         #set ($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
       #end
-    #elseif($order == 'averagevote')
-      #livetable_getTableName($order)
-      #set($fromSql = "${fromSql}, BaseObject as objratings, ${tableName} ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and doc.fullName=objratings.name and objratings.className='XWiki.AverageRatingsClass' and objratings.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
-      #set($discard = $whereParams.add("${order}"))
-      #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
     #else
       #set($multiselect = $class.get($order).getProperty('multiSelect').getValue())
       #if("$multiselect" != '1')
@@ -564,14 +553,8 @@
  #set ($joinModeMarker = "/join_mode")
  #if(!$colname.endsWith($joinModeMarker))
   #set ($filterValue = "$!{request.get($colname)}")
-  #if($colname == 'description')
-    #set($tableAlias = 'dtable')
-  #else
-    #set($tableAlias = $colname)
-  #end
-  ## Only safe versions should be used in SQL queries
-  #set($safe_colname = "$!{colname.replaceAll('[^a-zA-Z0-9_.]','')}")
-  #set($safe_tableAlias = "$!{tableAlias.replaceAll('[^a-zA-Z0-9_.]','')}")
+  ## Only safe version should be used in SQL queries
+  #set($safe_tableAlias = $colname.replaceAll('[^a-zA-Z0-9_.]', ''))
   ##
   #set($propType = '')
   #set($propClassName = "$!request.get(${colname.concat('_class')})")
@@ -594,9 +577,9 @@
       #set($filterObjectAlias = "$!{propClassName.replaceAll('[^a-zA-Z0-9_]','')}_obj")
       #addObjectClause($filterObjectAlias)
     #end
-    #set($discard = $tablelist.add($tableAlias))
+    #set($discard = $tablelist.add($colname))
     #if($colname.startsWith('doc.'))
-      #set($whereSql = "${whereSql} and upper(str(${safe_colname.replace('_','.')})) like upper(?)")
+      #set($whereSql = "${whereSql} and upper(str($safe_tableAlias.replace('_', '.'))) like upper(?)")
       #set($discard = $whereParams.add("%${filterValue}%"))
     #elseif($propType == 'NumberClass' || $propType == 'BooleanClass')
       #livetable_getTableName($colname)

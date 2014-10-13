@@ -19,11 +19,8 @@
  */
 package org.xwiki.configuration.internal;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -75,6 +72,8 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
         Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key"));
         Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key", Integer.class));
 
+        // Validate result for simple String key
+
         setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", "value");
 
@@ -82,11 +81,23 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
         Assert.assertEquals("value", this.componentManager.getComponentUnderTest().getProperty("key", "default"));
         Assert.assertEquals("value", this.componentManager.getComponentUnderTest().getProperty("key"));
 
+        // Validate result for non existing key
+
         Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("wrongkey", String.class));
         Assert
             .assertEquals("default", this.componentManager.getComponentUnderTest().getProperty("wrongkey", "default"));
         Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("wrongkey"));
         Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("wrongkey", Integer.class));
+
+        // Check that the --- is empty hack "works"
+
+        setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
+            WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", WikiPreferencesConfigurationSource.NO_VALUE);
+
+        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key", String.class));
+        Assert.assertEquals("default", this.componentManager.getComponentUnderTest().getProperty("key", "default"));
+        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key"));
+        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key", Integer.class));
     }
 
     @Test(expected = ConversionException.class)

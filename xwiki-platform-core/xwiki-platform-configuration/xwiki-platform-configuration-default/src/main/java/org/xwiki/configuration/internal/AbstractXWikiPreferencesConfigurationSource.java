@@ -150,13 +150,13 @@ public abstract class AbstractXWikiPreferencesConfigurationSource extends Abstra
         Object propertyValue = getBaseProperty(propertyName, xcontext.getLanguage(), text);
 
         // If empty we take it from the default pref object
-        if (propertyValue == null || (propertyValue instanceof String && propertyValue.equals(""))) {
+        if (propertyValue == null || isEmpty(propertyValue)) {
             propertyValue = getBaseProperty(propertyName, null, text);
         }
 
         // TODO: In the future we would need the notion of initialized/not-initialized property values in the wiki.
         // When this is implemented modify the code below.
-        if (propertyValue instanceof String && propertyValue.equals("")) {
+        if (isEmpty(propertyValue)) {
             propertyValue = null;
         }
 

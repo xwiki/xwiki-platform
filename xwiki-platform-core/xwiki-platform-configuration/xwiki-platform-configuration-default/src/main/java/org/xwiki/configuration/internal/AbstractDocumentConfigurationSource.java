@@ -70,6 +70,12 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
 {
     protected static final String NULL = new String();
 
+    /**
+     * Represents no value (ie the default value will be used) in xproperties.
+     */
+    // TODO: remove when XWIKI-10853 is fixed
+    protected static final String NO_VALUE = "---";
+
     @Inject
     protected WikiDescriptorManager wikiManager;
 
@@ -222,7 +228,15 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         if (baseObject != null) {
             BaseProperty property = (BaseProperty) baseObject.getField(propertyName);
 
-            return property != null ? (text ? property.toText() : property.getValue()) : null;
+            Object value = property != null ? (text ? property.toText() : property.getValue()) : null;
+
+            // TODO: In the future we would need the notion of initialized/not-initialized property values in the wiki.
+            // When this is implemented modify the code below.
+            if (isEmpty(value)) {
+                value = null;
+            }
+
+            return value;
         }
 
         return null;
@@ -353,5 +367,11 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         }
 
         return classReference;
+    }
+
+    protected boolean isEmpty(Object value)
+    {
+        // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
+        return value == null || (value instanceof String && (value.equals("") || value.equals(NO_VALUE)));
     }
 }

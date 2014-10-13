@@ -550,6 +550,7 @@
  *#
 #macro (livetable_addColumnToQuery $colName)
   ## Safe because / is not allowed in property names
+  ## The $joinModeMarker is used in #livetable_filterDBStringListProperty.
   #set ($joinModeMarker = "/join_mode")
   #if (!$colName.endsWith($joinModeMarker))
     #set ($filterValue = "$!request.getParameter($colName)")
@@ -591,55 +592,95 @@
   ##
   #set ($numberProperties = ['IntegerProperty', 'LongProperty', 'FloatProperty', 'DoubleProperty'])
   #if ($numberProperties.contains($tableName))
-    #set($numberValue = $numbertool.toNumber($filterValue))
-    #if($tableName == 'IntegerProperty' || $tableName == 'LongProperty')
-      #if($tableName == 'LongProperty')
-        #set($numberValue = $numberValue.longValue())
-      #else
-        ## IntegerProperty
-        #set($numberValue = $numberValue.intValue())
-      #end
-      #set($whereSql = "${whereSql} and ${safe_tableAlias}.value = ?")
-    #else
-      #if($tableName == 'FloatProperty')
-        #set($numberValue = $numberValue.floatValue())
-      #else
-        ## DoubleProperty
-        #set($numberValue = $numberValue.doubleValue())
-      #end
-      #set($precision = 0.000001)
-      #set($whereSql = "${whereSql} and abs(? - ${safe_tableAlias}.value) &lt;= ${precision}")
-    #end
-    #set($discard = $whereParams.add($numberValue))
+    #livetable_filterNumberProperty()
   #elseif ($tableName == 'DateProperty')
-    #set ($whereSql = "${whereSql} and upper(str(${safe_tableAlias}.value)) like upper(?)")
-    #set ($discard = $whereParams.add("%$filterValue%"))
+    #livetable_filterDateProperty()
   #elseif ($tableName == 'DBStringListProperty')
-    #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
-    #if($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
-      #set ($joinOperator = 'AND')
-    #end
-    #foreach ($filterValue in $request.getParameterValues($colname))
-      #if($foreach.isFirst())
-        #set ($whereSql = "${whereSql} and (")
-      #else
-        #set ($whereSql = "${whereSql} ${joinOperator}")
-      #end
-      #set ($whereSql = "${whereSql} ? in elements(${safe_tableAlias}.list)")
-      #set ($discard = $whereParams.add($filterValue))
-      #if($foreach.isLast())
-        #set ($whereSql = "${whereSql})")
-      #end
-    #end
+    #livetable_filterDBStringListProperty()
   #elseif ($tableName == 'StringListProperty')
-    #set ($whereSql = "${whereSql} and concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) like upper(?)")
-    #set ($discard = $whereParams.add("%|$filterValue|%"))
+    #livetable_filterStringListProperty()
   #else
     ## StringProperty or LargeStringProperty
-    ## TODO: Perform exact match by default for 'StaticListClass', 'DBListClass' and 'DBTreeListClass'.
-    #set ($whereSql = "${whereSql} and upper(${safe_tableAlias}.value) like upper(?)")
-    #set ($discard = $whereParams.add("%$filterValue%"))
+    #livetable_filterStringProperty()
   #end
+#end
+
+
+#**
+ * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
+ *#
+#macro (livetable_filterNumberProperty)
+  #set($numberValue = $numbertool.toNumber($filterValue))
+  #if($tableName == 'IntegerProperty' || $tableName == 'LongProperty')
+    #if($tableName == 'LongProperty')
+      #set($numberValue = $numberValue.longValue())
+    #else
+      ## IntegerProperty
+      #set($numberValue = $numberValue.intValue())
+    #end
+    #set($whereSql = "${whereSql} and ${safe_tableAlias}.value = ?")
+  #else
+    #if($tableName == 'FloatProperty')
+      #set($numberValue = $numberValue.floatValue())
+    #else
+      ## DoubleProperty
+      #set($numberValue = $numberValue.doubleValue())
+    #end
+    #set($precision = 0.000001)
+    #set($whereSql = "${whereSql} and abs(? - ${safe_tableAlias}.value) &lt;= ${precision}")
+  #end
+  #set($discard = $whereParams.add($numberValue))
+#end
+
+
+#**
+ * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
+ *#
+#macro (livetable_filterDateProperty)
+  ## TODO: The date filter should be smarter than this..
+  #set ($whereSql = "${whereSql} and upper(str(${safe_tableAlias}.value)) like upper(?)")
+  #set ($discard = $whereParams.add("%$filterValue%"))
+#end
+
+
+#**
+ * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
+ *#
+#macro (livetable_filterDBStringListProperty)
+  #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
+  #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
+    #set ($joinOperator = 'AND')
+  #end
+  #foreach ($filterValue in $request.getParameterValues($colname))
+    #if ($foreach.isFirst())
+      #set ($whereSql = "${whereSql} and (")
+    #else
+      #set ($whereSql = "${whereSql} ${joinOperator}")
+    #end
+    #set ($whereSql = "${whereSql} ? in elements(${safe_tableAlias}.list)")
+    #set ($discard = $whereParams.add($filterValue))
+    #if ($foreach.isLast())
+      #set ($whereSql = "${whereSql})")
+    #end
+  #end
+#end
+
+
+#**
+ * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
+ *#
+#macro (livetable_filterStringListProperty)
+  #set ($whereSql = "${whereSql} and concat('|', concat(upper(${safe_tableAlias}.textValue), '|')) like upper(?)")
+  #set ($discard = $whereParams.add("%|$filterValue|%"))
+#end
+
+
+#**
+ * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
+ *#
+#macro (livetable_filterStringProperty)
+  #set ($whereSql = "${whereSql} and upper(${safe_tableAlias}.value) like upper(?)")
+  #set ($discard = $whereParams.add("%$filterValue%"))
 #end
 
 
@@ -650,6 +691,5 @@
 #macro(grid_addcolumn $colname)
   #livetable_addColumnToQuery($colname)
 #end
-
 {{/velocity}}</content>
 </xwikidoc>

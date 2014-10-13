@@ -47,7 +47,8 @@ public abstract class AbstractXWikiPreferencesConfigurationSource extends Abstra
     /**
      * The local reference of the class containing wiki preferences.
      */
-    protected static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(CLASS_SPACE_NAME, CLASS_PAGE_NAME);
+    protected static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(CLASS_SPACE_NAME,
+        CLASS_PAGE_NAME);
 
     @Override
     protected String getCacheKeyPrefix()

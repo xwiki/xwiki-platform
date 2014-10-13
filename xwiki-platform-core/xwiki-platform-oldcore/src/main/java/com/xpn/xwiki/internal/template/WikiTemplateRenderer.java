@@ -361,42 +361,53 @@ public class WikiTemplateRenderer
 
     private TemplateContent getTemplateContentFromSkin(String template, String skin)
     {
-        TemplateContent source = null;
+        TemplateContent content;
 
         // Try from wiki pages
-        source = getTemplateContentFromDocumentSkin(template, skin);
-
-        // Try from filesystem skins
-        if (source == null) {
-            source = getResourceAsStringContent("/skins/" + skin + "/" + template);
+        XWikiDocument skinDocument = getSkinDocument(skin);
+        if (skinDocument != null) {
+            content = getTemplateContentFromDocumentSkin(template, skinDocument);
+        } else {
+            // If not a wiki based skin try from filesystem skins
+            content = getResourceAsStringContent("/skins/" + skin + '/', template);
         }
 
-        return source;
+        return content;
     }
 
-    private TemplateContent getTemplateContentFromDocumentSkin(String template, String skin)
+    private BaseProperty getTemplatePropertyValue(String template, XWikiDocument skinDocument)
     {
-        XWikiDocument skinDocument = getSkinDocument(skin);
+        // Try parsing the object property
+        BaseObject skinObject = skinDocument.getXObject(SKINCLASS_REFERENCE);
+        if (skinObject != null) {
+            BaseProperty templateProperty = (BaseProperty) skinObject.safeget(template);
 
+            // If not found try by replacing '/' with '.'
+            if (templateProperty == null) {
+                String escapedTemplateName = StringUtils.replaceChars(template, '/', '.');
+                templateProperty = (BaseProperty) skinObject.safeget(escapedTemplateName);
+            }
+
+            if (templateProperty != null) {
+                Object value = templateProperty.getValue();
+                if (value instanceof String && StringUtils.isNotEmpty((String) value)) {
+                    return templateProperty;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private TemplateContent getTemplateContentFromDocumentSkin(String template, XWikiDocument skinDocument)
+    {
         if (skinDocument != null) {
             // Try parsing the object property
-            BaseObject skinObject = skinDocument.getXObject(SKINCLASS_REFERENCE);
-            if (skinObject != null) {
-                BaseProperty templateProperty = (BaseProperty) skinObject.safeget(template);
-
-                // If not found try by replacing '/' with '.'
-                if (templateProperty == null) {
-                    String escapedTemplateName = StringUtils.replaceChars(template, '/', '.');
-                    templateProperty = (BaseProperty) skinObject.safeget(escapedTemplateName);
-                }
-
-                if (templateProperty != null) {
-                    Object value = templateProperty.getValue();
-                    if (value instanceof String && StringUtils.isNotEmpty((String) value)) {
-                        return new TemplateContent((String) value, this.referenceSerializer.serialize(templateProperty
-                            .getReference()), skinDocument.getAuthorReference());
-                    }
-                }
+            BaseProperty templateProperty = getTemplatePropertyValue(template, skinDocument);
+            if (templateProperty != null) {
+                return new TemplateContent((String) templateProperty.getValue(),
+                    this.referenceSerializer.serialize(templateProperty.getReference()),
+                    skinDocument.getAuthorReference());
             }
 
             // Try parsing a document attachment
@@ -418,7 +429,7 @@ public class WikiTemplateRenderer
         return null;
     }
 
-    private TemplateContent getTemplateStream(String template)
+    private TemplateContent getTemplateContent(String template)
     {
         TemplateContent source = null;
 
@@ -438,31 +449,22 @@ public class WikiTemplateRenderer
 
         // Try from /template/ resources
         if (source == null) {
-            String templatePath = "/templates/" + template;
-
-            // Prevent inclusion of templates from other directories
-            String normalizedTemplate = URI.create(templatePath).normalize().toString();
-            if (!normalizedTemplate.startsWith("/templates/")) {
-                this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!",
-                    normalizedTemplate);
-
-                return null;
-            }
-
-            source = getResourceAsStringContent(templatePath);
+            source = getResourceAsStringContent("/templates/", template);
         }
 
         return source;
     }
 
-    private TemplateContent getResourceAsStringContent(String path)
+    private TemplateContent getResourceAsStringContent(String suffixPath, String template)
     {
-        InputStream inputStream = this.environment.getResourceAsStream(path);
+        String templatePath = getResourcePath(suffixPath, template);
+
+        InputStream inputStream = this.environment.getResourceAsStream(templatePath);
         if (inputStream != null) {
             try {
-                return new FilesystemTemplateContent(IOUtils.toString(inputStream, "UTF-8"), path);
+                return new FilesystemTemplateContent(IOUtils.toString(inputStream, "UTF-8"), templatePath);
             } catch (IOException e) {
-                this.logger.error("Faied to get content if resource [{}]", path, e);
+                this.logger.error("Faied to get content of resource [{}]", templatePath, e);
             } finally {
                 IOUtils.closeQuietly(inputStream);
             }
@@ -471,10 +473,26 @@ public class WikiTemplateRenderer
         return null;
     }
 
+    private String getResourcePath(String suffixPath, String template)
+    {
+        String templatePath = suffixPath + template;
+
+        // Prevent inclusion of templates from other directories
+        String normalizedTemplate = URI.create(templatePath).normalize().toString();
+        if (!normalizedTemplate.startsWith(suffixPath)) {
+            this.logger.warn("Direct access to template file [{}] refused. Possible break-in attempt!",
+                normalizedTemplate);
+
+            return null;
+        }
+
+        return templatePath;
+    }
+
     private TemplateContent getTemplateContent(String template, String skin)
     {
         TemplateContent content =
-            skin != null ? getTemplateContentFromSkin(template, skin) : getTemplateStream(template);
+            skin != null ? getTemplateContentFromSkin(template, skin) : getTemplateContent(template);
 
         if (content == null) {
             return null;
@@ -770,5 +788,73 @@ public class WikiTemplateRenderer
         Syntax targetSyntax = this.renderingContext.getTargetSyntax();
 
         return targetSyntax != null ? targetSyntax : Syntax.PLAIN_1_0;
+    }
+
+    private String getPathFromDocumentSkin(String template, XWikiDocument skinDocument)
+    {
+        if (skinDocument != null) {
+            // Try parsing the object property
+            BaseProperty templateProperty = getTemplatePropertyValue(template, skinDocument);
+            if (templateProperty != null) {
+                return this.referenceSerializer.serialize(templateProperty.getReference());
+            }
+
+            // Try parsing a document attachment
+            XWikiAttachment attachment = skinDocument.getAttachment(template);
+            if (attachment != null) {
+                // It's impossible to know the real attachment encoding, but let's assume that they respect the
+                // standard and use UTF-8 (which is required for the files located on the filesystem)
+                try {
+                    return this.referenceSerializer.serialize(attachment.getReference());
+                } catch (Exception e) {
+                    this.logger.error("Faied to get attachment content [{}]", skinDocument.getDocumentReference(), e);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private String getPathFromSkin(String template, String skin)
+    {
+        String path;
+
+        // Try from wiki pages
+        // FIXME: macros.vm from document based skins is not supported by default VelocityManager yet
+        XWikiDocument skinDocument = template.equals("macros.vm") ? null : getSkinDocument(skin);
+        if (skinDocument != null) {
+            path = getPathFromDocumentSkin(template, skinDocument);
+        } else {
+            // If not a wiki based skin try from filesystem skins
+            path = getResourcePath("/skins/" + skin + '/', template);
+        }
+
+        return path;
+    }
+
+    public String getPath(String template)
+    {
+        String path = null;
+
+        // Try from skin
+        String skin = getSkin();
+        if (skin != null) {
+            path = getPathFromSkin(template, skin);
+        }
+
+        // Try from base skin
+        if (path == null) {
+            String baseSkin = getBaseSkin();
+            if (baseSkin != null) {
+                path = getPathFromSkin(template, baseSkin);
+            }
+        }
+
+        // Try from /template/ resources
+        if (path == null) {
+            path = getResourcePath("/templates/", template);
+        }
+
+        return path;
     }
 }

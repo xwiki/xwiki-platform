@@ -1380,6 +1380,7 @@ ${Msz}Mb##
   #set ($dataColumns = [])
   #set ($classParams = {})
   #foreach($colname in $collist)
+    ## If the live table options don't specify which column to select then select the first non-special column.
     #if("$!selectedColumn" == '' && !$colname.startsWith('_'))
       #set($selectedColumn = $colname)
     #end
@@ -1388,6 +1389,10 @@ ${Msz}Mb##
       #set($propClassName = "$!{colprops.get($colname).get('class')}")
       #if($propClassName != '')
         #set ($discard = $classParams.put("${colname}_class", $propClassName))
+      #end
+      #set ($propMatchType = "$!colprops.get($colname).match")
+      #if ($propMatchType != '')
+        #set ($discard = $classParams.put("${colname}_match", $propMatchType))
       #end
     #end
   #end

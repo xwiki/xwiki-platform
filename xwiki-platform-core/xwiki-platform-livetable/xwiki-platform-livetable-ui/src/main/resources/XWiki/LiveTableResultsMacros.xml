@@ -572,10 +572,11 @@
   ## Only safe version should be used in SQL queries
   #set ($safe_tableAlias = $colname.replaceAll('[^a-zA-Z0-9_.]', ''))
   #livetable_getTableName($colname)
-  #set ($fromSql = "$fromSql, $tableName $safe_tableAlias")
+  #set ($fromSql = "$fromSql, $tableName as $safe_tableAlias")
   ##
   ## If the column is not from $class, we need to make sure we join with the proper table.
   #set ($filterObjectAlias = 'obj')
+  #set ($propClass = $class)
   #set ($propClassName = $request.getParameter("${colname}_class"))
   #if ("$!propClassName" != '')
     #set ($propClass = $xwiki.getDocument($propClassName).getxWikiClass())
@@ -589,6 +590,14 @@
   #set ($joinObjectTable = "${filterObjectAlias}.id = ${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ?")
   #set ($whereSql = "$whereSql and $joinObjectTable")
   #set ($discard = $whereParams.add($colname))
+  ##
+  ## Specifies how the filter value should be matched against the stored value.
+  #set ($matchType = $request.getParameter("${colname}_match"))
+  ## We determine the default match type (when not specified) based on the property meta class (e.g. DateClass).
+  #set ($propMetaClass = $NULL)
+  #if ($propClass &amp;&amp; $propClass.getPropertyNames().contains($colname))
+    #set ($propMetaClass = $propClass.get($colname).type)
+  #end
   ##
   #set ($numberProperties = ['IntegerProperty', 'LongProperty', 'FloatProperty', 'DoubleProperty'])
   #if ($numberProperties.contains($tableName))
@@ -651,17 +660,22 @@
   #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
     #set ($joinOperator = 'AND')
   #end
-  #foreach ($filterValue in $request.getParameterValues($colname))
-    #if ($foreach.isFirst())
-      #set ($whereSql = "${whereSql} and (")
-    #else
-      #set ($whereSql = "${whereSql} ${joinOperator}")
-    #end
-    #set ($whereSql = "${whereSql} ? in elements(${safe_tableAlias}.list)")
-    #set ($discard = $whereParams.add($filterValue))
-    #if ($foreach.isLast())
-      #set ($whereSql = "${whereSql})")
-    #end
+  #if ($matchType == 'partial' || $matchType == 'prefix')
+    ## We need to join with the list of values in order to be able to use the LIKE operator.
+    #set ($matchTarget = "${safe_tableAlias}_item")
+    #set ($joinPos = $mathtool.add($fromSql.lastIndexOf(" $safe_tableAlias"), $mathtool.add($safe_tableAlias.length(), 1)))
+    #set ($fromSql = "$fromSql.substring(0, $joinPos) join ${safe_tableAlias}.list as $matchTarget $fromSql.substring($joinPos)")
+  #else
+    ## Perform exact matching by default (if no match type is specified).
+    #set ($matchType = 'exact')
+    #set ($matchTarget = "${safe_tableAlias}.list")
+  #end
+  #set ($filterValues = $request.getParameterValues($colname))
+  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true)")
+  #set ($constraints = $stringtool.repeat($filterQuery.trim(), " $joinOperator ", $filterValues.size()))
+  #set ($whereSql = "$whereSql and ($constraints)")
+  #foreach ($filterValue in $filterValues)
+    #livetable_addFilterParam($filterValue $matchType $whereParams)
   #end
 #end
 
@@ -679,8 +693,41 @@
  * NOTE: This macro uses variables defined in livetable_filterProperty . It was not meant to be used alone.
  *#
 #macro (livetable_filterStringProperty)
-  #set ($whereSql = "${whereSql} and upper(${safe_tableAlias}.value) like upper(?)")
-  #set ($discard = $whereParams.add("%$filterValue%"))
+  #if ("$!matchType" == '')
+    #if ($propMetaClass.endsWith('ListClass'))
+      ## Perform exact matching by default for StaticListClass, DBListClass and DBTreeListClass
+      ## when they are stored as StringProperty (i.e. single value and no relational storage).
+      #set ($matchType = 'exact')
+    #else
+      ## Perform partial matching by default otherwise (if no match type is specified).
+      #set ($matchType = 'partial')
+    #end
+  #end
+  #set ($filterQuery = "#livetable_getFilterQuery(""${safe_tableAlias}.value"" $matchType)")
+  #set ($whereSql = "${whereSql} and $filterQuery.trim()")
+  #livetable_addFilterParam($filterValue $matchType $whereParams)
+#end
+
+
+#macro (livetable_getFilterQuery $column $matchType $isList)
+  #if ($matchType == 'partial' || $matchType == 'prefix')
+    upper($column) like upper(?)
+  #elseif ($isList)
+    ? in elements($column)
+  #else
+    $column = ?
+  #end
+#end
+
+
+#macro (livetable_addFilterParam $filterValue $matchType $params)
+  #if ($matchType == 'partial')
+    #set ($discard = $params.add("%$!filterValue%"))
+  #elseif ($matchType == 'prefix')
+    #set ($discard = $params.add("$!filterValue%"))
+  #else
+    #set ($discard = $params.add($filterValue))
+  #end
 #end
 
 

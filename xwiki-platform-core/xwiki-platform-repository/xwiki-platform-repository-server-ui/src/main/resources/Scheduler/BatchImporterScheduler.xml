@@ -148,7 +148,7 @@
       <contextLang>en</contextLang>
     </property>
     <property>
-      <contextUser>xwiki:XWiki.ThomasMortagne</contextUser>
+      <contextUser>xwiki:XWiki.Admin</contextUser>
     </property>
     <property>
       <cron>0 0 0 * * ?</cron>

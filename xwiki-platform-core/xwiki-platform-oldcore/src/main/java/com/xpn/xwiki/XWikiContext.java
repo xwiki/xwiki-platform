@@ -40,6 +40,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.localization.LocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -692,6 +693,10 @@ public class XWikiContext extends Hashtable<Object, Object>
         return (String) get("links_qs");
     }
 
+    /**
+     * @deprecated since 4.3M2 use {@link LocalizationManager} component instead
+     */
+    @Deprecated
     public XWikiMessageTool getMessageTool()
     {
         XWikiMessageTool msg = ((XWikiMessageTool) get("msg"));

@@ -296,7 +296,7 @@ ul.xlist li.xitem div.xshowonhover img {
 ##
 ## List all the wikis.
 ##
-#set($discard = $xwiki.ssx.use('WikiManager.WikisMacros'))
+#set($discard = $xwiki.ssx.use('WikiManager.WikisMacro'))
 ##
 #set ($wikis = $services.wiki.getAll())
 ##set ($discard = $workspaces.removeAll($WorkspaceManager.getWorkspaceTemplates()))

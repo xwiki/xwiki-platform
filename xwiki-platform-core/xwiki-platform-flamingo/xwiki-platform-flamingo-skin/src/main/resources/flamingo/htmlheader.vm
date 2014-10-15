@@ -7,8 +7,17 @@
 #if("$!request.noDoctype" != "true")
 <!DOCTYPE html>
 #end
-#macro(xwikiDataAttribute $name $value)data-xwiki-${name}="$escapetool.xml($value)"#end
-<html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.language" xml:lang="$xcontext.language" #xwikiDataAttribute('document', $doc.fullName) #xwikiDataAttribute('wiki', $doc.wiki) #xwikiDataAttribute('space', $doc.space) #xwikiDataAttribute('page', $doc.name) #xwikiDataAttribute('version', $doc.version) #xwikiDataAttribute('rest-url', "${request.contextPath}/rest/wikis/${xcontext.database}/spaces/$escapetool.url(${doc.space})/pages/$escapetool.url(${doc.name})") #xwikiDataAttribute('form-token', "$!{services.csrf.token}")>
+#macro(xwikiDataAttribute $name $value)
+  data-xwiki-${name}="$escapetool.xml($value)"
+#end
+<html xmlns="http://www.w3.org/1999/xhtml" lang="$xcontext.language" xml:lang="$xcontext.language" 
+  #xwikiDataAttribute('document', $doc.fullName)
+  #xwikiDataAttribute('wiki', $doc.wiki)
+  #xwikiDataAttribute('space', $doc.space)
+  #xwikiDataAttribute('page', $doc.name)
+  #xwikiDataAttribute('version', $doc.version)
+  #xwikiDataAttribute('rest-url', "${request.contextPath}/rest/wikis/${xcontext.database}/spaces/$escapetool.url(${doc.space})/pages/$escapetool.url(${doc.name})")
+  #xwikiDataAttribute('form-token', "$!{services.csrf.token}")>
   <head>
     ## ---------------------------------------------------------------------------------------------------------------
     ## Ensure that the Content-Type meta directive is the first one in the header.

@@ -264,6 +264,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public static final int HAS_CLASS = 4;
 
     /**
+     * The name of the key in the XWikiContext which contains the document used to check for programming rights.
+     */
+    public static final String CKEY_SDOC = "sdoc";
+
+    /**
      * Separator string between database name and space name.
      */
     public static final String DB_SPACE_SEP = ":";

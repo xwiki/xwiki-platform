@@ -141,6 +141,11 @@
   'wikisSearchableFromMainWiki': $wikisSearchableFromMainWiki
 })
 
+#if (!$xcontext.isMainWiki())
+  ## Subwikis search by default in their content only so it doesn't make sense to display the wiki facet.
+  #set ($discard = $__defaultSolrConfig.facetFields.remove('wiki'))
+#end
+
 #if ($solrConfig)
   ## Merge the provided configuration with the default configuration.
   #set ($discard = $__defaultSolrConfig.putAll($solrConfig))

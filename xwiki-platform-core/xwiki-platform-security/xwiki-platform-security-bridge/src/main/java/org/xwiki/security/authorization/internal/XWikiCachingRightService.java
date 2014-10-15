@@ -296,11 +296,16 @@ public class XWikiCachingRightService implements XWikiRightService
         WikiReference wikiReference = new WikiReference(context.getWikiId());
         DocumentReference document = resolveDocumentName(docname, wikiReference);
         LOGGER.debug("hasAccessLevel() resolved document named [{}] into reference [{}]", docname, document);
-        DocumentReference user = resolveUserName(username, wikiReference);
 
-        if (XWikiConstants.GUEST_USER.equals(user.getName())) {
-            // Public users (not logged in) should be passed as null in the new API
+        // Handle guest users (Public users (not logged in) should be passed as null in the new API)
+        DocumentReference user;
+        if (username == null) {
             user = null;
+        } else {
+            user = resolveUserName(username, wikiReference);
+            if (XWikiConstants.GUEST_USER.equals(user.getName())) {
+                user = null;
+            }
         }
 
         Right right = Right.toRight(rightName);

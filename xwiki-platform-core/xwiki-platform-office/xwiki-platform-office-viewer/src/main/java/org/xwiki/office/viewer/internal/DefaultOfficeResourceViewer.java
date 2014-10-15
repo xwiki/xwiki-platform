@@ -66,7 +66,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
-import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 
 /**

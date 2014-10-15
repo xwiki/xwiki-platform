@@ -32,7 +32,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.google.common.base.Objects;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -54,7 +53,7 @@ public class SUExecutor
      */
     public static final class SUExecutorContext
     {
-        private XWikiDocument currentDocument;
+        private XWikiDocument currentSecureDocument;
 
         private Object xwikiContextDropPermissionHack;
 
@@ -114,30 +113,15 @@ public class SUExecutor
         if (xwikiContext != null) {
             suContext = new SUExecutorContext();
 
-            suContext.currentDocument = xwikiContext.getDoc();
-
-            if (suContext.currentDocument != null
-                && Objects.equal(suContext.currentDocument.getContentAuthorReference(), user)) {
-                return suContext;
-            }
-
-            // Make sure to not modify the instance stored in the document cache
-            XWikiDocument document;
-            if (suContext.currentDocument != null) {
-                document = suContext.currentDocument.clone();
-                xwikiContext.setDoc(document);
-            } else {
-                document =
-                    new XWikiDocument(new DocumentReference(xwikiContext.getMainXWiki() != null
-                        ? xwikiContext.getMainXWiki() : "xwiki", "SUSpace", "SUPage"));
-                document.setContentAuthorReference(user);
-                document.setAuthorReference(user);
-                document.setCreatorReference(user);
-                xwikiContext.setDoc(document);
-            }
-
-            // Set the new temporary content author so that programming right is tested on it
-            document.setContentAuthorReference(user);
+            // Make sure to have the right secure document
+            suContext.currentSecureDocument = (XWikiDocument) xwikiContext.get(XWikiDocument.CKEY_SDOC);
+            XWikiDocument secureDocument =
+                new XWikiDocument(new DocumentReference(user != null ? user.getWikiReference().getName() : "xwiki",
+                    "SUSpace", "SUPage"));
+            secureDocument.setContentAuthorReference(user);
+            secureDocument.setAuthorReference(user);
+            secureDocument.setCreatorReference(user);
+            xwikiContext.put(XWikiDocument.CKEY_SDOC, secureDocument);
 
             // Make sure to disable XWikiContext#dropPermission hack
             suContext.xwikiContextDropPermissionHack = xwikiContext.remove(XWikiConstant.DROPPED_PERMISSIONS);
@@ -167,7 +151,7 @@ public class SUExecutor
 
         if (xwikiContext != null) {
             // Restore context document's content author
-            xwikiContext.setDoc(suContext.currentDocument);
+            xwikiContext.put(XWikiDocument.CKEY_SDOC, suContext.currentSecureDocument);
 
             // Restore XWikiContext#dropPermission hack
             if (suContext.xwikiContextDropPermissionHack != null) {

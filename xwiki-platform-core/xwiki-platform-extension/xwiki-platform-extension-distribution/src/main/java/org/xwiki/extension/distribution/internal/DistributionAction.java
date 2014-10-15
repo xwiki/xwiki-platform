@@ -19,13 +19,9 @@
  */
 package org.xwiki.extension.distribution.internal;
 
-import org.xwiki.model.reference.DocumentReference;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiAction;
 
@@ -44,12 +40,6 @@ public class DistributionAction extends XWikiAction
      * @todo need an enumerated class for actions.
      */
     public static final String DISTRIBUTION_ACTION = "distribution";
-
-    /**
-     * The reference of the superadmin user document.
-     */
-    private static final DocumentReference SUPERADMIN_REFERENCE = new DocumentReference("xwiki", XWiki.SYSTEM_SPACE,
-        XWikiRightService.SUPERADMIN_USER);
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -77,15 +67,6 @@ public class DistributionAction extends XWikiAction
                     String.format("Current user need proper rights to access action [%s].", DISTRIBUTION_ACTION));
             }
         }
-
-        // Make sure to have programming rights
-        // TODO: find something nicer
-        XWikiDocument document =
-            new XWikiDocument(new DocumentReference(context.getWikiId(), XWiki.SYSTEM_SPACE, "Distribution"));
-        document.setContentAuthorReference(SUPERADMIN_REFERENCE);
-        document.setAuthorReference(SUPERADMIN_REFERENCE);
-        document.setCreatorReference(SUPERADMIN_REFERENCE);
-        context.setDoc(document);
 
         return true;
     }

@@ -19,13 +19,20 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.web.Utils;
 
 import static org.mockito.Mockito.*;
 
@@ -36,6 +43,19 @@ import static org.mockito.Mockito.*;
  */
 public class TextAreaClassTest
 {
+    @Rule
+    public MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
+
+    @Before
+    public void configure() throws Exception
+    {
+        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "relative");
+        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+
+        Utils.setComponentManager(mocker);
+    }
+
     @Test
     public void displayViewDropsPermissions()
     {

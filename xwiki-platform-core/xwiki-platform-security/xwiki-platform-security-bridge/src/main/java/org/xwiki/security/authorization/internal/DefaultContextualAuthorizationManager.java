@@ -184,7 +184,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
         XWikiDocument doc = null;
 
         if (right == Right.PROGRAM) {
-            doc = (XWikiDocument) xcontext.get("sdoc");
+            doc = (XWikiDocument) xcontext.get(XWikiDocument.CKEY_SDOC);
         }
         if (doc == null) {
             doc = xcontext.getDoc();

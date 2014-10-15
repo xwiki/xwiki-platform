@@ -33,7 +33,6 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
@@ -65,8 +64,8 @@ public class WikiMacroExecutionEventListener implements EventListener
      */
     private static final String DROPPED_PERMISSIONS_BACKUP = "wikimacro.backup.hasDroppedPermissions";
 
-    /** The context key which is used to store the original context document content author. */
-    private static final String CONTENT_AUTHOR_BACKUP = "wikimacro.backup.originalContentAuthor";
+    /** The context key which is used to store the original context secure document. */
+    private static final String SECURE_DOCUMENT_BACKUP = "wikimacro.backup.sdoc";
 
     /**
      * The events to match.
@@ -128,24 +127,20 @@ public class WikiMacroExecutionEventListener implements EventListener
     {
         ExecutionContext context = this.execution.getContext();
         XWikiContext xwikiContext = (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        XWikiDocument contextDoc = xwikiContext.getDoc();
 
-        // Set context document content author as macro author so that programming right is tested on the right
-        // user
+        // Set context secure document macro document so that programming right is tested on the right user
         XWikiDocument wikiMacroDocument;
         try {
             wikiMacroDocument = (XWikiDocument) this.documentAccessBridge.getDocument(wikiMacro.getDocumentReference());
 
             // Set context document content author as macro author so that programming right is tested on the right user
-            @SuppressWarnings("unchecked")
-            Stack<DocumentReference> authorBackup =
-                (Stack<DocumentReference>) context.getProperty(CONTENT_AUTHOR_BACKUP);
-            if (authorBackup == null) {
-                authorBackup = new Stack<DocumentReference>();
-                context.setProperty(CONTENT_AUTHOR_BACKUP, authorBackup);
+            Stack<XWikiDocument> docBackup = (Stack<XWikiDocument>) context.getProperty(SECURE_DOCUMENT_BACKUP);
+            if (docBackup == null) {
+                docBackup = new Stack<XWikiDocument>();
+                context.setProperty(SECURE_DOCUMENT_BACKUP, docBackup);
             }
-            authorBackup.push(contextDoc.getContentAuthorReference());
-            contextDoc.setContentAuthorReference(wikiMacroDocument.getContentAuthorReference());
+            docBackup.push((XWikiDocument) xwikiContext.get(XWikiDocument.CKEY_SDOC));
+            xwikiContext.put(XWikiDocument.CKEY_SDOC, wikiMacroDocument);
         } catch (Exception e) {
             Log.error("Failed to setup context before wiki macro execution");
         }
@@ -183,14 +178,11 @@ public class WikiMacroExecutionEventListener implements EventListener
     {
         ExecutionContext context = this.execution.getContext();
         XWikiContext xwikiContext = (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-        XWikiDocument contextDoc = xwikiContext.getDoc();
 
         // Restore context document's content author
-        @SuppressWarnings("unchecked")
-        Stack<DocumentReference> authorBackup =
-            (Stack<DocumentReference>) context.getProperty(CONTENT_AUTHOR_BACKUP);
-        if (authorBackup != null && !authorBackup.isEmpty()) {
-            contextDoc.setContentAuthorReference(authorBackup.pop());
+        Stack<XWikiDocument> sdocBackup = (Stack<XWikiDocument>) context.getProperty(SECURE_DOCUMENT_BACKUP);
+        if (sdocBackup != null && !sdocBackup.isEmpty()) {
+            xwikiContext.put(XWikiDocument.CKEY_SDOC, sdocBackup.pop());
         } else {
             this.logger.error("Can't find any backed up content author information in the execution context");
         }

@@ -104,6 +104,12 @@
     </init-param>
   </filter>
 
+  <!-- This filter is used to add the 'Content-Type-Script' header to the HTTP response. -->
+  <filter>
+    <filter-name>Set Content-Script-Type</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SetContentScriptTypeFilter</filter-class>
+  </filter>
+
   <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the
        request data. -->
   <filter-mapping>
@@ -169,6 +175,11 @@
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>Set Content-Script-Type</filter-name>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
 
   <!-- Initializes XWiki -->

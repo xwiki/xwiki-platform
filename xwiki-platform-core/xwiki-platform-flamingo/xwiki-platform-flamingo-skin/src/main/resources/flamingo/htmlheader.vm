@@ -33,11 +33,14 @@
     ## Force Compatibility mode for IE browsers to use the latest rendering mode. In order to work, the declaration 
     ## needs to be placed in the <head>, before all other elements except for the <title> and other <meta> elements
     ## See http://msdn.microsoft.com/en-us/library/jj676915(v=vs.85).aspx#SETMODE
-    ## The 'if IE' tag is needed because this meta tag is actually invalid in HTML5, so we just enable it for IE.
     ## ---------------------------------------------------------------------------------------------------------------
-    <!--[if IE]>
+    #set($userAgent = $request.getHeader('User-Agent'))
+    #if($userAgent.contains('MSIE') || $userAgent.contains('Trident'))
+      ## Add a meta-tag to disable the IE compatibility mode
       <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <![endif]-->
+      ## Add the equivalent HTTP header to disable the compatibility mode (the meta is not enough on intranet sites)
+      #set($discard = $response.addHeader('X-UA-Compatible', 'IE=edge'))
+    #end
     ## ---------------------------------------------------------------------------------------------------------------
     ## Enable Responsiveness for phones
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -51,15 +54,6 @@
     <link rel="icon" href="$xwiki.getSkinFile('icons/xwiki/favicon.svg')" type="image/svg+xml" />
     ## For smart phones and tablets
     <link rel="apple-touch-icon" href="$xwiki.getSkinFile('icons/xwiki/favicon144.png')" />
-    ## ---------------------------------------------------------------------------------------------------------------
-    ## Disable the toolbar that comes up when you mouse over an image in MSIE
-    ## TODO: Shouldn't this be moved to the Admin Presentation preferences instead (user-defined META), since
-    ## it's possible to imagine that the user might want it?
-    ## The 'if IE' tag is needed because this meta tag is actually invalid in HTML5, so we just enable it for IE.
-    ## ---------------------------------------------------------------------------------------------------------------
-    <!--[if IE]>
-      <meta http-equiv="imagetoolbar" content="no"/>
-    <![endif]-->
     ## ---------------------------------------------------------------------------------------------------------------
     ## Universal edit button. See http://universaleditbutton.org
     ## ---------------------------------------------------------------------------------------------------------------

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,7 +19,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Blog</web>
   <name>CategoriesCode</name>
   <language/>
@@ -29,15 +28,12 @@
   <parent>Blog.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1373016401000</creationDate>
   <date>1373018322000</date>
   <contentUpdateDate>1373017694000</contentUpdateDate>
   <version>1.1</version>
   <title>Macros for the Blog Categories</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
@@ -319,7 +315,7 @@
   #foreach($i in [1..$level])*#end ##
 &lt;span class="blog-category-level"&gt;&lt;span class="blog-category"&gt;##
 &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$nameUrl")" title="RSS"&gt;&lt;img class="icon icon-manage" src="$xwiki.getSkinFile('icons/xwiki/rss-medium.png')" alt="[RSS]"/&gt;&lt;/a&gt;##
-[[#getCategoryName($xwiki.getDocument($name)) (% class="itemCount" %)($totalEntries)(%%)&gt;&gt;${name}]]&lt;/span&gt; ##
+&lt;span class="wikilink"&gt;&lt;a href="$xwiki.getURL($name)"&gt;#getCategoryName($xwiki.getDocument($name)) &lt;span class="itemCount"&gt;($totalEntries)&lt;/span&gt;&lt;/a&gt;&lt;/span&gt;&lt;/span&gt; ##
 &lt;span class="blog-category-tools"&gt;##
 #if($xwiki.hasAccessLevel('delete', $xcontext.user, $name) &amp;&amp; ("$!{request.xaction}" != 'showRenameCategory' || "$!{request.category}" != $name))&lt;a href="$xwiki.getURL('Blog.ManageCategories', 'view', "xaction=showRenameCategory&amp;amp;category=$nameUrl")" class="tool rename"&gt;#toolImage('pencil' 'Rename ')&lt;/a&gt;#end ##
 #if($xwiki.hasAccessLevel('edit', $xcontext.user, $doc.fullName) &amp;&amp; ("$!{request.xaction}" != "showAddCategory" || "$!{request.parentCategory}" != $name))&lt;a href="$xwiki.getURL('Blog.ManageCategories', 'view', "xaction=showAddCategory&amp;amp;parentCategory=$nameUrl")" class="tool add-subcategory"&gt;#toolImage('chart_organisation_add' 'Add a subcategory ')&lt;/a&gt; #end ##
@@ -371,6 +367,8 @@
 #if($result == '')
 #set($result = $categoryDoc.name)
 #end
+## this should be a wiki-syntax-escape, see XWIKI-11241
+#set($result = $result.replaceAll('\[\[','~[~['))
 $escapetool.xml($result)##
 #end
 ##

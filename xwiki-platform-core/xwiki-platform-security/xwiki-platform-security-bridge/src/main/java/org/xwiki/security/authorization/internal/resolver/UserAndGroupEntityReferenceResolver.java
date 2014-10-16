@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.internal.reference.AbstractStringEntityReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.security.internal.XWikiConstants;
 
@@ -44,6 +45,18 @@ public class UserAndGroupEntityReferenceResolver extends AbstractStringEntityRef
      */
     @Inject
     private EntityReferenceValueProvider provider;
+
+    @Override
+    public EntityReference resolve(String entityReferenceRepresentation, EntityType type,
+        Object... parameters)
+    {
+        // Special case: if null is passed then consider it's the guest user and return null.
+        if (entityReferenceRepresentation == null) {
+            return null;
+        } else {
+            return super.resolve(entityReferenceRepresentation, type, parameters);
+        }
+    }
 
     @Override
     protected String getDefaultValue(EntityType type, Object... parameters)

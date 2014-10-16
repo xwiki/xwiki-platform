@@ -69,5 +69,8 @@ public class CurrentUserAndGroupDocumentReferenceResolverTest
             this.mocker.getComponentUnderTest().resolve("bossesSpace.Bosse", new WikiReference("bossesWiki")));
         assertEquals(new DocumentReference("bossesWiki", "bossesSpace", "Bosse"),
             this.mocker.getComponentUnderTest().resolve("bossesWiki:bossesSpace.Bosse"));
+
+        // If null is passed we expect no reference (i.e. the guest user).
+        assertNull(this.mocker.getComponentUnderTest().resolve(null));
     }
 }

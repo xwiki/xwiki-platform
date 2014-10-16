@@ -19,9 +19,9 @@
  */
 package org.xwiki.security.authorization.internal.resolver;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -59,16 +59,15 @@ public class CurrentUserAndGroupDocumentReferenceResolverTest
     @Test
     public void testResolver() throws ComponentLookupException
     {
-        Assert.assertTrue(this.mocker.getComponentUnderTest().resolve("Bosse")
-            .equals(new DocumentReference("currentwiki", "XWiki", "Bosse")));
-        Assert.assertTrue(this.mocker.getComponentUnderTest().resolve("bossesSpace.Bosse")
-            .equals(new DocumentReference("currentwiki", "bossesSpace", "Bosse")));
-        Assert.assertTrue(this.mocker.getComponentUnderTest().resolve("Bosse", new WikiReference("bossesWiki"))
-            .equals(new DocumentReference("bossesWiki", "XWiki", "Bosse")));
-        Assert.assertTrue(this.mocker.getComponentUnderTest()
-            .resolve("bossesSpace.Bosse", new WikiReference("bossesWiki"))
-            .equals(new DocumentReference("bossesWiki", "bossesSpace", "Bosse")));
-        Assert.assertTrue(this.mocker.getComponentUnderTest().resolve("bossesWiki:bossesSpace.Bosse")
-            .equals(new DocumentReference("bossesWiki", "bossesSpace", "Bosse")));
+        assertEquals(new DocumentReference("currentwiki", "XWiki", "Bosse"),
+            this.mocker.getComponentUnderTest().resolve("Bosse"));
+        assertEquals(new DocumentReference("currentwiki", "bossesSpace", "Bosse"),
+            this.mocker.getComponentUnderTest().resolve("bossesSpace.Bosse"));
+        assertEquals(new DocumentReference("bossesWiki", "XWiki", "Bosse"),
+            this.mocker.getComponentUnderTest().resolve("Bosse", new WikiReference("bossesWiki")));
+        assertEquals(new DocumentReference("bossesWiki", "bossesSpace", "Bosse"),
+            this.mocker.getComponentUnderTest().resolve("bossesSpace.Bosse", new WikiReference("bossesWiki")));
+        assertEquals(new DocumentReference("bossesWiki", "bossesSpace", "Bosse"),
+            this.mocker.getComponentUnderTest().resolve("bossesWiki:bossesSpace.Bosse"));
     }
 }

@@ -85,6 +85,8 @@ public class LegacyTestWiki extends AbstractTestWiki
     /** State variable for supporting XWikiContext.get/set("sdoc"). */
     private DocumentReference sdocReference;
 
+    private XWikiDocument sdoc;
+
     /** State variable for supporting XWikiContext.get/set("doc"). */
     private DocumentReference docReference;
 
@@ -185,10 +187,13 @@ public class LegacyTestWiki extends AbstractTestWiki
                     @Override
                     public Object invoke(Invocation invocation)
                     {
-                        if (sdocReference == null) {
-                            return null;
+                        if (sdoc != null) {
+                            return sdoc;
                         }
-                        return getDocument(sdocReference);
+                        if (sdocReference != null) {
+                            return getDocument(sdocReference);
+                        }
+                        return null;
                     }
                 });
                 allowing(context).getDoc();
@@ -208,6 +213,8 @@ public class LegacyTestWiki extends AbstractTestWiki
 
                 // Expectations for XWiki
 
+                allowing(xwiki).getDatabase();
+                will(returnValue(mainWikiName));
                 allowing(xwiki).isReadOnly();
                 will(new CustomAction("indicate wether the wiki is read only")
                 {
@@ -331,8 +338,7 @@ public class LegacyTestWiki extends AbstractTestWiki
     }
 
     @Override
-    public HasWikiContents addWiki(String name, String owner, boolean isMainWiki, boolean isReadOnly,
-        String alt)
+    public HasWikiContents addWiki(String name, String owner, boolean isMainWiki, boolean isReadOnly, String alt)
     {
 
         if (isMainWiki) {
@@ -358,6 +364,11 @@ public class LegacyTestWiki extends AbstractTestWiki
         } else {
             sdocReference = null;
         }
+    }
+
+    public void setSdoc(XWikiDocument sdoc)
+    {
+        this.sdoc = sdoc;
     }
 
     public void setDoc(String docFullname)
@@ -386,7 +397,7 @@ public class LegacyTestWiki extends AbstractTestWiki
         final TestWiki wiki = wikis.get(context.getWikiId());
 
         if (wiki == null) {
-            return Collections.<DocumentReference> emptySet();
+            return Collections.<DocumentReference>emptySet();
         }
 
         final Collection<String> groupNames = wiki.getGroupsForUser(userReference);
@@ -543,7 +554,6 @@ public class LegacyTestWiki extends AbstractTestWiki
 
         private final boolean isMainWiki;
 
-
         TestWiki(String name, String owner, boolean isReadOnly)
         {
             this(name, owner, isReadOnly, false);
@@ -681,12 +691,12 @@ public class LegacyTestWiki extends AbstractTestWiki
         {
             Set<String> groups;
             if (userDoc.getWikiReference().getName().equals(getName())) {
-               groups = groupsForUser.get(userDoc.getName());
+                groups = groupsForUser.get(userDoc.getName());
             } else {
                 groups = groupsForUser.get(entityReferenceSerializer.serialize(userDoc));
             }
 
-            return groups == null ? Collections.<String> emptySet() : groups;
+            return groups == null ? Collections.<String>emptySet() : groups;
         }
 
         void notifyCreatedDocument(XWikiDocument document)
@@ -735,7 +745,8 @@ public class LegacyTestWiki extends AbstractTestWiki
                 groupsForUser.remove(userDoc.getName());
                 for (Map.Entry<String, Set<String>> entry : groups.entrySet()) {
                     entry.getValue().remove(userDoc.getName());
-                    ((GroupTestDocument) getTestDocument(userDoc.getParent().getName(), entry.getKey())).removeUser(userDoc.getName());
+                    ((GroupTestDocument) getTestDocument(userDoc.getParent().getName(), entry.getKey()))
+                        .removeUser(userDoc.getName());
                 }
 
                 // Make sure user document is removed
@@ -1009,8 +1020,9 @@ public class LegacyTestWiki extends AbstractTestWiki
         public void addUser(String userName)
         {
             TestWiki testWiki = space.getWiki();
-            DocumentReference userDoc = documentReferenceResolver.resolve(userName,
-                new SpaceReference("XWiki", new WikiReference(testWiki.getName())));
+            DocumentReference userDoc =
+                documentReferenceResolver.resolve(userName,
+                    new SpaceReference("XWiki", new WikiReference(testWiki.getName())));
 
             String uname;
             if (userDoc.getWikiReference().getName().equals(testWiki.getName())) {
@@ -1034,8 +1046,9 @@ public class LegacyTestWiki extends AbstractTestWiki
         public void removeUser(String userName)
         {
             TestWiki testWiki = space.getWiki();
-            DocumentReference userDoc = documentReferenceResolver.resolve(userName,
-                new SpaceReference("XWiki", new WikiReference(testWiki.getName())));
+            DocumentReference userDoc =
+                documentReferenceResolver.resolve(userName,
+                    new SpaceReference("XWiki", new WikiReference(testWiki.getName())));
 
             String uname;
             if (userDoc.getWikiReference().getName().equals(testWiki.getName())) {
@@ -1255,7 +1268,7 @@ public class LegacyTestWiki extends AbstractTestWiki
         private void addRightType(Map<String, Set<String>> map, String key, String type)
         {
             if (type == null) {
-                for(Right right : Right.getEnabledRights(getType())) {
+                for (Right right : Right.getEnabledRights(getType())) {
                     addType(map, key, right.toString());
                 }
             } else {

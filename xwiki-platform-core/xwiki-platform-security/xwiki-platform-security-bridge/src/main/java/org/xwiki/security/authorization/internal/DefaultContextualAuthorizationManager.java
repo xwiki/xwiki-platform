@@ -24,7 +24,6 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.transformation.RenderingContext;
@@ -59,13 +58,13 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     @Override
     public void checkAccess(Right right) throws AccessDeniedException
     {
-        checkAccess(right, getCurrentEntity(right));
+        checkAccess(right, getCurrentEntity());
     }
 
     @Override
     public void checkAccess(Right right, EntityReference entity) throws AccessDeniedException
     {
-        DocumentReference user = getCurrentUser(right, entity);
+        DocumentReference user = getCurrentUser(right);
 
         if (!checkPreAccess(right)) {
             throw new AccessDeniedException(right, user, entity);
@@ -77,13 +76,13 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     @Override
     public boolean hasAccess(Right right)
     {
-        return hasAccess(right, getCurrentEntity(right));
+        return hasAccess(right, getCurrentEntity());
     }
 
     @Override
     public boolean hasAccess(Right right, EntityReference entity)
     {
-        DocumentReference user = getCurrentUser(right, entity);
+        DocumentReference user = getCurrentUser(right);
 
         return checkPreAccess(right) && authorizationManager.hasAccess(right, user, entity);
     }
@@ -108,51 +107,17 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     /**
      * @return the current user from context.
      */
-    private DocumentReference getCurrentUser(Right right, EntityReference entity)
+    private DocumentReference getCurrentUser(Right right)
     {
         // Backward compatibility for the old way of assigning programming right.
         if (right == Right.PROGRAM) {
-            XWikiDocument doc = getDocument(entity);
+            XWikiDocument doc = getProgrammingDocument();
             if (doc != null) {
                 return getContentAuthor(doc);
             }
         }
-        return xcontextProvider.get().getUserReference();
-    }
 
-    /**
-     * Retrieve the document corresponding to the given reference.
-     *
-     * @param entity an entity reference. The document reference is extracted from it.
-     * @return a document or null if the reference could not be resolved to a document.
-     */
-    private XWikiDocument getDocument(EntityReference entity)
-    {
-        if (entity == null) {
-            return null;
-        }
-
-        EntityReference docEntity = entity.extractReference(EntityType.DOCUMENT);
-        if (docEntity == null) {
-            return null;
-        }
-
-        XWikiContext xcontext = xcontextProvider.get();
-
-        // This is here for backward compatibility of hasProgrammingRights(XWikiContext context)
-        // method from the old right service, since the document in context may be a fake document.
-        // For example, the DistributionAction use a fake document with PR in context to have PR for
-        // its distribution.vm template.
-        if (xcontext.getDoc().getDocumentReference().equals(docEntity)) {
-            return xcontext.getDoc();
-        }
-
-        try {
-            return xcontext.getWiki().getDocument(new DocumentReference(docEntity), xcontext);
-        } catch (Exception e) {
-            // Ignored
-        }
-        return null;
+        return this.xcontextProvider.get().getUserReference();
     }
 
     /**
@@ -175,24 +140,35 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     /**
      * Get the current entity from context.
      *
-     * @param right the right being checked.
      * @return the current sdoc or doc document reference, or the current wiki reference if no doc available.
      */
-    private EntityReference getCurrentEntity(Right right)
+    private EntityReference getCurrentEntity()
     {
         XWikiContext xcontext = xcontextProvider.get();
-        XWikiDocument doc = null;
+        XWikiDocument doc = xcontext.getDoc();
 
-        if (right == Right.PROGRAM) {
-            doc = (XWikiDocument) xcontext.get(XWikiDocument.CKEY_SDOC);
-        }
-        if (doc == null) {
-            doc = xcontext.getDoc();
-        }
         if (doc != null) {
             return doc.getDocumentReference();
         }
 
         return null;
+    }
+
+    /**
+     * Get the document used to test programming right.
+     *
+     * @param right the right being checked.
+     * @return the current sdoc or doc document reference, null if no doc available.
+     */
+    private XWikiDocument getProgrammingDocument()
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        XWikiDocument document = (XWikiDocument) xcontext.get(XWikiDocument.CKEY_SDOC);
+        if (document == null) {
+            document = xcontext.getDoc();
+        }
+
+        return document;
     }
 }

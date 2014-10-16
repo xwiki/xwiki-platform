@@ -54,7 +54,7 @@
   ## ----------------------------
   <div id="xwikicontent">
     #if ("$!exception" != '')
-      #displayUnexpectedException($exception)
+      #displayUnhandledException($exception)
     #else
       $renderedContent
     #end

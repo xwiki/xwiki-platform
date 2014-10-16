@@ -2560,10 +2560,12 @@ Recursive title display detected!##
 #end
 
 ###
-### Displays an unexpected exception with a default message.
+### Generically display exceptions that have not been handled at the right level and have now bubbled up to the UI.
+###
+### This is a convenience macro, see #displayException.
 ###
 ### @param exception The exception to format for displaying
-#macro(displayUnexpectedException $exception)
+#macro(displayUnhandledException $exception)
   #set ($sentence1 = 'Unexpected error.')
   #set ($sentence2 = 'Contact your administrator or <a href="http://jira.xwiki.org">report the issue</a>.')
   #set ($sentence3 = 'Click this box to get technical details.')

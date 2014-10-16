@@ -21,12 +21,14 @@ package org.xwiki.security.authorization.internal;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AbstractLegacyWikiTestCase;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.testwikibuilding.LegacyTestWiki;
 import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl}.
@@ -43,11 +45,11 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
         XWikiContext ctx = testWiki.getXWikiContext();
         ctx.setWikiId("wiki");
 
-        assertAccessLevelTrue("User from another wiki has right on a local wiki", "view",
-            "wiki:XWiki.user", "wiki2:Space.Page", ctx);
+        assertAccessLevelTrue("User from another wiki has right on a local wiki", "view", "wiki:XWiki.user",
+            "wiki2:Space.Page", ctx);
 
-        assertAccessLevelTrue("User from another wiki has right on a local wiki", "view",
-            "XWiki.user", "wiki2:Space.Page", ctx);
+        assertAccessLevelTrue("User from another wiki has right on a local wiki", "view", "XWiki.user",
+            "wiki2:Space.Page", ctx);
     }
 
     @Test
@@ -64,7 +66,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from user wiki",
             "view", "XWiki.user", "wiki2:Space.Page", ctx);
-        
+
         ctx.setWikiId("wiki2");
 
         assertAccessLevelTrue("User from another wiki does not have right on a local wiki when tested from local wiki",
@@ -147,7 +149,7 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         setContext(ctx);
 
-        testWiki.setSdoc(null);
+        testWiki.setSdoc((String) null);
 
         // XWiki.Programmer should have PR, as per the global rights.
         testWiki.setUser("XWiki.programmer");
@@ -161,6 +163,38 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         // superadmin should always have PR
         testWiki.setUser(XWikiConstants.XWIKI_SPACE + '.' + AuthorizationManager.SUPERADMIN_USER);
+        Assert.assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
+        Assert.assertTrue(getCachingImpl().hasProgrammingRights(ctx));
+
+    }
+
+    @Test
+    public void testProgrammingRightsWhenCustomSecureDocIsSet() throws Exception
+    {
+        LegacyTestWiki testWiki = newTestWiki("programmingRights.xml", true);
+
+        XWikiContext ctx = testWiki.getXWikiContext();
+
+        ctx.setWikiId("wiki");
+
+        setContext(ctx);
+
+        XWikiDocument sdoc = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+        sdoc.setContentAuthorReference(new DocumentReference(ctx.getMainXWiki(), "XWiki", "superadmin"));
+        testWiki.setSdoc(sdoc);
+
+        // XWiki.Programmer should have PR, as per the global rights.
+        sdoc.setContentAuthorReference(new DocumentReference(ctx.getMainXWiki(), "XWiki", "programmer"));
+        Assert.assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
+        Assert.assertTrue(getCachingImpl().hasProgrammingRights(ctx));
+
+        // Guests should not have PR
+        sdoc.setContentAuthorReference(new DocumentReference(ctx.getMainXWiki(), "XWiki", XWikiConstants.GUEST_USER));
+        Assert.assertFalse(getLegacyImpl().hasProgrammingRights(ctx));
+        Assert.assertFalse(getCachingImpl().hasProgrammingRights(ctx));
+
+        // superadmin should always have PR
+        sdoc.setContentAuthorReference(new DocumentReference(ctx.getMainXWiki(), "XWiki", "superadmin"));
         Assert.assertTrue(getLegacyImpl().hasProgrammingRights(ctx));
         Assert.assertTrue(getCachingImpl().hasProgrammingRights(ctx));
 
@@ -182,12 +216,10 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
             "wiki:Space.Page", ctx);
 
         assertAccessLevelFalseExpectedDifference("Guest should not have delete right on empty wiki.", "delete",
-            "wiki:XWiki.XWikiGuest",
-            "wiki:Space.Page", ctx);
+            "wiki:XWiki.XWikiGuest", "wiki:Space.Page", ctx);
 
         assertAccessLevelFalseExpectedDifference("Guest should not have admin right on empty wiki.", "admin",
-            "wiki:XWiki.XWikiGuest",
-            "wiki:Space.Page", ctx);
+            "wiki:XWiki.XWikiGuest", "wiki:Space.Page", ctx);
 
         assertAccessLevelFalse("Guest should not have programming right on empty wiki.", "programming",
             "wiki:XWiki.XWikiGuest", "wiki:Space.Page", ctx);
@@ -241,30 +273,23 @@ public class XWikiRightServiceTest extends AbstractLegacyWikiTestCase
 
         // view
 
-        assertAccessLevelFalse("User has right on the denied document", "view",
-            "wiki:XWiki.user", "wiki:Space.Page", ctx);
+        assertAccessLevelFalse("User has right on the denied document", "view", "wiki:XWiki.user", "wiki:Space.Page",
+            ctx);
 
-        assertAccessLevelFalse("User has right on the denied document", "view",
-            "wiki:XWiki.user", "Space.Page", ctx);
+        assertAccessLevelFalse("User has right on the denied document", "view", "wiki:XWiki.user", "Space.Page", ctx);
 
-        assertAccessLevelFalse("User has right on the denied document", "view",
-            "wiki:XWiki.user", "Page", ctx);
+        assertAccessLevelFalse("User has right on the denied document", "view", "wiki:XWiki.user", "Page", ctx);
 
-        assertAccessLevelTrue("User does not have right on the document space", "view",
-            "wiki:XWiki.user", "", ctx);
+        assertAccessLevelTrue("User does not have right on the document space", "view", "wiki:XWiki.user", "", ctx);
 
         // edit
 
-        assertAccessLevelFalse("User has right on the denied document", "edit",
-            "XWiki.user", "wiki:Space.Page", ctx);
+        assertAccessLevelFalse("User has right on the denied document", "edit", "XWiki.user", "wiki:Space.Page", ctx);
 
-        assertAccessLevelFalse("User has right on the denied document", "edit",
-            "XWiki.user", "Space.Page", ctx);
+        assertAccessLevelFalse("User has right on the denied document", "edit", "XWiki.user", "Space.Page", ctx);
 
-        assertAccessLevelFalse("User has right on the denied document", "edit",
-            "XWiki.user", "Page", ctx);
+        assertAccessLevelFalse("User has right on the denied document", "edit", "XWiki.user", "Page", ctx);
 
-        assertAccessLevelTrue("User does not have right on the document space", "edit",
-            "XWiki.user", "", ctx);
+        assertAccessLevelTrue("User does not have right on the document space", "edit", "XWiki.user", "", ctx);
     }
 }

@@ -101,14 +101,15 @@ public class ConversionFilter implements Filter
             Map<String, String> output = new HashMap<String, String>();
             for (int i = 0; i < parametersRequiringHTMLConversion.length; i++) {
                 String parameterName = parametersRequiringHTMLConversion[i];
-                if (StringUtils.isEmpty(parameterName)) {
-                    continue;
-                }
+                String html = req.getParameter(parameterName);
                 // Remove the syntax parameter from the request to avoid interference with further request processing.
                 String syntax = mreq.removeParameter(parameterName + "_syntax");
+                if (html == null || syntax == null) {
+                    continue;
+                }
                 try {
                     HTMLConverter converter = Utils.getComponent((Type) HTMLConverter.class);
-                    mreq.setParameter(parameterName, converter.fromHTML(req.getParameter(parameterName), syntax));
+                    mreq.setParameter(parameterName, converter.fromHTML(html, syntax));
                 } catch (Exception e) {
                     LOGGER.error(e.getLocalizedMessage(), e);
                     errors.put(parameterName, e);

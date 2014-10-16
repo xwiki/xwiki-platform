@@ -24,6 +24,7 @@ import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.DeferredUpdater;
 import org.xwiki.gwt.user.client.HandlerRegistrationCollection;
 import org.xwiki.gwt.user.client.Updatable;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandListener;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
@@ -282,7 +283,8 @@ public class RichTextEditorController implements Updatable, MouseUpHandler, KeyU
      */
     public boolean canUpdate()
     {
-        return richTextEditor.getTextArea().isAttached() && richTextEditor.getTextArea().isEnabled();
+        RichTextArea textArea = richTextEditor.getTextArea();
+        return textArea.isAttached() && textArea.getDocument() != null;
     }
 
     /**

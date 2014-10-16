@@ -139,7 +139,7 @@
 ############################
 #macro(displayVariablesPanel)
   &lt;div class="col-xs-12 col-md-5"&gt;
-    &lt;div class="panel panel-primary"&gt;
+    &lt;div class="panel panel-primary" id="panel-theme-variables"&gt;
       &lt;div class="panel-heading"&gt;$services.localization.render("platform.flamingo.themes.title.variables")&lt;/div&gt;
         &lt;div class="panel-body"&gt;
           #displayVariablesTabs()

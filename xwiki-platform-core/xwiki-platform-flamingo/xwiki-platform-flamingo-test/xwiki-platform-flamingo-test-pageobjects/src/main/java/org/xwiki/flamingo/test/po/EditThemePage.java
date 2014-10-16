@@ -19,9 +19,95 @@
  */
 package org.xwiki.flamingo.test.po;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
 public class EditThemePage extends ViewPage
 {
+    @FindBy(id = "autosync")
+    private WebElement autoSyncCheckBox;
+
+    @FindBy(id = "refresh")
+    private WebElement refreshButton;
+
+    @FindBy(id = "preview-curtain")
+    private WebElement previewCurtain;
+
+    public EditThemePage()
+    {
+        waitUntilPageJSIsLoaded();
+    }
+
+    public void selectVariableCategory(String category)
+    {
+        WebElement categoryElem = getDriver().findElement(
+                By.xpath("//div[@id='panel-theme-variables']//div[@class='panel-body']"
+                        + "//li//a[@data-toggle='tab' and text()='" + category + "']"));
+        categoryElem.click();
+        // Wait until the panel is displayed
+        waitUntilElementIsVisible(
+                By.xpath("//div[@id='bt-variables']//div[contains(@class, 'active')]/h2[text()='"+category+"']"));
+    }
+
+    public List<String> getVariableCategories()
+    {
+        List<String> results = new ArrayList<>();
+        List<WebElement> categoryElems = getDriver().findElements(
+                By.xpath("//div[@id='panel-theme-variables']//div[@class='panel-body']"
+                        + "//li//a[@data-toggle='tab']"));
+        for (WebElement elem : categoryElems) {
+            results.add(elem.getText());
+        }
+
+        return results;
+    }
+
+    public void setAutoRefresh(boolean enabled)
+    {
+        if (autoSyncCheckBox.isEnabled() != enabled) {
+            autoSyncCheckBox.click();
+        }
+    }
+
+    public void setVariableValue(String variableName, String value)
+    {
+        WebElement variableField = getDriver().findElement(By.xpath("//label[text() = '@"+variableName+"']/..//input"));
+        // Remove the previous value
+        variableField.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.BACK_SPACE);
+        // Write the one
+        variableField.sendKeys(value);
+    }
+
+    public void clickOnRefreshPreview()
+    {
+        refreshButton.click();
+    }
+
+    public void refreshPreview()
+    {
+        clickOnRefreshPreview();
+        waitUntilPreviewIsLoaded();
+    }
+
+    public boolean isPreviewBoxLoading()
+    {
+        return previewCurtain.isDisplayed();
+    }
+
+    public void waitUntilPreviewIsLoaded()
+    {
+        waitUntilElementDisappears(By.id("preview-curtain"));
+    }
+
+    public PreviewBox getPreviewBox()
+    {
+        return new PreviewBox();
+    }
 
 }

@@ -25,6 +25,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.PresentationAdministrationSectionPage;
+import org.xwiki.flamingo.test.po.EditThemePage;
+import org.xwiki.flamingo.test.po.PreviewBox;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.SuperAdminAuthenticationRule;
 
@@ -50,51 +52,55 @@ public class FlamingoThemeTest extends AbstractTest
         PresentationAdministrationSectionPage presentationAdministrationSectionPage =
                 administrationPage.clickPresentationSection();
 
-        // Test that all color themes are present
-        testColorThemesArePresent(presentationAdministrationSectionPage);
-
-        // Test that the color theme displayer group the color theme by application
-        // I currently comment this test because the displayer is not set on XWikiPreferences by default...
-        // testColorThemesDisplayer(presentationAdministrationSectionPage);
-
         // Select the 'Charcoal' color theme
         presentationAdministrationSectionPage.setColorTheme("Charcoal");
         assertEquals("Charcoal", presentationAdministrationSectionPage.getCurrentColorTheme());
 
         // Click on the 'customize' button
         presentationAdministrationSectionPage.clickOnCustomize();
+        EditThemePage editThemePage = new EditThemePage();
+
+        verifyAllVariablesCategoriesArePresent(editThemePage);
+        verifyThatPreviewWorks(editThemePage);
+    }
+
+    private void verifyAllVariablesCategoriesArePresent(EditThemePage editThemePage) throws Exception
+    {
+        List<String> categories = editThemePage.getVariableCategories();
+        assertEquals(10, categories.size());
+        assertTrue(categories.contains("Logos"));
+        assertTrue(categories.contains("Base colors"));
+        assertTrue(categories.contains("Typography"));
+        assertTrue(categories.contains("Buttons"));
+        assertTrue(categories.contains("Navigation Bar"));
+        assertTrue(categories.contains("Drop downs"));
+        assertTrue(categories.contains("Forms"));
+        assertTrue(categories.contains("Panels"));
+        assertTrue(categories.contains("Breadcrumb"));
+        assertTrue(categories.contains("Advanced"));
     }
 
     /**
-     * Test that all color themes are present
+     * @since 6.3M2
      */
-    private void testColorThemesArePresent(PresentationAdministrationSectionPage presentationAdministrationSectionPage)
-            throws Exception
+    private void verifyThatPreviewWorks(EditThemePage editThemePage) throws Exception
     {
-        List<String> colorThemes = presentationAdministrationSectionPage.getColorThemes();
-        assertTrue(colorThemes.contains("Charcoal"));
-        assertTrue(colorThemes.contains("Mint"));
-        assertTrue(colorThemes.contains("Dusk"));
-        assertTrue(colorThemes.contains("Ruby"));
-        assertTrue(colorThemes.contains("Azure"));
-    }
-
-    /**
-     * Test that the color theme displayer group the color theme by application
-     */
-    private void testColorThemesDisplayer(PresentationAdministrationSectionPage presentationAdministrationSectionPage)
-            throws Exception
-    {
-        // Get the old color themes
-        List<String> oldColorThemes = presentationAdministrationSectionPage.getColibriColorThemes();
-        // Flamingo theme should be there
-        assertTrue(!oldColorThemes.contains("Charcoal"));
-        assertTrue(oldColorThemes.contains("Azure"));
-
-        // Get the flamingo themes
-        List<String> flamingoThemes = presentationAdministrationSectionPage.getFlamingoThemes();
-        assertTrue(flamingoThemes.contains("Charcoal"));
-        // Old color theme should not be there
-        assertTrue(!flamingoThemes.contains("Azure"));
+        // Wait for the preview to be fully loaded
+        assertTrue(editThemePage.isPreviewBoxLoading());
+        editThemePage.waitUntilPreviewIsLoaded();
+        // Disable auto refresh first
+        editThemePage.setAutoRefresh(false);
+        // Select a variable category and change value
+        editThemePage.selectVariableCategory("Base colors");
+        editThemePage.setVariableValue("xwiki-page-content-bg", "#ff0000");
+        // Again...
+        editThemePage.selectVariableCategory("Typography");
+        editThemePage.setVariableValue("font-family-base", "Monospace");
+        // Refresh
+        editThemePage.refreshPreview();
+        // Verify that the modification have been made in the preview
+        PreviewBox previewBox = editThemePage.getPreviewBox();
+        assertEquals("rgba(255, 0, 0, 1)", previewBox.getPageBackgroundColor());
+        assertEquals("monospace", previewBox.getFontFamily());
     }
 }

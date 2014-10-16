@@ -8,3 +8,7 @@
 .breadcrumb > li {
   display: inline;
 }
+
+.buttonwrapper a.attachment-picker-start {
+  filter: none;
+}

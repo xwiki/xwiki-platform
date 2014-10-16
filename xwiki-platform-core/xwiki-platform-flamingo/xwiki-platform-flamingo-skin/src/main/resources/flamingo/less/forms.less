@@ -57,7 +57,7 @@ select[size="0"], select[size="1"] {
         margin-top: 0;
       }
       label {
-        color: #636B75;
+        color: @text-color;
         font-size: 0.85em;
         font-weight: 700;
         margin-bottom: 0.3em;
@@ -81,7 +81,7 @@ select[size="0"], select[size="1"] {
   .xRequired {
     margin-left: 1ex;
   }
-  .xHint, .xRequired {
+  .xHint, .xRequired, .xErrorMsg {
     .text-muted-smaller;
     font-weight: 400;
     text-transform: none;
@@ -93,7 +93,7 @@ select[size="0"], select[size="1"] {
     color: @state-danger-text;
   }
   .xErrorField {
-    border-color: @state-danger-bg;
+    border-color: @state-danger-border;
   }
 }
 

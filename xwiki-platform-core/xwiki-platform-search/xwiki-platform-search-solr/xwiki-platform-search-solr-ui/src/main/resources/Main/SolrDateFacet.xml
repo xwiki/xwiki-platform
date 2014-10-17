@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -362,7 +361,7 @@
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
@@ -390,9 +389,11 @@
         form.toggle();
       });
 
-      var label = new Element('label', {'class': 'itemName'});
+      var label = new Element('label');
       label.insert(checkbox);
-      label.insert(form.down('.itemName').remove().innerHTML);
+      var wrap = new Element('span', {'class':'itemName'});
+      wrap.insert( form.down('.itemName').remove().innerHTML);
+      label.insert(wrap);
       form.hide().insert({before: label});
     },
 
@@ -505,7 +506,7 @@
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
@@ -518,7 +519,6 @@
 }
 .search-facet-body .customDateInterval .itemName {
   cursor: pointer;
-  padding-left: 0;
 }
 .search-facet-body .customDateInterval form {
   margin-top: .5em;

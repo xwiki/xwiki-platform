@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
@@ -48,7 +49,8 @@ public class CurrentUserAndGroupDocumentReferenceResolver implements DocumentRef
     @Override
     public DocumentReference resolve(String documentReferenceRepresentation, Object... parameters)
     {
-        return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,
-            EntityType.DOCUMENT, parameters));
+        EntityReference entityReference =
+            this.entityReferenceResolver.resolve(documentReferenceRepresentation, EntityType.DOCUMENT, parameters);
+        return entityReference == null ? null : new DocumentReference(entityReference);
     }
 }

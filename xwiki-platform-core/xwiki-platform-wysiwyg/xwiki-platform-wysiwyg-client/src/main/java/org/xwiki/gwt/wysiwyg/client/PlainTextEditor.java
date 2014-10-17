@@ -78,6 +78,8 @@ public class PlainTextEditor extends Composite implements BlurHandler, ClosingHa
         this.hook = hook;
 
         textArea = new TextArea();
+        textArea.setEnabled(!hook.getPropertyBoolean("disabled"));
+        textArea.setReadOnly(hook.getPropertyBoolean("readOnly"));
         textArea.setStyleName("xPlainTextEditor");
         textArea.setHeight(Math.max(hook.getOffsetHeight(), 100) + "px");
         textArea.addBlurHandler(this);

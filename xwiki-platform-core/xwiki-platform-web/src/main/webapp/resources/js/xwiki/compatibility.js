@@ -342,4 +342,31 @@ Object.extend(XWiki.constants, {
   pageAttachmentSeparator: "@"
 });
 
+/**
+ * Add some deprecated <meta> tags in the header of the page so that old script can still work. It is added via the
+ * JavaScript since these <meta> tags are invalid with HTML5 and we want to have valid static HTML code.
+ *
+ * Note: we do not use require JS here because this script have to be executed very quickly, before the execution of the
+ * scripts that need these meta tags.
+ */
+(function(){
+  // Get the DOM elements we need
+  var html = $$('html')[0];
+  var head = $$('head')[0];
+  
+  // Function that creates a meta tag with the value taken from the new HTML data-* attrribute
+  var addMetaTag = function(name, value) {
+    head.insert(new Element('meta', {'name': name, 'content': html.readAttribute('data-xwiki-'+value)}));
+  }
+  
+  // Add the new meta tags
+  addMetaTag('document',   'document');
+  addMetaTag('wiki',       'wiki');
+  addMetaTag('space',      'space');
+  addMetaTag('page',       'page');
+  addMetaTag('version',    'version');
+  addMetaTag('restURL',    'resturl');
+  addMetaTag('form_token', 'form-token');
+})();
+
 })();

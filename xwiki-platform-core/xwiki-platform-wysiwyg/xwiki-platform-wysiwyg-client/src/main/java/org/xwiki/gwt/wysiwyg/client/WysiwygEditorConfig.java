@@ -130,6 +130,15 @@ public class WysiwygEditorConfig implements ClosingHandler
     }
 
     /**
+     * @return {@code true} if the editor is enabled, {@code false} otherwise
+     */
+    public boolean isEnabled()
+    {
+        Element hook = getHook();
+        return !hook.getPropertyBoolean("disabled") && !hook.getPropertyBoolean("readOnly");
+    }
+
+    /**
      * @return {@code true} if the WYSIWYG/Source tabs are displayed, {@code false} otherwise
      */
     public boolean isTabbed()

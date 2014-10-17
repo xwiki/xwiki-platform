@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -101,7 +100,7 @@
       #end
       {{html}}
       #xwikimessagebox($services.localization.render('core.delete')
-                      $confirmationMessage $doc.getURL($xcontext.action, "$request.queryString&amp;confirm=1$!{redirectparam}&amp;amp;form_token=$!{services.csrf.getToken()}")
+                      $confirmationMessage $doc.getURL($xcontext.action, "appName=$escapetool.url($appName)&amp;scope=$!{scope}&amp;confirm=1$!{redirectparam}&amp;amp;form_token=$!{services.csrf.getToken()}")
                       $escapetool.xml($cancelURL)
                       $services.localization.render('yes')
                       $services.localization.render('no'))

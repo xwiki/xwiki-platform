@@ -7901,6 +7901,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Backup the current document on the XWiki Context.
         backup.put("doc", context.getDoc());
 
+        // Backup the secure document
+        backup.put(CKEY_SDOC, context.get(CKEY_SDOC));
+
         // Backup the old Groovy Context, which is used only when rendering XWiki 1.0 syntax.
         @SuppressWarnings("unchecked")
         Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
@@ -7946,6 +7949,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // Restore the current document on the XWiki Context.
         context.setDoc((XWikiDocument) backup.get("doc"));
 
+        // Restore the secure document
+        context.put(CKEY_SDOC, backup.get(CKEY_SDOC));
+
         // Restore the old Groovy Context, which is used only when rendering XWiki 1.0 syntax.
         @SuppressWarnings("unchecked")
         Map<String, Object> gcontext = (Map<String, Object>) context.get("gcontext");
@@ -7974,6 +7980,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         try {
             context.setDoc(this);
+
+            // Get rid of secure document (so that it fallback on context document)
+            context.remove(CKEY_SDOC);
 
             XWikiDocument defaultTranslation, translatedDocument;
             if (this.getTranslation() == 0) {

@@ -19,9 +19,13 @@
  */
 package org.xwiki.rest.internal.resources.wikis;
 
-import java.util.List;
+import javax.inject.Inject;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
@@ -31,8 +35,12 @@ import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Wikis;
 import org.xwiki.rest.resources.wikis.WikisResource;
 import org.xwiki.rest.resources.wikis.WikisSearchQueryResource;
-
-import com.xpn.xwiki.XWikiException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.user.MembershipType;
+import org.xwiki.wiki.user.UserScope;
+import org.xwiki.wiki.user.WikiUserManager;
 
 /**
  * @version $Id$
@@ -40,25 +48,45 @@ import com.xpn.xwiki.XWikiException;
 @Component("org.xwiki.rest.internal.resources.wikis.WikisResourceImpl")
 public class WikisResourceImpl extends XWikiResource implements WikisResource
 {
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
+
+    @Inject
+    private WikiUserManager wikiUserManager;
+
+    @Inject
+    private EntityReferenceValueProvider defaultEntityReferenceValueProvider;
+
     @Override
     public Wikis getWikis() throws XWikiRestException
     {
         try {
-            String mainWiki = Utils.getXWikiContext(componentManager).getMainXWiki();
-
-            List<String> databaseNames = Utils.getXWiki(componentManager).getVirtualWikisDatabaseNames(
-                    Utils.getXWikiContext(componentManager));
-
-            /* The main wiki, usually "xwiki", doesn't have a wiki descriptor. So if it's not in the list returned by
-             getVirtualWikisDatabaseNames add it. */
-            if (!databaseNames.contains(mainWiki)) {
-                databaseNames.add(mainWiki);
-            }
-
             Wikis wikis = objectFactory.createWikis();
 
-            for (String databaseName : databaseNames) {
-                wikis.getWikis().add(DomainObjectFactory.createWiki(objectFactory, uriInfo.getBaseUri(), databaseName));
+            for (String wikiId : this.wikiDescriptorManager.getAllIds()) {
+                // Allow listing a wiki if:
+                // - the user has view access to it
+                // - or the wiki accepts global users and is not an invitation-based wiki
+                // - or the current user has a pending invitation to the wiki
+                // Note 1: To check if a user has view access to a wiki we check if the user can access the home page
+                //         of the "XWiki" space. We do this because this needs to be allowed in view for the wiki to
+                //         work properly.
+                // Note 2: it would be nicer to have an API for this.
+                // Note 3: this strategy is copied from WikisLiveTableResults.xml
+                EntityReference absoluteCommentReference = new EntityReference(
+                    this.defaultEntityReferenceValueProvider.getDefaultValue(EntityType.DOCUMENT), EntityType.DOCUMENT,
+                        new EntityReference("XWiki", EntityType.SPACE, new EntityReference(wikiId, EntityType.WIKI)));
+                DocumentReference currentUserReference = getXWikiContext().getUserReference();
+                if (this.authorizationManager.hasAccess(Right.VIEW, absoluteCommentReference)
+                    || (this.wikiUserManager.getUserScope(wikiId) != UserScope.LOCAL_ONLY
+                        && this.wikiUserManager.getMembershipType(wikiId) != MembershipType.INVITE)
+                    || this.wikiUserManager.hasPendingInvitation(currentUserReference, wikiId))
+                {
+                    wikis.getWikis().add(DomainObjectFactory.createWiki(objectFactory, uriInfo.getBaseUri(), wikiId));
+                }
             }
 
             String queryUri = Utils.createURI(uriInfo.getBaseUri(), WikisSearchQueryResource.class).toString();
@@ -68,8 +96,8 @@ public class WikisResourceImpl extends XWikiResource implements WikisResource
             wikis.getLinks().add(queryLink);
 
             return wikis;
-        } catch (XWikiException e) {
-            throw new XWikiRestException(e);
+        } catch (Exception e) {
+            throw new XWikiRestException("Failed to get the list of wikis", e);
         }
     }
 }

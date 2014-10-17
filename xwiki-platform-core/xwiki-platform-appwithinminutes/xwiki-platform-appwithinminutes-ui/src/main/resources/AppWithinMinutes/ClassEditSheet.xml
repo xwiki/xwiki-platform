@@ -33,7 +33,7 @@
   <date>1319634251000</date>
   <contentUpdateDate>1319634251000</contentUpdateDate>
   <version>1.1</version>
-  <title>#if(!$doc.name.endsWith('Sheet'))Class: #end$stringtool.removeEnd($doc.name, 'Class')</title>
+  <title>#if(!$doc.name.endsWith('Sheet'))Class: $stringtool.removeEnd($doc.title, 'Class')#{else}$doc.name#end</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
@@ -605,7 +605,8 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #elseif("$!request.wizard" == 'true')
       ## Redirect to next wizard step.
       #set($className = $stringtool.removeEnd($doc.name, 'Class'))
-      #set($homePageRef = $services.model.createDocumentReference($doc.wiki, $className, 'WebHome'))
+      #set($appName = $request.appName)
+      #set($homePageRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
       #set($queryString = 'wizard=true')
       #if(!$xwiki.exists($homePageRef))
         #set($homePageTitle = '$services.localization.render(''platform.appwithinminutes.appHomePageTitle'', [$doc.space])')

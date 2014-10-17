@@ -19,6 +19,8 @@
  */
 package org.xwiki.rest.internal.resources.wikis;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.xwiki.component.annotation.Component;
@@ -35,7 +37,7 @@ import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Wikis;
 import org.xwiki.rest.resources.wikis.WikisResource;
 import org.xwiki.rest.resources.wikis.WikisSearchQueryResource;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.user.MembershipType;
@@ -52,7 +54,7 @@ public class WikisResourceImpl extends XWikiResource implements WikisResource
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
-    private ContextualAuthorizationManager authorizationManager;
+    private AuthorizationManager authorizationManager;
 
     @Inject
     private WikiUserManager wikiUserManager;
@@ -64,9 +66,20 @@ public class WikisResourceImpl extends XWikiResource implements WikisResource
     public Wikis getWikis() throws XWikiRestException
     {
         try {
+            String mainWiki = Utils.getXWikiContext(componentManager).getMainXWiki();
+
+            List<String> databaseNames = Utils.getXWiki(componentManager).getVirtualWikisDatabaseNames(
+                Utils.getXWikiContext(componentManager));
+
+            // The main wiki, usually "xwiki", doesn't have a wiki descriptor. So if it's not in the list returned by
+            // getVirtualWikisDatabaseNames add it.
+            if (!databaseNames.contains(mainWiki)) {
+                databaseNames.add(mainWiki);
+            }
+
             Wikis wikis = objectFactory.createWikis();
 
-            for (String wikiId : this.wikiDescriptorManager.getAllIds()) {
+            for (String wikiId : databaseNames) {
                 // Allow listing a wiki if:
                 // - the user has view access to it
                 // - or the wiki accepts global users and is not an invitation-based wiki
@@ -80,7 +93,7 @@ public class WikisResourceImpl extends XWikiResource implements WikisResource
                     this.defaultEntityReferenceValueProvider.getDefaultValue(EntityType.DOCUMENT), EntityType.DOCUMENT,
                         new EntityReference("XWiki", EntityType.SPACE, new EntityReference(wikiId, EntityType.WIKI)));
                 DocumentReference currentUserReference = getXWikiContext().getUserReference();
-                if (this.authorizationManager.hasAccess(Right.VIEW, absoluteCommentReference)
+                if (this.authorizationManager.hasAccess(Right.VIEW, currentUserReference, absoluteCommentReference)
                     || (this.wikiUserManager.getUserScope(wikiId) != UserScope.LOCAL_ONLY
                         && this.wikiUserManager.getMembershipType(wikiId) != MembershipType.INVITE)
                     || this.wikiUserManager.hasPendingInvitation(currentUserReference, wikiId))

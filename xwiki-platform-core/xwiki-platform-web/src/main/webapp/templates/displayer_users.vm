@@ -12,7 +12,9 @@
   #if ($isMultiSelect)
     #set ($class = "$class multipleSelection")
   #end
-  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)" class="$class" />
+  #set ($disabled = $field.getProperty('disabled').value == 1)
+  <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)" class="$class"
+    #if ($disabled)disabled="disabled"#end />
 #elseif ($type == 'view' || $type == 'rendered')
   #set ($values = $value.split('\s*,\s*'))
   #set ($selectedUsers = [])

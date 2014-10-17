@@ -24,6 +24,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.transformation.RenderingContext;
@@ -58,33 +59,51 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     @Override
     public void checkAccess(Right right) throws AccessDeniedException
     {
-        checkAccess(right, getCurrentEntity());
+        if (right == Right.PROGRAM) {
+            checkAccess(right, getCurrentUser(right, null), null);
+        }
+
+        checkAccess(right, right == Right.PROGRAM ? null : getCurrentEntity());
     }
 
     @Override
     public void checkAccess(Right right, EntityReference entity) throws AccessDeniedException
     {
-        DocumentReference user = getCurrentUser(right);
+        DocumentReference user = getCurrentUser(right, entity);
 
+        checkAccess(right, user, entity);
+    }
+
+    private void checkAccess(Right right, DocumentReference user, EntityReference entity) throws AccessDeniedException
+    {
         if (!checkPreAccess(right)) {
             throw new AccessDeniedException(right, user, entity);
         }
 
-        authorizationManager.checkAccess(right, user, entity);
+        this.authorizationManager.checkAccess(right, user, entity);
     }
 
     @Override
     public boolean hasAccess(Right right)
     {
+        if (right == Right.PROGRAM) {
+            return hasAccess(right, getCurrentUser(right, null), null);
+        }
+
         return hasAccess(right, getCurrentEntity());
     }
 
     @Override
     public boolean hasAccess(Right right, EntityReference entity)
     {
-        DocumentReference user = getCurrentUser(right);
+        DocumentReference user = getCurrentUser(right, entity);
 
-        return checkPreAccess(right) && authorizationManager.hasAccess(right, user, entity);
+        return hasAccess(right, user, entity);
+    }
+
+    private boolean hasAccess(Right right, DocumentReference user, EntityReference entity)
+    {
+        return checkPreAccess(right) && this.authorizationManager.hasAccess(right, user, entity);
     }
 
     /**
@@ -96,7 +115,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     private boolean checkPreAccess(Right right)
     {
         if (right == Right.PROGRAM) {
-            if (renderingContext.isRestricted() || xcontextProvider.get().hasDroppedPermissions()) {
+            if (this.renderingContext.isRestricted() || this.xcontextProvider.get().hasDroppedPermissions()) {
                 return false;
             }
         }
@@ -104,20 +123,39 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
         return true;
     }
 
-    /**
-     * @return the current user from context.
-     */
-    private DocumentReference getCurrentUser(Right right)
+    private DocumentReference getCurrentUser(Right right, EntityReference entity)
     {
         // Backward compatibility for the old way of assigning programming right.
         if (right == Right.PROGRAM) {
-            XWikiDocument doc = getProgrammingDocument();
+            XWikiDocument doc = entity == null ? getProgrammingDocument() : getDocument(entity);
             if (doc != null) {
                 return getContentAuthor(doc);
             }
         }
 
         return this.xcontextProvider.get().getUserReference();
+    }
+
+    private XWikiDocument getDocument(EntityReference entity)
+    {
+        if (entity == null) {
+            return null;
+        }
+
+        EntityReference docEntity = entity.extractReference(EntityType.DOCUMENT);
+        if (docEntity == null) {
+            return null;
+        }
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        try {
+            return xcontext.getWiki().getDocument(new DocumentReference(docEntity), xcontext);
+        } catch (Exception e) {
+            // Ignored
+        }
+
+        return null;
     }
 
     /**
@@ -144,7 +182,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
      */
     private EntityReference getCurrentEntity()
     {
-        XWikiContext xcontext = xcontextProvider.get();
+        XWikiContext xcontext = this.xcontextProvider.get();
         XWikiDocument doc = xcontext.getDoc();
 
         if (doc != null) {

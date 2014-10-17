@@ -96,6 +96,7 @@ solr.facets.moreValues={0} weitere
 solr.facets.resetAll=Zurücksetzen
 solr.facets.title=Suche verfeinern
 solr.field.attauthor=Hochgeladen von
+solr.field.attauthor_display=Hochgeladen von
 solr.field.attcontent=Dateiname
 solr.field.attdate=Hochgeladen am
 solr.field.attsize=Dateigröße

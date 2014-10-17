@@ -52,12 +52,14 @@
   ## ----------------------------
   ## Display the rendered content
   ## ----------------------------
-  <div id="xwikicontent">
-    #if ("$!exception" != '')
-      #displayUnhandledException($exception)
-    #else
-      $renderedContent
-    #end
+  <div class="row">
+    <div id="xwikicontent" class="col-xs-12">
+      #if ("$!exception" != '')
+        #displayUnhandledException($exception)
+      #else
+        $renderedContent
+      #end
+    </div>
   </div>
 </div>
 ## -----------------------------------------------------------------------------------

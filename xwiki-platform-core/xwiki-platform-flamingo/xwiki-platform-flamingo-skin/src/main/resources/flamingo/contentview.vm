@@ -50,8 +50,10 @@
   ## ----------------------------
   ## Display the rendered content
   ## ----------------------------
-  <div id="xwikicontent">
-  $renderedContent
+  <div class="row">
+    <div id="xwikicontent" class="col-xs-12">
+      $renderedContent
+    </div>
   </div>
 </div>
 ## -----------------------------------------------------------------------------------

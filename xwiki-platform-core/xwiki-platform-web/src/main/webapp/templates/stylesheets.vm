@@ -7,8 +7,7 @@
 #set ($urlParametersMap = {})
 ## Specifying the skin to avoid some problems if the base skin is not the same as the current skin
 ## (see: http://jira.xwiki.org/browse/XWIKI-11190)
-## TODO: fix skin action to take into account the skin indicated in the URL
-#set ($discard = $urlParametersMap.put("skin", "$!xcontext.skin"))
+#set ($discard = $urlParametersMap.put("skin", "$!xwiki.skin"))
 #if ($themeDoc)
   #set ($discard = $urlParametersMap.put("colorTheme", "$!themeDocFullName"))
 #end

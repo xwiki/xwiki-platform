@@ -18,5 +18,24 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-log.LEVEL=WARN
-org.xwiki.tools.jetty.listener.NotifyListener.LEVEL=INFO
+#
+# Deploy Feature
+#
+
+[depend]
+webapp
+
+[lib]
+lib/jetty-deploy-${jetty.version}.jar
+
+[files]
+webapps/
+
+[xml]
+etc/jetty-deploy.xml
+
+[ini-template]
+## DeployManager configuration
+# Monitored Directory name (relative to jetty.base)
+# jetty.deploy.monitoredDirName=webapps
+

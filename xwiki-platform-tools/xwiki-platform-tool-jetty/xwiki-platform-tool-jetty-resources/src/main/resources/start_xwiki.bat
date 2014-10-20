@@ -33,6 +33,7 @@ REM -------------------------------------------------------------------------
 setlocal EnableDelayedExpansion
 
 set JETTY_HOME=jetty
+set JETTY_BASE=.
 if not defined XWIKI_OPTS set XWIKI_OPTS=-Xmx512m -XX:MaxPermSize=196m
 
 REM The port on which to start Jetty can be defined in an enviroment variable called JETTY_PORT
@@ -77,8 +78,8 @@ if not exist %XWIKI_DATA_DIR%\logs mkdir %XWIKI_DATA_DIR%\logs
 REM Specify port on which HTTP requests will be handled
 set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.port=%JETTY_PORT%
 
-REM Specify Jetty's home directory
-set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home=%JETTY_HOME%
+REM Specify Jetty's home and base directories
+set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home=%JETTY_HOME% -Djetty.base=%JETTY_BASE%
 
 REM Specify port and key to stop a running Jetty instance
 set XWIKI_OPTS=%XWIKI_OPTS% -DSTOP.KEY=xwiki -DSTOP.PORT=%JETTY_STOP_PORT%
@@ -94,10 +95,7 @@ REM Note that setting this value too high can leave your server vulnerable to de
 REM service attacks.
 set XWIKI_OPTS=%XWIKI_OPTS% -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1000000
 
-set JETTY_CONFIGURATION_FILES=
-for /r %%i in (%JETTY_HOME%\etc\jetty-*.xml) do set JETTY_CONFIGURATION_FILES=!JETTY_CONFIGURATION_FILES! "%%i"
-
-"%JAVA_PATH%" %XWIKI_OPTS% %3 %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar %JETTY_HOME%/etc/jetty.xml %JETTY_CONFIGURATION_FILES%
+"%JAVA_PATH%" %XWIKI_OPTS% %3 %4 %5 %6 %7 %8 %9 -jar %JETTY_HOME%/start.jar --module=xwiki
 
 REM Pause so that the command window used to run this script doesn't close automatically in case of problem
 REM (like when the JDK/JRE is not installed)

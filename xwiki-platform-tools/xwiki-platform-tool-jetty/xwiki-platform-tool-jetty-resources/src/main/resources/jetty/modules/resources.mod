@@ -18,5 +18,13 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-log.LEVEL=WARN
-org.xwiki.tools.jetty.listener.NotifyListener.LEVEL=INFO
+#
+# Module to add resources directory to classpath
+#
+
+[lib]
+resources/
+
+[files]
+resources/
+

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
 
 <!-- =============================================================== -->
 <!-- Configure stderr and stdout to also go to a rollover log file   -->
@@ -45,7 +45,7 @@
     </Arg>
   </New>
 
-  <Call class="java.lang.System" name="setErr"><Arg><Ref id="ServerLog"/></Arg></Call>
-  <Call class="java.lang.System" name="setOut"><Arg><Ref id="ServerLog"/></Arg></Call>
+  <Call class="java.lang.System" name="setErr"><Arg><Ref refid="ServerLog"/></Arg></Call>
+  <Call class="java.lang.System" name="setOut"><Arg><Ref refid="ServerLog"/></Arg></Call>
 
 </Configure>

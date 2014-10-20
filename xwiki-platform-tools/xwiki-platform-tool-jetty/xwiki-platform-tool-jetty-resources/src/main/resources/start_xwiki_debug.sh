@@ -57,6 +57,7 @@ PRGDIR=`dirname "$PRG"`
 cd "$PRGDIR"
 
 JETTY_HOME=jetty
+JETTY_BASE=.
 
 # If no XWIKI_OPTS env variable has been defined use default values.
 if [ -z "$XWIKI_OPTS" ] ; then
@@ -149,8 +150,8 @@ mkdir -p $XWIKI_DATA_DIR/logs 2>/dev/null
 # Specify port on which HTTP requests will be handled
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.port=$JETTY_PORT"
 
-# Specify Jetty's home directory
-XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME"
+# Specify Jetty's home and base directories
+XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 
 # Specify port and key to stop a running Jetty instance
 XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOP_PORT"
@@ -183,4 +184,4 @@ echo $XWIKI_PID > $XWIKI_LOCK_FILE
 
 # This replaces the shell with the java process without starting a new process. This must be the last line
 # of this script as anything after won't be executed.
-exec java $XWIKI_OPTS -jar $JETTY_HOME/start.jar ${JETTY_HOME}/etc/jetty.xml ${JETTY_HOME}/etc/jetty-*.xml
+exec java $XWIKI_OPTS -jar ${JETTY_HOME}/start.jar --module=xwiki

@@ -66,6 +66,7 @@ PRGDIR=`dirname "$PRG"`
 cd "$PRGDIR"
 
 JETTY_HOME=jetty
+JETTY_BASE=.
 
 # The port on which to start Jetty can be defined in an environment variable called JETTY_PORT
 if [ -z "$JETTY_PORT" ]; then
@@ -115,8 +116,8 @@ XWIKI_LOCK_FILE="${XWIKI_LOCK_DIR}/xwiki-${JETTY_PORT}.lck"
 # Specify port and key to stop a running Jetty instance
 XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOP_PORT"
 
-# Specify Jetty's home directory
-XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME"
+# Specify Jetty's home and base directories
+XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 
 [ ! -e $XWIKI_LOCK_FILE ] && echo "Lock file [${XWIKI_LOCK_FILE}] is missing. Aborting stop." && exit 0
 

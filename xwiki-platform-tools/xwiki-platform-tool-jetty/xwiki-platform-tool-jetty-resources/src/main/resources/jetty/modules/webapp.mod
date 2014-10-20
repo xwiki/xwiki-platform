@@ -18,5 +18,13 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-log.LEVEL=WARN
-org.xwiki.tools.jetty.listener.NotifyListener.LEVEL=INFO
+#
+# WebApp Support Module
+#
+
+[depend]
+servlet
+security
+
+[lib]
+lib/jetty-webapp-${jetty.version}.jar

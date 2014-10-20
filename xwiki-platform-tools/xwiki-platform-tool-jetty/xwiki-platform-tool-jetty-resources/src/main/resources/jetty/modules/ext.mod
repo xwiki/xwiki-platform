@@ -18,5 +18,14 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-log.LEVEL=WARN
-org.xwiki.tools.jetty.listener.NotifyListener.LEVEL=INFO
+#
+# Module to add all lib/ext/**.jar files to classpath
+#
+
+[lib]
+lib/ext/**.jar
+
+[files]
+lib/
+lib/ext/
+

@@ -10,7 +10,7 @@
 #set ($displayCreateWiki = $isWikiAPIAvailable && $isWikiUIAvailable && $hasCreateWiki)
 #set ($displayCreateSubmenu = $hasCreateSpace || $hasCreatePage || $displayCreateWiki)
 #if ($displayCreateSubmenu)
-  <div class="navbar-form navbar-left">
+  <li><div class="navbar-form navbar-left">
   #xwikisplitbuttonentrystart($doc.getURL('create') $services.localization.render('core.menu.create') 'tmCreate' 'btn-success' 'plus')
   #if ($hasCreatePage)
     #submenuitem($doc.getURL('create') $services.localization.render('core.menu.create.page') 'tmCreatePage', '', 'file')
@@ -31,6 +31,6 @@
     #end
   #end
   #xwikibuttonentryend()
-  </div>
+  </div></li>
 #end
 #end

@@ -2,7 +2,7 @@
 ##        MENU VIEW
 ################################
 #if ($isInServletMode)## Visible only in a page
-  #template("menus_macros.vm") ## must be provided by the skin
+  #template("menus_macros.vm")
   
   ## Top Menu
   #xwikitopmenustart()

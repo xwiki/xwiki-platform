@@ -26,7 +26,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
@@ -38,14 +37,11 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
-import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.test.annotation.AfterComponent;
@@ -53,7 +49,6 @@ import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Validate {@link TemplateManager}.
@@ -61,7 +56,7 @@ import org.xwiki.velocity.XWikiVelocityException;
  * @version $Id$
  */
 @AllComponents
-public class WikiTemplateRendererTest
+public class TemplateManagerTest
 {
     @Rule
     public final MockitoComponentMockingRule<TemplateManager> mocker =

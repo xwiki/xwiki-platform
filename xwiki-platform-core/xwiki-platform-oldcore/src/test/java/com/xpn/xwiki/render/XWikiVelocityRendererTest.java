@@ -60,6 +60,7 @@ public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("getSkinFile").will(returnValue(null));
         this.mockXWiki.stubs().method("getResourceContent").will(returnValue(null));
         this.mockXWiki.stubs().method("prepareResources");
+        this.mockXWiki.stubs().method("getStore").will(returnValue(null));
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
 
         this.mockContentDocument = mock(XWikiDocument.class);

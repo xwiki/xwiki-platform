@@ -364,7 +364,8 @@ public class TemplateManager
         TemplateContent content;
 
         // Try from wiki pages
-        XWikiDocument skinDocument = getSkinDocument(skin);
+        // FIXME: macros.vm from document based skins is not supported by default VelocityManager yet
+        XWikiDocument skinDocument = template.equals("macros.vm") ? null : getSkinDocument(skin);
         if (skinDocument != null) {
             content = getTemplateContentFromDocumentSkin(template, skinDocument);
         } else {
@@ -457,7 +458,7 @@ public class TemplateManager
 
     private TemplateContent getResourceAsStringContent(String suffixPath, String template)
     {
-        String templatePath = getResourcePath(suffixPath, template);
+        String templatePath = getResourcePath(suffixPath, template, false);
 
         InputStream inputStream = this.environment.getResourceAsStream(templatePath);
         if (inputStream != null) {
@@ -473,7 +474,7 @@ public class TemplateManager
         return null;
     }
 
-    private String getResourcePath(String suffixPath, String template)
+    private String getResourcePath(String suffixPath, String template, boolean testExist)
     {
         String templatePath = suffixPath + template;
 
@@ -484,6 +485,13 @@ public class TemplateManager
                 normalizedTemplate);
 
             return null;
+        }
+
+        if (testExist) {
+            // Check if the resource exist
+            if (this.environment.getResource(templatePath) == null) {
+                return null;
+            }
         }
 
         return templatePath;
@@ -826,7 +834,7 @@ public class TemplateManager
             path = getPathFromDocumentSkin(template, skinDocument);
         } else {
             // If not a wiki based skin try from filesystem skins
-            path = getResourcePath("/skins/" + skin + '/', template);
+            path = getResourcePath("/skins/" + skin + '/', template, true);
         }
 
         return path;
@@ -852,7 +860,7 @@ public class TemplateManager
 
         // Try from /template/ resources
         if (path == null) {
-            path = getResourcePath("/templates/", template);
+            path = getResourcePath("/templates/", template, true);
         }
 
         return path;

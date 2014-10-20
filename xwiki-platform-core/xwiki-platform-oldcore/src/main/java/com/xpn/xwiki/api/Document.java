@@ -66,6 +66,7 @@ import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
@@ -1971,7 +1972,16 @@ public class Document extends Api
     {
         if (object != null) {
             try {
-                return ((BaseProperty) object.getBaseObject().safeget(fieldName)).getValue();
+                BaseProperty bp = (BaseProperty) object.getBaseObject().safeget(fieldName);
+                PropertyClass p = (PropertyClass) object.getBaseObject().getXClass(getXWikiContext()).get(fieldName);
+                if ("Password".equals(p.getClassType()))
+                {
+                    if(!this.getXWikiContext().getWiki().getRightService().hasProgrammingRights(this.getXWikiContext()))
+                    {
+                        return null;
+                    }
+                }
+                return bp.getValue();
             } catch (NullPointerException e) {
                 return null;
             }

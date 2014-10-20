@@ -730,7 +730,7 @@
               **/internal/observation/remote/converter/AbstractXWikiEventConverter.java,
               **/internal/observation/remote/converter/ActionExecutionEventConverter.java,
               **/internal/template/TemplateScriptService.java,
-              **/internal/template/WikiTemplateRenderer.java,
+              **/internal/template/TemplateManager.java,
               **/monitor/api/MonitorData.java,
               **/monitor/api/MonitorPlugin.java,
               **/monitor/api/MonitorTimer.java,

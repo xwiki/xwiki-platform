@@ -91,7 +91,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * Internal toolkit to experiment on wiki bases templates.
  * 
  * @version $Id$
- * @since 6.1M1
+ * @since 6.3M2
  */
 @Component(roles = TemplateManager.class)
 @Singleton

@@ -39,7 +39,7 @@ import org.xwiki.script.service.ScriptService;
 public class TemplateScriptService implements ScriptService
 {
     @Inject
-    private WikiTemplateRenderer renderer;
+    private TemplateManager renderer;
 
     /**
      * Execute and render passed template.

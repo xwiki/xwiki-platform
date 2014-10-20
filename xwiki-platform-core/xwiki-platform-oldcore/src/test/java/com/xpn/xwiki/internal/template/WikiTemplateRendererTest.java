@@ -56,7 +56,7 @@ import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
 
 /**
- * Validate {@link WikiTemplateRenderer}.
+ * Validate {@link TemplateManager}.
  * 
  * @version $Id$
  */
@@ -64,8 +64,8 @@ import org.xwiki.velocity.XWikiVelocityException;
 public class WikiTemplateRendererTest
 {
     @Rule
-    public final MockitoComponentMockingRule<WikiTemplateRenderer> mocker =
-        new MockitoComponentMockingRule<WikiTemplateRenderer>(WikiTemplateRenderer.class);
+    public final MockitoComponentMockingRule<TemplateManager> mocker =
+        new MockitoComponentMockingRule<TemplateManager>(TemplateManager.class);
 
     private Environment environmentmMock;
 

@@ -68,7 +68,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.template.WikiTemplateRenderer;
+import com.xpn.xwiki.internal.template.TemplateManager;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
@@ -492,7 +492,7 @@ public abstract class XWikiAction extends Action
         xcontext.getResponse().setContentType("text/html; charset=UTF-8");
 
         try {
-            Utils.getComponent(WikiTemplateRenderer.class).render("init.vm", xcontext.getResponse().getWriter());
+            Utils.getComponent(TemplateManager.class).render("init.vm", xcontext.getResponse().getWriter());
         } finally {
             if (mutableRenderingContext != null) {
                 mutableRenderingContext.pop();

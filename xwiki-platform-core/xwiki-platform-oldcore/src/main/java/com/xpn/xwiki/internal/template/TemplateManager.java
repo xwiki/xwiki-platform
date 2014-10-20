@@ -93,9 +93,9 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * @version $Id$
  * @since 6.1M1
  */
-@Component(roles = WikiTemplateRenderer.class)
+@Component(roles = TemplateManager.class)
 @Singleton
-public class WikiTemplateRenderer
+public class TemplateManager
 {
     private static final Pattern PROPERTY_LINE = Pattern.compile("^##!(.+)=(.*)$\r?\n?", Pattern.MULTILINE);
 

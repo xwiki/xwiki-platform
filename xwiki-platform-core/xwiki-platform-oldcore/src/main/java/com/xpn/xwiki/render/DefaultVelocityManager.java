@@ -44,7 +44,7 @@ import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.DeprecatedContext;
-import com.xpn.xwiki.internal.template.WikiTemplateRenderer;
+import com.xpn.xwiki.internal.template.TemplateManager;
 
 /**
  * Note: This class should be moved to the Velocity module. However this is not possible right now since we need to
@@ -97,10 +97,10 @@ public class DefaultVelocityManager implements VelocityManager
     private VelocityConfiguration velocityConfiguration;
 
     /**
-     * Accessing it trough {@link Provider} since {@link WikiTemplateRenderer} depends on {@link VelocityManager}.
+     * Accessing it trough {@link Provider} since {@link TemplateManager} depends on {@link VelocityManager}.
      */
     @Inject
-    private Provider<WikiTemplateRenderer> templates;
+    private Provider<TemplateManager> templates;
 
     @Override
     public VelocityContext getVelocityContext()

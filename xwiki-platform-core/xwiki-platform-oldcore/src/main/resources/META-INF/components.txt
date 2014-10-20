@@ -49,7 +49,7 @@ com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter
 com.xpn.xwiki.internal.template.SUExecutor
 com.xpn.xwiki.internal.template.TemplateScriptService
-com.xpn.xwiki.internal.template.WikiTemplateRenderer
+com.xpn.xwiki.internal.template.TemplateManager
 500:com.xpn.xwiki.internal.observation.remote.converter.FilteredSerializableEventConverter
 com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider

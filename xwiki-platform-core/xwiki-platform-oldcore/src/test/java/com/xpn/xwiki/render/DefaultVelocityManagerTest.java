@@ -46,7 +46,7 @@ import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.internal.template.WikiTemplateRenderer;
+import com.xpn.xwiki.internal.template.TemplateManager;
 
 /**
  * Unit tests for {@link DefaultVelocityManager}.
@@ -110,9 +110,9 @@ public class DefaultVelocityManagerTest
         VelocityEngine velocityEngine = mock(VelocityEngine.class);
         when(velocityFactory.createVelocityEngine(eq("default"), any(Properties.class))).thenReturn(velocityEngine);
 
-        WikiTemplateRenderer templates = mock(WikiTemplateRenderer.class);
-        Provider<WikiTemplateRenderer> templatesProvider = this.mocker.getInstance(new DefaultParameterizedType(null, Provider.class,
-            WikiTemplateRenderer.class));
+        TemplateManager templates = mock(TemplateManager.class);
+        Provider<TemplateManager> templatesProvider = this.mocker.getInstance(new DefaultParameterizedType(null, Provider.class,
+            TemplateManager.class));
         when(templatesProvider.get()).thenReturn(templates);
 
         Assert.assertSame(velocityEngine, this.mocker.getComponentUnderTest().getVelocityEngine());

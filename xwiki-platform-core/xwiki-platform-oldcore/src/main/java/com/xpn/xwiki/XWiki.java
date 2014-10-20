@@ -155,7 +155,7 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
-import com.xpn.xwiki.internal.template.WikiTemplateRenderer;
+import com.xpn.xwiki.internal.template.TemplateManager;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -1629,7 +1629,7 @@ public class XWiki implements EventListener
     public String evaluateTemplate(String template, XWikiContext context) throws IOException
     {
         try {
-            return Utils.getComponent(WikiTemplateRenderer.class).render(template);
+            return Utils.getComponent(TemplateManager.class).render(template);
         } catch (Exception e) {
             LOGGER.error("Error while evaluating velocity template [{}]", template, e);
 
@@ -1646,7 +1646,7 @@ public class XWiki implements EventListener
     public String parseTemplate(String template, String skin, XWikiContext context)
     {
         try {
-            return Utils.getComponent(WikiTemplateRenderer.class).renderFromSkin(template, skin);
+            return Utils.getComponent(TemplateManager.class).renderFromSkin(template, skin);
         } catch (Exception e) {
             LOGGER.error("Error while evaluating velocity template [{}] skin [{}]", template, skin, e);
 

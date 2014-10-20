@@ -40,7 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Allow executing some code with the right of a provided user.
  * 
  * @version $Id$
- * @since 6.3M1
+ * @since 6.3M2
  */
 @Component(roles = SUExecutor.class)
 @Singleton

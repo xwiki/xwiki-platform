@@ -169,23 +169,20 @@ public class PasswordClass extends StringClass
         }
         return DEFAULT_HASH_ALGORITHM;
     }
-    
+
     /**
-    * @param password
-    * @return The salt used for the given password. If this is an unsalted password, let it be known by returning "".
-    */
-        public String getSaltFromPassword(String password)
-        {
-            String[] components = password.split(":");
-            if(components.length == 4)
-            {
-                return components[2];
-            }
-            else
-            {
-                return "";
-            }
+     * @param password
+     * @return The salt used for the given password. If this is an unsalted password, let it be known by returning "".
+     */
+    public String getSaltFromPassword(String password)
+    {
+        String[] components = password.split(":");
+        if (components.length == 4) {
+            return components[2];
+        } else {
+            return "";
         }
+    }
 
     /**
      * Transforms a plain text password so that it has the same encryption as a password stored in the database. The
@@ -200,7 +197,8 @@ public class PasswordClass extends StringClass
     {
         String result = plainPassword;
         if (storedPassword.startsWith(HASH_IDENTIFIER + SEPARATOR)) {
-            result = getPasswordHash(result, getAlgorithmFromPassword(storedPassword), getSaltFromPassword(storedPassword));
+            result =
+                getPasswordHash(result, getAlgorithmFromPassword(storedPassword), getSaltFromPassword(storedPassword));
         } else if (storedPassword.startsWith(CRYPT_IDENTIFIER + SEPARATOR)) {
             result = getPasswordCrypt(result, getAlgorithmFromPassword(storedPassword));
         }
@@ -237,9 +235,8 @@ public class PasswordClass extends StringClass
 
     public String getPasswordHash(String password, String algorithmName, String salt)
     {
-        //If no salt given, let's generate one.
-        if(salt == null)
-        {
+        // If no salt given, let's generate one.
+        if (salt == null) {
             salt = randomSalt();
         }
         try {
@@ -249,9 +246,8 @@ public class PasswordClass extends StringClass
             hashAlgorithm.update(saltedPassword.getBytes());
             byte[] digest = hashAlgorithm.digest();
             StringBuffer sb = new StringBuffer(HASH_IDENTIFIER + SEPARATOR + algorithmName + SEPARATOR);
-            //Backward compatibility concern : let's keep unsalted password the way they are.
-            if(!salt.equals(""))
-            {
+            // Backward compatibility concern : let's keep unsalted password the way they are.
+            if (!salt.equals("")) {
                 sb.append(salt + SEPARATOR);
             }
             for (int j = 0; j < digest.length; ++j) {
@@ -269,19 +265,17 @@ public class PasswordClass extends StringClass
         }
         return password;
     }
-    
+
     public static String randomSalt()
     {
         String salt = "";
         SecureRandom random = new SecureRandom();
         byte bytes[] = new byte[32];
         random.nextBytes(bytes);
-        for (int i = 0; i < bytes.length; i++)
-        {
+        for (int i = 0; i < bytes.length; i++) {
             byte temp = bytes[i];
             String s = Integer.toHexString(new Byte(temp));
-            while (s.length() < 2)
-            {
+            while (s.length() < 2) {
                 s = "0" + s;
             }
             s = s.substring(s.length() - 2);

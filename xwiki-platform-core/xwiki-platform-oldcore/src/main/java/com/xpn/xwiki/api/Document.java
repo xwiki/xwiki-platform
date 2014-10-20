@@ -1974,10 +1974,9 @@ public class Document extends Api
             try {
                 BaseProperty bp = (BaseProperty) object.getBaseObject().safeget(fieldName);
                 PropertyClass p = (PropertyClass) object.getBaseObject().getXClass(getXWikiContext()).get(fieldName);
-                if ("Password".equals(p.getClassType()))
-                {
-                    if(!this.getXWikiContext().getWiki().getRightService().hasProgrammingRights(this.getXWikiContext()))
-                    {
+                if ("Password".equals(p.getClassType())) {
+                    if (!this.getXWikiContext().getWiki().getRightService()
+                        .hasProgrammingRights(this.getXWikiContext())) {
                         return null;
                     }
                 }

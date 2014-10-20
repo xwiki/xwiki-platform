@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -90,7 +91,7 @@
     #set($classTitle = "$appName Class")
     #set($appHomeRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
     #set($classParent = $services.model.serialize($appHomeRef))
-    #set($queryString = "$queryString&amp;editor=inline&amp;template=AppWithinMinutes.ClassTemplate&amp;parent=$escapetool.url($classParent)&amp;title=$escapetool.url($classTitle)&amp;appName=$escapetool.url($appName)")
+    #set($queryString = "$queryString&amp;editor=inline&amp;template=AppWithinMinutes.ClassTemplate&amp;parent=$escapetool.url($classParent)&amp;title=$escapetool.url($classTitle)&amp;AppWithinMinutes.MetadataClass_0_dataSpaceName=$escapetool.url($appName)")
   #end
   $response.sendRedirect($xwiki.getURL($classRef, 'edit', $queryString))
 #end

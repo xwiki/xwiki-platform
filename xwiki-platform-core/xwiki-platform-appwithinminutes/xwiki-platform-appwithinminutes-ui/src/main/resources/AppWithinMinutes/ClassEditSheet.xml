@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -604,8 +605,11 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
       {{error}}{{html}}$errorMessage{{/html}}{{/error}}
     #elseif("$!request.wizard" == 'true')
       ## Redirect to next wizard step.
-      #set($className = $stringtool.removeEnd($doc.name, 'Class'))
-      #set($appName = $request.appName)
+      #set($appName = $doc.getValue('dataSpaceName'))
+      #if("$!appName" == '')
+        ## Backwards compatibility for apps created before 6.3M2 when the code space was not properly cleaned and the data space name was restricted as a consequence.
+        #set($appName = $stringtool.removeEnd($doc.title, ' Class'))
+      #end
       #set($homePageRef = $services.model.createDocumentReference($doc.wiki, $appName, 'WebHome'))
       #set($queryString = 'wizard=true')
       #if(!$xwiki.exists($homePageRef))

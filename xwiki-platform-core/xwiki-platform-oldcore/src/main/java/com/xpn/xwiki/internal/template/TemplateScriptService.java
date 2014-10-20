@@ -39,7 +39,7 @@ import org.xwiki.script.service.ScriptService;
 public class TemplateScriptService implements ScriptService
 {
     @Inject
-    private TemplateManager renderer;
+    private TemplateManager templates;
 
     /**
      * Execute and render passed template.
@@ -52,20 +52,19 @@ public class TemplateScriptService implements ScriptService
      */
     public String render(String template)
     {
-        return this.renderer.renderNoException(template);
+        return this.templates.renderNoException(template);
     }
 
     /**
-     * Execute and passed template.
+     * Execute the passed template.
      * <p>
      * The current transformation id is used.
      * 
      * @param template the template name
      * @param transformationId the identifier of the transformation
-     * @return the result of the template execution and rendering
      */
     public void execute(String template) throws Exception
     {
-        this.renderer.execute(template);
+        this.templates.execute(template);
     }
 }

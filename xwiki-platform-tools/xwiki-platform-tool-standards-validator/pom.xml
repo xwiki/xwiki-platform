@@ -50,7 +50,7 @@
     <dependency>
       <groupId>nu.validator</groupId>
       <artifactId>vnu-lite</artifactId>
-      <version>20140222-xwiki</version>
+      <version>20141020-xwiki</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

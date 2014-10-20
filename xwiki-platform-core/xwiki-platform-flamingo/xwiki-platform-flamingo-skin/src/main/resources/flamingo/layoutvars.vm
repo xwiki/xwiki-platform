@@ -127,7 +127,7 @@
   #set($showRightPanels = '0')
 #end
 
-#if($xcontext.action == 'login')
+#if (($xcontext.action == 'login') || ($xcontext.action == 'loginsubmit'))
   #set($showLeftPanels = '0')
   #set($showRightPanels = '0')
 #end

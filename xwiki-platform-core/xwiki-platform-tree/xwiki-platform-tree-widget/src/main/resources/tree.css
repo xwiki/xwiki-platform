@@ -1,0 +1,11 @@
+.jstree ul.jstree-children {
+ /* Overwrite the margin from the XWiki skin. */
+  margin: 0;
+}
+.jstree-contextmenu {
+  z-index: 100;
+}
+.jstree-contextmenu a * {
+  /* Overwrite the line height from the XWiki skin. */
+  line-height: inherit;
+}

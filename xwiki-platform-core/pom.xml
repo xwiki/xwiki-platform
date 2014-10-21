@@ -37,6 +37,8 @@
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
+    <!-- Follow the specifications regarding the WebJar content path. -->
+    <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
   </properties>
   <dependencies>
     <dependency>
@@ -216,6 +218,13 @@
         <artifactId>joda-time</artifactId>
         <version>2.5</version>
       </dependency>
+      <!-- Common WebJars -->
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>jquery</artifactId>
+        <version>1.11.1</version>
+        <scope>runtime</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>
@@ -305,12 +314,48 @@
           <groupId>net.alchim31.maven</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>1.3.2</version>
+          <executions>
+            <execution>
+              <!-- Minify the WebJar resources before packing the jar. -->
+              <id>minify-webjar-resources</id>
+              <goals>
+                <goal>compress</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+                <!-- Don't overwrite the original version. -->
+                <nosuffix>false</nosuffix>
+                <suffix>.min</suffix>
+              </configuration>
+            </execution>
+          </executions>
           <configuration>
             <skip>${xwiki.minification.skip}</skip>
             <jswarn>false</jswarn>
             <!-- Overwrite the resource files with the minimized version. -->
             <nosuffix>true</nosuffix>
           </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <executions>
+            <execution>
+              <!-- Copy the WebJar resources to the right path before packing the jar. -->
+              <id>copy-webjar-resources</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>src/main/resources</directory>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -419,6 +464,7 @@
     <module>xwiki-platform-invitation</module>
     <module>xwiki-platform-ircbot</module>
     <module>xwiki-platform-jira</module>
+    <module>xwiki-platform-job</module>
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-ldap</module>
     <module>xwiki-platform-lesscss</module>
@@ -453,6 +499,7 @@
     <module>xwiki-platform-store</module>
     <module>xwiki-platform-tag</module>
     <module>xwiki-platform-test</module>
+    <module>xwiki-platform-tree</module>
     <module>xwiki-platform-user</module>
     <module>xwiki-platform-uiextension</module>
     <module>xwiki-platform-url</module>

@@ -23,9 +23,14 @@ import java.io.File;
 import java.io.FileReader;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.*;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.xwiki.component.util.ReflectionUtils;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests for {@link AbstractDocumentMojo}.
@@ -34,6 +39,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class DocumentUpdateMojoTest
 {
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
     /**
      * Test that a document loaded in memory from XML by the mojo then written back to XML does not lose any
      * information/is not affected by the process
@@ -43,13 +51,13 @@ public class DocumentUpdateMojoTest
     {
         AttachMojo mojo = new AttachMojo();
 
-        File resourceFile = new File(this.getClass().getResource("/SampleWikiXMLDocument.input").toURI());
+        File resourceFile = new File(this.getClass().getResource("/Test/SampleWikiXMLDocument.input").toURI());
 
         String inputContent = IOUtils.toString(new FileReader(resourceFile));
-        Assert.assertTrue(inputContent.contains("<class>"));
+        assertTrue(inputContent.contains("<class>"));
 
         XWikiDocument doc = mojo.loadFromXML(resourceFile);
-        Assert.assertEquals(doc.getName(), "Install");
+        assertEquals(doc.getName(), "Install");
 
         File outputFile = File.createTempFile("output", "xml");
         mojo.writeToXML(doc, outputFile);
@@ -57,6 +65,30 @@ public class DocumentUpdateMojoTest
         String outputContent = IOUtils.toString(new FileReader(outputFile));
 
         // Check that we did not lose the class definition during the loading from XML/writing to XML process.
-        Assert.assertTrue(outputContent.contains("<class>"));
+        assertTrue(outputContent.contains("<class>"));
+    }
+
+    @Test
+    public void execute() throws Exception
+    {
+        AttachMojo mojo = new AttachMojo();
+
+        set(mojo, "author", "XWiki.mflorea");
+        set(mojo, "file", new File(this.getClass().getResource("/fileToAttach.txt").toURI()));
+        set(mojo, "files", new File[] {new File(this.getClass().getResource("/fileToAttach.js").toURI())});
+        set(mojo, "sourceDocument", new File(this.getClass().getResource("/Test/SampleWikiXMLDocument.input").toURI()));
+        set(mojo, "outputDirectory", this.tempFolder.getRoot());
+
+        mojo.execute();
+
+        File outputFile = new File(tempFolder.getRoot(), "Test/SampleWikiXMLDocument.input");
+        String outputContent = IOUtils.toString(new FileReader(outputFile));
+        assertTrue(outputContent.contains("<attachment>\n<filename>fileToAttach.txt</filename>"));
+        assertTrue(outputContent.contains("<attachment>\n<filename>fileToAttach.js</filename>"));
+    }
+
+    private void set(AttachMojo mojo, String fieldName, Object value) throws Exception
+    {
+        ReflectionUtils.setFieldValue(mojo, fieldName, value);
     }
 }

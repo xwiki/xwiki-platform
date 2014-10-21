@@ -53,7 +53,7 @@
 ##
 #if (!$xwiki.hasAccessLevel('admin', $xcontext.user, $prefsdocument))
   {{html clean="false"}}
-  #xwikimessageboxstart($services.localization.render('panelwizard.placemanager') $services.localization.render('panelwizard.notadmininplace', [$place]))
+  #xwikimessageboxstart($services.localization.render('panelwizard.placemanager') $services.localization.render('panelwizard.notadmininplace', [$escapetool.html($place)]))
   #xwikimessageboxend()
   {{/html}}
 #elseif ("$!request.xpage" == 'plain')

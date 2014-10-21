@@ -30,6 +30,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 
+import javax.inject.Provider;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -37,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -45,6 +48,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
@@ -126,6 +132,11 @@ public class Document extends Api
      * Used to convert user references to string.
      */
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+
+    /**
+     * Authorization manager used to check rights.
+     */
+    private ContextualAuthorizationManager authorizationManager;
 
     private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
     {
@@ -1972,14 +1983,16 @@ public class Document extends Api
     {
         if (object != null) {
             try {
-                BaseProperty bp = (BaseProperty) object.getBaseObject().safeget(fieldName);
                 PropertyClass p = (PropertyClass) object.getBaseObject().getXClass(getXWikiContext()).get(fieldName);
+                // Avoid dumping password hashes if the user does not have programming rights. This is done only at the
+                // API level, so that java code using core classes will still have access, regardless or rights.
                 if ("Password".equals(p.getClassType())) {
-                    if (!this.getXWikiContext().getWiki().getRightService()
-                        .hasProgrammingRights(this.getXWikiContext())) {
+                    if (!this.getAuthorizationManager().hasAccess(Right.PROGRAM)) {
                         return null;
                     }
                 }
+                BaseProperty bp = (BaseProperty) object.getBaseObject().safeget(fieldName);
+
                 return bp.getValue();
             } catch (NullPointerException e) {
                 return null;
@@ -2851,5 +2864,14 @@ public class Document extends Api
     public boolean isTranslation()
     {
         return 1 == this.getDoc().getTranslation();
+    }
+
+    private ContextualAuthorizationManager getAuthorizationManager()
+    {
+        if (this.authorizationManager == null) {
+            this.authorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
+        }
+
+        return this.authorizationManager;
     }
 }

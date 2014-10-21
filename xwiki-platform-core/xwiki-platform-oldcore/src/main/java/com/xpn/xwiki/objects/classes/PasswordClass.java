@@ -228,11 +228,38 @@ public class PasswordClass extends StringClass
         return password;
     }
 
+    /**
+     * @param password the password to hash.
+     * @return a string of the form "hash:&lt;algorithmName>:&lt;salt>:&lt;hexStrignHash>", where &lt;algorithmName> is
+     *         the default hashing algorithm (see {@link #DEFAULT_HASH_ALGORITHM}), &lt;salt> is a random 64 character
+     *         salt and &lt;hexStrignHash> is the salted hash of the given password, using the given hashing algorithm.
+     */
     public String getPasswordHash(String password)
     {
         return getPasswordHash(password, getHashAlgorithm(), null);
     }
 
+    /**
+     * @param password the password to hash.
+     * @param algorithmName the name of the hashing algorithm to use. See {@link MessageDigest#getInstance(String)}.
+     * @return a string of the form "hash:&lt;algorithmName>:&lt;salt>:&lt;hexStrignHash>", where &lt;salt> is a random
+     *         64 character salt and &lt;hexStrignHash> is the salted hash of the given password, using the given
+     *         hashing algorithm.
+     */
+    public String getPasswordHash(String password, String algorithmName)
+    {
+        return getPasswordHash(password, algorithmName, null);
+    }
+
+    /**
+     * @param password the password to hash.
+     * @param algorithmName the name of the hashing algorithm to use. See {@link MessageDigest#getInstance(String)}.
+     * @param salt the string to pad the password with before hashing. If {@code null}, a random 64 character salt will
+     *            be used. To disable salting, use an empty ({@code ""}) salt string.
+     * @return a string of the form "hash:&lt;algorithmName>:&lt;salt>:&lt;hexStrignHash>", where &lt;hexStrignHash> is
+     *         the salted hash of the given password, using the given hashing algorithm.
+     * @since 6.3M2
+     */
     public String getPasswordHash(String password, String algorithmName, String salt)
     {
         // If no salt given, let's generate one.

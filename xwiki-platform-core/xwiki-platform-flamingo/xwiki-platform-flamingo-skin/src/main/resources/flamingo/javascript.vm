@@ -101,7 +101,8 @@ require.config({
   #set($jsExtension = '.min.js')
 #end
     'jquery': '#removeJsSuffix($services.webjars.url("jquery/1.11.1/jquery${jsExtension}"))',
-    'bootstrap': '#removeJsSuffix($services.webjars.url("bootstrap/3.2.0/js/bootstrap${jsExtension}"))'
+    'bootstrap': '#removeJsSuffix($services.webjars.url("bootstrap/3.2.0/js/bootstrap${jsExtension}"))',
+    'xwiki-meta': '$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js')'
   },
   shim: {
     'bootstrap' : ['jquery']

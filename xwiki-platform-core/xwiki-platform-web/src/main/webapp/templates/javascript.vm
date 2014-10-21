@@ -93,7 +93,10 @@ require.config({
 #else
   #set($jsExtension = '.min.js')
 #end
-  paths: { 'jquery': '#removeJsSuffix($services.webjars.url("jquery/1.11.1/jquery${jsExtension}"))' },
+  paths: {
+    'jquery': '#removeJsSuffix($services.webjars.url("jquery/1.11.1/jquery${jsExtension}"))',
+    'xwiki-meta': '$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js')'
+  },
   map: {
     '*': { 'jquery': 'jQueryNoConflict' },
     'jQueryNoConflict': { 'jquery': 'jquery' }

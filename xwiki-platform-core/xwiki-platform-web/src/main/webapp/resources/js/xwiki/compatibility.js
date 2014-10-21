@@ -350,6 +350,11 @@ Object.extend(XWiki.constants, {
  * scripts that need these meta tags.
  */
 (function(){
+  // Maybe the meta tags already exist
+  if ($$("meta[name='document']").length > 0) {
+    return;
+  }
+  
   // Get the DOM elements we need
   var html = $$('html')[0];
   var head = $$('head')[0];

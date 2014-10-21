@@ -1277,9 +1277,9 @@ XWiki.Document = Class.create({
 /* Initialize the document URL factory, and create XWiki.currentDocument.
 TODO: use the new API to get the document meta data (see: http://jira.xwiki.org/browse/XWIKI-11225) */
 var htmlElement = $(document.documentElement);
-XWiki.Document.currentWiki = (htmlElement.readAttribute('data-xwiki-wiki').length > 0) ? htmlElement.readAttribute('data-xwiki-wiki') : (XWiki.currentWiki || "xwiki");
-XWiki.Document.currentSpace = (htmlElement.readAttribute('data-xwiki-space').length > 0) ? htmlElement.readAttribute('data-xwiki-space') : (XWiki.currentSpace || "Main");
-XWiki.Document.currentPage = (htmlElement.readAttribute('data-xwiki-page').length > 0) ? htmlElement.readAttribute('data-xwiki-page') : (XWiki.currentPage || "WebHome");
+XWiki.Document.currentWiki = htmlElement.readAttribute('data-xwiki-wiki') ? htmlElement.readAttribute('data-xwiki-wiki') : (XWiki.currentWiki || "xwiki");
+XWiki.Document.currentSpace = htmlElement.readAttribute('data-xwiki-space') ? htmlElement.readAttribute('data-xwiki-space') : (XWiki.currentSpace || "Main");
+XWiki.Document.currentPage = htmlElement.readAttribute('data-xwiki-page') ? htmlElement.readAttribute('data-xwiki-page') : (XWiki.currentPage || "WebHome");
 XWiki.Document.URLTemplate = "$xwiki.getURL('__space__.__page__', '__action__')";
 XWiki.Document.RestURLTemplate = "${request.contextPath}/rest/wikis/__wiki__/spaces/__space__/pages/__page__";
 XWiki.Document.WikiSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/search";

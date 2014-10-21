@@ -41,7 +41,7 @@
   <hidden>true</hidden>
   <content>{{include reference="XWiki.LiveTableResultsMacros" /}}
 
-{{velocity wiki="false""}}
+{{velocity wiki="false"}}
 #if($xcontext.action == 'get' &amp;&amp; "$!{request.outputSyntax}" == 'plain')
   $response.setContentType('application/json')
   #set($map = {})

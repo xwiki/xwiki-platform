@@ -176,7 +176,7 @@ public class PasswordClass extends StringClass
      */
     public String getSaltFromPassword(String password)
     {
-        String[] components = password.split(":");
+        String[] components = password.split(SEPARATOR);
         if (components.length == 4) {
             return components[2];
         } else {
@@ -266,17 +266,29 @@ public class PasswordClass extends StringClass
         if (salt == null) {
             salt = randomSalt();
         }
+
         try {
             LOGGER.debug("Hashing password");
-            MessageDigest hashAlgorithm = MessageDigest.getInstance(algorithmName);
+
             String saltedPassword = salt + password;
+
+            MessageDigest hashAlgorithm = MessageDigest.getInstance(algorithmName);
             hashAlgorithm.update(saltedPassword.getBytes());
             byte[] digest = hashAlgorithm.digest();
-            StringBuffer sb = new StringBuffer(HASH_IDENTIFIER + SEPARATOR + algorithmName + SEPARATOR);
+
+            // Build the result.
+            StringBuilder sb = new StringBuilder();
+            // Metadata
+            sb.append(HASH_IDENTIFIER);
+            sb.append(SEPARATOR);
+            sb.append(algorithmName);
+            sb.append(SEPARATOR);
             // Backward compatibility concern : let's keep unsalted password the way they are.
             if (!salt.equals("")) {
-                sb.append(salt + SEPARATOR);
+                sb.append(salt);
+                sb.append(SEPARATOR);
             }
+            // The actual password hash.
             for (int j = 0; j < digest.length; ++j) {
                 int b = digest[j] & 0xFF;
                 if (b < 0x10) {
@@ -284,9 +296,11 @@ public class PasswordClass extends StringClass
                 }
                 sb.append(Integer.toHexString(b));
             }
+
             return sb.toString();
         } catch (NoSuchAlgorithmException ex) {
-            LOGGER.error("Wrong hash algorithm [" + algorithmName + "] in [" + getXClassReference() + "]", ex);
+            LOGGER.error("Wrong hash algorithm [{}] specified in property [{}] of class [{}]", algorithmName,
+                getName(), getXClassReference(), ex);
         } catch (NullPointerException ex) {
             LOGGER.error("Error hashing password", ex);
         }
@@ -295,7 +309,7 @@ public class PasswordClass extends StringClass
 
     public static String randomSalt()
     {
-        String salt = "";
+        StringBuilder salt = new StringBuilder();
         SecureRandom random = new SecureRandom();
         byte bytes[] = new byte[32];
         random.nextBytes(bytes);
@@ -306,8 +320,8 @@ public class PasswordClass extends StringClass
                 s = "0" + s;
             }
             s = s.substring(s.length() - 2);
-            salt += s;
+            salt.append(s);
         }
-        return salt;
+        return salt.toString();
     }
 }

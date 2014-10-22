@@ -1,0 +1,127 @@
+###
+### Template used by the livetable macro to display documents when calling it from inside other templates. It is meant
+### as a light data source for the livetable macro when it can not rely on more feature-rich document sources like
+### XWiki.LivetableResults. It supports basic document listing, sorting and pagination.
+###
+$response.setContentType("application/json")
+##
+## WHERE
+##
+#set ($whereQueryPart = 'WHERE 1=1')
+#set ($queryParams = [])
+#if ("$!request.space" != '')
+  #set ($whereQueryPart = "${whereQueryPart} AND doc.space = ?")
+  #set ($discard = $queryParams.add($request.space))
+#end
+##
+## ORDER
+##
+#set ($order = "$!request.sort")
+#set ($orderQueryPart = '')
+#if ($order != '')
+  #set ($orderDirection = "$!{request.get('dir').toLowerCase()}")
+  #if ("$!orderDirection" != '' && "$!orderDirection" != 'asc')
+    #set($orderDirection = 'desc')
+  #end
+  ## Weird things happen if we use "ORDER BY" (upper case), at least on HSQLDB. Other DBs may behave differently
+  #set ($orderQueryPart = "order by ${order} ${orderDirection}")
+#end
+##
+## OFFSET and LIMIT
+##
+#set ($offset = $mathtool.toInteger($request.get('offset')))
+## offset starts from 0 in velocity and 1 in javascript
+#set ($offset = $offset - 1)
+#if (!$offset || $offset < 0)
+  #set($offset = 0)
+#end
+#set ($limit = $mathtool.toInteger($request.get('limit')))
+#if (!$limit)
+  #set ($limit = 15)
+#end
+##
+## Build the query
+##
+#set ($queryString = "$!{whereQueryPart} $!{orderQueryPart}")
+#set ($query = $services.query.hql($queryString))
+## Apply query filters if defined. Otherwise use default
+#foreach ($queryFilter in $stringtool.split($!request.queryFilters, ', '))
+  #set ($query = $query.addFilter($queryFilter))
+#end
+#set ($query = $query.setLimit($limit).setOffset($offset).bindValues($queryParams))
+#if ("$!request.wiki" != '')
+  #set ($query = $query.setWiki($request.wiki))
+#end
+##
+## Execute the query and build the results
+##
+#set ($items = $query.execute())
+#set ($map = {})
+#set ($discard = $map.put('totalrows', $query.count()))
+#set ($discard = $map.put('returnedrows', $mathtool.min($items.size(), $limit)))
+#set ($discard = $map.put('offset', $mathtool.add($offset, 1)))
+#set ($rows = [])
+#foreach ($item in $items)
+  ## Handle both the case where the "language" filter is used and thus languages are returned too and the case where
+  ## only the document name is returned. When more than the document name is returned the $item variable is a list
+  #if ($item.size())
+    ## Extract doc name and doc language from $item
+    #set ($docName = $item[0])
+    #set ($docLanguage = $item[1])
+  #else
+    #set ($docName = $item)
+    #set ($docLanguage = '')
+  #end
+  #set ($viewable = $xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${docName}"))
+  #set ($row = {'doc_viewable' : $viewable})
+  #if (!$viewable)
+    #set ($discard = $row.put('doc_fullName', "${xcontext.database}:${item}"))
+  #else
+    #set ($itemDoc = $xwiki.getDocument($docName))
+    ## Handle translations. We need to make sure we display the data associated to the correct document if the returned
+    ## result is a translation
+    #if ("$!docLanguage" != "" && $xwiki.getLanguagePreference() != $docLanguage)
+      #set ($translatedDoc = $itemDoc.getTranslatedDocument($docLanguage))
+      #set ($isTranslation = true)
+    #else
+      #set ($translatedDoc = $itemDoc.translatedDocument)
+      #set ($isTranslation = false)
+    #end
+    #set ($fullname = $services.model.serialize($itemDoc.documentReference, 'default'))
+    #if ($isTranslation)
+      ## Display the language after the document name so that not all translated documents have the same name displayed
+      #set ($discard = $row.put('doc_name', "$itemDoc.name ($docLanguage)"))
+    #else
+      #set ($discard = $row.put('doc_name', $itemDoc.name))
+    #end
+    #set ($discard = $row.put('doc_fullName', $fullname))
+    #set ($discard = $row.put('doc_space', $itemDoc.space))
+    #set ($discard = $row.put('doc_url', $xwiki.getURL($docName)))
+    #set ($discard = $row.put('doc_space_url', $xwiki.getURL($services.model.createDocumentReference($!itemDoc.wiki, $!itemDoc.space, 'WebHome'))))
+    #set ($discard = $row.put('doc_wiki', $itemDoc.wiki))
+    #set ($discard = $row.put('doc_wiki_url', $xwiki.getURL($services.model.resolveDocument('', 'default', $itemDoc.documentReference.extractReference('WIKI')))))
+    #set ($discard = $row.put('doc_hasadmin', $xwiki.hasAdminRights()))
+    #set ($discard = $row.put('doc_hasedit', $xwiki.hasAccessLevel('edit', $xcontext.user, $fullname)))
+    #set ($discard = $row.put('doc_hasdelete', $xwiki.hasAccessLevel('delete', $xcontext.user, $fullname)))
+    #set ($discard = $row.put('doc_hasrename', $row.doc_hasdelete))
+    #set ($row.doc_hasrights = $row.doc_hasedit && $isAdvancedUser)
+    #set ($discard = $row.put('doc_edit_url', $itemDoc.getURL($itemDoc.defaultEditMode)))
+    #set ($discard = $row.put('doc_copy_url', $itemDoc.getURL('view', 'xpage=copy')))
+    #set ($discard = $row.put('doc_delete_url', $itemDoc.getURL('delete')))
+    #set ($discard = $row.put('doc_rename_url', $itemDoc.getURL('view', 'xpage=rename&step=1')))
+    #set ($discard = $row.put('doc_rights_url', $itemDoc.getURL('edit', 'editor=rights')))
+    #set ($discard = $row.put('doc_author_url', $xwiki.getURL($translatedDoc.author)))
+    #set ($discard = $row.put('doc_date', $xwiki.formatDate($translatedDoc.date)))
+    #set ($discard = $row.put('doc_title', $translatedDoc.plainTitle))
+    #set ($discard = $row.put('doc_author', $xwiki.getUserName($translatedDoc.author, false)))
+    #set ($discard = $row.put('doc_creationDate', $xwiki.formatDate($translatedDoc.creationDate)))
+    #set ($discard = $row.put('doc_creator', $xwiki.getUserName($translatedDoc.creator, false)))
+    ## Ignore other columns
+  #end
+  #set ($discard = $rows.add($row))
+#end
+#set ($discard = $map.put('rows', $rows))
+##
+## Serialize the JSON
+##
+$jsontool.serialize($map)

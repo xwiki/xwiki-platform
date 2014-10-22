@@ -372,6 +372,9 @@ Object.extend(XWiki.constants, {
   addMetaTag('version',    'version');
   addMetaTag('restURL',    'resturl');
   addMetaTag('form_token', 'form-token');
+
+  // Add the language
+  head.insert(new Element('meta', {'name': 'language', 'content': html.readAttribute('lang')}));
 })();
 
 })();

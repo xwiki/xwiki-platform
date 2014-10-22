@@ -164,7 +164,8 @@ public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> 
         DocumentReference skinDocRef = documentReferenceResolver.resolve(skin, new WikiReference(currentWikiId));
         if (skinDocRef != null && xwiki.exists(skinDocRef, xcontext)) {
             // Skin class
-            DocumentReference skinClass = new DocumentReference(currentWikiId, "XWiki", "XWikiSkins");
+            DocumentReference skinClass = new DocumentReference(skinDocRef.getWikiReference().getName(),
+                    "XWiki", "XWikiSkins");
             // Verify that the document is a skin by checking if a skin object is attached or not
             try {
                 XWikiDocument skinDoc = xwiki.getDocument(skinDocRef, xcontext);

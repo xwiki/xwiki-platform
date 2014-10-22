@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Macros</web>
+  <name>Tree</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1413908566000</creationDate>
+  <parent>Macros.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1413983201000</date>
+  <contentUpdateDate>1413982794000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Tree Macro</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>== Static tree ==
+
+{{tree}}
+* [[Chapter 1&gt;&gt;Main.WebHome]]
+** Section 2.1
+** Section 2.2
+*** Paragraph 2.2.1
+**** Once upon a time...
+*** Paragraph 2.2.2
+* [[Chapter 2&gt;&gt;Sandbox.WebHome]]
+* [[Chapter 3&gt;&gt;http://www.xwiki.org]]
+** Section 3.1
+*** Paragraph 3.1.1
+** Section 3.2
+{{/tree}}
+
+=== Static tree with opened path ===
+
+{{tree}}
+{{velocity}}
+{{html}}
+&lt;ul&gt;
+  &lt;li class="jstree-open"&gt;
+    &lt;a href="$xwiki.getURL('Main.WebHome')"&gt;One&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li class="jstree-open"&gt;
+        &lt;a href="http://www.xwiki.org"&gt;Two&lt;/a&gt;
+        &lt;ul&gt;
+          &lt;li&gt;
+            &lt;a href="#section" class="jstree-clicked"&gt;Three&lt;/a&gt;
+          &lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+{{/html}}
+{{/velocity}}
+{{/tree}}
+
+=== Static tree with custom icons ===
+
+{{tree}}
+{{html}}
+&lt;ul&gt;
+  &lt;li data-jstree='{"opened":true,"selected":true}'&gt;Users
+    &lt;ul&gt;
+      &lt;li data-jstree='{"disabled":true}'&gt;Alice&lt;/li&gt;
+      &lt;li data-jstree='{"icon":"http://jstree.com/tree.png"}'&gt;Bob&lt;/li&gt;
+      &lt;li data-jstree='{"icon":"glyphicon glyphicon-leaf"}'&gt;Carol&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+{{/html}}
+{{/tree}}
+
+== Dynamic Tree ==
+
+{{tree source="XWiki.Treeview" /}}</content>
+  <object>
+    <name>Macros.Tree</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>cdf8656d-0058-4ea0-b42d-8ec9c27fae8c</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>/*
+#set ($jsTreeVersion = '3.0.4')
+#set ($platformVersion = '6.3-SNAPSHOT')
+*/
+require.config({
+  paths: {
+    jsTree: [
+      '//cdnjs.cloudflare.com/ajax/libs/jstree/$jsTreeVersion/jstree.min',
+      '$!services.webjars.url("jstree/$jsTreeVersion/jstree.min.js")'
+    ],
+    JobRunner: '$!services.webjars.url("xwiki-platform-job-web/$platformVersion/jobRunner.js")',
+    tree: '$!services.webjars.url("xwiki-platform-tree-widget/$platformVersion/tree.js")'
+  },
+  shim: {
+    jsTree: {
+      deps: ['jquery']
+    }
+  }
+});
+
+(function loadCss(urls) {
+  for (var i = 0; i &lt; urls.length; i++) {
+    var link = document.createElement("link");
+    link.type = "text/css";
+    link.rel = "stylesheet";
+    link.href = urls[i];
+    document.getElementsByTagName("head")[0].appendChild(link);
+  }
+})([
+  // FIXME: We don't load the jsTree CSS from the webjar because images used in the CSS are not loaded.
+  // See XWIKI-10881: Introduce a proper "webjars" type instead of reusing the "bin" type
+  //'$!services.webjars.url("jstree/$jsTreeVersion/themes/default/style.min.css")',
+  '//cdnjs.cloudflare.com/ajax/libs/jstree/$jsTreeVersion/themes/default/style.min.css',
+  '$!services.webjars.url("xwiki-platform-tree-widget/$platformVersion/tree.min.css")'
+]);
+
+require(['tree'], function($) {
+  $('.xtree').xtree();
+});</code>
+    </property>
+    <property>
+      <name>Require Configuration</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>Macros.Tree</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroClass</className>
+    <guid>b082a404-08fa-45e5-b6d0-abc5fcf6fc61</guid>
+    <class>
+      <name>XWiki.WikiMacroClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>9</number>
+        <prettyName>Macro code</prettyName>
+        <rows>20</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentDescription>
+        <disabled>0</disabled>
+        <name>contentDescription</name>
+        <number>8</number>
+        <prettyName>Content description (Not applicable for "No content" type)</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </contentDescription>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>7</number>
+        <prettyName>Macro content type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Optional|Mandatory|No content</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <defaultCategory>
+        <disabled>0</disabled>
+        <name>defaultCategory</name>
+        <number>4</number>
+        <prettyName>Default category</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultCategory>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>3</number>
+        <prettyName>Macro description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <id>
+        <disabled>0</disabled>
+        <name>id</name>
+        <number>1</number>
+        <prettyName>Macro id</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </id>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Macro name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <supportsInlineMode>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>supportsInlineMode</name>
+        <number>5</number>
+        <prettyName>Supports inline mode</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </supportsInlineMode>
+      <visibility>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>visibility</name>
+        <number>6</number>
+        <prettyName>Macro visibility</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator>|</separator>
+        <separators>|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>Current User|Current Wiki|Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </visibility>
+    </class>
+    <property>
+      <code>{{velocity output="false"}}
+#set ($discard = $xwiki.jsx.use($xcontext.macro.doc, {'minify': false}))
+#set ($attributes = ['class="xtree"'])
+#if ("$!xcontext.macro.params.source" != '')
+  #set ($sourceURL = $xwiki.getURL($xcontext.macro.params.source, 'get', 'outputSyntax=plain'))
+  #set ($discard = $attributes.add("data-url='$sourceURL'"))
+#end
+#set ($output = "(% $stringtool.join($attributes, ' ') %)((($!xcontext.macro.content)))")
+## Parse the output and return the resulting XDOM blocks.
+#set ($xcontext.macro.result = $services.rendering.parse($output, $xwiki.currentContentSyntaxId).children)
+{{/velocity}}</code>
+    </property>
+    <property>
+      <contentDescription>You can use nested HTML unordered lists to describe the tree structure. See http://www.jstree.com/docs/html/ for more information.</contentDescription>
+    </property>
+    <property>
+      <contentType>Optional</contentType>
+    </property>
+    <property>
+      <defaultCategory>Navigation</defaultCategory>
+    </property>
+    <property>
+      <description>Displays a tree hierarchy defined by the macro content or the source parameter.</description>
+    </property>
+    <property>
+      <id>tree</id>
+    </property>
+    <property>
+      <name>Tree</name>
+    </property>
+    <property>
+      <supportsInlineMode>0</supportsInlineMode>
+    </property>
+    <property>
+      <visibility>Current Wiki</visibility>
+    </property>
+  </object>
+  <object>
+    <name>Macros.Tree</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>ad91bfb1-7560-487e-963d-55dd6b786b59</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>The tree source is a wiki page that describes the tree structure and its context menu and which is called to perform the actions on the tree nodes.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>source</name>
+    </property>
+  </object>
+</xwikidoc>

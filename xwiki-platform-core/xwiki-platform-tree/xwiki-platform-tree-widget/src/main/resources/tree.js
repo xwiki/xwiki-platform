@@ -1,4 +1,4 @@
-require(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
+define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
   var formToken = $('meta[name=form_token]').attr('content');
 
   var getNodeTypes = function(nodes) {
@@ -276,6 +276,27 @@ require(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
     }
   };
 
+  var getDefaultParams = function(element) {
+    if (element.attr('data-url')) {
+      return {
+        core: {
+          data: getChildren,
+          check_callback: validateOperation
+        },
+        plugins: ['dnd', 'contextmenu'],
+        dnd: {
+          is_draggable: areDraggable
+        },
+        contextmenu: {
+          items: getContextMenuItems
+        }
+      };
+    } else {
+      // The tree structure is in-line.
+      return {};
+    }
+  };
+
   var customTreeAPI = {
     openTo: function(nodeId) {
       if (this.get_node(nodeId)) {
@@ -302,21 +323,7 @@ require(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
   };
 
   $.fn.xtree = function(params) {
-    params = $.extend(true, {
-      core: {
-        data: getChildren,
-        check_callback: validateOperation
-      },
-      plugins: ['dnd', 'contextmenu'],
-      dnd: {
-        is_draggable: areDraggable
-      },
-      contextmenu: {
-        items: getContextMenuItems
-      }
-    }, params || {});
-
-    return this.jstree(params).on('select_node.jstree', function(event, data) {
+    return this.on('select_node.jstree', function(event, data) {
       var tree = data.instance;
       var selectedNode = data.node;
       selectedNode.data && selectedNode.data.type == 'pagination' && addMoreChildren(tree, selectedNode);
@@ -482,11 +489,14 @@ require(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       }
 
     //
-    // Extend the API of the tree.
+    // Create the tree and extend its API.
     //
 
     }).each(function() {
+      $(this).jstree($.extend(true, getDefaultParams($(this)), params || {}))
       $.extend($.jstree.reference(this), customTreeAPI, {jobRunner: createJobRunner(this)});
     });
   };
+
+  return $;
 });

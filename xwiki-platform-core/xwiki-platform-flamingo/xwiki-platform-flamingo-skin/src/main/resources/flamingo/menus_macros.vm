@@ -7,7 +7,7 @@
 #set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
 #set ($isWikiAPIAvailable = ("$!services.wiki" != '' && "$!services.wiki.user" != ''))
 #set ($isMainWikiUser = ($mainWikiId == "$!{xcontext.userReference.wikiReference.name}"))
-
+#set ($isAdminAppInstalled = $xwiki.exists($services.model.createDocumentReference('', 'XWiki', 'AdminSheet')))
 ###
 ###    Toplevel Menu
 ###

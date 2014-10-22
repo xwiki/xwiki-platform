@@ -87,8 +87,8 @@
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $theme.headerBackgroundImage;
-  @xwiki-page-header-bg-position:       $theme.headerBackgroundPosition;
+  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
+  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
 #end
 
 ##############################################
@@ -178,8 +178,8 @@
   @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $theme.headerBackgroundImage;
-  @xwiki-page-header-bg-position:       $theme.headerBackgroundPosition;
+  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
+  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
 #end
 
 ##############################################
@@ -196,8 +196,8 @@
   @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
   @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $theme.headerBackgroundImage;
-  @xwiki-page-header-bg-position:       $theme.headerBackgroundPosition;
+  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
+  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
 #end
 
 ##############################################

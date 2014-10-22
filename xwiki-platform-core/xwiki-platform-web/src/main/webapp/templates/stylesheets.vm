@@ -9,7 +9,7 @@
 ## (see: http://jira.xwiki.org/browse/XWIKI-11190)
 #set ($discard = $urlParametersMap.put("skin", "$!xwiki.skin"))
 #if ($themeDoc)
-  #set ($discard = $urlParametersMap.put("colorTheme", "$!themeDocFullName"))
+  #set ($discard = $urlParametersMap.put("colorTheme", $services.model.serialize($themeDoc.getDocumentReference(), "default")))
 #end
 #set ($urlParameters = $escapetool.xml($escapetool.url($urlParametersMap)))
 #set ($defaultStyleURL = $xwiki.getSkinFile($defaultstyle, true))

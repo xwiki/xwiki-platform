@@ -1,7 +1,6 @@
 ##################################
 ##          SPACE MENU
 ##################################s
-#set ($isAdminAppInstalled = $xwiki.exists('XWiki.AdminSheet'))
 #set ($displaySpaceSubmenu = $hasWatch || $hasSpaceAdmin || $xwiki.exists('Main.SpaceIndex'))
 #xwikitopmenuseparator()
 #set($spaceURL = $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('SPACE'))))

@@ -2,29 +2,31 @@
 ##        LANGUAGE MENU
 ##################################
 #if ($displayLanguageChoice && $xwiki.isMultiLingual())
-  #set ($currentLanguage = $services.localization.currentLocale)
-  #set ($translations = [])
-  #set ($wikiSettingsLanguages = $!xwiki.getXWikiPreference('languages').trim().split('\s*[,| ]\s*'))
-  #if ($wikiSettingsLanguages.size() > 1 || "$!wikiSettingsLanguages.get(0)" != '')
-    #foreach ($lang in $doc.translationList)
-      #if ($wikiSettingsLanguages.contains($lang))
-        #set($discard = $translations.add({'code':$lang, 'name':"#displayLanguagePrettyName($lang)"}))
+  #set($currentLanguage = "$!{tdoc.realLanguage}")
+  #set($originalLanguage = "$!{doc.realLanguage}")
+  #if($currentLanguage != '')
+    #set ($availtrans = $doc.translationList)
+    #set ($discard = $availtrans.add($originalLanguage))
+    #set ($wikiSettingsLanguages = $!xwiki.getXWikiPreference('languages').trim().split('\s*[,| ]\s*'))
+    #set ($hasLanguagesSet = $wikiSettingsLanguages.size() > 1 || "$!wikiSettingsLanguages.get(0)" != '')
+    #set ($additionallangs = [])
+    #foreach($lang in $availtrans)
+      #if((!$hasLanguagesSet || $wikiSettingsLanguages.contains($lang)) && $currentLanguage != $lang)
+        #set ($discard = $additionallangs.add($lang))
       #end
     #end
-  #end
-  #if ($translations.size() == 0)
-    #xwikitopmenuentry($doc.getURL('view', "language=$currentLanguage"), "#displayLanguagePrettyName($currentLanguage)" 'tmLanguages')
-  #else
-    ## The sort may not be good for performances, but without it, it is unusable when there is a lot of translations
-    #set ($translations = $sorttool.sort($translations, 'name'))
-    #xwikitopmenuentrystart ($doc.getURL('view', "language=$currentLanguage"), "#displayLanguagePrettyName($currentLanguage)", 'tmLanguages', '', '', '')
-      #foreach ($lang in $translations)
-        #submenuitem ($doc.getURL('view', "language=$lang.code"), "$lang.name", '', '', '')
+    #if($additionallangs.size() > 0)
+      #xwikitopmenuentrystart ($doc.getURL('view', "language=$currentLanguage"), "#displayLanguagePrettyName($currentLanguage)", 'tmLanguages', '', '', '')
+      #foreach($lang in $additionallangs)
+        #submenuitem($!doc.getURL('view', "language=$lang"), "#displayLanguagePrettyName($lang)", '', '', '')
       #end
-    #xwikitopmenuentryend()
+      #xwikitopmenuentryend()
+    #else
+      #xwikitopmenuentry($!doc.getURL('view', "language=$currentLanguage"), "#displayLanguagePrettyName($currentLanguage)" 'tmLanguages')
+    #end
   #end
 #end
 ##########################################
 ## Display the pretty name of a language
 ##########################################
-#macro(displayLanguagePrettyName $language)$stringtool.capitalize($services.localization.toLocale($language).getDisplayName($currentLanguage))#end
+#macro(displayLanguagePrettyName $language)#set($languageLocale = $services.localization.toLocale($language))$stringtool.capitalize($languageLocale.getDisplayName($languageLocale))#end

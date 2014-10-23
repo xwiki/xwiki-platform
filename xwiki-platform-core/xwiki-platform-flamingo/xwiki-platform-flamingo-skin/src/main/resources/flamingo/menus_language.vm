@@ -15,14 +15,23 @@
         #set ($discard = $additionallangs.add($lang))
       #end
     #end
+    ## Get the query string as a map to preserve the values except the language (see: http://jira.xwiki.org/browse/XWIKI-11314)
+    #set($queryStringMap = {})
+    #set($parameterMap = $request.getParameterMap())
+    #foreach($param in $parameterMap.entrySet())
+      #set($discard = $queryStringMap.put($param.key, $param.value))
+    #end
     #if($additionallangs.size() > 0)
-      #xwikitopmenuentrystart ($doc.getURL('view', "language=$currentLanguage"), "#displayLanguagePrettyName($currentLanguage)", 'tmLanguages', '', '', '')
+      #set($discard = $queryStringMap.put('language', $currentLanguage))
+      #xwikitopmenuentrystart ($doc.getURL('view', $escapetool.url($queryStringMap)), "#displayLanguagePrettyName($currentLanguage)", 'tmLanguages', '', '', '')
       #foreach($lang in $additionallangs)
-        #submenuitem($!doc.getURL('view', "language=$lang"), "#displayLanguagePrettyName($lang)", '', '', '')
+        #set($discard = $queryStringMap.put('language', $lang))
+        #submenuitem($!doc.getURL('view', $escapetool.url($queryStringMap)), "#displayLanguagePrettyName($lang)", '', '', '')
       #end
       #xwikitopmenuentryend()
     #else
-      #xwikitopmenuentry($!doc.getURL('view', "language=$currentLanguage"), "#displayLanguagePrettyName($currentLanguage)" 'tmLanguages')
+      #set($discard = $queryStringMap.put('language', $currentLanguage))
+      #xwikitopmenuentry($!doc.getURL('view', $escapetool.url($queryStringMap)), "#displayLanguagePrettyName($currentLanguage)" 'tmLanguages')
     #end
   #end
 #end

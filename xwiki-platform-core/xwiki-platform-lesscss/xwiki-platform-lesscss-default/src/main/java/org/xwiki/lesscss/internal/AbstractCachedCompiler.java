@@ -27,14 +27,8 @@ import javax.inject.Provider;
 
 import org.xwiki.lesscss.LESSCache;
 import org.xwiki.lesscss.LESSCompilerException;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.WikiReference;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiRequest;
 
 /**
  * Implements a cache system to prevent the compiler to be called too often.
@@ -52,13 +46,7 @@ public abstract class AbstractCachedCompiler<T>
     protected Provider<XWikiContext> xcontextProvider;
 
     @Inject
-    protected WikiDescriptorManager wikiDescriptorManager;
-
-    @Inject
-    protected DocumentReferenceResolver<String> referenceResolver;
-
-    @Inject
-    protected EntityReferenceSerializer<String> referenceSerializer;
+    private CurrentColorThemeGetter currentColorThemeGetter;
 
     private Map<String, Object> mutexList = new HashMap<>();
 
@@ -88,29 +76,15 @@ public abstract class AbstractCachedCompiler<T>
     {
         T result;
 
-        // Get information about the context
-        String wikiId = wikiDescriptorManager.getCurrentWikiId();
-        XWikiContext context = xcontextProvider.get();
-        XWikiRequest request = context.getRequest();
+        String colorTheme = currentColorThemeGetter.getCurrentColorTheme("default");
 
-        // Getting the full name representation of colorTheme
-        DocumentReference colorThemeReference = referenceResolver.resolve(request.getParameter("colorTheme"),
-                new WikiReference(wikiId));
-        String colorTheme = referenceSerializer.serialize(colorThemeReference);
-
-        // Check that the color theme exists, to avoid a DOS if some user tries to compile a skin file
-        // with random colorTheme names
-        if (!context.getWiki().exists(colorThemeReference, context)) {
-            colorTheme = "default";
-        }
-
-        // Only one computation is allowed in the same time on a wiki, then the waiting threads will be able to use
-        // the last result stored in the cache
-        synchronized (getMutex(wikiId)) {
+        // Only one computation is allowed in the same time per color theme, then the waiting threads will be able to
+        // use the last result stored in the cache
+        synchronized (getMutex(colorTheme)) {
 
             // Check if the result is in the cache
             if (!force) {
-                result = cache.get(fileName, wikiId, skin, colorTheme);
+                result = cache.get(fileName, skin, colorTheme);
                 if (result != null) {
                     return result;
                 }
@@ -118,7 +92,7 @@ public abstract class AbstractCachedCompiler<T>
 
             // Either the result was in the cache or the force flag is set to true, we need to compile
             result = compile(fileName, skin, force);
-            cache.set(fileName, wikiId, skin, colorTheme, result);
+            cache.set(fileName, skin, colorTheme, result);
 
         }
 
@@ -127,12 +101,12 @@ public abstract class AbstractCachedCompiler<T>
 
     protected abstract T compile(String fileName, String skin, boolean force) throws LESSCompilerException;
 
-    private synchronized Object getMutex(String wikiId)
+    private synchronized Object getMutex(String colorThemeFullName)
     {
-        Object mutex = mutexList.get(wikiId);
+        Object mutex = mutexList.get(colorThemeFullName);
         if (mutex == null) {
             mutex = new Object();
-            mutexList.put(wikiId, mutex);
+            mutexList.put(colorThemeFullName, mutex);
         }
         return mutex;
     }

@@ -29,6 +29,11 @@ import javax.inject.Inject;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.lesscss.LESSCache;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Default and abstract implementation of {@link org.xwiki.lesscss.LESSCache}.
@@ -51,29 +56,62 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     protected Cache<T> cache;
 
     /**
-     * This map stores the list of the cached files keys corresponding to a wiki.
+     * This map stores the list of the cached files keys corresponding to a skin, in order to clear the corresponding
+     * cache when a skin is saved.
      */
-    private Map<String, List<String>> cachedFilesKeysMap = new HashMap<>();
+    private Map<String, List<String>> cachedFilesKeysMapPerSkin = new HashMap<>();
+
+    /**
+     * This map stores the list of the cached files keys corresponding to a color theme, in order to clear the
+     * corresponding cache when a color theme is saved.
+     */
+    private Map<String, List<String>> cachedFilesKeysMapPerColorTheme = new HashMap<>();
+
+    @Inject
+    private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
-    public T get(String fileName, String wikiId, String fileSystemSkin, String colorTheme)
+    public T get(String fileName, String fileSystemSkin, String colorTheme)
     {
-        return cache.get(getCacheKey(fileName, wikiId, fileSystemSkin, colorTheme));
+        return cache.get(getCacheKey(fileName, fileSystemSkin, getColorThemeFullName(colorTheme)));
     }
 
     @Override
-    public void set(String fileName, String wikiId, String fileSystemSkin, String colorTheme, T content)
+    public void set(String fileName, String fileSystemSkin, String colorTheme, T content)
     {
+        // Get the fullname of the color theme
+        String colorThemeFullName = getColorThemeFullName(colorTheme);
+
         // Store the content in the cache
-        String cacheKey = getCacheKey(fileName, wikiId, fileSystemSkin, colorTheme);
+        String cacheKey = getCacheKey(fileName, fileSystemSkin, colorThemeFullName);
         cache.set(cacheKey, content);
 
-        // Add the new key to cachedFilesKeysMap.
-        List<String> cachedFilesKeys = cachedFilesKeysMap.get(wikiId);
+        // Add the new key to maps
+        registerCacheKey(cachedFilesKeysMapPerSkin, cacheKey, fileSystemSkin);
+        registerCacheKey(cachedFilesKeysMapPerColorTheme, cacheKey, colorTheme);
+    }
+
+    /**
+     * Add the cache key in the specified map (cachedFilesKeysMapPerSkin or cachedFilesKeysMapPerColorTheme), to be
+     * able to clear the cache when one skin or one color theme is modified.
+     *
+     * @param cachedFilesKeysMap could be cachedFilesKeysMapPerSkin or cachedFilesKeysMapPerColorTheme
+     * @param cacheKey the cache key to register
+     * @param name name of the skin or of the color theme
+     */
+    private void registerCacheKey(Map<String, List<String>> cachedFilesKeysMap, String cacheKey, String name)
+    {
+        List<String> cachedFilesKeys = cachedFilesKeysMap.get(name);
         if (cachedFilesKeys == null) {
-            // if the list of cached files keys corresponding to the wiki does not exist, we create it
+            // if the list of cached files keys corresponding to the skin/colortheme name does not exist, we create it
             cachedFilesKeys = new ArrayList<>();
-            cachedFilesKeysMap.put(wikiId, cachedFilesKeys);
+            cachedFilesKeysMap.put(name, cachedFilesKeys);
         }
         if (!cachedFilesKeys.contains(cacheKey)) {
             cachedFilesKeys.add(cacheKey);
@@ -84,14 +122,14 @@ public abstract class AbstractCache<T> implements LESSCache<T>
     public void clear()
     {
         cache.removeAll();
-        cachedFilesKeysMap.clear();
+        cachedFilesKeysMapPerSkin.clear();
+        cachedFilesKeysMapPerColorTheme.clear();
     }
 
-    @Override
-    public void clear(String wikiId)
+    private void clearFromCriteria(Map<String, List<String>> cachedFilesKeysMap, String criteria)
     {
-        // Get the list of cached files keys corresponding to the wiki
-        List<String> cachedFilesKeys = cachedFilesKeysMap.get(wikiId);
+        // Get the list of cached files keys corresponding to the criteria
+        List<String> cachedFilesKeys = cachedFilesKeysMap.get(criteria);
         if (cachedFilesKeys == null) {
             return;
         }
@@ -99,13 +137,35 @@ public abstract class AbstractCache<T> implements LESSCache<T>
         for (String cachedFileKey : cachedFilesKeys) {
             cache.remove(cachedFileKey);
         }
-        // Remove the list of cached keys corresponding to the wiki
-        cachedFilesKeysMap.remove(wikiId);
+        // Remove the list of cached keys corresponding to the criteria
+        cachedFilesKeysMap.remove(criteria);
     }
 
-    private String getCacheKey(String fileName, String wikiId, String skin, String colorTheme)
+    @Override
+    public void clearFromFileSystemSkin(String fileSystemSkin)
     {
-        return wikiId.length() + wikiId + CACHE_KEY_SEPARATOR + skin.length() + skin + CACHE_KEY_SEPARATOR
-            + colorTheme.length() + colorTheme + CACHE_KEY_SEPARATOR + fileName.length() + fileName;
+        clearFromCriteria(cachedFilesKeysMapPerSkin, fileSystemSkin);
+    }
+
+    @Override
+    public void clearFromColorTheme(String colorTheme)
+    {
+        clearFromCriteria(cachedFilesKeysMapPerColorTheme, colorTheme);
+    }
+
+    private String getColorThemeFullName(String colorTheme)
+    {
+        // Current Wiki Reference
+        WikiReference currentWikiRef = new WikiReference(wikiDescriptorManager.getCurrentWikiId());
+        // Get the full reference of the color theme
+        DocumentReference colorThemeRef = documentReferenceResolver.resolve(colorTheme, currentWikiRef);
+        // Return the serialized reference
+        return entityReferenceSerializer.serialize(colorThemeRef);
+    }
+
+    private String getCacheKey(String fileName, String skin, String colorThemeFullName)
+    {
+        return skin.length() + skin + CACHE_KEY_SEPARATOR  + colorThemeFullName.length() + colorThemeFullName
+                + CACHE_KEY_SEPARATOR + fileName.length() + fileName;
     }
 }

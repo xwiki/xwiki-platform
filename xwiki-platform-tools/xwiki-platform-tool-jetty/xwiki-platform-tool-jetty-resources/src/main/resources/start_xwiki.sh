@@ -24,6 +24,9 @@
 # -----------------
 #   XWIKI_OPTS - parameters passed to the Java VM when running XWiki e.g. to increase the memory allocated to the
 #       JVM to 1GB, use set XWIKI_OPTS=-Xmx1024m
+#   JETTY_OPTS - optional parameters passed to Jetty's start.jar. For example to list the configuration that will
+#       execute, try setting it to "--list-config". See
+#       http://www.eclipse.org/jetty/documentation/9.2.3.v20140905/start-jar.html for more options.
 #   JETTY_PORT - the port on which to start Jetty.
 #   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command.
 # ----------------------------------------------------------------------------------------------------------------
@@ -129,23 +132,20 @@ mkdir -p $XWIKI_DATA_DIR 2>/dev/null
 # Ensure the logs directory exists as otherwise Jetty reports an error
 mkdir -p $XWIKI_DATA_DIR/logs 2>/dev/null
 
-# Specify port on which HTTP requests will be handled
-XWIKI_OPTS="$XWIKI_OPTS -Djetty.port=$JETTY_PORT"
-
 # Specify Jetty's home and base directories
 XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
-
-# Specify port and key to stop a running Jetty instance
-XWIKI_OPTS="$XWIKI_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOP_PORT"
 
 # Specify the encoding to use
 XWIKI_OPTS="$XWIKI_OPTS -Dfile.encoding=UTF8"
 
-# In order to avoid getting a "java.lang.IllegalStateException: Form too large" error when editing large page in
-# XWiki we need to tell Jetty to allow for large content since by default it only allows for 20K. We do this by
-# passing the org.eclipse.jetty.server.Request.maxFormContentSize property.
-# Note that setting this value too high can leave your server vulnerable to denial of service attacks.
-XWIKI_OPTS="$XWIKI_OPTS -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1000000"
+# Specify port on which HTTP requests will be handled
+JETTY_OPTS="$JETTY_OPTS jetty.port=$JETTY_PORT"
+# In order to print a nice friendly message to the user when Jetty has finished loading the XWiki webapp, we pass
+# the port we use as a System Property
+XWIKI_OPTS="$XWIKI_OPTS -Djetty.port=$JETTY_PORT"
+
+# Specify port and key to stop a running Jetty instance
+JETTY_OPTS="$JETTY_OPTS STOP.KEY=xwiki STOP.PORT=$JETTY_STOP_PORT"
 
 # We save the shell PID here because we do an exec below and exec will replace the shell with the executed command
 # and thus the java process PID will actually be the shell PID.
@@ -166,4 +166,4 @@ echo $XWIKI_PID > $XWIKI_LOCK_FILE
 
 # This replaces the shell with the java process without starting a new process. This must be the last line
 # of this script as anything after won't be executed.
-exec java $XWIKI_OPTS -jar ${JETTY_HOME}/start.jar --module=xwiki
+exec java $XWIKI_OPTS -jar ${JETTY_HOME}/start.jar --module=xwiki $JETTY_OPTS

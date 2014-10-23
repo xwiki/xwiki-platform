@@ -458,8 +458,13 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
 
     }).on('xtree.contextMenu.openLink', function(event, data) {
       var tree = $.jstree.reference(data.reference);
-      var node = tree.get_node(data.reference, true);
-      window.location = node.children('a.jstree-anchor').prop('href');
+      if (data.parameters.urlProperty) {
+        var node = tree.get_node(data.reference);
+        window.location = node.data[data.parameters.urlProperty];
+      } else {
+        var nodeElement = tree.get_node(data.reference, true);
+        window.location = nodeElement.children('a.jstree-anchor').prop('href');
+      }
 
     }).on('xtree.contextMenu.openLinkInNewTab', function(event, data) {
       var tree = $.jstree.reference(data.reference);

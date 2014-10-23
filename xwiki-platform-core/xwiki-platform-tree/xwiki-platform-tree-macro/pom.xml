@@ -66,7 +66,7 @@
     <dependency>
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-macro-html</artifactId>
-      <version>${commons.version}</version>
+      <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
     <!-- The rendering script service is used to render the macro content. -->

@@ -45,6 +45,13 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tree-macro</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
     <!-- The Velocity Macro is used in this application's wiki pages -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

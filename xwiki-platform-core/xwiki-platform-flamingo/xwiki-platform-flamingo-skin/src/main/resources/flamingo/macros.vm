@@ -1255,12 +1255,15 @@ ${Msz}Mb##
  * @param options the livetable options.
  *#
 #macro(livetable $divid $collist $colprops $options)
+## Open wiki syntax wrappers.
+#if("$!options.outputOnlyHtml" != 'true')
 ## Do not indent:
 #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0")
 
 
 {{html}}
 #else {pre} #end
+#end
   ##
   ## SX deps.
   ##
@@ -1535,9 +1538,12 @@ ${Msz}Mb##
    //]]>
   </script>
 </div> ## xwiki-livetable-container
-  #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
+  ## Close wiki syntax wrappers.
+  #if("$!options.outputOnlyHtml" != 'true')
+    #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
 
 #else {/pre} #end
+  #end
 #end
 
 #**

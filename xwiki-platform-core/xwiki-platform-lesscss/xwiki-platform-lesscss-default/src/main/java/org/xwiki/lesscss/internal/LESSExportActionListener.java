@@ -27,6 +27,7 @@ import javax.inject.Named;
 
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.lesscss.ColorThemeCache;
 import org.xwiki.lesscss.LESSSkinFileCache;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -47,6 +48,12 @@ public class LESSExportActionListener implements EventListener
 {
     @Inject
     private LESSSkinFileCache lessSkinFileCache;
+
+    @Inject
+    private ColorThemeCache colorThemeCache;
+
+    @Inject
+    private CurrentColorThemeGetter currentColorThemeGetter;
 
     @Override
     public String getName()
@@ -69,7 +76,9 @@ public class LESSExportActionListener implements EventListener
         XWikiRequest request = xcontext.getRequest();
         String format = request.get("format");
         if ("html".equals(format)) {
-            this.lessSkinFileCache.clear(xcontext.getWikiId());
+            String colorTheme = currentColorThemeGetter.getCurrentColorTheme("default");
+            this.lessSkinFileCache.clearFromColorTheme(colorTheme);
+            this.colorThemeCache.clearFromColorTheme(colorTheme);
         }
     }
 }

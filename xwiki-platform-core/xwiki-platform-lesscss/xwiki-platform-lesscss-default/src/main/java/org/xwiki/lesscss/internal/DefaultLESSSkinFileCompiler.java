@@ -42,6 +42,7 @@ import org.xwiki.lesscss.LESSSkinFileCompiler;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -69,6 +70,9 @@ public class DefaultLESSSkinFileCompiler extends AbstractCachedCompiler<String> 
 
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public void initialize() throws InitializationException

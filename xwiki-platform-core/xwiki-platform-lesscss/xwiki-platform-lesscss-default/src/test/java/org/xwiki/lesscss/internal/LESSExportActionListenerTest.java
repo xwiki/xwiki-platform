@@ -22,6 +22,7 @@ package org.xwiki.lesscss.internal;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.event.ActionExecutingEvent;
+import org.xwiki.lesscss.ColorThemeCache;
 import org.xwiki.lesscss.LESSSkinFileCache;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -64,12 +65,16 @@ public class LESSExportActionListenerTest
         when(xcontext.getRequest()).thenReturn(request);
         when(request.get("format")).thenReturn("html");
         when(xcontext.getWikiId()).thenReturn("wiki");
+        CurrentColorThemeGetter currentColorThemeGetter = this.mocker.getInstance(CurrentColorThemeGetter.class);
+        when(currentColorThemeGetter.getCurrentColorTheme("default")).thenReturn("colorTheme");
 
         this.mocker.getComponentUnderTest().onEvent(new ActionExecutingEvent("export"), null, xcontext);
 
         // The test is here: we verify that the clear API was called!
         LESSSkinFileCache cache = this.mocker.getInstance(LESSSkinFileCache.class);
-        verify(cache).clear("wiki");
+        ColorThemeCache cache2 = this.mocker.getInstance(ColorThemeCache.class);
+        verify(cache).clearFromColorTheme("colorTheme");
+        verify(cache2).clearFromColorTheme("colorTheme");
     }
 
     @Test
@@ -86,5 +91,7 @@ public class LESSExportActionListenerTest
         // Actually that the cache object was not called at all...
         LESSSkinFileCache cache = this.mocker.getInstance(LESSSkinFileCache.class);
         verifyZeroInteractions(cache);
+        CurrentColorThemeGetter currentColorThemeGetter = this.mocker.getInstance(CurrentColorThemeGetter.class);
+        verifyZeroInteractions(currentColorThemeGetter);
     }
 }

@@ -43,11 +43,7 @@
 #macro (handleTreeViewRequest)
   #if ($request.action)
     #if ($services.csrf.isTokenValid($request.form_token))
-      #if ($request.action == 'delete')
-        #deleteNode($request.id)
-      #else
-        $response.sendError(400, 'The specified action is not supported.')
-      #end
+      $response.sendError(400, 'The specified action is not supported.')
     #elseif ($isAjaxRequest)
       $response.sendError(403, 'The CSRF token is missing.')
     #else
@@ -68,19 +64,6 @@
     #else
       $response.sendError(404);
     #end
-  #end
-#end
-
-#macro (deleteNode $nodeId)
-  #set ($parts = $nodeId.split(':', 2))
-  #set ($nodeType = $parts[0])
-  #set ($nodeId = $parts[1])
-  #if ($nodeType == 'document')
-    #set ($documentReference = $services.model.resolveDocument($nodeId))
-    #set ($document = $xwiki.getDocument($documentReference))
-    #set ($discard = $document.delete())
-  #else
-    $response.sendError(400, 'The specified action is not supported.')
   #end
 #end
 
@@ -139,7 +122,8 @@
       'hasContextMenu': true,
       'canRename': $hasSpaceAdmin,
       'canDelete': $hasSpaceAdmin,
-      'createDocumentURL': $xwiki.getURL($spaceHomePageRef, 'create', $NULL)
+      'createDocumentURL': $xwiki.getURL($spaceHomePageRef, 'create', $NULL),
+      'deleteURL': $xwiki.getURL($spaceHomePageRef, 'deletespace', 'confirm=1')
     },
     'a_attr': {
       'href': $xwiki.getURL($spaceHomePageRef)
@@ -206,7 +190,8 @@
       'canDelete': $canDeleteDoc,
       'canMove': $canDeleteDoc,
       'canCopy': true,
-      'createDocumentURL': $xwiki.getURL($documentReference, 'create', $NULL)
+      'createDocumentURL': $docNode.getURL('create', $NULL),
+      'deleteURL': $docNode.getURL('delete', 'confirm=1')
     },
     'a_attr': {
       'href': $docNode.getURL()
@@ -354,7 +339,8 @@
       'canRename': $canEditDoc,
       'canDelete': $canEditDoc,
       'canMove': $canEditDoc,
-      'canCopy': true
+      'canCopy': true,
+      'deleteURL': $docNode.getAttachmentURL($attachment.filename, 'delattachment')
     },
     'a_attr': {
       'href': $docNode.getAttachmentURL($attachment.filename)
@@ -451,7 +437,7 @@
         'label': 'Delete',
         'icon': 'fa fa-trash-o',
         'parameters': {
-          'confirmationMessage': 'Are you sure you want to delete this space?'
+          'confirmationMessage': 'Are you sure you want to move ALL the documents from this space to the recycle bin? If there are hidden documents in this space they will also be deleted.'
         }
       }
     },
@@ -491,7 +477,7 @@
         'label': 'Delete',
         'icon': 'fa fa-trash-o',
         'parameters': {
-          'confirmationMessage': 'Are you sure you want to delete this page?'
+          'confirmationMessage': 'Are you sure you want to move this document to the recycle bin? All child documents will become orphan as a result.'
         }
       }
     },

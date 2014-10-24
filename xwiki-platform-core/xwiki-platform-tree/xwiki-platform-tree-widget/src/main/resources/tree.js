@@ -307,6 +307,14 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
         getPath.call(this, nodeId, openPath);
       }
     },
+    refreshNode: function(node) {
+      if (node === '#') {
+        // jsTree doesn't want to refresh the root node so we refresh the entire tree.
+        this.refresh();
+      } else {
+        this.refresh_node(node);
+      }
+    },
     execute: function(action, node, params) {
       var url = node.data && node.data[action + 'URL'];
       var params = params || {};
@@ -343,7 +351,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
         if (data.old != data.text) {
           disableNodeBeforeLoading(data.instance, data.node);
           moveEntity(data.instance, data.node).always(function() {
-            data.instance.refresh_node(data.node.parent);
+            data.instance.refreshNode(data.node.parent);
           });
         }
       } else {
@@ -351,7 +359,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
         disableNodeBeforeLoading(data.instance, data.node);
         createEntity(data.instance, data.node)
           .done(function() {
-            data.instance.refresh_node(data.node.parent);
+            data.instance.refreshNode(data.node.parent);
           })
           .fail(function() {
             data.instance.delete_node(data.node);
@@ -362,7 +370,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       // Make sure the deleted tree node has an associated entity.
       var entityId = data.node.data && data.node.data.id;
       entityId && deleteEntity(data.instance, data.node).fail(function() {
-        data.instance.refresh_node(data.parent);
+        data.instance.refreshNode(data.parent);
       });
 
     }).on('move_node.jstree', function(event, data) {
@@ -374,7 +382,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       disableNodeBeforeLoading(data.instance, data.node);
       moveEntity(data.instance, data.node)
         .done(function() {
-          data.instance.refresh_node(data.parent);
+          data.instance.refreshNode(data.parent);
         })
         .fail(function(response) {
           // Undo the move.
@@ -400,7 +408,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       delete data.node.data.id;
       copyEntity(data.instance, data.original, data.parent)
         .done(function() {
-          data.instance.refresh_node(data.parent);
+          data.instance.refreshNode(data.parent);
         })
         .fail(function(response) {
           // Undo the copy.
@@ -414,7 +422,7 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
     }).on('xtree.contextMenu.refresh', function(event, data) {
       var tree = $.jstree.reference(data.reference);
       var node = tree.get_node(data.reference);
-      tree.refresh_node(node);
+      tree.refreshNode(node);
 
     }).on('xtree.contextMenu.create', function(event, data) {
       var tree = $.jstree.reference(data.reference);

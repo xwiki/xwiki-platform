@@ -22,8 +22,11 @@ package org.xwiki.test.ui.po.editor;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NotFoundException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -40,6 +43,11 @@ public class DatePicker extends BaseElement
      */
     @FindBy(className = "calendar_date_select")
     private WebElement container;
+
+    public DatePicker()
+    {
+        this.waitToLoad();
+    }
 
     /**
      * Selects the specified year.
@@ -162,5 +170,29 @@ public class DatePicker extends BaseElement
     public boolean hasHourSelector()
     {
         return getUtil().findElementsWithoutWaiting(getDriver(), container, By.className("hour")).size() > 0;
+    }
+
+    /**
+     * Waits for the DatePicker popup to load.
+     * 
+     * @since 6.3M2
+     */
+    public DatePicker waitToLoad()
+    {
+        getUtil().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                try {
+                    // Since container is a proxy WebElement, any method on it would call findElement internally. We
+                    // chose isDisplayed since it is the most self-describing, even if it's practically useless.
+                    return container.isDisplayed();
+                } catch (NotFoundException e) {
+                    return false;
+                }
+            }
+        });
+        return this;
     }
 }

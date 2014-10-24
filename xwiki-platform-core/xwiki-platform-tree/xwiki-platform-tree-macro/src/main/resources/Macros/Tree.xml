@@ -97,7 +97,11 @@
 
 == Dynamic Tree ==
 
-{{tree source="XWiki.Treeview" /}}</content>
+{{tree source="XWiki.Treeview" /}}
+
+=== Dynamic Sub-tree ===
+
+{{tree source="XWiki.Treeview" root="document:xwiki:Sandbox.WebHome" /}}</content>
   <object>
     <name>Macros.Tree</name>
     <number>0</number>
@@ -349,6 +353,7 @@ require(['tree'], function($) {
 #if ("$!xcontext.macro.params.source" != '')
   #set ($sourceURL = $xwiki.getURL($xcontext.macro.params.source, 'get', 'outputSyntax=plain'))
   #set ($discard = $attributes.add("data-url='$sourceURL'"))
+  #set ($discard = $attributes.add("data-root='$!escapetool.xml($xcontext.macro.params.root)'"))
 #end
 #set ($output = "(% $stringtool.join($attributes, ' ') %)((($!xcontext.macro.content)))")
 ## Parse the output and return the resulting XDOM blocks.
@@ -444,6 +449,72 @@ require(['tree'], function($) {
     </property>
     <property>
       <name>source</name>
+    </property>
+  </object>
+  <object>
+    <name>Macros.Tree</name>
+    <number>1</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>179e3bf8-9d82-4fd0-8e2c-9a9aad3c3f91</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>The root node id. This is useful if you want to display only the descendants of a given node (which is the specified root). The tree displays the children of the root node on the first level, so the root node is not actually displayed. The entire tree is displayed if the root node is not specified.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>root</name>
     </property>
   </object>
 </xwikidoc>

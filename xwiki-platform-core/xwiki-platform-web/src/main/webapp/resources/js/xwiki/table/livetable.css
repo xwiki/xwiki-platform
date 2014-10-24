@@ -199,12 +199,12 @@ tbody.xwiki-livetable-display-body td.linkeditor, tbody.xwiki-livetable-display-
   cursor: pointer;
 }
 tbody.xwiki-livetable-display-body td:hover.linkeditor {
-  background: $theme.highlightColor url("$xwiki.getSkinFile('pencil.gif')") no-repeat scroll right center;
+  background: $theme.highlightColor url("$xwiki.getSkinFile('icons/silk/pencil.png')") no-repeat scroll right center;
   cursor: pointer;
 }
 tbody.xwiki-livetable-display-body td.linkeditor a.editableCellHover { /* for IE6 td:hover fix and because IE6 doesn't support multiple class td.linkeditor.editableCellHover*/
   display: block;
-  background: $theme.highlightColor url("$xwiki.getSkinFile('pencil.gif')") no-repeat scroll right center;
+  background: $theme.highlightColor url("$xwiki.getSkinFile('icons/silk/pencil.png')") no-repeat scroll right center;
   cursor: pointer;
   color: $theme.textColor;
   padding-right: 16px;
@@ -226,7 +226,6 @@ tbody.xwiki-livetable-display-body td a.action {
   background-repeat: no-repeat;
   margin-right: 5px;
   padding-bottom: 1px;
-  text-transform: capitalize;
 }
 tbody.xwiki-livetable-display-body td a.action:hover {
   text-decoration: underline;

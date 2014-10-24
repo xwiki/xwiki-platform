@@ -1387,7 +1387,7 @@ XWiki.Annotation = Class.create({
       this.addEditListener(editButton, annotationId, container, inBubble);
     }
     // Annotations can have a reply button when they are merged with comments (and thus stored as comments). Custom annotations will not have this button displayed.
-    var replyButton = container.down('a.commentreply');
+    var replyButton = container.down('a.reply');
     if (replyButton) {
       // When a click is done on this button, fire a click on the corresponding button in the comments tab.
 

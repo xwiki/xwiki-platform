@@ -39,13 +39,13 @@ if not "%JAVA_HOME%" == "" (
   if "%JAVA_PATH%"=="" set JAVA_PATH=java
 )
 
-REM Specify port and key to stop a running Jetty instance
-set XWIKI_OPTS=-DSTOP.KEY=xwiki -DSTOP.PORT=%JETTY_STOP_PORT%
-
 REM Specify Jetty's home and base directories
 set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.home=%JETTY_HOME% -Djetty.base=%JETTY_BASE%
 
-"%JAVA_PATH%" %XWIKI_OPTS% -jar %JETTY_HOME%/start.jar --stop
+REM Specify port and key to stop a running Jetty instance
+set JETTY_OPTS=%JETTY_OPTS% STOP.KEY=xwiki STOP.PORT=%JETTY_STOP_PORT%
+
+"%JAVA_PATH%" %XWIKI_OPTS% -jar %JETTY_HOME%/start.jar --stop %JETTY_OPTS%
 
 REM Pause so that the command window used to run this script doesn't close automatically in case of problem
 REM (like when the JDK/JRE is not installed)

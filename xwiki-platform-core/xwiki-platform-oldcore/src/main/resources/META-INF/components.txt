@@ -48,6 +48,7 @@ com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter
 com.xpn.xwiki.internal.template.SUExecutor
+com.xpn.xwiki.internal.template.TemplateMacro
 com.xpn.xwiki.internal.template.TemplateScriptService
 com.xpn.xwiki.internal.template.TemplateManager
 500:com.xpn.xwiki.internal.observation.remote.converter.FilteredSerializableEventConverter

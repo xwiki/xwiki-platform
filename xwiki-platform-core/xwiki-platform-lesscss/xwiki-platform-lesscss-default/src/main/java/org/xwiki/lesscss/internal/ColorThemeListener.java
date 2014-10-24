@@ -32,7 +32,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.lesscss.ColorThemeCache;
 import org.xwiki.lesscss.LESSSkinFileCache;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
@@ -41,15 +41,15 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Listener that clears the cache of compiled LESS Skin file when a skin or a color theme is changed.
+ * Listener that clears the cache of compiled LESS Skin file when a color theme is changed.
  *
- * @since 6.1M2
+ * @since 6.3M2
  * @version $Id$
  */
 @Component
-@Named("lessSkinColorTheme")
+@Named("lessColorTheme")
 @Singleton
-public class SkinAndColorThemeListener implements EventListener
+public class ColorThemeListener implements EventListener
 {
     private static final LocalDocumentReference COLOR_THEME_CLASS =
             new LocalDocumentReference("ColorThemes", "ColorThemeClass");
@@ -57,13 +57,14 @@ public class SkinAndColorThemeListener implements EventListener
     private static final LocalDocumentReference FLAMINGO_THEME_CLASS =
             new LocalDocumentReference("FlamingoThemesCode", "ThemeClass");
 
-    private static final LocalDocumentReference SKIN_CLASS = new LocalDocumentReference("XWiki", "XWikiSkins");
-
     @Inject
     private LESSSkinFileCache lessSkinFileCache;
 
     @Inject
     private ColorThemeCache colorThemeCache;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Override
     public String getName()
@@ -87,29 +88,21 @@ public class SkinAndColorThemeListener implements EventListener
 
         List<BaseObject> flamingoThemeObjects = document.getXObjects(FLAMINGO_THEME_CLASS);
         if (flamingoThemeObjects != null && !flamingoThemeObjects.isEmpty()) {
-            clearCache(document);
+            clearCacheFromColorTheme(document);
             return;
         }
 
         List<BaseObject> colorThemeObjects = document.getXObjects(COLOR_THEME_CLASS);
         if (colorThemeObjects != null && !colorThemeObjects.isEmpty()) {
-            clearCache(document);
+            clearCacheFromColorTheme(document);
             return;
-        }
-
-        List<BaseObject> skinObjects = document.getXObjects(SKIN_CLASS);
-        if (skinObjects != null && !skinObjects.isEmpty()) {
-            clearCache(document);
         }
     }
 
-    private void clearCache(XWikiDocument document)
+    private void clearCacheFromColorTheme(XWikiDocument document)
     {
-        DocumentReference documentReference = document.getDocumentReference();
-
-        // Clear the cache for the specified wiki and color theme
-        String wiki = documentReference.getWikiReference().getName();
-        lessSkinFileCache.clear(wiki);
-        colorThemeCache.clear(wiki);
+        String fullName = entityReferenceSerializer.serialize(document.getDocumentReference());
+        lessSkinFileCache.clearFromColorTheme(fullName);
+        colorThemeCache.clearFromColorTheme(fullName);
     }
 }

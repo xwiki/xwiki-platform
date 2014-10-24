@@ -34,7 +34,6 @@ import org.xwiki.lesscss.LESSCompilerException;
 import org.xwiki.lesscss.LESSSkinFileCache;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
@@ -45,7 +44,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiEngineContext;
-import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -77,26 +75,25 @@ public class DefaultLESSSkinFileCompilerTest
 
     private Provider<XWikiContext> xcontextProvider;
 
+    private CurrentColorThemeGetter currentColorThemeGetter;
+
+    private DocumentReferenceResolver<String> referenceResolver;
+
     private XWikiContext xcontext;
 
     private XWiki xwiki;
 
     private XWikiEngineContext engineContext;
 
-    private DocumentReferenceResolver<String> referenceResolver;
-
-    private EntityReferenceSerializer<String> referenceSerializer;
-
     @Before
     public void setUp() throws Exception
     {
         lessCompiler = mocker.getInstance(LESSCompiler.class);
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        referenceResolver = mocker.getInstance(new DefaultParameterizedType(null, DocumentReferenceResolver.class,
-                        String.class));
-        referenceSerializer = mocker.getInstance(new DefaultParameterizedType(null, EntityReferenceSerializer.class,
-                String.class));        
         cache = mocker.getInstance(LESSSkinFileCache.class);
+        currentColorThemeGetter = mocker.getInstance(CurrentColorThemeGetter.class);
+        referenceResolver = mocker.getInstance(new DefaultParameterizedType(null, DocumentReferenceResolver.class,
+                String.class));
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
         xcontext = mock(XWikiContext.class);
         when(xcontextProvider.get()).thenReturn(xcontext);
@@ -104,16 +101,12 @@ public class DefaultLESSSkinFileCompilerTest
         when(xcontext.getWiki()).thenReturn(xwiki);
         engineContext = mock(XWikiEngineContext.class);
         when(xwiki.getEngineContext()).thenReturn(engineContext);
-        XWikiRequest request = mock(XWikiRequest.class);
-        when(xcontext.getRequest()).thenReturn(request);
-        when(request.getParameter("colorTheme")).thenReturn("myColorTheme");
+
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
         when(xwiki.getSkin(xcontext)).thenReturn("skin");
-        DocumentReference colorThemeReference = new DocumentReference("wikiId", "XWiki", "MyColorTheme");
-        WikiReference mainWikiReference = new WikiReference("wikiId");
-        when(referenceResolver.resolve(eq("myColorTheme"), eq(mainWikiReference))).thenReturn(colorThemeReference);
-        when(referenceSerializer.serialize(colorThemeReference)).thenReturn("wikiId:ColorTheme.MyColorTheme");
-        when(xwiki.exists(colorThemeReference, xcontext)).thenReturn(true);
+
+        when(currentColorThemeGetter.getCurrentColorTheme("default")).thenReturn("wikiId:ColorTheme.MyColorTheme");
+
     }
 
     private void prepareMocksForCompilation() throws Exception
@@ -158,8 +151,8 @@ public class DefaultLESSSkinFileCompilerTest
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", false));
 
         // Verify
-        verify(cache).get(eq("style2.less"), eq("wikiId"), eq("skin"), eq("wikiId:ColorTheme.MyColorTheme"));
-        verify(cache).set(eq("style2.less"), eq("wikiId"), eq("skin"), eq("wikiId:ColorTheme.MyColorTheme"),
+        verify(cache).get(eq("style2.less"), eq("skin"), eq("wikiId:ColorTheme.MyColorTheme"));
+        verify(cache).set(eq("style2.less"), eq("skin"), eq("wikiId:ColorTheme.MyColorTheme"),
                 eq("OUTPUT"));
     }
 
@@ -167,7 +160,7 @@ public class DefaultLESSSkinFileCompilerTest
     public void compileSkinFileWhenInCache() throws Exception
     {
         // Mock
-        when(cache.get("style2.less", "wikiId", "skin", "wikiId:ColorTheme.MyColorTheme")).thenReturn("OUTPUT");
+        when(cache.get("style2.less", "skin", "wikiId:ColorTheme.MyColorTheme")).thenReturn("OUTPUT");
 
         // Test
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", false));
@@ -181,32 +174,14 @@ public class DefaultLESSSkinFileCompilerTest
     public void compileSkinFileWhenInCacheButForce() throws Exception
     {
         // Mock
-        when(cache.get("style2.less", "wikiId", "skin", "wikiId:ColorTheme.MyColorTheme")).thenReturn("OLD OUTPUT");
+        when(cache.get("style2.less", "skin", "wikiId:ColorTheme.MyColorTheme")).thenReturn("OLD OUTPUT");
         prepareMocksForCompilation();
 
         // Test
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", true));
 
         // Verify
-        verify(cache).set(eq("style2.less"), eq("wikiId"), eq("skin"), eq("wikiId:ColorTheme.MyColorTheme"),
-                eq("OUTPUT"));
-    }
-
-    @Test
-    public void compileSkinFileWhenColorThemeDoesNotExist() throws Exception
-    {
-        // Mock
-        when(cache.get("style2.less", "wikiId", "skin", "default")).thenReturn("DEFAULT COLOR THEME");
-        DocumentReference colorThemeReference = new DocumentReference("wikiId", "XWiki", "invalidColorTheme");
-        when(referenceResolver.resolve("invalidColorTheme")).thenReturn(colorThemeReference);
-        when(xwiki.exists(colorThemeReference, xcontext)).thenReturn(false);
-        prepareMocksForCompilation();
-        XWikiRequest request = mock(XWikiRequest.class);
-        when(xcontext.getRequest()).thenReturn(request);
-        when(request.getParameter("colorTheme")).thenReturn("invalidColorTheme");
-
-        // Test
-        assertEquals("DEFAULT COLOR THEME", mocker.getComponentUnderTest().compileSkinFile("style2.less", false));
+        verify(cache).set(eq("style2.less"), eq("skin"), eq("wikiId:ColorTheme.MyColorTheme"), eq("OUTPUT"));
     }
 
     @Test
@@ -254,10 +229,9 @@ public class DefaultLESSSkinFileCompilerTest
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", false));
 
         // Verify
-        verify(cache).get(eq("style2.less"), eq("wikiId"), eq("XWiki.DefaultSkin"),
-                eq("wikiId:ColorTheme.MyColorTheme"));
-        verify(cache).set(eq("style2.less"), eq("wikiId"), eq("XWiki.DefaultSkin"),
-                eq("wikiId:ColorTheme.MyColorTheme"), eq("OUTPUT"));
+        verify(cache).get(eq("style2.less"), eq("XWiki.DefaultSkin"), eq("wikiId:ColorTheme.MyColorTheme"));
+        verify(cache).set(eq("style2.less"), eq("XWiki.DefaultSkin"), eq("wikiId:ColorTheme.MyColorTheme"),
+                eq("OUTPUT"));
         verify(xcontext, never()).put(anyString(), anyString());
     }
 
@@ -377,9 +351,8 @@ public class DefaultLESSSkinFileCompilerTest
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", false));
 
         // Verify
-        verify(cache).get(eq("style2.less"), eq("wikiId"), eq("flamingo"), eq("wikiId:ColorTheme.MyColorTheme"));
-        verify(cache).set(eq("style2.less"), eq("wikiId"), eq("flamingo"), eq("wikiId:ColorTheme.MyColorTheme"),
-            eq("OUTPUT"));
+        verify(cache).get(eq("style2.less"), eq("flamingo"), eq("wikiId:ColorTheme.MyColorTheme"));
+        verify(cache).set(eq("style2.less"), eq("flamingo"), eq("wikiId:ColorTheme.MyColorTheme"), eq("OUTPUT"));
         verify(xcontext, never()).put(anyString(), anyString());
     }
 
@@ -390,12 +363,8 @@ public class DefaultLESSSkinFileCompilerTest
         prepareMocksForCompilation();
         when(xwiki.getSkin(xcontext)).thenReturn("XWiki.DefaultSkin");
         WikiReference currentWikiReference = new WikiReference("wikiId");
-        DocumentReference colorThemeRef = new DocumentReference("wikiId", "ColorTheme", "MyColorTheme");
-        when(referenceResolver.resolve(eq("myColorTheme"), eq(currentWikiReference))).thenReturn(colorThemeRef);
-        when(referenceSerializer.serialize(colorThemeRef)).thenReturn("wikiId:ColorTheme.MyColorTheme");
-        when(xwiki.exists(colorThemeRef, xcontext)).thenReturn(true);
 
-        when(cache.get(eq("style.less"), eq("wikiId"), eq("XWiki.DefaultSkin"), eq("wikiId:ColorTheme.MyColorTheme"))).
+        when(cache.get(eq("style.less"), eq("XWiki.DefaultSkin"), eq("wikiId:ColorTheme.MyColorTheme"))).
                 thenReturn("SUBWIKI OUTPUT");
 
         // Test
@@ -407,11 +376,6 @@ public class DefaultLESSSkinFileCompilerTest
     {
         // Mocks
         prepareMocksForCompilationOnFlamingo();
-        WikiReference currentWikiReference = new WikiReference("wikiId");
-        DocumentReference colorThemeRef = new DocumentReference("wikiId", "ColorTheme", "MyColorTheme");
-        when(referenceResolver.resolve(eq("myColorTheme"), eq(currentWikiReference))).thenReturn(colorThemeRef);
-        when(referenceSerializer.serialize(colorThemeRef)).thenReturn("wikiId:ColorTheme.MyColorTheme");
-        when(xwiki.exists(colorThemeRef, xcontext)).thenReturn(true);
 
         // Test
         assertEquals("OUTPUT", mocker.getComponentUnderTest().compileSkinFile("style2.less", "flamingo", false));
@@ -426,11 +390,6 @@ public class DefaultLESSSkinFileCompilerTest
     {
         // Mocks
         prepareMocksForCompilationOnFlamingo();
-        WikiReference currentWikiReference = new WikiReference("wikiId");
-        DocumentReference colorThemeRef = new DocumentReference("wikiId", "ColorTheme", "MyColorTheme");
-        when(referenceResolver.resolve(eq("myColorTheme"), eq(currentWikiReference))).thenReturn(colorThemeRef);
-        when(referenceSerializer.serialize(colorThemeRef)).thenReturn("wikiId:ColorTheme.MyColorTheme");
-        when(xwiki.exists(colorThemeRef, xcontext)).thenReturn(true);
 
         Exception exception = new LESSCompilerException("Exception with LESS", null);
         when(lessCompiler.compile(anyString(), any(Path[].class))).thenThrow(exception);
@@ -453,12 +412,6 @@ public class DefaultLESSSkinFileCompilerTest
     public void compileSkinFileWhenDirectoryDoesNotExist() throws Exception
     {
         when(engineContext.getRealPath("/skins/flamingo/less")).thenReturn("ighgzuheubigvugvbzekvbzekvuzkkkhguiiiii");
-
-        WikiReference currentWikiReference = new WikiReference("wikiId");
-        DocumentReference colorThemeRef = new DocumentReference("wikiId", "ColorTheme", "MyColorTheme");
-        when(referenceResolver.resolve(eq("myColorTheme"), eq(currentWikiReference))).thenReturn(colorThemeRef);
-        when(referenceSerializer.serialize(colorThemeRef)).thenReturn("wikiId:ColorTheme.MyColorTheme");
-        when(xwiki.exists(colorThemeRef, xcontext)).thenReturn(true);
 
         // Test
         Exception exceptionCaught = null;
@@ -503,11 +456,6 @@ public class DefaultLESSSkinFileCompilerTest
         // Mocks
         prepareMocksForCompilation();
         when(xwiki.getSkin(xcontext)).thenReturn("mainWiki:XWiki.DefaultSkin");
-        WikiReference currentWikiReference = new WikiReference("wikiId");
-        DocumentReference colorThemeRef = new DocumentReference("wikiId", "ColorTheme", "MyColorTheme");
-        when(referenceResolver.resolve(eq("myColorTheme"), eq(currentWikiReference))).thenReturn(colorThemeRef);
-        when(referenceSerializer.serialize(colorThemeRef)).thenReturn("wikiId:ColorTheme.MyColorTheme");
-        when(xwiki.exists(colorThemeRef, xcontext)).thenReturn(true);
 
         DocumentReference skinDocRef = new DocumentReference("mainWiki", "XWiki", "DefaultSkin");
         when(referenceResolver.resolve(eq("mainWiki:XWiki.DefaultSkin"), any(WikiReference.class)))

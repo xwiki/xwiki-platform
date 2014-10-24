@@ -32,23 +32,25 @@ public interface LESSCache<T>
     /**
      * Get an object from the name of the LESS source, the wiki ID, the skin and the name of the color theme.
      * @param fileName name of the LESS source
-     * @param wikiId id of the wiki
      * @param skin name of the skin
      * @param colorTheme name of the color theme
      * @return the corresponding CSS
+     *
+     * @since 6.3M2
      */
-    T get(String fileName, String wikiId, String skin, String colorTheme);
+    T get(String fileName, String skin, String colorTheme);
 
     /**
      * Add an object in the cache.
      *
      * @param fileName name of the LESS source
-     * @param wikiId if of the wiki
      * @param fileSystemSkin name of the skin
      * @param colorThemeName name of the color theme
      * @param object the object to cache
+     *
+     * @since 6.3M2
      */
-    void set(String fileName, String wikiId, String fileSystemSkin, String colorThemeName, T object);
+    void set(String fileName, String fileSystemSkin, String colorThemeName, T object);
 
     /**
      * Clear the cache.
@@ -56,9 +58,20 @@ public interface LESSCache<T>
     void clear();
 
     /**
-     * Clear all the cached files related to a wiki.
+     * Clear all the cached files related to a skin.
      *
-     * @param wikiId id of the wiki
+     * @param fileSystemSkin name of the filesystem skin
+     *
+     * @since 6.3M2
      */
-    void clear(String wikiId);
+    void clearFromFileSystemSkin(String fileSystemSkin);
+
+    /**
+     * Clear all the cached files related to a color theme.
+     *
+     * @param colorTheme name of the color theme
+     *
+     * @since 6.3M2
+     */
+    void clearFromColorTheme(String colorTheme);
 }

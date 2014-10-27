@@ -17,10 +17,7 @@
     #end
     ## Get the query string as a map to preserve the values except the language (see: http://jira.xwiki.org/browse/XWIKI-11314)
     #set($queryStringMap = {})
-    #set($parameterMap = $request.getParameterMap())
-    #foreach($param in $parameterMap.entrySet())
-      #set($discard = $queryStringMap.put($param.key, $param.value))
-    #end
+    #set($discard = $queryStringMap.putAll($request.parameterMap))
     #if($additionallangs.size() > 0)
       #set($discard = $queryStringMap.put('language', $currentLanguage))
       #xwikitopmenuentrystart ($doc.getURL('view', $escapetool.url($queryStringMap)), "#displayLanguagePrettyName($currentLanguage)", 'tmLanguages', '', '', '')

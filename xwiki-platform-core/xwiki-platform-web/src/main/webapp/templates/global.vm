@@ -57,10 +57,7 @@
   #end
   ## Get the query string as a map to preserve the values except the language (see: http://jira.xwiki.org/browse/XWIKI-11314)
   #set($queryStringMap = {})
-  #set($parameterMap = $request.getParameterMap())
-  #foreach($param in $parameterMap.entrySet())
-    #set($discard = $queryStringMap.put($param.key, $param.value))
-  #end
+  #set($discard = $queryStringMap.putAll($request.parameterMap))
   <a href="$!doc.getURL("view", "language=$defaultLanguage")" class="language-default#if($tdoc.realLanguage == $defaultLanguage || ($defaultLanguage == 'default' && $tdoc.realLanguage == '')) language-current#end">$defaultLanguage</a>
   #set ($wikiSettingsLanguages = $!xwiki.getXWikiPreference('languages').trim().split('\s*[,| ]\s*'))
   #set ($hasLanguagesSet = $wikiSettingsLanguages.size() > 1 || "$!wikiSettingsLanguages.get(0)" != '')

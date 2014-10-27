@@ -22,6 +22,7 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,16 +101,39 @@ public class ExportAction extends XWikiAction
         XWikiRequest request = context.getRequest();
 
         String description = request.get("description");
-        String name = request.get("name");
-        String[] pages = request.getParameterValues("pages");
 
-        List<String> pageList = new ArrayList<String>();
+        String name = request.get("name");
+        if (StringUtils.isBlank(name)) {
+            name = context.getDoc().getFullName();
+        }
+
+        Collection<String> pageList = getPagesToExport(request.getParameterValues("pages"), context);
+        if (pageList.isEmpty()) {
+            return null;
+        }
+
+        HtmlPackager packager = new HtmlPackager();
+
+        if (name != null && name.trim().length() > 0) {
+            packager.setName(name);
+        }
+
+        if (description != null) {
+            packager.setDescription(description);
+        }
+
+        packager.addPages(pageList);
+
+        packager.export(context);
+
+        return null;
+    }
+
+    private Collection<String> getPagesToExport(String[] pages, XWikiContext context) throws XWikiException
+    {
+        List<String> pageList = new ArrayList<>();
         if (pages == null || pages.length == 0) {
             pageList.add(context.getDoc().getFullName());
-
-            if (StringUtils.isBlank(name)) {
-                name = context.getDoc().getFullName();
-            }
         } else {
             Map<String, Object[]> wikiQueries = new HashMap<String, Object[]>();
             for (int i = 0; i < pages.length; ++i) {
@@ -170,25 +194,7 @@ public class ExportAction extends XWikiAction
             }
         }
 
-        if (pageList.size() == 0) {
-            return null;
-        }
-
-        HtmlPackager packager = new HtmlPackager();
-
-        if (name != null && name.trim().length() > 0) {
-            packager.setName(name);
-        }
-
-        if (description != null) {
-            packager.setDescription(description);
-        }
-
-        packager.addPages(pageList);
-
-        packager.export(context);
-
-        return null;
+        return pageList;
     }
 
     private String export(String format, XWikiContext context) throws XWikiException, IOException
@@ -273,12 +279,12 @@ public class ExportAction extends XWikiAction
             if (all) {
                 entities.includes(new WikiReference(context.getWikiId()));
             } else {
-                if (pages != null) {
-                    DocumentReferenceResolver<String> resolver =
-                        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-                    for (String pageName : pages) {
-                        entities.includes(resolver.resolve(pageName));
-                    }
+                // Find all page references and add them for processing
+                Collection<String> pageList = getPagesToExport(pages, context);
+                DocumentReferenceResolver<String> resolver =
+                    Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+                for (String pageName : pageList) {
+                    entities.includes(resolver.resolve(pageName));
                 }
             }
 

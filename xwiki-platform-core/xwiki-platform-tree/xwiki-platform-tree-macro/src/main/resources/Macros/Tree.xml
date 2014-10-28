@@ -351,7 +351,17 @@ require(['tree'], function($) {
 #set ($discard = $xwiki.jsx.use($xcontext.macro.doc, {'minify': false}))
 #set ($attributes = ['class="xtree"'])
 #if ("$!xcontext.macro.params.source" != '')
-  #set ($sourceURL = $xwiki.getURL($xcontext.macro.params.source, 'get', 'outputSyntax=plain'))
+  #set ($source = $xcontext.macro.params.source)
+  #if ($source.startsWith('path:'))
+    ## URL/Path source
+    #set ($sourceURL = $source.substring(5))
+  #else
+    ## Document source
+    #if ($source.startsWith('doc:'))
+      #set ($source = $source.substring(4))
+    #end
+    #set ($sourceURL = $xwiki.getURL($source, 'get', 'outputSyntax=plain'))
+  #end
   #set ($discard = $attributes.add("data-url='$sourceURL'"))
   #set ($discard = $attributes.add("data-root='$!escapetool.xml($xcontext.macro.params.root)'"))
 #end

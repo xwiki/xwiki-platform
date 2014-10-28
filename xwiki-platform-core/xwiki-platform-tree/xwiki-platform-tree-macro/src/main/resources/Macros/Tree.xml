@@ -97,11 +97,11 @@
 
 == Dynamic Tree ==
 
-{{tree source="XWiki.Treeview" /}}
+{{tree source="XWiki.DocumentTree" /}}
 
 === Dynamic Sub-tree ===
 
-{{tree source="XWiki.Treeview" root="document:xwiki:Sandbox.WebHome" /}}</content>
+{{tree source="XWiki.DocumentTree" root="document:xwiki:Sandbox.WebHome" /}}</content>
   <object>
     <name>Macros.Tree</name>
     <number>0</number>

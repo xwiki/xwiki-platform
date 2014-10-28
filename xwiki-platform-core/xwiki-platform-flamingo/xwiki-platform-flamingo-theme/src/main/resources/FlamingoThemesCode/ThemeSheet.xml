@@ -43,9 +43,8 @@
 ############################
 ## JS, CSS AND TRANSLATIONS TO USE
 ############################
-#set($discard = $xwiki.jsx.use('FlamingoThemesCode.ThemeSheet', {'minify': false}))
+#set($discard = $xwiki.jsx.use('FlamingoThemesCode.ThemeSheet'))
 #set($discard = $xwiki.ssx.use('FlamingoThemesCode.ThemeSheet'))
-#set($discard = $services.localization.use('document', 'FlamingoThemesCode.Translations'))
 #set($discard = $xwiki.linkx.use($services.webjars.url('colpick/2.0.2/css/colpick.css'), {'rel': 'stylesheet'}))
 ############################
 ## GLOBALS

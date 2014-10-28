@@ -74,10 +74,23 @@
     <className>XWiki.TranslationDocumentClass</className>
     <guid>a82c1186-bcdf-414f-8fac-09dad00b3f02</guid>
     <property>
-      <scope>ON_DEMAND</scope>
+      <scope>WIKI</scope>
     </property>
   </object>
-  <content>platform.flamingo.themes.title.variables=Variables
+  <content>platform.flamingo.themes.home.title=Themes for Flamingo
+platform.flamingo.themes.home.currenttheme=Current theme
+platform.flamingo.themes.home.otherthemes=Other available themes
+platform.flamingo.themes.home.warningOldColorThemeInstalled=This is the new application to manage the Flamingo Themes. A Flamingo theme is a customizable variation of any skin based on Flamingo. If you want to manage the old color themes, you should go to the corresponding application:
+platform.flamingo.themes.home.oldColorThemeApp=Color themes
+platform.flamingo.themes.home.warningCurrentOldColorTheme=The current theme is an old color theme which is not optimized to work with a skin based on Flamingo. We have made our best to make it compatible, but the results might not be very good.
+platform.flamingo.themes.home.useThisTheme=Use this theme
+platform.flamingo.themes.home.newThemeName=Theme name...
+platform.flamingo.themes.home.create=Create new theme
+platform.flamingo.themes.home.create.invalid=Invalid theme name!
+platform.flamingo.themes.home.create.csrf=For security reason, please confirm that you want to create a theme called 
+platform.flamingo.themes.home.create.confirm=Confirm
+platform.flamingo.themes.home.set.success=Color theme set to {0}.
+platform.flamingo.themes.title.variables=Variables
 platform.flamingo.themes.title.preview=Preview
 platform.flamingo.themes.autorefresh=Auto refresh
 platform.flamingo.themes.refresh=Refresh

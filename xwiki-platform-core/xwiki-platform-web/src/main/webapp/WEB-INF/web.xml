@@ -107,7 +107,30 @@
   <!-- This filter is used to add the 'Content-Type-Script' header to the HTTP response. -->
   <filter>
     <filter-name>Set Content-Script-Type</filter-name>
-    <filter-class>org.xwiki.container.servlet.filters.internal.SetContentScriptTypeFilter</filter-class>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SetHTTPHeaderFilter</filter-class>
+    <init-param>
+      <param-name>name</param-name>
+      <param-value>Content-Script-Type</param-value>
+    </init-param>
+    <init-param>
+      <param-name>value</param-name>
+      <param-value>text/javascript</param-value>
+    </init-param>
+  </filter>
+  
+  <!-- We need this filter because cross domain request for fonts are not allowed if some headers are not set.
+       See http://jira.xwiki.org/browse/XWIKI-11300 for more informations. -->
+  <filter>
+    <filter-name>Set CORS policy for fonts</filter-name>
+    <filter-class>org.xwiki.container.servlet.filters.internal.SetHTTPHeaderFilter</filter-class>
+    <init-param>
+      <param-name>name</param-name>
+      <param-value>Access-Control-Allow-Origin</param-value>
+    </init-param>
+    <init-param>
+      <param-name>value</param-name>
+      <param-value>*</param-value>
+    </init-param>
   </filter>
 
   <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the
@@ -180,6 +203,28 @@
   <filter-mapping>
     <filter-name>Set Content-Script-Type</filter-name>
     <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <!-- We set the CORS policy globally for webjars because the <url-pattern> option does not filter on query strings 
+       TODO: Remove this when http://jira.xwiki.org/browse/XWIKI-10881 is fixed -->
+  <filter-mapping>
+    <filter-name>Set CORS policy for fonts</filter-name>
+    <url-pattern>/bin/webjars/*</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>Set CORS policy for fonts</filter-name>
+    <url-pattern>*.woff</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>Set CORS policy for fonts</filter-name>
+    <url-pattern>*.eot</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>Set CORS policy for fonts</filter-name>
+    <url-pattern>*.ttf</url-pattern>
   </filter-mapping>
 
   <!-- Initializes XWiki -->

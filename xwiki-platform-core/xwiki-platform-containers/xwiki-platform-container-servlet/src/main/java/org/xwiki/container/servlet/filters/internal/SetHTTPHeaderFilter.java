@@ -30,21 +30,22 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Filter that set the "Content-Script-Type" header of the HTTP response to Javascript.
+ * Filter that set the desired header of the HTTP response to the desired value.
  *
  * @version $Id$
- * @since 6.3M1
+ * @since 6.3M2
  */
-public class SetContentScriptTypeFilter implements Filter
+public class SetHTTPHeaderFilter implements Filter
 {
-    private static final String HTTP_HEADER_NAME = "Content-Script-Type";
+    private String httpHeaderName;
 
-    private static final String HTTP_HEADER_VALUE = "text/javascript";
+    private String httpHeaderValue;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException
     {
-        // Nothing to do
+        httpHeaderName = filterConfig.getInitParameter("name");
+        httpHeaderValue = filterConfig.getInitParameter("value");
     }
 
     @Override
@@ -55,7 +56,7 @@ public class SetContentScriptTypeFilter implements Filter
         if (response instanceof HttpServletResponse) {
             HttpServletResponse httpResponse = (HttpServletResponse) response;
             // Set the attribute
-            httpResponse.addHeader(HTTP_HEADER_NAME, HTTP_HEADER_VALUE);
+            httpResponse.addHeader(httpHeaderName, httpHeaderValue);
         }
 
         // Pass control on to the next filter

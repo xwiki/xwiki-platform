@@ -61,6 +61,18 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery-ui</artifactId>
+      <version>1.11.1</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Panels currently don't fully have their own Administration page. For example defining the left and right
          panels or whether left/right panels are displayed or not are currently defined in the Administration
          Application. In the future move those features in this Panel Application and remove this dependency. -->

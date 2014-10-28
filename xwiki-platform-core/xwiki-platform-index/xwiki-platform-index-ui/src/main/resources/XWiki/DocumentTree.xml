@@ -185,7 +185,6 @@
     <property>
       <code>{{velocity}}
 #set ($docTreeConfig = {
-  'readOnly': true,
   'showWikis': false,
   'showWikiPrettyName': true,
   'showSpaces': false,
@@ -203,8 +202,9 @@
     #set ($discard = $sourceParams.put($entry.key, $value))
   #end
 #end
+#set ($editable = $xcontext.macro.params.readOnly != 'true')
 {{tree source="path:$xwiki.getURL($xcontext.macro.doc.documentReference, 'get', $escapetool.url($sourceParams))"
-  root="$!xcontext.macro.params.root" /}}
+  root="$!xcontext.macro.params.root" dragAndDrop="$editable" contextMenu="$editable" /}}
 {{/velocity}}</code>
     </property>
     <property>

@@ -42,7 +42,6 @@
   <content>{{velocity output="false"}}
 ## Configuration options.
 #set ($docTreeConfig = {
-  'readOnly': true,
   'showWikis': false,
   'showWikiPrettyName': true,
   'showSpaces': false,
@@ -205,7 +204,7 @@
       'id': $spaceId,
       'type': 'space',
       'validChildren': ['document', 'pagination'],
-      'hasContextMenu': $docTreeConfig.readOnly.equals(false),
+      'hasContextMenu': true,
       'canRename': $hasSpaceAdmin,
       'canDelete': $hasSpaceAdmin,
       'createDocumentURL': $xwiki.getURL($spaceHomePageRef, 'create', $NULL),
@@ -287,8 +286,8 @@
       'id': "$documentReference",
       'type': 'document',
       'validChildren': ['translations', 'attachments', 'attachment', 'classProperties', 'objects', 'document', 'pagination'],
-      'hasContextMenu': $docTreeConfig.readOnly.equals(false),
-      'draggable': $docTreeConfig.readOnly.equals(false),
+      'hasContextMenu': true,
+      'draggable': true,
       'canDelete': $canDeleteDoc,
       'canMove': $canDeleteDoc,
       'canCopy': true,
@@ -372,7 +371,7 @@
       'data': {
         'type': 'attachments',
         'validChildren': ['attachment', 'pagination'],
-        'hasContextMenu': $docTreeConfig.readOnly.equals(false),
+        'hasContextMenu': true,
         'canDelete': $canEditDoc
       },
       'a_attr': {
@@ -477,8 +476,8 @@
       'id': $attachmentId,
       'type': 'attachment',
       'validChildren': [],
-      'hasContextMenu': $docTreeConfig.readOnly.equals(false),
-      'draggable': $docTreeConfig.readOnly.equals(false),
+      'hasContextMenu': true,
+      'draggable': true,
       'canRename': $canEditDoc,
       'canDelete': $canEditDoc,
       'canMove': $canEditDoc,

@@ -281,12 +281,22 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
 
   var getDefaultParams = function(element) {
     if (element.attr('data-url')) {
+      var plugins = [];
+      if (element.attr('data-dragAndDrop') == 'true') {
+        plugins.push('dnd');
+      }
+      if (element.attr('data-contextMenu') == 'true') {
+        plugins.push('contextmenu');
+      }
       return {
         core: {
           data: getChildren,
-          check_callback: validateOperation
+          check_callback: validateOperation,
+          themes: {
+            responsive: element.attr('data-responsive') == 'true'
+          }
         },
-        plugins: ['dnd', 'contextmenu'],
+        plugins: plugins,
         dnd: {
           is_draggable: areDraggable
         },

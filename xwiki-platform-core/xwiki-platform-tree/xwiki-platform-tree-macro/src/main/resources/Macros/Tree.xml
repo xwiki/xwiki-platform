@@ -349,7 +349,7 @@ require(['tree'], function($) {
     <property>
       <code>{{velocity output="false"}}
 #set ($discard = $xwiki.jsx.use($xcontext.macro.doc, {'minify': false}))
-#set ($attributes = ['class="xtree"'])
+#set ($attributes = ['class="xtree"', 'data-responsive="true"'])
 #if ("$!xcontext.macro.params.source" != '')
   #set ($source = $xcontext.macro.params.source)
   #if ($source.startsWith('path:'))
@@ -365,6 +365,10 @@ require(['tree'], function($) {
   #set ($discard = $attributes.add("data-url='$sourceURL'"))
   #set ($discard = $attributes.add("data-root='$!escapetool.xml($xcontext.macro.params.root)'"))
 #end
+#set ($dragAndDrop = $xcontext.macro.params.dragAndDrop == 'true')
+#set ($discard = $attributes.add("data-dragAndDrop='$dragAndDrop'"))
+#set ($contextMenu = $xcontext.macro.params.contextMenu == 'true')
+#set ($discard = $attributes.add("data-contextMenu='$contextMenu'"))
 #set ($output = "(% $stringtool.join($attributes, ' ') %)((($!xcontext.macro.content)))")
 ## Parse the output and return the resulting XDOM blocks.
 #set ($xcontext.macro.result = $services.rendering.parse($output, $xwiki.currentContentSyntaxId).children)
@@ -525,6 +529,138 @@ require(['tree'], function($) {
     </property>
     <property>
       <name>root</name>
+    </property>
+  </object>
+  <object>
+    <name>Macros.Tree</name>
+    <number>2</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>914470d9-8966-45aa-9e45-95faec55d151</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>Specifies if the user should be able to drag &amp; drop tree nodes.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>dragAndDrop</name>
+    </property>
+  </object>
+  <object>
+    <name>Macros.Tree</name>
+    <number>3</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>05a7d454-7262-4947-9631-e1820608a994</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>Whether to show the context menu when the user right-clicks a tree node.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>contextMenu</name>
     </property>
   </object>
 </xwikidoc>

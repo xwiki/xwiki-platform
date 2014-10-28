@@ -350,10 +350,6 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Changed the LESSCache interface and the LESS Script Service because the cache was poorly designed
-                 (see: http://jira.xwiki.org/browse/XWIKI-10776). -->
-            <exclude>**/LESSCache*</exclude>
-            <exclude>**/LessCompilerScriptService*</exclude>
           </excludes>
         </configuration>
       </plugin>

@@ -339,6 +339,14 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       var selectedNode = data.node;
       selectedNode.data && selectedNode.data.type == 'pagination' && addMoreChildren(tree, selectedNode);
 
+    }).on('open_node.jstree', function(event, data) {
+      var originalNode = data.node.original;
+      originalNode && originalNode.iconOpened && data.instance.set_icon(data.node, originalNode.iconOpened);
+
+    }).on('close_node.jstree', function(event, data) {
+      var originalNode = data.node.original;
+      originalNode && originalNode.iconOpened && data.instance.set_icon(data.node, originalNode.icon);
+
     //
     // Catch events triggered when the tree structure is modified.
     //

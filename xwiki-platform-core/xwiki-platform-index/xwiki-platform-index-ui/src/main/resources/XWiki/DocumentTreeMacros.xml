@@ -198,7 +198,8 @@
   #set ($discard = $siblings.add({
     'id': "space:$spaceId",
     'text': $spaceReference.name,
-    'icon': 'fa fa-folder-open-o',
+    'icon': 'fa fa-folder-o',
+    'iconOpened': 'fa fa-folder-open-o',
     'children': true,
     'data': {
       'id': $spaceId,

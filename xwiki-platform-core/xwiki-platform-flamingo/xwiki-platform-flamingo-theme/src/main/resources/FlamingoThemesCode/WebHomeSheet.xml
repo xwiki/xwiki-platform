@@ -147,7 +147,7 @@
 }
 
 /* Clear the floatting strategy after the display of all themes */
-.theme-viewer h2, .theme-viewer form {
+.theme-viewer h2, .theme-creation-form {
   clear: both;
 }
 
@@ -310,7 +310,7 @@
   left: 12px;
 }
 
-.theme-viewer form {
+.theme-creation-form form {
   background: url("$xwiki.getSkinFile('icons/silk/add.png')") no-repeat .2em center $theme.backgroundSecondaryColor;
   border: 1px dotted $theme.borderColor;
   display: inline-block;
@@ -332,7 +332,7 @@
   </object>
   <content>{{velocity}}
 ####################################
-## GLOBALS, STYLES &amp; TRANSLATIONS
+## GLOBALS &amp; STYLES
 ####################################
 #set($discard = $xwiki.ssx.use('FlamingoThemesCode.WebHomeSheet'))
 #set($currentTheme = $xwiki.getXWikiPreference('colorTheme'))
@@ -362,7 +362,7 @@
     ## Display a warning about old color themes (if any)
     #if($xwiki.exists($services.model.createDocumentReference('', 'ColorThemes', 'ColorThemeClass')) &amp;&amp; $xwiki.exists($services.model.createDocumentReference('', 'ColorThemes', 'WebHome')))
       {{info}}
-        $services.localization.render('platform.flamingo.themes.home.warningOldColorThemeInstalled') [[$services.localization.render('platform.flamingo.themes.home.oldColorThemeApp')&gt;&gt;ColorThemes.WebHome]].
+        $services.localization.render('platform.flamingo.themes.home.warningOldColorThemeInstalled', ["[[", "&gt;&gt;ColorThemes.WebHome]]"])
       {{/info}}
     #end
     
@@ -370,7 +370,7 @@
     == $services.localization.render('platform.flamingo.themes.home.currenttheme') ==
     #if($currentThemeDoc.getObject('ColorThemes.ColorThemeClass'))
       {{warning}}
-       $services.localization.render('platform.flamingo.themes.home.warningCurrentOldColorTheme')
+        $services.localization.render('platform.flamingo.themes.home.warningCurrentOldColorTheme')
       {{/warning}}
     #end
     #displayTheme($currentTheme)
@@ -418,54 +418,54 @@
 ## THEME MOCKUP
 ####################################
 #macro(themeMockup $themeObj)
-  #macro(displayValue $variableName $fallbackName)
+  #macro(displayValue $variableName $fallback)
     #set($value = $themeObj.getValue($variableName))
     #if("$!value" == '')
-      #set($value = $defaulTheme.get($fallbackName))
+      #set($value = $fallback)
     #end
     $value##
   #end
 
   {{html}}
-    &lt;div class="mockup-page" style="background-color: #displayValue('body-bg', 'pageBackgroundColor')"&gt;
+    &lt;div class="mockup-page" style="background-color: #displayValue('body-bg', '#fff')"&gt;
       ## A fake navbar
-      &lt;div class="mockup-navbar" style="background-color: #displayValue('navbar-default-bg', 'menuBackgroundColor')"&gt;
+      &lt;div class="mockup-navbar" style="background-color: #displayValue('navbar-default-bg', '#eee')"&gt;
         ## A fake logo
         &lt;div class="mockup-logo"&gt;&lt;/div&gt;
         ## A fake menu
-        &lt;div class="mockup-navbar-menu" style="border-color: #displayValue('navbar-default-color', 'menuLinkColor')"&gt;&lt;/div&gt;
+        &lt;div class="mockup-navbar-menu" style="border-color: #displayValue('navbar-default-color', '#000')"&gt;&lt;/div&gt;
         ## A fake add button
-        &lt;div class="mockup-add-button" style="background-color: #displayValue('btn-success-bg', 'menuAddEntryBackgroundColor')"&gt;&lt;/div&gt;
+        &lt;div class="mockup-add-button" style="background-color: #displayValue('btn-success-bg', '#4D9244')"&gt;&lt;/div&gt;
       &lt;/div&gt;
       
       ## A fake page content
-      &lt;div class="mockup-page-content" style="background-color: #displayValue('xwiki-page-content-bg', 'pageContentBackgroundColor')"&gt;
-        &lt;div class="mockup-title" style="border-color: #displayValue('text-color', 'titleColor')"&gt;&lt;/div&gt;
-        &lt;div class="mockup-text1" style="border-color: #displayValue('text-color', 'textColor')"&gt;&lt;/div&gt;
-        &lt;div class="mockup-text2" style="border-color: #displayValue('text-color', 'textColor')"&gt;&lt;/div&gt;
-        &lt;div class="mockup-text3" style="border-color: #displayValue('text-color', 'textColor')"&gt;&lt;/div&gt;
-        &lt;div class="mockup-text4" style="border-color: #displayValue('link-color', 'linkColor')"&gt;&lt;/div&gt;
-        &lt;div class="mockup-text5" style="border-color: #displayValue('text-color', 'textColor')"&gt;&lt;/div&gt;
+      &lt;div class="mockup-page-content" style="background-color: #displayValue('xwiki-page-content-bg', '#fff')"&gt;
+        &lt;div class="mockup-title" style="border-color: #displayValue('text-color', '#000')"&gt;&lt;/div&gt;
+        &lt;div class="mockup-text1" style="border-color: #displayValue('text-color', '#000')"&gt;&lt;/div&gt;
+        &lt;div class="mockup-text2" style="border-color: #displayValue('text-color', '#000')"&gt;&lt;/div&gt;
+        &lt;div class="mockup-text3" style="border-color: #displayValue('text-color', '#000')"&gt;&lt;/div&gt;
+        &lt;div class="mockup-text4" style="border-color: #displayValue('link-color', '#000')"&gt;&lt;/div&gt;
+        &lt;div class="mockup-text5" style="border-color: #displayValue('text-color', '#0000ff')"&gt;&lt;/div&gt;
       &lt;/div&gt;
       
       ## A fake app bar 
-      &lt;div class="mockup-left-panel" style="color: #displayValue('link-color', 'linkColor')"&gt;&lt;/div&gt;
+      &lt;div class="mockup-left-panel" style="color: #displayValue('link-color', '#0000ff')"&gt;&lt;/div&gt;
       
       ## A fake right panel
       &lt;div class="mockup-right-panel"&gt;
-        &lt;div class="mockup-right-panel-header" style="color: #displayValue('panel-default-text', 'panelHeaderTextColor'); background-color: #displayValue('panel-bg', 'panelHeaderBackgroundColor')"&gt;
-          &lt;div class="mockup-right-panel-header-text" style="border-color: #displayValue('panel-default-text', 'panelHeaderTextColor')"&gt;&lt;/div&gt;
+        &lt;div class="mockup-right-panel-header" style="color: #displayValue('panel-default-text', '#000'); background-color: #displayValue('panel-bg', '#fff')"&gt;
+          &lt;div class="mockup-right-panel-header-text" style="border-color: #displayValue('panel-default-text', '#000')"&gt;&lt;/div&gt;
         &lt;/div&gt;
-        &lt;div class="mockup-right-panel-contents" style="background-color: #displayValue('panel-bg', 'panelBackgroundColor')"&gt;
-          &lt;div class="mockup-right-panel-text1" style="background-color: #displayValue('panel-default-text', 'panelTextColor')"&gt; &lt;/div&gt;
-          &lt;div class="mockup-right-panel-text2" style="background-color: #displayValue('panel-default-text', 'panelTextColor')"&gt; &lt;/div&gt;
-          &lt;div class="mockup-right-panel-text3" style="background-color: #displayValue('link-color', 'linkColor')"&gt; &lt;/div&gt;
+        &lt;div class="mockup-right-panel-contents" style="background-color: #displayValue('panel-bg', '#fff')"&gt;
+          &lt;div class="mockup-right-panel-text1" style="background-color: #displayValue('panel-default-text', '#000')"&gt; &lt;/div&gt;
+          &lt;div class="mockup-right-panel-text2" style="background-color: #displayValue('panel-default-text', '#000')"&gt; &lt;/div&gt;
+          &lt;div class="mockup-right-panel-text3" style="background-color: #displayValue('link-color', '#0000ff')"&gt; &lt;/div&gt;
         &lt;/div&gt;
       &lt;/div&gt;
       
       ## A fake footer
-      &lt;div class="mockup-footer" style="background-color: #displayValue('navbar-default-bg', 'menuBackgroundColor')"&gt;
-        &lt;div class="mockup-footer-content" style="border-color: #displayValue('navbar-default-link-color', 'menuLinkColor')"&gt;
+      &lt;div class="mockup-footer" style="background-color: #displayValue('navbar-default-bg', '#fff')"&gt;
+        &lt;div class="mockup-footer-content" style="border-color: #displayValue('navbar-default-link-color', '#000')"&gt;
       &lt;/div&gt;
       
     &lt;/div&gt;
@@ -479,13 +479,15 @@
   #if($xwiki.hasAccessLevel('edit', $xcontext.user, 'FlamingoThemes.AnyPage____________'))
   
     {{html}}
-      &lt;form action="$doc.getURL()" method="post" class="form-inline"&gt;
-        &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
-        &lt;input type="hidden" name="action" value="create"/&gt;
-        &lt;label for="newThemeName" class="hidden"&gt;$services.localization.render('platform.flamingo.themes.home.newThemeName')&lt;/label&gt;
-        &lt;input type="text" name="newThemeName" id="newThemeName" value="$services.localization.render('platform.flamingo.themes.home.newThemeName')" class="withTip" size="30"/&gt;
-        &lt;input type="submit" value="$services.localization.render('platform.flamingo.themes.home.create')" class="button"/&gt;
-      &lt;/form&gt;
+      &lt;div class="theme-creation-form" &gt;
+        &lt;form action="$doc.getURL()" method="post" class="form-inline"&gt;
+          &lt;input type="hidden" name="form_token" value="$services.csrf.token" /&gt;
+          &lt;input type="hidden" name="action" value="create"/&gt;
+          &lt;label for="newThemeName" class="hidden"&gt;$services.localization.render('platform.flamingo.themes.home.newThemeName')&lt;/label&gt;
+          &lt;input type="text" name="newThemeName" id="newThemeName" value="$services.localization.render('platform.flamingo.themes.home.newThemeName')" class="withTip" size="30"/&gt;
+          &lt;input type="submit" value="$services.localization.render('platform.flamingo.themes.home.create')" class="button"/&gt;
+        &lt;/form&gt;
+      &lt;/div&gt;
     {{/html}}
     
   #end
@@ -502,7 +504,7 @@
     #creationForm()
   #elseif(!$services.csrf.isTokenValid($request.form_token))
     {{error}}
-      {{translation key="platform.flamingo.themes.home.create.csrf" /}}
+      {{translation key="platform.flamingo.themes.home.create.csrf" parameters="$request.newThemeName" /}}
     {{/error}}
     
     {{html}}

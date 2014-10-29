@@ -426,7 +426,10 @@ require(['jquery'], function($) {
       var varMap = {};
       for (var i=0; i&lt;variableInputs.length; ++i) {
         var variableInput = variableInputs[i];
-        if (variableInput.value != '' &amp;&amp; variableInput.id != 'var-logo') {
+        // 'logo' is handled by the 'setLogo' function
+        // 'lessCode' is a special case: it is not a LESS variable, but it contains some code to inject in the LESS
+        // file. We currently have not a solution for this case.
+        if (variableInput.value != '' &amp;&amp; variableInput.id != 'var-logo' &amp;&amp; variableInput.id != 'var-lessCode') {
           var name = '@' + variableInput.id.substr(4); // we remove the 'var-' part of the id to get the real variable name
           varMap[name] = variableInput.value;
         }

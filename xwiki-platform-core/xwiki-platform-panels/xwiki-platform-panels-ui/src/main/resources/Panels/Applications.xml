@@ -474,7 +474,7 @@ div.applicationPanelMoreContainer li a {
 
 .panel-width-Small .applicationPanelMoreContainer ul {
   padding: 0;
-  background-color: #fff;
+  background-color: $theme.pageContentBackgroundColor;
 }
 
 .panel-width-Small .applicationPanelMoreContainer ul li:hover {

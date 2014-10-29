@@ -271,6 +271,7 @@ $xwiki.getDocument('MenuTemplate').content
 .menu-vertical ul, .menu-horizontal ul {
   list-style-type: none;
   margin: auto;
+  padding: 0;
 }
 
 .menu-vertical ul *, .menu-horizontal ul * {
@@ -297,7 +298,7 @@ $xwiki.getDocument('MenuTemplate').content
 
 /* Horizontal Menu */
 
-.menu.menu-horizontal {
+.skin-colibri .menu.menu-horizontal {
   #css3_backgroundLinearGradient({
     'to': 'bottom',
     'colors': [
@@ -305,6 +306,10 @@ $xwiki.getDocument('MenuTemplate').content
       {'color': $theme.menuBackgroundColor, 'position': '50%'}
     ]
   })
+}
+
+.menu.menu-horizontal {
+  background-color: $theme.menuBackgroundColor;
   color: $theme.menuLinkColor;
   font-size: .85em;
   height: 2em;

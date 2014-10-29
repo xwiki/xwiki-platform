@@ -343,7 +343,7 @@
       </title>
     </class>
     <property>
-      <content>{{include reference="Main.Welcome"/}}</content>
+      <content>{{display reference="Main.Welcome"/}}</content>
     </property>
     <property>
       <position>1, 1</position>

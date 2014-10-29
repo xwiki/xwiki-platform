@@ -99,6 +99,16 @@
 ##############################################
 #macro(initFromFlamingoTheme)
   // Colors from the new flamingo theme class
+  ## Set the XWiki variables
+  @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
+  @xwiki-border-color:                  $theme.borderColor;
+  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
+  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
+  @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
+  @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
+  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
+  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
+  ## Now set the variables with the values of the object
   #if ("$!themeObj" != '')
     ## variables of the class
     #set($variables = {
@@ -173,13 +183,6 @@
       #end
     #end
   #end
-  @xwiki-border-color:                  $theme.borderColor;
-  @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
-  @xwiki-panel-header-text:             $theme.panelHeaderTextColor;
-  @xwiki-background-secondary-color:    $theme.backgroundSecondaryColor;
-  @xwiki-page-header-bg-color:          $theme.pageHeaderBackgroundColor;
-  @xwiki-page-header-bg-image:          $!{theme.headerBackgroundImage};
-  @xwiki-page-header-bg-position:       $!{theme.headerBackgroundPosition};
 #end
 
 ##############################################

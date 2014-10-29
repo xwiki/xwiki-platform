@@ -66,6 +66,8 @@ public class DefaultCurrentColorThemeGetterTest
 
     private XWiki xwiki;
 
+    private XWikiRequest request;
+
     @Before
     public void setUp() throws Exception
     {
@@ -81,9 +83,8 @@ public class DefaultCurrentColorThemeGetterTest
         when(xcontext.getWiki()).thenReturn(xwiki);
 
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiId");
-        XWikiRequest request = mock(XWikiRequest.class);
+        request = mock(XWikiRequest.class);
         when(xcontext.getRequest()).thenReturn(request);
-        when(request.getParameter("colorTheme")).thenReturn("myColorTheme");
         DocumentReference colorThemeReference = new DocumentReference("wikiId", "XWiki", "MyColorTheme");
         WikiReference mainWikiReference = new WikiReference("wikiId");
         when(documentReferenceResolver.resolve(eq("myColorTheme"), eq(mainWikiReference))).thenReturn(colorThemeReference);
@@ -92,14 +93,23 @@ public class DefaultCurrentColorThemeGetterTest
     }
 
     @Test
-    public void getCurrentColorThemeTest() throws Exception
+    public void getCurrentColorThemeTestWhenRequestParameter() throws Exception
     {
+         when(request.getParameter("colorTheme")).thenReturn("myColorTheme");
          assertEquals("wikiId:ColorTheme.MyColorTheme", mocker.getComponentUnderTest().getCurrentColorTheme("default"));
+    }
+
+    @Test
+    public void getCurrentColorThemeTestWhenNoRequestParameter() throws Exception
+    {
+        when(xwiki.getUserPreference(eq("colorTheme"), any(XWikiContext.class))).thenReturn("myColorTheme");
+        assertEquals("wikiId:ColorTheme.MyColorTheme", mocker.getComponentUnderTest().getCurrentColorTheme("default"));
     }
 
     @Test
     public void getCurrentColorThemeFallbackTest() throws Exception
     {
+        when(request.getParameter("colorTheme")).thenReturn("myColorTheme");
         when(xwiki.exists(any(DocumentReference.class), eq(xcontext))).thenReturn(false);
         assertEquals("fallback", mocker.getComponentUnderTest().getCurrentColorTheme("fallback"));
         assertEquals("error", mocker.getComponentUnderTest().getCurrentColorTheme("error"));

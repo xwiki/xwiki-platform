@@ -22,6 +22,7 @@ package org.xwiki.lesscss.internal;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -29,6 +30,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -41,6 +43,8 @@ import com.xpn.xwiki.web.XWikiRequest;
 @Component
 public class DefaultCurrentColorThemeGetter implements CurrentColorThemeGetter
 {
+    private static final String COLOR_THEME_FIELD = "colorTheme";
+
     @Inject
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
@@ -59,17 +63,24 @@ public class DefaultCurrentColorThemeGetter implements CurrentColorThemeGetter
         // Get information about the context
         String wikiId = wikiDescriptorManager.getCurrentWikiId();
         XWikiContext context = xcontextProvider.get();
+        XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
 
         // Get the current color theme
+        String colorTheme = request.getParameter(COLOR_THEME_FIELD);
+        if (StringUtils.isEmpty(colorTheme)) {
+            // Get it from the preferences
+            colorTheme = xwiki.getUserPreference(COLOR_THEME_FIELD, context);
+        }
+
         // Getting the full name representation of colorTheme
-        DocumentReference colorThemeReference = documentReferenceResolver.resolve(request.getParameter("colorTheme"),
-                new WikiReference(wikiId));
-        String colorTheme = entityReferenceSerializer.serialize(colorThemeReference);
+        DocumentReference colorThemeReference =
+                documentReferenceResolver.resolve(colorTheme, new WikiReference(wikiId));
+        colorTheme = entityReferenceSerializer.serialize(colorThemeReference);
 
         // Check that the color theme exists, to avoid a DOS if some user tries to compile a skin file
         // with random colorTheme names
-        if (!context.getWiki().exists(colorThemeReference, context)) {
+        if (!xwiki.exists(colorThemeReference, context)) {
             colorTheme = fallbackValue;
         }
 

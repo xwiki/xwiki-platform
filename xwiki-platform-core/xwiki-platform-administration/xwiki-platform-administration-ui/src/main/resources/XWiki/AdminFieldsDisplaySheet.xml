@@ -87,8 +87,10 @@
               #set ($colorThemeHint = $services.localization.render('admin.colortheme.wikiSetting', ["&lt;a href='$wikiColorTheme.getURL()'&gt;$wikiColorTheme.plainTitle&lt;/a&gt;"]))
             #end
           #end
-          #if($xwiki.exists('ColorThemes.WebHome'))
-            #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL('ColorThemes.WebHome')""&gt;$services.localization.render('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
+          #if($xwiki.exists($services.model.createDocumentReference('', 'FlamingoThemes', 'WebHome')))
+            #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'FlamingoThemes', 'WebHome'))""&gt;$services.localization.render('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
+          #elseif($xwiki.exists($services.model.createDocumentReference('', 'ColorThemes', 'WebHome')))
+            #set ($colorThemeHint = "$!{colorThemeHint} &lt;strong&gt;&lt;a href=""$xwiki.getURL($services.model.createDocumentReference('', 'ColorThemes', 'WebHome'))""&gt;$services.localization.render('admin.colortheme.manage')&lt;/a&gt;&lt;/strong&gt;")
           #end
           &lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL($colorThemeName, 'edit')"#if ($colorThemeName.indexOf('.') &lt; 0) class="hidden"#end&gt;$services.localization.render('admin.customize')&lt;/a&gt;&lt;/span&gt;
         #end

@@ -1763,6 +1763,7 @@ div.main {
 }
 
 @xwiki-panel-header-text: @navbar-default-color;
+@xwiki-page-content-bg:   @body-bg;
 @text-muted: @navbar-default-color;
 </lessCode>
     </property>

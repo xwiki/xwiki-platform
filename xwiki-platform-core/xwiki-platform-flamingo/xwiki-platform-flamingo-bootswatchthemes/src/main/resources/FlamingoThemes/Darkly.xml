@@ -2093,6 +2093,7 @@ textarea {
 // XWiki customization
 @xwiki-panel-header-text:  @text-color;
 @navbar-height:            50px;
+@xwiki-page-content-bg:    @body-bg;
 </lessCode>
     </property>
     <property>

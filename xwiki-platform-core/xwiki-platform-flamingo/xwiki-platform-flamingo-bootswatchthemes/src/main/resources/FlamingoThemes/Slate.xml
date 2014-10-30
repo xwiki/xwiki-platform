@@ -2144,6 +2144,7 @@ ul.nav.nav-pills.nav-stacked li{
 }
 
 @xwiki-panel-header-text: @navbar-default-color;
+@xwiki-page-content-bg:   @body-bg;
 </lessCode>
     </property>
     <property>

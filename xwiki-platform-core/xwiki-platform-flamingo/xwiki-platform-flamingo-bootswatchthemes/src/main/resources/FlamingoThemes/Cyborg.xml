@@ -1923,6 +1923,7 @@ a.thumbnail.active {
 
 // XWiki customization
 @xwiki-panel-header-text: @navbar-default-color;
+@xwiki-page-content-bg:   @body-bg;
 
 .nav &gt; li &gt; a {
   color: @navbar-default-color;
@@ -1968,7 +1969,7 @@ a.thumbnail.active {
       <text-color/>
     </property>
     <property>
-      <xwiki-page-content-bg>@body-bg</xwiki-page-content-bg>
+      <xwiki-page-content-bg />
     </property>
   </object>
   <content/>

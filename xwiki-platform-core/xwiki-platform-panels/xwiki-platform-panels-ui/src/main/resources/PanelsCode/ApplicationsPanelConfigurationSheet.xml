@@ -237,7 +237,8 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
   
   /**
    * First: init all applications marked with the 'draggableApp' class.
-   * Curiously, it does not work with the Android browser with $(window).load().
+   * It does not work with the Android browser with $(window).load(), probably because of the asynchronous nature of
+   * requirejs (http://requirejs.org/docs/api.html#pageload)
    */
   $(window).ready(function() {
     initDragAndDrop('.draggableApp');

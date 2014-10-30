@@ -236,9 +236,10 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
   }
   
   /**
-   * First: init all applications marked with the 'draggableApp' class
+   * First: init all applications marked with the 'draggableApp' class.
+   * Curiously, it does not work with the Android browser with $(window).load().
    */
-  $(window).load(function() {
+  $(window).ready(function() {
     initDragAndDrop('.draggableApp');
     
     $('#bt-revert').click(function(){

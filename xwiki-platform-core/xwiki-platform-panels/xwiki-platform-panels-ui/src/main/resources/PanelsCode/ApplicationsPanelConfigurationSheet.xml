@@ -236,11 +236,24 @@ require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function
   }
   
   /**
-   * First: init all applications marked with the 'draggableApp' class.
-   * It does not work with the Android browser with $(window).load(), probably because of the asynchronous nature of
-   * requirejs (http://requirejs.org/docs/api.html#pageload)
+   * Wait until all the DOM elements we want to initialize are ready.
+   * We cannot rely on $(window).load() or $(window).ready() because of the asynchronous nature of requirejs
+   * (see: http://requirejs.org/docs/api.html#pageload).
    */
-  $(window).ready(function() {
+  var waitDOMReady = function(callback) {
+    // if the dom elements that we want to initialize are not loaded
+    if ($('.draggableApp').length == 0) {
+      // then retry in 100ms
+      setTimeout(function(){waitDOMReady(callback);}, 100);
+    } else {
+       callback();
+    }
+  }
+
+  /**
+   * First: init all applications marked with the 'draggableApp' class.
+   */
+  waitDOMReady(function() {
     initDragAndDrop('.draggableApp');
     
     $('#bt-revert').click(function(){

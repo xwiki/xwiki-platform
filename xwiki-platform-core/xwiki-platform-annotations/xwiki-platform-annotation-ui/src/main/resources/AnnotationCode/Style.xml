@@ -302,7 +302,7 @@ AABJRU5ErkJggg==
   width: 10px;
   vertical-align: baseline;
   ##margin: -19px -14px 3px -2px;
-  margin: -15px -7px 5px -3px;
+  margin: -15px -7px 0.6em -3px;
   z-index: 1;
   position: relative;
   cursor: pointer;

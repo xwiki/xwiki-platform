@@ -40,17 +40,13 @@
         <!-- Note: We don't need to define a "org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern" attribute
              since 1) we don't use tlds and 2) starting with Jetty 8.x, jetty employs a Servlet 3.0 way of finding
              tlds, see http://wiki.eclipse.org/Jetty/Howto/Configure_JSP#Jetty_8.x -->
-        <!-- Note: Once we start using Servlet 3.0 we'll need to set the attribute named
-             "org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern" to not incur too heavy startup times.
-             See http://wiki.eclipse.org/Jetty/Howto/Avoid_slow_deployment.
 
-             Example:
-
-               <Call name="setContextAttribute">
-                 <Arg>org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern</Arg>
-                 <Arg>.*/.*myPrefixedJarToScan1-[^/]\.jar$|.*/.*myPrefixedJarToScan2-[^/]\.jar$</Arg>
-               </Call>
-        -->
+        <!-- Prevent any JAR scanning for tlds, etc, in order to improve startup speed. Seems it makes us win about
+             10% on startup time. -->
+        <Call name="setContextAttribute">
+          <Arg>org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern</Arg>
+          <Arg>somethingnotmatching.jar</Arg>
+        </Call>
 
         <Call name="addAppProvider">
           <Arg>

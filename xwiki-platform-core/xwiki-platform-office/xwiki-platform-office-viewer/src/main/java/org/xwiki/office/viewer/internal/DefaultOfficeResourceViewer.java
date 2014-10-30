@@ -157,11 +157,11 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
     @Inject
     private Logger logger;
 
-    String getFilePath(String resourceName, String fileName)
+    String getFilePath(String resourceName, String fileName, Map<String, ?> parameters)
     {
         try {
-            return URLEncoder.encode(getSafeFileName(resourceName), DEFAULT_ENCODING) + '/'
-                + URLEncoder.encode(getSafeFileName(fileName), DEFAULT_ENCODING);
+            return URLEncoder.encode(getSafeFileName(resourceName), DEFAULT_ENCODING) + '/' + parameters.hashCode()
+                + '/' + URLEncoder.encode(getSafeFileName(fileName), DEFAULT_ENCODING);
         } catch (UnsupportedEncodingException e) {
             // Should never happen
 
@@ -180,10 +180,12 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
      *            during the office import process should be processed
      * @param attachmentReference a reference to the office file that is being viewed; this reference is used to compute
      *            the path to the temporary directory holding the image artifacts
+     * @param parameters the build parameters. Note that currently only {@code filterStyles} is supported and if "true"
+     *            it means that styles will be filtered to the maximum and the focus will be put on importing only the
      * @return the set of temporary files corresponding to image artifacts
      */
     private Set<File> processImages(XDOM xdom, Map<String, byte[]> artifacts, DocumentReference documentReference,
-        String resourceReference)
+        String resourceReference, Map<String, ?> parameters)
     {
         // Process all image blocks.
         Set<File> temporaryFiles = new HashSet<File>();
@@ -194,7 +196,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             // Check whether there is a corresponding artifact.
             if (artifacts.containsKey(imageReference)) {
                 try {
-                    String filePath = getFilePath(resourceReference, imageReference);
+                    String filePath = getFilePath(resourceReference, imageReference, parameters);
 
                     // Write the image into a temporary file.
                     File tempFile = getTemporaryFile(documentReference, filePath);
@@ -339,7 +341,7 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             XDOM xdom = xdomOfficeDocument.getContentDocument();
             Set<File> temporaryFiles =
                 processImages(xdom, xdomOfficeDocument.getArtifacts(), attachmentReference.getDocumentReference(),
-                    this.resourceReferenceSerializer.serialize(reference));
+                    this.resourceReferenceSerializer.serialize(reference), parameters);
             view =
                 new AttachmentOfficeDocumentView(reference, attachmentReference, attachmentVersion, xdom,
                     temporaryFiles);
@@ -366,7 +368,8 @@ public class DefaultOfficeResourceViewer implements OfficeResourceViewer, Initia
             XDOMOfficeDocument xdomOfficeDocument = createXDOM(ownerDocument, resourceReference, parameters);
             XDOM xdom = xdomOfficeDocument.getContentDocument();
             Set<File> temporaryFiles =
-                processImages(xdom, xdomOfficeDocument.getArtifacts(), ownerDocument, serializedResourceReference);
+                processImages(xdom, xdomOfficeDocument.getArtifacts(), ownerDocument, serializedResourceReference,
+                    parameters);
             view = new OfficeDocumentView(resourceReference, xdom, temporaryFiles);
 
             this.externalCache.set(cacheKey, view);

@@ -56,7 +56,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.reference.AttachmentResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
-import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceTypeSerializer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
@@ -313,10 +312,10 @@ public class DefaultOfficeResourceViewerTest
 
         DefaultOfficeResourceViewer implementation = (DefaultOfficeResourceViewer) mocker.getComponentUnderTest();
         File tempFile =
-            implementation
-                .getTemporaryFile(ATTACHMENT_REFERENCE.getDocumentReference(), "Test+file.doc/some+image.png");
+            implementation.getTemporaryFile(ATTACHMENT_REFERENCE.getDocumentReference(),
+                "Test+file.doc/0/some+image.png");
         Assert.assertTrue(tempFile.getAbsolutePath().endsWith(
-            "/temp/officeviewer/xwiki/Main/Test/Test+file.doc/some+image.png"));
+            "/temp/officeviewer/xwiki/Main/Test/Test+file.doc/0/some+image.png"));
     }
 
     /**
@@ -331,7 +330,9 @@ public class DefaultOfficeResourceViewerTest
             .thenReturn("/xwiki/bin/temp/Main/Test");
 
         DefaultOfficeResourceViewer implementation = (DefaultOfficeResourceViewer) mocker.getComponentUnderTest();
-        String filePath = implementation.getFilePath(ATTACHMENT_REFERENCE.getName(), "some temporary artifact.gif");
-        Assert.assertEquals("Test+file.doc/some+temporary+artifact.gif", filePath);
+        String filePath =
+            implementation.getFilePath(ATTACHMENT_REFERENCE.getName(), "some temporary artifact.gif",
+                Collections.<String, Object>emptyMap());
+        Assert.assertEquals("Test+file.doc/0/some+temporary+artifact.gif", filePath);
     }
 }

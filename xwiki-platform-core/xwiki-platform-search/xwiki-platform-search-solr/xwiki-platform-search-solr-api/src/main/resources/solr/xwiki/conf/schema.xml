@@ -932,6 +932,9 @@
     <fieldType name="text_fr" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
+        <!-- A French word should be less than 30 characters, according to
+          http://en.wikipedia.org/wiki/Longest_words#French -->
+        <filter class="solr.LengthFilterFactory" min="1" max="30" />
         <!-- removes l', etc -->
         <filter class="solr.ElisionFilterFactory" ignoreCase="true" articles="lang/contractions_fr.txt"/>
         <filter class="solr.LowerCaseFilterFactory"/>
@@ -939,6 +942,8 @@
         <filter class="solr.FrenchLightStemFilterFactory"/>
         <!-- less aggressive: <filter class="solr.FrenchMinimalStemFilterFactory"/> -->
         <!-- more aggressive: <filter class="solr.SnowballPorterFilterFactory" language="French"/> -->
+        <!-- Remove accents -->
+        <filter class="solr.ASCIIFoldingFilterFactory"/>
       </analyzer>
     </fieldType>
     

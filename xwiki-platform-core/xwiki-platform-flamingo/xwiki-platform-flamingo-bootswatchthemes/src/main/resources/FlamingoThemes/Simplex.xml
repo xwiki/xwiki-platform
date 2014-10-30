@@ -831,7 +831,7 @@
       <btn-info-color/>
     </property>
     <property>
-      <btn-primary-bg/>
+      <btn-primary-bg>#d9230f</btn-primary-bg>
     </property>
     <property>
       <btn-primary-color/>
@@ -1899,7 +1899,7 @@ label {
 </lessCode>
     </property>
     <property>
-      <link-color/>
+      <link-color>#d9230f</link-color>
     </property>
     <property>
       <logo/>

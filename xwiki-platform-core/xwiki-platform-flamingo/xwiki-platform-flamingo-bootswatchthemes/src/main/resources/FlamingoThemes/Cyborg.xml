@@ -780,7 +780,7 @@
     <className>FlamingoThemesCode.ThemeClass</className>
     <guid>55f01b0b-3774-4d28-82dc-060e50504e0f</guid>
     <property>
-      <body-bg/>
+      <body-bg>#060606</body-bg>
     </property>
     <property>
       <brand-danger/>
@@ -1927,7 +1927,8 @@ a.thumbnail.active {
 
 .nav &gt; li &gt; a {
   color: @navbar-default-color;
-}</lessCode>
+}
+</lessCode>
     </property>
     <property>
       <link-color/>
@@ -1936,10 +1937,10 @@ a.thumbnail.active {
       <logo/>
     </property>
     <property>
-      <navbar-default-bg/>
+      <navbar-default-bg>#060606</navbar-default-bg>
     </property>
     <property>
-      <navbar-default-color/>
+      <navbar-default-color>#ffffff</navbar-default-color>
     </property>
     <property>
       <navbar-default-link-active-bg/>
@@ -1948,7 +1949,7 @@ a.thumbnail.active {
       <navbar-default-link-active-color/>
     </property>
     <property>
-      <navbar-default-link-color/>
+      <navbar-default-link-color>#ffffff</navbar-default-link-color>
     </property>
     <property>
       <navbar-default-link-hover-bg/>
@@ -1960,16 +1961,16 @@ a.thumbnail.active {
       <navbar-height/>
     </property>
     <property>
-      <panel-bg/>
+      <panel-bg>#060606</panel-bg>
     </property>
     <property>
-      <panel-default-text/>
+      <panel-default-text>#ffffff</panel-default-text>
     </property>
     <property>
-      <text-color/>
+      <text-color>#999999</text-color>
     </property>
     <property>
-      <xwiki-page-content-bg />
+      <xwiki-page-content-bg>#060606</xwiki-page-content-bg>
     </property>
   </object>
   <content/>

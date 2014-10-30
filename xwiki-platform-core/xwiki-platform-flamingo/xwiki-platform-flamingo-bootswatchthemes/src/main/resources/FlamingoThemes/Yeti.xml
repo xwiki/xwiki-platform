@@ -816,7 +816,7 @@
       <btn-default-bg/>
     </property>
     <property>
-      <btn-default-border/>
+      <btn-default-border>#ffffff</btn-default-border>
     </property>
     <property>
       <btn-default-color/>
@@ -2203,10 +2203,10 @@ label,
       <logo/>
     </property>
     <property>
-      <navbar-default-bg/>
+      <navbar-default-bg>#333233</navbar-default-bg>
     </property>
     <property>
-      <navbar-default-color/>
+      <navbar-default-color>#ffffff</navbar-default-color>
     </property>
     <property>
       <navbar-default-link-active-bg/>
@@ -2215,7 +2215,7 @@ label,
       <navbar-default-link-active-color/>
     </property>
     <property>
-      <navbar-default-link-color/>
+      <navbar-default-link-color>#ffffff</navbar-default-link-color>
     </property>
     <property>
       <navbar-default-link-hover-bg/>

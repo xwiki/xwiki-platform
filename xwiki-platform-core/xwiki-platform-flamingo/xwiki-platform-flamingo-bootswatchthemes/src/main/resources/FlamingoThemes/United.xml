@@ -1847,19 +1847,20 @@ RK5CYII=
 // Progress bars ==============================================================
 
 // Containers =================================================================
+
 </lessCode>
     </property>
     <property>
-      <link-color/>
+      <link-color>#dd4814</link-color>
     </property>
     <property>
       <logo>logo.png</logo>
     </property>
     <property>
-      <navbar-default-bg/>
+      <navbar-default-bg>#dd4814</navbar-default-bg>
     </property>
     <property>
-      <navbar-default-color/>
+      <navbar-default-color>#ffffff</navbar-default-color>
     </property>
     <property>
       <navbar-default-link-active-bg/>
@@ -1868,7 +1869,7 @@ RK5CYII=
       <navbar-default-link-active-color/>
     </property>
     <property>
-      <navbar-default-link-color/>
+      <navbar-default-link-color>#ffffff</navbar-default-link-color>
     </property>
     <property>
       <navbar-default-link-hover-bg/>

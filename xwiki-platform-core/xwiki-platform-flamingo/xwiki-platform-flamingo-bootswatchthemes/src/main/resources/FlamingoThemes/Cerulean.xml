@@ -1889,7 +1889,7 @@
       <logo/>
     </property>
     <property>
-      <navbar-default-bg/>
+      <navbar-default-bg>#2FA4E7</navbar-default-bg>
     </property>
     <property>
       <navbar-default-color/>

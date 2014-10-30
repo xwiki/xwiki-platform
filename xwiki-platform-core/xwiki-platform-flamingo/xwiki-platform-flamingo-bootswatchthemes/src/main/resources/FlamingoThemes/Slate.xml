@@ -780,7 +780,7 @@
     <className>FlamingoThemesCode.ThemeClass</className>
     <guid>60c07a36-dad4-4b1e-82cb-ebb84c166e78</guid>
     <property>
-      <body-bg/>
+      <body-bg>#272b30</body-bg>
     </property>
     <property>
       <brand-danger/>
@@ -2148,16 +2148,16 @@ ul.nav.nav-pills.nav-stacked li{
 </lessCode>
     </property>
     <property>
-      <link-color/>
+      <link-color>#ffffff</link-color>
     </property>
     <property>
       <logo/>
     </property>
     <property>
-      <navbar-default-bg/>
+      <navbar-default-bg>#3a3f44</navbar-default-bg>
     </property>
     <property>
-      <navbar-default-color/>
+      <navbar-default-color>#ffffff</navbar-default-color>
     </property>
     <property>
       <navbar-default-link-active-bg/>
@@ -2166,7 +2166,7 @@ ul.nav.nav-pills.nav-stacked li{
       <navbar-default-link-active-color/>
     </property>
     <property>
-      <navbar-default-link-color/>
+      <navbar-default-link-color>#ffffff</navbar-default-link-color>
     </property>
     <property>
       <navbar-default-link-hover-bg/>
@@ -2178,16 +2178,16 @@ ul.nav.nav-pills.nav-stacked li{
       <navbar-height/>
     </property>
     <property>
-      <panel-bg/>
+      <panel-bg>#272b30</panel-bg>
     </property>
     <property>
       <panel-default-text/>
     </property>
     <property>
-      <text-color/>
+      <text-color>#c8c8c8</text-color>
     </property>
     <property>
-      <xwiki-page-content-bg/>
+      <xwiki-page-content-bg>#272b30</xwiki-page-content-bg>
     </property>
   </object>
   <content/>

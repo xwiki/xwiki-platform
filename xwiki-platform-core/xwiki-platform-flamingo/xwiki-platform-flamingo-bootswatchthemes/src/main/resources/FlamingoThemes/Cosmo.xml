@@ -1960,10 +1960,10 @@ table,
       <logo/>
     </property>
     <property>
-      <navbar-default-bg/>
+      <navbar-default-bg>#000000</navbar-default-bg>
     </property>
     <property>
-      <navbar-default-color/>
+      <navbar-default-color>#ffffff</navbar-default-color>
     </property>
     <property>
       <navbar-default-link-active-bg/>

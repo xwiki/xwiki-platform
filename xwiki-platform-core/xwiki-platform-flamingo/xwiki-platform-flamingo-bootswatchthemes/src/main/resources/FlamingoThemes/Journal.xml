@@ -831,7 +831,7 @@
       <btn-info-color/>
     </property>
     <property>
-      <btn-primary-bg/>
+      <btn-primary-bg>#eb6864</btn-primary-bg>
     </property>
     <property>
       <btn-primary-color/>
@@ -1879,7 +1879,7 @@
 </lessCode>
     </property>
     <property>
-      <link-color/>
+      <link-color>#eb6864</link-color>
     </property>
     <property>
       <logo/>

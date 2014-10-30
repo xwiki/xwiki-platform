@@ -829,7 +829,7 @@ RK5CYII=
     <className>FlamingoThemesCode.ThemeClass</className>
     <guid>8e0ce202-38f5-4242-9273-0e800ae70117</guid>
     <property>
-      <body-bg/>
+      <body-bg>#222222</body-bg>
     </property>
     <property>
       <brand-danger/>
@@ -2103,10 +2103,10 @@ textarea {
       <logo>logo.png</logo>
     </property>
     <property>
-      <navbar-default-bg/>
+      <navbar-default-bg>#375a7f</navbar-default-bg>
     </property>
     <property>
-      <navbar-default-color/>
+      <navbar-default-color>#ffffff</navbar-default-color>
     </property>
     <property>
       <navbar-default-link-active-bg/>
@@ -2115,7 +2115,7 @@ textarea {
       <navbar-default-link-active-color/>
     </property>
     <property>
-      <navbar-default-link-color/>
+      <navbar-default-link-color>#ffffff</navbar-default-link-color>
     </property>
     <property>
       <navbar-default-link-hover-bg/>
@@ -2127,16 +2127,16 @@ textarea {
       <navbar-height/>
     </property>
     <property>
-      <panel-bg/>
+      <panel-bg>#222222</panel-bg>
     </property>
     <property>
       <panel-default-text/>
     </property>
     <property>
-      <text-color/>
+      <text-color>#ffffff</text-color>
     </property>
     <property>
-      <xwiki-page-content-bg/>
+      <xwiki-page-content-bg>#222222</xwiki-page-content-bg>
     </property>
   </object>
   <content/>

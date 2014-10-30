@@ -810,7 +810,7 @@
       <btn-danger-bg/>
     </property>
     <property>
-      <btn-danger-color/>
+      <btn-danger-color>#93c54b</btn-danger-color>
     </property>
     <property>
       <btn-default-bg/>
@@ -1954,16 +1954,16 @@ input,
 </lessCode>
     </property>
     <property>
-      <link-color/>
+      <link-color>#93c54b</link-color>
     </property>
     <property>
       <logo/>
     </property>
     <property>
-      <navbar-default-bg/>
+      <navbar-default-bg>#4d4c4d</navbar-default-bg>
     </property>
     <property>
-      <navbar-default-color/>
+      <navbar-default-color>#93c54b</navbar-default-color>
     </property>
     <property>
       <navbar-default-link-active-bg/>
@@ -1972,7 +1972,7 @@ input,
       <navbar-default-link-active-color/>
     </property>
     <property>
-      <navbar-default-link-color/>
+      <navbar-default-link-color>#93C54B</navbar-default-link-color>
     </property>
     <property>
       <navbar-default-link-hover-bg/>

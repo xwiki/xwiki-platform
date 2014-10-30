@@ -100,7 +100,7 @@
 #macro(initFromFlamingoTheme)
   // Colors from the new flamingo theme class
   ## Set the XWiki variables
-  @xwiki-page-content-bg:               @body-bg;
+  @xwiki-page-content-bg:               $theme.pageContentBackgroundColor;
   @xwiki-border-color:                  $theme.borderColor;
   @xwiki-panel-header-bg:               $theme.panelHeaderBackgroundColor;
   @xwiki-panel-header-text:             $theme.panelHeaderTextColor;

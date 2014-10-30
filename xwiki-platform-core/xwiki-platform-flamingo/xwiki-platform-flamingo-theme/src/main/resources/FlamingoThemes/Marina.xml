@@ -21,30 +21,39 @@
 -->
 
 <xwikidoc version="1.1">
-  <web>FlamingoThemesCode</web>
-  <name>ThemeTemplate</name>
+  <web>FlamingoThemes</web>
+  <name>Marina</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1414497923000</creationDate>
-  <parent>FlamingoThemesCode.ThemeClass</parent>
+  <creationDate>1414602826000</creationDate>
+  <parent>FlamingoThemes.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1414516443000</date>
-  <contentUpdateDate>1414497926000</contentUpdateDate>
+  <date>1414604887000</date>
+  <contentUpdateDate>1414603381000</contentUpdateDate>
   <version>1.1</version>
-  <title/>
+  <title>Marina</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content/>
+  <attachment>
+    <filename>logo.png</filename>
+    <author>XWiki.Admin</author>
+    <date>1414603381000</date>
+    <version>1.1</version>
+    <comment/>
+    <content>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</content>
+    <filesize>2228</filesize>
+  </attachment>
   <object>
-    <name>FlamingoThemesCode.ThemeTemplate</name>
+    <name>FlamingoThemes.Marina</name>
     <number>0</number>
     <className>FlamingoThemesCode.ThemeClass</className>
-    <guid>6d190ae2-62f2-49be-87a3-add606256c3f</guid>
+    <guid>8b0bad96-977f-466b-900f-e05efe6cfb55</guid>
     <class>
       <name>FlamingoThemesCode.ThemeClass</name>
       <customClass/>
@@ -779,7 +788,7 @@
       </xwiki-page-content-bg>
     </class>
     <property>
-      <body-bg/>
+      <body-bg>#dce7fa</body-bg>
     </property>
     <property>
       <brand-danger/>
@@ -794,10 +803,10 @@
       <brand-success/>
     </property>
     <property>
-      <brand-warning/>
+      <brand-warning>#7d611a</brand-warning>
     </property>
     <property>
-      <breadcrumb-bg/>
+      <breadcrumb-bg>#dce7fa</breadcrumb-bg>
     </property>
     <property>
       <breadcrumb-color/>
@@ -812,7 +821,7 @@
       <btn-danger-color/>
     </property>
     <property>
-      <btn-default-bg/>
+      <btn-default-bg>#cfcfcf</btn-default-bg>
     </property>
     <property>
       <btn-default-border/>
@@ -824,19 +833,19 @@
       <btn-font-weight/>
     </property>
     <property>
-      <btn-info-bg/>
+      <btn-info-bg>#1d5a70</btn-info-bg>
     </property>
     <property>
       <btn-info-color/>
     </property>
     <property>
-      <btn-primary-bg/>
+      <btn-primary-bg>#0e0b78</btn-primary-bg>
     </property>
     <property>
       <btn-primary-color/>
     </property>
     <property>
-      <btn-success-bg/>
+      <btn-success-bg>#4b754e</btn-success-bg>
     </property>
     <property>
       <btn-success-color/>
@@ -866,7 +875,7 @@
       <dropdown-link-color/>
     </property>
     <property>
-      <dropdown-link-hover-bg/>
+      <dropdown-link-hover-bg>#dce7fa</dropdown-link-hover-bg>
     </property>
     <property>
       <dropdown-link-hover-color/>
@@ -908,34 +917,45 @@
       <legend-color/>
     </property>
     <property>
-      <lessCode/>
+      <lessCode>.navbar{
+  #gradient &gt; .vertical-three-colors(lighten(@navbar-default-bg, 10%), @navbar-default-bg, 50%, darken(@navbar-default-bg, 5%));
+}
+
+@state-info-bg: #d4fffc;
+@state-warning-bg: #ffeec2;
+
+
+
+
+
+</lessCode>
     </property>
     <property>
-      <link-color/>
+      <link-color>#2980cc</link-color>
     </property>
     <property>
-      <logo/>
+      <logo>logo.png</logo>
     </property>
     <property>
-      <navbar-default-bg/>
+      <navbar-default-bg>#0e196e</navbar-default-bg>
     </property>
     <property>
-      <navbar-default-color/>
+      <navbar-default-color>#ffffff</navbar-default-color>
     </property>
     <property>
-      <navbar-default-link-active-bg/>
+      <navbar-default-link-active-bg>#103991</navbar-default-link-active-bg>
     </property>
     <property>
-      <navbar-default-link-active-color/>
+      <navbar-default-link-active-color>#ffffff</navbar-default-link-active-color>
     </property>
     <property>
-      <navbar-default-link-color/>
+      <navbar-default-link-color>#ffffff</navbar-default-link-color>
     </property>
     <property>
-      <navbar-default-link-hover-bg/>
+      <navbar-default-link-hover-bg>#103991</navbar-default-link-hover-bg>
     </property>
     <property>
-      <navbar-default-link-hover-color/>
+      <navbar-default-link-hover-color>#ffffff</navbar-default-link-hover-color>
     </property>
     <property>
       <navbar-height/>
@@ -947,10 +967,10 @@
       <panel-default-text/>
     </property>
     <property>
-      <text-color/>
+      <text-color>#091154</text-color>
     </property>
     <property>
-      <xwiki-page-content-bg/>
+      <xwiki-page-content-bg>#ffffff</xwiki-page-content-bg>
     </property>
   </object>
 </xwikidoc>

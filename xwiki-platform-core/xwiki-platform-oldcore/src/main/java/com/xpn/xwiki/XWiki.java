@@ -3383,6 +3383,12 @@ public class XWiki implements EventListener
             doc.setCreatorReference(doc.getDocumentReference());
             doc.setAuthorReference(doc.getDocumentReference());
 
+            // The information from the user profile needs to be indexed using the proper locale. If multilingual is
+            // enabled then the user can choose the desired language (from the list of supported languages) before
+            // registering. An administrator registering users can do the same. Otherwise, if there is only one language
+            // supported then that langage will be used.
+            doc.setDefaultLocale(context.getLocale());
+
             protectUserPage(doc.getFullName(), userRights, doc, context);
 
             saveDocument(doc, context.getMessageTool().get("core.comment.createdUser"), context);

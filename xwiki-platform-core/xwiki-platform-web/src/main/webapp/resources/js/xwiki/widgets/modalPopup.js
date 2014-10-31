@@ -192,8 +192,9 @@ widgets.ModalPopup = Class.create({
   registerShortcuts : function(action) {
     var shortcuts = this.shortcuts[action].keys;
     var method = this.shortcuts[action].method.bindAsEventListener(this, action);
+    var options = this.shortcuts[action].options;
     for (var i = 0; i < shortcuts.size(); ++i) {
-      shortcut.add(shortcuts[i], method);
+      shortcut.add(shortcuts[i], method, options);
     }
   },
   /**

@@ -113,7 +113,13 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     if ((!highlightedSuggestion || highlightedSuggestion.hasClassName('noSuggestion')) && this.input.value != "") {
       Event.stop(event);
       var reference = XWiki.Model.resolve(this.input.value, XWiki.EntityType.DOCUMENT);
-      window.self.location = this.urlTemplate.replace("__space__", reference.parent.name).replace("__document__", reference.name).replace("__action__", mode);
+      if (reference.parent) {
+        window.self.location = this.urlTemplate.replace("__space__", reference.parent.name).replace("__document__", reference.name).replace("__action__", mode);
+      } else {
+        if (typeof(XWiki.widgets.Suggest) != "undefined") {
+          new XWiki.widgets.Notification("$services.localization.render('core.viewers.jump.dialog.invalidNameError')", 'error');
+        }
+      }
     }
   },
   addQuickLinksEntry : function() {

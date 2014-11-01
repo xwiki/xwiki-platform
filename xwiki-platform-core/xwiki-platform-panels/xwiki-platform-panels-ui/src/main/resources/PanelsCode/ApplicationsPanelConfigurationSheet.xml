@@ -128,17 +128,18 @@
  ************************************/
 require.config({
   paths: {
-    'jquery-ui' : '$services.webjars.url('jquery-ui/1.11.1/jquery-ui.min.js')'
+    'jquery-ui' : '$services.webjars.url('jquery-ui/1.11.1/jquery-ui.min.js')',
+    'jquery-ui-touch-punch' : '$services.webjars.url('jquery-ui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js')'
   },
   shim: {
-    'jquery-ui' : ['jquery']
+    'jquery-ui' : ['jquery'],
+    'jquery-ui-touch-punch': ['jquery', 'jquery-ui']
   }
 });
 /************************************
- * Script that enable the drag &amp; drop af applications
+ * Script that enable the drag &amp; drop of applications
  ************************************/
-require(['jquery', 'xwiki-meta', 'jquery-ui'], function($, xm) {
-  
+require(['jquery', 'xwiki-meta', 'jquery-ui', 'jquery-ui-touch-punch'], function($, xm) {
   /**
    * Panel ID that contains the last selected application
    */
@@ -223,6 +224,8 @@ require(['jquery', 'xwiki-meta', 'jquery-ui'], function($, xm) {
       },
       // On stop: move the element to the other list
       stop: function(event, ui) {
+        // Reset the z-index
+        $(this).css('z-index', 1);
         if (lastDraggedObjectParent == 'displayedPanels' &amp;&amp; isInContainer(this, 'blacklistedPanels')) {
           moveToContainer(this, '#blacklistedPanels &gt; div &gt; ul')
         } else if (lastDraggedObjectParent == 'blacklistedPanels' &amp;&amp; isInContainer(this, 'displayedPanels')){
@@ -233,9 +236,24 @@ require(['jquery', 'xwiki-meta', 'jquery-ui'], function($, xm) {
   }
   
   /**
-   * First: init all applications marked with the 'draggableApp' class
+   * Wait until all the DOM elements we want to initialize are ready.
+   * We cannot rely on $(window).load() or $(window).ready() because of the asynchronous nature of requirejs
+   * (see: http://requirejs.org/docs/api.html#pageload).
    */
-  $(window).load(function() {
+  var waitDOMReady = function(callback) {
+    // if the dom elements that we want to initialize are not loaded
+    if ($('.draggableApp').length == 0) {
+      // then retry in 100ms
+      setTimeout(function(){waitDOMReady(callback);}, 100);
+    } else {
+       callback();
+    }
+  }
+
+  /**
+   * First: init all applications marked with the 'draggableApp' class.
+   */
+  waitDOMReady(function() {
     initDragAndDrop('.draggableApp');
     
     $('#bt-revert').click(function(){

@@ -158,8 +158,6 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     @Override
     public void dispose() throws ComponentLifecycleException
     {
-        this.cache.removeAll();
-
         this.observation.removeListener(getCacheId());
     }
 

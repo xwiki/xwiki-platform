@@ -55,6 +55,10 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
         verticalPosition : "top"
       }
     );
+
+    // Allow the default close event ('Escape' key) to propagate so that the ajaxsuggest can catch it and clear the suggestions list.
+    this.shortcuts['close'].options = { 'propagate' : true };
+
     this.addQuickLinksEntry();
   },
   /**
@@ -99,6 +103,15 @@ widgets.JumpToPage = Class.create(widgets.ModalPopup, {
     this.input.value = '';
     // Focus the input field
     this.input.focus();
+  },
+  /** Called when the dialog is closed. Overriding default behavior to check if the user actually wanted to close the suggestions list instead. */
+  closeDialog : function($super, event) {
+    if (!event.type.startsWith('key') || !this.dialogBox.down('.ajaxsuggest')) {
+      // Close the dialog either from the close/x button (mouse event) or when the keyboard shortcut (Escape key) is used and there is no ajax suggestion list displayed.
+      $super();
+      // Clear the suggestion list so that it does not flicker next time we open the dialog.
+      this.input.__x_suggest.clearSuggestions();
+    }
   },
   /**
    * Open the selected document in the specified mode.

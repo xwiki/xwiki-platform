@@ -280,6 +280,14 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
   };
 
   var getDefaultParams = function(element) {
+    var baseParams = {
+      core: {
+        themes: {
+          name: 'xwiki',
+          responsive: element.attr('data-responsive') == 'true'
+        }
+      }
+    };
     if (element.attr('data-url')) {
       var plugins = [];
       if (element.attr('data-dragAndDrop') == 'true') {
@@ -288,13 +296,10 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       if (element.attr('data-contextMenu') == 'true') {
         plugins.push('contextmenu');
       }
-      return {
+      return $.extend(true, baseParams, {
         core: {
           data: getChildren,
-          check_callback: validateOperation,
-          themes: {
-            responsive: element.attr('data-responsive') == 'true'
-          }
+          check_callback: validateOperation
         },
         plugins: plugins,
         dnd: {
@@ -303,10 +308,10 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
         contextmenu: {
           items: getContextMenuItems
         }
-      };
+      });
     } else {
       // The tree structure is in-line.
-      return {};
+      return baseParams;
     }
   };
 

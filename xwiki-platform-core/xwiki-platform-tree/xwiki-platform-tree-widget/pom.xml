@@ -45,7 +45,7 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>jstree</artifactId>
-      <version>3.0.4</version>
+      <version>3.0.8</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -57,6 +57,24 @@
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.lesscss</groupId>
+        <artifactId>lesscss-maven-plugin</artifactId>
+        <version>1.7.0.1.1</version>
+        <configuration>
+          <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+          <includes>
+            <include>tree.less</include>
+          </includes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>

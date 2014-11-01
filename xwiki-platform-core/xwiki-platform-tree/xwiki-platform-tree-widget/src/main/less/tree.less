@@ -1,0 +1,37 @@
+/*! #template('colorThemeInit.vm') */
+
+@theme-name: xwiki;
+@hovered-bg-color: $theme.highlightColor;
+@hovered-shadow-color: #cccccc;
+@disabled-color: #666666;
+@disabled-bg-color: #efefef;
+@clicked-bg-color: #beebff;
+@clicked-shadow-color: #999999;
+@clicked-gradient-color-1: #beebff;
+@clicked-gradient-color-2: #a8e4ff;
+@search-result-color: #8b0000;
+@mobile-wholerow-bg-color: #ebebeb;
+@mobile-wholerow-shadow: #666666;
+@mobile-wholerow-bordert: rgba(255,255,255,0.7);
+@mobile-wholerow-borderb: rgba(64,64,64,0.2);
+@responsive: true;
+@image-path: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-widget', '')";
+@base-height: 40px;
+
+@import "jstree/mixins.less";
+@import "jstree/base.less";
+@import "jstree/main.less";
+
+/* Custom styles for XWiki */
+.jstree ul.jstree-children {
+  /* Overwrite the margin and padding from the XWiki skin. */
+  margin: 0;
+  padding: 0;
+}
+.jstree-contextmenu {
+  z-index: 100;
+  a * {
+    /* Overwrite the line height from the XWiki skin. */
+    line-height: inherit;
+  }
+}

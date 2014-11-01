@@ -322,6 +322,10 @@
                 <goal>compress</goal>
               </goals>
               <configuration>
+                <sourceDirectory>${webjar.contentDirectory}</sourceDirectory>
+                <excludes>
+                  <exclude>**/*.min.*</exclude>
+                </excludes>
                 <outputDirectory>${webjar.contentDirectory}</outputDirectory>
                 <!-- Don't overwrite the original version. -->
                 <nosuffix>false</nosuffix>

@@ -183,17 +183,16 @@
     </property>
     <property>
       <code>/*
-#set ($jsTreeVersion = '3.0.4')
-#set ($platformVersion = '6.3-SNAPSHOT')
+#set ($jsTreeVersion = '3.0.8')
 */
 require.config({
   paths: {
     jsTree: [
       '//cdnjs.cloudflare.com/ajax/libs/jstree/$jsTreeVersion/jstree.min',
-      '$!services.webjars.url("jstree/$jsTreeVersion/jstree.min.js")'
+      "$!services.webjars.url('jstree', 'jstree.min.js')"
     ],
-    JobRunner: '$!services.webjars.url("xwiki-platform-job-web/$platformVersion/jobRunner.js")',
-    tree: '$!services.webjars.url("xwiki-platform-tree-widget/$platformVersion/tree.js")'
+    JobRunner: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-job-web', 'jobRunner.min.js')",
+    tree: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-widget', 'tree.min.js')"
   },
   shim: {
     jsTree: {
@@ -211,11 +210,7 @@ require.config({
     document.getElementsByTagName("head")[0].appendChild(link);
   }
 })([
-  // FIXME: We don't load the jsTree CSS from the webjar because images used in the CSS are not loaded.
-  // See XWIKI-10881: Introduce a proper "webjars" type instead of reusing the "bin" type
-  //'$!services.webjars.url("jstree/$jsTreeVersion/themes/default/style.min.css")',
-  '//cdnjs.cloudflare.com/ajax/libs/jstree/$jsTreeVersion/themes/default/style.min.css',
-  '$!services.webjars.url("xwiki-platform-tree-widget/$platformVersion/tree.min.css")'
+  "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-widget', 'tree.min.css', {'evaluate': true})"
 ]);
 
 require(['tree'], function($) {
@@ -349,7 +344,11 @@ require(['tree'], function($) {
     <property>
       <code>{{velocity output="false"}}
 #set ($discard = $xwiki.jsx.use($xcontext.macro.doc, {'minify': false}))
-#set ($attributes = ['class="xtree"', 'data-responsive="true"'])
+#set ($class = $xcontext.macro.params.get('class'))
+#set ($attributes = [
+  "class='xtree $!escapetool.xml($class)'",
+  'data-responsive="true"'
+])
 #if ("$!xcontext.macro.params.source" != '')
   #set ($source = $xcontext.macro.params.source)
   #if ($source.startsWith('path:'))
@@ -661,6 +660,72 @@ require(['tree'], function($) {
     </property>
     <property>
       <name>contextMenu</name>
+    </property>
+  </object>
+  <object>
+    <name>Macros.Tree</name>
+    <number>4</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>43c2f5b5-2e18-46b0-80b3-a05ae86b20a0</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>Additional CSS classes to add to the top level HTML element of the tree.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>class</name>
     </property>
   </object>
 </xwikidoc>

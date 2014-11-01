@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Adds support for packaging JS files using WebJars</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.86</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.85</xwiki.jacoco.instructionRatio>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>WebJars Integration</xwiki.extension.name>
   </properties>
@@ -50,6 +50,12 @@
       <!-- Used to determine the WebJar version when it is not specified. -->
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-extension-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <!-- Used to evaluate the Velocity code from the WebJar resources. -->
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-velocity</artifactId>
       <version>${commons.version}</version>
     </dependency>
     <dependency>

@@ -72,7 +72,11 @@ var XWiki = (function(XWiki){
     unifiedLoader: false,
     // The DOM node to use to display the loading indicator when in mode unified loader (it will receive a "loading" class name for the time of the loading)
     // Default is null, which falls back on the input itself. This option is used only when unifiedLoader is true.
-    loaderNode: null
+    loaderNode: null,
+    // A list of key codes for which to propagate the keyboard event.
+    // Useful when another keyboard event listener exists on the input field, even if it may be registered at a diferent level.
+    // By default, the handled key events do not propagate, the rest do. See #onKeyPress
+    propagateEventKeyCodes : []
   },
   sInput : "",
   nInputChars : 0,
@@ -202,6 +206,7 @@ var XWiki = (function(XWiki){
       return;
     }
     var key = event.keyCode;
+    var checkPropagation = true;
 
     switch(key) {
       case Event.KEY_RETURN:
@@ -209,22 +214,24 @@ var XWiki = (function(XWiki){
           this.highlightFirst();
         }
         this.setHighlightedValue();
-        Event.stop(event);
         break;
       case Event.KEY_ESC:
         this.clearSuggestions();
-        Event.stop(event);
         break;
       case Event.KEY_UP:
         this.changeHighlight(key);
-        Event.stop(event);
         break;
       case Event.KEY_DOWN:
         this.changeHighlight(key);
-        Event.stop(event);
         break;
       default:
+        checkPropagation = false;
         break;
+    }
+
+    // Stop propagation for the keys we have handled, unless otherwise specified in the options.
+    if (checkPropagation && this.options.propagateEventKeyCodes && this.options.propagateEventKeyCodes.indexOf(key) == -1) {
+      Event.stop(event);
     }
   },
 

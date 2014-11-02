@@ -46,7 +46,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-tree-widget</artifactId>
+      <artifactId>xwiki-platform-tree-webjar</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Required by wiki macros -->

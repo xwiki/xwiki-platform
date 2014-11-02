@@ -32,6 +32,6 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Job - Parent POM</description>
   <modules>
-    <module>xwiki-platform-job-web</module>
+    <module>xwiki-platform-job-webjar</module>
   </modules>
 </project>

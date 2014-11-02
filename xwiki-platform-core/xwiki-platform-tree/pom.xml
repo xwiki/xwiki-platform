@@ -33,6 +33,6 @@
   <description>XWiki Platform - Tree - Parent POM</description>
   <modules>
     <module>xwiki-platform-tree-macro</module>
-    <module>xwiki-platform-tree-widget</module>
+    <module>xwiki-platform-tree-webjar</module>
   </modules>
 </project>

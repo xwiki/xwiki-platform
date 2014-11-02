@@ -24,16 +24,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-job</artifactId>
+    <artifactId>xwiki-platform-tree</artifactId>
     <version>6.3-SNAPSHOT</version>
   </parent>
   <packaging>jar</packaging>
-  <artifactId>xwiki-platform-job-web</artifactId>
-  <name>XWiki Platform - Job - Web</name>
-  <description>JavaScript API that can be used to watch the progress of a job</description>
+  <artifactId>xwiki-platform-tree-webjar</artifactId>
+  <name>XWiki Platform - Tree - WebJar</name>
+  <description>A tree widget based on jsTree</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Job Web</xwiki.extension.name>
+    <xwiki.extension.name>Tree Widget</xwiki.extension.name>
     <!-- No Java code here -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
   </properties>
@@ -42,9 +42,39 @@
       <groupId>org.webjars</groupId>
       <artifactId>jquery</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jstree</artifactId>
+      <version>3.0.8</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-job-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.lesscss</groupId>
+        <artifactId>lesscss-maven-plugin</artifactId>
+        <version>1.7.0.1.1</version>
+        <configuration>
+          <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+          <includes>
+            <include>tree.less</include>
+          </includes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>

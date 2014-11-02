@@ -191,8 +191,8 @@ require.config({
       '//cdnjs.cloudflare.com/ajax/libs/jstree/$jsTreeVersion/jstree.min',
       "$!services.webjars.url('jstree', 'jstree.min.js')"
     ],
-    JobRunner: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-job-web', 'jobRunner.min.js')",
-    tree: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-widget', 'tree.min.js')"
+    JobRunner: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', 'jobRunner.min.js')",
+    tree: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.js')"
   },
   shim: {
     jsTree: {
@@ -210,7 +210,7 @@ require.config({
     document.getElementsByTagName("head")[0].appendChild(link);
   }
 })([
-  "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-widget', 'tree.min.css', {'evaluate': true})"
+  "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css', {'evaluate': true})"
 ]);
 
 require(['tree'], function($) {

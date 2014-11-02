@@ -195,15 +195,15 @@
   'showClassProperties': false,
   'showChildDocuments': true
 })
-#set ($sourceParams = {'outputSyntax': 'plain'})
+#set ($resourceParams = {'outputSyntax': 'plain'})
 #foreach ($entry in $docTreeConfig.entrySet())
   #set ($value = $xcontext.macro.params.get($entry.key))
   #if ("$!value" != '' &amp;&amp; $value != "$!entry.value")
-    #set ($discard = $sourceParams.put($entry.key, $value))
+    #set ($discard = $resourceParams.put($entry.key, $value))
   #end
 #end
 #set ($editable = $xcontext.macro.params.readOnly != 'true')
-{{tree source="path:$xwiki.getURL($xcontext.macro.doc.documentReference, 'get', $escapetool.url($sourceParams))"
+{{tree reference="path:$xwiki.getURL($xcontext.macro.doc.documentReference, 'get', $escapetool.url($resourceParams))"
   root="$!xcontext.macro.params.root" dragAndDrop="$editable" contextMenu="$editable" /}}
 {{/velocity}}</code>
     </property>

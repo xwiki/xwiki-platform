@@ -277,6 +277,13 @@
   font-size: 0px;
 }
 
+
+// Fix: Glyphicon: the space icon has a bad width
+// (see: http://jira.xwiki.org/browse/XWIKI-10835)
+.glyphicon-folder-open:before {
+  margin-right: 3px;
+}
+
 // Export ---------------------------------------------------------------------
 #exportModal {
   .modal-body {

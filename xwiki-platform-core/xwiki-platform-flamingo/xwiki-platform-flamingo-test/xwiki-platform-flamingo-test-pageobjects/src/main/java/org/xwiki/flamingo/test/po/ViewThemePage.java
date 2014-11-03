@@ -19,20 +19,9 @@
  */
 package org.xwiki.flamingo.test.po;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
+import org.xwiki.test.ui.po.ViewPage;
 
-public class PreviewBox extends CSSGetterPage
+public class ViewThemePage extends ViewPage
 {
-    @Override
-    protected String getElementCSSValue(final By locator, String attribute)
-    {
-        try {
-            getDriver().switchTo().frame("iframe");
-            WebElement element = getDriver().findElement(locator);
-            return element.getCssValue(attribute);
-        } finally {
-            getDriver().switchTo().defaultContent();
-        }
-    }
+
 }

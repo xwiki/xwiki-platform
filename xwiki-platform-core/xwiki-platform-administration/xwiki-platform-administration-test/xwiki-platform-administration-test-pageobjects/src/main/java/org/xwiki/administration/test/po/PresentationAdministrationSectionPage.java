@@ -43,6 +43,9 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
     @FindBy(xpath = "//label[@class='colorTheme']//a[contains(text(), 'Customize')]")
     private WebElement customizeButton;
 
+    @FindBy(xpath = "//a[contains(text(), 'Manage color themes')]")
+    private WebElement manageColorThemesButton;
+
     /**
      * Default constructor.
      */
@@ -134,5 +137,15 @@ public class PresentationAdministrationSectionPage extends AdministrationSection
     public void clickOnCustomize()
     {
         customizeButton.click();
+    }
+
+    /**
+     * Click on "manage color theme".
+     *
+     * @since 6.3RC1
+     */
+    public void manageColorThemes()
+    {
+        manageColorThemesButton.click();
     }
 }

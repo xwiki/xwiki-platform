@@ -36,6 +36,7 @@ usage() {
   echo "-sp, --stopport: The Jetty stop port to use. Overrides any value from JETTY_STOP_PORT. Defaults to 8079."
   echo "-ld, --lockdir: The directory where the executing process id is stored to verify that that only one instance"
   echo "    is started. Defaults to /var/tmp."
+  echo "-j, --jmx: Allows monitoring the Jetty server with a JMX console (such as jconsole)."
   echo "-yp, --yourkitpath: The path where Yourkit can find the agent. If not passed then YourKit won't be enabled."
   echo "    For example: \"/Applications/YourKit Java Profiler 7.0.11.app/bin/mac\""
   echo "    or \"/home/User/yjp-11.0.8/bin/linux-x86-64/\""
@@ -97,6 +98,10 @@ while [[ $# > 0 ]]; do
     -ld|--lockdir)
       XWIKI_LOCK_DIR="$1"
       shift
+      ;;
+    -j|--jmx)
+      XWIKI_OPTS="$XWIKI_OPTS -Dcom.sun.management.jmxremote"
+      JETTY_OPTS="$JETTY_OPTS --module=jmx"
       ;;
     -yp|--yourkitpath)
       YOURKIT_PATH="$1"

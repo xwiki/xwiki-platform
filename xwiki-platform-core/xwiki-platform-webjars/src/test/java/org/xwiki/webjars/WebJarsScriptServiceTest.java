@@ -33,6 +33,7 @@ import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.webjars.script.WebJarsScriptService;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiURLFactory;
@@ -68,17 +69,19 @@ public class WebJarsScriptServiceTest
     public void computeURLWithVersion() throws Exception
     {
         URL url = new URL("http://www.xwiki.org");
-        when(urlFactory.createURL("resources", "path", "webjars", "value=angular%2F2.1.11%2Fangular.js",
+        when(urlFactory.createURL("resources", "path", "webjars", "value=ang%3Aular%2F2.1.11%2Fangular.js",
             null, xcontext)).thenReturn(url);
         when(urlFactory.getURL(url, xcontext)).thenReturn("foo");
 
-        assertEquals("foo", this.mocker.getComponentUnderTest().url("angular/2.1.11/angular.js"));
+        // Test that colon is not interpreted as groupId/artifactId separator (for backwards compatibility).
+        assertEquals("foo", this.mocker.getComponentUnderTest().url("ang:ular/2.1.11/angular.js"));
     }
 
     @Test
     public void computeURLWithoutVersion() throws Exception
     {
-        when(xcontext.getWikiId()).thenReturn("math");
+        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("math");
 
         InstalledExtensionRepository installedExtensionRepository =
             this.mocker.getInstance(InstalledExtensionRepository.class);

@@ -53,6 +53,13 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
+      <!-- Used to determine the current wiki (i.e. the namespace where to look for installed WebJars when the WebJar
+        version is not specified). -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <!-- Used to evaluate the Velocity code from the WebJar resources. -->
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-velocity</artifactId>

@@ -138,6 +138,7 @@ public class FlamingoThemeTest extends AbstractTest
 
         // Create a new theme
         EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme("Test");
+        editThemePage.waitUntilPreviewIsLoaded();
 
         // Set variables
         editThemePage.selectVariableCategory("Base colors");

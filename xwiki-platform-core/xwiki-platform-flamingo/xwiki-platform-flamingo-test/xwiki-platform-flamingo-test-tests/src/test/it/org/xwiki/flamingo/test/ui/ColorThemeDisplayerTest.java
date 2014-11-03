@@ -51,6 +51,9 @@ public class ColorThemeDisplayerTest extends AbstractTest
     {
         List<String> colorThemes = colorThemePropertyDisplayerPage.getColorThemes();
         assertTrue(colorThemes.contains("Charcoal"));
+        assertTrue(colorThemes.contains("Marina"));
+        assertTrue(colorThemes.contains("Kitty"));
+        assertTrue(colorThemes.contains("Garden"));
         assertTrue(colorThemes.contains("Mint"));
         assertTrue(colorThemes.contains("Dusk"));
         assertTrue(colorThemes.contains("Ruby"));

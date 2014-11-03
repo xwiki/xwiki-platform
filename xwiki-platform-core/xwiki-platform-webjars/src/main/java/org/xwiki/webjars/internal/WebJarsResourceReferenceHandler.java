@@ -151,10 +151,11 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
 
     private void setResponseHeaders(Response response, ResourceReference reference)
     {
-        // Send back the "Last-Modified" header in the response so that the browser will send us an
-        // "If-Modified-Since" request for any subsequent call for this resource. When this happens we return
-        // a 304 to tell the browser to use its cached version.
-        if (!shouldEvaluateResource(reference) && response instanceof ServletResponse) {
+        // If the resource contains Velocity code then this code must be evaluated on each request and so the resource
+        // must not be cached. Otherwise, if the resource is static we need to send back the "Last-Modified" header in
+        // the response so that the browser will send us an "If-Modified-Since" request for any subsequent call for this
+        // static resource. When this happens we return a 304 to tell the browser to use its cached version.
+        if (response instanceof ServletResponse && !shouldEvaluateResource(reference)) {
             HttpServletResponse httpResponse = ((ServletResponse) response).getHttpServletResponse();
             httpResponse.setDateHeader("Last-Modified", new Date().getTime() / 1000 * 1000);
         }
@@ -163,9 +164,9 @@ public class WebJarsResourceReferenceHandler extends AbstractResourceReferenceHa
     private boolean shouldBrowserUseCachedContent(ResourceReference reference)
     {
         // If the request contains a "If-Modified-Since" and the referenced resource is not supposed to be evaluated
-        // then return a 304 so to tell the browser to use its cached version.
+        // (i.e. no Velocity code) then return a 304 so to tell the browser to use its cached version.
         Request request = this.container.getRequest();
-        if (!shouldEvaluateResource(reference) && request instanceof ServletRequest) {
+        if (request instanceof ServletRequest && !shouldEvaluateResource(reference)) {
             HttpServletRequest httpRequest = ((ServletRequest) request).getHttpServletRequest();
             if (httpRequest.getHeader("If-Modified-Since") != null) {
                 // Return the 304

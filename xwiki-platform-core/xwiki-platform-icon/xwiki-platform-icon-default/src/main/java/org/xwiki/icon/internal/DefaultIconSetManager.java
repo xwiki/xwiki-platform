@@ -97,6 +97,7 @@ public class DefaultIconSetManager implements IconSetManager
                 // lazy loading
                 iconSet = iconSetLoader.loadIconSet(iconThemeDocRef);
                 iconSetCache.put(iconThemeDocRef, iconSet);
+                iconSetCache.put(iconSet.getName(), wikiDescriptorManager.getCurrentWikiId(), iconSet);
             }
         }
 
@@ -133,10 +134,7 @@ public class DefaultIconSetManager implements IconSetManager
         }
 
         // Get the icon set from the cache
-        String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
-        // We create a cache key to avoid using the same cache across wikis
-        String cacheKey = currentWikiId.length() + currentWikiId + '_' + name;
-        IconSet iconSet = iconSetCache.get(cacheKey);
+        IconSet iconSet = iconSetCache.get(name, wikiDescriptorManager.getCurrentWikiId());
 
         // Load it if it is not loaded yet
         if (iconSet == null) {
@@ -158,7 +156,8 @@ public class DefaultIconSetManager implements IconSetManager
                 iconSet = iconSetLoader.loadIconSet(docRef);
 
                 // Put it in the cache
-                iconSetCache.put(cacheKey, iconSet);
+                iconSetCache.put(docRef, iconSet);
+                iconSetCache.put(name, wikiDescriptorManager.getCurrentWikiId(), iconSet);
             } catch (QueryException e) {
                 throw new IconException(String.format("Failed to load the icon set [%s].", name), e);
             }

@@ -126,6 +126,7 @@ public class DefaultIconSetManagerTest
         // Verify
         assertEquals(iconSet, result);
         verify(iconSetCache).put(iconThemeRef, iconSet);
+        verify(iconSetCache).put(currentIconTheme, "currentWikiId", iconSet);
     }
 
     @Test
@@ -224,7 +225,7 @@ public class DefaultIconSetManagerTest
     {
         // Mocks
         IconSet iconSet = new IconSet("silk");
-        when(iconSetCache.get("13currentWikiId_silk")).thenReturn(iconSet);
+        when(iconSetCache.get("silk", "currentWikiId")).thenReturn(iconSet);
 
         // Test
         assertEquals(iconSet, mocker.getComponentUnderTest().getIconSet("silk"));
@@ -253,7 +254,8 @@ public class DefaultIconSetManagerTest
 
         // Verify
         verify(query).bindValue("name", "silk");
-        verify(iconSetCache).put("13currentWikiId_silk", iconSet);
+        verify(iconSetCache).put(documentReference, iconSet);
+        verify(iconSetCache).put("silk", "currentWikiId", iconSet);
     }
 
     @Test

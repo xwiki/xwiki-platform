@@ -81,8 +81,7 @@ public class IconThemeListener implements EventListener
             BaseObject iconThemeObj = iconThemeObjects.get(0);
             String iconThemeName = iconThemeObj.getStringValue("name");
             String currentWiki = document.getDocumentReference().getWikiReference().getName();
-            String cacheKey = currentWiki.length() + currentWiki + '_' + iconThemeName;
-            iconSetCache.clear(cacheKey);
+            iconSetCache.clear(iconThemeName, currentWiki);
         }
     }
 }

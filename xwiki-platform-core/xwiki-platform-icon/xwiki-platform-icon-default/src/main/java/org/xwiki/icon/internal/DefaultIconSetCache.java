@@ -70,10 +70,21 @@ public class DefaultIconSetCache implements IconSetCache, Initializable
         }
     }
 
+    private String getCacheKey(String name, String wikiId)
+    {
+        return wikiId.length() + wikiId + '_' + name;
+    }
+
     @Override
     public IconSet get(String name)
     {
         return cache.get(getKeyFromName(name));
+    }
+
+    @Override
+    public IconSet get(String name, String wikiId)
+    {
+        return get(getCacheKey(name, wikiId));
     }
 
     @Override
@@ -86,6 +97,12 @@ public class DefaultIconSetCache implements IconSetCache, Initializable
     public void put(String name, IconSet iconSet)
     {
         cache.set(getKeyFromName(name), iconSet);
+    }
+
+    @Override
+    public void put(String name, String wikiId, IconSet iconSet)
+    {
+        put(getCacheKey(name, wikiId), iconSet);
     }
 
     @Override
@@ -110,6 +127,12 @@ public class DefaultIconSetCache implements IconSetCache, Initializable
     public void clear(String name)
     {
         cache.remove(getKeyFromName(name));
+    }
+
+    @Override
+    public void clear(String name, String wikiId)
+    {
+        clear(getCacheKey(name, wikiId));
     }
 
     private String getKeyFromName(String name)

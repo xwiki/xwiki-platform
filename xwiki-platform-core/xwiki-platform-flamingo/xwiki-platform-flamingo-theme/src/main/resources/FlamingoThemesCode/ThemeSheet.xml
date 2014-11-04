@@ -363,8 +363,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>#set($discard = $services.localization.use('document', 'FlamingoThemesCode.Translations'))
-// Require jQuery
+      <code>// Require jQuery
 require(['jquery'], function($) {
 
   // Waiting jQuery to be ready

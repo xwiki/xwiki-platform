@@ -209,9 +209,10 @@
 #set ($editable = $xcontext.macro.params.readOnly != 'true')
 #set ($isFullWidthAvailable = $xcontext.macro.params.compact != 'true')
 #set ($links = $xcontext.macro.params.links == 'true')
+#set ($checkboxes = $xcontext.macro.params.checkboxes == 'true')
 {{tree reference="path:$xwiki.getURL($xcontext.macro.doc.documentReference, 'get', $escapetool.url($resourceParams))"
   root="$!xcontext.macro.params.root" dragAndDrop="$editable" contextMenu="$editable" icons="$isFullWidthAvailable"
-  edges="$isFullWidthAvailable" links="$links" /}}
+  edges="$isFullWidthAvailable" links="$links" checkboxes="$checkboxes" /}}
 {{/velocity}}</code>
     </property>
     <property>
@@ -1095,6 +1096,72 @@
     </property>
     <property>
       <name>links</name>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DocumentTree</name>
+    <number>13</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>cfc10379-bd4f-4c23-a669-37566c6245ba</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>Whether to display a checkbox in front of each tree node to allow the user to select multiple tree nodes.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>checkboxes</name>
     </property>
   </object>
 </xwikidoc>

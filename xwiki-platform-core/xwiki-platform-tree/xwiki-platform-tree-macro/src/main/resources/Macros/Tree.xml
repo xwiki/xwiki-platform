@@ -99,9 +99,9 @@
 
 {{tree reference="XWiki.DocumentTree" /}}
 
-=== Dynamic Sub-tree ===
+=== Dynamic Sub-tree with Checkboxes ===
 
-{{tree reference="doc:XWiki.DocumentTree" root="document:xwiki:Sandbox.WebHome" /}}</content>
+{{tree reference="doc:XWiki.DocumentTree" root="document:xwiki:Sandbox.WebHome" checkboxes="true" /}}</content>
   <object>
     <name>Macros.Tree</name>
     <number>0</number>
@@ -376,6 +376,8 @@ require(['tree'], function($) {
 #set ($discard = $attributes.add("data-icons='$icons'"))
 #set ($edges = $xcontext.macro.params.edges == 'true')
 #set ($discard = $attributes.add("data-edges='$edges'"))
+#set ($checkboxes = $xcontext.macro.params.checkboxes == 'true')
+#set ($discard = $attributes.add("data-checkboxes='$checkboxes'"))
 #set ($output = "(% $stringtool.join($attributes, ' ') %)((($!xcontext.macro.content)))")
 ## Parse the output and return the resulting XDOM blocks.
 #set ($xcontext.macro.result = $services.rendering.parse($output, $xwiki.currentContentSyntaxId).children)
@@ -932,6 +934,72 @@ require(['tree'], function($) {
     </property>
     <property>
       <name>links</name>
+    </property>
+  </object>
+  <object>
+    <name>Macros.Tree</name>
+    <number>8</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>73875678-00b6-4516-a120-0401dc82b536</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>Whether to display a checkbox in front of each tree node to allow the user to select multiple tree nodes.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>checkboxes</name>
     </property>
   </object>
 </xwikidoc>

@@ -298,6 +298,9 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       if (element.attr('data-contextMenu') == 'true') {
         plugins.push('contextmenu');
       }
+      if (element.attr('data-checkboxes') == 'true') {
+        plugins.push('checkbox');
+      }
       return $.extend(true, baseParams, {
         core: {
           data: getChildren,

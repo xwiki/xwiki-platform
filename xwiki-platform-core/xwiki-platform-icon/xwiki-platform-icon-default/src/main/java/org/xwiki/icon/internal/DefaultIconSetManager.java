@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang.StringUtils;
@@ -54,6 +55,7 @@ public class DefaultIconSetManager implements IconSetManager
     private Provider<XWikiContext> xcontextProvider;
 
     @Inject
+    @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject

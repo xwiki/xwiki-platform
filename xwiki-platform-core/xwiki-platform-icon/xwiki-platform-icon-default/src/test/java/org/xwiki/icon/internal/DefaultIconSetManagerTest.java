@@ -87,7 +87,7 @@ public class DefaultIconSetManagerTest
         xwiki = mock(XWiki.class);
         when(xcontext.getWiki()).thenReturn(xwiki);
         documentReferenceResolver = mocker.getInstance(new DefaultParameterizedType(null,
-                DocumentReferenceResolver.class, String.class));
+                DocumentReferenceResolver.class, String.class), "current");
         documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
         iconSetCache = mocker.getInstance(IconSetCache.class);
         iconSetLoader = mocker.getInstance(IconSetLoader.class);

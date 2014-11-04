@@ -19,12 +19,28 @@
  */
 package org.xwiki.flamingo.test.po;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.ViewPage;
 
 public class ViewThemePage extends ViewPage
 {
+    @FindBy(id = "preview-curtain")
+    private WebElement previewCurtain;
+
     public ViewThemePage()
     {
         this.waitUntilPageJSIsLoaded();
+    }
+
+    public boolean isPreviewBoxLoading()
+    {
+        return previewCurtain.isDisplayed();
+    }
+
+    public void waitUntilPreviewIsLoaded()
+    {
+        waitUntilElementDisappears(By.id("preview-curtain"));
     }
 }

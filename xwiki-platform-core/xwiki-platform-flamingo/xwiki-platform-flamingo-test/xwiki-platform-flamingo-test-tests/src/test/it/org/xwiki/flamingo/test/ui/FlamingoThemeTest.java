@@ -168,6 +168,7 @@ public class FlamingoThemeTest extends AbstractTest
 
         // Remove the theme
         ViewThemePage themePage = themeApplicationWebHomePage.seeTheme("Test");
+        themePage.waitUntilPreviewIsLoaded();
         ConfirmationPage confirmationPage = themePage.delete();
         confirmationPage.clickYes();
     }

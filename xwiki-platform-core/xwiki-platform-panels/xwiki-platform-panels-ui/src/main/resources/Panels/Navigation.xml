@@ -124,54 +124,7 @@
     <property>
       <content>{{velocity}}
 #panelheader($services.localization.render('xe.panels.navigation'))
-#set ($hiddenPages = ['Main.WebRss', 'Main.DatabaseSearch', 'Main.WebSearch', 'Main.LuceneSearch', 'Main.WebSearchRss', 'Main.BlogRss', 'Main.TagsRss', 'Main.RegisterNewUserAction', 'Main.SpaceIndex', 'Blog.Category'])
-#set ($blacklistedPages = ['WebPreferences'])
-#set ($spaces = $xwiki.spaces)
-#set ($spacecount = 0)
-(% id="xwikinavcontainer" %)
-(((
-(% id="xwikinav" class="accordion" %)
-(((
-#foreach ($space in $spaces)
-  #if ($hasAdmin || ($xwiki.hasAccessLevel('view', "${space}.WebHome") &amp;&amp; !$blacklistedSpaces.contains($space)))
-    #if ($doc.space == $space)
-      #set ($spacecount = $foreach.index)
-    #end
-    (% id="xwikinav${space}" %)
-    (((
-    (% id="xwikinav${space}Header" class="accordionTabTitleBar" %)
-    (((=${space}=)))
-    (% id="xwikinav${space}Content" class="accordionTabContentBox" %)
-    (((
-    #set ($spaceDocs = $services.query.xwql('where doc.space=?1 order by doc.name').addFilter('hidden').addFilter('unique').bindValue(1, $space).execute())
-    #foreach ($page in $spaceDocs)
-      #if (!$hiddenPages.contains($page) || $hasAdmin)
-        #set($docReference = $services.model.resolveDocument($page))
-        #set($pageName = $docReference.name)
-        #if (!$blacklistedPages.contains($pageName) || $hasAdmin)
-          #if ($doc.fullName == $page)
-            * **${doc.name}**
-          #else
-            * [[$pageName&gt;&gt;$services.model.serialize($docReference)]]
-          #end
-        #end
-      #end
-    #end
-    )))## xwikinav${space}Content
-    )))## xwikinav${space}
-  #end
-#end
-)))## xwikinav
-)))## xwikinavcontainer
-$xwiki.jsfx.use('js/xwiki/accordion/accordion.js')##
-{{html clean="false"}}
-&lt;script type="text/javascript"&gt;
-document.observe('xwiki:dom:loaded', function() {
-  var obj = {div:'xwikinav', no:$spacecount, height:250};
-  var acc = createAccordion(obj);
-});
-&lt;/script&gt;
-{{/html}}
+{{documentTree showSpaces="true" showTranslations="false" showAttachments="false" showChildDocuments="false" compact="true" /}}
 #panelfooter()
 {{/velocity}}</content>
     </property>

@@ -1,6 +1,7 @@
 /*! #template('colorThemeInit.vm') */
 
 @theme-name: xwiki;
+@text-color: $theme.textColor;
 @hovered-bg-color: $theme.highlightColor;
 @hovered-shadow-color: #cccccc;
 @disabled-color: #666666;
@@ -22,7 +23,89 @@
 @import "jstree/base.less";
 @import "jstree/main.less";
 
-/* Custom styles for XWiki */
+/**
+ * Narrow Tree (no icons and no edges)
+ */
+@narrow-icon-width: 12px;
+.jstree-xwiki > .jstree-no-dots.jstree-no-icons {
+  /* Reduce a bit the font size. */
+  font-size: 95%;
+
+  .jstree-node {
+    /* Leave some space for the open/close icon. */
+    margin-left: 0;
+    padding-left: @narrow-icon-width;
+  }
+
+  .jstree-node,
+  .jstree-anchor {
+    /* Allow the label to be split on multiple lines. */
+    white-space: normal;
+  }
+
+  .jstree-anchor {
+    /* The node label can be split on multiple lines. */
+    height: auto;
+  }
+
+  .jstree-ocl {
+    /* Position the open/close icon in the parent left padding in order for the node label to be properly aligned when
+      split on multiple lines. */
+    margin-left: -@narrow-icon-width;
+    width: @narrow-icon-width;
+  }
+
+  .jstree-closed > .jstree-ocl {
+    background-position: -9px -4px;
+  }
+
+  .jstree-open > .jstree-ocl {
+    background-position: -41px -4px;
+  }
+
+  .jstree-leaf > .jstree-ocl {
+    color: $theme.textSecondaryColor;
+    /* Default FontAwesome styling */
+    display: inline-block;
+    font-family: FontAwesome;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    font-size-adjust: none;
+    font-stretch: normal;
+    -moz-font-feature-settings: normal;
+    -moz-font-language-override: normal;
+    font-size: @narrow-icon-width / 2;
+    text-rendering: auto;
+
+    &:before {
+      /* fa-circle */
+      content: '\f111';
+    }
+  }
+}
+@media (max-width: 768px) {
+  .jstree-xwiki-responsive > .jstree-no-dots.jstree-no-icons {
+    .jstree-node {
+      /* The icons are bigger on small screens. */
+      padding-left: @narrow-icon-width * 2;
+    }
+    .jstree-ocl {
+      margin-left: -@narrow-icon-width * 2;
+      width: @narrow-icon-width * 2;
+    }
+    .jstree-closed > .jstree-ocl {
+      background-position: -8px -40px !important;
+    }
+    .jstree-open > .jstree-ocl {
+      background-position: -9px 0px !important;
+    }
+  }
+}
+
+/**
+ * Custom styles for XWiki
+ */
 .jstree ul.jstree-children {
   /* Overwrite the margin and padding from the XWiki skin. */
   margin: 0;

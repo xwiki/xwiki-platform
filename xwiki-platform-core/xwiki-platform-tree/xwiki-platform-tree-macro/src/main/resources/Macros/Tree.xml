@@ -343,10 +343,14 @@ require(['tree'], function($) {
     </class>
     <property>
       <code>{{velocity output="false"}}
-#set ($discard = $xwiki.jsx.use($xcontext.macro.doc, {'minify': false}))
-#set ($class = $xcontext.macro.params.get('class'))
+#set ($discard = $xwiki.jsx.use($xcontext.macro.doc))
+#set ($classes = ['xtree', "$!xcontext.macro.params.get('class')"])
+#set ($noLinks = $xcontext.macro.params.links != 'true')
+#if ($noLinks)
+  #set ($discard = $classes.add('jstree-no-links'))
+#end
 #set ($attributes = [
-  "class='xtree $!escapetool.xml($class)'",
+  "class='$!escapetool.xml($stringtool.join($classes, ' '))'",
   'data-responsive="true"'
 ])
 #if ("$!xcontext.macro.params.reference" != '')
@@ -368,6 +372,10 @@ require(['tree'], function($) {
 #set ($discard = $attributes.add("data-dragAndDrop='$dragAndDrop'"))
 #set ($contextMenu = $xcontext.macro.params.contextMenu == 'true')
 #set ($discard = $attributes.add("data-contextMenu='$contextMenu'"))
+#set ($icons = $xcontext.macro.params.icons == 'true')
+#set ($discard = $attributes.add("data-icons='$icons'"))
+#set ($edges = $xcontext.macro.params.edges == 'true')
+#set ($discard = $attributes.add("data-edges='$edges'"))
 #set ($output = "(% $stringtool.join($attributes, ' ') %)((($!xcontext.macro.content)))")
 ## Parse the output and return the resulting XDOM blocks.
 #set ($xcontext.macro.result = $services.rendering.parse($output, $xwiki.currentContentSyntaxId).children)
@@ -726,6 +734,204 @@ require(['tree'], function($) {
     </property>
     <property>
       <name>class</name>
+    </property>
+  </object>
+  <object>
+    <name>Macros.Tree</name>
+    <number>5</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>0444f19d-11b1-4498-9d10-cae0624053df</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>true</defaultValue>
+    </property>
+    <property>
+      <description>Whether to show the tree node icons or not. You may want to hide the icons if all the tree nodes are of the same type or if you want to win some horizontal space.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>icons</name>
+    </property>
+  </object>
+  <object>
+    <name>Macros.Tree</name>
+    <number>6</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>041d4dfa-a5da-4eeb-aee4-b56a4ef8a372</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>true</defaultValue>
+    </property>
+    <property>
+      <description>Whether to show the edges that connect the sibling tree nodes between themselves and with their parent.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>edges</name>
+    </property>
+  </object>
+  <object>
+    <name>Macros.Tree</name>
+    <number>7</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>12b45fc2-abb4-4d88-a043-ba3fd6499e36</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>Specifies whether the node labels should look and behave as links (anchors).</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>links</name>
     </property>
   </object>
 </xwikidoc>

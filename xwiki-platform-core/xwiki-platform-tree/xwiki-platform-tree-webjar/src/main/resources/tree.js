@@ -284,7 +284,9 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       core: {
         themes: {
           name: 'xwiki',
-          responsive: element.attr('data-responsive') == 'true'
+          responsive: element.attr('data-responsive') == 'true',
+          icons: element.attr('data-icons') == 'true',
+          dots: element.attr('data-edges') == 'true'
         }
       }
     };
@@ -352,7 +354,11 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
     return this.on('select_node.jstree', function(event, data) {
       var tree = data.instance;
       var selectedNode = data.node;
-      selectedNode.data && selectedNode.data.type == 'pagination' && addMoreChildren(tree, selectedNode);
+      if (selectedNode.data && selectedNode.data.type == 'pagination') {
+        addMoreChildren(tree, selectedNode);
+      } else if (!$(this).hasClass('jstree-no-links')) {
+        window.location.href = selectedNode.a_attr.href;
+      }
 
     }).on('open_node.jstree', function(event, data) {
       var originalNode = data.node.original;

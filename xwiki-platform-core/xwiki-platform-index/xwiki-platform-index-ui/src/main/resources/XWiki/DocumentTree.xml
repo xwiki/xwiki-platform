@@ -54,6 +54,10 @@
 
   {{documentTree /}}
 
+  === Compact Document Hierarchy Tree ===
+
+  {{documentTree compact="true" /}}
+
   == Document Index Tree ==
 
   {{documentTree showSpaces="true" /}}
@@ -203,8 +207,11 @@
   #end
 #end
 #set ($editable = $xcontext.macro.params.readOnly != 'true')
+#set ($isFullWidthAvailable = $xcontext.macro.params.compact != 'true')
+#set ($links = $xcontext.macro.params.links == 'true')
 {{tree reference="path:$xwiki.getURL($xcontext.macro.doc.documentReference, 'get', $escapetool.url($resourceParams))"
-  root="$!xcontext.macro.params.root" dragAndDrop="$editable" contextMenu="$editable" /}}
+  root="$!xcontext.macro.params.root" dragAndDrop="$editable" contextMenu="$editable" icons="$isFullWidthAvailable"
+  edges="$isFullWidthAvailable" links="$links" /}}
 {{/velocity}}</code>
     </property>
     <property>
@@ -956,6 +963,138 @@
     </property>
     <property>
       <name>root</name>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DocumentTree</name>
+    <number>11</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>b8d3e6d9-1054-492d-89f8-3540ec029634</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>false</defaultValue>
+    </property>
+    <property>
+      <description>If you have limited horizontal space available then you should probably set this to true. The effect is that the node icons and the edges that connect them will be hidden. Some special styles will also be applied to ensure the tree takes less horizontal space while keeping the node labels fully visible.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>compact</name>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DocumentTree</name>
+    <number>12</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>2a0ef5ff-9d44-4e8f-9c5b-cddda8d82b4d</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>true</defaultValue>
+    </property>
+    <property>
+      <description>Specifies whether the node labels should look and behave as links (anchors).</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>links</name>
     </property>
   </object>
 </xwikidoc>

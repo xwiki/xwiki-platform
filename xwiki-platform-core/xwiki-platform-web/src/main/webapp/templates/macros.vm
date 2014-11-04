@@ -1620,14 +1620,13 @@ ${Msz}Mb##
 })();
    //]]>
   </script>
-</div> ## xwiki-livetable-container
-  ## Close wiki syntax wrappers.
-  #if("$!options.outputOnlyHtml" != 'true')
-    #if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
+</div>## xwiki-livetable-container
+## Close wiki syntax wrappers. Do not modify the indentation below or it will generate unwanted paragraphs!
+#if("$!options.outputOnlyHtml" != 'true')#if($xwiki.getCurrentContentSyntaxId() != "xwiki/1.0"){{/html}}
 
-#else {/pre} #end
-  #end
-#end
+#else{/pre}#end##
+#end## end-wrappers
+#end## end-livetable-macro
 
 #**
  * Internal macro - Used by the livetable macro to generate a JavaScript anonymous function

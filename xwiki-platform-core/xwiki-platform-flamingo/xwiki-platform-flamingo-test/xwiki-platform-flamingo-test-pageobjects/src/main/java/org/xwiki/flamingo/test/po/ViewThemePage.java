@@ -23,5 +23,8 @@ import org.xwiki.test.ui.po.ViewPage;
 
 public class ViewThemePage extends ViewPage
 {
-
+    public ViewThemePage()
+    {
+        this.waitUntilPageJSIsLoaded();
+    }
 }

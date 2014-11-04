@@ -37,7 +37,7 @@ usage() {
   echo "-sp, --stopport: The Jetty stop port to use. Overrides any value from JETTY_STOP_PORT. Defaults to 8079."
   echo "-ld, --lockdir: The directory where the executing process id is stored to verify that that only one instance"
   echo "    is started. Defaults to /var/tmp."
-  echo "-j, --jmx: Allows monitoring the Jetty server with a JMX console (such as jconsole)."
+  echo "-j, --jmx: Allows monitoring/managing Jetty through JMX."
   echo ""
   echo "Example: start_xwiki.sh -p 8080 -sp 8079"
 }
@@ -96,7 +96,6 @@ while [[ $# > 0 ]]; do
       shift
       ;;
     -j|--jmx)
-      XWIKI_OPTS="$XWIKI_OPTS -Dcom.sun.management.jmxremote"
       JETTY_OPTS="$JETTY_OPTS --module=jmx"
       ;;
     -h|--help)

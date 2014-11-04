@@ -21,6 +21,7 @@ package org.xwiki.icon.internal;
 
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,6 +37,10 @@ import org.xwiki.icon.IconSetLoader;
 import org.xwiki.icon.IconSetManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -66,6 +71,12 @@ public class DefaultIconSetManager implements IconSetManager
 
     @Inject
     private IconSetLoader iconSetLoader;
+
+    @Inject
+    private QueryManager queryManager;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public IconSet getCurrentIconSet() throws IconException
@@ -110,6 +121,50 @@ public class DefaultIconSetManager implements IconSetManager
             }
         }
 
+        return iconSet;
+    }
+
+    @Override
+    public IconSet getIconSet(String name) throws IconException
+    {
+        // Special case: the default icon theme
+        if (DEFAULT_ICONSET_NAME.equals(name)) {
+            return getDefaultIconSet();
+        }
+
+        // Get the icon set from the cache
+        String currentWikiId = wikiDescriptorManager.getCurrentWikiId();
+        // We create a cache key to avoid using the same cache across wikis
+        String cacheKey = currentWikiId.length() + currentWikiId + '_' + name;
+        IconSet iconSet = iconSetCache.get(cacheKey);
+
+        // Load it if it is not loaded yet
+        if (iconSet == null) {
+            try {
+                // Search by name
+                String xwql = "FROM doc.object(IconThemesCode.IconThemeClass) obj WHERE obj.name = :name";
+                Query query = queryManager.createQuery(xwql, Query.XWQL);
+                query.bindValue("name", name);
+                List<String> results = query.execute();
+                if (results.isEmpty()) {
+                    return null;
+                }
+
+                // Get the first result
+                String docName = results.get(0);
+                DocumentReference docRef = documentReferenceResolver.resolve(docName);
+
+                // Load the icon theme
+                iconSet = iconSetLoader.loadIconSet(docRef);
+
+                // Put it in the cache
+                iconSetCache.put(cacheKey, iconSet);
+            } catch (QueryException e) {
+                throw new IconException(String.format("Failed to load the icon set [%s].", name), e);
+            }
+        }
+
+        // Return the icon set
         return iconSet;
     }
 }

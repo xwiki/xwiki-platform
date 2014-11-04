@@ -109,4 +109,46 @@ public class DefaultIconManagerTest
         String result = mocker.getComponentUnderTest().renderHTML("test");
         assertEquals("rendered icon", result);
     }
+
+    @Test
+    public void renderWithIconSetName() throws Exception
+    {
+        // Mocks
+        IconSet iconSet1 = new IconSet("iconSet1");
+        iconSet1.addIcon("icon1", new Icon("icon"));
+        when(iconSetManager.getIconSet("iconSet1")).thenReturn(iconSet1);
+        when(iconRenderer.render("icon1", iconSet1)).thenReturn("rendered icon 1");
+        when(iconRenderer.renderHTML("icon1", iconSet1)).thenReturn("HTML rendered icon 1");
+        when(iconRenderer.render("icon2", iconSet1)).thenReturn("");
+        when(iconRenderer.renderHTML("icon2", iconSet1)).thenReturn("");
+
+        IconSet defaultIconSet = new IconSet("default");
+        defaultIconSet.addIcon("icon2", new Icon("icon"));
+        when(iconSetManager.getDefaultIconSet()).thenReturn(defaultIconSet);
+        when(iconRenderer.render("icon1", defaultIconSet)).thenReturn("default rendered icon 1");
+        when(iconRenderer.render("icon2", defaultIconSet)).thenReturn("default rendered icon 2");
+        when(iconRenderer.renderHTML("icon1", defaultIconSet)).thenReturn("HTML default rendered icon 1");
+        when(iconRenderer.renderHTML("icon2", defaultIconSet)).thenReturn("HTML default rendered icon 2");
+
+        // Tests
+        assertEquals("rendered icon 1",  mocker.getComponentUnderTest().render("icon1", "iconSet1"));
+        assertEquals("default rendered icon 2",  mocker.getComponentUnderTest().render("icon2", "iconSet1"));
+        assertEquals("default rendered icon 1",  mocker.getComponentUnderTest().render("icon1", "iconSet2"));
+        assertEquals("rendered icon 1",  mocker.getComponentUnderTest().render("icon1", "iconSet1", true));
+        assertEquals("default rendered icon 2",  mocker.getComponentUnderTest().render("icon2", "iconSet1", true));
+        assertEquals("default rendered icon 1",  mocker.getComponentUnderTest().render("icon1", "iconSet2", true));
+        assertEquals("rendered icon 1",  mocker.getComponentUnderTest().render("icon1", "iconSet1", false));
+        assertEquals("",  mocker.getComponentUnderTest().render("icon2", "iconSet1", false));
+        assertEquals("",  mocker.getComponentUnderTest().render("icon1", "iconSet2", false));
+
+        assertEquals("HTML rendered icon 1",  mocker.getComponentUnderTest().renderHTML("icon1", "iconSet1"));
+        assertEquals("HTML default rendered icon 2",  mocker.getComponentUnderTest().renderHTML("icon2", "iconSet1"));
+        assertEquals("HTML default rendered icon 1",  mocker.getComponentUnderTest().renderHTML("icon1", "iconSet2"));
+        assertEquals("HTML rendered icon 1",  mocker.getComponentUnderTest().renderHTML("icon1", "iconSet1", true));
+        assertEquals("HTML default rendered icon 2",  mocker.getComponentUnderTest().renderHTML("icon2", "iconSet1", true));
+        assertEquals("HTML default rendered icon 1",  mocker.getComponentUnderTest().renderHTML("icon1", "iconSet2", true));
+        assertEquals("HTML rendered icon 1",  mocker.getComponentUnderTest().renderHTML("icon1", "iconSet1", false));
+        assertEquals("",  mocker.getComponentUnderTest().renderHTML("icon2", "iconSet1", false));
+        assertEquals("",  mocker.getComponentUnderTest().renderHTML("icon1", "iconSet2", false));
+    }
 }

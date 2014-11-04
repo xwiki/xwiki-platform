@@ -45,4 +45,14 @@ public interface IconSetManager
      * @throws IconException if problem occur
      */
     IconSet getDefaultIconSet() throws IconException;
+
+    /**
+     * Get icon set by name.
+     * @param name of the icon set
+     * @return the icon set corresponding to the name, or null if it does not exist
+     * @throws IconException if problem occur
+     *
+     * @since 6.3RC1
+     */
+    IconSet getIconSet(String name) throws IconException;
 }

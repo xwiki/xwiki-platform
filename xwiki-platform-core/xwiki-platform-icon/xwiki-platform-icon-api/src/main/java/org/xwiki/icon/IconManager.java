@@ -33,12 +33,35 @@ import org.xwiki.stability.Unstable;
 public interface IconManager
 {
     /**
-     * Generate the wiki syntax to display an icon.
+     * Generate the wiki syntax to display an icon with the current icon theme.
      * @param iconName name of the icon to render
      * @return the wiki syntax that displays the icon or an empty string if the icon does not exist
      * @throws IconException if problems occur
      */
     String render(String iconName) throws IconException;
+
+    /**
+     * Generate the wiki syntax to display an icon with the specified icon theme.
+     * @param iconName name of the icon to render
+     * @param iconSetName name of the icon set to use
+     * @return the wiki syntax that displays the icon or an empty string if the icon does not exist
+     * @throws IconException if problems occur
+     *
+     * @since 6.3RC1
+     */
+    String render(String iconName, String iconSetName) throws IconException;
+
+    /**
+     * Generate the wiki syntax to display an icon with the specified icon theme.
+     * @param iconName name of the icon to render
+     * @param iconSetName name of the icon set to use
+     * @param fallback enable the fallback to the default icon theme if the icon does not exist
+     * @return the wiki syntax that displays the icon or an empty string if the icon does not exist
+     * @throws IconException if problems occur
+     *
+     * @since 6.3RC1
+     */
+    String render(String iconName, String iconSetName, boolean fallback) throws IconException;
 
     /**
      * Generate the HTML code to display an icon.
@@ -47,5 +70,28 @@ public interface IconManager
      * @throws IconException if problems occur
      */
     String renderHTML(String iconName) throws IconException;
+
+    /**
+     * Generate the HTML code to display an icon with the specified icon theme.
+     * @param iconName name of the icon to render
+     * @param iconSetName name of the icon set to use
+     * @return the HTML code that displays the icon or an empty string if the icon does not exist
+     * @throws IconException if problems occur
+     *
+     * @since 6.3RC1
+     */
+    String renderHTML(String iconName, String iconSetName) throws IconException;
+
+    /**
+     * Generate the HTML code to display an icon with the specified icon theme.
+     * @param iconName name of the icon to render
+     * @param iconSetName name of the icon set to use
+     * @param fallback enable the fallback to the default icon theme if the icon does not exist
+     * @return the HTML code that displays the icon or an empty string if the icon does not exist
+     * @throws IconException if problems occur
+     *
+     * @since 6.3RC1
+     */
+    String renderHTML(String iconName, String iconSetName, boolean fallback) throws IconException;
 
 }

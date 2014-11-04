@@ -21,7 +21,10 @@ package org.xwiki.icon.internal;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Provider;
 
@@ -36,7 +39,11 @@ import org.xwiki.icon.IconSetCache;
 import org.xwiki.icon.IconSetLoader;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -50,6 +57,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -74,6 +82,10 @@ public class DefaultIconSetManagerTest
 
     private IconSetLoader iconSetLoader;
 
+    private QueryManager queryManager;
+
+    private WikiDescriptorManager wikiDescriptorManager;
+
     private XWikiContext xcontext;
 
     private XWiki xwiki;
@@ -91,6 +103,9 @@ public class DefaultIconSetManagerTest
         documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
         iconSetCache = mocker.getInstance(IconSetCache.class);
         iconSetLoader = mocker.getInstance(IconSetLoader.class);
+        queryManager = mocker.getInstance(QueryManager.class);
+        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("currentWikiId");
     }
 
     @Test
@@ -202,5 +217,94 @@ public class DefaultIconSetManagerTest
         assertNotNull(exceptionCaught);
         assertEquals(exception, exceptionCaught.getCause());
         assertEquals("Failed to get the current default icon set.", exceptionCaught.getMessage());
+    }
+
+    @Test
+    public void getIconSetWhenInCache() throws Exception
+    {
+        // Mocks
+        IconSet iconSet = new IconSet("silk");
+        when(iconSetCache.get("13currentWikiId_silk")).thenReturn(iconSet);
+
+        // Test
+        assertEquals(iconSet, mocker.getComponentUnderTest().getIconSet("silk"));
+
+        // Verify
+        verify(iconSetCache, never()).put(anyString(), any(IconSet.class));
+    }
+
+    @Test
+    public void getIconSetWhenNotInCache() throws Exception
+    {
+        // Mocks
+        IconSet iconSet = new IconSet("silk");
+        Query query = mock(Query.class);
+        when(queryManager.createQuery("FROM doc.object(IconThemesCode.IconThemeClass) obj WHERE obj.name = :name",
+                Query.XWQL)).thenReturn(query);
+        List<String> results = new ArrayList<>();
+        results.add("IconThemes.Silk");
+        when(query.<String>execute()).thenReturn(results);
+        DocumentReference documentReference = new DocumentReference("wiki", "IconThemes", "Silk");
+        when(documentReferenceResolver.resolve("IconThemes.Silk")).thenReturn(documentReference);
+        when(iconSetLoader.loadIconSet(documentReference)).thenReturn(iconSet);
+
+        // Test
+        assertEquals(iconSet, mocker.getComponentUnderTest().getIconSet("silk"));
+
+        // Verify
+        verify(query).bindValue("name", "silk");
+        verify(iconSetCache).put("13currentWikiId_silk", iconSet);
+    }
+
+    @Test
+    public void getIconSetWhenDoesNotExists() throws Exception
+    {
+        // Mocks
+        Query query = mock(Query.class);
+        when(queryManager.createQuery("FROM doc.object(IconThemesCode.IconThemeClass) obj WHERE obj.name = :name",
+                Query.XWQL)).thenReturn(query);
+        List<String> results = new ArrayList<>();
+        when(query.<String>execute()).thenReturn(results);
+
+        // Test
+        assertNull(mocker.getComponentUnderTest().getIconSet("silk"));
+
+        // Verify
+        verify(query).bindValue("name", "silk");
+    }
+
+    @Test
+    public void getIconSetWhenException() throws Exception
+    {
+        // Mocks
+        Exception exception = new QueryException("exception in the query", null, null);
+        when(queryManager.createQuery(anyString(), anyString())).thenThrow(exception);
+
+        // Test
+        Exception caughtException = null;
+        try {
+            mocker.getComponentUnderTest().getIconSet("silk");
+        } catch (IconException e) {
+            caughtException = e;
+        }
+        assertNotNull(caughtException);
+        assertEquals(exception, caughtException.getCause());
+        assertEquals("Failed to load the icon set [silk].", caughtException.getMessage());
+    }
+
+    @Test
+    public void getDefaultIconSet() throws Exception
+    {
+        // Mock
+        IconSet iconSet = new IconSet("default");
+        when(iconSetLoader.loadIconSet(any(Reader.class), eq("default"))).thenReturn(iconSet);
+        InputStream is = getClass().getResourceAsStream("/test.iconset");
+        when(xwiki.getResourceAsStream("/resources/icons/default.iconset")).thenReturn(is);
+
+        // Test
+        assertEquals(iconSet, mocker.getComponentUnderTest().getIconSet("default"));
+
+        // Verify
+        verifyZeroInteractions(queryManager);
     }
 }

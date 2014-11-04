@@ -417,6 +417,9 @@
                  (see: http://jira.xwiki.org/browse/XWIKI-10776). -->
             <exclude>**/LESSCache*</exclude>
             <exclude>**/LessCompilerScriptService*</exclude>
+            <!-- Added new methods to the unstable Icon Module -->
+            <exclude>**/IconManager*</exclude>
+            <exclude>**/IconSetManager*</exclude>
           </excludes>
         </configuration>
       </plugin>

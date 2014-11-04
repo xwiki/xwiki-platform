@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -35,8 +36,16 @@ import org.xwiki.script.service.ScriptService;
 @Named("icon")
 public class IconManagerScriptService implements ScriptService
 {
+    /**
+     * The key under which the last encountered error is stored in the current execution context.
+     */
+    private static final String ERROR_KEY = "scriptservice.icon.error";
+
     @Inject
     private IconManager iconManager;
+
+    @Inject
+    private Execution execution;
 
     /**
      * Display an icon from the current {@link org.xwiki.icon.IconSet}.
@@ -48,6 +57,42 @@ public class IconManagerScriptService implements ScriptService
         try {
             return iconManager.render(iconName);
         } catch (IconException e) {
+            setLastError(e);
+            return null;
+        }
+    }
+
+    /**
+     * Display an icon from the specified {@link org.xwiki.icon.IconSet}.
+     * @param iconName name of the icon to display
+     * @param iconSetName name of the icon set
+     * @return the wiki code that displays the icon
+     * @since 6.3RC1
+     */
+    public String render(String iconName, String iconSetName)
+    {
+        try {
+            return iconManager.render(iconName, iconSetName);
+        } catch (IconException e) {
+            setLastError(e);
+            return null;
+        }
+    }
+
+    /**
+     * Display an icon from the specified {@link org.xwiki.icon.IconSet}.
+     * @param iconName name of the icon to display
+     * @param iconSetName name of the icon set
+     * @param fallback enable the fallback to the default icon theme if the icon does not exist
+     * @return the wiki code that displays the icon
+     * @since 6.3RC1
+     */
+    public String render(String iconName, String iconSetName, boolean fallback)
+    {
+        try {
+            return iconManager.render(iconName, iconSetName, fallback);
+        } catch (IconException e) {
+            setLastError(e);
             return null;
         }
     }
@@ -62,7 +107,65 @@ public class IconManagerScriptService implements ScriptService
         try {
             return iconManager.renderHTML(iconName);
         } catch (IconException e) {
+            setLastError(e);
             return null;
         }
+    }
+
+    /**
+     * Display an icon from the specified {@link org.xwiki.icon.IconSet}.
+     * @param iconName name of the icon to display
+     * @param iconSetName name of the icon set
+     * @return the HTML code that displays the icon
+     * @since 6.3RC1
+     */
+    public String renderHTML(String iconName, String iconSetName)
+    {
+        try {
+            return iconManager.renderHTML(iconName, iconSetName);
+        } catch (IconException e) {
+            setLastError(e);
+            return null;
+        }
+    }
+
+    /**
+     * Display an icon from the specified {@link org.xwiki.icon.IconSet}.
+     * @param iconName name of the icon to display
+     * @param iconSetName name of the icon set
+     * @param fallback enable the fallback to the default icon theme if the icon does not exist
+     * @return the HTML code that displays the icon
+     * @since 6.3RC1
+     */
+    public String renderHTML(String iconName, String iconSetName, boolean fallback)
+    {
+        try {
+            return iconManager.renderHTML(iconName, iconSetName, fallback);
+        } catch (IconException e) {
+            setLastError(e);
+            return null;
+        }
+    }
+
+    /**
+     * Get the error generated while performing the previously called action.
+     * @return an eventual exception or {@code null} if no exception was thrown
+     * @since 6.3RC1
+     */
+    public IconException getLastError()
+    {
+        return (IconException) this.execution.getContext().getProperty(ERROR_KEY);
+    }
+
+    /**
+     * Store a caught exception in the context, so that it can be later retrieved using {@link #getLastError()}.
+     *
+     * @param e the exception to store, can be {@code null} to clear the previously stored exception
+     * @see #getLastError()
+     * @since 6.3RC1
+     */
+    private void setLastError(IconException e)
+    {
+        this.execution.getContext().setProperty(ERROR_KEY, e);
     }
 }

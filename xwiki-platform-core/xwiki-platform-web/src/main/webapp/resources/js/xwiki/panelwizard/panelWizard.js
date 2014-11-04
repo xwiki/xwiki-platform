@@ -384,7 +384,7 @@ function save() {
   if (window.showRightColumn) {
     var rightPanelsList = getBlocNameList(rightPanels);
     url += "&rightPanels=" + rightPanelsList;
-    url += "&rightPanelsWidth=" + rightPanelsWidthInput.value;git log
+    url += "&rightPanelsWidth=" + rightPanelsWidthInput.value;
   }
   executeCommand(url, saveResult);
 }

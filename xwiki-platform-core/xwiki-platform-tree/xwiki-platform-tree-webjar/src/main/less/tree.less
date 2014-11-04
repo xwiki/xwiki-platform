@@ -23,6 +23,21 @@
 @import "jstree/base.less";
 @import "jstree/main.less";
 
+.fontAwesome() {
+  color: $theme.textSecondaryColor;
+  display: inline-block;
+  font-family: FontAwesome;
+  font-size: inherit;
+  font-size-adjust: none;
+  font-stretch: normal;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  text-rendering: auto;
+  -moz-font-feature-settings: normal;
+  -moz-font-language-override: normal;
+}
+
 /**
  * Narrow Tree (no icons and no edges)
  */
@@ -49,34 +64,28 @@
   }
 
   .jstree-ocl {
+    // Use FontAwesome for the open/close/leaf icons.
+    .fontAwesome();
+    background-image: none;
+
     /* Position the open/close icon in the parent left padding in order for the node label to be properly aligned when
       split on multiple lines. */
     margin-left: -@narrow-icon-width;
     width: @narrow-icon-width;
   }
 
-  .jstree-closed > .jstree-ocl {
-    background-position: -9px -4px;
+  .jstree-closed > .jstree-ocl:before {
+    /* fa-angle-right */
+    content: '\f105';
   }
 
-  .jstree-open > .jstree-ocl {
-    background-position: -41px -4px;
+  .jstree-open > .jstree-ocl:before {
+    /* fa-angle-down */
+    content: '\f107';
   }
 
   .jstree-leaf > .jstree-ocl {
-    color: $theme.textSecondaryColor;
-    /* Default FontAwesome styling */
-    display: inline-block;
-    font-family: FontAwesome;
-    font-style: normal;
-    font-variant: normal;
-    font-weight: normal;
-    font-size-adjust: none;
-    font-stretch: normal;
-    -moz-font-feature-settings: normal;
-    -moz-font-language-override: normal;
     font-size: @narrow-icon-width / 2;
-    text-rendering: auto;
 
     &:before {
       /* fa-circle */
@@ -91,14 +100,17 @@
       padding-left: @narrow-icon-width * 2;
     }
     .jstree-ocl {
+      font-size: @narrow-icon-width * 2;
       margin-left: -@narrow-icon-width * 2;
       width: @narrow-icon-width * 2;
     }
-    .jstree-closed > .jstree-ocl {
-      background-position: -8px -40px !important;
+    .jstree-closed > .jstree-ocl:before {
+      /* fa-chevron-right */
+      content: '\f054';
     }
-    .jstree-open > .jstree-ocl {
-      background-position: -9px 0px !important;
+    .jstree-open > .jstree-ocl:before {
+      /* fa-chevron-down */
+      content: '\f078';
     }
   }
 }

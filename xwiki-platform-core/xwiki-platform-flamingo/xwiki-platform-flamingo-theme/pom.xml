@@ -45,6 +45,12 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>less</artifactId>
       <version>1.7.0</version>

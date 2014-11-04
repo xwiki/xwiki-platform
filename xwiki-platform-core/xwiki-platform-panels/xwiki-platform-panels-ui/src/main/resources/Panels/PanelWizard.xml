@@ -750,11 +750,20 @@ div.pagelayoutoption:hover .lmleftcolumn,
 
   (% id="panelwizardbuttons" class="floatcontainer" %)
   (((
-    (% class="xwikibuttonlink" %)
-      (% class="buttonwrapper" %)[[$services.localization.render('xe.panels.wizard.savenew')&gt;&gt;path:#||id="saveLayout"]](%%) ##
-      (% class="buttonwrapper" %)[[$services.localization.render('xe.panels.wizard.revert')&gt;&gt;$doc.fullName||id="revertLayout"]](%%) ##
-      (% class="buttonwrapper" %)[[$services.localization.render('xe.panels.wizard.homepage')&gt;&gt;Panels.WebHome]](%%) ##
-    (%%)
+    
+    {{html}}
+      &lt;div class="xwikibuttonlink"&gt;
+        &lt;span class="buttonwrapper"&gt;
+          &lt;button id="saveLayout"&gt;$services.localization.render('xe.panels.wizard.savenew')&lt;/button&gt;
+        &lt;/span&gt;
+        &lt;span class="buttonwrapper"&gt;
+          &lt;button id="revertLayout"&gt;$services.localization.render('xe.panels.wizard.revert')&lt;/button&gt;
+        &lt;/span&gt;
+        &lt;span class="buttonwrapper"&gt;
+          &lt;a href="$xwiki.getURL($services.model.createDocumentReference('', 'Panels', 'WebHome'))"&gt;$services.localization.render('xe.panels.wizard.homepage')&lt;/a&gt;
+        &lt;/span&gt;
+      &lt;/div&gt;
+    {{/html}}
   )))
 #end
 {{/velocity}}</content>

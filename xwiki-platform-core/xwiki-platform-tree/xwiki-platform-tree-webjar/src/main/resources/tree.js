@@ -263,19 +263,15 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
     }
   };
 
-  var openPath = function(path) {
+  var openPath = function(path, callback) {
     // 'this' is the tree instance.
-    if (!path || !path.length) return;
-    var root = path[0];
-    if (this.get_node(root)) {
-      // The root node is present in the tree so we can open or select it.
-      if (path.length > 1) {
-        this.open_node(root, function() {
-          openPath.call(this, path.slice(1));
-        });
-      } else {
-        this.select_node(root);
-      }
+    if (path && path.length > 0 && this.get_node(path[0])) {
+      // The first node is present in the tree so we can open it.
+      this.open_node(path[0], function() {
+        openPath.call(this, path.slice(1), callback);
+      });
+    } else {
+      callback && callback();
     }
   };
 
@@ -321,13 +317,15 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
   };
 
   var customTreeAPI = {
-    openTo: function(nodeId) {
+    openTo: function(nodeId, callback) {
       if (this.get_node(nodeId)) {
         // The specified node is already loaded in the tree.
-        this.select_node(nodeId);
+        callback && callback();
       } else {
         // We need to load all the ancestors of the specified node.
-        getPath.call(this, nodeId, openPath);
+        getPath.call(this, nodeId, function(path) {
+          openPath.call(this, path, callback);
+        });
       }
     },
     refreshNode: function(node) {

@@ -24,16 +24,18 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-tree</artifactId>
     <version>6.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-tree</artifactId>
-  <name>XWiki Platform - Tree - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Tree - Parent POM</description>
-  <modules>
-    <module>xwiki-platform-tree-macro</module>
-    <module>xwiki-platform-tree-test-pageobjects</module>
-    <module>xwiki-platform-tree-webjar</module>
-  </modules>
+  <artifactId>xwiki-platform-tree-test-pageobjects</artifactId>
+  <name>XWiki Platform - Tree - Tests - Page Objects</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Tree - Tests - Page Objects</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-test</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

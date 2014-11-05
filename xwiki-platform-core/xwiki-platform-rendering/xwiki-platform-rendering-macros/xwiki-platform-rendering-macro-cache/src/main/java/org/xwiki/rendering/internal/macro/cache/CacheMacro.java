@@ -88,7 +88,7 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
      * Map of all caches. There's one cache per timeToLive/maxEntry combination since currently we cannot set these
      * configuration values at the cache entry level but only for the whole cache.
      */
-    private Map<CacheKey, Cache<List<Block>>> contentCacheMap = new ConcurrentHashMap<CacheKey, Cache<List<Block>>>();
+    private Map<CacheKey, Cache<List<Block>>> contentCacheMap = new ConcurrentHashMap<>();
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -150,13 +150,14 @@ public class CacheMacro extends AbstractMacro<CacheMacroParameters>
      * @return the matching cache (a new cache is created if no existing one is found)
      * @throws MacroExecutionException in case we fail to create the new cache
      */
-    private Cache<List<Block>> getContentCache(int timeToLive, int maxEntries) throws MacroExecutionException
+    Cache<List<Block>> getContentCache(int timeToLive, int maxEntries) throws MacroExecutionException
     {
         CacheKey cacheKey = new CacheKey(timeToLive, maxEntries);
         Cache<List<Block>> contentCache = this.contentCacheMap.get(cacheKey);
         if (contentCache == null) {
             // Create Cache
-            CacheConfiguration configuration = new CacheConfiguration();
+            CacheConfiguration configuration =
+                new CacheConfiguration(String.format("cacheMacro.%s", cacheKey.toString()));
 
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             lru.setMaxEntries(maxEntries);

@@ -22,24 +22,19 @@ package org.xwiki.icon.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.icon.Icon;
+import org.xwiki.icon.IconException;
 import org.xwiki.icon.IconSet;
 import org.xwiki.skinx.SkinExtension;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,29 +51,21 @@ public class DefaultIconRendererTest
     public MockitoComponentMockingRule<DefaultIconRenderer> mocker =
             new MockitoComponentMockingRule<>(DefaultIconRenderer.class);
 
-    private Provider<XWikiContext> xcontextProvider;
-
     private SkinExtension skinExtension;
 
     private SkinExtension linkExtension;
 
     private SkinExtension jsExtension;
 
-    private XWikiContext xcontext;
-
-    private XWiki xwiki;
+    private VelocityRenderer velocityRenderer;
 
     @Before
     public void setUp() throws Exception
     {
-        xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
         skinExtension = mocker.getInstance(SkinExtension.class, "ssx");
         linkExtension = mocker.getInstance(SkinExtension.class, "linkx");
         jsExtension = mocker.getInstance(SkinExtension.class, "jsx");
+        velocityRenderer = mocker.getInstance(VelocityRenderer.class);
     }
 
     @Test
@@ -87,7 +74,7 @@ public class DefaultIconRendererTest
         IconSet iconSet = new IconSet("default");
         iconSet.setRenderWiki("image:$icon.png");
         iconSet.addIcon("test", new Icon("blabla"));
-        when(xwiki.parseContent("#set($icon = \"blabla\")\nimage:$icon.png", xcontext)).thenReturn("image:blabla.png");
+        when(velocityRenderer.render("#set($icon = \"blabla\")\nimage:$icon.png")).thenReturn("image:blabla.png");
 
         // Test
         String result = mocker.getComponentUnderTest().render("test", iconSet);
@@ -105,7 +92,7 @@ public class DefaultIconRendererTest
         IconSet iconSet = new IconSet("default");
         iconSet.setCss("css");
         iconSet.addIcon("test", new Icon("blabla"));
-        when(xwiki.parseContent("css", xcontext)).thenReturn("velocityParsedCSS");
+        when(velocityRenderer.render("css")).thenReturn("velocityParsedCSS");
 
         // Test
         mocker.getComponentUnderTest().render("test", iconSet);
@@ -157,7 +144,7 @@ public class DefaultIconRendererTest
         iconSet.setRenderHTML("<img src=\"$icon.png\" />");
         iconSet.addIcon("test", new Icon("blabla"));
 
-        when(xwiki.parseContent("#set($icon = \"blabla\")\n<img src=\"$icon.png\" />", xcontext))
+        when(velocityRenderer.render("#set($icon = \"blabla\")\n<img src=\"$icon.png\" />"))
                 .thenReturn("<img src=\"blabla.png\" />");
 
         // Test
@@ -173,7 +160,7 @@ public class DefaultIconRendererTest
         IconSet iconSet = new IconSet("default");
         iconSet.setCss("css");
         iconSet.addIcon("test", new Icon("blabla"));
-        when(xwiki.parseContent("css", xcontext)).thenReturn("velocityParsedCSS");
+        when(velocityRenderer.render("css")).thenReturn("velocityParsedCSS");
 
         // Test
         mocker.getComponentUnderTest().renderHTML("test", iconSet);
@@ -228,6 +215,28 @@ public class DefaultIconRendererTest
 
         // Verify
         assertEquals("", result);
+    }
+
+    @Test
+    public void renderWithException() throws Exception
+    {
+        IconSet iconSet = new IconSet("default");
+        iconSet.setRenderWiki("image:$icon.png");
+        iconSet.addIcon("test", new Icon("blabla"));
+        IconException exception = new IconException("exception", null);
+        when(velocityRenderer.render(anyString())).thenThrow(exception);
+
+        // Test
+        IconException caughtException = null;
+        try {
+            mocker.getComponentUnderTest().render("test", iconSet);
+        } catch (IconException e) {
+            caughtException = e;
+        }
+
+        // Verify
+        assertNotNull(caughtException);
+        assertEquals(exception, caughtException);
     }
 
 }

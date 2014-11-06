@@ -42,7 +42,9 @@ public class DomainWikiReferenceExtractor extends AbstractWikiReferenceExtractor
     @Override
     public WikiReference extract(ExtendedURL url)
     {
-        String wikiId = resolveDomainBasedWikiReference(url.getURI().getHost());
+        // Note: we don't use url.getURI().getHost() since URI are more restricted in characters allowed in domain
+        // names. For example the "_" character is not supported URIs but it is supported in URLs.
+        String wikiId = resolveDomainBasedWikiReference(url.getWrappedURL().getHost());
 
         if (StringUtils.isEmpty(wikiId)) {
             wikiId = getMainWikiId();

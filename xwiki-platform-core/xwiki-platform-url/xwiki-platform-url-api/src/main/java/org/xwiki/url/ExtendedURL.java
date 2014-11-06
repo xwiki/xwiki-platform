@@ -56,6 +56,15 @@ public class ExtendedURL implements Cloneable
     private URI uri;
 
     /**
+     * Keep the URL that we're wrapping since for some operations it's better to make them on the URL object rather
+     * than on the URI one. For example domain names are stricter in URI (no "_" character allowed while they are
+     * allowed in URLs).
+     *
+     * @see #getWrappedURL()
+     */
+    private URL wrappedURL;
+
+    /**
      * @see #getSegments()
      */
     private List<String> segments;
@@ -89,6 +98,8 @@ public class ExtendedURL implements Cloneable
      */
     public ExtendedURL(URL url, String ignorePrefix) throws CreateResourceReferenceException
     {
+        this.wrappedURL = url;
+
         // Convert the URL to a URI since URI performs correctly decoding.
         // Note that this means that this method only accepts valid URLs (with proper encoding)
         URI internalURI;
@@ -128,6 +139,14 @@ public class ExtendedURL implements Cloneable
     public List<String> getSegments()
     {
         return this.segments;
+    }
+
+    /**
+     * @return the URL that this instance wraps, provided as a helper feature
+     */
+    public URL getWrappedURL()
+    {
+        return this.wrappedURL;
     }
 
     /**

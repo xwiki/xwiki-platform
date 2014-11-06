@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -99,6 +98,11 @@
       #set($discard = $whereParams.add($propClassName))
     #end
   #end
+  ## Set the order clause for a field. We first ignore the case using the lower function (so that e.g. 'aaa' equals 'AAA')
+  ## but then consider it only for equal values (so that e.g. 'AAA' comes before 'aaa').
+  #macro(setOrderClause $fieldName $direction)
+    #set($orderSql = " order by lower(${fieldName}) ${direction}, ${fieldName} ${direction}")
+  #end
   #set($order = "$!request.sort")
   #set ($orderSql = '')
   #if($order != '')
@@ -110,11 +114,11 @@
     #set($safe_tableAlias = $order.replaceAll('[^a-zA-Z0-9_.]', ''))
     ##
     #if($order.startsWith('doc.'))
-      #set($orderSql = " order by ${safe_tableAlias.replace('_','.')} ${orderDirection}")
+      #setOrderClause(${safe_tableAlias.replace('_','.')}, ${orderDirection})
     #elseif($tablelist.contains($order))
       #set ($multiselect = "$!{class.get($order).getProperty('multiSelect').getValue()}")
       #if($multiselect != '1')
-        #set ($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+        #setOrderClause("${safe_tableAlias}.value", ${orderDirection})
       #end
     #else
       #set($multiselect = $class.get($order).getProperty('multiSelect').getValue())
@@ -132,7 +136,7 @@
         ##Conditions are put on the object coresponding to the column of the order ($orderObjectAlias), which depends on which is the class of the $order
         #set($whereSql = "${whereSql} and ${orderObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
         #set($discard = $whereParams.add("${order}"))
-        #set($orderSql = " order by ${safe_tableAlias}.value ${orderDirection}")
+        #setOrderClause("${safe_tableAlias}.value", ${orderDirection})
       #end
     #end
   #end

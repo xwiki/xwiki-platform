@@ -4,3 +4,4 @@ org.xwiki.icon.internal.DefaultIconSetCache
 org.xwiki.icon.internal.DefaultIconSetLoader
 org.xwiki.icon.internal.DefaultIconSetManager
 org.xwiki.icon.internal.IconThemeListener
+org.xwiki.icon.internal.VelocityRenderer

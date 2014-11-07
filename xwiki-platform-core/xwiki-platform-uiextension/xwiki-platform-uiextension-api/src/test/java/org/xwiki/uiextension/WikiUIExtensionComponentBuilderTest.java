@@ -326,9 +326,9 @@ public class WikiUIExtensionComponentBuilderTest extends AbstractMockingComponen
                 allowing(velocityManager).getVelocityContext();
                 will(returnValue(velocityContext));
                 oneOf(velocityEngine).evaluate(with(any(VelocityContext.class)), with(any(StringWriter.class)),
-                    with(equal("")), with(equal("value=foo")));
+                    with(equal("name:key")), with(equal("value=foo")));
                 oneOf(velocityEngine).evaluate(with(any(VelocityContext.class)), with(any(StringWriter.class)),
-                    with(equal("")), with(equal("value2")));
+                    with(equal("name:key2")), with(equal("value2")));
                 will(returnValue(true));
             }
         });

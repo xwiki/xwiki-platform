@@ -692,10 +692,6 @@ li .category-add-form, li .category-rename-form{
   color: $theme.textSecondaryColor;
 }
 
-.category-add-form .buttonwrapper, .category-rename-form .buttonwrapper {
-  margin: 0 12px 0 0;
-}
-
 input.category-name-input {
   border: 1px solid $theme.borderColor;
   height: 80%;

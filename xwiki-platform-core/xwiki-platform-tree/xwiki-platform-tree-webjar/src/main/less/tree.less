@@ -92,6 +92,13 @@
       content: '\f111';
     }
   }
+
+  .jstree-closed.jstree-loading > .jstree-ocl:before,
+  .jstree-open.jstree-loading > .jstree-ocl:before,
+  .jstree-leaf.jstree-loading > .jstree-ocl:before {
+    /* Hide the open/close/leaf icon while the node is in loading state. */
+    content: normal;
+  }
 }
 @media (max-width: 768px) {
   .jstree-xwiki-responsive > .jstree-no-dots.jstree-no-icons {
@@ -120,6 +127,8 @@
  */
 .jstree-xwiki > .jstree-container-ul .jstree-loading > .jstree-ocl {
   background-image: url("$!xwiki.getSkinFile('icons/xwiki/spinner.gif')");
+  background-position: center center !important;
+  background-size: 16px;
 }
 .jstree ul.jstree-children {
   /* Overwrite the margin and padding from the XWiki skin. */

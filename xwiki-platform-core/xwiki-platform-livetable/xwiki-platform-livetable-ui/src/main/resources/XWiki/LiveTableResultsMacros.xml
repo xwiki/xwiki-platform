@@ -26,12 +26,12 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1393535342000</creationDate>
+  <creationDate>1393531742000</creationDate>
   <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1393542378000</date>
-  <contentUpdateDate>1393542368000</contentUpdateDate>
+  <date>1415643297000</date>
+  <contentUpdateDate>1415643297000</contentUpdateDate>
   <version>1.1</version>
   <title>$services.localization.render('platform.livetable.resultsMacros')</title>
   <comment/>
@@ -100,8 +100,12 @@
   #end
   ## Set the order clause for a field. We first ignore the case using the lower function (so that e.g. 'aaa' equals 'AAA')
   ## but then consider it only for equal values (so that e.g. 'AAA' comes before 'aaa').
-  #macro(setOrderClause $fieldName $direction)
-    #set($orderSql = " order by lower(${fieldName}) ${direction}, ${fieldName} ${direction}")
+  #macro(setOrderClause $fieldName $direction $useRawValue)
+    #if ($useRawValue)
+      #set($orderSql = " order by ${fieldName} ${direction}")
+    #else
+      #set($orderSql = " order by lower(${fieldName}) ${direction}, ${fieldName} ${direction}")
+    #end
   #end
   #set($order = "$!request.sort")
   #set ($orderSql = '')
@@ -114,29 +118,44 @@
     #set($safe_tableAlias = $order.replaceAll('[^a-zA-Z0-9_.]', ''))
     ##
     #if($order.startsWith('doc.'))
-      #setOrderClause(${safe_tableAlias.replace('_','.')}, ${orderDirection})
-    #elseif($tablelist.contains($order))
-      #set ($multiselect = "$!{class.get($order).getProperty('multiSelect').getValue()}")
-      #if($multiselect != '1')
-        #setOrderClause("${safe_tableAlias}.value", ${orderDirection})
-      #end
+      ## The column is a document field.
+      ##
+      ## These document fields need to be ordered as raw values and not as strings.
+      #set($rawDocumentFields = ['translation', 'date', 'contentUpdateDate', 'creationDate', 'elements', 'minorEdit1', 'hidden'])
+      #set($documentField = $stringtool.lowerCase($stringtool.removeStart($order, 'doc.'), 'en'))
+      #setOrderClause(${safe_tableAlias.replace('_','.')}, ${orderDirection},  $rawDocumentFields.contains($documentField))
     #else
-      #set($multiselect = $class.get($order).getProperty('multiSelect').getValue())
-      #if("$multiselect" != '1')
-        #livetable_getTableName($order)
-        ##If the sort column has a _class specified, join that object in
-        #set($orderObjectAlias = 'obj')
-        #if($propClassName != '' &amp;&amp; "$!propClass" != '')
-          ## prepare the alias of the BaseObject table that corresponds to the class of this column
-          #set($orderObjectAlias = "$!{propClassName.replaceAll('[^a-zA-Z0-9_]','')}_obj")
-          #addObjectClause($orderObjectAlias)
+      ## The column is an object property.
+      ##
+      ## Resolve the property.
+      #livetable_getPropertyClassAndType($order)
+      #set ($multiselect = "$!{propClass.get($order).getProperty('multiSelect').getValue()}")
+      ## We can only handle single values, not multiselect ones.
+      #if ($multiselect != '1')
+        ## Some property types do not need lowercasing since they have unique values by design, so we use the raw values to order.
+        #set($rawPropertyTypes = ['NumberClass', 'BooleanClass', 'DateClass', 'LevelsClass'])
+        ## If the order column is also a filer column, this means that it was already added to the query and all we need to do is to add it to the order clause.
+        #if(!$tablelist.contains($order))
+          ## The order column is not also a filter column, so not yet defined in the query.
+          ## We need to first define it (to the from and where clauses) before we can add it to the order clause.
+          ##
+          ## Resolve the table name of the property to be used in the from clause below.
+          #livetable_getTableName($order)
+          ## If the sort column has a _class specified, join that object in
+          #set($orderObjectAlias = 'obj')
+          #if($propClassName != '' &amp;&amp; "$!propClass" != '')
+            ## prepare the alias of the BaseObject table that corresponds to the class of this column
+            #set($orderObjectAlias = "$!{propClassName.replaceAll('[^a-zA-Z0-9_]', '')}_obj")
+            #addObjectClause($orderObjectAlias)
+          #end
+          #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
+          ## FIXME: Check if this is indeed a property of the class. Hint: $propType can be used.
+          ## Conditions are put on the object coresponding to the column of the order ($orderObjectAlias), which depends on which is the class of the $order
+          #set($whereSql = "${whereSql} and ${orderObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
+          #set($discard = $whereParams.add("${order}"))
         #end
-        #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
-        ## FIXME: Check if this is indeed a property of the class
-        ##Conditions are put on the object coresponding to the column of the order ($orderObjectAlias), which depends on which is the class of the $order
-        #set($whereSql = "${whereSql} and ${orderObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
-        #set($discard = $whereParams.add("${order}"))
-        #setOrderClause("${safe_tableAlias}.value", ${orderDirection})
+        ## Add the column to the order clause.
+        #setOrderClause("${safe_tableAlias}.value", ${orderDirection}, $rawPropertyTypes.contains($propType))
       #end
     #end
   #end
@@ -349,17 +368,9 @@
     #livetable_getImagesList($itemDoc)
     #set($discard = $row.put($colname, $imagesList))
   #else
-    #set($propClassName = "$!request.get($colname.concat('_class'))")
-    #if($propClassName != '')
-      #set($propClass = $xwiki.getDocument($propClassName).getxWikiClass())
+    #livetable_getPropertyClassAndType($colname)
+    #if(!$propClass.equals($class))
       #set($discard = $itemDoc.use($propClassName))
-    #else
-      #set($propClass = $class)
-    #end
-    ## Retrieve the property type as it might be usefull
-    #set($propType = '')
-    #if($propClass.getPropertyNames().contains($colname))
-      #set($propType = "$!propClass.get($colname).type")
     #end
     #set($fieldValue = "$!itemDoc.getValue($colname)")
     #set($fieldDisplayValue = "$!itemDoc.display($colname, 'view')")
@@ -431,16 +442,7 @@
  * NOTE the resulting $tableName is safe to use inside SQL queries
  *#
 #macro(livetable_getTableName $colname)
-  #set($propClassName = "$!request.get(${colname.concat('_class')})")
-  #if($propClassName != '')
-    #set($propClass = $xwiki.getDocument($propClassName).getxWikiClass())
-  #else
-    #set($propClass = $class)
-  #end
-  #set($propType = '')
-  #if($propClass.getPropertyNames().contains($colname))
-    #set($propType = "$!{propClass.get($colname).type}")
-  #end
+  #livetable_getPropertyClassAndType($colname)
   #if($propType == 'NumberClass')
     #set($numberType = $propClass.get($colname).getProperty('numberType').getValue())
     #if($numberType == 'integer')
@@ -472,6 +474,22 @@
     #end
   #else
     #set($tableName = 'StringProperty')
+  #end
+#end
+
+#**
+ * Get the property class and type for a given livetable column.
+ *#
+#macro(livetable_getPropertyClassAndType $colname)
+  #set($propClassName = "$!request.get(${colname.concat('_class')})")
+  #if($propClassName != '')
+    #set($propClass = $xwiki.getDocument($propClassName).getxWikiClass())
+  #else
+    #set($propClass = $class)
+  #end
+  #set($propType = '')
+  #if($propClass.getPropertyNames().contains($colname))
+    #set($propType = "$!{propClass.get($colname).type}")
   #end
 #end
 

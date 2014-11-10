@@ -96,7 +96,8 @@ public class FlamingoThemeTest extends AbstractTest
         // Wait for the preview to be fully loaded
         assertTrue(editThemePage.isPreviewBoxLoading());
         editThemePage.waitUntilPreviewIsLoaded();
-        // Disable auto refresh first
+        // First, disable auto refresh because it slows down the test
+        // (and can even make it fails if the computer is slow)
         editThemePage.setAutoRefresh(false);
         // Select a variable category and change value
         editThemePage.selectVariableCategory("Base colors");
@@ -140,7 +141,8 @@ public class FlamingoThemeTest extends AbstractTest
         EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme("Test");
         editThemePage.waitUntilPreviewIsLoaded();
 
-        // Disable auto refresh first
+        // First, disable auto refresh because it slows down the test
+        // (and can even make it fails if the computer is slow)
         editThemePage.setAutoRefresh(false);
 
         // Set variables

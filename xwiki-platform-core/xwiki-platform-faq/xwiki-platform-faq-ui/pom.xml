@@ -95,12 +95,5 @@
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
-    <!-- Required to display icons -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-icon-script</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
   </dependencies>
 </project>

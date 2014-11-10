@@ -102,7 +102,8 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
       var position = paginationElement.parent().children().index(paginationElement[0]);
       tree.delete_node(paginationNode);
       $.each(children, function(index) {
-        tree.create_node(parent, this, position + index, index == 0 && function(firstChild) {
+        var selectFirstChild = index == 0 && tree.element.hasClass('jstree-no-links');
+        tree.create_node(parent, this, position + index, selectFirstChild && function(firstChild) {
           tree.select_node(firstChild);
         });
       });

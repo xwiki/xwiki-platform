@@ -140,6 +140,9 @@ public class FlamingoThemeTest extends AbstractTest
         EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme("Test");
         editThemePage.waitUntilPreviewIsLoaded();
 
+        // Disable auto refresh first
+        editThemePage.setAutoRefresh(false);
+
         // Set variables
         editThemePage.selectVariableCategory("Base colors");
         editThemePage.setVariableValue("xwiki-page-content-bg", "#ff0000");

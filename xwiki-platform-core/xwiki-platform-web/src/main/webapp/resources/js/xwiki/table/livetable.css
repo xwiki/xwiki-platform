@@ -226,6 +226,7 @@ tbody.xwiki-livetable-display-body td a.action {
   background-repeat: no-repeat;
   margin-right: 5px;
   padding-bottom: 1px;
+  text-transform: capitalize;
 }
 tbody.xwiki-livetable-display-body td a.action:hover {
   text-decoration: underline;

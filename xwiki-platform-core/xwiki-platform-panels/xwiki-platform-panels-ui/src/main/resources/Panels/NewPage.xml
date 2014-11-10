@@ -130,9 +130,9 @@
 #panelheader($services.localization.render('core.create.pageTitle'))
 #set ($panelId = $util.generateRandomString(4))
 {{html clean="false"}}
-&lt;form method="post" action="$doc.getURL('create')" onsubmit="cancelCancelEdit()"&gt;
+&lt;form method="post" action="$doc.getURL('create')" onsubmit="cancelCancelEdit()" class='xform'&gt;
 {{/html}}
-  (% class="padded centered" %)
+  (% class='' %)
   (((
     (% class="hidden" %)
     {{html}}
@@ -148,8 +148,7 @@
     : {{html}}&lt;input type="text" id="$spaceInputId" name="space" value="$!space" class="suggestSpaces" /&gt;{{/html}}
     ; {{html}}&lt;label for="$pageInputId"&gt;$services.localization.render('core.create.page')&lt;/label&gt;{{/html}}
     : {{html}}&lt;input type="text" id="$pageInputId" class="withTip" name="page" value="$pageText" /&gt;{{/html}}
-
-    {{html}}&lt;input type="submit" class="button" value="$services.localization.render('create')" /&gt;{{/html}}
+    ; (% class="buttonwrapper" %){{html}}&lt;input type="submit" class="button" value="$services.localization.render('create')" /&gt;{{/html}}
   )))
 {{html clean="false"}}
 &lt;/form&gt;

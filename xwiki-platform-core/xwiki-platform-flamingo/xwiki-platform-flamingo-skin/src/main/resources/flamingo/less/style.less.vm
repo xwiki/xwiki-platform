@@ -21,6 +21,7 @@
 @import "messages";
 @import "misc";
 @import "panels";
+@import "tree";
 @import "type";
 @import "vertical-menus";
 @import "xlist";

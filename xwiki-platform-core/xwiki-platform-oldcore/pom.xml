@@ -729,6 +729,8 @@
               **/internal/model/reference/CurrentStringEntityReferenceResolver.java,
               **/internal/observation/remote/converter/AbstractXWikiEventConverter.java,
               **/internal/observation/remote/converter/ActionExecutionEventConverter.java,
+              **/internal/template/Template.java,
+              **/internal/template/TemplateContent.java,
               **/internal/template/TemplateScriptService.java,
               **/internal/template/TemplateManager.java,
               **/monitor/api/MonitorData.java,

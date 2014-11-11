@@ -49,10 +49,14 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.properties.PropertyException;
 import org.xwiki.properties.RawProperties;
@@ -63,10 +67,8 @@ import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.parser.MissingParserException;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.parser.ContentParser;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.printer.WriterWikiPrinter;
@@ -76,7 +78,6 @@ import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.velocity.XWikiVelocityException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -97,9 +98,9 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 @Singleton
 public class TemplateManager
 {
-    private static final Pattern PROPERTY_LINE = Pattern.compile("^##!(.+)=(.*)$\r?\n?", Pattern.MULTILINE);
+    static final LocalDocumentReference SKINCLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiSkins");
 
-    private static final LocalDocumentReference SKINCLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiSkins");
+    private static final Pattern PROPERTY_LINE = Pattern.compile("^##!(.+)=(.*)$\r?\n?", Pattern.MULTILINE);
 
     /**
      * The reference of the superadmin user.
@@ -160,11 +161,246 @@ public class TemplateManager
     @Inject
     private Logger logger;
 
-    private static class FilesystemTemplateContent extends TemplateContent
+    private static abstract class AbtractTemplate<T extends TemplateContent> implements Template
     {
-        public FilesystemTemplateContent(String content, String path)
+        protected String path;
+
+        protected T content;
+
+        public AbtractTemplate(String path)
         {
-            super(content, path);
+            this.path = path;
+        }
+
+        public AbtractTemplate(String path, T content)
+        {
+            this(path);
+
+            this.content = content;
+        }
+
+        @Override
+        public String getId()
+        {
+            return getPath();
+        }
+
+        @Override
+        public String getPath()
+        {
+            return this.path;
+        }
+
+        @Override
+        public TemplateContent getContent() throws Exception
+        {
+            if (this.content == null) {
+                this.content = getContentInternal();
+            }
+
+            return this.content;
+        }
+
+        protected abstract T getContentInternal() throws Exception;
+    }
+
+    private class FileSystemTemplate extends AbtractTemplate<FilesystemTemplateContent>
+    {
+        public FileSystemTemplate(String path)
+        {
+            super(path);
+        }
+
+        public FileSystemTemplate(String path, FilesystemTemplateContent content)
+        {
+            super(path, content);
+        }
+
+        @Override
+        protected FilesystemTemplateContent getContentInternal()
+        {
+            InputStream inputStream = environment.getResourceAsStream(getPath());
+            if (inputStream != null) {
+                try {
+                    return new FilesystemTemplateContent(IOUtils.toString(inputStream, "UTF-8"));
+                } catch (IOException e) {
+                    logger.error("Faied to get content of resource [{}]", getPath(), e);
+                } finally {
+                    IOUtils.closeQuietly(inputStream);
+                }
+            }
+
+            return null;
+        }
+    }
+
+    private abstract class AbstractWikiTemplate<R extends EntityReference> extends
+        AbtractTemplate<DefaultTemplateContent>
+    {
+        protected R reference;
+
+        public AbstractWikiTemplate(String path, R reference)
+        {
+            this(path, reference, null);
+        }
+
+        public AbstractWikiTemplate(String path, R reference, DefaultTemplateContent content)
+        {
+            super(path, content);
+
+            this.reference = reference;
+        }
+
+        @Override
+        protected DefaultTemplateContent getContentInternal() throws Exception
+        {
+            EntityReference documentReference = this.reference.extractReference(EntityType.DOCUMENT);
+
+            XWikiContext xcontext = xcontextProvider.get();
+
+            XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
+
+            return new DefaultTemplateContent(getContentAsString(document), document.getAuthorReference());
+        }
+
+        protected abstract String getContentAsString(XWikiDocument document) throws Exception;
+    }
+
+    private class ObjectPropertyWikiTemplate extends AbstractWikiTemplate<ObjectPropertyReference>
+    {
+        public ObjectPropertyWikiTemplate(String path, ObjectPropertyReference reference)
+        {
+            super(path, reference);
+        }
+
+        public ObjectPropertyWikiTemplate(String path, ObjectPropertyReference reference, DefaultTemplateContent content)
+        {
+            super(path, reference, content);
+        }
+
+        @Override
+        protected String getContentAsString(XWikiDocument document)
+        {
+            BaseProperty<ObjectPropertyReference> property = document.getXObjectProperty(this.reference);
+
+            return (String) property.getValue();
+        }
+    }
+
+    private class AttachmentWikiTemplate extends AbstractWikiTemplate<AttachmentReference>
+    {
+        public AttachmentWikiTemplate(String path, AttachmentReference reference)
+        {
+            super(path, reference);
+        }
+
+        public AttachmentWikiTemplate(String path, AttachmentReference reference, DefaultTemplateContent content)
+        {
+            super(path, reference, content);
+        }
+
+        @Override
+        protected String getContentAsString(XWikiDocument document) throws IOException, XWikiException
+        {
+            XWikiAttachment attachment = document.getAttachment(this.reference.getName());
+
+            // It's impossible to know the real attachment encoding, but let's assume that they respect the
+            // standard and use UTF-8 (which is required for the files located on the filesystem)
+            return IOUtils.toString(attachment.getContentInputStream(xcontextProvider.get()), "UTF-8");
+        }
+    }
+
+    private class DefaultTemplateContent implements RawProperties, TemplateContent
+    {
+        // TODO: work with streams instead
+        protected String content;
+
+        protected boolean authorProvided;
+
+        protected DocumentReference authorReference;
+
+        @PropertyId("source.syntax")
+        public Syntax sourceSyntax;
+
+        @PropertyId("raw.syntax")
+        public Syntax rawSyntax;
+
+        public Map<String, Object> properties = new HashMap<String, Object>();
+
+        public DefaultTemplateContent(String content)
+        {
+            this.content = content;
+
+            init();
+        }
+
+        protected void init()
+        {
+            Matcher matcher = PROPERTY_LINE.matcher(this.content);
+
+            Map<String, String> properties = new HashMap<String, String>();
+            while (matcher.find()) {
+                String key = matcher.group(1);
+                String value = matcher.group(2);
+
+                properties.put(key, value);
+
+                // Remove the line from the content
+                this.content = this.content.substring(matcher.end());
+            }
+
+            try {
+                beanManager.populate(content, properties);
+            } catch (PropertyException e) {
+                // Should never happen
+                logger.error("Failed to populate properties of template", e);
+            }
+
+            // The default is xhtml to support old templates
+            if (this.rawSyntax == null && this.sourceSyntax == null) {
+                this.rawSyntax = Syntax.XHTML_1_0;
+            }
+        }
+
+        public DefaultTemplateContent(String content, DocumentReference authorReference)
+        {
+            this(content);
+
+            setAuthorReference(authorReference);
+        }
+
+        @Override
+        public String getContent()
+        {
+            return this.content;
+        }
+
+        @PropertyId("author")
+        public DocumentReference getAuthorReference()
+        {
+            return this.authorReference;
+        }
+
+        protected void setAuthorReference(DocumentReference authorReference)
+        {
+            this.authorReference = authorReference;
+            this.authorProvided = true;
+        }
+
+        // RawProperties
+
+        @Override
+        public void set(String propertyName, Object value)
+        {
+            this.properties.put(propertyName, value);
+        }
+    }
+
+    private class FilesystemTemplateContent extends DefaultTemplateContent
+    {
+        public FilesystemTemplateContent(String content)
+        {
+            super(content);
         }
 
         /**
@@ -198,59 +434,6 @@ public class TemplateManager
             if (priviledged) {
                 setAuthorReference(SUPERADMIN_REFERENCE);
             }
-        }
-    }
-
-    private static class TemplateContent implements RawProperties
-    {
-        // TODO: work with steams instead
-        protected String content;
-
-        protected boolean authorProvided;
-
-        protected DocumentReference authorReference;
-
-        protected final String path;
-
-        @PropertyId("source.syntax")
-        public Syntax sourceSyntax;
-
-        @PropertyId("raw.syntax")
-        public Syntax rawSyntax;
-
-        public Map<String, Object> properties = new HashMap<String, Object>();
-
-        public TemplateContent(String content, String path)
-        {
-            this.content = content;
-            this.path = path;
-        }
-
-        public TemplateContent(String content, String path, DocumentReference authorReference)
-        {
-            this(content, path);
-
-            setAuthorReference(authorReference);
-        }
-
-        @PropertyId("author")
-        public DocumentReference getAuthorReference()
-        {
-            return this.authorReference;
-        }
-
-        protected void setAuthorReference(DocumentReference authorReference)
-        {
-            this.authorReference = authorReference;
-            this.authorProvided = true;
-        }
-
-        // RawProperties
-
-        @Override
-        public void set(String propertyName, Object value)
-        {
-            this.properties.put(propertyName, value);
         }
     }
 
@@ -359,34 +542,34 @@ public class TemplateManager
         return skinDocument != null ? skinDocument.getXObject(SKINCLASS_REFERENCE) : null;
     }
 
-    private TemplateContent getTemplateContentFromSkin(String template, String skin)
+    private Template getTemplateContentFromSkin(String templateName, String skin)
     {
-        TemplateContent content;
+        Template template;
 
         // Try from wiki pages
-        // FIXME: macros.vm from document based skins is not supported by default VelocityManager yet
-        XWikiDocument skinDocument = template.equals("macros.vm") ? null : getSkinDocument(skin);
+        XWikiDocument skinDocument = getSkinDocument(skin);
         if (skinDocument != null) {
-            content = getTemplateContentFromDocumentSkin(template, skinDocument);
+            template = getTemplateContentFromDocumentSkin(templateName, skinDocument);
         } else {
             // If not a wiki based skin try from filesystem skins
-            content = getResourceAsStringContent("/skins/" + skin + '/', template);
+            template = getResourceAsStringContent("/skins/" + skin + '/', templateName);
         }
 
-        return content;
+        return template;
     }
 
-    private BaseProperty getTemplatePropertyValue(String template, XWikiDocument skinDocument)
+    private BaseProperty<ObjectPropertyReference> getTemplatePropertyValue(String template, XWikiDocument skinDocument)
     {
         // Try parsing the object property
         BaseObject skinObject = skinDocument.getXObject(SKINCLASS_REFERENCE);
         if (skinObject != null) {
-            BaseProperty templateProperty = (BaseProperty) skinObject.safeget(template);
+            BaseProperty<ObjectPropertyReference> templateProperty =
+                (BaseProperty<ObjectPropertyReference>) skinObject.safeget(template);
 
             // If not found try by replacing '/' with '.'
             if (templateProperty == null) {
                 String escapedTemplateName = StringUtils.replaceChars(template, '/', '.');
-                templateProperty = (BaseProperty) skinObject.safeget(escapedTemplateName);
+                templateProperty = (BaseProperty<ObjectPropertyReference>) skinObject.safeget(escapedTemplateName);
             }
 
             if (templateProperty != null) {
@@ -400,27 +583,28 @@ public class TemplateManager
         return null;
     }
 
-    private TemplateContent getTemplateContentFromDocumentSkin(String template, XWikiDocument skinDocument)
+    private Template getTemplateContentFromDocumentSkin(String templateName, XWikiDocument skinDocument)
     {
         if (skinDocument != null) {
             // Try parsing the object property
-            BaseProperty templateProperty = getTemplatePropertyValue(template, skinDocument);
+            BaseProperty<ObjectPropertyReference> templateProperty =
+                getTemplatePropertyValue(templateName, skinDocument);
             if (templateProperty != null) {
-                return new TemplateContent((String) templateProperty.getValue(),
-                    this.referenceSerializer.serialize(templateProperty.getReference()),
-                    skinDocument.getAuthorReference());
+                ObjectPropertyReference reference = templateProperty.getReference();
+                return new ObjectPropertyWikiTemplate(getPath(reference), reference,
+                    new DefaultTemplateContent((String) templateProperty.getValue(), skinDocument.getAuthorReference()));
             }
 
             // Try parsing a document attachment
-            XWikiAttachment attachment = skinDocument.getAttachment(template);
+            XWikiAttachment attachment = skinDocument.getAttachment(templateName);
             if (attachment != null) {
                 // It's impossible to know the real attachment encoding, but let's assume that they respect the
                 // standard and use UTF-8 (which is required for the files located on the filesystem)
                 try {
-                    return new TemplateContent(IOUtils.toString(
-                        attachment.getContentInputStream(this.xcontextProvider.get()), "UTF-8"),
-                        this.referenceSerializer.serialize(attachment.getReference()),
-                        skinDocument.getAuthorReference());
+                    return new AttachmentWikiTemplate(getPath(attachment.getReference()),
+                        attachment.getReference(), new DefaultTemplateContent(IOUtils.toString(
+                            attachment.getContentInputStream(this.xcontextProvider.get()), "UTF-8"),
+                            skinDocument.getAuthorReference()));
                 } catch (Exception e) {
                     this.logger.error("Faied to get attachment content [{}]", skinDocument.getDocumentReference(), e);
                 }
@@ -430,40 +614,41 @@ public class TemplateManager
         return null;
     }
 
-    private TemplateContent getTemplateContent(String template)
+    private Template getTemplateContent(String templateName)
     {
-        TemplateContent source = null;
+        Template template = null;
 
         // Try from skin
         String skin = getSkin();
         if (skin != null) {
-            source = getTemplateContentFromSkin(template, skin);
+            template = getTemplateContentFromSkin(templateName, skin);
         }
 
         // Try from base skin
-        if (source == null) {
+        if (template == null) {
             String baseSkin = getBaseSkin();
             if (baseSkin != null) {
-                source = getTemplateContentFromSkin(template, baseSkin);
+                template = getTemplateContentFromSkin(templateName, baseSkin);
             }
         }
 
         // Try from /template/ resources
-        if (source == null) {
-            source = getResourceAsStringContent("/templates/", template);
+        if (template == null) {
+            template = getResourceAsStringContent("/templates/", templateName);
         }
 
-        return source;
+        return template;
     }
 
-    private TemplateContent getResourceAsStringContent(String suffixPath, String template)
+    private Template getResourceAsStringContent(String suffixPath, String templateName)
     {
-        String templatePath = getResourcePath(suffixPath, template, false);
+        String templatePath = getResourcePath(suffixPath, templateName, false);
 
         InputStream inputStream = this.environment.getResourceAsStream(templatePath);
         if (inputStream != null) {
             try {
-                return new FilesystemTemplateContent(IOUtils.toString(inputStream, "UTF-8"), templatePath);
+                return new FileSystemTemplate(templatePath, new FilesystemTemplateContent(IOUtils.toString(inputStream,
+                    "UTF-8")));
             } catch (IOException e) {
                 this.logger.error("Faied to get content of resource [{}]", templatePath, e);
             } finally {
@@ -474,9 +659,9 @@ public class TemplateManager
         return null;
     }
 
-    private String getResourcePath(String suffixPath, String template, boolean testExist)
+    private String getResourcePath(String suffixPath, String templateName, boolean testExist)
     {
-        String templatePath = suffixPath + template;
+        String templatePath = suffixPath + templateName;
 
         // Prevent inclusion of templates from other directories
         String normalizedTemplate = URI.create(templatePath).normalize().toString();
@@ -497,41 +682,9 @@ public class TemplateManager
         return templatePath;
     }
 
-    private TemplateContent getTemplateContent(String template, String skin)
+    private Template getTemplateContent(String templateName, String skin)
     {
-        TemplateContent content =
-            skin != null ? getTemplateContentFromSkin(template, skin) : getTemplateContent(template);
-
-        if (content == null) {
-            return null;
-        }
-
-        Matcher matcher = PROPERTY_LINE.matcher(content.content);
-
-        Map<String, String> properties = new HashMap<String, String>();
-        while (matcher.find()) {
-            String key = matcher.group(1);
-            String value = matcher.group(2);
-
-            properties.put(key, value);
-
-            // Remove the line from the content
-            content.content = content.content.substring(matcher.end());
-        }
-
-        try {
-            this.beanManager.populate(content, properties);
-        } catch (PropertyException e) {
-            // Should never happen
-            this.logger.error("Failed to populate properties of template [{}]", template, e);
-        }
-
-        // The default is xhtml to support old templates
-        if (content.rawSyntax == null && content.sourceSyntax == null) {
-            content.rawSyntax = Syntax.XHTML_1_0;
-        }
-
-        return content;
+        return skin != null ? getTemplateContentFromSkin(templateName, skin) : getTemplateContent(templateName);
     }
 
     private void renderError(Throwable throwable, Writer writer)
@@ -578,15 +731,15 @@ public class TemplateManager
     }
 
     /**
-     * @param template the template to parse
+     * @param templateName the template to parse
      * @return the result of the template parsing
      */
-    public XDOM getXDOMNoException(String template)
+    public XDOM getXDOMNoException(String templateName)
     {
         XDOM xdom;
 
         try {
-            xdom = getXDOM(template);
+            xdom = getXDOM(templateName);
         } catch (Throwable e) {
             xdom = generateError(e);
         }
@@ -594,17 +747,14 @@ public class TemplateManager
         return xdom;
     }
 
-    private XDOM getXDOM(TemplateContent content) throws ParseException, MissingParserException, XWikiVelocityException
+    private XDOM getXDOM(Template template) throws Exception
     {
         XDOM xdom;
 
-        if (content != null) {
-            if (content.sourceSyntax != null) {
-                xdom = this.parser.parse(content.content, content.sourceSyntax);
-            } else {
-                String result = evaluateContent(content);
-                xdom = new XDOM(Arrays.asList(new RawBlock(result, content.rawSyntax)));
-            }
+        if (template != null) {
+            DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
+
+            xdom = getXDOM(template, content);
         } else {
             xdom = new XDOM(Collections.<Block>emptyList());
         }
@@ -612,11 +762,25 @@ public class TemplateManager
         return xdom;
     }
 
-    public XDOM getXDOM(String template) throws ParseException, MissingParserException, XWikiVelocityException
+    private XDOM getXDOM(Template template, DefaultTemplateContent content) throws Exception
     {
-        TemplateContent content = getTemplateContent(template, null);
+        XDOM xdom;
 
-        return getXDOM(content);
+        if (content.sourceSyntax != null) {
+            xdom = this.parser.parse(content.content, content.sourceSyntax);
+        } else {
+            String result = evaluateContent(template, content);
+            xdom = new XDOM(Arrays.asList(new RawBlock(result, content.rawSyntax)));
+        }
+
+        return xdom;
+    }
+
+    public XDOM getXDOM(String templateName) throws Exception
+    {
+        Template template = getTemplateContent(templateName, null);
+
+        return getXDOM(template);
     }
 
     public String renderNoException(String template)
@@ -656,37 +820,45 @@ public class TemplateManager
         renderFromSkin(template, null, writer);
     }
 
-    public void renderFromSkin(final String template, final String skin, final Writer writer) throws Exception
+    public void renderFromSkin(final String templateName, final String skin, final Writer writer) throws Exception
     {
-        final TemplateContent content = getTemplateContent(template, skin);
+        final Template template = getTemplateContent(templateName, skin);
 
-        if (content != null) {
+        if (template != null) {
+            final DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
+
             if (content.authorProvided) {
                 this.suExecutor.call(new Callable<Void>()
                 {
                     @Override
                     public Void call() throws Exception
                     {
-                        renderFromSkin(content, writer);
+                        render(template, content, writer);
 
                         return null;
                     }
                 }, content.getAuthorReference());
             } else {
-                renderFromSkin(content, writer);
+                render(template, content, writer);
             }
         }
     }
 
-    private void renderFromSkin(TemplateContent content, Writer writer) throws ParseException, MissingParserException,
-        XWikiVelocityException
+    public void render(Template template, Writer writer) throws Exception
+    {
+        DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
+
+        render(template, content, writer);
+    }
+
+    private void render(Template template, DefaultTemplateContent content, Writer writer) throws Exception
     {
         if (content.sourceSyntax != null) {
-            XDOM xdom = execute(content);
+            XDOM xdom = execute(template, content);
 
             render(xdom, writer);
         } else {
-            evaluateContent(content, writer);
+            evaluateContent(template, content, writer);
         }
     }
 
@@ -718,43 +890,49 @@ public class TemplateManager
         return xdom;
     }
 
-    private XDOM execute(TemplateContent content) throws ParseException, MissingParserException, XWikiVelocityException
+    private XDOM execute(Template template, DefaultTemplateContent content) throws Exception
     {
-        XDOM xdom = getXDOM(content);
+        XDOM xdom = getXDOM(template, content);
 
         transform(xdom);
 
         return xdom;
     }
 
-    public XDOM execute(String template) throws Exception
+    public XDOM execute(String templateName) throws Exception
     {
-        final TemplateContent content = getTemplateContent(template, null);
+        final Template template = getTemplateContent(templateName, null);
 
-        if (content.authorProvided) {
-            return this.suExecutor.call(new Callable<XDOM>()
-            {
-                @Override
-                public XDOM call() throws Exception
+        if (template != null) {
+            final DefaultTemplateContent content = (DefaultTemplateContent) template.getContent();
+
+            if (content.authorProvided) {
+                return this.suExecutor.call(new Callable<XDOM>()
                 {
-                    return execute(content);
-                }
-            }, content.getAuthorReference());
-        } else {
-            return execute(content);
+                    @Override
+                    public XDOM call() throws Exception
+                    {
+                        return execute(template, content);
+                    }
+                }, content.getAuthorReference());
+            } else {
+                return execute(template, content);
+            }
         }
+
+        return null;
     }
 
-    private String evaluateContent(TemplateContent content) throws XWikiVelocityException
+    private String evaluateContent(Template template, DefaultTemplateContent content) throws Exception
     {
         Writer writer = new StringWriter();
 
-        evaluateContent(content, writer);
+        evaluateContent(template, content, writer);
 
         return writer.toString();
     }
 
-    private void evaluateContent(TemplateContent content, Writer writer) throws XWikiVelocityException
+    private void evaluateContent(Template template, DefaultTemplateContent content, Writer writer) throws Exception
     {
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
 
@@ -764,7 +942,7 @@ public class TemplateManager
 
         boolean renderingContextPushed = false;
         if (namespace == null) {
-            namespace = content.path != null ? content.path : "unknown namespace";
+            namespace = template.getId() != null ? template.getId() : "unknown namespace";
 
             if (this.renderingContext instanceof MutableRenderingContext) {
                 // Make the current velocity template id available
@@ -798,71 +976,78 @@ public class TemplateManager
         return targetSyntax != null ? targetSyntax : Syntax.PLAIN_1_0;
     }
 
-    private String getPathFromDocumentSkin(String template, XWikiDocument skinDocument)
+    private Template getTemplateFromDocumentSkin(String template, XWikiDocument skinDocument)
     {
         if (skinDocument != null) {
             // Try parsing the object property
-            BaseProperty templateProperty = getTemplatePropertyValue(template, skinDocument);
+            BaseProperty<ObjectPropertyReference> templateProperty = getTemplatePropertyValue(template, skinDocument);
             if (templateProperty != null) {
-                return this.referenceSerializer.serialize(templateProperty.getReference());
+                ObjectPropertyReference reference = templateProperty.getReference();
+                return new ObjectPropertyWikiTemplate(getPath(reference), reference);
             }
 
             // Try parsing a document attachment
             XWikiAttachment attachment = skinDocument.getAttachment(template);
             if (attachment != null) {
-                // It's impossible to know the real attachment encoding, but let's assume that they respect the
-                // standard and use UTF-8 (which is required for the files located on the filesystem)
-                try {
-                    return this.referenceSerializer.serialize(attachment.getReference());
-                } catch (Exception e) {
-                    this.logger.error("Faied to get attachment content [{}]", skinDocument.getDocumentReference(), e);
-                }
+                AttachmentReference reference = attachment.getReference();
+                return new AttachmentWikiTemplate(getPath(reference), reference);
             }
         }
 
         return null;
     }
 
-    private String getPathFromSkin(String template, String skin)
+    private Template getTemplateFromSkin(String templateName, String skin)
     {
-        String path;
+        Template template;
 
         // Try from wiki pages
-        // FIXME: macros.vm from document based skins is not supported by default VelocityManager yet
-        XWikiDocument skinDocument = template.equals("macros.vm") ? null : getSkinDocument(skin);
+        XWikiDocument skinDocument = getSkinDocument(skin);
         if (skinDocument != null) {
-            path = getPathFromDocumentSkin(template, skinDocument);
+            template = getTemplateFromDocumentSkin(templateName, skinDocument);
         } else {
             // If not a wiki based skin try from filesystem skins
-            path = getResourcePath("/skins/" + skin + '/', template, true);
+            template = getFileSystemTemplate("/skins/" + skin + '/', templateName);
         }
 
-        return path;
+        return template;
     }
 
-    public String getPath(String template)
+    private FileSystemTemplate getFileSystemTemplate(String suffixPath, String templateName)
     {
-        String path = null;
+        String path = getResourcePath(suffixPath, templateName, true);
+
+        return path != null ? new FileSystemTemplate(path) : null;
+    }
+
+    public Template getTemplate(String templateName)
+    {
+        Template template = null;
 
         // Try from skin
         String skin = getSkin();
         if (skin != null) {
-            path = getPathFromSkin(template, skin);
+            template = getTemplateFromSkin(templateName, skin);
         }
 
         // Try from base skin
-        if (path == null) {
+        if (template == null) {
             String baseSkin = getBaseSkin();
             if (baseSkin != null) {
-                path = getPathFromSkin(template, baseSkin);
+                template = getTemplateFromSkin(templateName, baseSkin);
             }
         }
 
         // Try from /template/ resources
-        if (path == null) {
-            path = getResourcePath("/templates/", template, true);
+        if (template == null) {
+            template = getFileSystemTemplate("/templates/", templateName);
         }
 
-        return path;
+        return template;
+    }
+
+    private String getPath(EntityReference reference)
+    {
+        return this.referenceSerializer.serialize(reference);
     }
 }

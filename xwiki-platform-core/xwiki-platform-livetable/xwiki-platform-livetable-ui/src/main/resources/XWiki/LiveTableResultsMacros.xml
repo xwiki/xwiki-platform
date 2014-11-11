@@ -122,7 +122,7 @@
       ##
       ## These document fields need to be ordered as raw values and not as strings.
       #set($rawDocumentFields = ['translation', 'date', 'contentUpdateDate', 'creationDate', 'elements', 'minorEdit1', 'hidden'])
-      #set($documentField = $stringtool.lowerCase($stringtool.removeStart($order, 'doc.'), 'en'))
+      #set($documentField = $stringtool.removeStart($order, 'doc.'))
       #setOrderClause(${safe_tableAlias.replace('_','.')}, ${orderDirection},  $rawDocumentFields.contains($documentField))
     #else
       ## The column is an object property.

@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-localization-script</artifactId>
   <name>XWiki Platform - Localization - Script</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Localization - Script</description>
+  <description>Provide script oriented APIs to manipulate translations</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.57</xwiki.jacoco.instructionRatio>
   </properties>

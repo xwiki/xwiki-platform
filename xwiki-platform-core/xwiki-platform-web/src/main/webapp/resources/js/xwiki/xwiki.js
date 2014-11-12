@@ -1408,7 +1408,7 @@ XWiki.currentDocument = new XWiki.Document();
 document.observe('xwiki:dom:loaded', function() {
     var suggestionsMapping = {
         "documents" : {
-            script: XWiki.Document.getRestSearchURL("scope=name&number=10&media=json&"),
+            script: XWiki.Document.getRestSearchURL("scope=name&number=10&"),
             varname: "q",
             icon: "$xwiki.getSkinFile('icons/silk/page_white_text.png')",
             noresults: "Document not found",
@@ -1419,7 +1419,7 @@ document.observe('xwiki:dom:loaded', function() {
             resultInfo : "pageFullName"
         },
         "spaces" : {
-            script: XWiki.Document.getRestSearchURL("scope=spaces&number=10&media=json&"),
+            script: XWiki.Document.getRestSearchURL("scope=spaces&number=10&"),
             varname: "q",
             icon: "$xwiki.getSkinFile('icons/silk/folder.png')",
             noresults: "Space not found",

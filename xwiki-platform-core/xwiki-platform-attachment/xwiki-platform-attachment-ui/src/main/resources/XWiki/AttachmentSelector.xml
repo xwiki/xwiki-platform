@@ -51,7 +51,10 @@
     #set ($sortedAttachments = $sorttool.sort($attachmentList, 'date:desc'))
     #set ($lastAttachment = $sortedAttachments.get(0))
   #end
-  $response.sendRedirect($targetDocument.getURL($docAction, "$!{fieldname}=$!{lastAttachment.filename}&amp;form_token=$!{escapetool.url($request.get('form_token'))}"))
+  $response.sendRedirect($targetDocument.getURL($docAction, $escapetool.url({
+    $fieldname: $lastAttachment.filename,
+    'form_token': $request.form_token
+  })))
   #stop
 #end
 {{/velocity}}

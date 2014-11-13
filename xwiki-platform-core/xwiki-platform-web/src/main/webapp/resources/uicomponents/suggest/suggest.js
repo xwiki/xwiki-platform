@@ -142,7 +142,7 @@ var XWiki = (function(XWiki){
     this.onKeyUp = this.onKeyUp.bindAsEventListener(this);
     this.fld.observe("keyup", this.onKeyUp);
     this.onKeyPress = this.onKeyPress.bindAsEventListener(this);
-    if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
+    if (Prototype.Browser.IE || Prototype.Browser.WebKit || browser.isIE11up) {
       this.fld.observe("keydown", this.onKeyPress);
     } else {
       this.fld.observe("keypress", this.onKeyPress);

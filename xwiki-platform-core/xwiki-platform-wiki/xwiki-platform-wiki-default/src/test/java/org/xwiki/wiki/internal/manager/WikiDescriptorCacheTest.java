@@ -38,13 +38,12 @@ import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
  * Unit tests for {@link org.xwiki.wiki.internal.manager.DefaultWikiDescriptorCache}.
  *
  * @version $Id$
- * @since 6.0M1
  */
-public class DefaultWikiDescriptorCacheTest
+public class WikiDescriptorCacheTest
 {
     @Rule
     public MockitoComponentMockingRule<WikiDescriptorCache> mocker =
-        new MockitoComponentMockingRule<WikiDescriptorCache>(DefaultWikiDescriptorCache.class);
+        new MockitoComponentMockingRule<WikiDescriptorCache>(WikiDescriptorCache.class);
 
     private Cache<WikiDescriptor> wikiAliasCache;
 

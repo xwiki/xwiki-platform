@@ -47,6 +47,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -142,6 +144,8 @@ public class DefaultWikiDescriptorManagerTest
         when(document.isNew()).thenReturn(true);
 
         assertNull(this.mocker.getComponentUnderTest().getById("wikiid"));
+
+        verify(cache).addFromId(eq("wikiid"), same(DefaultWikiDescriptor.VOID));
     }
 
     @Test
@@ -185,6 +189,8 @@ public class DefaultWikiDescriptorManagerTest
     public void getByAliasWhenNotInCacheAndItDoesntExist() throws Exception
     {
         assertNull(this.mocker.getComponentUnderTest().getByAlias("wikialias"));
+
+        verify(cache).addFromAlias(eq("wikialias"), same(DefaultWikiDescriptor.VOID));
     }
 
     @Test

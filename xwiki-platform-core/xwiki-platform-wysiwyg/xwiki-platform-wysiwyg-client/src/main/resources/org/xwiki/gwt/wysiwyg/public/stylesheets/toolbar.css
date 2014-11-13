@@ -34,6 +34,7 @@
 .xToolbar .gwt-ToggleButton-up-disabled,
 .xToolbar .gwt-ToggleButton-down-disabled {
   border:1px solid #F0F0EE !important;
+  box-sizing: content-box;
   cursor:default;
   height:20px;
   width:20px;
@@ -78,6 +79,7 @@
   border-color:buttonshadow buttonhighlight buttonhighlight buttonshadow;
   border-style:solid;
   border-width:1px;
+  box-sizing: content-box;
   height:17px;
   margin:2px 2px 2px 4px;
   width:0px;

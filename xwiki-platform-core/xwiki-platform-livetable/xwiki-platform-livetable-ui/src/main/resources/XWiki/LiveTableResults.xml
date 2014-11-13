@@ -52,7 +52,7 @@
   #set ($discard = $params.add($request.parent))
 #end
 #if ("$!request.orphaned" == '1')
-  #set ($extra = "${extra} and doc.parent='' and doc.name&lt;&gt;'WebHome'")
+  #set ($extra = "${extra} and doc.parent='' and doc.fullName &lt;&gt; 'Main.WebHome'")
 #end
 #gridresultwithfilter("$!request.classname" $request.collist.split(',') '' "${extra}" $params)
 {{/velocity}}</content>

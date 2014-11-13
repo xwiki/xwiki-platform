@@ -123,7 +123,7 @@
     <property>
       <content>{{velocity}}
 #panelheader($services.localization.render('xe.panels.orphaned'))
-#foreach ($item in $services.query.xwql('where doc.parent is null or doc.parent='''' and doc.name &lt;&gt; ''WebHome'' order by doc.name asc').addFilter('hidden').execute())
+#foreach ($item in $services.query.xwql('where doc.parent is null or doc.parent='''' and doc.fullName &lt;&gt; ''Main.WebHome'' order by doc.name asc').addFilter('hidden').execute())
   #if ($xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${item}"))
     #set ($bentrydoc = $xwiki.getDocument($item))
     * [[${bentrydoc.fullName}]]

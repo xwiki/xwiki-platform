@@ -22,11 +22,13 @@ package com.xpn.xwiki.plugin.scheduler;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -36,9 +38,15 @@ import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.context.concurrent.ExecutionContextRunnable;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
 import org.xwiki.script.service.ScriptServiceManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -58,7 +66,7 @@ import com.xpn.xwiki.web.XWikiServletRequest;
  * 
  * @version $Id$
  */
-public class SchedulerPlugin extends XWikiDefaultPlugin
+public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
 {
     /**
      * Log object to log messages in this class.
@@ -78,6 +86,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
      */
     public static final EntityReference XWIKI_JOB_CLASSREFERENCE =
         SchedulerJobClassDocumentInitializer.XWIKI_JOB_CLASSREFERENCE;
+
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new DocumentCreatedEvent(),
+        new DocumentDeletedEvent(), new DocumentUpdatedEvent());
 
     /**
      * Default Quartz scheduler instance.
@@ -109,11 +120,14 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         thread.setDaemon(true);
 
         thread.start();
+
+        // Start listening to documents modifications
+        Utils.getComponent(ObservationManager.class).addListener(this);
     }
 
     private void initAsync()
     {
-        XWikiContext xcontext = Utils.<Provider<XWikiContext>> getComponent(XWikiContext.TYPE_PROVIDER).get();
+        XWikiContext xcontext = Utils.<Provider<XWikiContext>>getComponent(XWikiContext.TYPE_PROVIDER).get();
 
         try {
             String initialDb = !xcontext.getWikiId().equals("") ? xcontext.getWikiId() : xcontext.getMainXWiki();
@@ -270,15 +284,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             for (DocumentReference docReference : jobDocReferences) {
                 try {
                     XWikiDocument jobDoc = context.getWiki().getDocument(docReference, context);
-                    BaseObject jobObj = jobDoc.getXObject(XWIKI_JOB_CLASSREFERENCE);
 
-                    String status = jobObj.getStringValue("status");
-                    if (status.equals(JobState.STATE_NORMAL) || status.equals(JobState.STATE_PAUSED)) {
-                        this.scheduleJob(jobObj, context);
-                    }
-                    if (status.equals(JobState.STATE_PAUSED)) {
-                        this.pauseJob(jobObj, context);
-                    }
+                    register(jobDoc, context);
                 } catch (Exception e) {
                     LOGGER.error("Failed to restore job with in document [{}] and wiki [{}]", docReference,
                         context.getWikiId(), e);
@@ -286,6 +293,35 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             }
         } catch (Exception e) {
             LOGGER.error("Failed to restore existing scheduler jobs in wiki [{}]", context.getWikiId(), e);
+        }
+    }
+
+    private void register(XWikiDocument jobDoc, XWikiContext context) throws SchedulerPluginException
+    {
+        BaseObject jobObj = jobDoc.getXObject(XWIKI_JOB_CLASSREFERENCE);
+
+        register(jobObj, context);
+    }
+
+    private void register(BaseObject jobObj, XWikiContext context) throws SchedulerPluginException
+    {
+        String status = jobObj.getStringValue("status");
+        if (status.equals(JobState.STATE_NORMAL) || status.equals(JobState.STATE_PAUSED)) {
+            scheduleJob(jobObj, context);
+        }
+        if (status.equals(JobState.STATE_PAUSED)) {
+            pauseJob(jobObj, context);
+        }
+    }
+
+    private void unregister(BaseObject jobObj, XWikiContext context) throws SchedulerPluginException
+    {
+        String status = jobObj.getStringValue("status");
+        if (status.equals(JobState.STATE_NORMAL) || status.equals(JobState.STATE_PAUSED)) {
+            scheduleJob(jobObj, context);
+        }
+        if (status.equals(JobState.STATE_PAUSED)) {
+            pauseJob(jobObj, context);
         }
     }
 
@@ -501,18 +537,12 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         return getTrigger(object, context).getNextFireTime();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new SchedulerPluginApi((SchedulerPlugin) plugin, context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getName()
     {
@@ -594,5 +624,44 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     private String getObjectUniqueId(BaseObject object, XWikiContext context)
     {
         return context.getWikiId() + ":" + object.getName() + "_" + object.getNumber();
+    }
+
+    @Override
+    public List<Event> getEvents()
+    {
+        return EVENTS;
+    }
+
+    @Override
+    public void onEvent(Event event, Object source, Object data)
+    {
+        XWikiContext xcontext = (XWikiContext) data;
+        XWikiDocument document = (XWikiDocument) source;
+        XWikiDocument originalDocument = document.getOriginalDocument();
+
+        BaseObject jobObj = document.getXObject(XWIKI_JOB_CLASSREFERENCE);
+        BaseObject originalJobObj = originalDocument.getXObject(XWIKI_JOB_CLASSREFERENCE);
+
+        if (jobObj == null) {
+            if (originalJobObj != null) {
+                // Job deleted
+                try {
+                    unregister(originalJobObj, xcontext);
+                } catch (SchedulerPluginException e) {
+                    LOGGER.warn("Failed to register job in document [{}]: {}", document.getDocumentReference(),
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+        } else {
+            if (originalJobObj == null) {
+                // New job
+                try {
+                    register(jobObj, xcontext);
+                } catch (SchedulerPluginException e) {
+                    LOGGER.warn("Failed to register job in document [{}]: {}", document.getDocumentReference(),
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+        }
     }
 }

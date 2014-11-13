@@ -350,7 +350,7 @@ public class TemplateManager
             }
 
             try {
-                beanManager.populate(content, properties);
+                beanManager.populate(this, properties);
             } catch (PropertyException e) {
                 // Should never happen
                 logger.error("Failed to populate properties of template", e);

@@ -38,12 +38,8 @@ import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.transformation.RenderingContext;
+import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -83,6 +79,7 @@ public class TemplateManagerTest
         this.environmentmMock = this.mocker.registerMockComponent(Environment.class);
         this.velocityManagerMock = this.mocker.registerMockComponent(VelocityManager.class);
         this.mocker.registerMockComponent(ConfigurationSource.class);
+        this.mocker.registerMockComponent(TransformationManager.class);
     }
 
     private void setTemplateContent(String content) throws UnsupportedEncodingException
@@ -94,30 +91,7 @@ public class TemplateManagerTest
     // Tests
 
     @Test
-    public void testRender() throws Exception
-    {
-        when(
-            this.velocityEngineMock.evaluate(Matchers.<Context>any(), Matchers.<Writer>any(), anyString(),
-                eq("<html>$toto</html>"))).then(new Answer<Boolean>()
-        {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable
-            {
-                Writer writer = (Writer) invocation.getArguments()[1];
-
-                writer.write("<html>value</html>");
-
-                return Boolean.TRUE;
-            }
-        });
-
-        setTemplateContent("##!raw.syntax=plain/1.0\n<html>$toto</html>");
-
-        assertEquals("<html>value</html>", mocker.getComponentUnderTest().render("template"));
-    }
-
-    @Test
-    public void testRenderWithoutRawSyntax() throws Exception
+    public void testRenderVelocity() throws Exception
     {
         when(
             this.velocityEngineMock.evaluate(Matchers.<Context>any(), Matchers.<Writer>any(), anyString(),
@@ -136,10 +110,14 @@ public class TemplateManagerTest
 
         setTemplateContent("<html>$toto</html>");
 
-        this.mocker.<Execution>getInstance(Execution.class).pushContext(new ExecutionContext());
-        ((MutableRenderingContext) this.mocker.getInstance(RenderingContext.class)).push(null, null, null, null, false,
-            Syntax.XHTML_1_0);
+        assertEquals("<html>value</html>", mocker.getComponentUnderTest().render("template"));
+    }
 
-        assertEquals("<html>value</html>", this.mocker.getComponentUnderTest().render("template"));
+    @Test
+    public void testRenderWiki() throws Exception
+    {
+        setTemplateContent("##!source.syntax=xwiki/2.1\nfirst line\\\\second line");
+
+        assertEquals("first line\nsecond line", mocker.getComponentUnderTest().render("template"));
     }
 }

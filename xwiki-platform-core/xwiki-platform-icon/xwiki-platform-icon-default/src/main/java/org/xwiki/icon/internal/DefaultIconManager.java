@@ -19,6 +19,8 @@
  */
 package org.xwiki.icon.internal;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -87,6 +89,18 @@ public class DefaultIconManager implements IconManager
             return "";
         }
         return iconRenderer.renderHTML(iconName, iconSet);
+    }
+
+    @Override
+    public List<String> getIconNames() throws IconException
+    {
+        return iconSetManager.getCurrentIconSet().getIconNames();
+    }
+
+    @Override
+    public List<String> getIconNames(String iconSetName) throws IconException
+    {
+        return iconSetManager.getIconSet(iconSetName).getIconNames();
     }
 
     private IconSet getIconSet(String iconName) throws IconException

@@ -19,6 +19,8 @@
  */
 package org.xwiki.icon;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
@@ -55,4 +57,14 @@ public interface IconSetManager
      * @since 6.3RC1
      */
     IconSet getIconSet(String name) throws IconException;
+
+    /**
+     * Get the name of all the icon sets present in the current wiki.
+     *
+     * @return the list of the name of the icon sets present in the current wiki.
+     * @throws IconException if problem occur
+     *
+     * @since 6.4M1
+     */
+    List<String> getIconSetNames() throws IconException;
 }

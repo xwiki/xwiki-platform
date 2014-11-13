@@ -401,6 +401,9 @@
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
+            <!-- Add new methods to the Icon Set Module -->
+            <exclude>**/IconSetManager**</exclude>
+            <exclude>**/IconManager**</exclude>
           </excludes>
         </configuration>
       </plugin>

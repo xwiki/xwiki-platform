@@ -19,6 +19,8 @@
  */
 package org.xwiki.icon.internal;
 
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,6 +31,7 @@ import org.xwiki.icon.IconSetManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -150,5 +153,29 @@ public class DefaultIconManagerTest
         assertEquals("HTML rendered icon 1",  mocker.getComponentUnderTest().renderHTML("icon1", "iconSet1", false));
         assertEquals("",  mocker.getComponentUnderTest().renderHTML("icon2", "iconSet1", false));
         assertEquals("",  mocker.getComponentUnderTest().renderHTML("icon1", "iconSet2", false));
+    }
+
+    @Test
+    public void getIconNames() throws Exception
+    {
+        IconSet iconSet = new IconSet("iconSet1");
+        iconSet.addIcon("icon1", new Icon("icon1 value"));
+        iconSet.addIcon("icon2", new Icon("icon2 value"));
+
+        // Mocks
+        when(iconSetManager.getCurrentIconSet()).thenReturn(iconSet);
+        when(iconSetManager.getIconSet("iconSet1")).thenReturn(iconSet);
+
+        // Test
+        List<String> results = mocker.getComponentUnderTest().getIconNames();
+        List<String> results2 = mocker.getComponentUnderTest().getIconNames("iconSet1");
+
+        // Verify
+        assertEquals(2, results.size());
+        assertTrue(results.contains("icon1"));
+        assertTrue(results.contains("icon2"));
+        assertEquals(2, results2.size());
+        assertTrue(results2.contains("icon1"));
+        assertTrue(results2.contains("icon2"));
     }
 }

@@ -309,4 +309,39 @@ public class DefaultIconSetManagerTest
         // Verify
         verifyZeroInteractions(queryManager);
     }
+
+    @Test
+    public void getIconSetNames() throws Exception
+    {
+        // Mocks
+        Query query = mock(Query.class);
+        when(queryManager.createQuery("SELECT obj.name FROM Document doc, doc.object(IconThemesCode.IconThemeClass) obj"
+                + " ORDER BY obj.name", Query.XWQL)).thenReturn(query);
+        List<String> results = new ArrayList<>();
+        when(query.<String>execute()).thenReturn(results);
+
+        // Test
+        assertEquals(results, mocker.getComponentUnderTest().getIconSetNames());
+    }
+
+    @Test
+    public void getIconSetNamesWhenException() throws Exception
+    {
+        // Mocks
+        QueryException exception = new QueryException("exception in the query", null, null);
+        when(queryManager.createQuery(anyString(), eq(Query.XWQL))).thenThrow(exception);
+
+        // Test
+        IconException caughtException = null;
+        try {
+            mocker.getComponentUnderTest().getIconSetNames();
+        } catch (IconException e) {
+            caughtException = e;
+        }
+
+        // Verify
+        assertNotNull(caughtException);
+        assertEquals("Failed to get the name of all icon sets.", caughtException.getMessage());
+        assertEquals(exception, caughtException.getCause());
+    }
 }

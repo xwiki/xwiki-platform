@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.diff.internal.DefaultDiffManager;
+import org.xwiki.logging.LogLevel;
 import org.xwiki.test.ComponentManagerRule;
 import org.xwiki.test.annotation.ComponentList;
 
@@ -73,4 +74,31 @@ public class MergeUtilsTest
         assertEquals("content\n", MergeUtils.mergeLines("content\n", "content\n", "content\n", result));
         assertFalse(result.isModified());
     }
+
+    @Test
+    public void mergeObjectSimple()
+    {
+        MergeResult result = new MergeResult();
+        assertEquals("new", MergeUtils.mergeOject("old", "new", "old", result));
+        assertTrue(result.isModified());
+    }
+
+    @Test
+    public void mergeObjectAlreadyDone()
+    {
+        MergeResult result = new MergeResult();
+        assertEquals("new", MergeUtils.mergeOject("old", "new", "new", result));
+        assertFalse(result.isModified());
+    }
+
+    @Test
+    public void mergeObjectWhileModified()
+    {
+        MergeResult result = new MergeResult();
+        assertEquals("old modified", MergeUtils.mergeOject("old", "new", "old modified", result));
+        assertFalse(result.isModified());
+        // conflicts are flagged as errors in the log 
+        assertFalse(result.getLog().getLogs(LogLevel.ERROR).isEmpty());
+    }
+
 }

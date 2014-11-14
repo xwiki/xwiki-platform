@@ -700,25 +700,27 @@
     #set ($docRef = $services.model.resolveDocument($docRefOrId))
   #end
   #if ($docTreeConfig.showChildDocuments)
-    #set ($docPath = [])
-    ## We are forced to build the document path in reverse order due to the limited way we can do recursion in Velocity
-    ## (variables are overwritten so we must store and then do recursion, not the other way around).
-    #getDocumentPathRecursively($docRef $docPath)
-    #set ($discard = $collectionstool.reverse($docPath))
-    #set ($discard = $path.addAll($docPath))
+    ## In order to compute the path recursively (and due to the limited way we can do recursion in Velocity) we have to
+    ## pass the document reference using a stack (macro arguments are overwritten by each recursive call otherwise).
+    #set ($docRefDeque = $collectionstool.queue)
+    #set ($discard = $docRefDeque.offerLast($docRef))
+    #getDocumentPathRecursively($docRefDeque $path)
   #else
     #getSpacePath($docRef.parent $path)
     #set ($discard = $path.add("document:$docRef"))
   #end
 #end
 
-#macro (getDocumentPathRecursively $docRef $path)
-  #set ($discard = $path.add("document:$docRef"))
+#macro (getDocumentPathRecursively $docRefDeque $path)
+  ## Handle the document reference from the top of the stack.
+  #set ($docRef = $docRefDeque.peekLast())
   #set ($docNode = $xwiki.getDocument($docRef))
-  #if ($docNode.parent != '')
+  #if ($docNode &amp;&amp; $docNode.parent != '')
     #set ($parentReference = $services.model.resolveDocument($docNode.parent, 'explicit', $docRef))
     #if (!$docTreeConfig.showSpaces || $docRef.parent.equals($parentReference.parent))
-      #getDocumentPathRecursively($parentReference $path)
+      ## Add the parent reference to the top of the stack and call this macro recursively.
+      #set ($discard = $docRefDeque.offerLast($parentReference))
+      #getDocumentPathRecursively($docRefDeque $path)
     #else
       ## The parent node is the space itself.
       #getSpacePath($docRef.parent $path)
@@ -727,6 +729,8 @@
     ## The parent node is the space itself.
     #getSpacePath($docRef.parent $path)
   #end
+  ## Remove the document reference from the top of the stack and add it to the path.
+  #set ($discard = $path.add("document:$docRefDeque.pollLast()"))
 #end
 
 #macro (getAttachmentsPath $docRefOrId $path)

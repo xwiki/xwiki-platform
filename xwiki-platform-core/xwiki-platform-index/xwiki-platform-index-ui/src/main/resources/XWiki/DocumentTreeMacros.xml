@@ -264,16 +264,20 @@
 
 #macro (addDocumentNode $documentReference $siblings)
   #set ($docNode = $xwiki.getDocument($documentReference))
-  #set ($hasChildren = $docTreeConfig.showTranslations &amp;&amp; $docNode.translationList.size() &gt; 0)
-  #set ($hasChildren = $hasChildren || ($docTreeConfig.showAttachments &amp;&amp; $docNode.attachmentList.size() &gt; 0))
-  #set ($xclass = $docNode.getxWikiClass())
-  #set ($hasChildren = $hasChildren || ($docTreeConfig.showClassProperties &amp;&amp; $xclass &amp;&amp; $xclass.propertyNames.size() &gt; 0))
-  #set ($hasChildren = $hasChildren || ($docTreeConfig.showObjects &amp;&amp; $docNode.getxWikiObjects().size() &gt; 0))
+  #set ($canViewDoc = "$!docNode" != '')
+  #set ($canDeleteDoc = $docNode.hasAccessLevel('delete'))
+  #set ($hasChildren = false)
+  #if ($canViewDoc)
+    #set ($hasChildren = $hasChildren || ($docTreeConfig.showTranslations &amp;&amp; $docNode.translationList.size() &gt; 0))
+    #set ($hasChildren = $hasChildren || ($docTreeConfig.showAttachments &amp;&amp; $docNode.attachmentList.size() &gt; 0))
+    #set ($xclass = $docNode.getxWikiClass())
+    #set ($hasChildren = $hasChildren || ($docTreeConfig.showClassProperties &amp;&amp; $xclass &amp;&amp; $xclass.propertyNames.size() &gt; 0))
+    #set ($hasChildren = $hasChildren || ($docTreeConfig.showObjects &amp;&amp; $docNode.getxWikiObjects().size() &gt; 0))
+  #end
   #if (!$hasChildren &amp;&amp; $docTreeConfig.showChildDocuments)
     #getChildDocumentsCount($documentReference $count)
     #set ($hasChildren = $count &gt; 0)
   #end
-  #set ($canDeleteDoc = $docNode.hasAccessLevel('delete'))
   #set ($label = $documentReference.name)
   #if ($docTreeConfig.showDocumentTitle)
     #set ($plainTitle = $docNode.plainTitle)
@@ -291,15 +295,15 @@
       'type': 'document',
       'validChildren': ['translations', 'attachments', 'attachment', 'classProperties', 'objects', 'document', 'pagination'],
       'hasContextMenu': true,
-      'draggable': true,
+      'draggable': $canViewDoc,
       'canDelete': $canDeleteDoc,
       'canMove': $canDeleteDoc,
-      'canCopy': true,
-      'createDocumentURL': $docNode.getURL('create', $NULL),
-      'deleteURL': $docNode.getURL('delete', 'confirm=1')
+      'canCopy': $canViewDoc,
+      'createDocumentURL': $xwiki.getURL($documentReference, 'create', $NULL),
+      'deleteURL': $xwiki.getURL($documentReference, 'delete', 'confirm=1')
     },
     'a_attr': {
-      'href': $docNode.getURL()
+      'href': $xwiki.getURL($documentReference)
     }
   }))
 #end

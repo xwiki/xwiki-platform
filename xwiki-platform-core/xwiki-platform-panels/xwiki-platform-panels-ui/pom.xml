@@ -96,5 +96,12 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed to get the homepage in Panels.OrphanedPages -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

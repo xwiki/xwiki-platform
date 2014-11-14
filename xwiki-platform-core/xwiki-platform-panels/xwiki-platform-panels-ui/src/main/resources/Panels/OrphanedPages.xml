@@ -123,7 +123,9 @@
     <property>
       <content>{{velocity}}
 #panelheader($services.localization.render('xe.panels.orphaned'))
-#foreach ($item in $services.query.xwql('where doc.parent is null or doc.parent='''' and doc.fullName &lt;&gt; ''Main.WebHome'' order by doc.name asc').addFilter('hidden').execute())
+#set ($homepage = $services.wiki.getById($services.wiki.currentWikiId).mainPageReference)
+#set ($homepageFullName = $services.model.serialize($homepage, 'local'))
+#foreach ($item in $services.query.xwql('where doc.parent is null or doc.parent='''' and doc.fullName &lt;&gt; :homepage order by doc.name asc').bindValue('homepage', $homepageFullName).addFilter('hidden').execute())
   #if ($xwiki.hasAccessLevel('view', $xcontext.user, "${xcontext.database}:${item}"))
     #set ($bentrydoc = $xwiki.getDocument($item))
     * [[${bentrydoc.fullName}]]

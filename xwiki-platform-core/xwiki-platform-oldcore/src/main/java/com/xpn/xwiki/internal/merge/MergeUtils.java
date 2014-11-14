@@ -100,6 +100,7 @@ public final class MergeUtils
     {
         if (ObjectUtils.notEqual(previousObject, newObject)) {
             if (ObjectUtils.equals(previousObject, currentObject)) {
+                mergeResult.setModified(true);
                 return newObject;
             } else if (ObjectUtils.equals(newObject, currentObject)) {
                 return currentObject;

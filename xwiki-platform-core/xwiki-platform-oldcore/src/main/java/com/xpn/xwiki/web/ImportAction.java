@@ -65,8 +65,8 @@ import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.DocumentInfoAPI;
-import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.plugin.packaging.Package;
+import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -357,8 +357,12 @@ public class ImportAction extends XWikiAction
                     oldImporter.getSkipped(context).add(
                         serializer.serialize((EntityReference) log.getArgumentArray()[0]));
                 } else if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_ERROR.getName())) {
-                    oldImporter.getErrors(context).add(
-                        serializer.serialize((EntityReference) log.getArgumentArray()[0]));
+                    Object entity = log.getArgumentArray()[0];
+                    if (entity != null) {
+                        oldImporter.getErrors(context).add(
+                            entity instanceof EntityReference ? serializer.serialize((EntityReference) log
+                                .getArgumentArray()[0]) : entity.toString());
+                    }
                 }
             }
         }

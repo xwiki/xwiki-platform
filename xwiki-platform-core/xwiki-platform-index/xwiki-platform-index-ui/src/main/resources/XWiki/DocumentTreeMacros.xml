@@ -120,30 +120,34 @@
 
 #macro (addFarmChildren $nodeId $offset $limit $children)
   #foreach ($wiki in $services.wiki.all)
-    ## The main wiki cannot be deleted. For the rest we need special rights.
-    #set ($canDeleteWiki = $wiki.id != $services.wiki.mainWikiId
-      &amp;&amp; $services.wiki.canDeleteWiki($xcontext.user, $wiki.id))
-    #if ($docTreeConfig.showWikiPrettyName)
-      #set ($label = $wiki.prettyName)
-    #else
-      #set ($label = $wiki.id)
-    #end
-    #set ($discard = $children.add({
-      'id': "wiki:$wiki.id",
-      'text': $label,
-      'icon': 'fa fa-hdd-o',
-      'children': true,
-      'data': {
-        'id': $wiki.id,
-        'type': 'wiki',
-        'validChildren': ['space', 'document', 'pagination'],
-        'canDelete': $canDeleteWiki
-      },
-      'a_attr': {
-        'href': $xwiki.getURL($wiki.mainPageReference)
-      }
-    }))
+    #addWikiNode($wiki $children)
   #end
+#end
+
+#macro (addWikiNode $wiki $siblings)
+  ## The main wiki cannot be deleted. For the rest we need special rights.
+  #set ($canDeleteWiki = $wiki.id != $services.wiki.mainWikiId
+    &amp;&amp; $services.wiki.canDeleteWiki($xcontext.user, $wiki.id))
+  #if ($docTreeConfig.showWikiPrettyName)
+    #set ($label = $wiki.prettyName)
+  #else
+    #set ($label = $wiki.id)
+  #end
+  #set ($discard = $siblings.add({
+    'id': "wiki:$wiki.id",
+    'text': $label,
+    'icon': 'fa fa-hdd-o',
+    'children': true,
+    'data': {
+      'id': $wiki.id,
+      'type': 'wiki',
+      'validChildren': ['space', 'document', 'pagination'],
+      'canDelete': $canDeleteWiki
+    },
+    'a_attr': {
+      'href': $xwiki.getURL($wiki.mainPageReference)
+    }
+  }))
 #end
 
 #macro (addWikiChildren $wikiId $offset $limit $children)

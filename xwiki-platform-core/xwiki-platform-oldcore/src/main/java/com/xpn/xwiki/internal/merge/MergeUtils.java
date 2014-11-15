@@ -24,6 +24,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -158,8 +159,15 @@ public final class MergeUtils
         try {
             result = DIFFMANAGER.merge(commonAncestor, next, current, null);
 
-            current.clear();
-            current.addAll(result.getMerged());
+            mergeResult.getLog().addAll(result.getLog());
+
+            List<T> merged = result.getMerged();
+            
+            if (!Objects.equals(merged, current)) {
+                current.clear();
+                current.addAll(result.getMerged());
+                mergeResult.setModified(true);
+            }
         } catch (MergeException e) {
             mergeResult.getLog().error("Failed to execute merge lists", e);
         }

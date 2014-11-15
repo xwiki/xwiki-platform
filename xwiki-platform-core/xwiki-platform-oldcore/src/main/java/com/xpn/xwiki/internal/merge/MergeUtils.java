@@ -24,7 +24,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -164,7 +163,7 @@ public final class MergeUtils
 
             List<T> merged = result.getMerged();
             
-            if (!Objects.equals(merged, current)) {
+            if (!ObjectUtils.equals(merged, current)) {
                 current.clear();
                 current.addAll(result.getMerged());
                 mergeResult.setModified(true);

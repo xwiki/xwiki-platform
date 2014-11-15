@@ -19,6 +19,14 @@
  */
 package com.xpn.xwiki.internal.merge;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,8 +36,6 @@ import org.xwiki.test.annotation.ComponentList;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.web.Utils;
-
-import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link MergeUtils}.
@@ -72,5 +78,38 @@ public class MergeUtilsTest
         MergeResult result = new MergeResult();
         assertEquals("content\n", MergeUtils.mergeLines("content\n", "content\n", "content\n", result));
         assertFalse(result.isModified());
+    }
+
+    @Test
+    public void mergeListSimple()
+    {
+        MergeResult result = new MergeResult();
+        List<String> current = new ArrayList<String>(Arrays.asList("old1", "old2"));
+        MergeUtils.mergeList(Arrays.asList("old1", "old2"), Arrays.asList("new1", "new2"), current, result);
+        assertEquals(Arrays.asList("new1", "new2"), current);
+        assertTrue(result.isModified());
+    }
+
+    @Test
+    public void mergeListAlreadyDone()
+    {
+        MergeResult result = new MergeResult();
+        List<String> current = new ArrayList<String>(Arrays.asList("new1", "new2"));
+        MergeUtils.mergeList(Arrays.asList("old1", "old2"), Arrays.asList("new1", "new2"), current, result);
+        assertEquals(Arrays.asList("new1", "new2"), current);
+        assertEquals(Arrays.asList("new1", "new2"), current);
+        assertFalse(result.isModified());
+    }
+
+    @Test
+    public void mergeListWhileModified()
+    {
+        MergeResult result = new MergeResult();
+        List<String> current = new ArrayList<String>(Arrays.asList("old modified1", "old modified2"));
+        MergeUtils.mergeList(Arrays.asList("old1", "old2"), Arrays.asList("new1", "new2"), current, result);
+        assertEquals(Arrays.asList("old modified1", "old modified2"), current);
+        assertFalse(result.isModified());
+        // conflicts are flagged as errors in the log 
+        assertFalse(result.getLog().getLogs(LogLevel.ERROR).isEmpty());
     }
 }

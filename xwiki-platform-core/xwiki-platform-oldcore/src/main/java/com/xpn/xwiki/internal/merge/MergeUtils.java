@@ -100,6 +100,7 @@ public final class MergeUtils
     {
         if (ObjectUtils.notEqual(previousObject, newObject)) {
             if (ObjectUtils.equals(previousObject, currentObject)) {
+                mergeResult.setModified(true);
                 return newObject;
             } else if (ObjectUtils.equals(newObject, currentObject)) {
                 return currentObject;
@@ -158,8 +159,15 @@ public final class MergeUtils
         try {
             result = DIFFMANAGER.merge(commonAncestor, next, current, null);
 
-            current.clear();
-            current.addAll(result.getMerged());
+            mergeResult.getLog().addAll(result.getLog());
+
+            List<T> merged = result.getMerged();
+            
+            if (!ObjectUtils.equals(merged, current)) {
+                current.clear();
+                current.addAll(result.getMerged());
+                mergeResult.setModified(true);
+            }
         } catch (MergeException e) {
             mergeResult.getLog().error("Failed to execute merge lists", e);
         }

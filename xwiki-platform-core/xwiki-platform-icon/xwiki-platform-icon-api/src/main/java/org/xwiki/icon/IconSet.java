@@ -19,7 +19,9 @@
  */
 package org.xwiki.icon;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.stability.Unstable;
@@ -194,5 +196,14 @@ public class IconSet
     public void setType(IconType type)
     {
         this.type = type;
+    }
+
+    /**
+     * @return the list of names of all icons
+     * @since 6.4M1
+     */
+    public List<String> getIconNames()
+    {
+        return new ArrayList<>(iconMap.keySet());
     }
 }

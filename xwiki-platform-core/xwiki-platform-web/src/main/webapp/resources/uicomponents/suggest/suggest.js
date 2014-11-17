@@ -100,7 +100,9 @@ var XWiki = (function(XWiki){
     // Clone default options from the prototype so that they are not shared and extend options with passed parameters
     this.options = Object.extend(Object.clone(this.options), param || { });
     if (typeof this.options.sources == 'object') {
-      // We are in multi-sources mode
+      // We are in multi-source mode. The display is different in this mode even if there is only one source. We need to
+      // set a flag to know that we are in this mode because we flatten the list of sources below.
+      this.isInMultiSourceMode = true;
       this.sources = this.options.sources;
     } else {
       // We are in mono-source mode
@@ -109,6 +111,13 @@ var XWiki = (function(XWiki){
 
     // Flatten sources
     this.sources = [ this.sources ].flatten().compact();
+
+    if (this.sources.length == 0) {
+      // We still need an empty (fake) source so that we display at least the 'No results' message.
+      this.sources.push({
+        script: function(value, callback) {callback([])}
+      });
+    }
 
     // Reset the container if the configured parameter is not valid
     if (!$(this.options.parentContainer)) {
@@ -142,7 +151,7 @@ var XWiki = (function(XWiki){
     this.onKeyUp = this.onKeyUp.bindAsEventListener(this);
     this.fld.observe("keyup", this.onKeyUp);
     this.onKeyPress = this.onKeyPress.bindAsEventListener(this);
-    if (Prototype.Browser.IE || Prototype.Browser.WebKit) {
+    if (Prototype.Browser.IE || Prototype.Browser.WebKit || browser.isIE11up) {
       this.fld.observe("keydown", this.onKeyPress);
     } else {
       this.fld.observe("keypress", this.onKeyPress);
@@ -307,32 +316,54 @@ var XWiki = (function(XWiki){
 
     for (var i=0;i<this.sources.length;i++) {
       var source = this.sources[i];
-
-      var url = source.script + (source.script.indexOf('?') < 0 ? '?' : '&') + source.varname + "=" + encodeURIComponent(this.fld.value.strip());
-      var method = source.method || "get";
-      var headers = {};
-      if (source.json) {
-        headers.Accept = "application/json";
+      if (typeof source.script == 'function') {
+        this.fld.addClassName('loading');
+        source.script(this.fld.value.strip(), function(suggestions) {
+          if (requestId == this.latestRequest) {
+            this.aSuggestions = suggestions || [];
+            suggestions && this.createList(this.aSuggestions, source);
+            this.fld.removeClassName('loading');
+          }
+        }.bind(this));
       } else {
-        headers.Accept = "application/xml";
+        this.doAjaxRequest(source, requestId, ajaxRequestParameters);
       }
-
-      // Allow the default request parameters to be overwritten.
-      var defaultAjaxRequestParameters = {
-        method: method,
-        requestHeaders: headers,
-        onCreate: this.fld.addClassName.bind(this.fld, 'loading'),
-        onSuccess: this.setSuggestions.bindAsEventListener(this, source, requestId),
-        onFailure: function (response) {
-          new XWiki.widgets.Notification("$services.localization.render('core.widgets.suggest.transportError')" + response.statusText, "error", {timeout: 5});
-        },
-        onComplete: this.fld.removeClassName.bind(this.fld, 'loading')
-      }
-      // Inject a reference to the (cloned) default AJAX request parameters to be able
-      // to access the defaults even when they are overwritten by the provided values.
-      defaultAjaxRequestParameters.defaultValues = Object.clone(defaultAjaxRequestParameters);
-      new Ajax.Request(url, Object.extend(defaultAjaxRequestParameters, ajaxRequestParameters || {}));
     }
+  },
+
+  /**
+   * Fire the AJAX request that will get the suggestions from the specified source.
+   *
+   * @param source the source to get the suggestions from
+   * @param requestId request identifier, used to ensure that only the latest request is handled, for improved performance
+   * @param ajaxRequestParameters optional AJAX request parameters, in case you need to overwrite the defaults
+   */
+  doAjaxRequest: function (source, requestId, ajaxRequestParameters)
+  {
+    var url = source.script + (source.script.indexOf('?') < 0 ? '?' : '&') + source.varname + "=" + encodeURIComponent(this.fld.value.strip());
+    var method = source.method || "get";
+    var headers = {};
+    if (source.json) {
+      headers.Accept = "application/json";
+    } else {
+      headers.Accept = "application/xml";
+    }
+
+    // Allow the default request parameters to be overwritten.
+    var defaultAjaxRequestParameters = {
+      method: method,
+      requestHeaders: headers,
+      onCreate: this.fld.addClassName.bind(this.fld, 'loading'),
+      onSuccess: this.setSuggestions.bindAsEventListener(this, source, requestId),
+      onFailure: function (response) {
+        new XWiki.widgets.Notification("$services.localization.render('core.widgets.suggest.transportError')" + response.statusText, "error", {timeout: 5});
+      },
+      onComplete: this.fld.removeClassName.bind(this.fld, 'loading')
+    }
+    // Inject a reference to the (cloned) default AJAX request parameters to be able
+    // to access the defaults even when they are overwritten by the provided values.
+    defaultAjaxRequestParameters.defaultValues = Object.clone(defaultAjaxRequestParameters);
+    new Ajax.Request(url, Object.extend(defaultAjaxRequestParameters, ajaxRequestParameters || {}));
   },
 
   /**
@@ -460,7 +491,7 @@ var XWiki = (function(XWiki){
       });
     }
 
-    if (this.sources.length > 1) {
+    if (this.isInMultiSourceMode) {
       // If we are in multi-source mode, we need to prepare a sub-container for each of the suggestion source
       for (var i=0;i<this.sources.length;i++) {
 
@@ -561,7 +592,7 @@ var XWiki = (function(XWiki){
   {
     this._createList(arr, source);
 
-    if (this.sources.length == 1 || !this.resultContainer.down('.results.loading')) {
+    if (!this.isInMultiSourceMode || !this.resultContainer.down('.results.loading')) {
       document.fire('xwiki:suggest:updated', {
         'container' : this.container,
         'suggest' : this
@@ -583,7 +614,7 @@ var XWiki = (function(XWiki){
     this.killTimeout();
 
     // Determine the source container.
-    if (this.sources.length > 1) {
+    if (this.isInMultiSourceMode) {
       var sourceContainer = this.resultContainer.down('.results' + source.id);
       sourceContainer.removeClassName('loading');
       sourceContainer.down('.sourceContent').removeClassName('loading');

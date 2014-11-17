@@ -145,9 +145,14 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
                 // Build the descriptor
                 descriptor = buildDescriptorFromDocument(document);
             }
+
+            if (descriptor == null) {
+                // Cache the fact that no descriptor is available for this alias
+                cache.addFromAlias(wikiAlias, DefaultWikiDescriptor.VOID);
+            }
         }
 
-        return descriptor;
+        return descriptor != DefaultWikiDescriptor.VOID ? descriptor : null;
     }
 
     @Override
@@ -166,9 +171,14 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
                 // Return a "virtual" descriptor if main wiki does not yet have a descriptor document
                 descriptor = new WikiDescriptor(wikiId, "localhost");
             }
+
+            if (descriptor == null) {
+                // Cache the fact that no descriptor is available for this alias
+                cache.addFromId(wikiId, DefaultWikiDescriptor.VOID);
+            }
         }
 
-        return descriptor;
+        return descriptor != DefaultWikiDescriptor.VOID ? descriptor : null;
     }
 
     @Override
@@ -217,6 +227,7 @@ public class DefaultWikiDescriptorManager implements WikiDescriptorManager
                 cache.add(descriptor);
             }
         }
+
         return descriptor;
     }
 }

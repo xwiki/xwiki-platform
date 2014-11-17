@@ -274,7 +274,7 @@
         #end
       #end
 
-      #if ($extension.issueManagement)
+      #if ($extension.issueManagement.getURL())
         <dt>$services.localization.render('extensions.info.issueManagement')</dt>
         <dd><a href="$extension.issueManagement.getURL()">$escapetool.xml($extension.issueManagement.system)</a></dd>
       #end

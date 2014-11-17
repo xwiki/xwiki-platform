@@ -944,23 +944,27 @@ var LiveTableFilter = Class.create({
 
   attachEventHandlers: function()
   {
-    for(var i = 0; i < this.inputs.length; i++) {
-      if (this.inputs[i].type == "text") {
-        Event.observe(this.inputs[i], 'keyup', this.refreshHandler.bind(this));
-        Event.observe(this.inputs[i], 'change', this.refreshHandler.bind(this));
+    var refreshHandler = this.refreshHandler.bind(this);
+    for (var i = 0; i < this.inputs.length; ++i) {
+      var input = this.inputs[i];
+      var events = ['change'];
+      if (input.type == "text") {
+        events.push('keyup');
       } else {
         //IE is buggy on "change" events for checkboxes and radios
-        Event.observe(this.inputs[i], 'click', this.refreshHandler.bind(this));
-        Event.observe(this.inputs[i], 'change', this.refreshHandler.bind(this));
+        events.push('click');
       }
+      events.each(function(event) {
+        Event.observe(input, event, refreshHandler);
+      });
     }
 
-    for(var i = 0; i < this.selects.length; i++) {
-      Event.observe(this.selects[i], 'change', this.refreshHandler.bind(this));
+    for (var i = 0; i < this.selects.length; ++i) {
+      Event.observe(this.selects[i], 'change', refreshHandler);
     }
 
     // Allow custom filters to trigger filter change from non-native events
-    document.observe("xwiki:livetable:" + this.table.domNodeName + ":filtersChanged", this.refreshHandler.bind(this));
+    document.observe("xwiki:livetable:" + this.table.domNodeName + ":filtersChanged", refreshHandler);
   },
 
   /**

@@ -19,6 +19,8 @@
  */
 package org.xwiki.icon;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
@@ -93,5 +95,24 @@ public interface IconManager
      * @since 6.3RC1
      */
     String renderHTML(String iconName, String iconSetName, boolean fallback) throws IconException;
+
+    /**
+     * Get the list of the names of all available icons in the current icon set.
+     * @return the icon names
+     * @throws IconException if problem occurs
+     *
+     * @since 6.4M1
+     */
+    List<String> getIconNames() throws IconException;
+
+    /**
+     * Get the list of the names of all available icons in the specified icon set.
+     * @param iconSetName name of the icon set
+     * @return the icon names
+     * @throws IconException if problem occurs
+     *
+     * @since 6.4M1
+     */
+    List<String> getIconNames(String iconSetName) throws IconException;
 
 }

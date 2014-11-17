@@ -41,6 +41,7 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.reference.link.LinkLabelGenerator;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 
@@ -79,6 +80,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
         this.mockDocumentAccessBridge = registerMockComponent(DocumentAccessBridge.class);
         this.mockCurrentValueProvider = registerMockComponent(EntityReferenceValueProvider.class, "current");
         this.mockWikiMacroFactory = registerMockComponent(WikiMacroFactory.class);
+        registerMockComponent(LinkLabelGenerator.class);
     }
 
     @Before

@@ -20,30 +20,310 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>XWiki</web>
   <name>AttachmentSelector</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1296400624000</creationDate>
-  <date>1300321645000</date>
-  <contentUpdateDate>1300321645000</contentUpdateDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1415803868000</date>
+  <contentUpdateDate>1415803868000</contentUpdateDate>
   <version>1.1</version>
   <title>#if ($request.docname)$xwiki.getDocument($request.docname).plainTitle ($request.docname): #end$services.localization.render('xe.attachmentSelector.gallery.title')</title>
-  <template/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#if ($request.xaction == 'postUpload')
+  #set ($targetDocument = $xwiki.getDocument($request.get('docname')))
+  #set ($targetAttachDocument = $xwiki.getDocument($request.get('targetdocname')))
+
+  #set ($fieldname = $request.get('fieldname'))
+  #set ($docAction = $request.get('docAction'))
+  #set ($attachmentList = $targetAttachDocument.getAttachmentList())
+  #if ($attachmentList &amp;&amp; $attachmentList.size() &gt; 0)
+    #set ($sortedAttachments = $sorttool.sort($attachmentList, 'date:desc'))
+    #set ($lastAttachment = $sortedAttachments.get(0))
+  #end
+  $response.sendRedirect($targetDocument.getURL($docAction, $escapetool.url({
+    $fieldname: $lastAttachment.filename,
+    'form_token': $request.form_token
+  })))
+  #stop
+#end
+{{/velocity}}
+
+{{velocity output="false"}}
+##
+## Macros
+##
+#set ($translationPrefix = 'xe.attachmentSelector')
+#set ($attachmentPickerDocName = 'XWiki.AttachmentSelector')
+
+$xwiki.ssx.use($attachmentPickerDocName)
+$xwiki.jsx.use($attachmentPickerDocName)
+
+#**
+ * Displays the attachment gallery as a list of attachment boxes, starting with special boxes for uploading a new attachment and for setting a default value.
+ *
+ * @param $targetDocument the document to recieve the field value being modified
+ * @param $targetAttachDocument the document to list/save attachments to
+ * @param $options generic picker options
+ *#
+#macro (attachmentPicker_displayAttachmentGallery $targetDocument, $targetAttachDocument, $options)
+  #set ($currentValue = $targetDocument.getValue($options.property))
+  #if ("$!{targetAttachDocument.getAttachment($currentValue)}" == '')
+    #set ($currentValue = "$!{options.defaultValue}")
+  #end
+  (% class="gallery" %)(((
+  ## Only display the upload form if they have edit permission on targetAttachDocument
+  #if ($xwiki.hasAccessLevel('edit',$xcontext.user,${targetAttachDocument.fullName}))
+    #attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
+  #end
+  #attachmentPicker_displayAttachmentGalleryEmptyValue($targetDocument, $targetAttachDocument, $options, $currentValue)
+  #set ($sortedAttachments = $sorttool.sort($targetAttachDocument.getAttachmentList(), "${options.sortAttachmentsBy}") )
+  #foreach ($attachment in $sortedAttachments)
+    #set ($extension = $attachment.getFilename())
+    #set ($extension = $extension.substring($mathtool.add($extension.lastIndexOf('.'), 1)).toLowerCase())
+    #if ($options.filter.size() == 0 || $options.filter.contains($extension))
+      #attachmentPicker_displayAttachmentBox($attachment $targetDocument $targetAttachDocument, $options $currentValue)
+    #end
+  #end
+  )))
+#end
+
+#**
+ * Displays an attachment box.
+ *
+ * @param $attachment the target attachment to display
+ * @param $targetDocument the document being modified
+ * @param $options generic picker options
+ * @param $currentValue the currently selected file, used for determining if the box should be highlighted as the current value
+ *#
+#macro (attachmentPicker_displayAttachmentBox $attachment $targetDocument $targetAttachDocument, $options $currentValue)
+  #if ($options.displayImage &amp;&amp; $attachment.isImage())
+    #set ($cssClass = 'gallery_image')
+  #else
+    #set ($cssClass = '')
+  #end
+  #attachmentPicker_displayStartFrame({'value' : $attachment.filename, 'text' : $attachment.filename, 'cssClass' : "$!{cssClass}"} $currentValue)
+  #attachmentPicker_displayAttachmentDetails($attachment $options)
+  #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
+  #set ($deleteURL = $targetAttachDocument.getAttachmentURL($attachment.filename, 'delattachment', "xredirect=${returnURL}&amp;form_token=$!{services.csrf.getToken()}") )
+  #set ($viewURL = $targetAttachDocument.getAttachmentURL($attachment.filename) )##{'name' : 'download', 'url' : $viewURL, 'rel' : '__blank'}
+  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, "${options.get('classname')}_${options.get('object')}_${options.get('property')}=${attachment.filename}&amp;form_token=$!{services.csrf.getToken()}"))
+  #attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL}, {'name' : 'delete', 'url' : $deleteURL}])
+#end
+
+#**
+ * Writes the wiki code used at the start of an attachment box. Outputs the attachment title bar, and opens the inner frame div.
+ *
+ * @param $boxOptions a map of parameters/options for the current attachment, holding, for example, the attachment name (boxOptions.value),
+ *        the title to display (boxOptions.text), optional extra CSS classnames to put on the box (boxOptions.cssClass)
+ * @param $currentValue the currently selected file, used for determining if this attachment should be highlighted as the current value
+ *#
+#macro (attachmentPicker_displayStartFrame $boxOptions $currentValue)
+  (% class="gallery_attachmentbox $!{boxOptions.cssClass} #if ("$!{boxOptions.value}" == $currentValue) current#{end}" %)(((
+    (% class="gallery_attachmenttitle" title="$!{boxOptions.value}" %)((($boxOptions.text)))
+    (% class="gallery_attachmentframe" %)(((
+#end
+
+#**
+ * Displays details about an attachment inside the attachment box. If the attachment is an image and the "displayImage" option is on,
+ * then the image is displayed. Otherwise, some basic information is displayed: the version, the size, the date and the author.
+ *
+ * @param $attachment the target attachment to display
+ * @param $options generic picker options
+ *#
+#macro (attachmentPicker_displayAttachmentDetails $attachment $options)
+  #if ($attachment)
+    #if ($attachment.isImage() &amp;&amp; $options.displayImage)
+      #set ($attachmentDocument = $attachment.getDocument())
+[[[[image:${attachmentDocument.fullName}@${attachment.filename}||width=160]]&gt;&gt;attach:${attachmentDocument.fullName}@${attachment.filename}||rel="lightbox[attachments]"]]
+    #else
+      * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$attachment.getFilename()(% %)
+      * v$attachment.getVersion() (#dynamicsize($attachment.filesize))
+      * $services.localization.render('core.viewers.attachments.author', [$!{xwiki.getUserName($attachment.author, false)}]) $services.localization.render('core.viewers.attachments.date', [$!{xwiki.formatDate($attachment.date, 'dd/MM/yyyy hh:mm')}])
+      * (% class="buttonwrapper" %)[[${services.localization.render("${translationPrefix}.actions.download")}&gt;&gt;attach:${attachment.getDocument()}@${attachment.filename}||title="$services.localization.render("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
+    #end
+  #end
+#end
+
+#**
+ * Writes the wiki code used at the end of an attachment box. Closes the inner frame div, and outputs the attachment actions.
+ *
+ * @param $actions a list of maps defining action buttons, where each entry contains a subset of the following:
+ *        &lt;dl&gt;
+ *          &lt;dt&gt;name&lt;/dt&gt;
+ *          &lt;dd&gt;identifies the action; the name is used as a CSS classname, and in the translation key for the display text, as "xe.attachmentSelector.actions.&lt;name&gt;"&lt;/dd&gt;
+ *          &lt;dt&gt;url&lt;/dt&gt;
+ *          &lt;dd&gt;the destination of the button&lt;/dd&gt;
+ *          &lt;dt&gt;rel&lt;/dt&gt;
+ *          &lt;dd&gt;an optional parameter to be used in the "rel" HTML attribute; for example "__blank" can be used to open the link in a new tab/window&lt;/dd&gt;
+ *        &lt;/dl&gt;
+ *#
+#macro (attachmentPicker_displayEndFrame $actions)
+    )))## attachmentframe
+    (% class="gallery_actions" %)(((
+      #foreach ($action in $actions)
+        #set( $actionname = $services.localization.render("${translationPrefix}.actions.${action.name}") )
+        [[${actionname}&gt;&gt;path:${action.url}||class="tool ${action.name}" title="${actionname}" #if($action.rel) rel="${action.rel}"#end]]##
+      #end
+    )))## actions
+  )))## attachmentbox
+#end
+
+#**
+ * Displays the upload box used for adding and selecting a new attachment.
+ *
+ * @param $targetDocument the document with the property being modified
+ * @param $targetAttachDocument the document to upload the attachment to
+ * @param $options generic picker options
+ *#
+#macro (attachmentPicker_displayUploadForm $targetDocument, $targetAttachDocument, $options)
+#attachmentPicker_displayStartFrame({
+   'value' : $services.localization.render("${translationPrefix}.upload.title"),
+   'text' : $services.localization.render("${translationPrefix}.upload.title"),
+   'cssClass' : 'gallery_upload'
+  } $NULL)
+{{html clean="false"}}
+&lt;form action="$targetAttachDocument.getURL('upload')" enctype="multipart/form-data" method="post" id="uploadAttachment" class="uploadAttachment xform"&gt;
+  &lt;div class="gallery_upload_input"&gt;
+    #if (${options.rawfilter} != '')
+      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render("${translationPrefix}.upload.hint", [${options.rawfilter}]))&lt;/span&gt;
+    #end
+    &lt;input type="file" name="filepath" id="attachfile" class="attachment" size="30" title="$!{escapetool.xml($options.rawfilter)}"/&gt;
+    &lt;input type="hidden" name="xredirect" value="$xwiki.getDocument($attachmentPickerDocName).getURL('get', "xaction=postUpload&amp;amp;docAction=$!{escapetool.url($options.get('docAction'))}&amp;amp;targetdocname=$!{escapetool.url($targetAttachDocument.fullName)}&amp;amp;docname=$!{escapetool.url($targetDocument.fullName)}&amp;amp;fieldname=$!{escapetool.url($options.get('classname'))}_$!{escapetool.url($options.get('object'))}_$!{escapetool.url($options.get('property'))}&amp;amp;form_token=$!{services.csrf.getToken()}")" /&gt;
+    &lt;input type="hidden" name="docname" value="$!{escapetool.xml($targetDocument.fullName)}" /&gt;
+    &lt;input type="hidden" name="classname" value="$!{escapetool.xml($options.get('classname'))}" /&gt;
+    &lt;input type="hidden" name="object" value="$!{escapetool.xml($options.get('object'))}" /&gt;
+    &lt;input type="hidden" name="property" value="$!{escapetool.xml($options.get('property'))}" /&gt;
+    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+  &lt;/div&gt;
+  &lt;div class="buttons"&gt;
+    &lt;span class="buttonwrapper"&gt;
+    &lt;input type="submit" name="action_upload" class="button " value='$services.localization.render("${translationPrefix}.upload.submit")'  title='$services.localization.render("${translationPrefix}.upload.submit")'/&gt;
+    &lt;/span&gt;
+  &lt;/div&gt;
+&lt;/form&gt;
+{{/html}}
+#attachmentPicker_displayEndFrame ([])
+#end
+
+#**
+ * Displays the "empty value" box, used for unsetting the field value.
+ *
+ * @param $targetDocument the document being modified
+ * @param $targetAttachDocument the document that the attachments will the loaded from/saved to
+ * @param $options generic picker options
+ * @param $currentValue the currently selected file, used for determining if the empty box should be highlighted as the current value
+ *#
+#macro (attachmentPicker_displayAttachmentGalleryEmptyValue $targetDocument, $targetAttachDocument, $options, $currentValue)
+  #if ("$!{options.get('defaultValue')}" != '')
+    #set ($reference = ${options.get('defaultValue')})
+    #set ($docNameLimit = $reference.indexOf('@'))
+    #if ($docNameLimit &gt; 0)
+      #set ($docName = $reference.substring(0, $docNameLimit))
+    #else
+      #set ($docName = $targetAttachDocument.fullName)
+    #end
+    #set ($attachmentName = $reference.substring($mathtool.add($docNameLimit, 1)))
+    #set ($defaultAttachment = $xwiki.getDocument($docName).getAttachment($attachmentName))
+    #if ($defaultAttachment.isImage())
+      #set($dcssClass = 'gallery_image')
+    #end
+  #end
+  #attachmentPicker_displayStartFrame({'cssClass' : "gallery_emptyChoice $!{dcssClass}", 'text' : $services.localization.render("${translationPrefix}.default"), 'value' : "${options.defaultValue}"} $currentValue)
+  #attachmentPicker_displayAttachmentDetails($defaultAttachment $options)
+  #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
+  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, "${options.get('classname')}_${options.get('object')}_${options.get('property')}=&amp;form_token=$!{services.csrf.getToken()}"))
+  #attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL}])
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ($request.docname)
+  ###if ($request.xpage == 'plain')
+  ##  ## IE6 + XHR + gzip compression = BOOM!
+  ##  ## This disables the automatic gzip compression
+  ##  $response.setContentType('multipart/formdata')
+  ###end
+  #set ($targetDocument = $xwiki.getDocument($request.docname))
+  #if ($request.targetdocname)
+    ## Use the target document if it exists.
+    #set ($targetAttachDocument = $xwiki.getDocument($request.targetdocname))
+  #else
+    ## Otherwise, just use the current document as the target to save/load attachments
+    #set ($targetAttachDocument = $targetDocument)
+  #end
+  #if ("$!{request.savemode}" == 'direct')
+    #set($docAction = 'save')
+  #else
+    #set($docAction = $targetAttachDocument.getDefaultEditMode())
+  #end
+  #set ($filter = [])
+  #set ($rawfilter = '')
+  #if ("$!{request.filter}" != '')
+    #foreach ($value in $request.filter.trim().split('\s*+[,|; ]\s*+'))
+      #if ("$!value" != '')
+        #set ($discard = $filter.add($value.toLowerCase()))
+        #set ($rawfilter = "${rawfilter}, ${value}")
+      #end
+    #end
+    #if ($rawfilter != '')
+      #set ($rawfilter = $rawfilter.substring(2))
+    #end
+  #end
+  #if ("$!{request.displayImage}" == 'true')
+    #set ($displayImage = true)
+  #else
+    #set ($displayImage = false)
+  #end
+  ### Determine attachment sorting
+  #set($sortAttachmentsBy = "$!{request.sortAttachmentsBy}")
+  #set ($validAttachmentProperties = ['filename', 'date', 'filesize', 'author', 'version', 'mimeType'])
+  #if($sortAttachmentsBy == '' || $validAttachmentProperties.indexOf($sortAttachmentsBy) == -1)
+    ### Default to sorting by filename, sort not requested.
+    #set($sortAttachmentsBy = "filename")
+  #end
+  ### Set attachment sorting direction
+  #if($sortAttachmentsBy == 'date')
+    ### Sort the date descending
+    #set($sortAttachmentsBy = "date:desc")
+  #else
+    ### Sort everything else ascending
+    #set($sortAttachmentsBy = "${sortAttachmentsBy}:asc")
+  #end
+  #set ($options = {
+    'classname' : ${request.get('classname')},
+    'object' : $!{mathtool.toInteger($request.object)},
+    'property' : ${request.property},
+    'displayImage' : ${displayImage},
+    'docAction' : ${docAction},
+    'defaultValue' : "$!{request.defaultValue}",
+    'rawfilter': "$!{rawfilter}",
+    'filter': ${filter},
+    'sortAttachmentsBy': ${sortAttachmentsBy}
+  })
+  $!targetDocument.use($targetDocument.getObject($options.classname, $options.object))##
+  #attachmentPicker_displayAttachmentGallery($targetDocument, $targetAttachDocument, $options)
+
+  (% class="gallery_buttons buttons" %)(((
+  (% class="buttonwrapper secondary" %)[[$services.localization.render("${translationPrefix}.cancel")&gt;&gt;$targetDocument||class="button secondary" id="attachment-picker-close"]]
+  )))
+#end
+{{/velocity}}</content>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>caa5337b-fad4-4c21-8ef4-9e7e1c44dbfe</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -111,14 +391,10 @@
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>caa5337b-fad4-4c21-8ef4-9e7e1c44dbfe</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -435,6 +711,10 @@
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>2aa565e6-b9bd-4095-a7a9-bbf47d75d079</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -502,14 +782,10 @@
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>1</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>2aa565e6-b9bd-4095-a7a9-bbf47d75d079</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -560,6 +836,10 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>2a28ce9c-ab00-4847-936d-53e4f2acbfe0</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -627,14 +907,10 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>2a28ce9c-ab00-4847-936d-53e4f2acbfe0</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -849,6 +1125,10 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroClass</className>
+    <guid>7f67fdfc-a67a-4166-b7c1-6d572ee54719</guid>
     <class>
       <name>XWiki.WikiMacroClass</name>
       <customClass/>
@@ -958,10 +1238,6 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibility>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>0</number>
-    <className>XWiki.WikiMacroClass</className>
-    <guid>7f67fdfc-a67a-4166-b7c1-6d572ee54719</guid>
     <property>
       <code>{{velocity output="false"}}
 $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##
@@ -1131,6 +1407,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>0</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>bb1b9208-3b4a-43e4-8a69-603281ca1412</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1179,10 +1459,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>0</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>bb1b9208-3b4a-43e4-8a69-603281ca1412</guid>
     <property>
       <defaultValue/>
     </property>
@@ -1197,6 +1473,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>1</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>c51517fc-93e9-4594-8b10-b014a8907452</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1245,10 +1525,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>1</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>c51517fc-93e9-4594-8b10-b014a8907452</guid>
     <property>
       <defaultValue/>
     </property>
@@ -1263,6 +1539,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>2</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>b43c2df7-9941-4941-834b-0236424cfaa9</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1311,10 +1591,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>2</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>b43c2df7-9941-4941-834b-0236424cfaa9</guid>
     <property>
       <defaultValue/>
     </property>
@@ -1329,6 +1605,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>5</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>a35e6fcc-b5e9-4c49-a601-cead93cba813</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1377,10 +1657,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>5</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>a35e6fcc-b5e9-4c49-a601-cead93cba813</guid>
     <property>
       <defaultValue/>
     </property>
@@ -1395,6 +1671,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>6</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>2dcec651-66b9-4d7c-9ac6-2578a426a5f4</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1443,10 +1723,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>6</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>2dcec651-66b9-4d7c-9ac6-2578a426a5f4</guid>
     <property>
       <defaultValue>form</defaultValue>
     </property>
@@ -1461,6 +1737,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>7</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>a932ece6-3c6d-48c7-a717-536317705f71</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1509,10 +1789,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>7</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>a932ece6-3c6d-48c7-a717-536317705f71</guid>
     <property>
       <defaultValue/>
     </property>
@@ -1527,6 +1803,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>10</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>5c3f5b0d-1d0d-4820-8985-13d779972acb</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1575,10 +1855,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>10</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>5c3f5b0d-1d0d-4820-8985-13d779972acb</guid>
     <property>
       <defaultValue/>
     </property>
@@ -1593,6 +1869,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>12</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>aa252c40-59a0-4e82-a94b-e133862fe082</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1641,10 +1921,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>12</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>aa252c40-59a0-4e82-a94b-e133862fe082</guid>
     <property>
       <defaultValue/>
     </property>
@@ -1659,6 +1935,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>13</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>e31c42de-47d7-4a73-a236-b99c2231dca7</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1707,10 +1987,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>13</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>e31c42de-47d7-4a73-a236-b99c2231dca7</guid>
     <property>
       <defaultValue>false</defaultValue>
     </property>
@@ -1725,6 +2001,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>14</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>0b2cea67-1942-4ce2-9f5e-90907033c92c</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1773,10 +2053,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>14</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>0b2cea67-1942-4ce2-9f5e-90907033c92c</guid>
     <property>
       <defaultValue/>
     </property>
@@ -1791,6 +2067,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>15</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>003ab606-5c72-465d-bfd6-bd21262be502</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1839,10 +2119,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>15</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>003ab606-5c72-465d-bfd6-bd21262be502</guid>
     <property>
       <defaultValue/>
     </property>
@@ -1857,6 +2133,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>16</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>9ca8402c-6df8-4068-b00f-1f9bb18f38a9</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1905,10 +2185,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>16</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>9ca8402c-6df8-4068-b00f-1f9bb18f38a9</guid>
     <property>
       <defaultValue/>
     </property>
@@ -1923,6 +2199,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>17</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>54e733cd-f755-4dee-8629-b713f685790a</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -1971,10 +2251,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>17</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>54e733cd-f755-4dee-8629-b713f685790a</guid>
     <property>
       <defaultValue>false</defaultValue>
     </property>
@@ -1989,6 +2265,10 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
   </object>
   <object>
+    <name>XWiki.AttachmentSelector</name>
+    <number>18</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>99b73453-120c-481a-8889-1a7efc7b73f2</guid>
     <class>
       <name>XWiki.WikiMacroParameterClass</name>
       <customClass/>
@@ -2037,10 +2317,6 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
     </class>
-    <name>XWiki.AttachmentSelector</name>
-    <number>18</number>
-    <className>XWiki.WikiMacroParameterClass</className>
-    <guid>99b73453-120c-481a-8889-1a7efc7b73f2</guid>
     <property>
       <defaultValue/>
     </property>
@@ -2054,281 +2330,4 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
       <name>targetdocname</name>
     </property>
   </object>
-  <content>{{velocity output="false"}}
-#if ($request.xaction == 'postUpload')
-  #set ($targetDocument = $xwiki.getDocument($request.get('docname')))
-  #set ($targetAttachDocument = $xwiki.getDocument($request.get('targetdocname')))
-
-  #set ($fieldname = $request.get('fieldname'))
-  #set ($docAction = $request.get('docAction'))
-  #set ($attachmentList = $targetAttachDocument.getAttachmentList())
-  #if ($attachmentList &amp;&amp; $attachmentList.size() &gt; 0)
-    #set ($sortedAttachments = $sorttool.sort($attachmentList, 'date:desc'))
-    #set ($lastAttachment = $sortedAttachments.get(0))
-  #end
-  $response.sendRedirect($targetDocument.getURL($docAction, "$!{fieldname}=$!{lastAttachment.filename}&amp;form_token=$!{escapetool.url($request.get('form_token'))}"))
-  #stop
-#end
-{{/velocity}}
-
-{{velocity output="false"}}
-##
-## Macros
-##
-#set ($translationPrefix = 'xe.attachmentSelector')
-#set ($attachmentPickerDocName = 'XWiki.AttachmentSelector')
-
-$xwiki.ssx.use($attachmentPickerDocName)
-$xwiki.jsx.use($attachmentPickerDocName)
-
-#**
- * Displays the attachment gallery as a list of attachment boxes, starting with special boxes for uploading a new attachment and for setting a default value.
- *
- * @param $targetDocument the document to recieve the field value being modified
- * @param $targetAttachDocument the document to list/save attachments to
- * @param $options generic picker options
- *#
-#macro (attachmentPicker_displayAttachmentGallery $targetDocument, $targetAttachDocument, $options)
-  #set ($currentValue = $targetDocument.getValue($options.property))
-  #if ("$!{targetAttachDocument.getAttachment($currentValue)}" == '')
-    #set ($currentValue = "$!{options.defaultValue}")
-  #end
-  (% class="gallery" %)(((
-  ## Only display the upload form if they have edit permission on targetAttachDocument
-  #if ($xwiki.hasAccessLevel('edit',$xcontext.user,${targetAttachDocument.fullName}))
-    #attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
-  #end
-  #attachmentPicker_displayAttachmentGalleryEmptyValue($targetDocument, $targetAttachDocument, $options, $currentValue)
-  #set ($sortedAttachments = $sorttool.sort($targetAttachDocument.getAttachmentList(), "${options.sortAttachmentsBy}") )
-  #foreach ($attachment in $sortedAttachments)
-    #set ($extension = $attachment.getFilename())
-    #set ($extension = $extension.substring($mathtool.add($extension.lastIndexOf('.'), 1)).toLowerCase())
-    #if ($options.filter.size() == 0 || $options.filter.contains($extension))
-      #attachmentPicker_displayAttachmentBox($attachment $targetDocument $targetAttachDocument, $options $currentValue)
-    #end
-  #end
-  )))
-#end
-
-#**
- * Displays an attachment box.
- *
- * @param $attachment the target attachment to display
- * @param $targetDocument the document being modified
- * @param $options generic picker options
- * @param $currentValue the currently selected file, used for determining if the box should be highlighted as the current value
- *#
-#macro (attachmentPicker_displayAttachmentBox $attachment $targetDocument $targetAttachDocument, $options $currentValue)
-  #if ($options.displayImage &amp;&amp; $attachment.isImage())
-    #set ($cssClass = 'gallery_image')
-  #else
-    #set ($cssClass = '')
-  #end
-  #attachmentPicker_displayStartFrame({'value' : $attachment.filename, 'text' : $attachment.filename, 'cssClass' : "$!{cssClass}"} $currentValue)
-  #attachmentPicker_displayAttachmentDetails($attachment $options)
-  #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
-  #set ($deleteURL = $targetAttachDocument.getAttachmentURL($attachment.filename, 'delattachment', "xredirect=${returnURL}&amp;form_token=$!{services.csrf.getToken()}") )
-  #set ($viewURL = $targetAttachDocument.getAttachmentURL($attachment.filename) )##{'name' : 'download', 'url' : $viewURL, 'rel' : '__blank'}
-  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, "${options.get('classname')}_${options.get('object')}_${options.get('property')}=${attachment.filename}&amp;form_token=$!{services.csrf.getToken()}"))
-  #attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL}, {'name' : 'delete', 'url' : $deleteURL}])
-#end
-
-#**
- * Writes the wiki code used at the start of an attachment box. Outputs the attachment title bar, and opens the inner frame div.
- *
- * @param $boxOptions a map of parameters/options for the current attachment, holding, for example, the attachment name (boxOptions.value),
- *        the title to display (boxOptions.text), optional extra CSS classnames to put on the box (boxOptions.cssClass)
- * @param $currentValue the currently selected file, used for determining if this attachment should be highlighted as the current value
- *#
-#macro (attachmentPicker_displayStartFrame $boxOptions $currentValue)
-  (% class="gallery_attachmentbox $!{boxOptions.cssClass} #if ("$!{boxOptions.value}" == $currentValue) current#{end}" %)(((
-    (% class="gallery_attachmenttitle" title="$!{boxOptions.value}" %)((($boxOptions.text)))
-    (% class="gallery_attachmentframe" %)(((
-#end
-
-#**
- * Displays details about an attachment inside the attachment box. If the attachment is an image and the "displayImage" option is on,
- * then the image is displayed. Otherwise, some basic information is displayed: the version, the size, the date and the author.
- *
- * @param $attachment the target attachment to display
- * @param $options generic picker options
- *#
-#macro (attachmentPicker_displayAttachmentDetails $attachment $options)
-  #if ($attachment)
-    #if ($attachment.isImage() &amp;&amp; $options.displayImage)
-      #set ($attachmentDocument = $attachment.getDocument())
-[[[[image:${attachmentDocument.fullName}@${attachment.filename}||width=160]]&gt;&gt;attach:${attachmentDocument.fullName}@${attachment.filename}||rel="lightbox[attachments]"]]
-    #else
-      * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$attachment.getFilename()(% %)
-      * v$attachment.getVersion() (#dynamicsize($attachment.filesize))
-      * $services.localization.render('core.viewers.attachments.author', [$!{xwiki.getUserName($attachment.author, false)}]) $services.localization.render('core.viewers.attachments.date', [$!{xwiki.formatDate($attachment.date, 'dd/MM/yyyy hh:mm')}])
-      * (% class="buttonwrapper" %)[[${services.localization.render("${translationPrefix}.actions.download")}&gt;&gt;attach:${attachment.getDocument()}@${attachment.filename}||title="$services.localization.render("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
-    #end
-  #end
-#end
-
-#**
- * Writes the wiki code used at the end of an attachment box. Closes the inner frame div, and outputs the attachment actions.
- *
- * @param $actions a list of maps defining action buttons, where each entry contains a subset of the following:
- *        &lt;dl&gt;
- *          &lt;dt&gt;name&lt;/dt&gt;
- *          &lt;dd&gt;identifies the action; the name is used as a CSS classname, and in the translation key for the display text, as "xe.attachmentSelector.actions.&lt;name&gt;"&lt;/dd&gt;
- *          &lt;dt&gt;url&lt;/dt&gt;
- *          &lt;dd&gt;the destination of the button&lt;/dd&gt;
- *          &lt;dt&gt;rel&lt;/dt&gt;
- *          &lt;dd&gt;an optional parameter to be used in the "rel" HTML attribute; for example "__blank" can be used to open the link in a new tab/window&lt;/dd&gt;
- *        &lt;/dl&gt;
- *#
-#macro (attachmentPicker_displayEndFrame $actions)
-    )))## attachmentframe
-    (% class="gallery_actions" %)(((
-      #foreach ($action in $actions)
-        #set( $actionname = $services.localization.render("${translationPrefix}.actions.${action.name}") )
-        [[${actionname}&gt;&gt;path:${action.url}||class="tool ${action.name}" title="${actionname}" #if($action.rel) rel="${action.rel}"#end]]##
-      #end
-    )))## actions
-  )))## attachmentbox
-#end
-
-#**
- * Displays the upload box used for adding and selecting a new attachment.
- *
- * @param $targetDocument the document with the property being modified
- * @param $targetAttachDocument the document to upload the attachment to
- * @param $options generic picker options
- *#
-#macro (attachmentPicker_displayUploadForm $targetDocument, $targetAttachDocument, $options)
-#attachmentPicker_displayStartFrame({
-   'value' : $services.localization.render("${translationPrefix}.upload.title"),
-   'text' : $services.localization.render("${translationPrefix}.upload.title"),
-   'cssClass' : 'gallery_upload'
-  } $NULL)
-{{html clean="false"}}
-&lt;form action="$targetAttachDocument.getURL('upload')" enctype="multipart/form-data" method="post" id="uploadAttachment" class="uploadAttachment xform"&gt;
-  &lt;div class="gallery_upload_input"&gt;
-    #if (${options.rawfilter} != '')
-      &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render("${translationPrefix}.upload.hint", [${options.rawfilter}]))&lt;/span&gt;
-    #end
-    &lt;input type="file" name="filepath" id="attachfile" class="attachment" size="30" title="$!{escapetool.xml($options.rawfilter)}"/&gt;
-    &lt;input type="hidden" name="xredirect" value="$xwiki.getDocument($attachmentPickerDocName).getURL('get', "xaction=postUpload&amp;amp;docAction=$!{escapetool.url($options.get('docAction'))}&amp;amp;targetdocname=$!{escapetool.url($targetAttachDocument.fullName)}&amp;amp;docname=$!{escapetool.url($targetDocument.fullName)}&amp;amp;fieldname=$!{escapetool.url($options.get('classname'))}_$!{escapetool.url($options.get('object'))}_$!{escapetool.url($options.get('property'))}&amp;amp;form_token=$!{services.csrf.getToken()}")" /&gt;
-    &lt;input type="hidden" name="docname" value="$!{escapetool.xml($targetDocument.fullName)}" /&gt;
-    &lt;input type="hidden" name="classname" value="$!{escapetool.xml($options.get('classname'))}" /&gt;
-    &lt;input type="hidden" name="object" value="$!{escapetool.xml($options.get('object'))}" /&gt;
-    &lt;input type="hidden" name="property" value="$!{escapetool.xml($options.get('property'))}" /&gt;
-    &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
-  &lt;/div&gt;
-  &lt;div class="buttons"&gt;
-    &lt;span class="buttonwrapper"&gt;
-    &lt;input type="submit" name="action_upload" class="button " value='$services.localization.render("${translationPrefix}.upload.submit")'  title='$services.localization.render("${translationPrefix}.upload.submit")'/&gt;
-    &lt;/span&gt;
-  &lt;/div&gt;
-&lt;/form&gt;
-{{/html}}
-#attachmentPicker_displayEndFrame ([])
-#end
-
-#**
- * Displays the "empty value" box, used for unsetting the field value.
- *
- * @param $targetDocument the document being modified
- * @param $targetAttachDocument the document that the attachments will the loaded from/saved to
- * @param $options generic picker options
- * @param $currentValue the currently selected file, used for determining if the empty box should be highlighted as the current value
- *#
-#macro (attachmentPicker_displayAttachmentGalleryEmptyValue $targetDocument, $targetAttachDocument, $options, $currentValue)
-  #if ("$!{options.get('defaultValue')}" != '')
-    #set ($reference = ${options.get('defaultValue')})
-    #set ($docNameLimit = $reference.indexOf('@'))
-    #if ($docNameLimit &gt; 0)
-      #set ($docName = $reference.substring(0, $docNameLimit))
-    #else
-      #set ($docName = $targetAttachDocument.fullName)
-    #end
-    #set ($attachmentName = $reference.substring($mathtool.add($docNameLimit, 1)))
-    #set ($defaultAttachment = $xwiki.getDocument($docName).getAttachment($attachmentName))
-    #if ($defaultAttachment.isImage())
-      #set($dcssClass = 'gallery_image')
-    #end
-  #end
-  #attachmentPicker_displayStartFrame({'cssClass' : "gallery_emptyChoice $!{dcssClass}", 'text' : $services.localization.render("${translationPrefix}.default"), 'value' : "${options.defaultValue}"} $currentValue)
-  #attachmentPicker_displayAttachmentDetails($defaultAttachment $options)
-  #set ($returnURL = $escapetool.url($doc.getURL('view', $request.queryString)))
-  #set ($selectURL = $targetDocument.getURL(${options.get('docAction')}, "${options.get('classname')}_${options.get('object')}_${options.get('property')}=&amp;form_token=$!{services.csrf.getToken()}"))
-  #attachmentPicker_displayEndFrame ([{'name' : 'select', 'url' : $selectURL}])
-#end
-{{/velocity}}
-
-{{velocity}}
-#if ($request.docname)
-  ###if ($request.xpage == 'plain')
-  ##  ## IE6 + XHR + gzip compression = BOOM!
-  ##  ## This disables the automatic gzip compression
-  ##  $response.setContentType('multipart/formdata')
-  ###end
-  #set ($targetDocument = $xwiki.getDocument($request.docname))
-  #if ($request.targetdocname)
-    ## Use the target document if it exists.
-    #set ($targetAttachDocument = $xwiki.getDocument($request.targetdocname))
-  #else
-    ## Otherwise, just use the current document as the target to save/load attachments
-    #set ($targetAttachDocument = $targetDocument)
-  #end
-  #if ("$!{request.savemode}" == 'direct')
-    #set($docAction = 'save')
-  #else
-    #set($docAction = $targetAttachDocument.getDefaultEditMode())
-  #end
-  #set ($filter = [])
-  #set ($rawfilter = '')
-  #if ("$!{request.filter}" != '')
-    #foreach ($value in $request.filter.trim().split('\s*+[,|; ]\s*+'))
-      #if ("$!value" != '')
-        #set ($discard = $filter.add($value.toLowerCase()))
-        #set ($rawfilter = "${rawfilter}, ${value}")
-      #end
-    #end
-    #if ($rawfilter != '')
-      #set ($rawfilter = $rawfilter.substring(2))
-    #end
-  #end
-  #if ("$!{request.displayImage}" == 'true')
-    #set ($displayImage = true)
-  #else
-    #set ($displayImage = false)
-  #end
-  ### Determine attachment sorting
-  #set($sortAttachmentsBy = "$!{request.sortAttachmentsBy}")
-  #set ($validAttachmentProperties = ['filename', 'date', 'filesize', 'author', 'version', 'mimeType'])
-  #if($sortAttachmentsBy == '' || $validAttachmentProperties.indexOf($sortAttachmentsBy) == -1)
-    ### Default to sorting by filename, sort not requested.
-    #set($sortAttachmentsBy = "filename")
-  #end
-  ### Set attachment sorting direction
-  #if($sortAttachmentsBy == 'date')
-    ### Sort the date descending
-    #set($sortAttachmentsBy = "date:desc")
-  #else
-    ### Sort everything else ascending
-    #set($sortAttachmentsBy = "${sortAttachmentsBy}:asc")
-  #end
-  #set ($options = {
-    'classname' : ${request.get('classname')},
-    'object' : $!{mathtool.toInteger($request.object)},
-    'property' : ${request.property},
-    'displayImage' : ${displayImage},
-    'docAction' : ${docAction},
-    'defaultValue' : "$!{request.defaultValue}",
-    'rawfilter': "$!{rawfilter}",
-    'filter': ${filter},
-    'sortAttachmentsBy': ${sortAttachmentsBy}
-  })
-  $!targetDocument.use($targetDocument.getObject($options.classname, $options.object))##
-  #attachmentPicker_displayAttachmentGallery($targetDocument, $targetAttachDocument, $options)
-
-  (% class="gallery_buttons buttons" %)(((
-  (% class="buttonwrapper secondary" %)[[$services.localization.render("${translationPrefix}.cancel")&gt;&gt;$targetDocument||class="button secondary" id="attachment-picker-close"]]
-  )))
-#end
-{{/velocity}}</content>
 </xwikidoc>

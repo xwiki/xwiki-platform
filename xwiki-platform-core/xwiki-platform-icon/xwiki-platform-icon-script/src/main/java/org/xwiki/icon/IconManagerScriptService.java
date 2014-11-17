@@ -19,6 +19,8 @@
  */
 package org.xwiki.icon;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -43,6 +45,9 @@ public class IconManagerScriptService implements ScriptService
 
     @Inject
     private IconManager iconManager;
+
+    @Inject
+    private IconSetManager iconSetManager;
 
     @Inject
     private Execution execution;
@@ -141,6 +146,52 @@ public class IconManagerScriptService implements ScriptService
     {
         try {
             return iconManager.renderHTML(iconName, iconSetName, fallback);
+        } catch (IconException e) {
+            setLastError(e);
+            return null;
+        }
+    }
+
+    /**
+     * Get the name of all the icon sets present in the current wiki.
+     * @return the list of the name of the icon sets present in the current wiki.
+     * @since 6.4M1
+     */
+    public List<String> getIconSetNames()
+    {
+        try {
+            return iconSetManager.getIconSetNames();
+        } catch (IconException e) {
+            setLastError(e);
+            return null;
+        }
+    }
+
+    /**
+     * Get the list of the names of all available icons in the current icon set.
+     * @return the icon names
+     * @since 6.4M1
+     */
+    public List<String> getIconNames()
+    {
+        try {
+            return iconManager.getIconNames();
+        } catch (IconException e) {
+            setLastError(e);
+            return null;
+        }
+    }
+
+    /**
+     * Get the list of the names of all available icons in the specified icon set.
+     * @param iconSetName name of the icon set
+     * @return the icon names
+     * @since 6.4M1
+     */
+    public List<String> getIconNames(String iconSetName)
+    {
+        try {
+            return iconManager.getIconNames(iconSetName);
         } catch (IconException e) {
             setLastError(e);
             return null;

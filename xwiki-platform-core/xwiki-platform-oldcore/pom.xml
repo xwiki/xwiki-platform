@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -729,6 +729,8 @@
               **/internal/model/reference/CurrentStringEntityReferenceResolver.java,
               **/internal/observation/remote/converter/AbstractXWikiEventConverter.java,
               **/internal/observation/remote/converter/ActionExecutionEventConverter.java,
+              **/internal/template/Template.java,
+              **/internal/template/TemplateContent.java,
               **/internal/template/TemplateScriptService.java,
               **/internal/template/TemplateManager.java,
               **/monitor/api/MonitorData.java,

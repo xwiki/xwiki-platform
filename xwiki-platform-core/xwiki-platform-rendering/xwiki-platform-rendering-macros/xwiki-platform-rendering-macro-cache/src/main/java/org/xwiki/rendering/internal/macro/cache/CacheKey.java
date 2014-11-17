@@ -95,4 +95,10 @@ public class CacheKey
         hash = 31 * hash + getMaxEntries();
         return hash;
     }
+
+    @Override
+    public String toString()
+    {
+        return getTimeToLive() + "s-" + getMaxEntries();
+    }
 }

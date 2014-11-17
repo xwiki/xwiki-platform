@@ -25,12 +25,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tree</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tree-macro</artifactId>
   <name>XWiki Platform - Tree - Macro</name>
   <packaging>xar</packaging>
-  <description>Tree Macro</description>
+  <description>Provides a tree view for the structured data stored in the wiki.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Tree Macro</xwiki.extension.name>

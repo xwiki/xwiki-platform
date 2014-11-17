@@ -13,13 +13,11 @@
   </div>## main
   #template("endpage.vm")
 #else
-  #set($queryString = "$!escapetool.url($urltool.parseQuery($request.qs))")
   #template("startpage.vm")
   <div class="main layoutsubsection">
   <div id="mainContentArea">
     <div id="document-title"><h1>$services.localization.render('core.export.pdf.options.title')</h1></div>
-    ## Submit using POST method to preserve the query string parameters of the action URL.
-    <form id="pdfExportOptions" method="post" class="xform half" action="$escapetool.html($doc.getURL('export', $queryString))">
+    <form id="pdfExportOptions" class="xform half" action="$escapetool.xml($doc.getURL('export'))">
       <div class="hidden">
         <input type="hidden" name="format" value="pdf" />
       </div>
@@ -88,9 +86,23 @@
           <span class="xHint">$services.localization.render('core.export.pdf.options.images.hint')</span>
         </dt>
       </dl>
+      #set ($originalParams = $urltool.parseQuery($request.qs))
       <div class="buttons">
         <span class="buttonwrapper"><input type="submit" value="$services.localization.render('export')" class="button" /></span>
-        <span class="buttonwrapper"><a class="secondary button" href="$escapetool.html($doc.getURL('view', $queryString))">$services.localization.render('cancel')</a></span>
+        <span class="buttonwrapper">
+          <a class="secondary button" href="$escapetool.xml($doc.getURL('view', $escapetool.url($originalParams)))">
+            $services.localization.render('cancel')
+          </a>
+        </span>
+      </div>
+      ## We preserve the original request parameters but we put them at the end so that they don't overwrite the
+      ## parameters from the PDF export form.
+      <div class="hidden">
+        #foreach ($entry in $originalParams.entrySet())
+          #foreach($value in $entry.value)
+            <input type="hidden" name="$escapetool.xml($entry.key)" value="$escapetool.xml($value)" />
+          #end
+        #end
       </div>
     </form>
     <div class="clearfloats"></div>

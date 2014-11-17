@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>6.3-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -396,31 +396,14 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
-            <difference>
-              <differenceType>6010</differenceType>
-              <className>com/xpn/xwiki/objects/BaseElement</className>
-              <field>localEntityReferenceSerializer</field>
-              <justification>Never really been supposed to be exposed as an API.</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <method>java.lang.String ajc$privMethod$com_xpn_xwiki_doc_XWikiDocumentCompatibilityAspect$com_xpn_xwiki_doc_XWikiDocument$serializeReference(org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.EntityReferenceSerializer, org.xwiki.model.reference.DocumentReference)</method>
-              <justification>serializeReference method never been public. AspectJ hacks...</justification>
-            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <!-- Changed the LESSCache interface and the LESS Script Service because the cache was poorly designed
-                 (see: http://jira.xwiki.org/browse/XWIKI-10776). -->
-            <exclude>**/LESSCache*</exclude>
-            <exclude>**/LessCompilerScriptService*</exclude>
-            <!-- Added new methods to the unstable Icon Module -->
-            <exclude>**/IconManager*</exclude>
-            <exclude>**/IconSetCache*</exclude>
-            <exclude>**/IconSetManager*</exclude>
+            <!-- Add new methods to the Icon Set Module -->
+            <exclude>**/IconSetManager**</exclude>
+            <exclude>**/IconManager**</exclude>
           </excludes>
         </configuration>
       </plugin>

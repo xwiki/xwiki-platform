@@ -166,4 +166,17 @@ public class DefaultIconSetManager implements IconSetManager
         // Return the icon set
         return iconSet;
     }
+
+    @Override
+    public List<String> getIconSetNames() throws IconException
+    {
+        try {
+            String xwql = "SELECT obj.name FROM Document doc, doc.object(IconThemesCode.IconThemeClass) obj "
+                    + "ORDER BY obj.name";
+            Query query = queryManager.createQuery(xwql, Query.XWQL);
+            return query.execute();
+        } catch (QueryException e) {
+            throw new IconException("Failed to get the name of all icon sets.", e);
+        }
+    }
 }

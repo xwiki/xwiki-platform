@@ -214,7 +214,15 @@ require.config({
 ]);
 
 require(['tree'], function($) {
-  $('.xtree').xtree();
+  $('.xtree').xtree().one('ready.jstree', function(event, data) {
+    var tree = data.instance;
+    var openToNodeId = tree.element.attr('data-openTo');
+    // Open the tree to the specified node.
+    openToNodeId &amp;&amp; data.instance.openTo(openToNodeId, function() {
+      // Select the node only if the node label doesn't behave as link (otherwise we're going to open the link).
+      tree.element.hasClass('jstree-no-links') &amp;&amp; tree.select_node(openToNodeId);
+    });
+  });
 });</code>
     </property>
     <property>
@@ -378,6 +386,7 @@ require(['tree'], function($) {
 #set ($discard = $attributes.add("data-edges='$edges'"))
 #set ($checkboxes = $xcontext.macro.params.checkboxes == 'true')
 #set ($discard = $attributes.add("data-checkboxes='$checkboxes'"))
+#set ($discard = $attributes.add("data-openTo='$!escapetool.xml($xcontext.macro.params.openTo)'"))
 #set ($content = $xcontext.macro.content)
 #if ("$!content" == '' &amp;&amp; $xcontext.action == 'edit')
   #set ($content = "$services.icon.render('chart_organisation') This tree can't be displayed in edit mode.")
@@ -1004,6 +1013,72 @@ require(['tree'], function($) {
     </property>
     <property>
       <name>checkboxes</name>
+    </property>
+  </object>
+  <object>
+    <name>Macros.Tree</name>
+    <number>9</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>6468cb7d-a8a5-496e-a98b-8c542006b13d</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue/>
+    </property>
+    <property>
+      <description>The id of the node to open the tree to. All the ancestors of the specified node, up to the root of the tree, will be opened also.</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>openTo</name>
     </property>
   </object>
 </xwikidoc>

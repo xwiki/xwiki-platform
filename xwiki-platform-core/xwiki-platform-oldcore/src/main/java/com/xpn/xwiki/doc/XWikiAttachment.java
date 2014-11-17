@@ -44,7 +44,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -52,10 +58,34 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.xml.DOMXMLWriter;
 import com.xpn.xwiki.internal.xml.XMLWriter;
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 public class XWikiAttachment implements Cloneable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAttachment.class);
+
+    /**
+     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
+     * wiki).
+     */
+    private static EntityReferenceSerializer<String> getCompactWikiEntityReferenceSerializer()
+    {
+        return Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+    }
+
+    private static EntityReferenceResolver<String> getXClassEntityReferenceResolver()
+    {
+        return Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
+    }
+
+    /**
+     * Used to normalize references.
+     */
+    private DocumentReferenceResolver<EntityReference> getExplicitReferenceDocumentReferenceResolver()
+    {
+        return Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
+    }
 
     private XWikiDocument doc;
 
@@ -63,7 +93,7 @@ public class XWikiAttachment implements Cloneable
 
     private String filename;
 
-    private String author;
+    private DocumentReference authorReference;
 
     private Version version;
 
@@ -91,7 +121,6 @@ public class XWikiAttachment implements Cloneable
     {
         this.filesize = 0;
         this.filename = "";
-        this.author = "";
         this.comment = "";
         this.date = new Date();
     }
@@ -138,7 +167,7 @@ public class XWikiAttachment implements Cloneable
             LOGGER.error("exception while attach.clone", e);
         }
 
-        attachment.setAuthor(getAuthor());
+        attachment.setAuthorReference(getAuthorReference());
         attachment.setComment(getComment());
         attachment.setDate(getDate());
         attachment.setFilename(getFilename());
@@ -210,17 +239,52 @@ public class XWikiAttachment implements Cloneable
         this.reference = null;
     }
 
-    public String getAuthor()
+    /**
+     * @since 6.4M1
+     */
+    public DocumentReference getAuthorReference()
     {
-        return this.author;
+        return this.authorReference;
     }
 
+    /**
+     * @since 6.4M1
+     */
+    public void setAuthorReference(DocumentReference authorReference)
+    {
+        if (ObjectUtils.notEqual(authorReference, getAuthorReference())) {
+            setMetaDataDirty(true);
+        }
+
+        this.authorReference = authorReference;
+
+        // Log this since it's probably a mistake so that we find who is doing bad things
+        if (this.authorReference != null && this.authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
+            LOGGER.warn("A reference to XWikiGuest user as been set instead of null. This is probably a mistake.",
+                new Exception("See stack trace"));
+        }
+    }
+
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 6.4M1 use {@link #getAuthorReference()} instead
+     */
+    @Deprecated
+    public String getAuthor()
+    {
+        return userReferenceToString(getAuthorReference());
+    }
+
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
+     * 
+     * @deprecated since 6.4M1 use {@link #setAuthorReference} instead
+     */
+    @Deprecated
     public void setAuthor(String author)
     {
-        if (ObjectUtils.notEqual(getAuthor(), author)) {
-            setMetaDataDirty(true);
-            this.author = author;
-        }
+        setAuthorReference(userStringToReference(author));
     }
 
     public String getVersion()
@@ -835,5 +899,46 @@ public class XWikiAttachment implements Cloneable
         } catch (Exception e) {
             mergeResult.getLog().error("Failed to merge attachment [{}]", this, e);
         }
+    }
+
+    /**
+     * @param userReference the user {@link DocumentReference} to convert to {@link String}
+     * @return the user as String
+     */
+    private String userReferenceToString(DocumentReference userReference)
+    {
+        String userString;
+
+        if (userReference != null) {
+            userString = getCompactWikiEntityReferenceSerializer().serialize(userReference, getReference());
+        } else {
+            userString = XWikiRightService.GUEST_USER_FULLNAME;
+        }
+
+        return userString;
+    }
+    
+    /**
+     * @param userString the user {@link String} to convert to {@link DocumentReference}
+     * @return the user as {@link DocumentReference}
+     */
+    private DocumentReference userStringToReference(String userString)
+    {
+        DocumentReference userReference;
+
+        if (StringUtils.isEmpty(userString)) {
+            userReference = null;
+        } else {
+            userReference =
+                getExplicitReferenceDocumentReferenceResolver()
+                    .resolve(getXClassEntityReferenceResolver().resolve(userString, EntityType.DOCUMENT),
+                        getReference());
+
+            if (userReference.getName().equals(XWikiRightService.GUEST_USER)) {
+                userReference = null;
+            }
+        }
+
+        return userReference;
     }
 }

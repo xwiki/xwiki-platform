@@ -378,7 +378,11 @@ require(['tree'], function($) {
 #set ($discard = $attributes.add("data-edges='$edges'"))
 #set ($checkboxes = $xcontext.macro.params.checkboxes == 'true')
 #set ($discard = $attributes.add("data-checkboxes='$checkboxes'"))
-#set ($output = "(% $stringtool.join($attributes, ' ') %)((($!xcontext.macro.content)))")
+#set ($content = $xcontext.macro.content)
+#if ("$!content" == '' &amp;&amp; $xcontext.action == 'edit')
+  #set ($content = "$services.icon.render('chart_organisation') This tree can't be displayed in edit mode.")
+#end
+#set ($output = "(% $stringtool.join($attributes, ' ') %)((($!content)))")
 ## Parse the output and return the resulting XDOM blocks.
 #set ($xcontext.macro.result = $services.rendering.parse($output, $xwiki.currentContentSyntaxId).children)
 {{/velocity}}</code>

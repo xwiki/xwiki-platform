@@ -3906,7 +3906,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                     return false;
                 }
             } catch (XWikiException e) {
-                throw new RuntimeException(String.format("Failed to compare attachments with reference [%0]",
+                throw new RuntimeException(String.format("Failed to compare attachments with reference [%s]",
                     attachment.getReference()), e);
             }
         }

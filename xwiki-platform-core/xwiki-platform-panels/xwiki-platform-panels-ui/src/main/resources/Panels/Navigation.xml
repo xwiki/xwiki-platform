@@ -124,7 +124,9 @@
     <property>
       <content>{{velocity}}
 #panelheader($services.localization.render('xe.panels.navigation'))
-{{documentTree showSpaces="true" showTranslations="false" showAttachments="false" showChildDocuments="false" compact="true" /}}
+#set ($currentSpaceId = $services.model.serialize($doc.documentReference.parent, 'default'))
+{{documentTree showSpaces="true" showTranslations="false" showAttachments="false"
+  showChildDocuments="false" compact="true" openTo="space:$currentSpaceId" /}}
 #panelfooter()
 {{/velocity}}</content>
     </property>

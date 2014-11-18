@@ -97,7 +97,7 @@ public class EnvironmentSkin extends AbstractSkin
     }
 
     @Override
-    public Resource<?> getSkinResource(String resourceName)
+    public Resource<?> getLocalResource(String resourceName)
     {
         String resourcePath = getResourcePath(resourceName, false);
 

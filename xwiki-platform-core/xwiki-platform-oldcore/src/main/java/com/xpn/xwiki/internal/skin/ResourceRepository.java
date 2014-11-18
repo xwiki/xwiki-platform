@@ -30,4 +30,6 @@ public interface ResourceRepository
     String getId();
 
     Resource<?> getResource(String resourceName);
+
+    Resource<?> getLocalResource(String resourceName);
 }

@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.internal.skin;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @version $Id$
  * @since 6.4M1
@@ -31,7 +34,7 @@ public abstract class AbstractSkin implements Skin
 
     protected String id;
 
-    protected Skin parent;
+    protected ResourceRepository parent;
 
     public AbstractSkin(String id, SkinManager skinManager, SkinConfiguration configuration)
     {
@@ -47,20 +50,7 @@ public abstract class AbstractSkin implements Skin
     }
 
     @Override
-    public Skin getParent()
-    {
-        // From the context
-        Skin skin = this.skinManager.getContextBaseSkin();
-
-        // From the skin itself
-        if (skin == null) {
-            skin = getParentFromSkin();
-        }
-
-        return skin;
-    }
-
-    private Skin getParentFromSkin()
+    public ResourceRepository getParent()
     {
         if (this.parent == null) {
             this.parent = createParent();
@@ -80,9 +70,20 @@ public abstract class AbstractSkin implements Skin
     @Override
     public Resource<?> getResource(String resourceName)
     {
-        Resource<?> resource = getSkinResource(resourceName);
+        Resource<?> resource = getLocalResource(resourceName);
 
-        return resource != null ? resource : getParent().getResource(resourceName);
+        if (resource == null) {
+            // Make sure to not try several times the same skin
+            Set<String> skins = new HashSet<String>();
+            skins.add(getId());
+            for (ResourceRepository parent = getParent(); parent != null && resource == null
+                && !skins.contains(parent.getId()); parent = parent.getParent()) {
+                resource = parent.getLocalResource(resourceName);
+                skins.add(parent.getId());
+            }
+        }
+
+        return resource;
     }
 
     protected abstract Skin createParent();

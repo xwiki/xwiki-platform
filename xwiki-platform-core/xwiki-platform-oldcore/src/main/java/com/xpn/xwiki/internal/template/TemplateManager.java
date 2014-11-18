@@ -707,7 +707,7 @@ public class TemplateManager
 
     public Template getSkinTemplate(String templateName, Skin skin)
     {
-        Resource<?> resource = skin.getSkinResource(templateName);
+        Resource<?> resource = skin.getLocalResource(templateName);
         if (resource != null) {
             return createTemplate(resource);
         }

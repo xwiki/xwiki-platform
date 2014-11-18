@@ -40,7 +40,7 @@ public class WikiSkin extends AbstractSkin
     }
 
     @Override
-    public Resource<?> getSkinResource(String resourceName)
+    public Resource<?> getLocalResource(String resourceName)
     {
         return this.utils.getResource(resourceName, this);
     }

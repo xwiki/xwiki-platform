@@ -34,7 +34,7 @@ public interface Skin extends ResourceRepository
         }
 
         @Override
-        public Resource<?> getSkinResource(String resource)
+        public Resource<?> getLocalResource(String resource)
         {
             return null;
         }
@@ -51,6 +51,4 @@ public interface Skin extends ResourceRepository
             return null;
         }
     };
-
-    Resource<?> getSkinResource(String resourceName);
 }

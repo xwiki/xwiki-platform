@@ -24,6 +24,7 @@ org.xwiki.rest.internal.resources.comments.CommentsVersionResourceImpl
 org.xwiki.rest.internal.resources.comments.CommentVersionResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentHistoryResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentResourceImpl
+org.xwiki.rest.internal.resources.attachments.AttachmentAtPageVersionResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentsAtPageVersionResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentsResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentVersionResourceImpl

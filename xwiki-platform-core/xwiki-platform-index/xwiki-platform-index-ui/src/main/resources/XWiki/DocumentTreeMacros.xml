@@ -51,7 +51,8 @@
   'showObjects': false,
   'showClassProperties': false,
   'showChildDocuments': true,
-  'showOnlyViewable': true
+  'showOnlyViewable': true,
+  'filterByClass': ''
 })
 
 #macro (updateDocTreeConfigFromRequest)
@@ -193,8 +194,35 @@
   #end
 #end
 
+#macro (getDocumentsQuery $constraints $parameters $return)
+  #set ($fromClause = '')
+  #set ($finalConstraints = [])
+  #set ($finalParameters = {})
+  #if ("$!docTreeConfig.filterByClass" != '')
+    #set ($fromClause = ', BaseObject as obj')
+    #set ($discard = $finalConstraints.addAll([
+      'obj.name = doc.fullName',
+      'obj.className = :class',
+      'doc.fullName &lt;&gt; :template'
+    ]))
+    #set ($discard = $finalParameters.putAll({
+      'class': $docTreeConfig.filterByClass,
+      'template': "$stringtool.removeEnd($docTreeConfig.filterByClass, 'Class')Template"
+    }))
+  #end
+  #set ($discard = $finalConstraints.addAll($constraints))
+  #set ($discard = $finalParameters.putAll($parameters))
+  #set ($docsQuery = $services.query.hql("$fromClause where $stringtool.join($finalConstraints, ' and ') order by doc.name"))
+  #foreach ($entry in $finalParameters.entrySet())
+    #set ($docsQuery = $docsQuery.bindValue($entry.key, $entry.value))
+  #end
+  #set ($discard = $docsQuery.addFilter('hidden'))
+  #set ($return = $NULL)
+  #setVariable("$return" $docsQuery)
+#end
+
 #macro (addWikiDocumentChildren $wikiReference $offset $limit $children)
-  #set ($query = $services.query.hql("where doc.parent = '' and doc.translation = 0"))
+  #getDocumentsQuery(["doc.parent = ''", 'doc.translation = 0'] {} $query)
   #addDocumentNodesFromQuery($query $offset $limit $wikiReference $children)
 #end
 
@@ -231,25 +259,22 @@
     'doc.space = :space',
     'doc.translation = 0'
   ])
+  #set ($spaceReference = $services.model.resolveSpace($spaceId))
+  #set ($parameters = {'space': $spaceReference.name})
   #if ($docTreeConfig.showChildDocuments)
     ## Include only documents that either don't have a parent or that have a parent in a different space.
     #set ($discard = $constraints.add("(doc.parent = '' or (doc.parent like '%.%' and doc.parent not like :absoluteRef and doc.parent not like :localRef))"))
-  #end
-  #set ($query = $services.query.hql("where $stringtool.join($constraints, ' and ') order by doc.name"))
-  #set ($spaceReference = $services.model.resolveSpace($spaceId))
-  #set ($query = $query.bindValue('space', $spaceReference.name))
-  #if ($docTreeConfig.showChildDocuments)
     #set ($absoluteRef = $services.model.resolveDocument('%', 'explicit', $spaceReference))
-    #set ($query = $query.bindValue('absoluteRef', "$absoluteRef"))
-    #set ($localRef = $services.model.serialize($absoluteRef, 'compactwiki', $absoluteRef.wikiReference))
-    #set ($query = $query.bindValue('localRef', $localRef))
+    #set ($parameters.absoluteRef = "$absoluteRef")
+    #set ($parameters.localRef = $services.model.serialize($absoluteRef, 'compactwiki', $absoluteRef.wikiReference))
   #end
+  #getDocumentsQuery($constraints $parameters $query)
   #addDocumentNodesFromQuery($query $offset $limit $spaceReference $children)
 #end
 
 #macro (addDocumentNodesFromQuery $_query $offset $limit $parentReference $children)
   #set ($wikiReference = $parentReference.extractReference('WIKI'))
-  #set ($_query = $_query.setWiki($wikiReference.name).addFilter('hidden'))
+  #set ($_query = $_query.setWiki($wikiReference.name))
   #set ($results = $_query.setOffset($offset).setLimit($limit).execute())
   #foreach ($docFullName in $results)
     #set ($documentReference = $services.model.resolveDocument($docFullName, 'explicit', $parentReference))
@@ -318,28 +343,26 @@
 #macro (getChildDocumentsQuery $parentReference $return)
   #set ($constraints = [
     'doc.translation = 0',
-    'doc.parent in (:absoluteRef, :localRef, :relativeRef)'
+    '(doc.parent in (:absoluteRef, :localRef) or (doc.space = :space and doc.parent = :relativeRef))'
   ])
   #set ($parameters = {
+    'space': $parentReference.lastSpaceReference.name,
     'absoluteRef': "$parentReference",
     'localRef': $services.model.serialize($parentReference, 'compactwiki', $parentReference.wikiReference),
     'relativeRef': $services.model.serialize($parentReference, 'compact', $parentReference.parent)
   })
   #if ($docTreeConfig.showSpaces)
     #set ($discard = $constraints.add(0, 'doc.space = :space'))
-    #set ($parameters.space = $parentReference.lastSpaceReference.name)
+    #set ($discard = $constraints.set(2, 'doc.parent in (:absoluteRef, :localRef, :relativeRef)'))
   #end
-  #set ($query = $services.query.hql("where $stringtool.join($constraints, ' and ')"))
-  #foreach ($entry in $parameters.entrySet())
-    #set ($query = $query.bindValue($entry.key, $entry.value))
-  #end
+  #getDocumentsQuery($constraints $parameters $query)
   #set ($return = $NULL)
   #setVariable("$return" $query)
 #end
 
 #macro (getChildDocumentsCount $parentReference $return)
   #getChildDocumentsQuery($parentReference $countQuery)
-  #set ($count = $countQuery.setWiki($parentReference.wikiReference.name).addFilter('hidden').count())
+  #set ($count = $countQuery.setWiki($parentReference.wikiReference.name).count())
   #set ($return = $NULL)
   #setVariable("$return" $count)
 #end

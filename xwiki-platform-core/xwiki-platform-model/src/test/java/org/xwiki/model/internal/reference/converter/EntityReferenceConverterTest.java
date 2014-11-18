@@ -19,7 +19,6 @@
  */
 package org.xwiki.model.internal.reference.converter;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,6 +29,8 @@ import org.xwiki.properties.converter.Converter;
 import org.xwiki.properties.internal.converter.ColorConverter;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.*;
 
 /**
  * Validate {@link ColorConverter} component.
@@ -59,16 +60,15 @@ public class EntityReferenceConverterTest
         reference =
             new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE,
                 new EntityReference("wiki", EntityType.WIKI)));
-        Assert
-            .assertEquals(reference, this.converterManager.convert(EntityReference.class, "document:wiki:space.page"));
+        assertEquals(reference, this.converterManager.convert(EntityReference.class, "document:wiki:space.page"));
 
         reference = new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE));
-        Assert.assertEquals(reference, this.converterManager.convert(EntityReference.class, "document:space.page"));
-        Assert.assertEquals(reference, this.converterManager.convert(EntityReference.class, "space.page"));
+        assertEquals(reference, this.converterManager.convert(EntityReference.class, "document:space.page"));
+        assertEquals(reference, this.converterManager.convert(EntityReference.class, "space.page"));
 
         reference = new EntityReference("page", EntityType.DOCUMENT);
-        Assert.assertEquals(reference, this.converterManager.convert(EntityReference.class, "document:page"));
-        Assert.assertEquals(reference, this.converterManager.convert(EntityReference.class, "page"));
+        assertEquals(reference, this.converterManager.convert(EntityReference.class, "document:page"));
+        assertEquals(reference, this.converterManager.convert(EntityReference.class, "page"));
     }
 
     @Test
@@ -77,16 +77,23 @@ public class EntityReferenceConverterTest
         EntityReference reference;
 
         reference = new EntityReference("space", EntityType.SPACE, new EntityReference("wiki", EntityType.WIKI));
-        Assert.assertEquals(reference, this.converterManager.convert(EntityReference.class, "space:wiki:space"));
+        assertEquals(reference, this.converterManager.convert(EntityReference.class, "space:wiki:space"));
 
         reference = new EntityReference("space", EntityType.SPACE);
-        Assert.assertEquals(reference, this.converterManager.convert(EntityReference.class, "space:space"));
+        assertEquals(reference, this.converterManager.convert(EntityReference.class, "space:space"));
+    }
+
+    @Test
+    public void testConvertWikiFromString()
+    {
+        EntityReference reference = new EntityReference("dev", EntityType.WIKI);
+        assertEquals(reference, this.converterManager.convert(EntityReference.class, "wiki:dev"));
     }
 
     @Test
     public void testConvertFromNull()
     {
-        Assert.assertNull(this.converterManager.convert(EntityReference.class, null));
+        assertNull(this.converterManager.convert(EntityReference.class, null));
     }
 
     @Test
@@ -97,6 +104,6 @@ public class EntityReferenceConverterTest
         reference =
             new EntityReference("page", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE,
                 new EntityReference("wiki", EntityType.WIKI)));
-        Assert.assertEquals("document:wiki:space.page", this.converterManager.convert(String.class, reference));
+        assertEquals("document:wiki:space.page", this.converterManager.convert(String.class, reference));
     }
 }

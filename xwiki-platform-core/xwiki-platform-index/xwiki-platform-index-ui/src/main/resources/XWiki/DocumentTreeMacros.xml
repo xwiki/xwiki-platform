@@ -50,7 +50,8 @@
   'showAttachments': true,
   'showObjects': false,
   'showClassProperties': false,
-  'showChildDocuments': true
+  'showChildDocuments': true,
+  'showOnlyViewable': true
 })
 
 #macro (updateDocTreeConfigFromRequest)
@@ -120,7 +121,9 @@
 
 #macro (addFarmChildren $nodeId $offset $limit $children)
   #foreach ($wiki in $services.wiki.all)
-    #addWikiNode($wiki $children)
+    #if (!$docTreeConfig.showOnlyViewable || $services.security.authorization.hasAccess('view', $wiki.reference))
+      #addWikiNode($wiki $children)
+    #end
   #end
 #end
 
@@ -178,7 +181,9 @@
   #end
   #foreach ($space in $spaces)
     #set ($spaceReference = $services.model.createSpaceReference($space, $wikiReference))
-    #addSpaceNode($spaceReference $children)
+    #if (!$docTreeConfig.showOnlyViewable || $services.security.authorization.hasAccess('view', $spaceReference))
+      #addSpaceNode($spaceReference $children)
+    #end
   #end
   #if ($spaces.size() &gt;= $limit)
     #set ($newOffset = $mathtool.add($offset, $spaces.size()))
@@ -248,7 +253,9 @@
   #set ($results = $_query.setOffset($offset).setLimit($limit).execute())
   #foreach ($docFullName in $results)
     #set ($documentReference = $services.model.resolveDocument($docFullName, 'explicit', $parentReference))
-    #addDocumentNode($documentReference $children)
+    #if (!$docTreeConfig.showOnlyViewable || $services.security.authorization.hasAccess('view', $documentReference))
+      #addDocumentNode($documentReference $children)
+    #end
   #end
   #if ($results.size() &gt;= $limit)
     ## There may be more documents in this space.

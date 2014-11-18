@@ -197,7 +197,8 @@
   'showAttachments': true,
   'showObjects': false,
   'showClassProperties': false,
-  'showChildDocuments': true
+  'showChildDocuments': true,
+  'showOnlyViewable': true
 })
 #set ($resourceParams = {'outputSyntax': 'plain'})
 #foreach ($entry in $docTreeConfig.entrySet())
@@ -1228,6 +1229,72 @@
     </property>
     <property>
       <name>openTo</name>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.DocumentTree</name>
+    <number>15</number>
+    <className>XWiki.WikiMacroParameterClass</className>
+    <guid>57c05fc4-6df3-4cc8-ab8f-ec523341ce0d</guid>
+    <class>
+      <name>XWiki.WikiMacroParameterClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <defaultValue>
+        <disabled>0</disabled>
+        <name>defaultValue</name>
+        <number>4</number>
+        <prettyName>Parameter default value</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </defaultValue>
+      <description>
+        <disabled>0</disabled>
+        <name>description</name>
+        <number>2</number>
+        <prettyName>Parameter description</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </description>
+      <mandatory>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>mandatory</name>
+        <number>3</number>
+        <prettyName>Parameter mandatory</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </mandatory>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Parameter name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+    </class>
+    <property>
+      <defaultValue>true</defaultValue>
+    </property>
+    <property>
+      <description>Show only the wiki, space and document nodes for which the current user has view right. If this is set to false then the wiki, space and document nodes that are not viewable by the current user are listed in the tree using their names. The user won't be able to see their content by following their links though (the user will just be aware of their existence).</description>
+    </property>
+    <property>
+      <mandatory>0</mandatory>
+    </property>
+    <property>
+      <name>showOnlyViewable</name>
     </property>
   </object>
 </xwikidoc>

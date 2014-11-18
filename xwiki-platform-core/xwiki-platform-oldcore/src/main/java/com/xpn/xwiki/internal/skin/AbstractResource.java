@@ -19,29 +19,42 @@
  */
 package com.xpn.xwiki.internal.skin;
 
+import org.xwiki.filter.input.InputSource;
+
 /**
  * @version $Id$
  * @since 6.4M1
  */
-public class WikiSkin extends AbstractSkin
+public abstract class AbstractResource<I extends InputSource> implements Resource<I>
 {
-    private WikiSkinUtils utils;
+    protected ResourceRepository repository;
 
-    public WikiSkin(String id, SkinManager skinManager, SkinConfiguration configuration, WikiSkinUtils utils)
+    protected String id;
+
+    protected String path;
+
+    public AbstractResource(String id, String path, ResourceRepository repository)
     {
-        super(id, skinManager, configuration);
-        this.utils = utils;
+        this.id = id;
+        this.path = path;
+        this.repository = repository;
     }
 
     @Override
-    protected Skin createParent()
+    public ResourceRepository getRepository()
     {
-        return this.skinManager.getSkin(this.utils.getParentId(this.id));
+        return this.repository;
     }
 
     @Override
-    public Resource<?> getSkinResource(String resourceName)
+    public String getId()
     {
-        return this.utils.getResource(resourceName, this);
+        return this.id;
+    }
+
+    @Override
+    public String getPath()
+    {
+        return this.path;
     }
 }

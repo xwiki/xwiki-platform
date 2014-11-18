@@ -19,15 +19,38 @@
  */
 package com.xpn.xwiki.internal.skin;
 
-import org.xwiki.filter.input.InputSource;
-
-public interface Skin
+/**
+ * @version $Id$
+ * @since 6.4M1
+ */
+public interface Skin extends ResourceRepository
 {
-    Skin getParent();
+    Skin VOID = new Skin()
+    {
+        @Override
+        public Resource<?> getResource(String resource)
+        {
+            return null;
+        }
 
-    String getId();
+        @Override
+        public Resource<?> getSkinResource(String resource)
+        {
+            return null;
+        }
 
-    InputSource getResourceInputSource(String resource);
+        @Override
+        public ResourceRepository getParent()
+        {
+            return null;
+        }
 
-    InputSource getSkinResourceInputSource(String resource);
+        @Override
+        public String getId()
+        {
+            return null;
+        }
+    };
+
+    Resource<?> getSkinResource(String resourceName);
 }

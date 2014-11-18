@@ -28,6 +28,8 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
@@ -71,6 +73,8 @@ public class TemplateManagerTest
 
         when(this.velocityManagerMock.getVelocityContext()).thenReturn(new VelocityContext());
         when(this.velocityManagerMock.getVelocityEngine()).thenReturn(this.velocityEngineMock);
+
+        this.mocker.registerMemoryConfigurationSource();
     }
 
     @AfterComponent
@@ -82,10 +86,11 @@ public class TemplateManagerTest
         this.mocker.registerMockComponent(TransformationManager.class);
     }
 
-    private void setTemplateContent(String content) throws UnsupportedEncodingException
+    private void setTemplateContent(String content) throws UnsupportedEncodingException, MalformedURLException
     {
         when(this.environmentmMock.getResourceAsStream("/templates/template")).thenReturn(
             new ByteArrayInputStream(content.getBytes("UTF8")));
+        when(this.environmentmMock.getResource("/templates/template")).thenReturn(new URL("http://url"));
     }
 
     // Tests

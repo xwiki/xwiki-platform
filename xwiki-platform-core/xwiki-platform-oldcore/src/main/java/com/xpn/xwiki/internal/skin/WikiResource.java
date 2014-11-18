@@ -19,29 +19,14 @@
  */
 package com.xpn.xwiki.internal.skin;
 
+import org.xwiki.filter.input.InputSource;
+import org.xwiki.model.reference.DocumentReference;
+
 /**
  * @version $Id$
  * @since 6.4M1
  */
-public class WikiSkin extends AbstractSkin
+public interface WikiResource<I extends InputSource> extends Resource<I>
 {
-    private WikiSkinUtils utils;
-
-    public WikiSkin(String id, SkinManager skinManager, SkinConfiguration configuration, WikiSkinUtils utils)
-    {
-        super(id, skinManager, configuration);
-        this.utils = utils;
-    }
-
-    @Override
-    protected Skin createParent()
-    {
-        return this.skinManager.getSkin(this.utils.getParentId(this.id));
-    }
-
-    @Override
-    public Resource<?> getSkinResource(String resourceName)
-    {
-        return this.utils.getResource(resourceName, this);
-    }
+    DocumentReference getAuthorReference();
 }

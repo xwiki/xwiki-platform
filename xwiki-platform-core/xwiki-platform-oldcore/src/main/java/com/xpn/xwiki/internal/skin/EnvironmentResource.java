@@ -19,29 +19,35 @@
  */
 package com.xpn.xwiki.internal.skin;
 
+import java.io.InputStream;
+
+import org.xwiki.environment.Environment;
+import org.xwiki.filter.input.DefaultInputStreamInputSource;
+import org.xwiki.filter.input.InputSource;
+
 /**
  * @version $Id$
  * @since 6.4M1
  */
-public class WikiSkin extends AbstractSkin
+public class EnvironmentResource extends AbstractResource<InputSource>
 {
-    private WikiSkinUtils utils;
+    private Environment environment;
 
-    public WikiSkin(String id, SkinManager skinManager, SkinConfiguration configuration, WikiSkinUtils utils)
+    public EnvironmentResource(String path, ResourceRepository repository, Environment environment)
     {
-        super(id, skinManager, configuration);
-        this.utils = utils;
+        super(path, path, repository);
+
+        this.environment = environment;
     }
 
     @Override
-    protected Skin createParent()
+    public InputSource getInputSource()
     {
-        return this.skinManager.getSkin(this.utils.getParentId(this.id));
-    }
+        InputStream inputStream = environment.getResourceAsStream(getPath());
+        if (inputStream != null) {
+            return new DefaultInputStreamInputSource(inputStream, true);
+        }
 
-    @Override
-    public Resource<?> getSkinResource(String resourceName)
-    {
-        return this.utils.getResource(resourceName, this);
+        return null;
     }
 }

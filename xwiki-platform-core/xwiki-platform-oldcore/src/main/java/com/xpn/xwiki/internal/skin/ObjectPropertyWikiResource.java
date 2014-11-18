@@ -19,29 +19,34 @@
  */
 package com.xpn.xwiki.internal.skin;
 
+import javax.inject.Provider;
+
+import org.xwiki.filter.input.StringInputSource;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.ObjectPropertyReference;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+
 /**
  * @version $Id$
  * @since 6.4M1
  */
-public class WikiSkin extends AbstractSkin
+public class ObjectPropertyWikiResource extends AbstractWikiResource<ObjectPropertyReference, StringInputSource>
 {
-    private WikiSkinUtils utils;
+    private final String content;
 
-    public WikiSkin(String id, SkinManager skinManager, SkinConfiguration configuration, WikiSkinUtils utils)
+    public ObjectPropertyWikiResource(String path, ResourceRepository repository, ObjectPropertyReference reference,
+        DocumentReference authorReference, Provider<XWikiContext> xcontextProvider, String content)
     {
-        super(id, skinManager, configuration);
-        this.utils = utils;
+        super(path, path, repository, reference, authorReference, xcontextProvider);
+
+        this.content = content;
     }
 
     @Override
-    protected Skin createParent()
+    protected StringInputSource getInputSourceInternal(XWikiDocument document)
     {
-        return this.skinManager.getSkin(this.utils.getParentId(this.id));
-    }
-
-    @Override
-    public Resource<?> getSkinResource(String resourceName)
-    {
-        return this.utils.getResource(resourceName, this);
+        return new StringInputSource(content);
     }
 }

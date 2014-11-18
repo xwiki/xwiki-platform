@@ -137,6 +137,10 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
     </dependency>
+    <dependency>
+      <groupId>commons-configuration</groupId>
+      <artifactId>commons-configuration</artifactId>
+    </dependency>
 
     <!-- For extracting metadata from various document types -->
     <dependency>
@@ -729,6 +733,7 @@
               **/internal/model/reference/CurrentStringEntityReferenceResolver.java,
               **/internal/observation/remote/converter/AbstractXWikiEventConverter.java,
               **/internal/observation/remote/converter/ActionExecutionEventConverter.java,
+              **/internal/skin/*.java,
               **/internal/template/Template.java,
               **/internal/template/TemplateContent.java,
               **/internal/template/TemplateScriptService.java,

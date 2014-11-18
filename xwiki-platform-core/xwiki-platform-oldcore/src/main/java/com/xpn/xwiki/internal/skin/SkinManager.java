@@ -19,62 +19,123 @@
  */
 package com.xpn.xwiki.internal.skin;
 
-import java.io.InputStream;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.LRUCacheConfiguration;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.filter.input.DefaultInputStreamInputSource;
-import org.xwiki.filter.input.InputSource;
-import org.xwiki.filter.input.StringInputSource;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.environment.Environment;
+import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
 
+/**
+ * @version $Id$
+ * @since 6.4M1
+ */
 @Component(roles = SkinManager.class)
 @Singleton
-public class SkinManager
+public class SkinManager implements Initializable
 {
     @Inject
+    private SkinConfiguration skinConfiguration;
+
+    @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private WikiSkinUtils wikiSkinUtils;
+
+    @Inject
+    private Environment environment;
 
     @Inject
     @Named("all")
     private ConfigurationSource allConfiguration;
 
     @Inject
-    @Named("xwikicfg")
-    private ConfigurationSource xwikicfg;
+    private ObservationManager observation;
 
     @Inject
-    @Named("currentmixed")
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
+    private CacheManager cacheManager;
 
-    @Inject
-    private Logger logger;
+    private Cache<Skin> cache;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        // Initialize cache
+        try {
+            this.cache = this.cacheManager.createNewCache(new LRUCacheConfiguration("skins", 100, 86400));
+        } catch (CacheException e) {
+            throw new InitializationException("Failed to initialize cache", e);
+        }
+
+        // Initialize listener
+        this.observation.addListener(new AbstractEventListener("skins", new DocumentUpdatedEvent(),
+            new DocumentDeletedEvent(), new DocumentCreatedEvent())
+        {
+            @Override
+            public void onEvent(Event event, Object source, Object data)
+            {
+                XWikiDocument document = (XWikiDocument) source;
+
+                if (document.getXObject(WikiSkinUtils.SKINCLASS_REFERENCE) != null
+                    || document.getOriginalDocument().getXObject(WikiSkinUtils.SKINCLASS_REFERENCE) != null) {
+                    // TODO: lower the granularity
+                    cache.removeAll();
+                }
+
+            }
+        });
+    }
 
     public Skin getSkin(String id)
     {
+        if (StringUtils.isBlank(id)) {
+            return null;
+        }
 
+        Skin skin = this.cache.get(id);
+
+        if (skin == null) {
+            skin = createSkin(id);
+        }
+
+        return skin;
+    }
+
+    private Skin createSkin(String id)
+    {
+        Skin skin;
+
+        if (this.wikiSkinUtils.isWikiSkin(id)) {
+            skin = new WikiSkin(id, this, this.skinConfiguration, this.wikiSkinUtils);
+        } else {
+            skin = new EnvironmentSkin(id, this, this.skinConfiguration, this.environment);
+        }
+
+        return skin;
     }
 
     public Skin getCurrentSkin()
     {
-
+        return getSkin(getCurrentSkinId());
     }
 
     public String getCurrentSkinId()
@@ -110,62 +171,46 @@ public class SkinManager
         }
 
         // Try to get it from xwiki.cfg
-        skin = this.xwikicfg.getProperty("xwiki.defaultskin", XWiki.DEFAULT_SKIN);
-
-        return StringUtils.isNotEmpty(skin) ? skin : null;
+        return this.skinConfiguration.getDefaultSkin();
     }
 
-    // TODO: put that in some SkinContext component
-    private String getBaseSkin()
+    public Skin getCurrentBaseSkin()
     {
-        String baseskin;
+        // From the context
+        Skin baseSkin = getContextBaseSkin();
+
+        // From the skin
+        if (baseSkin == null) {
+            Skin skin = getCurrentSkin();
+            if (skin != null) {
+                if (skin.getParent() instanceof Skin) {
+                    baseSkin = (Skin) skin.getParent();
+                }
+            }
+        }
+
+        // From the configuration
+        if (baseSkin == null) {
+            baseSkin = getSkin(this.skinConfiguration.getDefaultBaseSkinId());
+        }
+
+        return baseSkin;
+    }
+
+    Skin getContextBaseSkin()
+    {
+        String parentId = null;
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
         if (xcontext != null) {
             // Try to get it from context
-            baseskin = (String) xcontext.get("baseskin");
-            if (StringUtils.isNotEmpty(baseskin)) {
-                return baseskin;
-            } else {
-                baseskin = null;
-            }
-
-            // Try to get it from the skin
-            String skin = getCurrentSkinId();
-            if (skin != null) {
-                BaseObject skinObject = getSkinObject(skin);
-                if (skinObject != null) {
-                    baseskin = skinObject.getStringValue("baseskin");
-                    if (StringUtils.isNotEmpty(baseskin)) {
-                        return baseskin;
-                    }
-                }
+            parentId = (String) xcontext.get("baseskin");
+            if (StringUtils.isEmpty(parentId)) {
+                parentId = null;
             }
         }
 
-        // Try to get it from xwiki.cfg
-        baseskin = this.xwikicfg.getProperty("xwiki.defaultbaseskin");
-
-        return StringUtils.isNotEmpty(baseskin) ? baseskin : null;
+        return getSkin(parentId);
     }
-
-    private InputSource getTemplateContentFromSkin(String template, String skin)
-    {
-        InputSource source;
-
-        // Try from wiki pages
-        // FIXME: macros.vm from document based skins is not supported by default VelocityManager yet
-        XWikiDocument skinDocument = template.equals("macros.vm") ? null : getSkinDocument(skin);
-        if (skinDocument != null) {
-            source = getTemplateContentFromDocumentSkin(template, skinDocument);
-        } else {
-            // If not a wiki based skin try from filesystem skins
-            source = getResourceAsStringContent("/skins/" + skin + '/', template);
-        }
-
-        return source;
-    }
-
-
 }

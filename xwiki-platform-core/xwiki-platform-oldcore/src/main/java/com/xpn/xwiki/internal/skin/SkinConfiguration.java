@@ -19,29 +19,39 @@
  */
 package com.xpn.xwiki.internal.skin;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
+
+import com.xpn.xwiki.XWiki;
+
 /**
  * @version $Id$
  * @since 6.4M1
  */
-public class WikiSkin extends AbstractSkin
+@Component(roles = SkinConfiguration.class)
+@Singleton
+public class SkinConfiguration
 {
-    private WikiSkinUtils utils;
+    @Inject
+    @Named("xwikicfg")
+    private ConfigurationSource xwikicfg;
 
-    public WikiSkin(String id, SkinManager skinManager, SkinConfiguration configuration, WikiSkinUtils utils)
+    public String getDefaultBaseSkinId()
     {
-        super(id, skinManager, configuration);
-        this.utils = utils;
+        String baseskin = this.xwikicfg.getProperty("xwiki.defaultbaseskin");
+
+        return StringUtils.isNotEmpty(baseskin) ? baseskin : null;
     }
-
-    @Override
-    protected Skin createParent()
+    
+    public String getDefaultSkin()
     {
-        return this.skinManager.getSkin(this.utils.getParentId(this.id));
-    }
+        String skin = this.xwikicfg.getProperty("xwiki.defaultskin", XWiki.DEFAULT_SKIN);
 
-    @Override
-    public Resource<?> getSkinResource(String resourceName)
-    {
-        return this.utils.getResource(resourceName, this);
+        return StringUtils.isNotEmpty(skin) ? skin : null;
     }
 }

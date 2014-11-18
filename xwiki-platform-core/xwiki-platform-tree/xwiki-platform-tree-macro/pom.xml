@@ -75,6 +75,12 @@
       <artifactId>xwiki-platform-rendering-xwiki</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- The icon script service is used to add a tree icon before the message displayed in edit mode. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <!-- Needed to add support for the XAR packaging -->

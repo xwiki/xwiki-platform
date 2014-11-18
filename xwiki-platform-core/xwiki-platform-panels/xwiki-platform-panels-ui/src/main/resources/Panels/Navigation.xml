@@ -124,7 +124,8 @@
     <property>
       <content>{{velocity}}
 #panelheader($services.localization.render('xe.panels.navigation'))
-{{documentTree showSpaces="true" showTranslations="false" showAttachments="false" showChildDocuments="false" compact="true" /}}
+{{documentTree showSpaces="true" showTranslations="false" showAttachments="false"
+  showChildDocuments="false" compact="true" openTo="document:$doc.documentReference" /}}
 #panelfooter()
 {{/velocity}}</content>
     </property>

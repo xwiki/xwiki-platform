@@ -252,15 +252,21 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
   var getPath = function(nodeId, callback) {
     // 'this' is the tree instance.
     callback = $.proxy(callback, this);
-    var url = this.element.attr('data-url');
-    if (url) {
-      $.get(url, {data: 'path', 'id': nodeId})
-        .done(callback)
-        .fail(function() {
-          callback([]);
-        });
+    if (this.get_node(nodeId)) {
+      // The specified node is already loaded in the tree.
+      callback(this.get_path(nodeId, false, true));
     } else {
-      callback([]);
+      // We need to retrieve the node path from the server.
+      var url = this.element.attr('data-url');
+      if (url) {
+        $.get(url, {data: 'path', 'id': nodeId})
+          .done(callback)
+          .fail(function() {
+            callback([]);
+          });
+      } else {
+        callback([]);
+      }
     }
   };
 
@@ -319,15 +325,10 @@ define(['jquery', 'JobRunner', 'jsTree'], function($, JobRunner) {
 
   var customTreeAPI = {
     openTo: function(nodeId, callback) {
-      if (this.get_node(nodeId)) {
-        // The specified node is already loaded in the tree.
-        callback && callback();
-      } else {
-        // We need to load all the ancestors of the specified node.
-        getPath.call(this, nodeId, function(path) {
-          openPath.call(this, path, callback);
-        });
-      }
+      // We need to open all the ancestors of the specified node.
+      getPath.call(this, nodeId, function(path) {
+        openPath.call(this, path, callback);
+      });
     },
     refreshNode: function(node) {
       if (node === '#') {

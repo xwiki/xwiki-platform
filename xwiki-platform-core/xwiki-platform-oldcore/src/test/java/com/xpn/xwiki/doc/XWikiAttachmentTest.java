@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
 
@@ -169,5 +170,43 @@ public class XWikiAttachmentTest extends AbstractBridgedComponentTestCase
 
         Assert.assertEquals("application/octet-stream", attachment.getMimeType(null));
 
+    }
+
+    @Test
+    public void testAuthorWithDocument()
+    {
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+
+        XWikiAttachment attachment = new XWikiAttachment(document, "filename");
+
+        DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
+        attachment.setAuthorReference(userReference);
+        Assert.assertEquals(userReference, attachment.getAuthorReference());
+        Assert.assertEquals("userwiki:userspace.userpage", attachment.getAuthor());
+
+        userReference = new DocumentReference(document.getWikiName(), document.getSpaceName(), "userpage");
+        attachment.setAuthorReference(userReference);
+        Assert.assertEquals(userReference, attachment.getAuthorReference());
+        Assert.assertEquals("space.userpage", attachment.getAuthor());
+
+        attachment.setAuthor("author");
+        Assert.assertEquals("author", attachment.getAuthor());
+        Assert.assertEquals(new DocumentReference("wiki", "XWiki", "author"), attachment.getAuthorReference());
+    }
+
+    @Test
+    public void testAuthorWithoutDocument()
+    {
+        XWikiAttachment attachment = new XWikiAttachment(null, "filename");
+
+        DocumentReference userReference = new DocumentReference("userwiki", "userspace", "userpage");
+
+        attachment.setAuthorReference(userReference);
+        Assert.assertEquals(userReference, attachment.getAuthorReference());
+        Assert.assertEquals("userwiki:userspace.userpage", attachment.getAuthor());
+
+        attachment.setAuthor("author");
+        Assert.assertEquals("author", attachment.getAuthor());
+        Assert.assertEquals(new DocumentReference("xwiki", "XWiki", "author"), attachment.getAuthorReference());
     }
 }

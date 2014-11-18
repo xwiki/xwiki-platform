@@ -5256,17 +5256,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         XWikiAttachment attachment = getAttachment(filename);
         if (attachment == null) {
-            attachment = new XWikiAttachment();
-            // TODO: Review this code and understand why it's needed.
+            attachment = new XWikiAttachment(this, filename);
+
             // Add the attachment in the current doc
             getAttachmentList().add(attachment);
         }
 
         attachment.setContent(content);
-        attachment.setFilename(filename);
-        attachment.setAuthor(context.getUser());
-        // Add the attachment to the document
-        attachment.setDoc(this);
+        attachment.setAuthorReference(context.getUserReference());
 
         return attachment;
     }

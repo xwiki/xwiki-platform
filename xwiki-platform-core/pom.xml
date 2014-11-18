@@ -41,6 +41,16 @@
     <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
   </properties>
   <dependencies>
+    <!-- Adds an Annotation Processor to automatically verify components.txt files.
+         Note that we need to add this dependency because the Maven Compiler Plugin doesn't support
+         having a plugin dependency. Thus we need it as a normal dependency and in order to avoid drawing it
+         transitively we defined it as a "provided" dependency -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-component-generation</artifactId>
+      <version>${commons.version}</version>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-test-component</artifactId>

@@ -19,6 +19,8 @@
  */
 package org.xwiki.captcha.internal.velocity;
 
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.captcha.internal.DefaultXWikiCaptchaService;
 import org.xwiki.captcha.CaptchaVerifier;
@@ -31,6 +33,7 @@ import org.xwiki.captcha.CaptchaVerifierNotFoundException;
  * @since 2.2M2
  */
 @Component("velocity")
+@Singleton
 public class VelocityXWikiCaptchaService extends DefaultXWikiCaptchaService
 {
     @Override

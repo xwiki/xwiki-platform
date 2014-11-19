@@ -55,6 +55,12 @@ public class WikiSkinUtils
 
     public static final String SKINCLASS_BASESKIN = "baseskin";
 
+    /**
+     * Represents no value (ie the default value will be used) in xproperties.
+     */
+    // TODO: remove when XWIKI-10853 is fixed
+    private static final String NO_VALUE = "---";
+
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
@@ -169,7 +175,8 @@ public class WikiSkinUtils
         BaseObject skinObject = getSkinObject(id);
         if (skinObject != null) {
             String parentId = skinObject.getStringValue(SKINCLASS_BASESKIN);
-            if (StringUtils.isNotBlank(parentId)) {
+            // TODO: remove the NO_VALUE test when XWIKI-10853 is fixed
+            if (StringUtils.isNotBlank(parentId) && !NO_VALUE.equals(parentId)) {
                 return parentId;
             }
         }

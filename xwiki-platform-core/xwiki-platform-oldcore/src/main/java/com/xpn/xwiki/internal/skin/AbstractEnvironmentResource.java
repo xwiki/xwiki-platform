@@ -19,8 +19,12 @@
  */
 package com.xpn.xwiki.internal.skin;
 
+import java.io.InputStream;
+
 import javax.inject.Provider;
 
+import org.xwiki.environment.Environment;
+import org.xwiki.filter.input.DefaultInputStreamInputSource;
 import org.xwiki.filter.input.InputSource;
 
 import com.xpn.xwiki.XWikiContext;
@@ -29,44 +33,26 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 6.4M1
  */
-public abstract class AbstractResource<I extends InputSource> implements Resource<I>
+public abstract class AbstractEnvironmentResource extends AbstractResource<InputSource>
 {
-    protected final Provider<XWikiContext> xcontextProvider;
+    protected Environment environment;
 
-    protected ResourceRepository repository;
-
-    protected String id;
-
-    protected String path;
-
-    protected String resourceName;
-
-    public AbstractResource(String id, String path, String resourceName, ResourceRepository repository,
-        Provider<XWikiContext> xcontextProvider)
+    public AbstractEnvironmentResource(String path, String resourceName, ResourceRepository repository,
+        Environment environment, Provider<XWikiContext> xcontextProvider)
     {
-        this.id = id;
-        this.path = path;
-        this.resourceName = resourceName;
-        this.repository = repository;
+        super(path, path, resourceName, repository, xcontextProvider);
 
-        this.xcontextProvider = xcontextProvider;
+        this.environment = environment;
     }
 
     @Override
-    public ResourceRepository getRepository()
+    public InputSource getInputSource()
     {
-        return this.repository;
-    }
+        InputStream inputStream = environment.getResourceAsStream(getPath());
+        if (inputStream != null) {
+            return new DefaultInputStreamInputSource(inputStream, true);
+        }
 
-    @Override
-    public String getId()
-    {
-        return this.id;
-    }
-
-    @Override
-    public String getPath()
-    {
-        return this.path;
+        return null;
     }
 }

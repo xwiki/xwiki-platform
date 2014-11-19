@@ -22,6 +22,8 @@ package com.xpn.xwiki.internal.skin;
 import java.net.URI;
 import java.net.URL;
 
+import javax.inject.Provider;
+
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -30,6 +32,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.environment.Environment;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * @version $Id$
@@ -43,11 +47,15 @@ public class EnvironmentSkin extends AbstractSkin
 
     private Configuration properties;
 
-    public EnvironmentSkin(String id, SkinManager skinManager, SkinConfiguration configuration, Environment environment)
+    private Provider<XWikiContext> xcontextProvider;
+
+    public EnvironmentSkin(String id, SkinManager skinManager, SkinConfiguration configuration,
+        Environment environment, Provider<XWikiContext> xcontextProvider)
     {
         super(id, skinManager, configuration);
 
         this.environment = environment;
+        this.xcontextProvider = xcontextProvider;
     }
 
     @Override
@@ -102,10 +110,15 @@ public class EnvironmentSkin extends AbstractSkin
         String resourcePath = getResourcePath(resourceName, false);
 
         if (this.environment.getResource(resourcePath) != null) {
-            return new EnvironmentResource(resourcePath, this, this.environment);
+            return createResource(resourcePath, resourceName);
         }
 
         return null;
+    }
+
+    protected AbstractEnvironmentResource createResource(String resourcePath, String resourceName)
+    {
+        return new SkinEnvironmentResource(resourcePath, resourceName, this, this.environment, this.xcontextProvider);
     }
 
     private String getResourcePath(String resource, boolean testExist)

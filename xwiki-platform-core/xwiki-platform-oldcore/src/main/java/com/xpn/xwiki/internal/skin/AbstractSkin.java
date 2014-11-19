@@ -56,7 +56,7 @@ public abstract class AbstractSkin implements Skin
             this.parent = createParent();
 
             if (this.parent == null) {
-                this.parent = this.skinManager.getSkin(this.configuration.getDefaultBaseSkinId());
+                this.parent = this.skinManager.getSkin(this.configuration.getDefaultParentSkinId());
             }
 
             if (this.parent == null) {

@@ -27,6 +27,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -36,21 +37,17 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public abstract class AbstractWikiResource<R extends EntityReference, I extends InputSource> extends
     AbstractResource<I> implements WikiResource<I>
 {
-    protected final Provider<XWikiContext> xcontextProvider;
-
     protected final R reference;
 
     protected final DocumentReference authorReference;
 
-    public AbstractWikiResource(String id, String path, ResourceRepository repository, R reference,
-        DocumentReference authorReference, Provider<XWikiContext> xcontextProvider)
+    public AbstractWikiResource(String id, String path, String resourceName, ResourceRepository repository,
+        R reference, DocumentReference authorReference, Provider<XWikiContext> xcontextProvider)
     {
-        super(id, path, repository);
+        super(id, path, resourceName, repository, xcontextProvider);
 
         this.reference = reference;
         this.authorReference = authorReference;
-
-        this.xcontextProvider = xcontextProvider;
     }
 
     @Override
@@ -59,17 +56,28 @@ public abstract class AbstractWikiResource<R extends EntityReference, I extends 
         return this.authorReference;
     }
 
-    @Override
-    public I getInputSource() throws Exception
+    protected XWikiDocument getDocument() throws XWikiException
     {
         EntityReference documentReference = this.reference.extractReference(EntityType.DOCUMENT);
 
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        XWikiDocument document = xcontext.getWiki().getDocument(documentReference, xcontext);
+        return xcontext.getWiki().getDocument(documentReference, xcontext);
+    }
 
-        return getInputSourceInternal(document);
+    @Override
+    public I getInputSource() throws Exception
+    {
+        return getInputSourceInternal(getDocument());
     }
 
     protected abstract I getInputSourceInternal(XWikiDocument document) throws Exception;
+
+    @Override
+    public String getURL(boolean forceSkinAction) throws Exception
+    {
+        return getURL(getDocument());
+    }
+
+    public abstract String getURL(XWikiDocument document) throws Exception;
 }

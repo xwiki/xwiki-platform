@@ -27,8 +27,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 
-import com.xpn.xwiki.XWiki;
-
 /**
  * @version $Id$
  * @since 6.4M1
@@ -37,20 +35,32 @@ import com.xpn.xwiki.XWiki;
 @Singleton
 public class SkinConfiguration
 {
+    public static final String DEFAULT_SKIN = "flamingo";
+
     @Inject
     @Named("xwikicfg")
     private ConfigurationSource xwikicfg;
 
-    public String getDefaultBaseSkinId()
+    public String getDefaultParentSkinId()
     {
-        String baseskin = this.xwikicfg.getProperty("xwiki.defaultbaseskin");
+        return getDefaultParentSkinId(null);
+    }
+
+    public String getDefaultParentSkinId(String def)
+    {
+        String baseskin = this.xwikicfg.getProperty("xwiki.defaultbaseskin", def);
 
         return StringUtils.isNotEmpty(baseskin) ? baseskin : null;
     }
-    
-    public String getDefaultSkin()
+
+    public String getDefaultSkinId()
     {
-        String skin = this.xwikicfg.getProperty("xwiki.defaultskin", XWiki.DEFAULT_SKIN);
+        return getDefaultSkinId(DEFAULT_SKIN);
+    }
+
+    public String getDefaultSkinId(String def)
+    {
+        String skin = this.xwikicfg.getProperty("xwiki.defaultskin", def);
 
         return StringUtils.isNotEmpty(skin) ? skin : null;
     }

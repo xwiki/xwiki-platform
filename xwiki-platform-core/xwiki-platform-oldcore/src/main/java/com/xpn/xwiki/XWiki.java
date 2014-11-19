@@ -160,6 +160,10 @@ import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
 import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
+import com.xpn.xwiki.internal.skin.Resource;
+import com.xpn.xwiki.internal.skin.Skin;
+import com.xpn.xwiki.internal.skin.SkinConfiguration;
+import com.xpn.xwiki.internal.skin.SkinManager;
 import com.xpn.xwiki.internal.template.TemplateManager;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -217,11 +221,11 @@ public class XWiki implements EventListener
     /** Name of the default space homepage. */
     public static final String DEFAULT_SPACE_HOMEPAGE = "WebHome";
 
-    public static final String CKEY_SKIN = "skin";
+    public static final String CKEY_SKIN = SkinManager.CKEY_SKIN;
 
-    public static final String CKEY_BASESKIN = "baseskin";
+    public static final String CKEY_BASESKIN = SkinManager.CKEY_PARENTSKIN;
 
-    public static final String DEFAULT_SKIN = "flamingo";
+    public static final String DEFAULT_SKIN = SkinConfiguration.DEFAULT_SKIN;
 
     /** Logging helper object. */
     protected static final Logger LOGGER = LoggerFactory.getLogger(XWiki.class);
@@ -365,6 +369,10 @@ public class XWiki implements EventListener
     @SuppressWarnings("deprecation")
     private ResourceReferenceManager resourceReferenceManager = Utils
         .getComponent((Type) ResourceReferenceManager.class);
+
+    private SkinManager skinManager = Utils.getComponent((Type) SkinManager.class);
+
+    private TemplateManager templateManager = Utils.getComponent(TemplateManager.class);
 
     /**
      * Whether backlinks are enabled or not (cached for performance).
@@ -1634,15 +1642,15 @@ public class XWiki implements EventListener
     public String evaluateTemplate(String template, XWikiContext context) throws IOException
     {
         try {
-            return Utils.getComponent(TemplateManager.class).render(template);
+            return this.templateManager.render(template);
         } catch (Exception e) {
             LOGGER.error("Error while evaluating velocity template [{}]", template, e);
 
             Object[] args = {template};
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
-                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while evaluating velocity template {0}",
-                    e, args);
+                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION,
+                    "Error while evaluating velocity template {0}", e, args);
 
             return Util.getHTMLExceptionMessage(xe, context);
         }
@@ -1651,15 +1659,15 @@ public class XWiki implements EventListener
     public String parseTemplate(String template, String skin, XWikiContext context)
     {
         try {
-            return Utils.getComponent(TemplateManager.class).renderFromSkin(template, skin);
+            return this.templateManager.renderFromSkin(template, skin);
         } catch (Exception e) {
             LOGGER.error("Error while evaluating velocity template [{}] skin [{}]", template, skin, e);
 
             Object[] args = {template, skin};
             XWikiException xe =
                 new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
-                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION, "Error while evaluating velocity template [{0}] from skin [{1}]",
-                    e, args);
+                    XWikiException.ERROR_XWIKI_RENDERING_VELOCITY_EXCEPTION,
+                    "Error while evaluating velocity template [{0}] from skin [{1}]", e, args);
 
             return Util.getHTMLExceptionMessage(xe, context);
         }
@@ -1732,19 +1740,27 @@ public class XWiki implements EventListener
 
         try {
             // Try in the specified skin
-            String skin = getSkin(context);
-            String result = getSkinFile(filename, skin, forceSkinAction, context);
-            if (result != null) {
-                return result;
+            Skin skin = this.skinManager.getCurrentSkin(true);
+            if (skin != null) {
+                Resource<?> resource = skin.getResource(filename);
+                if (resource != null) {
+                    return resource.getURL(forceSkinAction);
+                }
+            } else {
+                // Try in the current parent skin
+                Skin parentSkin = this.skinManager.getCurrentParentSkin(true);
+                if (parentSkin != null) {
+                    Resource<?> resource = parentSkin.getResource(filename);
+                    if (resource != null) {
+                        return resource.getURL(forceSkinAction);
+                    }
+                }
             }
 
-            // Try in the parent skin
-            String baseskin = getBaseSkin(context);
-            if (StringUtils.isNotEmpty(baseskin) && !skin.equals(baseskin)) {
-                result = getSkinFile(filename, baseskin, forceSkinAction, context);
-                if (result != null) {
-                    return result;
-                }
+            // Look for a resource file
+            if (resourceExists("/resources/" + filename)) {
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
+                return urlf.getURL(url, context);
             }
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
@@ -1767,56 +1783,27 @@ public class XWiki implements EventListener
         return getSkinFile(filename, skin, false, context);
     }
 
-    public String getSkinFile(String filename, String skin, boolean forceSkinAction, XWikiContext context)
+    public String getSkinFile(String filename, String skinId, boolean forceSkinAction, XWikiContext context)
     {
-        XWikiURLFactory urlf = context.getURLFactory();
         try {
-            DocumentReference skinReference = this.currentMixedDocumentReferenceResolver.resolve(skin);
-            XWikiDocument doc = getDocument(skinReference, context);
-            if (!doc.isNew()) {
-                // Look for an object property
-                BaseObject object =
-                    doc.getXObject(new DocumentReference(doc.getDocumentReference().getWikiReference().getName(),
-                        SYSTEM_SPACE, "XWikiSkins"));
-                if (object != null) {
-                    String content = object.getStringValue(filename);
-                    if (StringUtils.isNotBlank(content)) {
-                        URL url =
-                            urlf.createSkinURL(filename, doc.getSpace(), doc.getName(), doc.getDatabase(), context);
-                        return urlf.getURL(url, context);
-                    }
-                }
+            Skin skin = this.skinManager.getSkin(skinId);
 
-                // Look for an attachment
-                String shortName = StringUtils.replaceChars(filename, '/', '.');
-                XWikiAttachment attachment = doc.getAttachment(shortName);
-                if (attachment != null) {
-                    return doc.getAttachmentURL(shortName, "skin", context);
-                }
-            }
+            Resource<?> resource = skin.getLocalResource(filename);
 
-            // Look for a skin file
-            if (resourceExists("/skins/" + skin + "/" + filename)) {
-                URL url;
-
-                if (forceSkinAction) {
-                    url = urlf.createSkinURL(filename, "skins", skin, context);
-                } else {
-                    url = urlf.createSkinURL(filename, skin, context);
-                }
-                return urlf.getURL(url, context);
+            if (resource != null) {
+                return resource.getURL(forceSkinAction);
             }
 
             // Look for a resource file
             if (resourceExists("/resources/" + filename)) {
-                URL url;
-                url = urlf.createResourceURL(filename, forceSkinAction, context);
+                XWikiURLFactory urlf = context.getURLFactory();
+
+                URL url = urlf.createResourceURL(filename, forceSkinAction, context);
                 return urlf.getURL(url, context);
             }
-
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Exception while getting skin file [" + filename + "] from skin [" + skin + "]", e);
+                LOGGER.debug("Exception while getting skin file [{}] from skin [{}]", filename, skinId, e);
             }
         }
 
@@ -1825,66 +1812,15 @@ public class XWiki implements EventListener
 
     public String getSkin(XWikiContext context)
     {
-        String skin = "";
+        String skin;
+
         try {
-            // Try to get it from context
-            skin = (String) context.get(CKEY_SKIN);
-            if (skin != null) {
-                return skin;
-            }
-
-            // Try to get it from URL
-            if (context.getRequest() != null) {
-                skin = context.getRequest().getParameter("skin");
-                if (LOGGER.isDebugEnabled()) {
-                    if (StringUtils.isNotEmpty(skin)) {
-                        LOGGER.debug("Requested skin in the URL: [{}]", skin);
-                    }
-                }
-            }
-
-            if (StringUtils.isEmpty(skin)) {
-                skin = getUserPreference("skin", context);
-                if (LOGGER.isDebugEnabled()) {
-                    if (StringUtils.isNotEmpty(skin)) {
-                        LOGGER.debug("Configured skin in user preferences: [{}]", skin);
-                    }
-                }
-            }
-            if (StringUtils.isEmpty(skin)) {
-                skin = getConfiguration().getProperty("xwiki.defaultskin");
-                if (LOGGER.isDebugEnabled()) {
-                    if (StringUtils.isNotEmpty(skin)) {
-                        LOGGER.debug("Configured default skin in preferences: [{}]", skin);
-                    }
-                }
-            }
-            if (StringUtils.isEmpty(skin)) {
-                skin = getDefaultBaseSkin(context);
-                if (LOGGER.isDebugEnabled()) {
-                    if (StringUtils.isNotEmpty(skin)) {
-                        LOGGER.debug("Configured default base skin in preferences: [{}]", skin);
-                    }
-                }
-            }
+            skin = this.skinManager.getCurrentSkinId(true);
         } catch (Exception e) {
             LOGGER.debug("Exception while determining current skin", e);
             skin = getDefaultBaseSkin(context);
         }
 
-        try {
-            if (skin.indexOf('.') != -1) {
-                if (!getRightService().hasAccessLevel("view", context.getUser(), skin, context)) {
-                    LOGGER.debug("Cannot access configured skin due to access rights, using the default skin.");
-                    skin = getConfiguration().getProperty("xwiki.defaultskin", getDefaultBaseSkin(context));
-                }
-            }
-        } catch (XWikiException e) {
-            // if it fails here, let's just ignore it
-            LOGGER.debug("Exception while determining current skin", e);
-        }
-
-        context.put(CKEY_SKIN, skin);
         return skin;
     }
 
@@ -1925,14 +1861,7 @@ public class XWiki implements EventListener
 
     public String getDefaultBaseSkin(XWikiContext context)
     {
-        // We do not pass a default value, because we want to know if the property is set to an empty value (and so it
-        // would be intended) or if it is not set at all
-        String defaultbaseskin = getConfiguration().getProperty("xwiki.defaultbaseskin");
-        if (defaultbaseskin == null) {
-            // if the property is not set, we fallback to the default skin
-            defaultbaseskin = getConfiguration().getProperty("xwiki.defaultskin", DEFAULT_SKIN);
-        }
-        return defaultbaseskin;
+        return this.skinManager.getDefaultParentSkinId();
     }
 
     public String getBaseSkin(XWikiContext context)
@@ -1944,42 +1873,18 @@ public class XWiki implements EventListener
     {
         String baseskin = "";
         try {
-            // Try to get it from context
-            baseskin = (String) context.get(CKEY_BASESKIN);
-            if (baseskin != null) {
-                return baseskin;
-            } else {
-                baseskin = "";
-            }
-
-            // Let's get the base skin doc itself
-            if (fromRenderSkin) {
-                baseskin = context.getDoc().getStringValue("XWiki.XWikiSkins", "baseskin");
-            }
-
-            if (baseskin.equals("")) {
-                // Let's get the base skin from the skin itself
-                String skin = getSkin(context);
-                baseskin = getBaseSkin(skin, context);
-            }
-
-            if (baseskin.equals("")) {
-                baseskin = getDefaultBaseSkin(context);
-            }
+            return this.skinManager.getCurrentParentSkinId(false);
         } catch (Exception e) {
             baseskin = getDefaultBaseSkin(context);
 
             LOGGER.debug("Exception while determining base skin", e);
         }
 
-        context.put(CKEY_BASESKIN, baseskin);
-
         return baseskin;
     }
 
     /**
-     * @param skin the full name of the skin document for which to return the base skin. For example :
-     *            <tt>XWiki.DefaultSkin</tt>
+     * @param skin the name of the skin for which to return the base skin. For example : <tt>XWiki.DefaultSkin</tt>
      * @param context the XWiki context
      * @return if found, the name of the base skin the asked skin inherits from. If not found, returns an empty string.
      * @since 2.0.2
@@ -1987,16 +1892,9 @@ public class XWiki implements EventListener
      */
     public String getBaseSkin(String skin, XWikiContext context)
     {
-        DocumentReference skinReference = this.currentMixedDocumentReferenceResolver.resolve(skin);
-        if (context.getWiki().exists(skinReference, context)) {
-            try {
-                return getDocument(skinReference, context).getStringValue("XWiki.XWikiSkins", "baseskin");
-            } catch (XWikiException e) {
-                // Do nothing and let return the empty string.
-            }
-        }
+        String baseSkin = this.skinManager.getParentSkin(skin);
 
-        return "";
+        return baseSkin != null ? baseSkin : "";
     }
 
     public String getSpaceCopyright(XWikiContext context)

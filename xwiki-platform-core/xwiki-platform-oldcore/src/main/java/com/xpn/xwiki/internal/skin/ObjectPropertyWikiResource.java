@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.internal.skin;
 
+import java.net.URL;
+
 import javax.inject.Provider;
 
 import org.xwiki.filter.input.StringInputSource;
@@ -27,6 +29,7 @@ import org.xwiki.model.reference.ObjectPropertyReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * @version $Id$
@@ -39,7 +42,7 @@ public class ObjectPropertyWikiResource extends AbstractWikiResource<ObjectPrope
     public ObjectPropertyWikiResource(String path, ResourceRepository repository, ObjectPropertyReference reference,
         DocumentReference authorReference, Provider<XWikiContext> xcontextProvider, String content)
     {
-        super(path, path, repository, reference, authorReference, xcontextProvider);
+        super(path, path, reference.getName(), repository, reference, authorReference, xcontextProvider);
 
         this.content = content;
     }
@@ -48,5 +51,18 @@ public class ObjectPropertyWikiResource extends AbstractWikiResource<ObjectPrope
     protected StringInputSource getInputSourceInternal(XWikiDocument document)
     {
         return new StringInputSource(content);
+    }
+
+    @Override
+    public String getURL(XWikiDocument document) throws Exception
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        XWikiURLFactory urlf = xcontext.getURLFactory();
+
+        URL url =
+            urlf.createSkinURL(this.reference.getName(), document.getSpace(), document.getName(),
+                document.getDatabase(), xcontext);
+        return urlf.getURL(url, xcontext);
     }
 }

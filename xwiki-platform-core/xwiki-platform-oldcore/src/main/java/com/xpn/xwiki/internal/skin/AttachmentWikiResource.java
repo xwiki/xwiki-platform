@@ -39,7 +39,7 @@ public class AttachmentWikiResource extends AbstractWikiResource<AttachmentRefer
     public AttachmentWikiResource(String path, ResourceRepository repository, AttachmentReference reference,
         DocumentReference authorReference, Provider<XWikiContext> xcontextProvider)
     {
-        super(path, path, repository, reference, authorReference, xcontextProvider);
+        super(path, path, reference.getName(), repository, reference, authorReference, xcontextProvider);
     }
 
     @Override
@@ -50,4 +50,9 @@ public class AttachmentWikiResource extends AbstractWikiResource<AttachmentRefer
         return new DefaultInputStreamInputSource(attachment.getContentInputStream(this.xcontextProvider.get()), true);
     }
 
+    @Override
+    public String getURL(XWikiDocument document) throws Exception
+    {
+        return document.getAttachmentURL(this.reference.getName(), "skin", this.xcontextProvider.get());
+    }
 }

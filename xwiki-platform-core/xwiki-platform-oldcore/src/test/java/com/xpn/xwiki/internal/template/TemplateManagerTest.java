@@ -42,6 +42,7 @@ import org.mockito.stubbing.Answer;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -75,6 +76,8 @@ public class TemplateManagerTest
         when(this.velocityManagerMock.getVelocityEngine()).thenReturn(this.velocityEngineMock);
 
         this.mocker.registerMemoryConfigurationSource();
+
+        this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
     }
 
     @AfterComponent

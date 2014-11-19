@@ -19,35 +19,41 @@
  */
 package com.xpn.xwiki.internal.skin;
 
-import java.io.InputStream;
+import java.net.URL;
+
+import javax.inject.Provider;
 
 import org.xwiki.environment.Environment;
-import org.xwiki.filter.input.DefaultInputStreamInputSource;
-import org.xwiki.filter.input.InputSource;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * @version $Id$
  * @since 6.4M1
  */
-public class EnvironmentResource extends AbstractResource<InputSource>
+public class SkinEnvironmentResource extends AbstractEnvironmentResource
 {
-    private Environment environment;
-
-    public EnvironmentResource(String path, ResourceRepository repository, Environment environment)
+    public SkinEnvironmentResource(String path, String resourceName, ResourceRepository repository, Environment environment,
+        Provider<XWikiContext> xcontextProvider)
     {
-        super(path, path, repository);
-
-        this.environment = environment;
+        super(path, resourceName, repository, environment, xcontextProvider);
     }
-
+    
     @Override
-    public InputSource getInputSource()
+    public String getURL(boolean forceSkinAction) throws Exception
     {
-        InputStream inputStream = environment.getResourceAsStream(getPath());
-        if (inputStream != null) {
-            return new DefaultInputStreamInputSource(inputStream, true);
+        XWikiContext xcontext = this.xcontextProvider.get();
+        XWikiURLFactory urlf = xcontext.getURLFactory();
+
+        URL url;
+
+        if (forceSkinAction) {
+            url = urlf.createSkinURL(this.resourceName, "skins", getRepository().getId(), xcontext);
+        } else {
+            url = urlf.createSkinURL(this.resourceName, getRepository().getId(), xcontext);
         }
 
-        return null;
+        return urlf.getURL(url, xcontext);
     }
 }

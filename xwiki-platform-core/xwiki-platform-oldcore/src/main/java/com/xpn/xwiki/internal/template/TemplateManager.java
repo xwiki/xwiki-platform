@@ -76,7 +76,7 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.internal.skin.EnvironmentResource;
+import com.xpn.xwiki.internal.skin.AbstractEnvironmentResource;
 import com.xpn.xwiki.internal.skin.Resource;
 import com.xpn.xwiki.internal.skin.Skin;
 import com.xpn.xwiki.internal.skin.SkinManager;
@@ -206,9 +206,9 @@ public class TemplateManager
         protected abstract T getContentInternal(String content) throws Exception;
     }
 
-    private class EnvironmentTemplate extends AbtractTemplate<FilesystemTemplateContent, EnvironmentResource>
+    private class EnvironmentTemplate extends AbtractTemplate<FilesystemTemplateContent, AbstractEnvironmentResource>
     {
-        public EnvironmentTemplate(EnvironmentResource resource)
+        public EnvironmentTemplate(AbstractEnvironmentResource resource)
         {
             super(resource);
         }
@@ -689,15 +689,16 @@ public class TemplateManager
     {
         String path = getResourcePath(suffixPath, templateName, true);
 
-        return path != null ? new EnvironmentTemplate(new EnvironmentResource(path, null, this.environment)) : null;
+        return path != null ? new EnvironmentTemplate(new TemplateEnvironmentResource(path, templateName,
+            this.environment)) : null;
     }
 
     private Template createTemplate(Resource<?> resource)
     {
         Template template;
 
-        if (resource instanceof EnvironmentResource) {
-            template = new EnvironmentTemplate((EnvironmentResource) resource);
+        if (resource instanceof AbstractEnvironmentResource) {
+            template = new EnvironmentTemplate((AbstractEnvironmentResource) resource);
         } else {
             template = new DefaultTemplate(resource);
         }
@@ -730,7 +731,7 @@ public class TemplateManager
         Template template = null;
 
         // Try from skin
-        Skin skin = this.skins.getCurrentSkin();
+        Skin skin = this.skins.getCurrentSkin(false);
         if (skin != null) {
             template = getTemplate(templateName, skin);
         }
@@ -738,7 +739,7 @@ public class TemplateManager
         // Try from base skin if no skin is set
         if (skin == null) {
             if (template == null) {
-                Skin baseSkin = this.skins.getCurrentBaseSkin();
+                Skin baseSkin = this.skins.getCurrentParentSkin(false);
                 if (baseSkin != null) {
                     template = getTemplate(templateName, baseSkin);
                 }

@@ -26,6 +26,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -52,6 +53,7 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultIconSetManager implements IconSetManager
 {
     private static final String DEFAULT_ICONSET_NAME = "default";

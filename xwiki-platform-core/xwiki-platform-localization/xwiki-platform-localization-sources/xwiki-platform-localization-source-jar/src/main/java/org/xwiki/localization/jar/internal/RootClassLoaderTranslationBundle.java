@@ -31,6 +31,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.collections.EnumerationUtils;
 import org.xwiki.component.annotation.Component;
@@ -50,6 +51,7 @@ import org.xwiki.localization.message.TranslationMessageParser;
  */
 @Component
 @Named("rootclassloader")
+@Singleton
 public class RootClassLoaderTranslationBundle extends AbstractCachedTranslationBundle
 {
     /**

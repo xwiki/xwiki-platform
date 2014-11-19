@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.internal.model.reference;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 
@@ -29,7 +32,9 @@ import org.xwiki.model.EntityType;
  * @version $Id$
  * @since 2.2M1
  */
-@Component("compactwiki")
+@Component
+@Named("compactwiki")
+@Singleton
 public class CompactWikiStringEntityReferenceSerializer extends CompactStringEntityReferenceSerializer
 {
     @Override

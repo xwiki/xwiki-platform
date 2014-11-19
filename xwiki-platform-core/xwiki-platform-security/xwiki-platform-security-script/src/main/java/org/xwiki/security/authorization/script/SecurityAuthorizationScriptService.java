@@ -21,6 +21,7 @@ package org.xwiki.security.authorization.script;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -41,6 +42,7 @@ import org.xwiki.stability.Unstable;
  */
 @Component
 @Named(SecurityScriptService.ROLEHINT + '.' + SecurityAuthorizationScriptService.ID)
+@Singleton
 @Unstable
 public class SecurityAuthorizationScriptService implements ScriptService
 {

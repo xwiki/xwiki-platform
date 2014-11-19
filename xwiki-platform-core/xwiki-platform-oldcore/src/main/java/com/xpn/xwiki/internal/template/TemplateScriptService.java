@@ -19,10 +19,9 @@
  */
 package com.xpn.xwiki.internal.template;
 
-import groovy.lang.Singleton;
-
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
@@ -47,7 +46,6 @@ public class TemplateScriptService implements ScriptService
      * The current transformation id is used.
      * 
      * @param template the template name
-     * @param targetSyntax the syntax in which to render the template
      * @return the result of the template execution and rendering
      */
     public String render(String template)
@@ -61,7 +59,6 @@ public class TemplateScriptService implements ScriptService
      * The current transformation id is used.
      * 
      * @param template the template name
-     * @param transformationId the identifier of the transformation
      */
     public void execute(String template) throws Exception
     {

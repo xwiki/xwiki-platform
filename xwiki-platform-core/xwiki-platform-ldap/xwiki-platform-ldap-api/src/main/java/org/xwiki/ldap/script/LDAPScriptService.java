@@ -21,6 +21,7 @@ package org.xwiki.ldap.script;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -36,6 +37,7 @@ import com.xpn.xwiki.plugin.ldap.XWikiLDAPUtils;
  */
 @Component
 @Named("ldap")
+@Singleton
 public class LDAPScriptService implements ScriptService
 {
     /**

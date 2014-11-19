@@ -21,6 +21,7 @@ package org.xwiki.security.authorization.internal;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -37,6 +38,7 @@ import org.xwiki.security.authorization.AuthorizationSettler;
  * @since 4.0M2 
  */
 @Component
+@Singleton
 public class AuthorizationSettlerProvider implements Provider<AuthorizationSettler>, Initializable
 {
     /** Authorisation manager configuration to retrieve the settler hint. */

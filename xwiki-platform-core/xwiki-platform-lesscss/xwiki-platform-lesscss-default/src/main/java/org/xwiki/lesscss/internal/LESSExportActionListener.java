@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.ActionExecutingEvent;
 import org.xwiki.component.annotation.Component;
@@ -44,6 +45,7 @@ import com.xpn.xwiki.web.XWikiRequest;
  */
 @Component
 @Named("lessexport")
+@Singleton
 public class LESSExportActionListener implements EventListener
 {
     @Inject

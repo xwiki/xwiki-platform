@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -36,6 +37,7 @@ import org.xwiki.script.service.ScriptService;
  */
 @Component
 @Named("icon")
+@Singleton
 public class IconManagerScriptService implements ScriptService
 {
     /**

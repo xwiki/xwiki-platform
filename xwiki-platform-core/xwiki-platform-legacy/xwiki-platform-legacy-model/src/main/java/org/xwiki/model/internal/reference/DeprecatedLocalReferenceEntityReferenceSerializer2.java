@@ -19,6 +19,9 @@
  */
 package org.xwiki.model.internal.reference;
 
+import javax.inject.Singleton;
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
@@ -32,7 +35,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @deprecated you may use {@link EntityReference#removeParent(org.xwiki.model.reference.EntityReference)} since 4.0M2
  */
 @Deprecated
-@Component("local/reference")
+@Component
+@Named("local/reference")
+@Singleton
 public class DeprecatedLocalReferenceEntityReferenceSerializer2 implements EntityReferenceSerializer<EntityReference>
 {
     @Override

@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -55,6 +56,7 @@ import org.xwiki.search.solr.internal.api.SolrInstance;
  */
 @Component
 @Named(SolrQueryExecutor.SOLR)
+@Singleton
 public class SolrQueryExecutor implements QueryExecutor
 {
     /**

@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -40,6 +41,7 @@ import org.xwiki.lesscss.LESSSkinFileCompiler;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultLESSColorThemeConverter extends AbstractCachedCompiler<ColorTheme>
         implements LESSColorThemeConverter, Initializable
 {

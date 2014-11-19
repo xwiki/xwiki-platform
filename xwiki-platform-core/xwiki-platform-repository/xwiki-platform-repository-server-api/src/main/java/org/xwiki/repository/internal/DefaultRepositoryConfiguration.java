@@ -25,6 +25,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -42,6 +43,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @since 4.5M1
  */
 @Component
+@Singleton
 public class DefaultRepositoryConfiguration implements RepositoryConfiguration
 {
     /**

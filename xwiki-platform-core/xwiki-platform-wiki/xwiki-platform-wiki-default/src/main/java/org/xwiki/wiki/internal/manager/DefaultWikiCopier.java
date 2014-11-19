@@ -24,6 +24,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.event.status.PopLevelProgressEvent;
@@ -48,6 +49,7 @@ import com.xpn.xwiki.XWikiException;
  * @since 5.3M2
  */
 @Component
+@Singleton
 public class DefaultWikiCopier implements WikiCopier
 {
     @Inject

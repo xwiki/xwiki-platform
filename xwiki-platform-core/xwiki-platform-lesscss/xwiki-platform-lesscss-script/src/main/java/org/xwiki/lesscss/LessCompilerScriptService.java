@@ -22,6 +22,7 @@ package org.xwiki.lesscss;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
@@ -39,6 +40,7 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component
 @Named("lesscss")
+@Singleton
 @Unstable
 public class LessCompilerScriptService implements ScriptService
 {

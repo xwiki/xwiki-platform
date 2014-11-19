@@ -22,6 +22,7 @@ package org.xwiki.icon.internal;
 import java.io.StringWriter;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
@@ -37,6 +38,7 @@ import org.xwiki.velocity.XWikiVelocityException;
  * @since 6.4M1
  */
 @Component(roles = VelocityRenderer.class)
+@Singleton
 public class VelocityRenderer
 {
     @Inject

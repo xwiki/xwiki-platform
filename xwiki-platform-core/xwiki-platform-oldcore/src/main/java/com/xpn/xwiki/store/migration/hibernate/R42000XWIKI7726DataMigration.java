@@ -26,6 +26,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -48,6 +49,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  */
 @Component
 @Named("R42000XWIKI7726")
+@Singleton
 public class R42000XWIKI7726DataMigration extends AbstractHibernateDataMigration
 {
     @Override

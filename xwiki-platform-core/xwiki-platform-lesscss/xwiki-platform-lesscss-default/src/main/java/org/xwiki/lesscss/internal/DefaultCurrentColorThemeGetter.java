@@ -21,6 +21,7 @@ package org.xwiki.lesscss.internal;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
@@ -41,6 +42,7 @@ import com.xpn.xwiki.web.XWikiRequest;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultCurrentColorThemeGetter implements CurrentColorThemeGetter
 {
     private static final String COLOR_THEME_FIELD = "colorTheme";

@@ -21,6 +21,7 @@ package org.xwiki.csrf.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
@@ -36,6 +37,7 @@ import org.xwiki.csrf.CSRFTokenConfiguration;
  * @since 2.5M2
  */
 @Component
+@Singleton
 public class DefaultCSRFTokenConfiguration implements CSRFTokenConfiguration
 {
     /** Prefix for the configuration keys for the {@link org.xwiki.csrf.CSRFToken} component. */

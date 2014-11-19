@@ -19,6 +19,9 @@
  */
 package org.xwiki.captcha.internal;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 
 import com.octo.captcha.service.sound.SoundCaptchaService;
@@ -31,10 +34,12 @@ import com.octo.captcha.service.sound.DefaultManageableSoundCaptchaService;
  * @version $Id$
  * @since 2.2M2
  */
-@Component("sound")
+@Component
+@Named("sound")
+@Singleton
 public class DefaultSoundCaptchaAction extends AbstractSoundCaptchaAction
 {
-    /** The service which provides the captcha, must be static because struts instanciates per request. */
+    /** The service which provides the captcha, must be static because struts instantiates per request. */
     private static final SoundCaptchaService SERVICE = new DefaultManageableSoundCaptchaService();
 
     @Override

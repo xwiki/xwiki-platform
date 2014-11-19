@@ -20,6 +20,7 @@
 package org.xwiki.icon.internal;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
@@ -42,6 +43,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultIconSetCache implements IconSetCache, Initializable
 {
     private static final String ICON_SET_CACHE_ID = "iconset";

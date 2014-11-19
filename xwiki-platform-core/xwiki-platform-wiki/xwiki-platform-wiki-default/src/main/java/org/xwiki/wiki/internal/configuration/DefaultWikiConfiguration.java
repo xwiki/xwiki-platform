@@ -21,6 +21,7 @@ package org.xwiki.wiki.internal.configuration;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
@@ -33,6 +34,7 @@ import org.xwiki.wiki.configuration.WikiConfiguration;
  * @since 5.4.4
  */
 @Component
+@Singleton
 public class DefaultWikiConfiguration implements WikiConfiguration
 {
     /**

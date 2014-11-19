@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,7 +31,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormatSymbols;
@@ -53,6 +53,10 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.naming.NamingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -73,8 +77,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.net.smtp.SMTPClient;
-import org.apache.commons.net.smtp.SMTPReply;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
@@ -103,6 +105,9 @@ import org.xwiki.context.Execution;
 import org.xwiki.job.Job;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.mail.MailSender;
+import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -3001,11 +3006,12 @@ public class XWiki implements EventListener
     public void sendValidationEmail(String xwikiname, String password, String email, String addfieldname,
         String addfieldvalue, String contentfield, XWikiContext context) throws XWikiException
     {
+        MailSenderConfiguration configuration = Utils.getComponent(MailSenderConfiguration.class);
+
         String sender;
         String content;
-
         try {
-            sender = getXWikiPreference("admin_email", context);
+            sender = configuration.getFromAddress();
             if (StringUtils.isBlank(sender)) {
                 String server = context.getRequest().getServerName();
                 if (server.matches("\\[.*\\]|(\\d{1,3}+\\.){3}+\\d{1,3}+")) {
@@ -3038,148 +3044,20 @@ public class XWiki implements EventListener
         }
 
         // Let's now send the message
-        sendMessage(sender, email, content, context);
-    }
-
-    /**
-     * @deprecated replaced by the <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
-     *             Plugin</a>
-     */
-    @Deprecated
-    public void sendMessage(String sender, String[] recipients, String rawMessage, XWikiContext context)
-        throws XWikiException
-    {
-        LOGGER.trace("Entering sendMessage()");
-
-        // We'll be using the MailSender plugin, which has much more advanced capabilities (authentication, TLS).
-        // Since the plugin is in another module, and it depends on the core, we have to use it through reflection in
-        // order to avoid cyclic dependencies. This should be fixed once the mailsender becomes a clean component
-        // instead of a plugin.
-        Object mailSender;
-        Class mailSenderClass;
-        Method mailSenderSendRaw;
-
         try {
-            mailSender = getPluginApi("mailsender", context);
-            mailSenderClass = Class.forName("com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi");
-
-            // public int sendRawMessage(String from, String to, String rawMessage)
-            mailSenderSendRaw =
-                mailSenderClass.getMethod("sendRawMessage", new Class[] {String.class, String.class, String.class});
+            Session session =
+                Session.getInstance(configuration.getAllProperties(), new XWikiAuthenticator(configuration));
+            InputStream is = new ByteArrayInputStream(content.getBytes());
+            MimeMessage message = new MimeMessage(session, is);
+            message.setFrom(new InternetAddress(sender));
+            message.setRecipients(Message.RecipientType.TO, email);
+            MailSender mailSender = Utils.getComponent(MailSender.class);
+            mailSender.send(message, session);
         } catch (Exception e) {
-            LOGGER.error("Problem getting MailSender via Reflection. Using the old sendMessage mechanism.", e);
-            sendMessageOld(sender, recipients, rawMessage, context);
-            return;
-        }
-
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Sending message = \"" + rawMessage + "\"");
-        }
-
-        String messageRecipients = StringUtils.join(recipients, ',');
-
-        try {
-            mailSenderSendRaw.invoke(mailSender, sender, messageRecipients, rawMessage);
-        } catch (InvocationTargetException ite) {
-            Throwable cause = ite.getCause();
-            if (cause instanceof XWikiException) {
-                throw (XWikiException) cause;
-            } else {
-                throw new RuntimeException(cause);
-            }
-        } catch (Exception e) {
-            // Probably either IllegalAccessException or IllegalArgumentException
-            // Shouldn't happen unless there were an incompatible code change
-            throw new RuntimeException(e);
-        }
-
-        LOGGER.info("Exiting sendMessage(). It seems everything went ok.");
-    }
-
-    /**
-     * @deprecated replaced by the <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
-     *             Plugin</a>
-     */
-    @Deprecated
-    private void sendMessageOld(String sender, String[] recipient, String message, XWikiContext context)
-        throws XWikiException
-    {
-        SMTPClient smtpc = null;
-        try {
-            String server = getXWikiPreference("smtp_server", context);
-            String port = getXWikiPreference("smtp_port", context);
-            String login = getXWikiPreference("smtp_login", context);
-
-            if (context.get("debugMail") != null) {
-                StringBuffer msg = new StringBuffer(message);
-                msg.append("\n Recipient: ");
-                msg.append(recipient);
-                recipient = ((String) context.get("debugMail")).split(",");
-                message = msg.toString();
-            }
-
-            if ((server == null) || server.equals("")) {
-                server = "127.0.0.1";
-            }
-            if ((port == null) || (port.equals(""))) {
-                port = "25";
-            }
-            if ((login == null) || login.equals("")) {
-                login = InetAddress.getLocalHost().getHostName();
-            }
-
-            smtpc = new SMTPClient();
-            smtpc.connect(server, Integer.parseInt(port));
-            int reply = smtpc.getReplyCode();
-            if (!SMTPReply.isPositiveCompletion(reply)) {
-                Object[] args = {server, port, Integer.valueOf(reply), smtpc.getReplyString()};
-                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
-                    XWikiException.ERROR_XWIKI_EMAIL_CONNECT_FAILED,
-                    "Could not connect to server {0} port {1} error code {2} ({3})", null, args);
-            }
-
-            if (smtpc.login(login) == false) {
-                reply = smtpc.getReplyCode();
-                Object[] args = {server, port, Integer.valueOf(reply), smtpc.getReplyString()};
-                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
-                    XWikiException.ERROR_XWIKI_EMAIL_LOGIN_FAILED,
-                    "Could not login to mail server {0} port {1} error code {2} ({3})", null, args);
-            }
-
-            if (smtpc.sendSimpleMessage(sender, recipient, message) == false) {
-                reply = smtpc.getReplyCode();
-                Object[] args = {server, port, Integer.valueOf(reply), smtpc.getReplyString()};
-                throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
-                    XWikiException.ERROR_XWIKI_EMAIL_SEND_FAILED,
-                    "Could not send mail to server {0} port {1} error code {2} ({3})", null, args);
-            }
-
-        } catch (IOException e) {
-            Object[] args = {sender, recipient};
             throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
-                XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL, "Exception while sending email from {0} to {1}",
-                e, args);
-        } finally {
-            if ((smtpc != null) && (smtpc.isConnected())) {
-                try {
-                    smtpc.disconnect();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+                XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL,
+                "Error while sending validation email", e);
         }
-    }
-
-    /**
-     * @deprecated replaced by the <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
-     *             Plugin</a>
-     */
-    @Deprecated
-    public void sendMessage(String sender, String recipient, String message, XWikiContext context)
-        throws XWikiException
-    {
-        String[] recip = recipient.split(",");
-        sendMessage(sender, recip, message, context);
     }
 
     public String generateRandomString(int size)

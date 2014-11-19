@@ -20,29 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>Panels</web>
   <name>Applications</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Panels.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1346768961000</creationDate>
-  <date>1413987072000</date>
-  <contentUpdateDate>1413569583000</contentUpdateDate>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1416392687000</date>
+  <contentUpdateDate>1416392687000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>Panels.Applications</name>
+    <number>0</number>
+    <className>Panels.PanelClass</className>
+    <guid>cbe1606c-2ad6-4a85-8f76-4c2d65829623</guid>
     <class>
       <name>Panels.PanelClass</name>
       <customClass/>
@@ -116,10 +118,6 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </type>
     </class>
-    <name>Panels.Applications</name>
-    <number>0</number>
-    <className>Panels.PanelClass</className>
-    <guid>cbe1606c-2ad6-4a85-8f76-4c2d65829623</guid>
     <property>
       <category>Information</category>
     </property>
@@ -185,6 +183,10 @@
     </property>
   </object>
   <object>
+    <name>Panels.Applications</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>12aa5bbf-26ee-4bc2-b649-1b508cdec8df</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -256,10 +258,6 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Panels.Applications</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>12aa5bbf-26ee-4bc2-b649-1b508cdec8df</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -330,6 +328,10 @@ document.observe('xwiki:dom:loaded', function(e) {
     </property>
   </object>
   <object>
+    <name>Panels.Applications</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>4511aeeb-4b3d-4c11-b76f-dc434d4cc9b0</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -401,10 +403,6 @@ document.observe('xwiki:dom:loaded', function(e) {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Panels.Applications</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>4511aeeb-4b3d-4c11-b76f-dc434d4cc9b0</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -562,5 +560,4 @@ div.applicationPanelMoreContainer li a {
       <use>onDemand</use>
     </property>
   </object>
-  <content/>
 </xwikidoc>

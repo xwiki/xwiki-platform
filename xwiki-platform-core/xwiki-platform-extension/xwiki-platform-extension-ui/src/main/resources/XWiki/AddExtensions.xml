@@ -209,7 +209,10 @@
     </property>
     <property>
       <parameters>label=$services.localization.render('extensions.applicationsPanel.install')
-target=XWiki.XWikiPreferences
+## The Application Panel checks only if the current user has the right to view the specified target page. Since simple
+## users have by default view right on the XWiki.XWikiPreferences page but only admins can actually install
+## applications, we need to check admin rights here in order to hide this entry for simple users.
+target=#if ($xwiki.hasWikiAdminRights())XWiki.XWikiPreferences#end
 targetQueryString=editor=globaladmin&amp;section=XWiki.AddExtensions
 icon=icon:bullet_go</parameters>
     </property>

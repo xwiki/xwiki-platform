@@ -53,7 +53,7 @@ public class WikiUIExtensionTest
     }
 
     @Test
-    public void createWikiUIExtension() throws ComponentLookupException
+    public void createWikiUIExtension()
     {
         WikiUIExtension wikiUIX =
             new WikiUIExtension("roleHint", "id", "epId", objectReference, AUTHOR_REFERENCE, null);

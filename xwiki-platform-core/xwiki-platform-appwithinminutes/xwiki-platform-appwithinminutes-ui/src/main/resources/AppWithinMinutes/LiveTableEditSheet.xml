@@ -205,6 +205,8 @@
   #set($discard = $uix.set('name', "platform.panels.${doc.space}Application"))
   #set($discard = $uix.set('extensionPointId', "org.xwiki.platform.panels.Applications"))
   #set($discard = $uix.set('parameters', "label=${doc.space}${util.newline}target=${doc.fullName}${util.newline}icon=${request.applicationIcon}"))
+  #set ($hasWikiAdminRights = $services.security.authorization.hasAccess('admin', $doc.documentReference.wikiReference))
+  #set($discard = $uix.set('scope', "#if ($hasWikiAdminRights)wiki#{else}user#end"))
   #set($discard = $doc.save('Updated application icon', true))
 #end
 

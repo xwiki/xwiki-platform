@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Java API for the User Interface extensions</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.68</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.70</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -72,6 +72,14 @@
     </dependency>
 
     <!-- Test Dependencies -->
+    <dependency>
+      <!-- We're using the MockitoOldcoreRule -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>

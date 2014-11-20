@@ -22,6 +22,7 @@ package org.xwiki.skinx;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
@@ -71,6 +72,14 @@ public abstract class AbstractWrapperSkinExtension implements SkinExtension
      */
     public String getName()
     {
-        return getClass().getAnnotation(Component.class).value();
+        String name;
+        Named named = getClass().getAnnotation(Named.class);
+        if (named != null) {
+            name = named.value();
+        } else {
+            // Backward compatibility
+            name = getClass().getAnnotation(Component.class).value();
+        }
+        return name;
     }
 }

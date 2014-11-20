@@ -31,6 +31,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroPlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroSelector;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroServiceAsync;
 
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -112,8 +113,9 @@ public class InsertExecutable extends InsertHTMLExecutable
             // return immediately because the macro descriptor was cached before this code is executed (the insert macro
             // wizard requires the macro descriptor).
             final boolean[] success = new boolean[] {true};
+            String currentWikiId = Document.get().getDocumentElement().getAttribute("data-xwiki-wiki");
             macroService.getMacroDescriptor(new MacroCall(param).getName(), config.getParameter("syntax"),
-                new AsyncCallback<MacroDescriptor>()
+                currentWikiId, new AsyncCallback<MacroDescriptor>()
                 {
                     @Override
                     public void onFailure(Throwable caught)

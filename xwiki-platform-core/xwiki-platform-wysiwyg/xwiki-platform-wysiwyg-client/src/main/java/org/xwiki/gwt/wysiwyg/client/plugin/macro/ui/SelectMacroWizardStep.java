@@ -47,6 +47,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroServiceAsync;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.RepeatingCommand;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -286,7 +287,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
     /**
      * The call-back used to notify the wizard that this wizard step has finished loading.
      */
-    private AsyncCallback< ? > initCallback;
+    private AsyncCallback<?> initCallback;
 
     /**
      * The object called back when the macro descriptors are received. A request for macro descriptors is pending
@@ -389,7 +390,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
      * @see AbstractMacroWizardStep#init(Object, AsyncCallback)
      */
     @SuppressWarnings("unchecked")
-    public void init(Object data, AsyncCallback< ? > initCallback)
+    public void init(Object data, AsyncCallback<?> initCallback)
     {
         // Save the initialization call-back to be able to notify the wizard when we're done.
         this.initCallback = initCallback;
@@ -430,7 +431,8 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
                     }
                 }
             };
-            getMacroService().getMacroDescriptors(getSyntax(), macroDescriptorsCallback);
+            String currentWikiId = Document.get().getDocumentElement().getAttribute("data-xwiki-wiki");
+            getMacroService().getMacroDescriptors(getSyntax(), currentWikiId, macroDescriptorsCallback);
         }
     }
 

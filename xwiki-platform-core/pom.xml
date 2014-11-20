@@ -406,6 +406,30 @@
           -->
           <ignored>
             <!-- Remove the following ignores after we release the current version as final -->
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroService</className>
+              <method>org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor getMacroDescriptor(java.lang.String, java.lang.String, java.lang.String)</method>
+              <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroService</className>
+              <method>java.util.List getMacroDescriptors(java.lang.String, java.lang.String)</method>
+              <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroServiceAsync</className>
+              <method>void getMacroDescriptor(java.lang.String, java.lang.String, java.lang.String, com.google.gwt.user.client.rpc.AsyncCallback)</method>
+              <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
+            </difference>
+            <difference>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroServiceAsync</className>
+              <method>void getMacroDescriptors(java.lang.String, java.lang.String, com.google.gwt.user.client.rpc.AsyncCallback)</method>
+              <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
+            </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>

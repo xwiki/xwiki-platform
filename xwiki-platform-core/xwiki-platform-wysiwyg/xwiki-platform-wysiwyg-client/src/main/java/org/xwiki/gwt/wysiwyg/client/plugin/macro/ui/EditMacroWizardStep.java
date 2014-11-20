@@ -32,6 +32,7 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDescriptor;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDisplayer;
 
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
@@ -56,14 +57,14 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
         /**
          * The call-back used to notify the wizard that this wizard step has finished loading.
          */
-        private final AsyncCallback< ? > wizardCallback;
+        private final AsyncCallback<?> wizardCallback;
 
         /**
          * Creates a new call-back for the request with the specified index.
          * 
          * @param wizardCallback the call-back used to notify the wizard that this wizard step has finished loading
          */
-        public MacroDescriptorAsyncCallback(AsyncCallback< ? > wizardCallback)
+        public MacroDescriptorAsyncCallback(AsyncCallback<?> wizardCallback)
         {
             this.wizardCallback = wizardCallback;
             this.index = ++macroDescriptorRequestIndex;
@@ -160,7 +161,7 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
      * 
      * @see AbstractMacroWizardStep#init(Object, AsyncCallback)
      */
-    public void init(Object data, AsyncCallback< ? > cb)
+    public void init(Object data, AsyncCallback<?> cb)
     {
         // Reset the model.
         macroCall = (MacroCall) data;
@@ -171,7 +172,8 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
         parameterDisplayers.clear();
         contentDisplayer = null;
 
-        getMacroService().getMacroDescriptor(macroCall.getName(), getConfig().getParameter("syntax"),
+        String currentWikiId = Document.get().getDocumentElement().getAttribute("data-xwiki-wiki");
+        getMacroService().getMacroDescriptor(macroCall.getName(), getConfig().getParameter("syntax"), currentWikiId,
             new MacroDescriptorAsyncCallback(cb));
     }
 

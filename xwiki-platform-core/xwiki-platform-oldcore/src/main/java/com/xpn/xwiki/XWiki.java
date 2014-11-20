@@ -370,9 +370,9 @@ public class XWiki implements EventListener
     private ResourceReferenceManager resourceReferenceManager = Utils
         .getComponent((Type) ResourceReferenceManager.class);
 
-    private SkinManager skinManager = Utils.getComponent((Type) SkinManager.class);
+    private SkinManager skinManager;
 
-    private TemplateManager templateManager = Utils.getComponent(TemplateManager.class);
+    private TemplateManager templateManager;
 
     /**
      * Whether backlinks are enabled or not (cached for performance).
@@ -425,6 +425,24 @@ public class XWiki implements EventListener
         }
 
         return this.userConfiguration;
+    }
+
+    private SkinManager getSkinManager()
+    {
+        if (this.skinManager == null) {
+            this.skinManager = Utils.getComponent(SkinManager.class);
+        }
+
+        return this.skinManager;
+    }
+
+    private TemplateManager getTemplateManager()
+    {
+        if (this.templateManager == null) {
+            this.templateManager = Utils.getComponent(TemplateManager.class);
+        }
+
+        return this.templateManager;
     }
 
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException
@@ -1642,7 +1660,7 @@ public class XWiki implements EventListener
     public String evaluateTemplate(String template, XWikiContext context) throws IOException
     {
         try {
-            return this.templateManager.render(template);
+            return getTemplateManager().render(template);
         } catch (Exception e) {
             LOGGER.error("Error while evaluating velocity template [{}]", template, e);
 
@@ -1659,7 +1677,7 @@ public class XWiki implements EventListener
     public String parseTemplate(String template, String skin, XWikiContext context)
     {
         try {
-            return this.templateManager.renderFromSkin(template, skin);
+            return getTemplateManager().renderFromSkin(template, skin);
         } catch (Exception e) {
             LOGGER.error("Error while evaluating velocity template [{}] skin [{}]", template, skin, e);
 
@@ -1740,7 +1758,7 @@ public class XWiki implements EventListener
 
         try {
             // Try in the specified skin
-            Skin skin = this.skinManager.getCurrentSkin(true);
+            Skin skin = getSkinManager().getCurrentSkin(true);
             if (skin != null) {
                 Resource<?> resource = skin.getResource(filename);
                 if (resource != null) {
@@ -1748,7 +1766,7 @@ public class XWiki implements EventListener
                 }
             } else {
                 // Try in the current parent skin
-                Skin parentSkin = this.skinManager.getCurrentParentSkin(true);
+                Skin parentSkin = getSkinManager().getCurrentParentSkin(true);
                 if (parentSkin != null) {
                     Resource<?> resource = parentSkin.getResource(filename);
                     if (resource != null) {
@@ -1786,7 +1804,7 @@ public class XWiki implements EventListener
     public String getSkinFile(String filename, String skinId, boolean forceSkinAction, XWikiContext context)
     {
         try {
-            Skin skin = this.skinManager.getSkin(skinId);
+            Skin skin = getSkinManager().getSkin(skinId);
 
             Resource<?> resource = skin.getLocalResource(filename);
 
@@ -1815,7 +1833,7 @@ public class XWiki implements EventListener
         String skin;
 
         try {
-            skin = this.skinManager.getCurrentSkinId(true);
+            skin = getSkinManager().getCurrentSkinId(true);
         } catch (Exception e) {
             LOGGER.debug("Exception while determining current skin", e);
             skin = getDefaultBaseSkin(context);
@@ -1861,7 +1879,7 @@ public class XWiki implements EventListener
 
     public String getDefaultBaseSkin(XWikiContext context)
     {
-        return this.skinManager.getDefaultParentSkinId();
+        return getSkinManager().getDefaultParentSkinId();
     }
 
     public String getBaseSkin(XWikiContext context)
@@ -1873,7 +1891,7 @@ public class XWiki implements EventListener
     {
         String baseskin = "";
         try {
-            return this.skinManager.getCurrentParentSkinId(false);
+            return getSkinManager().getCurrentParentSkinId(false);
         } catch (Exception e) {
             baseskin = getDefaultBaseSkin(context);
 
@@ -1892,7 +1910,7 @@ public class XWiki implements EventListener
      */
     public String getBaseSkin(String skin, XWikiContext context)
     {
-        String baseSkin = this.skinManager.getParentSkin(skin);
+        String baseSkin = getSkinManager().getParentSkin(skin);
 
         return baseSkin != null ? baseSkin : "";
     }

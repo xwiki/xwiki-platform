@@ -113,8 +113,6 @@ public class XWikiMockitoTest
         this.mocker.registerMockComponent(Environment.class);
         this.mocker.registerMockComponent(ObservationManager.class);
         this.mocker.registerMockComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
-        this.mocker.registerMockComponent(SkinManager.class);
-        this.mocker.registerMockComponent(TemplateManager.class);
 
         Utils.setComponentManager(mocker);
         xwiki = new XWiki();

@@ -230,9 +230,11 @@ $xwiki.getUserName("xwiki:${username}")
   #end
   <ul class="users">
     #foreach($user in $usersList)
+      ## Since we accept both a String or an EntityReference as input, we first check if we have a Entity Reference
+      ## to a Document and if not then we resolve the String to convert it to a Document Reference.
       #set ($userReference = $user.extractReference('DOCUMENT'))
       #if (!$userReference)
-        #set ($userReference = $services.model.resolveDocument($user, 'explicit', $xcontext.userReference))
+        #set ($userReference = $services.model.resolveDocument($user, 'user/current'))
       #end
       #set ($userName = ${userReference.name})
       #getUserAvatarURL($userReference $avatarURL 30)
@@ -272,9 +274,11 @@ $xwiki.getUserName("xwiki:${username}")
   #end
   <ul class="users">
     #foreach ($group in $groupsList)
+      ## Since we accept both a String or an EntityReference as input, we first check if we have a Entity Reference
+      ## to a Document and if not then we resolve the String to convert it to a Document Reference.
       #set ($groupReference = $group.extractReference('DOCUMENT'))
       #if (!$groupReference)
-        #set ($groupReference = $services.model.resolveDocument($group, 'explicit', $xcontext.userReference))
+        #set ($groupReference = $services.model.resolveDocument($user, 'group/current'))
       #end
       #set ($groupTitle = $xwiki.getDocument($groupReference).plainTitle)
       #if ("$!groupTitle" == '')

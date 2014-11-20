@@ -23,11 +23,11 @@ import org.apache.commons.collections.MapUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.wiki.WikiComponentScope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.rendering.block.WordBlock;
-
 import org.xwiki.uiextension.internal.WikiUIExtension;
 
 /**
@@ -53,9 +53,10 @@ public class WikiUIExtensionTest
     }
 
     @Test
-    public void createWikiUIExtension()
+    public void createWikiUIExtension() throws ComponentLookupException
     {
-        WikiUIExtension wikiUIX = new WikiUIExtension("roleHint", "id", "epId", objectReference, AUTHOR_REFERENCE);
+        WikiUIExtension wikiUIX =
+            new WikiUIExtension("roleHint", "id", "epId", objectReference, AUTHOR_REFERENCE, null);
         wikiUIX.setScope(WikiComponentScope.WIKI);
 
         Assert.assertEquals("roleHint", wikiUIX.getRoleHint());

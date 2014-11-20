@@ -42,6 +42,7 @@ import org.xwiki.security.authorization.Right;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.template.SUExecutor;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -87,6 +88,9 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
 
     @Inject
     private AuthorizationManager authorization;
+
+    @Inject
+    private SUExecutor suExecutor;
 
     /**
      * Checks if the last author of the document holding the extension(s) has the rights required to register extensions
@@ -159,11 +163,12 @@ public class WikiUIExtensionComponentBuilder implements WikiComponentBuilder, Wi
             // Before going further we need to check the document author is authorized to register the extension
             this.checkRights(doc, scope);
 
-            String roleHint = serializer.serialize(extensionDefinition.getReference());
+            String roleHint = this.serializer.serialize(extensionDefinition.getReference());
 
             WikiUIExtension extension =
                 new WikiUIExtension(roleHint, id, extensionPointId, extensionDefinition.getReference(),
-                    doc.getAuthorReference());
+                    doc.getAuthorReference(), this.suExecutor);
+
             // It would be nice to have PER_LOOKUP components for UIX parameters but without constructor injection it's
             // safer to use a POJO and pass the Component Manager to it.
             WikiUIExtensionParameters parameters = new WikiUIExtensionParameters(id, rawParameters, cm);

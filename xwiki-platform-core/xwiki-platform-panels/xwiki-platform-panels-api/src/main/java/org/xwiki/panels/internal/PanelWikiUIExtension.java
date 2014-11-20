@@ -21,6 +21,7 @@ package org.xwiki.panels.internal;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
@@ -39,8 +40,9 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.uiextension.UIExtension;
+
+import com.xpn.xwiki.internal.template.SUExecutor;
 
 /**
  * Provides a bridge between Panels defined in XObjects and {@link UIExtension}.
@@ -98,6 +100,8 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
      */
     private final Transformation macroTransformation;
 
+    private final SUExecutor suExecutor;
+
     /**
      * Default constructor.
      *
@@ -118,6 +122,7 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
         this.macroTransformation = componentManager.getInstance(Transformation.class, "macro");
         this.serializer = componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
         this.renderingContext = componentManager.getInstance(RenderingContext.class);
+        this.suExecutor = componentManager.getInstance(SUExecutor.class);
     }
 
     @Override
@@ -149,17 +154,25 @@ public class PanelWikiUIExtension implements UIExtension, WikiComponent
     {
         // We need to clone the xdom to avoid transforming the original and make it useless after the first
         // transformation
-        XDOM transformedXDOM = xdom.clone();
+        final XDOM transformedXDOM = xdom.clone();
 
-        // Perform macro transformations.
+        // Perform panel transformations with the right of the panel author
         try {
-            TransformationContext transformationContext = new TransformationContext(transformedXDOM, syntax);
-            transformationContext.setId(this.getRoleHint());
-            ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation, transformationContext,
-                transformedXDOM);
-        } catch (TransformationException e) {
-            LOGGER.error("Error while executing wiki component macro transformation for extension [{}]",
-                documentReference.toString());
+            this.suExecutor.call(new Callable<Void>()
+            {
+                @Override
+                public Void call() throws Exception
+                {
+                    TransformationContext transformationContext = new TransformationContext(transformedXDOM, syntax);
+                    transformationContext.setId(getRoleHint());
+                    ((MutableRenderingContext) renderingContext).transformInContext(macroTransformation,
+                        transformationContext, transformedXDOM);
+
+                    return null;
+                }
+            }, getAuthorReference());
+        } catch (Exception e) {
+            LOGGER.error("Error while executing transformation for panel [{}]", this.documentReference.toString());
         }
 
         return new CompositeBlock(transformedXDOM.getChildren());

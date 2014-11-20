@@ -35,9 +35,6 @@
          [ERROR] Unable to locate enclosing class com.xpn.xwiki.web.sx.JsExtension for nested class
          com.xpn.xwiki.web.sx.JsExtension$1 -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- TODO: Seems there's some problems as jacoco reprots 0% when it shouldn't. Could be cause by the aspects, needs
-         to be analyzed and fixed -->
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <!-- Build tools -->
@@ -46,7 +43,6 @@
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
     </dependency>
-
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>

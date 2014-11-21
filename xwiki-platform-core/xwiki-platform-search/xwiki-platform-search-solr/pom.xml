@@ -96,6 +96,7 @@
     <module>xwiki-platform-search-solr-api</module>
     <module>xwiki-platform-search-solr-plugin</module>
     <module>xwiki-platform-search-solr-query</module>
+    <module>xwiki-platform-search-solr-rest</module>
     <module>xwiki-platform-search-solr-ui</module>
   </modules>
 </project>

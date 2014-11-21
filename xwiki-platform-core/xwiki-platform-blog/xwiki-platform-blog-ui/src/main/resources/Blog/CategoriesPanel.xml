@@ -140,7 +140,7 @@
 {{/velocity}}</content>
     </property>
     <property>
-      <description>List all Blog Categories. A Category is a name used to organize Blog articles that you post. XWiki is preconfigured with three categories: News, Personal and Others.</description>
+      <description>List all Blog Categories. A Category is a name used to organize Blog articles that you post. XWiki is preconfigured with three categories: News, Other and Personal.</description>
     </property>
     <property>
       <name>Blog Categories</name>

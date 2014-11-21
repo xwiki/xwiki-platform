@@ -103,5 +103,12 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Used to check access rights (e.g. in the Applications panel). -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

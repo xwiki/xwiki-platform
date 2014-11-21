@@ -32,7 +32,6 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDescriptor;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDisplayer;
 
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 

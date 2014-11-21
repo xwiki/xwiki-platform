@@ -31,7 +31,6 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroPlugin;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroSelector;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroServiceAsync;
 
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**

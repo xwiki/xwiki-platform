@@ -43,7 +43,7 @@ import com.xpn.xwiki.XWikiContext;
  * Component that createAndExecuteJob a wiki with the content of a template wiki.
  *
  * @since 5.3M2
- * @version $Id :$
+ * @version $Id$
  */
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
@@ -73,6 +73,9 @@ public class TemplateWikiProvisioningJob extends AbstractJob<WikiProvisioningJob
         XWikiContext xcontext = xcontextProvider.get();
         String wikiId = request.getWikiId();
         String templateId = (String) request.getProvisioningJobParameter();
+
+        // Set the user actually doing the action in the context
+        xcontext.setUserReference(request.getProvisioningUser());
 
         try {
             observationManager.notify(new WikiProvisioningEvent(wikiId), wikiId, xcontext);

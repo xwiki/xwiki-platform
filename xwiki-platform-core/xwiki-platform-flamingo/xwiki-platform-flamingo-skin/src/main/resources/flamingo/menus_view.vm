@@ -1,0 +1,28 @@
+################################
+##        MENU VIEW
+################################
+#if ($isInServletMode)## Visible only in a page
+  #template("menus_macros.vm")
+  
+  ## Top Menu
+  #xwikitopmenustart()
+    
+    ## Right menu
+    #xwikitopmenurightstart()
+      #template("quicksearch.vm")
+      #template("menus_language.vm")
+      #template("menus_user.vm")
+    #xwikitopmenurightend()
+    
+    ## Left menu
+    #xwikitopmenuleftstart()
+      #template("menus_home.vm")
+      #template("menus_wiki.vm")
+      #template("menus_space.vm")
+      #template("menus_page.vm")
+      #template("menus_create.vm")
+    #xwikitopmenuleftend()
+    
+  ## End of Top Menu
+  #xwikitopmenuend()
+#end

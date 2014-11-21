@@ -500,9 +500,20 @@ public final class XWikiLDAPConfig
      * @param context the XWiki context.
      * @return the maximum number of milliseconds the client waits for any operation under these constraints to
      *         complete.
+     * @since 4.3M1
      */
     public int getLDAPTimeout(XWikiContext context)
     {
         return (int) getLDAPParamAsLong("ldap_timeout", 1000, context);
+    }
+
+    /**
+     * @param context the XWiki context.
+     * @return the maximum number of search results to be returned from a search operation.
+     * @since 6.3M1
+     */
+    public int getLDAPMaxResults(XWikiContext context)
+    {
+        return (int) getLDAPParamAsLong("ldap_maxresults", 1000, context);
     }
 }

@@ -148,7 +148,7 @@ public class DefaultSolrReferenceResolver implements SolrReferenceResolver
 
         SolrReferenceResolver resolver;
         try {
-            resolver = this.componentManager.getInstance(SolrReferenceResolver.class, type.name().toLowerCase());
+            resolver = this.componentManager.getInstance(SolrReferenceResolver.class, type.getLowerCase());
         } catch (ComponentLookupException e) {
             throw new SolrIndexerException("Failed to get SolrDocumentReferenceResolver corresponding to entity type ["
                 + type + "]", e);

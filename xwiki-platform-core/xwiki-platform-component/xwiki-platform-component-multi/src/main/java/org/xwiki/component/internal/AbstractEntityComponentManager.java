@@ -46,7 +46,7 @@ public abstract class AbstractEntityComponentManager extends AbstractGenericComp
     {
         EntityReference reference = getCurrentReference();
 
-        return reference != null ? reference.getType().toString().toLowerCase() + ":"
-            + this.serializer.serialize(reference) : null;
+        return reference != null ? reference.getType().getLowerCase() + ':' + this.serializer.serialize(reference)
+            : null;
     }
 }

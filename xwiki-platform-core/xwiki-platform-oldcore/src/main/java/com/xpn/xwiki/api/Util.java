@@ -133,8 +133,8 @@ public class Util extends Api
 
     /**
      * Output a BufferedImage object into the response outputstream. Once this method has been called, no further action
-     * is possible. Users should set {@code $context.setFinished(true)} to avoid template output. The image is served as
-     * image/jpeg.
+     * is possible. Users should set {@code $xcontext.setFinished(true)} to avoid template output. The image is served
+     * as image/jpeg.
      * 
      * @param image the BufferedImage to output
      * @throws java.io.IOException if the output fails

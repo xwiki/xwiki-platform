@@ -116,7 +116,7 @@ public class X509KeyWikiStore extends AbstractX509WikiStore implements KeyStore
         byte[] key;
 
         try {
-            key = encryptor.encrypt(password, keyPair.getPrivateKey());
+            key = this.encryptor.encrypt(password, keyPair.getPrivateKey());
         } catch (Exception e) {
             throw new KeyStoreException("Error while encrypting private key to store a key pair in [" + store + "]", e);
         }
@@ -190,9 +190,10 @@ public class X509KeyWikiStore extends AbstractX509WikiStore implements KeyStore
             byte[] key = getEncoder().decode(pkObj.getLargeStringValue(PRIVATEKEYCLASS_PROP_KEY));
 
             if (password != null) {
-                return new CertifiedKeyPair(encryptor.decrypt(password, key), getCertificateFactory().decode(cert));
+                return new CertifiedKeyPair(
+                    this.encryptor.decrypt(password, key), getCertificateFactory().decode(cert));
             } else {
-                return new CertifiedKeyPair(keyFactory.fromPKCS8(key), getCertificateFactory().decode(cert));
+                return new CertifiedKeyPair(this.keyFactory.fromPKCS8(key), getCertificateFactory().decode(cert));
             }
         } catch (Exception e) {
             throw new KeyStoreException("Failed to retrieved private key from [" + store + "]");
@@ -243,9 +244,9 @@ public class X509KeyWikiStore extends AbstractX509WikiStore implements KeyStore
             byte[] key = getEncoder().decode(pkObj.getLargeStringValue(PRIVATEKEYCLASS_PROP_KEY));
 
             if (password != null) {
-                return new CertifiedKeyPair(encryptor.decrypt(password, key), certificate);
+                return new CertifiedKeyPair(this.encryptor.decrypt(password, key), certificate);
             } else {
-                return new CertifiedKeyPair(keyFactory.fromPKCS8(key), certificate);
+                return new CertifiedKeyPair(this.keyFactory.fromPKCS8(key), certificate);
             }
         } catch (Exception e) {
             throw new KeyStoreException("Failed to retrieved private key for certificate ["

@@ -30,10 +30,12 @@ package org.xwiki.crypto.store.wiki.internal.query;
 public class CertificateObjectReference
 {
     private final String documentName;
+
     private final int objectNumber;
 
     /**
      * Construct a reference based on document name and object number.
+     *
      * @param documentName the name of the document containing the XObject.
      * @param objectNumber the XObject number.
      */
@@ -48,7 +50,7 @@ public class CertificateObjectReference
      */
     public String getDocumentName()
     {
-        return documentName;
+        return this.documentName;
     }
 
     /**
@@ -56,6 +58,6 @@ public class CertificateObjectReference
      */
     public int getObjectNumber()
     {
-        return objectNumber;
+        return this.objectNumber;
     }
 }

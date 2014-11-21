@@ -152,7 +152,7 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
     public void testLinksAndCache() throws Exception
     {
         String link = "http://some:123/link";
-        String text = "$context.setCacheDuration(1800)\n" + link;
+        String text = "$xcontext.setCacheDuration(1800)\n" + link;
         XWikiDocument document = new XWikiDocument();
 
         Utils.enablePlaceholders(getContext());

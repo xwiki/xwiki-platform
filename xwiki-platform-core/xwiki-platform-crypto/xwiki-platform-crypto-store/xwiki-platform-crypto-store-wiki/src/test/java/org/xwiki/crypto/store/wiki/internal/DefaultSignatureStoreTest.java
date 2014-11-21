@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.crypto.BinaryStringEncoder;
 import org.xwiki.crypto.store.SignatureStore;
-import org.xwiki.crypto.store.wiki.internal.DefaultSignatureStore;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.BlockReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -59,10 +58,11 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.0
  */
-@ComponentList({CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class})
+@ComponentList({ CurrentReferenceDocumentReferenceResolver.class, CurrentReferenceEntityReferenceResolver.class })
 public class DefaultSignatureStoreTest
 {
     private static final byte[] SIGNATURE = "signature".getBytes();
+
     private static final String ENCODED_SIGNATURE = "encoded_signature";
 
     @Rule
@@ -70,6 +70,7 @@ public class DefaultSignatureStoreTest
         new MockitoComponentMockingRule<SignatureStore>(DefaultSignatureStore.class);
 
     private XWikiContext xcontext;
+
     private XWiki xwiki;
 
     private SignatureStore store;
@@ -82,45 +83,47 @@ public class DefaultSignatureStoreTest
         when(valueProvider.getDefaultValue(EntityType.SPACE)).thenReturn("space");
         when(valueProvider.getDefaultValue(EntityType.DOCUMENT)).thenReturn("document");
 
-        mocker.registerComponent(EntityReferenceValueProvider.class, "current", valueProvider);
+        this.mocker.registerComponent(EntityReferenceValueProvider.class, "current", valueProvider);
 
         Provider<XWikiContext> xcontextProvider =
-            mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
-        xcontext = mock(XWikiContext.class);
-        when(xcontextProvider.get()).thenReturn(xcontext);
-        xwiki = mock(com.xpn.xwiki.XWiki.class);
-        when(xcontext.getWiki()).thenReturn(xwiki);
+            this.mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
+        this.xcontext = mock(XWikiContext.class);
+        when(xcontextProvider.get()).thenReturn(this.xcontext);
+        this.xwiki = mock(com.xpn.xwiki.XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
 
-        BinaryStringEncoder encoder = mocker.getInstance(BinaryStringEncoder.class, "Base64");
+        BinaryStringEncoder encoder = this.mocker.getInstance(BinaryStringEncoder.class, "Base64");
         when(encoder.encode(SIGNATURE, 64)).thenReturn(ENCODED_SIGNATURE);
         when(encoder.decode(ENCODED_SIGNATURE)).thenReturn(SIGNATURE);
 
-        store = mocker.getComponentUnderTest();
+        this.store = this.mocker.getComponentUnderTest();
     }
 
     @Test
     public void testStoringNewSignature() throws Exception
     {
         XWikiDocument sourceDocument = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference("wiki", "space", "document"), xcontext))
+        when(this.xwiki.getDocument(new DocumentReference("wiki", "space", "document"), this.xcontext))
             .thenReturn(sourceDocument);
 
         BaseObject signatureObject = mock(BaseObject.class);
-        when(sourceDocument.newXObject(DefaultSignatureStore.SIGNATURECLASS, xcontext)).thenReturn(signatureObject);
+        when(sourceDocument.newXObject(DefaultSignatureStore.SIGNATURECLASS, this.xcontext))
+            .thenReturn(signatureObject);
 
-        store.store(new BlockReference("block", new DocumentReference("wiki", "space", "document")), SIGNATURE);
+        this.store.store(new BlockReference("block", new DocumentReference("wiki", "space", "document")), SIGNATURE);
 
         verify(signatureObject).setStringValue(DefaultSignatureStore.SIGNATURECLASS_PROP_REFERENCE, "block");
-        verify(signatureObject).setLargeStringValue(DefaultSignatureStore.SIGNATURECLASS_PROP_SIGNATURE, ENCODED_SIGNATURE);
+        verify(signatureObject).setLargeStringValue(DefaultSignatureStore.SIGNATURECLASS_PROP_SIGNATURE,
+            ENCODED_SIGNATURE);
 
-        verify(xwiki).saveDocument(sourceDocument, xcontext);
+        verify(this.xwiki).saveDocument(sourceDocument, this.xcontext);
     }
 
     @Test
     public void testUpdatingSignature() throws Exception
     {
         XWikiDocument sourceDocument = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference("wiki", "space", "document"), xcontext))
+        when(this.xwiki.getDocument(new DocumentReference("wiki", "space", "document"), this.xcontext))
             .thenReturn(sourceDocument);
 
         BaseObject signatureObject = mock(BaseObject.class);
@@ -129,21 +132,21 @@ public class DefaultSignatureStoreTest
             DefaultSignatureStore.SIGNATURECLASS_PROP_REFERENCE,
             "block")).thenReturn(signatureObject);
 
-        store.store(new BlockReference("block", new DocumentReference("wiki", "space", "document")), SIGNATURE);
+        this.store.store(new BlockReference("block", new DocumentReference("wiki", "space", "document")), SIGNATURE);
 
         verify(signatureObject, never()).setStringValue(eq(DefaultSignatureStore.SIGNATURECLASS_PROP_REFERENCE),
             any(String.class));
         verify(signatureObject).setLargeStringValue(DefaultSignatureStore.SIGNATURECLASS_PROP_SIGNATURE,
             ENCODED_SIGNATURE);
 
-        verify(xwiki).saveDocument(sourceDocument, xcontext);
+        verify(this.xwiki).saveDocument(sourceDocument, this.xcontext);
     }
 
     @Test
     public void testRetrievingExistingSignature() throws Exception
     {
         XWikiDocument sourceDocument = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference("wiki", "space", "document"), xcontext))
+        when(this.xwiki.getDocument(new DocumentReference("wiki", "space", "document"), this.xcontext))
             .thenReturn(sourceDocument);
 
         BaseObject signatureObject = mock(BaseObject.class);
@@ -152,19 +155,24 @@ public class DefaultSignatureStoreTest
             DefaultSignatureStore.SIGNATURECLASS_PROP_REFERENCE,
             "block")).thenReturn(signatureObject);
 
-        when(signatureObject.getLargeStringValue(DefaultSignatureStore.SIGNATURECLASS_PROP_SIGNATURE)).thenReturn(ENCODED_SIGNATURE);
+        when(signatureObject.getLargeStringValue(DefaultSignatureStore.SIGNATURECLASS_PROP_SIGNATURE)).thenReturn(
+            ENCODED_SIGNATURE);
 
-        assertThat(store.retrieve(new BlockReference("block", new DocumentReference("wiki", "space", "document"))), equalTo(SIGNATURE));
+        assertThat(
+            this.store.retrieve(new BlockReference("block", new DocumentReference("wiki", "space", "document"))),
+            equalTo(SIGNATURE));
     }
 
     @Test
     public void testRetrievingMissingSignature() throws Exception
     {
         XWikiDocument sourceDocument = mock(XWikiDocument.class);
-        when(xwiki.getDocument(new DocumentReference("wiki", "space", "document"), xcontext))
+        when(this.xwiki.getDocument(new DocumentReference("wiki", "space", "document"), this.xcontext))
             .thenReturn(sourceDocument);
 
-        assertThat(store.retrieve(new BlockReference("block", new DocumentReference("wiki", "space", "document"))), nullValue());
+        assertThat(
+            this.store.retrieve(new BlockReference("block", new DocumentReference("wiki", "space", "document"))),
+            nullValue());
         verify(sourceDocument).getXObject(
             new DocumentReference(DefaultSignatureStore.SIGNATURECLASS, new WikiReference("wiki")),
             DefaultSignatureStore.SIGNATURECLASS_PROP_REFERENCE,

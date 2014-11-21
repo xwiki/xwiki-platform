@@ -68,7 +68,7 @@ public class X509CertificateKeyIdentifierQuery extends AbstractX509KeyIdentifier
     public CertifiedPublicKey getCertificate(byte[] keyIdentifier)
     {
         try {
-            return factory.decode(getEncoder().decode(this.<String>execute(keyIdentifier).get(0)));
+            return this.factory.decode(getEncoder().decode(this.<String>execute(keyIdentifier).get(0)));
         } catch (Exception e) {
             return null;
         }

@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
 import org.xwiki.gwt.wysiwyg.client.converter.HTMLConverter;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -60,10 +59,6 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
     @Inject
     private ComponentManager componentManager;
 
-    /** Execution context handler, needed for accessing the XWiki context map. */
-    @Inject
-    private Execution execution;
-
     /**
      * The component used to convert HTML to wiki syntax.
      */
@@ -94,7 +89,7 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
     @Override
     public String parseAndRender(String html, String syntax)
     {
-        protectAgainstProgrammingRightsExecution();
+        XWikiDocument originalSecurityDocument = setSecurityDocument(createSecurityDocument());
 
         // Save the value of the "is in rendering engine" context property.
         Object isInRenderingEngine = this.xcontextProvider.get().get(IS_IN_RENDERING_ENGINE);
@@ -116,13 +111,15 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
             } else {
                 this.xcontextProvider.get().remove(IS_IN_RENDERING_ENGINE);
             }
+
+            setSecurityDocument(originalSecurityDocument);
         }
     }
 
     @Override
     public String toAnnotatedXHTML(String source, String syntaxId)
     {
-        protectAgainstProgrammingRightsExecution();
+        XWikiDocument originalSecurityDocument = setSecurityDocument(createSecurityDocument());
 
         // Save the value of the "is in rendering engine" context property.
         Object isInRenderingEngine = this.xcontextProvider.get().get(IS_IN_RENDERING_ENGINE);
@@ -144,6 +141,8 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
             } else {
                 this.xcontextProvider.get().remove(IS_IN_RENDERING_ENGINE);
             }
+
+            setSecurityDocument(originalSecurityDocument);
         }
     }
 
@@ -156,16 +155,26 @@ public class DefaultWysiwygEditorScriptService implements WysiwygEditorScriptSer
     /**
      * When the user switches to the Source tab he'll be able to make modifications and when he switches back to the
      * WYSIWYG tab his changes will be rendered. If the document had PR, then we need to be sure that if the user
-     * doesn't have PR he won't be able to execute the code. We do this by setting the content author (similar to
-     * what happens when a document is saved)
+     * doesn't have PR he won't be able to execute the code. We do this by setting as security document a clone of the
+     * current document that has the current user as content author (because the content author is used to check PR).
      */
-    private void protectAgainstProgrammingRightsExecution()
+    private XWikiDocument createSecurityDocument()
     {
         XWikiContext xwikiContext = this.xcontextProvider.get();
-
         // We clone the document in order to not impact the environment (the document cache for example).
         XWikiDocument clonedDocument = xwikiContext.getDoc().clone();
         clonedDocument.setContentAuthorReference(xwikiContext.getUserReference());
-        xwikiContext.setDoc(clonedDocument);
+        return clonedDocument;
+    }
+
+    /**
+     * Sets the document that is going to be used to check for programming rights.
+     * 
+     * @param document the document that is going to be used to check for programming rights
+     * @return the previous security document
+     */
+    private XWikiDocument setSecurityDocument(XWikiDocument document)
+    {
+        return (XWikiDocument) this.xcontextProvider.get().put(XWikiDocument.CKEY_SDOC, document);
     }
 }

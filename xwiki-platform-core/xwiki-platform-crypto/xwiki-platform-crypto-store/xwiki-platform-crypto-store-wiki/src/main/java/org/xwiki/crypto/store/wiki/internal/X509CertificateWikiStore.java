@@ -134,4 +134,3 @@ public class X509CertificateWikiStore extends AbstractX509WikiStore implements C
             .getCertificates();
     }
 }
-

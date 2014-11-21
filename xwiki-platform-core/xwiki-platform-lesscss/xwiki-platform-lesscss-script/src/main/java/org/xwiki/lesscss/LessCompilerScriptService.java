@@ -22,6 +22,7 @@ package org.xwiki.lesscss;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
@@ -39,6 +40,7 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component
 @Named("lesscss")
+@Singleton
 @Unstable
 public class LessCompilerScriptService implements ScriptService
 {
@@ -46,7 +48,10 @@ public class LessCompilerScriptService implements ScriptService
     private LESSSkinFileCompiler lessCompiler;
 
     @Inject
-    private LESSSkinFileCache cache;
+    private LESSSkinFileCache lessCache;
+
+    @Inject
+    private ColorThemeCache colorThemeCache;
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
@@ -166,17 +171,18 @@ public class LessCompilerScriptService implements ScriptService
             return false;
         }
 
-        cache.clear();
+        lessCache.clear();
+        colorThemeCache.clear();
         return true;
     }
 
     /**
-     * Remove every generated files corresponding to a wiki.
+     * Remove every generated files corresponding to a color theme.
      * The script calling this method needs the programming rights.
-     * @param wikiId id of the wiki
+     * @param colorTheme fullname of the color theme
      * @return true if the operation succeed
      */
-    public boolean clearCache(String wikiId)
+    public boolean clearCacheFromColorTheme(String colorTheme)
     {
         XWikiContext xcontext = xcontextProvider.get();
 
@@ -186,7 +192,29 @@ public class LessCompilerScriptService implements ScriptService
             return false;
         }
 
-        cache.clear(wikiId);
+        lessCache.clearFromColorTheme(colorTheme);
+        colorThemeCache.clearFromColorTheme(colorTheme);
+        return true;
+    }
+
+    /**
+     * Remove every generated files corresponding to a filesystem skin.
+     * The script calling this method needs the programming rights.
+     * @param skin name of the filesystem skin
+     * @return true if the operation succeed
+     */
+    public boolean clearCacheFromFileSystemSkin(String skin)
+    {
+        XWikiContext xcontext = xcontextProvider.get();
+
+        // Check if the current script has the programing rights
+        if (!authorizationManager.hasAccess(Right.PROGRAM, xcontext.getDoc().getAuthorReference(),
+                xcontext.getDoc().getDocumentReference())) {
+            return false;
+        }
+
+        lessCache.clearFromFileSystemSkin(skin);
+        colorThemeCache.clearFromFileSystemSkin(skin);
         return true;
     }
 }

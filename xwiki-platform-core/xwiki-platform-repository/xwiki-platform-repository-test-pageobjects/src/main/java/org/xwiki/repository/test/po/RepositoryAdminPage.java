@@ -29,6 +29,8 @@ import org.xwiki.administration.test.po.AdministrationSectionPage;
  */
 public class RepositoryAdminPage extends AdministrationSectionPage
 {
+    public static final String ADMINISTRATION_SECTION_ID = "Repository";
+
     @FindBy(id = "ExtensionCode.RepositoryConfigClass_0_defaultIdPrefix")
     private WebElement defaultIdPrefix;
 
@@ -37,15 +39,13 @@ public class RepositoryAdminPage extends AdministrationSectionPage
 
     public static RepositoryAdminPage gotoPage()
     {
-        RepositoryAdminPage page = new RepositoryAdminPage();
-        page.getDriver().get(page.getURL());
-
-        return page;
+        AdministrationSectionPage.gotoPage(ADMINISTRATION_SECTION_ID);
+        return new RepositoryAdminPage();
     }
 
     public RepositoryAdminPage()
     {
-        super("Repository");
+        super(ADMINISTRATION_SECTION_ID);
     }
 
     public void setDefaultIdPrefix(String defaultIdPrefix)

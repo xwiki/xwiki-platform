@@ -41,6 +41,16 @@ public interface IconSetCache
     IconSet get(String name);
 
     /**
+     * Get an icon set, from its name and the icon where it is located.
+     * @param name name of the icon set to get
+     * @param wikiId id of the wiki
+     * @return the icon set corresponding to the given name
+     *
+     * @since 6.3RC1
+     */
+    IconSet get(String name, String wikiId);
+
+    /**
      * Get the icon set corresponding to a document on the wiki.
      * @param documentReference reference of the document
      * @return the icon set corresponding to the given document reference
@@ -53,6 +63,16 @@ public interface IconSetCache
      * @param iconSet the icon set to cache
      */
     void put(String name, IconSet iconSet);
+
+    /**
+     * Put an iconset into this cache.
+     * @param name name of the icon set to cache
+     * @param wikiId id of the wiki
+     * @param iconSet the icon set to cache
+     *
+     * @since 6.3RC1
+     */
+    void put(String name, String wikiId, IconSet iconSet);
 
     /**
      * Put an iconset into this cache.
@@ -77,4 +97,13 @@ public interface IconSetCache
      * @param name the name of the icon set
      */
     void clear(String name);
+
+    /**
+     * Remove from the cache an icon set corresponding to a given name.
+     * @param name the name of the icon set
+     * @param wikiId id of the wiki where the icon theme is stored
+     *
+     * @since 6.3RC1
+     */
+    void clear(String name, String wikiId);
 }

@@ -26,6 +26,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -44,7 +45,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -52,10 +60,39 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.xml.DOMXMLWriter;
 import com.xpn.xwiki.internal.xml.XMLWriter;
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 public class XWikiAttachment implements Cloneable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiAttachment.class);
+
+    /**
+     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
+     * wiki).
+     */
+    private static EntityReferenceSerializer<String> getCompactWikiEntityReferenceSerializer()
+    {
+        return Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+    }
+
+    private static EntityReferenceResolver<String> getXClassEntityReferenceResolver()
+    {
+        return Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
+    }
+
+    /**
+     * Used to normalize references.
+     */
+    private DocumentReferenceResolver<EntityReference> getExplicitReferenceDocumentReferenceResolver()
+    {
+        return Utils.getComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
+    }
+
+    private AttachmentReferenceResolver<String> getCurentAttachmentReferenceResolver()
+    {
+        return Utils.getComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
+    }
 
     private XWikiDocument doc;
 
@@ -64,6 +101,8 @@ public class XWikiAttachment implements Cloneable
     private String filename;
 
     private String author;
+
+    private DocumentReference authorReference;
 
     private Version version;
 
@@ -91,7 +130,6 @@ public class XWikiAttachment implements Cloneable
     {
         this.filesize = 0;
         this.filename = "";
-        this.author = "";
         this.comment = "";
         this.date = new Date();
     }
@@ -99,7 +137,12 @@ public class XWikiAttachment implements Cloneable
     public AttachmentReference getReference()
     {
         if (this.reference == null) {
-            this.reference = new AttachmentReference(this.filename, this.doc.getDocumentReference());
+            if (this.doc != null) {
+                this.reference = new AttachmentReference(this.filename, this.doc.getDocumentReference());
+            } else {
+                // Try with current
+                return getCurentAttachmentReferenceResolver().resolve(this.filename);
+            }
         }
 
         return this.reference;
@@ -138,7 +181,9 @@ public class XWikiAttachment implements Cloneable
             LOGGER.error("exception while attach.clone", e);
         }
 
-        attachment.setAuthor(getAuthor());
+        attachment.author = this.author;
+        attachment.authorReference = this.authorReference;
+
         attachment.setComment(getComment());
         attachment.setDate(getDate());
         attachment.setFilename(getFilename());
@@ -210,16 +255,71 @@ public class XWikiAttachment implements Cloneable
         this.reference = null;
     }
 
-    public String getAuthor()
+    /**
+     * @since 6.4M1
+     */
+    public DocumentReference getAuthorReference()
     {
-        return this.author;
+        if (this.authorReference == null) {
+            if (this.doc != null) {
+                this.authorReference = userStringToReference(this.author);
+            } else {
+                // Don't store the reference when generated based on context (it might become wrong when actually
+                // setting the document)
+                return userStringToReference(this.author);
+            }
+        }
+
+        return this.authorReference;
     }
 
+    /**
+     * @since 6.4M1
+     */
+    public void setAuthorReference(DocumentReference authorReference)
+    {
+        if (ObjectUtils.notEqual(authorReference, getAuthorReference())) {
+            setMetaDataDirty(true);
+        }
+
+        this.authorReference = authorReference;
+        this.author = null;
+
+        // Log this since it's probably a mistake so that we find who is doing bad things
+        if (this.authorReference != null && this.authorReference.getName().equals(XWikiRightService.GUEST_USER)) {
+            LOGGER.warn("A reference to XWikiGuest user as been set instead of null. This is probably a mistake.",
+                new Exception("See stack trace"));
+        }
+    }
+
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 6.4M1 use {@link #getAuthorReference()} instead
+     */
+    @Deprecated
+    public String getAuthor()
+    {
+        if (this.author == null) {
+            this.author = userReferenceToString(getAuthorReference());
+        }
+
+        return this.author != null ? this.author : "";
+    }
+
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
+     * 
+     * @deprecated since 6.4M1 use {@link #setAuthorReference} instead
+     */
+    @Deprecated
     public void setAuthor(String author)
     {
-        if (ObjectUtils.notEqual(getAuthor(), author)) {
-            setMetaDataDirty(true);
+        if (!Objects.equals(getAuthor(), author)) {
             this.author = author;
+            this.authorReference = null;
+
+            setMetaDataDirty(true);
         }
     }
 
@@ -278,6 +378,7 @@ public class XWikiAttachment implements Cloneable
     {
         this.doc = doc;
         this.reference = null;
+
         if (isMetaDataDirty() && doc != null) {
             doc.setMetaDataDirty(true);
         }
@@ -835,5 +936,45 @@ public class XWikiAttachment implements Cloneable
         } catch (Exception e) {
             mergeResult.getLog().error("Failed to merge attachment [{}]", this, e);
         }
+    }
+
+    /**
+     * @param userReference the user {@link DocumentReference} to convert to {@link String}
+     * @return the user as String
+     */
+    private String userReferenceToString(DocumentReference userReference)
+    {
+        String userString;
+
+        if (userReference != null) {
+            userString = getCompactWikiEntityReferenceSerializer().serialize(userReference, getReference());
+        } else {
+            userString = XWikiRightService.GUEST_USER_FULLNAME;
+        }
+
+        return userString;
+    }
+
+    /**
+     * @param userString the user {@link String} to convert to {@link DocumentReference}
+     * @return the user as {@link DocumentReference}
+     */
+    private DocumentReference userStringToReference(String userString)
+    {
+        DocumentReference userReference;
+
+        if (StringUtils.isEmpty(userString)) {
+            userReference = null;
+        } else {
+            userReference =
+                getExplicitReferenceDocumentReferenceResolver().resolve(
+                    getXClassEntityReferenceResolver().resolve(userString, EntityType.DOCUMENT), getReference());
+
+            if (userReference.getName().equals(XWikiRightService.GUEST_USER)) {
+                userReference = null;
+            }
+        }
+
+        return userReference;
     }
 }

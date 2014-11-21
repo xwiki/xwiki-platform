@@ -43,9 +43,11 @@ public abstract class AbstractX509StoreQuery
     private static final String WHERE_STATEMENT = " where 1=1";
 
     private static final String SPACE = "space";
+
     private static final String WHERE_SPACE_STATEMENT = " where doc.space=:" + SPACE;
 
     private static final String DOCNAME = "name";
+
     private static final String WHERE_DOC_STATEMENT = " and doc.name=:" + DOCNAME;
 
     /**
@@ -136,7 +138,7 @@ public abstract class AbstractX509StoreQuery
      */
     protected Query getQuery()
     {
-        return query;
+        return this.query;
     }
 
     /**
@@ -144,7 +146,7 @@ public abstract class AbstractX509StoreQuery
      */
     protected BinaryStringEncoder getEncoder()
     {
-        return encoder;
+        return this.encoder;
     }
 
     /**

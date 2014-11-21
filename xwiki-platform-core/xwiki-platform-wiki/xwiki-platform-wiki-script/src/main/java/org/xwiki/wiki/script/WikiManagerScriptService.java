@@ -244,13 +244,17 @@ public class WikiManagerScriptService implements ScriptService
                 error(new Exception(errorMessage));
                 return false;
             }
-            String owner = descriptor.getOwnerId();
+            // Get the full reference of the given user
+            DocumentReference userReference = documentReferenceResolver.resolve(userId);
+            String fullUserId = entityReferenceSerializer.serialize(userReference);
+
             // If the user is the owner
-            if (userId.equals(owner)) {
+            String owner = descriptor.getOwnerId();
+            if (fullUserId.equals(owner)) {
                 return true;
             }
+
             // If the user is an admin
-            DocumentReference userReference = documentReferenceResolver.resolve(userId);
             WikiReference wikiReference = new WikiReference(wikiId);
             if (authorizationManager.hasAccess(Right.ADMIN, userReference, wikiReference)) {
                 return true;

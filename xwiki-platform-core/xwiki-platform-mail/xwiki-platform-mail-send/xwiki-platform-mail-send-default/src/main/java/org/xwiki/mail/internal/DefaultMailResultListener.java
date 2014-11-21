@@ -34,8 +34,6 @@ import org.xwiki.mail.MailResultListener;
  */
 public class DefaultMailResultListener implements MailResultListener
 {
-    private static final String CONTEXT_KEY = "mailsenderExceptions";
-
     private BlockingQueue<Exception> errorQueue = new LinkedBlockingQueue<>(100);
 
     @Override

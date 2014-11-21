@@ -92,15 +92,27 @@ public class BasePage extends BaseElement
 
     @FindBy(id = "tmWiki")
     private WebElement wikiMenu;
-    
+
     @FindBy(id = "tmWatchWiki")
     private WebElement watchWikiLink;
-    
+
     /**
      * Used to scroll the page to the top before accessing the floating menu.
      */
     @FindBy(id = "companylogo")
     protected WebElement logo;
+
+    /**
+     * Note: when reusing instances of BasePage, the constructor is not doing the work anymore and the
+     * waitUntilPageJSIsLoaded() method needs to be executed manually, when needed.
+     * <p/>
+     * Note2: Never call the constructor before navigating to the page you need to test first.
+     */
+    public BasePage()
+    {
+        super();
+        waitUntilPageJSIsLoaded();
+    }
 
     public String getPageTitle()
     {
@@ -147,6 +159,8 @@ public class BasePage extends BaseElement
     {
         // Open the edit menu
         getDriver().findElement(By.xpath("//div[@id='tmEdit']//button")).click();
+        // Wait for the submenu entry to be visible
+        waitUntilElementIsVisible(By.id(id));
         // Click on the specified entry
         getDriver().findElement(By.id(id)).click();
     }
@@ -266,6 +280,7 @@ public class BasePage extends BaseElement
 
     /**
      * On Flamingo, we have to click to open the menu (hovering it is not enough).
+     * 
      * @since 6.2M2
      */
     public void toggleCreateMenu()
@@ -307,7 +322,8 @@ public class BasePage extends BaseElement
         if (!getUtil().hasElement(By.id(wikiMenuId))) {
             wikiMenuId = "tmMainWiki";
         }
-        getDriver().findElement(By.xpath("//li[@id='"+wikiMenuId+"']//a[contains(@class, 'dropdown-toggle')]")).click();
+        getDriver().findElement(By.xpath("//li[@id='" + wikiMenuId + "']//a[contains(@class, 'dropdown-toggle')]"))
+            .click();
     }
 
     /**
@@ -454,5 +470,23 @@ public class BasePage extends BaseElement
     public String getPageMenuLink()
     {
         return this.pageMenu.findElement(By.xpath(".//a[contains(@title, 'Page: ')]")).getAttribute("href");
+    }
+
+    /**
+     * Waits for the javascript libraries and their plugins that need to load before the UI's elements can be used
+     * safely.
+     * <p/>
+     * Subclassed should override this method and add additional checks needed by their logic.
+     * 
+     * @since 6.2
+     */
+    public void waitUntilPageJSIsLoaded()
+    {
+        // Prototype
+        waitUntilJavascriptCondition("return window.Prototype != null && window.Prototype.Version != null");
+
+        // JQuery and dependencies
+        // JQuery dropdown plugin needed for the edit button's dropdown menu.
+        waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
     }
 }

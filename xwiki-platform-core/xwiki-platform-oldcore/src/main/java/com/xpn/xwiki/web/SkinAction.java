@@ -111,7 +111,7 @@ public class SkinAction extends XWikiAction
                 }
 
                 // Try on the base skin document, if it is not the same as above.
-                if (!doc.getName().equals(baseskin)) {
+                if (StringUtils.isNotEmpty(baseskin) && !doc.getName().equals(baseskin)) {
                     if (renderSkin(filename, baseskindoc, context)) {
                         found = true;
                         break;
@@ -119,7 +119,7 @@ public class SkinAction extends XWikiAction
                 }
 
                 // Try on the default base skin, if it wasn't already tested above.
-                if (!(doc.getName().equals(defaultbaseskin) || baseskin.equals(defaultbaseskin))) {
+                if (StringUtils.isNotEmpty(baseskin) && !(doc.getName().equals(defaultbaseskin) || baseskin.equals(defaultbaseskin))) {
                     // defaultbaseskin can only be on the filesystem, so don't try to use it as a
                     // skin document.
                     if (renderFileFromFilesystem(getSkinFilePath(filename, defaultbaseskin), context)) {

@@ -64,7 +64,6 @@ import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.apache.velocity.runtime.RuntimeConstants;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
@@ -72,7 +71,6 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.hibernate.cfg.Environment;
 import org.xwiki.tool.utils.LogUtils;
-import org.xwiki.velocity.internal.log.SLF4JLogChute;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.tool.backup.Importer;
@@ -317,21 +315,18 @@ public class PackageMojo extends AbstractMojo
         Artifact jettyArtifact = resolveJettyArtifact();
         unzip(jettyArtifact.getFile(), this.outputPackageDirectory);
 
-        // Replace maven properties in start shell scripts
-        VelocityContext context = createVelocityContext();
+        // Replace properties in start shell scripts
         Collection<File> startFiles =
             org.apache.commons.io.FileUtils.listFiles(this.outputPackageDirectory, new WildcardFileFilter(
                 "start_xwiki*.*"), null);
 
-        // Note: Init is done once even if this method is called several times...
-        Velocity.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, new SLF4JLogChute());
-        Velocity.init();
+        VelocityContext velocityContext = createVelocityContext();
         for (File startFile : startFiles) {
             getLog().info(String.format("  Replacing variables in [%s]...", startFile));
             try {
                 String content = org.apache.commons.io.FileUtils.readFileToString(startFile);
                 OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(startFile));
-                Velocity.evaluate(context, writer, "", content);
+                writer.write(replaceProperty(content, velocityContext));
                 writer.close();
             } catch (Exception e) {
                 // Failed to read or write file...
@@ -339,6 +334,16 @@ public class PackageMojo extends AbstractMojo
                     e);
             }
         }
+    }
+
+    protected String replaceProperty(String content, VelocityContext velocityContext)
+    {
+        String result = content;
+        for (Object key : velocityContext.getKeys()) {
+            Object value = velocityContext.get(key.toString());
+            result = StringUtils.replace(result, String.format("${%s}", key.toString()), value.toString());
+        }
+        return result;
     }
 
     private Artifact resolveArtifactItem(ArtifactItem artifactItem) throws MojoExecutionException
@@ -665,6 +670,10 @@ public class PackageMojo extends AbstractMojo
             "xwiki-platform-lesscss-script", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-webjars", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-configuration-default", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-icon-default", getXWikiPlatformVersion(), null, "jar"));
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.webjars",
             "bootstrap", "3.2.0", null, "jar"));
 

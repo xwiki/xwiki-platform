@@ -44,7 +44,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -113,6 +113,9 @@ public class DefaultWikiDescriptorBuilderTest
         BaseObject object1 = mock(BaseObject.class);
         BaseObject object2 = mock(BaseObject.class);
         BaseObject object3 = mock(BaseObject.class);
+        // Make sure that the first object is null to also verify this case since it can happen that we get holes
+        // with the XWikiDocument.getXObjects() API...
+        objects.add(null);
         objects.add(object1);
         objects.add(object2);
         objects.add(null);
@@ -138,6 +141,10 @@ public class DefaultWikiDescriptorBuilderTest
         when(object1.getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION)).
                 thenReturn("myDescription");
 
+        DocumentReference ownerRef = new DocumentReference("xwiki", "XWiki", "myOwner");
+        when(referenceResolver.resolve("myOwner")).thenReturn(ownerRef);
+        when(referenceSerializer.serialize(ownerRef)).thenReturn("xwiki:XWiki.myOwner");
+
         // Test
         WikiDescriptor result = mocker.getComponentUnderTest().buildDescriptorObject(objects, document);
 
@@ -148,7 +155,7 @@ public class DefaultWikiDescriptorBuilderTest
         assertEquals("alias2", result.getAliases().get(2));
         assertEquals(mainPageReference, result.getMainPageReference());
         assertEquals("myPrettyName", result.getPrettyName());
-        assertEquals("myOwner", result.getOwnerId());
+        assertEquals("xwiki:XWiki.myOwner", result.getOwnerId());
         assertEquals("myDescription", result.getDescription());
 
         // Verify

@@ -23,6 +23,9 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReference;
 
@@ -33,7 +36,9 @@ import org.xwiki.model.reference.EntityReference;
  * @version $Id$
  * @since 3.0M2
  */
-@Component("path")
+@Component
+@Named("path")
+@Singleton
 public class PathStringEntityReferenceSerializer extends AbstractStringEntityReferenceSerializer
 {
     /**

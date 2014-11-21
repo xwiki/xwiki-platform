@@ -3,7 +3,7 @@
 // --------------------------------------------------
 
 // Left menu2 =================================================================
-.leftmenu2{
+.leftmenu2 {
   background-color: #F0F0EE; 
   padding: 5px;
   a {
@@ -41,8 +41,8 @@
 
 // XDialogs ===================================================================
 
-.xdialog-content{
-  .buttonwrapper{
+.xdialog-content {
+  .buttonwrapper {
     input.button{
       margin: 2px;
     }
@@ -51,7 +51,7 @@
 
 // Wiki Code =================================================================
 
-.wiki-code{
+.wiki-code {
   width: 100%;
 }
 
@@ -64,10 +64,6 @@
 }
 
 // AllDocs Tree ===============================================================
-
-.dropdown-menu {
-  z-index: 200000 + @zindex-dropdown; // The AllDocs Tree uses very high inline values to display its content TODO: Remove to delete me when we replace the Tree
-}
 
 #XWEWrapper {
   margin: 2px 0 (30px + @input-height-base);
@@ -90,6 +86,9 @@
     }
     td {
       vertical-align: baseline;
+    }
+    .vScrollThumb td, .vScrollThumbOver td, #isc_4 td {
+      vertical-align: middle; // Center grip in the middle of the scrollbar
     }
     #isc_4 { // Scrollbar area
       background-image: -ms-linear-gradient(left, #f5f5f5 0%, #e8e8e9 50%, #d7d9da 50%, #caccce 82%, #c0c2c4 100%); // IE10
@@ -187,9 +186,13 @@
 }
 
 // FIX: Date Picker
-.calendar_date_select {
+.skin-flamingo .calendar_date_select {
+  width: auto;
   div.cds_header select.month {
-    width: 80px;
+    width: 9em;
+  }
+  div.cds_header select.year {
+    width: 7em;
   }
   td {
     padding: 0;
@@ -197,32 +200,32 @@
 }
 
 // FIX: Auto-save
-.skin-flamingo #autosaveControl input.autosave-frequency{
+.skin-flamingo #autosaveControl input.autosave-frequency {
   width: 3em;
 }
 
 // FIX: user profile
-.skin-flamingo{
-  .user-menu-profile:before, .user-menu-preferences:before, .user-menu-watchlist:before, .user-menu-network:before, .user-menu-wikis:before, .user-menu-dashboard:before{
+.skin-flamingo {
+  .user-menu-profile:before, .user-menu-preferences:before, .user-menu-watchlist:before, .user-menu-network:before, .user-menu-wikis:before, .user-menu-dashboard:before {
     display: none;
   }
 }
 
 // FIX: file upload
-.skin-flamingo{
-  .upload-status-container{
-    .buttonwrapper a, .upload-canceled-label{
+.skin-flamingo {
+  .upload-status-container {
+    .buttonwrapper a, .upload-canceled-label {
       .btn-xs();
     }
   }
 }
 
 // FIX: app bar
-.applicationPanelMoreContainer ul li > span > a{
+.applicationPanelMoreContainer ul li > span > a {
   &:extend(.nav > li > a);
   &:extend(.nav-pills > li > a);
   
-  &:hover{
+  &:hover {
     &:extend(.nav > li > a:hover);
   }
 }
@@ -243,8 +246,8 @@
 }
 
 // FIX: User profile
-.skin-flamingo{
-  #user-menu-col{
+.skin-flamingo {
+  #user-menu-col {
     width: 13em;
     @media (max-width: @screen-xs-min) {
       float: none;
@@ -252,7 +255,7 @@
     }
   }
 
-  #user-page-content{
+  #user-page-content {
     @media (max-width: @screen-xs-min) {
       margin-left: 0;
     }
@@ -260,24 +263,31 @@
 }
 
 // FIX: Syntax help page (XWIKI-10675)
-.syntax-menu:extend(.admin-menu all){}
-#syntax-page-content:extend(#admin-page-content all){}
-.skin-flamingo{
-  #syntax-page-content{
+.syntax-menu:extend(.admin-menu all) {}
+#syntax-page-content:extend(#admin-page-content all) {}
+.skin-flamingo {
+  #syntax-page-content {
     margin-left: 0;
   }
 }
 
 // FIX: do no use .hidden (see: XWIKI-10827) but must be invisible
-#docextraanchors{
+#docextraanchors {
   .invisible();
   font-size: 0px;
 }
 
+
+// Fix: Glyphicon: the space icon has a bad width
+// (see: http://jira.xwiki.org/browse/XWIKI-10835)
+.glyphicon-folder-open:before {
+  margin-right: 3px;
+}
+
 // Export ---------------------------------------------------------------------
-#exportModal{
-  .modal-body{
-    a, button{
+#exportModal {
+  .modal-body {
+    a, button {
       margin: 2px;
     }
   }
@@ -289,19 +299,8 @@
 }
 
 // Importer -------------------------------------------------------------------
-#package .checkbox{
-  min-height: 10px;
-  margin: 0;
-  padding: 0.3em;
-}
-
-// Importer options
-.historyStrategyOption{
-  input[type="radio"], input[type="checkbox"] {
-    min-height: 10px;
-    margin-top: 0;
-    margin-bottom: 0;
-  }
+#package .checkbox {
+  margin: 0 -2px 0 0;
 }
 
 // Viewer = changes -----------------------------------------------------------
@@ -327,7 +326,7 @@
     left: 50%;
     top: 3em;
   }
-  &:before, &:after{
+  &:before, &:after {
     content: "";
     display: block;
     position: absolute;
@@ -336,7 +335,6 @@
 
 .changes-info-box {
   .make-sm-column(6, @main-padding);
-  z-index: 100; /* Have text above the arrow in responsive mode */
 }
 
 .changes-info-box, #changes-info-comment {
@@ -345,4 +343,35 @@
 
 .changes-info-title {
   .h3;
+}
+
+@media (max-width: @screen-xs-max) {
+  #changes-info:before, #changes-info:after {
+    display: none; /* Hide the arrow for small resolutions */
+  }
+}
+
+// Panels Layout --------------------------------------------------------------
+/* Content Panels are defined in macros.vm in #displayPanelLayout and used in applications like Statistics */
+
+.panellayoutcol {
+  .panellayoutcontainer-1col &, .panellayoutcontainer-2col &, .panellayoutcontainer-3col &, .panellayoutcontainer-4col & {
+    .make-xs-column(12);
+    & .xwikipanelcontents {
+      overflow: auto;
+    }
+  }
+  .panellayoutcontainer-2col & {
+    .make-sm-column(6);
+  }
+  .panellayoutcontainer-3col & {
+    .make-sm-column(4);
+  }
+  .panellayoutcontainer-4col & {
+    .make-sm-column(3);
+  }
+}
+
+.panellayoutcontainer-1col, .panellayoutcontainer-2col, .panellayoutcontainer-3col, .panellayoutcontainer-4col {
+  .clearfix();
 }

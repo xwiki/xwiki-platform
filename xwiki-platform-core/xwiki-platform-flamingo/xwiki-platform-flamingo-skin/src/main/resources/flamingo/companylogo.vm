@@ -8,8 +8,13 @@
   #set($themeDocFullName = 'ColorThemes.DefaultColorTheme')
 #end
 #set($themeDoc = $xwiki.getDocument($themeDocFullName))
-#set($themeObj = $themeDoc.getObject('ColorThemes.ColorThemeClass'))
-#set($logoname = $themeObj.getProperty('logoImage').value)
+#set($themeObj = $themeDoc.getObject('FlamingoThemesCode.ThemeClass'))
+#if($themeObj)
+  #set($logoname = $themeObj.getValue('logo'))
+#else
+  #set($themeObj = $themeDoc.getObject('ColorThemes.ColorThemeClass'))
+  #set($logoname = $themeObj.getValue('logoImage'))
+#end
 #if("$!{logoname}" != '')
   #set($logourl = $themeDoc.getAttachmentURL($logoname))
 #else

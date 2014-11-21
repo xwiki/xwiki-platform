@@ -55,6 +55,7 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         }
     }
 
+    @Override
     public WikiAttachment read(XMLStreamReader xmlReader) throws XMLStreamException, FilterException
     {
         WikiAttachment wikiAttachment = new WikiAttachment();

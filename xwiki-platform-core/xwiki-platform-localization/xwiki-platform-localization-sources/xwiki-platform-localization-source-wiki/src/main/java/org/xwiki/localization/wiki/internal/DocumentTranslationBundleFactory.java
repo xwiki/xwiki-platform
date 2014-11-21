@@ -50,7 +50,6 @@ import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.localization.TranslationBundle;
-import org.xwiki.localization.TranslationBundleContext;
 import org.xwiki.localization.TranslationBundleDoesNotExistsException;
 import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.message.TranslationMessageParser;
@@ -95,10 +94,10 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
      */
     public static final String ID_PREFIX = ID + ':';
 
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentUpdatedEvent(),
+    private static final List<Event> EVENTS = Arrays.<Event>asList(new DocumentUpdatedEvent(),
         new DocumentDeletedEvent(), new DocumentCreatedEvent());
 
-    private static final List<Event> WIKIEVENTS = Arrays.<Event> asList(new WikiReadyEvent());
+    private static final List<Event> WIKIEVENTS = Arrays.<Event>asList(new WikiReadyEvent());
 
     @Inject
     @Named("context")
@@ -144,12 +143,9 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     private AuthorizationManager authorizationManager;
 
     /**
-     * Used to access the current bundles.
+     * Used to cache on demand document bundles (those that are not registered as components).
      */
-    @Inject
-    private TranslationBundleContext bundleContext;
-
-    private Cache<TranslationBundle> bundlesCache;
+    private Cache<TranslationBundle> onDemandBundleCache;
 
     private final EventListener listener = new EventListener()
     {
@@ -200,7 +196,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         CacheConfiguration cacheConfiguration = new CacheConfiguration("localization.bundle.document");
 
         try {
-            this.bundlesCache = this.cacheManager.createNewCache(cacheConfiguration);
+            this.onDemandBundleCache = this.cacheManager.createNewCache(cacheConfiguration);
         } catch (CacheException e) {
             this.logger.error("Failed to create cache [{}]", cacheConfiguration.getConfigurationId(), e);
         }
@@ -233,7 +229,12 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
 
                 XWikiDocument document = xcontext.getWiki().getDocument(reference, xcontext);
 
-                registerTranslationBundle(document);
+                try {
+                    registerTranslationBundle(document);
+                } catch (Exception e) {
+                    this.logger.error("Failed to register translation bundle from document [{}]",
+                        document.getDocumentReference(), e);
+                }
             }
         } catch (Exception e) {
             this.logger.error("Failed to load existing translations", e);
@@ -254,21 +255,24 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
             }
         }
 
-        return getDocumentBundle(this.currentResolver.resolve(bundleId));
+        return getOnDemandDocumentBundle(this.currentResolver.resolve(bundleId));
     }
 
-    private TranslationBundle getDocumentBundle(DocumentReference documentReference)
+    /**
+     * Get non-component bundle.
+     */
+    private TranslationBundle getOnDemandDocumentBundle(DocumentReference documentReference)
         throws TranslationBundleDoesNotExistsException
     {
         String uid = this.uidSerializer.serialize(documentReference);
 
-        TranslationBundle bundle = this.bundlesCache.get(uid);
+        TranslationBundle bundle = this.onDemandBundleCache.get(uid);
         if (bundle == null) {
-            synchronized (this.bundlesCache) {
-                bundle = this.bundlesCache.get(uid);
+            synchronized (this.onDemandBundleCache) {
+                bundle = this.onDemandBundleCache.get(uid);
                 if (bundle == null) {
-                    bundle = createDocumentBundle(documentReference);
-                    this.bundlesCache.set(uid, bundle);
+                    bundle = createOnDemandDocumentBundle(documentReference, uid);
+                    this.onDemandBundleCache.set(uid, bundle);
                 }
             }
         }
@@ -276,8 +280,8 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
         return bundle;
     }
 
-    private DefaultDocumentTranslationBundle createDocumentBundle(DocumentReference documentReference)
-        throws TranslationBundleDoesNotExistsException
+    private OnDemandDocumentTranslationBundle createOnDemandDocumentBundle(DocumentReference documentReference,
+        String uid) throws TranslationBundleDoesNotExistsException
     {
         XWikiContext context = this.xcontextProvider.get();
 
@@ -293,29 +297,39 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
                 documentReference));
         }
 
-        return createDocumentBundle(document);
-    }
-
-    private DefaultDocumentTranslationBundle createDocumentBundle(XWikiDocument document)
-        throws TranslationBundleDoesNotExistsException
-    {
-        BaseObject translationObject = document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE);
-
-        if (translationObject == null) {
-            throw new TranslationBundleDoesNotExistsException(String.format("[%s] is not a translation document",
-                document));
-        }
-
-        DefaultDocumentTranslationBundle documentBundle;
+        OnDemandDocumentTranslationBundle documentBundle;
         try {
             documentBundle =
-                new DefaultDocumentTranslationBundle(ID_PREFIX, document.getDocumentReference(),
-                    this.componentManagerProvider.get(), this.translationParser);
+                new OnDemandDocumentTranslationBundle(ID_PREFIX, document.getDocumentReference(),
+                    this.componentManagerProvider.get(), this.translationParser, this, uid);
         } catch (ComponentLookupException e) {
             throw new TranslationBundleDoesNotExistsException("Failed to create document bundle", e);
         }
 
         return documentBundle;
+    }
+
+    private ComponentDocumentTranslationBundle createComponentDocumentBundle(XWikiDocument document,
+        ComponentDescriptor<TranslationBundle> descriptor) throws TranslationBundleDoesNotExistsException
+    {
+        ComponentDocumentTranslationBundle documentBundle;
+        try {
+            documentBundle =
+                new ComponentDocumentTranslationBundle(ID_PREFIX, document.getDocumentReference(),
+                    this.componentManagerProvider.get(), this.translationParser, descriptor);
+        } catch (ComponentLookupException e) {
+            throw new TranslationBundleDoesNotExistsException("Failed to create document bundle", e);
+        }
+
+        return documentBundle;
+    }
+
+    /**
+     * @param uid remove the bundle from the cache
+     */
+    void clear(String uid)
+    {
+        this.onDemandBundleCache.remove(uid);
     }
 
     /**
@@ -335,6 +349,17 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
                     document.getDocumentReference(), e);
             }
         }
+    }
+
+    private Scope getScope(XWikiDocument document)
+    {
+        BaseObject obj = document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE);
+
+        if (obj != null) {
+            return getScope(obj);
+        }
+
+        return null;
     }
 
     /**
@@ -362,22 +387,18 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
      */
     private void unregisterTranslationBundle(XWikiDocument document)
     {
-        BaseObject obj = document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE);
+        Scope scope = getScope(document);
 
-        if (obj != null) {
-            Scope scope = getScope(obj);
+        // Unregister component
+        if (scope != null && scope != Scope.ON_DEMAND) {
+            ComponentDescriptor<TranslationBundle> descriptor =
+                createComponentDescriptor(document.getDocumentReference());
 
-            // Unregister component
-            if (scope != null && scope != Scope.ON_DEMAND) {
-                ComponentDescriptor<TranslationBundle> descriptor =
-                    createComponentDescriptor(document.getDocumentReference());
-
-                getComponentManager(document, scope, true).unregisterComponent(descriptor);
-            }
-
-            // Remove from cache
-            this.bundlesCache.remove(this.uidSerializer.serialize(document.getDocumentReference()));
+            getComponentManager(document, scope, true).unregisterComponent(descriptor);
         }
+
+        // Remove from cache
+        this.onDemandBundleCache.remove(this.uidSerializer.serialize(document.getDocumentReference()));
     }
 
     /**
@@ -391,23 +412,17 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     private void registerTranslationBundle(XWikiDocument document) throws TranslationBundleDoesNotExistsException,
         ComponentRepositoryException, AccessDeniedException
     {
-        BaseObject obj = document.getXObject(TranslationDocumentModel.TRANSLATIONCLASS_REFERENCE);
+        Scope scope = getScope(document);
 
-        if (obj != null) {
-            Scope scope = getScope(obj);
+        if (scope != null && scope != Scope.ON_DEMAND) {
+            checkRegistrationAuthorization(document, scope);
 
-            if (scope != null && scope != Scope.ON_DEMAND) {
-                checkRegistrationAuthorization(document, scope);
+            ComponentDescriptor<TranslationBundle> descriptor =
+                createComponentDescriptor(document.getDocumentReference());
 
-                DefaultDocumentTranslationBundle bundle = createDocumentBundle(document);
+            ComponentDocumentTranslationBundle bundle = createComponentDocumentBundle(document, descriptor);
 
-                ComponentDescriptor<TranslationBundle> descriptor =
-                    createComponentDescriptor(document.getDocumentReference());
-
-                getComponentManager(document, scope, true).registerComponent(descriptor, bundle);
-
-                this.bundleContext.addBundle(bundle);
-            }
+            getComponentManager(document, scope, true).registerComponent(descriptor, bundle);
         }
     }
 
@@ -440,7 +455,7 @@ public class DocumentTranslationBundleFactory implements TranslationBundleFactor
     {
         DefaultComponentDescriptor<TranslationBundle> descriptor = new DefaultComponentDescriptor<TranslationBundle>();
 
-        descriptor.setImplementation(DefaultDocumentTranslationBundle.class);
+        descriptor.setImplementation(ComponentDocumentTranslationBundle.class);
         descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
         descriptor.setRoleHint(ID_PREFIX + this.serializer.serialize(documentReference));
         descriptor.setRoleType(TranslationBundle.class);

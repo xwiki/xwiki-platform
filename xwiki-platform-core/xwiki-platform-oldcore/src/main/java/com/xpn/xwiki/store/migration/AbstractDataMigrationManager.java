@@ -41,6 +41,8 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.job.JobManager;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -68,6 +70,9 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      */
     @Inject
     protected ObservationManager observationManager;
+
+    @Inject
+    protected JobProgressManager progress;
 
     /**
      * Ordered list of migrators that may be applied.
@@ -639,25 +644,32 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
      */
     protected void startMigrations() throws DataMigrationException
     {
-        // We should migrate the main wiki first to be able to access subwiki descriptors if needed.
-        if (!migrateDatabase(getMainXWiki())) {
-            String message = "Main wiki database migration failed, it is not safe to continue!";
-            logger.error(message);
-            throw new DataMigrationException(message);
-        }
+        Set<String> databasesToMigrate = getDatabasesToMigrate();
 
-        int errorCount = 0;
-        for (String database : getDatabasesToMigrate()) {
-            if (!migrateDatabase(database)) {
-                errorCount++;
+        this.progress.pushLevelProgress(databasesToMigrate.size() + 1, this);
+
+        try {
+            // We should migrate the main wiki first to be able to access subwiki descriptors if needed.
+            if (!migrateDatabase(getMainXWiki())) {
+                String message = "Main wiki database migration failed, it is not safe to continue!";
+                logger.error(message);
+                throw new DataMigrationException(message);
             }
-        }
 
-        if (errorCount > 0) {
-            String message =
-                String.format("%s wiki database migration(s) failed.", errorCount);
-            logger.error(message);
-            throw new DataMigrationException(message);
+            int errorCount = 0;
+            for (String database : databasesToMigrate) {
+                if (!migrateDatabase(database)) {
+                    errorCount++;
+                }
+            }
+
+            if (errorCount > 0) {
+                String message = String.format("%s wiki database migration(s) failed.", errorCount);
+                logger.error(message);
+                throw new DataMigrationException(message);
+            }
+        } finally {
+            this.progress.popLevelProgress(this);
         }
     }
 
@@ -809,25 +821,33 @@ public abstract class AbstractDataMigrationManager implements DataMigrationManag
             database = getXWikiContext().getWikiId();
         }
 
-        for (XWikiMigration migration : migrations) {
-            if (logger.isInfoEnabled()) {
-                logger.info("Starting data migration [{}] with version [{}] on database [{}]",
-                    migration.dataMigration.getName(), migration.dataMigration.getVersion(), database);
-            }
+        this.progress.pushLevelProgress(migrations.size(), this);
 
-            migration.dataMigration.migrate();
-
-            if (migration.dataMigration.getVersion().compareTo(curversion) > 0) {
-                curversion = migration.dataMigration.getVersion();
-                updateMigrationStatus(curversion);
+        try {
+            for (XWikiMigration migration : migrations) {
                 if (logger.isInfoEnabled()) {
-                    logger.info("Data migration [{}] applied successfully, database [{}] upgraded to version [{}]",
+                    logger.info("Starting data migration [{}] with version [{}] on database [{}]",
+                        migration.dataMigration.getName(), migration.dataMigration.getVersion(), database);
+                }
+
+                migration.dataMigration.migrate();
+
+                if (migration.dataMigration.getVersion().compareTo(curversion) > 0) {
+                    curversion = migration.dataMigration.getVersion();
+                    updateMigrationStatus(curversion);
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Data migration [{}] applied successfully, database [{}] upgraded to version [{}]",
+                            migration.dataMigration.getName(), database, getDBVersion());
+                    }
+                } else if (logger.isInfoEnabled()) {
+                    logger.info("Data migration [{}] applied successfully, database [{}] stay in version [{}]",
                         migration.dataMigration.getName(), database, getDBVersion());
                 }
-            } else if (logger.isInfoEnabled()) {
-                logger.info("Data migration [{}] applied successfully, database [{}] stay in version [{}]",
-                    migration.dataMigration.getName(), database, getDBVersion());
+
+                this.progress.stepPropress(this);
             }
+        } finally {
+            this.progress.popLevelProgress(this);
         }
 
         // If migration is launch on an empty DB or latest migration was unneeded, properly set the latest DB version

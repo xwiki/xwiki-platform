@@ -25,7 +25,7 @@ import org.xwiki.observation.remote.RemoteEventData;
 
 /**
  * Convert a remote event to a local event.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */
@@ -39,7 +39,7 @@ public interface RemoteEventConverter
 
     /**
      * Convert provided remote event to local event by filling the provided local event object.
-     * 
+     *
      * @param remoteEvent the remote event
      * @param localEvent the local event
      * @return if the converter support this conversion it should return true after the conversion, otherwise false

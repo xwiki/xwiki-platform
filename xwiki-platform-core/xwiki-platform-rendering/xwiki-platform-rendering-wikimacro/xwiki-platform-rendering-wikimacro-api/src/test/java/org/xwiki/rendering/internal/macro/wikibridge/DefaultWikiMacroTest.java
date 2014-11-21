@@ -55,6 +55,7 @@ import org.xwiki.script.ScriptContextManager;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * Unit tests for {@link DefaultWikiMacro}.
@@ -77,6 +78,8 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     private WikiModel mockWikiModel;
 
     private WikiMacroFactory mockWikiMacroFactory;
+
+    private WikiDescriptorManager mockWikiDescriptorManager;
 
     private Map<String, Object> xcontext;
 
@@ -128,6 +131,8 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
+
+        this.mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
 
         // some tests fail because the lookup of this component fails (the implementation is defined in xwiki-core)
         this.mockWikiMacroFactory = registerMockComponent(WikiMacroFactory.class);
@@ -268,7 +273,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
         // Hack into velocity context.
         Execution execution = getComponentManager().getInstance(Execution.class);
-        Map< ? , ? > xwikiContext = (Map< ? , ? >) execution.getContext().getProperty("xwikicontext");
+        Map<?, ?> xwikiContext = (Map<?, ?>) execution.getContext().getProperty("xwikicontext");
         final VelocityContext vContext = new VelocityContext();
         vContext.put("xcontext", xwikiContext);
 

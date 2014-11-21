@@ -23,6 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -36,7 +39,9 @@ import org.xwiki.xml.html.filter.ElementSelector;
  * @version $Id$
  * @since 1.8M1
  */
-@Component("officeimporter/linebreak")
+@Component
+@Named("officeimporter/linebreak")
+@Singleton
 public class LineBreakFilter extends AbstractHTMLFilter
 {
     /**

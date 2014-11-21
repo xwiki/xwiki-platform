@@ -45,6 +45,18 @@
 #set($void = $SUPPORTED_SYNTAXES.put(2.0, 'XWiki Syntax 2.0'))
 #set($void = $SUPPORTED_SYNTAXES.put(2.1, 'XWiki Syntax 2.1'))
 
+## We need a way to have a mapping between a string and a number, and we cannot use $mathtool.toDouble() because
+## it is locale dependent (see: http://jira.xwiki.org/browse/XWIKI-11343).
+## TODO: fix $mathtool or create a script service that handles this english-locale string&lt;-&gt;number conversion,
+## because this fix is a bit hacky/spaghetti.
+## A better fix would be to refactor this application, because the syntax number SHOULD NOT BE USED because a syntax
+## is not supposed to be a number (imagine that we switch to 'Markdown', it is impossible to compare).
+## Instead, a syntax object should have a list of categories that the syntax supports.
+#set($NUMBERS_CONVERSION = {})
+#set($void = $NUMBERS_CONVERSION.put('1.0', 1.0))
+#set($void = $NUMBERS_CONVERSION.put('2.0', 2.0))
+#set($void = $NUMBERS_CONVERSION.put('2.1', 2.1))
+
 #if ($request.xaction == 'switchContext')
   $response.sendRedirect($request.target)
   #stop
@@ -55,11 +67,8 @@
   #set ($crtCategoryId = $mathtool.toInteger($crtCategoryId))
 #end
 #set ($crtSectionId = "$!{request.section}")
-#set ($crtSyntaxVer = $mathtool.toDouble($request.syntax))
-#if ($crtSyntaxVer &amp;&amp; $SUPPORTED_SYNTAXES.containsKey($crtSyntaxVer))
-  #set ($crtSyntaxVer = $mathtool.toDouble($crtSyntaxVer))
-
-#else
+#set ($crtSyntaxVer = $NUMBERS_CONVERSION.get($request.syntax))
+#if ("$!crtSyntaxVer" == '' || !$SUPPORTED_SYNTAXES.containsKey($crtSyntaxVer))
   #set ($crtSyntaxVer = 2.1) ## Default to Syntax 2.1
 #end
 
@@ -145,6 +154,7 @@ $syntaxMenu.add($cat)
 #foreach ($category in $syntaxMenu)
   #set ($sectionsToRemove = [])
   #foreach ($section on $category.children)
+    ## TODO: This should be refactored (see before): a syntax is not supposed to be a number
     #if ($section.minSyntax &gt; $crtSyntaxVer)
       #set ($discard = $sectionsToRemove.add($section))
       #if ($section.id == $crtSectionId)
@@ -214,6 +224,7 @@ $syntaxMenu.add($cat)
 #macro(syntax_displayCategory $sections $translationPrefix $heading)
   #foreach ($section in $sections)
     #set ($displayVersion = $crtSyntaxVer)
+    ## TODO: This should be refactored (see before): a syntax is not supposed to be a number
     #if ($crtSyntaxVer &gt; $section.maxSyntax)
       #set ($displayVersion = $section.maxSyntax)
     #end

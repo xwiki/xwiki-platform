@@ -22,6 +22,8 @@ package org.xwiki.container.servlet;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.internal.StackingComponentEventManager;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -40,6 +42,11 @@ import org.xwiki.observation.event.ApplicationStoppedEvent;
  */
 public class XWikiServletContextListener implements ServletContextListener
 {
+    /**
+     * Logger to use to log shutdown information (opposite of initialization).
+     */
+    private static final Logger SHUTDOWN_LOGGER = LoggerFactory.getLogger("org.xwiki.shutdown");
+
     /** The component manager used to lookup other components. */
     private EmbeddableComponentManager componentManager;
 
@@ -114,6 +121,8 @@ public class XWikiServletContextListener implements ServletContextListener
     @Override
     public void contextDestroyed(ServletContextEvent sce)
     {
+        SHUTDOWN_LOGGER.debug("Stopping XWiki...");
+
         // It's possible that the Component Manager failed to initialize some of the required components.
         if (this.componentManager != null) {
             // Send an Observation event to signal the XWiki application is stopped. This allows components who need
@@ -142,6 +151,8 @@ public class XWikiServletContextListener implements ServletContextListener
 
             // Make sure to dispose all components before leaving
             this.componentManager.dispose();
+
+            SHUTDOWN_LOGGER.debug("XWiki has been stopped!");
         }
     }
 }

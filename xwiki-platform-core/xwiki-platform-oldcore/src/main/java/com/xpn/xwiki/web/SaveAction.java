@@ -45,6 +45,11 @@ public class SaveAction extends PreviewAction
     /** The identifier of the save action. */
     public static final String ACTION_NAME = "save";
 
+    public SaveAction()
+    {
+        this.waitForXWikiInitialization = true;
+    }
+
     /**
      * Saves the current document, updated according to the parameters sent in the request.
      * 
@@ -95,7 +100,6 @@ public class SaveAction extends PreviewAction
                 // Same as above, clone the object retrieved from the store cache.
                 tdoc = tdoc.clone();
             }
-            tdoc.setTranslation(1);
         }
 
         if (doc.isNew()) {

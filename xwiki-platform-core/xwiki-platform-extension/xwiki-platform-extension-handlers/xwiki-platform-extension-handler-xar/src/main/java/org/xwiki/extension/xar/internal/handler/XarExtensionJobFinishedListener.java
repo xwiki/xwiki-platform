@@ -191,7 +191,7 @@ public class XarExtensionJobFinishedListener implements EventListener
                             try {
                                 currentDocument.loadAttachmentsContent(xcontext);
                                 if (!currentDocument.equalsData(previousDocument)) {
-                                    // XXX: conflict between current and new
+                                    // conflict between current and new
                                     pages.put(reference, false);
                                 }
                             } catch (Exception e) {

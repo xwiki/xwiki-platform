@@ -59,7 +59,11 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     @Override
     public void checkAccess(Right right) throws AccessDeniedException
     {
-        checkAccess(right, getCurrentEntity(right));
+        if (right == Right.PROGRAM) {
+            checkAccess(right, getCurrentUser(right, null), null);
+        }
+
+        checkAccess(right, right == Right.PROGRAM ? null : getCurrentEntity());
     }
 
     @Override
@@ -67,17 +71,26 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     {
         DocumentReference user = getCurrentUser(right, entity);
 
+        checkAccess(right, user, entity);
+    }
+
+    private void checkAccess(Right right, DocumentReference user, EntityReference entity) throws AccessDeniedException
+    {
         if (!checkPreAccess(right)) {
             throw new AccessDeniedException(right, user, entity);
         }
 
-        authorizationManager.checkAccess(right, user, entity);
+        this.authorizationManager.checkAccess(right, user, entity);
     }
 
     @Override
     public boolean hasAccess(Right right)
     {
-        return hasAccess(right, getCurrentEntity(right));
+        if (right == Right.PROGRAM) {
+            return hasAccess(right, getCurrentUser(right, null), null);
+        }
+
+        return hasAccess(right, getCurrentEntity());
     }
 
     @Override
@@ -85,7 +98,12 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     {
         DocumentReference user = getCurrentUser(right, entity);
 
-        return checkPreAccess(right) && authorizationManager.hasAccess(right, user, entity);
+        return hasAccess(right, user, entity);
+    }
+
+    private boolean hasAccess(Right right, DocumentReference user, EntityReference entity)
+    {
+        return checkPreAccess(right) && this.authorizationManager.hasAccess(right, user, entity);
     }
 
     /**
@@ -97,7 +115,7 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     private boolean checkPreAccess(Right right)
     {
         if (right == Right.PROGRAM) {
-            if (renderingContext.isRestricted() || xcontextProvider.get().hasDroppedPermissions()) {
+            if (this.renderingContext.isRestricted() || this.xcontextProvider.get().hasDroppedPermissions()) {
                 return false;
             }
         }
@@ -105,27 +123,19 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
         return true;
     }
 
-    /**
-     * @return the current user from context.
-     */
     private DocumentReference getCurrentUser(Right right, EntityReference entity)
     {
         // Backward compatibility for the old way of assigning programming right.
         if (right == Right.PROGRAM) {
-            XWikiDocument doc = getDocument(entity);
+            XWikiDocument doc = entity == null ? getProgrammingDocument() : getDocument(entity);
             if (doc != null) {
                 return getContentAuthor(doc);
             }
         }
-        return xcontextProvider.get().getUserReference();
+
+        return this.xcontextProvider.get().getUserReference();
     }
 
-    /**
-     * Retrieve the document corresponding to the given reference.
-     *
-     * @param entity an entity reference. The document reference is extracted from it.
-     * @return a document or null if the reference could not be resolved to a document.
-     */
     private XWikiDocument getDocument(EntityReference entity)
     {
         if (entity == null) {
@@ -137,21 +147,14 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
             return null;
         }
 
-        XWikiContext xcontext = xcontextProvider.get();
-
-        // This is here for backward compatibility of hasProgrammingRights(XWikiContext context)
-        // method from the old right service, since the document in context may be a fake document.
-        // For example, the DistributionAction use a fake document with PR in context to have PR for
-        // its distribution.vm template.
-        if (xcontext.getDoc().getDocumentReference().equals(docEntity)) {
-            return xcontext.getDoc();
-        }
+        XWikiContext xcontext = this.xcontextProvider.get();
 
         try {
             return xcontext.getWiki().getDocument(new DocumentReference(docEntity), xcontext);
         } catch (Exception e) {
             // Ignored
         }
+
         return null;
     }
 
@@ -175,24 +178,35 @@ public class DefaultContextualAuthorizationManager implements ContextualAuthoriz
     /**
      * Get the current entity from context.
      *
-     * @param right the right being checked.
      * @return the current sdoc or doc document reference, or the current wiki reference if no doc available.
      */
-    private EntityReference getCurrentEntity(Right right)
+    private EntityReference getCurrentEntity()
     {
-        XWikiContext xcontext = xcontextProvider.get();
-        XWikiDocument doc = null;
+        XWikiContext xcontext = this.xcontextProvider.get();
+        XWikiDocument doc = xcontext.getDoc();
 
-        if (right == Right.PROGRAM) {
-            doc = (XWikiDocument) xcontext.get("sdoc");
-        }
-        if (doc == null) {
-            doc = xcontext.getDoc();
-        }
         if (doc != null) {
             return doc.getDocumentReference();
         }
 
         return null;
+    }
+
+    /**
+     * Get the document used to test programming right.
+     *
+     * @param right the right being checked.
+     * @return the current sdoc or doc document reference, null if no doc available.
+     */
+    private XWikiDocument getProgrammingDocument()
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+
+        XWikiDocument document = (XWikiDocument) xcontext.get(XWikiDocument.CKEY_SDOC);
+        if (document == null) {
+            document = xcontext.getDoc();
+        }
+
+        return document;
     }
 }

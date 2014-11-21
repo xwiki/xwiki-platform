@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -50,6 +51,7 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
  */
 @Component
 @Named("R54000WikiTemplateMigration")
+@Singleton
 public class WikiTemplateMigration extends AbstractHibernateDataMigration
 {
     private static final String OLD_TEMPLATE_PROPERTY = "iswikitemplate";

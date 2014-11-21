@@ -44,7 +44,7 @@ import org.xwiki.observation.remote.converter.EventConverterManager;
 
 /**
  * JGoups based {@link RemoteObservationManager}. It's also the default implementation for now.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */

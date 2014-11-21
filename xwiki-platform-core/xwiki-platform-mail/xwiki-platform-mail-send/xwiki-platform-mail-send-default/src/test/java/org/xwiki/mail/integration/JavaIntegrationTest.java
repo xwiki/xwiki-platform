@@ -49,6 +49,7 @@ import org.xwiki.mail.XWikiAuthenticator;
 import org.xwiki.mail.internal.DefaultMailSender;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.icegreen.greenmail.util.GreenMail;
@@ -111,6 +112,8 @@ public class JavaIntegrationTest
     public void initialize() throws Exception
     {
         this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+        this.componentManager.registerComponent(MockConfigurationSource.getDescriptor("documents"));
+        this.componentManager.registerComponent(MockConfigurationSource.getDescriptor("xwikiproperties"));
 
         this.configuration = this.componentManager.getInstance(MailSenderConfiguration.class);
         this.defaultBodyPartFactory = this.componentManager.getInstance(

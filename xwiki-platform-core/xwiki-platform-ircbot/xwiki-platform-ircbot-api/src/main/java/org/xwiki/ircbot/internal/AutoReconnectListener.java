@@ -21,6 +21,7 @@ package org.xwiki.ircbot.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.DisconnectEvent;
@@ -38,6 +39,7 @@ import org.xwiki.ircbot.IRCBotListener;
  */
 @Component
 @Named("autoreconnect")
+@Singleton
 public class AutoReconnectListener<T extends ExtendedPircBotX> extends ListenerAdapter<T> implements IRCBotListener<T>
 {
     /**

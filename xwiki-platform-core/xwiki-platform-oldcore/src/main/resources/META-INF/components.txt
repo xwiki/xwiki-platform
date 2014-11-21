@@ -47,10 +47,14 @@ com.xpn.xwiki.internal.model.reference.XClassRelativeStringEntityReferenceResolv
 com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter
-com.xpn.xwiki.internal.template.DefaultPrivilegedTemplateRenderer
+com.xpn.xwiki.internal.skin.SkinConfiguration
+com.xpn.xwiki.internal.skin.SkinManager
+com.xpn.xwiki.internal.skin.WikiSkinUtils
+com.xpn.xwiki.internal.template.SUExecutor
+com.xpn.xwiki.internal.template.TemplateListener
 com.xpn.xwiki.internal.template.TemplateMacro
 com.xpn.xwiki.internal.template.TemplateScriptService
-com.xpn.xwiki.internal.template.WikiTemplateRenderer
+com.xpn.xwiki.internal.template.TemplateManager
 500:com.xpn.xwiki.internal.observation.remote.converter.FilteredSerializableEventConverter
 com.xpn.xwiki.internal.plugin.image.DefaultImageProcessor
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
@@ -84,6 +88,7 @@ com.xpn.xwiki.store.migration.hibernate.R42000XWIKI7726DataMigration
 com.xpn.xwiki.store.migration.hibernate.R43000XWIKI6691DataMigration
 com.xpn.xwiki.store.migration.hibernate.R4340XWIKI883DataMigration
 com.xpn.xwiki.store.migration.hibernate.R4359XWIKI1459DataMigration
+com.xpn.xwiki.store.migration.hibernate.R54600TranslationDataMigration
 com.xpn.xwiki.store.migration.hibernate.R6079XWIKI1878DataMigration
 com.xpn.xwiki.store.migration.hibernate.R6405XWIKI1933DataMigration
 com.xpn.xwiki.store.migration.hibernate.R7350XWIKI2079DataMigration
@@ -94,7 +99,6 @@ com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore
 com.xpn.xwiki.store.VoidAttachmentVersioningStore
 com.xpn.xwiki.store.XWikiHibernateRecycleBinStore
 com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore
-com.xpn.xwiki.internal.store.HibernateShutdownEventListener
 com.xpn.xwiki.objects.meta.BooleanMetaClass
 com.xpn.xwiki.objects.meta.ComputedFieldMetaClass
 com.xpn.xwiki.objects.meta.DateMetaClass

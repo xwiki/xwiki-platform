@@ -107,6 +107,7 @@ public class WikiObjectReader extends AbstractReader implements XARXMLReader<Wik
         }
     }
 
+    @Override
     public WikiObject read(XMLStreamReader xmlReader) throws XMLStreamException, FilterException
     {
         WikiObject wikiObject = new WikiObject();

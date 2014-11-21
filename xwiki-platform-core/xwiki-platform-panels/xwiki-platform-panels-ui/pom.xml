@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-panels</artifactId>
-    <version>6.2-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-panels-ui</artifactId>
   <name>XWiki Platform - Panels - UI</name>
@@ -61,6 +61,31 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery-ui</artifactId>
+      <version>1.11.1</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>jquery-ui-touch-punch</artifactId>
+      <version>0.2.3-2</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Needed to display icons -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-script</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Panels currently don't fully have their own Administration page. For example defining the left and right
          panels or whether left/right panels are displayed or not are currently defined in the Administration
          Application. In the future move those features in this Panel Application and remove this dependency. -->
@@ -69,6 +94,13 @@
       <artifactId>xwiki-platform-administration-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Needed to get the homepage in Panels.OrphanedPages -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-script</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

@@ -94,12 +94,10 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         ServletEnvironment environment = getComponentManager().getInstance(Environment.class);
         Mock mockServletContext = mock(ServletContext.class); 
         environment.setServletContext((ServletContext) mockServletContext.proxy());
-        mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/cache/infinispan/config.xml"))
-            .will(returnValue(null));
+        mockServletContext.stubs().method("getResourceAsStream").will(returnValue(null));
+        mockServletContext.stubs().method("getResource").will(returnValue(null));
         mockServletContext.stubs().method("getAttribute").with(eq("javax.servlet.context.tempdir"))
             .will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
-        mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/xwiki.cfg"))
-        .will(returnValue(null));
 
         Mock mockCoreConfiguration = registerMockComponent(CoreConfiguration.class);
         mockCoreConfiguration.stubs().method("getDefaultDocumentSyntax").will(returnValue(Syntax.XWIKI_1_0));

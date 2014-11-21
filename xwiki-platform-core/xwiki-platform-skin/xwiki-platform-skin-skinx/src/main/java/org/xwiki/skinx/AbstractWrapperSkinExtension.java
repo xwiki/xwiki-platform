@@ -23,7 +23,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.xwiki.component.annotation.Component;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWiki;
@@ -43,6 +43,9 @@ public abstract class AbstractWrapperSkinExtension implements SkinExtension
     /** Execution context handler, needed for accessing the XWikiContext. */
     @Inject
     private Execution execution;
+
+    @Inject
+    private ComponentDescriptor<SkinExtension> descriptor;
 
     @Override
     public void use(String resource)
@@ -71,6 +74,6 @@ public abstract class AbstractWrapperSkinExtension implements SkinExtension
      */
     public String getName()
     {
-        return getClass().getAnnotation(Component.class).value();
+        return this.descriptor.getRoleHint();
     }
 }

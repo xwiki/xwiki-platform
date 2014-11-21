@@ -86,11 +86,6 @@ public class WikiDescriptorListener implements EventListener
     {
         XWikiDocument document = (XWikiDocument) source;
 
-        // If a wiki is deleted or created reset the list of wiki ids
-        if (event instanceof DocumentDeletedEvent || event instanceof DocumentCreatedEvent) {
-            this.cache.setWikiIds(null);
-        }
-
         // If the document is deleted then check the original document to see if it had XWiki Server objects and if
         // so then unregister them
         if (event instanceof DocumentDeletedEvent || event instanceof DocumentUpdatedEvent) {
@@ -103,6 +98,7 @@ public class WikiDescriptorListener implements EventListener
             DefaultWikiDescriptor descriptor = this.builder.buildDescriptorObject(serverClassObjects, document);
             if (descriptor != null) {
                 this.cache.add(descriptor);
+                this.cache.setWikiIds(null);
             }
         }
     }
@@ -116,6 +112,7 @@ public class WikiDescriptorListener implements EventListener
             DefaultWikiDescriptor existingDescriptor = this.cache.getFromId(wikiId);
             if (existingDescriptor != null) {
                 this.cache.remove(existingDescriptor);
+                this.cache.setWikiIds(null);
             }
         }
     }

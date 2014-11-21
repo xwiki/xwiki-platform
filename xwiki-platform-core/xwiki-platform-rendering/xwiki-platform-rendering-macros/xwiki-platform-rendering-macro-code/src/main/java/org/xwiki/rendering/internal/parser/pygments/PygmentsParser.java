@@ -36,7 +36,6 @@ import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -119,12 +118,6 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
      * The Python script used to manipulate Pygments.
      */
     private String script;
-
-    /**
-     * The logger to log.
-     */
-    @Inject
-    private Logger logger;
 
     @Override
     public void initialize() throws InitializationException

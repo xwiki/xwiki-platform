@@ -32,7 +32,9 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.sheet.SheetBinder;
 import org.xwiki.sheet.SheetManager;
@@ -96,6 +98,8 @@ public class SheetScriptServiceTest
         this.mockDocumentAccessBridge = this.mocker.registerMockComponent(DocumentAccessBridge.class);
 
         this.mocker.registerMockComponent(SheetManager.class);
+        this.mocker.registerMockComponent(ConfigurationSource.class, "all");
+        this.mocker.registerMockComponent(ConfigurationSource.class, "xwikiproperties");
     }
 
     /**
@@ -109,6 +113,7 @@ public class SheetScriptServiceTest
     {
         DocumentReference classReference = new DocumentReference("wiki", "Space", "MyClass");
         final XWikiDocument classDocument = new XWikiDocument(classReference);
+        classDocument.setSyntax(Syntax.PLAIN_1_0);
         Document classDocumentApi = new Document(classDocument, null);
 
         final DocumentReference sheetReference =

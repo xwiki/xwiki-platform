@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -30,14 +29,11 @@
   <creationDate>1385047495000</creationDate>
   <parent>Main.XWikiUsers</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <date>1385071571000</date>
   <contentUpdateDate>1385071571000</contentUpdateDate>
   <version>1.1</version>
   <title>#set($userName="$!doc.getValue('first_name') $!doc.getValue('last_name')")#if($userName==' ')#set($userName=$doc.name)#{end}$services.localization.render('platform.core.profile.title', [$userName])</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
@@ -81,7 +77,7 @@
 #########################
 #set($currentCategory = "$!request.category")
 #if($currentCategory == "")
-  #set($currentCategory = $listtool.get($categories, 0).get('id'))
+  #set($currentCategory = $categories[0].get('id'))
 #end
 #########################
 ## Creating vertical menu
@@ -238,7 +234,7 @@
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
@@ -259,7 +255,7 @@ Object.extend(XWiki, {
       this.tabsContainer.select('.category-tab').each(function (tabElement) {
         tabElement.observe('click', function(event) {
           Event.stop(event);
-          this.switchTab(tabElement.id);
+          this.switchTab(tabElement.id, true);
         }.bindAsEventListener(this));
       }.bind(this));
       this.tabsContainer.select('.category-tab.current').each(function (activeTab) {
@@ -267,9 +263,20 @@ Object.extend(XWiki, {
         document.fire('xwiki:profile:switchedCategory', {'category' : activeTab.id});
       }.bind(this));
       this.handleCancelAction();
+
+      // History navigation through our pushed states.
+      window.addEventListener('popstate', function(event) {
+        if (event.state &amp;&amp; event.state.category) {
+          this.switchTab('vertical-menu-' + event.state.category);
+        }
+      }.bindAsEventListener(this));
+      // Store the initial history state so we can go back.
+      history.replaceState({
+        category: window.location.search.toQueryParams().category || 'profile'
+      }, document.title, document.location.href);
     },
 
-    switchTab : function(tab) {
+    switchTab : function(tab, pushHistory) {
       var tabName = tab.substring(14); // 14 = len('vertical-menu-')
       $("user-page-content").select("div.user-page-pane").each(function(pane){
         pane.addClassName('hidden');
@@ -280,6 +287,9 @@ Object.extend(XWiki, {
       });
       $(tab).addClassName('current');
       this.updateCategoryFields(tab);
+      if (pushHistory) {
+        this.updateURL(tabName);
+      }
       document.fire('xwiki:profile:switchedCategory', {'category' : tab});
     },
 
@@ -289,6 +299,17 @@ Object.extend(XWiki, {
       this.updateField('xredirect', XWiki.currentDocument.getURL('view', 'category=' + category));
       this.updateField('xcontinue', XWiki.currentDocument.getURL('edit', 'editor=inline&amp;category=' + category));
       this.updateField('category', category);
+    },
+
+    updateURL : function (category) {
+      if (history.pushState) {
+        var params = window.location.search.toQueryParams();
+        params.category = category;
+        newQueryString = Object.toQueryString(params);
+
+        var newURL = window.location.protocol + '//' + window.location.host + window.location.pathname + '?' + newQueryString;
+        window.history.pushState({category : category}, '', newURL);
+      }
     },
 
     updateField : function (fieldName, value) {
@@ -404,7 +425,7 @@ return XWiki;
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>

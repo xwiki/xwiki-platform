@@ -62,7 +62,7 @@
   #template("htmlheader.vm")
   #if($displayMainMenu)
     <div id="menuview">
-      #template("menus/view.vm")
+      #template("menus_view.vm")
     </div>
   #end
   #template("header.vm")
@@ -113,7 +113,7 @@
     #end
     #if($displayContentMenu)
       <div class="col-xs-12 col-md-5">
-        #template("menus/content.vm")
+        #template("menus_content.vm")
       </div>
     #end
   </div> ## row

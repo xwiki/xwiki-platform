@@ -221,10 +221,11 @@ function executeCommand(url, callback) {
         if (ajaxCallback) {
           ajaxCallback(ajaxRequest.responseText);
         } else {
-          alert('no callback defined');
+          new XWiki.widgets.Notification('no callback defined', 'error');
         }
       } else {
-        alert("There was a problem retrieving the xml data:\n" + ajaxRequest.status + ":\t" + ajaxRequest.statusText + "\n" + ajaxRequest.responseText);
+        new XWiki.widgets.Notification("There was a problem retrieving the xml data:\n" + ajaxRequest.status + ":\t"
+            + ajaxRequest.statusText + "\n" + ajaxRequest.responseText, 'error');
       }
     }
   }
@@ -247,10 +248,10 @@ function executeCommand(url, callback) {
       ajaxRequest.open("GET", url, true);
       ajaxRequest.send();
     } else{
-      alert("your browser does not support xmlhttprequest" )
+      new XWiki.widgets.Notification('your browser does not support xmlhttprequest', 'error');
     }
   } else{
-    alert("your browser does not support xmlhttprequest" )
+    new XWiki.widgets.Notification("your browser does not support xmlhttprequest", 'error');
   }
 }
 
@@ -390,15 +391,16 @@ function save() {
 
 function saveResult(html) {
   if (html=="SUCCESS") {
-    alert(window.panelsavesuccess)
+    new XWiki.widgets.Notification(window.panelsavesuccess, 'done');
     // this is for the "revert" button:
     leftPanels.savedPanelList = getBlocList(leftPanels);
     rightPanels.savedPanelList = getBlocList(rightPanels);
     leftPanels.isVisible = window.showLeftColumn;
     rightPanels.isVisible = window.showRightColumn;
   } else {
-    alert(window.panelsaveerror)
-    alert(html)
+    // Alerts are more appropriate to display the "html" message
+    alert(window.panelsaveerror);
+    alert(html);
   }
 }
 

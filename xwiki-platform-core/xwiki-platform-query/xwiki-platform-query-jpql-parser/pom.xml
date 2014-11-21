@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-query</artifactId>
-    <version>6.2-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-query-jpql-parser</artifactId>
   <name>XWiki Platform - Query - JPQL Parser</name>
@@ -46,6 +46,19 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>
+            org/xwiki/query/jpql/analysis/*.java,
+            org/xwiki/query/jpql/lexer/*.java,
+            org/xwiki/query/jpql/node/*.java,
+            org/xwiki/query/jpql/parser/*.java
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

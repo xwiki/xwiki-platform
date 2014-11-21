@@ -24,9 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.jmock.Expectations;
-import org.jmock.Sequence;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -36,17 +35,23 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.sheet.SheetManager;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link SheetDocumentDisplayer}.
  * 
  * @version $Id$
  */
-@MockingRequirement(SheetDocumentDisplayer.class)
-public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase<DocumentDisplayer>
+public class SheetDocumentDisplayerTest
 {
+    @Rule
+    public MockitoComponentMockingRule<DocumentDisplayer> mocker = new MockitoComponentMockingRule<DocumentDisplayer>(
+        SheetDocumentDisplayer.class);
+
     /**
      * The reference to the displayed document.
      */
@@ -56,16 +61,6 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
      * The reference to the sheet document.
      */
     private static final DocumentReference SHEET_REFERENCE = new DocumentReference("wiki2", "Code", "Sheet");
-
-    /**
-     * A user reference.
-     */
-    private static final DocumentReference ALICE = new DocumentReference("wiki3", "Users1", "Alice");
-
-    /**
-     * A user reference.
-     */
-    private static final DocumentReference BOB = new DocumentReference("wiki4", "Users2", "Bob");
 
     /**
      * The component used to access the documents.
@@ -80,59 +75,33 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
     @Before
     public void configure() throws Exception
     {
-        this.modelBridge = getComponentManager().getInstance(ModelBridge.class);
-        this.documentAccessBridge = getComponentManager().getInstance(DocumentAccessBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                // Assume the current action is view.
-                allowing(modelBridge).getCurrentAction();
-                will(returnValue("view"));
+        this.modelBridge = this.mocker.getInstance(ModelBridge.class);
+        // Assume the current action is view.
+        when(this.modelBridge.getCurrentAction()).thenReturn("view");
 
-                // Assume all documents are viewable by the current user.
-                allowing(documentAccessBridge).isDocumentViewable(with(any(DocumentReference.class)));
-                will(returnValue(true));
-            }
-        });
+        this.documentAccessBridge = this.mocker.getInstance(DocumentAccessBridge.class);
+        // Assume all documents are viewable by the current user.
+        when(this.documentAccessBridge.isDocumentViewable(any(DocumentReference.class))).thenReturn(true);
     }
 
     /**
-     * Creates a mock {@link DocumentModelBridge} that has the specified reference, author and programming rights.
+     * Creates a mock {@link DocumentModelBridge} that has the specified reference.
      * 
      * @param documentReference the document reference
-     * @param authorReference the author reference
-     * @param hasProgrammingRights {@code true} if the document has programming rights, {@code false} otherwise
      * @return the mock {@link DocumentModelBridge}
      * @throws Exception if creating the mock fails
      */
-    private DocumentModelBridge mockDocument(final DocumentReference documentReference,
-        final DocumentReference authorReference, final boolean hasProgrammingRights) throws Exception
+    private DocumentModelBridge mockDocument(DocumentReference documentReference) throws Exception
     {
         StringBuilder id = new StringBuilder(documentReference.getLastSpaceReference().getName());
         // Allow different instances of the same document to exist.
         id.append('.').append(documentReference.getName()).append(RandomStringUtils.randomAlphanumeric(3));
-        final DocumentModelBridge document = getMockery().mock(DocumentModelBridge.class, id.toString());
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(document).getDocumentReference();
-                will(returnValue(documentReference));
+        DocumentModelBridge document = mock(DocumentModelBridge.class, id.toString());
 
-                allowing(documentAccessBridge).getDocument(documentReference);
-                will(returnValue(document));
-
-                allowing(modelBridge).getDefaultEditMode(document);
-                will(returnValue("edit"));
-
-                allowing(modelBridge).getDefaultTranslation(document);
-                will(returnValue(document));
-
-                allowing(modelBridge).hasProgrammingRights(document);
-                will(returnValue(hasProgrammingRights));
-                allowing(modelBridge).getContentAuthorReference(document);
-                will(returnValue(authorReference));
-            }
-        });
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(this.documentAccessBridge.getDocument(documentReference)).thenReturn(document);
+        when(this.modelBridge.getDefaultEditMode(document)).thenReturn("edit");
+        when(this.modelBridge.getDefaultTranslation(document)).thenReturn(document);
 
         return document;
     }
@@ -142,18 +111,11 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
      * 
      * @param document an XWiki document
      */
-    private void setCurrentDocument(final DocumentModelBridge document)
+    private void setCurrentDocument(DocumentModelBridge document)
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(documentAccessBridge).getCurrentDocumentReference();
-                will(returnValue(document.getDocumentReference()));
-
-                allowing(modelBridge).getCurrentDocument();
-                will(returnValue(document));
-            }
-        });
+        DocumentReference documentReference = document.getDocumentReference();
+        when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(documentReference);
+        when(this.modelBridge.getCurrentDocument()).thenReturn(document);
     }
 
     /**
@@ -164,36 +126,26 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
     @Test
     public void testPreserveSheetPRWhenDocumentIsOnContext() throws Exception
     {
-        final DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE, ALICE, false);
-        final DocumentModelBridge sheet = mockDocument(SHEET_REFERENCE, BOB, true);
+        DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE);
+        DocumentModelBridge sheet = mockDocument(SHEET_REFERENCE);
 
         setCurrentDocument(document);
 
-        final SheetManager sheetManager = getComponentManager().getInstance(SheetManager.class);
-        final DocumentDisplayer documentDisplayer = getComponentManager().getInstance(DocumentDisplayer.class);
-        final Sequence displaySequence = getMockery().sequence("displayInCurrentContext");
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(sheetManager).getSheets(with(document), with(any(String.class)));
-                inSequence(displaySequence);
-                will(returnValue(Collections.singletonList(SHEET_REFERENCE)));
+        SheetManager sheetManager = this.mocker.getInstance(SheetManager.class);
+        when(sheetManager.getSheets(document, "view")).thenReturn(Collections.singletonList(SHEET_REFERENCE));
 
-                // Required in order to preserve the programming rights of the sheet.
-                oneOf(modelBridge).setContentAuthorReference(document, BOB);
-                inSequence(displaySequence);
+        DocumentModelBridge originalSecurityDoc = mock(DocumentModelBridge.class, "sdoc");
+        // Required in order to preserve the programming rights of the sheet.
+        when(this.modelBridge.setSecurityDocument(sheet)).thenReturn(originalSecurityDoc);
 
-                oneOf(documentDisplayer).display(with(sheet), with(any(DocumentDisplayerParameters.class)));
-                inSequence(displaySequence);
-                will(returnValue(new XDOM(Collections.<Block> emptyList())));
+        XDOM output = new XDOM(Collections.<Block>emptyList());
+        DocumentDisplayer documentDisplayer = this.mocker.getInstance(DocumentDisplayer.class);
+        when(documentDisplayer.display(eq(sheet), any(DocumentDisplayerParameters.class))).thenReturn(output);
 
-                // Document author must be reverted.
-                oneOf(modelBridge).setContentAuthorReference(document, ALICE);
-                inSequence(displaySequence);
-            }
-        });
+        assertSame(output, this.mocker.getComponentUnderTest().display(document, new DocumentDisplayerParameters()));
 
-        getMockedComponent().display(document, new DocumentDisplayerParameters());
+        // The security document must be reverted.
+        verify(this.modelBridge).setSecurityDocument(originalSecurityDoc);
     }
 
     /**
@@ -204,52 +156,35 @@ public class SheetDocumentDisplayerTest extends AbstractMockingComponentTestCase
     @Test
     public void testPreserveSheetPRWhenDocumentIsNotOnContext() throws Exception
     {
-        final DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE, ALICE, true);
-        final DocumentModelBridge sheet = mockDocument(SHEET_REFERENCE, BOB, false);
+        DocumentModelBridge document = mockDocument(DOCUMENT_REFERENCE);
+        DocumentModelBridge sheet = mockDocument(SHEET_REFERENCE);
 
         // We test that the displayed document is put on the context even if the current document is just a different
         // instance of the displayed document. This is needed because the displayed document can have unsaved changes.
-        setCurrentDocument(mockDocument(DOCUMENT_REFERENCE, null, false));
+        setCurrentDocument(mockDocument(DOCUMENT_REFERENCE));
 
-        final SheetManager sheetManager = getComponentManager().getInstance(SheetManager.class);
-        final DocumentDisplayer documentDisplayer = getComponentManager().getInstance(DocumentDisplayer.class);
-        final Map<String, Object> backupObjects = new HashMap<String, Object>();
-        final Sequence displaySequence = getMockery().sequence("displayInNewContext");
-        getMockery().checking(new Expectations()
-        {
-            {
-                // The sheet must be determined and displayed in a new execution context that has the target document as
-                // the current document.
-                oneOf(modelBridge).pushDocumentInContext(document);
-                inSequence(displaySequence);
-                will(returnValue(backupObjects));
+        // The sheet must be determined and displayed in a new execution context that has the target document as
+        // the current document.
+        Map<String, Object> backupObjects = new HashMap<String, Object>();
+        when(this.modelBridge.pushDocumentInContext(document)).thenReturn(backupObjects);
 
-                oneOf(sheetManager).getSheets(with(document), with(any(String.class)));
-                inSequence(displaySequence);
-                will(returnValue(Collections.singletonList(SHEET_REFERENCE)));
+        SheetManager sheetManager = this.mocker.getInstance(SheetManager.class);
+        when(sheetManager.getSheets(document, "view")).thenReturn(Collections.singletonList(SHEET_REFERENCE));
 
-                // Required in order to preserve the programming rights of the sheet.
-                oneOf(modelBridge).setContentAuthorReference(document, BOB);
-                inSequence(displaySequence);
-            }
-        });
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(documentDisplayer).display(with(sheet), with(any(DocumentDisplayerParameters.class)));
-                inSequence(displaySequence);
-                will(returnValue(new XDOM(Collections.<Block> emptyList())));
+        DocumentModelBridge originalSecurityDoc = mock(DocumentModelBridge.class, "sdoc");
+        // Required in order to preserve the programming rights of the sheet.
+        when(this.modelBridge.setSecurityDocument(sheet)).thenReturn(originalSecurityDoc);
 
-                // Document content author must be restored.
-                oneOf(modelBridge).setContentAuthorReference(document, ALICE);
-                inSequence(displaySequence);
+        XDOM output = new XDOM(Collections.<Block>emptyList());
+        DocumentDisplayer documentDisplayer = this.mocker.getInstance(DocumentDisplayer.class);
+        when(documentDisplayer.display(eq(sheet), any(DocumentDisplayerParameters.class))).thenReturn(output);
 
-                // The previous execution context must be restored.
-                oneOf(documentAccessBridge).popDocumentFromContext(backupObjects);
-                inSequence(displaySequence);
-            }
-        });
+        assertSame(output, this.mocker.getComponentUnderTest().display(document, new DocumentDisplayerParameters()));
 
-        getMockedComponent().display(document, new DocumentDisplayerParameters());
+        // The security document must be reverted.
+        verify(this.modelBridge).setSecurityDocument(originalSecurityDoc);
+
+        // The previous execution context must be restored.
+        verify(this.documentAccessBridge).popDocumentFromContext(backupObjects);
     }
 }

@@ -25,14 +25,18 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>6.2-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-git</artifactId>
   <name>XWiki Platform - Git</name>
   <packaging>jar</packaging>
-  <description>Script Service to make it easy to run Git commands in wiki pages</description>
+  <description>Make it easy to run Git commands in Java and from wiki pages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Git API</xwiki.extension.name>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>vincentmassol:git-module</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>

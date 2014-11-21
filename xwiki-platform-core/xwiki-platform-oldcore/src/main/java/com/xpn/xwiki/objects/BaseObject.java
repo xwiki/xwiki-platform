@@ -53,8 +53,17 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver2;
+
+    private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
+    {
+        if (this.currentMixedDocumentReferenceResolver2 == null) {
+            this.currentMixedDocumentReferenceResolver2 =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        }
+
+        return this.currentMixedDocumentReferenceResolver2;
+    }
 
     /**
      * {@inheritDoc}
@@ -84,13 +93,13 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
         DocumentReference reference = getDocumentReference();
 
         if (reference != null) {
-            EntityReference relativeReference = this.relativeEntityReferenceResolver.resolve(name, EntityType.DOCUMENT);
+            EntityReference relativeReference = getRelativeEntityReferenceResolver().resolve(name, EntityType.DOCUMENT);
             reference =
                 new DocumentReference(relativeReference.extractReference(EntityType.DOCUMENT).getName(),
                     new SpaceReference(relativeReference.extractReference(EntityType.SPACE).getName(), reference
                         .getParent().getParent()));
         } else {
-            reference = this.currentMixedDocumentReferenceResolver.resolve(name);
+            reference = getCurrentMixedDocumentReferenceResolver().resolve(name);
         }
         setDocumentReference(reference);
     }

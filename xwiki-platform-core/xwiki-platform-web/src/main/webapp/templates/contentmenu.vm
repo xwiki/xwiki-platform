@@ -58,8 +58,8 @@
   #submenuitem($doc.getURL('view', "xpage=pdfoptions&amp;qs=$!escapetool.url($request.getQueryString())") $services.localization.render('core.menu.export.pdf') 'tmExportPdf', '')
   #if("$!{services.officemanager.serverState}" == "Connected")
     #submenuitem($doc.getURL('export', "format=odt&amp;$cleanQueryString") $services.localization.render('core.menu.export.odt') 'tmExportOdt', '')
+    #submenuitem($doc.getURL('export', "format=rtf&amp;$cleanQueryString") $services.localization.render('core.menu.export.rtf') 'tmExportRtf', '')
   #end
-  #submenuitem($doc.getURL('export', "format=rtf&amp;$cleanQueryString") $services.localization.render('core.menu.export.rtf') 'tmExportRtf', '')
   #submenuitem($doc.getURL('export', "format=html&amp;$cleanQueryString") $services.localization.render('core.menu.export.html') 'tmExportHtml', '')
   #if($hasAdmin && "$!xwiki.getPlugin('package')" != '')
     #submenuitem($doc.getURL('export', "format=xar&amp;name=$escapetool.url($doc.fullName)&amp;pages=$escapetool.url($doc.fullName)&amp;$!docvariant") $services.localization.render('core.menu.export.xar') 'tmExportXar', '')

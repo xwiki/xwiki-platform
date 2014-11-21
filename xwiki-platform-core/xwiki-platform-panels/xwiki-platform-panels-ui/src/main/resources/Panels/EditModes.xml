@@ -147,7 +147,7 @@
       <description>Panel Description</description>
     </property>
     <property>
-      <name>EditModes</name>
+      <name>Edit Modes</name>
     </property>
     <property>
       <type>edit</type>

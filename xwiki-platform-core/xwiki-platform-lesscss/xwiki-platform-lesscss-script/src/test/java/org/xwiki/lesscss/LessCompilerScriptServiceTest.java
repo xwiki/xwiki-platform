@@ -38,8 +38,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -56,7 +56,9 @@ public class LessCompilerScriptServiceTest
 
     private LESSSkinFileCompiler lessCompiler;
 
-    private LESSSkinFileCache cache;
+    private LESSSkinFileCache lessCache;
+
+    private ColorThemeCache colorThemeCache;
 
     private LESSColorThemeConverter lessColorThemeConverter;
 
@@ -71,7 +73,8 @@ public class LessCompilerScriptServiceTest
     {
         lessCompiler = mocker.getInstance(LESSSkinFileCompiler.class);
         lessColorThemeConverter = mocker.getInstance(LESSColorThemeConverter.class);
-        cache = mocker.getInstance(LESSSkinFileCache.class);
+        lessCache = mocker.getInstance(LESSSkinFileCache.class);
+        colorThemeCache = mocker.getInstance(ColorThemeCache.class);
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
         xcontextProvider = mocker.getInstance(new DefaultParameterizedType(null, Provider.class, XWikiContext.class));
         xcontext = mock(XWikiContext.class);
@@ -212,7 +215,8 @@ public class LessCompilerScriptServiceTest
         assertTrue(mocker.getComponentUnderTest().clearCache());
 
         // Verify
-        verify(cache).clear();
+        verify(lessCache).clear();
+        verify(colorThemeCache).clear();
     }
 
     @Test
@@ -232,11 +236,12 @@ public class LessCompilerScriptServiceTest
         assertFalse(mocker.getComponentUnderTest().clearCache());
 
         // Verify
-        verify(cache, never()).clear();
+        verifyZeroInteractions(lessCache);
+        verifyZeroInteractions(colorThemeCache);
     }
 
     @Test
-    public void clearCacheWithParamsWithRights() throws Exception
+    public void clearCacheFromColorThemeWithRights() throws Exception
     {
         // Mocks
         XWikiDocument doc = mock(XWikiDocument.class);
@@ -249,14 +254,15 @@ public class LessCompilerScriptServiceTest
         when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(true);
 
         // Tests
-        assertTrue(mocker.getComponentUnderTest().clearCache("wiki"));
+        assertTrue(mocker.getComponentUnderTest().clearCacheFromColorTheme("colorTheme"));
 
         // Verify
-        verify(cache).clear(eq("wiki"));
+        verify(lessCache).clearFromColorTheme(eq("colorTheme"));
+        verify(colorThemeCache).clearFromColorTheme(eq("colorTheme"));
     }
 
     @Test
-    public void clearCacheWithParamsWithoutRights() throws Exception
+    public void clearCacheFromColorThemeWithoutRights() throws Exception
     {
         // Mocks
         XWikiDocument doc = mock(XWikiDocument.class);
@@ -269,10 +275,53 @@ public class LessCompilerScriptServiceTest
         when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(false);
 
         // Tests
-        assertFalse(mocker.getComponentUnderTest().clearCache("wiki"));
+        assertFalse(mocker.getComponentUnderTest().clearCacheFromColorTheme("colorTheme"));
 
         // Verify
-        verify(cache, never()).clear(eq("wiki"));
+        verifyZeroInteractions(lessCache);
+        verifyZeroInteractions(colorThemeCache);
+    }
+
+    @Test
+    public void clearCacheFromSkinWithRights() throws Exception
+    {
+        // Mocks
+        XWikiDocument doc = mock(XWikiDocument.class);
+        DocumentReference authorReference = new DocumentReference("wiki", "Space", "User");
+        when(xcontext.getDoc()).thenReturn(doc);
+        when(doc.getAuthorReference()).thenReturn(authorReference);
+        DocumentReference currentDocReference = new DocumentReference("wiki", "Space", "Page");
+        when(doc.getDocumentReference()).thenReturn(currentDocReference);
+
+        when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(true);
+
+        // Tests
+        assertTrue(mocker.getComponentUnderTest().clearCacheFromFileSystemSkin("skin"));
+
+        // Verify
+        verify(lessCache).clearFromFileSystemSkin(eq("skin"));
+        verify(colorThemeCache).clearFromFileSystemSkin(eq("skin"));
+    }
+
+    @Test
+    public void clearCacheFromSkinWithoutRights() throws Exception
+    {
+        // Mocks
+        XWikiDocument doc = mock(XWikiDocument.class);
+        DocumentReference authorReference = new DocumentReference("wiki", "Space", "User");
+        when(xcontext.getDoc()).thenReturn(doc);
+        when(doc.getAuthorReference()).thenReturn(authorReference);
+        DocumentReference currentDocReference = new DocumentReference("wiki", "Space", "Page");
+        when(doc.getDocumentReference()).thenReturn(currentDocReference);
+
+        when(authorizationManager.hasAccess(Right.PROGRAM, authorReference, currentDocReference)).thenReturn(false);
+
+        // Tests
+        assertFalse(mocker.getComponentUnderTest().clearCacheFromFileSystemSkin("skin"));
+
+        // Verify
+        verifyZeroInteractions(lessCache);
+        verifyZeroInteractions(colorThemeCache);
     }
 
 }

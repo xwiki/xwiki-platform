@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -40,6 +41,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultSearchSuggestCustomConfigDeleter implements SearchSuggestCustomConfigDeleter
 {
     @Inject

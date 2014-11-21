@@ -72,7 +72,7 @@ public class X509CertificateIssuerAndSerialQuery extends AbstractX509IssuerAndSe
     public CertifiedPublicKey getCertificate(PrincipalIndentifier issuer, BigInteger serial)
     {
         try {
-            return factory.decode(getEncoder().decode(this.<String>execute(issuer, serial).get(0)));
+            return this.factory.decode(getEncoder().decode(this.<String>execute(issuer, serial).get(0)));
         } catch (Exception e) {
             return null;
         }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>6.2-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -37,8 +37,20 @@
     <!-- JS/CSS minification is on by default, this property is used in order to able to skip minification when the
          debug profile is active. It can also be used from the command line to skip minification -->
     <xwiki.minification.skip>false</xwiki.minification.skip>
+    <!-- Follow the specifications regarding the WebJar content path. -->
+    <webjar.contentDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.contentDirectory>
   </properties>
   <dependencies>
+    <!-- Adds an Annotation Processor to automatically verify Component declarations.
+         Note that we need to add this dependency because the Maven Compiler Plugin doesn't support
+         having a plugin dependency. Thus we need it as a normal dependency and in order to avoid drawing it
+         transitively we defined it as a "provided" dependency -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-verification-resources</artifactId>
+      <version>${commons.version}</version>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-test-component</artifactId>
@@ -60,28 +72,23 @@
       <dependency>
         <groupId>org.jgroups</groupId>
         <artifactId>jgroups</artifactId>
-        <version>3.4.5.Final</version>
+        <version>3.6.0.Final</version>
       </dependency>
       <!-- Apache Tika used by Lucene and Office modules -->
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-core</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parsers</artifactId>
-        <version>1.5</version>
+        <version>1.6</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-          </exclusion>
-          <!-- TODO: Remove when https://github.com/Gagravarr/VorbisJava/issues/2 is fixed -->
-          <exclusion>
-            <groupId>org.gagravarr</groupId>
-            <artifactId>vorbis-java-core</artifactId>
           </exclusion>
           <!-- Tika Parsers 1.3 depends on bcprov-jdk15 1.45 but some XWiki extensions (such as the CRaSH integration)
                require bcprov-jdk16, thus we exclude it and add a dependency on it just after to the latest version -->
@@ -196,6 +203,13 @@
         <groupId>org.codehaus.woodstox</groupId>
         <artifactId>woodstox-core-asl</artifactId>
         <version>4.1.4</version>
+        <exclusions>
+          <!-- Already part of Java SE 6 -->
+          <exclusion>
+            <artifactId>stax-api</artifactId>
+            <groupId>javax.xml.stream</groupId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- Drawn by several transitive dependencies -->
       <dependency>
@@ -212,7 +226,14 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.4</version>
+        <version>2.5</version>
+      </dependency>
+      <!-- Common WebJars -->
+      <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>jquery</artifactId>
+        <version>1.11.1</version>
+        <scope>runtime</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -303,12 +324,52 @@
           <groupId>net.alchim31.maven</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>1.3.2</version>
+          <executions>
+            <execution>
+              <!-- Minify the WebJar resources before packing the jar. -->
+              <id>minify-webjar-resources</id>
+              <goals>
+                <goal>compress</goal>
+              </goals>
+              <configuration>
+                <sourceDirectory>${webjar.contentDirectory}</sourceDirectory>
+                <excludes>
+                  <exclude>**/*.min.*</exclude>
+                </excludes>
+                <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+                <!-- Don't overwrite the original version. -->
+                <nosuffix>false</nosuffix>
+                <suffix>.min</suffix>
+              </configuration>
+            </execution>
+          </executions>
           <configuration>
             <skip>${xwiki.minification.skip}</skip>
             <jswarn>false</jswarn>
             <!-- Overwrite the resource files with the minimized version. -->
             <nosuffix>true</nosuffix>
           </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <executions>
+            <execution>
+              <!-- Copy the WebJar resources to the right path before packing the jar. -->
+              <id>copy-webjar-resources</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${webjar.contentDirectory}</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>src/main/resources</directory>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -347,234 +408,36 @@
             <!-- Remove the following ignores after we release the current version as final -->
             <difference>
               <differenceType>7012</differenceType>
-              <className>org/xwiki/wiki/descriptor/WikiDescriptorManager</className>
-              <method>java.util.Collection getAllIds()</method>
-              <justification>Wiki module is still a young API.
-              Added an API for a very common use case so that we optimize it</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
-              <method>org.xwiki.model.reference.EntityReference getDefaultReference()</method>
-              <justification>Filter module is still a young API.
-              Those properties were copy/pasted by mistake</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
-              <method>org.xwiki.rendering.syntax.Syntax getDefaultSyntax()</method>
-              <justification>Filter module is still a young API.
-              Those properties were copy/pasted by mistake</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
-              <method>java.lang.String getSaveComment()</method>
-              <justification>Filter module is still a young API.
-              Those properties were copy/pasted by mistake</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
-              <method>boolean isAuthorPreserved()</method>
-              <justification>Filter module is still a young API.
-              Those properties were copy/pasted by mistake</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
-              <method>boolean isPreviousDeleted()</method>
-              <justification>Filter module is still a young API.
-              Those properties were copy/pasted by mistake</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
-              <method>boolean isVersionPreserved()</method>
-              <justification>Filter module is still a young API.
-              Those properties were copy/pasted by mistake</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
-              <method>void setAuthorPreserved(boolean)</method>
-              <justification>Filter module is still a young API.
-              Those properties were copy/pasted by mistake</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
-              <method>void setDefaultReference(org.xwiki.model.reference.EntityReference)</method>
-              <justification>Filter module is still a young API.
-              Those properties were copy/pasted by mistake</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
-              <method>void setDefaultSyntax(org.xwiki.rendering.syntax.Syntax)</method>
-              <justification>Filter module is still a young API.
-              Those properties were copy/pasted by mistake</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
-              <method>void setPreviousDeleted(boolean)</method>
-              <justification>Filter module is still a young API.
-              Those properties were copy/pasted by mistake</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
-              <method>void setSaveComment(java.lang.String)</method>
-              <justification>Filter module is still a young API.
-              Those properties were copy/pasted by mistake</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/filter/instance/output/ExtensionInstanceOutputProperties</className>
-              <method>void setVersionPreserved(boolean)</method>
-              <justification>Filter module is still a young API.
-              Those properties were copy/pasted by mistake</justification>
-            </difference>
-            <!-- Mail Sender API: Young API! -->
-            <difference>
-              <differenceType>7005</differenceType>
-              <className>org/xwiki/mail/MailResultListener</className>
-              <method>void onError(javax.mail.internet.MimeMessage, java.lang.Throwable)</method>
-              <to>void onError(javax.mail.internet.MimeMessage, java.lang.Exception)</to>
-              <justification>Mail Sender API is still a young API.</justification>
-            </difference>
-            <difference>
-              <differenceType>7002</differenceType>
-              <className>org/xwiki/mail/MailSender</className>
-              <method>void send(javax.mail.internet.MimeMessage, javax.mail.Session, org.xwiki.mail.MailResultListener)</method>
-              <justification>Mail Sender API is still a young API.</justification>
+              <className>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroService</className>
+              <method>org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroDescriptor getMacroDescriptor(java.lang.String, java.lang.String, java.lang.String)</method>
+              <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
             </difference>
             <difference>
               <differenceType>7012</differenceType>
-              <className>org/xwiki/mail/MailSender</className>
-              <method>void sendAsynchronously(javax.mail.internet.MimeMessage, javax.mail.Session, org.xwiki.mail.MailResultListener)</method>
-              <justification>Mail Sender API is still a young API.</justification>
+              <className>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroService</className>
+              <method>java.util.List getMacroDescriptors(java.lang.String, java.lang.String)</method>
+              <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
             </difference>
             <difference>
-              <differenceType>7005</differenceType>
-              <className>org/xwiki/mail/script/MimeMessageWrapper</className>
-              <method>MimeMessageWrapper*</method>
-              <to>MimeMessageWrapper*</to>
-              <justification>Mail Sender API is still a young API.</justification>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroServiceAsync</className>
+              <method>void getMacroDescriptor(java.lang.String, java.lang.String, java.lang.String, com.google.gwt.user.client.rpc.AsyncCallback)</method>
+              <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
             </difference>
             <difference>
-              <differenceType>7006</differenceType>
-              <className>org/xwiki/mail/script/MimeMessageWrapper</className>
-              <method>javax.mail.internet.MimeMessage getMessage()</method>
-              <to>org.xwiki.mail.internal.ExtendedMimeMessage</to>
-              <justification>Mail Sender API is still a young API.</justification>
-            </difference>
-            <!-- 5001 (Removed class from the set of superclasses): className, to (as a path expression) -->
-            <difference>
-              <differenceType>5001</differenceType>
-              <className>org/xwiki/velocity/XWikiWebappResourceLoader</className>
-              <to>org/apache/velocity/tools/view/servlet/WebappLoader</to>
-              <justification>The extended class got moved to a new package with the upgrade to velocity-tools 2.0 and the old location got deprecated.</justification>
-            </difference>
-            <!-- Not really APIs -->
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>compactEntityReferenceSerializer</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>compactWikiEntityReferenceSerializer</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>currentDocumentReferenceResolver</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>currentMixedDocumentReferenceResolver</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>currentReferenceDocumentReferenceResolver</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>currentReferenceObjectReferenceResolver</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>defaultEntityReferenceSerializer</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>explicitDocumentReferenceResolver</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>explicitReferenceDocumentReferenceResolver</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>localEntityReferenceSerializer</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>localUidStringEntityReferenceSerializer</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>relativeEntityReferenceResolver</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>syntaxFactory</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>uidStringEntityReferenceSerializer</field>
-              <justification>Not really an APIs.</justification>
-            </difference>
-            <difference>
-              <differenceType>6001</differenceType>
-              <className>com/xpn/xwiki/doc/XWikiDocument</className>
-              <field>xClassEntityReferenceResolver</field>
-              <justification>Not really an APIs.</justification>
+              <differenceType>7012</differenceType>
+              <className>org/xwiki/gwt/wysiwyg/client/plugin/macro/MacroServiceAsync</className>
+              <method>void getMacroDescriptors(java.lang.String, java.lang.String, com.google.gwt.user.client.rpc.AsyncCallback)</method>
+              <justification>WYSIWYG's MacroService API was not previously considering a multiwiki environment.</justification>
             </difference>
           </ignored>
           <excludes>
             <exclude>**/internal/**</exclude>
             <exclude>**/test/**</exclude>
             <!-- Remove the following excludes after we release the current version as final -->
-            <exclude>**/LESSColorThemeConverter</exclude>
-            <exclude>**/LESSSkinFileCompiler</exclude>
+            <!-- Add new methods to the Icon Set Module -->
+            <exclude>**/IconSetManager**</exclude>
+            <exclude>**/IconManager**</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -630,6 +493,7 @@
     <module>xwiki-platform-invitation</module>
     <module>xwiki-platform-ircbot</module>
     <module>xwiki-platform-jira</module>
+    <module>xwiki-platform-job</module>
     <module>xwiki-platform-jodatime</module>
     <module>xwiki-platform-ldap</module>
     <module>xwiki-platform-lesscss</module>
@@ -664,6 +528,7 @@
     <module>xwiki-platform-store</module>
     <module>xwiki-platform-tag</module>
     <module>xwiki-platform-test</module>
+    <module>xwiki-platform-tree</module>
     <module>xwiki-platform-user</module>
     <module>xwiki-platform-uiextension</module>
     <module>xwiki-platform-url</module>

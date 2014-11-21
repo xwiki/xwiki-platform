@@ -106,7 +106,7 @@ public class SchedulerHomePage extends ViewPage
     private void clickAction(String jobName, String actionLinkName)
     {
         getDriver().findElement(
-            By.xpath("//tr[td[.='" + jobName + "']]/td/span/a[.='" + actionLinkName + "']")).click();
+            By.xpath("//tr[td[.='" + jobName + "']]//a[.='" + actionLinkName + "']")).click();
     }
 
     public SchedulerEditPage clickAdd()

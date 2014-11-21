@@ -49,7 +49,7 @@ public class TemplateMacro extends AbstractMacro<TemplateMacroParameters>
     private static final String DESCRIPTION = "[INTERNAL] Insert a template.";
 
     @Inject
-    private WikiTemplateRenderer renderer;
+    private TemplateManager renderer;
 
     /**
      * Default constructor.

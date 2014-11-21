@@ -60,26 +60,6 @@ public interface ModelBridge
     String getCurrentAction();
 
     /**
-     * @param document a document
-     * @return {@code true} if the given document has programming rights, {@code false} otherwise
-     */
-    boolean hasProgrammingRights(DocumentModelBridge document);
-
-    /**
-     * Sets the content author of the given document.
-     * 
-     * @param document a document
-     * @param contentAuthorReference specifies the content author
-     */
-    void setContentAuthorReference(DocumentModelBridge document, DocumentReference contentAuthorReference);
-
-    /**
-     * @param document a document
-     * @return the content author of the given document
-     */
-    DocumentReference getContentAuthorReference(DocumentModelBridge document);
-
-    /**
      * @return the current document from the XWiki context
      */
     DocumentModelBridge getCurrentDocument();
@@ -101,4 +81,13 @@ public interface ModelBridge
      * @return the type of XObjects attached to the given document
      */
     Set<DocumentReference> getXObjectClassReferences(DocumentModelBridge document);
+
+    /**
+     * Sets the document that should be used for checking programming rights.
+     * 
+     * @param document the document used to check for programming rights
+     * @return the previous security document or {@code null} if no security document was set before
+     * @since 6.3M1
+     */
+    DocumentModelBridge setSecurityDocument(DocumentModelBridge document);
 }

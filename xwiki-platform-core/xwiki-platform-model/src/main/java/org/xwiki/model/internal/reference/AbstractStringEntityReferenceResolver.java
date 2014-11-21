@@ -60,6 +60,7 @@ public abstract class AbstractStringEntityReferenceResolver  extends AbstractEnt
                 EntityType.DOCUMENT, EntityType.SPACE, EntityType.WIKI});
             put(EntityType.CLASS_PROPERTY, new EntityType[]{EntityType.CLASS_PROPERTY, EntityType.DOCUMENT,
                 EntityType.SPACE, EntityType.WIKI});
+            put(EntityType.WIKI, new EntityType[] {EntityType.WIKI});
         }
     };
 

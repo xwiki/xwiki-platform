@@ -99,7 +99,7 @@ public class SignableMacroTest
         }
     };
 
-    @Component
+    @Component(staticRegistration = false)
     @Named("testmacro")
     @Singleton
     public static class TestSignable extends AbstractNoParameterSignableMacro

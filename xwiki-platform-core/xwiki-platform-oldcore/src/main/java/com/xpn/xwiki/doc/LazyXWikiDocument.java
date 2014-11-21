@@ -93,8 +93,7 @@ public class LazyXWikiDocument extends XWikiDocument
             XWikiContext context =
                 (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
 
-            XWikiDocument doc = new XWikiDocument(getDocumentReference());
-            doc.setLocale(getLocale());
+            XWikiDocument doc = new XWikiDocument(getDocumentReference(), getLocale());
 
             String currentWiki = context.getWikiId();
             try {

@@ -288,9 +288,9 @@
 ##
 ## Page
 ##
-#set ($canView = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, 'view'))
+#set ($canView = !$doc.isNew() && $xwiki.hasAccessLevel('view'))
 #set ($canCopy = $canView && $hasCreatePage)
-#set ($canDelete = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, 'delete'))
+#set ($canDelete = !$doc.isNew() && $xwiki.hasAccessLevel('delete'))
 #set ($canShare = $canView && $xwiki.exists('XWiki.SharePage') && !$isGuest)
 #set ($canWatch = !$doc.isNew() && $hasWatch)
 #set ($displayPageSubmenu = $canWatch || $canShare || $canCopy || $canDelete)

@@ -59,4 +59,3 @@ public class PrivateKeyClassDocumentInitializer extends AbstractMandatoryDocumen
         return needsUpdate;
     }
 }
-

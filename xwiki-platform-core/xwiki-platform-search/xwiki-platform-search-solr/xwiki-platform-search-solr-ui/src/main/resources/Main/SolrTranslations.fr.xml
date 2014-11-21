@@ -107,6 +107,7 @@ solr.field.class=Type d'objet
 solr.field.class.definedBy=Défini par {0} » {1} 
 solr.field.comment=Commentaires
 solr.field.creationdate=Date de création
+solr.field.creator=Créateur
 solr.field.creator_display=Créateur
 solr.field.date=Date de dernière modification
 solr.field.doccontent=Contenu du document

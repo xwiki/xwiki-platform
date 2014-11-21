@@ -13,8 +13,10 @@
     #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
   #end
   #set ($id = $escapetool.xml("${prefix}${name}"))
-  <input type="text" id="$!id" name="$!id" value="$!formattedValue"#if ($picker)
-    class="datetime t$!value.time" title="$!escapetool.xml($format)"#end />
+  #set ($disabled = $field.getProperty('disabled').value == 1)
+  <input type="text" id="$!id" name="$!id" value="$!formattedValue"
+    #if ($picker)class="datetime t$!value.time" title="$!escapetool.xml($format)"#end
+    #if ($disabled)disabled="disabled"#end />
 #elseif ($type == 'view' || $type == 'rendered')
 $!formattedValue##
 #elseif ($type == 'hidden')

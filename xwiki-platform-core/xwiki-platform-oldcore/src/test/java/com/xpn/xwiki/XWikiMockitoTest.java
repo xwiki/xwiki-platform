@@ -19,8 +19,13 @@
  */
 package com.xpn.xwiki;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -50,8 +55,10 @@ import org.xwiki.test.mockito.MockitoComponentManagerRule;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
-import com.xpn.xwiki.internal.template.PrivilegedTemplateRenderer;
+import com.xpn.xwiki.internal.skin.SkinManager;
+import com.xpn.xwiki.internal.template.TemplateManager;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
+import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.web.Utils;
@@ -80,31 +87,32 @@ public class XWikiMockitoTest
      */
     private XWikiContext context = mock(XWikiContext.class);
 
+    private ConfigurationSource xwikiCfgConfigurationSource;
+
     @Before
     public void setUp() throws Exception
     {
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compact");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "uid");
-        mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local/uid");
-        mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "relative");
-        mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "currentmixed");
-        mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
-        mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-        mocker.registerMockComponent(ObjectReferenceResolver.TYPE_REFERENCE, "current");
-        mocker.registerMockComponent(EntityReferenceValueProvider.class);
-        mocker.registerMockComponent(SyntaxFactory.class);
-        mocker.registerMockComponent(PrivilegedTemplateRenderer.class);
-        mocker.registerMockComponent(ResourceReferenceManager.class);
-        mocker.registerMockComponent(Environment.class);
-        mocker.registerMockComponent(ObservationManager.class);
-        mocker.registerMockComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
+        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
+        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compact");
+        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "uid");
+        this.mocker.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local/uid");
+        this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "relative");
+        this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "currentmixed");
+        this.mocker.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
+        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "current");
+        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
+        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
+        this.mocker.registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        this.mocker.registerMockComponent(ObjectReferenceResolver.TYPE_REFERENCE, "current");
+        this.mocker.registerMockComponent(EntityReferenceValueProvider.class);
+        this.mocker.registerMockComponent(SyntaxFactory.class);
+        this.mocker.registerMockComponent(ResourceReferenceManager.class);
+        this.mocker.registerMockComponent(Environment.class);
+        this.mocker.registerMockComponent(ObservationManager.class);
+        this.mocker.registerMockComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
 
         Utils.setComponentManager(mocker);
         xwiki = new XWiki();
@@ -115,6 +123,8 @@ public class XWikiMockitoTest
 
         XWikiVersioningStoreInterface versioningStore = mock(XWikiVersioningStoreInterface.class);
         xwiki.setVersioningStore(versioningStore);
+
+        this.xwikiCfgConfigurationSource = this.mocker.registerMockComponent(ConfigurationSource.class, "xwikicfg");
     }
 
     /**
@@ -228,5 +238,35 @@ public class XWikiMockitoTest
         verify(attachmentRecycleBinStore, never()).saveToRecycleBin(same(currentAttachment), any(String.class),
             any(Date.class), same(context), eq(true));
         verify(oldAttachment, never()).setMetaDataDirty(true);
+    }
+
+    @Test
+    public void deleteAllDocumentsAndWithoutSendingToTrash() throws Exception
+    {
+        XWiki xwiki = new XWiki();
+
+        XWikiDocument document = mock(XWikiDocument.class);
+        DocumentReference reference = new DocumentReference("wiki", "space", "page");
+        when(document.getDocumentReference()).thenReturn(reference);
+
+        // Make sure we have a trash for the test.
+        XWikiRecycleBinStoreInterface recycleBinStoreInterface = mock(XWikiRecycleBinStoreInterface.class);
+        xwiki.setRecycleBinStore(recycleBinStoreInterface);
+        when(xwikiCfgConfigurationSource.getProperty("xwiki.recyclebin", "1")).thenReturn("1");
+
+        // Configure the mocked Store to later verify if it's called
+        XWikiStoreInterface storeInterface = mock(XWikiStoreInterface.class);
+        xwiki.setStore(storeInterface);
+        XWikiContext xwikiContext = mock(XWikiContext.class);
+
+        xwiki.deleteAllDocuments(document, false, xwikiContext);
+
+        // Verify that saveToRecycleBin is never called since otherwise it would mean the doc has been saved in the
+        // trash
+        verify(recycleBinStoreInterface, never()).saveToRecycleBin(any(XWikiDocument.class), any(String.class),
+            any(Date.class), any(XWikiContext.class), any(Boolean.class));
+
+        // Verify that deleteXWikiDoc() is called
+        verify(storeInterface).deleteXWikiDoc(document, xwikiContext);
     }
 }

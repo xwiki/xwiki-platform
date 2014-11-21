@@ -38,7 +38,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content>{{velocity}}
 #set ($appName = $request.appName)
 #set ($scope = $request.scope)
@@ -66,7 +66,7 @@
         ## Delete only the application's entries (just data) from the data space.
         ##
         ## Note: XWQL does not support parametrised object class, so we just have to push it directly in the query string.    
-        #set ($deleteQueryString = "FROM doc.object($classFullName) as obj $deleteQueryString")
+        #set ($deleteQueryString = "FROM doc.object('"+$classFullName+"') as obj $deleteQueryString")
       #else
         ## Delete the entire application (code + data spaces).
         ##
@@ -101,7 +101,7 @@
       #end
       {{html}}
       #xwikimessagebox($services.localization.render('core.delete')
-                      $confirmationMessage $doc.getURL($xcontext.action, "$request.queryString&amp;confirm=1$!{redirectparam}&amp;amp;form_token=$!{services.csrf.getToken()}")
+                      $confirmationMessage $doc.getURL($xcontext.action, "appName=$escapetool.url($appName)&amp;scope=$!{scope}&amp;confirm=1$!{redirectparam}&amp;amp;form_token=$!{services.csrf.getToken()}")
                       $escapetool.xml($cancelURL)
                       $services.localization.render('yes')
                       $services.localization.render('no'))

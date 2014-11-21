@@ -32,7 +32,7 @@ $xwiki.ssfx.use('uicomponents/widgets/fullScreen.css', true)##
   </div>
   #if($displayContentMenu)
     <div class="col-xs-12 col-md-5">
-      #template("menus/content.vm")
+      #template("menus_content.vm")
     </div>
   #end
 </div>

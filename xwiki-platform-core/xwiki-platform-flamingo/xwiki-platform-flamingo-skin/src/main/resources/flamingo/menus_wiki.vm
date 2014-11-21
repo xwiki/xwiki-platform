@@ -1,0 +1,75 @@
+##################################
+##          WIKI MENU
+##################################
+#set ($WikiManagerMainDocReference = $services.model.createDocumentReference($mainWikiId, 'WikiManager', 'WebHome'))
+#set ($isWikiUIAvailable = $xwiki.exists($WikiManagerMainDocReference))
+#set ($wikiEntryId = 'tmWiki')
+#set ($wikiEntryText = $services.localization.render('core.menu.type.wiki'))
+#set ($wikiName = $services.wiki.getById($xcontext.database).prettyName)
+## If no pretty name is available (no wiki script service or pretty name is empty), use the wiki name.
+#if ("$!wikiName.trim()" == '')
+  #set ($wikiName = $xcontext.getDatabase())
+#end
+#set ($wikiEntryText = "${wikiEntryText}__SEPARATOR__${wikiName}")
+#set ($canDeleteWiki = $isWikiAPIAvailable && $isWikiUIAvailable && $services.wiki.mainWikiId != $services.wiki.currentWikiId && $services.wiki.canDeleteWiki($xcontext.user, $services.wiki.currentWikiId))
+#set ($displayWikiSubmenu = $hasWatch || $hasGlobalAdmin || $xwiki.exists('Main.AllDocs') || $canDeleteWiki)
+## The wiki menu is available if:
+## - OR WikiManager is not installed
+## - OR the wiki is not the home
+#if(!$isWikiUIAvailable || !$xcontext.isMainWiki() || $request.getParameter("forceWikiMenu"))
+  #if($displayHomeMenu)
+    #xwikitopmenuseparator()
+  #end
+  #set($wikiURL = $xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))))
+  #if(!$displayWikiSubmenu)
+    ## Only display a link to the wiki
+    #xwikitopmenuentry($wikiURL $wikiEntryText $wikiEntryId '', 'globe')
+  #else
+    ## Display a complete menu
+    #xwikitopmenuentrystart($wikiURL $wikiEntryText $wikiEntryId '' 'globe')
+      ## GO TO
+      #submenuitem($wikiURL $services.localization.render('core.menu.goto.wiki') '', '', 'arrow-right')
+      ## WATCH / UNWATCH
+      #if ($hasWatch)
+        #set ($watchClasses = '')
+        #set ($unwatchClasses = 'hidden')
+        #if ($xwiki.watchlist.isWikiWatched())
+          #set ($watchClasses = 'hidden')
+          #set ($unwatchClasses = '')
+        #end
+        #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.add.wiki') 'tmWatchWiki', $watchClasses 'eye-open')
+        #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', $unwatchClasses 'eye-close')
+        #set ($hasPreviousMenuSection = true)
+      #end
+      ## ADMIN
+      #if ($hasGlobalAdmin)
+        #set ($adminwikiaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'admin'))
+        #set ($importaction = $!xwiki.getURL('XWiki.XWikiPreferences', 'import'))
+        #if ($isAdminAppInstalled)
+          #submenuitem($adminwikiaction $services.localization.render('core.menu.admin.wiki') 'tmAdminWiki', '', 'wrench')
+        #else
+          #submenuitem($importaction $services.localization.render('core.menu.admin') 'tmAdminWiki' '' 'wrench')
+        #end
+        #set ($hasPreviousMenuSection = true)
+      #end
+      ## DOCUMENT INDEX
+      #if ($xwiki.exists('Main.AllDocs'))
+        #if ($hasPreviousMenuSection)
+          #submenuseparator()
+        #end
+        #submenuitem("$xwiki.getURL('Main.AllDocs')" $services.localization.render('core.menu.wiki.documentindex') 'tmWikiDocumentIndex' '' 'book')
+        #set ($hasPreviousMenuSection = true)
+      #end
+      ## DELETE WIKI
+      #if ($canDeleteWiki)
+        #if ($hasPreviousMenuSection)
+          #submenuseparator()
+        #end
+        #set ($deleteWikiPageReference = $services.model.createDocumentReference($xcontext.mainWikiName, 'WikiManager', 'DeleteWiki'))
+        #set ($deleteUrl = $xwiki.getURL($deleteWikiPageReference, 'view', "wikiId=${services.wiki.currentWikiId}"))
+        #submenuitem($deleteUrl $services.localization.render('platform.wiki.menu.deletewiki') 'tmDeleteWiki' '' 'remove')
+        #set ($hasPreviousMenuSection = true)
+      #end
+    #xwikitopmenuentryend()
+  #end
+#end

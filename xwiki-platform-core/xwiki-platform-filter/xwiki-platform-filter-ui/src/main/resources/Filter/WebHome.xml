@@ -40,13 +40,9 @@
   <hidden>true</hidden>
   <content>{{warning}}Filter module is still young and experimental and while exporting should be safe enough, importing can be more risky for the current instance.{{/warning}}
 
+{{template name="extension.vm" output="false"/}}
+
 {{velocity output="false"}}
-## TODO: Move what is needed is a place common to filter and extensions
-## NOTE: We don't use #template because it currently registers the Velocity macros in a different namespace which makes
-## them unavailable in the current wiki page or the current template. We also tried #parse but it "randomly" fails to
-## register the Velocity macros from the parsed template. The only solution we found is to use #evaluate with #include
-## but unfortunately this doesn't allow the template to be overridden from the skin.
-#evaluate("#include('extension.vm')")
 #set ($discard = $xwiki.ssfx.use('uicomponents/extension/extension.css', true))
 #set ($discard = $xwiki.jsfx.use('uicomponents/extension/extension.js', true))
 {{/velocity}}

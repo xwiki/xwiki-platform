@@ -347,8 +347,8 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   ## Store the minimum and maximum number of occurrences.
   #set ($sortedTagCounts = $sorttool.sort($tagCount.values()))
   #set ($maxIndex = $sortedTagCounts.size() - 1)
-  #set ($minCount = $listtool.get($sortedTagCounts, 0))
-  #set ($maxCount = $listtool.get($sortedTagCounts, $maxIndex))
+  #set ($minCount = $sortedTagCounts[0])
+  #set ($maxCount = $sortedTagCounts[$maxIndex])
   ##
   ## Calculate the total number of tags in the wiki.
   #set ($totalTagNumber = 0)

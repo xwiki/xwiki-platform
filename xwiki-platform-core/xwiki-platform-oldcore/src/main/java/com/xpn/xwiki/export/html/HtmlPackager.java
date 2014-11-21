@@ -216,13 +216,28 @@ public class HtmlPackager
             context.put(CONTEXT_TDOC, tdoc);
             vcontext.put(VCONTEXT_TDOC, tdoc.newDocument(context));
 
-            String content = context.getWiki().evaluateTemplate("view.vm", context);
+            String content = evaluateDocumentContent(context);
 
             zos.write(content.getBytes(context.getWiki().getEncoding()));
             zos.closeEntry();
         } finally {
             context.setWikiId(originalDatabase);
         }
+    }
+
+    private String evaluateDocumentContent(XWikiContext context) throws IOException
+    {
+        context.getWiki().getPluginManager().beginParsing(context);
+        Utils.enablePlaceholders(context);
+        String content;
+        try {
+            content = context.getWiki().evaluateTemplate("view.vm", context);
+            content = Utils.replacePlaceholders(content, context);
+        } finally {
+            Utils.disablePlaceholders(context);
+        }
+        content = context.getWiki().getPluginManager().endParsing(content.trim(), context);
+        return content;
     }
 
     /**
@@ -313,15 +328,11 @@ public class HtmlPackager
         renderDocuments(zos, tempdir, urlf, context);
 
         // Add required skins to ZIP file
-        for (String skinName : urlf.getNeededSkins()) {
-            addSkinToZip(skinName, zos, urlf.getExportedSkinFiles(), context);
+        for (String skinName : urlf.getExportURLFactoryContext().getNeededSkins()) {
+            addSkinToZip(skinName, zos, urlf.getExportURLFactoryContext().getExportedSkinFiles(), context);
         }
 
-        // add "resources" folder
-        File file = new File(context.getWiki().getEngineContext().getRealPath("/resources/"));
-        addDirToZip(file, zos, "resources" + ZIPPATH_SEPARATOR, urlf.getExportedSkinFiles());
-
-        // Add attachments and generated skin files files to ZIP file
+        // Copy generated files in the ZIP file.
         addDirToZip(tempdir, zos, "", null);
 
         zos.setComment(this.description);

@@ -1,0 +1,60 @@
+##################################
+##          HOME MENU
+##################################
+## This menu is displayed if:
+## - Wiki UI is available
+## - The current wiki is the main wiki OR the current wiki has support for local users only
+#set($homeURL = $xwiki.getURL($mainWikiHomeDocumentReference))
+#set ($displayHomeMenu = $isWikiUIAvailable && ($xcontext.isMainWiki() || ("$!services.wiki.user" != '' && $services.wiki.user.getUserScope()=='GLOBAL_ONLY')))
+#if ($displayHomeMenu)
+  #xwikitopmenuentrystart($homeURL $services.localization.render('core.menu.type.home') 'tmMainWiki' '' 'home')
+    ## GO TO
+    #submenuitem($homeURL $services.localization.render('core.menu.goto.wiki') '', '', 'arrow-right')
+    ## WATCH / UNWATCH WIKI -- TODO EXTENSION POINT
+    #if ($hasWatch && $xcontext.isMainWiki())
+      #set ($watchClasses = '')
+      #set ($unwatchClasses = 'hidden')
+      #if ($xwiki.watchlist.isWikiWatched())
+        #set ($watchClasses = 'hidden')
+        #set ($unwatchClasses = '')
+      #end
+      #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.add.wiki') 'tmWatchWiki', $watchClasses, 'eye-open')
+      #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$escapetool.url($doc.getURL())" $services.localization.render('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', $unwatchClasses, 'eye-close')
+      #set ($hasPreviousMenuSection = true)
+    #end
+    ## ADMINISTER WIKI
+    #set ($hasHomeWikiAdmin = $xwiki.hasAccessLevel('admin', $xcontext.user, "${mainWikiId}:XWiki.XWikiPreferences"))
+    #if ($hasHomeWikiAdmin)
+      #set ($adminRef = $services.model.createDocumentReference($mainWikiId, 'XWiki', 'XWikiPreferences'))
+      #set ($adminwikiaction = $!xwiki.getURL($adminRef, 'admin'))
+      #set ($importaction = $!xwiki.getURL($adminRef, 'import'))
+      #set ($homeAdminSheetRef = $services.model.createDocumentReference($mainWikiId, 'XWiki', 'AdminSheet'))
+      #set ($isHomeAdminAppInstalled = $xwiki.exists($homeAdminSheetRef))
+      #if ($isHomeAdminAppInstalled)
+        #if($xcontext.isMainWiki())
+          #submenuitem($adminwikiaction, $services.localization.render('core.menu.admin.wiki'), 'tmAdminWiki', '', 'wrench')
+        #else
+          #submenuitem($adminwikiaction, $services.localization.render('core.menu.admin'), 'tmAdminWiki', '', 'wrench')
+        #end
+      #else
+        #submenuitem($importaction, $services.localization.render('core.menu.admin'), 'tmAdminWiki', '', 'wrench')
+      #end
+      #set ($hasPreviousMenuSection = true)
+    #end
+    ## WIKI INDEX
+    #submenuseparator()
+    #submenuitem("$xwiki.getURL($WikiManagerMainDocReference)" $services.localization.render('platform.wiki.menu.wikiindex') 'tmWikiIndex' '' 'list')
+    ## DOCUMENT INDEX
+    #set($homeDocumentIndexRef = $services.model.createDocumentReference($mainWikiId, 'Main', 'AllDocs'))
+    #if ($xwiki.exists($homeDocumentIndexRef))
+      #submenuitem($xwiki.getURL($homeDocumentIndexRef) $services.localization.render('core.menu.wiki.documentindex') 'tmWikiDocumentIndex' '' 'book')
+    #end
+    ## DOCUMENT INDEX
+    #set($homeUserIndexRef = $services.model.createDocumentReference($mainWikiId, 'Main', 'UserDirectory'))
+    ## USER INDEX
+    #if ($xwiki.exists($homeUserIndexRef))
+      #submenuitem($xwiki.getURL($homeUserIndexRef) $services.localization.render('xe.panels.quicklinks.userdirectory') 'tmMainUserIndex' '' 'user')
+    #end
+  ## END OF THE HOME MENU
+  #xwikitopmenuentryend()  
+#end

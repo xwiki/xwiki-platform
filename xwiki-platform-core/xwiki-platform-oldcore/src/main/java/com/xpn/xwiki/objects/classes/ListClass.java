@@ -51,15 +51,27 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public abstract class ListClass extends PropertyClass
 {
+    /**
+     * @since 6.2RC1
+     */
+    public static final String DISPLAYTYPE_INPUT = "input";
+
+    /**
+     * @since 6.2RC1
+     */
+    public static final String DISPLAYTYPE_RADIO = "radio";
+
+    /**
+     * @since 6.2RC1
+     */
+    public static final String DISPLAYTYPE_CHECKBOX = "checkbox";
+
+    /**
+     * @since 6.2RC1
+     */
+    public static final String DISPLAYTYPE_SELECT = "select";
+
     private static final String XCLASSNAME = "list";
-
-    protected static final String DISPLAYTYPE_INPUT = "input";
-
-    protected static final String DISPLAYTYPE_RADIO = "radio";
-
-    protected static final String DISPLAYTYPE_CHECKBOX = "checkbox";
-
-    protected static final String DISPLAYTYPE_SELECT = "select";
 
     public ListClass(String name, String prettyname, PropertyMetaClass wclass)
     {

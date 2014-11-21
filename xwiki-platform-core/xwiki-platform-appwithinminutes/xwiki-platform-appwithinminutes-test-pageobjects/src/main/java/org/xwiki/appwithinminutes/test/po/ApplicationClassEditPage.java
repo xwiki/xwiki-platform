@@ -172,8 +172,7 @@ public class ApplicationClassEditPage extends InlinePage
      */
     public void moveFieldBefore(String fieldToMove, String beforeField)
     {
-        // Drag the field slightly before the target field (vertically). For some reason it doesn't work if we use x=0.
-        new ClassFieldEditPane(fieldToMove).dragTo(fieldsCanvas.findElement(By.id("field-" + beforeField)), 1, -30);
+        new ClassFieldEditPane(fieldToMove).dragTo(fieldsCanvas.findElement(By.id("field-" + beforeField)), 0, 0);
     }
 
     /**
@@ -186,5 +185,16 @@ public class ApplicationClassEditPage extends InlinePage
         if (updateClassSheetCheckbox.isSelected() != update) {
             updateClassSheetCheckbox.click();
         }
+    }
+
+    /**
+     * Use this method instead of {@link #clickSaveAndView()} and call {@link WebElement#click()} when you know that the
+     * next page is not a standard XWiki {@link ViewPage}.
+     *
+     * @return the save and view button used to submit the form.
+     */
+    public WebElement getSaveAndViewButton()
+    {
+        return saveButton;
     }
 }

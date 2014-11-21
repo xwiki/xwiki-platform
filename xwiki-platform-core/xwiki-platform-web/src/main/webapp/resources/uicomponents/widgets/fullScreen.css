@@ -9,7 +9,15 @@
   cursor: pointer;
   display: block;
   margin-top: -1.4em;
+  position: relative;
   text-align: right;
+}
+/* The 'fullScreenEditLinkContainer' is displayed in the same row that the '#toggleLineNumbers' link because of
+   'margin-top: -1.4em' and that makes it impossible to click (see: http://jira.xwiki.org/browse/XWIKI-11228).
+   So we set the z-index of this element to be on top. */
+#toggleLineNumbers {
+  position: relative; /* needed by the z-index attribute */
+  z-index: 1;
 }
 
 /* Matches the style of the new object editor */

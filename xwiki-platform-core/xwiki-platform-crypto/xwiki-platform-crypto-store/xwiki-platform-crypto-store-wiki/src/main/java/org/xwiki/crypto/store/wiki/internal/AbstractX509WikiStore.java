@@ -97,7 +97,7 @@ public abstract class AbstractX509WikiStore
      */
     protected XWikiContext getXWikiContext()
     {
-        return contextProvider.get();
+        return this.contextProvider.get();
     }
 
     /**
@@ -105,7 +105,7 @@ public abstract class AbstractX509WikiStore
      */
     protected BinaryStringEncoder getEncoder()
     {
-        return base64;
+        return this.base64;
     }
 
     /**
@@ -113,7 +113,7 @@ public abstract class AbstractX509WikiStore
      */
     protected CertificateFactory getCertificateFactory()
     {
-        return certificateFactory;
+        return this.certificateFactory;
     }
 
     /**
@@ -121,7 +121,7 @@ public abstract class AbstractX509WikiStore
      */
     protected QueryManager getQueryManager()
     {
-        return queryManager;
+        return this.queryManager;
     }
 
     /**
@@ -157,7 +157,7 @@ public abstract class AbstractX509WikiStore
 
                 byte[] keyId = publicKey.getSubjectKeyIdentifier();
                 if (keyId != null) {
-                    obj.setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_KEYID, base64.encode(keyId));
+                    obj.setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_KEYID, this.base64.encode(keyId));
                 }
                 obj.setStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_ISSUER,
                     publicKey.getIssuer().getName());
@@ -168,7 +168,7 @@ public abstract class AbstractX509WikiStore
             }
 
             obj.setLargeStringValue(X509CertificateWikiStore.CERTIFICATECLASS_PROP_CERTIFICATE,
-                base64.encode(certificate.getEncoded(), 64));
+                this.base64.encode(certificate.getEncoded(), 64));
 
             return document;
         } catch (Exception e) {
@@ -176,7 +176,7 @@ public abstract class AbstractX509WikiStore
         }
     }
 
-   /**
+    /**
      * Find the reference of the XObject storing a matching certificate in the given store.
      *
      * @param store the reference to a document or space used to store certificates.
@@ -190,14 +190,13 @@ public abstract class AbstractX509WikiStore
         byte[] keyId = publicKey.getSubjectKeyIdentifier();
         CertificateObjectReference certRef;
         if (keyId != null) {
-            certRef = new X509CertificateReferenceKeyIdentifierQuery(resolveStore(store), base64, queryManager)
-                .getReference(keyId);
+            certRef =
+                new X509CertificateReferenceKeyIdentifierQuery(resolveStore(store), this.base64, this.queryManager)
+                    .getReference(keyId);
         } else {
-            certRef = new X509CertificateReferenceIssuerAndSerialQuery(resolveStore(store), base64, queryManager)
-                .getReference(
-                    publicKey.getIssuer(),
-                    publicKey.getSerialNumber()
-            );
+            certRef =
+                new X509CertificateReferenceIssuerAndSerialQuery(resolveStore(store), this.base64, this.queryManager)
+                    .getReference(publicKey.getIssuer(), publicKey.getSerialNumber());
         }
 
         return certRef;
@@ -217,7 +216,7 @@ public abstract class AbstractX509WikiStore
     {
         XWikiDocument document;
         document = context.getWiki().getDocument(
-            new DocumentReference(stringReferenceResolver.resolve(certRef.getDocumentName(),
+            new DocumentReference(this.stringReferenceResolver.resolve(certRef.getDocumentName(),
                 EntityType.DOCUMENT, store)),
             context);
         return document;
@@ -231,7 +230,7 @@ public abstract class AbstractX509WikiStore
      */
     protected DocumentReference getDocumentReference(StoreReference store)
     {
-        return new DocumentReference(referenceResolver.resolve(getStoreReference(store), EntityType.DOCUMENT));
+        return new DocumentReference(this.referenceResolver.resolve(getStoreReference(store), EntityType.DOCUMENT));
     }
 
     /**
@@ -250,7 +249,7 @@ public abstract class AbstractX509WikiStore
         if (reference.getType() == EntityType.DOCUMENT) {
             return getDocumentReference(store);
         }
-        return new DocumentReference(referenceResolver.resolve(
+        return new DocumentReference(this.referenceResolver.resolve(
             new EntityReference(getCertIdentifier(publicKey), EntityType.DOCUMENT), EntityType.DOCUMENT, reference));
     }
 
@@ -267,7 +266,7 @@ public abstract class AbstractX509WikiStore
     {
         byte[] keyId = publicKey.getSubjectKeyIdentifier();
         if (keyId != null) {
-            return base64.encode(keyId);
+            return this.base64.encode(keyId);
         }
         return publicKey.getSerialNumber().toString() + ", " + publicKey.getIssuer().getName();
     }
@@ -283,10 +282,10 @@ public abstract class AbstractX509WikiStore
         EntityReference reference = getStoreReference(store);
 
         if (reference.getType() == EntityType.DOCUMENT) {
-            return referenceResolver.resolve(reference, EntityType.DOCUMENT);
+            return this.referenceResolver.resolve(reference, EntityType.DOCUMENT);
         }
 
-        return referenceResolver.resolve(reference, EntityType.SPACE);
+        return this.referenceResolver.resolve(reference, EntityType.SPACE);
     }
 
     private EntityReference getStoreReference(StoreReference store)

@@ -5,5 +5,5 @@ $response.setContentType('text/plain')##
 $cdoc.getTranslatedContent()
 #else
 #template('xwikivars.vm')
-#template('rendercontent.vm')
+#template('displaycontent.vm')
 #end

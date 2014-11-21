@@ -153,6 +153,7 @@ public class WikiEventListener extends AbstractEventListener
 
         InstallRequest installRequest = new InstallRequest();
         installRequest.setProperty("user.reference", context.getUserReference());
+        installRequest.setVerbose(false);
         // TODO: make it interactive ? (require wiki creation to be job based)
         installRequest.setInteractive(false);
 

@@ -25,11 +25,11 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-filter-streams</artifactId>
-    <version>6.2-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-filter-stream-confluencexml</artifactId>
   <name>XWiki Platform - Filter - Confluence XML</name>
-  <description>Wiki stream extension to parse a Confluence XML package</description>
+  <description>Filter stream extension to parse a Confluence XML package</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
 

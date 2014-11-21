@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang.StringUtils;
@@ -42,6 +43,7 @@ import org.xwiki.environment.internal.ServletEnvironment;
  */
 @Component
 @Named("servlet")
+@Singleton
 public class ServletContainerPingDataProvider implements PingDataProvider
 {
     private static final String SERVLET_INFO_VERSION_SEPARATOR = "/";

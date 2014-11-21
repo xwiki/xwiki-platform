@@ -89,11 +89,9 @@ public abstract class AbstractCachedTranslationBundle extends AbstractTranslatio
         if (bundle == null) {
             try {
                 bundle = createBundle(locale);
-                if (bundle == null) {
-                    bundle = LocalizedTranslationBundle.EMPTY;
+                if (bundle != null) {
+                    this.bundleCache.put(locale, bundle);
                 }
-
-                this.bundleCache.put(locale, bundle);
             } catch (Exception e) {
                 this.logger.error("Failed to get localization bundle", e);
             }

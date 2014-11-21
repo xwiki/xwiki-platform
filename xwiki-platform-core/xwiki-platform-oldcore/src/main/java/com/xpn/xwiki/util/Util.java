@@ -590,16 +590,10 @@ public class Util
     {
         String title = XMLUtils.escape(xe.getMessage());
         String text = XMLUtils.escape(xe.getFullMessage());
-        String id = (String) context.get("xwikierrorid");
-        if (id == null) {
-            id = "1";
-        } else {
-            id = "" + (Integer.parseInt(id) + 1);
-        }
 
-        return "<a href=\"\" onclick=\"document.getElementById('xwikierror" + id
-            + "').style.display='block'; return false;\">" + title + "</a><div id=\"xwikierror" + id
-            + "\" style=\"display: none;\"><pre class=\"xwikierror\">\n" + text + "</pre></div>";
+        return "<div class=\"xwikirenderingerror\" title=\"Read technical information related to this error\" "
+            + "style=\"cursor: pointer;\">" + title + "</div>"
+            + "<div class=\"xwikirenderingerrordescription hidden\"><pre>" + text + "</pre></div>";
     }
 
     public static MonitorPlugin getMonitorPlugin(XWikiContext context)

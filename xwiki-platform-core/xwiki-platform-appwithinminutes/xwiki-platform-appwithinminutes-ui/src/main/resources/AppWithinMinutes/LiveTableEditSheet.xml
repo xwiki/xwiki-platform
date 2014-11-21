@@ -20,29 +20,248 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc>
+<xwikidoc version="1.1">
   <web>AppWithinMinutes</web>
   <name>LiveTableEditSheet</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>AppWithinMinutes.LiveTableClass</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <author>xwiki:XWiki.Admin</author>
-  <customClass/>
-  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1321279658000</creationDate>
-  <date>1321383708000</date>
-  <contentUpdateDate>1321383708000</contentUpdateDate>
+  <parent>AppWithinMinutes.LiveTableClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1416475756000</date>
+  <contentUpdateDate>1416475756000</contentUpdateDate>
   <version>1.1</version>
   <title>#if($doc.fullName=='AppWithinMinutes.LiveTableEditSheet')LiveTable Edit Sheet#{else}#evaluate($doc.title)#end</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
+  <content>{{velocity output="false"}}
+#macro(listAvailableColumns)
+  {{html}}
+  &lt;select id="availableColumns"&gt;
+    #set($className = "$!liveTableObj.getProperty('class').value")
+    #set($classFields = $xwiki.getDocument($className).getxWikiClass().properties)
+    #set($discard = $services.localization.use('document', "$stringtool.removeEnd($className, 'Class')Translations"))
+    #if($classFields.size() &gt; 0)
+      &lt;optgroup label="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel'))" id="classFields"&gt;
+        #foreach($field in $classFields)
+          &lt;option value="$field.name"&gt;$escapetool.xml($field.translatedPrettyName)&lt;/option&gt;
+        #end
+      &lt;/optgroup&gt;
+    #end
+    &lt;optgroup label="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel'))"&gt;
+      #foreach($entry in $genericColumns.entrySet())
+        &lt;option value="$entry.key" title="$escapetool.xml($entry.value.get(1))"&gt;$escapetool.xml($entry.value.get(0))&lt;/option&gt;
+      #end
+    &lt;/optgroup&gt;
+  &lt;/select&gt;
+  {{/html}}
+#end
+
+#macro(displayHelpPanel)
+  #set($genericColumns = {
+    'doc.title': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocTitleColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocTitleColumnDescription')],
+    'doc.name': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocNameColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocNameColumnDescription')],
+    'doc.author': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocAuthorColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription')],
+    'doc.creator': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocCreatorColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription')],
+    'doc.date': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocDateColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocDateColumnDescription')],
+    'doc.creationDate': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocCreationDateColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription')],
+    '_actions': [$services.localization.render('platform.appwithinminutes.liveTableEditorActionsColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorActionsColumnDescription')],
+    '_attachments': [$services.localization.render('platform.appwithinminutes.liveTableEditorAttachmentsColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription')],
+    '_images': [$services.localization.render('platform.appwithinminutes.liveTableEditorImagesColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorImagesColumnDescription')]
+  })
+  (% class="wizard-help" %)
+  (((
+    **$services.localization.render('platform.appwithinminutes.liveTableEditorHelpTitle')** $services.localization.render('platform.appwithinminutes.liveTableEditorHelpDescription')
+
+    #foreach($columnId in ['doc.name', 'doc.date', 'doc.author', '_actions'])
+      ; {{{$genericColumns.get($columnId).get(0)}}}
+      : {{{$genericColumns.get($columnId).get(1)}}}
+    #end
+  )))
+#end
+
+#macro(displayFormFields)
+  {{html wiki="true"}}
+  (% class="hidden" %)
+  (((
+    ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
+    &lt;input type="hidden" name="xpage" value="plain" /&gt;
+    ## We prevent the class name from being edited directly. The class name can be specified in the URL.
+    $doc.display('class', 'hidden')
+    ## We have to pass the list of available columns to the JavaScript code.
+    #listAvailableColumns()
+  )))
+  ; &lt;label for="AppWithinMinutes.LiveTableClass_0_description"&gt;$doc.displayPrettyName('description', false, false)&lt;/label&gt;##
+    (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorDescriptionHint')
+  : $doc.display('description')
+  ; &lt;label for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;##
+    (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorColumnsHint')
+  : $doc.display('columns')
+  {{/html}}
+#end
+
+#macro(displayIcon)
+  #if($services.uix)
+    #set($icon = 'icon:application')
+    #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications'))
+      #if($uix.getId() == "platform.panels.${doc.space}Application" &amp;&amp; "$!uix.getParameters().get('icon')" != '')
+        #set($icon = $uix.getParameters().get('icon'))
+      #end
+    #end
+    {{html wiki="true"}}
+    ; &lt;label for="applicationIcon"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorIcon')&lt;/label&gt;
+      (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorIconHint',
+        [$xwiki.getSkinFile('icons/silk/index_abc.png')])  
+    : &lt;input id="applicationIcon" name="applicationIcon" type="text" size="10" value="$!escapetool.xml($icon)" /&gt;
+    {{/html}}
+  #end
+#end
+
+#macro(doEdit)
+  #set($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass', true))
+  #set($discard = $doc.use($liveTableObj))
+  #set($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
+  #set($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableEditSheet'))
+  #set($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableEditSheet'))
+  #if("$!request.wizard" == 'true')
+    #appWizardHeader(3)
+
+  #end
+  #displayHelpPanel()
+  (% class="form-body" %)
+  (((
+    #displayFormFields()
+
+    #displayIcon()
+
+    #if("$!request.wizard" == 'true')
+
+      #appWizardFooter(3)
+    #end
+  )))
+  {{html}}&lt;div class="clearfloats"&gt;&lt;/div&gt;{{/html}}
+#end
+
+#macro(maybeGrantSpaceAdminRight $spaceHomeRef)
+  ## Grant space administration rights only if the space is new.
+  #if(!$xwiki.exists($spaceHomeRef))
+    #set($spacePrefsRef = $services.model.createDocumentReference($spaceHomeRef.wikiReference.name, $spaceHomeRef.lastSpaceReference.name, 'WebPreferences'))
+    #set($spacePrefsDoc = $xwiki.getDocument($spacePrefsRef))
+    ## Don't overwrite existing space preferences.
+    #if($spacePrefsDoc.isNew())
+      #set($discard = $spacePrefsDoc.use($spacePrefsDoc.getObject('XWiki.XWikiGlobalRights', true)))
+      #set($discard = $spacePrefsDoc.set('allow', 1))
+      #set($discard = $spacePrefsDoc.set('levels', 'admin'))
+      #set($discard = $spacePrefsDoc.set('users', $services.model.serialize($xcontext.userReference, 'default')))
+      #set($discard = $spacePrefsDoc.setParent($services.model.serialize($spaceHomeRef, 'default')))
+      #set($discard = $spacePrefsDoc.setHidden(true))
+      #set($discard = $spacePrefsDoc.saveWithProgrammingRights($services.localization.render('platform.appwithinminutes.grantSpaceAdminRightsSaveComment')))
+    #end
+  #end
+#end
+
+#macro(maybeGrantSpaceAdminRights)
+  ## Data space
+  #set($dataSpaceHomeRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebHome'))
+  #maybeGrantSpaceAdminRight($dataSpaceHomeRef)
+  ## Code space
+  #set($className = $request.get('AppWithinMinutes.LiveTableClass_0_class'))
+  #set($classRef = $services.model.resolveDocument($className))
+  #set($codeSpaceHomeRef = $services.model.createDocumentReference($classRef.wikiReference.name, $classRef.lastSpaceReference.name, 'WebHome'))
+  #maybeGrantSpaceAdminRight($codeSpaceHomeRef)
+#end
+
+#macro(updateAndSaveLiveTable)
+  #set($discard = $doc.updateObjectFromRequest('AppWithinMinutes.LiveTableClass'))
+  #set($liveTableGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.LiveTableGenerator'))
+  #set($discard = $doc.setContent($doc.getRenderedContent($liveTableGeneratorDoc.content, $liveTableGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+  #set($minorEdit = "$!request.minorEdit" != '')
+  #set($comment = $request.comment)
+  #if("$!comment" == '')
+    #set($comment = $services.localization.render('platform.appwithinminutes.liveTableEditorSaveComment'))
+  #end
+  #set($discard = $doc.save($comment, $minorEdit))
+#end
+
+#macro(maybeCreateLiveTableResultsPage)
+  #set ($className = "$!doc.getObject('AppWithinMinutes.LiveTableClass').getProperty('class').value")
+  #set ($liveTableResultsDoc = $xwiki.getDocument("$!stringtool.removeEnd($className, 'Class')LiveTableResults"))
+  #set ($liveTableResultsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.LiveTableResultsGenerator'))
+  #if ($liveTableResultsDoc.isNew())
+    #set ($discard = $liveTableResultsDoc.setParent($doc.name))
+    #set ($discard = $liveTableResultsDoc.setHidden(true))
+    #set ($discard = $liveTableResultsDoc.setContent($doc.getRenderedContent($liveTableResultsGeneratorDoc.content, $liveTableResultsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
+    #set ($discard = $liveTableResultsDoc.save($services.localization.render('platform.appwithinminutes.liveTableEditorCreateLiveTableResultsComment')))
+  #end
+#end
+
+#macro(updateAndSaveIcon)
+  #set($uix = $doc.getObject('XWiki.UIExtensionClass', true))
+  #set($discard = $uix.set('name', "platform.panels.${doc.space}Application"))
+  #set($discard = $uix.set('extensionPointId', "org.xwiki.platform.panels.Applications"))
+  #set($discard = $uix.set('parameters', "label=${doc.space}${util.newline}target=${doc.fullName}${util.newline}icon=${request.applicationIcon}"))
+  #set ($hasWikiAdminRights = $services.security.authorization.hasAccess('admin', $doc.documentReference.wikiReference))
+  #set($discard = $uix.set('scope', "#if ($hasWikiAdminRights)wiki#{else}user#end"))
+  #set($discard = $doc.save('Updated application icon', true))
+#end
+
+#macro(doSave)
+  #maybeGrantSpaceAdminRights()
+  #updateAndSaveLiveTable()
+  #maybeCreateLiveTableResultsPage()
+  #updateAndSaveIcon()
+  #if($action == 'save')
+    #if($errorMessage)
+      {{error}}{{html}}$errorMessage{{/html}}{{/error}}
+    #else
+      ## Redirect to view mode.
+      $response.sendRedirect($doc.getURL())
+    #end
+  #else
+    #if($errorMessage)
+      $response.sendError(400, $errorMessage)
+    #else
+      $response.setStatus(204)
+    #end
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#if("$!request.wizard" == 'true')
+  {{include reference="AppWithinMinutes.WizardStep" /}}
+#end
+{{/velocity}}
+
+{{velocity}}
+## Determine the action button that triggered the request
+#set($action = $xcontext.action)
+#foreach($paramName in $request.getParameterMap().keySet())
+  #if($paramName.startsWith('xaction_'))
+    #set($action = $paramName.substring(8))
+    #break
+  #end
+#end
+#if($action == 'edit')
+  #doEdit()
+#elseif($action == 'save' || $action == 'saveandcontinue')
+  #if($services.csrf.isTokenValid($request.form_token))
+    #doSave()
+  #else
+    $response.sendRedirect($services.csrf.getResubmissionURL());
+  #end
+#end
+{{/velocity}}</content>
   <object>
+    <name>AppWithinMinutes.LiveTableEditSheet</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>dd545e46-1a0f-494a-a1db-5a45892ad4ab</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -110,14 +329,10 @@
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>AppWithinMinutes.LiveTableEditSheet</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>dd545e46-1a0f-494a-a1db-5a45892ad4ab</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -304,6 +519,10 @@ return XWiki;
     </property>
   </object>
   <object>
+    <name>AppWithinMinutes.LiveTableEditSheet</name>
+    <number>0</number>
+    <className>XWiki.RequiredRightClass</className>
+    <guid>c8e4a863-1a27-47d5-bb40-a37bcd27508d</guid>
     <class>
       <name>XWiki.RequiredRightClass</name>
       <customClass/>
@@ -334,15 +553,15 @@ return XWiki;
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </level>
     </class>
-    <name>AppWithinMinutes.LiveTableEditSheet</name>
-    <number>0</number>
-    <className>XWiki.RequiredRightClass</className>
-    <guid>c8e4a863-1a27-47d5-bb40-a37bcd27508d</guid>
     <property>
       <level>programming</level>
     </property>
   </object>
   <object>
+    <name>AppWithinMinutes.LiveTableEditSheet</name>
+    <number>0</number>
+    <className>XWiki.SheetDescriptorClass</className>
+    <guid>b4421c7c-8010-487f-aa21-8abb799e011e</guid>
     <class>
       <name>XWiki.SheetDescriptorClass</name>
       <customClass/>
@@ -366,15 +585,15 @@ return XWiki;
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </action>
     </class>
-    <name>AppWithinMinutes.LiveTableEditSheet</name>
-    <number>0</number>
-    <className>XWiki.SheetDescriptorClass</className>
-    <guid>b4421c7c-8010-487f-aa21-8abb799e011e</guid>
     <property>
       <action>edit</action>
     </property>
   </object>
   <object>
+    <name>AppWithinMinutes.LiveTableEditSheet</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>d6100cff-9fc3-46be-b56a-0561cadf45f9</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -442,14 +661,10 @@ return XWiki;
         <separators> ,|</separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>AppWithinMinutes.LiveTableEditSheet</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>d6100cff-9fc3-46be-b56a-0561cadf45f9</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -556,220 +771,4 @@ return XWiki;
       <use>onDemand</use>
     </property>
   </object>
-  <content>{{velocity output="false"}}
-#macro(listAvailableColumns)
-  {{html}}
-  &lt;select id="availableColumns"&gt;
-    #set($className = "$!liveTableObj.getProperty('class').value")
-    #set($classFields = $xwiki.getDocument($className).getxWikiClass().properties)
-    #set($discard = $services.localization.use('document', "$stringtool.removeEnd($className, 'Class')Translations"))
-    #if($classFields.size() &gt; 0)
-      &lt;optgroup label="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel'))" id="classFields"&gt;
-        #foreach($field in $classFields)
-          &lt;option value="$field.name"&gt;$escapetool.xml($field.translatedPrettyName)&lt;/option&gt;
-        #end
-      &lt;/optgroup&gt;
-    #end
-    &lt;optgroup label="$escapetool.xml($services.localization.render('platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel'))"&gt;
-      #foreach($entry in $genericColumns.entrySet())
-        &lt;option value="$entry.key" title="$escapetool.xml($entry.value.get(1))"&gt;$escapetool.xml($entry.value.get(0))&lt;/option&gt;
-      #end
-    &lt;/optgroup&gt;
-  &lt;/select&gt;
-  {{/html}}
-#end
-
-#macro(displayHelpPanel)
-  #set($genericColumns = {
-    'doc.title': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocTitleColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocTitleColumnDescription')],
-    'doc.name': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocNameColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocNameColumnDescription')],
-    'doc.author': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocAuthorColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription')],
-    'doc.creator': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocCreatorColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription')],
-    'doc.date': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocDateColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocDateColumnDescription')],
-    'doc.creationDate': [$services.localization.render('platform.appwithinminutes.liveTableEditorDocCreationDateColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription')],
-    '_actions': [$services.localization.render('platform.appwithinminutes.liveTableEditorActionsColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorActionsColumnDescription')],
-    '_attachments': [$services.localization.render('platform.appwithinminutes.liveTableEditorAttachmentsColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription')],
-    '_images': [$services.localization.render('platform.appwithinminutes.liveTableEditorImagesColumnName'), $services.localization.render('platform.appwithinminutes.liveTableEditorImagesColumnDescription')]
-  })
-  (% class="wizard-help" %)
-  (((
-    **$services.localization.render('platform.appwithinminutes.liveTableEditorHelpTitle')** $services.localization.render('platform.appwithinminutes.liveTableEditorHelpDescription')
-
-    #foreach($columnId in ['doc.name', 'doc.date', 'doc.author', '_actions'])
-      ; {{{$genericColumns.get($columnId).get(0)}}}
-      : {{{$genericColumns.get($columnId).get(1)}}}
-    #end
-  )))
-#end
-
-#macro(displayFormFields)
-  {{html wiki="true"}}
-  (% class="hidden" %)
-  (((
-    ## Make sure that only the sheet content is rendered when the class is saved using AJAX.
-    &lt;input type="hidden" name="xpage" value="plain" /&gt;
-    ## We prevent the class name from being edited directly. The class name can be specified in the URL.
-    $doc.display('class', 'hidden')
-    ## We have to pass the list of available columns to the JavaScript code.
-    #listAvailableColumns()
-  )))
-  ; &lt;label for="AppWithinMinutes.LiveTableClass_0_description"&gt;$doc.displayPrettyName('description', false, false)&lt;/label&gt;##
-    (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorDescriptionHint')
-  : $doc.display('description')
-  ; &lt;label for="AppWithinMinutes.LiveTableClass_0_columns"&gt;$doc.displayPrettyName('columns', false, false)&lt;/label&gt;##
-    (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorColumnsHint')
-  : $doc.display('columns')
-  {{/html}}
-#end
-
-#macro(displayIcon)
-  #if($services.uix)
-    #set($icon = 'icon:application')
-    #foreach($uix in $services.uix.getExtensions('org.xwiki.platform.panels.Applications'))
-      #if($uix.getId() == "platform.panels.${doc.space}Application" &amp;&amp; "$!uix.getParameters().get('icon')" != '')
-        #set($icon = $uix.getParameters().get('icon'))
-      #end
-    #end
-    {{html wiki="true"}}
-    ; &lt;label for="applicationIcon"&gt;$services.localization.render('platform.appwithinminutes.liveTableEditorIcon')&lt;/label&gt;
-      (% class="xHint" %)$services.localization.render('platform.appwithinminutes.liveTableEditorIconHint',
-        [$xwiki.getSkinFile('icons/silk/index_abc.png')])  
-    : &lt;input id="applicationIcon" name="applicationIcon" type="text" size="10" value="$!escapetool.xml($icon)" /&gt;
-    {{/html}}
-  #end
-#end
-
-#macro(doEdit)
-  #set($liveTableObj = $doc.getObject('AppWithinMinutes.LiveTableClass', true))
-  #set($discard = $doc.use($liveTableObj))
-  #set($discard = $xwiki.jsfx.use('js/scriptaculous/dragdrop.js'))
-  #set($discard = $xwiki.ssx.use('AppWithinMinutes.LiveTableEditSheet'))
-  #set($discard = $xwiki.jsx.use('AppWithinMinutes.LiveTableEditSheet'))
-  #if("$!request.wizard" == 'true')
-    #appWizardHeader(3)
-
-  #end
-  #displayHelpPanel()
-  (% class="form-body" %)
-  (((
-    #displayFormFields()
-
-    #displayIcon()
-
-    #if("$!request.wizard" == 'true')
-
-      #appWizardFooter(3)
-    #end
-  )))
-  {{html}}&lt;div class="clearfloats"&gt;&lt;/div&gt;{{/html}}
-#end
-
-#macro(maybeGrantSpaceAdminRight $spaceHomeRef)
-  ## Grant space administration rights only if the space is new.
-  #if(!$xwiki.exists($spaceHomeRef))
-    #set($spacePrefsRef = $services.model.createDocumentReference($spaceHomeRef.wikiReference.name, $spaceHomeRef.lastSpaceReference.name, 'WebPreferences'))
-    #set($spacePrefsDoc = $xwiki.getDocument($spacePrefsRef))
-    ## Don't overwrite existing space preferences.
-    #if($spacePrefsDoc.isNew())
-      #set($discard = $spacePrefsDoc.use($spacePrefsDoc.getObject('XWiki.XWikiGlobalRights', true)))
-      #set($discard = $spacePrefsDoc.set('allow', 1))
-      #set($discard = $spacePrefsDoc.set('levels', 'admin'))
-      #set($discard = $spacePrefsDoc.set('users', $services.model.serialize($xcontext.userReference, 'default')))
-      #set($discard = $spacePrefsDoc.setParent($services.model.serialize($spaceHomeRef, 'default')))
-      #set($discard = $spacePrefsDoc.setHidden(true))
-      #set($discard = $spacePrefsDoc.saveWithProgrammingRights($services.localization.render('platform.appwithinminutes.grantSpaceAdminRightsSaveComment')))
-    #end
-  #end
-#end
-
-#macro(maybeGrantSpaceAdminRights)
-  ## Data space
-  #set($dataSpaceHomeRef = $services.model.createDocumentReference($doc.wiki, $doc.space, 'WebHome'))
-  #maybeGrantSpaceAdminRight($dataSpaceHomeRef)
-  ## Code space
-  #set($className = $request.get('AppWithinMinutes.LiveTableClass_0_class'))
-  #set($classRef = $services.model.resolveDocument($className))
-  #set($codeSpaceHomeRef = $services.model.createDocumentReference($classRef.wikiReference.name, $classRef.lastSpaceReference.name, 'WebHome'))
-  #maybeGrantSpaceAdminRight($codeSpaceHomeRef)
-#end
-
-#macro(updateAndSaveLiveTable)
-  #set($discard = $doc.updateObjectFromRequest('AppWithinMinutes.LiveTableClass'))
-  #set($liveTableGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.LiveTableGenerator'))
-  #set($discard = $doc.setContent($doc.getRenderedContent($liveTableGeneratorDoc.content, $liveTableGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
-  #set($minorEdit = "$!request.minorEdit" != '')
-  #set($comment = $request.comment)
-  #if("$!comment" == '')
-    #set($comment = $services.localization.render('platform.appwithinminutes.liveTableEditorSaveComment'))
-  #end
-  #set($discard = $doc.save($comment, $minorEdit))
-#end
-
-#macro(maybeCreateLiveTableResultsPage)
-  #set ($className = "$!doc.getObject('AppWithinMinutes.LiveTableClass').getProperty('class').value")
-  #set ($liveTableResultsDoc = $xwiki.getDocument("$!stringtool.removeEnd($className, 'Class')LiveTableResults"))
-  #set ($liveTableResultsGeneratorDoc = $xwiki.getDocument('AppWithinMinutes.LiveTableResultsGenerator'))
-  #if ($liveTableResultsDoc.isNew())
-    #set ($discard = $liveTableResultsDoc.setParent($doc.name))
-    #set ($discard = $liveTableResultsDoc.setHidden(true))
-    #set ($discard = $liveTableResultsDoc.setContent($doc.getRenderedContent($liveTableResultsGeneratorDoc.content, $liveTableResultsGeneratorDoc.syntax.toIdString(), 'plain/1.0')))
-    #set ($discard = $liveTableResultsDoc.save($services.localization.render('platform.appwithinminutes.liveTableEditorCreateLiveTableResultsComment')))
-  #end
-#end
-
-#macro(updateAndSaveIcon)
-  #set($uix = $doc.getObject('XWiki.UIExtensionClass', true))
-  #set($discard = $uix.set('name', "platform.panels.${doc.space}Application"))
-  #set($discard = $uix.set('extensionPointId', "org.xwiki.platform.panels.Applications"))
-  #set($discard = $uix.set('parameters', "label=${doc.space}${util.newline}target=${doc.fullName}${util.newline}icon=${request.applicationIcon}"))
-  #set($discard = $doc.save('Updated application icon', true))
-#end
-
-#macro(doSave)
-  #maybeGrantSpaceAdminRights()
-  #updateAndSaveLiveTable()
-  #maybeCreateLiveTableResultsPage()
-  #updateAndSaveIcon()
-  #if($action == 'save')
-    #if($errorMessage)
-      {{error}}{{html}}$errorMessage{{/html}}{{/error}}
-    #else
-      ## Redirect to view mode.
-      $response.sendRedirect($doc.getURL())
-    #end
-  #else
-    #if($errorMessage)
-      $response.sendError(400, $errorMessage)
-    #else
-      $response.setStatus(204)
-    #end
-  #end
-#end
-{{/velocity}}
-
-{{velocity}}
-#if("$!request.wizard" == 'true')
-  {{include reference="AppWithinMinutes.WizardStep" /}}
-#end
-{{/velocity}}
-
-{{velocity}}
-## Determine the action button that triggered the request
-#set($action = $xcontext.action)
-#foreach($paramName in $request.getParameterMap().keySet())
-  #if($paramName.startsWith('xaction_'))
-    #set($action = $paramName.substring(8))
-    #break
-  #end
-#end
-#if($action == 'edit')
-  #doEdit()
-#elseif($action == 'save' || $action == 'saveandcontinue')
-  #if($services.csrf.isTokenValid($request.form_token))
-    #doSave()
-  #else
-    $response.sendRedirect($services.csrf.getResubmissionURL());
-  #end
-#end
-{{/velocity}}</content>
 </xwikidoc>

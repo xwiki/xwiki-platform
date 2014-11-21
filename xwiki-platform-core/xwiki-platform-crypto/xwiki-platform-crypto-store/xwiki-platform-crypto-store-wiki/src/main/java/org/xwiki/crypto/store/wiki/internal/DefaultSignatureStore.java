@@ -92,8 +92,8 @@ public class DefaultSignatureStore implements SignatureStore
         checkArguments(entity);
 
         // TODO: Support object property as parent
-        DocumentReference docRef = resolver.resolve(entity.getParent());
-        XWikiContext context = contextProvider.get();
+        DocumentReference docRef = this.resolver.resolve(entity.getParent());
+        XWikiContext context = this.contextProvider.get();
 
         try {
             XWikiDocument document = context.getWiki().getDocument(docRef, context);
@@ -108,7 +108,7 @@ public class DefaultSignatureStore implements SignatureStore
                 object.setStringValue(SIGNATURECLASS_PROP_REFERENCE, entityReference);
             }
 
-            object.setLargeStringValue(SIGNATURECLASS_PROP_SIGNATURE, base64.encode(signature, 64));
+            object.setLargeStringValue(SIGNATURECLASS_PROP_SIGNATURE, this.base64.encode(signature, 64));
 
             context.getWiki().saveDocument(document, context);
         } catch (XWikiException e) {
@@ -123,8 +123,8 @@ public class DefaultSignatureStore implements SignatureStore
     {
         checkArguments(entity);
 
-        DocumentReference docRef = resolver.resolve(entity);
-        XWikiContext context = contextProvider.get();
+        DocumentReference docRef = this.resolver.resolve(entity);
+        XWikiContext context = this.contextProvider.get();
 
         try {
             XWikiDocument document = context.getWiki().getDocument(docRef, context);
@@ -142,7 +142,7 @@ public class DefaultSignatureStore implements SignatureStore
                 return null;
             }
 
-            return base64.decode(signature);
+            return this.base64.decode(signature);
         } catch (XWikiException e) {
             throw new SignatureStoreException("Error while retrieving signature for entity [" + entity + "]", e);
         } catch (IOException e) {

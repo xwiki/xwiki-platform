@@ -167,6 +167,9 @@
     ## We are editing an application entry so the title must be read from / written to the current document.
     #set ($name = 'title')
     #set ($value = $tdoc.title)
+    #if ("$!value" == '')
+      #set ($value = $tdoc.name)
+    #end
   #end
   {{html clean="false"}}
   &lt;input type="text" name="$name" value="$!escapetool.xml($value)"

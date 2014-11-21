@@ -49,8 +49,6 @@ public class WikiUIExtensionRendererTest
 
     private RenderingContext renderingContext;
 
-    private Transformation macroTransformation;
-
     private ContentParser contentParser;
 
     private XDOM xdom;
@@ -67,7 +65,7 @@ public class WikiUIExtensionRendererTest
         ExecutionContext executionContext = mock(ExecutionContext.class);
         renderingContext = mock(MutableRenderingContext.class);
         cm.registerComponent(RenderingContext.class, renderingContext);
-        macroTransformation = cm.registerMockComponent(Transformation.class, "macro");
+        cm.registerMockComponent(Transformation.class, "macro");
         contentParser = cm.registerMockComponent(ContentParser.class);
         when(execution.getContext()).thenReturn(executionContext);
         xdom = mock(XDOM.class);

@@ -1,0 +1,49 @@
+##################################
+##          PAGE MENU
+##################################
+#set ($canView = !$doc.isNew() && $xwiki.hasAccessLevel('view'))
+#set ($canCopy = $canView && $hasCreatePage)
+#set ($canDelete = !$doc.isNew() && $xwiki.hasAccessLevel('delete'))
+#set ($canWatch = !$doc.isNew() && $hasWatch)
+#set ($displayPageSubmenu = $canWatch || $canCopy || $canDelete)
+#set ($pageURL = $xwiki.getURL($doc.documentReference, 'view'))
+#xwikitopmenuseparator()
+#if (!$displayPageSubmenu)
+  #xwikitopmenuentry($pageURL "$services.localization.render('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' '' 'file')
+#else
+  #xwikitopmenuentrystart($pageURL "$services.localization.render('core.menu.type.page')__SEPARATOR__$!{escapetool.xml($doc.name)}" 'tmPage' '' 'file')
+    ## GO TO
+    #submenuitem($pageURL $services.localization.render('core.menu.goto.page') '', '', 'arrow-right')
+    ## WATCH /UNWATCH
+    #if ($canWatch)
+     #set ($watchClasses = '')
+      #set ($unwatchClasses = 'hidden')
+      #if ($xwiki.watchlist.isDocumentWatched())
+        #set ($watchClasses = 'hidden')
+        #set ($unwatchClasses = '')
+      #end
+      #submenuitem("$xwiki.getURL($doc.documentReference, 'view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$escapetool.url($xwiki.getURL($doc.documentReference))" $services.localization.render('core.menu.watchlist.add.page') 'tmWatchDocument' $watchClasses 'eye-open')
+      #submenuitem("$xwiki.getURL($doc.documentReference, 'view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$escapetool.url($xwiki.getURL($doc.documentReference))" $services.localization.render('core.menu.watchlist.remove.page') 'tmUnwatchDocument' $unwatchClasses 'eye-close')
+    #end
+    #if ($canCopy || $canDelete)
+      #submenuseparator()
+    #end
+    ## COPY
+    #if ($canCopy)
+      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=copy') $services.localization.render('core.menu.copy') 'tmActionCopy', '' 'share')
+    #end
+    ## DELETE
+    #if ($canDelete)
+      #submenuitem($xwiki.getURL($doc.documentReference, 'view', 'xpage=rename&amp;step=1') $services.localization.render('core.menu.rename') 'tmActionRename', '' 'edit')
+      #submenuitem($xwiki.getURL($doc.documentReference, 'delete', $!languageparams) $services.localization.render('core.menu.delete') 'tmActionDelete', '', 'remove')
+    #end
+  #xwikitopmenuentryend()
+  #if ($canDelete && $keyboardShortcutsEnabled)
+    <script type="text/javascript">
+      //<![CDATA[
+      shortcut.add("$services.localization.render('core.shortcuts.view.delete')",function() { location.href=$('tmActionDelete').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      shortcut.add("$services.localization.render('core.shortcuts.view.rename')",function() { location.href=$('tmActionRename').href; }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+      //]]>
+    </script>
+  #end
+#end

@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ import net.sf.json.JSONObject;
  */
 @Component
 @Named("date")
+@Singleton
 public class DatePingDataProvider implements PingDataProvider
 {
     private static final String PROPERTY_FIRST_PING_DATE = "firstPingDate";

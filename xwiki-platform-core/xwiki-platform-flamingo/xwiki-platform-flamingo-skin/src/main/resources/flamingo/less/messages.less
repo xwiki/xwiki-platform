@@ -11,6 +11,7 @@ span.box { // Used by: Inline boxes and messages
 .box, .plainmessage, // Used by: Code Macro, Success Macro, etc.
 fieldset.xwikimessage { // Used by: Login form, Delete messages
   .well;
+  overflow-x: auto;
 }
 
 .plainmessage {
@@ -36,6 +37,7 @@ fieldset.xwikimessage { // Used by: Login form, Delete messages
 .xwikirenderingerror {
   .box;
   .alert-danger;
+  display: block;
   margin-bottom: 0;
 }
 
@@ -44,4 +46,7 @@ fieldset.xwikimessage { // Used by: Login form, Delete messages
   .border-top-radius(0);
   border-color: @alert-danger-border;
   border-style: solid;
+  display: block;
+  overflow-x: scroll;
+  overflow-y: hidden;
 }

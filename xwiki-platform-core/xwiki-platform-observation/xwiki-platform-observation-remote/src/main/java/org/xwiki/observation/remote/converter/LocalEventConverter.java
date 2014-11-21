@@ -25,7 +25,7 @@ import org.xwiki.observation.remote.RemoteEventData;
 
 /**
  * Convert a local event to a serializable remote event.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */
@@ -39,7 +39,7 @@ public interface LocalEventConverter
 
     /**
      * Convert provided local event to remote event by filling the provided remote event object.
-     * 
+     *
      * @param localEvent the local event
      * @param remoteEvent the remote event
      * @return if the converter support this conversion it should return true after the conversion, otherwise false

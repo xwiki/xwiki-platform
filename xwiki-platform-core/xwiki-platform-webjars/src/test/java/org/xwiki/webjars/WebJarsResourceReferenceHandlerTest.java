@@ -19,22 +19,34 @@
  */
 package org.xwiki.webjars;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Reader;
+import java.io.StringWriter;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.velocity.VelocityContext;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.container.Container;
-import org.xwiki.container.Response;
+import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.container.servlet.ServletResponse;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.VelocityManager;
 import org.xwiki.webjars.internal.TestableWebJarsResourceReferenceHandler;
+
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link org.xwiki.webjars.internal.WebJarsResourceReferenceHandler}.
@@ -81,7 +93,9 @@ public class WebJarsResourceReferenceHandlerTest
             bais);
 
         Container container = this.componentManager.getInstance(Container.class);
-        Response response = mock(Response.class);
+        ServletResponse response = mock(ServletResponse.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        when(response.getHttpServletResponse()).thenReturn(httpResponse);
         when(container.getResponse()).thenReturn(response);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         when(response.getOutputStream()).thenReturn(baos);
@@ -93,5 +107,88 @@ public class WebJarsResourceReferenceHandlerTest
         assertEquals("content", baos.toString());
         // Verify that the correct Content Type has been set.
         verify(response).setContentType("application/javascript");
+
+        // Also verify that the "Last-Modified" header has been set in the response so that the browser will send
+        // an If-Modified-Since header for the next request and we can tell it to use its cache.
+        verify(httpResponse).setDateHeader(eq("Last-Modified"), anyLong());
+    }
+
+    @Test
+    public void return304WhenIfModifiedSinceHeader() throws Exception
+    {
+        EntityResourceReference reference = new EntityResourceReference(new DocumentReference("wiki", "space", "page"),
+            EntityResourceAction.VIEW);
+        ResourceReferenceHandlerChain chain = mock(ResourceReferenceHandlerChain.class);
+        TestableWebJarsResourceReferenceHandler handler = this.componentManager.getComponentUnderTest();
+
+        Container container = this.componentManager.getInstance(Container.class);
+
+        ServletResponse response = mock(ServletResponse.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        when(response.getHttpServletResponse()).thenReturn(httpResponse);
+        when(container.getResponse()).thenReturn(response);
+
+        ServletRequest request = mock(ServletRequest.class);
+        HttpServletRequest httpRequest = mock(HttpServletRequest.class);
+        when(httpRequest.getHeader("If-Modified-Since")).thenReturn("some value");
+        when(request.getHttpServletRequest()).thenReturn(httpRequest);
+        when(container.getRequest()).thenReturn(request);
+
+        handler.handle(reference, chain);
+
+        // This the test: we verify that 304 is returned when the "If-Modified-Since" header is found in the request
+        verify(httpResponse).setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+    }
+
+    @Test
+    public void evaluateResource() throws Exception
+    {
+        EntityResourceReference reference =
+            new EntityResourceReference(new DocumentReference("wiki", "Space", "Page"), EntityResourceAction.VIEW);
+        reference.addParameter("value", "angular/2.1.11/angular.js");
+        reference.addParameter("evaluate", "true");
+
+        TestableWebJarsResourceReferenceHandler handler = this.componentManager.getComponentUnderTest();
+
+        ClassLoader classLoader = mock(ClassLoader.class);
+        handler.setClassLoader(classLoader);
+
+        ByteArrayInputStream resourceStream = new ByteArrayInputStream("content".getBytes());
+        when(classLoader.getResourceAsStream("META-INF/resources/webjars/angular/2.1.11/angular.js")).thenReturn(
+            resourceStream);
+
+        Container container = this.componentManager.getInstance(Container.class);
+        ServletResponse response = mock(ServletResponse.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        when(response.getHttpServletResponse()).thenReturn(httpResponse);
+        when(container.getResponse()).thenReturn(response);
+        ByteArrayOutputStream responseOutputStream = new ByteArrayOutputStream();
+        when(response.getOutputStream()).thenReturn(responseOutputStream);
+
+        VelocityManager velocityManager = this.componentManager.getInstance(VelocityManager.class);
+        VelocityEngine velocityEngine = mock(VelocityEngine.class);
+        when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
+
+        doAnswer(new Answer<Void>()
+        {
+            public Void answer(InvocationOnMock invocation)
+            {
+                ((StringWriter) invocation.getArguments()[1]).write("evaluated content");
+                return null;
+            }
+        }).when(velocityEngine).evaluate(any(VelocityContext.class), any(StringWriter.class),
+            eq("angular/2.1.11/angular.js"), any(Reader.class));
+
+        handler.handle(reference, mock(ResourceReferenceHandlerChain.class));
+
+        // Verify that the resource content has been evaluated and copied to the Response output stream.
+        assertEquals("evaluated content", responseOutputStream.toString());
+
+        // Verify that the correct Content Type has been set.
+        verify(response).setContentType("application/javascript");
+
+        // Also verify that the "Last-Modified" header has not been set in the response because the resource is dynamic
+        // (has Velocity code that is evaluated on each request).
+        verify(httpResponse, never()).setDateHeader(eq("Last-Modified"), anyLong());
     }
 }

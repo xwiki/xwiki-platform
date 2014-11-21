@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-icon</artifactId>
-    <version>6.2-SNAPSHOT</version>
+    <version>6.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-icon-ui</artifactId>
   <packaging>xar</packaging>
@@ -40,6 +40,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-icon-script</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- We need a default implementation at runtime, include it here so that any other module that depends on this
+         XAR will be sure to have all that's required to make it work at runtime. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-icon-default</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

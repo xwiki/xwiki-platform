@@ -73,7 +73,7 @@ rendering.macro.watchlist.description=Show the content of your current watchlist
       </scope>
     </class>
     <property>
-      <scope>GLOBAL</scope>
+      <scope>WIKI</scope>
     </property>
   </object>
 </xwikidoc>

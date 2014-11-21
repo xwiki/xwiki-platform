@@ -85,6 +85,16 @@ public class DefaultIconSetCacheTest
     }
 
     @Test
+    public void getByNameAndWiki() throws Exception
+    {
+        IconSet iconSet = new IconSet("key");
+        when(cache.get("NAMED:6wikiId_key")).thenReturn(iconSet);
+
+        IconSet result = mocker.getComponentUnderTest().get("key", "wikiId");
+        assertTrue(iconSet == result);
+    }
+
+    @Test
     public void getByDocRef() throws Exception
     {
         IconSet iconSet = new IconSet("key");
@@ -102,6 +112,14 @@ public class DefaultIconSetCacheTest
         IconSet iconSet = new IconSet("key");
         mocker.getComponentUnderTest().put("key", iconSet);
         verify(cache).set("NAMED:key", iconSet);
+    }
+
+    @Test
+    public void putByNameAndWiki() throws Exception
+    {
+        IconSet iconSet = new IconSet("key");
+        mocker.getComponentUnderTest().put("key", "wikiId", iconSet);
+        verify(cache).set("NAMED:6wikiId_key", iconSet);
     }
 
     @Test
@@ -126,6 +144,13 @@ public class DefaultIconSetCacheTest
     {
         mocker.getComponentUnderTest().clear("key");
         verify(cache).remove("NAMED:key");
+    }
+
+    @Test
+    public void clearByNameAndWiki() throws Exception
+    {
+        mocker.getComponentUnderTest().clear("key", "wikiId");
+        verify(cache).remove("NAMED:6wikiId_key");
     }
 
     @Test

@@ -30,11 +30,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.localization.Translation;
 import org.xwiki.localization.TranslationBundleDoesNotExistsException;
 import org.xwiki.localization.TranslationBundleFactory;
 import org.xwiki.localization.TranslationBundleFactoryDoesNotExistsException;
+import org.xwiki.localization.internal.DefaultTranslationBundleContext;
 import org.xwiki.localization.wiki.internal.TranslationDocumentModel.Scope;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.Query;
@@ -68,6 +71,7 @@ public class DocumentTranslationBundleFactoryTest
     {
         this.oldcore.notifyDocumentCreatedEvent(true);
         this.oldcore.notifyDocumentUpdatedEvent(true);
+        this.oldcore.notifyDocumentDeletedEvent(true);
     }
 
     @Before
@@ -87,11 +91,14 @@ public class DocumentTranslationBundleFactoryTest
         when(this.mockQuery.execute()).thenReturn(Collections.EMPTY_LIST);
 
         when(this.mockWikiDescriptorManager.getMainWikiId()).thenReturn(this.oldcore.getXWikiContext().getMainXWiki());
+        when(this.mockWikiDescriptorManager.getCurrentWikiId()).thenReturn(this.oldcore.getXWikiContext().getWikiId());
 
         // Initialize document bundle factory
         this.oldcore.getMocker().getInstance(TranslationBundleFactory.class, DocumentTranslationBundleFactory.ID);
 
         this.localization = this.oldcore.getMocker().getInstance(LocalizationManager.class);
+
+        this.oldcore.getMocker().registerMockComponent(ConfigurationSource.class);
     }
 
     @AfterComponent
@@ -124,9 +131,8 @@ public class DocumentTranslationBundleFactoryTest
         if (!locale.equals(Locale.ROOT)) {
             XWikiDocument tdocument = document.getTranslatedDocument(locale, this.oldcore.getXWikiContext());
             if (tdocument == document) {
-                tdocument = new XWikiDocument(document.getDocumentReference());
-                tdocument.setLocale(locale);
-                tdocument.setTranslation(1);
+                tdocument = new XWikiDocument(document.getDocumentReference(), locale);
+                tdocument.setDefaultLocale(document.getDefaultLocale());
             }
             document = tdocument;
         }
@@ -157,22 +163,46 @@ public class DocumentTranslationBundleFactoryTest
         }
     }
 
+    private void resetContext() throws ComponentLookupException
+    {
+        this.oldcore.getExecutionContext().removeProperty(DefaultTranslationBundleContext.CKEY_BUNDLES);
+    }
+
     // tests
 
     @Test
-    public void getTranslationScopeWiki() throws XWikiException
+    public void getTranslationScopeWiki() throws XWikiException, ComponentLookupException
     {
         assertTranslation("wiki.translation", null, Locale.ROOT);
 
         addTranslation("wiki.translation", "Wiki translation", new DocumentReference(this.oldcore.getXWikiContext()
             .getWikiId(), "space", "translation"), Locale.ROOT, Scope.WIKI);
 
+        assertTranslation("wiki.translation", null, Locale.ROOT);
+
+        resetContext();
+
         assertTranslation("wiki.translation", "Wiki translation", Locale.ROOT);
     }
 
     @Test
+    public void getTranslationScopeWikiFromOtherWiki() throws XWikiException, ComponentLookupException
+    {
+        assertTranslation("wiki.translation", null, Locale.ROOT);
+
+        addTranslation("wiki.translation", "Wiki translation", new DocumentReference("otherwiki", "space",
+            "translation"), Locale.ROOT, Scope.WIKI);
+
+        assertTranslation("wiki.translation", null, Locale.ROOT);
+
+        resetContext();
+
+        assertTranslation("wiki.translation", null, Locale.ROOT);
+    }
+
+    @Test
     public void getTranslationScopeONDemand() throws XWikiException, TranslationBundleDoesNotExistsException,
-        TranslationBundleFactoryDoesNotExistsException
+        TranslationBundleFactoryDoesNotExistsException, ComponentLookupException
     {
         assertTranslation("wiki.translation", null, Locale.ROOT);
 
@@ -180,6 +210,8 @@ public class DocumentTranslationBundleFactoryTest
             new DocumentReference(this.oldcore.getXWikiContext().getWikiId(), "space", "translation");
 
         addTranslation("wiki.translation", "Wiki translation", translationDocument, Locale.ROOT, Scope.ON_DEMAND);
+
+        resetContext();
 
         this.localization.use(DocumentTranslationBundleFactory.ID, translationDocument.toString());
 

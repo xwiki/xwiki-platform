@@ -73,7 +73,7 @@ public class X509CertificateQuery extends AbstractX509StoreQuery
         try {
             for (String cert : this.<String>execute()) {
                 try {
-                    result.add(factory.decode(getEncoder().decode(cert)));
+                    result.add(this.factory.decode(getEncoder().decode(cert)));
                 } catch (Exception e) {
                     // Ignored
                 }

@@ -85,6 +85,10 @@ import org.slf4j.LoggerFactory;
  */
 public class DBCPConnectionProvider implements ConnectionProvider
 {
+    /**
+     * Logger to use to log shutdown information (opposite of initialization).
+     */
+    private static final Logger SHUTDOWN_LOGGER = LoggerFactory.getLogger("org.xwiki.shutdown");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBCPConnectionProvider.class);
 
@@ -220,6 +224,12 @@ public class DBCPConnectionProvider implements ConnectionProvider
     @Override
     public Connection getConnection() throws SQLException
     {
+        // Check if the database has not been already stopped to avoid NPE. This could also possibly happen if the init
+        // has not been already executed and some code calls getConnection().
+        if (ds == null) {
+            throw new SQLException("Database Connection Pool has not been started or is already stopped!");
+        }
+
         Connection conn = null;
         try {
             conn = ds.getConnection();
@@ -242,19 +252,19 @@ public class DBCPConnectionProvider implements ConnectionProvider
     @Override
     public void close() throws HibernateException
     {
-        LOGGER.debug("Close DBCPConnectionProvider");
+        SHUTDOWN_LOGGER.debug("Stopping Database Connection Pool...");
         logStatistics();
         try {
             if (ds != null) {
                 ds.close();
                 ds = null;
             } else {
-                LOGGER.warn("Cannot close DBCP pool (not initialized)");
+                LOGGER.warn("Cannot close Database Connection Pool (not initialized)");
             }
         } catch (Exception e) {
             throw new HibernateException("Could not close DBCP pool", e);
         }
-        LOGGER.debug("Close DBCPConnectionProvider complete");
+        SHUTDOWN_LOGGER.debug("Database Connection Pool has been stopped");
     }
 
     /**
@@ -276,9 +286,9 @@ public class DBCPConnectionProvider implements ConnectionProvider
 
     protected void logStatistics()
     {
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("active: " + ds.getNumActive() + " (max: " + ds.getMaxActive() + ")   " + "idle: "
-                + ds.getNumIdle() + "(max: " + ds.getMaxIdle() + ")");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("active: [{}] (max: [{}]), idle: [{}] (max: [{}])", ds.getNumActive(), ds.getMaxActive(),
+                ds.getNumIdle(), ds.getMaxIdle());
         }
     }
 }

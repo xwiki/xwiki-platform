@@ -527,6 +527,10 @@ xwiki.authentication.ldap.trylocal=1
 #-# The default is 1000
 # xwiki.authentication.ldap.timeout=1000
 
+#-# [Since 6.3M1, XWikiLDAPAuthServiceImpl]
+#-# The maximum number of search results to be returned from a search operation.
+#-# The default is 1000
+# xwiki.authentication.ldap.maxresults=1000
 
 #---------------------------------------
 # WYSIWYG Editor configuration
@@ -552,7 +556,7 @@ xwiki.defaultskin=$xwikiCfgDefaultSkin
 
 #-# The default base for skins that don't specify a base skin. This is also the last place where a skin file is searched
 #-# if not found in the more specific skins.
-xwiki.defaultbaseskin=$xwikiCfgDefaultBaseSkin
+xwiki.defaultbaseskin=$!xwikiCfgDefaultBaseSkin
 
 #-# Defines whether title handling should be using the compatibility mode or not. When the compatibility
 #-# mode is active, if the document's content first header (level 1 or level 2) matches the document's title

@@ -33,11 +33,16 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import static org.xwiki.model.internal.reference.StringReferenceSeparators.WIKISEP;
 
 /**
+ * <p>
  * Serialize a reference into a unique identifier string within a wiki. Its similar to the
  * {@link UidStringEntityReferenceSerializer}, but is made appropriate for a wiki independent storage.
- *
- * ie: The string created looks like 5:space3:doc for the wiki:space.doc document.
- * and 5:space3:doc15:xspace.class[0] for the wiki:space.doc^wiki:xspace.class[0] object.
+ * </p>
+ * <p>
+ * The string created looks like {@code 5:space3:doc} for the {@code wiki:space.doc} document reference.
+ * and {@code 5:space3:doc15:xspace.class[0]} for the wiki:space.doc^wiki:xspace.class[0] object.
+ * (with {@code 5} being the length of the space name, i.e the length of {@code space} and {@code 3} being the length of
+ * the page name, i.e. the length of {@code doc}).
+ * </p>
  *
  * @version $Id$
  * @since 4.0M1

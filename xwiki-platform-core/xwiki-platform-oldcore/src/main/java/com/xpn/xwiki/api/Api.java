@@ -22,15 +22,16 @@ package com.xpn.xwiki.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Provider;
+
+import org.xwiki.stability.Unstable;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
-
-import org.xwiki.context.Execution;
-import org.xwiki.stability.Unstable;
 
 /**
  * Base class for all API Objects. API Objects are the Java Objects that can be manipulated from Velocity or Groovy in
@@ -48,6 +49,8 @@ public class Api
      *       better do it now rather than after the 1.0 release...
      */
     protected XWikiContext context;
+
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * @param context the XWiki Context object
@@ -69,15 +72,16 @@ public class Api
      */
     protected XWikiContext getXWikiContext()
     {
-        XWikiContext xcontext =
-            (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
+        if (this.xcontextProvider == null) {
+            this.xcontextProvider = Utils.getComponent(XWikiContext.TYPE_PROVIDER);
+        }
 
         // TODO: We need to get rid of this.context but since it's been protected for a long time, a lot of code
         // wrongly use it instead of calling this getXWikiContext() method. Thus the best we can do ATM is to sync
         // the saved context with the dynamic one we just retrieved...
-        this.context = xcontext;
+        this.context = this.xcontextProvider.get();
 
-        return context;
+        return this.context;
     }
 
     /**

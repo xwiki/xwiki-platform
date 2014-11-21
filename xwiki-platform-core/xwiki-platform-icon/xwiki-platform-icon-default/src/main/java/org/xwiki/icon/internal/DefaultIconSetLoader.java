@@ -25,6 +25,7 @@ import java.io.StringReader;
 import java.util.Properties;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
@@ -44,6 +45,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
  * @version $Id$
  */
 @Component
+@Singleton
 public class DefaultIconSetLoader implements IconSetLoader
 {
     private static final String CSS_PROPERTY_NAME = "xwiki.iconset.css";

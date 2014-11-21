@@ -3,4 +3,4 @@
 ########################################################
 #template("xwikivars.vm")
 $response.setContentType("text/plain")##
-#template("rendercontent.vm")
+#template("displaycontent.vm")

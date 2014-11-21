@@ -42,6 +42,7 @@ import org.xwiki.mail.script.MimeMessageWrapper;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.internal.MockConfigurationSource;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
 import com.icegreen.greenmail.util.GreenMail;
@@ -82,6 +83,8 @@ public class ScriptingIntegrationTest
     public void initialize() throws Exception
     {
         this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
+        this.componentManager.registerComponent(MockConfigurationSource.getDescriptor("documents"));
+        this.componentManager.registerComponent(MockConfigurationSource.getDescriptor("xwikiproperties"));
 
         this.scriptService = this.componentManager.getInstance(ScriptService.class, "mailsender");
     }

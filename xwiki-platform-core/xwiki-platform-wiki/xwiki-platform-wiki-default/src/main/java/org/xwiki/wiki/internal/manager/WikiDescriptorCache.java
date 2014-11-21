@@ -21,7 +21,16 @@ package org.xwiki.wiki.internal.manager;
 
 import java.util.Collection;
 
-import org.xwiki.component.annotation.Role;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheManager;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
 
 /**
@@ -30,22 +39,91 @@ import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptor;
  * @version $Id$
  * @since 5.3M2
  */
-@Role
-public interface WikiDescriptorCache
+@Component(roles = WikiDescriptorCache.class)
+@Singleton
+public class WikiDescriptorCache implements Initializable
 {
+    @Inject
+    private CacheManager cacheManager;
+
+    private Cache<DefaultWikiDescriptor> wikiAliasCache;
+
+    private Cache<DefaultWikiDescriptor> wikiIdCache;
+
+    private Collection<String> wikiIds;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        this.wikiAliasCache = createCache("wiki.descriptor.cache.wikiAlias");
+        this.wikiIdCache = createCache("wiki.descriptor.cache.wikiId");
+    }
+
+    private Cache<DefaultWikiDescriptor> createCache(String cacheId) throws InitializationException
+    {
+        CacheConfiguration configuration = new CacheConfiguration(cacheId);
+
+        try {
+            return this.cacheManager.createNewCache(configuration);
+        } catch (CacheException e) {
+            throw new InitializationException(String.format("Failed to initialize wiki descriptor caches [%s]",
+                configuration.getConfigurationId()), e);
+        }
+    }
+
     /**
      * Add a descriptor to the cache.
      *
      * @param descriptor descriptor to add
      */
-    void add(DefaultWikiDescriptor descriptor);
+    public void add(DefaultWikiDescriptor descriptor)
+    {
+        // Update the wiki name cache
+        addFromId(descriptor.getId(), descriptor);
+
+        // Update the wiki alias cache
+        for (String alias : descriptor.getAliases()) {
+            addFromAlias(alias, descriptor);
+        }
+    }
+
+    /**
+     * Add a descriptor to the cache.
+     *
+     * @param wikiAlias Alias of the wiki to get
+     * @param descriptor descriptor to add
+     */
+    public void addFromAlias(String wikiAlias, DefaultWikiDescriptor descriptor)
+    {
+        this.wikiAliasCache.set(wikiAlias, descriptor);
+    }
+
+    /**
+     * Add a descriptor to the cache.
+     * 
+     * @param wikiId Id of the wiki to get
+     * @param descriptor descriptor to add
+     */
+    public void addFromId(String wikiId, DefaultWikiDescriptor descriptor)
+    {
+        this.wikiIdCache.set(wikiId, descriptor);
+    }
 
     /**
      * Remove a descriptor from the cache.
      * 
      * @param descriptor descriptor to remove
      */
-    void remove(DefaultWikiDescriptor descriptor);
+    public void remove(DefaultWikiDescriptor descriptor)
+    {
+        // Remove from the wiki name cache
+        this.wikiIdCache.remove(descriptor.getId());
+
+        // Remove from the wiki alias cache
+        for (String alias : descriptor.getAliases()) {
+            this.wikiAliasCache.remove(alias);
+        }
+    }
 
     /**
      * Get a descriptor from the cache.
@@ -53,7 +131,10 @@ public interface WikiDescriptorCache
      * @param wikiId Id of the wiki to get
      * @return the descriptor related to the id or null if there is no corresponding descriptor in the cache
      */
-    DefaultWikiDescriptor getFromId(String wikiId);
+    public DefaultWikiDescriptor getFromId(String wikiId)
+    {
+        return wikiIdCache.get(wikiId);
+    }
 
     /**
      * Get a descriptor from the cache.
@@ -61,17 +142,26 @@ public interface WikiDescriptorCache
      * @param wikiAlias Alias of the wiki to get
      * @return the descriptor related to the alias or null if there is no corresponding descriptor in the cache
      */
-    DefaultWikiDescriptor getFromAlias(String wikiAlias);
+    public DefaultWikiDescriptor getFromAlias(String wikiAlias)
+    {
+        return wikiAliasCache.get(wikiAlias);
+    }
 
     /**
      * @param wikiIds the full list of wikis identifiers
      * @since 6.2M1
      */
-    void setWikiIds(Collection<String> wikiIds);
+    public void setWikiIds(Collection<String> wikiIds)
+    {
+        this.wikiIds = wikiIds;
+    }
 
     /**
      * @return the full list of wikis identifiers
      * @since 6.2M1
      */
-    Collection<String> getWikiIds();
+    public Collection<String> getWikiIds()
+    {
+        return this.wikiIds;
+    }
 }

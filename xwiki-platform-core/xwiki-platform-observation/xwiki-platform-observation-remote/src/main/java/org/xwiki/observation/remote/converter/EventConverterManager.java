@@ -27,7 +27,7 @@ import org.xwiki.observation.remote.RemoteEventData;
 
 /**
  * Provide events converters.
- * 
+ *
  * @version $Id$
  * @since 2.0M3
  */
@@ -46,7 +46,7 @@ public interface EventConverterManager
 
     /**
      * Convert a local event to a remote event.
-     * 
+     *
      * @param localEvent the local event
      * @return the remote event, if null the event should not be sent to the network.
      */
@@ -54,7 +54,7 @@ public interface EventConverterManager
 
     /**
      * Convert a remote event to a local event.
-     * 
+     *
      * @param remoteEvent the remote event
      * @return the local event, if null the event should not send to {@link org.xwiki.observation.ObservationManager}.
      */

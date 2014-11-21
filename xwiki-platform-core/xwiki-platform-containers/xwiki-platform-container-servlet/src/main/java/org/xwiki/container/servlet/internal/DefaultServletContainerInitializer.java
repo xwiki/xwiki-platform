@@ -25,7 +25,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
@@ -64,12 +63,6 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
 
     @Inject
     private ComponentManager componentManager;
-
-    /**
-     * The logger to log.
-     */
-    @Inject
-    private Logger logger;
 
     /**
      * @deprecated starting with 3.5M1, use the notion of Environment instead

@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
@@ -48,6 +49,7 @@ import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
  */
 @Component
 @Named("applicationmanager")
+@Singleton
 public class ApplicationManagerListener implements EventListener
 {
     /**

@@ -62,6 +62,7 @@ public class ClassPropertyReader extends AbstractReader implements XARXMLReader<
         }
     }
 
+    @Override
     public WikiClassProperty read(XMLStreamReader xmlReader) throws XMLStreamException, FilterException
     {
         WikiClassProperty wikiClassProperty = new WikiClassProperty();

@@ -69,8 +69,8 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
 
     public static ProfileUserProfilePage gotoPage(String username)
     {
+        getUtil().gotoPage("XWiki", username);
         ProfileUserProfilePage page = new ProfileUserProfilePage(username);
-        getUtil().gotoPage("XWiki", page.getUsername());
         return page;
     }
 

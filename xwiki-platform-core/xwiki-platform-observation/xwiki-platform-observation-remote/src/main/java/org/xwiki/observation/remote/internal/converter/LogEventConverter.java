@@ -31,7 +31,7 @@ import org.xwiki.observation.remote.converter.LocalEventConverter;
 
 /**
  * Make sure to skip {@link LogEvent}.
- * 
+ *
  * @version $Id$
  * @since 6.0RC1
  */

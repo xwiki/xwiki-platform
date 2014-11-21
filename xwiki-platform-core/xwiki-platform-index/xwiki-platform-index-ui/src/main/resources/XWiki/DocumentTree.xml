@@ -188,6 +188,7 @@
     </class>
     <property>
       <code>{{velocity}}
+#macro (escapeMacroParam $value)$!value.replaceAll('([~"])', '~$1')#end
 #set ($docTreeConfig = {
   'showWikis': false,
   'showWikiPrettyName': true,
@@ -208,13 +209,14 @@
     #set ($discard = $resourceParams.put($entry.key, $value))
   #end
 #end
+#set ($reference = "path:$xwiki.getURL($xcontext.macro.doc.documentReference, 'get', $escapetool.url($resourceParams))")
 #set ($editable = $xcontext.macro.params.readOnly != 'true')
 #set ($isFullWidthAvailable = $xcontext.macro.params.compact != 'true')
 #set ($links = $xcontext.macro.params.links == 'true')
 #set ($checkboxes = $xcontext.macro.params.checkboxes == 'true')
-{{tree reference="path:$xwiki.getURL($xcontext.macro.doc.documentReference, 'get', $escapetool.url($resourceParams))"
-  root="$!xcontext.macro.params.root" dragAndDrop="$editable" contextMenu="$editable" icons="$isFullWidthAvailable"
-  edges="$isFullWidthAvailable" links="$links" checkboxes="$checkboxes" openTo="$!xcontext.macro.params.openTo" /}}
+{{tree reference="#escapeMacroParam($reference)" root="#escapeMacroParam($xcontext.macro.params.root)"
+  dragAndDrop="$editable" contextMenu="$editable" icons="$isFullWidthAvailable" edges="$isFullWidthAvailable"
+  links="$links" checkboxes="$checkboxes" openTo="#escapeMacroParam($xcontext.macro.params.openTo)" /}}
 {{/velocity}}</code>
     </property>
     <property>

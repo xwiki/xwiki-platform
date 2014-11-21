@@ -141,7 +141,7 @@ $services.localization.render('xe.panels.includedDocs.count', [$pages.size()])
       <description>Displays the documents included in the curent document.</description>
     </property>
     <property>
-      <name>Included documents</name>
+      <name>Included Documents</name>
     </property>
     <property>
       <type>edit</type>

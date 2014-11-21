@@ -167,7 +167,7 @@ $services.localization.render('helponsyntax') {{html clean="false"}}&lt;a href="
       <description>Displays information on the XWiki syntax.</description>
     </property>
     <property>
-      <name>Syntax help</name>
+      <name>Syntax Help</name>
     </property>
     <property>
       <type>edit</type>

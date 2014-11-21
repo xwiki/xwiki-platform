@@ -113,6 +113,9 @@ public class DefaultWikiDescriptorBuilderTest
         BaseObject object1 = mock(BaseObject.class);
         BaseObject object2 = mock(BaseObject.class);
         BaseObject object3 = mock(BaseObject.class);
+        // Make sure that the first object is null to also verify this case since it can happen that we get holes
+        // with the XWikiDocument.getXObjects() API...
+        objects.add(null);
         objects.add(object1);
         objects.add(object2);
         objects.add(null);

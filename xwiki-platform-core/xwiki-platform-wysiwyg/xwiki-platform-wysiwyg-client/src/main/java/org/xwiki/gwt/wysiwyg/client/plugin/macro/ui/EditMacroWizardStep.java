@@ -32,7 +32,6 @@ import org.xwiki.gwt.wysiwyg.client.plugin.macro.MacroServiceAsync;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDescriptor;
 import org.xwiki.gwt.wysiwyg.client.plugin.macro.ParameterDisplayer;
 
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
@@ -172,7 +171,7 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
         parameterDisplayers.clear();
         contentDisplayer = null;
 
-        String currentWikiId = Document.get().getDocumentElement().getAttribute("data-xwiki-wiki");
+        String currentWikiId = getConfig().getParameter("wiki");
         getMacroService().getMacroDescriptor(macroCall.getName(), getConfig().getParameter("syntax"), currentWikiId,
             new MacroDescriptorAsyncCallback(cb));
     }

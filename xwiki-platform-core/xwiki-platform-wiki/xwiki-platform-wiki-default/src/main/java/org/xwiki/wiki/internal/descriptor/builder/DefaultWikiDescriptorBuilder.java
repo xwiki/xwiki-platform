@@ -19,6 +19,7 @@
  */
 package org.xwiki.wiki.internal.descriptor.builder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -98,29 +99,28 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
     @Override
     public DefaultWikiDescriptor buildDescriptorObject(List<BaseObject> serverClassObjects, XWikiDocument document)
     {
-        // Create a Wiki object with the first XWikiServerClass object
-        DefaultWikiDescriptor descriptor = extractWikiDescriptor(serverClassObjects.get(0), document);
+        List<BaseObject> normalizedServerClassObjects = normalizeServerClassObjects(serverClassObjects);
+        BaseObject mainServerClassObject = normalizedServerClassObjects.remove(0);
+        DefaultWikiDescriptor descriptor = extractWikiDescriptor(mainServerClassObject, document);
 
         if (descriptor != null) {
             // Create WikiAlias instances for the other XWikiServerClass objects
-            for (int i = 1; i < serverClassObjects.size(); ++i) {
-                BaseObject serverClassObject = serverClassObjects.get(i);
-                if (serverClassObject == null) {
-                    continue;
+            for (BaseObject serverClassObject : normalizedServerClassObjects) {
+                if (serverClassObject != null) {
+                    String descriptorAlias = extractWikiAlias(serverClassObject);
+                    descriptor.addAlias(descriptorAlias);
                 }
-                String descriptorAlias = extractWikiAlias(serverClassObject);
-                descriptor.addAlias(descriptorAlias);
             }
 
             // load properties
-            BaseObject object = serverClassObjects.get(0);
             descriptor.setMainPageReference(referenceResolver.resolve(
-                    object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE)));
-            //descriptor.setHidden(object.getIntValue(XWikiServerClassDocumentInitializer.FI));
-            descriptor.setPrettyName(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME));
-            descriptor.setOwnerId(
-                    getFullReference(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_OWNER)));
-            descriptor.setDescription(object.getStringValue(XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION));
+                mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_HOMEPAGE)));
+            descriptor.setPrettyName(
+                mainServerClassObject.getStringValue(XWikiServerClassDocumentInitializer.FIELD_WIKIPRETTYNAME));
+            descriptor.setOwnerId(getFullReference(mainServerClassObject.getStringValue(
+                XWikiServerClassDocumentInitializer.FIELD_OWNER)));
+            descriptor.setDescription(mainServerClassObject.getStringValue(
+                XWikiServerClassDocumentInitializer.FIELD_DESCRIPTION));
 
             // load the property groups
             try {
@@ -132,6 +132,19 @@ public class DefaultWikiDescriptorBuilder implements WikiDescriptorBuilder
         }
 
         return descriptor;
+    }
+
+    private List<BaseObject> normalizeServerClassObjects(List<BaseObject> serverClassObjects)
+    {
+        // Remove null entries. Nulls can happen due to how the serverClassObjects parameter has been retrieved. If it
+        // was retrieved using the XWikiDocument#getXObjects() then it can have holes in it with null values.
+        List<BaseObject> result = new ArrayList<>();
+        for (BaseObject serverClassObject : serverClassObjects) {
+            if (serverClassObject != null) {
+                result.add(serverClassObject);
+            }
+        }
+        return result;
     }
 
     private DefaultWikiDescriptor extractWikiDescriptor(BaseObject serverClassObject, XWikiDocument document)
